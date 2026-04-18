@@ -1,9 +1,11 @@
 import type { Metadata } from "next";
 import { brand } from "@/config/brand";
+import { CookieBanner } from "@/components/cookie-banner";
+import "./globals.css";
 
 export const metadata: Metadata = {
-  title: brand.name,
-  description: `${brand.name} — suomalainen tietovisa`,
+  title: `${brand.name} — suomalainen tietovisa`,
+  description: `${brand.name} — tänään syntyneet, päivän visa ja tulevat juhlat.`,
 };
 
 export default function RootLayout({
@@ -13,14 +15,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="fi">
-      <body
-        style={{
-          margin: 0,
-          fontFamily:
-            "system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif",
-        }}
-      >
+      <body>
         {children}
+        <CookieBanner />
       </body>
     </html>
   );

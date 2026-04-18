@@ -1,0 +1,16 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+  body {
+    @apply bg-white text-ink antialiased;
+  }
+  /* Avoid zoom on iOS when focusing small inputs */
+  input, select, textarea {
+    font-size: 16px;
+  }
+}
