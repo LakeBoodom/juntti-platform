@@ -10,6 +10,12 @@ export function Nav({ email }: { email?: string | null }) {
             Admin
           </Link>
           <Link
+            href="/quizzes"
+            className="text-sm text-muted-foreground hover:text-foreground"
+          >
+            Visat
+          </Link>
+          <Link
             href="/countdowns"
             className="text-sm text-muted-foreground hover:text-foreground"
           >

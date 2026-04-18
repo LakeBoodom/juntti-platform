@@ -21,6 +21,16 @@ export default async function HomePage() {
 
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           <Link
+            href="/quizzes"
+            className="block rounded-lg border p-4 transition-colors hover:bg-muted/50"
+          >
+            <div className="text-sm text-muted-foreground">Tauluja</div>
+            <div className="text-lg font-medium">Visat</div>
+            <div className="text-xs text-muted-foreground">
+              AI-generointi + muokkaus
+            </div>
+          </Link>
+          <Link
             href="/countdowns"
             className="block rounded-lg border p-4 transition-colors hover:bg-muted/50"
           >
@@ -30,11 +40,6 @@ export default async function HomePage() {
               Merkkipäivät ja juhlat
             </div>
           </Link>
-          <div className="rounded-lg border border-dashed p-4 opacity-60">
-            <div className="text-sm text-muted-foreground">Tulossa</div>
-            <div className="text-lg font-medium">Visat</div>
-            <div className="text-xs text-muted-foreground">AI-generointi</div>
-          </div>
           <div className="rounded-lg border border-dashed p-4 opacity-60">
             <div className="text-sm text-muted-foreground">Tulossa</div>
             <div className="text-lg font-medium">Julkkikset</div>
