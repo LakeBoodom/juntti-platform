@@ -1,8 +1,8 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { Check, X, Share2, RotateCcw } from "lucide-react";
+import { RotateCcw, Share2 } from "lucide-react";
 
 type Quiz = {
   id: string;
@@ -41,68 +41,69 @@ export function QuizPlayer({
   questions: Question[];
 }) {
   const total = questions.length;
-  const [current, setCurrent] = useState(0);
-  const [selected, setSelected] = useState<number | null>(null);
-  const [revealed, setRevealed] = useState(false);
-  const [score, setScore] = useState(0);
-  const [done, setDone] = useState(false);
-  const [logged, setLogged] = useState(false);
-
-  const q = questions[current];
-  const correctIndex = useMemo(
-    () => q?.answers.findIndex((a) => a.is_correct) ?? 0,
-    [q],
+  // picks: questionIndex -> chosenAnswerIndex (null while unanswered)
+  const [picks, setPicks] = useState<(number | null)[]>(
+    () => Array(total).fill(null),
   );
+  const answeredCount = picks.filter((p) => p !== null).length;
+  const score = useMemo(
+    () =>
+      picks.reduce<number>((s, pick, qi) => {
+        if (pick === null) return s;
+        const correct = questions[qi].answers.findIndex((a) => a.is_correct);
+        return s + (pick === correct ? 1 : 0);
+      }, 0),
+    [picks, questions],
+  );
+  const allDone = answeredCount === total;
 
-  function pick(idx: number) {
-    if (revealed) return;
-    setSelected(idx);
-    setRevealed(true);
-    if (idx === correctIndex) setScore((s) => s + 1);
+  function pick(qIdx: number, aIdx: number) {
+    setPicks((prev) => {
+      if (prev[qIdx] !== null) return prev; // lock once answered
+      const next = [...prev];
+      next[qIdx] = aIdx;
+      return next;
+    });
+    // Scroll to next unanswered question after a short beat
+    setTimeout(() => {
+      const nextEl = document.getElementById(`q-${qIdx + 1}`);
+      if (nextEl) {
+        nextEl.scrollIntoView({ behavior: "smooth", block: "start" });
+      } else {
+        const result = document.getElementById("q-result");
+        if (result)
+          result.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    }, 500);
   }
 
-  async function next() {
-    if (current + 1 < total) {
-      setCurrent((c) => c + 1);
-      setSelected(null);
-      setRevealed(false);
-    } else {
-      setDone(true);
-      // Fire-and-forget analytics
-      if (!logged) {
-        setLogged(true);
-        try {
-          fetch("/api/quiz-plays", {
-            method: "POST",
-            headers: { "content-type": "application/json" },
-            body: JSON.stringify({
-              quiz_id: quiz.id,
-              platform: quiz.platform,
-              score: score + (selected === correctIndex ? 0 : 0),
-              total,
-              session_id: getOrCreateSessionId(),
-            }),
-          });
-        } catch {
-          // swallow
-        }
+  // Log the play once when all questions are answered
+  const [logged, setLogged] = useState(false);
+  useEffect(() => {
+    if (allDone && !logged) {
+      setLogged(true);
+      try {
+        fetch("/api/quiz-plays", {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({
+            quiz_id: quiz.id,
+            platform: quiz.platform,
+            score,
+            total,
+            session_id: getOrCreateSessionId(),
+          }),
+        });
+      } catch {
+        // ignored
       }
     }
-  }
-
-  function restart() {
-    setCurrent(0);
-    setSelected(null);
-    setRevealed(false);
-    setScore(0);
-    setDone(false);
-    setLogged(false);
-  }
+  }, [allDone, logged, quiz.id, quiz.platform, score, total]);
 
   async function share() {
     const text = `Sain ${score}/${total} Junttin "${quiz.title}" -visassa`;
     const url = typeof window !== "undefined" ? window.location.href : "";
-    if (navigator.share) {
+    if (typeof navigator !== "undefined" && navigator.share) {
       try {
         await navigator.share({ title: quiz.title, text, url });
         return;
@@ -114,116 +115,114 @@ export function QuizPlayer({
     } catch {}
   }
 
-  if (done) {
-    const percent = Math.round((score / total) * 100);
-    const verdict =
-      percent >= 80
-        ? "Huippu!"
-        : percent >= 60
-          ? "Hyvin meni"
-          : percent >= 40
-            ? "Ihan kelpo"
-            : "Harjoittelua";
-    return (
-      <section className="mt-4 space-y-6">
-        <div className="rounded-2xl bg-ink p-6 text-center text-white">
-          <p className="text-sm uppercase tracking-wide text-white/60">
-            {quiz.title}
-          </p>
-          <p className="mt-4 text-5xl font-extrabold">
-            {score}/{total}
-          </p>
-          <p className="mt-2 text-xl font-semibold text-accent">{verdict}</p>
-        </div>
-
-        <div className="flex gap-2">
-          <button
-            onClick={share}
-            className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-brand px-4 py-3 text-sm font-semibold text-white"
-          >
-            <Share2 className="h-4 w-4" /> Jaa tulos
-          </button>
-          <button
-            onClick={restart}
-            className="flex items-center justify-center gap-2 rounded-xl border border-ink/10 px-4 py-3 text-sm font-semibold text-ink"
-          >
-            <RotateCcw className="h-4 w-4" /> Uudestaan
-          </button>
-        </div>
-
-        <Link
-          href="/"
-          className="block text-center text-sm text-ink-muted underline"
-        >
-          Takaisin etusivulle
-        </Link>
-      </section>
-    );
+  function restart() {
+    setPicks(Array(total).fill(null));
+    setLogged(false);
+    window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
-  return (
-    <section className="mt-4">
-      <div className="mb-4">
-        <p className="text-xs font-semibold uppercase tracking-wider text-ink-muted">
-          {quiz.category} · {quiz.difficulty}
-        </p>
-        <h1 className="mt-0.5 text-2xl font-bold leading-tight">{quiz.title}</h1>
-      </div>
+  const progressPct = (answeredCount / total) * 100;
+  const verdict =
+    score / total >= 0.8
+      ? "🔥 Oikea perussuomalainen"
+      : score / total >= 0.6
+        ? "💪 Hyvin meni"
+        : score / total >= 0.4
+          ? "🙂 Ihan kelpo"
+          : "📚 Harjoittelua";
 
-      <div className="mb-4 h-1.5 w-full rounded-full bg-ink/10">
+  return (
+    <div className="quiz-page">
+      <div className="quiz-head">
+        <div className="quiz-head-eyebrow">
+          {quiz.category} · {quiz.difficulty} · {total} kysymystä
+        </div>
+        <div className="quiz-head-title">
+          {quiz.emoji_hint && <span className="mr-2">{quiz.emoji_hint}</span>}
+          {quiz.title}
+        </div>
+      </div>
+      <div className="quiz-progress">
         <div
-          className="h-full rounded-full bg-brand transition-all"
-          style={{ width: `${((current + (revealed ? 1 : 0)) / total) * 100}%` }}
+          className="quiz-progress-bar"
+          style={{ width: `${progressPct}%` }}
         />
       </div>
 
-      <p className="mb-1 text-xs font-semibold uppercase tracking-wider text-ink-muted">
-        Kysymys {current + 1} / {total}
-      </p>
-      <h2 className="mb-4 text-xl font-semibold leading-snug">
-        {q.question_text}
-      </h2>
+      {questions.map((q, qi) => {
+        const chosen = picks[qi];
+        const correctIdx = q.answers.findIndex((a) => a.is_correct);
+        const revealed = chosen !== null;
+        return (
+          <div key={q.id} id={`q-${qi}`} className="q-item">
+            <div className="q-item-wrap">
+              <div className="q-number">{qi + 1}</div>
+              <div className="q-text">{q.question_text}</div>
+              <div className="q-answers">
+                {q.answers.map((a, ai) => {
+                  let cls = "q-ans";
+                  if (revealed) {
+                    if (ai === correctIdx) cls += " correct";
+                    else if (ai === chosen) cls += " wrong";
+                    else cls += " muted";
+                  }
+                  return (
+                    <button
+                      key={ai}
+                      type="button"
+                      className={cls}
+                      disabled={revealed}
+                      onClick={() => pick(qi, ai)}
+                    >
+                      {a.text}
+                    </button>
+                  );
+                })}
+              </div>
+              {revealed && q.explanation && (
+                <div className="q-explain" style={{ width: "100%" }}>
+                  <div className="q-explain-lbl">Tiesithän että…</div>
+                  <div className="q-explain-txt">{q.explanation}</div>
+                </div>
+              )}
+            </div>
+          </div>
+        );
+      })}
 
-      <div className="space-y-2">
-        {q.answers.map((a, i) => {
-          const isCorrect = i === correctIndex;
-          const isChosen = i === selected;
-          const cls = revealed
-            ? isCorrect
-              ? "border-green-500 bg-green-50 text-green-900"
-              : isChosen
-                ? "border-red-400 bg-red-50 text-red-900"
-                : "border-ink/10 bg-white text-ink-muted"
-            : "border-ink/10 bg-white hover:border-brand active:bg-brand-soft";
-          return (
-            <button
-              key={i}
-              onClick={() => pick(i)}
-              disabled={revealed}
-              className={`flex w-full items-center justify-between rounded-xl border-2 px-4 py-3 text-left text-base transition ${cls}`}
-            >
-              <span>{a.text}</span>
-              {revealed && isCorrect && <Check className="h-5 w-5" />}
-              {revealed && isChosen && !isCorrect && <X className="h-5 w-5" />}
-            </button>
-          );
-        })}
+      <div id="q-result" className="q-result">
+        {allDone ? (
+          <>
+            <div className="q-result-score">
+              {score}
+              <span>/{total}</span>
+            </div>
+            <div className="q-result-title">{verdict}</div>
+            <div className="q-result-sub">
+              {Math.round((score / total) * 100)}% oikein
+            </div>
+            <div className="q-result-actions">
+              <button type="button" onClick={share} className="q-btn">
+                <Share2 style={{ width: 16, height: 16 }} /> Jaa tulos
+              </button>
+              <button
+                type="button"
+                onClick={restart}
+                className="q-btn secondary"
+              >
+                <RotateCcw style={{ width: 16, height: 16 }} /> Uudestaan
+              </button>
+              <Link href="/" className="q-btn secondary">
+                Takaisin etusivulle
+              </Link>
+            </div>
+          </>
+        ) : (
+          <div style={{ opacity: 0.7, fontSize: 13 }}>
+            Vastaa kysymyksiin yllä ({answeredCount}/{total} valmiina)
+          </div>
+        )}
       </div>
-
-      {revealed && q.explanation && (
-        <p className="mt-4 rounded-xl bg-ink/5 p-3 text-sm text-ink-muted">
-          <strong className="text-ink">Selitys.</strong> {q.explanation}
-        </p>
-      )}
-
-      {revealed && (
-        <button
-          onClick={next}
-          className="mt-6 w-full rounded-xl bg-ink px-4 py-3 text-base font-semibold text-white"
-        >
-          {current + 1 < total ? "Seuraava kysymys →" : "Näytä tulos"}
-        </button>
-      )}
-    </section>
+    </div>
   );
 }

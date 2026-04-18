@@ -6,9 +6,12 @@ import {
   getUpcomingCountdowns,
   getStats,
   loadQuizWithFirstQuestion,
+  getRandomQuizPool,
 } from "@/lib/queries";
 import { countdownEmoji, roleEmoji } from "@/lib/icons";
 import { ShareRow, ShareRowCompact } from "@/components/share-buttons";
+import { AdPlaceholder } from "@/components/ad-placeholder";
+import { MoreQuizzes } from "@/components/more-quizzes";
 
 export const dynamic = "force-dynamic";
 
@@ -39,25 +42,28 @@ function daysLabel(n: number): string {
 
 export default async function HomePage() {
   const platform = brand.key;
-  const [birthdays, countdowns, featured, stats] = await Promise.all([
+  const [birthdays, countdowns, stats] = await Promise.all([
     getBirthdaysToday(platform),
     getUpcomingCountdowns(platform, 8),
-    getFeaturedQuiz(platform),
     getStats(platform),
   ]);
 
+  // Quizzes surfaced elsewhere on the page — exclude from random slots.
+  const bdayQuizIds = birthdays
+    .map((b) => b.trivia_quiz_id)
+    .filter((x): x is string => !!x);
+
+  const featured = await getFeaturedQuiz(platform, bdayQuizIds);
   const featuredFull = featured
     ? await loadQuizWithFirstQuestion(featured.id)
     : null;
 
-  // Birthday featured quiz — first celebrity today that has a quiz.
   const bdayWithQuiz = birthdays.find((b) => b.trivia_quiz_id);
   const bdayFeatured =
     bdayWithQuiz && bdayWithQuiz.trivia_quiz_id
       ? await loadQuizWithFirstQuestion(bdayWithQuiz.trivia_quiz_id)
       : null;
 
-  // Closest countdown that has a linked quiz.
   const nearestWithQuiz = countdowns.find((c) => c.trivia_quiz_id);
   const countdownFeatured =
     nearestWithQuiz && nearestWithQuiz.trivia_quiz_id
@@ -65,6 +71,14 @@ export default async function HomePage() {
       : null;
 
   const topBirthday = birthdays[0];
+
+  // "Haluatko pelata lisää?" pool — exclude everything already on the page.
+  const excludeFromPool = [
+    featured?.id,
+    bdayFeatured?.id,
+    countdownFeatured?.id,
+  ].filter((x): x is string => !!x);
+  const pool = await getRandomQuizPool(platform, excludeFromPool, 15);
 
   return (
     <>
@@ -157,6 +171,9 @@ export default async function HomePage() {
         </div>
       )}
 
+      {/* AD 1 — päivän visan jälkeen */}
+      <AdPlaceholder />
+
       {/* SYNTTÄRIT */}
       {birthdays.length > 0 && (
         <div className="section">
@@ -234,6 +251,19 @@ export default async function HomePage() {
         </div>
       )}
 
+      {/* MID HERO — toinen henkilökuva sivun keskellä */}
+      <div className="mid-hero">
+        <div className="mid-hero-bg"></div>
+        <div className="mid-hero-text">
+          <div className="mid-hero-eyebrow">Pysy kyydissä</div>
+          <div className="mid-hero-title">
+            JUNTTI ON <em>SINUN.</em>
+          </div>
+        </div>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img className="mid-hero-img" src="/hosts/hero-2.png" alt="" />
+      </div>
+
       {/* COUNTDOWNS */}
       {countdowns.length > 0 && (
         <div className="section">
@@ -241,8 +271,8 @@ export default async function HomePage() {
 
           <div className="countdown-section">
             <div className="countdown-scroll">
-              {countdowns.map((c) => (
-                <div key={c.id} className="cobj">
+              {countdowns.map((c, i) => (
+                <div key={c.id} className={i === 0 ? "cobj first" : "cobj"}>
                   <div className="cobj-icon">{countdownEmoji(c.object_type)}</div>
                   <div className="cobj-days">{daysLabel(c.days_until)}</div>
                   <div className="cobj-lbl">{c.name}</div>
@@ -296,7 +326,11 @@ export default async function HomePage() {
         </div>
       )}
 
-      {/* MURRESANA — hidden until murresanat CRUD is populated */}
+      {/* HALUATKO PELATA LISÄÄ */}
+      <MoreQuizzes pool={pool} />
+
+      {/* AD 2 — viimeinen */}
+      <AdPlaceholder />
 
       <div className="spacer"></div>
 

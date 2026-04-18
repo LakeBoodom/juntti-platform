@@ -121,19 +121,47 @@ export async function getUpcomingCountdowns(
     return Math.round((target - ref) / (24 * 60 * 60 * 1000));
   }
 
-  return data
+  const enriched = data
     .map((c) => ({ ...c, days_until: daysUntil(c.month, c.day) }))
     .sort((a, b) => a.days_until - b.days_until)
     .slice(0, limit);
+
+  // Fuzzy-match countdowns → published quizzes by name/slug for rows that
+  // don't have an explicit trivia_quiz_id. One query, in-memory match.
+  const unlinked = enriched.filter((c) => !c.trivia_quiz_id);
+  if (unlinked.length > 0) {
+    const { data: published } = await sb
+      .from("quizzes")
+      .select("id, title, slug, platform, status")
+      .eq("status", "published")
+      .in("platform", platformFilter(platform));
+    if (published?.length) {
+      for (const c of enriched) {
+        if (c.trivia_quiz_id) continue;
+        const nameLc = c.name.toLowerCase();
+        const slugLc = c.slug.toLowerCase();
+        const match = published.find(
+          (q) =>
+            q.title.toLowerCase().includes(nameLc) ||
+            q.slug.toLowerCase().includes(slugLc),
+        );
+        if (match) c.trivia_quiz_id = match.id;
+      }
+    }
+  }
+
+  return enriched;
 }
 
 export async function getFeaturedQuiz(
   platform = "juntti",
+  excludeQuizIds: string[] = [],
 ): Promise<QuizSummary | null> {
   const sb = getPublicSupabase();
   const today = todayUtcIso();
 
-  // 1. daily_schedule override
+  // 1. daily_schedule override (honored even if in excludeQuizIds; explicit
+  //    scheduling wins over any dedup rule)
   const { data: scheduled } = await sb
     .from("daily_schedule")
     .select("quiz_id")
@@ -145,15 +173,9 @@ export async function getFeaturedQuiz(
     if (quiz) return quiz;
   }
 
-  // 2. today's birthday celebrity
-  const birthdays = await getBirthdaysToday(platform);
-  const bd = birthdays.find((b) => b.trivia_quiz_id);
-  if (bd?.trivia_quiz_id) {
-    const quiz = await loadQuiz(bd.trivia_quiz_id);
-    if (quiz) return quiz;
-  }
-
-  // 3. random published
+  // 2. random published, excluding birthday quizzes (shown elsewhere) and
+  //    any other excluded ids. The bday quiz gets its own section, so
+  //    Päivän visa should always be a different quiz.
   const { data: candidates } = await sb
     .from("quizzes")
     .select(
@@ -161,11 +183,46 @@ export async function getFeaturedQuiz(
     )
     .eq("status", "published")
     .in("platform", platformFilter(platform))
-    .limit(40);
-  if (!candidates?.length) return null;
-  const pick = candidates[Math.floor(Math.random() * candidates.length)];
+    .limit(100);
+  const filtered =
+    candidates?.filter((c) => !excludeQuizIds.includes(c.id)) ?? [];
+  if (!filtered.length) return null;
+  const pick = filtered[Math.floor(Math.random() * filtered.length)];
   const count = await countQuestions(pick.id);
   return { ...pick, question_count: count };
+}
+
+// Pool of random published quizzes for the 'Haluatko pelata vielä lisää?'
+// section. Excludes anything already shown on the homepage.
+export async function getRandomQuizPool(
+  platform = "juntti",
+  excludeIds: string[] = [],
+  size = 10,
+): Promise<QuizSummary[]> {
+  const sb = getPublicSupabase();
+  const { data } = await sb
+    .from("quizzes")
+    .select(
+      "id, title, description, slug, category, difficulty, emoji_hint, platform",
+    )
+    .eq("status", "published")
+    .in("platform", platformFilter(platform))
+    .limit(100);
+  if (!data?.length) return [];
+  const filtered = data.filter((q) => !excludeIds.includes(q.id));
+  // Fisher-Yates shuffle
+  for (let i = filtered.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [filtered[i], filtered[j]] = [filtered[j], filtered[i]];
+  }
+  const picked = filtered.slice(0, size);
+  // Fill question_count for each
+  const results: QuizSummary[] = [];
+  for (const q of picked) {
+    const count = await countQuestions(q.id);
+    results.push({ ...q, question_count: count });
+  }
+  return results;
 }
 
 async function loadQuiz(id: string): Promise<QuizSummary | null> {
