@@ -18,12 +18,22 @@ const AUDIENCE_GUIDE: Record<string, string> = {
 export function buildQuizSystemPrompt() {
   return `Olet suomalainen tietovisa-asiantuntija. Kirjoitat kysymyksiä sujuvalla, luonnollisella suomen kielellä — ei käännöskieltä, ei kömpelöä fraasia. Tarkkuus on ehdoton: jos et ole varma vastauksesta, älä esitä kysymystä. Kaikki kysymykset on faktoiltaan pitäviä 2026-aprilin tiedon mukaan.
 
-Säännöt jokaiselle kysymykselle:
+**Tuota TASAN pyydetty määrä kysymyksiä** — ei vähemmän, ei enempää. Jos pyydettiin 10, palauta 10.
+
+**Työjärjestys jokaiselle kysymykselle:**
+1. Päätä ensin aihe ja tarkka oikea vastaus (esim. "1995").
+2. Kirjoita kysymys joka ohjaa tähän vastaukseen selvästi.
+3. Valitse oikea vastausvaihtoehto joka vastaa tätä — merkitse is_correct: true.
+4. Kirjoita 3 uskottavaa mutta väärää vastausvaihtoehtoa — kaikki is_correct: false.
+5. Kirjoita selitys ikään kuin kirjoittaisit lopullista ensyklopediatekstiä.
+
+**Säännöt:**
 - Kysymys on yhdellä lauseella, korkeintaan 160 merkkiä.
-- Tasan 4 vastausvaihtoehtoa.
-- **TÄSMÄLLEEN YKSI vastauksista on \`is_correct: true\`.** Tämä on ehdoton — kaikki muut kolme ovat \`is_correct: false\`. Älä koskaan jätä kaikkia vastauksia \`false\`-tilaan, älä koskaan merkitse useampaa kuin yhtä oikeaksi.
+- Tasan 4 vastausvaihtoehtoa, tasan 1 oikein.
 - Vääristä vastauksista ei saa olla ilmeisen hölmöjä — ne ovat uskottavia, samaa aihepiiriä.
-- Jokaiselle kysymykselle lyhyt (1–2 lausetta) selitys miksi oikea on oikea.
+- Selitys on 1–2 siistiä lausetta lopullisena faktana. **Älä koskaan paljasta ajatteluprosessia selityksessä** — ei sanoja kuten "hetkinen", "odota", "korjaus", "ei vaan", "toisin sanoen", "itse asiassa". Selitys lukee kuin tietosanakirjan lyhyt kuvaus, ei kuin kirjoittaja miettisi ääneen.
+- Jos huomaat kesken kirjoittamisen että vastausmerkintä oli väärin, **käynnistä sama kysymys alusta** — korjaa is_correct-flagi oikealle vastaukselle ennen kuin viimeistelet selityksen. Älä jätä ristiriitaa merkinnän ja selityksen väliin.
+- Rajatapausaiheissa (esim. vuosikymmen-rajat) valitse selvä esimerkki — jos 1995-luku voisi olla sekä 1990- että 2000-luku riippuen tulkinnasta, **vaihda koko kysymys** aiheeseen joka ei ole rajatapaus.
 - Ei päivämäärä-tarkkuutta ("tarkalleen 15. elokuuta 2003") ellei se ole kysymyksen pointti — suuntaa antavat vuosiluvut ovat parempia.
 
 Älä liitä tekstiin johdantoja ("Tässä on visa…"), yhteenvetoja, metakommentteja tai emoji-ketjuja. Vastaa vain pyydetyllä työkalulla (tool use).`;
@@ -46,51 +56,54 @@ Palauta tulos \`submit_quiz\`-työkalulla.`;
 }
 
 // Input schema for Claude's tool use — Anthropic will only return this shape.
-export const quizToolSchema = {
-  name: "submit_quiz",
-  description:
-    "Palauttaa valmiin visan rakenteisessa muodossa. Kutsu tätä kun kysymykset on valmiita.",
-  input_schema: {
-    type: "object" as const,
-    required: ["title", "description", "slug", "emoji_hint", "questions"],
-    properties: {
-      title: {
-        type: "string",
-        description: "Visan otsikko, korkeintaan 60 merkkiä",
-      },
-      description: {
-        type: "string",
-        description: "1–2 lauseen kuvaus mitä visassa kysytään",
-      },
-      slug: {
-        type: "string",
-        description: "ASCII-slug viivalla eroteltuna, vain a-z 0-9 ja -",
-        pattern: "^[a-z0-9-]+$",
-      },
-      emoji_hint: {
-        type: "string",
-        description: "Yksittäinen emoji tai lyhyt ikoni-vihje",
-      },
-      questions: {
-        type: "array",
-        minItems: 3,
-        maxItems: 15,
-        items: {
-          type: "object",
-          required: ["question_text", "answers", "explanation"],
-          properties: {
-            question_text: { type: "string" },
-            explanation: { type: "string" },
-            answers: {
-              type: "array",
-              minItems: 4,
-              maxItems: 4,
-              items: {
-                type: "object",
-                required: ["text", "is_correct"],
-                properties: {
-                  text: { type: "string" },
-                  is_correct: { type: "boolean" },
+// Factory so we can pin minItems/maxItems to the exact requested count.
+export function quizToolSchema(requestedCount: number) {
+  return {
+    name: "submit_quiz",
+    description:
+      "Palauttaa valmiin visan rakenteisessa muodossa. Kutsu tätä kun kysymykset on valmiita.",
+    input_schema: {
+      type: "object" as const,
+      required: ["title", "description", "slug", "emoji_hint", "questions"],
+      properties: {
+        title: {
+          type: "string",
+          description: "Visan otsikko, korkeintaan 60 merkkiä",
+        },
+        description: {
+          type: "string",
+          description: "1–2 lauseen kuvaus mitä visassa kysytään",
+        },
+        slug: {
+          type: "string",
+          description: "ASCII-slug viivalla eroteltuna, vain a-z 0-9 ja -",
+          pattern: "^[a-z0-9-]+$",
+        },
+        emoji_hint: {
+          type: "string",
+          description: "Yksittäinen emoji tai lyhyt ikoni-vihje",
+        },
+        questions: {
+          type: "array",
+          minItems: requestedCount,
+          maxItems: requestedCount,
+          items: {
+            type: "object",
+            required: ["question_text", "answers", "explanation"],
+            properties: {
+              question_text: { type: "string" },
+              explanation: { type: "string" },
+              answers: {
+                type: "array",
+                minItems: 4,
+                maxItems: 4,
+                items: {
+                  type: "object",
+                  required: ["text", "is_correct"],
+                  properties: {
+                    text: { type: "string" },
+                    is_correct: { type: "boolean" },
+                  },
                 },
               },
             },
@@ -98,5 +111,5 @@ export const quizToolSchema = {
         },
       },
     },
-  },
-};
+  };
+}

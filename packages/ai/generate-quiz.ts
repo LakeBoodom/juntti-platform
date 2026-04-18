@@ -16,18 +16,31 @@ export async function generateQuiz(
 
   const anthropic = getAnthropic();
 
-  const resp = await anthropic.messages.create({
-    model: MODEL,
-    max_tokens: 4096,
-    system: buildQuizSystemPrompt(),
-    tools: [quizToolSchema as any],
-    tool_choice: { type: "tool", name: "submit_quiz" },
-    messages: [{ role: "user", content: buildQuizUserPrompt(clamped) }],
-  });
+  async function callOnce() {
+    // 8192 tokens fits 15 Finnish questions + explanations comfortably.
+    const resp = await anthropic.messages.create({
+      model: MODEL,
+      max_tokens: 8192,
+      system: buildQuizSystemPrompt(),
+      tools: [quizToolSchema(clamped.questionCount) as any],
+      tool_choice: { type: "tool", name: "submit_quiz" },
+      messages: [{ role: "user", content: buildQuizUserPrompt(clamped) }],
+    });
+    return resp.content.find((b: any) => b.type === "tool_use") as
+      | { type: "tool_use"; name: string; input: GeneratedQuiz }
+      | undefined;
+  }
 
-  const toolUse = resp.content.find((b: any) => b.type === "tool_use") as
-    | { type: "tool_use"; name: string; input: GeneratedQuiz }
-    | undefined;
+  let toolUse = await callOnce();
+  // If the first call returned fewer than 60% of requested questions,
+  // retry once — usually token pressure eased up.
+  const minAcceptable = Math.ceil(clamped.questionCount * 0.6);
+  if (toolUse && toolUse.input.questions.length < minAcceptable) {
+    const retry = await callOnce();
+    if (retry && retry.input.questions.length > toolUse.input.questions.length) {
+      toolUse = retry;
+    }
+  }
   if (!toolUse) {
     throw new Error(
       "Claude did not return a tool_use block — check prompt + model",
