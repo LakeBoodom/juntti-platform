@@ -29,7 +29,7 @@ export function getSupabaseServer(cookieStore: {
     {
       cookies: {
         getAll: () => cookieStore.getAll(),
-        setAll: (cookies) => {
+        setAll: (cookies: { name: string; value: string; options?: any }[]) => {
           try {
             cookies.forEach(({ name, value, options }) =>
               cookieStore.set?.(name, value, options)
