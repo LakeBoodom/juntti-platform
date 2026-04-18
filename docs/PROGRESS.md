@@ -9,7 +9,7 @@
 |---|---|---|
 | 0 | Infra setup (GitHub, Supabase, Anthropic, Vercel) | ✅ Complete |
 | 1 | DB schema + seed | ✅ Complete |
-| 2 | Admin tool (Next.js) | 🟡 Scaffold + auth + Countdowns CRUD done; AI quiz gen + celebrity + murresana next |
+| 2 | Admin tool (Next.js) | 🟡 Scaffold + auth + Countdowns CRUD + AI quiz generator done; celebrity + murresana + daily schedule next |
 | 3 | Initial content (~50 quizzes, 365 murresanat, ~200 celebrities) | ⬜ |
 | 4 | juntti.com frontend (copy `juntti_mobile_v2.html` 1:1) | ⬜ |
 | 5 | Cron jobs + production launch | ⬜ |
@@ -87,16 +87,31 @@ schedule content. Live at https://juntti-admin.vercel.app.
 - **Supabase auth URLs**: Site URL → `https://juntti-admin.vercel.app`,
   Redirect URLs → `https://juntti-admin.vercel.app/**` + `http://localhost:3001/**`.
 
+### ✅ Done 2026-04-18 (session 2)
+
+- **`packages/ai`** — `@juntti/ai` workspace. `getAnthropic()` singleton (server-
+  only), `generateQuiz(input)` calls `claude-sonnet-4-6` via Anthropic SDK with
+  a `submit_quiz` tool schema that enforces exactly 4 answers per question, 1
+  correct, slug pattern, and minItems/maxItems for questions. System prompt
+  defines Finnish voice + tone guide + platform-specific audience notes.
+- **`/quizzes` list** — all drafts/published, newest first, status chip.
+- **`/quizzes/new` generator** — chip selectors (category, difficulty, count,
+  tone, platform) + free-text topic. Server action `generateAndSaveDraft()`
+  calls AI, inserts `quizzes` + `questions` transactionally via service_role,
+  redirects to detail. Slug collision auto-resolves with `-<timestamp>` suffix.
+- **`/quizzes/[id]` detail** — inline edit of title/description via `MetaEditor`,
+  per-question card with edit toggle (question text, 4 answers with radio for
+  correct, explanation). `QuizActionsBar` has Publish / unpublish / Delete
+  with confirm dialog. FK cascade deletes questions.
+- **ANTHROPIC_API_KEY** set in both `juntti` + `juntti-admin` Vercel envs.
+
 ### ⬜ Remaining Phase 2 scope
 
-- `packages/ai` Claude wrapper (model `claude-sonnet-4-6`, prompts from
-  yet-to-be-written `docs/CONTENT_PIPELINE.md`)
-- "Luo AI:llä" view — chip selectors for category / difficulty / count / tone,
-  free-text topic, "Generoi visa" button, streaming preview, inline edit,
-  fact-check flag, save draft / schedule / publish
 - Celebrity admin — add person, auto-generate 5-question trivia
 - Murresana batch — generate 365 at once, review, save
 - Daily schedule calendar — visual view of scheduled quizzes per date
+- Regenerate-single-question button (nice-to-have, skipped for v1)
+- Fact-check flag / confidence score (nice-to-have, skipped for v1)
 
 ### Watch-outs carried from this session
 
