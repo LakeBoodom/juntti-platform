@@ -1,7 +1,7 @@
 # Progress Report — Juntti Platform
 
-**Last updated:** 2026-04-18
-**Current phase:** Vaihe 2 (admin tool) in progress — scaffold + countdowns CRUD live.
+**Last updated:** 2026-04-18 (illalla)
+**Current phase:** Phase 4 live — homepage + scroll-based quiz player shipped. Heikki building content; next technical step is Murresanat CRUD + social share integration.
 
 ## Build phases
 
@@ -9,10 +9,10 @@
 |---|---|---|
 | 0 | Infra setup (GitHub, Supabase, Anthropic, Vercel) | ✅ Complete |
 | 1 | DB schema + seed | ✅ Complete |
-| 2 | Admin tool (Next.js) | 🟡 Scaffold + auth + Countdowns CRUD + AI quiz generator done; celebrity + murresana + daily schedule next |
-| 3 | Initial content (~50 quizzes, 365 murresanat, ~200 celebrities) | ⬜ |
-| 4 | juntti.com frontend (copy `juntti_mobile_v2.html` 1:1) | ⬜ |
-| 5 | Cron jobs + production launch | ⬜ |
+| 2 | Admin tool (Next.js) | 🟡 Countdowns + AI quiz gen + Celebrities (w/ Wikipedia grounding) + Päivän ohjelma live. Murresanat CRUD + manual quiz creation remaining. |
+| 3 | Initial content — Heikki authoring | 🟡 In progress — 19 julkkista + 17 julkaistua visaa + 7 countdownia + 1 daily_schedule setup |
+| 4 | juntti.com frontend | ✅ Homepage + play page shipped to juntti.vercel.app, matches juntti_mobile_v1.html mockup 1:1. Social share + AdSense as placeholders. |
+| 5 | Social integrations + cron jobs + launch | ⬜ Next — FB/WA share wiring, AdSense, domain DNS, sitemap |
 
 ---
 
@@ -105,13 +105,42 @@ schedule content. Live at https://juntti-admin.vercel.app.
   with confirm dialog. FK cascade deletes questions.
 - **ANTHROPIC_API_KEY** set in both `juntti` + `juntti-admin` Vercel envs.
 
+### ✅ Done 2026-04-18 (session 3)
+
+- **Celebrities CRUD + Wikipedia import** (`/celebrities` admin): form with
+  three-field day/month/year inputs, Wikipedia URL paste auto-fills name
+  + bio + image via MediaWiki API (`/rest_v1/page/summary/{slug}`), thumbnail
+  preview in the list. Per-row 'Luo visa' button generates a quiz tightly
+  scoped to that celebrity.
+- **Wikipedia grounding for AI**: `celebrities.wikipedia_url` column stores
+  the source URL. When generating quizzes (both per-celebrity and general
+  `/quizzes/new`), `fetchWikipediaArticle` pulls the full plain-text extract
+  (action=query, explaintext=1) and passes it to Claude as `sourceContext`.
+  System prompt was updated: "source material overrides internal knowledge,
+  don't fabricate outside it". Drops hallucination rate markedly on narrow
+  scopes.
+- **Päivän ohjelma** (`/schedule`): range-based scheduler. Pick platform +
+  start/end date + published quiz, upsert rows into `daily_schedule`
+  `(platform, date)` unique key. 'Tyhjennä ajanjakso' clears a range.
+  Only published quizzes appear in the selector. Range cap 365 days as
+  safety.
+- **General quiz generator hardenings**: auto-correct Claude answer slips
+  (no correct flagged / multiple flagged → first stays), defensive parse
+  of partial tool_use blocks, `max_tokens` 8192, minItems=maxItems pinned
+  to requested count, retry once if <60% of requested returned, stronger
+  Finnish prompt rules.
+
 ### ⬜ Remaining Phase 2 scope
 
-- Celebrity admin — add person, auto-generate 5-question trivia
-- Murresana batch — generate 365 at once, review, save
-- Daily schedule calendar — visual view of scheduled quizzes per date
-- Regenerate-single-question button (nice-to-have, skipped for v1)
-- Fact-check flag / confidence score (nice-to-have, skipped for v1)
+- **Murresanat CRUD + AI batch** — table is there, admin UI still to come.
+  Flow: Heikki types a starter word or topic, AI generates N murresanat
+  rows with definition/example, Heikki reviews + saves. Shown on /
+  homepage when data exists.
+- **Manual quiz authoring** — Heikki requested this earlier. Requires:
+  'Luo tyhjästä' button on `/quizzes/new` → creates empty draft →
+  redirects to detail where 'Lisää kysymys' appends questions.
+- Regenerate-single-question button (nice-to-have, skipped for v1).
+- Fact-check flag / confidence score (nice-to-have, skipped for v1).
 
 ### Watch-outs carried from this session
 
@@ -134,6 +163,84 @@ schedule content. Live at https://juntti-admin.vercel.app.
 2. Start `packages/ai` scaffold (ANTHROPIC_API_KEY already in juntti app env
    — mirror to juntti-admin, or set ANTHROPIC_API_KEY in juntti-admin env).
 3. Design the `quizzes` + `questions` draft → publish flow.
+
+---
+
+## Phase 4 — juntti.com frontend (shipped 2026-04-18)
+
+Live: https://juntti.vercel.app
+
+### Stack
+
+- Next.js 15 App Router + React 19 in `apps/juntti/`
+- Tailwind 3 + custom globals.css copied verbatim from `juntti_mobile_v1.html`
+  mockup. Class names preserved so mockup iterations diff cleanly.
+- Fonts from Google: Roboto Condensed 700/900, Nunito 400/700/800/900,
+  Caveat 600/700.
+- Public Supabase anon key client only. RLS enforces access.
+
+### Pages
+
+- `/` — homepage. Sections in order: nav → hero (with speech bubble,
+  centered top, stage lights) → intro "TESTAA TIETOSI" → live ticker
+  (players + latest quiz + top birthday) → Päivän visa → AdSense #1 →
+  Synttärit tänään + synttärisankarin trivia → mid-hero (second couple
+  photo) → Montako päivää (horizontal scroll, first countdown sized up) +
+  countdown trivia → Haluatko pelata lisää (client shuffle over random
+  pool of 15) → AdSense #2 → bottom nav.
+- `/visa/[slug]` — scroll-based quiz player (10kysymysta.fi pattern):
+  all questions stacked on red bg, tap locks + smooth-scrolls to next,
+  explanation unrolls in place. Result at bottom: score + verdict +
+  share + restart + home.
+- `/tietosuoja`, `/yhteys` — minimal pages linked from footer.
+- `/api/quiz-plays` — anonymous POST endpoint, inserts one row per
+  completed play.
+
+### Data flow (homepage)
+
+Featured quiz priority: `daily_schedule(platform, today)` → random
+published (excluding today's birthday quizzes).
+Today's birthday celebrities via client-side MM-DD filter (Postgres LIKE
+doesn't work on DATE columns).
+Countdowns with no explicit `trivia_quiz_id` fuzzy-matched to published
+quizzes by title/slug containment in a single follow-up query.
+
+### Key decisions
+
+- **No scheduling override for AdSense**: placeholders live after Päivän
+  visa and at the end (before bottom nav). Never before header.
+- **Social share = placeholders** (alert) until Phase 5. UI slot is
+  reserved per mockup.
+- **Hero images**: `/public/hosts/hero.png` (top) and `hero-2.png`
+  (mid). Swap by overwriting the files. Black background + mix-blend-
+  mode lighten.
+- **Quiz play page** background is red `#C8120A` (nav color), answers
+  are white pills — matches the 10kysymysta.fi pattern Heikki
+  referenced.
+- **Source of truth for mockup**: `~/Downloads/juntti_mobile_v1.html`
+  on Heikki's laptop. Not in repo because it's a working scratch file;
+  CLAUDE.md originally called it `juntti_mobile_v2.html` — same file,
+  renamed at some point.
+
+---
+
+## Phase 5 — pending (to do after current content push)
+
+- **Social share real**: Facebook, WhatsApp, X, Messenger. Open Graph
+  meta tags per quiz (title, description, og:image). `/api/og` endpoint
+  for dynamic OG images that embed the quiz title + brand mascot.
+- **AdSense activation**: apply for account, replace `<AdPlaceholder/>`
+  innards with `<ins>` tags once approved.
+- **Cron jobs**: Vercel cron to pick a "päivän visa" into `daily_schedule`
+  automatically if no row exists for tomorrow. Optional nightly task
+  to refresh Wikipedia extracts for celebrities whose quizzes were
+  flagged for revision.
+- **Domain DNS** for juntti.com + tietovisa.fi.
+- **Sitemap + robots**: generate from published quizzes + celebrities
+  (for SEO).
+- **Tietovisa.fi** second-brand build: same codebase, different env
+  vars (NEXT_PUBLIC_SITE_NAME, SITE_URL, BRAND_KEY), new Vercel project,
+  alternate host photos if desired.
 
 ---
 
