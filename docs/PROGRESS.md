@@ -23,8 +23,7 @@
 - **GitHub repo**: `github.com/LakeBoodom/juntti-platform` (public, under user `LakeBoodom`)
 - **Supabase project**: `juntti-platform` (ID `pkfsdzqwfxqczirjddue`, eu-north-1 / Stockholm)
 - **Supabase URL + anon key**: in `.env.local` and Vercel env
-- **Supabase service_role key**: created as `juntti-platform-service-role`, in `.env.local` and Vercel env
-  - ⚠️ Exposed in chat + a one-off browser fetch during verification — **rotate at start of Phase 2**
+- **Supabase service_role key**: `juntti_platform_service_role_v2` (prefix `sb_secret_QFETe`), in `.env.local` and Vercel env. Previous key (`l-UyV...`) disabled + deleted 2026-04-18.
 - **Anthropic API key**: created as `juntti-platform`, in `.env.local`
 - **`uplause-feedback` Supabase project paused** to free up Heikki's 2-project slot
 - **Monorepo skeleton pushed**: `apps/`, `packages/`, `admin/`, `supabase/` folders
