@@ -33,6 +33,7 @@ const CATEGORIES = [
 
 export function GeneratorForm() {
   const [topic, setTopic] = useState("");
+  const [wikipediaUrl, setWikipediaUrl] = useState("");
   const [category, setCategory] = useState<string>("yleistieto");
   const [difficulty, setDifficulty] = useState<"helppo" | "keski" | "vaikea">(
     "keski",
@@ -57,6 +58,7 @@ export function GeneratorForm() {
       questionCount,
       tone,
       platform,
+      wikipediaUrl: wikipediaUrl.trim() || undefined,
     };
     startTransition(async () => {
       const res = await generateAndSaveDraft(input);
@@ -79,6 +81,23 @@ export function GeneratorForm() {
         />
         <p className="text-xs text-muted-foreground">
           Vapaatekstinen aihe — voi olla laaja tai hyvin spesifi.
+        </p>
+      </div>
+
+      <div className="space-y-1.5 rounded-md border bg-muted/30 p-3">
+        <Label htmlFor="wiki">Wikipedia-lähde (vapaaehtoinen, suositus)</Label>
+        <Input
+          id="wiki"
+          type="url"
+          value={wikipediaUrl}
+          onChange={(e) => setWikipediaUrl(e.target.value)}
+          placeholder="https://fi.wikipedia.org/wiki/…"
+          disabled={pending}
+        />
+        <p className="text-xs text-muted-foreground">
+          Jos annat URL:n, AI käyttää vain tätä artikkelia lähteenä. Tämä
+          pudottaa hallusinaatioita radikaalisti — suositeltu aina kun aiheelle
+          löytyy sopiva Wikipedia-sivu.
         </p>
       </div>
 

@@ -4,13 +4,34 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { generateQuiz, type GenerateQuizInput } from "@juntti/ai";
 import { getSupabaseAdmin } from "@juntti/db";
+import { fetchWikipediaArticle } from "@/app/celebrities/wikipedia-actions";
 
-export type GenerateAndSaveInput = GenerateQuizInput;
+export type GenerateAndSaveInput = GenerateQuizInput & {
+  wikipediaUrl?: string;
+};
 
 export async function generateAndSaveDraft(input: GenerateAndSaveInput) {
+  // If a Wikipedia URL is given, pull the article text and ground the
+  // AI call on it — same pattern as celebrity quizzes.
+  let sourceContext = input.sourceContext;
+  let sourceLabel = input.sourceLabel;
+  if (!sourceContext && input.wikipediaUrl) {
+    const article = await fetchWikipediaArticle(input.wikipediaUrl);
+    if (article) {
+      sourceContext = article;
+      sourceLabel = `Wikipedia: ${input.topic}`;
+    } else {
+      return {
+        ok: false as const,
+        error:
+          "Wikipedia-artikkelia ei saatu haettua. Tarkista URL tai jätä kenttä tyhjäksi.",
+      };
+    }
+  }
+
   let quiz;
   try {
-    quiz = await generateQuiz(input);
+    quiz = await generateQuiz({ ...input, sourceContext, sourceLabel });
   } catch (err: any) {
     return { ok: false as const, error: err?.message ?? "AI-kutsu epäonnistui" };
   }
