@@ -27,6 +27,12 @@ export function Nav({ email }: { email?: string | null }) {
           >
             Countdownit
           </Link>
+          <Link
+            href="/schedule"
+            className="text-sm text-muted-foreground hover:text-foreground"
+          >
+            Päivän ohjelma
+          </Link>
         </div>
         <div className="flex items-center gap-3">
           {email && (

@@ -50,6 +50,16 @@ export default async function HomePage() {
               Synttärisankarit + AI-visat
             </div>
           </Link>
+          <Link
+            href="/schedule"
+            className="block rounded-lg border p-4 transition-colors hover:bg-muted/50"
+          >
+            <div className="text-sm text-muted-foreground">Ajastus</div>
+            <div className="text-lg font-medium">Päivän ohjelma</div>
+            <div className="text-xs text-muted-foreground">
+              Aseta visa ajanjaksolle
+            </div>
+          </Link>
         </div>
       </main>
     </>
