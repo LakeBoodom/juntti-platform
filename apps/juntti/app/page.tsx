@@ -4,73 +4,338 @@ import {
   getBirthdaysToday,
   getFeaturedQuiz,
   getUpcomingCountdowns,
+  getStats,
+  loadQuizWithFirstQuestion,
 } from "@/lib/queries";
-import { BirthdayCard } from "@/components/birthday-card";
-import { CountdownList } from "@/components/countdown-list";
-import { QuizCta } from "@/components/quiz-cta";
+import { countdownEmoji, roleEmoji } from "@/lib/icons";
+import { ShareRow, ShareRowCompact } from "@/components/share-buttons";
 
-// Always render fresh — admin changes (publish, schedule, new celebrity)
-// need to appear immediately, not after a 15-minute cache window.
 export const dynamic = "force-dynamic";
 
-export default async function HomePage() {
-  const platform = brand.key;
-  const [birthdays, countdowns, featured] = await Promise.all([
-    getBirthdaysToday(platform),
-    getUpcomingCountdowns(platform, 4),
-    getFeaturedQuiz(platform),
-  ]);
+const LETTERS = ["A", "B", "C", "D"];
 
-  const dateLine = new Intl.DateTimeFormat("fi-FI", {
-    weekday: "long",
+function formatFiDate(): string {
+  return new Intl.DateTimeFormat("fi-FI", {
+    day: "numeric",
+    month: "numeric",
+    year: "numeric",
+  })
+    .format(new Date())
+    .replace(/\s/g, "");
+}
+
+function formatFiLongDay(): string {
+  return new Intl.DateTimeFormat("fi-FI", {
     day: "numeric",
     month: "long",
   }).format(new Date());
+}
+
+function daysLabel(n: number): string {
+  if (n === 0) return "tänään";
+  if (n === 1) return "huomenna";
+  return `${n} pv`;
+}
+
+export default async function HomePage() {
+  const platform = brand.key;
+  const [birthdays, countdowns, featured, stats] = await Promise.all([
+    getBirthdaysToday(platform),
+    getUpcomingCountdowns(platform, 8),
+    getFeaturedQuiz(platform),
+    getStats(platform),
+  ]);
+
+  const featuredFull = featured
+    ? await loadQuizWithFirstQuestion(featured.id)
+    : null;
+
+  // Birthday featured quiz — first celebrity today that has a quiz.
+  const bdayWithQuiz = birthdays.find((b) => b.trivia_quiz_id);
+  const bdayFeatured =
+    bdayWithQuiz && bdayWithQuiz.trivia_quiz_id
+      ? await loadQuizWithFirstQuestion(bdayWithQuiz.trivia_quiz_id)
+      : null;
+
+  // Closest countdown that has a linked quiz.
+  const nearestWithQuiz = countdowns.find((c) => c.trivia_quiz_id);
+  const countdownFeatured =
+    nearestWithQuiz && nearestWithQuiz.trivia_quiz_id
+      ? await loadQuizWithFirstQuestion(nearestWithQuiz.trivia_quiz_id)
+      : null;
+
+  const topBirthday = birthdays[0];
 
   return (
-    <main className="mx-auto max-w-xl px-4 pb-24 pt-4 space-y-6">
-      <header className="space-y-1 pt-2">
-        <p className="text-xs font-semibold uppercase tracking-wider text-ink-muted">
-          {dateLine}
-        </p>
-        <h1 className="text-3xl font-extrabold tracking-tight">
-          {brand.name}
-        </h1>
-        <p className="text-sm text-ink-muted">
-          Suomalainen tietovisa — päivä kerrallaan
-        </p>
-      </header>
+    <>
+      {/* NAV */}
+      <div className="nav">
+        <div>
+          <div className="nav-logo">{brand.name.toUpperCase()}.COM</div>
+          <div className="nav-logo-sub">Oikean Suomen kotisivu</div>
+        </div>
+        <button className="nav-menu" aria-label="Valikko">
+          ☰
+        </button>
+      </div>
 
-      {featured ? (
-        <QuizCta quiz={featured} />
-      ) : (
-        <div className="rounded-2xl border border-dashed border-ink/10 p-6 text-center text-sm text-ink-muted">
-          Ei vielä julkaistuja visoja. Palaa huomenna.
+      {/* HERO */}
+      <div className="hero">
+        <div className="hero-bg"></div>
+        <div className="hero-glow"></div>
+        <div className="stage-lights">
+          {Array.from({ length: 12 }).map((_, i) => (
+            <span key={i} className="bulb"></span>
+          ))}
+        </div>
+        <div className="bubble">
+          <p>&ldquo;Tiedätkö enemmän kuin naapuri?&rdquo;</p>
+        </div>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          className="hero-couple"
+          src="/hosts/hero.png"
+          alt=""
+          onError={(e) => ((e.target as HTMLImageElement).style.display = "none")}
+        />
+        <div className="hero-floor"></div>
+      </div>
+
+      {/* INTRO */}
+      <div className="intro">
+        <div className="intro-eyebrow">Tervetuloa kotiin</div>
+        <div className="intro-title">
+          TESTAA
+          <em>TIETOSI.</em>
+        </div>
+        <div className="intro-sub">
+          Päivittäin vaihtuva visa, julkkisten synttärit ja paljon muuta —{" "}
+          <strong>100% ilmainen, aina.</strong>
+        </div>
+      </div>
+
+      {/* TICKER */}
+      <div className="ticker">
+        <span className="ticker-badge">Nyt</span>
+        <span className="ticker-text">
+          Pelaajia: <b>{stats.total_plays.toLocaleString("fi-FI")}</b>
+          {stats.latest_quiz && (
+            <>
+              {" "}· Uusin: <b>&ldquo;{stats.latest_quiz.title}&rdquo;</b>
+            </>
+          )}
+          {topBirthday && (
+            <>
+              {" "}· Synttärit: <b>{topBirthday.name} {topBirthday.age_years}v</b>
+            </>
+          )}
+        </span>
+      </div>
+
+      {/* PÄIVÄN VISA */}
+      {featuredFull && (
+        <div className="section">
+          <div className="section-title">🎯 Päivän visa</div>
+          <Link href={`/visa/${featuredFull.slug}`} className="quiz-block">
+            <div className="quiz-stripe"></div>
+            <div className="quiz-inner">
+              <div className="quiz-tag">● Suomi · {formatFiDate()}</div>
+              <div className="quiz-q">
+                {featuredFull.first_question?.question_text ??
+                  featuredFull.title}
+              </div>
+              {featuredFull.first_question && (
+                <div className="quiz-answers">
+                  {featuredFull.first_question.answers
+                    .slice(0, 4)
+                    .map((a, i) => (
+                      <div key={i} className="qans">
+                        <div className="qkey">{LETTERS[i]}</div>
+                        <div className="qtext">{a.text}</div>
+                      </div>
+                    ))}
+                </div>
+              )}
+            </div>
+            <ShareRow label="Pelaa nyt →" />
+          </Link>
         </div>
       )}
 
+      {/* SYNTTÄRIT */}
       {birthdays.length > 0 && (
-        <section className="space-y-3">
-          <h2 className="text-sm font-semibold uppercase tracking-wide text-ink-muted">
-            Tänään täyttää vuosia
-          </h2>
-          <div className="space-y-3">
-            {birthdays.map((c) => (
-              <BirthdayCard key={c.id} celeb={c} platform={platform} />
-            ))}
+        <div className="section">
+          <div className="section-title">🎂 Synttärit tänään</div>
+
+          <div className="bday-block">
+            <div className="bday-head">📅 Tänään {formatFiLongDay()}</div>
+            <div className="bday-list">
+              {birthdays.map((b) =>
+                b.trivia_quiz_id ? (
+                  <Link
+                    key={b.id}
+                    href={`/visa/${b.trivia_quiz_id}`}
+                    className="bday-row"
+                  >
+                    <BdayBadge celeb={b} />
+                    <div className="bday-info">
+                      <div className="bday-name">{b.name}</div>
+                      <div className="bday-role">{b.role}</div>
+                    </div>
+                    <span className="bday-play">Trivia →</span>
+                  </Link>
+                ) : (
+                  <div key={b.id} className="bday-row">
+                    <BdayBadge celeb={b} />
+                    <div className="bday-info">
+                      <div className="bday-name">{b.name}</div>
+                      <div className="bday-role">{b.role}</div>
+                    </div>
+                  </div>
+                ),
+              )}
+            </div>
           </div>
-        </section>
+
+          {bdayWithQuiz && bdayFeatured && (
+            <Link
+              href={`/visa/${bdayFeatured.slug}`}
+              className="bday-quiz"
+            >
+              <div className="bday-quiz-head">
+                <div className="bday-quiz-icon">
+                  {bdayFeatured.emoji_hint || roleEmoji(bdayWithQuiz.role)}
+                </div>
+                <div>
+                  <div className="bday-quiz-title">
+                    {bdayWithQuiz.name} täyttää tänään {bdayWithQuiz.age_years}
+                  </div>
+                  <div className="bday-quiz-sub">
+                    {bdayFeatured.description ??
+                      `Tiedätkö ${bdayWithQuiz.name.split(" ")[0]}sta kaiken?`}
+                  </div>
+                </div>
+              </div>
+              <div className="bday-quiz-inner">
+                <div className="bday-quiz-q">
+                  {bdayFeatured.first_question?.question_text ??
+                    bdayFeatured.title}
+                </div>
+                {bdayFeatured.first_question && (
+                  <div className="bday-quiz-answers">
+                    {bdayFeatured.first_question.answers
+                      .slice(0, 4)
+                      .map((a, i) => (
+                        <div key={i} className="bqans">
+                          {LETTERS[i]} · {a.text}
+                        </div>
+                      ))}
+                  </div>
+                )}
+                <ShareRowCompact label="Jaa syntymäpäiväbiisa!" />
+              </div>
+            </Link>
+          )}
+        </div>
       )}
 
-      <CountdownList items={countdowns} />
+      {/* COUNTDOWNS */}
+      {countdowns.length > 0 && (
+        <div className="section">
+          <div className="section-title">⏳ Montako päivää...</div>
 
-      <footer className="pt-8 text-center text-xs text-ink-hint">
-        <div className="space-x-3">
-          <Link href="/tietosuoja" className="underline">Tietosuoja</Link>
-          <Link href="/yhteys" className="underline">Yhteys</Link>
+          <div className="countdown-section">
+            <div className="countdown-scroll">
+              {countdowns.map((c) => (
+                <div key={c.id} className="cobj">
+                  <div className="cobj-icon">{countdownEmoji(c.object_type)}</div>
+                  <div className="cobj-days">{daysLabel(c.days_until)}</div>
+                  <div className="cobj-lbl">{c.name}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {nearestWithQuiz && countdownFeatured && (
+            <Link
+              href={`/visa/${countdownFeatured.slug}`}
+              className="countdown-trivia"
+            >
+              <div className="ct-head">
+                <div className="ct-icon">
+                  {countdownEmoji(nearestWithQuiz.object_type)}
+                </div>
+                <div className="ct-info">
+                  <div className="ct-title">
+                    {nearestWithQuiz.name} —{" "}
+                    {nearestWithQuiz.days_until === 0
+                      ? "tänään!"
+                      : `${nearestWithQuiz.days_until} päivää jäljellä!`}
+                  </div>
+                  <div className="ct-sub">
+                    {countdownFeatured.description ??
+                      `Tiedätkö ${nearestWithQuiz.name}sta kaiken?`}
+                  </div>
+                </div>
+              </div>
+              <div className="ct-inner">
+                <div className="ct-q">
+                  {countdownFeatured.first_question?.question_text ??
+                    countdownFeatured.title}
+                </div>
+                {countdownFeatured.first_question && (
+                  <div className="ct-answers">
+                    {countdownFeatured.first_question.answers
+                      .slice(0, 4)
+                      .map((a, i) => (
+                        <div key={i} className="ctans">
+                          {LETTERS[i]} · {a.text}
+                        </div>
+                      ))}
+                  </div>
+                )}
+                <ShareRowCompact label="Jaa tulos!" />
+              </div>
+            </Link>
+          )}
         </div>
-        <p className="mt-2">© {new Date().getFullYear()} {brand.name}</p>
-      </footer>
-    </main>
+      )}
+
+      {/* MURRESANA — hidden until murresanat CRUD is populated */}
+
+      <div className="spacer"></div>
+
+      {/* BOTTOM NAV */}
+      <div className="bottom-nav">
+        <Link href="/" className="active">
+          <div className="bottom-nav-icon">🏠</div>
+          <div className="bottom-nav-lbl">Koti</div>
+        </Link>
+        <Link href="/">
+          <div className="bottom-nav-icon">🎯</div>
+          <div className="bottom-nav-lbl">Visat</div>
+        </Link>
+        <Link href="/">
+          <div className="bottom-nav-icon">🎂</div>
+          <div className="bottom-nav-lbl">Synttärit</div>
+        </Link>
+        <Link href="/yhteys">
+          <div className="bottom-nav-icon">☰</div>
+          <div className="bottom-nav-lbl">Lisää</div>
+        </Link>
+      </div>
+    </>
   );
+}
+
+function BdayBadge({ celeb }: { celeb: { name: string; image_url: string | null; age_years: number } }) {
+  if (celeb.image_url) {
+    return (
+      <div className="bday-age-badge">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src={celeb.image_url} alt={celeb.name} />
+      </div>
+    );
+  }
+  return <div className="bday-age-badge">{celeb.age_years}</div>;
 }

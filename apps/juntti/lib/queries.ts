@@ -20,6 +20,7 @@ export type CountdownLite = {
   month: number;
   object_type: string;
   days_until: number;
+  trivia_quiz_id: string | null;
 };
 
 export type QuizSummary = {
@@ -34,6 +35,14 @@ export type QuizSummary = {
   question_count: number;
 };
 
+export type QuizPreview = QuizSummary & {
+  first_question: {
+    id: string;
+    question_text: string;
+    answers: { text: string; is_correct: boolean }[];
+  } | null;
+};
+
 const platformFilter = (platform: string) =>
   platform === "juntti" ? ["juntti", "both"] : ["tietovisa", "both"];
 
@@ -41,29 +50,33 @@ function todayUtcIso(): string {
   return new Date().toISOString().slice(0, 10);
 }
 
-// Which Finns turned a year older today (based on MM-DD match).
 export async function getBirthdaysToday(
   platform = "juntti",
 ): Promise<CelebrityToday[]> {
   const sb = getPublicSupabase();
   const today = new Date();
-  const mm = String(today.getUTCMonth() + 1).padStart(2, "0");
-  const dd = String(today.getUTCDate()).padStart(2, "0");
-  // Postgrest doesn't support MM-DD extraction directly, but we can
-  // leverage the `birth_date` text format (yyyy-mm-dd) and use `like`.
+  const mm = today.getUTCMonth() + 1;
+  const dd = today.getUTCDate();
+
   const { data, error } = await sb
     .from("celebrities")
     .select(
       "id, name, role, image_url, bio_short, birth_date, death_date, trivia_quiz_id, platform",
     )
-    .like("birth_date", `%-${mm}-${dd}`)
     .in("platform", platformFilter(platform));
   if (error || !data) return [];
-  return data.map((c) => {
+
+  const matches = data.filter((c) => {
+    const d = new Date(c.birth_date);
+    return d.getUTCMonth() + 1 === mm && d.getUTCDate() === dd;
+  });
+
+  return matches.map((c) => {
     const birth = new Date(c.birth_date);
     const ref = c.death_date ? new Date(c.death_date) : today;
     const age =
-      ref.getUTCFullYear() - birth.getUTCFullYear() -
+      ref.getUTCFullYear() -
+      birth.getUTCFullYear() -
       (ref.getUTCMonth() < birth.getUTCMonth() ||
       (ref.getUTCMonth() === birth.getUTCMonth() &&
         ref.getUTCDate() < birth.getUTCDate())
@@ -83,15 +96,16 @@ export async function getBirthdaysToday(
   });
 }
 
-// Next few countdowns in calendar order.
 export async function getUpcomingCountdowns(
   platform = "juntti",
-  limit = 4,
+  limit = 5,
 ): Promise<CountdownLite[]> {
   const sb = getPublicSupabase();
   const { data } = await sb
     .from("countdowns")
-    .select("id, name, slug, day, month, object_type, platform")
+    .select(
+      "id, name, slug, day, month, object_type, platform, trivia_quiz_id",
+    )
     .in("platform", platformFilter(platform));
   if (!data) return [];
 
@@ -113,15 +127,13 @@ export async function getUpcomingCountdowns(
     .slice(0, limit);
 }
 
-// Today's featured quiz. Priority: daily_schedule > today's celebrity quiz >
-// random published quiz for this platform.
 export async function getFeaturedQuiz(
   platform = "juntti",
 ): Promise<QuizSummary | null> {
   const sb = getPublicSupabase();
   const today = todayUtcIso();
 
-  // 1. Manual override: daily_schedule
+  // 1. daily_schedule override
   const { data: scheduled } = await sb
     .from("daily_schedule")
     .select("quiz_id")
@@ -133,7 +145,7 @@ export async function getFeaturedQuiz(
     if (quiz) return quiz;
   }
 
-  // 2. Today's birthday celebrity
+  // 2. today's birthday celebrity
   const birthdays = await getBirthdaysToday(platform);
   const bd = birthdays.find((b) => b.trivia_quiz_id);
   if (bd?.trivia_quiz_id) {
@@ -141,7 +153,7 @@ export async function getFeaturedQuiz(
     if (quiz) return quiz;
   }
 
-  // 3. Fallback: random published quiz for this platform
+  // 3. random published
   const { data: candidates } = await sb
     .from("quizzes")
     .select(
@@ -189,7 +201,31 @@ async function countQuestions(quizId: string): Promise<number> {
   return count ?? 0;
 }
 
-// For the quiz play page
+export async function loadQuizWithFirstQuestion(
+  id: string,
+): Promise<QuizPreview | null> {
+  const summary = await loadQuiz(id);
+  if (!summary) return null;
+  const sb = getPublicSupabase();
+  const { data } = await sb
+    .from("questions")
+    .select("id, question_text, answers")
+    .eq("quiz_id", id)
+    .order("sort_order", { ascending: true })
+    .limit(1);
+  const first = data?.[0];
+  return {
+    ...summary,
+    first_question: first
+      ? {
+          id: first.id,
+          question_text: first.question_text,
+          answers: first.answers as { text: string; is_correct: boolean }[],
+        }
+      : null,
+  };
+}
+
 export async function getQuizBySlug(slug: string) {
   const sb = getPublicSupabase();
   const { data: quiz } = await sb
@@ -208,8 +244,28 @@ export async function getQuizBySlug(slug: string) {
     .eq("quiz_id", quiz.id)
     .order("sort_order", { ascending: true });
 
+  return { quiz, questions: questions ?? [] };
+}
+
+export async function getStats(platform = "juntti"): Promise<{
+  total_plays: number;
+  latest_quiz: { title: string; slug: string } | null;
+}> {
+  const sb = getPublicSupabase();
+  const { count: plays } = await sb
+    .from("quiz_plays")
+    .select("id", { count: "exact", head: true })
+    .eq("platform", platform);
+  const { data: latest } = await sb
+    .from("quizzes")
+    .select("title, slug")
+    .eq("status", "published")
+    .in("platform", platformFilter(platform))
+    .order("published_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
   return {
-    quiz,
-    questions: questions ?? [],
+    total_plays: plays ?? 0,
+    latest_quiz: latest ?? null,
   };
 }
