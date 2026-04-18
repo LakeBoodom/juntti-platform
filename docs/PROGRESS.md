@@ -1,7 +1,7 @@
 # Progress Report — Juntti Platform
 
 **Last updated:** 2026-04-18
-**Current phase:** Vaihe 2 (admin tool) is next.
+**Current phase:** Vaihe 2 (admin tool) in progress — scaffold + countdowns CRUD live.
 
 ## Build phases
 
@@ -9,7 +9,7 @@
 |---|---|---|
 | 0 | Infra setup (GitHub, Supabase, Anthropic, Vercel) | ✅ Complete |
 | 1 | DB schema + seed | ✅ Complete |
-| 2 | Admin tool (Next.js) | ⬜ Next |
+| 2 | Admin tool (Next.js) | 🟡 Scaffold + auth + Countdowns CRUD done; AI quiz gen + celebrity + murresana next |
 | 3 | Initial content (~50 quizzes, 365 murresanat, ~200 celebrities) | ⬜ |
 | 4 | juntti.com frontend (copy `juntti_mobile_v2.html` 1:1) | ⬜ |
 | 5 | Cron jobs + production launch | ⬜ |
@@ -62,37 +62,63 @@
 
 ---
 
-## Phase 2 — Admin tool (next)
+## Phase 2 — Admin tool (in progress)
 
 Goal: a Next.js app under `admin/` that lets Heikki generate, review, and
-schedule content. Runs locally on :3001 during dev, deployed to
-`admin.juntti.com` (or equivalent) later.
+schedule content. Live at https://juntti-admin.vercel.app.
 
-### Scope
+### ✅ Done this session (2026-04-18)
 
+- **Scaffold**: `admin/` Next.js 15 + React 19 + TS, Tailwind + inline shadcn-
+  style components (Button, Input, Label, Table, Dialog, Select) under
+  `admin/components/ui/`. `admin/lib/utils.ts` provides `cn()` helper.
+- **Auth**: Supabase magic-link (`signInWithOtp`) with custom email → allowed
+  email hard-coded in `admin/middleware.ts` (currently `heikki.aura@uplause.com`).
+  `/auth/callback` exchanges code for session, `/auth/signout` POSTs to sign out.
+- **Middleware email gate**: all routes except `/login`, `/auth/*` require
+  session AND matching email — wrong email → immediate signOut + redirect.
+- **Countdowns CRUD**: `/countdowns` table view with server actions (create,
+  update, delete) that use `getSupabaseAdmin()` → bypasses RLS.
+  Form validates slug `[a-z0-9-]+`, day 1–31, month 1–12, platform
+  (juntti/tietovisa/null=both). Delete has confirm dialog.
+- **Vercel project**: `juntti-admin` (`prj_Md8AuMx7wBLluHx8uRfSXrCvkERT`), root
+  `admin/`, install `npm install --prefix=..`. All 3 Supabase env vars set via
+  REST API. Live at `juntti-admin.vercel.app`.
+- **Supabase auth URLs**: Site URL → `https://juntti-admin.vercel.app`,
+  Redirect URLs → `https://juntti-admin.vercel.app/**` + `http://localhost:3001/**`.
+
+### ⬜ Remaining Phase 2 scope
+
+- `packages/ai` Claude wrapper (model `claude-sonnet-4-6`, prompts from
+  yet-to-be-written `docs/CONTENT_PIPELINE.md`)
 - "Luo AI:llä" view — chip selectors for category / difficulty / count / tone,
-  free-text topic input, "Generoi visa" button
-- Preview screen per quiz — inline edit per question, "Regeneroi tämä",
-  correct answer highlighted
-- Fact-check button — flags `confidence: low` questions for review
-- Save draft / Schedule publish / Publish now
+  free-text topic, "Generoi visa" button, streaming preview, inline edit,
+  fact-check flag, save draft / schedule / publish
 - Celebrity admin — add person, auto-generate 5-question trivia
 - Murresana batch — generate 365 at once, review, save
 - Daily schedule calendar — visual view of scheduled quizzes per date
 
-### Prerequisites before starting
+### Watch-outs carried from this session
 
-- `SUPABASE_SERVICE_ROLE_KEY` in `.env.local` (see Phase 0 pending item)
-- Optionally Vercel project linked for preview deploys
+- NEXT_PUBLIC_* env vars are baked at build time → set env vars BEFORE first
+  deploy, or expect a redeploy. We did a two-deploy dance (first 500'd, second
+  OK). The fix: push env via `POST /api/v10/projects/:id/env` from an
+  already-logged-in vercel.com tab (Chrome MCP `javascript_tool` with
+  `credentials: "include"`), then trigger a fresh build via
+  `POST /api/v13/deployments` referencing the same gitSource.
+- Next 15 App Router: `useSearchParams()` in a client component MUST be wrapped
+  in `<Suspense>` or prerender bails out. Login page now splits into a server
+  `page.tsx` with Suspense + client `login-form.tsx`.
+- `@supabase/ssr` `setAll` cookies parameter needs an explicit type annotation
+  in strict TS builds — `(cookies: { name: string; value: string; options?: any }[])`.
 
-### Rough order
+### Entry point for next session
 
-1. Scaffold `admin/` as Next.js 14 app with shared DB + Tailwind
-2. Create `packages/ai` with Claude API wrapper (model `claude-sonnet-4-6`,
-   prompts from `docs/CONTENT_PIPELINE.md`)
-3. Build "Luo AI:llä" route with chip selectors + streaming preview
-4. Build draft/publish flow (uses service_role to bypass RLS)
-5. Build celebrity admin + murresana batch + daily schedule calendar
+1. Rotate/verify admin access: log into `https://juntti-admin.vercel.app`,
+   confirm magic link works, Countdowns CRUD round-trip.
+2. Start `packages/ai` scaffold (ANTHROPIC_API_KEY already in juntti app env
+   — mirror to juntti-admin, or set ANTHROPIC_API_KEY in juntti-admin env).
+3. Design the `quizzes` + `questions` draft → publish flow.
 
 ---
 
