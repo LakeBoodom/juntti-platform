@@ -92,12 +92,7 @@ export default async function HomePage() {
           <p>&ldquo;Tiedätkö enemmän kuin naapuri?&rdquo;</p>
         </div>
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          className="hero-couple"
-          src="/hosts/hero.png"
-          alt=""
-          onError={(e) => ((e.target as HTMLImageElement).style.display = "none")}
-        />
+        <img className="hero-couple" src="/hosts/hero.png" alt="" />
         <div className="hero-floor"></div>
       </div>
 
