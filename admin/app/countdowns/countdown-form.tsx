@@ -12,6 +12,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { DialogFooter, DialogClose } from "@/components/ui/dialog";
+// Note: Select is still imported because Alusta still uses it.
 import {
   createCountdown,
   updateCountdown,
@@ -32,7 +33,7 @@ export function CountdownForm({
   const [day, setDay] = useState<number>(initial?.day ?? 1);
   const [month, setMonth] = useState<number>(initial?.month ?? 1);
   const [objectType, setObjectType] = useState(
-    initial?.object_type ?? "holiday",
+    initial?.object_type ?? "",
   );
   const [platform, setPlatform] = useState<string>(initial?.platform ?? "both");
   const [error, setError] = useState<string | null>(null);
@@ -108,18 +109,18 @@ export function CountdownForm({
         </div>
       </div>
       <div className="space-y-1.5">
-        <Label>Tyyppi</Label>
-        <Select value={objectType} onValueChange={setObjectType}>
-          <SelectTrigger>
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="holiday">Juhlapäivä</SelectItem>
-            <SelectItem value="event">Tapahtuma</SelectItem>
-            <SelectItem value="season">Kausi</SelectItem>
-            <SelectItem value="other">Muu</SelectItem>
-          </SelectContent>
-        </Select>
+        <Label htmlFor="object_type">Ikoni</Label>
+        <Input
+          id="object_type"
+          value={objectType}
+          onChange={(e) => setObjectType(e.target.value)}
+          placeholder="esim. bottle, helmet, bonfire, microphone, cross"
+          required
+        />
+        <p className="text-xs text-muted-foreground">
+          Lyhyt englanninkielinen nimi ikonille, jota etusivun countdown
+          näyttää. Nykyiset: bottle, helmet, bonfire, sunglasses, ornament.
+        </p>
       </div>
       <div className="space-y-1.5">
         <Label>Alusta</Label>
