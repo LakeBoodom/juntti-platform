@@ -34,19 +34,28 @@ export async function generateQuiz(
     );
   }
 
-  // Validate: each question has exactly one correct answer.
+  // Auto-correct common Claude slips instead of throwing and losing the
+  // whole generation. The detail page shows the first answer as 'correct'
+  // if we had to guess, so the user fixes it with one click.
   const data = toolUse.input;
-  for (const [i, q] of data.questions.entries()) {
-    const correct = q.answers.filter((a) => a.is_correct).length;
-    if (correct !== 1) {
-      throw new Error(
-        `Question ${i + 1} had ${correct} correct answers — expected exactly 1`,
-      );
+  for (const q of data.questions) {
+    // Pad or truncate to exactly 4 answers.
+    while (q.answers.length < 4) {
+      q.answers.push({ text: "", is_correct: false });
     }
-    if (q.answers.length !== 4) {
-      throw new Error(
-        `Question ${i + 1} had ${q.answers.length} answers — expected 4`,
-      );
+    if (q.answers.length > 4) q.answers.length = 4;
+
+    // Ensure exactly one is_correct = true.
+    const correctIndices = q.answers
+      .map((a, i) => (a.is_correct ? i : -1))
+      .filter((i) => i >= 0);
+    if (correctIndices.length === 0) {
+      q.answers[0].is_correct = true;
+    } else if (correctIndices.length > 1) {
+      const keep = correctIndices[0];
+      q.answers.forEach((a, i) => {
+        a.is_correct = i === keep;
+      });
     }
   }
   return data;

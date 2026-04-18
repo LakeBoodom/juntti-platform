@@ -20,7 +20,8 @@ export function buildQuizSystemPrompt() {
 
 Säännöt jokaiselle kysymykselle:
 - Kysymys on yhdellä lauseella, korkeintaan 160 merkkiä.
-- Tasan 4 vastausvaihtoehtoa, tasan 1 oikein.
+- Tasan 4 vastausvaihtoehtoa.
+- **TÄSMÄLLEEN YKSI vastauksista on \`is_correct: true\`.** Tämä on ehdoton — kaikki muut kolme ovat \`is_correct: false\`. Älä koskaan jätä kaikkia vastauksia \`false\`-tilaan, älä koskaan merkitse useampaa kuin yhtä oikeaksi.
 - Vääristä vastauksista ei saa olla ilmeisen hölmöjä — ne ovat uskottavia, samaa aihepiiriä.
 - Jokaiselle kysymykselle lyhyt (1–2 lausetta) selitys miksi oikea on oikea.
 - Ei päivämäärä-tarkkuutta ("tarkalleen 15. elokuuta 2003") ellei se ole kysymyksen pointti — suuntaa antavat vuosiluvut ovat parempia.
