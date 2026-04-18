@@ -11,6 +11,7 @@ export type CelebrityInput = {
   bio_short: string | null;
   image_url: string | null;
   platform: "juntti" | "tietovisa" | "both";
+  wikipedia_url: string | null;
 };
 
 function validate(input: CelebrityInput): string | null {
@@ -36,6 +37,7 @@ export async function createCelebrity(input: CelebrityInput) {
     bio_short: input.bio_short?.trim() || null,
     image_url: input.image_url?.trim() || null,
     platform: input.platform,
+    wikipedia_url: input.wikipedia_url?.trim() || null,
   });
   if (error) return { ok: false as const, error: error.message };
   revalidatePath("/celebrities");
@@ -56,6 +58,7 @@ export async function updateCelebrity(id: string, input: CelebrityInput) {
       bio_short: input.bio_short?.trim() || null,
       image_url: input.image_url?.trim() || null,
       platform: input.platform,
+      wikipedia_url: input.wikipedia_url?.trim() || null,
     })
     .eq("id", id);
   if (error) return { ok: false as const, error: error.message };

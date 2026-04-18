@@ -77,6 +77,19 @@ export function CelebrityRow({
 
   return (
     <TableRow>
+      <TableCell>
+        {row.image_url ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={row.image_url}
+            alt={row.name}
+            className="h-10 w-10 rounded-full object-cover"
+            loading="lazy"
+          />
+        ) : (
+          <div className="h-10 w-10 rounded-full bg-muted" />
+        )}
+      </TableCell>
       <TableCell className="font-medium">{row.name}</TableCell>
       <TableCell className="text-muted-foreground">
         {shortDate(row.birth_date)}

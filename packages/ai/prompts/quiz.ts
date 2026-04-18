@@ -20,6 +20,8 @@ export function buildQuizSystemPrompt() {
 
 **Tuota TASAN pyydetty määrä kysymyksiä** — ei vähemmän, ei enempää. Jos pyydettiin 10, palauta 10.
 
+**Lähdemateriaali ohittaa sisäisen tietosi:** Jos käyttäjän viestissä on LÄHDEMATERIAALI-osio, käytä SEN sisältöä faktojen pohjana. Älä sekoita sisäistä tietoasi lähteen kanssa. Jos sisäinen muistisi ja lähde ovat ristiriidassa, luota lähteeseen. Jos kysymyksen vastausta ei voi johdonmukaisesti johtaa lähteestä, vaihda kysymys toiseen.
+
 **Työjärjestys jokaiselle kysymykselle:**
 1. Päätä ensin aihe ja tarkka oikea vastaus (esim. "1995").
 2. Kirjoita kysymys joka ohjaa tähän vastaukseen selvästi.
@@ -43,8 +45,19 @@ export function buildQuizUserPrompt(input: GenerateQuizInput) {
   const tone = TONE_GUIDE[input.tone] ?? input.tone;
   const audience = AUDIENCE_GUIDE[input.platform] ?? AUDIENCE_GUIDE.both;
 
-  return `Luo ${input.questionCount} kysymyksen tietovisa aiheesta: **${input.topic}**.
+  const sourceBlock = input.sourceContext
+    ? `\n\n**LÄHDEMATERIAALI — käytä vain tätä faktojen pohjana. ÄLÄ keksi asioita joita tässä ei lue. Jos jotakin ei lähteessä kerrota, älä esitä siitä kysymystä.**
 
+Lähde: ${input.sourceLabel ?? "annettu teksti"}
+---
+${input.sourceContext.slice(0, 50000)}
+---
+
+`
+    : "";
+
+  return `Luo ${input.questionCount} kysymyksen tietovisa aiheesta: **${input.topic}**.
+${sourceBlock}
 Kategoria: ${input.category}
 Vaikeustaso: ${input.difficulty} (helppo = useimmat tietävät, keski = yleissivistystä vaativa, vaikea = erikoistuneempaa tietoa)
 Sävy: ${tone}

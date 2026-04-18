@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { generateQuiz } from "@juntti/ai";
 import { getSupabaseAdmin } from "@juntti/db";
+import { fetchWikipediaArticle } from "./wikipedia-actions";
 
 // Generates a trivia quiz tailored to this specific celebrity — ties the
 // quiz back to celebrities.trivia_quiz_id so the public page can surface
@@ -11,7 +12,9 @@ export async function generateQuizForCelebrity(celebrityId: string) {
   const sb = getSupabaseAdmin();
   const { data: person, error: pErr } = await sb
     .from("celebrities")
-    .select("id, name, birth_date, death_date, role, bio_short, platform, trivia_quiz_id")
+    .select(
+      "id, name, birth_date, death_date, role, bio_short, platform, trivia_quiz_id, wikipedia_url",
+    )
     .eq("id", celebrityId)
     .maybeSingle();
 
@@ -33,6 +36,17 @@ export async function generateQuizForCelebrity(celebrityId: string) {
     person.bio_short ?? ""
   }`.trim();
 
+  // If we stored a Wikipedia URL, pull the full article as AI grounding.
+  let sourceContext: string | undefined;
+  let sourceLabel: string | undefined;
+  if (person.wikipedia_url) {
+    const article = await fetchWikipediaArticle(person.wikipedia_url);
+    if (article) {
+      sourceContext = article;
+      sourceLabel = `Wikipedia: ${person.name}`;
+    }
+  }
+
   let quiz;
   try {
     quiz = await generateQuiz({
@@ -42,6 +56,8 @@ export async function generateQuizForCelebrity(celebrityId: string) {
       questionCount: 5,
       tone: "rento",
       platform: person.platform === "both" ? "juntti" : (person.platform as any),
+      sourceContext,
+      sourceLabel,
     });
   } catch (err: any) {
     return { ok: false as const, error: err?.message ?? "AI-kutsu epäonnistui" };

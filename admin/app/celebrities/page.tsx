@@ -55,6 +55,7 @@ export default async function CelebritiesPage() {
             <Table>
               <TableHeader>
                 <TableRow>
+                  <TableHead className="w-14"></TableHead>
                   <TableHead>Nimi</TableHead>
                   <TableHead>Syntynyt</TableHead>
                   <TableHead>Rooli</TableHead>

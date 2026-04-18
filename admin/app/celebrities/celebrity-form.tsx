@@ -44,7 +44,7 @@ export function CelebrityForm({
   initial?: CelebrityFormValue;
   onDone: () => void;
 }) {
-  const [wikiUrl, setWikiUrl] = useState("");
+  const [wikiUrl, setWikiUrl] = useState(initial?.wikipedia_url ?? "");
   const [wikiError, setWikiError] = useState<string | null>(null);
   const [wikiPending, startWikiTransition] = useTransition();
 
@@ -92,6 +92,7 @@ export function CelebrityForm({
       bio_short: bio || null,
       image_url: imageUrl || null,
       platform,
+      wikipedia_url: wikiUrl || null,
     };
     startTransition(async () => {
       const res = initial?.id
@@ -130,8 +131,9 @@ export function CelebrityForm({
           <p className="text-xs text-destructive">{wikiError}</p>
         )}
         <p className="text-xs text-muted-foreground">
-          Täyttää nimen, lyhyen bion ja kuva-URL:n automaattisesti. Syntymäpäivä
-          ja rooli syötetään käsin.
+          Täyttää nimen, lyhyen bion ja kuva-URL:n automaattisesti. URL
+          tallentuu myös talteen — AI-visan generointi käyttää koko artikkelin
+          lähteenä, mikä parantaa faktatarkkuutta.
         </p>
       </div>
 

@@ -33,4 +33,8 @@ export type GenerateQuizInput = {
   tone: Tone;
   platform: Platform; // usually "juntti" or "tietovisa"
   targetAge?: TargetAge;
+  // Optional grounding material — e.g. a Wikipedia article. When provided,
+  // the model is instructed to use ONLY this text as fact source.
+  sourceContext?: string;
+  sourceLabel?: string; // e.g. "Wikipedia: Matti Nykänen"
 };

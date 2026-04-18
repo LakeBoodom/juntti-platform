@@ -27,6 +27,7 @@ export type Database = {
           platform: string | null
           role: string
           trivia_quiz_id: string | null
+          wikipedia_url: string | null
         }
         Insert: {
           bio_short?: string | null
@@ -39,6 +40,7 @@ export type Database = {
           platform?: string | null
           role: string
           trivia_quiz_id?: string | null
+          wikipedia_url?: string | null
         }
         Update: {
           bio_short?: string | null
@@ -51,6 +53,7 @@ export type Database = {
           platform?: string | null
           role?: string
           trivia_quiz_id?: string | null
+          wikipedia_url?: string | null
         }
         Relationships: [
           {
