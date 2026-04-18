@@ -7,7 +7,7 @@
 
 | # | Phase | Status |
 |---|---|---|
-| 0 | Infra setup (GitHub, Supabase, Anthropic, Vercel) | 🟡 Mostly done — Vercel + service_role pending |
+| 0 | Infra setup (GitHub, Supabase, Anthropic, Vercel) | ✅ Complete |
 | 1 | DB schema + seed | ✅ Complete |
 | 2 | Admin tool (Next.js) | ⬜ Next |
 | 3 | Initial content (~50 quizzes, 365 murresanat, ~200 celebrities) | ⬜ |
@@ -22,34 +22,18 @@
 
 - **GitHub repo**: `github.com/LakeBoodom/juntti-platform` (public, under user `LakeBoodom`)
 - **Supabase project**: `juntti-platform` (ID `pkfsdzqwfxqczirjddue`, eu-north-1 / Stockholm)
-- **Supabase URL + anon key**: in `.env.local`
+- **Supabase URL + anon key**: in `.env.local` and Vercel env
+- **Supabase service_role key**: created as `juntti-platform-service-role`, in `.env.local` and Vercel env
+  - ⚠️ Exposed in chat + a one-off browser fetch during verification — **rotate at start of Phase 2**
 - **Anthropic API key**: created as `juntti-platform`, in `.env.local`
-- **GitHub PAT**: in `.env.local` for programmatic push (90d expiry)
 - **`uplause-feedback` Supabase project paused** to free up Heikki's 2-project slot
 - **Monorepo skeleton pushed**: `apps/`, `packages/`, `admin/`, `supabase/` folders
-
-### 🟡 Pending (do these at the start of the next session)
-
-1. **Supabase service_role / secret key**
-   - Why: admin tool backend needs it to bypass RLS when inserting quizzes, murresanat, celebrities
-   - How: via Claude in Chrome —
-     `https://supabase.com/dashboard/project/pkfsdzqwfxqczirjddue/settings/api-keys`
-     → scroll to "Secret keys" → click **New secret key**
-     → name: `juntti-platform-service-role`
-     → scope/role: `service_role`
-     → copy the revealed value (shown once) → paste into `.env.local` under `SUPABASE_SERVICE_ROLE_KEY=`
-   - Blocker encountered: Supabase dashboard throttles background tabs; close other tabs
-     or activate the Supabase tab before trying to read the page via MCP.
-
-2. **Vercel project**
-   - Why: hosting + preview deploys + env vars in one place
-   - Steps:
-     - Import the GitHub repo in Vercel under team `lakeboodoms-projects` (`team_d8ClUfyvgtYEzX9YmbQ4rXeF`)
-     - Root directory: `apps/juntti` (first app to deploy)
-     - Framework preset: Next.js
-     - Add env vars from `.env.local` (except `GITHUB_PAT` — not needed at runtime)
-     - Disable auto-deploy on every push; enable preview deploys for branches
-   - Can be done via Vercel MCP (`deploy_to_vercel`) once env vars are set
+- **`apps/juntti` Next.js placeholder**: Next 15 + React 19, `brand.ts` env abstraction, static `/` route
+- **Vercel project**: `juntti` (`prj_ViEeVJ2YamK92zyB2nSOnfz9DuV1`) under `lakeboodoms-projects`
+  - Root dir `apps/juntti`, install command `npm install --prefix=../../` (monorepo)
+  - Production URL: `https://juntti.vercel.app`
+  - All 7 env vars set (Production + Preview + Development)
+  - First deploy: `dpl_2YSce89iVFhpgpCgXNFaUGEMWJgf` — READY, ~35s build
 
 ### Not yet needed
 
