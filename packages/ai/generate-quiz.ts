@@ -103,6 +103,14 @@ export async function generateQuiz(
         a.is_correct = i === keep;
       });
     }
+
+    // Shuffle answer order — Claude (and most LLMs) have a strong bias
+    // toward putting the correct answer first. Fisher-Yates on the
+    // normalized array guarantees uniform random position for is_correct.
+    for (let i = q.answers.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [q.answers[i], q.answers[j]] = [q.answers[j], q.answers[i]];
+    }
   }
   return data;
 }

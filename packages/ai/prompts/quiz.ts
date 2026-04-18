@@ -27,7 +27,8 @@ export function buildQuizSystemPrompt() {
 2. Kirjoita kysymys joka ohjaa tähän vastaukseen selvästi.
 3. Valitse oikea vastausvaihtoehto joka vastaa tätä — merkitse is_correct: true.
 4. Kirjoita 3 uskottavaa mutta väärää vastausvaihtoehtoa — kaikki is_correct: false.
-5. Kirjoita selitys ikään kuin kirjoittaisit lopullista ensyklopediatekstiä.
+5. **Sekoita vastausten järjestys.** Älä aina laita oikeaa ensimmäiseksi tai mihinkään erityiseen paikkaan — oikean pitää vaihdella kysymyksestä toiseen satunnaisesti paikoilla 1, 2, 3 ja 4. Tämä on pelikokemuksen kannalta kriittistä.
+6. Kirjoita selitys ikään kuin kirjoittaisit lopullista ensyklopediatekstiä.
 
 **Säännöt:**
 - Kysymys on yhdellä lauseella, korkeintaan 160 merkkiä.
