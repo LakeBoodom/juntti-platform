@@ -16,6 +16,12 @@ export function Nav({ email }: { email?: string | null }) {
             Visat
           </Link>
           <Link
+            href="/celebrities"
+            className="text-sm text-muted-foreground hover:text-foreground"
+          >
+            Julkkikset
+          </Link>
+          <Link
             href="/countdowns"
             className="text-sm text-muted-foreground hover:text-foreground"
           >

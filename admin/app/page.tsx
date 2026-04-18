@@ -40,10 +40,16 @@ export default async function HomePage() {
               Merkkipäivät ja juhlat
             </div>
           </Link>
-          <div className="rounded-lg border border-dashed p-4 opacity-60">
-            <div className="text-sm text-muted-foreground">Tulossa</div>
+          <Link
+            href="/celebrities"
+            className="block rounded-lg border p-4 transition-colors hover:bg-muted/50"
+          >
+            <div className="text-sm text-muted-foreground">Tauluja</div>
             <div className="text-lg font-medium">Julkkikset</div>
-          </div>
+            <div className="text-xs text-muted-foreground">
+              Synttärisankarit + AI-visat
+            </div>
+          </Link>
         </div>
       </main>
     </>
