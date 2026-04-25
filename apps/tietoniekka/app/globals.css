@@ -1,0 +1,45 @@
+/* Tietoniekka — globals.css
+   Brief-osion 2 ja 11 mukaiset CSS-tokenit lisätään tähän kun
+   index.html migroidaan Next.js-sivuksi (työpaketti 5).
+   Tämä on toistaiseksi minimi-resetti placeholder-etusivulle. */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  font-family: "Barlow", system-ui, -apple-system, sans-serif;
+  background: #0f1520;
+  color: #f5f5f5;
+}
+
+.placeholder {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 24px;
+  text-align: center;
+}
+
+.placeholder h1 {
+  font-family: "Barlow Condensed", "Barlow", sans-serif;
+  font-weight: 900;
+  font-size: 64px;
+  letter-spacing: 0.02em;
+  margin: 0 0 16px 0;
+  color: #e8a320;
+}
+
+.placeholder p {
+  margin: 0;
+  font-size: 18px;
+  color: #d8d8d8;
+  max-width: 28em;
+}
