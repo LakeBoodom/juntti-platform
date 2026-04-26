@@ -38,7 +38,6 @@ function PeliInner() {
   const [showFact, setShowFact] = useState(false);
   const [showNext, setShowNext] = useState(false);
   const [soundOn, setSoundOn] = useState(false);
-  const [displayedScore, setDisplayedScore] = useState(0);
   const audioCtxRef = useRef<AudioContext | null>(null);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const optionRefs = useRef<(HTMLButtonElement | null)[]>([]);
@@ -56,7 +55,6 @@ function PeliInner() {
     setPhase("playing");
     setIdx(0);
     setScore(0);
-    setDisplayedScore(0);
     setStreak(0);
     setAnswered(false);
     setChosen(null);
@@ -108,25 +106,6 @@ function PeliInner() {
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [phase, idx, answered]);
-
-  /* ─── Score count-up animation ────────────────────────────── */
-  useEffect(() => {
-    if (displayedScore === score) return;
-    const start = displayedScore;
-    const delta = score - start;
-    const duration = 700;
-    const startTime = performance.now();
-    let raf = 0;
-    const tick = (now: number) => {
-      const t = Math.min(1, (now - startTime) / duration);
-      const eased = 1 - Math.pow(1 - t, 3);
-      setDisplayedScore(Math.round(start + delta * eased));
-      if (t < 1) raf = requestAnimationFrame(tick);
-    };
-    raf = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(raf);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [score]);
 
   /* ─── Helpers — sound + vibration ─────────────────────────── */
   function getCtx(): AudioContext | null {
@@ -341,7 +320,7 @@ function PeliInner() {
                 <div className="peli-progress-fill" style={{ width: `${progressPct}%` }} />
               </div>
               <div className="peli-score-pill">
-                PISTEET <span className="score-value">{displayedScore}</span>
+                PISTEET <span className="score-value">{score}</span>
               </div>
               {streak >= 2 && (
                 <div className={`peli-streak-pill visible ${streakBump ? "bump" : ""}`} key={streakBump}>
