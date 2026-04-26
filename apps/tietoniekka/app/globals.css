@@ -1,45 +1,1655 @@
-/* Tietoniekka — globals.css
-   Brief-osion 2 ja 11 mukaiset CSS-tokenit lisätään tähän kun
-   index.html migroidaan Next.js-sivuksi (työpaketti 5).
-   Tämä on toistaiseksi minimi-resetti placeholder-etusivulle. */
+/* =====================================================================
+   Tietoniekka — globals.css
+   Lähde: /Tietoniekka.com/css/tokens.css + styles.css (2026-04-25)
+   Konkatenointi v1:lle. PRODUCTION → self-hosted woff2 myöhemmin.
+   ===================================================================== */
 
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
+/* =====================================================================
+   Tietoniekka — Design Tokens
+   Source of truth: design_brief.md (osio 2 + 3)
+   ===================================================================== */
+
+:root {
+  /* ─── Brändivärit ───────────────────────────────────────────────── */
+  --color-surface-dark: #0f1520;
+  --color-surface-card-dark: #1a2130;
+  --color-brand-gold: #e8a320;
+  --color-brand-gold-light: #f5bc45;
+  --color-surface-light: #f4ede0;
+  --color-surface-light-2: #ece3d1;
+  --color-state-correct: #2e7d52;
+  --color-state-wrong: #c0392b;
+  --color-text-light: #ffffff;
+  --color-text-muted-light: rgba(255, 255, 255, 0.6);
+  --color-text-muted-dark: rgba(15, 21, 32, 0.55);
+
+  /* ─── Kategoria-alipaletti (9 kategoriaa) ───────────────────────── */
+  --color-cat-urheilu:     #1e3a5f;  /* sininen, cool */
+  --color-cat-maantieto:   #1a3a45;  /* tumma teal, kartta/valtameri */
+  --color-cat-luonto:      #1f3d2e;  /* metsävihreä */
+  --color-cat-historia:    #3d2418;  /* sepiapunainen */
+  --color-cat-tv-sarjat:   #2d1b3d;  /* tumma violetti */
+  --color-cat-elokuvat:    #3d1818;  /* tumma punainen */
+  --color-cat-musiikki:    #3d1830;  /* magenta */
+  --color-cat-ruoka-juoma: #3d2818;  /* lämmin oranssi */
+  --color-cat-synttarit:   #0f1520;  /* navy + julkkisvalokuva */
+
+  /* ─── Typografia ────────────────────────────────────────────────── */
+  --font-display: 'Barlow Condensed', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-body: 'Barlow', -apple-system, BlinkMacSystemFont, sans-serif;
+  /* Note: PRODUCTION → self-hosted woff2. Prototype käyttää Google Fonts CDN. */
+
+  /* ─── Spacing (4 px base) ───────────────────────────────────────── */
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 40px;
+  --space-2xl: 64px;
+
+  /* ─── Radius ────────────────────────────────────────────────────── */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 14px;
+  --radius-xl: 20px;
+  --radius-pill: 999px;
+
+  /* ─── Varjot ────────────────────────────────────────────────────── */
+  --shadow-md: 0 8px 24px -8px rgba(15, 21, 32, 0.35);
+  --shadow-lg: 0 20px 60px -20px rgba(15, 21, 32, 0.45);
+  --shadow-gold: 0 6px 20px -6px rgba(232, 163, 32, 0.65);
+
+  /* ─── Easing ────────────────────────────────────────────────────── */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  /* ─── Container-leveydet ────────────────────────────────────────── */
+  --container-wide: 1024px;   /* etusivu, kategoriasivu */
+  --container-medium: 720px;  /* päivän sankari */
+  --container-narrow: 520px;  /* pelinäkymä */
 }
 
-html,
+/* =====================================================================
+   Tietoniekka — Etusivu styles (prototype v1)
+   ===================================================================== */
+
+/* ─── Reset + perus ──────────────────────────────────────────────── */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; }
+
 body {
-  margin: 0;
-  padding: 0;
-  font-family: "Barlow", system-ui, -apple-system, sans-serif;
-  background: #0f1520;
-  color: #f5f5f5;
+  font-family: var(--font-body);
+  background: var(--color-surface-dark);
+  color: var(--color-text-light);
+  overflow-x: hidden;
+  position: relative;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-.placeholder {
-  min-height: 100vh;
+/* Brändipattern — diagonaaliviivat tummalla pohjalla */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: repeating-linear-gradient(
+    -45deg,
+    transparent 0px,
+    transparent 22px,
+    rgba(255, 255, 255, 0.04) 22px,
+    rgba(255, 255, 255, 0.04) 23px
+  );
+  pointer-events: none;
+  z-index: 0;
+}
+
+main {
+  position: relative;
+  z-index: 1;
+}
+
+a { color: inherit; text-decoration: none; }
+img { display: block; max-width: 100%; }
+
+/* ─── Container-leveydet ─────────────────────────────────────────── */
+.container-wide   { max-width: var(--container-wide);   margin: 0 auto; padding: 0 var(--space-md); }
+.container-medium { max-width: var(--container-medium); margin: 0 auto; padding: 0 var(--space-md); }
+.container-narrow { max-width: var(--container-narrow); margin: 0 auto; padding: 0 var(--space-md); }
+
+/* ─── Section-otsikot (— OTSIKKO -tyyli) ─────────────────────────── */
+.section-label {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-brand-gold);
+  display: inline-block;
+}
+.section-label.with-dash::before { content: '— '; }
+
+.section-header {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 24px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-text-light);
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-2xl) 0 var(--space-sm);
+  line-height: 1;
+}
+.section-header .icon { font-size: 26px; }
+@media (min-width: 768px) {
+  .section-header { font-size: 28px; padding-top: var(--space-2xl); }
+  .section-header .icon { font-size: 30px; }
+}
+
+/* Section subtitle — brand voice -kopio otsikon alla */
+.section-subtitle {
+  font-family: var(--font-body);
+  font-weight: 400;
+  font-size: 17px;
+  line-height: 1.45;
+  color: var(--color-text-muted-light);
+  padding: 0 0 var(--space-lg);
+  max-width: 540px;
+}
+@media (min-width: 768px) {
+  .section-subtitle { font-size: 18px; }
+}
+.section-header-row { display: flex; justify-content: space-between; align-items: center; }
+.section-header-row .see-all {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 14px;
+  letter-spacing: 0.08em;
+  color: var(--color-brand-gold);
+  text-transform: uppercase;
+}
+
+/* ─── Painikkeet ─────────────────────────────────────────────────── */
+.btn {
+  appearance: none;
+  border: none;
+  cursor: pointer;
+  font-family: var(--font-display);
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+  border-radius: var(--radius-pill);
+  transition: transform 0.18s var(--ease-out), background 0.2s, border-color 0.2s, box-shadow 0.2s;
+  text-decoration: none;
+}
+.btn:active { transform: scale(0.97); }
+.btn:focus-visible { outline: 2px solid var(--color-brand-gold); outline-offset: 2px; }
+
+.btn-primary {
+  background: var(--color-brand-gold);
+  color: var(--color-surface-dark);
+}
+.btn-primary:hover { background: var(--color-brand-gold-light); }
+
+.btn-ghost {
+  background: transparent;
+  border: 1.5px solid var(--color-text-light);
+  color: var(--color-text-light);
+}
+.btn-ghost:hover { background: rgba(255, 255, 255, 0.08); border-width: 2px; }
+
+.btn-outline-gold {
+  background: transparent;
+  border: 1.5px solid var(--color-brand-gold);
+  color: var(--color-brand-gold);
+}
+.btn-outline-gold:hover { background: rgba(232, 163, 32, 0.08); border-width: 2px; }
+
+.btn-large { padding: 16px 32px; font-size: 18px; }
+.btn-small { padding: 10px 20px; font-size: 15px; }
+
+/* ─── 1. HERO (Header8) ──────────────────────────────────────────── */
+.hero {
+  background: var(--color-surface-dark);
+  position: relative;
+  padding-bottom: 0;
+}
+
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: var(--space-lg) var(--space-md) var(--space-md);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  max-width: var(--container-wide);
+  margin: 0 auto;
+}
+
+.logo {
+  font-family: var(--font-display);
+  display: flex;
+  flex-direction: column;
+  line-height: 0.95;
+}
+.logo .name {
+  display: flex;
+  align-items: baseline;
+  gap: 1px;
+}
+.logo .tieto { color: var(--color-brand-gold); font-weight: 900; font-size: 22px; }
+.logo .niekka { color: var(--color-text-light); font-weight: 700; font-size: 22px; }
+.logo .tagline {
+  font-weight: 700;
+  font-size: 9px;
+  letter-spacing: 0.18em;
+  color: var(--color-text-muted-light);
+  text-transform: uppercase;
+  margin-top: 2px;
+}
+
+.date {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-text-light);
+  margin-top: 6px;
+}
+
+.hero-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-lg) var(--space-md) 0;
+  max-width: var(--container-wide);
+  margin: 0 auto;
+}
+
+.hero-image {
+  width: 100%;
+  max-width: 460px;
+  position: relative;
+  order: 2;
+}
+.hero-image img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.hero-text {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  order: 1;
+}
+
+.hero-title {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: clamp(80px, 22vw, 130px);
+  line-height: 0.9;
+  letter-spacing: -0.02em;
+}
+.hero-title .tieto-line { color: var(--color-brand-gold); display: block; }
+.hero-title .niekka-line { color: var(--color-text-light); display: block; }
+
+.hero-subtitle {
+  color: var(--color-text-muted-light);
+  font-size: 18px;
+  line-height: 1.5;
+  max-width: 420px;
+  font-weight: 400;
+}
+@media (min-width: 768px) {
+  .hero-subtitle { font-size: 20px; }
+}
+
+.hero-cta { align-self: flex-start; }
+
+.hero-strip {
+  background: var(--color-brand-gold);
+  color: var(--color-surface-dark);
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 14px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 12px var(--space-md);
+  text-align: center;
+  margin-top: var(--space-lg);
+}
+.hero-strip .pulse {
+  display: inline-block;
+  background: var(--color-surface-dark);
+  color: var(--color-brand-gold);
+  padding: 2px 10px;
+  border-radius: var(--radius-pill);
+  margin-right: 6px;
+  font-size: 12px;
+}
+
+/* Hero responsive — desktop layout */
+@media (min-width: 768px) {
+  .hero-content {
+    flex-direction: row;
+    align-items: center;
+    gap: var(--space-2xl);
+    padding: var(--space-xl) var(--space-md) var(--space-md);
+  }
+  .hero-text { order: 1; flex: 1; }
+  .hero-image { order: 2; flex: 1; max-width: 520px; }
+  .hero-title { font-size: clamp(80px, 9vw, 130px); }
+}
+
+/* ─── 2. PINNALLA NYT ─────────────────────────────────────────────── */
+.pinnalla-nyt { background: var(--color-surface-dark); }
+.pinnalla-nyt .container-wide { max-width: 1024px; }
+
+.pinnalla-strip {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-sm);
+  padding: 0 0 var(--space-lg);
+}
+@media (min-width: 768px) {
+  .pinnalla-strip { gap: var(--space-md); }
+}
+
+.event-card {
+  width: 100%;
+  min-width: 0;
+  background: var(--color-surface-card-dark);
+  border-radius: var(--radius-lg);
+  padding: var(--space-md) var(--space-sm);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-sm);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  transition: transform 0.2s var(--ease-out), border-color 0.2s;
+}
+.event-card:hover { transform: translateY(-3px); border-color: var(--color-brand-gold); }
+
+.event-card img {
+  width: 100%;
+  max-width: 90px;
+  height: auto;
+  aspect-ratio: 1 / 1;
+  object-fit: contain;
+}
+.event-card .event-name {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  text-align: center;
+  color: var(--color-text-light);
+}
+.event-card .event-countdown {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+  margin-top: auto;
+}
+.event-card .days {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 32px;
+  color: var(--color-brand-gold);
+  line-height: 1;
+}
+.event-card .suffix {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  color: var(--color-text-muted-light);
+  text-transform: uppercase;
+}
+.event-card.today .days { font-size: 16px; }
+.event-card.today .countdown-pill {
+  background: var(--color-brand-gold);
+  color: var(--color-surface-dark);
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 14px;
+  letter-spacing: 0.1em;
+  padding: 4px 12px;
+  border-radius: var(--radius-pill);
+  animation: pulse 1.4s ease-in-out infinite;
+}
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.06); }
+}
+
+@media (min-width: 768px) {
+  .event-card img { max-width: 120px; }
+}
+
+/* ─── 3. PÄIVÄN SANKARI ──────────────────────────────────────────── */
+.paivan-sankari { background: var(--color-surface-dark); }
+
+.sankari-card {
+  display: block;
+  background: var(--color-surface-card-dark);
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  max-width: var(--container-medium);
+  margin: 0;  /* vasen-tasaus container-wide -kontainerin sisällä */
+  position: relative;
+  transition: transform 0.2s var(--ease-out);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+.sankari-card:hover { transform: translateY(-3px); }
+
+.sankari-photo {
+  position: relative;
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+  background: var(--color-surface-card-dark);
+}
+.sankari-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.sankari-photo::after {
+  content: '';
+  position: absolute;
+  inset: 50% 0 0 0;
+  background: linear-gradient(180deg, transparent, rgba(15, 21, 32, 0.85));
+  pointer-events: none;
+}
+
+.age-pill {
+  position: absolute;
+  top: var(--space-md);
+  left: var(--space-md);
+  background: var(--color-brand-gold);
+  color: var(--color-surface-dark);
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 13px;
+  letter-spacing: 0.06em;
+  padding: 6px 14px;
+  border-radius: var(--radius-pill);
+  text-transform: uppercase;
+  z-index: 2;
+}
+
+.sankari-overlay {
+  position: absolute;
+  bottom: var(--space-lg);
+  left: var(--space-lg);
+  right: var(--space-lg);
+  z-index: 2;
+}
+.sankari-name {
+  /* Barlow non-Condensed → I/l-erottuvuus julkkisten nimissä */
+  font-family: var(--font-body);
+  font-weight: 800;
+  font-size: clamp(28px, 7vw, 44px);
+  color: var(--color-text-light);
+  line-height: 1;
+  margin-bottom: 6px;
+  letter-spacing: 0.01em;
+}
+.sankari-meta {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  color: var(--color-text-muted-light);
+  text-transform: uppercase;
+}
+
+.sankari-cta-row {
+  padding: var(--space-md) var(--space-lg) var(--space-lg);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.sankari-cta-row .label {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 14px;
+  color: var(--color-text-light);
+}
+.sankari-cta-row .arrow {
+  color: var(--color-brand-gold);
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 14px;
+  letter-spacing: 0.06em;
+}
+
+.wiki-credit {
+  position: absolute;
+  bottom: 6px;
+  right: 8px;
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.6);
+  z-index: 2;
+}
+
+/* ─── 4. KATEGORIAT ──────────────────────────────────────────────── */
+.kategoriat { background: var(--color-surface-dark); padding-bottom: var(--space-xl); }
+
+.kategoria-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-md);
+}
+@media (min-width: 600px) {
+  .kategoria-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (min-width: 1024px) {
+  .kategoria-grid { grid-template-columns: repeat(3, 1fr); }
+}
+
+.kategoria-card {
+  display: block;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  position: relative;
+  aspect-ratio: 3 / 2;
+  transition: transform 0.2s var(--ease-out);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  background: var(--kategoria-color, var(--color-surface-card-dark));
+}
+.kategoria-card:hover { transform: translateY(-4px); }
+
+.kategoria-card .kategoria-image {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+.kategoria-card .kategoria-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.7;
+}
+.kategoria-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, transparent 30%, rgba(0, 0, 0, 0.85));
+  z-index: 1;
+}
+
+.kategoria-content {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: var(--space-md);
+  z-index: 2;
+}
+.kategoria-content h3 {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 28px;
+  color: var(--color-brand-gold);
+  letter-spacing: -0.01em;
+  margin-bottom: 2px;
+}
+.kategoria-content p {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 0.06em;
+  color: var(--color-text-light);
+  text-transform: uppercase;
+  opacity: 0.85;
+}
+
+/* ─── 5. TUNNISTA TÄMÄ ───────────────────────────────────────────── */
+.tunnista-tama { background: var(--color-surface-dark); }
+
+.kuvavisa-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-md);
+}
+@media (min-width: 768px) {
+  .kuvavisa-grid { grid-template-columns: repeat(3, 1fr); }
+}
+@media (min-width: 1024px) {
+  .kuvavisa-grid { grid-template-columns: repeat(4, 1fr); }
+}
+
+.kuvavisa-card {
+  display: flex;
+  flex-direction: column;
+  background: var(--color-surface-card-dark);
+  border-radius: var(--radius-lg);
+  padding: var(--space-md);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  transition: transform 0.2s var(--ease-out), border-color 0.2s;
+  min-height: 200px;
+}
+.kuvavisa-card:hover { transform: translateY(-3px); border-color: var(--color-brand-gold); }
+
+.kuvavisa-emoji {
+  font-size: 48px;
+  text-align: center;
+  margin: var(--space-sm) 0 var(--space-md);
+}
+.alaluokka-badge {
+  align-self: flex-start;
+  background: var(--color-brand-gold);
+  color: var(--color-surface-dark);
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  padding: 4px 10px;
+  border-radius: var(--radius-pill);
+  text-transform: uppercase;
+  margin-bottom: var(--space-sm);
+}
+.kuvavisa-card h3 {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 16px;
+  color: var(--color-text-light);
+  line-height: 1.2;
+  margin-bottom: var(--space-sm);
+  flex: 1;
+}
+.kuvavisa-card p {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  color: var(--color-text-muted-light);
+  text-transform: uppercase;
+}
+
+/* ─── 6. ARVO SATUNNAINEN ────────────────────────────────────────── */
+.arvo-satunnainen { padding: var(--space-2xl) 0 var(--space-2xl); }
+
+.arvo-card {
+  background: var(--color-surface-card-dark) url('/noppa_kuva.png') center / cover no-repeat;
+  border-radius: var(--radius-xl);
+  padding: var(--space-2xl) var(--space-lg);
+  text-align: center;
+  max-width: var(--container-medium);
+  margin: 0 auto;
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(232, 163, 32, 0.25);
+  min-height: 380px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.arvo-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(15, 21, 32, 0.55), rgba(15, 21, 32, 0.85));
+  pointer-events: none;
+}
+.arvo-card > * { position: relative; z-index: 1; }
+.arvo-card h2 {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: clamp(36px, 7vw, 52px);
+  color: var(--color-text-light);
+  line-height: 1;
+  margin-bottom: var(--space-md);
+  letter-spacing: -0.01em;
+}
+.arvo-card p {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 15px;
+  letter-spacing: 0.04em;
+  color: var(--color-text-muted-light);
+  margin-bottom: var(--space-lg);
+}
+
+/* ─── 7. FOOTER ──────────────────────────────────────────────────── */
+.footer {
+  background: var(--color-surface-dark);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  padding: var(--space-xl) var(--space-md);
+  text-align: center;
+}
+.footer-logo {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 18px;
+  letter-spacing: 0.05em;
+  color: var(--color-brand-gold);
+  margin-bottom: var(--space-sm);
+}
+.footer-meta {
+  font-family: var(--font-body);
+  font-size: 13px;
+  color: var(--color-text-muted-light);
+}
+.footer-meta a { color: inherit; text-decoration: underline; }
+
+/* ─── FEATURED INLINE QUIZ (yhteinen komponentti) ─────────────────── */
+.featured-quiz, .pinnalla-featured-quiz {
+  background: linear-gradient(160deg, var(--quiz-tint, rgba(31, 61, 46, 0.4)), var(--color-surface-card-dark));
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-xl);
+  padding: var(--space-lg);
+  margin-top: var(--space-md);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+.featured-quiz .quiz-header,
+.pinnalla-featured-quiz .quiz-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+}
+.featured-quiz .quiz-header .emoji,
+.pinnalla-featured-quiz .quiz-header .emoji {
+  font-size: 32px;
+  flex-shrink: 0;
+}
+.featured-quiz .quiz-header h3,
+.pinnalla-featured-quiz .quiz-header h3 {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 22px;
+  color: var(--color-text-light);
+  letter-spacing: -0.01em;
+  line-height: 1;
+  margin-bottom: 4px;
+}
+.featured-quiz .quiz-header h3 .countdown,
+.pinnalla-featured-quiz .quiz-header h3 .countdown {
+  color: var(--color-brand-gold);
+  font-weight: 800;
+  font-size: 18px;
+}
+.featured-quiz .quiz-header p,
+.pinnalla-featured-quiz .quiz-header p {
+  font-family: var(--font-body);
+  font-size: 15px;
+  color: var(--color-text-muted-light);
+  line-height: 1.4;
+}
+.featured-quiz .quiz-progress,
+.pinnalla-featured-quiz .quiz-progress {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-brand-gold);
+}
+.featured-quiz .quiz-question,
+.pinnalla-featured-quiz .quiz-question {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: clamp(24px, 5vw, 30px);
+  line-height: 1.15;
+  color: var(--color-text-light);
+}
+.featured-quiz .quiz-options,
+.pinnalla-featured-quiz .quiz-options {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+.featured-quiz .quiz-option,
+.pinnalla-featured-quiz .quiz-option {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  padding: 14px 16px;
+  border: 1.5px solid rgba(255, 255, 255, 0.15);
+  border-radius: var(--radius-md);
+  background: rgba(0, 0, 0, 0.2);
+  color: var(--color-text-light);
+  font-family: var(--font-body);
+  font-weight: 500;
+  font-size: 17px;
+  transition: border-color 0.2s, background 0.2s, transform 0.18s var(--ease-out);
+}
+.featured-quiz .quiz-option:hover,
+.pinnalla-featured-quiz .quiz-option:hover {
+  border-color: var(--color-brand-gold);
+  background: rgba(232, 163, 32, 0.08);
+  transform: translateY(-1px);
+}
+.featured-quiz .quiz-option .badge,
+.pinnalla-featured-quiz .quiz-option .badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+
+/* ─── KATEGORIA INLINE CARD (full-width, recreates kategoria_kuva mockup) */
+.kategoria-inline-card {
+  position: relative;
+  background: linear-gradient(180deg, var(--kat-color, var(--color-surface-card-dark)) 0%, var(--color-surface-card-dark) 65%);
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  margin-bottom: var(--space-xl);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+.kategoria-inline-card::before {
+  content: attr(data-watermark);
+  position: absolute;
+  top: 30px;
+  right: -30px;
+  transform: rotate(-8deg);
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: clamp(120px, 28vw, 200px);
+  color: rgba(255, 255, 255, 0.05);
+  letter-spacing: -0.02em;
+  pointer-events: none;
+  white-space: nowrap;
+  z-index: 0;
+  line-height: 1;
+}
+
+.kategoria-card-hero {
+  padding: var(--space-lg) var(--space-lg) var(--space-md);
+  position: relative;
+  z-index: 1;
+}
+.kategoria-card-hero .eyebrow {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-brand-gold);
+  display: block;
+  margin-bottom: var(--space-xs);
+}
+.kategoria-card-hero h3 {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: clamp(48px, 12vw, 72px);
+  color: var(--color-brand-gold);
+  letter-spacing: -0.02em;
+  line-height: 0.92;
+}
+.kategoria-card-hero p {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: clamp(18px, 4vw, 22px);
+  color: var(--color-text-light);
+  margin-top: var(--space-xs);
+  letter-spacing: -0.005em;
+  line-height: 1.15;
+  text-transform: uppercase;
+  max-width: 380px;
+}
+.kategoria-card-hero .badge-visat {
+  display: inline-block;
+  margin-top: var(--space-md);
+  background: var(--color-brand-gold);
+  color: var(--color-surface-dark);
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  padding: 6px 12px;
+  border-radius: var(--radius-pill);
+  text-transform: uppercase;
+}
+.kategoria-card-hero .description {
+  font-family: var(--font-body);
+  font-weight: 400;
+  font-size: 15px;
+  color: var(--color-text-muted-light);
+  margin-top: var(--space-md);
+  line-height: 1.5;
+  max-width: 480px;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+.kategoria-card-quiz {
+  background: rgba(0, 0, 0, 0.3);
+  padding: var(--space-lg);
+  position: relative;
+  z-index: 1;
+}
+.kategoria-card-quiz .visa-title {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 18px;
+  color: var(--color-text-light);
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--space-md);
+  padding-bottom: var(--space-md);
+  border-bottom: 1px solid rgba(232, 163, 32, 0.3);
+  margin-bottom: var(--space-md);
+}
+.kategoria-card-quiz .visa-title .count {
+  font-size: 13px;
+  color: var(--color-text-muted-light);
+  letter-spacing: 0.04em;
+  flex-shrink: 0;
+}
+.kategoria-card-quiz .visa-progress {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-brand-gold);
+  margin-bottom: var(--space-sm);
+}
+.kategoria-card-quiz .visa-question {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: clamp(20px, 4.5vw, 26px);
+  line-height: 1.2;
+  color: var(--color-text-light);
+  margin-bottom: var(--space-md);
+}
+.kategoria-card-quiz .visa-options {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+.kategoria-card-quiz .visa-option {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  padding: 14px 16px;
+  border: 1.5px solid rgba(255, 255, 255, 0.15);
+  border-radius: var(--radius-md);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--color-text-light);
+  font-family: var(--font-body);
+  font-weight: 500;
+  font-size: 17px;
+  transition: border-color 0.2s, background 0.2s, transform 0.18s var(--ease-out);
+}
+.kategoria-card-quiz .visa-option:hover {
+  border-color: var(--color-brand-gold);
+  background: rgba(232, 163, 32, 0.08);
+  transform: translateY(-1px);
+}
+.kategoria-card-quiz .visa-option .badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+
+/* ─── KUVAVISA inline featured (Lippuvisa) ───────────────────────── */
+.kuvavisa-featured {
+  background: linear-gradient(160deg, rgba(30, 58, 95, 0.5), var(--color-surface-card-dark));
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-xl);
+  padding: var(--space-lg);
+  margin-bottom: var(--space-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+.kuvavisa-featured .flag-stage {
+  position: relative;
+  aspect-ratio: 3 / 2;
+  background: linear-gradient(135deg, #4a7fcc 0%, #2d4a85 100%);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.kuvavisa-featured .flag-stage .flag-emoji {
+  font-size: 120px;
+}
+
+.pinnalla-featured-quiz .quiz-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+}
+.pinnalla-featured-quiz .quiz-header .emoji {
+  font-size: 32px;
+  flex-shrink: 0;
+}
+.pinnalla-featured-quiz .quiz-header h3 {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 22px;
+  color: var(--color-text-light);
+  letter-spacing: -0.01em;
+  line-height: 1;
+  margin-bottom: 4px;
+}
+.pinnalla-featured-quiz .quiz-header h3 .countdown {
+  color: var(--color-brand-gold);
+  font-weight: 800;
+  font-size: 18px;
+}
+.pinnalla-featured-quiz .quiz-header p {
+  font-family: var(--font-body);
+  font-size: 15px;
+  color: var(--color-text-muted-light);
+  line-height: 1.4;
+}
+
+.pinnalla-featured-quiz .quiz-progress {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-brand-gold);
+}
+
+.pinnalla-featured-quiz .quiz-question {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: clamp(24px, 5vw, 30px);
+  line-height: 1.15;
+  color: var(--color-text-light);
+}
+
+.pinnalla-featured-quiz .quiz-options {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+.pinnalla-featured-quiz .quiz-option {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  padding: 14px 16px;
+  border: 1.5px solid rgba(255, 255, 255, 0.15);
+  border-radius: var(--radius-md);
+  background: rgba(0, 0, 0, 0.2);
+  color: var(--color-text-light);
+  font-family: var(--font-body);
+  font-weight: 500;
+  font-size: 17px;
+  transition: border-color 0.2s, background 0.2s, transform 0.18s var(--ease-out);
+}
+.pinnalla-featured-quiz .quiz-option:hover {
+  border-color: var(--color-brand-gold);
+  background: rgba(232, 163, 32, 0.08);
+  transform: translateY(-1px);
+}
+.pinnalla-featured-quiz .quiz-option .badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+
+/* ─── MID-PROMO ("Kyllä kansa tietää") ───────────────────────────── */
+.mid-promo {
+  position: relative;
+  margin: var(--space-2xl) 0;
+  overflow: hidden;
+  border-radius: 0;
+}
+.mid-promo .promo-image {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+.mid-promo .promo-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+.mid-promo::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(15, 21, 32, 0.55) 0%, rgba(15, 21, 32, 0.85) 100%);
+  z-index: 1;
+}
+.mid-promo .promo-content {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  padding: var(--space-2xl) var(--space-md);
+  max-width: var(--container-medium);
+  margin: 0 auto;
+  min-height: 380px;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  padding: 24px;
+  gap: var(--space-md);
+}
+.mid-promo .promo-eyebrow {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--color-brand-gold);
+}
+.mid-promo h2 {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: clamp(48px, 12vw, 88px);
+  line-height: 0.92;
+  letter-spacing: -0.02em;
+  color: var(--color-text-light);
+}
+.mid-promo h2 .gold { color: var(--color-brand-gold); }
+.mid-promo p {
+  font-family: var(--font-body);
+  font-size: 19px;
+  font-weight: 500;
+  color: var(--color-text-light);
+  max-width: 420px;
+  line-height: 1.4;
+}
+@media (min-width: 768px) {
+  .mid-promo .promo-content { min-height: 460px; padding: var(--space-2xl) var(--space-xl); }
+  .mid-promo p { font-size: 22px; }
+}
+
+/* ─── PÄIVÄN SANKARI — onnittelu + quiz info card ─────────────────── */
+.sankari-onnittelu {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 18px;
+  color: var(--color-text-light);
+  padding: var(--space-lg) var(--space-lg) var(--space-md);
+  letter-spacing: 0.02em;
+}
+.sankari-onnittelu .gold {
+  color: var(--color-brand-gold);
+}
+
+.sankari-quiz-info {
+  background: var(--color-surface-light);
+  color: var(--color-surface-dark);
+  border-radius: var(--radius-lg);
+  margin: 0 var(--space-md) var(--space-md);
+  padding: var(--space-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+.sankari-quiz-info h4 {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 18px;
+  letter-spacing: 0.04em;
+  color: var(--color-surface-dark);
+  text-transform: uppercase;
+}
+.sankari-quiz-info p {
+  font-family: var(--font-body);
+  font-size: 15px;
+  color: rgba(15, 21, 32, 0.7);
+  line-height: 1.45;
+  margin-bottom: var(--space-sm);
+}
+.sankari-quiz-info .btn {
+  align-self: stretch;
   text-align: center;
 }
 
-.placeholder h1 {
-  font-family: "Barlow Condensed", "Barlow", sans-serif;
-  font-weight: 900;
-  font-size: 64px;
-  letter-spacing: 0.02em;
-  margin: 0 0 16px 0;
-  color: #e8a320;
+/* =====================================================================
+   ANIMAATIOPAKETTI — Taso 1 (1-4) + Taso 2 (5-6)
+   1. Scroll-reveal kaikille osioille
+   2. CTA shimmer
+   3. Sticky topbar + shadow
+   4. Lipun lehahdus (flagWave)
+   5. Hero-otsikon split-saapuminen
+   6. Quiz-vaihtoehtojen klikkauspalaute
+   ===================================================================== */
+
+/* ─── Reduced-motion -tuki: kunnioitetaan käyttäjän asetusta ────────── */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
 
-.placeholder p {
-  margin: 0;
-  font-size: 18px;
-  color: #d8d8d8;
-  max-width: 28em;
+/* ─── 1. SCROLL-REVEAL ──────────────────────────────────────────────── */
+.reveal {
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity 0.55s var(--ease-out), transform 0.55s var(--ease-out);
+  will-change: opacity, transform;
+}
+.reveal.is-visible {
+  opacity: 1;
+  transform: none;
+}
+
+/* ─── 2. CTA SHIMMER (btn-primary-nappien yli pyyhkivä kultaraita) ──── */
+.btn-primary {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+.btn-primary::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -150%;
+  width: 60%;
+  height: 100%;
+  background: linear-gradient(
+    100deg,
+    transparent 20%,
+    rgba(255, 255, 255, 0.45) 50%,
+    transparent 80%
+  );
+  transform: skewX(-20deg);
+  animation: ctaShimmer 4.5s ease-in-out infinite;
+  pointer-events: none;
+  z-index: 0;
+}
+/* Varmistetaan että nappi-teksti pysyy shimmerin päällä */
+.btn-primary > * {
+  position: relative;
+  z-index: 1;
+}
+@keyframes ctaShimmer {
+  0% { left: -150%; }
+  35%, 100% { left: 150%; }
+}
+
+/* ─── 3. STICKY TOPBAR + SHADOW ─────────────────────────────────────── */
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: var(--color-surface-dark);
+  transition: padding 0.2s var(--ease-out);
+  /* Pseudoelement venytetään täyteen leveyteen + tarjoaa varjon */
+}
+.topbar::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 100vw;
+  transform: translateX(-50%);
+  background: var(--color-surface-dark);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  z-index: -1;
+  transition: box-shadow 0.25s var(--ease-out), border-bottom-color 0.25s var(--ease-out);
+}
+body.is-scrolled .topbar::before {
+  box-shadow: 0 6px 20px -6px rgba(0, 0, 0, 0.6);
+}
+body.is-scrolled .topbar {
+  padding-top: var(--space-md);
+  padding-bottom: var(--space-sm);
+}
+/* Hero-section ei tarvitse enää alkuperäistä topbarin border-bottomia
+   koska se on nyt pseudoelementissä */
+
+/* ─── 4. LIPUN LEHAHDUS (flagWave) ──────────────────────────────────── */
+.kuvavisa-featured .flag-stage .flag-emoji {
+  display: inline-block;
+  transform-origin: 50% 80%;
+  animation: flagWave 3.2s ease-in-out infinite;
+}
+@keyframes flagWave {
+  0%, 100% { transform: skewX(0deg) rotate(0deg); }
+  25%      { transform: skewX(-3deg) rotate(-1deg); }
+  50%      { transform: skewX(0deg) rotate(0deg); }
+  75%      { transform: skewX(3deg) rotate(1deg); }
+}
+
+/* ─── 5. HERO-OTSIKON SPLIT-SAAPUMINEN ──────────────────────────────── */
+.hero-title .tieto-line {
+  animation: heroSlideInLeft 0.75s var(--ease-out) both;
+}
+.hero-title .niekka-line {
+  animation: heroSlideInRight 0.75s var(--ease-out) 0.12s both;
+}
+@keyframes heroSlideInLeft {
+  from { opacity: 0; transform: translateX(-22%); }
+  to   { opacity: 1; transform: none; }
+}
+@keyframes heroSlideInRight {
+  from { opacity: 0; transform: translateX(22%); }
+  to   { opacity: 1; transform: none; }
+}
+
+/* ─── 6. QUIZ-VAIHTOEHTOJEN KLIKKAUSPALAUTE ─────────────────────────── */
+.quiz-option.is-clicked,
+.visa-option.is-clicked {
+  background: var(--color-brand-gold) !important;
+  color: var(--color-surface-dark) !important;
+  border-color: var(--color-brand-gold) !important;
+  transform: scale(1.015);
+  box-shadow: var(--shadow-gold);
+  transition: background 0.15s, color 0.15s, border-color 0.15s,
+              transform 0.15s, box-shadow 0.15s;
+}
+.quiz-option.is-clicked .badge,
+.visa-option.is-clicked .badge {
+  background: rgba(15, 21, 32, 0.18);
+  color: var(--color-surface-dark);
+}
+
+/* =====================================================================
+   DESKTOP REFINEMENTS — vain ≥1024 px
+   Mobiili (alle 1024 px) säilyy 100 % ennallaan: tämä lohko ei muuta
+   yhtäkään mobile-sääntöä, ainoastaan lisää desktop-overrideja.
+   ===================================================================== */
+@media (min-width: 1024px) {
+
+  /* ─── 0. Globaali rytmi: leveämpi container + section-padding ───── */
+  :root {
+    --container-wide: 1200px;
+  }
+  .container-wide {
+    padding: 0 var(--space-xl);
+  }
+
+  .section-header {
+    font-size: 40px;
+    padding: 112px 0 16px;
+  }
+  .section-header .icon { font-size: 42px; }
+  .section-subtitle {
+    font-size: 21px;
+    padding-bottom: 40px;
+    max-width: 680px;
+  }
+
+  /* ─── 1. Topbar — isompi logo, leveämpi padding, viewport-tasaus ─ */
+  .topbar {
+    padding: 28px 40px 20px;
+    max-width: 1280px;
+  }
+  .logo .tieto,
+  .logo .niekka { font-size: 34px; }
+  .logo .tagline { font-size: 12px; margin-top: 4px; }
+  .date { font-size: 16px; margin-top: 10px; }
+
+  /* ─── 2. Hero — enemmän hengitystilaa, kuva painoarvoltaan isompi ─ */
+  .hero-content {
+    padding: 80px 40px 40px;
+    gap: 80px;
+    align-items: center;
+  }
+  .hero-text  { flex: 1.1; gap: var(--space-lg); }
+  .hero-image { flex: 1; max-width: 600px; }
+  .hero-subtitle { font-size: 24px; max-width: 480px; }
+  .hero-cta.btn-large { padding: 18px 36px; font-size: 20px; }
+  .hero-strip {
+    padding: 18px var(--space-md);
+    font-size: 18px;
+    margin-top: 64px;
+  }
+
+  /* ─── 3. Featured-quiz (Päivän visa, Vapputrivia) ──────────────── */
+  /*   - kortti ei venytä full-widthiin → keskitetty + comfortable max
+       - vaihtoehdot 2×2 -gridiin
+       - kaikki sisäiset fontit isommiksi                              */
+  .paivan-visa .featured-quiz,
+  .pinnalla-nyt .featured-quiz {
+    max-width: 860px;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 40px 48px;
+  }
+  .featured-quiz .quiz-header h3,
+  .pinnalla-featured-quiz .quiz-header h3 { font-size: 28px; }
+  .featured-quiz .quiz-header p,
+  .pinnalla-featured-quiz .quiz-header p { font-size: 17px; }
+  .featured-quiz .quiz-progress,
+  .pinnalla-featured-quiz .quiz-progress { font-size: 14px; }
+  .featured-quiz .quiz-question,
+  .pinnalla-featured-quiz .quiz-question { font-size: 34px; line-height: 1.18; }
+  .featured-quiz .quiz-options,
+  .pinnalla-featured-quiz .quiz-options {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-sm);
+  }
+  .featured-quiz .quiz-option,
+  .pinnalla-featured-quiz .quiz-option { font-size: 19px; padding: 16px 18px; }
+
+  /* ─── 4. Pinnalla nyt — event-cardit isompina ──────────────────── */
+  .pinnalla-strip { gap: var(--space-lg); }
+  .event-card {
+    padding: 32px 24px;
+    gap: var(--space-md);
+  }
+  .event-card img { max-width: 160px; }
+  .event-card .event-name { font-size: 17px; }
+  .event-card .days { font-size: 52px; }
+  .event-card .suffix { font-size: 13px; }
+
+  /* ─── 5. Päivän sankari — horisontaalinen split ────────────────── */
+  .paivan-sankari .sankari-card {
+    display: grid;
+    grid-template-columns: 460px 1fr;
+    max-width: 1120px;
+    margin: 0 auto;
+    align-items: stretch;
+  }
+  .paivan-sankari .sankari-photo {
+    aspect-ratio: 4 / 5;
+    height: 100%;
+  }
+  .paivan-sankari .age-pill { font-size: 14px; padding: 8px 16px; }
+  .paivan-sankari .sankari-name { font-size: 56px; }
+  .paivan-sankari .sankari-meta { font-size: 14px; }
+  .paivan-sankari .sankari-onnittelu {
+    padding: 40px 40px 16px;
+    font-size: 28px;
+  }
+  .paivan-sankari .sankari-quiz-info {
+    margin: 0 40px 40px;
+    padding: 36px;
+    align-self: start;
+  }
+  .paivan-sankari .sankari-quiz-info h4 { font-size: 26px; }
+  .paivan-sankari .sankari-quiz-info p { font-size: 17px; line-height: 1.5; }
+  .paivan-sankari .sankari-quiz-info .btn { align-self: flex-start; font-size: 19px; padding: 18px 32px; }
+
+  /* ─── 6. Mid-promo — leveämpi sisältöalue + enemmän korkeutta ──── */
+  .mid-promo .promo-content {
+    max-width: 920px;
+    min-height: 540px;
+  }
+  .mid-promo p { font-size: 24px; }
+
+  /* ─── 7. Kategoriat — split layout (hero vasen, kvissi oikea) ──── */
+  .kategoria-inline-card {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    margin-bottom: var(--space-2xl);
+  }
+  .kategoria-inline-card::before {
+    /* watermark kookkaammaksi desktop-mittakaavaan */
+    font-size: clamp(180px, 24vw, 280px);
+    top: 32px;
+    right: -24px;
+  }
+  .kategoria-card-hero {
+    padding: 64px 48px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  .kategoria-card-hero h3 { font-size: clamp(80px, 7vw, 104px); }
+  .kategoria-card-hero p { font-size: 26px; max-width: 460px; }
+  .kategoria-card-hero .description { font-size: 17px; max-width: 480px; }
+  .kategoria-card-hero .badge-visat { font-size: 14px; padding: 8px 16px; }
+  .kategoria-card-quiz {
+    padding: 48px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.35);
+  }
+  .kategoria-card-quiz .visa-title { font-size: 21px; }
+  .kategoria-card-quiz .visa-title .count { font-size: 14px; }
+  .kategoria-card-quiz .visa-progress { font-size: 14px; }
+  .kategoria-card-quiz .visa-question { font-size: 30px; line-height: 1.2; }
+  .kategoria-card-quiz .visa-options {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-sm);
+  }
+  .kategoria-card-quiz .visa-option { font-size: 19px; padding: 16px 18px; }
+
+  /* ─── 8. Tunnista tämä — Lippuvisa horisontaaliseksi ───────────── */
+  .kuvavisa-featured {
+    display: grid;
+    grid-template-columns: 420px 1fr;
+    gap: 24px 48px;
+    align-items: start;
+    padding: 40px 48px;
+    margin-bottom: var(--space-xl);
+  }
+  .kuvavisa-featured > .quiz-header { grid-column: 1 / -1; }
+  .kuvavisa-featured .quiz-header h3 { font-size: 28px; }
+  .kuvavisa-featured .quiz-header p { font-size: 17px; }
+  .kuvavisa-featured > .flag-stage {
+    grid-column: 1;
+    grid-row: 2 / span 3;
+    aspect-ratio: 4 / 3;
+    align-self: stretch;
+  }
+  .kuvavisa-featured .flag-stage .flag-emoji { font-size: 200px; }
+  .kuvavisa-featured > .quiz-progress { grid-column: 2; font-size: 14px; }
+  .kuvavisa-featured > .quiz-question { grid-column: 2; font-size: 30px; line-height: 1.18; }
+  .kuvavisa-featured > .quiz-options {
+    grid-column: 2;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-sm);
+  }
+  /* Kuvavisa-featuredin sisäiset quiz-optiot tarvitsevat omat tyylit
+     desktopilla (ei jaeta .featured-quiz-luokkaa) */
+  .kuvavisa-featured .quiz-option {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    padding: 16px 18px;
+    border: 1.5px solid rgba(255, 255, 255, 0.15);
+    border-radius: var(--radius-md);
+    background: rgba(0, 0, 0, 0.2);
+    color: var(--color-text-light);
+    font-family: var(--font-body);
+    font-weight: 500;
+    font-size: 19px;
+    transition: border-color 0.2s, background 0.2s, transform 0.18s var(--ease-out);
+  }
+  .kuvavisa-featured .quiz-option:hover {
+    border-color: var(--color-brand-gold);
+    background: rgba(232, 163, 32, 0.08);
+    transform: translateY(-1px);
+  }
+  .kuvavisa-featured .quiz-option .badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: var(--radius-sm);
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: 15px;
+    flex-shrink: 0;
+  }
+
+  /* Kuvavisa-grid kortit hieman korkeampia rinnakkain Lippuvisan kanssa */
+  .kuvavisa-card { min-height: 260px; padding: 24px; }
+  .kuvavisa-card .kuvavisa-emoji { font-size: 56px; }
+  .kuvavisa-card h3 { font-size: 19px; }
+  .kuvavisa-card p { font-size: 13px; }
+  .alaluokka-badge { font-size: 12px; padding: 5px 12px; }
+
+  /* ─── 9. Arvo satunnainen — FULL-BLEED bändi (matsaa mid-promoa) ─ */
+  /*   Tasapainottaa pystysuunnan rytmin: hero-strip (kelta-bändi)
+       → mid-promo (tumma bändi) → arvo (tumma bändi)               */
+  .arvo-satunnainen { padding: 0; }
+  .arvo-satunnainen > .container-wide {
+    max-width: none;
+    padding: 0;
+  }
+  .arvo-card {
+    max-width: none;
+    margin: 0;
+    border: none;
+    border-radius: 0;
+    min-height: 540px;
+    padding: 96px 48px;
+  }
+  .arvo-card h2 {
+    font-size: 80px;
+    max-width: 900px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .arvo-card p {
+    font-size: 22px;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: var(--space-xl);
+  }
+  .arvo-card .btn { font-size: 22px; padding: 20px 40px; }
+
+  /* ─── 10. Footer ──────────────────────────────────────────────── */
+  .footer { padding: var(--space-2xl) var(--space-md); }
+  .footer-logo { font-size: 22px; }
+  .footer-meta { font-size: 14px; }
 }
