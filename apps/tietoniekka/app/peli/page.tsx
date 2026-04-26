@@ -271,7 +271,8 @@ function PeliInner() {
   }
 
   const totalQ = quiz.questions.length;
-  const maxScore = totalQ * (BASE_POINTS + TIME_BONUS);
+  // Max = base+time per Q + summa streak-bonuksista (Σ i*STREAK_BONUS, i=1..totalQ-1)
+  const maxScore = totalQ * (BASE_POINTS + TIME_BONUS) + (totalQ * (totalQ - 1) / 2) * STREAK_BONUS;
   const q = quiz.questions[idx];
   const progressPct = phase === "end" ? 100 : (idx / totalQ) * 100;
   const timerPct = (timeLeft / TIME_PER_Q) * 100;
