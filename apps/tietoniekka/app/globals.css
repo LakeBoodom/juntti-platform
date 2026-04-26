@@ -1201,6 +1201,7 @@ img { display: block; max-width: 100%; }
   color: var(--color-text-light);
   max-width: 420px;
   line-height: 1.4;
+}
 
 @media (min-width: 768px) {
   .mid-promo {
