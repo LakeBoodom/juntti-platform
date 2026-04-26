@@ -176,9 +176,7 @@ export default function HomePage() {
       {/* 2. PÄIVÄN VISA */}
       <section className="paivan-visa" id="paivan-visa">
         <div className="container-wide">
-          <h2 className="section-header">
-            <span className="icon">🎯</span> Päivän visa
-          </h2>
+          <h2 className="section-header">Päivän visa</h2>
           <p className="section-subtitle">Tuntuuko, että tänään kulkee?</p>
           <div className="featured-quiz" style={{ ["--quiz-tint" as string]: "rgba(26, 58, 69, 0.5)" } as React.CSSProperties}>
             <div className="quiz-progress">Kysymys 1 / 5</div>
@@ -196,8 +194,8 @@ export default function HomePage() {
       {/* 3. PINNALLA NYT */}
       <section className="pinnalla-nyt">
         <div className="container-wide">
-          <h2 className="section-header"><span className="icon">⏳</span> Kuiteskin jo odotat tätä...</h2>
-          <p className="section-subtitle">Kohta tapahtuu. Pelaa teemavisa ennen ja jälkeen juhlan.</p>
+          <h2 className="section-header">Mitä Suomi odottaa...</h2>
+          <p className="section-subtitle">Virittäydy tunnelmaan teemavisalla.</p>
         </div>
         <div className="container-wide">
           <div className="pinnalla-strip">
@@ -294,7 +292,7 @@ export default function HomePage() {
       {/* 6. KATEGORIAT */}
       <section className="kategoriat">
         <div className="container-wide">
-          <h2 className="section-header"><span className="icon">📚</span> Kategoriat</h2>
+          <h2 className="section-header">Kategoriat</h2>
           <p className="section-subtitle">Mahtaakohan taitosi riittää, mutta kokeile nyt kuitenkin!</p>
 
           <article className="kategoria-inline-card" data-watermark="URHEILU" style={{ ["--kat-color" as string]: "var(--color-cat-urheilu)" } as React.CSSProperties}>
@@ -471,7 +469,7 @@ export default function HomePage() {
       <section className="tunnista-tama">
         <div className="container-wide">
           <div className="section-header-row">
-            <h2 className="section-header"><span className="icon">🔍</span> Tunnista tämä</h2>
+            <h2 className="section-header">Tunnista tämä</h2>
             <a href="kuvavisat.html" className="see-all">Kaikki →</a>
           </div>
           <p className="section-subtitle">Jospa kuvien tunnistaminen sujuisi paremmin.</p>

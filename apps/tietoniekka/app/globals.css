@@ -377,7 +377,7 @@ img { display: block; max-width: 100%; }
   border: 1px solid rgba(255, 255, 255, 0.06);
   transition: transform 0.2s var(--ease-out), border-color 0.2s;
 }
-.event-card:hover { transform: translateY(-3px); border-color: var(--color-brand-gold); }
+/* .event-card:hover poistettu Heikin palautteen mukaan 2026-04-26 — klikit eivät vie minnekään ennen kuin peli.html migroitu Next.js:ään */
 
 .event-card img {
   width: 100%;
