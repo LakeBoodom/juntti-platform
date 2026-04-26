@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
+import Link from "next/link";
 
 /* ─────────────────────────────────────────────────────────────────
    Tietoniekka — Etusivu
@@ -279,13 +280,13 @@ export default function HomePage() {
           <p className="section-subtitle">mahtaakohan tietosi riittää? Kokeile nyt kuitenkin!</p>
 
           <article className="kategoria-inline-card" data-watermark="URHEILU" style={{ ["--kat-color" as string]: "var(--color-cat-urheilu)", ["--bg-image" as string]: "url(/urheilu_kuva.png)" } as React.CSSProperties}>
-            <div className="kategoria-card-hero">
+            <Link href="/kategoria/urheilu" className="kategoria-card-hero kategoria-card-hero-link">
               <span className="eyebrow">— Kategoria</span>
               <h3>URHEILU</h3>
               <p>Jääkiekko, jalkapallo, yleisurheilu</p>
               <span className="badge-visat">18 visaa</span>
               <p className="description">Suomen urheilun huippuhetkistä ja suurista nimistä.</p>
-            </div>
+            </Link>
             <div className="kategoria-card-quiz">
               <div className="visa-title"><span>Näytätkin enemmän penkkiurheilijalta</span><span className="count">1 / 18</span></div>
               <div className="visa-progress">Kokeile · Kysymys 1 / 5</div>
@@ -304,13 +305,13 @@ export default function HomePage() {
           </a>
 
           <article className="kategoria-inline-card" data-watermark="MAANTIETO" style={{ ["--kat-color" as string]: "var(--color-cat-maantieto)", ["--bg-image" as string]: "url(/maantieto_kuva.png)" } as React.CSSProperties}>
-            <div className="kategoria-card-hero">
+            <Link href="/kategoria/maantieto" className="kategoria-card-hero kategoria-card-hero-link">
               <span className="eyebrow">— Kategoria</span>
               <h3>MAANTIETO</h3>
               <p>Suomi, Eurooppa, maailma</p>
               <span className="badge-visat">15 visaa</span>
               <p className="description">Paikat, pääkaupungit, vuoret ja virrat — kuinka hyvin tunnet maailman?</p>
-            </div>
+            </Link>
             <div className="kategoria-card-quiz">
               <div className="visa-title"><span>Ootko kiertänyt muutakin kuin tahkoa?</span><span className="count">1 / 15</span></div>
               <div className="visa-progress">Kokeile · Kysymys 1 / 10</div>
@@ -325,13 +326,13 @@ export default function HomePage() {
           </article>
 
           <article className="kategoria-inline-card" data-watermark="LUONTO" style={{ ["--kat-color" as string]: "var(--color-cat-luonto)", ["--bg-image" as string]: "url(/luonto_kuva.png)" } as React.CSSProperties}>
-            <div className="kategoria-card-hero">
+            <Link href="/kategoria/luonto" className="kategoria-card-hero kategoria-card-hero-link">
               <span className="eyebrow">— Kategoria</span>
               <h3>LUONTO</h3>
               <p>Suomen luonnon ihmeet ja eläimet</p>
               <span className="badge-visat">27 visaa</span>
               <p className="description">Testaa tietosi Suomen luonnosta, eläimistä ja upeista maisemista.</p>
-            </div>
+            </Link>
             <div className="kategoria-card-quiz">
               <div className="visa-title"><span>Mä tiedän, että susta löytyy eräjorma sisältä</span><span className="count">1 / 27</span></div>
               <div className="visa-progress">Kokeile · Kysymys 1 / 10</div>
@@ -346,13 +347,13 @@ export default function HomePage() {
           </article>
 
           <article className="kategoria-inline-card" data-watermark="HISTORIA" style={{ ["--kat-color" as string]: "var(--color-cat-historia)", ["--bg-image" as string]: "url(/historia_kuva.png)" } as React.CSSProperties}>
-            <div className="kategoria-card-hero">
+            <Link href="/kategoria/historia" className="kategoria-card-hero kategoria-card-hero-link">
               <span className="eyebrow">— Kategoria</span>
               <h3>HISTORIA</h3>
               <p>Suomi, maailma, henkilöt</p>
               <span className="badge-visat">22 visaa</span>
               <p className="description">Tapahtumat, jotka muokkasivat aikaansa — ja meidän tämän päivän.</p>
-            </div>
+            </Link>
             <div className="kategoria-card-quiz">
               <div className="visa-title"><span>Just ne kysymykset jolloin lintsasit koulussa</span><span className="count">1 / 22</span></div>
               <div className="visa-progress">Kokeile · Kysymys 1 / 12</div>
@@ -367,13 +368,13 @@ export default function HomePage() {
           </article>
 
           <article className="kategoria-inline-card" data-watermark="TV-SARJAT" style={{ ["--kat-color" as string]: "var(--color-cat-tv-sarjat)", ["--bg-image" as string]: "url(/TV_kuva.png)" } as React.CSSProperties}>
-            <div className="kategoria-card-hero">
+            <Link href="/kategoria/tv-sarjat" className="kategoria-card-hero kategoria-card-hero-link">
               <span className="eyebrow">— Kategoria</span>
               <h3>TV-SARJAT</h3>
               <p>Klassikot, uutuudet, kulttisarjat</p>
               <span className="badge-visat">12 visaa</span>
               <p className="description">Tuntemiisi sarjoihin yllättäviä yksityiskohtia. Kuinka tarkkaan katsot?</p>
-            </div>
+            </Link>
             <div className="kategoria-card-quiz">
               <div className="visa-title"><span>Paljasta vaan, oot katsonut kaikki Metsolat</span><span className="count">1 / 12</span></div>
               <div className="visa-progress">Kokeile · Kysymys 1 / 8</div>
@@ -388,13 +389,13 @@ export default function HomePage() {
           </article>
 
           <article className="kategoria-inline-card" data-watermark="ELOKUVAT" style={{ ["--kat-color" as string]: "var(--color-cat-elokuvat)", ["--bg-image" as string]: "url(/elokuvat_kuva.png)" } as React.CSSProperties}>
-            <div className="kategoria-card-hero">
+            <Link href="/kategoria/elokuvat" className="kategoria-card-hero kategoria-card-hero-link">
               <span className="eyebrow">— Kategoria</span>
               <h3>ELOKUVAT</h3>
               <p>Kotimainen, Hollywood, Eurooppa</p>
               <span className="badge-visat">18 visaa</span>
               <p className="description">Klassikoista uusiin julkaisuihin — kuka teki ja milloin?</p>
-            </div>
+            </Link>
             <div className="kategoria-card-quiz">
               <div className="visa-title"><span>Ei ole sitten pelkkiä turhapuroja tarjolla</span><span className="count">1 / 18</span></div>
               <div className="visa-progress">Kokeile · Kysymys 1 / 10</div>
@@ -409,13 +410,13 @@ export default function HomePage() {
           </article>
 
           <article className="kategoria-inline-card" data-watermark="MUSIIKKI" style={{ ["--kat-color" as string]: "var(--color-cat-musiikki)", ["--bg-image" as string]: "url(/musiikki_kuva.png)" } as React.CSSProperties}>
-            <div className="kategoria-card-hero">
+            <Link href="/kategoria/musiikki" className="kategoria-card-hero kategoria-card-hero-link">
               <span className="eyebrow">— Kategoria</span>
               <h3>MUSIIKKI</h3>
               <p>Hitit, klassikot, artistit</p>
               <span className="badge-visat">24 visaa</span>
               <p className="description">Suomalainen ja maailman musiikki. Kuka lauloi minkä ja milloin?</p>
-            </div>
+            </Link>
             <div className="kategoria-card-quiz">
               <div className="visa-title"><span>Ei taatusti yhtään sun playlistilta</span><span className="count">1 / 24</span></div>
               <div className="visa-progress">Kokeile · Kysymys 1 / 10</div>
@@ -434,13 +435,13 @@ export default function HomePage() {
           </a>
 
           <article className="kategoria-inline-card" data-watermark="RUOKA" style={{ ["--kat-color" as string]: "var(--color-cat-ruoka-juoma)", ["--bg-image" as string]: "url(/ruokajajuoma_kuva.png)" } as React.CSSProperties}>
-            <div className="kategoria-card-hero">
+            <Link href="/kategoria/ruoka-juoma" className="kategoria-card-hero kategoria-card-hero-link">
               <span className="eyebrow">— Kategoria</span>
               <h3>RUOKA &amp; JUOMA</h3>
               <p>Ruokakulttuuri ja juomahistoria</p>
               <span className="badge-visat">14 visaa</span>
               <p className="description">Mitä syömme ja miksi — perinteistä ja uudesta keittiöstä.</p>
-            </div>
+            </Link>
             <div className="kategoria-card-quiz">
               <div className="visa-title"><span>Oot tässä varmasti parempi kuin keittiössä</span><span className="count">1 / 14</span></div>
               <div className="visa-progress">Kokeile · Kysymys 1 / 8</div>

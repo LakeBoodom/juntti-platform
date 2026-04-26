@@ -2295,3 +2295,119 @@ a.sankari-photo {
   .peli-opt { font-size: 15px; padding: 12px 12px; }
 }
 
+
+/* ─────────────────────────────────────────────────────────────────
+   KATEGORIASIVU — /kategoria/[slug]
+   Visuaalinen hero kategoriavärillä + iso CTA peliin.
+   ───────────────────────────────────────────────────────────────── */
+.kategoria-page {
+  background: var(--color-surface-dark);
+  min-height: 100vh;
+  min-height: 100dvh;
+  color: var(--color-text-light);
+  display: flex;
+  flex-direction: column;
+}
+
+.kategoria-page .topbar {
+  display: flex;
+  align-items: center;
+  padding: var(--space-lg) var(--space-md);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  max-width: var(--container-wide);
+  margin: 0 auto;
+  width: 100%;
+}
+.kategoria-page .logo {
+  text-decoration: none;
+}
+
+.kategoria-hero {
+  position: relative;
+  padding: var(--space-2xl) var(--space-md);
+  min-height: 60vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background:
+    linear-gradient(180deg, rgba(15, 21, 32, 0.55) 0%, rgba(15, 21, 32, 0.92) 100%),
+    var(--bg-image, none) center / cover no-repeat,
+    var(--kat-color);
+}
+.kategoria-hero-content {
+  max-width: var(--container-medium);
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-md);
+}
+.kategoria-eyebrow {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 13px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--color-brand-gold);
+}
+.kategoria-title {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: clamp(56px, 14vw, 120px);
+  line-height: 0.92;
+  letter-spacing: -0.02em;
+  color: var(--color-text-light);
+}
+.kategoria-tagline {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(18px, 3vw, 22px);
+  letter-spacing: 0.04em;
+  color: rgba(255, 255, 255, 0.85);
+  text-transform: uppercase;
+}
+.kategoria-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 8px 16px;
+  background: var(--color-brand-gold);
+  color: var(--color-surface-dark);
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 14px;
+  letter-spacing: 0.06em;
+  border-radius: var(--radius-pill);
+  text-transform: uppercase;
+}
+.kategoria-intro {
+  font-family: var(--font-body);
+  font-size: clamp(17px, 2.4vw, 19px);
+  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.85);
+  max-width: 600px;
+  margin-top: var(--space-sm);
+}
+.kategoria-cta {
+  margin-top: var(--space-lg);
+  font-size: clamp(17px, 2.4vw, 20px);
+  padding: 18px 32px;
+}
+
+@media (min-width: 768px) {
+  .kategoria-hero {
+    padding: 120px 40px;
+    min-height: 70vh;
+  }
+}
+
+/* Etusivun kategoria-kortin hero-puoli linkkinä — säilytä grid-layout */
+.kategoria-card-hero-link {
+  text-decoration: none;
+  color: inherit;
+  cursor: pointer;
+  transition: filter 0.2s ease;
+}
+.kategoria-card-hero-link:hover {
+  filter: brightness(1.1);
+}
+
