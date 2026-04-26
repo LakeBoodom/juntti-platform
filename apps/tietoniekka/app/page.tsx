@@ -238,7 +238,7 @@ export default function HomePage() {
               <div className="age-pill">🎂 Tänään 42 vuotta</div>
               <div className="sankari-overlay">
                 <h3 className="sankari-name">IINA KUUSTONEN</h3>
-                <p className="sankari-meta">Näyttelijä · Syntynyt 19.4.1984 · Tampere</p>
+                <p className="sankari-meta">Näyttelijä · Syntynyt 19.4.1984</p>
               </div>
               <span className="wiki-credit">📷 Wikipedia</span>
             </a>

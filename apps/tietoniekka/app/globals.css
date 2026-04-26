@@ -287,6 +287,8 @@ img { display: block; max-width: 100%; }
   max-width: 460px;
   position: relative;
   order: 2;
+  border-radius: var(--radius-xl);
+  overflow: hidden;
 }
 .hero-image img {
   width: 100%;
@@ -701,7 +703,6 @@ img { display: block; max-width: 100%; }
   margin: 0 auto;
   position: relative;
   overflow: hidden;
-  border: 1px solid rgba(232, 163, 32, 0.25);
   min-height: 480px;
   display: flex;
   flex-direction: column;
@@ -1140,9 +1141,9 @@ img { display: block; max-width: 100%; }
 /* ─── MID-PROMO ("Kyllä kansa tietää") ───────────────────────────── */
 .mid-promo {
   position: relative;
-  margin: var(--space-2xl) 0;
+  margin: var(--space-2xl) var(--space-md);
   overflow: hidden;
-  border-radius: 0;
+  border-radius: var(--radius-xl);
 }
 .mid-promo .promo-image {
   position: absolute;
@@ -1200,7 +1201,15 @@ img { display: block; max-width: 100%; }
   color: var(--color-text-light);
   max-width: 420px;
   line-height: 1.4;
+
+@media (min-width: 768px) {
+  .mid-promo {
+    margin-left: auto;
+    margin-right: auto;
+    max-width: var(--container-wide);
+  }
 }
+
 @media (min-width: 768px) {
   .mid-promo .promo-content { min-height: 560px; padding: var(--space-2xl) var(--space-xl); }
   .mid-promo p { font-size: 22px; }
