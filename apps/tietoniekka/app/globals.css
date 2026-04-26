@@ -1653,3 +1653,90 @@ body.is-scrolled .topbar {
   .footer-logo { font-size: 22px; }
   .footer-meta { font-size: 14px; }
 }
+
+/* =====================================================================
+   Sankari-osion CTA-laajennus (Heikin palaute 2026-04-26)
+   sankari-quiz-info nyt featured-quiz cream-pohjalla:
+   1. kysymys + 4 vaihtoehtoa + iso PISTÄ TULEEN -CTA.
+   ===================================================================== */
+.sankari-quiz-info .eyebrow {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 13px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(15, 21, 32, 0.55);
+  margin: 0;
+}
+.sankari-quiz-info .quiz-progress {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-brand-gold);
+  margin-top: var(--space-xs);
+}
+.sankari-quiz-info .quiz-question {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: clamp(22px, 4vw, 28px);
+  line-height: 1.18;
+  color: var(--color-surface-dark);
+  text-transform: none;
+  letter-spacing: 0;
+  margin: 0;
+}
+.sankari-quiz-info .quiz-options {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  margin-top: var(--space-xs);
+}
+.sankari-quiz-info .quiz-option {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  padding: 14px 16px;
+  border: 1.5px solid rgba(15, 21, 32, 0.18);
+  border-radius: var(--radius-md);
+  background: rgba(15, 21, 32, 0.04);
+  color: var(--color-surface-dark);
+  font-family: var(--font-body);
+  font-weight: 500;
+  font-size: 17px;
+  transition: border-color 0.2s, background 0.2s, transform 0.18s var(--ease-out);
+}
+.sankari-quiz-info .quiz-option:hover {
+  border-color: var(--color-brand-gold);
+  background: rgba(232, 163, 32, 0.10);
+  transform: translateY(-1px);
+}
+.sankari-quiz-info .quiz-option .badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  background: rgba(15, 21, 32, 0.10);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 14px;
+  color: var(--color-surface-dark);
+  flex-shrink: 0;
+}
+.sankari-quiz-info .quiz-option.is-clicked,
+.sankari-quiz-info .quiz-option.is-clicked .badge {
+  background: var(--color-brand-gold);
+  border-color: var(--color-brand-gold);
+}
+.sankari-quiz-info .btn {
+  margin-top: var(--space-sm);
+}
+
+/* sankari-photo on nyt <a> (kortti ei enää itse linkki) — varmistetaan block-display */
+a.sankari-photo {
+  display: block;
+  text-decoration: none;
+}

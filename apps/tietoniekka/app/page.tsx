@@ -248,13 +248,11 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* 4. PÄIVÄN SANKARI */}
+      {/* 4. PÄIVÄN SANKARI — kuva + featured-quiz CTA (Heikki 2026-04-26) */}
       <section className="paivan-sankari">
         <div className="container-wide">
-          <h2 className="section-header"><span className="icon">🎂</span> Päivän sankari</h2>
-          <p className="section-subtitle">Tänään juhlitaan hänen synttäreitä — mutta juhlitko sinä tietovisassa?</p>
-          <a className="sankari-card" href="sankari.html">
-            <div className="sankari-photo">
+          <div className="sankari-card">
+            <a href="sankari.html" className="sankari-photo">
               <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=600&h=750&fit=crop&q=80" alt="Päivän sankari" />
               <div className="age-pill">🎂 Tänään 42 vuotta</div>
               <div className="sankari-overlay">
@@ -262,16 +260,20 @@ export default function HomePage() {
                 <p className="sankari-meta">Näyttelijä · Syntynyt 19.4.1984 · Tampere</p>
               </div>
               <span className="wiki-credit">📷 Wikipedia</span>
-            </div>
-            <div className="sankari-onnittelu">
-              Päivän sankari: <span className="gold">Iina Kuustonen</span>
-            </div>
+            </a>
             <div className="sankari-quiz-info">
-              <h4>Tunne päivän sankari</h4>
-              <p>5 kysymystä. Jos saat 5/5, muistathan kerskua naapurillesi?</p>
-              <span className="btn btn-primary btn-large">PISTÄ TULEEN →</span>
+              <span className="eyebrow">Tunne päivän sankari</span>
+              <div className="quiz-progress">Kysymys 1 / 5</div>
+              <h4 className="quiz-question">Kuinka vanha Iina Kuustonen täyttää tänään?</h4>
+              <div className="quiz-options">
+                <a className="quiz-option" href="peli.html?paivan_sankari=1&first=A"><span className="badge">A</span> 40</a>
+                <a className="quiz-option" href="peli.html?paivan_sankari=1&first=B"><span className="badge">B</span> 42</a>
+                <a className="quiz-option" href="peli.html?paivan_sankari=1&first=C"><span className="badge">C</span> 44</a>
+                <a className="quiz-option" href="peli.html?paivan_sankari=1&first=D"><span className="badge">D</span> 46</a>
+              </div>
+              <a href="peli.html?paivan_sankari=1" className="btn btn-primary btn-large">PISTÄ TULEEN →</a>
             </div>
-          </a>
+          </div>
         </div>
       </section>
 
