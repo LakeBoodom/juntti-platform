@@ -9,17 +9,6 @@ import { useEffect } from "react";
    Datafetch (Supabase) tulee myöhemmin — pidetään tämä yksinkertaisena.
    ───────────────────────────────────────────────────────────────── */
 
-const FI_MONTHS = [
-  "tammikuuta", "helmikuuta", "maaliskuuta", "huhtikuuta",
-  "toukokuuta", "kesäkuuta", "heinäkuuta", "elokuuta",
-  "syyskuuta", "lokakuuta", "marraskuuta", "joulukuuta",
-];
-
-function formatToday(): string {
-  const d = new Date();
-  return `${d.getDate()}. ${FI_MONTHS[d.getMonth()]}`.toUpperCase();
-}
-
 function daysUntil(targetDateStr: string): number {
   const target = new Date(targetDateStr);
   const today = new Date();
@@ -31,10 +20,6 @@ function daysUntil(targetDateStr: string): number {
 export default function HomePage() {
   // Päivämäärä, countdownit, scroll-reveal, sticky topbar, click feedback
   useEffect(() => {
-    // 1. Tänään-pvm
-    const dateEl = document.getElementById("today-date");
-    if (dateEl) dateEl.textContent = formatToday();
-
     // 2. Pinnalla nyt -countdownit
     document.querySelectorAll<HTMLElement>(".event-card[data-target]").forEach((card) => {
       const target = card.dataset.target;
@@ -145,7 +130,6 @@ export default function HomePage() {
           </div>
           <span className="tagline">Testaa tietosi</span>
         </div>
-        <div className="date" id="today-date">22. HUHTIKUUTA</div>
       </header>
 
       {/* 1. HERO */}
@@ -315,6 +299,10 @@ export default function HomePage() {
             </div>
           </article>
 
+          <a href="#" className="kategoria-ad" aria-label="Mainos">
+            <img src="/maantieto_ad.png" alt="" />
+          </a>
+
           <article className="kategoria-inline-card" data-watermark="MAANTIETO" style={{ ["--kat-color" as string]: "var(--color-cat-maantieto)", ["--bg-image" as string]: "url(/maantieto_kuva.png)" } as React.CSSProperties}>
             <div className="kategoria-card-hero">
               <span className="eyebrow">— Kategoria</span>
@@ -440,6 +428,10 @@ export default function HomePage() {
               </div>
             </div>
           </article>
+
+          <a href="#" className="kategoria-ad" aria-label="Mainos">
+            <img src="/Ruokajajuoma_ad.png" alt="" />
+          </a>
 
           <article className="kategoria-inline-card" data-watermark="RUOKA" style={{ ["--kat-color" as string]: "var(--color-cat-ruoka-juoma)", ["--bg-image" as string]: "url(/ruokajajuoma_kuva.png)" } as React.CSSProperties}>
             <div className="kategoria-card-hero">

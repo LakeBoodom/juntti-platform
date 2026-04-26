@@ -466,7 +466,7 @@ img { display: block; max-width: 100%; }
 
 .sankari-photo {
   position: relative;
-  aspect-ratio: 4 / 5;
+  aspect-ratio: 16 / 13;
   overflow: hidden;
   background: var(--color-surface-card-dark);
 }
@@ -693,7 +693,7 @@ img { display: block; max-width: 100%; }
 .arvo-satunnainen { padding: var(--space-2xl) 0 var(--space-2xl); }
 
 .arvo-card {
-  background: var(--color-surface-card-dark) url('/noppa_kuva.png') center / cover no-repeat;
+  background: var(--color-surface-card-dark) url('/noppa_kuva.png') center top / cover no-repeat;
   border-radius: var(--radius-xl);
   padding: var(--space-2xl) var(--space-lg);
   text-align: center;
@@ -702,10 +702,10 @@ img { display: block; max-width: 100%; }
   position: relative;
   overflow: hidden;
   border: 1px solid rgba(232, 163, 32, 0.25);
-  min-height: 380px;
+  min-height: 480px;
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: flex-end;
 }
 .arvo-card::before {
   content: '';
@@ -1169,10 +1169,10 @@ img { display: block; max-width: 100%; }
   padding: var(--space-2xl) var(--space-md);
   max-width: var(--container-medium);
   margin: 0 auto;
-  min-height: 380px;
+  min-height: 480px;
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: flex-end;
   align-items: center;
   gap: var(--space-md);
 }
@@ -1202,7 +1202,7 @@ img { display: block; max-width: 100%; }
   line-height: 1.4;
 }
 @media (min-width: 768px) {
-  .mid-promo .promo-content { min-height: 460px; padding: var(--space-2xl) var(--space-xl); }
+  .mid-promo .promo-content { min-height: 560px; padding: var(--space-2xl) var(--space-xl); }
   .mid-promo p { font-size: 22px; }
 }
 
@@ -1247,6 +1247,30 @@ img { display: block; max-width: 100%; }
 .sankari-quiz-info .btn {
   align-self: stretch;
   text-align: center;
+}
+
+
+
+/* ─── KATEGORIA-MAINOS — visual breaker between category cards ───── */
+.kategoria-ad {
+  display: block;
+  width: 100%;
+  max-width: var(--container-medium);
+  margin: var(--space-md) 0;
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  line-height: 0;
+  background: var(--color-surface-card-dark);
+  transition: transform 0.2s var(--ease-out);
+}
+.kategoria-ad:hover { transform: translateY(-2px); }
+.kategoria-ad img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+@media (min-width: 768px) {
+  .kategoria-ad { margin: var(--space-lg) auto; }
 }
 
 /* =====================================================================
@@ -1517,7 +1541,7 @@ body.is-scrolled .topbar {
   /* ─── 6. Mid-promo — leveämpi sisältöalue + enemmän korkeutta ──── */
   .mid-promo .promo-content {
     max-width: 920px;
-    min-height: 540px;
+    min-height: 620px;
   }
   .mid-promo p { font-size: 24px; }
 
@@ -1643,8 +1667,8 @@ body.is-scrolled .topbar {
     margin: 0;
     border: none;
     border-radius: 0;
-    min-height: 540px;
-    padding: 96px 48px;
+    min-height: 640px;
+    padding: 96px 48px 80px;
   }
   .arvo-card h2 {
     font-size: 80px;
