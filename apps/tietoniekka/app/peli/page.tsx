@@ -4,7 +4,7 @@ import { Suspense, useCallback, useEffect, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import confetti from "canvas-confetti";
-import { resolveQuiz, type QuizConfig, type Question } from "./questions";
+import { resolveQuiz, getSectionAnchor, getCategoryLabel, type QuizConfig, type Question } from "./questions";
 
 /* ─────────────────────────────────────────────────────────────────
    Tietoniekka — Pelinäkymä
@@ -413,14 +413,23 @@ function PeliInner() {
               niekoista
             </div>
             <div className="peli-end-actions">
+              {getCategoryLabel(quiz) && (
+                <Link
+                  href={`/peli?kat=${quiz.id.split(":")[1]}`}
+                  className="peli-btn-primary"
+                  prefetch={false}
+                >
+                  UUSI {getCategoryLabel(quiz)}-VISA →
+                </Link>
+              )}
               <button className="peli-btn-primary" onClick={resetGame} type="button">
                 PELAA UUDELLEEN
               </button>
               <button className="peli-btn-ghost" onClick={shareResult} type="button">
                 JAA TULOS
               </button>
-              <Link href="/" className="peli-btn-ghost">
-                TOINEN VISA →
+              <Link href={getSectionAnchor(quiz)} className="peli-btn-ghost">
+                TAKAISIN ETUSIVULLE
               </Link>
             </div>
           </div>

@@ -176,7 +176,7 @@ export default function HomePage() {
       </section>
 
       {/* 3. PINNALLA NYT */}
-      <section className="pinnalla-nyt">
+      <section className="pinnalla-nyt" id="pinnalla-nyt">
         <div className="container-wide">
           <h2 className="section-header">Mitä Suomi odottaa</h2>
           <p className="section-subtitle">virittäydy tunnelmaan teemavisalla</p>
@@ -230,7 +230,7 @@ export default function HomePage() {
       </section>
 
       {/* 4. PÄIVÄN SANKARI — kuva + featured-quiz CTA (Heikki 2026-04-26) */}
-      <section className="paivan-sankari">
+      <section className="paivan-sankari" id="paivan-sankari">
         <div className="container-wide">
           <div className="sankari-card">
             <a href="/peli?paivan_sankari=1" className="sankari-photo">
@@ -273,7 +273,7 @@ export default function HomePage() {
       </section>
 
       {/* 6. KATEGORIAT */}
-      <section className="kategoriat">
+      <section className="kategoriat" id="kategoriat">
         <div className="container-wide">
           <h2 className="section-header">Testaa tietosi eri aiheissa</h2>
           <p className="section-subtitle">mahtaakohan tietosi riittää? Kokeile nyt kuitenkin!</p>
@@ -457,7 +457,7 @@ export default function HomePage() {
       </section>
 
       {/* 7. TUNNISTA TÄMÄ */}
-      <section className="tunnista-tama">
+      <section className="tunnista-tama" id="tunnista-tama">
         <div className="container-wide">
           <div className="section-header-row">
             <h2 className="section-header">Tunnistatko kuvasta</h2>
@@ -510,7 +510,7 @@ export default function HomePage() {
       </section>
 
       {/* 8. ARVO SATUNNAINEN */}
-      <section className="arvo-satunnainen">
+      <section className="arvo-satunnainen" id="arvo-satunnainen">
         <div className="container-wide">
           <div className="arvo-card">
             <h2>Ei me kerrota kellekään</h2>

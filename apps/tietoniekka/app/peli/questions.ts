@@ -249,6 +249,36 @@ const katUrheilu: QuizConfig = {
       correct: "4",
       fact: "Lasse Virén voitti 4 olympiakultaa: 5000m ja 10000m sekä Münchenissä 1972 että Montrealissa 1976.",
     },
+      {
+      question: "Mikä yhdistys järjestää Suomen jalkapallomaajoukkueen toimintaa?",
+      options: ["SJL", "Palloliitto", "SM-liiga", "Suomi-Sport"],
+      correct: "Palloliitto",
+      fact: "Suomen Palloliitto perustettiin vuonna 1907 — yksi maailman vanhimmista jalkapalloliitoista.",
+    },
+    {
+      question: "Kuka on Suomen menestynein olympialaisten mäkihyppääjä?",
+      options: ["Janne Ahonen", "Matti Nykänen", "Jens Weißflog", "Toni Nieminen"],
+      correct: "Matti Nykänen",
+      fact: "Matti Nykänen voitti 4 olympiakultaa (1984 ja 1988) — Suomen mäkihypyn legenda.",
+    },
+    {
+      question: "Mikä on Formula 1 -kuljettaja Mika Häkkisen syntymävuosi?",
+      options: ["1966", "1968", "1970", "1972"],
+      correct: "1968",
+      fact: "Mika Häkkinen (s. 28.9.1968) voitti F1-maailmanmestaruuden 1998 ja 1999.",
+    },
+    {
+      question: "Mikä on hiihdon suomalaislegendan Marja-Liisa Kirvesniemen syntyperänimi?",
+      options: ["Hämäläinen", "Mäki", "Kallioniemi", "Lindgren"],
+      correct: "Hämäläinen",
+      fact: "Marja-Liisa Kirvesniemi (o.s. Hämäläinen) voitti 3 olympiakultaa Sarajevossa 1984.",
+    },
+    {
+      question: "Kuinka monta MM-kultamitalia Tero Pitkämäki keihäänheitossa on voittanut?",
+      options: ["1", "2", "3", "4"],
+      correct: "1",
+      fact: "Tero Pitkämäki voitti MM-kultaa Osakassa 2007 — yksi Suomen merkittävimmistä keihäänheittäjistä.",
+    },
   ],
 };
 
@@ -286,6 +316,36 @@ const katMaantieto: QuizConfig = {
       options: ["Argentiina", "Brasilia", "Peru", "Kolumbia"],
       correct: "Brasilia",
       fact: "Brasilia kattaa noin 47 % Etelä-Amerikan pinta-alasta — yli 8,5 miljoonaa km².",
+    },
+      {
+      question: "Mikä on Suomen pääkaupunki?",
+      options: ["Helsinki", "Tampere", "Turku", "Oulu"],
+      correct: "Helsinki",
+      fact: "Helsinki on Suomen pääkaupunki vuodesta 1812.",
+    },
+    {
+      question: "Mikä on Yhdysvaltain pääkaupunki?",
+      options: ["New York", "Los Angeles", "Washington D.C.", "Chicago"],
+      correct: "Washington D.C.",
+      fact: "Washington D.C. on ollut Yhdysvaltain pääkaupunki vuodesta 1800.",
+    },
+    {
+      question: "Mikä on Afrikan suurin maa pinta-alaltaan?",
+      options: ["Egypti", "Algeria", "Kongo", "Sudan"],
+      correct: "Algeria",
+      fact: "Algeria on noin 2,38 miljoonaa km² — Afrikan suurin maa pinta-alaltaan.",
+    },
+    {
+      question: "Mikä joki halkaisee Egyptin?",
+      options: ["Niili", "Niger", "Kongo", "Sambesi"],
+      correct: "Niili",
+      fact: "Niili on noin 6650 km pitkä — maailman pisin joki.",
+    },
+    {
+      question: "Mikä valtameri on suurin?",
+      options: ["Atlantin valtameri", "Tyynimeri", "Intian valtameri", "Pohjoinen jäämeri"],
+      correct: "Tyynimeri",
+      fact: "Tyynimeri kattaa noin 165 miljoonaa km² — kolmasosan maapallon pinta-alasta.",
     },
   ],
 };
@@ -325,6 +385,36 @@ const katLuonto: QuizConfig = {
       correct: "Lemmenjoen kansallispuisto",
       fact: "Lemmenjoen kansallispuisto on 2860 km² — Suomen suurin ja Euroopan toiseksi suurin.",
     },
+      {
+      question: "Mikä eläin tunnetaan nimellä 'metsän kuningas'?",
+      options: ["Karhu", "Susi", "Hirvi", "Ilves"],
+      correct: "Karhu",
+      fact: "Karhu on Suomen suurin maaeläin ja perinteisesti 'metsän kuningas'.",
+    },
+    {
+      question: "Mikä on Suomen yleisin lintulaji?",
+      options: ["Pajulintu", "Peippo", "Talitiainen", "Räkättirastas"],
+      correct: "Peippo",
+      fact: "Peippo on Suomen runsaslukuisin pesimälintu — yli 6 miljoonaa pesivää paria.",
+    },
+    {
+      question: "Mikä on Suomen ainoa myrkyllinen käärme?",
+      options: ["Kyy", "Rantakäärme", "Vaskitsa", "Sileäkäärme"],
+      correct: "Kyy",
+      fact: "Kyy on Suomen ainoa luonnonvarainen myrkyllinen käärme. Pureminen voi olla vaarallista mutta harvoin tappavaa.",
+    },
+    {
+      question: "Mikä on saimaannorpan tieteellinen nimi?",
+      options: ["Pusa hispida saimensis", "Phoca vitulina", "Halichoerus grypus", "Pagophilus groenlandicus"],
+      correct: "Pusa hispida saimensis",
+      fact: "Saimaannorppa on yksi maailman uhanalaisimmista hyljelajeista — vain Saimaalla.",
+    },
+    {
+      question: "Mikä Suomen järvi on tilavuudeltaan suurin?",
+      options: ["Saimaa", "Päijänne", "Inarijärvi", "Oulujärvi"],
+      correct: "Päijänne",
+      fact: "Päijänteen vesimäärä on noin 18,1 km³ — Suomen tilavuudeltaan suurin järvi.",
+    },
   ],
 };
 
@@ -362,6 +452,36 @@ const katHistoria: QuizConfig = {
       options: ["1985", "1989", "1991", "1993"],
       correct: "1989",
       fact: "Berliinin muuri murtui 9.11.1989 — kylmän sodan loppumisen symboli.",
+    },
+      {
+      question: "Kuka oli Suomen ensimmäinen marsalkka?",
+      options: ["C.G.E. Mannerheim", "K.J. Ståhlberg", "P.E. Svinhufvud", "J.K. Paasikivi"],
+      correct: "C.G.E. Mannerheim",
+      fact: "Mannerheim sai marsalkan arvon 75-vuotissyntymäpäivänään 1942.",
+    },
+    {
+      question: "Milloin Suomi liittyi YK:hon?",
+      options: ["1948", "1955", "1962", "1970"],
+      correct: "1955",
+      fact: "Suomi liittyi YK:hon 14.12.1955.",
+    },
+    {
+      question: "Kuka oli Rooman ensimmäinen keisari?",
+      options: ["Julius Caesar", "Augustus", "Tiberius", "Caligula"],
+      correct: "Augustus",
+      fact: "Augustus (Octavianus) oli Rooman ensimmäinen keisari 27 eKr.–14 jKr.",
+    },
+    {
+      question: "Milloin ensimmäinen ihminen kävi Kuussa?",
+      options: ["1965", "1969", "1972", "1975"],
+      correct: "1969",
+      fact: "Neil Armstrong ja Buzz Aldrin laskeutuivat Kuuhun Apollo 11 -lennolla 20.7.1969.",
+    },
+    {
+      question: "Mikä keskiaikainen tauti tappoi noin kolmanneksen Euroopan väestöstä 1300-luvulla?",
+      options: ["Isorokko", "Musta surma", "Lavantauti", "Kolera"],
+      correct: "Musta surma",
+      fact: "Musta surma (paiserutto) tappoi 25–60 % Euroopan väestöstä 1346–1353.",
     },
   ],
 };
@@ -401,6 +521,36 @@ const katTvSarjat: QuizConfig = {
       correct: "David Lynch",
       fact: "David Lynch ja Mark Frost loivat Twin Peaksin 1990 — surrealismin merkkipaalu TV:ssä.",
     },
+      {
+      question: "Mikä HBO:n sarja kertoo mafiapomo Tony Sopranosta?",
+      options: ["The Wire", "The Sopranos", "Boardwalk Empire", "Ozark"],
+      correct: "The Sopranos",
+      fact: "The Sopranos (1999–2007) muutti TV-draaman aikakautta — usein nimetty kaikkien aikojen parhaaksi sarjaksi.",
+    },
+    {
+      question: "Missä kaupungissa tapahtuu Friends-sarja?",
+      options: ["Chicago", "Boston", "New York", "Los Angeles"],
+      correct: "New York",
+      fact: "Friends sijoittuu Manhattaniin, Greenwich Villageen — vaikka useimmat kohtaukset kuvattiin Los Angelesissa.",
+    },
+    {
+      question: "Mikä on Game of Thrones -sarjan alkuperäisten kirjojen kirjoittaja?",
+      options: ["George R. R. Martin", "J. R. R. Tolkien", "Brandon Sanderson", "Robert Jordan"],
+      correct: "George R. R. Martin",
+      fact: "George R. R. Martin julkaisi A Song of Ice and Fire -sarjan ensimmäisen osan 1996.",
+    },
+    {
+      question: "Kuka näyttelee Walter White -hahmoa Breaking Bad -sarjassa?",
+      options: ["Bryan Cranston", "Aaron Paul", "Bob Odenkirk", "Jonathan Banks"],
+      correct: "Bryan Cranston",
+      fact: "Bryan Cranston voitti 4 Emmy-palkintoa Walter Whiten roolista 2008–2014.",
+    },
+    {
+      question: "Mistä maasta TV-sarja Borgen on kotoisin?",
+      options: ["Ruotsi", "Norja", "Tanska", "Suomi"],
+      correct: "Tanska",
+      fact: "Borgen (2010–2013, 2022) on tanskalainen poliittinen draamasarja Tanskan ensimmäisestä naispääministeristä.",
+    },
   ],
 };
 
@@ -438,6 +588,36 @@ const katElokuvat: QuizConfig = {
       options: ["Markku Peltola", "Kati Outinen", "Matti Pellonpää", "Sakari Kuosmanen"],
       correct: "Markku Peltola",
       fact: "Markku Peltola sai Cannesin parhaan miespääosan kunniamaininnan 2002.",
+    },
+      {
+      question: "Mikä on Star Wars -elokuvan ensimmäisen osan (1977) alkuperäinen nimi?",
+      options: ["Episode IV: A New Hope", "Star Wars", "Star Wars: Episode I", "The Phantom Menace"],
+      correct: "Star Wars",
+      fact: "Alkuperäinen 1977 elokuva nimettiin pelkäksi 'Star Wars' — 'A New Hope' -alaotsikko lisättiin uudelleenjulkaisussa 1981.",
+    },
+    {
+      question: "Kuka ohjasi Schindlerin lista -elokuvan (1993)?",
+      options: ["Steven Spielberg", "Martin Scorsese", "Stanley Kubrick", "Roman Polanski"],
+      correct: "Steven Spielberg",
+      fact: "Spielberg voitti elokuvasta parhaan ohjauksen Oscarin — yksi 7 Oscarista jotka elokuva sai.",
+    },
+    {
+      question: "Mikä on Studio Ghiblin ensimmäinen pitkä animaatioelokuva?",
+      options: ["Tuulen laakson Nausicaä", "Laputa", "Naapurini Totoro", "Kikis Express"],
+      correct: "Laputa",
+      fact: "Laputa: Linna taivaalla (1986) oli Ghiblin ensimmäinen pitkä animaatio — Nausicaä (1984) tehtiin ennen studion perustamista.",
+    },
+    {
+      question: "Kuka näyttelee päärooleja Pulp Fiction (1994) -elokuvassa?",
+      options: ["John Travolta ja Samuel L. Jackson", "Robert De Niro ja Al Pacino", "Tom Hanks ja Tim Robbins", "Kevin Costner ja Whitney Houston"],
+      correct: "John Travolta ja Samuel L. Jackson",
+      fact: "Tarantinon Pulp Fiction nosti John Travoltan uran takaisin pintaan ja teki Samuel L. Jacksonista A-listan tähden.",
+    },
+    {
+      question: "Mikä elokuva voitti Cannes'n Kultaisen palmun 2019?",
+      options: ["Parasite", "Joker", "Once Upon a Time in Hollywood", "1917"],
+      correct: "Parasite",
+      fact: "Parasite voitti Kultaisen palmun 2019 ja seuraavana vuonna 4 Oscaria — ensimmäinen ei-englanninkielinen Best Picture.",
     },
   ],
 };
@@ -477,6 +657,36 @@ const katMusiikki: QuizConfig = {
       correct: "Maamme",
       fact: "Maamme — Vårt land — sävellettiin 1848. Sanat Runeberg, sävel Pacius.",
     },
+      {
+      question: "Mikä bändi tunnetaan kappaleesta 'Stairway to Heaven'?",
+      options: ["The Beatles", "Led Zeppelin", "Pink Floyd", "Deep Purple"],
+      correct: "Led Zeppelin",
+      fact: "'Stairway to Heaven' (1971) on Led Zeppelinin Led Zeppelin IV -albumin tunnetuin kappale.",
+    },
+    {
+      question: "Kuka sävelsi 'Finlandia'-hymnin?",
+      options: ["Jean Sibelius", "Yrjö Kilpinen", "Toivo Kuula", "Erik Bergman"],
+      correct: "Jean Sibelius",
+      fact: "Jean Sibelius sävelsi 'Finlandian' 1899 osana Suomi-näyttämömusiikkia.",
+    },
+    {
+      question: "Kuka on tunnetuin suomalainen 'humppa'-orkesterijohtaja?",
+      options: ["Eino Grön", "Eero Aven", "Lasse Mårtenson", "Ossi Runne"],
+      correct: "Eero Aven",
+      fact: "Eero Aven johti Humppaveikot-yhtyettä useita vuosikymmeniä — humpan ikoni.",
+    },
+    {
+      question: "Minkä yhtyeen tähti Kurt Cobain oli?",
+      options: ["Pearl Jam", "Soundgarden", "Nirvana", "Alice in Chains"],
+      correct: "Nirvana",
+      fact: "Kurt Cobain (1967–1994) oli Nirvanan laulaja-kitaristi — grunge-ilmiön symboli.",
+    },
+    {
+      question: "Mikä suomalaisbändi voitti Wackenin festivaalin 2003?",
+      options: ["Apocalyptica", "HIM", "Lordi", "Children of Bodom"],
+      correct: "Lordi",
+      fact: "Lordi voitti Wacken Open Air -festivaalin 2003 — kolme vuotta ennen Eurovision-voittoaan.",
+    },
   ],
 };
 
@@ -514,6 +724,36 @@ const katRuokaJuoma: QuizConfig = {
       options: ["Kaura", "Vehnä", "Ruis", "Ohra"],
       correct: "Ohra",
       fact: "Ohraa on viljelty Suomessa noin 4000 vuoden ajan — vanhin viljelykasvi.",
+    },
+      {
+      question: "Mikä on perinteinen suomalainen kalakukko?",
+      options: ["Kalakukko on hauen sisuksiin täytetty makkara", "Kalakukko on ruisleivän sisään leivottu kala", "Kalakukko on suolattu silakka", "Kalakukko on graavattu kala"],
+      correct: "Kalakukko on ruisleivän sisään leivottu kala",
+      fact: "Kalakukko on Savon perinneruoka — muikkua tai ahventa leivotaan ruisleipätaikinan sisään uunissa.",
+    },
+    {
+      question: "Mikä juoma on perinteisesti kuuluva 'glögin' ainesosa?",
+      options: ["Punaviini", "Olut", "Sahti", "Vodka"],
+      correct: "Punaviini",
+      fact: "Glögi tehdään perinteisesti punaviinistä, kanelista, sokerista, mausteista — usein lisätään mantelia ja rusinoita.",
+    },
+    {
+      question: "Mistä tehdään perinteinen suomalainen leipäjuusto ('narskuva juusto')?",
+      options: ["Lehmänmaito", "Lammasmaito", "Vuohimaito", "Härkien maitoa"],
+      correct: "Lehmänmaito",
+      fact: "Leipäjuusto tehdään yleensä lehmän juustomaidosta. Pohjois-Suomessa ja Lapissa myös poromaidosta.",
+    },
+    {
+      question: "Mikä on ruisleivän tärkein raaka-aine paitsi ruisjauho?",
+      options: ["Ruishiiva", "Vesi", "Sokeri", "Voi"],
+      correct: "Vesi",
+      fact: "Perinteinen ruisleipä tehdään ruisjauhosta, vedestä, suolasta ja juuriviileestä. Hiivaa ei tarvita kun on juuri.",
+    },
+    {
+      question: "Mikä viini on Italian Toscanan tunnetuin?",
+      options: ["Chianti", "Barolo", "Prosecco", "Soave"],
+      correct: "Chianti",
+      fact: "Chianti on Toscanan kuuluisa punaviini — pääasiassa Sangiovese-rypäleestä.",
     },
   ],
 };
@@ -754,4 +994,22 @@ export function resolveQuiz(searchParams: URLSearchParams): QuizConfig {
 
   // Fallback
   return paivanVisa;
+}
+
+/** Etusivun ankkuri jonka kohdalle 'Toinen visa →' palaa */
+export function getSectionAnchor(quiz: QuizConfig): string {
+  if (quiz.id === "paivan_visa") return "/#paivan-visa";
+  if (quiz.id === "paivan_sankari") return "/#paivan-sankari";
+  if (quiz.id.startsWith("event:")) return "/#pinnalla-nyt";
+  if (quiz.id.startsWith("kat:")) return "/#kategoriat";
+  if (quiz.id.startsWith("kuvavisa:")) return "/#tunnista-tama";
+  return "/";
+}
+
+/** Käyttäjäystävällinen kategorianimi quiz-id:stä, esim "kat:urheilu" → "URHEILU" */
+export function getCategoryLabel(quiz: QuizConfig): string | null {
+  if (quiz.id.startsWith("kat:")) {
+    return quiz.title; // title on jo iso (esim "URHEILU")
+  }
+  return null;
 }
