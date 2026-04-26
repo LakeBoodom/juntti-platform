@@ -13,6 +13,8 @@
     "@juntti/db": "*",
     "@supabase/ssr": "^0.5.0",
     "@supabase/supabase-js": "^2.45.0",
+    "@types/canvas-confetti": "^1.9.0",
+    "canvas-confetti": "^1.9.4",
     "clsx": "^2.1.1",
     "next": "^15.1.6",
     "react": "19.0.0",

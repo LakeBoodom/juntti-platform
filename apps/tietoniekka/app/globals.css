@@ -1787,3 +1787,511 @@ a.sankari-photo {
   display: block;
   text-decoration: none;
 }
+
+/* ─────────────────────────────────────────────────────────────────
+   PELINÄKYMÄ — /peli reitti
+   Cream-pohja (matsaa lippuvisa_2_0.html alkuperäistä), gold-aksentit.
+   Skoopattu .peli-prefiksin alle, ettei valu etusivun puolelle.
+   ───────────────────────────────────────────────────────────────── */
+.peli {
+  --peli-navy: var(--color-surface-dark);
+  --peli-gold: var(--color-brand-gold);
+  --peli-gold-light: #f5bc45;
+  --peli-cream: #f4ede0;
+  --peli-cream-2: #ece3d1;
+  --peli-correct: #2e7d52;
+  --peli-wrong: #c0392b;
+  --peli-white: #ffffff;
+  --peli-ink: #0f1520;
+  --peli-muted: rgba(15, 21, 32, 0.55);
+  --peli-shadow-lg: 0 20px 60px -20px rgba(15, 21, 32, 0.45);
+  --peli-shadow-md: 0 8px 24px -8px rgba(15, 21, 32, 0.35);
+
+  position: relative;
+  min-height: 100vh;
+  min-height: 100dvh;
+  background: var(--peli-cream);
+  color: var(--peli-ink);
+  overflow-x: hidden;
+  font-family: var(--font-body);
+}
+.peli::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    repeating-linear-gradient(
+      -45deg,
+      transparent 0,
+      transparent 22px,
+      rgba(15, 21, 32, 0.035) 22px,
+      rgba(15, 21, 32, 0.035) 23px
+    );
+  pointer-events: none;
+  z-index: 0;
+}
+.peli-vignette {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 5;
+  background: radial-gradient(ellipse at center, transparent 50%, rgba(192, 57, 43, 0.18) 100%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+.peli-vignette[data-active="true"] { opacity: 1; }
+
+.peli-app {
+  position: relative;
+  z-index: 1;
+  max-width: 520px;
+  margin: 0 auto;
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  padding: env(safe-area-inset-top, 0) 16px env(safe-area-inset-bottom, 0);
+}
+
+.peli-loading {
+  margin: auto;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 18px;
+  color: var(--peli-muted);
+  letter-spacing: 0.04em;
+}
+
+/* Top bar */
+.peli-topbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 4px 12px;
+}
+.peli-logo {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 20px;
+  letter-spacing: 0.01em;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  text-decoration: none;
+}
+.peli-logo .tieto { color: var(--peli-gold); }
+.peli-logo .niekka { color: var(--peli-navy); }
+.peli-topbar .spacer { flex: 1; }
+.peli-icon-btn {
+  width: 36px; height: 36px;
+  border-radius: 999px;
+  border: 1.5px solid rgba(15, 21, 32, 0.15);
+  background: transparent;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.15s;
+  color: var(--peli-navy);
+  font-size: 16px;
+}
+.peli-icon-btn:hover { background: rgba(15, 21, 32, 0.06); }
+.peli-icon-btn:active { transform: scale(0.92); }
+.peli-icon-btn[data-on="true"] {
+  background: var(--peli-navy);
+  color: var(--peli-white);
+  border-color: var(--peli-navy);
+}
+
+/* Intro */
+.peli-intro {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 40px 16px 60px;
+  gap: 16px;
+}
+.peli-kicker {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 14px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--peli-muted);
+}
+.peli-h1 {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: clamp(56px, 14vw, 82px);
+  line-height: 0.9;
+  letter-spacing: -0.02em;
+  color: var(--peli-navy);
+}
+.peli-intro-text {
+  font-family: var(--font-body);
+  font-size: 17px;
+  line-height: 1.45;
+  color: var(--peli-muted);
+  max-width: 380px;
+  margin: 8px 0 12px;
+}
+
+.peli-btn-primary {
+  appearance: none;
+  border: none;
+  background: linear-gradient(135deg, var(--peli-gold), var(--peli-gold-light));
+  color: var(--peli-navy);
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 17px;
+  letter-spacing: 0.04em;
+  padding: 16px 32px;
+  border-radius: 999px;
+  cursor: pointer;
+  box-shadow: var(--peli-shadow-md);
+  transition: transform 0.15s var(--ease-out), box-shadow 0.2s;
+  text-decoration: none;
+  display: inline-block;
+}
+.peli-btn-primary:hover { transform: translateY(-2px); box-shadow: 0 14px 32px -10px rgba(232, 163, 32, 0.45); }
+.peli-btn-primary:active { transform: scale(0.97); }
+
+.peli-btn-ghost {
+  appearance: none;
+  border: 1.5px solid rgba(15, 21, 32, 0.2);
+  background: transparent;
+  color: var(--peli-navy);
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 15px;
+  letter-spacing: 0.04em;
+  padding: 14px 24px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.15s;
+  text-decoration: none;
+  display: inline-block;
+}
+.peli-btn-ghost:hover { background: rgba(15, 21, 32, 0.06); }
+.peli-btn-ghost:active { transform: scale(0.97); }
+
+/* Game stats row */
+.peli-game {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.peli-stats-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 4px 8px;
+}
+.peli-progress {
+  flex: 1;
+  height: 6px;
+  background: rgba(15, 21, 32, 0.08);
+  border-radius: 999px;
+  overflow: hidden;
+}
+.peli-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--peli-gold), var(--peli-gold-light));
+  border-radius: 999px;
+  transition: width 0.5s var(--ease-out);
+}
+.peli-score-pill, .peli-streak-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 13px;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+.peli-score-pill {
+  background: var(--peli-navy);
+  color: var(--peli-white);
+}
+.peli-score-pill .score-value { color: var(--peli-gold); min-width: 1ch; display: inline-block; }
+.peli-streak-pill {
+  background: linear-gradient(135deg, var(--peli-gold), var(--peli-gold-light));
+  color: var(--peli-navy);
+}
+.peli-streak-pill.bump { animation: peliStreakBump 0.5s var(--ease-spring); }
+@keyframes peliStreakBump {
+  0%   { transform: scale(1); }
+  40%  { transform: scale(1.25) rotate(-3deg); }
+  100% { transform: scale(1) rotate(0deg); }
+}
+
+/* Card */
+.peli-card {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 18px 16px 22px;
+  background: var(--peli-white);
+  border-radius: 20px;
+  box-shadow: var(--peli-shadow-lg);
+  margin-bottom: 16px;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Q header + timer */
+.peli-q-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.peli-q-label {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--peli-muted);
+}
+.peli-q-counter {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 18px;
+  color: var(--peli-navy);
+}
+.peli-q-header .spacer { flex: 1; }
+
+.peli-timer {
+  position: relative;
+  width: 52px;
+  height: 52px;
+}
+.peli-timer .bg-ring {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: conic-gradient(var(--peli-gold) var(--pct, 100%), rgba(15, 21, 32, 0.08) 0);
+  transition: background 0.3s;
+}
+.peli-timer .inner {
+  position: absolute;
+  inset: 4px;
+  background: var(--peli-white);
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 20px;
+  color: var(--peli-navy);
+}
+.peli-timer.warn .bg-ring { background: conic-gradient(#f59e0b var(--pct, 100%), rgba(15, 21, 32, 0.08) 0); }
+.peli-timer.danger .bg-ring {
+  background: conic-gradient(var(--peli-wrong) var(--pct, 100%), rgba(15, 21, 32, 0.08) 0);
+  animation: peliTimerPulse 0.9s infinite;
+}
+@keyframes peliTimerPulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.06); } }
+
+/* Image stage (kuvavisa) */
+.peli-image-stage {
+  position: relative;
+  aspect-ratio: 3 / 2;
+  width: 100%;
+  border-radius: 14px;
+  overflow: hidden;
+  background: var(--peli-cream-2);
+  box-shadow: var(--peli-shadow-md);
+}
+.peli-image {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Question text */
+.peli-q-text {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 21px;
+  line-height: 1.2;
+  color: var(--peli-navy);
+}
+
+/* Options */
+.peli-options {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.peli-opt {
+  appearance: none;
+  background: var(--peli-cream);
+  border: 1.5px solid rgba(15, 21, 32, 0.1);
+  color: var(--peli-navy);
+  font-family: var(--font-body);
+  font-size: 16px;
+  font-weight: 600;
+  padding: 14px 14px;
+  border-radius: 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  transition: transform 0.15s, background 0.2s, border-color 0.2s;
+  text-align: left;
+}
+.peli-opt:hover:not(:disabled) {
+  background: var(--peli-cream-2);
+  border-color: rgba(15, 21, 32, 0.2);
+}
+.peli-opt:active:not(:disabled) { transform: scale(0.98); }
+.peli-opt:disabled { cursor: default; }
+.peli-opt-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+}
+.peli-opt-letter {
+  display: inline-grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 6px;
+  background: rgba(15, 21, 32, 0.08);
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 14px;
+  color: var(--peli-navy);
+  flex-shrink: 0;
+}
+.peli-opt-badge {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 18px;
+  width: 26px;
+  text-align: center;
+}
+.peli-opt.correct {
+  background: rgba(46, 125, 82, 0.12);
+  border-color: var(--peli-correct);
+  color: var(--peli-correct);
+}
+.peli-opt.correct .peli-opt-letter {
+  background: var(--peli-correct);
+  color: var(--peli-white);
+}
+.peli-opt.correct .peli-opt-badge { color: var(--peli-correct); }
+.peli-opt.wrong {
+  background: rgba(192, 57, 43, 0.1);
+  border-color: var(--peli-wrong);
+  color: var(--peli-wrong);
+}
+.peli-opt.wrong .peli-opt-letter {
+  background: var(--peli-wrong);
+  color: var(--peli-white);
+}
+.peli-opt.wrong .peli-opt-badge { color: var(--peli-wrong); }
+
+/* Fact panel */
+.peli-fact {
+  background: var(--peli-cream-2);
+  padding: 14px 16px;
+  border-radius: 12px;
+  border-left: 4px solid var(--peli-gold);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity 0.4s, transform 0.4s;
+}
+.peli-fact.show { opacity: 1; transform: translateY(0); }
+.peli-fact .label {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--peli-gold);
+}
+.peli-fact .body {
+  font-family: var(--font-body);
+  font-size: 15px;
+  color: var(--peli-navy);
+  line-height: 1.45;
+}
+
+.peli-next-wrap {
+  display: flex;
+  justify-content: center;
+  margin-top: 4px;
+}
+
+/* End screen */
+.peli-end {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 40px 16px 60px;
+  gap: 14px;
+}
+.peli-trophy { font-size: 64px; line-height: 1; }
+.peli-end-h2 {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 38px;
+  letter-spacing: -0.01em;
+  color: var(--peli-navy);
+}
+.peli-big-score {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 64px;
+  line-height: 1;
+  color: var(--peli-gold);
+}
+.peli-big-score small {
+  font-size: 24px;
+  color: var(--peli-muted);
+}
+.peli-percentile {
+  font-family: var(--font-body);
+  font-size: 16px;
+  color: var(--peli-navy);
+}
+.peli-percentile b { color: var(--peli-gold); }
+.peli-end-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 14px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .peli *, .peli *::before, .peli *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+@media (max-width: 380px) {
+  .peli-h1 { font-size: 54px; }
+  .peli-q-text { font-size: 19px; }
+  .peli-opt { font-size: 15px; padding: 12px 12px; }
+}
+

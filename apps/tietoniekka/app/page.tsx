@@ -166,10 +166,10 @@ export default function HomePage() {
             <div className="quiz-progress">Kysymys 1 / 5</div>
             <h4 className="quiz-question">Mikä on Suomen pisin joki?</h4>
             <div className="quiz-options">
-              <a className="quiz-option" href="peli.html?paivan_visa=1&first=A"><span className="badge">A</span> Tornionjoki</a>
-              <a className="quiz-option" href="peli.html?paivan_visa=1&first=B"><span className="badge">B</span> Kemijoki</a>
-              <a className="quiz-option" href="peli.html?paivan_visa=1&first=C"><span className="badge">C</span> Oulujoki</a>
-              <a className="quiz-option" href="peli.html?paivan_visa=1&first=D"><span className="badge">D</span> Vantaanjoki</a>
+              <a className="quiz-option" href="/peli?paivan_visa=1&first=A"><span className="badge">A</span> Tornionjoki</a>
+              <a className="quiz-option" href="/peli?paivan_visa=1&first=B"><span className="badge">B</span> Kemijoki</a>
+              <a className="quiz-option" href="/peli?paivan_visa=1&first=C"><span className="badge">C</span> Oulujoki</a>
+              <a className="quiz-option" href="/peli?paivan_visa=1&first=D"><span className="badge">D</span> Vantaanjoki</a>
             </div>
           </div>
         </div>
@@ -183,7 +183,7 @@ export default function HomePage() {
         </div>
         <div className="container-wide">
           <div className="pinnalla-strip">
-            <a className="event-card" href="peli.html?event=vappu" data-target="2026-05-01">
+            <a className="event-card" href="/peli?event=vappu" data-target="2026-05-01">
               <img src="/pinnalla_vappu.png" alt="Vappu" />
               <div className="event-name">Vappu</div>
               <div className="event-countdown">
@@ -191,7 +191,7 @@ export default function HomePage() {
                 <span className="suffix">päivää</span>
               </div>
             </a>
-            <a className="event-card" href="peli.html?event=jaakiekko_mm" data-target="2026-05-09">
+            <a className="event-card" href="/peli?event=jaakiekko_mm" data-target="2026-05-09">
               <img src="/pinnalla_jaakiekko_mm.png" alt="Jääkiekon MM-kisat" />
               <div className="event-name">Jääkiekko MM</div>
               <div className="event-countdown">
@@ -199,7 +199,7 @@ export default function HomePage() {
                 <span className="suffix">päivää</span>
               </div>
             </a>
-            <a className="event-card" href="peli.html?event=euroviisut" data-target="2026-05-16">
+            <a className="event-card" href="/peli?event=euroviisut" data-target="2026-05-16">
               <img src="/pinnalla_euroviisut.png" alt="Euroviisut" />
               <div className="event-name">Euroviisut</div>
               <div className="event-countdown">
@@ -220,10 +220,10 @@ export default function HomePage() {
             <div className="quiz-progress">Kysymys 1 / 5</div>
             <h4 className="quiz-question">Mistä kaupungista suomalainen vappuperinne — haalarit ja lakki — sai alkunsa?</h4>
             <div className="quiz-options">
-              <a className="quiz-option" href="peli.html?event=vappu&first=A"><span className="badge">A</span> Helsinki</a>
-              <a className="quiz-option" href="peli.html?event=vappu&first=B"><span className="badge">B</span> Turku</a>
-              <a className="quiz-option" href="peli.html?event=vappu&first=C"><span className="badge">C</span> Tampere</a>
-              <a className="quiz-option" href="peli.html?event=vappu&first=D"><span className="badge">D</span> Jyväskylä</a>
+              <a className="quiz-option" href="/peli?event=vappu&first=A"><span className="badge">A</span> Helsinki</a>
+              <a className="quiz-option" href="/peli?event=vappu&first=B"><span className="badge">B</span> Turku</a>
+              <a className="quiz-option" href="/peli?event=vappu&first=C"><span className="badge">C</span> Tampere</a>
+              <a className="quiz-option" href="/peli?event=vappu&first=D"><span className="badge">D</span> Jyväskylä</a>
             </div>
           </div>
         </div>
@@ -233,7 +233,7 @@ export default function HomePage() {
       <section className="paivan-sankari">
         <div className="container-wide">
           <div className="sankari-card">
-            <a href="sankari.html" className="sankari-photo">
+            <a href="/peli?paivan_sankari=1" className="sankari-photo">
               <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=600&h=750&fit=crop&q=80" alt="Päivän sankari" />
               <div className="age-pill">🎂 Tänään 42 vuotta</div>
               <div className="sankari-overlay">
@@ -247,12 +247,12 @@ export default function HomePage() {
               <div className="quiz-progress">Kysymys 1 / 5</div>
               <h4 className="quiz-question">Kuinka vanha Iina Kuustonen täyttää tänään?</h4>
               <div className="quiz-options">
-                <a className="quiz-option" href="peli.html?paivan_sankari=1&first=A"><span className="badge">A</span> 40</a>
-                <a className="quiz-option" href="peli.html?paivan_sankari=1&first=B"><span className="badge">B</span> 42</a>
-                <a className="quiz-option" href="peli.html?paivan_sankari=1&first=C"><span className="badge">C</span> 44</a>
-                <a className="quiz-option" href="peli.html?paivan_sankari=1&first=D"><span className="badge">D</span> 46</a>
+                <a className="quiz-option" href="/peli?paivan_sankari=1&first=A"><span className="badge">A</span> 40</a>
+                <a className="quiz-option" href="/peli?paivan_sankari=1&first=B"><span className="badge">B</span> 42</a>
+                <a className="quiz-option" href="/peli?paivan_sankari=1&first=C"><span className="badge">C</span> 44</a>
+                <a className="quiz-option" href="/peli?paivan_sankari=1&first=D"><span className="badge">D</span> 46</a>
               </div>
-              <a href="peli.html?paivan_sankari=1" className="btn btn-primary btn-large">PISTÄ TULEEN →</a>
+              <a href="/peli?paivan_sankari=1" className="btn btn-primary btn-large">PISTÄ TULEEN →</a>
             </div>
           </div>
         </div>
@@ -291,10 +291,10 @@ export default function HomePage() {
               <div className="visa-progress">Kokeile · Kysymys 1 / 5</div>
               <h4 className="visa-question">Kuinka monta kertaa Suomi on voittanut jääkiekon MM-kultaa?</h4>
               <div className="visa-options">
-                <a className="visa-option" href="peli.html?kat=urheilu&first=A"><span className="badge">A</span> 4</a>
-                <a className="visa-option" href="peli.html?kat=urheilu&first=B"><span className="badge">B</span> 3</a>
-                <a className="visa-option" href="peli.html?kat=urheilu&first=C"><span className="badge">C</span> 5</a>
-                <a className="visa-option" href="peli.html?kat=urheilu&first=D"><span className="badge">D</span> 2</a>
+                <a className="visa-option" href="/peli?kat=urheilu&first=A"><span className="badge">A</span> 4</a>
+                <a className="visa-option" href="/peli?kat=urheilu&first=B"><span className="badge">B</span> 3</a>
+                <a className="visa-option" href="/peli?kat=urheilu&first=C"><span className="badge">C</span> 5</a>
+                <a className="visa-option" href="/peli?kat=urheilu&first=D"><span className="badge">D</span> 2</a>
               </div>
             </div>
           </article>
@@ -316,10 +316,10 @@ export default function HomePage() {
               <div className="visa-progress">Kokeile · Kysymys 1 / 10</div>
               <h4 className="visa-question">Mikä on Suomen suurin järvi?</h4>
               <div className="visa-options">
-                <a className="visa-option" href="peli.html?kat=maantieto&first=A"><span className="badge">A</span> Päijänne</a>
-                <a className="visa-option" href="peli.html?kat=maantieto&first=B"><span className="badge">B</span> Saimaa</a>
-                <a className="visa-option" href="peli.html?kat=maantieto&first=C"><span className="badge">C</span> Inarijärvi</a>
-                <a className="visa-option" href="peli.html?kat=maantieto&first=D"><span className="badge">D</span> Oulujärvi</a>
+                <a className="visa-option" href="/peli?kat=maantieto&first=A"><span className="badge">A</span> Päijänne</a>
+                <a className="visa-option" href="/peli?kat=maantieto&first=B"><span className="badge">B</span> Saimaa</a>
+                <a className="visa-option" href="/peli?kat=maantieto&first=C"><span className="badge">C</span> Inarijärvi</a>
+                <a className="visa-option" href="/peli?kat=maantieto&first=D"><span className="badge">D</span> Oulujärvi</a>
               </div>
             </div>
           </article>
@@ -337,10 +337,10 @@ export default function HomePage() {
               <div className="visa-progress">Kokeile · Kysymys 1 / 10</div>
               <h4 className="visa-question">Mikä on Suomen kansalliseläin?</h4>
               <div className="visa-options">
-                <a className="visa-option" href="peli.html?kat=luonto&first=A"><span className="badge">A</span> Karhu</a>
-                <a className="visa-option" href="peli.html?kat=luonto&first=B"><span className="badge">B</span> Ahma</a>
-                <a className="visa-option" href="peli.html?kat=luonto&first=C"><span className="badge">C</span> Hirvi</a>
-                <a className="visa-option" href="peli.html?kat=luonto&first=D"><span className="badge">D</span> Joutsen</a>
+                <a className="visa-option" href="/peli?kat=luonto&first=A"><span className="badge">A</span> Karhu</a>
+                <a className="visa-option" href="/peli?kat=luonto&first=B"><span className="badge">B</span> Ahma</a>
+                <a className="visa-option" href="/peli?kat=luonto&first=C"><span className="badge">C</span> Hirvi</a>
+                <a className="visa-option" href="/peli?kat=luonto&first=D"><span className="badge">D</span> Joutsen</a>
               </div>
             </div>
           </article>
@@ -358,10 +358,10 @@ export default function HomePage() {
               <div className="visa-progress">Kokeile · Kysymys 1 / 12</div>
               <h4 className="visa-question">Minä vuonna Suomi itsenäistyi?</h4>
               <div className="visa-options">
-                <a className="visa-option" href="peli.html?kat=historia&first=A"><span className="badge">A</span> 1906</a>
-                <a className="visa-option" href="peli.html?kat=historia&first=B"><span className="badge">B</span> 1917</a>
-                <a className="visa-option" href="peli.html?kat=historia&first=C"><span className="badge">C</span> 1918</a>
-                <a className="visa-option" href="peli.html?kat=historia&first=D"><span className="badge">D</span> 1944</a>
+                <a className="visa-option" href="/peli?kat=historia&first=A"><span className="badge">A</span> 1906</a>
+                <a className="visa-option" href="/peli?kat=historia&first=B"><span className="badge">B</span> 1917</a>
+                <a className="visa-option" href="/peli?kat=historia&first=C"><span className="badge">C</span> 1918</a>
+                <a className="visa-option" href="/peli?kat=historia&first=D"><span className="badge">D</span> 1944</a>
               </div>
             </div>
           </article>
@@ -379,10 +379,10 @@ export default function HomePage() {
               <div className="visa-progress">Kokeile · Kysymys 1 / 8</div>
               <h4 className="visa-question">Mikä on Suomen pitkäikäisin kotimainen TV-sarja?</h4>
               <div className="visa-options">
-                <a className="visa-option" href="peli.html?kat=tv-sarjat&first=A"><span className="badge">A</span> Salatut elämät</a>
-                <a className="visa-option" href="peli.html?kat=tv-sarjat&first=B"><span className="badge">B</span> Kotikatu</a>
-                <a className="visa-option" href="peli.html?kat=tv-sarjat&first=C"><span className="badge">C</span> Hovimäki</a>
-                <a className="visa-option" href="peli.html?kat=tv-sarjat&first=D"><span className="badge">D</span> Reinikainen</a>
+                <a className="visa-option" href="/peli?kat=tv-sarjat&first=A"><span className="badge">A</span> Salatut elämät</a>
+                <a className="visa-option" href="/peli?kat=tv-sarjat&first=B"><span className="badge">B</span> Kotikatu</a>
+                <a className="visa-option" href="/peli?kat=tv-sarjat&first=C"><span className="badge">C</span> Hovimäki</a>
+                <a className="visa-option" href="/peli?kat=tv-sarjat&first=D"><span className="badge">D</span> Reinikainen</a>
               </div>
             </div>
           </article>
@@ -400,10 +400,10 @@ export default function HomePage() {
               <div className="visa-progress">Kokeile · Kysymys 1 / 10</div>
               <h4 className="visa-question">Kuka ohjasi Tuntemattoman sotilaan vuoden 2017 versiossa?</h4>
               <div className="visa-options">
-                <a className="visa-option" href="peli.html?kat=elokuvat&first=A"><span className="badge">A</span> Aki Kaurismäki</a>
-                <a className="visa-option" href="peli.html?kat=elokuvat&first=B"><span className="badge">B</span> Aku Louhimies</a>
-                <a className="visa-option" href="peli.html?kat=elokuvat&first=C"><span className="badge">C</span> Klaus Härö</a>
-                <a className="visa-option" href="peli.html?kat=elokuvat&first=D"><span className="badge">D</span> Jalmari Helander</a>
+                <a className="visa-option" href="/peli?kat=elokuvat&first=A"><span className="badge">A</span> Aki Kaurismäki</a>
+                <a className="visa-option" href="/peli?kat=elokuvat&first=B"><span className="badge">B</span> Aku Louhimies</a>
+                <a className="visa-option" href="/peli?kat=elokuvat&first=C"><span className="badge">C</span> Klaus Härö</a>
+                <a className="visa-option" href="/peli?kat=elokuvat&first=D"><span className="badge">D</span> Jalmari Helander</a>
               </div>
             </div>
           </article>
@@ -421,10 +421,10 @@ export default function HomePage() {
               <div className="visa-progress">Kokeile · Kysymys 1 / 10</div>
               <h4 className="visa-question">Kuka voitti Eurovision Suomelle vuonna 2006?</h4>
               <div className="visa-options">
-                <a className="visa-option" href="peli.html?kat=musiikki&first=A"><span className="badge">A</span> Lordi</a>
-                <a className="visa-option" href="peli.html?kat=musiikki&first=B"><span className="badge">B</span> Krista Siegfrids</a>
-                <a className="visa-option" href="peli.html?kat=musiikki&first=C"><span className="badge">C</span> Saara Aalto</a>
-                <a className="visa-option" href="peli.html?kat=musiikki&first=D"><span className="badge">D</span> Pertti Kurikka</a>
+                <a className="visa-option" href="/peli?kat=musiikki&first=A"><span className="badge">A</span> Lordi</a>
+                <a className="visa-option" href="/peli?kat=musiikki&first=B"><span className="badge">B</span> Krista Siegfrids</a>
+                <a className="visa-option" href="/peli?kat=musiikki&first=C"><span className="badge">C</span> Saara Aalto</a>
+                <a className="visa-option" href="/peli?kat=musiikki&first=D"><span className="badge">D</span> Pertti Kurikka</a>
               </div>
             </div>
           </article>
@@ -446,10 +446,10 @@ export default function HomePage() {
               <div className="visa-progress">Kokeile · Kysymys 1 / 8</div>
               <h4 className="visa-question">Mikä on klassinen pääsiäisruoka Suomessa?</h4>
               <div className="visa-options">
-                <a className="visa-option" href="peli.html?kat=ruoka-juoma&first=A"><span className="badge">A</span> Mämmi</a>
-                <a className="visa-option" href="peli.html?kat=ruoka-juoma&first=B"><span className="badge">B</span> Karjalanpiirakka</a>
-                <a className="visa-option" href="peli.html?kat=ruoka-juoma&first=C"><span className="badge">C</span> Mustamakkara</a>
-                <a className="visa-option" href="peli.html?kat=ruoka-juoma&first=D"><span className="badge">D</span> Lanttulaatikko</a>
+                <a className="visa-option" href="/peli?kat=ruoka-juoma&first=A"><span className="badge">A</span> Mämmi</a>
+                <a className="visa-option" href="/peli?kat=ruoka-juoma&first=B"><span className="badge">B</span> Karjalanpiirakka</a>
+                <a className="visa-option" href="/peli?kat=ruoka-juoma&first=C"><span className="badge">C</span> Mustamakkara</a>
+                <a className="visa-option" href="/peli?kat=ruoka-juoma&first=D"><span className="badge">D</span> Lanttulaatikko</a>
               </div>
             </div>
           </article>
@@ -479,27 +479,27 @@ export default function HomePage() {
             <div className="quiz-progress">Kysymys 1 / 50</div>
             <h4 className="quiz-question">Minkä maan lippu tämä on?</h4>
             <div className="quiz-options">
-              <a className="quiz-option" href="peli.html?kuvavisa=liput&first=A"><span className="badge">A</span> Suomi</a>
-              <a className="quiz-option" href="peli.html?kuvavisa=liput&first=B"><span className="badge">B</span> Ruotsi</a>
-              <a className="quiz-option" href="peli.html?kuvavisa=liput&first=C"><span className="badge">C</span> Tanska</a>
-              <a className="quiz-option" href="peli.html?kuvavisa=liput&first=D"><span className="badge">D</span> Norja</a>
+              <a className="quiz-option" href="/peli?kuvavisa=liput&first=A"><span className="badge">A</span> Suomi</a>
+              <a className="quiz-option" href="/peli?kuvavisa=liput&first=B"><span className="badge">B</span> Ruotsi</a>
+              <a className="quiz-option" href="/peli?kuvavisa=liput&first=C"><span className="badge">C</span> Tanska</a>
+              <a className="quiz-option" href="/peli?kuvavisa=liput&first=D"><span className="badge">D</span> Norja</a>
             </div>
           </div>
 
           <div className="kuvavisa-grid">
-            <a className="kuvavisa-card" href="peli.html?kuvavisa=paikkakunta">
+            <a className="kuvavisa-card" href="/peli?kuvavisa=paikkakunta">
               <div className="kuvavisa-emoji">🏘️</div>
               <span className="alaluokka-badge">Paikkakunta</span>
               <h3>Tunnista suomalainen paikkakunta kuvasta</h3>
               <p>10 kysymystä</p>
             </a>
-            <a className="kuvavisa-card" href="peli.html?kuvavisa=logot">
+            <a className="kuvavisa-card" href="/peli?kuvavisa=logot">
               <div className="kuvavisa-emoji">🚜</div>
               <span className="alaluokka-badge">Logot</span>
               <h3>Tunnista traktori pelkästä logosta</h3>
               <p>15 kysymystä</p>
             </a>
-            <a className="kuvavisa-card" href="peli.html?kuvavisa=vaakuna">
+            <a className="kuvavisa-card" href="/peli?kuvavisa=vaakuna">
               <div className="kuvavisa-emoji">🛡️</div>
               <span className="alaluokka-badge">Vaakuna</span>
               <h3>Tunnista suomalainen kunnanvaakuna</h3>
@@ -515,7 +515,7 @@ export default function HomePage() {
           <div className="arvo-card">
             <h2>Ei me kerrota kellekään</h2>
             <p>jos pelaat vielä lisää. 50+ visaa odottaa, noppa päättää.</p>
-            <a href="peli.html?random=1" className="btn btn-primary btn-large">ANNA MENNÄ NYT VAAN →</a>
+            <a href="/peli?random=1" className="btn btn-primary btn-large">ANNA MENNÄ NYT VAAN →</a>
           </div>
         </div>
       </section>
