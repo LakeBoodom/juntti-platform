@@ -194,8 +194,8 @@ export default function HomePage() {
       {/* 3. PINNALLA NYT */}
       <section className="pinnalla-nyt">
         <div className="container-wide">
-          <h2 className="section-header">Mitä Suomi odottaa...</h2>
-          <p className="section-subtitle">Virittäydy tunnelmaan teemavisalla.</p>
+          <h2 className="section-header">Mitä Suomi odottaa</h2>
+          <p className="section-subtitle">virittäydy tunnelmaan teemavisalla</p>
         </div>
         <div className="container-wide">
           <div className="pinnalla-strip">
@@ -228,9 +228,8 @@ export default function HomePage() {
         <div className="container-wide">
           <div className="featured-quiz" style={{ ["--quiz-tint" as string]: "rgba(31, 61, 46, 0.4)" } as React.CSSProperties}>
             <div className="quiz-header">
-              <span className="emoji">🎉</span>
               <div>
-                <h3>Vapputrivia <span className="countdown">— 6 päivää!</span></h3>
+                <h3>Teematrivia <span className="countdown">— 6 päivää!</span></h3>
                 <p>Testaa ennen kuin olet nauttinut liikaa simaa!</p>
               </div>
             </div>
@@ -292,10 +291,10 @@ export default function HomePage() {
       {/* 6. KATEGORIAT */}
       <section className="kategoriat">
         <div className="container-wide">
-          <h2 className="section-header">Kategoriat</h2>
-          <p className="section-subtitle">Mahtaakohan taitosi riittää, mutta kokeile nyt kuitenkin!</p>
+          <h2 className="section-header">Testaa tietosi eri aiheissa</h2>
+          <p className="section-subtitle">mahtaakohan tietosi riittää? Kokeile nyt kuitenkin!</p>
 
-          <article className="kategoria-inline-card" data-watermark="URHEILU" style={{ ["--kat-color" as string]: "var(--color-cat-urheilu)" } as React.CSSProperties}>
+          <article className="kategoria-inline-card" data-watermark="URHEILU" style={{ ["--kat-color" as string]: "var(--color-cat-urheilu)", ["--bg-image" as string]: "url(/urheilu_kuva.png)" } as React.CSSProperties}>
             <div className="kategoria-card-hero">
               <span className="eyebrow">— Kategoria</span>
               <h3>URHEILU</h3>
@@ -316,7 +315,7 @@ export default function HomePage() {
             </div>
           </article>
 
-          <article className="kategoria-inline-card" data-watermark="MAANTIETO" style={{ ["--kat-color" as string]: "var(--color-cat-maantieto)" } as React.CSSProperties}>
+          <article className="kategoria-inline-card" data-watermark="MAANTIETO" style={{ ["--kat-color" as string]: "var(--color-cat-maantieto)", ["--bg-image" as string]: "url(/maantieto_kuva.png)" } as React.CSSProperties}>
             <div className="kategoria-card-hero">
               <span className="eyebrow">— Kategoria</span>
               <h3>MAANTIETO</h3>
@@ -337,7 +336,7 @@ export default function HomePage() {
             </div>
           </article>
 
-          <article className="kategoria-inline-card" data-watermark="LUONTO" style={{ ["--kat-color" as string]: "var(--color-cat-luonto)" } as React.CSSProperties}>
+          <article className="kategoria-inline-card" data-watermark="LUONTO" style={{ ["--kat-color" as string]: "var(--color-cat-luonto)", ["--bg-image" as string]: "url(/luonto_kuva.png)" } as React.CSSProperties}>
             <div className="kategoria-card-hero">
               <span className="eyebrow">— Kategoria</span>
               <h3>LUONTO</h3>
@@ -358,7 +357,7 @@ export default function HomePage() {
             </div>
           </article>
 
-          <article className="kategoria-inline-card" data-watermark="HISTORIA" style={{ ["--kat-color" as string]: "var(--color-cat-historia)" } as React.CSSProperties}>
+          <article className="kategoria-inline-card" data-watermark="HISTORIA" style={{ ["--kat-color" as string]: "var(--color-cat-historia)", ["--bg-image" as string]: "url(/historia_kuva.png)" } as React.CSSProperties}>
             <div className="kategoria-card-hero">
               <span className="eyebrow">— Kategoria</span>
               <h3>HISTORIA</h3>
@@ -379,7 +378,7 @@ export default function HomePage() {
             </div>
           </article>
 
-          <article className="kategoria-inline-card" data-watermark="TV-SARJAT" style={{ ["--kat-color" as string]: "var(--color-cat-tv-sarjat)" } as React.CSSProperties}>
+          <article className="kategoria-inline-card" data-watermark="TV-SARJAT" style={{ ["--kat-color" as string]: "var(--color-cat-tv-sarjat)", ["--bg-image" as string]: "url(/TV_kuva.png)" } as React.CSSProperties}>
             <div className="kategoria-card-hero">
               <span className="eyebrow">— Kategoria</span>
               <h3>TV-SARJAT</h3>
@@ -400,7 +399,7 @@ export default function HomePage() {
             </div>
           </article>
 
-          <article className="kategoria-inline-card" data-watermark="ELOKUVAT" style={{ ["--kat-color" as string]: "var(--color-cat-elokuvat)" } as React.CSSProperties}>
+          <article className="kategoria-inline-card" data-watermark="ELOKUVAT" style={{ ["--kat-color" as string]: "var(--color-cat-elokuvat)", ["--bg-image" as string]: "url(/elokuvat_kuva.png)" } as React.CSSProperties}>
             <div className="kategoria-card-hero">
               <span className="eyebrow">— Kategoria</span>
               <h3>ELOKUVAT</h3>
@@ -421,7 +420,7 @@ export default function HomePage() {
             </div>
           </article>
 
-          <article className="kategoria-inline-card" data-watermark="MUSIIKKI" style={{ ["--kat-color" as string]: "var(--color-cat-musiikki)" } as React.CSSProperties}>
+          <article className="kategoria-inline-card" data-watermark="MUSIIKKI" style={{ ["--kat-color" as string]: "var(--color-cat-musiikki)", ["--bg-image" as string]: "url(/musiikki_kuva.png)" } as React.CSSProperties}>
             <div className="kategoria-card-hero">
               <span className="eyebrow">— Kategoria</span>
               <h3>MUSIIKKI</h3>
@@ -442,7 +441,7 @@ export default function HomePage() {
             </div>
           </article>
 
-          <article className="kategoria-inline-card" data-watermark="RUOKA" style={{ ["--kat-color" as string]: "var(--color-cat-ruoka-juoma)" } as React.CSSProperties}>
+          <article className="kategoria-inline-card" data-watermark="RUOKA" style={{ ["--kat-color" as string]: "var(--color-cat-ruoka-juoma)", ["--bg-image" as string]: "url(/ruokajajuoma_kuva.png)" } as React.CSSProperties}>
             <div className="kategoria-card-hero">
               <span className="eyebrow">— Kategoria</span>
               <h3>RUOKA &amp; JUOMA</h3>
@@ -469,10 +468,10 @@ export default function HomePage() {
       <section className="tunnista-tama">
         <div className="container-wide">
           <div className="section-header-row">
-            <h2 className="section-header">Tunnista tämä</h2>
+            <h2 className="section-header">Tunnistatko kuvasta</h2>
             <a href="kuvavisat.html" className="see-all">Kaikki →</a>
           </div>
-          <p className="section-subtitle">Jospa kuvien tunnistaminen sujuisi paremmin.</p>
+          <p className="section-subtitle">jospa kuvat olisi paremmin hallussa</p>
 
           <div className="kuvavisa-featured">
             <div className="quiz-header">
