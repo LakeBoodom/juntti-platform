@@ -234,7 +234,7 @@ export default function HomePage() {
       <section className="paivan-sankari" id="paivan-sankari">
         <div className="container-wide">
           <div className="sankari-card">
-            <a href="/peli?paivan_sankari=1" className="sankari-photo">
+            <Link href="/sankari/iina-kuustonen" className="sankari-photo">
               <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=600&h=750&fit=crop&q=80" alt="Päivän sankari" />
               <div className="age-pill">🎂 Tänään 42 vuotta</div>
               <div className="sankari-overlay">
@@ -242,7 +242,7 @@ export default function HomePage() {
                 <p className="sankari-meta">Näyttelijä · Syntynyt 19.4.1984</p>
               </div>
               <span className="wiki-credit">📷 Wikipedia</span>
-            </a>
+            </Link>
             <div className="sankari-quiz-info">
               <span className="eyebrow">Tunne päivän sankari</span>
               <div className="quiz-progress">Kysymys 1 / 5</div>
