@@ -26,6 +26,7 @@ export type Database = {
           name: string
           platform: string | null
           role: string
+          site_id: string | null
           trivia_quiz_id: string | null
           wikipedia_url: string | null
         }
@@ -39,6 +40,7 @@ export type Database = {
           name: string
           platform?: string | null
           role: string
+          site_id?: string | null
           trivia_quiz_id?: string | null
           wikipedia_url?: string | null
         }
@@ -52,10 +54,18 @@ export type Database = {
           name?: string
           platform?: string | null
           role?: string
+          site_id?: string | null
           trivia_quiz_id?: string | null
           wikipedia_url?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "celebrities_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: false
+            referencedRelation: "sites"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "celebrities_trivia_quiz_id_fkey"
             columns: ["trivia_quiz_id"]
@@ -73,7 +83,9 @@ export type Database = {
           name: string
           object_type: string
           platform: string | null
+          site_id: string | null
           slug: string
+          tag: string | null
           trivia_quiz_id: string | null
         }
         Insert: {
@@ -83,7 +95,9 @@ export type Database = {
           name: string
           object_type: string
           platform?: string | null
+          site_id?: string | null
           slug: string
+          tag?: string | null
           trivia_quiz_id?: string | null
         }
         Update: {
@@ -93,10 +107,19 @@ export type Database = {
           name?: string
           object_type?: string
           platform?: string | null
+          site_id?: string | null
           slug?: string
+          tag?: string | null
           trivia_quiz_id?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "countdowns_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: false
+            referencedRelation: "sites"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "countdowns_trivia_quiz_id_fkey"
             columns: ["trivia_quiz_id"]
@@ -131,6 +154,65 @@ export type Database = {
             columns: ["quiz_id"]
             isOneToOne: false
             referencedRelation: "quizzes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      kuvavisas: {
+        Row: {
+          active: boolean
+          correct_option: string
+          created_at: string
+          difficulty: string | null
+          fact: string | null
+          id: string
+          image_url: string
+          options: Json
+          question: string
+          site_id: string
+          tag: string | null
+          type: string
+          updated_at: string
+          weight: number
+        }
+        Insert: {
+          active?: boolean
+          correct_option: string
+          created_at?: string
+          difficulty?: string | null
+          fact?: string | null
+          id?: string
+          image_url: string
+          options: Json
+          question: string
+          site_id: string
+          tag?: string | null
+          type: string
+          updated_at?: string
+          weight?: number
+        }
+        Update: {
+          active?: boolean
+          correct_option?: string
+          created_at?: string
+          difficulty?: string | null
+          fact?: string | null
+          id?: string
+          image_url?: string
+          options?: Json
+          question?: string
+          site_id?: string
+          tag?: string | null
+          type?: string
+          updated_at?: string
+          weight?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "kuvavisas_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: false
+            referencedRelation: "sites"
             referencedColumns: ["id"]
           },
         ]
@@ -262,6 +344,7 @@ export type Database = {
           play_count: number | null
           published_at: string | null
           scheduled_for: string | null
+          site_id: string | null
           slug: string
           status: string
           target_age: string | null
@@ -283,6 +366,7 @@ export type Database = {
           play_count?: number | null
           published_at?: string | null
           scheduled_for?: string | null
+          site_id?: string | null
           slug: string
           status?: string
           target_age?: string | null
@@ -304,6 +388,7 @@ export type Database = {
           play_count?: number | null
           published_at?: string | null
           scheduled_for?: string | null
+          site_id?: string | null
           slug?: string
           status?: string
           target_age?: string | null
@@ -311,12 +396,121 @@ export type Database = {
           tone?: string | null
           updated_at?: string | null
         }
+        Relationships: [
+          {
+            foreignKeyName: "quizzes_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: false
+            referencedRelation: "sites"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      schedule_rules: {
+        Row: {
+          active: boolean
+          content_id: string
+          content_type: string
+          created_at: string
+          id: string
+          scheduled_date: string | null
+          site_id: string
+          strategy: string
+          tag: string | null
+          weight: number
+        }
+        Insert: {
+          active?: boolean
+          content_id: string
+          content_type: string
+          created_at?: string
+          id?: string
+          scheduled_date?: string | null
+          site_id: string
+          strategy: string
+          tag?: string | null
+          weight?: number
+        }
+        Update: {
+          active?: boolean
+          content_id?: string
+          content_type?: string
+          created_at?: string
+          id?: string
+          scheduled_date?: string | null
+          site_id?: string
+          strategy?: string
+          tag?: string | null
+          weight?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "schedule_rules_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: false
+            referencedRelation: "sites"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sites: {
+        Row: {
+          active: boolean
+          created_at: string
+          id: string
+          name: string
+          slug: string
+          theme_token: string | null
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          id?: string
+          name: string
+          slug: string
+          theme_token?: string | null
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          id?: string
+          name?: string
+          slug?: string
+          theme_token?: string | null
+        }
         Relationships: []
       }
     }
-    Views: { [_ in never]: never }
-    Functions: { [_ in never]: never }
-    Enums: { [_ in never]: never }
-    CompositeTypes: { [_ in never]: never }
+    Views: {
+      v_today_picks: {
+        Row: {
+          content_id: string | null
+          content_type: string | null
+          rule_id: string | null
+          site_id: string | null
+          strategy: string | null
+          tag: string | null
+          weight: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "schedule_rules_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: false
+            referencedRelation: "sites"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+    }
+    Functions: {
+      [_ in never]: never
+    }
+    Enums: {
+      [_ in never]: never
+    }
+    CompositeTypes: {
+      [_ in never]: never
+    }
   }
 }
