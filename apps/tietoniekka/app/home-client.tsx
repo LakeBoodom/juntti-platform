@@ -179,16 +179,23 @@ export function HomeClient({
         <div className="container-wide">
           <h2 className="section-header">Päivän visa</h2>
           <p className="section-subtitle">Tuntuuko, että tänään kulkee?</p>
-          <div className="featured-quiz" style={{ ["--quiz-tint" as string]: "rgba(26, 58, 69, 0.5)" } as React.CSSProperties}>
-            <div className="quiz-progress">Kysymys 1 / 5</div>
-            <h4 className="quiz-question">Mikä on Suomen pisin joki?</h4>
-            <div className="quiz-options">
-              <a className="quiz-option" href="/peli?paivan_visa=1&first=A"><span className="badge">A</span> Tornionjoki</a>
-              <a className="quiz-option" href="/peli?paivan_visa=1&first=B"><span className="badge">B</span> Kemijoki</a>
-              <a className="quiz-option" href="/peli?paivan_visa=1&first=C"><span className="badge">C</span> Oulujoki</a>
-              <a className="quiz-option" href="/peli?paivan_visa=1&first=D"><span className="badge">D</span> Vantaanjoki</a>
+          {todaysQuiz ? (
+            <Link
+              href={`/peli?paivan_visa=1&quiz_id=${todaysQuiz.id}`}
+              className="featured-quiz"
+              style={{ ["--quiz-tint" as string]: "rgba(26, 58, 69, 0.5)", textDecoration: "none", display: "block" } as React.CSSProperties}
+            >
+              <h4 className="quiz-question" style={{ marginBottom: "12px" }}>{todaysQuiz.title}</h4>
+              {todaysQuiz.description && (
+                <p style={{ color: "rgba(255,255,255,0.85)", marginBottom: "16px" }}>{todaysQuiz.description}</p>
+              )}
+              <span className="btn btn-primary btn-large" style={{ display: "inline-block" }}>PELAA NYT →</span>
+            </Link>
+          ) : (
+            <div className="featured-quiz" style={{ ["--quiz-tint" as string]: "rgba(26, 58, 69, 0.5)" } as React.CSSProperties}>
+              <p style={{ color: "rgba(255,255,255,0.7)" }}>Päivän visaa ei ole vielä asetettu — kokeile kategoriavisaa!</p>
             </div>
-          </div>
+          )}
         </div>
       </section>
 
@@ -201,8 +208,13 @@ export function HomeClient({
         <div className="container-wide">
           <div className="pinnalla-strip">
             {upcomingEvents.length > 0 ? upcomingEvents.map((ev) => {
-              // Kuva-fallback slugista (pinnalla_{slug}.png) jos tiedosto on /public:ssa
-              const imgSrc = `/pinnalla_${ev.slug}.png`;
+              // Slug → kuvatiedosto -mappaus (DB-slug ei aina matchaa /public-tiedostoa)
+              const SLUG_TO_IMAGE: Record<string, string> = {
+                "mm-kisat": "jaakiekko_mm",
+                "euroviisu": "euroviisut",
+              };
+              const imgKey = SLUG_TO_IMAGE[ev.slug] ?? ev.slug;
+              const imgSrc = `/pinnalla_${imgKey}.png`;
               const eventQuery = ev.tag ? `event=${ev.tag}` : `event=${ev.slug}`;
               // Laske target ISO-päivämäärä (tämä vuosi tai seuraava jos jo mennyt)
               const today = new Date();
@@ -210,14 +222,20 @@ export function HomeClient({
               const eventThisYear = new Date(year, ev.month - 1, ev.day);
               if (eventThisYear < today) year++;
               const targetIso = `${year}-${String(ev.month).padStart(2, "0")}-${String(ev.day).padStart(2, "0")}`;
+              // Päivien lasku
+              const targetDate = new Date(year, ev.month - 1, ev.day);
+              targetDate.setHours(0, 0, 0, 0);
+              const todayMidnight = new Date();
+              todayMidnight.setHours(0, 0, 0, 0);
+              const diffDays = Math.round((targetDate.getTime() - todayMidnight.getTime()) / (1000 * 60 * 60 * 24));
               return (
                 <a key={ev.id} className="event-card" href={`/peli?${eventQuery}${ev.trivia_quiz_id ? `&quiz_id=${ev.trivia_quiz_id}` : ""}`} data-target={targetIso}>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src={imgSrc} alt={ev.name} onError={(e) => { (e.target as HTMLImageElement).src = `https://placehold.co/400x300/1a3a45/e8a320?text=${encodeURIComponent(ev.name)}`; }} />
                   <div className="event-name">{ev.name}</div>
                   <div className="event-countdown">
-                    <span className="days">—</span>
-                    <span className="suffix">päivää</span>
+                    <span className="days">{diffDays === 0 ? "TÄNÄÄN" : diffDays === 1 ? "1" : diffDays}</span>
+                    <span className="suffix">{diffDays === 1 ? "päivä" : diffDays === 0 ? "" : "päivää"}</span>
                   </div>
                 </a>
               );
@@ -227,22 +245,38 @@ export function HomeClient({
           </div>
         </div>
         <div className="container-wide">
-          <div className="featured-quiz" style={{ ["--quiz-tint" as string]: "rgba(31, 61, 46, 0.4)" } as React.CSSProperties}>
-            <div className="quiz-header">
-              <div>
-                <h3>Teematrivia <span className="countdown">— 6 päivää!</span></h3>
-                <p>Testaa ennen kuin olet nauttinut liikaa simaa!</p>
-              </div>
-            </div>
-            <div className="quiz-progress">Kysymys 1 / 5</div>
-            <h4 className="quiz-question">Mistä kaupungista suomalainen vappuperinne — haalarit ja lakki — sai alkunsa?</h4>
-            <div className="quiz-options">
-              <a className="quiz-option" href="/peli?event=vappu&first=A"><span className="badge">A</span> Helsinki</a>
-              <a className="quiz-option" href="/peli?event=vappu&first=B"><span className="badge">B</span> Turku</a>
-              <a className="quiz-option" href="/peli?event=vappu&first=C"><span className="badge">C</span> Tampere</a>
-              <a className="quiz-option" href="/peli?event=vappu&first=D"><span className="badge">D</span> Jyväskylä</a>
-            </div>
-          </div>
+          {(() => {
+            // Ota lähin event jolla on trivia_quiz_id — sen pohjalta featured-teematrivia
+            const featured = upcomingEvents.find((e) => e.trivia_quiz_id) ?? upcomingEvents[0];
+            if (!featured) return null;
+            const today2 = new Date();
+            let yr = today2.getFullYear();
+            const eventThisYear2 = new Date(yr, featured.month - 1, featured.day);
+            if (eventThisYear2 < today2) yr++;
+            const targetDate = new Date(yr, featured.month - 1, featured.day);
+            targetDate.setHours(0, 0, 0, 0);
+            const todayMidnight = new Date();
+            todayMidnight.setHours(0, 0, 0, 0);
+            const diff = Math.round((targetDate.getTime() - todayMidnight.getTime()) / (1000 * 60 * 60 * 24));
+            const dayLabel = diff === 0 ? "tänään!" : diff === 1 ? "1 päivä!" : `${diff} päivää!`;
+            const linkQuery = featured.tag ? `event=${featured.tag}` : `event=${featured.slug}`;
+            const peliHref = `/peli?${linkQuery}${featured.trivia_quiz_id ? `&quiz_id=${featured.trivia_quiz_id}` : ""}`;
+            return (
+              <Link href={peliHref} className="featured-quiz" style={{ ["--quiz-tint" as string]: "rgba(31, 61, 46, 0.4)", textDecoration: "none", display: "block" } as React.CSSProperties}>
+                <div className="quiz-header">
+                  <div>
+                    <h3>Teematrivia <span className="countdown">— {dayLabel}</span></h3>
+                    <p>{featured.name} — virittäydy tunnelmaan teemavisalla.</p>
+                  </div>
+                </div>
+                {featured.trivia_quiz_id ? (
+                  <span className="btn btn-primary btn-large" style={{ display: "inline-block", marginTop: "16px" }}>PELAA TEEMAVISAA →</span>
+                ) : (
+                  <p style={{ color: "rgba(255,255,255,0.7)", marginTop: "16px" }}>Visaa luodaan parhaillaan…</p>
+                )}
+              </Link>
+            );
+          })()}
         </div>
       </section>
 
