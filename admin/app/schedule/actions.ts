@@ -19,7 +19,7 @@ function* eachDate(startIso: string, endIso: string): Generator<string> {
 }
 
 export type ScheduleRangeInput = {
-  platform: "juntti" | "tietovisa";
+  platform: "juntti" | "tietoniekka";
   startDate: string; // yyyy-mm-dd
   endDate: string; // inclusive
   quizId: string;
@@ -66,7 +66,7 @@ export async function deleteScheduleRow(id: string) {
 }
 
 export async function clearScheduleRange(input: {
-  platform: "juntti" | "tietovisa";
+  platform: "juntti" | "tietoniekka";
   startDate: string;
   endDate: string;
 }) {

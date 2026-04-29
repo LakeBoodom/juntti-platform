@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 import { getSupabaseAdmin, supabaseFromCookies } from "@/lib/supabase-server";
+import { listSites } from "@/lib/sites";
 import { Nav } from "@/components/nav";
 import { MetaEditor } from "./meta-editor";
 import { QuestionCard } from "./question-card";
@@ -28,6 +29,8 @@ export default async function QuizDetailPage({
     .maybeSingle();
 
   if (error || !quiz) return notFound();
+
+  const sites = await listSites();
 
   const { data: questions } = await admin
     .from("questions")
@@ -56,7 +59,17 @@ export default async function QuizDetailPage({
         <div className="space-y-3">
           <MetaEditor
             id={quiz.id}
-            initial={{ title: quiz.title, description: quiz.description }}
+            sites={sites}
+            isDraft={quiz.status === "draft"}
+            initial={{
+              title: quiz.title,
+              description: quiz.description,
+              category: quiz.category,
+              difficulty: quiz.difficulty as "helppo" | "keski" | "vaikea",
+              tone: (quiz.tone ?? "rento") as "rento" | "humoristinen" | "asiallinen" | "nostalginen",
+              platform: quiz.platform as "juntti" | "tietoniekka" | "both",
+              site_id: quiz.site_id,
+            }}
           />
           <div className="flex flex-wrap gap-2 text-xs text-muted-foreground">
             <span className="inline-flex items-center rounded-full border px-2 py-0.5">

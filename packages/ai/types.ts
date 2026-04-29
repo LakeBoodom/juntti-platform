@@ -1,7 +1,7 @@
 // Shared types for AI-generated content. Mirrors the Supabase schema
 // constraints from supabase/migrations/001_initial_schema.sql.
 
-export type Platform = "juntti" | "tietovisa" | "both";
+export type Platform = "juntti" | "tietoniekka" | "both";
 export type Difficulty = "helppo" | "keski" | "vaikea";
 export type TargetAge = "30-50" | "50-70" | "kaikki";
 export type Tone = "rento" | "humoristinen" | "asiallinen" | "nostalginen";
@@ -31,7 +31,7 @@ export type GenerateQuizInput = {
   difficulty: Difficulty;
   questionCount: number; // 5 or 10 (capped 3–15)
   tone: Tone;
-  platform: Platform; // usually "juntti" or "tietovisa"
+  platform: Platform; // usually "juntti" or "tietoniekka"
   targetAge?: TargetAge;
   // Optional grounding material — e.g. a Wikipedia article. When provided,
   // the model is instructed to use ONLY this text as fact source.

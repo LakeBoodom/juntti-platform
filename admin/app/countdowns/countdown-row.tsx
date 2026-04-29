@@ -48,8 +48,8 @@ export function CountdownRow({ row, siteId }: { row: CountdownFormValue; siteId:
   const platformLabel =
     row.platform === "juntti"
       ? "juntti.com"
-      : row.platform === "tietovisa"
-        ? "tietovisa.fi"
+      : row.platform === "tietoniekka"
+        ? "Tietoniekka.fi"
         : "molemmat";
 
   return (

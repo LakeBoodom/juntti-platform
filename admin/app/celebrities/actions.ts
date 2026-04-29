@@ -10,7 +10,7 @@ export type CelebrityInput = {
   role: string;
   bio_short: string | null;
   image_url: string | null;
-  platform: "juntti" | "tietovisa" | "both";
+  platform: "juntti" | "tietoniekka" | "both";
   wikipedia_url: string | null;
 };
 

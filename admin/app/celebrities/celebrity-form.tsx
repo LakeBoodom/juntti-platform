@@ -60,7 +60,7 @@ export function CelebrityForm({
   const [role, setRole] = useState(initial?.role ?? "");
   const [bio, setBio] = useState(initial?.bio_short ?? "");
   const [imageUrl, setImageUrl] = useState(initial?.image_url ?? "");
-  const [platform, setPlatform] = useState<"juntti" | "tietovisa" | "both">(
+  const [platform, setPlatform] = useState<"juntti" | "tietoniekka" | "both">(
     initial?.platform ?? "both",
   );
   const [error, setError] = useState<string | null>(null);
@@ -252,7 +252,7 @@ export function CelebrityForm({
           <SelectContent>
             <SelectItem value="both">Molemmat</SelectItem>
             <SelectItem value="juntti">Vain juntti.com</SelectItem>
-            <SelectItem value="tietovisa">Vain tietovisa.fi</SelectItem>
+            <SelectItem value="tietoniekka">Vain Tietoniekka.fi</SelectItem>
           </SelectContent>
         </Select>
       </div>

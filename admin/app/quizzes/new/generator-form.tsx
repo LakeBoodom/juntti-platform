@@ -42,7 +42,7 @@ export function GeneratorForm() {
   const [tone, setTone] = useState<
     "rento" | "humoristinen" | "asiallinen" | "nostalginen"
   >("rento");
-  const [platform, setPlatform] = useState<"juntti" | "tietovisa" | "both">(
+  const [platform, setPlatform] = useState<"juntti" | "tietoniekka" | "both">(
     "juntti",
   );
   const [error, setError] = useState<string | null>(null);
@@ -168,7 +168,7 @@ export function GeneratorForm() {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="juntti">juntti.com (30–50v)</SelectItem>
-              <SelectItem value="tietovisa">tietovisa.fi (50–70v)</SelectItem>
+              <SelectItem value="tietoniekka">Tietoniekka.fi (50–70v)</SelectItem>
               <SelectItem value="both">Molemmat</SelectItem>
             </SelectContent>
           </Select>

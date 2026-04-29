@@ -84,7 +84,7 @@ function DateFields({
 export function ScheduleForm({ quizzes }: { quizzes: QuizOption[] }) {
   const today = new Date().toISOString().slice(0, 10);
   const start = toParts(today);
-  const [platform, setPlatform] = useState<"juntti" | "tietovisa">("juntti");
+  const [platform, setPlatform] = useState<"juntti" | "tietoniekka">("juntti");
   const [startDay, setStartDay] = useState(start.day);
   const [startMonth, setStartMonth] = useState(start.month);
   const [startYear, setStartYear] = useState(start.year);
@@ -136,7 +136,7 @@ export function ScheduleForm({ quizzes }: { quizzes: QuizOption[] }) {
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="juntti">juntti.com</SelectItem>
-            <SelectItem value="tietovisa">tietovisa.fi</SelectItem>
+            <SelectItem value="tietoniekka">Tietoniekka.fi</SelectItem>
           </SelectContent>
         </Select>
       </div>

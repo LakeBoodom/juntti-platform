@@ -22,8 +22,8 @@ function validate(input: CountdownInput): string | null {
   if (input.day < 1 || input.day > 31) return "Päivä pitää olla 1–31";
   if (input.month < 1 || input.month > 12) return "Kuukausi pitää olla 1–12";
   if (!input.object_type.trim()) return "Tyyppi puuttuu";
-  if (input.platform && !["juntti", "tietovisa"].includes(input.platform))
-    return "Alusta pitää olla juntti, tietovisa tai tyhjä";
+  if (input.platform && !["juntti", "tietoniekka"].includes(input.platform))
+    return "Alusta pitää olla juntti, tietoniekka tai tyhjä";
   if (!input.site_id) return "Site ID puuttuu";
   if (input.tag && !/^[a-z0-9_-]+$/.test(input.tag))
     return "Tag saa sisältää vain pieniä kirjaimia, numeroita, alaviivoja ja viivoja";

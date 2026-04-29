@@ -6,13 +6,39 @@ import { getSupabaseAdmin } from "@juntti/db";
 
 export async function updateQuizMeta(
   id: string,
-  input: { title: string; description: string },
+  input: {
+    title: string;
+    description: string;
+    category?: string;
+    difficulty?: "helppo" | "keski" | "vaikea";
+    tone?: "rento" | "humoristinen" | "asiallinen" | "nostalginen";
+    platform?: "juntti" | "tietoniekka" | "both";
+    site_id?: string | null;
+  },
 ) {
+  if (!input.title.trim()) return { ok: false as const, error: "Otsikko puuttuu" };
   const sb = getSupabaseAdmin();
-  const { error } = await sb
-    .from("quizzes")
-    .update({ title: input.title, description: input.description })
-    .eq("id", id);
+  // Älä päivitä saraketta jos sitä ei ole annettu — tukee partiaalia inputtia
+  type QuizUpdate = {
+    title: string;
+    description: string | null;
+    category?: string;
+    difficulty?: string;
+    tone?: string;
+    platform?: string;
+    site_id?: string | null;
+  };
+  const update: QuizUpdate = {
+    title: input.title.trim(),
+    description: input.description?.trim() || null,
+  };
+  if (input.category !== undefined) update.category = input.category.trim();
+  if (input.difficulty !== undefined) update.difficulty = input.difficulty;
+  if (input.tone !== undefined) update.tone = input.tone;
+  if (input.platform !== undefined) update.platform = input.platform;
+  if (input.site_id !== undefined) update.site_id = input.site_id;
+
+  const { error } = await sb.from("quizzes").update(update).eq("id", id);
   if (error) return { ok: false as const, error: error.message };
   revalidatePath(`/quizzes/${id}`);
   revalidatePath(`/quizzes`);

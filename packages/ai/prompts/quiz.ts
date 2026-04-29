@@ -12,6 +12,8 @@ const AUDIENCE_GUIDE: Record<string, string> = {
     "Kohderyhmä: 30–50-vuotiaat suomalaiset. Viittaukset 90- ja 2000-lukuun tuttuja. Humoristinen, nostalginen tyyli toimii. Kieli rentoa ja nykysuomea.",
   tietovisa:
     "Kohderyhmä: 50–70-vuotiaat suomalaiset. Klassinen yleissivistys, perinteinen kulttuuri, historia. Kieli asiallisempaa, ei slangia.",
+  tietoniekka:
+    "Kohderyhmä: kaikenikäiset suomalaiset, keskimäärin 30-50. Yleissivistys ja ajankohtainen kulttuuri sekoitettuna. Sävy: hauska, lämpimän haastava.",
   both: "Kohderyhmä: kaikenikäiset suomalaiset. Vältä sukupolvikohtaisia viittauksia.",
 };
 

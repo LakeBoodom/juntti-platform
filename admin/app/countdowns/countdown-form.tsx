@@ -153,9 +153,9 @@ export function CountdownForm({
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="both">Molemmat (juntti + tietovisa)</SelectItem>
+            <SelectItem value="both">Molemmat (juntti + tietoniekka)</SelectItem>
             <SelectItem value="juntti">Vain juntti.com</SelectItem>
-            <SelectItem value="tietovisa">Vain tietovisa.fi</SelectItem>
+            <SelectItem value="tietoniekka">Vain Tietoniekka.fi</SelectItem>
           </SelectContent>
         </Select>
         <p className="text-xs text-muted-foreground">
