@@ -30,16 +30,17 @@ export type SankariData = {
 export async function getTodaysCelebrity(): Promise<SankariData | null> {
   const siteId = await getSiteId();
   if (!siteId) return null;
-  const today = new Date();
-  const mmdd = `${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
   const sb = getSupabase();
   if (!sb) return null;
-  const { data } = await sb
-    .from("celebrities")
-    .select("id, slug, name, role, birth_date, bio_short, image_url, wikipedia_url, trivia_quiz_id")
-    .eq("site_id", siteId)
-    .like("birth_date", `%-${mmdd}`);
-  return data?.[0] ?? null;
+  // RPC todays_celebrities — date-vertailu PG-puolella koska PostgREST .like()
+  // ei toimi date-tyyppi-sarakkeelle
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data, error } = await (sb as any).rpc("todays_celebrities", { p_site_id: siteId });
+  if (error) {
+    console.error("getTodaysCelebrity RPC:", error);
+    return null;
+  }
+  return (data as SankariData[] | null)?.[0] ?? null;
 }
 
 export async function getCelebrityBySlug(slug: string): Promise<SankariData | null> {

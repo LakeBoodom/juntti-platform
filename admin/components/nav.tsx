@@ -1,12 +1,7 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { SiteSwitcher } from "@/components/site-switcher";
-import { listSites, getCurrentSite } from "@/lib/sites";
 
-export async function Nav({ email }: { email?: string | null }) {
-  const sites = await listSites();
-  const current = await getCurrentSite();
-
+export function Nav({ email }: { email?: string | null }) {
   return (
     <nav className="border-b bg-background">
       <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4">
@@ -52,7 +47,6 @@ export async function Nav({ email }: { email?: string | null }) {
           </Link>
         </div>
         <div className="flex items-center gap-3">
-          <SiteSwitcher sites={sites} currentSlug={current.slug} />
           {email && (
             <span className="text-sm text-muted-foreground">{email}</span>
           )}
