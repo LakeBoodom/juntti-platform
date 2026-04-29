@@ -68,6 +68,7 @@ export function KuvavisaForm({
   const [uploading, startUpload] = useTransition();
   const [aiPending, startAi] = useTransition();
   const [aiSubject, setAiSubject] = useState("");
+  const [aiWikiUrl, setAiWikiUrl] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   function fillFromAi() {
@@ -81,6 +82,7 @@ export function KuvavisaForm({
         type,
         subject: aiSubject.trim(),
         difficulty,
+        wikipediaUrl: aiWikiUrl.trim() || null,
       });
       if (!res.ok) {
         setError(res.error);
@@ -186,8 +188,16 @@ export function KuvavisaForm({
             {aiPending ? "Generoidaan…" : "Täytä AI:lla"}
           </Button>
         </div>
+        <Input
+          value={aiWikiUrl}
+          onChange={(e) => setAiWikiUrl(e.target.value)}
+          placeholder="(valinnainen) Wikipedia-URL — rajaa AI:n vastauksen lähteeseen"
+          disabled={aiPending}
+        />
         <p className="text-xs text-muted-foreground">
           Kerro mitä kuvassa on. AI keksii kysymyksen + 3 väärää vastausta + fact-tekstin.
+          Jos annat Wikipedia-URL:n, AI käyttää sitä lähteenä — vastaava logiikka kuin
+          julkkisten visa-luonnissa.
         </p>
       </div>
 

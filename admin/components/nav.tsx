@@ -15,10 +15,22 @@ export async function Nav({ email }: { email?: string | null }) {
             Admin
           </Link>
           <Link
+            href="/paivan-visa"
+            className="text-sm text-muted-foreground hover:text-foreground"
+          >
+            Päivän visa
+          </Link>
+          <Link
             href="/quizzes"
             className="text-sm text-muted-foreground hover:text-foreground"
           >
             Visat
+          </Link>
+          <Link
+            href="/kuvavisat"
+            className="text-sm text-muted-foreground hover:text-foreground"
+          >
+            Kuvavisat
           </Link>
           <Link
             href="/celebrities"
@@ -33,22 +45,10 @@ export async function Nav({ email }: { email?: string | null }) {
             Countdownit
           </Link>
           <Link
-            href="/kuvavisat"
-            className="text-sm text-muted-foreground hover:text-foreground"
-          >
-            Kuvavisat
-          </Link>
-          <Link
             href="/schedule-rules"
             className="text-sm text-muted-foreground hover:text-foreground"
           >
             Ajastus
-          </Link>
-          <Link
-            href="/schedule"
-            className="text-sm text-muted-foreground hover:text-foreground"
-          >
-            Päivän ohjelma
           </Link>
         </div>
         <div className="flex items-center gap-3">

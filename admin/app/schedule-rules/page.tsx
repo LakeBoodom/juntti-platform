@@ -34,14 +34,22 @@ export default async function ScheduleRulesPage() {
   // Hae kaikki sisältö-vaihtoehdot per type — käytetään lomakkeessa selectoreina
   const [quizzes, celebs, countdowns, kuvavisas] = await Promise.all([
     admin.from("quizzes").select("id, title").eq("site_id", site.id).order("title"),
-    admin.from("celebrities").select("id, name").eq("site_id", site.id).order("name"),
+    admin.from("celebrities").select("id, name, birth_date").eq("site_id", site.id).order("name"),
     admin.from("countdowns").select("id, name").eq("site_id", site.id).order("name"),
     admin.from("kuvavisas").select("id, type, question").eq("site_id", site.id).order("created_at", { ascending: false }),
   ]);
 
   const contentOptions: ContentOptionsMap = {
     quiz: (quizzes.data ?? []).map((q) => ({ id: q.id, label: q.title })),
-    celebrity: (celebs.data ?? []).map((c) => ({ id: c.id, label: c.name })),
+    celebrity: (celebs.data ?? []).map((c) => {
+      // Näytä myös syntymäpäivä esim. "Niko Kapanen — 29.4."
+      let bdShort = "";
+      if (c.birth_date && /^\d{4}-\d{2}-\d{2}$/.test(c.birth_date)) {
+        const [, m, d] = c.birth_date.split("-").map((p) => parseInt(p, 10));
+        bdShort = ` — ${d}.${m}.`;
+      }
+      return { id: c.id, label: `${c.name}${bdShort}` };
+    }),
     countdown: (countdowns.data ?? []).map((c) => ({ id: c.id, label: c.name })),
     kuvavisa: (kuvavisas.data ?? []).map((k) => ({
       id: k.id,

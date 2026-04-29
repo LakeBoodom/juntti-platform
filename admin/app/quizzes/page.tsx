@@ -12,10 +12,14 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { SortableHeader } from "@/components/sortable-header";
 
 export const dynamic = "force-dynamic";
 
-export default async function QuizzesPage() {
+export default async function QuizzesPage({ searchParams }: { searchParams: Promise<{ sort?: string; dir?: string }> }) {
+  const sp = await searchParams;
+  const sortKey = sp.sort ?? "created_at";
+  const sortDir = sp.dir === "asc" ? "asc" : "desc";
   const sb = await supabaseFromCookies();
   const {
     data: { user },
@@ -29,7 +33,7 @@ export default async function QuizzesPage() {
       "id, title, slug, category, difficulty, tone, platform, status, created_at, play_count, site_id",
     )
     .eq("site_id", site.id)
-    .order("created_at", { ascending: false });
+    .order(sortKey, { ascending: sortDir === "asc" });
 
   return (
     <>
@@ -62,12 +66,12 @@ export default async function QuizzesPage() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Otsikko</TableHead>
-                  <TableHead>Kategoria</TableHead>
-                  <TableHead>Vaikeus</TableHead>
-                  <TableHead>Sävy</TableHead>
-                  <TableHead>Alusta</TableHead>
-                  <TableHead>Status</TableHead>
+                  <SortableHeader column="title">Otsikko</SortableHeader>
+                  <SortableHeader column="category">Kategoria</SortableHeader>
+                  <SortableHeader column="difficulty">Vaikeus</SortableHeader>
+                  <SortableHeader column="tone">Sävy</SortableHeader>
+                  <SortableHeader column="platform">Alusta</SortableHeader>
+                  <SortableHeader column="status">Status</SortableHeader>
                   <TableHead className="text-right">Pelatut</TableHead>
                 </TableRow>
               </TableHeader>

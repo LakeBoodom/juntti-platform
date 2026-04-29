@@ -8,12 +8,16 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { SortableHeader } from "@/components/sortable-header";
 import { CountdownRow } from "./countdown-row";
 import { NewCountdownButton } from "./new-button";
 
 export const dynamic = "force-dynamic";
 
-export default async function CountdownsPage() {
+export default async function CountdownsPage({ searchParams }: { searchParams: Promise<{ sort?: string; dir?: string }> }) {
+  const sp = await searchParams;
+  const sortKey = sp.sort ?? "month";
+  const sortDir = sp.dir === "desc" ? "desc" : "asc";
   const supabase = await supabaseFromCookies();
   const {
     data: { user },
@@ -26,8 +30,7 @@ export default async function CountdownsPage() {
     .from("countdowns")
     .select("id, name, slug, day, month, object_type, platform, tag, site_id")
     .eq("site_id", site.id)
-    .order("month", { ascending: true })
-    .order("day", { ascending: true });
+    .order(sortKey, { ascending: sortDir === "asc" });
 
   return (
     <>
@@ -56,11 +59,11 @@ export default async function CountdownsPage() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Nimi</TableHead>
-                  <TableHead>Slug</TableHead>
-                  <TableHead>Päivä</TableHead>
-                  <TableHead>Tyyppi</TableHead>
-                  <TableHead>Alusta</TableHead>
+                  <SortableHeader column="name">Nimi</SortableHeader>
+                  <SortableHeader column="slug">Slug</SortableHeader>
+                  <SortableHeader column="month">Päivä</SortableHeader>
+                  <SortableHeader column="object_type">Tyyppi</SortableHeader>
+                  <SortableHeader column="platform">Alusta</SortableHeader>
                   <TableHead className="text-right">Toiminnot</TableHead>
                 </TableRow>
               </TableHeader>

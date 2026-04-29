@@ -8,6 +8,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { SortableHeader } from "@/components/sortable-header";
 import { CelebrityRow } from "./celebrity-row";
 import { NewCelebrityButton } from "./new-button";
 
@@ -23,7 +24,10 @@ function daysUntilNextBirthday(birthDate: string): number {
 
 export const dynamic = "force-dynamic";
 
-export default async function CelebritiesPage() {
+export default async function CelebritiesPage({ searchParams }: { searchParams: Promise<{ sort?: string; dir?: string }> }) {
+  const sp = await searchParams;
+  const sortKey = sp.sort ?? "birthday";
+  const sortDir = sp.dir === "desc" ? "desc" : "asc";
   const sb = await supabaseFromCookies();
   const {
     data: { user },
@@ -39,11 +43,22 @@ export default async function CelebritiesPage() {
     .eq("site_id", site.id)
     .order("name", { ascending: true });
 
-  // Järjestä seuraavan synttärin mukaan (tulevat ensin, sitten myöhemmin)
+  // Järjestä valitun sarakkeen mukaan
   const data = rawData
-    ? [...rawData].sort(
-        (a, b) => daysUntilNextBirthday(a.birth_date) - daysUntilNextBirthday(b.birth_date),
-      )
+    ? [...rawData].sort((a, b) => {
+        let cmp = 0;
+        if (sortKey === "name") {
+          cmp = a.name.localeCompare(b.name, "fi");
+        } else if (sortKey === "birth_date") {
+          cmp = a.birth_date.localeCompare(b.birth_date);
+        } else if (sortKey === "role") {
+          cmp = a.role.localeCompare(b.role, "fi");
+        } else {
+          // default: seuraavan synttärin mukaan
+          cmp = daysUntilNextBirthday(a.birth_date) - daysUntilNextBirthday(b.birth_date);
+        }
+        return sortDir === "desc" ? -cmp : cmp;
+      })
     : null;
 
   return (
@@ -76,9 +91,9 @@ export default async function CelebritiesPage() {
               <TableHeader>
                 <TableRow>
                   <TableHead className="w-14"></TableHead>
-                  <TableHead>Nimi</TableHead>
-                  <TableHead>Syntynyt</TableHead>
-                  <TableHead>Rooli</TableHead>
+                  <SortableHeader column="name">Nimi</SortableHeader>
+                  <SortableHeader column="birth_date">Syntynyt</SortableHeader>
+                  <SortableHeader column="role">Rooli</SortableHeader>
                   <TableHead>Alusta</TableHead>
                   <TableHead>Visa</TableHead>
                   <TableHead className="text-right">Toiminnot</TableHead>

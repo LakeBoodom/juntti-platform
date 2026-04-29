@@ -10,6 +10,9 @@ export type KuvavisaQuestionInput = {
   subject: string;
   /** Vaikeustaso */
   difficulty: "helppo" | "keski" | "vaikea";
+  /** Lähdemateriaali (esim. Wikipedia-artikkelin teksti) jolla rajataan AI:ta. */
+  sourceContext?: string;
+  sourceLabel?: string;
 };
 
 export type GeneratedKuvavisaQuestion = {
@@ -53,12 +56,18 @@ export async function generateKuvavisaQuestion(
 5. **Sekoita vastausten järjestys** — älä laita oikeaa aina samaan paikkaan.
 6. Kirjoita 1–2 lauseen fact-teksti, joka antaa lisätietoa oikeasta vastauksesta. Ei johdantoja, ei metakommentteja.
 
+**Lähdemateriaali ohittaa sisäisen tietosi:** Jos käyttäjän viestissä on LÄHDEMATERIAALI-osio, käytä SEN sisältöä faktojen pohjana. Älä sekoita sisäistä tietoasi lähteen kanssa. Jos sisäinen muistisi ja lähde ovat ristiriidassa, luota lähteeseen. Fact-teksti rakennetaan lähteestä.
+
 Palauta vain submit_question-työkalulla.`;
+
+  const sourceBlock = input.sourceContext
+    ? `\n\n**LÄHDEMATERIAALI — käytä vain tätä faktojen pohjana. ÄLÄ keksi asioita joita tässä ei lue. Jos jotain ei lähteessä kerrota, älä esitä siitä kysymystä.**\n\nLähde: ${input.sourceLabel ?? "annettu teksti"}\n---\n${input.sourceContext.slice(0, 50000)}\n---\n`
+    : "";
 
   const user = `Tyyppi: ${input.type}
 Kuvassa: **${input.subject}** (tämä on oikea vastaus)
 Vaikeustaso: ${input.difficulty}
-
+${sourceBlock}
 Luo kysymys, 4 vastausvaihtoehtoa (oikea + 3 väärää), ja fact.`;
 
   const tool = {
