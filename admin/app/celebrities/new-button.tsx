@@ -12,7 +12,9 @@ import {
 } from "@/components/ui/dialog";
 import { CelebrityForm } from "./celebrity-form";
 
-export function NewCelebrityButton() {
+type Site = { id: string; slug: string; name: string };
+
+export function NewCelebrityButton({ sites, defaultSiteId }: { sites: Site[]; defaultSiteId: string }) {
   const [open, setOpen] = useState(false);
   return (
     <>
@@ -27,7 +29,7 @@ export function NewCelebrityButton() {
               Suomalainen henkilö jonka syntymäpäivänä näytetään trivia.
             </DialogDescription>
           </DialogHeader>
-          <CelebrityForm onDone={() => setOpen(false)} />
+          <CelebrityForm onDone={() => setOpen(false)} sites={sites} defaultSiteId={defaultSiteId} />
         </DialogContent>
       </Dialog>
     </>

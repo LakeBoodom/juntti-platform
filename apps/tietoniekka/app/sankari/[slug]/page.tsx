@@ -1,37 +1,40 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { SANKARIT, getSankari, getAge, formatBirthDateFi } from "../../../lib/sankarit";
+import { getCelebrityBySlug, listCelebrities } from "../../../lib/queries";
+import { getAge, formatBirthDateFi } from "../../../lib/sankarit";
 
 /* ─────────────────────────────────────────────────────────────────
    Tietoniekka — /sankari/[slug]
-   Päivän sankari -sivu: hero (kuva, ikäpilleri, nimi, rooli, syntymäaika),
-   lyhyt bio, iso "Pelaa visa" -CTA → /peli?paivan_sankari=1.
+   v3.2: hakee julkkiksen Supabasesta (oli aiemmin hardcoded "iina-kuustonen").
    ───────────────────────────────────────────────────────────────── */
 
-export function generateStaticParams() {
-  return SANKARIT.map((s) => ({ slug: s.slug }));
+export const revalidate = 3600; // 1 h cache
+
+export async function generateStaticParams() {
+  // Pre-renderöi kaikki sitellä olevat julkkikset
+  const all = await listCelebrities();
+  return all.filter((c) => c.slug).map((c) => ({ slug: c.slug! }));
 }
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const s = getSankari(slug);
-  if (!s) return { title: "Sankari ei löydy — Tietoniekka" };
+  const sankari = await getCelebrityBySlug(slug);
+  if (!sankari) return { title: "Sankari ei löydy — Tietoniekka" };
   return {
-    title: `${s.name} — Päivän sankari · Tietoniekka`,
-    description: s.bio,
+    title: `${sankari.name} — Päivän sankari · Tietoniekka`,
+    description: sankari.bio_short ?? `${sankari.name} — ${sankari.role}`,
   };
 }
 
 export default async function SankariPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const sankari = getSankari(slug);
+  const sankari = await getCelebrityBySlug(slug);
   if (!sankari) notFound();
 
-  const age = getAge(sankari.birthDate);
+  const age = getAge(sankari.birth_date);
 
   return (
     <main className="sankari-page">
-      {/* Topbar — sama kuin etusivulla */}
       <header className="topbar">
         <Link href="/" className="logo" aria-label="Etusivulle">
           <div className="name">
@@ -42,39 +45,47 @@ export default async function SankariPage({ params }: { params: Promise<{ slug: 
         </Link>
       </header>
 
-      {/* Hero — iso kuva taustana, gold age-pilleri, nimi, rooli + syntymäaika */}
       <section className="sankari-hero">
         <div className="sankari-hero-photo">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={sankari.imageUrl} alt={sankari.name} />
-          {sankari.wikiCredit && (
-            <span className="sankari-wiki-credit">{sankari.wikiCredit}</span>
+          <img
+            src={sankari.image_url ?? "https://placehold.co/600x750/1a3a45/e8a320?text=" + encodeURIComponent(sankari.name)}
+            alt={sankari.name}
+          />
+          {sankari.wikipedia_url && (
+            <span className="sankari-wiki-credit">📷 Wikipedia</span>
           )}
         </div>
         <div className="sankari-hero-content">
           <span className="sankari-eyebrow">— Päivän sankari</span>
           <span className="sankari-age-pill">🎂 Tänään {age} vuotta</span>
-          <h1 className="sankari-name">{sankari.name}</h1>
+          <h1 className="sankari-name">{sankari.name.toUpperCase()}</h1>
           <p className="sankari-meta">
-            {sankari.role} · Syntynyt {formatBirthDateFi(sankari.birthDate)}
+            {sankari.role} · Syntynyt {formatBirthDateFi(sankari.birth_date)}
           </p>
         </div>
       </section>
 
-      {/* Bio + CTA */}
-      <section className="sankari-bio-section">
-        <div className="sankari-bio-content">
-          <p className="sankari-bio">{sankari.bio}</p>
-          <Link
-            href="/peli?paivan_sankari=1"
-            className="btn btn-primary btn-large sankari-cta"
-          >
-            PELAA {sankari.name.split(" ")[0]}-VISA →
-          </Link>
-        </div>
-      </section>
+      {sankari.bio_short && (
+        <section className="sankari-bio-section">
+          <div className="sankari-bio-content">
+            <p className="sankari-bio">{sankari.bio_short}</p>
+            {sankari.trivia_quiz_id ? (
+              <Link
+                href={`/peli?paivan_sankari=1&quiz_id=${sankari.trivia_quiz_id}`}
+                className="btn btn-primary btn-large sankari-cta"
+              >
+                PELAA {sankari.name.split(" ")[0].toUpperCase()}-VISA →
+              </Link>
+            ) : (
+              <p className="sankari-meta" style={{ opacity: 0.6 }}>
+                Visa ei vielä saatavilla.
+              </p>
+            )}
+          </div>
+        </section>
+      )}
 
-      {/* Footer — sama kuin etusivulla */}
       <footer className="footer">
         <Link href="/" className="footer-logo">TIETONIEKKA</Link>
         <p className="footer-meta">

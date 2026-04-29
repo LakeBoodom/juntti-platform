@@ -1,5 +1,5 @@
 import { getSupabaseAdmin, supabaseFromCookies } from "@/lib/supabase-server";
-import { getCurrentSite } from "@/lib/sites";
+import { getCurrentSite, listSites } from "@/lib/sites";
 import { Nav } from "@/components/nav";
 import {
   Table,
@@ -34,6 +34,7 @@ export default async function CelebritiesPage({ searchParams }: { searchParams: 
   } = await sb.auth.getUser();
 
   const site = await getCurrentSite();
+  const sites = await listSites();
   const admin = getSupabaseAdmin();
   const { data: rawData, error } = await admin
     .from("celebrities")
@@ -74,7 +75,7 @@ export default async function CelebritiesPage({ searchParams }: { searchParams: 
               tulos kuin laajassa aiheessa. Site: <strong>{site.name}</strong>
             </p>
           </div>
-          <NewCelebrityButton />
+          <NewCelebrityButton sites={sites} defaultSiteId={site.id} />
         </div>
 
         {error ? (
@@ -101,7 +102,7 @@ export default async function CelebritiesPage({ searchParams }: { searchParams: 
               </TableHeader>
               <TableBody>
                 {data.map((row) => (
-                  <CelebrityRow
+                  <CelebrityRow sites={sites} defaultSiteId={site.id}
                     key={row.id}
                     row={row as any}
                     hasQuiz={!!row.trivia_quiz_id}

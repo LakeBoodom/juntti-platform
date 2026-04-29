@@ -12,6 +12,7 @@ export type CelebrityInput = {
   image_url: string | null;
   platform: "juntti" | "tietoniekka" | "both";
   wikipedia_url: string | null;
+  site_id: string;
 };
 
 function validate(input: CelebrityInput): string | null {
@@ -22,6 +23,7 @@ function validate(input: CelebrityInput): string | null {
   if (input.death_date && !/^\d{4}-\d{2}-\d{2}$/.test(input.death_date))
     return "Kuolinpäivä muodossa YYYY-MM-DD tai tyhjä";
   if (!input.role.trim()) return "Rooli puuttuu";
+  if (!input.site_id) return "Site puuttuu";
   return null;
 }
 
@@ -38,6 +40,7 @@ export async function createCelebrity(input: CelebrityInput) {
     image_url: input.image_url?.trim() || null,
     platform: input.platform,
     wikipedia_url: input.wikipedia_url?.trim() || null,
+    site_id: input.site_id,
   });
   if (error) return { ok: false as const, error: error.message };
   revalidatePath("/celebrities");
@@ -59,6 +62,7 @@ export async function updateCelebrity(id: string, input: CelebrityInput) {
       image_url: input.image_url?.trim() || null,
       platform: input.platform,
       wikipedia_url: input.wikipedia_url?.trim() || null,
+      site_id: input.site_id,
     })
     .eq("id", id);
   if (error) return { ok: false as const, error: error.message };

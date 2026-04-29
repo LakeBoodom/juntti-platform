@@ -37,12 +37,18 @@ function shortDate(iso: string): string {
   return `${d.getDate()}. ${MONTHS[d.getMonth()]} ${d.getFullYear()}`;
 }
 
+type Site = { id: string; slug: string; name: string };
+
 export function CelebrityRow({
   row,
   hasQuiz,
+  sites,
+  defaultSiteId,
 }: {
   row: CelebrityFormValue;
   hasQuiz: boolean;
+  sites: Site[];
+  defaultSiteId: string;
 }) {
   const router = useRouter();
   const [editOpen, setEditOpen] = useState(false);
@@ -147,7 +153,7 @@ export function CelebrityRow({
                 Muutokset tallentuvat kun klikkaat Tallenna.
               </DialogDescription>
             </DialogHeader>
-            <CelebrityForm initial={row} onDone={() => setEditOpen(false)} />
+            <CelebrityForm initial={row} onDone={() => setEditOpen(false)} sites={sites} defaultSiteId={defaultSiteId} />
           </DialogContent>
         </Dialog>
 

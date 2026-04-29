@@ -20,7 +20,7 @@ import {
 } from "./actions";
 import { fetchFromWikipedia } from "./wikipedia-actions";
 
-export type CelebrityFormValue = CelebrityInput & { id?: string };
+export type CelebrityFormValue = Omit<CelebrityInput, "site_id"> & { id?: string; site_id?: string | null };
 
 function isoToParts(iso: string): { day: string; month: string; year: string } {
   if (!iso || !/^\d{4}-\d{2}-\d{2}$/.test(iso))
@@ -37,12 +37,18 @@ function partsToIso(day: string, month: string, year: string): string {
   return `${y}-${m}-${d}`;
 }
 
+type Site = { id: string; slug: string; name: string };
+
 export function CelebrityForm({
   initial,
   onDone,
+  sites,
+  defaultSiteId,
 }: {
   initial?: CelebrityFormValue;
   onDone: () => void;
+  sites: Site[];
+  defaultSiteId: string;
 }) {
   const [wikiUrl, setWikiUrl] = useState(initial?.wikipedia_url ?? "");
   const [wikiError, setWikiError] = useState<string | null>(null);
@@ -63,6 +69,7 @@ export function CelebrityForm({
   const [platform, setPlatform] = useState<"juntti" | "tietoniekka" | "both">(
     initial?.platform ?? "both",
   );
+  const [siteId, setSiteId] = useState<string>(initial?.site_id ?? defaultSiteId);
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
 
@@ -93,6 +100,7 @@ export function CelebrityForm({
       image_url: imageUrl || null,
       platform,
       wikipedia_url: wikiUrl || null,
+      site_id: siteId,
     };
     startTransition(async () => {
       const res = initial?.id
@@ -250,11 +258,30 @@ export function CelebrityForm({
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="both">Molemmat</SelectItem>
-            <SelectItem value="juntti">Vain juntti.com</SelectItem>
-            <SelectItem value="tietoniekka">Vain Tietoniekka.fi</SelectItem>
+            <SelectItem value="both">Molemmat (legacy)</SelectItem>
+            <SelectItem value="juntti">Vain juntti.com (legacy)</SelectItem>
+            <SelectItem value="tietoniekka">Vain Tietoniekka.fi (legacy)</SelectItem>
           </SelectContent>
         </Select>
+      </div>
+
+      <div className="space-y-1.5">
+        <Label>Site (uusi totuuden lähde)</Label>
+        <Select value={siteId} onValueChange={setSiteId}>
+          <SelectTrigger>
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            {sites.map((s) => (
+              <SelectItem key={s.id} value={s.id}>
+                {s.name}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        <p className="text-xs text-muted-foreground">
+          Site määrittää mille sivustolle julkkis n&auml;ytetään. Vanha &quot;Alusta&quot;-kenttä on legacy.
+        </p>
       </div>
 
       {error && (

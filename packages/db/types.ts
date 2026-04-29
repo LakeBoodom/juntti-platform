@@ -27,6 +27,7 @@ export type Database = {
           platform: string | null
           role: string
           site_id: string | null
+          slug: string | null
           trivia_quiz_id: string | null
           wikipedia_url: string | null
         }
@@ -41,6 +42,7 @@ export type Database = {
           platform?: string | null
           role: string
           site_id?: string | null
+          slug?: string | null
           trivia_quiz_id?: string | null
           wikipedia_url?: string | null
         }
@@ -55,6 +57,7 @@ export type Database = {
           platform?: string | null
           role?: string
           site_id?: string | null
+          slug?: string | null
           trivia_quiz_id?: string | null
           wikipedia_url?: string | null
         }
