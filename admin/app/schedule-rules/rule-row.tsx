@@ -12,25 +12,34 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
-import { CountdownForm, type CountdownFormValue } from "./countdown-form";
-import { deleteCountdown } from "./actions";
+import { RuleForm, type ContentOptionsMap, type RuleFormValue } from "./rule-form";
+import { deleteRule, toggleRule, type ContentType } from "./actions";
 
-const MONTHS = [
-  "tammi",
-  "helmi",
-  "maalis",
-  "huhti",
-  "touko",
-  "kesä",
-  "heinä",
-  "elo",
-  "syys",
-  "loka",
-  "marras",
-  "joulu",
-];
+const STRATEGY_LABELS: Record<string, string> = {
+  date: "📅 Päivämäärä",
+  tag: "🏷️ Tag",
+  recurring_daily: "🔁 Joka päivä",
+  random: "🎲 Random",
+};
 
-export function CountdownRow({ row, siteId }: { row: CountdownFormValue; siteId: string }) {
+const CONTENT_TYPE_LABELS: Record<ContentType, string> = {
+  quiz: "Visa",
+  celebrity: "Julkkis",
+  countdown: "Countdown",
+  kuvavisa: "Kuvavisa",
+};
+
+export function RuleRow({
+  row,
+  contentLabel,
+  contentOptions,
+  siteId,
+}: {
+  row: RuleFormValue;
+  contentLabel: string;
+  contentOptions: ContentOptionsMap;
+  siteId: string;
+}) {
   const [editOpen, setEditOpen] = useState(false);
   const [delOpen, setDelOpen] = useState(false);
   const [pending, startTransition] = useTransition();
@@ -39,28 +48,45 @@ export function CountdownRow({ row, siteId }: { row: CountdownFormValue; siteId:
   function doDelete() {
     setError(null);
     startTransition(async () => {
-      const res = await deleteCountdown(row.id!);
+      const res = await deleteRule(row.id!);
       if (!res.ok) setError(res.error);
       else setDelOpen(false);
     });
   }
 
-  const platformLabel =
-    row.platform === "juntti"
-      ? "juntti.com"
-      : row.platform === "tietovisa"
-        ? "tietovisa.fi"
-        : "molemmat";
+  function doToggle() {
+    startTransition(async () => {
+      await toggleRule(row.id!, !row.active);
+    });
+  }
+
+  const detail =
+    row.strategy === "date"
+      ? row.scheduled_date
+      : row.strategy === "tag"
+        ? `#${row.tag}`
+        : row.strategy === "random"
+          ? `paino ${row.weight}`
+          : "—";
 
   return (
-    <TableRow>
-      <TableCell className="font-medium">{row.name}</TableCell>
-      <TableCell className="text-muted-foreground">{row.slug}</TableCell>
-      <TableCell>
-        {row.day}. {MONTHS[row.month - 1]}
+    <TableRow className={row.active ? "" : "opacity-50"}>
+      <TableCell className="font-medium">
+        {CONTENT_TYPE_LABELS[row.content_type as ContentType]}
       </TableCell>
-      <TableCell>{row.object_type}</TableCell>
-      <TableCell>{platformLabel}</TableCell>
+      <TableCell>{contentLabel}</TableCell>
+      <TableCell>{STRATEGY_LABELS[row.strategy] ?? row.strategy}</TableCell>
+      <TableCell className="text-muted-foreground">{detail}</TableCell>
+      <TableCell>
+        <button
+          type="button"
+          onClick={doToggle}
+          disabled={pending}
+          className="text-xs underline-offset-2 hover:underline"
+        >
+          {row.active ? "✓ Aktiivinen" : "○ Pois käytöstä"}
+        </button>
+      </TableCell>
       <TableCell className="text-right">
         <div className="inline-flex gap-1">
           <Button
@@ -84,21 +110,26 @@ export function CountdownRow({ row, siteId }: { row: CountdownFormValue; siteId:
         <Dialog open={editOpen} onOpenChange={setEditOpen}>
           <DialogContent>
             <DialogHeader>
-              <DialogTitle>Muokkaa countdownia</DialogTitle>
+              <DialogTitle>Muokkaa sääntöä</DialogTitle>
               <DialogDescription>
                 Muutokset tallentuvat heti kun klikkaat Tallenna.
               </DialogDescription>
             </DialogHeader>
-            <CountdownForm initial={row} onDone={() => setEditOpen(false)} siteId={siteId} />
+            <RuleForm
+              initial={row}
+              onDone={() => setEditOpen(false)}
+              siteId={siteId}
+              contentOptions={contentOptions}
+            />
           </DialogContent>
         </Dialog>
 
         <Dialog open={delOpen} onOpenChange={setDelOpen}>
           <DialogContent>
             <DialogHeader>
-              <DialogTitle>Poistetaanko “{row.name}”?</DialogTitle>
+              <DialogTitle>Poistetaanko sääntö?</DialogTitle>
               <DialogDescription>
-                Tätä ei voi perua. Kaikki countdownin viittaukset katoavat.
+                Tätä ei voi perua. Sisältö pysyy tallessa, vain ajastus poistuu.
               </DialogDescription>
             </DialogHeader>
             {error && (
@@ -110,11 +141,7 @@ export function CountdownRow({ row, siteId }: { row: CountdownFormValue; siteId:
               <Button variant="outline" onClick={() => setDelOpen(false)}>
                 Peruuta
               </Button>
-              <Button
-                variant="destructive"
-                onClick={doDelete}
-                disabled={pending}
-              >
+              <Button variant="destructive" onClick={doDelete} disabled={pending}>
                 {pending ? "Poistetaan…" : "Poista"}
               </Button>
             </DialogFooter>

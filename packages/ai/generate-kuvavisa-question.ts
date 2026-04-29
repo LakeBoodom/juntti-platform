@@ -1,0 +1,122 @@
+// AI-luotu yksittäinen kuvavisa-kysymys (kuva + 4 vastausta + fact).
+// Käyttäjä antaa tyypin (liput/paikkakunnat/logot/vaakunat) + kuvauksen siitä mitä kuvassa on.
+// AI keksii uskottavat 3 väärää vastausta + fact-paneelin.
+
+import { getAnthropic, MODEL } from "./client";
+
+export type KuvavisaQuestionInput = {
+  type: "liput" | "paikkakunnat" | "logot" | "vaakunat";
+  /** Mitä kuvassa on, esim. "Jamaikan lippu" tai "Tampereen tuomiokirkko" */
+  subject: string;
+  /** Vaikeustaso */
+  difficulty: "helppo" | "keski" | "vaikea";
+};
+
+export type GeneratedKuvavisaQuestion = {
+  question: string;
+  options: [string, string, string, string];
+  correct_option: string;
+  fact: string;
+};
+
+const TYPE_GUIDE: Record<KuvavisaQuestionInput["type"], { question: string; distractor: string }> = {
+  liput: {
+    question: "Minkä maan lippu?",
+    distractor: "Naapurimaita, samanvärisiä lippuja, samalta alueelta tai vastaavanlaisia lippuja sekoitusvaihtoehdoiksi.",
+  },
+  paikkakunnat: {
+    question: "Mikä paikkakunta?",
+    distractor: "Muita suomalaisia kaupunkeja samassa kokoluokassa tai maantieteellisesti lähellä.",
+  },
+  logot: {
+    question: "Minkä yrityksen/seuran logo?",
+    distractor: "Saman alan kilpailijoita, samanlaisia brändejä.",
+  },
+  vaakunat: {
+    question: "Minkä kunnan vaakuna?",
+    distractor: "Samalla maakunnalla tai alueella sijaitsevia kuntia.",
+  },
+};
+
+export async function generateKuvavisaQuestion(
+  input: KuvavisaQuestionInput,
+): Promise<GeneratedKuvavisaQuestion> {
+  const { question: defaultQ, distractor } = TYPE_GUIDE[input.type];
+
+  const system = `Olet suomalainen tietovisa-asiantuntija. Kirjoitat kysymyksiä sujuvalla, luonnollisella suomen kielellä. Tarkkuus on ehdoton.
+
+**Työjärjestys:**
+1. Aiheena on ${input.type}-kuvavisa.
+2. Käyttäjä kertoo mitä kuvassa on (oikea vastaus).
+3. Kirjoita kysymys (yleensä "${defaultQ}") ja merkkaa oikea vastaus täsmälleen kuten käyttäjä antoi.
+4. Keksi 3 uskottavaa väärää vastausta. ${distractor}
+5. **Sekoita vastausten järjestys** — älä laita oikeaa aina samaan paikkaan.
+6. Kirjoita 1–2 lauseen fact-teksti, joka antaa lisätietoa oikeasta vastauksesta. Ei johdantoja, ei metakommentteja.
+
+Palauta vain submit_question-työkalulla.`;
+
+  const user = `Tyyppi: ${input.type}
+Kuvassa: **${input.subject}** (tämä on oikea vastaus)
+Vaikeustaso: ${input.difficulty}
+
+Luo kysymys, 4 vastausvaihtoehtoa (oikea + 3 väärää), ja fact.`;
+
+  const tool = {
+    name: "submit_question",
+    description: "Palauttaa yhden kuvavisa-kysymyksen.",
+    input_schema: {
+      type: "object" as const,
+      properties: {
+        question: { type: "string", description: "Kysymys, esim. 'Minkä maan lippu?'" },
+        options: {
+          type: "array",
+          items: { type: "string" },
+          minItems: 4,
+          maxItems: 4,
+          description: "4 vastausvaihtoehtoa sekoitetussa järjestyksessä",
+        },
+        correct_option: {
+          type: "string",
+          description: "Yksi options-listan jäsen — oikea vastaus",
+        },
+        fact: {
+          type: "string",
+          description: "1–2 lauseen lisätieto oikeasta vastauksesta",
+        },
+      },
+      required: ["question", "options", "correct_option", "fact"],
+    },
+  };
+
+  const anthropic = getAnthropic();
+  const resp = await anthropic.messages.create({
+    model: MODEL,
+    max_tokens: 1024,
+    system,
+    tools: [tool],
+    tool_choice: { type: "tool", name: "submit_question" },
+    messages: [{ role: "user", content: user }],
+  });
+
+  const toolUse = resp.content.find((b) => b.type === "tool_use") as
+    | { type: "tool_use"; name: string; input: GeneratedKuvavisaQuestion }
+    | undefined;
+  if (!toolUse) throw new Error("Claude ei palauttanut tool_use-blokkia");
+
+  const out = toolUse.input;
+  if (
+    !out.question ||
+    !Array.isArray(out.options) ||
+    out.options.length !== 4 ||
+    !out.options.includes(out.correct_option)
+  ) {
+    throw new Error("AI palautti virheellisen rakenteen");
+  }
+
+  return {
+    question: out.question,
+    options: out.options as [string, string, string, string],
+    correct_option: out.correct_option,
+    fact: out.fact,
+  };
+}

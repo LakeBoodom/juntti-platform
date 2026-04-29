@@ -19,14 +19,21 @@ import {
   type CountdownInput,
 } from "./actions";
 
-export type CountdownFormValue = CountdownInput & { id?: string };
+// CountdownFormValue: row tulee DB:stä jossa site_id voi olla null vanhalle datalle.
+// Form-arvot rentona tyyppinä; payload-rakentaja täyttää siteId-prop:n pakollisesta arvosta.
+export type CountdownFormValue = Omit<CountdownInput, "site_id"> & {
+  id?: string;
+  site_id?: string | null;
+};
 
 export function CountdownForm({
   initial,
   onDone,
+  siteId,
 }: {
   initial?: CountdownFormValue;
   onDone: () => void;
+  siteId: string;
 }) {
   const [name, setName] = useState(initial?.name ?? "");
   const [slug, setSlug] = useState(initial?.slug ?? "");
@@ -36,6 +43,7 @@ export function CountdownForm({
     initial?.object_type ?? "",
   );
   const [platform, setPlatform] = useState<string>(initial?.platform ?? "both");
+  const [tag, setTag] = useState(initial?.tag ?? "");
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
 
@@ -49,6 +57,8 @@ export function CountdownForm({
       month,
       object_type: objectType,
       platform: platform === "both" ? null : platform,
+      tag: tag.trim() || null,
+      site_id: siteId,
     };
     startTransition(async () => {
       const res = initial?.id
@@ -123,7 +133,21 @@ export function CountdownForm({
         </p>
       </div>
       <div className="space-y-1.5">
-        <Label>Alusta</Label>
+        <Label htmlFor="tag">Tag <span className="text-muted-foreground">(valinnainen)</span></Label>
+        <Input
+          id="tag"
+          value={tag}
+          onChange={(e) => setTag(e.target.value)}
+          placeholder="esim. vappu, jaakiekko_mm, euroviisut"
+          pattern="[a-z0-9_\-]*"
+        />
+        <p className="text-xs text-muted-foreground">
+          Tagi linkittää eventin teemavisaan: schedule_rules-säännössä strategy=&quot;tag&quot; matchaa samanniminen tag.
+        </p>
+      </div>
+
+      <div className="space-y-1.5">
+        <Label>Alusta (legacy)</Label>
         <Select value={platform} onValueChange={setPlatform}>
           <SelectTrigger>
             <SelectValue />
@@ -134,6 +158,9 @@ export function CountdownForm({
             <SelectItem value="tietovisa">Vain tietovisa.fi</SelectItem>
           </SelectContent>
         </Select>
+        <p className="text-xs text-muted-foreground">
+          Vanha kenttä — site valitaan navigaation site-vaihtimesta. Säilytetty legacy-tueksi.
+        </p>
       </div>
 
       {error && (

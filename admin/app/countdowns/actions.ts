@@ -10,6 +10,8 @@ export type CountdownInput = {
   month: number;
   object_type: string;
   platform: string | null;
+  tag: string | null;
+  site_id: string;
 };
 
 function validate(input: CountdownInput): string | null {
@@ -22,6 +24,9 @@ function validate(input: CountdownInput): string | null {
   if (!input.object_type.trim()) return "Tyyppi puuttuu";
   if (input.platform && !["juntti", "tietovisa"].includes(input.platform))
     return "Alusta pitää olla juntti, tietovisa tai tyhjä";
+  if (!input.site_id) return "Site ID puuttuu";
+  if (input.tag && !/^[a-z0-9_-]+$/.test(input.tag))
+    return "Tag saa sisältää vain pieniä kirjaimia, numeroita, alaviivoja ja viivoja";
   return null;
 }
 

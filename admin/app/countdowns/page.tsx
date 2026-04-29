@@ -1,4 +1,5 @@
 import { supabaseFromCookies, getSupabaseAdmin } from "@/lib/supabase-server";
+import { getCurrentSite } from "@/lib/sites";
 import { Nav } from "@/components/nav";
 import {
   Table,
@@ -19,10 +20,12 @@ export default async function CountdownsPage() {
   } = await supabase.auth.getUser();
 
   // Use admin client to read (same dataset but consistent with mutations).
+  const site = await getCurrentSite();
   const admin = getSupabaseAdmin();
   const { data, error } = await admin
     .from("countdowns")
-    .select("id, name, slug, day, month, object_type, platform")
+    .select("id, name, slug, day, month, object_type, platform, tag, site_id")
+    .eq("site_id", site.id)
     .order("month", { ascending: true })
     .order("day", { ascending: true });
 
@@ -37,7 +40,7 @@ export default async function CountdownsPage() {
               Merkkipäivät ja tapahtumat kalenterissa. Näkyvät etusivulla.
             </p>
           </div>
-          <NewCountdownButton />
+          <NewCountdownButton siteId={site.id} />
         </div>
 
         {error ? (
@@ -63,7 +66,7 @@ export default async function CountdownsPage() {
               </TableHeader>
               <TableBody>
                 {data.map((row) => (
-                  <CountdownRow key={row.id} row={row} />
+                  <CountdownRow key={row.id} row={row} siteId={site.id} />
                 ))}
               </TableBody>
             </Table>

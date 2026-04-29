@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Plus } from "lucide-react";
 import { getSupabaseAdmin, supabaseFromCookies } from "@/lib/supabase-server";
+import { getCurrentSite } from "@/lib/sites";
 import { Nav } from "@/components/nav";
 import { Button } from "@/components/ui/button";
 import {
@@ -20,12 +21,14 @@ export default async function QuizzesPage() {
     data: { user },
   } = await sb.auth.getUser();
 
+  const site = await getCurrentSite();
   const admin = getSupabaseAdmin();
   const { data, error } = await admin
     .from("quizzes")
     .select(
-      "id, title, slug, category, difficulty, tone, platform, status, created_at, play_count",
+      "id, title, slug, category, difficulty, tone, platform, status, created_at, play_count, site_id",
     )
+    .eq("site_id", site.id)
     .order("created_at", { ascending: false });
 
   return (
@@ -36,7 +39,7 @@ export default async function QuizzesPage() {
           <div>
             <h1 className="text-2xl font-semibold">Visat</h1>
             <p className="text-sm text-muted-foreground">
-              Kaikki draftit ja julkaistut visat. Luo uusi AI:lla.
+              Kaikki draftit ja julkaistut visat. Site: <strong>{site.name}</strong>. Luo uusi AI:lla.
             </p>
           </div>
           <Link href="/quizzes/new">

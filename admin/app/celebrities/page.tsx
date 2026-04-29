@@ -1,4 +1,5 @@
 import { getSupabaseAdmin, supabaseFromCookies } from "@/lib/supabase-server";
+import { getCurrentSite } from "@/lib/sites";
 import { Nav } from "@/components/nav";
 import {
   Table,
@@ -10,6 +11,16 @@ import {
 import { CelebrityRow } from "./celebrity-row";
 import { NewCelebrityButton } from "./new-button";
 
+/** Päivää seuraavaan synttäriin tästä päivästä (0 = tänään, 365 = eilen) */
+function daysUntilNextBirthday(birthDate: string): number {
+  const today = new Date();
+  const todayMd = today.getMonth() * 31 + today.getDate(); // karkea järjestyksenmukainen luku
+  const [, m, d] = birthDate.split("-").map((p) => parseInt(p, 10));
+  const bdMd = (m - 1) * 31 + d;
+  const diff = bdMd - todayMd;
+  return diff >= 0 ? diff : diff + 372; // pyöräytä vuoden ympäri
+}
+
 export const dynamic = "force-dynamic";
 
 export default async function CelebritiesPage() {
@@ -18,13 +29,22 @@ export default async function CelebritiesPage() {
     data: { user },
   } = await sb.auth.getUser();
 
+  const site = await getCurrentSite();
   const admin = getSupabaseAdmin();
-  const { data, error } = await admin
+  const { data: rawData, error } = await admin
     .from("celebrities")
     .select(
-      "id, name, birth_date, death_date, role, bio_short, image_url, platform, trivia_quiz_id",
+      "id, name, birth_date, death_date, role, bio_short, image_url, platform, trivia_quiz_id, site_id",
     )
-    .order("birth_date", { ascending: true });
+    .eq("site_id", site.id)
+    .order("name", { ascending: true });
+
+  // Järjestä seuraavan synttärin mukaan (tulevat ensin, sitten myöhemmin)
+  const data = rawData
+    ? [...rawData].sort(
+        (a, b) => daysUntilNextBirthday(a.birth_date) - daysUntilNextBirthday(b.birth_date),
+      )
+    : null;
 
   return (
     <>
@@ -36,7 +56,7 @@ export default async function CelebritiesPage() {
             <p className="text-sm text-muted-foreground">
               Suomalaiset henkilöt joiden syntymäpäivänä näytetään trivia.
               "Luo visa" käyttää AI:ta henkilön kontekstilla — tarkempi
-              tulos kuin laajassa aiheessa.
+              tulos kuin laajassa aiheessa. Site: <strong>{site.name}</strong>
             </p>
           </div>
           <NewCelebrityButton />

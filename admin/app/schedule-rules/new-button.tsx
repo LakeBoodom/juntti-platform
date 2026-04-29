@@ -10,24 +10,34 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { CountdownForm } from "./countdown-form";
+import { RuleForm, type ContentOptionsMap } from "./rule-form";
 
-export function NewCountdownButton({ siteId }: { siteId: string }) {
+export function NewRuleButton({
+  siteId,
+  contentOptions,
+}: {
+  siteId: string;
+  contentOptions: ContentOptionsMap;
+}) {
   const [open, setOpen] = useState(false);
   return (
     <>
       <Button onClick={() => setOpen(true)}>
-        <Plus /> Lisää
+        <Plus /> Lisää sääntö
       </Button>
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Uusi countdown</DialogTitle>
+            <DialogTitle>Uusi ajastussääntö</DialogTitle>
             <DialogDescription>
-              Esim. Vappu, MM-kisat, Joulu.
+              Valitse mikä sisältö näytetään ja millä logiikalla.
             </DialogDescription>
           </DialogHeader>
-          <CountdownForm onDone={() => setOpen(false)} siteId={siteId} />
+          <RuleForm
+            onDone={() => setOpen(false)}
+            siteId={siteId}
+            contentOptions={contentOptions}
+          />
         </DialogContent>
       </Dialog>
     </>

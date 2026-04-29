@@ -12,25 +12,18 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
-import { CountdownForm, type CountdownFormValue } from "./countdown-form";
-import { deleteCountdown } from "./actions";
+import { KuvavisaForm, type KuvavisaFormValue } from "./kuvavisa-form";
+import { deleteKuvavisa, type KuvavisaType } from "./actions";
 
-const MONTHS = [
-  "tammi",
-  "helmi",
-  "maalis",
-  "huhti",
-  "touko",
-  "kesä",
-  "heinä",
-  "elo",
-  "syys",
-  "loka",
-  "marras",
-  "joulu",
-];
-
-export function CountdownRow({ row, siteId }: { row: CountdownFormValue; siteId: string }) {
+export function KuvavisaRow({
+  row,
+  siteId,
+  siteSlug,
+}: {
+  row: KuvavisaFormValue;
+  siteId: string;
+  siteSlug: string;
+}) {
   const [editOpen, setEditOpen] = useState(false);
   const [delOpen, setDelOpen] = useState(false);
   const [pending, startTransition] = useTransition();
@@ -39,28 +32,31 @@ export function CountdownRow({ row, siteId }: { row: CountdownFormValue; siteId:
   function doDelete() {
     setError(null);
     startTransition(async () => {
-      const res = await deleteCountdown(row.id!);
+      const res = await deleteKuvavisa(row.id!);
       if (!res.ok) setError(res.error);
       else setDelOpen(false);
     });
   }
 
-  const platformLabel =
-    row.platform === "juntti"
-      ? "juntti.com"
-      : row.platform === "tietovisa"
-        ? "tietovisa.fi"
-        : "molemmat";
-
   return (
-    <TableRow>
-      <TableCell className="font-medium">{row.name}</TableCell>
-      <TableCell className="text-muted-foreground">{row.slug}</TableCell>
+    <TableRow className={row.active ? "" : "opacity-50"}>
       <TableCell>
-        {row.day}. {MONTHS[row.month - 1]}
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={row.image_url}
+          alt=""
+          className="h-12 w-16 rounded border object-cover"
+        />
       </TableCell>
-      <TableCell>{row.object_type}</TableCell>
-      <TableCell>{platformLabel}</TableCell>
+      <TableCell className="font-medium max-w-md">
+        <div className="line-clamp-1">{row.question}</div>
+        <div className="text-xs text-muted-foreground">→ {row.correct_option}</div>
+      </TableCell>
+      <TableCell className="text-xs text-muted-foreground">
+        {row.difficulty} · paino {row.weight}
+        {row.tag ? ` · #${row.tag}` : ""}
+      </TableCell>
+      <TableCell>{row.active ? "✓ Aktiivinen" : "○ Pois"}</TableCell>
       <TableCell className="text-right">
         <div className="inline-flex gap-1">
           <Button
@@ -82,23 +78,29 @@ export function CountdownRow({ row, siteId }: { row: CountdownFormValue; siteId:
         </div>
 
         <Dialog open={editOpen} onOpenChange={setEditOpen}>
-          <DialogContent>
+          <DialogContent className="sm:max-w-2xl">
             <DialogHeader>
-              <DialogTitle>Muokkaa countdownia</DialogTitle>
+              <DialogTitle>Muokkaa kuvavisaa</DialogTitle>
               <DialogDescription>
                 Muutokset tallentuvat heti kun klikkaat Tallenna.
               </DialogDescription>
             </DialogHeader>
-            <CountdownForm initial={row} onDone={() => setEditOpen(false)} siteId={siteId} />
+            <KuvavisaForm
+              initial={row}
+              onDone={() => setEditOpen(false)}
+              siteId={siteId}
+              siteSlug={siteSlug}
+              defaultType={row.type as KuvavisaType}
+            />
           </DialogContent>
         </Dialog>
 
         <Dialog open={delOpen} onOpenChange={setDelOpen}>
           <DialogContent>
             <DialogHeader>
-              <DialogTitle>Poistetaanko “{row.name}”?</DialogTitle>
+              <DialogTitle>Poistetaanko kuvavisa?</DialogTitle>
               <DialogDescription>
-                Tätä ei voi perua. Kaikki countdownin viittaukset katoavat.
+                Kuva pysyy Storage:ssa, mutta kysymys-rivi poistetaan.
               </DialogDescription>
             </DialogHeader>
             {error && (
@@ -110,11 +112,7 @@ export function CountdownRow({ row, siteId }: { row: CountdownFormValue; siteId:
               <Button variant="outline" onClick={() => setDelOpen(false)}>
                 Peruuta
               </Button>
-              <Button
-                variant="destructive"
-                onClick={doDelete}
-                disabled={pending}
-              >
+              <Button variant="destructive" onClick={doDelete} disabled={pending}>
                 {pending ? "Poistetaan…" : "Poista"}
               </Button>
             </DialogFooter>
