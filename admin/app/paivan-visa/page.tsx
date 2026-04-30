@@ -12,9 +12,21 @@ import { DayRow } from "./day-row";
 
 export const dynamic = "force-dynamic";
 
-const DAYS_AHEAD = 14;
+const DEFAULT_DAYS_AHEAD = 30;
+const MAX_DAYS_AHEAD = 365;
+const PRESETS = [14, 30, 60, 90, 180, 365] as const;
 
-export default async function PaivanVisaPage() {
+export default async function PaivanVisaPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ days?: string }>;
+}) {
+  const sp = await searchParams;
+  const requested = Number(sp.days);
+  const DAYS_AHEAD = Number.isFinite(requested) && requested > 0
+    ? Math.min(MAX_DAYS_AHEAD, Math.max(7, Math.floor(requested)))
+    : DEFAULT_DAYS_AHEAD;
+
   const sb = await supabaseFromCookies();
   const {
     data: { user },
@@ -88,8 +100,25 @@ export default async function PaivanVisaPage() {
             <span className="font-medium">
               {filledCount} / {DAYS_AHEAD} päivää täytetty
             </span>{" "}
-            seuraavalle 2 viikolle.
+            seuraavalle {DAYS_AHEAD} päivälle.
           </p>
+        </div>
+
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="text-sm text-muted-foreground">Näytä:</span>
+          {PRESETS.map((d) => (
+            <a
+              key={d}
+              href={`?days=${d}`}
+              className={
+                DAYS_AHEAD === d
+                  ? "rounded-md bg-foreground text-background px-3 py-1 text-sm font-medium"
+                  : "rounded-md border px-3 py-1 text-sm hover:bg-muted"
+              }
+            >
+              {d === 365 ? "1 vuosi" : `${d} päivää`}
+            </a>
+          ))}
         </div>
 
         <div className="rounded-md border">
@@ -122,7 +151,7 @@ export default async function PaivanVisaPage() {
           <a href="/schedule-rules" className="underline">
             Ajastus-sivulla
           </a>
-          . Tämä näkymä näyttää vain päivämäärä-pohjaiset säännöt 14 päivän ikkunassa.
+          . Tämä näkymä näyttää vain päivämäärä-pohjaiset säännöt valitussa päiväikkunassa.
         </p>
       </main>
     </>
