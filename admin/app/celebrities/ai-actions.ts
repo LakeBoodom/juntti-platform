@@ -4,12 +4,14 @@ import { revalidatePath } from "next/cache";
 import { generateQuiz } from "@juntti/ai";
 import { getSupabaseAdmin } from "@juntti/db";
 import { fetchWikipediaArticle } from "./wikipedia-actions";
+import { getCurrentSite } from "@/lib/sites";
 
 // Generates a trivia quiz tailored to this specific celebrity — ties the
 // quiz back to celebrities.trivia_quiz_id so the public page can surface
 // it on the birthday.
 export async function generateQuizForCelebrity(celebrityId: string) {
   const sb = getSupabaseAdmin();
+  const site = await getCurrentSite();
   const { data: person, error: pErr } = await sb
     .from("celebrities")
     .select(
@@ -87,6 +89,7 @@ export async function generateQuizForCelebrity(celebrityId: string) {
       target_age: "kaikki",
       status: "draft",
       created_by: "ai-celebrity",
+      site_id: site.id,
     })
     .select("id")
     .single();

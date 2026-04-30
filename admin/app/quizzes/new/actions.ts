@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache";
 import { generateQuiz, type GenerateQuizInput } from "@juntti/ai";
 import { getSupabaseAdmin } from "@juntti/db";
 import { fetchWikipediaArticle } from "@/app/celebrities/wikipedia-actions";
+import { getCurrentSite } from "@/lib/sites";
 
 export type GenerateAndSaveInput = GenerateQuizInput & {
   wikipediaUrl?: string;
@@ -37,6 +38,7 @@ export async function generateAndSaveDraft(input: GenerateAndSaveInput) {
   }
 
   const sb = getSupabaseAdmin();
+  const site = await getCurrentSite();
 
   // Make slug unique by suffixing if needed.
   let slug = quiz.slug;
@@ -62,6 +64,7 @@ export async function generateAndSaveDraft(input: GenerateAndSaveInput) {
       target_age: input.targetAge ?? "kaikki",
       status: "draft",
       created_by: "ai",
+      site_id: site.id,
     })
     .select("id")
     .single();
