@@ -1085,6 +1085,21 @@ img { display: block; max-width: 100%; }
   flex-shrink: 0;
 }
 
+
+/* ─── Kuvavisa CTA -kortti (ilman .kategoria-card-quiz-osiota) ──── */
+.kuvavisa-cta-card .kategoria-card-hero {
+  /* Tasattu padding kun ei ole alaosaa */
+  padding: var(--space-xl) var(--space-lg) var(--space-xl);
+  min-height: 220px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+.kuvavisa-cta-btn {
+  margin-top: var(--space-md);
+  align-self: flex-start;
+}
+
 /* ─── KUVAVISA inline featured (Lippuvisa) ───────────────────────── */
 .kuvavisa-featured {
   position: relative;

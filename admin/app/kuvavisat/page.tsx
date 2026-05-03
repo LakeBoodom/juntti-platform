@@ -16,10 +16,11 @@ import type { KuvavisaType } from "./actions";
 export const dynamic = "force-dynamic";
 
 const TYPES: { slug: KuvavisaType; label: string }[] = [
-  { slug: "liput",        label: "Liput" },
-  { slug: "paikkakunnat", label: "Paikkakunnat" },
-  { slug: "logot",        label: "Logot" },
-  { slug: "vaakunat",     label: "Vaakunat" },
+  { slug: "liput",    label: "Liput" },
+  { slug: "vaakunat", label: "Vaakunat" },
+  { slug: "linnut",   label: "Linnut" },
+  { slug: "kasvit",   label: "Kasvit" },
+  { slug: "elaimet",  label: "Eläimet" },
 ];
 
 export default async function KuvavisatPage({

@@ -1,11 +1,11 @@
 // AI-luotu yksittäinen kuvavisa-kysymys (kuva + 4 vastausta + fact).
-// Käyttäjä antaa tyypin (liput/paikkakunnat/logot/vaakunat) + kuvauksen siitä mitä kuvassa on.
+// Käyttäjä antaa tyypin (liput/vaakunat/linnut/kasvit/elaimet) + kuvauksen siitä mitä kuvassa on.
 // AI keksii uskottavat 3 väärää vastausta + fact-paneelin.
 
 import { getAnthropic, MODEL } from "./client";
 
 export type KuvavisaQuestionInput = {
-  type: "liput" | "paikkakunnat" | "logot" | "vaakunat";
+  type: "liput" | "vaakunat" | "linnut" | "kasvit" | "elaimet";
   /** Mitä kuvassa on, esim. "Jamaikan lippu" tai "Tampereen tuomiokirkko" */
   subject: string;
   /** Vaikeustaso */
@@ -27,17 +27,21 @@ const TYPE_GUIDE: Record<KuvavisaQuestionInput["type"], { question: string; dist
     question: "Minkä maan lippu?",
     distractor: "Naapurimaita, samanvärisiä lippuja, samalta alueelta tai vastaavanlaisia lippuja sekoitusvaihtoehdoiksi.",
   },
-  paikkakunnat: {
-    question: "Mikä paikkakunta?",
-    distractor: "Muita suomalaisia kaupunkeja samassa kokoluokassa tai maantieteellisesti lähellä.",
-  },
-  logot: {
-    question: "Minkä yrityksen/seuran logo?",
-    distractor: "Saman alan kilpailijoita, samanlaisia brändejä.",
-  },
   vaakunat: {
     question: "Minkä kunnan vaakuna?",
     distractor: "Samalla maakunnalla tai alueella sijaitsevia kuntia.",
+  },
+  linnut: {
+    question: "Mikä lintu?",
+    distractor: "Muita samannäköisiä tai samalla alueella eläviä lintuja.",
+  },
+  kasvit: {
+    question: "Mikä kasvi?",
+    distractor: "Muita samanvärisiä tai samalla alueella kasvavia kasveja.",
+  },
+  elaimet: {
+    question: "Mikä eläin?",
+    distractor: "Muita samansukuisia tai samalla alueella eläviä eläimiä.",
   },
 };
 

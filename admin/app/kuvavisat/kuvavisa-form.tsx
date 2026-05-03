@@ -27,9 +27,10 @@ export type KuvavisaFormValue = KuvavisaInput & { id?: string };
 
 const TYPE_LABELS: Record<KuvavisaType, string> = {
   liput: "Liput",
-  paikkakunnat: "Paikkakunnat",
-  logot: "Logot",
   vaakunat: "Vaakunat",
+  linnut: "Linnut",
+  kasvit: "Kasvit",
+  elaimet: "Eläimet",
 };
 
 export function KuvavisaForm({

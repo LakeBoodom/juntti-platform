@@ -84,12 +84,12 @@ export default async function PeliPage({
     const rows = await getKuvavisat(kvSlug, 10);
     if (rows.length > 0) {
       const KUVAVISA_TITLES: Record<string, { title: string; intro: string }> = {
-        liput:        { title: "LIPPUVISA",       intro: "Tunnista lippu — yksi kuva, neljä vaihtoehtoa." },
-        paikkakunta:  { title: "PAIKKAKUNTAVISA", intro: "Tunnista suomalainen paikkakunta kuvasta." },
-        paikkakunnat: { title: "PAIKKAKUNTAVISA", intro: "Tunnista suomalainen paikkakunta kuvasta." },
-        logot:        { title: "LOGOVISA",        intro: "Tunnista brändi pelkästä logosta." },
-        vaakuna:      { title: "VAAKUNAVISA",     intro: "Tunnista suomalainen kunnanvaakuna." },
-        vaakunat:     { title: "VAAKUNAVISA",     intro: "Tunnista suomalainen kunnanvaakuna." },
+        liput:    { title: "LIPPUVISA",    intro: "Tunnista lippu — yksi kuva, neljä vaihtoehtoa." },
+        vaakuna:  { title: "VAAKUNAVISA",  intro: "Tunnista suomalainen kunnanvaakuna." },
+        vaakunat: { title: "VAAKUNAVISA",  intro: "Tunnista suomalainen kunnanvaakuna." },
+        linnut:   { title: "LINTUVISA",    intro: "Tunnista lintu kuvasta — eihän tämä ole varis." },
+        kasvit:   { title: "KASVIVISA",    intro: "Tunnista kasvi kuvasta." },
+        elaimet:  { title: "ELÄINVISA",    intro: "Tunnista eläin kuvasta." },
       };
       const meta = KUVAVISA_TITLES[kvSlug] ?? { title: "KUVAVISA", intro: "Tunnista kuvasta." };
       const mappedQuestions: Question[] = rows.map((r) => {

@@ -274,11 +274,12 @@ export type KuvavisaRow = {
 // URL-slug → DB type -mappaus (frontti käyttää yksikkö-muotoja, DB monikko)
 const KUVAVISA_URL_TO_TYPE: Record<string, string> = {
   liput: "liput",
-  paikkakunta: "paikkakunnat",
-  paikkakunnat: "paikkakunnat",
-  logot: "logot",
   vaakuna: "vaakunat",
   vaakunat: "vaakunat",
+  linnut: "linnut",
+  kasvit: "kasvit",
+  elaimet: "elaimet",
+  elaimia: "elaimet",
 };
 
 /** Hakee aktiiviset kuvavisat-rivit annetulle tyypille, palauttaa shuffled. */

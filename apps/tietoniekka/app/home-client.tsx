@@ -443,56 +443,61 @@ export function HomeClient({
         </div>
       </section>
 
-      {/* 7. TUNNISTA TÄMÄ */}
+      {/* 7. TUNNISTA TÄMÄ — kuvavisat (5 kategoriaa) */}
       <section className="tunnista-tama" id="tunnista-tama">
         <div className="container-wide">
-          <div className="section-header-row">
-            <h2 className="section-header">Tunnistatko kuvasta</h2>
-            <a href="kuvavisat.html" className="see-all">Kaikki →</a>
-          </div>
+          <h2 className="section-header">Tunnistatko kuvasta</h2>
           <p className="section-subtitle">jospa kuvat olisi paremmin hallussa</p>
 
-          <div className="kuvavisa-featured" style={{ ["--bg-image" as string]: "url(/lippuvisa_kuva.png)" } as React.CSSProperties}>
-            <div className="quiz-header">
-              <span className="emoji">🚩</span>
-              <div>
-                <h3>Tunnista maailman liput</h3>
-                <p>50 kysymystä · pelaa minuutissa</p>
-              </div>
-            </div>
-            <div className="flag-stage">
-              <span className="flag-emoji">🇩🇰</span>
-            </div>
-            <div className="quiz-progress">Kysymys 1 / 50</div>
-            <h4 className="quiz-question">Minkä maan lippu tämä on?</h4>
-            <div className="quiz-options">
-              <a className="quiz-option" href="/peli?kuvavisa=liput&first=A"><span className="badge">A</span> Suomi</a>
-              <a className="quiz-option" href="/peli?kuvavisa=liput&first=B"><span className="badge">B</span> Ruotsi</a>
-              <a className="quiz-option" href="/peli?kuvavisa=liput&first=C"><span className="badge">C</span> Tanska</a>
-              <a className="quiz-option" href="/peli?kuvavisa=liput&first=D"><span className="badge">D</span> Norja</a>
-            </div>
-          </div>
+          <article className="kategoria-inline-card kuvavisa-cta-card" data-watermark="LIPUT" style={{ ["--kat-color" as string]: "var(--color-cat-maantieto)", ["--bg-image" as string]: "url(/lippuvisa_kuva.png)" } as React.CSSProperties}>
+            <Link href="/peli?kuvavisa=liput" className="kategoria-card-hero kategoria-card-hero-link">
+              <span className="eyebrow">— Kuvavisa</span>
+              <h3>LIPPUVISA</h3>
+              <p>Maailman liput</p>
+              <p className="description">Tunnista kuvan lippu — pelaa minuutissa.</p>
+              <span className="btn btn-primary btn-large kuvavisa-cta-btn">PELAA NYT →</span>
+            </Link>
+          </article>
 
-          <div className="kuvavisa-grid">
-            <a className="kuvavisa-card" href="/peli?kuvavisa=paikkakunta">
-              <div className="kuvavisa-emoji">🏘️</div>
-              <span className="alaluokka-badge">Paikkakunta</span>
-              <h3>Tunnista suomalainen paikkakunta kuvasta</h3>
-              <p>10 kysymystä</p>
-            </a>
-            <a className="kuvavisa-card" href="/peli?kuvavisa=logot">
-              <div className="kuvavisa-emoji">🚜</div>
-              <span className="alaluokka-badge">Logot</span>
-              <h3>Tunnista traktori pelkästä logosta</h3>
-              <p>15 kysymystä</p>
-            </a>
-            <a className="kuvavisa-card" href="/peli?kuvavisa=vaakuna" style={{ ["--bg-image" as string]: "url(/vaakunavisa_kuva.png)" } as React.CSSProperties}>
-              <div className="kuvavisa-emoji">🛡️</div>
-              <span className="alaluokka-badge">Vaakuna</span>
-              <h3>Tunnista suomalainen kunnanvaakuna</h3>
-              <p>20 kysymystä</p>
-            </a>
-          </div>
+          <article className="kategoria-inline-card kuvavisa-cta-card" data-watermark="VAAKUNAT" style={{ ["--kat-color" as string]: "var(--color-cat-historia)", ["--bg-image" as string]: "url(/vaakunavisa_kuva.png)" } as React.CSSProperties}>
+            <Link href="/peli?kuvavisa=vaakuna" className="kategoria-card-hero kategoria-card-hero-link">
+              <span className="eyebrow">— Kuvavisa</span>
+              <h3>VAAKUNAT</h3>
+              <p>Suomen kunnat</p>
+              <p className="description">Tunnista kunnanvaakuna — Pohjois-Karjalasta Lounais-Suomeen.</p>
+              <span className="btn btn-primary btn-large kuvavisa-cta-btn">PELAA NYT →</span>
+            </Link>
+          </article>
+
+          <article className="kategoria-inline-card kuvavisa-cta-card" data-watermark="LINNUT" style={{ ["--kat-color" as string]: "var(--color-cat-luonto)" } as React.CSSProperties}>
+            <Link href="/peli?kuvavisa=linnut" className="kategoria-card-hero kategoria-card-hero-link">
+              <span className="eyebrow">— Kuvavisa</span>
+              <h3>LINNUT</h3>
+              <p>Suomen siivekkäät</p>
+              <p className="description">Tunnista lintu kuvasta — eihän tämä ole varis sittenkään.</p>
+              <span className="btn btn-primary btn-large kuvavisa-cta-btn">PELAA NYT →</span>
+            </Link>
+          </article>
+
+          <article className="kategoria-inline-card kuvavisa-cta-card" data-watermark="KASVIT" style={{ ["--kat-color" as string]: "var(--color-cat-luonto)" } as React.CSSProperties}>
+            <Link href="/peli?kuvavisa=kasvit" className="kategoria-card-hero kategoria-card-hero-link">
+              <span className="eyebrow">— Kuvavisa</span>
+              <h3>KASVIT</h3>
+              <p>Suomen kasvio</p>
+              <p className="description">Tunnista kasvi kuvasta — niittypursusta nokkoseen.</p>
+              <span className="btn btn-primary btn-large kuvavisa-cta-btn">PELAA NYT →</span>
+            </Link>
+          </article>
+
+          <article className="kategoria-inline-card kuvavisa-cta-card" data-watermark="ELÄIMET" style={{ ["--kat-color" as string]: "var(--color-cat-luonto)" } as React.CSSProperties}>
+            <Link href="/peli?kuvavisa=elaimet" className="kategoria-card-hero kategoria-card-hero-link">
+              <span className="eyebrow">— Kuvavisa</span>
+              <h3>ELÄIMET</h3>
+              <p>Pohjolan luonto</p>
+              <p className="description">Tunnista eläin kuvasta — karhuista kärppiin.</p>
+              <span className="btn btn-primary btn-large kuvavisa-cta-btn">PELAA NYT →</span>
+            </Link>
+          </article>
         </div>
       </section>
 

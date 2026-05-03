@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { getSupabaseAdmin } from "@juntti/db";
 
-export type KuvavisaType = "liput" | "paikkakunnat" | "logot" | "vaakunat";
+export type KuvavisaType = "liput" | "vaakunat" | "linnut" | "kasvit" | "elaimet";
 
 export type KuvavisaInput = {
   site_id: string;
@@ -21,7 +21,7 @@ export type KuvavisaInput = {
 
 function validate(input: KuvavisaInput): string | null {
   if (!input.site_id) return "Site puuttuu";
-  if (!["liput", "paikkakunnat", "logot", "vaakunat"].includes(input.type))
+  if (!["liput", "vaakunat", "linnut", "kasvit", "elaimet"].includes(input.type))
     return "Virheellinen kuvavisa-tyyppi";
   if (!input.question.trim()) return "Kysymys puuttuu";
   if (!input.image_url) return "Kuva puuttuu — lataa kuva ensin";
