@@ -49,7 +49,6 @@ export default async function KategoriaPage({ params }: { params: Promise<{ slug
           <span className="kategoria-eyebrow">— Kategoria</span>
           <h1 className="kategoria-title">{cat.title}</h1>
           <p className="kategoria-tagline">{cat.description}</p>
-          <span className="kategoria-badge">{cat.visaCount} visaa</span>
           <p className="kategoria-intro">{cat.intro}</p>
           {quiz ? (
             <Link

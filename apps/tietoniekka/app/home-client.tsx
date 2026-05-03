@@ -170,7 +170,7 @@ export function HomeClient({
                 className="featured-quiz paivan-visa-card"
                 data-watermark={cat?.badge ?? ""}
                 style={{
-                  ["--quiz-tint" as string]: "rgba(15, 21, 32, 0.78)",
+                  ["--quiz-tint" as string]: "rgba(15, 21, 32, 0.55)",
                   ["--kat-color" as string]: katColor,
                   ...(bgImage ? { ["--bg-image" as string]: `url(${bgImage})` } : {}),
                   textDecoration: "none",
@@ -259,7 +259,6 @@ export function HomeClient({
               <span className="eyebrow">— Kategoria</span>
               <h3>URHEILU</h3>
               <p>Jääkiekko, jalkapallo, yleisurheilu</p>
-              <span className="badge-visat">18 visaa</span>
               <p className="description">Suomen urheilun huippuhetkistä ja suurista nimistä.</p>
             </Link>
             <div className="kategoria-card-quiz">
@@ -284,7 +283,6 @@ export function HomeClient({
               <span className="eyebrow">— Kategoria</span>
               <h3>MAANTIETO</h3>
               <p>Suomi, Eurooppa, maailma</p>
-              <span className="badge-visat">15 visaa</span>
               <p className="description">Paikat, pääkaupungit, vuoret ja virrat — kuinka hyvin tunnet maailman?</p>
             </Link>
             <div className="kategoria-card-quiz">
@@ -305,7 +303,6 @@ export function HomeClient({
               <span className="eyebrow">— Kategoria</span>
               <h3>LUONTO</h3>
               <p>Suomen luonnon ihmeet ja eläimet</p>
-              <span className="badge-visat">27 visaa</span>
               <p className="description">Testaa tietosi Suomen luonnosta, eläimistä ja upeista maisemista.</p>
             </Link>
             <div className="kategoria-card-quiz">
@@ -326,7 +323,6 @@ export function HomeClient({
               <span className="eyebrow">— Kategoria</span>
               <h3>HISTORIA</h3>
               <p>Suomi, maailma, henkilöt</p>
-              <span className="badge-visat">22 visaa</span>
               <p className="description">Tapahtumat, jotka muokkasivat aikaansa — ja meidän tämän päivän.</p>
             </Link>
             <div className="kategoria-card-quiz">
@@ -347,7 +343,6 @@ export function HomeClient({
               <span className="eyebrow">— Kategoria</span>
               <h3>TV-SARJAT</h3>
               <p>Klassikot, uutuudet, kulttisarjat</p>
-              <span className="badge-visat">12 visaa</span>
               <p className="description">Tuntemiisi sarjoihin yllättäviä yksityiskohtia. Kuinka tarkkaan katsot?</p>
             </Link>
             <div className="kategoria-card-quiz">
@@ -368,7 +363,6 @@ export function HomeClient({
               <span className="eyebrow">— Kategoria</span>
               <h3>ELOKUVAT</h3>
               <p>Kotimainen, Hollywood, Eurooppa</p>
-              <span className="badge-visat">18 visaa</span>
               <p className="description">Klassikoista uusiin julkaisuihin — kuka teki ja milloin?</p>
             </Link>
             <div className="kategoria-card-quiz">
@@ -389,7 +383,6 @@ export function HomeClient({
               <span className="eyebrow">— Kategoria</span>
               <h3>MUSIIKKI</h3>
               <p>Hitit, klassikot, artistit</p>
-              <span className="badge-visat">24 visaa</span>
               <p className="description">Suomalainen ja maailman musiikki. Kuka lauloi minkä ja milloin?</p>
             </Link>
             <div className="kategoria-card-quiz">
@@ -414,7 +407,6 @@ export function HomeClient({
               <span className="eyebrow">— Kategoria</span>
               <h3>RUOKA &amp; JUOMA</h3>
               <p>Ruokakulttuuri ja juomahistoria</p>
-              <span className="badge-visat">14 visaa</span>
               <p className="description">Mitä syömme ja miksi — perinteistä ja uudesta keittiöstä.</p>
             </Link>
             <div className="kategoria-card-quiz">
@@ -426,6 +418,25 @@ export function HomeClient({
                 <a className="visa-option" href="/peli?kat=ruoka-juoma&first=B"><span className="badge">B</span> Karjalanpiirakka</a>
                 <a className="visa-option" href="/peli?kat=ruoka-juoma&first=C"><span className="badge">C</span> Mustamakkara</a>
                 <a className="visa-option" href="/peli?kat=ruoka-juoma&first=D"><span className="badge">D</span> Lanttulaatikko</a>
+              </div>
+            </div>
+          </article>
+
+          <article className="kategoria-inline-card" data-watermark="MUOTI" style={{ ["--kat-color" as string]: "var(--color-cat-muoti-design)", ["--bg-image" as string]: "url(/muoti_design_kuva.png)" } as React.CSSProperties}>
+            <Link href="/kategoria/muoti-design" className="kategoria-card-hero kategoria-card-hero-link">
+              <span className="eyebrow">— Kategoria</span>
+              <h3>MUOTI &amp; DESIGN</h3>
+              <p>Suomalainen muoti, brändit, muotoilu</p>
+              <p className="description">Marimekosta Iittalaan ja Aaltoon — suomalainen muotoilu kantaa maailmalle.</p>
+            </Link>
+            <div className="kategoria-card-quiz">
+              <div className="visa-title"><span>Tunnistatko klassikot pelkästä piirroksesta?</span></div>
+              <h4 className="visa-question">Kuka suunnitteli Aalto-maljakon?</h4>
+              <div className="visa-options">
+                <a className="visa-option" href="/peli?kat=muoti-design&first=A"><span className="badge">A</span> Alvar Aalto</a>
+                <a className="visa-option" href="/peli?kat=muoti-design&first=B"><span className="badge">B</span> Tapio Wirkkala</a>
+                <a className="visa-option" href="/peli?kat=muoti-design&first=C"><span className="badge">C</span> Kaj Franck</a>
+                <a className="visa-option" href="/peli?kat=muoti-design&first=D"><span className="badge">D</span> Eero Saarinen</a>
               </div>
             </div>
           </article>

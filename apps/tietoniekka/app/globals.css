@@ -459,7 +459,7 @@ img { display: block; max-width: 100%; }
   border-radius: var(--radius-xl);
   padding: var(--space-lg);
   background:
-    linear-gradient(180deg, rgba(15, 21, 32, 0.55) 0%, var(--quiz-tint, rgba(15, 21, 32, 0.78)) 100%),
+    linear-gradient(180deg, rgba(15, 21, 32, 0.18) 0%, var(--quiz-tint, rgba(15, 21, 32, 0.62)) 65%, rgba(15, 21, 32, 0.78) 100%),
     var(--bg-image, none) center / cover no-repeat,
     var(--kat-color, var(--color-surface-card-dark));
   border: 1px solid rgba(255, 255, 255, 0.06);
