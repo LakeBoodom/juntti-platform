@@ -1,5 +1,5 @@
 import { Suspense } from "react";
-import { getQuizById } from "../../lib/queries";
+import { getQuizById, getKuvavisat } from "../../lib/queries";
 import { PeliClient } from "./peli-client";
 import type { QuizConfig, Question } from "./questions";
 
@@ -77,6 +77,39 @@ export default async function PeliPage({
           kuvavisa: typeof params.kuvavisa === "string" ? params.kuvavisa : undefined,
         },
       );
+    }
+  } else if (typeof params.kuvavisa === "string") {
+    // Kuvavisat: hae random N riviä DB:stä Heikin admin-toolista
+    const kvSlug = params.kuvavisa;
+    const rows = await getKuvavisat(kvSlug, 10);
+    if (rows.length > 0) {
+      const KUVAVISA_TITLES: Record<string, { title: string; intro: string }> = {
+        liput:        { title: "LIPPUVISA",       intro: "Tunnista lippu — yksi kuva, neljä vaihtoehtoa." },
+        paikkakunta:  { title: "PAIKKAKUNTAVISA", intro: "Tunnista suomalainen paikkakunta kuvasta." },
+        paikkakunnat: { title: "PAIKKAKUNTAVISA", intro: "Tunnista suomalainen paikkakunta kuvasta." },
+        logot:        { title: "LOGOVISA",        intro: "Tunnista brändi pelkästä logosta." },
+        vaakuna:      { title: "VAAKUNAVISA",     intro: "Tunnista suomalainen kunnanvaakuna." },
+        vaakunat:     { title: "VAAKUNAVISA",     intro: "Tunnista suomalainen kunnanvaakuna." },
+      };
+      const meta = KUVAVISA_TITLES[kvSlug] ?? { title: "KUVAVISA", intro: "Tunnista kuvasta." };
+      const mappedQuestions: Question[] = rows.map((r) => {
+        const opts = (r.options ?? []).slice(0, 4);
+        while (opts.length < 4) opts.push("—");
+        return {
+          question: r.question,
+          options: [opts[0], opts[1], opts[2], opts[3]] as [string, string, string, string],
+          correct: r.correct_option,
+          fact: r.fact ?? "",
+          image: r.image_url,
+        };
+      });
+      preloadedQuiz = {
+        id: `kuvavisa:${kvSlug}`,
+        title: meta.title,
+        intro: meta.intro,
+        questions: mappedQuestions,
+        isImageQuiz: true,
+      };
     }
   }
 

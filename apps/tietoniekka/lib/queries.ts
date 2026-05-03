@@ -258,3 +258,52 @@ export async function getUpcomingEvents(limit = 3): Promise<EventData[]> {
   });
   return sorted.slice(0, limit);
 }
+
+
+/* ─── Kuvavisat ────────────────────────────────────────────────── */
+export type KuvavisaRow = {
+  id: string;
+  type: string;
+  question: string;
+  image_url: string;
+  options: string[];
+  correct_option: string;
+  fact: string | null;
+};
+
+// URL-slug → DB type -mappaus (frontti käyttää yksikkö-muotoja, DB monikko)
+const KUVAVISA_URL_TO_TYPE: Record<string, string> = {
+  liput: "liput",
+  paikkakunta: "paikkakunnat",
+  paikkakunnat: "paikkakunnat",
+  logot: "logot",
+  vaakuna: "vaakunat",
+  vaakunat: "vaakunat",
+};
+
+/** Hakee aktiiviset kuvavisat-rivit annetulle tyypille, palauttaa shuffled. */
+export async function getKuvavisat(urlSlug: string, limit = 10): Promise<KuvavisaRow[]> {
+  const type = KUVAVISA_URL_TO_TYPE[urlSlug] ?? urlSlug;
+  const sb = getSupabase();
+  if (!sb) return [];
+  const siteId = await getSiteId();
+  if (!siteId) return [];
+
+  const { data, error } = await sb
+    .from("kuvavisas")
+    .select("id, type, question, image_url, options, correct_option, fact")
+    .eq("site_id", siteId)
+    .eq("type", type)
+    .eq("active", true);
+
+  if (error || !data) return [];
+
+  // Fisher-Yates shuffle, sitten leikkaa limit
+  const arr = [...data] as KuvavisaRow[];
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr.slice(0, limit);
+}
+

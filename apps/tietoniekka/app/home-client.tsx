@@ -452,7 +452,7 @@ export function HomeClient({
           </div>
           <p className="section-subtitle">jospa kuvat olisi paremmin hallussa</p>
 
-          <div className="kuvavisa-featured">
+          <div className="kuvavisa-featured" style={{ ["--bg-image" as string]: "url(/lippuvisa_kuva.png)" } as React.CSSProperties}>
             <div className="quiz-header">
               <span className="emoji">🚩</span>
               <div>
@@ -486,7 +486,7 @@ export function HomeClient({
               <h3>Tunnista traktori pelkästä logosta</h3>
               <p>15 kysymystä</p>
             </a>
-            <a className="kuvavisa-card" href="/peli?kuvavisa=vaakuna">
+            <a className="kuvavisa-card" href="/peli?kuvavisa=vaakuna" style={{ ["--bg-image" as string]: "url(/vaakunavisa_kuva.png)" } as React.CSSProperties}>
               <div className="kuvavisa-emoji">🛡️</div>
               <span className="alaluokka-badge">Vaakuna</span>
               <h3>Tunnista suomalainen kunnanvaakuna</h3>

@@ -453,6 +453,7 @@ img { display: block; max-width: 100%; }
 }
 
 /* ─── 2.5 PÄIVÄN VISA -KORTTI (kategorian mukaan dynaaminen tausta) ─ */
+.featured-quiz.paivan-visa-card,
 .paivan-visa-card {
   position: relative;
   overflow: hidden;
@@ -466,8 +467,8 @@ img { display: block; max-width: 100%; }
   border-top: 3px solid var(--color-brand-gold);
   transition: transform 0.2s var(--ease-out);
 }
-.paivan-visa-card:hover { transform: translateY(-2px); }
-.paivan-visa-card::before {
+.featured-quiz.paivan-visa-card:hover, .paivan-visa-card:hover { transform: translateY(-2px); }
+.featured-quiz.paivan-visa-card::before, .paivan-visa-card::before {
   content: attr(data-watermark);
   position: absolute;
   top: 18px;
@@ -483,7 +484,7 @@ img { display: block; max-width: 100%; }
   z-index: 0;
   line-height: 1;
 }
-.paivan-visa-card > * { position: relative; z-index: 1; }
+.featured-quiz.paivan-visa-card > *, .paivan-visa-card > * { position: relative; z-index: 1; }
 .paivan-visa-eyebrow {
   font-family: var(--font-display);
   font-weight: 700;
@@ -697,12 +698,17 @@ img { display: block; max-width: 100%; }
 .kuvavisa-card {
   display: flex;
   flex-direction: column;
-  background: var(--color-surface-card-dark);
+  position: relative;
+  background:
+    linear-gradient(180deg, rgba(15, 21, 32, 0.45) 0%, rgba(15, 21, 32, 0.85) 100%),
+    var(--bg-image, none) center / cover no-repeat,
+    var(--color-surface-card-dark);
   border-radius: var(--radius-lg);
   padding: var(--space-md);
   border: 1px solid rgba(255, 255, 255, 0.06);
   transition: transform 0.2s var(--ease-out), border-color 0.2s;
   min-height: 200px;
+  overflow: hidden;
 }
 .kuvavisa-card:hover { transform: translateY(-3px); border-color: var(--color-brand-gold); }
 
@@ -1081,7 +1087,11 @@ img { display: block; max-width: 100%; }
 
 /* ─── KUVAVISA inline featured (Lippuvisa) ───────────────────────── */
 .kuvavisa-featured {
-  background: linear-gradient(160deg, rgba(30, 58, 95, 0.5), var(--color-surface-card-dark));
+  position: relative;
+  background:
+    linear-gradient(180deg, rgba(15, 21, 32, 0.30) 0%, rgba(15, 21, 32, 0.70) 100%),
+    var(--bg-image, linear-gradient(160deg, rgba(30, 58, 95, 0.5), var(--color-surface-card-dark))) center / cover no-repeat,
+    var(--color-surface-card-dark);
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: var(--radius-xl);
   padding: var(--space-lg);
@@ -1089,6 +1099,7 @@ img { display: block; max-width: 100%; }
   display: flex;
   flex-direction: column;
   gap: var(--space-md);
+  overflow: hidden;
 }
 .kuvavisa-featured .flag-stage {
   position: relative;
