@@ -449,7 +449,7 @@ export function HomeClient({
           <h2 className="section-header">Tunnistatko kuvasta</h2>
           <p className="section-subtitle">jospa kuvat olisi paremmin hallussa</p>
 
-          <article className="kategoria-inline-card kuvavisa-cta-card" data-watermark="LIPUT" style={{ ["--kat-color" as string]: "var(--color-cat-maantieto)", ["--bg-image" as string]: "url(/lippuvisa_kuva.png)" } as React.CSSProperties}>
+          <article className="kategoria-inline-card kuvavisa-cta-card" data-watermark="LIPUT" style={{ ["--kat-color" as string]: "var(--color-cat-maantieto)", ["--bg-image" as string]: "url(/liput_kuva.png)" } as React.CSSProperties}>
             <Link href="/peli?kuvavisa=liput" className="kategoria-card-hero kategoria-card-hero-link">
               <span className="eyebrow">— Kuvavisa</span>
               <h3>LIPPUVISA</h3>
@@ -459,17 +459,17 @@ export function HomeClient({
             </Link>
           </article>
 
-          <article className="kategoria-inline-card kuvavisa-cta-card" data-watermark="VAAKUNAT" style={{ ["--kat-color" as string]: "var(--color-cat-historia)", ["--bg-image" as string]: "url(/vaakunavisa_kuva.png)" } as React.CSSProperties}>
+          <article className="kategoria-inline-card kuvavisa-cta-card" data-watermark="VAAKUNAT" style={{ ["--kat-color" as string]: "var(--color-cat-historia)", ["--bg-image" as string]: "url(/vaakunat_kuva.png)" } as React.CSSProperties}>
             <Link href="/peli?kuvavisa=vaakuna" className="kategoria-card-hero kategoria-card-hero-link">
               <span className="eyebrow">— Kuvavisa</span>
               <h3>VAAKUNAT</h3>
               <p>Suomen kunnat</p>
-              <p className="description">Tunnista kunnanvaakuna — Pohjois-Karjalasta Lounais-Suomeen.</p>
+              <p className="description">Tunnista maakuntavaakuna — Pohjois-Karjalasta Lounais-Suomeen.</p>
               <span className="btn btn-primary btn-large kuvavisa-cta-btn">PELAA NYT →</span>
             </Link>
           </article>
 
-          <article className="kategoria-inline-card kuvavisa-cta-card" data-watermark="LINNUT" style={{ ["--kat-color" as string]: "var(--color-cat-luonto)" } as React.CSSProperties}>
+          <article className="kategoria-inline-card kuvavisa-cta-card" data-watermark="LINNUT" style={{ ["--kat-color" as string]: "var(--color-cat-luonto)", ["--bg-image" as string]: "url(/linnut_kuva.png)" } as React.CSSProperties}>
             <Link href="/peli?kuvavisa=linnut" className="kategoria-card-hero kategoria-card-hero-link">
               <span className="eyebrow">— Kuvavisa</span>
               <h3>LINNUT</h3>
@@ -479,7 +479,7 @@ export function HomeClient({
             </Link>
           </article>
 
-          <article className="kategoria-inline-card kuvavisa-cta-card" data-watermark="KASVIT" style={{ ["--kat-color" as string]: "var(--color-cat-luonto)" } as React.CSSProperties}>
+          <article className="kategoria-inline-card kuvavisa-cta-card" data-watermark="KASVIT" style={{ ["--kat-color" as string]: "var(--color-cat-luonto)", ["--bg-image" as string]: "url(/kasvit_kuva.png)" } as React.CSSProperties}>
             <Link href="/peli?kuvavisa=kasvit" className="kategoria-card-hero kategoria-card-hero-link">
               <span className="eyebrow">— Kuvavisa</span>
               <h3>KASVIT</h3>
@@ -489,7 +489,7 @@ export function HomeClient({
             </Link>
           </article>
 
-          <article className="kategoria-inline-card kuvavisa-cta-card" data-watermark="ELÄIMET" style={{ ["--kat-color" as string]: "var(--color-cat-luonto)" } as React.CSSProperties}>
+          <article className="kategoria-inline-card kuvavisa-cta-card" data-watermark="ELÄIMET" style={{ ["--kat-color" as string]: "var(--color-cat-luonto)", ["--bg-image" as string]: "url(/elaimet_kuva.png)" } as React.CSSProperties}>
             <Link href="/peli?kuvavisa=elaimet" className="kategoria-card-hero kategoria-card-hero-link">
               <span className="eyebrow">— Kuvavisa</span>
               <h3>ELÄIMET</h3>
