@@ -11,6 +11,7 @@ import Link from "next/link";
    ───────────────────────────────────────────────────────────────── */
 
 import type { SankariData, QuizMeta } from "../lib/queries";
+import { CATEGORY_BY_SLUG } from "../lib/categories";
 
 type CategoryQuizMap = Record<string, QuizMeta | null>;
 
@@ -159,19 +160,32 @@ export function HomeClient({
         <div className="container-wide">
           <h2 className="section-header">Päivän visa</h2>
           <p className="section-subtitle">{todaysDateLabel && (<span style={{ color: "var(--color-gold)", fontWeight: 700, marginRight: 8 }}>{todaysDateLabel}</span>)}Tuntuuko, että tänään kulkee?</p>
-          {todaysQuiz ? (
-            <Link
-              href={`/peli?paivan_visa=1&quiz_id=${todaysQuiz.id}`}
-              className="featured-quiz"
-              style={{ ["--quiz-tint" as string]: "rgba(26, 58, 69, 0.5)", textDecoration: "none", display: "block" } as React.CSSProperties}
-            >
-              <h4 className="quiz-question" style={{ marginBottom: "12px" }}>{todaysQuiz.title}</h4>
-              {todaysQuiz.description && (
-                <p style={{ color: "rgba(255,255,255,0.85)", marginBottom: "16px" }}>{todaysQuiz.description}</p>
-              )}
-              <span className="btn btn-primary btn-large" style={{ display: "inline-block" }}>PELAA NYT →</span>
-            </Link>
-          ) : (
+          {todaysQuiz ? (() => {
+            const cat = CATEGORY_BY_SLUG[todaysQuiz.category] ?? null;
+            const bgImage = cat?.imageUrl ?? null;
+            const katColor = cat?.colorVar ?? "var(--color-surface-card-dark)";
+            return (
+              <Link
+                href={`/peli?paivan_visa=1&quiz_id=${todaysQuiz.id}`}
+                className="featured-quiz paivan-visa-card"
+                data-watermark={cat?.badge ?? ""}
+                style={{
+                  ["--quiz-tint" as string]: "rgba(15, 21, 32, 0.78)",
+                  ["--kat-color" as string]: katColor,
+                  ...(bgImage ? { ["--bg-image" as string]: `url(${bgImage})` } : {}),
+                  textDecoration: "none",
+                  display: "block",
+                } as React.CSSProperties}
+              >
+                {cat && <span className="paivan-visa-eyebrow">— {cat.badge}</span>}
+                <h4 className="quiz-question" style={{ marginBottom: "12px" }}>{todaysQuiz.title}</h4>
+                {todaysQuiz.description && (
+                  <p style={{ color: "rgba(255,255,255,0.85)", marginBottom: "16px" }}>{todaysQuiz.description}</p>
+                )}
+                <span className="btn btn-primary btn-large" style={{ display: "inline-block" }}>PELAA NYT →</span>
+              </Link>
+            );
+          })() : (
             <div className="featured-quiz" style={{ ["--quiz-tint" as string]: "rgba(26, 58, 69, 0.5)" } as React.CSSProperties}>
               <p style={{ color: "rgba(255,255,255,0.7)" }}>Päivän visaa ei ole vielä asetettu — kokeile kategoriavisaa!</p>
             </div>

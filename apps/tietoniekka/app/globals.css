@@ -452,6 +452,49 @@ img { display: block; max-width: 100%; }
   .event-card img { max-width: 120px; }
 }
 
+/* ─── 2.5 PÄIVÄN VISA -KORTTI (kategorian mukaan dynaaminen tausta) ─ */
+.paivan-visa-card {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--radius-xl);
+  padding: var(--space-lg);
+  background:
+    linear-gradient(180deg, rgba(15, 21, 32, 0.55) 0%, var(--quiz-tint, rgba(15, 21, 32, 0.78)) 100%),
+    var(--bg-image, none) center / cover no-repeat,
+    var(--kat-color, var(--color-surface-card-dark));
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-top: 3px solid var(--color-brand-gold);
+  transition: transform 0.2s var(--ease-out);
+}
+.paivan-visa-card:hover { transform: translateY(-2px); }
+.paivan-visa-card::before {
+  content: attr(data-watermark);
+  position: absolute;
+  top: 18px;
+  right: -22px;
+  transform: rotate(-8deg);
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: clamp(96px, 22vw, 160px);
+  color: rgba(255, 255, 255, 0.06);
+  letter-spacing: -0.02em;
+  pointer-events: none;
+  white-space: nowrap;
+  z-index: 0;
+  line-height: 1;
+}
+.paivan-visa-card > * { position: relative; z-index: 1; }
+.paivan-visa-eyebrow {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-brand-gold);
+  display: block;
+  margin-bottom: var(--space-xs);
+}
+
 /* ─── 3. PÄIVÄN SANKARI ──────────────────────────────────────────── */
 .paivan-sankari {
   background: var(--color-surface-dark);
