@@ -47,6 +47,7 @@
   --space-lg: 24px;
   --space-xl: 40px;
   --space-2xl: 64px;
+  --space-3xl: 96px;
 
   /* ─── Radius ────────────────────────────────────────────────────── */
   --radius-sm: 4px;
@@ -452,7 +453,12 @@ img { display: block; max-width: 100%; }
 }
 
 /* ─── 3. PÄIVÄN SANKARI ──────────────────────────────────────────── */
-.paivan-sankari { background: var(--color-surface-dark); }
+.paivan-sankari {
+  background: var(--color-surface-dark);
+  padding-top: var(--space-md);
+  /* erotellaan visuaalisesti edellisestä Päivän visa -osiosta */
+}
+.paivan-sankari .section-header { padding-top: var(--space-3xl); }
 
 .sankari-card {
   display: block;
@@ -464,6 +470,7 @@ img { display: block; max-width: 100%; }
   position: relative;
   transition: transform 0.2s var(--ease-out);
   border: 1px solid rgba(255, 255, 255, 0.06);
+  border-top: 3px solid var(--color-brand-gold);  /* aksentti — erottaa Päivän visa -kortista */
 }
 .sankari-card:hover { transform: translateY(-3px); }
 
@@ -867,7 +874,7 @@ img { display: block; max-width: 100%; }
   background: linear-gradient(180deg, var(--kat-color, var(--color-surface-card-dark)) 0%, var(--color-surface-card-dark) 65%);
   border-radius: var(--radius-xl);
   overflow: hidden;
-  margin-bottom: var(--space-xl);
+  margin-bottom: var(--space-2xl);
   border: 1px solid rgba(255, 255, 255, 0.06);
 }
 .kategoria-inline-card::before {
@@ -1267,7 +1274,7 @@ img { display: block; max-width: 100%; }
   display: block;
   width: 100%;
   max-width: var(--container-medium);
-  margin: var(--space-md) 0;
+  margin: var(--space-2xl) 0;
   border-radius: var(--radius-xl);
   overflow: hidden;
   line-height: 0;
@@ -1281,7 +1288,7 @@ img { display: block; max-width: 100%; }
   display: block;
 }
 @media (min-width: 768px) {
-  .kategoria-ad { margin: var(--space-lg) auto; }
+  .kategoria-ad { margin: var(--space-2xl) auto; }
 }
 
 /* =====================================================================

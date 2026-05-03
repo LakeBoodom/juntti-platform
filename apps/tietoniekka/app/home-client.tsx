@@ -182,6 +182,8 @@ export function HomeClient({
       {/* 4. PÄIVÄN SANKARI — kuva + featured-quiz CTA (Heikki 2026-04-26) */}
       <section className="paivan-sankari" id="paivan-sankari">
         <div className="container-wide">
+          <h2 className="section-header">Päivän sankari</h2>
+          <p className="section-subtitle">{todaysCelebrity ? `Tänään juhlitaan — tunnetko hänet?` : "Pieni hengähdys, ei sankaria tänään."}</p>
           {todaysCelebrity ? (() => {
             const today = new Date();
             const b = new Date(todaysCelebrity.birth_date);
