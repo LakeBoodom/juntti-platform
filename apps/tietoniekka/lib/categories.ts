@@ -95,6 +95,16 @@ export const CATEGORIES: Category[] = [
     imageUrl: "/ruokajajuoma_kuva.png",
     colorVar: "var(--color-cat-ruoka-juoma)",
   },
+  {
+    slug: "muoti-design",
+    title: "MUOTI & DESIGN",
+    badge: "MUOTI",
+    description: "Suomalainen muoti, brändit, muotoilu",
+    intro: "Marimekosta Iittalaan, Aaltoon ja Lapuan Kankureihin — suomalainen muotoilu on kantanut maailmalle.",
+    visaCount: 0,
+    imageUrl: "/muoti-design_kuva.png",
+    colorVar: "var(--color-cat-muoti-design)",
+  },
 ];
 
 export const CATEGORY_BY_SLUG: Record<string, Category> = Object.fromEntries(

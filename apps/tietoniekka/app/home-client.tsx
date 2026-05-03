@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 
 /* ─────────────────────────────────────────────────────────────────
@@ -10,15 +10,7 @@ import Link from "next/link";
    Datafetch (Supabase) tulee myöhemmin — pidetään tämä yksinkertaisena.
    ───────────────────────────────────────────────────────────────── */
 
-function daysUntil(targetDateStr: string): number {
-  const target = new Date(targetDateStr);
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  target.setHours(0, 0, 0, 0);
-  return Math.ceil((target.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
-}
-
-import type { SankariData, QuizMeta, EventData } from "../lib/queries";
+import type { SankariData, QuizMeta } from "../lib/queries";
 
 type CategoryQuizMap = Record<string, QuizMeta | null>;
 
@@ -26,45 +18,33 @@ export type HomeClientProps = {
   todaysCelebrity: SankariData | null;
   todaysQuiz: QuizMeta | null;
   categoryQuizzes: CategoryQuizMap;
-  upcomingEvents: EventData[];
 };
 
 export function HomeClient({
   todaysCelebrity,
   todaysQuiz,
-  categoryQuizzes,
-  upcomingEvents,
+  categoryQuizzes
 }: HomeClientProps) {
-  // Päivämäärä, countdownit, scroll-reveal, sticky topbar, click feedback
-  useEffect(() => {
-    // 2. Pinnalla nyt -countdownit
-    document.querySelectorAll<HTMLElement>(".event-card[data-target]").forEach((card) => {
-      const target = card.dataset.target;
-      if (!target) return;
-      const days = daysUntil(target);
-      const daysEl = card.querySelector(".days");
-      const suffixEl = card.querySelector(".suffix");
-      const countdownEl = card.querySelector(".event-countdown");
-      if (days < 0) {
-        if (countdownEl) countdownEl.innerHTML = '<span class="suffix">PÄÄTTYNYT</span>';
-      } else if (days === 0) {
-        card.classList.add("today");
-        if (countdownEl) countdownEl.innerHTML = '<span class="countdown-pill">TÄNÄÄN!</span>';
-      } else if (days <= 7) {
-        if (daysEl) daysEl.textContent = String(days);
-        if (suffixEl) suffixEl.textContent = days === 1 ? "PÄIVÄ" : "PÄIVÄÄ";
-      } else {
-        if (daysEl) daysEl.textContent = String(days);
-        if (suffixEl) suffixEl.textContent = "PÄIVÄÄ";
-      }
-    });
+  const [todaysDateLabel, setTodaysDateLabel] = useState<string>("");
 
+  useEffect(() => {
+    const fmt = new Intl.DateTimeFormat("fi-FI", { weekday: "long", day: "numeric", month: "numeric" });
+    const parts = fmt.formatToParts(new Date());
+    const wd = (parts.find((p) => p.type === "weekday")?.value ?? "").trim();
+    const d  = (parts.find((p) => p.type === "day")?.value ?? "").trim();
+    const mo = (parts.find((p) => p.type === "month")?.value ?? "").trim();
+    if (wd && d && mo) {
+      setTodaysDateLabel(`${wd[0].toUpperCase()}${wd.slice(1)} ${d}.${mo}.`);
+    }
+  }, []);
+
+  // Scroll-reveal, sticky topbar, click feedback
+  useEffect(() => {
     // 3. Scroll-reveal (Intersection Observer)
     const revealSelector = [
       ".section-header",
       ".section-subtitle",
       ".featured-quiz",
-      ".pinnalla-strip",
       ".kategoria-inline-card",
       ".sankari-card",
       ".kuvavisa-featured",
@@ -178,7 +158,7 @@ export function HomeClient({
       <section className="paivan-visa" id="paivan-visa">
         <div className="container-wide">
           <h2 className="section-header">Päivän visa</h2>
-          <p className="section-subtitle">Tuntuuko, että tänään kulkee?</p>
+          <p className="section-subtitle">{todaysDateLabel && (<span style={{ color: "var(--color-gold)", fontWeight: 700, marginRight: 8 }}>{todaysDateLabel}</span>)}Tuntuuko, että tänään kulkee?</p>
           {todaysQuiz ? (
             <Link
               href={`/peli?paivan_visa=1&quiz_id=${todaysQuiz.id}`}
@@ -196,87 +176,6 @@ export function HomeClient({
               <p style={{ color: "rgba(255,255,255,0.7)" }}>Päivän visaa ei ole vielä asetettu — kokeile kategoriavisaa!</p>
             </div>
           )}
-        </div>
-      </section>
-
-      {/* 3. PINNALLA NYT */}
-      <section className="pinnalla-nyt" id="pinnalla-nyt">
-        <div className="container-wide">
-          <h2 className="section-header">Mitä Suomi odottaa</h2>
-          <p className="section-subtitle">virittäydy tunnelmaan teemavisalla</p>
-        </div>
-        <div className="container-wide">
-          <div className="pinnalla-strip">
-            {upcomingEvents.length > 0 ? upcomingEvents.map((ev) => {
-              // Slug → kuvatiedosto -mappaus (DB-slug ei aina matchaa /public-tiedostoa)
-              const SLUG_TO_IMAGE: Record<string, string> = {
-                "mm-kisat": "jaakiekko_mm",
-                "euroviisu": "euroviisut",
-              };
-              const imgKey = SLUG_TO_IMAGE[ev.slug] ?? ev.slug;
-              const imgSrc = `/pinnalla_${imgKey}.png`;
-              const eventQuery = ev.tag ? `event=${ev.tag}` : `event=${ev.slug}`;
-              // Laske target ISO-päivämäärä (tämä vuosi tai seuraava jos jo mennyt)
-              const today = new Date();
-              let year = today.getFullYear();
-              const eventThisYear = new Date(year, ev.month - 1, ev.day);
-              if (eventThisYear < today) year++;
-              const targetIso = `${year}-${String(ev.month).padStart(2, "0")}-${String(ev.day).padStart(2, "0")}`;
-              // Päivien lasku
-              const targetDate = new Date(year, ev.month - 1, ev.day);
-              targetDate.setHours(0, 0, 0, 0);
-              const todayMidnight = new Date();
-              todayMidnight.setHours(0, 0, 0, 0);
-              const diffDays = Math.round((targetDate.getTime() - todayMidnight.getTime()) / (1000 * 60 * 60 * 24));
-              return (
-                <a key={ev.id} className="event-card" href={`/peli?${eventQuery}${ev.trivia_quiz_id ? `&quiz_id=${ev.trivia_quiz_id}` : ""}`} data-target={targetIso}>
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={imgSrc} alt={ev.name} onError={(e) => { (e.target as HTMLImageElement).src = `https://placehold.co/400x300/1a3a45/e8a320?text=${encodeURIComponent(ev.name)}`; }} />
-                  <div className="event-name">{ev.name}</div>
-                  <div className="event-countdown">
-                    <span className="days">{diffDays === 0 ? "TÄNÄÄN" : diffDays === 1 ? "1" : diffDays}</span>
-                    <span className="suffix">{diffDays === 1 ? "päivä" : diffDays === 0 ? "" : "päivää"}</span>
-                  </div>
-                </a>
-              );
-            }) : (
-              <p style={{ color: "var(--color-text-muted-light)", padding: "var(--space-md)" }}>Ei tulevia tapahtumia.</p>
-            )}
-          </div>
-        </div>
-        <div className="container-wide">
-          {(() => {
-            // Ota lähin event jolla on trivia_quiz_id — sen pohjalta featured-teematrivia
-            const featured = upcomingEvents.find((e) => e.trivia_quiz_id) ?? upcomingEvents[0];
-            if (!featured) return null;
-            const today2 = new Date();
-            let yr = today2.getFullYear();
-            const eventThisYear2 = new Date(yr, featured.month - 1, featured.day);
-            if (eventThisYear2 < today2) yr++;
-            const targetDate = new Date(yr, featured.month - 1, featured.day);
-            targetDate.setHours(0, 0, 0, 0);
-            const todayMidnight = new Date();
-            todayMidnight.setHours(0, 0, 0, 0);
-            const diff = Math.round((targetDate.getTime() - todayMidnight.getTime()) / (1000 * 60 * 60 * 24));
-            const dayLabel = diff === 0 ? "tänään!" : diff === 1 ? "1 päivä!" : `${diff} päivää!`;
-            const linkQuery = featured.tag ? `event=${featured.tag}` : `event=${featured.slug}`;
-            const peliHref = `/peli?${linkQuery}${featured.trivia_quiz_id ? `&quiz_id=${featured.trivia_quiz_id}` : ""}`;
-            return (
-              <Link href={peliHref} className="featured-quiz" style={{ ["--quiz-tint" as string]: "rgba(31, 61, 46, 0.4)", textDecoration: "none", display: "block" } as React.CSSProperties}>
-                <div className="quiz-header">
-                  <div>
-                    <h3>Teematrivia <span className="countdown">— {dayLabel}</span></h3>
-                    <p>{featured.name} — virittäydy tunnelmaan teemavisalla.</p>
-                  </div>
-                </div>
-                {featured.trivia_quiz_id ? (
-                  <span className="btn btn-primary btn-large" style={{ display: "inline-block", marginTop: "16px" }}>PELAA TEEMAVISAA →</span>
-                ) : (
-                  <p style={{ color: "rgba(255,255,255,0.7)", marginTop: "16px" }}>Visaa luodaan parhaillaan…</p>
-                )}
-              </Link>
-            );
-          })()}
         </div>
       </section>
 

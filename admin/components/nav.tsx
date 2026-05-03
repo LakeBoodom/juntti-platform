@@ -34,12 +34,6 @@ export function Nav({ email }: { email?: string | null }) {
             Julkkikset
           </Link>
           <Link
-            href="/countdowns"
-            className="text-sm text-muted-foreground hover:text-foreground"
-          >
-            Countdownit
-          </Link>
-          <Link
             href="/schedule-rules"
             className="text-sm text-muted-foreground hover:text-foreground"
           >

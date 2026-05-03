@@ -2,7 +2,6 @@ import {
   getTodaysCelebrity,
   getTodaysQuiz,
   getRandomQuizzesPerCategory,
-  getUpcomingEvents,
 } from "../lib/queries";
 import { CATEGORIES } from "../lib/categories";
 import { HomeClient } from "./home-client";
@@ -12,10 +11,9 @@ export const revalidate = 3600;
 
 export default async function HomePage() {
   // Rinnakkainen haku
-  const [todaysCelebrity, todaysQuiz, upcomingEvents, categoryQuizzes] = await Promise.all([
+  const [todaysCelebrity, todaysQuiz, categoryQuizzes] = await Promise.all([
     getTodaysCelebrity(),
     getTodaysQuiz(),
-    getUpcomingEvents(3),
     getRandomQuizzesPerCategory(CATEGORIES.map((c) => c.slug)),
   ]);
 
@@ -24,7 +22,6 @@ export default async function HomePage() {
       todaysCelebrity={todaysCelebrity}
       todaysQuiz={todaysQuiz}
       categoryQuizzes={categoryQuizzes}
-      upcomingEvents={upcomingEvents}
     />
   );
 }
