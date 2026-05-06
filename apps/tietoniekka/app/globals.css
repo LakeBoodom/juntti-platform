@@ -2001,10 +2001,15 @@ a.sankari-photo {
 .peli-h1 {
   font-family: var(--font-display);
   font-weight: 900;
-  font-size: clamp(56px, 14vw, 82px);
-  line-height: 0.9;
+  font-size: clamp(40px, 11vw, 76px);
+  line-height: 0.95;
   letter-spacing: -0.02em;
   color: var(--peli-navy);
+  /* Pakota pitkät sanat (esim. NAAPURIKANSAMME) tavuttumaan tarvittaessa */
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  text-wrap: balance;
+  max-width: 100%;
 }
 .peli-intro-text {
   font-family: var(--font-body);
@@ -2312,7 +2317,16 @@ a.sankari-photo {
   display: flex;
   justify-content: center;
   margin-top: 4px;
+  position: sticky;
+  bottom: 12px;
+  z-index: 20;
+  padding-top: 14px;
+  padding-bottom: 4px;
+  /* Pehmeä gradient-fade jotta nappi erottuu sisällöstä taustasta */
+  background: linear-gradient(to top, var(--peli-cream) 55%, rgba(244, 237, 224, 0));
+  pointer-events: none;
 }
+.peli-next-wrap > * { pointer-events: auto; }
 
 /* End screen */
 .peli-end {
@@ -2367,7 +2381,7 @@ a.sankari-photo {
   }
 }
 @media (max-width: 380px) {
-  .peli-h1 { font-size: 54px; }
+  .peli-h1 { font-size: 38px; }
   .peli-q-text { font-size: 19px; }
   .peli-opt { font-size: 15px; padding: 12px 12px; }
 }
