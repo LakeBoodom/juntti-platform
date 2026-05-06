@@ -1,10 +1,58 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
+import Script from "next/script";
 import { brand } from "@/config/brand";
 import "./globals.css";
 
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://tietoniekka.fi";
+const PLAUSIBLE_DOMAIN = process.env.NEXT_PUBLIC_PLAUSIBLE_DOMAIN;
+
 export const metadata: Metadata = {
-  title: `${brand.name} — testaa tietosi`,
-  description: `${brand.name} — päivittäin vaihtuva visa, julkkisten synttärit. 100% ilmainen.`,
+  metadataBase: new URL(SITE_URL),
+  title: {
+    default: `${brand.name} — testaa tietosi`,
+    template: `%s | ${brand.name}`,
+  },
+  description: `${brand.name} — päivittäin vaihtuva visa, julkkisten synttärit. Aina ilmainen.`,
+  applicationName: brand.name,
+  keywords: [
+    "visa",
+    "tietovisa",
+    "trivia",
+    "päivän visa",
+    "suomalainen visa",
+    "tietoniekka",
+  ],
+  authors: [{ name: brand.name }],
+  openGraph: {
+    type: "website",
+    locale: "fi_FI",
+    url: SITE_URL,
+    siteName: brand.name,
+    title: `${brand.name} — testaa tietosi`,
+    description: `Päivittäin vaihtuva visa, julkkisten synttärit. Aina ilmainen.`,
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: `${brand.name} — testaa tietosi`,
+    description: `Päivittäin vaihtuva visa, julkkisten synttärit.`,
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
+  formatDetection: {
+    telephone: false,
+  },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#0f1520",
 };
 
 export default function RootLayout({
@@ -26,7 +74,17 @@ export default function RootLayout({
           rel="stylesheet"
         />
       </head>
-      <body>{children}</body>
+      <body>
+        {children}
+        {PLAUSIBLE_DOMAIN && (
+          <Script
+            defer
+            src="https://plausible.io/js/script.js"
+            data-domain={PLAUSIBLE_DOMAIN}
+            strategy="afterInteractive"
+          />
+        )}
+      </body>
     </html>
   );
 }
