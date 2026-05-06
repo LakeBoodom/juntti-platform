@@ -10,10 +10,10 @@ import Link from "next/link";
    Datafetch (Supabase) tulee myöhemmin — pidetään tämä yksinkertaisena.
    ───────────────────────────────────────────────────────────────── */
 
-import type { SankariData, QuizMeta } from "../lib/queries";
+import type { SankariData, QuizMeta, CategoryPreview } from "../lib/queries";
 import { CATEGORIES, CATEGORY_BY_SLUG } from "../lib/categories";
 
-type CategoryQuizMap = Record<string, QuizMeta | null>;
+type CategoryQuizMap = Record<string, CategoryPreview | null>;
 
 export type HomeClientProps = {
   todaysCelebrity: SankariData | null;
@@ -140,7 +140,7 @@ export function HomeClient({
               <span className="niekka-line">NIEKKA</span>
             </h1>
             <p className="hero-subtitle">
-              Naapurisi sai 4/5 — kyllä kai sinä hänet voitat?
+              Naapurisi sai 7/10 — kyllä kai sinä hänet voitat?
             </p>
             <a href="#paivan-visa" className="btn btn-primary btn-large hero-cta">
               OTETAAN SELVÄÄ →
@@ -151,7 +151,7 @@ export function HomeClient({
           </div>
         </div>
         <div className="hero-strip">
-          <span className="pulse">NYT</span> Eiköhän jo pelata?
+          Eiköhän jo pelata?
         </div>
       </section>
 
@@ -197,7 +197,7 @@ export function HomeClient({
       <section className="paivan-sankari" id="paivan-sankari">
         <div className="container-wide">
           <h2 className="section-header">Päivän sankari</h2>
-          <p className="section-subtitle">{todaysCelebrity ? `Tänään juhlitaan — tunnetko hänet?` : "Pieni hengähdys, ei sankaria tänään."}</p>
+          <p className="section-subtitle">{todaysCelebrity ? `Tietoniekka onnittelee! Tunnetko sankarin?` : "Pieni hengähdys, ei sankaria tänään."}</p>
           {todaysCelebrity ? (() => {
             const today = new Date();
             const b = new Date(todaysCelebrity.birth_date);
@@ -218,8 +218,7 @@ export function HomeClient({
                 </Link>
                 {todaysCelebrity.trivia_quiz_id && (
                   <div className="sankari-quiz-info">
-                    <span className="eyebrow">Tunne päivän sankari</span>
-                    <a href={peliHref} className="btn btn-primary btn-large">PISTÄ TULEEN →</a>
+                    <a href={peliHref} className="btn btn-primary btn-large">PELAA TÄSTÄ! →</a>
                   </div>
                 )}
               </div>
@@ -252,7 +251,7 @@ export function HomeClient({
       <section className="kategoriat" id="kategoriat">
         <div className="container-wide">
           <h2 className="section-header">Testaa tietosi eri aiheissa</h2>
-          <p className="section-subtitle">mahtaakohan tietosi riittää? Kokeile nyt kuitenkin!</p>
+          <p className="section-subtitle">Löytyykö sinusta todellinen tietoniekka?</p>
 
           {CATEGORIES.map((cat, idx) => {
             const quiz = categoryQuizzes[cat.slug];
@@ -286,19 +285,36 @@ export function HomeClient({
                     <p className="description">{cat.intro}</p>
                   </Link>
                   {quiz ? (
-                    <Link href={peliHref} className="kategoria-card-quiz kategoria-card-quiz-link">
+                    <div className="kategoria-card-quiz">
                       <div className="visa-title">
-                        <span>{quiz.title}</span>
+                        <span>{cat.quote}</span>
+                        {quiz.questionCount > 0 && <span className="count">1 / {quiz.questionCount}</span>}
                       </div>
-                      {quiz.description && (
-                        <p className="visa-question" style={{ fontSize: 17, fontWeight: 600, lineHeight: 1.35 }}>
-                          {quiz.description}
-                        </p>
+                      <div className="visa-progress">Kokeile · Kysymys 1 / {quiz.questionCount}</div>
+                      {quiz.firstQuestion ? (
+                        <>
+                          <h4 className="visa-question">{quiz.firstQuestion.question}</h4>
+                          <div className="visa-options">
+                            {quiz.firstQuestion.options.map((opt, i) => {
+                              const letter = ["A", "B", "C", "D"][i];
+                              return (
+                                <a
+                                  key={i}
+                                  className="visa-option"
+                                  href={`/peli?kat=${cat.slug}&quiz_id=${quiz.id}&first=${letter}`}
+                                >
+                                  <span className="badge">{letter}</span> {opt}
+                                </a>
+                              );
+                            })}
+                          </div>
+                        </>
+                      ) : (
+                        <Link href={peliHref} className="btn btn-primary btn-large" style={{ display: "inline-block", marginTop: "var(--space-md)" }}>
+                          PELAA NYT →
+                        </Link>
                       )}
-                      <span className="btn btn-primary btn-large" style={{ display: "inline-block", marginTop: "var(--space-md)" }}>
-                        PELAA NYT →
-                      </span>
-                    </Link>
+                    </div>
                   ) : (
                     <div className="kategoria-card-quiz">
                       <p style={{ color: "rgba(255,255,255,0.7)", fontSize: 15 }}>
@@ -322,9 +338,9 @@ export function HomeClient({
           <article className="kategoria-inline-card kuvavisa-cta-card" data-watermark="LIPUT" style={{ ["--kat-color" as string]: "var(--color-cat-maantieto)", ["--bg-image" as string]: "url(/liput_kuva.png)" } as React.CSSProperties}>
             <Link href="/peli?kuvavisa=liput" className="kategoria-card-hero kategoria-card-hero-link">
               <span className="eyebrow">— Kuvavisa</span>
-              <h3>LIPPUVISA</h3>
-              <p>Maailman liput</p>
-              <p className="description">Tunnista kuvan lippu — pelaa minuutissa.</p>
+              <h3>MAAILMAN LIPUT</h3>
+              <p>Kuvavisa</p>
+              <p className="description">Euroopasta Aasiaan — kuinka monta lippua tunnistat?</p>
               <span className="btn btn-primary btn-large kuvavisa-cta-btn">PELAA NYT →</span>
             </Link>
           </article>
@@ -333,8 +349,8 @@ export function HomeClient({
             <Link href="/peli?kuvavisa=vaakuna" className="kategoria-card-hero kategoria-card-hero-link">
               <span className="eyebrow">— Kuvavisa</span>
               <h3>VAAKUNAT</h3>
-              <p>Suomen kunnat</p>
-              <p className="description">Tunnista maakuntavaakuna — Pohjois-Karjalasta Lounais-Suomeen.</p>
+              <p>Kuvavisa</p>
+              <p className="description">Karhuja, kruunuja ja miekkoja — tunnetko maakuntavaakunat?</p>
               <span className="btn btn-primary btn-large kuvavisa-cta-btn">PELAA NYT →</span>
             </Link>
           </article>
@@ -343,8 +359,8 @@ export function HomeClient({
             <Link href="/peli?kuvavisa=linnut" className="kategoria-card-hero kategoria-card-hero-link">
               <span className="eyebrow">— Kuvavisa</span>
               <h3>LINNUT</h3>
-              <p>Suomen siivekkäät</p>
-              <p className="description">Tunnista lintu kuvasta — eihän tämä ole varis sittenkään.</p>
+              <p>Kuvavisa</p>
+              <p className="description">Kuinka hyvin tunnet siivekkäät?</p>
               <span className="btn btn-primary btn-large kuvavisa-cta-btn">PELAA NYT →</span>
             </Link>
           </article>
@@ -353,8 +369,8 @@ export function HomeClient({
             <Link href="/peli?kuvavisa=kasvit" className="kategoria-card-hero kategoria-card-hero-link">
               <span className="eyebrow">— Kuvavisa</span>
               <h3>KASVIT</h3>
-              <p>Suomen kasvio</p>
-              <p className="description">Tunnista kasvi kuvasta — niittypursusta nokkoseen.</p>
+              <p>Kuvavisa</p>
+              <p className="description">Voikukasta vanamoon — tunnetko kasvit kuvasta?</p>
               <span className="btn btn-primary btn-large kuvavisa-cta-btn">PELAA NYT →</span>
             </Link>
           </article>
@@ -363,8 +379,8 @@ export function HomeClient({
             <Link href="/peli?kuvavisa=elaimet" className="kategoria-card-hero kategoria-card-hero-link">
               <span className="eyebrow">— Kuvavisa</span>
               <h3>ELÄIMET</h3>
-              <p>Pohjolan luonto</p>
-              <p className="description">Tunnista eläin kuvasta — karhuista kärppiin.</p>
+              <p>Kuvavisa</p>
+              <p className="description">Hirvi, ilves vai saukko? Tunnistatko kaikki?</p>
               <span className="btn btn-primary btn-large kuvavisa-cta-btn">PELAA NYT →</span>
             </Link>
           </article>
@@ -376,7 +392,7 @@ export function HomeClient({
         <div className="container-wide">
           <div className="arvo-card">
             <h2>Ei me kerrota kellekään</h2>
-            <p>jos pelaat vielä lisää. 50+ visaa odottaa, noppa päättää.</p>
+            <p>jos pelaat vielä lisää. Yli 500 visaa odottaa!</p>
             <a href="/peli?random=1" className="btn btn-primary btn-large">ANNA MENNÄ NYT VAAN →</a>
           </div>
         </div>

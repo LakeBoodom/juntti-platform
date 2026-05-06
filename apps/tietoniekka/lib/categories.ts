@@ -11,6 +11,8 @@ export type Category = {
   intro: string;
   imageUrl: string;
   colorVar: string;
+  /** Humoristinen tagline kategoria-kortin visa-otsikoksi (etusivu) */
+  quote: string;
 };
 
 export const CATEGORIES: Category[] = [
@@ -22,6 +24,7 @@ export const CATEGORIES: Category[] = [
     intro: "Suomen urheilun huippuhetkistä ja suurista nimistä — Lasse Virénistä Saku Koivuun, Nykäsestä Kirvesniemeen.",
     imageUrl: "/urheilu_kuva.png",
     colorVar: "var(--color-cat-urheilu)",
+    quote: "Näytätkin enemmän penkkiurheilijalta",
   },
   {
     slug: "maantieto",
@@ -31,6 +34,7 @@ export const CATEGORIES: Category[] = [
     intro: "Paikat, pääkaupungit, vuoret ja virrat — kuinka hyvin tunnet maailman?",
     imageUrl: "/maantieto_kuva.png",
     colorVar: "var(--color-cat-maantieto)",
+    quote: "Ootko kiertänyt muutakin kuin tahkoa?",
   },
   {
     slug: "luonto",
@@ -40,6 +44,7 @@ export const CATEGORIES: Category[] = [
     intro: "Testaa tietosi Suomen luonnosta, eläimistä, kasveista ja upeista maisemista.",
     imageUrl: "/luonto_kuva.png",
     colorVar: "var(--color-cat-luonto)",
+    quote: "Tiedän, että sinusta löytyy pieni eräjorma",
   },
   {
     slug: "historia",
@@ -49,6 +54,7 @@ export const CATEGORIES: Category[] = [
     intro: "Tapahtumat, jotka muokkasivat aikaansa — ja meidän tämän päivän.",
     imageUrl: "/historia_kuva.png",
     colorVar: "var(--color-cat-historia)",
+    quote: "Just ne kysymykset jolloin lintsasit koulussa",
   },
   {
     slug: "tv-sarjat",
@@ -58,6 +64,7 @@ export const CATEGORIES: Category[] = [
     intro: "Tuntemiisi sarjoihin yllättäviä yksityiskohtia. Kuinka tarkkaan katsot?",
     imageUrl: "/TV_kuva.png",
     colorVar: "var(--color-cat-tv-sarjat)",
+    quote: "Paljasta vaan, olet katsonut kaikki Metsolat",
   },
   {
     slug: "elokuvat",
@@ -67,6 +74,7 @@ export const CATEGORIES: Category[] = [
     intro: "Klassikoista uusiin julkaisuihin — kuka teki ja milloin?",
     imageUrl: "/elokuvat_kuva.png",
     colorVar: "var(--color-cat-elokuvat)",
+    quote: "Ei ole sitten pelkkiä turhapuroja tarjolla",
   },
   {
     slug: "musiikki",
@@ -76,6 +84,7 @@ export const CATEGORIES: Category[] = [
     intro: "Suomalainen ja maailman musiikki. Kuka lauloi minkä ja milloin?",
     imageUrl: "/musiikki_kuva.png",
     colorVar: "var(--color-cat-musiikki)",
+    quote: "Ei varmasti mitään sinun soittolistaltasi.",
   },
   {
     slug: "ruoka-juoma",
@@ -85,6 +94,7 @@ export const CATEGORIES: Category[] = [
     intro: "Mitä syömme ja miksi — perinteistä ja uudesta keittiöstä.",
     imageUrl: "/ruokajajuoma_kuva.png",
     colorVar: "var(--color-cat-ruoka-juoma)",
+    quote: "Ainakaan täällä ei ruoka pala pohjaan.",
   },
   {
     slug: "muoti-design",
@@ -94,6 +104,7 @@ export const CATEGORIES: Category[] = [
     intro: "Marimekosta Iittalaan, Aaltoon ja Lapuan Kankureihin — suomalainen muotoilu on kantanut maailmalle.",
     imageUrl: "/muoti_design_kuva.png",
     colorVar: "var(--color-cat-muoti-design)",
+    quote: "Muotia, designia ja hyvää makua – ainakin melkein.",
   },
 ];
 

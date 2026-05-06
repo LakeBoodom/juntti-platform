@@ -133,15 +133,61 @@ export async function getRandomQuizByCategory(category: string): Promise<QuizMet
   return data[Math.floor(Math.random() * data.length)];
 }
 
-/** Hae julkaistut visat per kategoria-mappi (etusivua varten 1 random per kategoria) */
+/**
+ * Etusivun kategoria-kortti -preview:
+ * - random visa kategoriasta
+ * - sen ensimmäinen kysymys + 4 vaihtoehtoa
+ * - kysymysmäärä (n / X -laskuria varten)
+ */
+export type CategoryPreview = QuizMeta & {
+  questionCount: number;
+  firstQuestion: {
+    question: string;
+    options: string[];
+    correct: string;
+  } | null;
+};
+
+/** Hae julkaistut visat per kategoria-mappi (etusivua varten 1 random per kategoria, sis. 1. kysymys) */
 export async function getRandomQuizzesPerCategory(
   categories: string[],
-): Promise<Record<string, QuizMeta | null>> {
-  const result: Record<string, QuizMeta | null> = {};
-  // Yksinkertainen: useita queryja. Voidaan optimoida myöhemmin.
+): Promise<Record<string, CategoryPreview | null>> {
+  const sb = getSupabase();
+  if (!sb) {
+    const empty: Record<string, CategoryPreview | null> = {};
+    for (const c of categories) empty[c] = null;
+    return empty;
+  }
+  const result: Record<string, CategoryPreview | null> = {};
+
   await Promise.all(
     categories.map(async (cat) => {
-      result[cat] = await getRandomQuizByCategory(cat);
+      const meta = await getRandomQuizByCategory(cat);
+      if (!meta) {
+        result[cat] = null;
+        return;
+      }
+      // Hae kysymykset visaan
+      const { data: qs } = await sb
+        .from("questions")
+        .select("question_text, answers, sort_order")
+        .eq("quiz_id", meta.id)
+        .order("sort_order", { ascending: true });
+      const total = qs?.length ?? 0;
+      const first = qs?.[0];
+      let firstQuestion: CategoryPreview["firstQuestion"] = null;
+      if (first) {
+        const answers = first.answers as Array<{ text: string; is_correct: boolean }> | undefined;
+        const options = (answers ?? []).slice(0, 4).map((a) => a.text);
+        while (options.length < 4) options.push("—");
+        const correct = (answers ?? []).find((a) => a.is_correct)?.text ?? options[0];
+        firstQuestion = {
+          question: first.question_text,
+          options,
+          correct,
+        };
+      }
+      result[cat] = { ...meta, questionCount: total, firstQuestion };
     }),
   );
   return result;
