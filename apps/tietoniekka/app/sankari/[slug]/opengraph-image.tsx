@@ -4,19 +4,18 @@ import { getCelebrityBySlug } from "../../../lib/queries";
 export const runtime = "edge";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
-
 export const alt = "Tietoniekka — päivän sankari";
 
 export default async function SankariOG({
   params,
 }: {
-  params: { slug: string };
+  params: Promise<{ slug: string }>;
 }) {
-  const cel = await getCelebrityBySlug(params.slug);
+  const { slug } = await params;
+  const cel = await getCelebrityBySlug(slug);
   const name = cel?.name ?? "Päivän sankari";
   const role = cel?.role ?? "Tietoniekka";
 
-  // Renderöidään kuva vain jos saadaan ladattua ulkoinen URL — muuten gradient
   return new ImageResponse(
     (
       <div

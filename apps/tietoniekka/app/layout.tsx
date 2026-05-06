@@ -30,11 +30,20 @@ export const metadata: Metadata = {
     siteName: brand.name,
     title: `${brand.name} — testaa tietosi`,
     description: `Päivittäin vaihtuva visa, julkkisten synttärit. Aina ilmainen.`,
+    images: [
+      {
+        url: "/og-image.png",
+        width: 1729,
+        height: 910,
+        alt: `${brand.name} — testaa tietosi`,
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
     title: `${brand.name} — testaa tietosi`,
     description: `Päivittäin vaihtuva visa, julkkisten synttärit.`,
+    images: ["/og-image.png"],
   },
   robots: {
     index: true,

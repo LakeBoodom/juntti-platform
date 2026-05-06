@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import Link from "next/link";
 
 /* ─────────────────────────────────────────────────────────────────
@@ -11,7 +11,7 @@ import Link from "next/link";
    ───────────────────────────────────────────────────────────────── */
 
 import type { SankariData, QuizMeta } from "../lib/queries";
-import { CATEGORY_BY_SLUG } from "../lib/categories";
+import { CATEGORIES, CATEGORY_BY_SLUG } from "../lib/categories";
 
 type CategoryQuizMap = Record<string, QuizMeta | null>;
 
@@ -248,198 +248,68 @@ export function HomeClient({
         </div>
       </section>
 
-      {/* 6. KATEGORIAT — kategoria-otsikot ja kuvaukset CATEGORIES:stä, kysymykset ja vastausvaihtoehdot ovat tällä hetkellä hardcoded placeholdereita. Klikkaaminen vie /peli-reittiin joka ei vielä lue DB:tä. Vaihe 3.5 myöhemmin. */}
+      {/* 6. KATEGORIAT — silmukka CATEGORIES + categoryQuizzes (random per kategoria, päivittyy 1 h välein) */}
       <section className="kategoriat" id="kategoriat">
         <div className="container-wide">
           <h2 className="section-header">Testaa tietosi eri aiheissa</h2>
           <p className="section-subtitle">mahtaakohan tietosi riittää? Kokeile nyt kuitenkin!</p>
 
-          <article className="kategoria-inline-card" data-watermark="URHEILU" style={{ ["--kat-color" as string]: "var(--color-cat-urheilu)", ["--bg-image" as string]: "url(/urheilu_kuva.png)" } as React.CSSProperties}>
-            <Link href="/kategoria/urheilu" className="kategoria-card-hero kategoria-card-hero-link">
-              <span className="eyebrow">— Kategoria</span>
-              <h3>URHEILU</h3>
-              <p>Jääkiekko, jalkapallo, yleisurheilu</p>
-              <p className="description">Suomen urheilun huippuhetkistä ja suurista nimistä.</p>
-            </Link>
-            <div className="kategoria-card-quiz">
-              <div className="visa-title"><span>Näytätkin enemmän penkkiurheilijalta</span><span className="count">1 / 18</span></div>
-              <div className="visa-progress">Kokeile · Kysymys 1 / 5</div>
-              <h4 className="visa-question">Kuinka monta kertaa Suomi on voittanut jääkiekon MM-kultaa?</h4>
-              <div className="visa-options">
-                <a className="visa-option" href="/peli?kat=urheilu&first=A"><span className="badge">A</span> 4</a>
-                <a className="visa-option" href="/peli?kat=urheilu&first=B"><span className="badge">B</span> 3</a>
-                <a className="visa-option" href="/peli?kat=urheilu&first=C"><span className="badge">C</span> 5</a>
-                <a className="visa-option" href="/peli?kat=urheilu&first=D"><span className="badge">D</span> 2</a>
-              </div>
-            </div>
-          </article>
-
-          <a href="#" className="kategoria-ad" aria-label="Mainos">
-            <img src="/maantieto_ad.png" alt="" />
-          </a>
-
-          <article className="kategoria-inline-card" data-watermark="MAANTIETO" style={{ ["--kat-color" as string]: "var(--color-cat-maantieto)", ["--bg-image" as string]: "url(/maantieto_kuva.png)" } as React.CSSProperties}>
-            <Link href="/kategoria/maantieto" className="kategoria-card-hero kategoria-card-hero-link">
-              <span className="eyebrow">— Kategoria</span>
-              <h3>MAANTIETO</h3>
-              <p>Suomi, Eurooppa, maailma</p>
-              <p className="description">Paikat, pääkaupungit, vuoret ja virrat — kuinka hyvin tunnet maailman?</p>
-            </Link>
-            <div className="kategoria-card-quiz">
-              <div className="visa-title"><span>Ootko kiertänyt muutakin kuin tahkoa?</span><span className="count">1 / 15</span></div>
-              <div className="visa-progress">Kokeile · Kysymys 1 / 10</div>
-              <h4 className="visa-question">Mikä on Suomen suurin järvi?</h4>
-              <div className="visa-options">
-                <a className="visa-option" href="/peli?kat=maantieto&first=A"><span className="badge">A</span> Päijänne</a>
-                <a className="visa-option" href="/peli?kat=maantieto&first=B"><span className="badge">B</span> Saimaa</a>
-                <a className="visa-option" href="/peli?kat=maantieto&first=C"><span className="badge">C</span> Inarijärvi</a>
-                <a className="visa-option" href="/peli?kat=maantieto&first=D"><span className="badge">D</span> Oulujärvi</a>
-              </div>
-            </div>
-          </article>
-
-          <article className="kategoria-inline-card" data-watermark="LUONTO" style={{ ["--kat-color" as string]: "var(--color-cat-luonto)", ["--bg-image" as string]: "url(/luonto_kuva.png)" } as React.CSSProperties}>
-            <Link href="/kategoria/luonto" className="kategoria-card-hero kategoria-card-hero-link">
-              <span className="eyebrow">— Kategoria</span>
-              <h3>LUONTO</h3>
-              <p>Suomen luonnon ihmeet ja eläimet</p>
-              <p className="description">Testaa tietosi Suomen luonnosta, eläimistä ja upeista maisemista.</p>
-            </Link>
-            <div className="kategoria-card-quiz">
-              <div className="visa-title"><span>Mä tiedän, että susta löytyy eräjorma sisältä</span><span className="count">1 / 27</span></div>
-              <div className="visa-progress">Kokeile · Kysymys 1 / 10</div>
-              <h4 className="visa-question">Mikä on Suomen kansalliseläin?</h4>
-              <div className="visa-options">
-                <a className="visa-option" href="/peli?kat=luonto&first=A"><span className="badge">A</span> Karhu</a>
-                <a className="visa-option" href="/peli?kat=luonto&first=B"><span className="badge">B</span> Ahma</a>
-                <a className="visa-option" href="/peli?kat=luonto&first=C"><span className="badge">C</span> Hirvi</a>
-                <a className="visa-option" href="/peli?kat=luonto&first=D"><span className="badge">D</span> Joutsen</a>
-              </div>
-            </div>
-          </article>
-
-          <article className="kategoria-inline-card" data-watermark="HISTORIA" style={{ ["--kat-color" as string]: "var(--color-cat-historia)", ["--bg-image" as string]: "url(/historia_kuva.png)" } as React.CSSProperties}>
-            <Link href="/kategoria/historia" className="kategoria-card-hero kategoria-card-hero-link">
-              <span className="eyebrow">— Kategoria</span>
-              <h3>HISTORIA</h3>
-              <p>Suomi, maailma, henkilöt</p>
-              <p className="description">Tapahtumat, jotka muokkasivat aikaansa — ja meidän tämän päivän.</p>
-            </Link>
-            <div className="kategoria-card-quiz">
-              <div className="visa-title"><span>Just ne kysymykset jolloin lintsasit koulussa</span><span className="count">1 / 22</span></div>
-              <div className="visa-progress">Kokeile · Kysymys 1 / 12</div>
-              <h4 className="visa-question">Minä vuonna Suomi itsenäistyi?</h4>
-              <div className="visa-options">
-                <a className="visa-option" href="/peli?kat=historia&first=A"><span className="badge">A</span> 1906</a>
-                <a className="visa-option" href="/peli?kat=historia&first=B"><span className="badge">B</span> 1917</a>
-                <a className="visa-option" href="/peli?kat=historia&first=C"><span className="badge">C</span> 1918</a>
-                <a className="visa-option" href="/peli?kat=historia&first=D"><span className="badge">D</span> 1944</a>
-              </div>
-            </div>
-          </article>
-
-          <article className="kategoria-inline-card" data-watermark="TV-SARJAT" style={{ ["--kat-color" as string]: "var(--color-cat-tv-sarjat)", ["--bg-image" as string]: "url(/TV_kuva.png)" } as React.CSSProperties}>
-            <Link href="/kategoria/tv-sarjat" className="kategoria-card-hero kategoria-card-hero-link">
-              <span className="eyebrow">— Kategoria</span>
-              <h3>TV-SARJAT</h3>
-              <p>Klassikot, uutuudet, kulttisarjat</p>
-              <p className="description">Tuntemiisi sarjoihin yllättäviä yksityiskohtia. Kuinka tarkkaan katsot?</p>
-            </Link>
-            <div className="kategoria-card-quiz">
-              <div className="visa-title"><span>Paljasta vaan, oot katsonut kaikki Metsolat</span><span className="count">1 / 12</span></div>
-              <div className="visa-progress">Kokeile · Kysymys 1 / 8</div>
-              <h4 className="visa-question">Mikä on Suomen pitkäikäisin kotimainen TV-sarja?</h4>
-              <div className="visa-options">
-                <a className="visa-option" href="/peli?kat=tv-sarjat&first=A"><span className="badge">A</span> Salatut elämät</a>
-                <a className="visa-option" href="/peli?kat=tv-sarjat&first=B"><span className="badge">B</span> Kotikatu</a>
-                <a className="visa-option" href="/peli?kat=tv-sarjat&first=C"><span className="badge">C</span> Hovimäki</a>
-                <a className="visa-option" href="/peli?kat=tv-sarjat&first=D"><span className="badge">D</span> Reinikainen</a>
-              </div>
-            </div>
-          </article>
-
-          <article className="kategoria-inline-card" data-watermark="ELOKUVAT" style={{ ["--kat-color" as string]: "var(--color-cat-elokuvat)", ["--bg-image" as string]: "url(/elokuvat_kuva.png)" } as React.CSSProperties}>
-            <Link href="/kategoria/elokuvat" className="kategoria-card-hero kategoria-card-hero-link">
-              <span className="eyebrow">— Kategoria</span>
-              <h3>ELOKUVAT</h3>
-              <p>Kotimainen, Hollywood, Eurooppa</p>
-              <p className="description">Klassikoista uusiin julkaisuihin — kuka teki ja milloin?</p>
-            </Link>
-            <div className="kategoria-card-quiz">
-              <div className="visa-title"><span>Ei ole sitten pelkkiä turhapuroja tarjolla</span><span className="count">1 / 18</span></div>
-              <div className="visa-progress">Kokeile · Kysymys 1 / 10</div>
-              <h4 className="visa-question">Kuka ohjasi Tuntemattoman sotilaan vuoden 2017 versiossa?</h4>
-              <div className="visa-options">
-                <a className="visa-option" href="/peli?kat=elokuvat&first=A"><span className="badge">A</span> Aki Kaurismäki</a>
-                <a className="visa-option" href="/peli?kat=elokuvat&first=B"><span className="badge">B</span> Aku Louhimies</a>
-                <a className="visa-option" href="/peli?kat=elokuvat&first=C"><span className="badge">C</span> Klaus Härö</a>
-                <a className="visa-option" href="/peli?kat=elokuvat&first=D"><span className="badge">D</span> Jalmari Helander</a>
-              </div>
-            </div>
-          </article>
-
-          <article className="kategoria-inline-card" data-watermark="MUSIIKKI" style={{ ["--kat-color" as string]: "var(--color-cat-musiikki)", ["--bg-image" as string]: "url(/musiikki_kuva.png)" } as React.CSSProperties}>
-            <Link href="/kategoria/musiikki" className="kategoria-card-hero kategoria-card-hero-link">
-              <span className="eyebrow">— Kategoria</span>
-              <h3>MUSIIKKI</h3>
-              <p>Hitit, klassikot, artistit</p>
-              <p className="description">Suomalainen ja maailman musiikki. Kuka lauloi minkä ja milloin?</p>
-            </Link>
-            <div className="kategoria-card-quiz">
-              <div className="visa-title"><span>Ei taatusti yhtään sun playlistilta</span><span className="count">1 / 24</span></div>
-              <div className="visa-progress">Kokeile · Kysymys 1 / 10</div>
-              <h4 className="visa-question">Kuka voitti Eurovision Suomelle vuonna 2006?</h4>
-              <div className="visa-options">
-                <a className="visa-option" href="/peli?kat=musiikki&first=A"><span className="badge">A</span> Lordi</a>
-                <a className="visa-option" href="/peli?kat=musiikki&first=B"><span className="badge">B</span> Krista Siegfrids</a>
-                <a className="visa-option" href="/peli?kat=musiikki&first=C"><span className="badge">C</span> Saara Aalto</a>
-                <a className="visa-option" href="/peli?kat=musiikki&first=D"><span className="badge">D</span> Pertti Kurikka</a>
-              </div>
-            </div>
-          </article>
-
-          <a href="#" className="kategoria-ad" aria-label="Mainos">
-            <img src="/Ruokajajuoma_ad.png" alt="" />
-          </a>
-
-          <article className="kategoria-inline-card" data-watermark="RUOKA" style={{ ["--kat-color" as string]: "var(--color-cat-ruoka-juoma)", ["--bg-image" as string]: "url(/ruokajajuoma_kuva.png)" } as React.CSSProperties}>
-            <Link href="/kategoria/ruoka-juoma" className="kategoria-card-hero kategoria-card-hero-link">
-              <span className="eyebrow">— Kategoria</span>
-              <h3>RUOKA &amp; JUOMA</h3>
-              <p>Ruokakulttuuri ja juomahistoria</p>
-              <p className="description">Mitä syömme ja miksi — perinteistä ja uudesta keittiöstä.</p>
-            </Link>
-            <div className="kategoria-card-quiz">
-              <div className="visa-title"><span>Oot tässä varmasti parempi kuin keittiössä</span><span className="count">1 / 14</span></div>
-              <div className="visa-progress">Kokeile · Kysymys 1 / 8</div>
-              <h4 className="visa-question">Mikä on klassinen pääsiäisruoka Suomessa?</h4>
-              <div className="visa-options">
-                <a className="visa-option" href="/peli?kat=ruoka-juoma&first=A"><span className="badge">A</span> Mämmi</a>
-                <a className="visa-option" href="/peli?kat=ruoka-juoma&first=B"><span className="badge">B</span> Karjalanpiirakka</a>
-                <a className="visa-option" href="/peli?kat=ruoka-juoma&first=C"><span className="badge">C</span> Mustamakkara</a>
-                <a className="visa-option" href="/peli?kat=ruoka-juoma&first=D"><span className="badge">D</span> Lanttulaatikko</a>
-              </div>
-            </div>
-          </article>
-
-          <article className="kategoria-inline-card" data-watermark="MUOTI" style={{ ["--kat-color" as string]: "var(--color-cat-muoti-design)", ["--bg-image" as string]: "url(/muoti_design_kuva.png)" } as React.CSSProperties}>
-            <Link href="/kategoria/muoti-design" className="kategoria-card-hero kategoria-card-hero-link">
-              <span className="eyebrow">— Kategoria</span>
-              <h3>MUOTI &amp; DESIGN</h3>
-              <p>Suomalainen muoti, brändit, muotoilu</p>
-              <p className="description">Marimekosta Iittalaan ja Aaltoon — suomalainen muotoilu kantaa maailmalle.</p>
-            </Link>
-            <div className="kategoria-card-quiz">
-              <div className="visa-title"><span>Tunnistatko klassikot pelkästä piirroksesta?</span></div>
-              <h4 className="visa-question">Kuka suunnitteli Aalto-maljakon?</h4>
-              <div className="visa-options">
-                <a className="visa-option" href="/peli?kat=muoti-design&first=A"><span className="badge">A</span> Alvar Aalto</a>
-                <a className="visa-option" href="/peli?kat=muoti-design&first=B"><span className="badge">B</span> Tapio Wirkkala</a>
-                <a className="visa-option" href="/peli?kat=muoti-design&first=C"><span className="badge">C</span> Kaj Franck</a>
-                <a className="visa-option" href="/peli?kat=muoti-design&first=D"><span className="badge">D</span> Eero Saarinen</a>
-              </div>
-            </div>
-          </article>
+          {CATEGORIES.map((cat, idx) => {
+            const quiz = categoryQuizzes[cat.slug];
+            const peliHref = quiz ? `/peli?kat=${cat.slug}&quiz_id=${quiz.id}` : `/peli?kat=${cat.slug}`;
+            return (
+              <Fragment key={cat.slug}>
+                {idx === 1 && (
+                  <a href="#" className="kategoria-ad" aria-label="Mainos">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src="/maantieto_ad.png" alt="" />
+                  </a>
+                )}
+                {idx === 7 && (
+                  <a href="#" className="kategoria-ad" aria-label="Mainos">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src="/Ruokajajuoma_ad.png" alt="" />
+                  </a>
+                )}
+                <article
+                  className="kategoria-inline-card"
+                  data-watermark={cat.badge}
+                  style={{
+                    ["--kat-color" as string]: cat.colorVar,
+                    ["--bg-image" as string]: `url(${cat.imageUrl})`,
+                  } as React.CSSProperties}
+                >
+                  <Link href={`/kategoria/${cat.slug}`} className="kategoria-card-hero kategoria-card-hero-link">
+                    <span className="eyebrow">— Kategoria</span>
+                    <h3>{cat.title}</h3>
+                    <p>{cat.description}</p>
+                    <p className="description">{cat.intro}</p>
+                  </Link>
+                  {quiz ? (
+                    <Link href={peliHref} className="kategoria-card-quiz kategoria-card-quiz-link">
+                      <div className="visa-title">
+                        <span>{quiz.title}</span>
+                      </div>
+                      {quiz.description && (
+                        <p className="visa-question" style={{ fontSize: 17, fontWeight: 600, lineHeight: 1.35 }}>
+                          {quiz.description}
+                        </p>
+                      )}
+                      <span className="btn btn-primary btn-large" style={{ display: "inline-block", marginTop: "var(--space-md)" }}>
+                        PELAA NYT →
+                      </span>
+                    </Link>
+                  ) : (
+                    <div className="kategoria-card-quiz">
+                      <p style={{ color: "rgba(255,255,255,0.7)", fontSize: 15 }}>
+                        Kategoriavisa tulossa pian — tutustu kategoriaan yläosan otsikosta.
+                      </p>
+                    </div>
+                  )}
+                </article>
+              </Fragment>
+            );
+          })}
         </div>
       </section>
 

@@ -4,28 +4,18 @@ import { CATEGORY_BY_SLUG } from "../../../lib/categories";
 export const runtime = "edge";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
-
 export const alt = "Tietoniekka — kategoria";
-
-export async function generateImageMetadata({
-  params,
-}: {
-  params: { slug: string };
-}) {
-  const cat = CATEGORY_BY_SLUG[params.slug];
-  return [{ id: params.slug, alt: `Tietoniekka — ${cat?.title ?? "Visa"}` }];
-}
 
 export default async function CategoryOG({
   params,
 }: {
-  params: { slug: string };
+  params: Promise<{ slug: string }>;
 }) {
-  const cat = CATEGORY_BY_SLUG[params.slug];
+  const { slug } = await params;
+  const cat = CATEGORY_BY_SLUG[slug];
   const title = cat?.title ?? "TIETOVISA";
   const desc = cat?.description ?? "Pelaa Tietoniekkaa";
 
-  // Kategoria-värisävy fallback navy:hin
   const colorMap: Record<string, string> = {
     urheilu: "#1e3a5f",
     maantieto: "#1a3a45",
@@ -37,7 +27,7 @@ export default async function CategoryOG({
     "ruoka-juoma": "#3d2818",
     "muoti-design": "#2d1f33",
   };
-  const accent = colorMap[params.slug] ?? "#0f1520";
+  const accent = colorMap[slug] ?? "#0f1520";
 
   return new ImageResponse(
     (
