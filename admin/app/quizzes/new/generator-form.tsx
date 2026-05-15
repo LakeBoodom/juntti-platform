@@ -35,7 +35,8 @@ const CATEGORIES = [
 
 export function GeneratorForm() {
   const [topic, setTopic] = useState("");
-  const [wikipediaUrl, setWikipediaUrl] = useState("");
+  const [sourceUrls, setSourceUrls] = useState<string[]>([""]);
+  const [customGuidance, setCustomGuidance] = useState("");
   const [category, setCategory] = useState<string>("yleistieto");
   const [difficulty, setDifficulty] = useState<"helppo" | "keski" | "vaikea">(
     "keski",
@@ -53,6 +54,7 @@ export function GeneratorForm() {
   function submit(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
+    const cleanUrls = sourceUrls.map((u) => u.trim()).filter(Boolean);
     const input: GenerateAndSaveInput = {
       topic: topic.trim(),
       category,
@@ -60,7 +62,8 @@ export function GeneratorForm() {
       questionCount,
       tone,
       platform,
-      wikipediaUrl: wikipediaUrl.trim() || undefined,
+      sourceUrls: cleanUrls.length > 0 ? cleanUrls : undefined,
+      customGuidance: customGuidance.trim() || undefined,
     };
     startTransition(async () => {
       const res = await generateAndSaveDraft(input);
@@ -86,20 +89,71 @@ export function GeneratorForm() {
         </p>
       </div>
 
+      <div className="space-y-2 rounded-md border bg-muted/30 p-3">
+        <Label>Lähteet (vapaaehtoisia, 1–5 — suositus)</Label>
+        {sourceUrls.map((url, i) => (
+          <div key={i} className="flex gap-2">
+            <Input
+              type="url"
+              value={url}
+              onChange={(e) => {
+                const next = [...sourceUrls];
+                next[i] = e.target.value;
+                setSourceUrls(next);
+              }}
+              placeholder={
+                i === 0
+                  ? "https://fi.wikipedia.org/wiki/… tai esim. yle.fi/uutiset/…"
+                  : "Lisää URL"
+              }
+              disabled={pending}
+            />
+            {sourceUrls.length > 1 && (
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={() => setSourceUrls(sourceUrls.filter((_, j) => j !== i))}
+                disabled={pending}
+                aria-label="Poista lähde"
+              >
+                ✕
+              </Button>
+            )}
+          </div>
+        ))}
+        {sourceUrls.length < 5 && (
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={() => setSourceUrls([...sourceUrls, ""])}
+            disabled={pending}
+          >
+            + Lisää lähde
+          </Button>
+        )}
+        <p className="text-xs text-muted-foreground">
+          Tukee Wikipedia-artikkeleita ja yleisiä web-sivuja (esim. yle.fi,
+          hs.fi). Useampi lähde tekee kysymyksistä monipuolisempia. Lähteet
+          haetaan ja yhdistetään automaattisesti AI:lle.
+        </p>
+      </div>
+
       <div className="space-y-1.5 rounded-md border bg-muted/30 p-3">
-        <Label htmlFor="wiki">Wikipedia-lähde (vapaaehtoinen, suositus)</Label>
-        <Input
-          id="wiki"
-          type="url"
-          value={wikipediaUrl}
-          onChange={(e) => setWikipediaUrl(e.target.value)}
-          placeholder="https://fi.wikipedia.org/wiki/…"
+        <Label htmlFor="guidance">Lisäohjeet AI:lle (vapaaehtoinen)</Label>
+        <textarea
+          id="guidance"
+          className="w-full min-h-[80px] rounded-md border bg-background px-3 py-2 text-sm"
+          value={customGuidance}
+          onChange={(e) => setCustomGuidance(e.target.value)}
+          placeholder={"Esim. \"Keskity Putouksen tunnetuimpiin hahmoihin (Helga, Hannes Hynynen). Vältä tuotantotiimi-kysymyksiä ja vuosilukuja.\""}
           disabled={pending}
         />
         <p className="text-xs text-muted-foreground">
-          Jos annat URL:n, AI käyttää vain tätä artikkelia lähteenä. Tämä
-          pudottaa hallusinaatioita radikaalisti — suositeltu aina kun aiheelle
-          löytyy sopiva Wikipedia-sivu.
+          Tämä on per-visa-ohjaus. AI noudattaa system-promptin sääntöjä
+          (vältä vuosilukuja, suosi tunnistuskysymyksiä) automaattisesti —
+          tähän voit lisätä aihekohtaisia tarkennuksia.
         </p>
       </div>
 

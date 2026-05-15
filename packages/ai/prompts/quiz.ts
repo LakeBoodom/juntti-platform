@@ -41,6 +41,24 @@ export function buildQuizSystemPrompt() {
 - Rajatapausaiheissa (esim. vuosikymmen-rajat) valitse selvä esimerkki — jos 1995-luku voisi olla sekä 1990- että 2000-luku riippuen tulkinnasta, **vaihda koko kysymys** aiheeseen joka ei ole rajatapaus.
 - Ei päivämäärä-tarkkuutta ("tarkalleen 15. elokuuta 2003") ellei se ole kysymyksen pointti — suuntaa antavat vuosiluvut ovat parempia.
 
+**Visan laatu — VÄLTÄ erityisesti:**
+- **Vuosilukukysymykset** ("Minä vuonna X tapahtui?", "Miltä vuosikymmeneltä Y on?") — käytä **korkeintaan 1** per 10 kysymyksen visa. Wikipedian artikkelit ovat täynnä vuosilukuja mutta ne tekevät visasta tylsän ja epätarkan. Vuosilukukysymys hyväksyttävä vain jos vuosi on **kulttuurisesti ikoninen** (esim. itsenäistyminen 1917, kuun valloitus 1969).
+- Tarkat luvut, väestömäärät, pinta-alat, mitat — ellei numero ole **yleisesti tunnettu** ("Suomen järvien määrä")
+- Sivuhahmot ja erikoisuudet ("Kuka oli X-yhtyeen kiertuemanageri?") — keskity päähenkilöihin ja ydintapahtumiin
+- Yli-spesifit yksityiskohdat lähdemateriaalin syvältä — käyttäjä ei ole lukenut samaa Wikipedia-artikkelia
+
+**SUOSI:**
+- **Tunnistuskysymyksiä**: "Mistä elokuvasta tämä repliikki on?", "Kuka esitti hahmoa Y?", "Mistä sarjasta tunnistat nämä paikat?"
+- **"Mistä X tunnetaan?"** -kysymyksiä — pakottaa tunnistamaan henkilön/asian yhden kuvaavan piirteen kautta
+- **Lempinimet, alkuperät, klassikko-asema**: "Millä lempinimellä Y tunnetaan?", "Mikä on X:n kotimaa?", "Mikä oli ensimmäinen Y?"
+- **Kulttuurinen yleisivistys** jolla on koukku — kahvipöytäkeskustelu, ei tietokilpailu-tylsyys
+- **Yllättävät faktat** jotka jäävät mieleen — "Tiesitkö että X tehtiin Y:llä?"
+
+**Tavoitevaikeus visa-tasolla:**
+- helppo: 7–8/10 keskivertosuomalainen vastaa oikein
+- keski: 5–6/10 keskivertosuomalainen — yleissivistystä vaativa
+- vaikea: 3–4/10 keskivertosuomalainen — erikoistuneempaa tietoa, mutta **ei** tarkkoja vuosilukuja tai sivuhahmoja
+
 Älä liitä tekstiin johdantoja ("Tässä on visa…"), yhteenvetoja, metakommentteja tai emoji-ketjuja. Vastaa vain pyydetyllä työkalulla (tool use).`;
 }
 
@@ -59,8 +77,12 @@ ${input.sourceContext.slice(0, 50000)}
 `
     : "";
 
+  const guidanceBlock = input.customGuidance && input.customGuidance.trim()
+    ? `\n\n**ADMININ LISÄOHJEET TÄLLE VISALLE — noudata näitä prioriteetilla:**\n${input.customGuidance.trim()}\n`
+    : "";
+
   return `Luo ${input.questionCount} kysymyksen tietovisa aiheesta: **${input.topic}**.
-${sourceBlock}
+${sourceBlock}${guidanceBlock}
 Kategoria: ${input.category}
 Vaikeustaso: ${input.difficulty} (helppo = useimmat tietävät, keski = yleissivistystä vaativa, vaikea = erikoistuneempaa tietoa)
 Sävy: ${tone}

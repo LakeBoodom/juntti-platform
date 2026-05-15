@@ -33,8 +33,11 @@ export type GenerateQuizInput = {
   tone: Tone;
   platform: Platform; // usually "juntti" or "tietoniekka"
   targetAge?: TargetAge;
-  // Optional grounding material — e.g. a Wikipedia article. When provided,
-  // the model is instructed to use ONLY this text as fact source.
+  // Optional grounding material — e.g. a Wikipedia article or several sources.
+  // When provided, the model is instructed to use ONLY this text as fact source.
   sourceContext?: string;
-  sourceLabel?: string; // e.g. "Wikipedia: Matti Nykänen"
+  sourceLabel?: string; // e.g. "Wikipedia: Matti Nykänen" or "3 lähdettä"
+  // Optional per-quiz guidance from the admin — e.g.
+  // "Keskity päähenkilöihin, vältä vuosilukuja." Appended to the system rules.
+  customGuidance?: string;
 };

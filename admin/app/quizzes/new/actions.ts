@@ -4,30 +4,42 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { generateQuiz, type GenerateQuizInput } from "@juntti/ai";
 import { getSupabaseAdmin } from "@juntti/db";
-import { fetchWikipediaArticle } from "@/app/celebrities/wikipedia-actions";
+import { fetchArticles } from "@/app/quizzes/article-fetcher";
 import { getCurrentSite } from "@/lib/sites";
 
 export type GenerateAndSaveInput = GenerateQuizInput & {
+  /** 1-5 source URLs (Wikipedia or other web articles). */
+  sourceUrls?: string[];
+  /** Legacy: single Wikipedia URL — converted to sourceUrls if given. */
   wikipediaUrl?: string;
 };
 
 export async function generateAndSaveDraft(input: GenerateAndSaveInput) {
-  // If a Wikipedia URL is given, pull the article text and ground the
-  // AI call on it — same pattern as celebrity quizzes.
+  // Kerätään lähde-URL:t — uusi monilähde-kenttä tai legacy wikipediaUrl
+  const urls: string[] = [];
+  if (input.sourceUrls && input.sourceUrls.length > 0) {
+    urls.push(...input.sourceUrls);
+  } else if (input.wikipediaUrl) {
+    urls.push(input.wikipediaUrl);
+  }
+
   let sourceContext = input.sourceContext;
   let sourceLabel = input.sourceLabel;
-  if (!sourceContext && input.wikipediaUrl) {
-    const article = await fetchWikipediaArticle(input.wikipediaUrl);
-    if (article) {
-      sourceContext = article;
-      sourceLabel = `Wikipedia: ${input.topic}`;
-    } else {
+  const fetchErrors: Array<{ url: string; error: string }> = [];
+
+  if (!sourceContext && urls.length > 0) {
+    const result = await fetchArticles(urls);
+    if (!result.combinedText) {
       return {
         ok: false as const,
         error:
-          "Wikipedia-artikkelia ei saatu haettua. Tarkista URL tai jätä kenttä tyhjäksi.",
+          "Yhtään lähdettä ei saatu haettua. " +
+          result.errors.map((e) => `${e.url}: ${e.error}`).join("; "),
       };
     }
+    sourceContext = result.combinedText;
+    sourceLabel = result.combinedLabel;
+    fetchErrors.push(...result.errors);
   }
 
   let quiz;
