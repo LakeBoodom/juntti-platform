@@ -5,6 +5,7 @@ import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import confetti from "canvas-confetti";
 import { resolveQuiz, getSectionAnchor, getCategoryLabel, type QuizConfig, type Question } from "./questions";
+import { getSupabase } from "../../lib/supabase";
 
 /* ─────────────────────────────────────────────────────────────────
    Tietoniekka — Pelinäkymä
@@ -17,10 +18,27 @@ import { resolveQuiz, getSectionAnchor, getCategoryLabel, type QuizConfig, type 
    - lisäksi &first=A|B|C|D esivalitsee ensimmäisen vastauksen
    ───────────────────────────────────────────────────────────────── */
 
+// v1: ei aikalaskuria — säilytetään flag:in takana Speed-mode-laajennusta varten
+const TIMER_ENABLED = false;
 const TIME_PER_Q = 20;
-const BASE_POINTS = 200;
-const TIME_BONUS = 100;
+const BASE_POINTS = 100;
+const TIME_BONUS = 0;
 const STREAK_BONUS = 50;
+
+/** Anonyymi sessio-tunnus pelitulosten ryhmittelyä varten. Pysyy localStoragessa. */
+function getOrCreateSessionId(): string {
+  if (typeof window === "undefined") return "";
+  try {
+    let id = window.localStorage.getItem("tn_session_id");
+    if (!id) {
+      id = crypto.randomUUID();
+      window.localStorage.setItem("tn_session_id", id);
+    }
+    return id;
+  } catch {
+    return "";
+  }
+}
 
 type Phase = "intro" | "playing" | "end";
 
@@ -88,6 +106,7 @@ function PeliInner({ preloadedQuiz }: { preloadedQuiz: QuizConfig | null }) {
 
   /* ─── Ajastin ─────────────────────────────────────────────── */
   useEffect(() => {
+    if (!TIMER_ENABLED) return;
     if (phase !== "playing" || answered) {
       if (timerRef.current) {
         clearInterval(timerRef.current);
@@ -168,7 +187,7 @@ function PeliInner({ preloadedQuiz }: { preloadedQuiz: QuizConfig | null }) {
     const q = quiz.questions[idx];
     const correct = opt === q.correct;
     if (correct) {
-      const timeBonus = Math.round((timeLeft / TIME_PER_Q) * TIME_BONUS);
+      const timeBonus = TIMER_ENABLED ? Math.round((timeLeft / TIME_PER_Q) * TIME_BONUS) : 0;
       const newStreak = streak + 1;
       const streakExtra = newStreak > 1 ? (newStreak - 1) * STREAK_BONUS : 0;
       const gained = BASE_POINTS + timeBonus + streakExtra;
@@ -206,8 +225,31 @@ function PeliInner({ preloadedQuiz }: { preloadedQuiz: QuizConfig | null }) {
     }
   }
 
+  /** Tallenna pelitulos Supabase quiz_plays-tauluun (best-effort, ei estä UI:ta). */
+  async function recordPlay() {
+    if (typeof window === "undefined") return;
+    const dbQuizId = searchParams.get("quiz_id");
+    if (!dbQuizId) return; // hardcoded fallback-visat eivät tallennu
+    try {
+      const sb = getSupabase();
+      if (!sb) return;
+      await sb.from("quiz_plays").insert({
+        quiz_id: dbQuizId,
+        platform: "tietoniekka",
+        score,
+        total: maxScore,
+        session_id: getOrCreateSessionId(),
+        shared: false,
+      });
+    } catch (e) {
+      // best-effort: ei kaadeta tulosnäkymää jos tallennus epäonnistuu
+      console.error("recordPlay failed", e);
+    }
+  }
+
   function endGame() {
     setPhase("end");
+    void recordPlay();
     // Party konfettit
     const duration = 2200;
     const end = Date.now() + duration;
@@ -240,6 +282,27 @@ function PeliInner({ preloadedQuiz }: { preloadedQuiz: QuizConfig | null }) {
       navigator.share({ title: `Tietoniekka — ${quiz.title}`, text }).catch(() => {});
     } else if (navigator.clipboard) {
       navigator.clipboard.writeText(text);
+    }
+    // Merkitse viimeisin pelitulos jaetuksi (best-effort)
+    void markShared();
+  }
+
+  async function markShared() {
+    if (typeof window === "undefined") return;
+    const dbQuizId = searchParams.get("quiz_id");
+    if (!dbQuizId) return;
+    try {
+      const sb = getSupabase();
+      if (!sb) return;
+      await sb
+        .from("quiz_plays")
+        .update({ shared: true })
+        .eq("quiz_id", dbQuizId)
+        .eq("session_id", getOrCreateSessionId())
+        .order("played_at", { ascending: false })
+        .limit(1);
+    } catch (e) {
+      console.error("markShared failed", e);
     }
   }
 
@@ -343,10 +406,12 @@ function PeliInner({ preloadedQuiz }: { preloadedQuiz: QuizConfig | null }) {
                   </div>
                 </div>
                 <div className="spacer" />
-                <div className={`peli-timer ${timerClass}`}>
-                  <div className="bg-ring" style={{ ["--pct" as string]: `${timerPct}%` } as React.CSSProperties} />
-                  <div className="inner">{Math.max(0, timeLeft)}</div>
-                </div>
+                {TIMER_ENABLED && (
+                  <div className={`peli-timer ${timerClass}`}>
+                    <div className="bg-ring" style={{ ["--pct" as string]: `${timerPct}%` } as React.CSSProperties} />
+                    <div className="inner">{Math.max(0, timeLeft)}</div>
+                  </div>
+                )}
               </div>
 
               {quiz.isImageQuiz && q.image && (
@@ -388,15 +453,15 @@ function PeliInner({ preloadedQuiz }: { preloadedQuiz: QuizConfig | null }) {
                   <span className="body">{q.fact}</span>
                 </div>
               )}
-
-              {showNext && (
-                <div className="peli-next-wrap">
-                  <button className="peli-btn-primary" onClick={nextQuestion} type="button">
-                    {idx === totalQ - 1 ? "NÄYTÄ TULOS →" : "SEURAAVA →"}
-                  </button>
-                </div>
-              )}
             </div>
+
+            {showNext && (
+              <div className="peli-next-wrap">
+                <button className="peli-btn-primary" onClick={nextQuestion} type="button">
+                  {idx === totalQ - 1 ? "NÄYTÄ TULOS →" : "SEURAAVA →"}
+                </button>
+              </div>
+            )}
           </div>
         )}
 
@@ -408,13 +473,6 @@ function PeliInner({ preloadedQuiz }: { preloadedQuiz: QuizConfig | null }) {
             <div className="peli-big-score">
               <span>{score}</span>
               <small>/{maxScore}</small>
-            </div>
-            <div className="peli-percentile">
-              Olit parempi kuin{" "}
-              <b>
-                {Math.min(99, Math.max(10, Math.round((score / maxScore) * 95)))} %
-              </b>{" "}
-              niekoista
             </div>
             <div className="peli-end-actions">
               {getCategoryLabel(quiz) && (
