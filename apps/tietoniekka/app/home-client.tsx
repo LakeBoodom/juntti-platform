@@ -339,7 +339,6 @@ export function HomeClient({
             <Link href="/peli?kuvavisa=liput" className="kategoria-card-hero kategoria-card-hero-link">
               <span className="eyebrow">— Kuvavisa</span>
               <h3>MAAILMAN LIPUT</h3>
-              <p>Kuvavisa</p>
               <p className="description">Euroopasta Aasiaan — kuinka monta lippua tunnistat?</p>
               <span className="btn btn-primary btn-large kuvavisa-cta-btn">PELAA NYT →</span>
             </Link>
@@ -349,7 +348,6 @@ export function HomeClient({
             <Link href="/peli?kuvavisa=vaakuna" className="kategoria-card-hero kategoria-card-hero-link">
               <span className="eyebrow">— Kuvavisa</span>
               <h3>VAAKUNAT</h3>
-              <p>Kuvavisa</p>
               <p className="description">Karhuja, kruunuja ja miekkoja — tunnetko maakuntavaakunat?</p>
               <span className="btn btn-primary btn-large kuvavisa-cta-btn">PELAA NYT →</span>
             </Link>
@@ -359,7 +357,6 @@ export function HomeClient({
             <Link href="/peli?kuvavisa=linnut" className="kategoria-card-hero kategoria-card-hero-link">
               <span className="eyebrow">— Kuvavisa</span>
               <h3>LINNUT</h3>
-              <p>Kuvavisa</p>
               <p className="description">Kuinka hyvin tunnet siivekkäät?</p>
               <span className="btn btn-primary btn-large kuvavisa-cta-btn">PELAA NYT →</span>
             </Link>
@@ -369,7 +366,6 @@ export function HomeClient({
             <Link href="/peli?kuvavisa=kasvit" className="kategoria-card-hero kategoria-card-hero-link">
               <span className="eyebrow">— Kuvavisa</span>
               <h3>KASVIT</h3>
-              <p>Kuvavisa</p>
               <p className="description">Voikukasta vanamoon — tunnetko kasvit kuvasta?</p>
               <span className="btn btn-primary btn-large kuvavisa-cta-btn">PELAA NYT →</span>
             </Link>
@@ -379,7 +375,6 @@ export function HomeClient({
             <Link href="/peli?kuvavisa=elaimet" className="kategoria-card-hero kategoria-card-hero-link">
               <span className="eyebrow">— Kuvavisa</span>
               <h3>ELÄIMET</h3>
-              <p>Kuvavisa</p>
               <p className="description">Hirvi, ilves vai saukko? Tunnistatko kaikki?</p>
               <span className="btn btn-primary btn-large kuvavisa-cta-btn">PELAA NYT →</span>
             </Link>

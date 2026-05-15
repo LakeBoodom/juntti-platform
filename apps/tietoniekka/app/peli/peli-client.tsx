@@ -4,7 +4,7 @@ import { Suspense, useCallback, useEffect, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import confetti from "canvas-confetti";
-import { resolveQuiz, getSectionAnchor, getCategoryLabel, type QuizConfig, type Question } from "./questions";
+import { getSectionAnchor, getCategoryLabel, type QuizConfig, type Question } from "./questions";
 import { getSupabase } from "../../lib/supabase";
 
 /* ─────────────────────────────────────────────────────────────────
@@ -60,16 +60,14 @@ function PeliInner({ preloadedQuiz }: { preloadedQuiz: QuizConfig | null }) {
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const optionRefs = useRef<(HTMLButtonElement | null)[]>([]);
 
-  /* ─── Quiz resolve + first-answer pre-select ─────────────── */
+  /* ─── Quiz resolve — käyttää AINOASTAAN server-side preloadedQuiz:ia (Supabasesta).
+     resolveQuiz-fallback hardcoded-questions.ts:stä poistettu Heikin pyynnöstä — kaikki
+     visat tulevat admin-toolista. ─────────────────────────────────────────────── */
   useEffect(() => {
     if (preloadedQuiz) {
       setQuiz(preloadedQuiz);
-      return;
     }
-    const params = new URLSearchParams(searchParams.toString());
-    const q = resolveQuiz(params);
-    setQuiz(q);
-  }, [searchParams, preloadedQuiz]);
+  }, [preloadedQuiz]);
 
   const startGame = useCallback(() => {
     if (!quiz) return;
@@ -331,7 +329,12 @@ function PeliInner({ preloadedQuiz }: { preloadedQuiz: QuizConfig | null }) {
     return (
       <main className="peli">
         <div className="peli-app">
-          <div className="peli-loading">Ladataan visaa…</div>
+          <div className="peli-loading">
+            Visaa ei löytynyt.{" "}
+            <Link href="/" style={{ color: "var(--peli-gold)", textDecoration: "underline" }}>
+              Palaa etusivulle →
+            </Link>
+          </div>
         </div>
       </main>
     );
@@ -399,11 +402,9 @@ function PeliInner({ preloadedQuiz }: { preloadedQuiz: QuizConfig | null }) {
 
             <div className="peli-card">
               <div className="peli-q-header">
-                <div>
-                  <div className="peli-q-label">Kysymys</div>
-                  <div className="peli-q-counter">
-                    <span>{idx + 1}</span> / <span>{totalQ}</span>
-                  </div>
+                <div className="peli-q-meta">
+                  <span className="peli-q-label">Kysymys</span>
+                  <span className="peli-q-counter">{idx + 1} / {totalQ}</span>
                 </div>
                 <div className="spacer" />
                 {TIMER_ENABLED && (

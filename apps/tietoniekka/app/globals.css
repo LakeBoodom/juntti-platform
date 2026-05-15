@@ -2134,6 +2134,12 @@ a.sankari-photo {
   align-items: center;
   gap: 14px;
 }
+.peli-q-meta {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  flex-wrap: wrap;
+}
 .peli-q-label {
   font-family: var(--font-display);
   font-weight: 800;
@@ -2145,7 +2151,7 @@ a.sankari-photo {
 .peli-q-counter {
   font-family: var(--font-display);
   font-weight: 800;
-  font-size: 18px;
+  font-size: 15px;
   color: var(--peli-navy);
 }
 .peli-q-header .spacer { flex: 1; }
@@ -2321,12 +2327,30 @@ a.sankari-photo {
   bottom: 12px;
   z-index: 20;
   padding-top: 14px;
-  padding-bottom: 4px;
+  padding-bottom: max(4px, env(safe-area-inset-bottom, 4px));
   /* Pehmeä gradient-fade jotta nappi erottuu sisällöstä taustasta */
   background: linear-gradient(to top, var(--peli-cream) 55%, rgba(244, 237, 224, 0));
   pointer-events: none;
 }
 .peli-next-wrap > * { pointer-events: auto; }
+
+/* Mobile: vaihda fixed-positiointiin sticky-luotettavuusongelmien vuoksi
+   (iOS Safari -urlpalkin alle jääminen) */
+@media (max-width: 640px) {
+  .peli-next-wrap {
+    position: fixed;
+    left: 16px;
+    right: 16px;
+    bottom: max(12px, env(safe-area-inset-bottom, 12px));
+    margin: 0 auto;
+    max-width: 488px; /* 520 - 2*16 */
+    z-index: 50;
+  }
+  /* Lisää padding-bottom .peli-game:lle jotta sisältö ei jää napin alle */
+  .peli-game {
+    padding-bottom: 88px;
+  }
+}
 
 /* End screen */
 .peli-end {

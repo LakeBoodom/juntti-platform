@@ -1,5 +1,5 @@
 import { Suspense } from "react";
-import { getQuizById, getKuvavisat } from "../../lib/queries";
+import { getQuizById, getKuvavisat, getRandomQuizByCategory, getTodaysQuiz } from "../../lib/queries";
 import { PeliClient } from "./peli-client";
 import type { QuizConfig, Question } from "./questions";
 
@@ -63,6 +63,7 @@ export default async function PeliPage({
 
   let preloadedQuiz: QuizConfig | null = null;
 
+  // 1. Explicit quiz_id annettu URL:ssä → suora haku
   if (quizId) {
     const full = await getQuizById(quizId);
     if (full && full.questions.length > 0) {
@@ -78,7 +79,40 @@ export default async function PeliPage({
         },
       );
     }
-  } else if (typeof params.kuvavisa === "string") {
+  }
+
+  // 2. Päivän visa (ei quiz_id:tä) → tämän päivän visa DB:stä
+  if (!preloadedQuiz && params.paivan_visa === "1") {
+    const today = await getTodaysQuiz();
+    if (today) {
+      const full = await getQuizById(today.id);
+      if (full && full.questions.length > 0) {
+        preloadedQuiz = dbQuizToConfig(
+          { id: full.id, title: full.title, description: full.description, category: full.category },
+          full.questions,
+          { paivan_visa: true },
+        );
+      }
+    }
+  }
+
+  // 3. Kategoria (ei quiz_id:tä) → satunnainen julkaistu visa kategoriasta — käytetään "Uusi X-visa" -napissa
+  if (!preloadedQuiz && typeof params.kat === "string") {
+    const random = await getRandomQuizByCategory(params.kat);
+    if (random) {
+      const full = await getQuizById(random.id);
+      if (full && full.questions.length > 0) {
+        preloadedQuiz = dbQuizToConfig(
+          { id: full.id, title: full.title, description: full.description, category: full.category },
+          full.questions,
+          { kat: params.kat },
+        );
+      }
+    }
+  }
+
+  // 4. Kuvavisa-flow (alkuperäinen)
+  if (!preloadedQuiz && typeof params.kuvavisa === "string") {
     // Kuvavisat: hae random N riviä DB:stä Heikin admin-toolista
     const kvSlug = params.kuvavisa;
     const rows = await getKuvavisat(kvSlug, 10);
