@@ -286,6 +286,7 @@ export function HomeClient({
                   </Link>
                   {quiz ? (
                     <div className="kategoria-card-quiz">
+                      <div className="visa-name">{quiz.title}</div>
                       <div className="visa-title">
                         <span>{cat.quote}</span>
                         {quiz.questionCount > 0 && <span className="count">1 / {quiz.questionCount}</span>}

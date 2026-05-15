@@ -1011,10 +1011,26 @@ img { display: block; max-width: 100%; }
   position: relative;
   z-index: 1;
 }
+/* Visan oma otsikko (esim "Aki Kaurismäki – tunnetko mestarin?") — näkyvin houkutin */
+.kategoria-card-quiz .visa-name {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: clamp(18px, 4.6vw, 22px);
+  line-height: 1.25;
+  color: var(--color-brand-gold, #e8a320);
+  letter-spacing: 0.01em;
+  margin-bottom: var(--space-sm);
+  /* Pitkät otsikot leikataan kahteen riviin ettei rikkoa kortin layoutia */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 .kategoria-card-quiz .visa-title {
   font-family: var(--font-display);
   font-weight: 800;
-  font-size: 18px;
+  font-size: 16px;
   color: var(--color-text-light);
   display: flex;
   justify-content: space-between;
@@ -1661,7 +1677,8 @@ body.is-scrolled .topbar {
     justify-content: center;
     background: rgba(0, 0, 0, 0.35);
   }
-  .kategoria-card-quiz .visa-title { font-size: 21px; }
+  .kategoria-card-quiz .visa-name { font-size: 22px; }
+  .kategoria-card-quiz .visa-title { font-size: 18px; }
   .kategoria-card-quiz .visa-title .count { font-size: 14px; }
   .kategoria-card-quiz .visa-progress { font-size: 14px; }
   .kategoria-card-quiz .visa-question { font-size: 30px; line-height: 1.2; }
