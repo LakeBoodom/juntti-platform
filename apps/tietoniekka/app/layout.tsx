@@ -84,6 +84,41 @@ export default function RootLayout({
         />
       </head>
       <body>
+        {/* JSON-LD: Organization + WebSite — helps Google + LLM crawlers */}
+        <Script
+          id="ld-organization"
+          type="application/ld+json"
+          strategy="beforeInteractive"
+        >
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "Organization",
+            name: brand.name,
+            url: SITE_URL,
+            logo: `${SITE_URL}/og-image.png`,
+            description: `${brand.name} — suomalainen tietovisa-sivusto. Päivittäin vaihtuva visa, yli 9 kategoriaa, päivän sankari -profiilit. Aina ilmainen, ei rekisteröitymistä.`,
+            sameAs: [],
+          })}
+        </Script>
+        <Script
+          id="ld-website"
+          type="application/ld+json"
+          strategy="beforeInteractive"
+        >
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "WebSite",
+            name: brand.name,
+            url: SITE_URL,
+            inLanguage: "fi-FI",
+            description: `Suomenkielisiä tietovisoja: päivän visa, kategoriat (urheilu, maantieto, luonto, historia, tv-sarjat, elokuvat, musiikki, ruoka & juoma, muoti & design), kuvavisat (liput, vaakunat, linnut, kasvit, eläimet) ja päivän sankari -profiilit. Tietoniekka on ilmainen suomalainen visa-sivusto.`,
+            publisher: {
+              "@type": "Organization",
+              name: brand.name,
+              url: SITE_URL,
+            },
+          })}
+        </Script>
         {children}
         {PLAUSIBLE_DOMAIN && (
           <Script
