@@ -395,8 +395,7 @@ export function HomeClient({
         <div className="footer-logo">TIETONIEKKA</div>
         <p className="footer-meta">
           © 2026 Tietoniekka.com ·{" "}
-          <a href="/tietosuoja">Tietosuoja</a> ·{" "}
-          <a href="/yhteystiedot">Yhteystiedot</a>
+          <a href="/tietosuoja">Tietosuoja</a>
         </p>
         <p className="footer-meta" style={{ marginTop: "8px", opacity: 0.7 }}>
           Tietoniekka — ei menny kuin Strömsössä! Mutta huomenna uudestaan!
