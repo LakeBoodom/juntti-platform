@@ -1,7 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
 
-const SITEE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://synttarit.com";
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://synttarit.com";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -10,7 +10,7 @@ export const metadata: Metadata = {
     template: "%s | synttarit.com",
   },
   description:
-    "Kayso kenen julkkiksen syntymääivä on tänään ja kuinka vanha hän on. Suomalaisten julkkisten syntymäpäiväkkalenteri.",
+    "Katso kenen julkkiksen syntymäpäivä on tänään ja kuinka vanha hän on. Suomalaisten julkkisten syntymäpäiväkalenteri.",
   applicationName: "Synttärit",
   keywords: [
     "synttärit",
@@ -18,9 +18,9 @@ export const metadata: Metadata = {
     "julkkikset",
     "suomalaiset julkkikset",
     "kuka syntyy tänään",
-    "syntymääiväkkalenteri",
+    "syntymäpäiväkalenteri",
   ],
-  openGraph: { 
+  openGraph: {
     type: "website",
     locale: "fi_FI",
     url: SITE_URL,
