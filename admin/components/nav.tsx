@@ -34,6 +34,12 @@ export function Nav({ email }: { email?: string | null }) {
             Julkkikset
           </Link>
           <Link
+            href="/synttarit"
+            className="text-sm text-muted-foreground hover:text-foreground"
+          >
+            Synttärit
+          </Link>
+          <Link
             href="/schedule-rules"
             className="text-sm text-muted-foreground hover:text-foreground"
           >
