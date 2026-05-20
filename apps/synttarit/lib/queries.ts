@@ -2,7 +2,6 @@
 import { getSupabase, SITE_SLUG } from "./supabase";
 
 let _siteId: string | null = null;
-
 async function getSiteId(): Promise<string | null> {
   if (_siteId) return _siteId;
   const sb = getSupabase();
@@ -13,7 +12,7 @@ async function getSiteId(): Promise<string | null> {
     .eq("slug", SITE_SLUG)
     .maybeSingle();
   if (!data) return null;
-  _siteId = data.id;
+  _siteId = (data as unknown as { id: string }).id;
   return _siteId;
 }
 
@@ -46,23 +45,17 @@ export async function getTodaysCelebrities(): Promise<CelebrityData[]> {
   if (!siteId) return [];
   const sb = getSupabase();
   if (!sb) return [];
-
   const today = new Date();
   const month = today.getMonth() + 1;
   const day = today.getDate();
-
-  // Haetaan suoraan birth_date-vertailulla
   const { data, error } = await sb
     .from("celebrities")
     .select("id, slug, name, role, birth_date, bio_short, image_url, wikipedia_url, priority, is_hero")
     .eq("site_id", siteId)
-    .lt("priority", 99) // piilota priority=99
+    .lt("priority", 99)
     .order("priority", { ascending: true });
-
   if (error || !data) return [];
-
-  // Suodata tänään syntyvät (kuukausi + päivä)
-  return data.filter((c) => {
+  return (data as unknown as CelebrityData[]).filter((c) => {
     const d = new Date(c.birth_date);
     return d.getMonth() + 1 === month && d.getDate() === day;
   });
@@ -74,32 +67,28 @@ export async function getCelebrityBySlug(slug: string): Promise<CelebrityData | 
   if (!siteId) return null;
   const sb = getSupabase();
   if (!sb) return null;
-
   const { data } = await sb
     .from("celebrities")
     .select("id, slug, name, role, birth_date, bio_short, image_url, wikipedia_url, priority, is_hero")
     .eq("site_id", siteId)
     .eq("slug", slug)
     .maybeSingle();
-
-  return data;
+  return data as unknown as CelebrityData | null;
 }
 
-// Hae kaikki julkkikset vuosikalenteria varten (koko vuosi)
+// Hae kaikki julkkikset vuosikalenteria varten
 export async function getAllCelebrities(): Promise<CelebrityData[]> {
   const siteId = await getSiteId();
   if (!siteId) return [];
   const sb = getSupabase();
   if (!sb) return [];
-
   const { data } = await sb
     .from("celebrities")
     .select("id, slug, name, role, birth_date, bio_short, image_url, wikipedia_url, priority, is_hero")
     .eq("site_id", siteId)
     .lt("priority", 99)
     .order("birth_date", { ascending: true });
-
-  return data ?? [];
+  return (data as unknown as CelebrityData[]) ?? [];
 }
 
 // Hae tietyn päivän julkkikset (kuukausi + päivä)
@@ -108,17 +97,14 @@ export async function getCelebritiesByDate(month: number, day: number): Promise<
   if (!siteId) return [];
   const sb = getSupabase();
   if (!sb) return [];
-
   const { data } = await sb
     .from("celebrities")
     .select("id, slug, name, role, birth_date, bio_short, image_url, wikipedia_url, priority, is_hero")
     .eq("site_id", siteId)
     .lt("priority", 99)
     .order("priority", { ascending: true });
-
   if (!data) return [];
-
-  return data.filter((c) => {
+  return (data as unknown as CelebrityData[]).filter((c) => {
     const d = new Date(c.birth_date);
     return d.getMonth() + 1 === month && d.getDate() === day;
   });
@@ -131,17 +117,13 @@ export async function getVoteCounts(
 ): Promise<{ awareness: VoteCounts | null; favorability: VoteCounts | null }> {
   const sb = getSupabase();
   if (!sb) return { awareness: null, favorability: null };
-
   const { data } = await sb
     .from("celebrity_vote_counts")
     .select("*")
     .eq("celebrity_id", celebrityId)
     .eq("vote_date", voteDate);
-
   if (!data) return { awareness: null, favorability: null };
-
-  const awareness = data.find((r) => r.question_type === "awareness") ?? null;
-  const favorability = data.find((r) => r.question_type === "favorability") ?? null;
-
+  const awareness = (data as unknown as Array<VoteCounts & { question_type: string }>).find((r) => r.question_type === "awareness") ?? null;
+  const favorability = (data as unknown as Array<VoteCounts & { question_type: string }>).find((r) => r.question_type === "favorability") ?? null;
   return { awareness, favorability };
 }
