@@ -1,4 +1,5 @@
 import { Suspense } from "react";
+import { CATEGORIES } from "../../lib/categories";
 import { getQuizById, getKuvavisat, getRandomQuizByCategory, getTodaysQuiz } from "../../lib/queries";
 import { PeliClient } from "./peli-client";
 import type { QuizConfig, Question } from "./questions";
@@ -106,6 +107,23 @@ export default async function PeliPage({
           { id: full.id, title: full.title, description: full.description, category: full.category },
           full.questions,
           { kat: params.kat },
+        );
+      }
+    }
+  }
+
+  // 5. Täysin satunnainen visa (?random=1) — "Anna mennä nyt vaan" -nappi
+  if (!preloadedQuiz && params.random === "1") {
+    const slugs = CATEGORIES.map((c) => c.slug);
+    const randomSlug = slugs[Math.floor(Math.random() * slugs.length)];
+    const random = await getRandomQuizByCategory(randomSlug);
+    if (random) {
+      const full = await getQuizById(random.id);
+      if (full && full.questions.length > 0) {
+        preloadedQuiz = dbQuizToConfig(
+          { id: full.id, title: full.title, description: full.description, category: full.category },
+          full.questions,
+          { kat: randomSlug },
         );
       }
     }
