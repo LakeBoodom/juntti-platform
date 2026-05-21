@@ -121,8 +121,10 @@ export async function getVoteCounts(
 
   if (!data) return { awareness: null, favorability: null };
 
-  const awareness = data.find((r) => r.question_type === "awareness") ?? null;
-  const favorability = data.find((r) => r.question_type === "favorability") ?? null;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const rows = data as any[];
+  const awareness = rows.find((r) => r.question_type === "awareness") ?? null;
+  const favorability = rows.find((r) => r.question_type === "favorability") ?? null;
 
   return { awareness, favorability };
 }
