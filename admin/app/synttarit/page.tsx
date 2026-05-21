@@ -25,7 +25,8 @@ export default async function SynttaritPage({
   const admin = getSupabaseAdmin();
 
   // Hae kaikki synttarit-julkkikset (platform = synttarit tai both)
-  const { data: celebrities } = await admin
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data: rawCelebrities } = await (admin as any)
     .from("celebrities")
     .select(
       "id, name, birth_date, death_date, role, bio_short, image_url, wikipedia_url, priority, is_hero, platform, site_id"
@@ -34,30 +35,37 @@ export default async function SynttaritPage({
     .order("priority", { ascending: true })
     .order("name", { ascending: true });
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const celebrities = (rawCelebrities ?? []) as any[];
+
   // Suodata valitun päivän mukaan
-  const filtered = (celebrities ?? []).filter((c) => {
+  const filtered = celebrities.filter((c) => {
     const [, m, d] = c.birth_date.split("-").map(Number);
     return m === month && d === day;
   });
 
   // Äänestystulokset tälle päivälle
-  const { data: voteCounts } = await admin
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data: rawVoteCounts } = await (admin as any)
     .from("celebrity_vote_counts")
     .select("*")
     .in(
       "celebrity_id",
-      filtered.map((c) => c.id)
+      filtered.map((c: { id: string }) => c.id)
     )
     .eq("vote_date", todayStr);
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const voteCounts = (rawVoteCounts ?? []) as any[];
+
   const votesByIdAndType = Object.fromEntries(
-    (voteCounts ?? []).map((v) => [`${v.celebrity_id}:${v.question_type}`, v])
+    voteCounts.map((v) => [`${v.celebrity_id}:${v.question_type}`, v])
   );
 
   // Tilastot koko datasta
-  const totalCelebrities = celebrities?.length ?? 0;
+  const totalCelebrities = celebrities.length;
   const daysWithCelebrities = new Set(
-    (celebrities ?? []).map((c) => c.birth_date.slice(5))
+    celebrities.map((c) => c.birth_date.slice(5))
   ).size;
 
   return (

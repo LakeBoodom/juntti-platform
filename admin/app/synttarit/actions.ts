@@ -11,9 +11,10 @@ export async function setCelebrityPriority(
   isHero: boolean
 ): Promise<{ ok: boolean; error?: string }> {
   const sb = getSupabaseAdmin();
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { error } = await sb
     .from("celebrities")
-    .update({ priority, is_hero: isHero })
+    .update({ priority, is_hero: isHero } as any)
     .eq("id", id);
 
   if (error) return { ok: false, error: error.message };
@@ -51,6 +52,7 @@ export async function createSynttaritCelebrity(
   if (err) return { ok: false, error: err };
 
   const sb = getSupabaseAdmin();
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { error } = await sb.from("celebrities").insert({
     name: input.name.trim(),
     birth_date: input.birth_date,
@@ -62,7 +64,7 @@ export async function createSynttaritCelebrity(
     platform: input.platform,
     priority: 10,
     is_hero: false,
-  });
+  } as any);
 
   if (error) return { ok: false, error: error.message };
 
@@ -78,6 +80,7 @@ export async function updateSynttaritCelebrity(
   if (err) return { ok: false, error: err };
 
   const sb = getSupabaseAdmin();
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { error } = await sb
     .from("celebrities")
     .update({
@@ -89,7 +92,7 @@ export async function updateSynttaritCelebrity(
       image_url: input.image_url?.trim() || null,
       wikipedia_url: input.wikipedia_url?.trim() || null,
       platform: input.platform,
-    })
+    } as any)
     .eq("id", id);
 
   if (error) return { ok: false, error: error.message };
