@@ -66,7 +66,7 @@ export function CelebrityForm({
   const [role, setRole] = useState(initial?.role ?? "");
   const [bio, setBio] = useState(initial?.bio_short ?? "");
   const [imageUrl, setImageUrl] = useState(initial?.image_url ?? "");
-  const [platform, setPlatform] = useState<"juntti" | "tietoniekka" | "both">(
+  const [platform, setPlatform] = useState<"juntti" | "tietoniekka" | "both" | "synttarit">(
     initial?.platform ?? "both",
   );
   const [siteId, setSiteId] = useState<string>(initial?.site_id ?? defaultSiteId);
@@ -258,9 +258,10 @@ export function CelebrityForm({
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="both">Molemmat (legacy)</SelectItem>
+            <SelectItem value="synttarit">Synttärit.com</SelectItem>
+            <SelectItem value="both">Synttärit + Tietoniekka</SelectItem>
+            <SelectItem value="tietoniekka">Vain Tietoniekka.fi</SelectItem>
             <SelectItem value="juntti">Vain juntti.com (legacy)</SelectItem>
-            <SelectItem value="tietoniekka">Vain Tietoniekka.fi (legacy)</SelectItem>
           </SelectContent>
         </Select>
       </div>
