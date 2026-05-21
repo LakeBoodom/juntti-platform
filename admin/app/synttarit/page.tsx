@@ -1,4 +1,3 @@
-"use server";
 import { getSupabaseAdmin, supabaseFromCookies } from "@/lib/supabase-server";
 import { Nav } from "@/components/nav";
 import { SynttaritDayEditor } from "./day-editor";
