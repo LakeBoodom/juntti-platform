@@ -43,7 +43,9 @@ export async function getTodaysCelebrities(): Promise<CelebrityData[]> {
 
   if (error || !data) return [];
 
-  return data.filter((c) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const celebs = (data as any) as CelebrityData[];
+  return celebs.filter((c) => {
     const d = new Date(c.birth_date);
     return d.getMonth() + 1 === month && d.getDate() === day;
   });
@@ -61,7 +63,8 @@ export async function getCelebrityBySlug(slug: string): Promise<CelebrityData | 
     .eq("slug", slug)
     .maybeSingle();
 
-  return data;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return (data as any) as CelebrityData | null;
 }
 
 // Hae kaikki julkkikset vuosikalenteria varten
@@ -76,7 +79,8 @@ export async function getAllCelebrities(): Promise<CelebrityData[]> {
     .lt("priority", 99)
     .order("birth_date", { ascending: true });
 
-  return data ?? [];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return ((data as any) as CelebrityData[]) ?? [];
 }
 
 // Hae tietyn päivän julkkikset
@@ -93,7 +97,9 @@ export async function getCelebritiesByDate(month: number, day: number): Promise<
 
   if (!data) return [];
 
-  return data.filter((c) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const celebs = (data as any) as CelebrityData[];
+  return celebs.filter((c) => {
     const d = new Date(c.birth_date);
     return d.getMonth() + 1 === month && d.getDate() === day;
   });
