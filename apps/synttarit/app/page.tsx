@@ -4,7 +4,7 @@ import HeroCard from "./components/HeroCard";
 import ListCard from "./components/ListCard";
 import YearCalendar from "./components/YearCalendar";
 
-export const revalidate = 300; // 5 min cache, päivittyy itsestään
+export const revalidate = 300; // 5 min cache
 
 export default async function HomePage() {
   const [todaysCelebrities, allCelebrities] = await Promise.all([
@@ -23,10 +23,13 @@ export default async function HomePage() {
       {/* Topbar */}
       <header className="topbar">
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/logo.svg" alt="Synttärit" className="topbar-logo" />
+        <img src="/logo.png" alt="Synttärit" className="topbar-logo" />
+        <button className="topbar-icon-btn" aria-label="Haku">
+          <i className="ti ti-search" aria-hidden="true" />
+        </button>
       </header>
 
-      {/* Kerros 1: Hero */}
+      {/* Hero */}
       {hero ? (
         <HeroCard celebrity={hero} todayStr={todayStr} />
       ) : (
@@ -35,17 +38,22 @@ export default async function HomePage() {
         </div>
       )}
 
-      {/* Kerros 2: Myös tänään syntyy */}
+      {/* Myös tänään syntyy */}
       {listCelebrities.length > 0 && (
         <>
-          <p className="section-title">Myös tänään syntyy</p>
-          {listCelebrities.map((c) => (
-            <ListCard key={c.id} celebrity={c} todayStr={todayStr} />
-          ))}
+          <div className="sec-label">
+            <span className="sl-txt">Myös tänään syntyy</span>
+            <div className="sl-line" />
+          </div>
+          <div className="list-cards-wrap">
+            {listCelebrities.map((c) => (
+              <ListCard key={c.id} celebrity={c} todayStr={todayStr} />
+            ))}
+          </div>
         </>
       )}
 
-      {/* Kerros 3: Koko vuosi */}
+      {/* Koko vuosi */}
       <YearCalendar celebrities={allCelebrities} today={today} />
 
       {/* SEO-häntä */}
@@ -60,6 +68,26 @@ export default async function HomePage() {
       <footer className="footer">
         <p>© 2026 synttarit.com · <a href="/tietosuoja">Tietosuoja</a></p>
       </footer>
+
+      {/* Bottom nav */}
+      <nav className="bottom-nav" aria-label="Päänavigaatio">
+        <a href="/" className="bn-item active" aria-label="Synttärit">
+          <i className="ti ti-cake" aria-hidden="true" />
+          <span>Synttärit</span>
+        </a>
+        <button className="bn-item" aria-label="Visat" disabled>
+          <i className="ti ti-target" aria-hidden="true" />
+          <span>Visat</span>
+        </button>
+        <button className="bn-item" aria-label="Haku">
+          <i className="ti ti-search" aria-hidden="true" />
+          <span>Haku</span>
+        </button>
+        <button className="bn-item" aria-label="Lisää">
+          <i className="ti ti-menu-2" aria-hidden="true" />
+          <span>Lisää</span>
+        </button>
+      </nav>
     </main>
   );
 }

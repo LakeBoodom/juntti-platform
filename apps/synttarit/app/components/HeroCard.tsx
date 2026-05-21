@@ -1,7 +1,5 @@
 "use client";
 
-
-import { useState } from "react";
 import Link from "next/link";
 import { getAge } from "../../lib/utils";
 import type { CelebrityData } from "../../lib/queries";
@@ -26,24 +24,30 @@ export default function HeroCard({ celebrity, todayStr }: Props) {
             className="hero-photo"
           />
         ) : (
-          <div className="hero-photo-placeholder">🎂</div>
+          <div className="hero-photo-placeholder">
+            <i className="ti ti-confetti hero-photo-icon" aria-hidden="true" />
+          </div>
         )}
       </Link>
 
       <div className="hero-content">
-        <div className="hero-eyebrow">
-          <span className="pill">🎂 Päivän pääsankari</span>
+        <div className="hero-pill">
+          <i className="ti ti-cake" style={{ fontSize: 9 }} aria-hidden="true" />
+          Päivän pääsankari
         </div>
 
-        <Link href={`/${celebrity.slug ?? celebrity.id}`} style={{ textDecoration: "none" }}>
-          <h1 className="hero-name">
+        <div className="hero-nameline">
+          <Link href={`/${celebrity.slug ?? celebrity.id}`} className="hero-name">
             {celebrity.name}
-            <span className="age-chip">{age} v</span>
-          </h1>
-          <p className="hero-meta">{celebrity.role}</p>
-        </Link>
+          </Link>
+          <div className="hero-age-chip">
+            <div className="hero-age-n">{age}</div>
+            <div className="hero-age-l">vuotta</div>
+          </div>
+        </div>
 
-        {/* Äänestys */}
+        <div className="hero-role">{celebrity.role}</div>
+
         <VoteWidget
           celebrityId={celebrity.id}
           celebrityName={celebrity.name}

@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react";
 import { createClient } from "@supabase/supabase-js";
 
-// Client-side Supabase
 function getClient() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL!;
   const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
@@ -21,17 +20,12 @@ function getSessionId(): string {
 }
 
 type AwarenessVote = "ei_tunnista" | "tuttu" | "legenda";
-type FavorabilityVote = "ei_uppoa" | "ihan_ok" | "rakastan";
 
 interface VoteCounts {
   ei_tunnista: number;
   tuttu: number;
   legenda: number;
-  ei_uppoa: number;
-  ihan_ok: number;
-  rakastan: number;
   awareness_total: number;
-  favorability_total: number;
 }
 
 interface Props {
@@ -43,29 +37,17 @@ interface Props {
 }
 
 export default function VoteWidget({ celebrityId, celebrityName, todayStr, age, compact }: Props) {
-  const [awarenessVote, setAwarenessVote] = useState<AwarenessVote | null>(null);
-  const [favorabilityVote, setFavorabilityVote] = useState<FavorabilityVote | null>(null);
+  const [vote, setVote] = useState<AwarenessVote | null>(null);
   const [counts, setCounts] = useState<VoteCounts | null>(null);
   const [loading, setLoading] = useState(false);
-  const [phase, setPhase] = useState<"awareness" | "favorability" | "done">("awareness");
+  const [showResults, setShowResults] = useState(false);
 
   useEffect(() => {
-    const sid = getSessionId();
     const aKey = `vote_${celebrityId}_awareness_${todayStr}`;
-    const fKey = `vote_${celebrityId}_favorability_${todayStr}`;
     const av = localStorage.getItem(aKey) as AwarenessVote | null;
-    const fv = localStorage.getItem(fKey) as FavorabilityVote | null;
-
     if (av) {
-      setAwarenessVote(av);
-      if (fv) {
-        setFavorabilityVote(fv);
-        setPhase("done");
-      } else if (av !== "ei_tunnista") {
-        setPhase("favorability");
-      } else {
-        setPhase("done");
-      }
+      setVote(av);
+      setShowResults(true);
       fetchCounts();
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -81,21 +63,16 @@ export default function VoteWidget({ celebrityId, celebrityName, todayStr, age, 
 
     if (!data) return;
     const aw = data.find((r) => r.question_type === "awareness");
-    const fv = data.find((r) => r.question_type === "favorability");
     setCounts({
       ei_tunnista: aw?.ei_tunnista_count ?? 0,
       tuttu: aw?.tuttu_count ?? 0,
       legenda: aw?.legenda_count ?? 0,
-      ei_uppoa: fv?.ei_uppoa_count ?? 0,
-      ihan_ok: fv?.ihan_ok_count ?? 0,
-      rakastan: fv?.rakastan_count ?? 0,
       awareness_total: aw?.total_count ?? 0,
-      favorability_total: fv?.total_count ?? 0,
     });
   }
 
-  async function handleAwareness(vote: AwarenessVote) {
-    if (awarenessVote || loading) return;
+  async function handleVote(v: AwarenessVote) {
+    if (vote || loading) return;
     setLoading(true);
     const sid = getSessionId();
     const sb = getClient();
@@ -103,53 +80,25 @@ export default function VoteWidget({ celebrityId, celebrityName, todayStr, age, 
     await sb.from("celebrity_votes").upsert({
       celebrity_id: celebrityId,
       question_type: "awareness",
-      vote,
+      vote: v,
       session_id: sid,
       vote_date: todayStr,
     }, { onConflict: "celebrity_id,question_type,session_id,vote_date" });
 
-    localStorage.setItem(`vote_${celebrityId}_awareness_${todayStr}`, vote);
-    setAwarenessVote(vote);
-
+    localStorage.setItem(`vote_${celebrityId}_awareness_${todayStr}`, v);
+    setVote(v);
     await fetchCounts();
     setLoading(false);
-
-    if (vote === "ei_tunnista") {
-      setPhase("done");
-    } else {
-      setPhase("favorability");
-    }
-  }
-
-  async function handleFavorability(vote: FavorabilityVote) {
-    if (favorabilityVote || loading) return;
-    setLoading(true);
-    const sid = getSessionId();
-    const sb = getClient();
-
-    await sb.from("celebrity_votes").upsert({
-      celebrity_id: celebrityId,
-      question_type: "favorability",
-      vote,
-      session_id: sid,
-      vote_date: todayStr,
-    }, { onConflict: "celebrity_id,question_type,session_id,vote_date" });
-
-    localStorage.setItem(`vote_${celebrityId}_favorability_${todayStr}`, vote);
-    setFavorabilityVote(vote);
-    setPhase("done");
-    await fetchCounts();
-    setLoading(false);
+    setShowResults(true);
   }
 
   function handleShare() {
-    const awarenessLabel = awarenessVote === "legenda" ? "legenda!" :
-                           awarenessVote === "tuttu" ? "tuttu tyyppi" : "ei tuttu";
-    const text = `${celebrityName} täyttää tänään ${age} vuotta! Minulla hän on: ${awarenessLabel} 🎂 synttarit.com`;
+    const label = vote === "legenda" ? "legenda!" : vote === "tuttu" ? "tuttu tyyppi" : "en tunne";
+    const text = `${celebrityName} täyttää tänään ${age} vuotta! Minulle hän on: ${label} 🎂 synttarit.com`;
     if (navigator.share) {
       navigator.share({ text, url: "https://synttarit.com" }).catch(() => {});
     } else {
-      navigator.clipboard.writeText(text).then(() => alert("Kopioitu leikepöydälle!")).catch(() => {});
+      navigator.clipboard.writeText(text).then(() => alert("Kopioitu!")).catch(() => {});
     }
   }
 
@@ -158,92 +107,139 @@ export default function VoteWidget({ celebrityId, celebrityName, todayStr, age, 
     return Math.round((val / total) * 100);
   }
 
+  // ─── COMPACT MODE (lista-kortit) ───
+  if (compact) {
+    return (
+      <>
+        {!showResults && (
+          <div className="lc-vote-row">
+            <button
+              className={`lc-vbtn${vote === "ei_tunnista" ? " voted-neverhear" : ""}`}
+              onClick={() => handleVote("ei_tunnista")}
+              disabled={!!vote || loading}
+              aria-label="En tunne"
+            >
+              <i className="ti ti-mood-empty" aria-hidden="true" />
+            </button>
+            <button
+              className={`lc-vbtn${vote === "tuttu" ? " voted-tuttu" : ""}`}
+              onClick={() => handleVote("tuttu")}
+              disabled={!!vote || loading}
+              aria-label="Tuttu"
+            >
+              <i className="ti ti-mood-smile" aria-hidden="true" />
+            </button>
+            <button
+              className={`lc-vbtn${vote === "legenda" ? " voted-legenda" : ""}`}
+              onClick={() => handleVote("legenda")}
+              disabled={!!vote || loading}
+              aria-label="Legenda"
+            >
+              <i className="ti ti-star" aria-hidden="true" />
+            </button>
+          </div>
+        )}
+        {showResults && counts && (
+          <div className="lc-vote-row">
+            <button className={`lc-vbtn${vote === "ei_tunnista" ? " voted-neverhear" : ""}`} aria-label="En tunne" disabled>
+              <i className="ti ti-mood-empty" aria-hidden="true" />
+            </button>
+            <button className={`lc-vbtn${vote === "tuttu" ? " voted-tuttu" : ""}`} aria-label="Tuttu" disabled>
+              <i className="ti ti-mood-smile" aria-hidden="true" />
+            </button>
+            <button className={`lc-vbtn${vote === "legenda" ? " voted-legenda" : ""}`} aria-label="Legenda" disabled>
+              <i className="ti ti-star" aria-hidden="true" />
+            </button>
+          </div>
+        )}
+        {showResults && counts && (
+          <div className="lc-result">
+            <div className="lcr-row">
+              <i className="ti ti-star lcr-icon" style={{ color: "var(--pink)" }} aria-hidden="true" />
+              <div className="lcr-bar-bg">
+                <div className="lcr-bar" style={{ background: "var(--pink)", width: `${pct(counts.legenda, counts.awareness_total)}%` }} />
+              </div>
+              <span className="lcr-pct" style={{ color: "var(--pink)" }}>{pct(counts.legenda, counts.awareness_total)}%</span>
+            </div>
+            <div className="lcr-row">
+              <i className="ti ti-mood-smile lcr-icon" style={{ color: "var(--yellow)" }} aria-hidden="true" />
+              <div className="lcr-bar-bg">
+                <div className="lcr-bar" style={{ background: "var(--yellow)", width: `${pct(counts.tuttu, counts.awareness_total)}%` }} />
+              </div>
+              <span className="lcr-pct" style={{ color: "var(--yellow)" }}>{pct(counts.tuttu, counts.awareness_total)}%</span>
+            </div>
+            <div className="lcr-row">
+              <i className="ti ti-mood-empty lcr-icon" style={{ color: "var(--text-muted)" }} aria-hidden="true" />
+              <div className="lcr-bar-bg">
+                <div className="lcr-bar" style={{ background: "rgba(245,237,216,0.2)", width: `${pct(counts.ei_tunnista, counts.awareness_total)}%` }} />
+              </div>
+              <span className="lcr-pct" style={{ color: "var(--text-muted)" }}>{pct(counts.ei_tunnista, counts.awareness_total)}%</span>
+            </div>
+          </div>
+        )}
+      </>
+    );
+  }
+
+  // ─── HERO MODE ───
   return (
     <div>
-      {phase === "awareness" && (
-        <div className="vote-section">
-          <div className="vote-label">Tunnenko tämän?</div>
-          <div className="vote-buttons">
-            <button className="vote-btn" onClick={() => handleAwareness("ei_tunnista")} disabled={loading}>
-              En tunnista
-            </button>
-            <button className="vote-btn" onClick={() => handleAwareness("tuttu")} disabled={loading}>
-              Tuttu tyyppi
-            </button>
-            <button className="vote-btn" onClick={() => handleAwareness("legenda")} disabled={loading}>
-              🏆 Legenda!
-            </button>
-          </div>
+      {!showResults && (
+        <div className="vote-row">
+          <button
+            className={`vm-btn${vote === "ei_tunnista" ? " voted-neverhear" : ""}`}
+            onClick={() => handleVote("ei_tunnista")}
+            disabled={!!vote || loading}
+          >
+            <i className="ti ti-mood-empty" aria-hidden="true" />
+            <span>En tunne</span>
+          </button>
+          <button
+            className={`vm-btn${vote === "tuttu" ? " voted-tuttu" : ""}`}
+            onClick={() => handleVote("tuttu")}
+            disabled={!!vote || loading}
+          >
+            <i className="ti ti-mood-smile" aria-hidden="true" />
+            <span>Tuttu</span>
+          </button>
+          <button
+            className={`vm-btn${vote === "legenda" ? " voted-legenda" : ""}`}
+            onClick={() => handleVote("legenda")}
+            disabled={!!vote || loading}
+          >
+            <i className="ti ti-star" aria-hidden="true" />
+            <span>Legenda!</span>
+          </button>
         </div>
       )}
 
-      {phase === "favorability" && (
-        <div className="vote-section">
-          <div className="vote-label">Mitä ajattelet hänestä?</div>
-          <div className="vote-buttons">
-            <button className="vote-btn" onClick={() => handleFavorability("ei_uppoa")} disabled={loading}>
-              Ei uppoa
-            </button>
-            <button className="vote-btn" onClick={() => handleFavorability("ihan_ok")} disabled={loading}>
-              Ihan ok
-            </button>
-            <button className="vote-btn" onClick={() => handleFavorability("rakastan")} disabled={loading}>
-              ❤️ Rakastan!
-            </button>
-          </div>
-        </div>
-      )}
-
-      {phase === "done" && counts && (
-        <div className="vote-results">
-          <div style={{ marginBottom: 4 }}>
-            <div className="vote-label" style={{ marginBottom: 6 }}>
-              Tunnettuus — {counts.awareness_total} ääntä
+      {showResults && counts && (
+        <div className="mini-results">
+          <div className="mr-row">
+            <i className="ti ti-star mr-icon" style={{ color: "var(--pink)" }} aria-hidden="true" />
+            <div className="mr-bar-bg">
+              <div className="mr-bar" style={{ background: "var(--pink)", width: `${pct(counts.legenda, counts.awareness_total)}%` }} />
             </div>
-            {[
-              { label: "Legenda", val: counts.legenda, cls: "bar-pink" },
-              { label: "Tuttu", val: counts.tuttu, cls: "bar-yellow" },
-              { label: "Ei tunne", val: counts.ei_tunnista, cls: "bar-dim" },
-            ].map((r) => (
-              <div className="vote-bar-row" key={r.label}>
-                <span className="vote-bar-label">{r.label}</span>
-                <div className="vote-bar-track">
-                  <div
-                    className={`vote-bar-fill ${r.cls}`}
-                    style={{ width: `${pct(r.val, counts.awareness_total)}%` }}
-                  />
-                </div>
-                <span className="vote-bar-pct">{pct(r.val, counts.awareness_total)}%</span>
-              </div>
-            ))}
+            <span className="mr-pct" style={{ color: "var(--pink)" }}>{pct(counts.legenda, counts.awareness_total)}%</span>
           </div>
-
-          {counts.favorability_total > 0 && (
-            <div style={{ marginTop: 10 }}>
-              <div className="vote-label" style={{ marginBottom: 6 }}>
-                Suosio — {counts.favorability_total} ääntä
-              </div>
-              {[
-                { label: "Rakastan", val: counts.rakastan, cls: "bar-pink" },
-                { label: "Ihan ok", val: counts.ihan_ok, cls: "bar-yellow" },
-                { label: "Ei uppoa", val: counts.ei_uppoa, cls: "bar-dim" },
-              ].map((r) => (
-                <div className="vote-bar-row" key={r.label}>
-                  <span className="vote-bar-label">{r.label}</span>
-                  <div className="vote-bar-track">
-                    <div
-                      className={`vote-bar-fill ${r.cls}`}
-                      style={{ width: `${pct(r.val, counts.favorability_total)}%` }}
-                    />
-                  </div>
-                  <span className="vote-bar-pct">{pct(r.val, counts.favorability_total)}%</span>
-                </div>
-              ))}
+          <div className="mr-row">
+            <i className="ti ti-mood-smile mr-icon" style={{ color: "var(--yellow)" }} aria-hidden="true" />
+            <div className="mr-bar-bg">
+              <div className="mr-bar" style={{ background: "var(--yellow)", width: `${pct(counts.tuttu, counts.awareness_total)}%` }} />
             </div>
-          )}
+            <span className="mr-pct" style={{ color: "var(--yellow)" }}>{pct(counts.tuttu, counts.awareness_total)}%</span>
+          </div>
+          <div className="mr-row">
+            <i className="ti ti-mood-empty mr-icon" style={{ color: "var(--text-muted)" }} aria-hidden="true" />
+            <div className="mr-bar-bg">
+              <div className="mr-bar" style={{ background: "rgba(245,237,216,0.2)", width: `${pct(counts.ei_tunnista, counts.awareness_total)}%` }} />
+            </div>
+            <span className="mr-pct" style={{ color: "var(--text-muted)" }}>{pct(counts.ei_tunnista, counts.awareness_total)}%</span>
+          </div>
 
           <button className="share-btn" onClick={handleShare}>
-            📤 Jaa kaverille
+            <i className="ti ti-share" aria-hidden="true" />
+            Jaa kaverille
           </button>
         </div>
       )}
