@@ -82,9 +82,19 @@ export default function VoteWidget({ celebrityId, celebrityName, todayStr, age, 
     const fv = localStorage.getItem(`vote_${celebrityId}_favorability_${todayStr}`) as FavorabilityVote | null;
     if (av) {
       setQ1vote(av);
-      if (fv) setQ2vote(fv);
-      setStep("results");
-      fetchAllCounts(celebrityId, todayStr).then(setCounts);
+      if (fv) {
+        // Both Q1 and Q2 answered → show results
+        setQ2vote(fv);
+        setStep("results");
+        fetchAllCounts(celebrityId, todayStr).then(setCounts);
+      } else if (av === "ei_tunnista") {
+        // Q1 = "en tunne" skips Q2 → show results
+        setStep("results");
+        fetchAllCounts(celebrityId, todayStr).then(setCounts);
+      } else {
+        // Q1 answered (tuttu/legenda) but Q2 not yet → resume at Q2
+        setStep("q2");
+      }
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [celebrityId, todayStr]);
