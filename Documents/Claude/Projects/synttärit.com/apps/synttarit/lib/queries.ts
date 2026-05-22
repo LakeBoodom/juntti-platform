@@ -1,21 +1,6 @@
 // Synttärit-frontin DB-haut. Server-side, anon-client → respektoi RLS.
-import { getSupabase, SITE_SLUG } from "./supabase";
-
-let _siteId: string | null = null;
-
-async function getSiteId(): Promise<string | null> {
-  if (_siteId) return _siteId;
-  const sb = getSupabase();
-  if (!sb) return null;
-  const { data } = await sb
-    .from("sites")
-    .select("id")
-    .eq("slug", SITE_SLUG)
-    .maybeSingle();
-  if (!data) return null;
-  _siteId = data.id;
-  return _siteId;
-}
+// Näyttää julkkikset joilla platform = 'synttarit' TAI 'both'
+import { getSupabase } from "./supabase";
 
 export type CelebrityData = {
   id: string;
@@ -40,10 +25,8 @@ export type VoteCounts = {
   total_count: number;
 };
 
-// Hae tänään syntyvät julkkikset (priority 1-5, ei piilotetut)
+// Hae tänään syntyvät julkkikset (platform = synttarit tai both, priority < 99)
 export async function getTodaysCelebrities(): Promise<CelebrityData[]> {
-  const siteId = await getSiteId();
-  if (!siteId) return [];
   const sb = getSupabase();
   if (!sb) return [];
 
@@ -51,18 +34,18 @@ export async function getTodaysCelebrities(): Promise<CelebrityData[]> {
   const month = today.getMonth() + 1;
   const day = today.getDate();
 
-  // Haetaan suoraan birth_date-vertailulla
   const { data, error } = await sb
     .from("celebrities")
     .select("id, slug, name, role, birth_date, bio_short, image_url, wikipedia_url, priority, is_hero")
-    .eq("site_id", siteId)
-    .lt("priority", 99) // piilota priority=99
+    .in("platform", ["synttarit", "both"])
+    .lt("priority", 99)
     .order("priority", { ascending: true });
 
   if (error || !data) return [];
 
-  // Suodata tänään syntyvät (kuukausi + päivä)
-  return data.filter((c) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const celebs = (data as any) as CelebrityData[];
+  return celebs.filter((c) => {
     const d = new Date(c.birth_date);
     return d.getMonth() + 1 === month && d.getDate() === day;
   });
@@ -70,61 +53,59 @@ export async function getTodaysCelebrities(): Promise<CelebrityData[]> {
 
 // Hae yksittäinen julkkis slugilla
 export async function getCelebrityBySlug(slug: string): Promise<CelebrityData | null> {
-  const siteId = await getSiteId();
-  if (!siteId) return null;
   const sb = getSupabase();
   if (!sb) return null;
 
   const { data } = await sb
     .from("celebrities")
     .select("id, slug, name, role, birth_date, bio_short, image_url, wikipedia_url, priority, is_hero")
-    .eq("site_id", siteId)
+    .in("platform", ["synttarit", "both"])
     .eq("slug", slug)
     .maybeSingle();
 
-  return data;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return (data as any) as CelebrityData | null;
 }
 
-// Hae kaikki julkkikset vuosikalenteria varten (koko vuosi)
+// Hae kaikki julkkikset vuosikalenteria varten
 export async function getAllCelebrities(): Promise<CelebrityData[]> {
-  const siteId = await getSiteId();
-  if (!siteId) return [];
   const sb = getSupabase();
   if (!sb) return [];
 
   const { data } = await sb
     .from("celebrities")
     .select("id, slug, name, role, birth_date, bio_short, image_url, wikipedia_url, priority, is_hero")
-    .eq("site_id", siteId)
+    .in("platform", ["synttarit", "both"])
     .lt("priority", 99)
     .order("birth_date", { ascending: true });
 
-  return data ?? [];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return ((data as any) as CelebrityData[]) ?? [];
 }
 
-// Hae tietyn päivän julkkikset (kuukausi + päivä)
+// Hae tietyn päivän julkkikset
 export async function getCelebritiesByDate(month: number, day: number): Promise<CelebrityData[]> {
-  const siteId = await getSiteId();
-  if (!siteId) return [];
   const sb = getSupabase();
   if (!sb) return [];
 
   const { data } = await sb
     .from("celebrities")
     .select("id, slug, name, role, birth_date, bio_short, image_url, wikipedia_url, priority, is_hero")
-    .eq("site_id", siteId)
+    .in("platform", ["synttarit", "both"])
     .lt("priority", 99)
     .order("priority", { ascending: true });
 
   if (!data) return [];
 
-  return data.filter((c) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const celebs = (data as any) as CelebrityData[];
+  return celebs.filter((c) => {
     const d = new Date(c.birth_date);
     return d.getMonth() + 1 === month && d.getDate() === day;
   });
 }
 
-// Hae äänestystulokset yhdelle julkkikselle tänään
+// Hae äänestystulokset
 export async function getVoteCounts(
   celebrityId: string,
   voteDate: string
@@ -140,8 +121,10 @@ export async function getVoteCounts(
 
   if (!data) return { awareness: null, favorability: null };
 
-  const awareness = data.find((r) => r.question_type === "awareness") ?? null;
-  const favorability = data.find((r) => r.question_type === "favorability") ?? null;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const rows = data as any[];
+  const awareness = rows.find((r) => r.question_type === "awareness") ?? null;
+  const favorability = rows.find((r) => r.question_type === "favorability") ?? null;
 
   return { awareness, favorability };
 }

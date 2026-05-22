@@ -17,12 +17,15 @@ export default function HeroCard({ celebrity, todayStr }: Props) {
     <div className="hero-card">
       <Link href={`/${celebrity.slug ?? celebrity.id}`} style={{ display: "block", textDecoration: "none" }}>
         {celebrity.image_url ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={celebrity.image_url}
-            alt={celebrity.name}
-            className="hero-photo"
-          />
+          <div className="hero-photo-wrap">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={celebrity.image_url}
+              alt={celebrity.name}
+              className="hero-photo"
+            />
+            <div className="hero-photo-fade" />
+          </div>
         ) : (
           <div className="hero-photo-placeholder">
             <i className="ti ti-confetti hero-photo-icon" aria-hidden="true" />
