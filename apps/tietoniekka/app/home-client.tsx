@@ -145,6 +145,11 @@ export function HomeClient({
             <a href="#paivan-visa" className="btn btn-primary btn-large hero-cta">
               OTETAAN SELVÄÄ →
             </a>
+            <ul className="hero-badges">
+              <li>Yli 500 tietovisaa</li>
+              <li>Joka päivä uusia visoja</li>
+              <li>Aina ilmainen</li>
+            </ul>
           </div>
           <div className="hero-image">
             <img src="/Header5.png" alt="Tietoniekan juontajat" />

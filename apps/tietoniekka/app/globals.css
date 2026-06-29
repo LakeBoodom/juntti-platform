@@ -329,6 +329,35 @@ img { display: block; max-width: 100%; }
 
 .hero-cta { align-self: flex-start; }
 
+.hero-badges {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+}
+.hero-badges li {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 14px;
+  letter-spacing: 0.04em;
+  color: var(--color-text-muted-light);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.hero-badges li::before {
+  content: '';
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  background: var(--color-brand-gold);
+  border-radius: 50%;
+  flex-shrink: 0;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M3 8l3.5 3.5L13 5' stroke='%230f1520' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3C/svg%3E");
+}
+
 .hero-strip {
   background: var(--color-brand-gold);
   color: var(--color-surface-dark);
