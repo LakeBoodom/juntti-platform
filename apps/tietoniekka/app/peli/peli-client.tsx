@@ -401,59 +401,63 @@ function PeliInner({ preloadedQuiz }: { preloadedQuiz: QuizConfig | null }) {
             </div>
 
             <div className="peli-card">
-              <div className="peli-q-header">
-                <div className="peli-q-meta">
-                  <span className="peli-q-label">Kysymys</span>
-                  <span className="peli-q-counter">{idx + 1} / {totalQ}</span>
+              <div className="peli-card-left">
+                <div className="peli-q-header">
+                  <div className="peli-q-meta">
+                    <span className="peli-q-label">Kysymys</span>
+                    <span className="peli-q-counter">{idx + 1} / {totalQ}</span>
+                  </div>
+                  <div className="spacer" />
+                  {TIMER_ENABLED && (
+                    <div className={`peli-timer ${timerClass}`}>
+                      <div className="bg-ring" style={{ ["--pct" as string]: `${timerPct}%` } as React.CSSProperties} />
+                      <div className="inner">{Math.max(0, timeLeft)}</div>
+                    </div>
+                  )}
                 </div>
-                <div className="spacer" />
-                {TIMER_ENABLED && (
-                  <div className={`peli-timer ${timerClass}`}>
-                    <div className="bg-ring" style={{ ["--pct" as string]: `${timerPct}%` } as React.CSSProperties} />
-                    <div className="inner">{Math.max(0, timeLeft)}</div>
+
+                {quiz.isImageQuiz && q.image && (
+                  <div className="peli-image-stage">
+                    <img className="peli-image" src={q.image} alt="" />
+                  </div>
+                )}
+
+                <div className="peli-q-text">{q.question}</div>
+
+                {showFact && (
+                  <div className="peli-fact show">
+                    <span className="label">Tiesitkö?</span>
+                    <span className="body">{q.fact}</span>
                   </div>
                 )}
               </div>
 
-              {quiz.isImageQuiz && q.image && (
-                <div className="peli-image-stage">
-                  <img className="peli-image" src={q.image} alt="" />
+              <div className="peli-card-right">
+                <div className="peli-options">
+                  {q.options.map((opt, i) => {
+                    const isCorrect = answered && opt === q.correct;
+                    const isWrong = answered && chosen === opt && opt !== q.correct;
+                    return (
+                      <button
+                        key={opt}
+                        ref={(el) => { optionRefs.current[i] = el; }}
+                        className={`peli-opt ${isCorrect ? "correct" : ""} ${isWrong ? "wrong" : ""}`}
+                        onClick={() => choose(opt)}
+                        disabled={answered}
+                        type="button"
+                      >
+                        <span className="peli-opt-label">
+                          <span className="peli-opt-letter">{String.fromCharCode(65 + i)}</span>
+                          <span>{opt}</span>
+                        </span>
+                        <span className="peli-opt-badge">
+                          {isCorrect ? "✓" : isWrong ? "✕" : ""}
+                        </span>
+                      </button>
+                    );
+                  })}
                 </div>
-              )}
-
-              <div className="peli-q-text">{q.question}</div>
-
-              <div className="peli-options">
-                {q.options.map((opt, i) => {
-                  const isCorrect = answered && opt === q.correct;
-                  const isWrong = answered && chosen === opt && opt !== q.correct;
-                  return (
-                    <button
-                      key={opt}
-                      ref={(el) => { optionRefs.current[i] = el; }}
-                      className={`peli-opt ${isCorrect ? "correct" : ""} ${isWrong ? "wrong" : ""}`}
-                      onClick={() => choose(opt)}
-                      disabled={answered}
-                      type="button"
-                    >
-                      <span className="peli-opt-label">
-                        <span className="peli-opt-letter">{String.fromCharCode(65 + i)}</span>
-                        <span>{opt}</span>
-                      </span>
-                      <span className="peli-opt-badge">
-                        {isCorrect ? "✓" : isWrong ? "✕" : ""}
-                      </span>
-                    </button>
-                  );
-                })}
               </div>
-
-              {showFact && (
-                <div className="peli-fact show">
-                  <span className="label">Tiesitkö?</span>
-                  <span className="body">{q.fact}</span>
-                </div>
-              )}
             </div>
 
             {showNext && (

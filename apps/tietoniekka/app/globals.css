@@ -2114,6 +2114,44 @@ a.sankari-photo {
   padding: env(safe-area-inset-top, 0) 16px env(safe-area-inset-bottom, 0);
 }
 
+/* ─── Peli desktop split-layout ≥1024px ─────────────────────────── */
+@media (min-width: 1024px) {
+  .peli-app {
+    max-width: 900px;
+  }
+  .peli-card {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+    padding: 0;
+    overflow: hidden;
+    align-items: stretch;
+  }
+  .peli-card-left {
+    padding: 36px 40px;
+    background: var(--peli-white);
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    justify-content: center;
+  }
+  .peli-card-right {
+    padding: 36px 40px;
+    background: var(--peli-cream, #f0ece3);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    border-left: 1px solid rgba(15, 21, 32, 0.08);
+  }
+  .peli-card-right .peli-options {
+    gap: 12px;
+  }
+  .peli-q-text {
+    font-size: 28px;
+    line-height: 1.18;
+  }
+}
+
 .peli-loading {
   margin: auto;
   font-family: var(--font-display);
