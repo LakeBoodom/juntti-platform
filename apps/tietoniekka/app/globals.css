@@ -552,7 +552,7 @@ img { display: block; max-width: 100%; }
   margin-bottom: var(--space-xs);
 }
 .paivan-visa-right {
-  background: rgba(0,0,0,0.30);
+  background: #ffffff;
   border-radius: var(--radius-lg);
   padding: var(--space-lg);
   display: flex;
@@ -573,7 +573,7 @@ img { display: block; max-width: 100%; }
   font-weight: 800;
   font-size: clamp(18px, 3vw, 24px);
   line-height: 1.2;
-  color: var(--color-text-light);
+  color: #0f1520;
   margin: 0 0 var(--space-xs);
 }
 .paivan-visa-options {
@@ -582,11 +582,27 @@ img { display: block; max-width: 100%; }
   gap: var(--space-sm);
 }
 
+/* Vastausvaihtoehdot pelimoodi-tyyliin (beige, tumma teksti) */
+.paivan-visa-right .visa-option {
+  background: #f4ede0;
+  border: 1.5px solid rgba(15, 21, 32, 0.10);
+  color: #0f1520;
+}
+.paivan-visa-right .visa-option:hover {
+  border-color: var(--color-brand-gold);
+  background: #ece3d1;
+  transform: translateY(-1px);
+}
+.paivan-visa-right .visa-option .badge {
+  background: rgba(15, 21, 32, 0.08);
+  color: #0f1520;
+}
+
 @media (min-width: 1024px) {
   .paivan-visa-card--split {
     flex-direction: row;
     align-items: stretch;
-    gap: 64px;
+    gap: 0;
   }
   .paivan-visa-left {
     flex: 1;
@@ -595,10 +611,13 @@ img { display: block; max-width: 100%; }
   .paivan-visa-right {
     flex: 1;
     justify-content: center;
-    background: rgba(0,0,0,0.35);
+    background: #ffffff;
     padding: 40px 36px;
+    border-radius: 0 var(--radius-xl) var(--radius-xl) 0;
+    border-left: 1px solid rgba(15, 21, 32, 0.08);
   }
-  .paivan-visa-question { font-size: 26px; }
+  .paivan-visa-question { font-size: 24px; }
+  .paivan-visa-right .visa-option { font-size: 16px; padding: 14px 16px; }
 }
 
 /* ─── 3. PÄIVÄN SANKARI ──────────────────────────────────────────── */
