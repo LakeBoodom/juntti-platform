@@ -216,11 +216,22 @@ export function HomeClient({
                   </div>
                   {todaysCelebrity.wikipedia_url && <span className="wiki-credit">📷 Wikipedia</span>}
                 </Link>
-                {todaysCelebrity.trivia_quiz_id && (
-                  <div className="sankari-quiz-info">
-                    <a href={peliHref} className="btn btn-primary btn-large">PELAA TÄSTÄ! →</a>
+                <div className="sankari-right">
+                  <div className="sankari-onnittelu">
+                    <span className="gold">Tänään {age} vuotta! 🎂</span>
+                    <p className="sankari-right-name">{todaysCelebrity.name.toUpperCase()}</p>
+                    <p className="sankari-right-role">{todaysCelebrity.role}</p>
                   </div>
-                )}
+                  <div className="sankari-quiz-info">
+                    {todaysCelebrity.bio_short && <p>{todaysCelebrity.bio_short}</p>}
+                    <h4>Testaa tietosi sankarin elämästä</h4>
+                    {todaysCelebrity.trivia_quiz_id ? (
+                      <a href={peliHref} className="btn btn-primary btn-large">PELAA TÄSTÄ! →</a>
+                    ) : (
+                      <Link href={`/sankari/${sankariSlug}`} className="btn btn-primary btn-large">TUTUSTU SANKARIIN →</Link>
+                    )}
+                  </div>
+                </div>
               </div>
             );
           })() : (
