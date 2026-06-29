@@ -195,7 +195,29 @@ export async function getRandomQuizzesPerCategory(
 
 /* ─── Päivän visa (schedule_rules-resolver) ──────────────────────── */
 
-export async function getTodaysQuiz(): Promise<QuizMeta | null> {
+/** Lisää ensimmäinen kysymys QuizMeta-objektiin → CategoryPreview */
+async function withFirstQuestion(quiz: QuizMeta): Promise<CategoryPreview> {
+  const sb = getSupabase();
+  if (!sb) return { ...quiz, questionCount: 0, firstQuestion: null };
+  const { data: qs } = await sb
+    .from("questions")
+    .select("question_text, answers, sort_order")
+    .eq("quiz_id", quiz.id)
+    .order("sort_order", { ascending: true });
+  const total = qs?.length ?? 0;
+  const first = qs?.[0];
+  let firstQuestion: CategoryPreview["firstQuestion"] = null;
+  if (first) {
+    const answers = first.answers as Array<{ text: string; is_correct: boolean }> | undefined;
+    const options = (answers ?? []).slice(0, 4).map((a) => a.text);
+    while (options.length < 4) options.push("—");
+    const correct = (answers ?? []).find((a) => a.is_correct)?.text ?? options[0];
+    firstQuestion = { question: first.question_text, options, correct };
+  }
+  return { ...quiz, questionCount: total, firstQuestion };
+}
+
+export async function getTodaysQuiz(): Promise<CategoryPreview | null> {
   const siteId = await getSiteId();
   if (!siteId) return null;
   const today = new Date().toISOString().slice(0, 10);
@@ -219,11 +241,10 @@ export async function getTodaysQuiz(): Promise<QuizMeta | null> {
       .eq("id", dateRule.content_id)
       .eq("status", "published")
       .maybeSingle();
-    if (q) return q;
+    if (q) return withFirstQuestion(q);
   }
 
-  // 2. Tag-strategy: tagi voi olla esim. tämän päivän pvm "20260429" tai event "vappu"
-  // V1.0: yksinkertainen tag-haku - käytetään countdowns-taulun samaan päivään tagattuja eventtejä
+  // 2. Tag-strategy
   const todayMonth = new Date().getMonth() + 1;
   const todayDay = new Date().getDate();
   const { data: events } = await sb
@@ -252,19 +273,18 @@ export async function getTodaysQuiz(): Promise<QuizMeta | null> {
         .eq("id", tagRule.content_id)
         .eq("status", "published")
         .maybeSingle();
-      if (q) return q;
+      if (q) return withFirstQuestion(q);
     }
   }
 
-  // 3. Fallback: random kategoriavisa
-  // Fallback random query — sama client
+  // 3. Fallback: random
   const { data: any } = await sb
     .from("quizzes")
     .select("id, slug, title, description, category, difficulty, status, emoji_hint")
     .eq("site_id", siteId)
     .eq("status", "published");
   if (!any || any.length === 0) return null;
-  return any[Math.floor(Math.random() * any.length)];
+  return withFirstQuestion(any[Math.floor(Math.random() * any.length)]);
 }
 
 /* ─── Pinnalla nyt — countdownit ─────────────────────────────────── */

@@ -525,6 +525,82 @@ img { display: block; max-width: 100%; }
   margin-bottom: var(--space-xs);
 }
 
+/* ─── Päivän visa split-layout ──────────────────────────────────── */
+.paivan-visa-card--split {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+}
+.paivan-visa-left {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+.paivan-visa-desc {
+  color: rgba(255,255,255,0.80);
+  font-size: 16px;
+  line-height: 1.5;
+  max-width: 520px;
+}
+.paivan-visa-meta {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-brand-gold);
+  margin-bottom: var(--space-xs);
+}
+.paivan-visa-right {
+  background: rgba(0,0,0,0.30);
+  border-radius: var(--radius-lg);
+  padding: var(--space-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+.paivan-visa-question-label {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-brand-gold);
+  margin: 0;
+}
+.paivan-visa-question {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: clamp(18px, 3vw, 24px);
+  line-height: 1.2;
+  color: var(--color-text-light);
+  margin: 0 0 var(--space-xs);
+}
+.paivan-visa-options {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-sm);
+}
+
+@media (min-width: 1024px) {
+  .paivan-visa-card--split {
+    flex-direction: row;
+    align-items: stretch;
+    gap: 64px;
+  }
+  .paivan-visa-left {
+    flex: 1;
+    justify-content: flex-end;
+  }
+  .paivan-visa-right {
+    flex: 1;
+    justify-content: center;
+    background: rgba(0,0,0,0.35);
+    padding: 40px 36px;
+  }
+  .paivan-visa-question { font-size: 26px; }
+}
+
 /* ─── 3. PÄIVÄN SANKARI ──────────────────────────────────────────── */
 .paivan-sankari {
   background: var(--color-surface-dark);

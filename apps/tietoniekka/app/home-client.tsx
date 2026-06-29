@@ -10,14 +10,14 @@ import Link from "next/link";
    Datafetch (Supabase) tulee myöhemmin — pidetään tämä yksinkertaisena.
    ───────────────────────────────────────────────────────────────── */
 
-import type { SankariData, QuizMeta, CategoryPreview } from "../lib/queries";
+import type { SankariData, CategoryPreview } from "../lib/queries";
 import { CATEGORIES, CATEGORY_BY_SLUG } from "../lib/categories";
 
 type CategoryQuizMap = Record<string, CategoryPreview | null>;
 
 export type HomeClientProps = {
   todaysCelebrity: SankariData | null;
-  todaysQuiz: QuizMeta | null;
+  todaysQuiz: CategoryPreview | null;
   categoryQuizzes: CategoryQuizMap;
 };
 
@@ -170,25 +170,55 @@ export function HomeClient({
             const bgImage = cat?.imageUrl ?? null;
             const katColor = cat?.colorVar ?? "var(--color-surface-card-dark)";
             return (
-              <Link
-                href={`/peli?paivan_visa=1&quiz_id=${todaysQuiz.id}`}
-                className="featured-quiz paivan-visa-card"
+              <div
+                className="featured-quiz paivan-visa-card paivan-visa-card--split"
                 data-watermark={cat?.badge ?? ""}
                 style={{
                   ["--quiz-tint" as string]: "rgba(15, 21, 32, 0.55)",
                   ["--kat-color" as string]: katColor,
                   ...(bgImage ? { ["--bg-image" as string]: `url(${bgImage})` } : {}),
-                  textDecoration: "none",
-                  display: "block",
                 } as React.CSSProperties}
               >
-                {cat && <span className="paivan-visa-eyebrow">— {cat.badge}</span>}
-                <h4 className="quiz-question" style={{ marginBottom: "12px" }}>{todaysQuiz.title}</h4>
-                {todaysQuiz.description && (
-                  <p style={{ color: "rgba(255,255,255,0.85)", marginBottom: "16px" }}>{todaysQuiz.description}</p>
+                {/* Vasen: info + CTA */}
+                <div className="paivan-visa-left">
+                  {cat && <span className="paivan-visa-eyebrow">— {cat.badge}</span>}
+                  <h4 className="quiz-question">{todaysQuiz.title}</h4>
+                  {todaysQuiz.description && (
+                    <p className="paivan-visa-desc">{todaysQuiz.description}</p>
+                  )}
+                  <div className="paivan-visa-meta">
+                    {todaysQuiz.questionCount > 0 && (
+                      <span>{todaysQuiz.questionCount} kysymystä</span>
+                    )}
+                  </div>
+                  <Link
+                    href={`/peli?paivan_visa=1&quiz_id=${todaysQuiz.id}`}
+                    className="btn btn-primary btn-large"
+                    style={{ display: "inline-block" }}
+                  >PELAA NYT →</Link>
+                </div>
+                {/* Oikea: ensimmäinen kysymys teaserilla */}
+                {todaysQuiz.firstQuestion && (
+                  <div className="paivan-visa-right">
+                    <p className="paivan-visa-question-label">Kokeile — Kysymys 1 / {todaysQuiz.questionCount}</p>
+                    <p className="paivan-visa-question">{todaysQuiz.firstQuestion.question}</p>
+                    <div className="paivan-visa-options">
+                      {todaysQuiz.firstQuestion.options.map((opt, i) => {
+                        const letter = ["A","B","C","D"][i];
+                        return (
+                          <Link
+                            key={i}
+                            href={`/peli?paivan_visa=1&quiz_id=${todaysQuiz.id}&first=${letter}`}
+                            className="visa-option"
+                          >
+                            <span className="badge">{letter}</span> {opt}
+                          </Link>
+                        );
+                      })}
+                    </div>
+                  </div>
                 )}
-                <span className="btn btn-primary btn-large" style={{ display: "inline-block" }}>PELAA NYT →</span>
-              </Link>
+              </div>
             );
           })() : (
             <div className="featured-quiz" style={{ ["--quiz-tint" as string]: "rgba(26, 58, 69, 0.5)" } as React.CSSProperties}>
