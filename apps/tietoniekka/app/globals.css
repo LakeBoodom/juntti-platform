@@ -1602,7 +1602,37 @@ body.is-scrolled .topbar {
   /*   - kortti ei venytä full-widthiin → keskitetty + comfortable max
        - vaihtoehdot 2×2 -gridiin
        - kaikki sisäiset fontit isommiksi                              */
-  .paivan-visa .featured-quiz,
+  /* Päivän visa — hero-kortti, koko container-leveys */
+  .paivan-visa .featured-quiz.paivan-visa-card {
+    max-width: 100%;
+    min-height: 420px;
+    padding: 56px 64px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    background:
+      linear-gradient(180deg,
+        rgba(15, 21, 32, 0.04) 0%,
+        rgba(15, 21, 32, 0.28) 40%,
+        rgba(15, 21, 32, 0.78) 70%,
+        rgba(15, 21, 32, 0.94) 100%),
+      var(--bg-image, none) center / cover no-repeat,
+      var(--kat-color, var(--color-surface-card-dark));
+  }
+  .paivan-visa .paivan-visa-eyebrow { font-size: 15px; margin-bottom: 14px; }
+  .paivan-visa .featured-quiz .quiz-question {
+    font-size: 52px;
+    line-height: 1.08;
+    max-width: 800px;
+    margin-bottom: 14px;
+  }
+  .paivan-visa .featured-quiz > p {
+    font-size: 18px;
+    max-width: 640px;
+    margin-bottom: 28px;
+  }
+
+  /* Muut featured-quiz -käytöt (pinnalla nyt) — ennallaan */
   .pinnalla-nyt .featured-quiz {
     max-width: 860px;
     margin-left: auto;
