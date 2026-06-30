@@ -100,11 +100,14 @@ export default async function QuizDetailPage({
           <h2 className="text-lg font-semibold">
             Kysymykset ({questions?.length ?? 0})
           </h2>
-          {questions?.map((q: any) => (
+          {questions?.map((q: any, i: number) => (
             <QuestionCard
               key={q.id}
               id={q.id}
+              quizId={quiz.id}
               sortOrder={q.sort_order}
+              isFirst={i === 0}
+              isLast={i === (questions?.length ?? 0) - 1}
               initial={{
                 question_text: q.question_text,
                 answers: q.answers,

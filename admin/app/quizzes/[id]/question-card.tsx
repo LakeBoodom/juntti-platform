@@ -1,16 +1,20 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { Check, Pencil, X } from "lucide-react";
+import { Check, ChevronDown, ChevronUp, Pencil, X } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { updateQuestion } from "./actions";
+import { reorderQuestion, updateQuestion } from "./actions";
 
 type Answer = { text: string; is_correct: boolean };
 type Props = {
   id: string;
+  quizId: string;
   sortOrder: number;
+  isFirst: boolean;
+  isLast: boolean;
   initial: {
     question_text: string;
     answers: Answer[];
@@ -18,7 +22,9 @@ type Props = {
   };
 };
 
-export function QuestionCard({ id, sortOrder, initial }: Props) {
+export function QuestionCard({ id, quizId, sortOrder, isFirst, isLast, initial }: Props) {
+  const router = useRouter();
+  const [moving, startMove] = useTransition();
   const [editing, setEditing] = useState(false);
   const [text, setText] = useState(initial.question_text);
   const [answers, setAnswers] = useState<Answer[]>(
@@ -60,15 +66,50 @@ export function QuestionCard({ id, sortOrder, initial }: Props) {
     });
   }
 
+  function move(direction: "up" | "down") {
+    setError(null);
+    startMove(async () => {
+      const res = await reorderQuestion(quizId, id, direction);
+      if (!res.ok) setError(res.error);
+      else router.refresh();
+    });
+  }
+
   if (!editing) {
     return (
       <div className="space-y-3 rounded-md border p-4">
         <div className="flex items-start justify-between gap-3">
-          <div>
-            <div className="text-xs text-muted-foreground">
-              Kysymys {sortOrder + 1}
+          <div className="flex items-start gap-2">
+            <div className="flex flex-col">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-6 px-1"
+                onClick={() => move("up")}
+                disabled={isFirst || moving}
+                aria-label="Siirrä ylös"
+                title="Siirrä ylös"
+              >
+                <ChevronUp className="h-4 w-4" />
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-6 px-1"
+                onClick={() => move("down")}
+                disabled={isLast || moving}
+                aria-label="Siirrä alas"
+                title="Siirrä alas"
+              >
+                <ChevronDown className="h-4 w-4" />
+              </Button>
             </div>
-            <div className="font-medium">{text}</div>
+            <div>
+              <div className="text-xs text-muted-foreground">
+                Kysymys {sortOrder + 1}
+              </div>
+              <div className="font-medium">{text}</div>
+            </div>
           </div>
           <Button
             variant="ghost"
