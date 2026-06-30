@@ -117,6 +117,43 @@ export async function getQuizById(id: string): Promise<FullQuiz | null> {
   };
 }
 
+/** Hae julkaistu visa slugilla (kaikkine kysymyksineen). */
+export async function getQuizBySlug(slug: string): Promise<FullQuiz | null> {
+  const sb = getSupabase();
+  if (!sb) return null;
+  const { data: quiz } = await sb
+    .from("quizzes")
+    .select("id, slug, title, description, category, difficulty, status, emoji_hint")
+    .eq("slug", slug)
+    .eq("status", "published")
+    .maybeSingle();
+  if (!quiz) return null;
+  const { data: qs } = await sb
+    .from("questions")
+    .select("id, sort_order, question_text, explanation, answers")
+    .eq("quiz_id", quiz.id)
+    .order("sort_order", { ascending: true });
+  return {
+    ...quiz,
+    questions: (qs ?? []).map((q) => ({
+      ...q,
+      answers: q.answers as never,
+    })),
+  };
+}
+
+/** Kaikkien julkaistujen visojen slugit + päivitysaika sitemapia varten. */
+export async function getPublishedQuizSlugs(): Promise<{ slug: string; updated_at: string | null }[]> {
+  const sb = getSupabase();
+  if (!sb) return [];
+  const { data } = await sb
+    .from("quizzes")
+    .select("slug, updated_at")
+    .eq("status", "published")
+    .not("slug", "is", null);
+  return (data ?? []) as { slug: string; updated_at: string | null }[];
+}
+
 /** Hae random julkaistu visa kategoriasta. */
 export async function getRandomQuizByCategory(category: string): Promise<QuizMeta | null> {
   const siteId = await getSiteId();

@@ -14,7 +14,9 @@ export type Question = {
 
 export type QuizConfig = {
   id: string;                 // route-tunniste (esim. "kat:urheilu")
-  title: string;              // näkyy intro-screenissä isolla
+  title: string;              // näkyy intro-screenissä isolla (UPPERCASE)
+  titleRaw?: string;          // alkuperäinen otsikko (jakotekstiä varten)
+  slug?: string;              // DB-slug → /visa/<slug> jakolinkkiä varten
   intro: string;              // intro-tekstinä
   questions: Question[];
   isImageQuiz?: boolean;      // näytetään flag-stage / kuvalaatikko

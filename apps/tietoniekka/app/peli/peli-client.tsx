@@ -1,6 +1,7 @@
 "use client";
 
 import { Suspense, useCallback, useEffect, useRef, useState } from "react";
+import type { CSSProperties } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import confetti from "canvas-confetti";
@@ -57,6 +58,7 @@ function PeliInner({ preloadedQuiz }: { preloadedQuiz: QuizConfig | null }) {
   const [showNext, setShowNext] = useState(false);
   const [soundOn, setSoundOn] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [shareOpen, setShareOpen] = useState(false);
   const audioCtxRef = useRef<AudioContext | null>(null);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const optionRefs = useRef<(HTMLButtonElement | null)[]>([]);
@@ -274,35 +276,48 @@ function PeliInner({ preloadedQuiz }: { preloadedQuiz: QuizConfig | null }) {
     if (ctx?.state === "suspended") ctx.resume();
   }
 
-  function shareResult() {
-    if (!quiz) return;
+  function getShareData() {
     const quizId = searchParams.get("quiz_id");
-    const shareUrl = quizId
-      ? `https://tietoniekka.fi/peli?quiz_id=${quizId}`
-      : "https://tietoniekka.fi";
-    const text = `Sain ${score} pistettä Tietoniekan ${quiz.title}-visassa! 🏆 Voitatko sinä?`;
+    const url = quiz?.slug
+      ? `https://tietoniekka.fi/visa/${quiz.slug}`
+      : quizId
+        ? `https://tietoniekka.fi/peli?quiz_id=${quizId}`
+        : "https://tietoniekka.fi";
+    const niceTitle = quiz?.titleRaw ?? quiz?.title ?? "";
+    const text = `Sain ${score} pistettä Tietoniekan visassa "${niceTitle}" 🏆 Voitatko sinä?`;
+    return { url, text };
+  }
 
-    // Mobiilissa natiivijako (WhatsApp, Viestit…), desktopilla kopioi linkki +
-    // palaute — macin natiivi jakovalikko ei tarjoa oikeita kanavia desktopilla.
-    const isMobile =
-      typeof window !== "undefined" &&
-      window.matchMedia("(pointer: coarse)").matches;
-
-    if (isMobile && typeof navigator !== "undefined" && navigator.share) {
-      navigator
-        .share({ title: `Tietoniekka — ${quiz.title}`, text, url: shareUrl })
-        .catch(() => {});
-    } else if (typeof navigator !== "undefined" && navigator.clipboard) {
+  function copyShareLink() {
+    const { url, text } = getShareData();
+    if (typeof navigator !== "undefined" && navigator.clipboard) {
       navigator.clipboard
-        .writeText(`${text} ${shareUrl}`)
+        .writeText(`${text} ${url}`)
         .then(() => {
           setCopied(true);
+          setShareOpen(false);
           setTimeout(() => setCopied(false), 2200);
         })
         .catch(() => {});
     }
-    // Merkitse viimeisin pelitulos jaetuksi (best-effort)
     void markShared();
+  }
+
+  function shareResult() {
+    if (!quiz) return;
+    const { url, text } = getShareData();
+    const isMobile =
+      typeof window !== "undefined" &&
+      window.matchMedia("(pointer: coarse)").matches;
+
+    // Mobiilissa natiivijako (WhatsApp, Viestit…); desktopilla avaa pieni valikko
+    // suorilla napeilla — macin natiivi jakovalikko on siellä kömpelö.
+    if (isMobile && typeof navigator !== "undefined" && navigator.share) {
+      navigator.share({ title: `Tietoniekka — ${quiz.title}`, text, url }).catch(() => {});
+      void markShared();
+    } else {
+      setShareOpen((o) => !o);
+    }
   }
 
   async function markShared() {
@@ -512,9 +527,53 @@ function PeliInner({ preloadedQuiz }: { preloadedQuiz: QuizConfig | null }) {
               <button className="peli-btn-primary" onClick={resetGame} type="button">
                 PELAA UUDELLEEN
               </button>
-              <button className="peli-btn-ghost" onClick={shareResult} type="button">
-                {copied ? "LINKKI KOPIOITU ✓" : "JAA TULOS"}
-              </button>
+              <div style={{ position: "relative", display: "inline-block" }}>
+                <button className="peli-btn-ghost" onClick={shareResult} type="button">
+                  {copied ? "LINKKI KOPIOITU ✓" : "JAA TULOS"}
+                </button>
+                {shareOpen && (() => {
+                  const { url, text } = getShareData();
+                  const enc = encodeURIComponent;
+                  const item: CSSProperties = {
+                    padding: "10px 12px",
+                    borderRadius: 8,
+                    color: "white",
+                    textDecoration: "none",
+                    fontWeight: 600,
+                    fontSize: 14,
+                    textAlign: "left",
+                    background: "transparent",
+                    border: "none",
+                    cursor: "pointer",
+                    whiteSpace: "nowrap",
+                  };
+                  return (
+                    <div
+                      style={{
+                        position: "absolute",
+                        bottom: "calc(100% + 8px)",
+                        left: "50%",
+                        transform: "translateX(-50%)",
+                        background: "#1b2433",
+                        border: "1px solid rgba(255,255,255,0.15)",
+                        borderRadius: 12,
+                        padding: 8,
+                        display: "flex",
+                        flexDirection: "column",
+                        gap: 4,
+                        minWidth: 190,
+                        zIndex: 20,
+                        boxShadow: "0 8px 24px rgba(0,0,0,0.4)",
+                      }}
+                    >
+                      <a style={item} href={`https://wa.me/?text=${enc(`${text} ${url}`)}`} target="_blank" rel="noopener noreferrer">📱  WhatsApp</a>
+                      <a style={item} href={`https://t.me/share/url?url=${enc(url)}&text=${enc(text)}`} target="_blank" rel="noopener noreferrer">✈️  Telegram</a>
+                      <a style={item} href={`https://twitter.com/intent/tweet?text=${enc(text)}&url=${enc(url)}`} target="_blank" rel="noopener noreferrer">𝕏   Jaa X:ssä</a>
+                      <button style={item} onClick={copyShareLink} type="button">🔗  Kopioi linkki</button>
+                    </div>
+                  );
+                })()}
+              </div>
               <Link href={getSectionAnchor(quiz)} className="peli-btn-ghost">
                 TAKAISIN ETUSIVULLE
               </Link>

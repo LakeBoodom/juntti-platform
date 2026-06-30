@@ -1,10 +1,13 @@
 import type { MetadataRoute } from "next";
 import { CATEGORIES } from "@/lib/categories";
 import { SANKARIT } from "@/lib/sankarit";
+import { getPublishedQuizSlugs } from "@/lib/queries";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://tietoniekka.fi";
 
-export default function sitemap(): MetadataRoute.Sitemap {
+export const revalidate = 3600;
+
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const now = new Date();
 
   const staticPages: MetadataRoute.Sitemap = [
@@ -36,5 +39,16 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.6,
   }));
 
-  return [...staticPages, ...categoryPages, ...sankariPages];
+  // Yksittäiset visat — /visa/<slug> (löytyy myös jakolinkeistä)
+  const quizzes = await getPublishedQuizSlugs();
+  const quizPages: MetadataRoute.Sitemap = quizzes
+    .filter((q) => q.slug)
+    .map((q) => ({
+      url: `${SITE_URL}/visa/${q.slug}`,
+      lastModified: q.updated_at ? new Date(q.updated_at) : now,
+      changeFrequency: "monthly",
+      priority: 0.7,
+    }));
+
+  return [...staticPages, ...categoryPages, ...sankariPages, ...quizPages];
 }
