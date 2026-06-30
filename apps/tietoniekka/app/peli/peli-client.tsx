@@ -5,7 +5,7 @@ import type { CSSProperties } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import confetti from "canvas-confetti";
-import { getSectionAnchor, getCategoryLabel, type QuizConfig, type Question } from "./questions";
+import { getSectionAnchor, type QuizConfig, type Question } from "./questions";
 import { getSupabase } from "../../lib/supabase";
 
 /* ─────────────────────────────────────────────────────────────────
@@ -59,9 +59,11 @@ function PeliInner({ preloadedQuiz }: { preloadedQuiz: QuizConfig | null }) {
   const [soundOn, setSoundOn] = useState(false);
   const [copied, setCopied] = useState(false);
   const [shareOpen, setShareOpen] = useState(false);
+  const [correctCount, setCorrectCount] = useState(0);
   const audioCtxRef = useRef<AudioContext | null>(null);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const optionRefs = useRef<(HTMLButtonElement | null)[]>([]);
+  const shareWrapRef = useRef<HTMLDivElement>(null);
 
   /* ─── Quiz resolve — käyttää AINOASTAAN server-side preloadedQuiz:ia (Supabasesta).
      resolveQuiz-fallback hardcoded-questions.ts:stä poistettu Heikin pyynnöstä — kaikki
@@ -78,6 +80,7 @@ function PeliInner({ preloadedQuiz }: { preloadedQuiz: QuizConfig | null }) {
     setPhase("playing");
     setIdx(0);
     setScore(0);
+    setCorrectCount(0);
     setStreak(0);
     setAnswered(false);
     setChosen(null);
@@ -195,6 +198,7 @@ function PeliInner({ preloadedQuiz }: { preloadedQuiz: QuizConfig | null }) {
       setStreak(newStreak);
       setStreakBump((b) => b + 1);
       setScore((s) => s + gained);
+      setCorrectCount((c) => c + 1);
       // Confetti at button position approximated
       try {
         confetti({
@@ -276,6 +280,17 @@ function PeliInner({ preloadedQuiz }: { preloadedQuiz: QuizConfig | null }) {
     if (ctx?.state === "suspended") ctx.resume();
   }
 
+  useEffect(() => {
+    if (!shareOpen) return;
+    function onDocClick(e: MouseEvent) {
+      if (shareWrapRef.current && !shareWrapRef.current.contains(e.target as Node)) {
+        setShareOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", onDocClick);
+    return () => document.removeEventListener("mousedown", onDocClick);
+  }, [shareOpen]);
+
   function getShareData() {
     const quizId = searchParams.get("quiz_id");
     const url = quiz?.slug
@@ -284,7 +299,8 @@ function PeliInner({ preloadedQuiz }: { preloadedQuiz: QuizConfig | null }) {
         ? `https://tietoniekka.fi/peli?quiz_id=${quizId}`
         : "https://tietoniekka.fi";
     const niceTitle = quiz?.titleRaw ?? quiz?.title ?? "";
-    const text = `Sain ${score} pistettä Tietoniekan visassa "${niceTitle}" 🏆 Voitatko sinä?`;
+    const total = quiz?.questions.length ?? 0;
+    const text = `Sain ${correctCount}/${total} oikein Tietoniekan visassa "${niceTitle}" 🏆 Pystytkö parempaan?`;
     return { url, text };
   }
 
@@ -515,19 +531,19 @@ function PeliInner({ preloadedQuiz }: { preloadedQuiz: QuizConfig | null }) {
               <small>/{maxScore}</small>
             </div>
             <div className="peli-end-actions">
-              {getCategoryLabel(quiz) && (
+              {quiz.categoryLabel && (
                 <Link
-                  href={`/peli?kat=${quiz.id.split(":")[1]}`}
+                  href={`/peli?kat=${encodeURIComponent(quiz.id.split(":")[1])}${quiz.dbId ? `&exclude=${quiz.dbId}` : ""}`}
                   className="peli-btn-primary"
                   prefetch={false}
                 >
-                  UUSI {getCategoryLabel(quiz)}-VISA →
+                  UUSI {quiz.categoryLabel}-VISA →
                 </Link>
               )}
               <button className="peli-btn-primary" onClick={resetGame} type="button">
                 PELAA UUDELLEEN
               </button>
-              <div style={{ position: "relative", display: "inline-block" }}>
+              <div ref={shareWrapRef} style={{ position: "relative", display: "inline-block" }}>
                 <button className="peli-btn-ghost" onClick={shareResult} type="button">
                   {copied ? "LINKKI KOPIOITU ✓" : "JAA TULOS"}
                 </button>
@@ -566,9 +582,9 @@ function PeliInner({ preloadedQuiz }: { preloadedQuiz: QuizConfig | null }) {
                         boxShadow: "0 8px 24px rgba(0,0,0,0.4)",
                       }}
                     >
-                      <a style={item} href={`https://wa.me/?text=${enc(`${text} ${url}`)}`} target="_blank" rel="noopener noreferrer">📱  WhatsApp</a>
-                      <a style={item} href={`https://t.me/share/url?url=${enc(url)}&text=${enc(text)}`} target="_blank" rel="noopener noreferrer">✈️  Telegram</a>
-                      <a style={item} href={`https://twitter.com/intent/tweet?text=${enc(text)}&url=${enc(url)}`} target="_blank" rel="noopener noreferrer">𝕏   Jaa X:ssä</a>
+                      <a style={item} href={`https://wa.me/?text=${enc(`${text} ${url}`)}`} target="_blank" rel="noopener noreferrer" onClick={() => setShareOpen(false)}>📱  WhatsApp</a>
+                      <a style={item} href={`https://t.me/share/url?url=${enc(url)}&text=${enc(text)}`} target="_blank" rel="noopener noreferrer" onClick={() => setShareOpen(false)}>✈️  Telegram</a>
+                      <a style={item} href={`https://twitter.com/intent/tweet?text=${enc(text)}&url=${enc(url)}`} target="_blank" rel="noopener noreferrer" onClick={() => setShareOpen(false)}>𝕏   Jaa X:ssä</a>
                       <button style={item} onClick={copyShareLink} type="button">🔗  Kopioi linkki</button>
                     </div>
                   );

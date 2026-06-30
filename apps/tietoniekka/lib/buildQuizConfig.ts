@@ -1,4 +1,5 @@
 import type { QuizConfig, Question } from "../app/peli/questions";
+import { CATEGORY_BY_SLUG } from "./categories";
 
 type Answer = { text: string; is_correct: boolean };
 
@@ -44,11 +45,18 @@ export function buildQuizConfig(
     };
   });
 
+  const catSlug = meta.kat;
+  const categoryLabel = catSlug
+    ? CATEGORY_BY_SLUG[catSlug]?.title ?? catSlug.toUpperCase()
+    : undefined;
+
   return {
     id,
     title: quiz.title.toUpperCase(),
     titleRaw: quiz.title,
     slug: quiz.slug ?? undefined,
+    dbId: quiz.id,
+    categoryLabel,
     intro: quiz.description ?? "Pelataan!",
     questions: mappedQuestions,
     isImageQuiz: meta.isImageQuiz ?? false,

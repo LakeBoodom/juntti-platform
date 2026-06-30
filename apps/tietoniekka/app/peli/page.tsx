@@ -150,7 +150,8 @@ export default async function PeliPage({
 
   // 3. Kategoria (ei quiz_id:tä) → satunnainen julkaistu visa kategoriasta — käytetään "Uusi X-visa" -napissa
   if (!preloadedQuiz && typeof params.kat === "string") {
-    const random = await getRandomQuizByCategory(params.kat);
+    const excludeId = typeof params.exclude === "string" ? params.exclude : undefined;
+    const random = await getRandomQuizByCategory(params.kat, excludeId);
     if (random) {
       const full = await getQuizById(random.id);
       if (full && full.questions.length > 0) {

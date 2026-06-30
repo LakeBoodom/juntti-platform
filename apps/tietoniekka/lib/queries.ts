@@ -155,7 +155,10 @@ export async function getPublishedQuizSlugs(): Promise<{ slug: string; updated_a
 }
 
 /** Hae random julkaistu visa kategoriasta. */
-export async function getRandomQuizByCategory(category: string): Promise<QuizMeta | null> {
+export async function getRandomQuizByCategory(
+  category: string,
+  excludeId?: string,
+): Promise<QuizMeta | null> {
   const siteId = await getSiteId();
   if (!siteId) return null;
   const sb = getSupabase();
@@ -167,7 +170,10 @@ export async function getRandomQuizByCategory(category: string): Promise<QuizMet
     .eq("status", "published")
     .eq("category", category);
   if (!data || data.length === 0) return null;
-  return data[Math.floor(Math.random() * data.length)];
+  // Älä tarjoa juuri pelattua visaa "Uusi X-visa" -napissa
+  const pool = excludeId ? data.filter((q) => q.id !== excludeId) : data;
+  const choices = pool.length > 0 ? pool : data;
+  return choices[Math.floor(Math.random() * choices.length)];
 }
 
 /**

@@ -17,6 +17,8 @@ export type QuizConfig = {
   title: string;              // näkyy intro-screenissä isolla (UPPERCASE)
   titleRaw?: string;          // alkuperäinen otsikko (jakotekstiä varten)
   slug?: string;              // DB-slug → /visa/<slug> jakolinkkiä varten
+  dbId?: string;              // visan oikea DB-id ("Uusi X-visa" exclude)
+  categoryLabel?: string;     // kategorian näyttönimi ("LUONTO")
   intro: string;              // intro-tekstinä
   questions: Question[];
   isImageQuiz?: boolean;      // näytetään flag-stage / kuvalaatikko
