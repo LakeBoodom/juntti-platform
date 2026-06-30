@@ -39,8 +39,8 @@ function resultTier(correct: number, total: number) {
   if (pct >= 0.4)
     return { emoji: "🙂", heading: "EIPÄ HULLUMMIN", blurb: "Tästä on hyvä parantaa.", celebrate: false };
   if (pct >= 0.2)
-    return { emoji: "💪", heading: "NYT TAKKUSI", blurb: "Ei hätää — uusi yritys auttaa.", celebrate: false };
-  return { emoji: "🤓", heading: "HARJOITUS TEKEE MESTARIN", blurb: "Kokeile uudestaan, kyllä se siitä.", celebrate: false };
+    return { emoji: "😞", heading: "NYT TAKKUSI", blurb: "Ei hätää — uusi yritys auttaa.", celebrate: false };
+  return { emoji: "😭", heading: "EI MENNYT NAPPIIN, LISÄÄ HARJOITTELUA VAAN", blurb: "", celebrate: false };
 }
 
 /** Anonyymi sessio-tunnus pelitulosten ryhmittelyä varten. Pysyy localStoragessa. */
@@ -548,7 +548,7 @@ function PeliInner({ preloadedQuiz }: { preloadedQuiz: QuizConfig | null }) {
           <div className="peli-end show">
             <div className="peli-trophy">{result.emoji}</div>
             <h2 className="peli-end-h2">{result.heading}</h2>
-            <p className="peli-end-blurb">{result.blurb}</p>
+            {result.blurb && <p className="peli-end-blurb">{result.blurb}</p>}
             <div className="peli-big-score">
               <span>{correctCount}</span>
               <small>/{totalQ} oikein</small>
