@@ -2637,6 +2637,60 @@ a.sankari-photo {
   justify-content: center;
 }
 
+.peli-end-blurb {
+  font-family: var(--font-body);
+  font-size: 16px;
+  color: var(--peli-muted);
+  margin-top: 4px;
+  text-align: center;
+}
+.peli-points-sub {
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--peli-muted);
+  margin-top: 2px;
+}
+.peli-end-more {
+  margin-top: 22px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+.peli-end-more-label {
+  font-family: var(--font-body);
+  font-size: 13px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--peli-muted);
+}
+.peli-end-cats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+  max-width: 520px;
+}
+.peli-cat-chip {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--peli-navy);
+  background: rgba(15, 21, 32, 0.06);
+  border: 1px solid rgba(15, 21, 32, 0.12);
+  border-radius: 999px;
+  padding: 7px 14px;
+  text-decoration: none;
+  transition: background 0.15s ease, transform 0.1s ease;
+}
+.peli-cat-chip:hover {
+  background: var(--peli-gold);
+  color: var(--peli-navy);
+  transform: translateY(-1px);
+}
+
 /* Reduced motion */
 @media (prefers-reduced-motion: reduce) {
   .peli *, .peli *::before, .peli *::after {

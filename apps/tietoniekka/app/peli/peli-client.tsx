@@ -7,6 +7,7 @@ import Link from "next/link";
 import confetti from "canvas-confetti";
 import { getSectionAnchor, type QuizConfig, type Question } from "./questions";
 import { getSupabase } from "../../lib/supabase";
+import { CATEGORIES } from "../../lib/categories";
 
 /* ─────────────────────────────────────────────────────────────────
    Tietoniekka — Pelinäkymä
@@ -25,6 +26,22 @@ const TIME_PER_Q = 20;
 const BASE_POINTS = 100;
 const TIME_BONUS = 0;
 const STREAK_BONUS = 50;
+
+/** Tulosporrastus oikeiden vastausten osuuden mukaan. */
+function resultTier(correct: number, total: number) {
+  const pct = total > 0 ? correct / total : 0;
+  if (pct >= 1)
+    return { emoji: "🏆", heading: "TÄYDELLINEN!", blurb: "Täydet pisteet — todellinen tietoniekka!", celebrate: true };
+  if (pct >= 0.8)
+    return { emoji: "🏆", heading: "HIENOA, NIEKKA!", blurb: "Vahva suoritus!", celebrate: true };
+  if (pct >= 0.6)
+    return { emoji: "👏", heading: "IHAN KELPO!", blurb: "Hyvä pohja — vielä vähän hiomista.", celebrate: false };
+  if (pct >= 0.4)
+    return { emoji: "🙂", heading: "EIPÄ HULLUMMIN", blurb: "Tästä on hyvä parantaa.", celebrate: false };
+  if (pct >= 0.2)
+    return { emoji: "💪", heading: "NYT TAKKUSI", blurb: "Ei hätää — uusi yritys auttaa.", celebrate: false };
+  return { emoji: "🤓", heading: "HARJOITUS TEKEE MESTARIN", blurb: "Kokeile uudestaan, kyllä se siitä.", celebrate: false };
+}
 
 /** Anonyymi sessio-tunnus pelitulosten ryhmittelyä varten. Pysyy localStoragessa. */
 function getOrCreateSessionId(): string {
@@ -255,7 +272,10 @@ function PeliInner({ preloadedQuiz }: { preloadedQuiz: QuizConfig | null }) {
   function endGame() {
     setPhase("end");
     void recordPlay();
-    // Party konfettit
+    // Juhlinta vain hyvästä tuloksesta (≥80 % oikein) — ei joka kerta.
+    const total = quiz?.questions.length ?? 0;
+    const celebrate = total > 0 && correctCount / total >= 0.8;
+    if (!celebrate) return;
     const duration = 2200;
     const end = Date.now() + duration;
     (function frame() {
@@ -396,6 +416,8 @@ function PeliInner({ preloadedQuiz }: { preloadedQuiz: QuizConfig | null }) {
   const maxScore = totalQ * (BASE_POINTS + TIME_BONUS) + (totalQ * (totalQ - 1) / 2) * STREAK_BONUS;
   const q = quiz.questions[idx];
   const progressPct = phase === "end" ? 100 : (idx / totalQ) * 100;
+  const result = resultTier(correctCount, totalQ);
+  const currentCatSlug = quiz.id.startsWith("kat:") ? quiz.id.split(":")[1] : null;
   const timerPct = (timeLeft / TIME_PER_Q) * 100;
   const timerClass = timeLeft <= 5 ? "danger" : timeLeft <= 10 ? "warn" : "";
 
@@ -524,12 +546,14 @@ function PeliInner({ preloadedQuiz }: { preloadedQuiz: QuizConfig | null }) {
         {/* End */}
         {phase === "end" && (
           <div className="peli-end show">
-            <div className="peli-trophy">🏆</div>
-            <h2 className="peli-end-h2">HIENOA NIEKKA!</h2>
+            <div className="peli-trophy">{result.emoji}</div>
+            <h2 className="peli-end-h2">{result.heading}</h2>
+            <p className="peli-end-blurb">{result.blurb}</p>
             <div className="peli-big-score">
-              <span>{score}</span>
-              <small>/{maxScore}</small>
+              <span>{correctCount}</span>
+              <small>/{totalQ} oikein</small>
             </div>
+            <div className="peli-points-sub">{score} pistettä</div>
             <div className="peli-end-actions">
               {quiz.categoryLabel && (
                 <Link
@@ -593,6 +617,22 @@ function PeliInner({ preloadedQuiz }: { preloadedQuiz: QuizConfig | null }) {
               <Link href={getSectionAnchor(quiz)} className="peli-btn-ghost">
                 TAKAISIN ETUSIVULLE
               </Link>
+            </div>
+
+            <div className="peli-end-more">
+              <div className="peli-end-more-label">Kokeile toista aihetta</div>
+              <div className="peli-end-cats">
+                {CATEGORIES.filter((c) => c.slug !== currentCatSlug).map((c) => (
+                  <Link
+                    key={c.slug}
+                    href={`/kategoria/${c.slug}`}
+                    className="peli-cat-chip"
+                    prefetch={false}
+                  >
+                    {c.title}
+                  </Link>
+                ))}
+              </div>
             </div>
           </div>
         )}
