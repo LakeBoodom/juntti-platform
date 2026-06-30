@@ -1,4 +1,5 @@
 import { Suspense } from "react";
+import type { Metadata } from "next";
 import { CATEGORIES } from "../../lib/categories";
 import { getQuizById, getKuvavisat, getRandomQuizByCategory, getTodaysQuiz } from "../../lib/queries";
 import { PeliClient } from "./peli-client";
@@ -11,6 +12,91 @@ import type { QuizConfig, Question } from "./questions";
  * 3. Jos ei, jättää preloadedQuiz nullhi → client-puoli käyttää hardcoded resolveQuiz:ia
  *    (vanhaa fallback-rataa kunnes admin-data on valmis kaikille tyypeille)
  */
+
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://tietoniekka.fi";
+
+const KUVAVISA_META: Record<string, string> = {
+  liput: "LIPPUVISA",
+  vaakuna: "VAAKUNAVISA",
+  vaakunat: "VAAKUNAVISA",
+  linnut: "LINTUVISA",
+  kasvit: "KASVIVISA",
+  elaimet: "ELÄINVISA",
+};
+
+/**
+ * Per-visa metadata: uniikki title, description, canonical ja dynaaminen OG-kuva.
+ * Tämä korjaa sen, että jaettu linkki näytti aiemmin geneerisen etusivun esikatselun.
+ */
+export async function generateMetadata({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}): Promise<Metadata> {
+  const params = await searchParams;
+  const quizId = typeof params.quiz_id === "string" ? params.quiz_id : null;
+
+  let title: string | null = null;
+  let description =
+    "Pelaa ilmainen suomalainen tietovisa — 10 kysymystä. Montako saat oikein?";
+  let kat = typeof params.kat === "string" ? params.kat : "";
+  let canonicalId: string | null = quizId;
+
+  if (quizId) {
+    const full = await getQuizById(quizId);
+    if (full) {
+      title = full.title;
+      description = full.description ?? description;
+      kat = full.category ?? kat;
+    }
+  } else if (params.paivan_visa === "1") {
+    const today = await getTodaysQuiz();
+    if (today) {
+      const full = await getQuizById(today.id);
+      if (full) {
+        title = full.title;
+        description = full.description ?? description;
+        kat = full.category ?? kat;
+      }
+      canonicalId = today.id;
+    }
+  } else if (typeof params.kuvavisa === "string") {
+    title = KUVAVISA_META[params.kuvavisa] ?? "KUVAVISA";
+    description = "Tunnista kuvasta — yksi kuva, neljä vaihtoehtoa.";
+  }
+
+  const pageTitle = title ?? "Tietovisa";
+  const ogUrl = `${SITE_URL}/peli/og?title=${encodeURIComponent(
+    title ?? "TIETOVISA",
+  )}&kat=${encodeURIComponent(kat)}`;
+  const canonical = canonicalId
+    ? `${SITE_URL}/peli?quiz_id=${canonicalId}`
+    : null;
+
+  return {
+    title: pageTitle,
+    description,
+    // Satunnais- ja parametriset variaatiot ilman vakaata osoitetta: ei indeksoida
+    robots: canonical ? undefined : { index: false, follow: true },
+    alternates: canonical ? { canonical } : undefined,
+    openGraph: {
+      type: "website",
+      locale: "fi_FI",
+      siteName: "Tietoniekka",
+      title: pageTitle,
+      description,
+      url: canonical ?? `${SITE_URL}/peli`,
+      images: [{ url: ogUrl, width: 1200, height: 630, alt: pageTitle }],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: pageTitle,
+      description,
+      images: [ogUrl],
+    },
+  };
+}
+
 export const dynamic = "force-dynamic";
 
 type Answer = { text: string; is_correct: boolean };

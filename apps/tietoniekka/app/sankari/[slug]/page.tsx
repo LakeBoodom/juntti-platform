@@ -8,6 +8,8 @@ import { getAge, formatBirthDateFi } from "../../../lib/sankarit";
    v3.2: hakee julkkiksen Supabasesta (oli aiemmin hardcoded "iina-kuustonen").
    ───────────────────────────────────────────────────────────────── */
 
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://tietoniekka.fi";
+
 export const revalidate = 3600; // 1 h cache
 
 export async function generateStaticParams() {
@@ -21,8 +23,14 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const sankari = await getCelebrityBySlug(slug);
   if (!sankari) return { title: "Sankari ei löydy — Tietoniekka" };
   return {
-    title: `${sankari.name} — Päivän sankari · Tietoniekka`,
+    title: { absolute: `${sankari.name} — Päivän sankari · Tietoniekka` },
     description: sankari.bio_short ?? `${sankari.name} — ${sankari.role}`,
+    alternates: { canonical: `${SITE_URL}/sankari/${slug}` },
+    openGraph: {
+      title: `${sankari.name} — Päivän sankari`,
+      description: sankari.bio_short ?? `${sankari.name} — ${sankari.role}`,
+      url: `${SITE_URL}/sankari/${slug}`,
+    },
   };
 }
 

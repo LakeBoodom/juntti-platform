@@ -3,6 +3,8 @@ import { notFound } from "next/navigation";
 import { CATEGORIES, getCategory } from "../../../lib/categories";
 import { getRandomQuizByCategory } from "../../../lib/queries";
 
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://tietoniekka.fi";
+
 export const revalidate = 3600;
 
 export function generateStaticParams() {
@@ -14,8 +16,14 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const cat = getCategory(slug);
   if (!cat) return { title: "Kategoria ei löydy — Tietoniekka" };
   return {
-    title: `${cat.title} — Tietoniekka`,
+    title: cat.title,
     description: cat.intro,
+    alternates: { canonical: `${SITE_URL}/kategoria/${slug}` },
+    openGraph: {
+      title: `${cat.title} — Tietoniekka`,
+      description: cat.intro,
+      url: `${SITE_URL}/kategoria/${slug}`,
+    },
   };
 }
 

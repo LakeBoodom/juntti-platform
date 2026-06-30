@@ -56,6 +56,7 @@ function PeliInner({ preloadedQuiz }: { preloadedQuiz: QuizConfig | null }) {
   const [showFact, setShowFact] = useState(false);
   const [showNext, setShowNext] = useState(false);
   const [soundOn, setSoundOn] = useState(false);
+  const [copied, setCopied] = useState(false);
   const audioCtxRef = useRef<AudioContext | null>(null);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const optionRefs = useRef<(HTMLButtonElement | null)[]>([]);
@@ -275,11 +276,30 @@ function PeliInner({ preloadedQuiz }: { preloadedQuiz: QuizConfig | null }) {
 
   function shareResult() {
     if (!quiz) return;
-    const text = `Sain ${score} pistettä Tietoniekan ${quiz.title}-visassa! 🏆 Pelaa itse: tietoniekka.vercel.app`;
-    if (typeof navigator !== "undefined" && navigator.share) {
-      navigator.share({ title: `Tietoniekka — ${quiz.title}`, text }).catch(() => {});
-    } else if (navigator.clipboard) {
-      navigator.clipboard.writeText(text);
+    const quizId = searchParams.get("quiz_id");
+    const shareUrl = quizId
+      ? `https://tietoniekka.fi/peli?quiz_id=${quizId}`
+      : "https://tietoniekka.fi";
+    const text = `Sain ${score} pistettä Tietoniekan ${quiz.title}-visassa! 🏆 Voitatko sinä?`;
+
+    // Mobiilissa natiivijako (WhatsApp, Viestit…), desktopilla kopioi linkki +
+    // palaute — macin natiivi jakovalikko ei tarjoa oikeita kanavia desktopilla.
+    const isMobile =
+      typeof window !== "undefined" &&
+      window.matchMedia("(pointer: coarse)").matches;
+
+    if (isMobile && typeof navigator !== "undefined" && navigator.share) {
+      navigator
+        .share({ title: `Tietoniekka — ${quiz.title}`, text, url: shareUrl })
+        .catch(() => {});
+    } else if (typeof navigator !== "undefined" && navigator.clipboard) {
+      navigator.clipboard
+        .writeText(`${text} ${shareUrl}`)
+        .then(() => {
+          setCopied(true);
+          setTimeout(() => setCopied(false), 2200);
+        })
+        .catch(() => {});
     }
     // Merkitse viimeisin pelitulos jaetuksi (best-effort)
     void markShared();
@@ -493,7 +513,7 @@ function PeliInner({ preloadedQuiz }: { preloadedQuiz: QuizConfig | null }) {
                 PELAA UUDELLEEN
               </button>
               <button className="peli-btn-ghost" onClick={shareResult} type="button">
-                JAA TULOS
+                {copied ? "LINKKI KOPIOITU ✓" : "JAA TULOS"}
               </button>
               <Link href={getSectionAnchor(quiz)} className="peli-btn-ghost">
                 TAKAISIN ETUSIVULLE
