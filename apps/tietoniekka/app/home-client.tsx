@@ -237,58 +237,96 @@ export function HomeClient({
         </div>
       </section>
 
-      {/* 3. PINNALLA NYT — kausistrippi (brief osio 7, copy + hierarkia päivitetty 2026-07-04) */}
+      {/* 3. PINNALLA NYT — täysleveä tapahtumakortti (sama layout kuin Päivän visa) */}
       {pinnallaEvents.length > 0 && (
         <section className="pinnalla-nyt" id="pinnalla-nyt">
           <div className="container-wide">
-            <h2 className="section-header">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img className="pinnalla-header-icon" src="/pinnallanyt_tiimalasi.png" alt="" />
-              Pinnalla nyt
-            </h2>
+            <h2 className="section-header">Pinnalla nyt</h2>
             <p className="section-subtitle">Testaa, kuinka hyvin olet kartalla Suomen puheenaiheista.</p>
-            <div className="pinnalla-strip">
-              {pinnallaEvents.map((ev) => {
-                const mins = Math.max(1, Math.round((ev.questionCount * 12) / 60));
-                return (
-                  <Link
-                    key={ev.id}
-                    href={`/peli?quiz_id=${ev.quizId}&pinnalla=${ev.slug}`}
-                    className="pinnalla-card"
-                    prefetch={false}
-                  >
-                    <div className="pinnalla-visual">
-                      {/* Oma kuvitus jos asetettu, muuten tiimalasi-oletuskuva */}
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src={ev.imageUrl ?? "/pinnallanyt_tiimalasi.png"} alt="" />
-                    </div>
-                    <div className="pinnalla-eyebrow">
-                      <span className="pinnalla-event">{ev.name}</span>
+            {pinnallaEvents.map((ev) => {
+              const mins = Math.max(1, Math.round((ev.questionCount * 12) / 60));
+              const peliHref = `/peli?quiz_id=${ev.quizId}&pinnalla=${ev.slug}`;
+              const bgImage = ev.imageUrl ?? "/pinnallanyt_tiimalasi.png";
+              return (
+                <div
+                  key={ev.id}
+                  className="featured-quiz paivan-visa-card paivan-visa-card--split pinnalla-event-card"
+                  data-watermark=""
+                  style={{
+                    ["--quiz-tint" as string]: "rgba(15, 21, 32, 0.78)",
+                    ["--kat-color" as string]: "var(--color-surface-card-dark)",
+                    ["--bg-image" as string]: `url(${bgImage})`,
+                  } as React.CSSProperties}
+                >
+                  {/* Vasen: tapahtuma + päivän kisavisa + CTA */}
+                  <div className="paivan-visa-left">
+                    <span className="paivan-visa-eyebrow">
+                      — {ev.name}
                       {ev.status !== "upcoming" && (
                         <span className="pinnalla-badge">
                           {ev.status === "today" ? "TÄNÄÄN!" : "PARHAILLAAN"}
                         </span>
                       )}
-                    </div>
+                    </span>
                     {ev.status === "upcoming" && (
                       <div className="pinnalla-count">
                         <span className="num">{ev.daysUntil}</span>
-                        <span className="suffix">{ev.daysUntil === 1 ? "PÄIVÄ" : "PÄIVÄÄ"}</span>
+                        <span className="suffix">{ev.daysUntil === 1 ? "PÄIVÄ JÄLJELLÄ" : "PÄIVÄÄ JÄLJELLÄ"}</span>
                       </div>
                     )}
                     {ev.quizTitle && (
-                      <div className="pinnalla-title">{shortQuizTitle(ev.quizTitle)}</div>
+                      <h4 className="quiz-question">{shortQuizTitle(ev.quizTitle)}</h4>
                     )}
-                    {ev.questionCount > 0 && (
-                      <div className="pinnalla-meta">
-                        {ev.questionCount} kysymystä · ~{mins} min
+                    <div className="paivan-visa-meta">
+                      {ev.questionCount > 0 && (
+                        <span>Päivän kisavisa · {ev.questionCount} kysymystä · ~{mins} min</span>
+                      )}
+                    </div>
+                    <Link
+                      href={peliHref}
+                      className="btn btn-primary btn-large"
+                      style={{ display: "inline-block" }}
+                    >ALOITA VISA →</Link>
+                    {ev.allQuizzes.length > 1 && (
+                      <div className="pinnalla-chips">
+                        <span className="pinnalla-chips-label">Kaikki aiheen visat:</span>
+                        {ev.allQuizzes.map((q) => (
+                          <Link
+                            key={q.id}
+                            href={`/peli?quiz_id=${q.id}&pinnalla=${ev.slug}`}
+                            className={`pinnalla-chip${q.id === ev.quizId ? " active" : ""}`}
+                            prefetch={false}
+                          >
+                            {shortQuizTitle(q.title)}
+                          </Link>
+                        ))}
                       </div>
                     )}
-                    <span className="pinnalla-cta">Aloita visa →</span>
-                  </Link>
-                );
-              })}
-            </div>
+                  </div>
+                  {/* Oikea: päivän kisavisan 1. kysymys teaserilla */}
+                  {ev.firstQuestion && (
+                    <div className="paivan-visa-right">
+                      <p className="paivan-visa-question-label">Kokeile — Kysymys 1 / {ev.questionCount}</p>
+                      <p className="paivan-visa-question">{ev.firstQuestion.question}</p>
+                      <div className="paivan-visa-options">
+                        {ev.firstQuestion.options.map((opt, i) => {
+                          const letter = ["A", "B", "C", "D"][i];
+                          return (
+                            <Link
+                              key={i}
+                              href={`${peliHref}&first=${letter}`}
+                              className="visa-option"
+                            >
+                              <span className="badge">{letter}</span> {opt}
+                            </Link>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
           </div>
         </section>
       )}

@@ -383,6 +383,9 @@ export type PinnallaEvent = {
   quizId: string;
   quizTitle: string | null;
   questionCount: number;
+  firstQuestion: { question: string; options: string[]; correct: string } | null;
+  /** Kaikki tapahtumaan tägätyt visat rotaatiojärjestyksessä (sis. päivän visan) */
+  allQuizzes: { id: string; title: string }[];
 };
 
 const PINNALLA_HORIZON_DAYS = 45;
@@ -458,17 +461,28 @@ export async function getPinnallaEvents(limit = 5): Promise<PinnallaEvent[]> {
       quizId,
       quizTitle,
       questionCount: 0,
+      firstQuestion: null,
+      allQuizzes: attached.map((cq) => ({ id: cq.quizzes!.id, title: cq.quizzes!.title })),
     });
   }
 
-  // Kysymysmäärät meta-riviä varten ("10 kysymystä · ~2 min")
+  // Päivän visan kysymykset: määrä meta-riviä varten + 1. kysymys teaseriksi
   await Promise.all(
     events.map(async (ev) => {
-      const { count } = await sb
+      const { data: qs } = await sb
         .from("questions")
-        .select("id", { count: "exact", head: true })
-        .eq("quiz_id", ev.quizId);
-      ev.questionCount = count ?? 0;
+        .select("question_text, answers, sort_order")
+        .eq("quiz_id", ev.quizId)
+        .order("sort_order", { ascending: true });
+      ev.questionCount = qs?.length ?? 0;
+      const first = qs?.[0];
+      if (first) {
+        const answers = first.answers as Array<{ text: string; is_correct: boolean }> | undefined;
+        const options = (answers ?? []).slice(0, 4).map((a) => a.text);
+        while (options.length < 4) options.push("—");
+        const correct = (answers ?? []).find((a) => a.is_correct)?.text ?? options[0];
+        ev.firstQuestion = { question: first.question_text, options, correct };
+      }
     }),
   );
 

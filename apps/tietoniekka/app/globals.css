@@ -3021,86 +3021,25 @@ a.sankari-photo {
   max-width: 90%;
 }
 
-/* ── Pinnalla nyt — kausistrippi (brief osio 7, hierarkia-päivitys) ── */
+/* ── Pinnalla nyt — täysleveä tapahtumakortti (layout peritty Päivän visalta) ── */
 .pinnalla-nyt {
   background: var(--color-surface-dark);
   padding: var(--space-xl) 0 var(--space-md);
 }
-.pinnalla-header-icon {
-  width: 30px;
-  height: 30px;
-  border-radius: 8px;
-  vertical-align: -6px;
-  margin-right: 10px;
-}
-.pinnalla-strip {
-  display: flex;
-  gap: var(--space-md);
-  overflow-x: auto;
-  padding: var(--space-sm) 4px var(--space-md);
-  scroll-snap-type: x mandatory;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: thin;
-}
-.pinnalla-card {
-  flex: 0 0 auto;
-  width: 250px;
-  scroll-snap-align: start;
-  background: var(--color-surface-card-dark);
-  border: 1px solid rgba(232, 163, 32, 0.18);
-  border-radius: var(--radius-lg, 14px);
-  padding: var(--space-md);
-  text-decoration: none;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 8px;
-  transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
-}
-.pinnalla-card:hover {
-  transform: translateY(-4px);
-  border-color: rgba(232, 163, 32, 0.55);
-  box-shadow: 0 12px 28px -12px rgba(0, 0, 0, 0.55);
-}
-.pinnalla-card:hover .pinnalla-cta {
-  background: var(--color-brand-gold);
-  color: var(--color-surface-dark);
-}
-.pinnalla-visual {
-  width: 100%;
-  aspect-ratio: 16 / 9;
-  border-radius: 10px;
-  overflow: hidden;
-  background: rgba(232, 163, 32, 0.08);
-}
-.pinnalla-visual img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-.pinnalla-eyebrow {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex-wrap: wrap;
-}
-.pinnalla-event {
-  font-family: var(--font-display);
-  font-weight: 700;
-  font-size: 13px;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--color-brand-gold);
+.pinnalla-event-card {
+  margin-bottom: var(--space-lg);
 }
 .pinnalla-badge {
   font-family: var(--font-display);
   font-weight: 800;
-  font-size: 11px;
+  font-size: 12px;
   letter-spacing: 0.08em;
   color: var(--color-surface-dark);
   background: var(--color-brand-gold);
   border-radius: 999px;
-  padding: 2px 8px;
+  padding: 3px 10px;
+  margin-left: 10px;
+  vertical-align: 1px;
   animation: pinnalla-pulse 1.6s ease-in-out infinite;
 }
 @keyframes pinnalla-pulse {
@@ -3110,12 +3049,13 @@ a.sankari-photo {
 .pinnalla-count {
   display: flex;
   align-items: baseline;
-  gap: 6px;
+  gap: 8px;
+  margin: 4px 0;
 }
 .pinnalla-count .num {
   font-family: var(--font-display);
   font-weight: 900;
-  font-size: 38px;
+  font-size: 44px;
   line-height: 1;
   color: var(--color-brand-gold);
   font-variant-numeric: tabular-nums;
@@ -3123,40 +3063,41 @@ a.sankari-photo {
 .pinnalla-count .suffix {
   font-family: var(--font-display);
   font-weight: 700;
-  font-size: 14px;
+  font-size: 15px;
   letter-spacing: 0.1em;
-  color: rgba(255, 255, 255, 0.55);
+  color: rgba(255, 255, 255, 0.6);
 }
-.pinnalla-title {
-  font-family: var(--font-display);
-  font-weight: 800;
-  font-size: 21px;
-  line-height: 1.1;
-  color: var(--color-text-light);
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
+.pinnalla-chips {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-top: var(--space-md);
 }
-.pinnalla-meta {
+.pinnalla-chips-label {
   font-family: var(--font-body);
   font-size: 13px;
   color: rgba(255, 255, 255, 0.55);
+  margin-right: 2px;
 }
-.pinnalla-cta {
-  margin-top: 4px;
+.pinnalla-chip {
   font-family: var(--font-display);
-  font-weight: 800;
-  font-size: 14px;
-  letter-spacing: 0.05em;
-  color: var(--color-brand-gold);
-  border: 1.5px solid rgba(232, 163, 32, 0.55);
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 0.04em;
+  color: rgba(255, 255, 255, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.25);
   border-radius: 999px;
-  padding: 7px 18px;
-  transition: background 0.18s ease, color 0.18s ease;
+  padding: 5px 13px;
+  text-decoration: none;
+  transition: border-color 0.15s ease, background 0.15s ease, color 0.15s ease;
 }
-@media (max-width: 767px) {
-  /* Leveä kortti + seuraavan reuna näkyviin = scroll-vihje (peek) */
-  .pinnalla-card { width: min(78vw, 320px); }
-  .pinnalla-title { font-size: 19px; }
+.pinnalla-chip:hover {
+  border-color: var(--color-brand-gold);
+  color: var(--color-brand-gold);
+}
+.pinnalla-chip.active {
+  border-color: var(--color-brand-gold);
+  background: rgba(232, 163, 32, 0.14);
+  color: var(--color-brand-gold);
 }
