@@ -44,6 +44,10 @@ export function CountdownForm({
   );
   const [platform, setPlatform] = useState<string>(initial?.platform ?? "both");
   const [tag, setTag] = useState(initial?.tag ?? "");
+  const [startsOn, setStartsOn] = useState(initial?.starts_on ?? "");
+  const [endsOn, setEndsOn] = useState(initial?.ends_on ?? "");
+  const [emoji, setEmoji] = useState(initial?.emoji ?? "");
+  const [imageUrl, setImageUrl] = useState(initial?.image_url ?? "");
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
 
@@ -59,6 +63,10 @@ export function CountdownForm({
       platform: platform === "both" ? null : platform,
       tag: tag.trim() || null,
       site_id: siteId,
+      starts_on: startsOn || null,
+      ends_on: endsOn || null,
+      emoji: emoji.trim() || null,
+      image_url: imageUrl.trim() || null,
     };
     startTransition(async () => {
       const res = initial?.id
@@ -115,6 +123,50 @@ export function CountdownForm({
             value={month}
             onChange={(e) => setMonth(parseInt(e.target.value) || 1)}
             required
+          />
+        </div>
+      </div>
+      <div className="grid grid-cols-2 gap-3">
+        <div className="space-y-1.5">
+          <Label htmlFor="starts_on">Alkupäivä <span className="text-muted-foreground">(kausi)</span></Label>
+          <Input
+            id="starts_on"
+            type="date"
+            value={startsOn}
+            onChange={(e) => setStartsOn(e.target.value)}
+          />
+        </div>
+        <div className="space-y-1.5">
+          <Label htmlFor="ends_on">Loppupäivä <span className="text-muted-foreground">(kausi)</span></Label>
+          <Input
+            id="ends_on"
+            type="date"
+            value={endsOn}
+            onChange={(e) => setEndsOn(e.target.value)}
+          />
+        </div>
+        <p className="col-span-2 -mt-2 text-xs text-muted-foreground">
+          Kausitapahtumalle (esim. MM-kisat): päivämääräväli yliajaa yllä olevan vuosipäivän.
+          Kortti näyttää countdownin ennen alkua, &quot;PARHAILLAAN&quot; keston ajan ja katoaa lopun jälkeen.
+        </p>
+      </div>
+      <div className="grid grid-cols-2 gap-3">
+        <div className="space-y-1.5">
+          <Label htmlFor="emoji">Emoji <span className="text-muted-foreground">(kortin fallback)</span></Label>
+          <Input
+            id="emoji"
+            value={emoji}
+            onChange={(e) => setEmoji(e.target.value)}
+            placeholder="esim. ⚽"
+          />
+        </div>
+        <div className="space-y-1.5">
+          <Label htmlFor="image_url">Kuvan URL <span className="text-muted-foreground">(valinnainen)</span></Label>
+          <Input
+            id="image_url"
+            value={imageUrl}
+            onChange={(e) => setImageUrl(e.target.value)}
+            placeholder="/pinnalla_mm_futis.png"
           />
         </div>
       </div>

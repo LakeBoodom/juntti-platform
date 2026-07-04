@@ -13,6 +13,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { SortableHeader } from "@/components/sortable-header";
+import { FeaturedToggle } from "./featured-toggle";
 
 export const dynamic = "force-dynamic";
 
@@ -30,7 +31,7 @@ export default async function QuizzesPage({ searchParams }: { searchParams: Prom
   const { data, error } = await admin
     .from("quizzes")
     .select(
-      "id, title, slug, category, difficulty, tone, platform, status, created_at, play_count, site_id",
+      "id, title, slug, category, difficulty, tone, platform, status, created_at, play_count, site_id, featured_in_category",
     )
     .eq("site_id", site.id)
     .order(sortKey, { ascending: sortDir === "asc" });
@@ -72,6 +73,7 @@ export default async function QuizzesPage({ searchParams }: { searchParams: Prom
                   <SortableHeader column="tone">Sävy</SortableHeader>
                   <SortableHeader column="platform">Alusta</SortableHeader>
                   <SortableHeader column="status">Status</SortableHeader>
+                  <TableHead>Nosto</TableHead>
                   <TableHead className="text-right">Pelatut</TableHead>
                 </TableRow>
               </TableHeader>
@@ -108,6 +110,9 @@ export default async function QuizzesPage({ searchParams }: { searchParams: Prom
                             ? "Draft"
                             : "Arkistoitu"}
                       </span>
+                    </TableCell>
+                    <TableCell>
+                      <FeaturedToggle quizId={q.id} featured={q.featured_in_category} />
                     </TableCell>
                     <TableCell className="text-right">{q.play_count}</TableCell>
                   </TableRow>

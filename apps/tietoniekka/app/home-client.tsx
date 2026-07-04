@@ -10,7 +10,7 @@ import Link from "next/link";
    Datafetch (Supabase) tulee myöhemmin — pidetään tämä yksinkertaisena.
    ───────────────────────────────────────────────────────────────── */
 
-import type { SankariData, CategoryPreview } from "../lib/queries";
+import type { SankariData, CategoryPreview, PinnallaEvent } from "../lib/queries";
 import { CATEGORIES, CATEGORY_BY_SLUG } from "../lib/categories";
 
 type CategoryQuizMap = Record<string, CategoryPreview | null>;
@@ -19,12 +19,14 @@ export type HomeClientProps = {
   todaysCelebrity: SankariData | null;
   todaysQuiz: CategoryPreview | null;
   categoryQuizzes: CategoryQuizMap;
+  pinnallaEvents: PinnallaEvent[];
 };
 
 export function HomeClient({
   todaysCelebrity,
   todaysQuiz,
-  categoryQuizzes
+  categoryQuizzes,
+  pinnallaEvents
 }: HomeClientProps) {
   const [todaysDateLabel, setTodaysDateLabel] = useState<string>("");
 
@@ -46,6 +48,7 @@ export function HomeClient({
       ".section-header",
       ".section-subtitle",
       ".featured-quiz",
+      ".pinnalla-card",
       ".kategoria-inline-card",
       ".sankari-card",
       ".kuvavisa-featured",
@@ -227,6 +230,47 @@ export function HomeClient({
           )}
         </div>
       </section>
+
+      {/* 3. PINNALLA NYT — kausistrippi (brief osio 7) */}
+      {pinnallaEvents.length > 0 && (
+        <section className="pinnalla-nyt" id="pinnalla-nyt">
+          <div className="container-wide">
+            <h2 className="section-header">⏳ Pinnalla nyt</h2>
+            <p className="section-subtitle">Mitä Suomessa juuri nyt tapahtuu — testaa tietosi ajankohtaisista.</p>
+            <div className="pinnalla-strip">
+              {pinnallaEvents.map((ev) => (
+                <Link
+                  key={ev.id}
+                  href={`/peli?quiz_id=${ev.quizId}&pinnalla=${ev.slug}`}
+                  className="pinnalla-card"
+                  prefetch={false}
+                >
+                  <div className="pinnalla-visual">
+                    {ev.imageUrl ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={ev.imageUrl} alt="" />
+                    ) : (
+                      <span className="pinnalla-emoji">{ev.emoji ?? "⏳"}</span>
+                    )}
+                  </div>
+                  <div className="pinnalla-name">{ev.name}</div>
+                  {ev.status === "upcoming" ? (
+                    <div className="pinnalla-count">
+                      <span className="num">{ev.daysUntil}</span>
+                      <span className="suffix">{ev.daysUntil === 1 ? "PÄIVÄ" : "PÄIVÄÄ"}</span>
+                    </div>
+                  ) : (
+                    <div className="pinnalla-count pinnalla-count--now">
+                      <span className="now-label">{ev.status === "today" ? "TÄNÄÄN!" : "PARHAILLAAN"}</span>
+                    </div>
+                  )}
+                  {ev.quizTitle && <div className="pinnalla-quiz">{ev.quizTitle}</div>}
+                </Link>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* 4. PÄIVÄN SANKARI — kuva + featured-quiz CTA (Heikki 2026-04-26) */}
       <section className="paivan-sankari" id="paivan-sankari">

@@ -13,6 +13,7 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { CountdownForm, type CountdownFormValue } from "./countdown-form";
+import { QuizAttach, type AttachableQuiz } from "./quiz-attach";
 import { deleteCountdown } from "./actions";
 
 const MONTHS = [
@@ -30,7 +31,17 @@ const MONTHS = [
   "joulu",
 ];
 
-export function CountdownRow({ row, siteId }: { row: CountdownFormValue; siteId: string }) {
+export function CountdownRow({
+  row,
+  siteId,
+  allQuizzes,
+  attachedIds,
+}: {
+  row: CountdownFormValue;
+  siteId: string;
+  allQuizzes: AttachableQuiz[];
+  attachedIds: string[];
+}) {
   const [editOpen, setEditOpen] = useState(false);
   const [delOpen, setDelOpen] = useState(false);
   const [pending, startTransition] = useTransition();
@@ -57,10 +68,20 @@ export function CountdownRow({ row, siteId }: { row: CountdownFormValue; siteId:
       <TableCell className="font-medium">{row.name}</TableCell>
       <TableCell className="text-muted-foreground">{row.slug}</TableCell>
       <TableCell>
-        {row.day}. {MONTHS[row.month - 1]}
+        {row.starts_on
+          ? `${row.starts_on} → ${row.ends_on ?? row.starts_on}`
+          : `${row.day}. ${MONTHS[row.month - 1]}`}
       </TableCell>
       <TableCell>{row.object_type}</TableCell>
       <TableCell>{platformLabel}</TableCell>
+      <TableCell>
+        <QuizAttach
+          countdownId={row.id!}
+          countdownName={row.name}
+          allQuizzes={allQuizzes}
+          attachedIds={attachedIds}
+        />
+      </TableCell>
       <TableCell className="text-right">
         <div className="inline-flex gap-1">
           <Button

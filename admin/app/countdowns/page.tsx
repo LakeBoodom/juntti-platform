@@ -28,9 +28,27 @@ export default async function CountdownsPage({ searchParams }: { searchParams: P
   const admin = getSupabaseAdmin();
   const { data, error } = await admin
     .from("countdowns")
-    .select("id, name, slug, day, month, object_type, platform, tag, site_id")
+    .select("id, name, slug, day, month, object_type, platform, tag, site_id, starts_on, ends_on, emoji, image_url")
     .eq("site_id", site.id)
     .order(sortKey, { ascending: sortDir === "asc" });
+
+  // Tägättävät visat + nykyiset tägäykset (Pinnalla nyt -rotaatio)
+  const [{ data: quizzes }, { data: attachments }] = await Promise.all([
+    admin
+      .from("quizzes")
+      .select("id, title, category")
+      .eq("site_id", site.id)
+      .eq("status", "published")
+      .order("title"),
+    admin
+      .from("countdown_quizzes")
+      .select("countdown_id, quiz_id, sort_order")
+      .order("sort_order"),
+  ]);
+  const attachedByCountdown: Record<string, string[]> = {};
+  for (const a of attachments ?? []) {
+    (attachedByCountdown[a.countdown_id] ??= []).push(a.quiz_id);
+  }
 
   return (
     <>
@@ -64,12 +82,19 @@ export default async function CountdownsPage({ searchParams }: { searchParams: P
                   <SortableHeader column="month">Päivä</SortableHeader>
                   <SortableHeader column="object_type">Tyyppi</SortableHeader>
                   <SortableHeader column="platform">Alusta</SortableHeader>
+                  <TableHead>Visat</TableHead>
                   <TableHead className="text-right">Toiminnot</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {data.map((row) => (
-                  <CountdownRow key={row.id} row={row} siteId={site.id} />
+                  <CountdownRow
+                    key={row.id}
+                    row={row}
+                    siteId={site.id}
+                    allQuizzes={quizzes ?? []}
+                    attachedIds={attachedByCountdown[row.id] ?? []}
+                  />
                 ))}
               </TableBody>
             </Table>

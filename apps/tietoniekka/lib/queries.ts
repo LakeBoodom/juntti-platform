@@ -191,7 +191,28 @@ export type CategoryPreview = QuizMeta & {
   } | null;
 };
 
-/** Hae julkaistut visat per kategoria-mappi (etusivua varten 1 random per kategoria, sis. 1. kysymys) */
+/**
+ * Nosto-visa: admin voi merkitä visan kategorian nostoksi (featured_in_category),
+ * jolloin etusivun kategoriateaseri näyttää sen randomin sijaan.
+ * Esim. urheilu → futisvisa MM-kisojen ajan. Jos nostoja on useita, arvotaan niistä.
+ */
+async function getFeaturedQuizByCategory(category: string): Promise<QuizMeta | null> {
+  const siteId = await getSiteId();
+  if (!siteId) return null;
+  const sb = getSupabase();
+  if (!sb) return null;
+  const { data } = await sb
+    .from("quizzes")
+    .select("id, slug, title, description, category, difficulty, status, emoji_hint")
+    .eq("site_id", siteId)
+    .eq("status", "published")
+    .eq("category", category)
+    .eq("featured_in_category", true);
+  if (!data || data.length === 0) return null;
+  return data[Math.floor(Math.random() * data.length)];
+}
+
+/** Hae julkaistut visat per kategoria-mappi (etusivua varten: nosto jos asetettu, muuten random; sis. 1. kysymys) */
 export async function getRandomQuizzesPerCategory(
   categories: string[],
 ): Promise<Record<string, CategoryPreview | null>> {
@@ -205,7 +226,7 @@ export async function getRandomQuizzesPerCategory(
 
   await Promise.all(
     categories.map(async (cat) => {
-      const meta = await getRandomQuizByCategory(cat);
+      const meta = (await getFeaturedQuizByCategory(cat)) ?? (await getRandomQuizByCategory(cat));
       if (!meta) {
         result[cat] = null;
         return;
@@ -341,6 +362,111 @@ export type EventData = {
   tag: string | null;
   trivia_quiz_id: string | null;
 };
+
+/**
+ * Pinnalla nyt -strippi (brief osio 7).
+ * - Kausitapahtuma: starts_on/ends_on asetettu → countdown alkuun, "PARHAILLAAN" keston ajan,
+ *   pois stripistä lopun jälkeen.
+ * - Vuosittainen: month/day → seuraava esiintymä, "TÄNÄÄN!" osuessa.
+ * - Rotaatio: tapahtumaan tägätyistä julkaistuista visoista valitaan päivän visa
+ *   järjestyksessä (päivä mod visamäärä) — briefin rotaatiologiikka.
+ * - Kortti näytetään vain jos tapahtumalla on pelattava visa.
+ */
+export type PinnallaEvent = {
+  id: string;
+  name: string;
+  slug: string;
+  imageUrl: string | null;
+  emoji: string | null;
+  status: "upcoming" | "today" | "ongoing";
+  daysUntil: number;
+  quizId: string;
+  quizTitle: string | null;
+};
+
+const PINNALLA_HORIZON_DAYS = 45;
+
+export async function getPinnallaEvents(limit = 5): Promise<PinnallaEvent[]> {
+  const siteId = await getSiteId();
+  if (!siteId) return [];
+  const sb = getSupabase();
+  if (!sb) return [];
+  const { data } = await sb
+    .from("countdowns")
+    .select(
+      "id, name, slug, month, day, starts_on, ends_on, image_url, emoji, trivia_quiz_id, countdown_quizzes(sort_order, quizzes(id, title, status))",
+    )
+    .eq("site_id", siteId);
+  if (!data) return [];
+
+  const MS_DAY = 86400000;
+  const now = new Date();
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+  const events: PinnallaEvent[] = [];
+  for (const row of data) {
+    let status: PinnallaEvent["status"];
+    let daysUntil = 0;
+    // Rotaatiopäivä: kausitapahtumalle päivät alusta, muille juokseva päivä
+    let rotationDay = Math.floor(today.getTime() / MS_DAY);
+
+    if (row.starts_on) {
+      const start = new Date(`${row.starts_on}T00:00:00`);
+      const end = row.ends_on ? new Date(`${row.ends_on}T00:00:00`) : start;
+      if (today.getTime() > end.getTime()) continue; // tapahtuma ohi → kortti pois
+      if (today.getTime() < start.getTime()) {
+        daysUntil = Math.round((start.getTime() - today.getTime()) / MS_DAY);
+        status = "upcoming";
+      } else {
+        status = today.getTime() === start.getTime() ? "today" : "ongoing";
+        rotationDay = Math.round((today.getTime() - start.getTime()) / MS_DAY);
+      }
+    } else {
+      // Vuosittainen month/day
+      const next = new Date(today.getFullYear(), (row.month ?? 1) - 1, row.day ?? 1);
+      if (next.getTime() < today.getTime()) next.setFullYear(next.getFullYear() + 1);
+      daysUntil = Math.round((next.getTime() - today.getTime()) / MS_DAY);
+      status = daysUntil === 0 ? "today" : "upcoming";
+    }
+    if (status === "upcoming" && daysUntil > PINNALLA_HORIZON_DAYS) continue;
+
+    // Päivän rotaatiovisa tägätyistä; fallback vanhaan trivia_quiz_id-kenttään
+    type AttachedQuiz = { sort_order: number; quizzes: { id: string; title: string; status: string } | null };
+    const attached = ((row.countdown_quizzes ?? []) as unknown as AttachedQuiz[])
+      .filter((cq) => cq.quizzes?.status === "published")
+      .sort((a, b) => a.sort_order - b.sort_order);
+    let quizId: string | null = null;
+    let quizTitle: string | null = null;
+    if (attached.length > 0) {
+      const idx = ((rotationDay % attached.length) + attached.length) % attached.length;
+      quizId = attached[idx].quizzes!.id;
+      quizTitle = attached[idx].quizzes!.title;
+    } else if (row.trivia_quiz_id) {
+      quizId = row.trivia_quiz_id;
+    }
+    if (!quizId) continue; // ei visaa → ei korttia
+
+    events.push({
+      id: row.id,
+      name: row.name,
+      slug: row.slug,
+      imageUrl: row.image_url ?? null,
+      emoji: row.emoji ?? null,
+      status,
+      daysUntil,
+      quizId,
+      quizTitle,
+    });
+  }
+
+  // Käynnissä olevat ensin, sitten lähimmät
+  events.sort((a, b) => {
+    const aOn = a.status !== "upcoming" ? 0 : 1;
+    const bOn = b.status !== "upcoming" ? 0 : 1;
+    return aOn - bOn || a.daysUntil - b.daysUntil;
+  });
+  return events.slice(0, limit);
+}
 
 /** Hae 3 tulevaa countdownia (tämän vuoden seuraavat) */
 export async function getUpcomingEvents(limit = 3): Promise<EventData[]> {
