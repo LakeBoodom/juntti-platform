@@ -246,12 +246,9 @@ export function HomeClient({
                   prefetch={false}
                 >
                   <div className="pinnalla-visual">
-                    {ev.imageUrl ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img src={ev.imageUrl} alt="" />
-                    ) : (
-                      <span className="pinnalla-emoji">{ev.emoji ?? "⏳"}</span>
-                    )}
+                    {/* Oma kuvitus jos asetettu, muuten tiimalasi-oletuskuva */}
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={ev.imageUrl ?? "/pinnallanyt_tiimalasi.png"} alt="" />
                   </div>
                   <div className="pinnalla-name">{ev.name}</div>
                   {ev.status === "upcoming" ? (
