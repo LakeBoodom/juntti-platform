@@ -69,9 +69,10 @@ export async function generateMetadata({
     description = "Tunnista kuvasta — yksi kuva, neljä vaihtoehtoa.";
   }
 
-  // Jaettava tuloskortti: ?t=8-10 → OG-kuva ja kuvaus näyttävät jakajan tuloksen
-  const tulosMatch =
-    typeof params.t === "string" ? /^(\d{1,2})-(\d{1,2})$/.exec(params.t) : null;
+  // Jaettava tuloskortti: ?tulos=8-10 → OG-kuva ja kuvaus näyttävät jakajan tuloksen
+  const tulosRaw =
+    typeof params.tulos === "string" ? params.tulos : typeof params.t === "string" ? params.t : null;
+  const tulosMatch = tulosRaw ? /^(\d{1,2})-(\d{1,2})$/.exec(tulosRaw) : null;
   const tulos =
     tulosMatch &&
     Number(tulosMatch[2]) >= 1 &&

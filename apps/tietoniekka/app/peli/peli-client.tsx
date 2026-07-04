@@ -121,8 +121,9 @@ function PeliInner({ preloadedQuiz }: { preloadedQuiz: QuizConfig | null }) {
   const [correctCount, setCorrectCount] = useState(0);
   const [answerLog, setAnswerLog] = useState<boolean[]>([]);
   const [dailyStreak, setDailyStreak] = useState<number | null>(null);
-  // Jaetun linkin haaste: ?t=8-10 → "Kaverisi sai 8/10 — pystytkö parempaan?"
-  const challenge = parseTulosParam(searchParams.get("t"));
+  // Jaetun linkin haaste: ?tulos=8-10 → "Kaverisi sai 8/10 — pystytkö parempaan?"
+  // (parametrin nimi EI saa olla "t" — linkkisiivoajat poistavat sen seurantaparametrina)
+  const challenge = parseTulosParam(searchParams.get("tulos"));
   const audioCtxRef = useRef<AudioContext | null>(null);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const optionRefs = useRef<(HTMLButtonElement | null)[]>([]);
@@ -374,10 +375,10 @@ function PeliInner({ preloadedQuiz }: { preloadedQuiz: QuizConfig | null }) {
         : "https://tietoniekka.fi";
     const niceTitle = quiz?.titleRaw ?? quiz?.title ?? "";
     const total = quiz?.questions.length ?? 0;
-    // Tulos mukaan linkkiin → esikatselukuvaksi tulee jaettava tuloskortti (?t=8-10)
+    // Tulos mukaan linkkiin → esikatselukuvaksi tulee jaettava tuloskortti (?tulos=8-10)
     const url =
       total > 0 && base !== "https://tietoniekka.fi"
-        ? `${base}${base.includes("?") ? "&" : "?"}t=${correctCount}-${total}`
+        ? `${base}${base.includes("?") ? "&" : "?"}tulos=${correctCount}-${total}`
         : base;
     // Wordle-tyylinen emoji-rivi: 🟩 oikein, 🟥 väärin — kysymysjärjestyksessä
     const emojiRow = answerLog.map((ok) => (ok ? "🟩" : "🟥")).join("");

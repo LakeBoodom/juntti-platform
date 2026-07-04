@@ -30,7 +30,8 @@ export async function generateMetadata({
   const quiz = await getQuizBySlug(slug);
   if (!quiz) return { title: "Visa ei löydy — Tietoniekka" };
 
-  const tulos = parseTulos((await searchParams).t);
+  const sp = await searchParams;
+  const tulos = parseTulos(sp.tulos) ?? parseTulos(sp.t);
   const description = tulos
     ? `Sain ${tulos.score}/${tulos.total} oikein visassa "${quiz.title}" — pystytkö parempaan? Pelaa ilmaiseksi!`
     : quiz.description ??
