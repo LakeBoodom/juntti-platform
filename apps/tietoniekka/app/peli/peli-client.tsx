@@ -58,6 +58,48 @@ function getOrCreateSessionId(): string {
   }
 }
 
+/** Paikallinen päivämäärä muodossa YYYY-MM-DD (ei UTC — putki vaihtuu keskiyöllä Suomen ajassa). */
+function localDateStr(d = new Date()): string {
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+}
+
+/**
+ * Päivän visa -putki: kasvaa kun pelaa peräkkäisinä päivinä, nollautuu jos päivä jää väliin.
+ * Sama päivä ei kasvata putkea kahdesti. Palauttaa nykyisen putken pituuden (0 jos localStorage ei toimi).
+ */
+function updateDailyStreak(): number {
+  if (typeof window === "undefined") return 0;
+  try {
+    const KEY = "tn_paivan_visa_putki";
+    const today = localDateStr();
+    const y = new Date();
+    y.setDate(y.getDate() - 1);
+    const yesterday = localDateStr(y);
+    const raw = window.localStorage.getItem(KEY);
+    let count = 1;
+    if (raw) {
+      const data = JSON.parse(raw) as { count?: number; last?: string };
+      if (data.last === today) return data.count ?? 1;
+      if (data.last === yesterday) count = (data.count ?? 0) + 1;
+    }
+    window.localStorage.setItem(KEY, JSON.stringify({ count, last: today }));
+    return count;
+  } catch {
+    return 0;
+  }
+}
+
+/** Parsii jakolinkin "8-10"-tulosparametrin haastebanneria varten. */
+function parseTulosParam(raw: string | null): { score: number; total: number } | null {
+  if (!raw) return null;
+  const m = /^(\d{1,2})-(\d{1,2})$/.exec(raw);
+  if (!m) return null;
+  const score = Number(m[1]);
+  const total = Number(m[2]);
+  if (total < 1 || total > 30 || score < 0 || score > total) return null;
+  return { score, total };
+}
+
 type Phase = "intro" | "playing" | "end";
 
 function PeliInner({ preloadedQuiz }: { preloadedQuiz: QuizConfig | null }) {
@@ -77,6 +119,10 @@ function PeliInner({ preloadedQuiz }: { preloadedQuiz: QuizConfig | null }) {
   const [copied, setCopied] = useState(false);
   const [shareOpen, setShareOpen] = useState(false);
   const [correctCount, setCorrectCount] = useState(0);
+  const [answerLog, setAnswerLog] = useState<boolean[]>([]);
+  const [dailyStreak, setDailyStreak] = useState<number | null>(null);
+  // Jaetun linkin haaste: ?t=8-10 → "Kaverisi sai 8/10 — pystytkö parempaan?"
+  const challenge = parseTulosParam(searchParams.get("t"));
   const audioCtxRef = useRef<AudioContext | null>(null);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const optionRefs = useRef<(HTMLButtonElement | null)[]>([]);
@@ -98,6 +144,7 @@ function PeliInner({ preloadedQuiz }: { preloadedQuiz: QuizConfig | null }) {
     setIdx(0);
     setScore(0);
     setCorrectCount(0);
+    setAnswerLog([]);
     setStreak(0);
     setAnswered(false);
     setChosen(null);
@@ -193,6 +240,7 @@ function PeliInner({ preloadedQuiz }: { preloadedQuiz: QuizConfig | null }) {
   function timeOut() {
     if (!quiz) return;
     setAnswered(true);
+    setAnswerLog((log) => [...log, false]);
     setStreak(0);
     setShowFact(true);
     setTimeout(() => setShowNext(true), 600);
@@ -207,6 +255,7 @@ function PeliInner({ preloadedQuiz }: { preloadedQuiz: QuizConfig | null }) {
     if (timerRef.current) clearInterval(timerRef.current);
     const q = quiz.questions[idx];
     const correct = opt === q.correct;
+    setAnswerLog((log) => [...log, correct]);
     if (correct) {
       const timeBonus = TIMER_ENABLED ? Math.round((timeLeft / TIME_PER_Q) * TIME_BONUS) : 0;
       const newStreak = streak + 1;
@@ -272,6 +321,11 @@ function PeliInner({ preloadedQuiz }: { preloadedQuiz: QuizConfig | null }) {
   function endGame() {
     setPhase("end");
     void recordPlay();
+    // Päivän visa -putki: päivittyy vain Päivän visan pelaamisesta
+    if (searchParams.get("paivan_visa") === "1") {
+      const s = updateDailyStreak();
+      if (s > 0) setDailyStreak(s);
+    }
     // Juhlinta vain hyvästä tuloksesta (≥80 % oikein) — ei joka kerta.
     const total = quiz?.questions.length ?? 0;
     const celebrate = total > 0 && correctCount / total >= 0.8;
@@ -313,14 +367,27 @@ function PeliInner({ preloadedQuiz }: { preloadedQuiz: QuizConfig | null }) {
 
   function getShareData() {
     const quizId = searchParams.get("quiz_id");
-    const url = quiz?.slug
+    const base = quiz?.slug
       ? `https://tietoniekka.fi/visa/${quiz.slug}`
       : quizId
         ? `https://tietoniekka.fi/peli?quiz_id=${quizId}`
         : "https://tietoniekka.fi";
     const niceTitle = quiz?.titleRaw ?? quiz?.title ?? "";
     const total = quiz?.questions.length ?? 0;
-    const text = `Sain ${correctCount}/${total} oikein Tietoniekan visassa "${niceTitle}" 🏆 Pystytkö parempaan?`;
+    // Tulos mukaan linkkiin → esikatselukuvaksi tulee jaettava tuloskortti (?t=8-10)
+    const url =
+      total > 0 && base !== "https://tietoniekka.fi"
+        ? `${base}${base.includes("?") ? "&" : "?"}t=${correctCount}-${total}`
+        : base;
+    // Wordle-tyylinen emoji-rivi: 🟩 oikein, 🟥 väärin — kysymysjärjestyksessä
+    const emojiRow = answerLog.map((ok) => (ok ? "🟩" : "🟥")).join("");
+    const perfect = total > 0 && correctCount === total;
+    const isDaily = searchParams.get("paivan_visa") === "1";
+    const streakLine =
+      isDaily && dailyStreak !== null && dailyStreak >= 2
+        ? `\n🔥 ${dailyStreak} päivän putki!`
+        : "";
+    const text = `Sain ${correctCount}/${total} oikein Tietoniekan visassa "${niceTitle}"${perfect ? " 🏆" : ""}\n${emojiRow}${streakLine}\nPystytkö parempaan?`;
     return { url, text };
   }
 
@@ -450,6 +517,11 @@ function PeliInner({ preloadedQuiz }: { preloadedQuiz: QuizConfig | null }) {
             <div className="peli-kicker">Testaa tietosi</div>
             <h1 className="peli-h1">{quiz.title}</h1>
             <p className="peli-intro-text">{quiz.intro}</p>
+            {challenge && (
+              <div className="peli-challenge">
+                🏆 Kaverisi sai <strong>{challenge.score}/{challenge.total}</strong> — pystytkö parempaan?
+              </div>
+            )}
             <button className="peli-btn-primary" onClick={startGame} type="button">
               PELAA NYT →
             </button>
@@ -554,6 +626,13 @@ function PeliInner({ preloadedQuiz }: { preloadedQuiz: QuizConfig | null }) {
               <small>/{totalQ} oikein</small>
             </div>
             <div className="peli-points-sub">{score} pistettä</div>
+            {dailyStreak !== null && dailyStreak > 0 && (
+              <div className="peli-putki">
+                {dailyStreak === 1
+                  ? "🔥 Putki avattu! Pelaa huomenna uudestaan, niin se jatkuu."
+                  : `🔥 ${dailyStreak} päivän putki! Huomenna uusi visa — pidä liekki elossa.`}
+              </div>
+            )}
             <div className="peli-end-actions">
               {quiz.categoryLabel && (
                 <Link
@@ -606,9 +685,10 @@ function PeliInner({ preloadedQuiz }: { preloadedQuiz: QuizConfig | null }) {
                         boxShadow: "0 8px 24px rgba(0,0,0,0.4)",
                       }}
                     >
-                      <a style={item} href={`https://wa.me/?text=${enc(`${text} ${url}`)}`} target="_blank" rel="noopener noreferrer" onClick={() => setShareOpen(false)}>📱  WhatsApp</a>
-                      <a style={item} href={`https://t.me/share/url?url=${enc(url)}&text=${enc(text)}`} target="_blank" rel="noopener noreferrer" onClick={() => setShareOpen(false)}>✈️  Telegram</a>
-                      <a style={item} href={`https://twitter.com/intent/tweet?text=${enc(text)}&url=${enc(url)}`} target="_blank" rel="noopener noreferrer" onClick={() => setShareOpen(false)}>𝕏   Jaa X:ssä</a>
+                      <a style={item} href={`https://wa.me/?text=${enc(`${text}\n${url}`)}`} target="_blank" rel="noopener noreferrer" onClick={() => { setShareOpen(false); void markShared(); }}>📱  WhatsApp</a>
+                      <a style={item} href={`https://www.facebook.com/sharer/sharer.php?u=${enc(url)}`} target="_blank" rel="noopener noreferrer" onClick={() => { setShareOpen(false); void markShared(); }}>📘  Facebook</a>
+                      <a style={item} href={`https://t.me/share/url?url=${enc(url)}&text=${enc(text)}`} target="_blank" rel="noopener noreferrer" onClick={() => { setShareOpen(false); void markShared(); }}>✈️  Telegram</a>
+                      <a style={item} href={`https://twitter.com/intent/tweet?text=${enc(text)}&url=${enc(url)}`} target="_blank" rel="noopener noreferrer" onClick={() => { setShareOpen(false); void markShared(); }}>𝕏   Jaa X:ssä</a>
                       <button style={item} onClick={copyShareLink} type="button">🔗  Kopioi linkki</button>
                     </div>
                   );

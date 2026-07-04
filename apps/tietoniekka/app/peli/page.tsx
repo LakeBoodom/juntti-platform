@@ -69,10 +69,26 @@ export async function generateMetadata({
     description = "Tunnista kuvasta — yksi kuva, neljä vaihtoehtoa.";
   }
 
+  // Jaettava tuloskortti: ?t=8-10 → OG-kuva ja kuvaus näyttävät jakajan tuloksen
+  const tulosMatch =
+    typeof params.t === "string" ? /^(\d{1,2})-(\d{1,2})$/.exec(params.t) : null;
+  const tulos =
+    tulosMatch &&
+    Number(tulosMatch[2]) >= 1 &&
+    Number(tulosMatch[2]) <= 30 &&
+    Number(tulosMatch[1]) <= Number(tulosMatch[2])
+      ? { score: Number(tulosMatch[1]), total: Number(tulosMatch[2]) }
+      : null;
+  if (tulos && title) {
+    description = `Sain ${tulos.score}/${tulos.total} oikein visassa "${title}" — pystytkö parempaan? Pelaa ilmaiseksi!`;
+  }
+
   const pageTitle = title ?? "Tietovisa";
   const ogUrl = `${SITE_URL}/peli/og?title=${encodeURIComponent(
     title ?? "TIETOVISA",
-  )}&kat=${encodeURIComponent(kat)}`;
+  )}&kat=${encodeURIComponent(kat)}${
+    tulos ? `&tulos=${tulos.score}-${tulos.total}` : ""
+  }`;
   const canonical = canonicalSlug
     ? `${SITE_URL}/visa/${canonicalSlug}`
     : canonicalId
