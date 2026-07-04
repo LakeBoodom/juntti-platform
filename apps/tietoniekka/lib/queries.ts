@@ -382,6 +382,7 @@ export type PinnallaEvent = {
   daysUntil: number;
   quizId: string;
   quizTitle: string | null;
+  questionCount: number;
 };
 
 const PINNALLA_HORIZON_DAYS = 45;
@@ -456,8 +457,20 @@ export async function getPinnallaEvents(limit = 5): Promise<PinnallaEvent[]> {
       daysUntil,
       quizId,
       quizTitle,
+      questionCount: 0,
     });
   }
+
+  // Kysymysmäärät meta-riviä varten ("10 kysymystä · ~2 min")
+  await Promise.all(
+    events.map(async (ev) => {
+      const { count } = await sb
+        .from("questions")
+        .select("id", { count: "exact", head: true })
+        .eq("quiz_id", ev.quizId);
+      ev.questionCount = count ?? 0;
+    }),
+  );
 
   // Käynnissä olevat ensin, sitten lähimmät
   events.sort((a, b) => {

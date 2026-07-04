@@ -15,6 +15,12 @@ import { CATEGORIES, CATEGORY_BY_SLUG } from "../lib/categories";
 
 type CategoryQuizMap = Record<string, CategoryPreview | null>;
 
+/** Lyhennä pitkä visaotsikko korttiin: katkaise ensimmäiseen väliviiva-erottimeen. */
+function shortQuizTitle(title: string): string {
+  const cut = title.split(/\s+[–—-]\s+/)[0].trim();
+  return cut.length >= 4 ? cut : title;
+}
+
 export type HomeClientProps = {
   todaysCelebrity: SankariData | null;
   todaysQuiz: CategoryPreview | null;
@@ -231,39 +237,57 @@ export function HomeClient({
         </div>
       </section>
 
-      {/* 3. PINNALLA NYT — kausistrippi (brief osio 7) */}
+      {/* 3. PINNALLA NYT — kausistrippi (brief osio 7, copy + hierarkia päivitetty 2026-07-04) */}
       {pinnallaEvents.length > 0 && (
         <section className="pinnalla-nyt" id="pinnalla-nyt">
           <div className="container-wide">
-            <h2 className="section-header">⏳ Pinnalla nyt</h2>
-            <p className="section-subtitle">Mitä Suomessa juuri nyt tapahtuu — testaa tietosi ajankohtaisista.</p>
+            <h2 className="section-header">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img className="pinnalla-header-icon" src="/pinnallanyt_tiimalasi.png" alt="" />
+              Pinnalla nyt
+            </h2>
+            <p className="section-subtitle">Testaa, kuinka hyvin olet kartalla Suomen puheenaiheista.</p>
             <div className="pinnalla-strip">
-              {pinnallaEvents.map((ev) => (
-                <Link
-                  key={ev.id}
-                  href={`/peli?quiz_id=${ev.quizId}&pinnalla=${ev.slug}`}
-                  className="pinnalla-card"
-                  prefetch={false}
-                >
-                  <div className="pinnalla-visual">
-                    {/* Oma kuvitus jos asetettu, muuten tiimalasi-oletuskuva */}
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={ev.imageUrl ?? "/pinnallanyt_tiimalasi.png"} alt="" />
-                  </div>
-                  <div className="pinnalla-name">{ev.name}</div>
-                  {ev.status === "upcoming" ? (
-                    <div className="pinnalla-count">
-                      <span className="num">{ev.daysUntil}</span>
-                      <span className="suffix">{ev.daysUntil === 1 ? "PÄIVÄ" : "PÄIVÄÄ"}</span>
+              {pinnallaEvents.map((ev) => {
+                const mins = Math.max(1, Math.round((ev.questionCount * 12) / 60));
+                return (
+                  <Link
+                    key={ev.id}
+                    href={`/peli?quiz_id=${ev.quizId}&pinnalla=${ev.slug}`}
+                    className="pinnalla-card"
+                    prefetch={false}
+                  >
+                    <div className="pinnalla-visual">
+                      {/* Oma kuvitus jos asetettu, muuten tiimalasi-oletuskuva */}
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={ev.imageUrl ?? "/pinnallanyt_tiimalasi.png"} alt="" />
                     </div>
-                  ) : (
-                    <div className="pinnalla-count pinnalla-count--now">
-                      <span className="now-label">{ev.status === "today" ? "TÄNÄÄN!" : "PARHAILLAAN"}</span>
+                    <div className="pinnalla-eyebrow">
+                      <span className="pinnalla-event">{ev.name}</span>
+                      {ev.status !== "upcoming" && (
+                        <span className="pinnalla-badge">
+                          {ev.status === "today" ? "TÄNÄÄN!" : "PARHAILLAAN"}
+                        </span>
+                      )}
                     </div>
-                  )}
-                  {ev.quizTitle && <div className="pinnalla-quiz">{ev.quizTitle}</div>}
-                </Link>
-              ))}
+                    {ev.status === "upcoming" && (
+                      <div className="pinnalla-count">
+                        <span className="num">{ev.daysUntil}</span>
+                        <span className="suffix">{ev.daysUntil === 1 ? "PÄIVÄ" : "PÄIVÄÄ"}</span>
+                      </div>
+                    )}
+                    {ev.quizTitle && (
+                      <div className="pinnalla-title">{shortQuizTitle(ev.quizTitle)}</div>
+                    )}
+                    {ev.questionCount > 0 && (
+                      <div className="pinnalla-meta">
+                        {ev.questionCount} kysymystä · ~{mins} min
+                      </div>
+                    )}
+                    <span className="pinnalla-cta">Aloita visa →</span>
+                  </Link>
+                );
+              })}
             </div>
           </div>
         </section>

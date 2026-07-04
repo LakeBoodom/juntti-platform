@@ -3021,10 +3021,17 @@ a.sankari-photo {
   max-width: 90%;
 }
 
-/* ── Pinnalla nyt — kausistrippi (brief osio 7) ── */
+/* ── Pinnalla nyt — kausistrippi (brief osio 7, hierarkia-päivitys) ── */
 .pinnalla-nyt {
   background: var(--color-surface-dark);
-  padding: var(--space-xl) 0 var(--space-lg);
+  padding: var(--space-xl) 0 var(--space-md);
+}
+.pinnalla-header-icon {
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  vertical-align: -6px;
+  margin-right: 10px;
 }
 .pinnalla-strip {
   display: flex;
@@ -3037,7 +3044,7 @@ a.sankari-photo {
 }
 .pinnalla-card {
   flex: 0 0 auto;
-  width: 200px;
+  width: 250px;
   scroll-snap-align: start;
   background: var(--color-surface-card-dark);
   border: 1px solid rgba(232, 163, 32, 0.18);
@@ -3046,7 +3053,7 @@ a.sankari-photo {
   text-decoration: none;
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: flex-start;
   gap: 8px;
   transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
 }
@@ -3055,14 +3062,15 @@ a.sankari-photo {
   border-color: rgba(232, 163, 32, 0.55);
   box-shadow: 0 12px 28px -12px rgba(0, 0, 0, 0.55);
 }
+.pinnalla-card:hover .pinnalla-cta {
+  background: var(--color-brand-gold);
+  color: var(--color-surface-dark);
+}
 .pinnalla-visual {
-  width: 96px;
-  height: 96px;
-  border-radius: 12px;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border-radius: 10px;
   overflow: hidden;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   background: rgba(232, 163, 32, 0.08);
 }
 .pinnalla-visual img {
@@ -3070,15 +3078,34 @@ a.sankari-photo {
   height: 100%;
   object-fit: cover;
 }
-.pinnalla-emoji { font-size: 44px; line-height: 1; }
-.pinnalla-name {
+.pinnalla-eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.pinnalla-event {
   font-family: var(--font-display);
   font-weight: 700;
-  font-size: 17px;
-  letter-spacing: 0.06em;
+  font-size: 13px;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: var(--color-text-light);
-  text-align: center;
+  color: var(--color-brand-gold);
+}
+.pinnalla-badge {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  color: var(--color-surface-dark);
+  background: var(--color-brand-gold);
+  border-radius: 999px;
+  padding: 2px 8px;
+  animation: pinnalla-pulse 1.6s ease-in-out infinite;
+}
+@keyframes pinnalla-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.65; }
 }
 .pinnalla-count {
   display: flex;
@@ -3088,7 +3115,7 @@ a.sankari-photo {
 .pinnalla-count .num {
   font-family: var(--font-display);
   font-weight: 900;
-  font-size: 40px;
+  font-size: 38px;
   line-height: 1;
   color: var(--color-brand-gold);
   font-variant-numeric: tabular-nums;
@@ -3100,32 +3127,36 @@ a.sankari-photo {
   letter-spacing: 0.1em;
   color: rgba(255, 255, 255, 0.55);
 }
-.pinnalla-count--now .now-label {
+.pinnalla-title {
   font-family: var(--font-display);
-  font-weight: 900;
-  font-size: 22px;
-  letter-spacing: 0.08em;
-  color: var(--color-brand-gold);
-  animation: pinnalla-pulse 1.6s ease-in-out infinite;
-}
-@keyframes pinnalla-pulse {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.72; transform: scale(1.05); }
-}
-.pinnalla-quiz {
-  font-family: var(--font-body);
-  font-size: 13px;
-  line-height: 1.35;
-  color: rgba(255, 255, 255, 0.65);
-  text-align: center;
+  font-weight: 800;
+  font-size: 21px;
+  line-height: 1.1;
+  color: var(--color-text-light);
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
+.pinnalla-meta {
+  font-family: var(--font-body);
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.55);
+}
+.pinnalla-cta {
+  margin-top: 4px;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 14px;
+  letter-spacing: 0.05em;
+  color: var(--color-brand-gold);
+  border: 1.5px solid rgba(232, 163, 32, 0.55);
+  border-radius: 999px;
+  padding: 7px 18px;
+  transition: background 0.18s ease, color 0.18s ease;
+}
 @media (max-width: 767px) {
-  /* ~2.5 korttia näkyvissä — peek-vihje skrollaamiseen (brief) */
-  .pinnalla-card { width: 38vw; min-width: 150px; }
-  .pinnalla-visual { width: 72px; height: 72px; }
-  .pinnalla-count .num { font-size: 32px; }
+  /* Leveä kortti + seuraavan reuna näkyviin = scroll-vihje (peek) */
+  .pinnalla-card { width: min(78vw, 320px); }
+  .pinnalla-title { font-size: 19px; }
 }
