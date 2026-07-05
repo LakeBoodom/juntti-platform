@@ -309,19 +309,17 @@ function PeliInner({ preloadedQuiz }: { preloadedQuiz: QuizConfig | null }) {
     try {
       const sb = getSupabase();
       if (!sb) return;
-      const { data } = await sb
-        .from("quiz_plays")
-        .insert({
-          quiz_id: dbQuizId,
-          platform: "tietoniekka",
-          score,
-          total: maxScore,
-          session_id: getOrCreateSessionId(),
-          shared: false,
-        })
-        .select("id")
-        .single();
-      if (data?.id) playIdRef.current = data.id;
+      const playId = crypto.randomUUID();
+      const { error } = await sb.from("quiz_plays").insert({
+        id: playId,
+        quiz_id: dbQuizId,
+        platform: "tietoniekka",
+        score,
+        total: maxScore,
+        session_id: getOrCreateSessionId(),
+        shared: false,
+      });
+      if (!error) playIdRef.current = playId;
     } catch (e) {
       // best-effort: ei kaadeta tulosnäkymää jos tallennus epäonnistuu
       console.error("recordPlay failed", e);
