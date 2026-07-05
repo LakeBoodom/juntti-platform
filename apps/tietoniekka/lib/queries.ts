@@ -422,7 +422,9 @@ export async function getPinnallaEvents(limit = 5): Promise<PinnallaEvent[]> {
         daysUntil = Math.round((start.getTime() - today.getTime()) / MS_DAY);
         status = "upcoming";
       } else {
-        status = today.getTime() === start.getTime() ? "today" : "ongoing";
+        // "TÄNÄÄN!" vain yksipäiväiselle tapahtumalle — kausi on "PARHAILLAAN" alusta asti
+        const singleDay = end.getTime() === start.getTime();
+        status = singleDay && today.getTime() === start.getTime() ? "today" : "ongoing";
         rotationDay = Math.round((today.getTime() - start.getTime()) / MS_DAY);
       }
     } else {

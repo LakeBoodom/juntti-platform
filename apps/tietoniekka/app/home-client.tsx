@@ -244,7 +244,6 @@ export function HomeClient({
             <h2 className="section-header">Pinnalla nyt</h2>
             <p className="section-subtitle">Testaa, kuinka hyvin olet kartalla Suomen puheenaiheista.</p>
             {pinnallaEvents.map((ev) => {
-              const mins = Math.max(1, Math.round((ev.questionCount * 12) / 60));
               const peliHref = `/peli?quiz_id=${ev.quizId}&pinnalla=${ev.slug}`;
               const bgImage = ev.imageUrl ?? "/pinnallanyt_tiimalasi.png";
               return (
@@ -278,9 +277,7 @@ export function HomeClient({
                       <h4 className="quiz-question">{shortQuizTitle(ev.quizTitle)}</h4>
                     )}
                     <div className="paivan-visa-meta">
-                      {ev.questionCount > 0 && (
-                        <span>Päivän kisavisa · {ev.questionCount} kysymystä · ~{mins} min</span>
-                      )}
+                      {ev.questionCount > 0 && <span>{ev.questionCount} kysymystä</span>}
                     </div>
                     <Link
                       href={peliHref}
