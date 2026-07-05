@@ -1,5 +1,16 @@
 import type { Metadata, Viewport } from "next";
 import Script from "next/script";
+
+/* Self-hosted fontit (brief osio 2): @fontsource-paketit — woff2:t tulevat
+   npm-paketista ja tarjoillaan omalta domainilta. Ei kutsuja Googleen. */
+import "@fontsource/barlow/400.css";
+import "@fontsource/barlow/500.css";
+import "@fontsource/barlow/600.css";
+import "@fontsource/barlow/700.css";
+import "@fontsource/barlow-condensed/600.css";
+import "@fontsource/barlow-condensed/700.css";
+import "@fontsource/barlow-condensed/800.css";
+import "@fontsource/barlow-condensed/900.css";
 import { brand } from "@/config/brand";
 import "./globals.css";
 
@@ -33,8 +44,8 @@ export const metadata: Metadata = {
     images: [
       {
         url: "/og-image.png",
-        width: 1729,
-        height: 910,
+        width: 1200,
+        height: 630,
         alt: `${brand.name} — testaa tietosi`,
       },
     ],
@@ -71,18 +82,6 @@ export default function RootLayout({
 }) {
   return (
     <html lang="fi">
-      <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link
-          rel="preconnect"
-          href="https://fonts.gstatic.com"
-          crossOrigin="anonymous"
-        />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=Barlow+Condensed:wght@600;700;800;900&display=swap"
-          rel="stylesheet"
-        />
-      </head>
       <body>
         {/* JSON-LD: Organization + WebSite — helps Google + LLM crawlers */}
         <Script

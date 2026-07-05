@@ -121,6 +121,8 @@ function PeliInner({ preloadedQuiz }: { preloadedQuiz: QuizConfig | null }) {
   const [correctCount, setCorrectCount] = useState(0);
   const [answerLog, setAnswerLog] = useState<boolean[]>([]);
   const [dailyStreak, setDailyStreak] = useState<number | null>(null);
+  const [feedback, setFeedback] = useState<0 | 1 | -1>(0);
+  const playIdRef = useRef<string | null>(null);
   // Jaetun linkin haaste: ?tulos=8-10 → "Kaverisi sai 8/10 — pystytkö parempaan?"
   // (parametrin nimi EI saa olla "t" — linkkisiivoajat poistavat sen seurantaparametrina)
   const challenge = parseTulosParam(searchParams.get("tulos"));
@@ -146,6 +148,8 @@ function PeliInner({ preloadedQuiz }: { preloadedQuiz: QuizConfig | null }) {
     setScore(0);
     setCorrectCount(0);
     setAnswerLog([]);
+    setFeedback(0);
+    playIdRef.current = null;
     setStreak(0);
     setAnswered(false);
     setChosen(null);
@@ -305,14 +309,19 @@ function PeliInner({ preloadedQuiz }: { preloadedQuiz: QuizConfig | null }) {
     try {
       const sb = getSupabase();
       if (!sb) return;
-      await sb.from("quiz_plays").insert({
-        quiz_id: dbQuizId,
-        platform: "tietoniekka",
-        score,
-        total: maxScore,
-        session_id: getOrCreateSessionId(),
-        shared: false,
-      });
+      const { data } = await sb
+        .from("quiz_plays")
+        .insert({
+          quiz_id: dbQuizId,
+          platform: "tietoniekka",
+          score,
+          total: maxScore,
+          session_id: getOrCreateSessionId(),
+          shared: false,
+        })
+        .select("id")
+        .single();
+      if (data?.id) playIdRef.current = data.id;
     } catch (e) {
       // best-effort: ei kaadeta tulosnäkymää jos tallennus epäonnistuu
       console.error("recordPlay failed", e);
@@ -425,21 +434,28 @@ function PeliInner({ preloadedQuiz }: { preloadedQuiz: QuizConfig | null }) {
   }
 
   async function markShared() {
-    if (typeof window === "undefined") return;
-    const dbQuizId = searchParams.get("quiz_id");
-    if (!dbQuizId) return;
+    if (typeof window === "undefined" || !playIdRef.current) return;
     try {
       const sb = getSupabase();
       if (!sb) return;
-      await sb
-        .from("quiz_plays")
-        .update({ shared: true })
-        .eq("quiz_id", dbQuizId)
-        .eq("session_id", getOrCreateSessionId())
-        .order("played_at", { ascending: false })
-        .limit(1);
+      await sb.from("quiz_plays").update({ shared: true }).eq("id", playIdRef.current);
     } catch (e) {
       console.error("markShared failed", e);
+    }
+  }
+
+  /** Visapalaute: 1 = 👍, -1 = 👎. Tallentuu pelikertaan (quiz_plays.feedback). */
+  function giveFeedback(value: 1 | -1) {
+    if (feedback !== 0) return;
+    setFeedback(value);
+    soundClick();
+    if (typeof window === "undefined" || !playIdRef.current) return;
+    try {
+      const sb = getSupabase();
+      if (!sb) return;
+      void sb.from("quiz_plays").update({ feedback: value }).eq("id", playIdRef.current);
+    } catch (e) {
+      console.error("giveFeedback failed", e);
     }
   }
 
@@ -634,6 +650,17 @@ function PeliInner({ preloadedQuiz }: { preloadedQuiz: QuizConfig | null }) {
                   : `🔥 ${dailyStreak} päivän putki! Huomenna uusi visa — pidä liekki elossa.`}
               </div>
             )}
+            <div className="peli-feedback">
+              {feedback !== 0 ? (
+                <span className="peli-feedback-thanks">Kiitos palautteesta! 🙏</span>
+              ) : (
+                <>
+                  <span className="peli-feedback-label">Oliko hyvä visa?</span>
+                  <button className="peli-feedback-btn" onClick={() => giveFeedback(1)} type="button" aria-label="Hyvä visa">👍</button>
+                  <button className="peli-feedback-btn" onClick={() => giveFeedback(-1)} type="button" aria-label="Huono visa">👎</button>
+                </>
+              )}
+            </div>
             <div className="peli-end-actions">
               {quiz.categoryLabel && (
                 <Link

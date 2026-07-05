@@ -28,13 +28,25 @@ export default async function QuizzesPage({ searchParams }: { searchParams: Prom
 
   const site = await getCurrentSite();
   const admin = getSupabaseAdmin();
-  const { data, error } = await admin
-    .from("quizzes")
-    .select(
-      "id, title, slug, category, difficulty, tone, platform, status, created_at, play_count, site_id, featured_in_category",
-    )
-    .eq("site_id", site.id)
-    .order(sortKey, { ascending: sortDir === "asc" });
+  const [{ data, error }, { data: fbRows }] = await Promise.all([
+    admin
+      .from("quizzes")
+      .select(
+        "id, title, slug, category, difficulty, tone, platform, status, created_at, play_count, site_id, featured_in_category",
+      )
+      .eq("site_id", site.id)
+      .order(sortKey, { ascending: sortDir === "asc" }),
+    admin.from("quiz_plays").select("quiz_id, feedback").not("feedback", "is", null),
+  ]);
+
+  // Visapalaute: 👍/👎-summat per visa
+  const fb: Record<string, { up: number; down: number }> = {};
+  for (const r of fbRows ?? []) {
+    if (!r.quiz_id) continue;
+    const e = (fb[r.quiz_id] ??= { up: 0, down: 0 });
+    if (r.feedback === 1) e.up += 1;
+    else if (r.feedback === -1) e.down += 1;
+  }
 
   return (
     <>
@@ -74,6 +86,7 @@ export default async function QuizzesPage({ searchParams }: { searchParams: Prom
                   <SortableHeader column="platform">Alusta</SortableHeader>
                   <SortableHeader column="status">Status</SortableHeader>
                   <TableHead>Nosto</TableHead>
+                  <TableHead>Palaute</TableHead>
                   <TableHead className="text-right">Pelatut</TableHead>
                 </TableRow>
               </TableHeader>
@@ -113,6 +126,9 @@ export default async function QuizzesPage({ searchParams }: { searchParams: Prom
                     </TableCell>
                     <TableCell>
                       <FeaturedToggle quizId={q.id} featured={q.featured_in_category} />
+                    </TableCell>
+                    <TableCell className="whitespace-nowrap text-sm text-muted-foreground">
+                      {fb[q.id] ? `👍 ${fb[q.id].up} · 👎 ${fb[q.id].down}` : "—"}
                     </TableCell>
                     <TableCell className="text-right">{q.play_count}</TableCell>
                   </TableRow>

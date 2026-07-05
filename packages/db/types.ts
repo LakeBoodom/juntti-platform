@@ -390,6 +390,7 @@ export type Database = {
       }
       quiz_plays: {
         Row: {
+          feedback: number | null
           id: string
           platform: string
           played_at: string | null
@@ -400,6 +401,7 @@ export type Database = {
           total: number | null
         }
         Insert: {
+          feedback?: number | null
           id?: string
           platform: string
           played_at?: string | null
@@ -410,6 +412,7 @@ export type Database = {
           total?: number | null
         }
         Update: {
+          feedback?: number | null
           id?: string
           platform?: string
           played_at?: string | null

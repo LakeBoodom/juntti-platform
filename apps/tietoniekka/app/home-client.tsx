@@ -543,7 +543,7 @@ export function HomeClient({
       <footer className="footer">
         <div className="footer-logo">TIETONIEKKA</div>
         <p className="footer-meta">
-          © 2026 Tietoniekka.com ·{" "}
+          © 2026 Tietoniekka.fi ·{" "}
           <a href="/tietosuoja">Tietosuoja</a>
         </p>
         <p className="footer-meta" style={{ marginTop: "8px", opacity: 0.7 }}>

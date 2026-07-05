@@ -76,7 +76,7 @@ export default async function KategoriaPage({ params }: { params: Promise<{ slug
       <footer className="footer">
         <Link href="/" className="footer-logo">TIETONIEKKA</Link>
         <p className="footer-meta">
-          © 2026 Tietoniekka.com ·{" "}
+          © 2026 Tietoniekka.fi ·{" "}
           <Link href="/tietosuoja">Tietosuoja</Link> ·{" "}
           <Link href="/yhteystiedot">Yhteystiedot</Link>
         </p>
