@@ -1044,11 +1044,17 @@ img { display: block; max-width: 100%; }
 /* ─── KATEGORIA INLINE CARD (full-width, recreates kategoria_kuva mockup) */
 .kategoria-inline-card {
   position: relative;
-  background: linear-gradient(180deg, var(--kat-color, var(--color-surface-card-dark)) 0%, var(--color-surface-card-dark) 65%);
+  /* KOKEILU B: kategoriaväri kantaa koko kortin läpi + värillinen yläreuna */
+  background: linear-gradient(
+    180deg,
+    var(--kat-color, var(--color-surface-card-dark)) 0%,
+    color-mix(in srgb, var(--kat-color, var(--color-surface-card-dark)) 55%, var(--color-surface-card-dark)) 100%
+  );
   border-radius: var(--radius-xl);
   overflow: hidden;
   margin-bottom: var(--space-2xl);
   border: 1px solid rgba(255, 255, 255, 0.06);
+  border-top: 3px solid color-mix(in srgb, var(--kat-color, var(--color-surface-card-dark)) 45%, var(--color-brand-gold));
 }
 .kategoria-inline-card::before {
   content: attr(data-watermark);
@@ -1071,8 +1077,9 @@ img { display: block; max-width: 100%; }
   padding: var(--space-lg) var(--space-lg) var(--space-md);
   position: relative;
   z-index: 1;
+  /* KOKEILU B: kevyempi tummennos → kuva ja kategoriaväri näkyvät enemmän */
   background:
-    linear-gradient(180deg, rgba(15, 21, 32, 0.40) 0%, rgba(15, 21, 32, 0.82) 100%),
+    linear-gradient(180deg, rgba(15, 21, 32, 0.26) 0%, rgba(15, 21, 32, 0.66) 100%),
     var(--bg-image, none) center / cover no-repeat;
 }
 .kategoria-card-hero .eyebrow {
@@ -1130,7 +1137,8 @@ img { display: block; max-width: 100%; }
 }
 
 .kategoria-card-quiz {
-  background: rgba(0, 0, 0, 0.3);
+  /* KOKEILU B: visapuoli saa kategoriavärin tumman sävyn */
+  background: color-mix(in srgb, var(--kat-color, #1a2130) 40%, rgba(0, 0, 0, 0.45));
   padding: var(--space-lg);
   position: relative;
   z-index: 1;
