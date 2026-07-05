@@ -45,6 +45,18 @@ export function Nav({ email }: { email?: string | null }) {
           >
             Ajastus
           </Link>
+          <Link
+            href="/kalenteri"
+            className="text-sm text-muted-foreground hover:text-foreground"
+          >
+            Kalenteri
+          </Link>
+          <Link
+            href="/somepostaukset"
+            className="text-sm text-muted-foreground hover:text-foreground"
+          >
+            Some
+          </Link>
         </div>
         <div className="flex items-center gap-3">
           {email && (
