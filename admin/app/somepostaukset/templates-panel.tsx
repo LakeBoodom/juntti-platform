@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState, useRef, useTransition } from "react";
 import { ChevronDown, ChevronRight, Plus, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -25,6 +25,7 @@ import {
   createTemplate,
   deleteTemplate,
   toggleTemplateActive,
+  uploadSocialTemplateImage,
   type TemplateContentScope,
   type TemplateAspectRatio,
 } from "./actions";
@@ -55,10 +56,30 @@ function NewTemplateForm({ siteId, onDone }: { siteId: string; onDone: () => voi
   const [themeKey, setThemeKey] = useState("");
   const [contentScope, setContentScope] = useState<TemplateContentScope>("all");
   const [imageUrl, setImageUrl] = useState("");
-  const [aspectRatio, setAspectRatio] = useState<TemplateAspectRatio>("square");
+  const [aspectRatio, setAspectRatio] = useState<TemplateAspectRatio>("portrait");
   const [active, setActive] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [uploading, setUploading] = useState(false);
   const [pending, startTransition] = useTransition();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  function onFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setError(null);
+    setUploading(true);
+    const fd = new FormData();
+    fd.set("file", file);
+    fd.set("site_slug", siteId);
+    uploadSocialTemplateImage(fd).then((res) => {
+      setUploading(false);
+      if (!res.ok) {
+        setError(res.error);
+        return;
+      }
+      setImageUrl(res.publicUrl);
+    });
+  }
 
   function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -116,21 +137,50 @@ function NewTemplateForm({ siteId, onDone }: { siteId: string; onDone: () => voi
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
+            <SelectItem value="portrait">Pysty 4:5 (1080×1350) — suositus IG/FB:lle</SelectItem>
             <SelectItem value="square">Neliö (1080×1080)</SelectItem>
-            <SelectItem value="portrait">Pysty (1080×1350)</SelectItem>
             <SelectItem value="landscape">Vaaka</SelectItem>
           </SelectContent>
         </Select>
       </div>
       <div className="space-y-1.5">
-        <Label htmlFor="tpl_image">Kuvan URL</Label>
-        <Input
-          id="tpl_image"
-          value={imageUrl}
-          onChange={(e) => setImageUrl(e.target.value)}
-          placeholder="https://..."
-          required
+        <Label>Kuva</Label>
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/jpeg,image/png,image/webp"
+          onChange={onFileChange}
+          className="hidden"
         />
+        <div className="flex items-start gap-3">
+          {imageUrl ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={imageUrl}
+              alt="Esikatselu"
+              className="h-24 w-24 rounded border object-cover"
+            />
+          ) : (
+            <div className="flex h-24 w-24 items-center justify-center rounded border border-dashed text-xs text-muted-foreground">
+              Ei kuvaa
+            </div>
+          )}
+          <div className="space-y-1">
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              disabled={uploading}
+              onClick={() => fileInputRef.current?.click()}
+            >
+              {uploading ? "Ladataan…" : imageUrl ? "Vaihda kuva" : "Lataa kuva"}
+            </Button>
+            <p className="text-xs text-muted-foreground">
+              JPG/PNG/WebP, max 8 Mt. Kuvan pitäisi olla tekstitön tausta —
+              teksti ja pisteet piirretään sen päälle automaattisesti.
+            </p>
+          </div>
+        </div>
       </div>
       <div className="flex items-center gap-2">
         <input
@@ -157,7 +207,7 @@ function NewTemplateForm({ siteId, onDone }: { siteId: string; onDone: () => voi
             Peruuta
           </Button>
         </DialogClose>
-        <Button type="submit" disabled={pending}>
+        <Button type="submit" disabled={pending || uploading || !imageUrl}>
           {pending ? "Tallennetaan…" : "Tallenna"}
         </Button>
       </DialogFooter>

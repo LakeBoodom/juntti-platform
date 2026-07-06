@@ -157,8 +157,37 @@ export type TemplateInput = {
 function validateTemplate(input: TemplateInput): string | null {
   if (!input.site_id) return "Site puuttuu";
   if (!input.name.trim()) return "Nimi puuttuu";
-  if (!input.image_url.trim()) return "Kuvan URL puuttuu";
+  if (!input.image_url.trim()) return "Kuva puuttuu";
   return null;
+}
+
+/**
+ * Lataa pohjakuvan Supabase Storageen ("social-templates" bucket, public)
+ * ja palauttaa julkisen URLin. Sama malli kuin admin/app/kuvavisat/actions.ts.
+ */
+export async function uploadSocialTemplateImage(formData: FormData) {
+  const file = formData.get("file") as File | null;
+  const siteSlug = (formData.get("site_slug") as string) || "tietoniekka";
+
+  if (!file || !file.size) return { ok: false as const, error: "Tiedosto puuttuu" };
+  if (file.size > 8 * 1024 * 1024)
+    return { ok: false as const, error: "Tiedosto liian iso (max 8 MB)" };
+
+  const ext = file.name.split(".").pop()?.toLowerCase() || "jpg";
+  const fileName = `${siteSlug}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+
+  const sb = getSupabaseAdmin();
+  const arrayBuf = await file.arrayBuffer();
+  const { error } = await sb.storage
+    .from("social-templates")
+    .upload(fileName, arrayBuf, {
+      contentType: file.type || "image/jpeg",
+      upsert: false,
+    });
+  if (error) return { ok: false as const, error: error.message };
+
+  const { data } = sb.storage.from("social-templates").getPublicUrl(fileName);
+  return { ok: true as const, publicUrl: data.publicUrl, path: fileName };
 }
 
 export async function createTemplate(input: TemplateInput) {
