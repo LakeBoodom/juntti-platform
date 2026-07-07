@@ -10,10 +10,60 @@ import Link from "next/link";
    Datafetch (Supabase) tulee myöhemmin — pidetään tämä yksinkertaisena.
    ───────────────────────────────────────────────────────────────── */
 
-import type { SankariData, CategoryPreview, PinnallaEvent } from "../lib/queries";
+import type { SankariData, CategoryPreview, PinnallaEvent, KuvavisaTeaser } from "../lib/queries";
 import { CATEGORIES, CATEGORY_BY_SLUG } from "../lib/categories";
 
 type CategoryQuizMap = Record<string, CategoryPreview | null>;
+
+/** Tunnista tämä -osion 5 kuvavisakorttia. `type` vastaa kuvavisas.type-saraketta,
+ *  `urlParam` on /peli?kuvavisa=X -arvo (ks. KUVAVISA_URL_TO_TYPE queries.ts:ssä). */
+const KUVAVISA_CARDS = [
+  {
+    type: "liput",
+    urlParam: "liput",
+    watermark: "LIPUT",
+    colorVar: "var(--color-cat-maantieto)",
+    bgImage: "/liput_kuva.png",
+    title: "MAAILMAN LIPUT",
+    description: "Euroopasta Aasiaan — kuinka monta lippua tunnistat?",
+  },
+  {
+    type: "vaakunat",
+    urlParam: "vaakuna",
+    watermark: "VAAKUNAT",
+    colorVar: "var(--color-cat-historia)",
+    bgImage: "/vaakunat_kuva.png",
+    title: "VAAKUNAT",
+    description: "Karhuja, kruunuja ja miekkoja — tunnetko maakuntavaakunat?",
+  },
+  {
+    type: "linnut",
+    urlParam: "linnut",
+    watermark: "LINNUT",
+    colorVar: "var(--color-cat-luonto)",
+    bgImage: "/linnut_kuva.png",
+    title: "LINNUT",
+    description: "Kuinka hyvin tunnet siivekkäät?",
+  },
+  {
+    type: "kasvit",
+    urlParam: "kasvit",
+    watermark: "KASVIT",
+    colorVar: "var(--color-cat-luonto)",
+    bgImage: "/kasvit_kuva.png",
+    title: "KASVIT",
+    description: "Voikukasta vanamoon — tunnetko kasvit kuvasta?",
+  },
+  {
+    type: "elaimet",
+    urlParam: "elaimet",
+    watermark: "ELÄIMET",
+    colorVar: "var(--color-cat-luonto)",
+    bgImage: "/elaimet_kuva.png",
+    title: "ELÄIMET",
+    description: "Hirvi, ilves vai saukko? Tunnistatko kaikki?",
+  },
+] as const;
 
 /** Lyhennä pitkä visaotsikko korttiin: katkaise ensimmäiseen väliviiva-erottimeen. */
 function shortQuizTitle(title: string): string {
@@ -26,13 +76,15 @@ export type HomeClientProps = {
   todaysQuiz: CategoryPreview | null;
   categoryQuizzes: CategoryQuizMap;
   pinnallaEvents: PinnallaEvent[];
+  kuvavisaTeasers: Record<string, KuvavisaTeaser | null>;
 };
 
 export function HomeClient({
   todaysCelebrity,
   todaysQuiz,
   categoryQuizzes,
-  pinnallaEvents
+  pinnallaEvents,
+  kuvavisaTeasers,
 }: HomeClientProps) {
   const [todaysDateLabel, setTodaysDateLabel] = useState<string>("");
 
@@ -478,50 +530,47 @@ export function HomeClient({
           <h2 className="section-header">Tunnistatko kuvasta</h2>
           <p className="section-subtitle">jospa kuvat olisi paremmin hallussa</p>
 
-          <article className="kategoria-inline-card kuvavisa-cta-card" data-watermark="LIPUT" style={{ ["--kat-color" as string]: "var(--color-cat-maantieto)", ["--bg-image" as string]: "url(/liput_kuva.png)" } as React.CSSProperties}>
-            <Link href="/peli?kuvavisa=liput" className="kategoria-card-hero kategoria-card-hero-link">
-              <span className="eyebrow">— Kuvavisa</span>
-              <h3>MAAILMAN LIPUT</h3>
-              <p className="description">Euroopasta Aasiaan — kuinka monta lippua tunnistat?</p>
-              <span className="btn btn-primary btn-large kuvavisa-cta-btn">PELAA NYT →</span>
-            </Link>
-          </article>
-
-          <article className="kategoria-inline-card kuvavisa-cta-card" data-watermark="VAAKUNAT" style={{ ["--kat-color" as string]: "var(--color-cat-historia)", ["--bg-image" as string]: "url(/vaakunat_kuva.png)" } as React.CSSProperties}>
-            <Link href="/peli?kuvavisa=vaakuna" className="kategoria-card-hero kategoria-card-hero-link">
-              <span className="eyebrow">— Kuvavisa</span>
-              <h3>VAAKUNAT</h3>
-              <p className="description">Karhuja, kruunuja ja miekkoja — tunnetko maakuntavaakunat?</p>
-              <span className="btn btn-primary btn-large kuvavisa-cta-btn">PELAA NYT →</span>
-            </Link>
-          </article>
-
-          <article className="kategoria-inline-card kuvavisa-cta-card" data-watermark="LINNUT" style={{ ["--kat-color" as string]: "var(--color-cat-luonto)", ["--bg-image" as string]: "url(/linnut_kuva.png)" } as React.CSSProperties}>
-            <Link href="/peli?kuvavisa=linnut" className="kategoria-card-hero kategoria-card-hero-link">
-              <span className="eyebrow">— Kuvavisa</span>
-              <h3>LINNUT</h3>
-              <p className="description">Kuinka hyvin tunnet siivekkäät?</p>
-              <span className="btn btn-primary btn-large kuvavisa-cta-btn">PELAA NYT →</span>
-            </Link>
-          </article>
-
-          <article className="kategoria-inline-card kuvavisa-cta-card" data-watermark="KASVIT" style={{ ["--kat-color" as string]: "var(--color-cat-luonto)", ["--bg-image" as string]: "url(/kasvit_kuva.png)" } as React.CSSProperties}>
-            <Link href="/peli?kuvavisa=kasvit" className="kategoria-card-hero kategoria-card-hero-link">
-              <span className="eyebrow">— Kuvavisa</span>
-              <h3>KASVIT</h3>
-              <p className="description">Voikukasta vanamoon — tunnetko kasvit kuvasta?</p>
-              <span className="btn btn-primary btn-large kuvavisa-cta-btn">PELAA NYT →</span>
-            </Link>
-          </article>
-
-          <article className="kategoria-inline-card kuvavisa-cta-card" data-watermark="ELÄIMET" style={{ ["--kat-color" as string]: "var(--color-cat-luonto)", ["--bg-image" as string]: "url(/elaimet_kuva.png)" } as React.CSSProperties}>
-            <Link href="/peli?kuvavisa=elaimet" className="kategoria-card-hero kategoria-card-hero-link">
-              <span className="eyebrow">— Kuvavisa</span>
-              <h3>ELÄIMET</h3>
-              <p className="description">Hirvi, ilves vai saukko? Tunnistatko kaikki?</p>
-              <span className="btn btn-primary btn-large kuvavisa-cta-btn">PELAA NYT →</span>
-            </Link>
-          </article>
+          {KUVAVISA_CARDS.map((card) => {
+            const teaser = kuvavisaTeasers[card.type];
+            const peliHref = `/peli?kuvavisa=${card.urlParam}`;
+            return (
+              <article
+                key={card.type}
+                className="kategoria-inline-card kuvavisa-cta-card"
+                data-watermark={card.watermark}
+                style={{ ["--kat-color" as string]: card.colorVar, ["--bg-image" as string]: `url(${card.bgImage})` } as React.CSSProperties}
+              >
+                <Link href={peliHref} className="kategoria-card-hero kategoria-card-hero-link">
+                  <span className="eyebrow">— Kuvavisa</span>
+                  <h3>{card.title}</h3>
+                  <p className="description">{card.description}</p>
+                  {!teaser && (
+                    <span className="btn btn-primary btn-large kuvavisa-cta-btn">PELAA NYT →</span>
+                  )}
+                </Link>
+                {teaser && (
+                  <div className="kategoria-card-quiz">
+                    <div className="visa-progress">Kokeile · Kysymys 1 / 2</div>
+                    <h4 className="visa-question">{teaser.question}</h4>
+                    <div className="visa-options">
+                      {teaser.options.map((opt, i) => {
+                        const letter = ["A", "B", "C", "D"][i];
+                        return (
+                          <a
+                            key={i}
+                            className="visa-option"
+                            href={`${peliHref}&first=${letter}`}
+                          >
+                            <span className="badge">{letter}</span> {opt}
+                          </a>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+              </article>
+            );
+          })}
         </div>
       </section>
 

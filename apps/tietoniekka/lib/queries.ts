@@ -572,3 +572,50 @@ export async function getKuvavisat(urlSlug: string, limit = 10): Promise<Kuvavis
   return arr.slice(0, limit);
 }
 
+
+/** Yksi "päivän" kuvavisa-kysymys per tyyppi — etusivun Tunnista tämä -teaseriin. */
+export type KuvavisaTeaser = {
+  type: string;
+  question: string;
+  imageUrl: string;
+  options: string[];
+};
+
+const KUVAVISA_TEASER_TYPES = ["liput", "vaakunat", "linnut", "kasvit", "elaimet"] as const;
+
+/** Hakee yhden aktiivisen kysymyksen jokaiselle kuvavisa-tyypille, deterministisesti
+ *  päivän mukaan kiertäen (sama logiikka kuin countdown_quizzes-rotaatiossa). */
+export async function getKuvavisaTeasers(): Promise<Record<string, KuvavisaTeaser | null>> {
+  const result: Record<string, KuvavisaTeaser | null> = {};
+  for (const type of KUVAVISA_TEASER_TYPES) result[type] = null;
+
+  const sb = getSupabase();
+  const siteId = await getSiteId();
+  if (!sb || !siteId) return result;
+
+  const dayOfYear = Math.floor(
+    (Date.now() - new Date(new Date().getFullYear(), 0, 0).getTime()) / 86400000,
+  );
+
+  await Promise.all(
+    KUVAVISA_TEASER_TYPES.map(async (type) => {
+      const { data, error } = await sb
+        .from("kuvavisas")
+        .select("id, question, image_url, options")
+        .eq("site_id", siteId)
+        .eq("type", type)
+        .eq("active", true)
+        .order("id", { ascending: true });
+      if (error || !data || data.length === 0) return;
+      const row = data[dayOfYear % data.length];
+      result[type] = {
+        type,
+        question: row.question,
+        imageUrl: row.image_url,
+        options: (row.options as unknown as string[]) ?? [],
+      };
+    }),
+  );
+
+  return result;
+}
