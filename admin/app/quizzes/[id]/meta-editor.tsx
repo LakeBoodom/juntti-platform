@@ -43,6 +43,8 @@ export function MetaEditor({
   initial: {
     title: string;
     description: string | null;
+    slug: string;
+    custom_slug: string | null;
     category: string;
     difficulty: Difficulty;
     tone: Tone;
@@ -55,6 +57,7 @@ export function MetaEditor({
   const [editing, setEditing] = useState(false);
   const [title, setTitle] = useState(initial.title);
   const [description, setDescription] = useState(initial.description ?? "");
+  const [customSlug, setCustomSlug] = useState(initial.custom_slug ?? "");
   const [category, setCategory] = useState(initial.category);
   const [difficulty, setDifficulty] = useState<Difficulty>(initial.difficulty);
   const [tone, setTone] = useState<Tone>(initial.tone);
@@ -69,6 +72,7 @@ export function MetaEditor({
       const res = await updateQuizMeta(id, {
         title: title.trim(),
         description: description.trim(),
+        custom_slug: customSlug.trim() || null,
         category: category.trim(),
         difficulty,
         tone,
@@ -84,6 +88,7 @@ export function MetaEditor({
     setEditing(false);
     setTitle(initial.title);
     setDescription(initial.description ?? "");
+    setCustomSlug(initial.custom_slug ?? "");
     setCategory(initial.category);
     setDifficulty(initial.difficulty);
     setTone(initial.tone);
@@ -122,6 +127,25 @@ export function MetaEditor({
           value={description}
           onChange={(e) => setDescription(e.target.value)}
         />
+      </div>
+
+      <div className="space-y-1.5">
+        <Label>Custom-URL (valinnainen)</Label>
+        <div className="flex items-center gap-1.5">
+          <span className="text-sm text-muted-foreground whitespace-nowrap">tietoniekka.fi/</span>
+          <Input
+            value={customSlug}
+            onChange={(e) =>
+              setCustomSlug(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ""))
+            }
+            placeholder="porinjazz"
+          />
+        </div>
+        <p className="text-xs text-muted-foreground">
+          Lyhyt B2B/kumppanilinkki, esim. yhteistyökumppanille. Jätä tyhjäksi jos ei tarvita —
+          visa löytyy silti aina osoitteesta tietoniekka.fi/{initial.slug}. Vältä varattuja sanoja
+          (peli, kategoria, sankari, visa, tietosuoja, api).
+        </p>
       </div>
 
       {!isDraft && (

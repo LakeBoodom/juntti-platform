@@ -39,12 +39,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.6,
   }));
 
-  // Yksittäiset visat — /visa/<slug> (löytyy myös jakolinkeistä)
+  // Yksittäiset visat — kanoninen lyhyt URL (custom_slug jos asetettu, muuten
+  // sisältöslug). /visa/<slug> toimii yhä, mutta sitemap listaa vain kanonisen.
   const quizzes = await getPublishedQuizSlugs();
   const quizPages: MetadataRoute.Sitemap = quizzes
     .filter((q) => q.slug)
     .map((q) => ({
-      url: `${SITE_URL}/visa/${q.slug}`,
+      url: `${SITE_URL}/${q.custom_slug ?? q.slug}`,
       lastModified: q.updated_at ? new Date(q.updated_at) : now,
       changeFrequency: "monthly",
       priority: 0.7,

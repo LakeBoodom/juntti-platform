@@ -64,6 +64,8 @@ export default async function QuizDetailPage({
             initial={{
               title: quiz.title,
               description: quiz.description,
+              slug: quiz.slug,
+              custom_slug: quiz.custom_slug,
               category: quiz.category,
               difficulty: quiz.difficulty as "helppo" | "keski" | "vaikea",
               tone: (quiz.tone ?? "rento") as "rento" | "humoristinen" | "asiallinen" | "nostalginen",

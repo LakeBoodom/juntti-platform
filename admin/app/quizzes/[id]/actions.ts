@@ -4,11 +4,29 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { getSupabaseAdmin } from "@juntti/db";
 
+// Nämä juuritason polut on jo varattu Next.js:n omille reiteille — custom_slug
+// jolla on sama arvo ei ikinä olisi saavutettavissa (ks. apps/tietoniekka/app/[slug]/page.tsx).
+const RESERVED_ROOT_SLUGS = new Set([
+  "peli",
+  "kategoria",
+  "sankari",
+  "visa",
+  "tietosuoja",
+  "llms.txt",
+  "robots.txt",
+  "sitemap.xml",
+  "manifest.webmanifest",
+  "icon",
+  "apple-icon",
+  "api",
+]);
+
 export async function updateQuizMeta(
   id: string,
   input: {
     title: string;
     description: string;
+    custom_slug?: string | null;
     category?: string;
     difficulty?: "helppo" | "keski" | "vaikea";
     tone?: "rento" | "humoristinen" | "asiallinen" | "nostalginen";
@@ -17,11 +35,31 @@ export async function updateQuizMeta(
   },
 ) {
   if (!input.title.trim()) return { ok: false as const, error: "Otsikko puuttuu" };
+
+  let customSlug: string | null | undefined = undefined;
+  if (input.custom_slug !== undefined) {
+    const trimmed = (input.custom_slug ?? "").trim().toLowerCase();
+    if (trimmed && !/^[a-z0-9-]+$/.test(trimmed)) {
+      return {
+        ok: false as const,
+        error: "Custom-URL saa sisältää vain pieniä kirjaimia, numeroita ja väliviivoja",
+      };
+    }
+    if (trimmed && RESERVED_ROOT_SLUGS.has(trimmed)) {
+      return {
+        ok: false as const,
+        error: `"${trimmed}" on varattu sana eikä toimisi custom-URL:na — kokeile toista`,
+      };
+    }
+    customSlug = trimmed || null;
+  }
+
   const sb = getSupabaseAdmin();
   // Älä päivitä saraketta jos sitä ei ole annettu — tukee partiaalia inputtia
   type QuizUpdate = {
     title: string;
     description: string | null;
+    custom_slug?: string | null;
     category?: string;
     difficulty?: string;
     tone?: string;
@@ -32,6 +70,7 @@ export async function updateQuizMeta(
     title: input.title.trim(),
     description: input.description?.trim() || null,
   };
+  if (customSlug !== undefined) update.custom_slug = customSlug;
   if (input.category !== undefined) update.category = input.category.trim();
   if (input.difficulty !== undefined) update.difficulty = input.difficulty;
   if (input.tone !== undefined) update.tone = input.tone;
@@ -39,7 +78,16 @@ export async function updateQuizMeta(
   if (input.site_id !== undefined) update.site_id = input.site_id;
 
   const { error } = await sb.from("quizzes").update(update).eq("id", id);
-  if (error) return { ok: false as const, error: error.message };
+  if (error) {
+    // Uniikkiusrajoite antaa raa'an Postgres-virheen — käännä ymmärrettäväksi.
+    if (error.message.includes("quizzes_custom_slug_key") || error.code === "23505") {
+      return {
+        ok: false as const,
+        error: "Tämä custom-URL on jo toisen visan käytössä — valitse toinen",
+      };
+    }
+    return { ok: false as const, error: error.message };
+  }
   revalidatePath(`/quizzes/${id}`);
   revalidatePath(`/quizzes`);
   return { ok: true as const };

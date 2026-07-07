@@ -437,6 +437,7 @@ export type Database = {
           category: string
           created_at: string | null
           created_by: string | null
+          custom_slug: string | null
           description: string | null
           difficulty: string
           emoji_hint: string | null
@@ -460,6 +461,7 @@ export type Database = {
           category: string
           created_at?: string | null
           created_by?: string | null
+          custom_slug?: string | null
           description?: string | null
           difficulty: string
           emoji_hint?: string | null
@@ -483,6 +485,7 @@ export type Database = {
           category?: string
           created_at?: string | null
           created_by?: string | null
+          custom_slug?: string | null
           description?: string | null
           difficulty?: string
           emoji_hint?: string | null

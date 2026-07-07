@@ -1,12 +1,18 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { getQuizBySlug } from "../../../lib/queries";
-import { buildQuizConfig } from "../../../lib/buildQuizConfig";
-import { PeliClient } from "../../peli/peli-client";
+import { getQuizBySlugOrCustom } from "../../lib/queries";
+import { buildQuizConfig } from "../../lib/buildQuizConfig";
+import { PeliClient } from "../peli/peli-client";
 
 export const dynamic = "force-dynamic";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://tietoniekka.fi";
+
+// Note: Next.js already prefers a literal route (app/peli, app/kategoria/[slug],
+// ...) over this catch-all dynamic segment at the same level, so reserved words
+// like "peli" or "visa" never actually reach this file. The admin custom-URL
+// field validates against the same reserved list (see admin quizzes/[id]/actions.ts)
+// so Heikki gets a warning before saving a slug that would be silently shadowed.
 
 /** Parsii "8-10"-muotoisen tulosparametrin jakolinkeistä. */
 function parseTulos(raw: string | string[] | undefined): { score: number; total: number } | null {
@@ -27,13 +33,8 @@ export async function generateMetadata({
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const quiz = await getQuizBySlug(slug);
+  const quiz = await getQuizBySlugOrCustom(slug);
   if (!quiz) return { title: "Visa ei löydy — Tietoniekka" };
-
-  // Kanoninen osoite osoittaa juuritason lyhyeen URL:iin (custom_slug tai
-  // sisältöslug), ei tähän /visa/-poluun — sama sisältö on saatavilla
-  // molemmista, mutta hakukoneille annetaan vain yksi kanoninen versio.
-  const canonicalSlug = (quiz as { custom_slug?: string | null }).custom_slug ?? quiz.slug;
 
   const sp = await searchParams;
   const tulos = parseTulos(sp.tulos) ?? parseTulos(sp.t);
@@ -46,6 +47,10 @@ export async function generateMetadata({
   )}&kat=${encodeURIComponent(quiz.category ?? "")}${
     tulos ? `&tulos=${tulos.score}-${tulos.total}` : ""
   }`;
+  // Kanoninen osoite on aina lyhin: custom_slug jos asetettu, muuten sisältöslug.
+  // /visa/[slug] osoittaa saman kanonisen URL:n tänne, jotta hakukoneet eivät
+  // näe kahta kilpailevaa osoitetta samasta sisällöstä.
+  const canonicalSlug = quiz.custom_slug ?? quiz.slug;
   const canonical = `${SITE_URL}/${canonicalSlug}`;
 
   return {
@@ -70,13 +75,13 @@ export async function generateMetadata({
   };
 }
 
-export default async function VisaPage({
+export default async function VanityQuizPage({
   params,
 }: {
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const quiz = await getQuizBySlug(slug);
+  const quiz = await getQuizBySlugOrCustom(slug);
   if (!quiz) notFound();
 
   const config = buildQuizConfig(

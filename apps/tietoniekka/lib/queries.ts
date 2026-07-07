@@ -74,6 +74,9 @@ export async function listCelebrities(): Promise<SankariData[]> {
 export type QuizMeta = {
   id: string;
   slug: string;
+  // Optional vanity URL for B2B/partner links (e.g. tietoniekka.fi/porinjazz).
+  // Only present when the query explicitly selects it.
+  custom_slug?: string | null;
   title: string;
   description: string | null;
   category: string;
@@ -98,7 +101,7 @@ export async function getQuizById(id: string): Promise<FullQuiz | null> {
   if (!sb) return null;
   const { data: quiz } = await sb
     .from("quizzes")
-    .select("id, slug, title, description, category, difficulty, status, emoji_hint")
+    .select("id, slug, custom_slug, title, description, category, difficulty, status, emoji_hint")
     .eq("id", id)
     .eq("status", "published")
     .maybeSingle();
@@ -123,7 +126,7 @@ export async function getQuizBySlug(slug: string): Promise<FullQuiz | null> {
   if (!sb) return null;
   const { data: quiz } = await sb
     .from("quizzes")
-    .select("id, slug, title, description, category, difficulty, status, emoji_hint")
+    .select("id, slug, custom_slug, title, description, category, difficulty, status, emoji_hint")
     .eq("slug", slug)
     .eq("status", "published")
     .maybeSingle();
@@ -142,16 +145,49 @@ export async function getQuizBySlug(slug: string): Promise<FullQuiz | null> {
   };
 }
 
+/** Hae julkaistu visa joko sisältöslugilla TAI custom_slug-vanity-URL:lla.
+ *  Käytetään app/[slug]/page.tsx -juuritason reitillä (lyhyt B2B-linkki, esim.
+ *  tietoniekka.fi/porinjazz), erillään /visa/[slug]-reitistä joka käyttää vain
+ *  sisältöslugia. */
+export async function getQuizBySlugOrCustom(slugParam: string): Promise<FullQuiz | null> {
+  const sb = getSupabase();
+  if (!sb) return null;
+  // Karsi ilmeisen turvattomat merkit pois ennen .or()-lausekkeeseen liittämistä.
+  const safe = slugParam.replace(/[^a-z0-9-]/gi, "");
+  if (!safe) return null;
+  const { data: quiz } = await sb
+    .from("quizzes")
+    .select("id, slug, custom_slug, title, description, category, difficulty, status, emoji_hint")
+    .or(`slug.eq.${safe},custom_slug.eq.${safe}`)
+    .eq("status", "published")
+    .maybeSingle();
+  if (!quiz) return null;
+  const { data: qs } = await sb
+    .from("questions")
+    .select("id, sort_order, question_text, explanation, answers")
+    .eq("quiz_id", quiz.id)
+    .order("sort_order", { ascending: true });
+  return {
+    ...quiz,
+    questions: (qs ?? []).map((q) => ({
+      ...q,
+      answers: q.answers as never,
+    })),
+  };
+}
+
 /** Kaikkien julkaistujen visojen slugit + päivitysaika sitemapia varten. */
-export async function getPublishedQuizSlugs(): Promise<{ slug: string; updated_at: string | null }[]> {
+export async function getPublishedQuizSlugs(): Promise<
+  { slug: string; custom_slug: string | null; updated_at: string | null }[]
+> {
   const sb = getSupabase();
   if (!sb) return [];
   const { data } = await sb
     .from("quizzes")
-    .select("slug, updated_at")
+    .select("slug, custom_slug, updated_at")
     .eq("status", "published")
     .not("slug", "is", null);
-  return (data ?? []) as { slug: string; updated_at: string | null }[];
+  return (data ?? []) as { slug: string; custom_slug: string | null; updated_at: string | null }[];
 }
 
 /** Hae random julkaistu visa kategoriasta. */
@@ -165,7 +201,7 @@ export async function getRandomQuizByCategory(
   if (!sb) return null;
   const { data } = await sb
     .from("quizzes")
-    .select("id, slug, title, description, category, difficulty, status, emoji_hint")
+    .select("id, slug, custom_slug, title, description, category, difficulty, status, emoji_hint")
     .eq("site_id", siteId)
     .eq("status", "published")
     .eq("category", category);
@@ -203,7 +239,7 @@ async function getFeaturedQuizByCategory(category: string): Promise<QuizMeta | n
   if (!sb) return null;
   const { data } = await sb
     .from("quizzes")
-    .select("id, slug, title, description, category, difficulty, status, emoji_hint")
+    .select("id, slug, custom_slug, title, description, category, difficulty, status, emoji_hint")
     .eq("site_id", siteId)
     .eq("status", "published")
     .eq("category", category)
@@ -301,7 +337,7 @@ export async function getTodaysQuiz(): Promise<CategoryPreview | null> {
   if (dateRule?.content_id) {
     const { data: q } = await sb
       .from("quizzes")
-      .select("id, slug, title, description, category, difficulty, status, emoji_hint")
+      .select("id, slug, custom_slug, title, description, category, difficulty, status, emoji_hint")
       .eq("id", dateRule.content_id)
       .eq("status", "published")
       .maybeSingle();
@@ -333,7 +369,7 @@ export async function getTodaysQuiz(): Promise<CategoryPreview | null> {
     if (tagRule?.content_id) {
       const { data: q } = await sb
         .from("quizzes")
-        .select("id, slug, title, description, category, difficulty, status, emoji_hint")
+        .select("id, slug, custom_slug, title, description, category, difficulty, status, emoji_hint")
         .eq("id", tagRule.content_id)
         .eq("status", "published")
         .maybeSingle();
@@ -344,7 +380,7 @@ export async function getTodaysQuiz(): Promise<CategoryPreview | null> {
   // 3. Fallback: random
   const { data: any } = await sb
     .from("quizzes")
-    .select("id, slug, title, description, category, difficulty, status, emoji_hint")
+    .select("id, slug, custom_slug, title, description, category, difficulty, status, emoji_hint")
     .eq("site_id", siteId)
     .eq("status", "published");
   if (!any || any.length === 0) return null;
