@@ -97,30 +97,32 @@ export async function createGeneralPost(input: {
   if (!platforms.length) return { ok: false, error: "Valitse vähintään yksi alusta" };
 
   try {
-    const { copyText } = await generateSocialCopy({
+    const { variants } = await generateSocialCopy({
       sourceType: "general",
       brief: brief.trim(),
     });
 
     const sb = getSupabaseAdmin();
-    const imageUrl = buildGenericOgUrl(copyText.slice(0, 100));
 
     let created = 0;
     const errors: string[] = [];
     for (const platform of platforms) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const { error } = await (sb as any).from("social_posts").insert({
-        site_id: siteId,
-        platform,
-        source_type: "general",
-        source_id: null,
-        target_date: targetDate,
-        copy_text: copyText,
-        image_url: imageUrl,
-        status: "draft",
-      });
-      if (error) errors.push(`${platform}: ${error.message}`);
-      else created++;
+      for (const variant of variants) {
+        const imageUrl = buildGenericOgUrl(variant.text.slice(0, 100));
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const { error } = await (sb as any).from("social_posts").insert({
+          site_id: siteId,
+          platform,
+          source_type: "general",
+          source_id: null,
+          target_date: targetDate,
+          copy_text: variant.text,
+          image_url: imageUrl,
+          status: "draft",
+        });
+        if (error) errors.push(`${platform}/${variant.style}: ${error.message}`);
+        else created++;
+      }
     }
 
     revalidatePath("/somepostaukset");

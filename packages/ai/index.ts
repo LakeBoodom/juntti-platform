@@ -16,4 +16,10 @@ export type {
   GeneratedKuvavisaQuestion,
 } from "./generate-kuvavisa-question";
 export { generateSocialCopy } from "./generate-social-copy";
-export type { SocialCopyInput, GeneratedSocialCopy } from "./generate-social-copy";
+export type {
+  SocialCopyInput,
+  GeneratedSocialCopy,
+  SocialCopyStyle,
+  SocialCopyVariant,
+  SocialCopyStat,
+} from "./generate-social-copy";

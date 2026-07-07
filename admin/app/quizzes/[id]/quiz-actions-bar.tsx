@@ -13,6 +13,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { togglePublish, deleteQuiz } from "./actions";
+import { SocialHookGenerator } from "./social-hook-generator";
 
 export function QuizActionsBar({
   id,
@@ -63,6 +64,7 @@ export function QuizActionsBar({
           <Archive /> Palauta draftiksi
         </Button>
       )}
+      <SocialHookGenerator quizId={id} />
       <Button
         variant="ghost"
         onClick={() => setDelOpen(true)}

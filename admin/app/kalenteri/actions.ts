@@ -11,41 +11,9 @@ import {
   type RawCountdownQuizRow,
   type RawScheduleRuleRow,
 } from "@/lib/content-calendar";
+import { findTemplateImage, buildOgUrl } from "@/lib/social-og";
 
 export type SocialPlatform = "facebook" | "instagram" | "linkedin";
-
-const OG_BASE_URL =
-  process.env.NEXT_PUBLIC_ADMIN_BASE_URL ?? "http://localhost:3001";
-
-/** Hakee aktiivisen pohjakuvan (social_templates) annetulle content_scope:lle, jos sellainen on. */
-async function findTemplateImage(
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  sb: any,
-  siteId: string,
-  scope: "quiz" | "celebrity" | "countdown" | "general",
-): Promise<string | null> {
-  const { data } = await sb
-    .from("social_templates")
-    .select("image_url, content_scope, sort_order")
-    .eq("site_id", siteId)
-    .eq("active", true)
-    .in("content_scope", [scope, "all"])
-    .order("sort_order", { ascending: true });
-  const rows = (data ?? []) as { image_url: string; content_scope: string }[];
-  if (rows.length === 0) return null;
-  // Suosi tarkkaa scope-osumaa yleisen "all" sijaan
-  const exact = rows.find((r) => r.content_scope === scope);
-  return (exact ?? rows[0]).image_url ?? null;
-}
-
-function buildOgUrl(path: string, params: Record<string, string | null | undefined>) {
-  const url = new URL(path, OG_BASE_URL);
-  for (const [k, v] of Object.entries(params)) {
-    if (v) url.searchParams.set(k, v);
-  }
-  // Palautetaan suhteellinen polku + query, jotta se toimii ympäristöstä riippumatta
-  return `${url.pathname}${url.search}`;
-}
 
 /**
  * Luo some-postausluonnokset yhdelle päivälle: selvittää mikä sisältö on live
@@ -104,17 +72,34 @@ export async function generateSocialDraftsForDay(
     try {
       const { data: qs } = await sb
         .from("questions")
-        .select("question_text")
+        .select("question_text, answers")
         .eq("quiz_id", day.quiz.id)
-        .order("sort_order", { ascending: true })
-        .limit(1);
-      const exampleQuestion = qs?.[0]?.question_text as string | undefined;
+        .order("sort_order", { ascending: true });
+      const questions = (qs ?? []).map((q) => ({
+        question_text: q.question_text as string,
+        answers: q.answers as unknown as { text: string; is_correct: boolean }[],
+      }));
+      const exampleQuestion = questions[0]?.question_text;
 
-      const { copyText } = await generateSocialCopy({
+      // Tilastokoukku vain jos oikeaa pelidataa on tarpeeksi (≥20 pelikertaa) —
+      // ei koskaan keksitty prosenttiluku.
+      const { data: plays } = await sb
+        .from("quiz_plays")
+        .select("score, total")
+        .eq("quiz_id", day.quiz.id);
+      let stat: { totalPlays: number; allCorrectPct: number } | undefined;
+      if (plays && plays.length >= 20) {
+        const allCorrect = plays.filter((p) => p.score !== null && p.total !== null && p.score === p.total).length;
+        stat = { totalPlays: plays.length, allCorrectPct: Math.round((allCorrect / plays.length) * 100) };
+      }
+
+      const { variants } = await generateSocialCopy({
         sourceType: "quiz",
         title: day.quiz.title,
         category: day.quiz.category,
+        questions: questions.length ? questions : undefined,
         exampleQuestion,
+        stat,
       });
 
       const templateImage = await findTemplateImage(sb, siteId, "quiz");
@@ -127,19 +112,21 @@ export async function generateSocialDraftsForDay(
       });
 
       for (const platform of platforms) {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const { error } = await (sb as any).from("social_posts").insert({
-          site_id: siteId,
-          platform,
-          source_type: "quiz",
-          source_id: day.quiz.id,
-          target_date: isoDate,
-          copy_text: copyText,
-          image_url: imageUrl,
-          status: "draft",
-        });
-        if (error) errors.push(`visa/${platform}: ${error.message}`);
-        else created++;
+        for (const variant of variants) {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const { error } = await (sb as any).from("social_posts").insert({
+            site_id: siteId,
+            platform,
+            source_type: "quiz",
+            source_id: day.quiz.id,
+            target_date: isoDate,
+            copy_text: variant.text,
+            image_url: imageUrl,
+            status: "draft",
+          });
+          if (error) errors.push(`visa/${platform}/${variant.style}: ${error.message}`);
+          else created++;
+        }
       }
     } catch (e) {
       errors.push(`visa: ${e instanceof Error ? e.message : String(e)}`);
@@ -150,7 +137,7 @@ export async function generateSocialDraftsForDay(
   if (day.celebrity) {
     try {
       const isDeceased = !!day.celebrity.death_date;
-      const { copyText } = await generateSocialCopy({
+      const { variants } = await generateSocialCopy({
         sourceType: "celebrity",
         name: day.celebrity.name,
         role: day.celebrity.role,
@@ -170,19 +157,21 @@ export async function generateSocialDraftsForDay(
       });
 
       for (const platform of platforms) {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const { error } = await (sb as any).from("social_posts").insert({
-          site_id: siteId,
-          platform,
-          source_type: "celebrity",
-          source_id: day.celebrity.id,
-          target_date: isoDate,
-          copy_text: copyText,
-          image_url: imageUrl,
-          status: "draft",
-        });
-        if (error) errors.push(`synttäri/${platform}: ${error.message}`);
-        else created++;
+        for (const variant of variants) {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const { error } = await (sb as any).from("social_posts").insert({
+            site_id: siteId,
+            platform,
+            source_type: "celebrity",
+            source_id: day.celebrity.id,
+            target_date: isoDate,
+            copy_text: variant.text,
+            image_url: imageUrl,
+            status: "draft",
+          });
+          if (error) errors.push(`synttäri/${platform}/${variant.style}: ${error.message}`);
+          else created++;
+        }
       }
     } catch (e) {
       errors.push(`synttäri: ${e instanceof Error ? e.message : String(e)}`);
@@ -192,7 +181,7 @@ export async function generateSocialDraftsForDay(
   // ── Countdown / tapahtuma ──
   if (day.countdown) {
     try {
-      const { copyText } = await generateSocialCopy({
+      const { variants } = await generateSocialCopy({
         sourceType: "countdown",
         name: day.countdown.name,
         emoji: day.countdown.emoji ?? undefined,
@@ -207,19 +196,21 @@ export async function generateSocialDraftsForDay(
       });
 
       for (const platform of platforms) {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const { error } = await (sb as any).from("social_posts").insert({
-          site_id: siteId,
-          platform,
-          source_type: "countdown",
-          source_id: day.countdown.id,
-          target_date: isoDate,
-          copy_text: copyText,
-          image_url: imageUrl,
-          status: "draft",
-        });
-        if (error) errors.push(`tapahtuma/${platform}: ${error.message}`);
-        else created++;
+        for (const variant of variants) {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const { error } = await (sb as any).from("social_posts").insert({
+            site_id: siteId,
+            platform,
+            source_type: "countdown",
+            source_id: day.countdown.id,
+            target_date: isoDate,
+            copy_text: variant.text,
+            image_url: imageUrl,
+            status: "draft",
+          });
+          if (error) errors.push(`tapahtuma/${platform}/${variant.style}: ${error.message}`);
+          else created++;
+        }
       }
     } catch (e) {
       errors.push(`tapahtuma: ${e instanceof Error ? e.message : String(e)}`);
