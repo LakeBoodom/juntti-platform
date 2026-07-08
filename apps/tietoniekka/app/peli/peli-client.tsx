@@ -304,7 +304,10 @@ function PeliInner({ preloadedQuiz }: { preloadedQuiz: QuizConfig | null }) {
   /** Tallenna pelitulos Supabase quiz_plays-tauluun (best-effort, ei estä UI:ta). */
   async function recordPlay() {
     if (typeof window === "undefined") return;
-    const dbQuizId = searchParams.get("quiz_id");
+    // /peli-reitti antaa quiz_id:n query-parametrina, mutta /visa/[slug] (jakolinkit,
+    // Google-tulokset) renderöi PeliClientin suoraan preloadedQuiz-propilla eikä koskaan
+    // aseta ?quiz_id:tä URL:iin — siksi kaatui hiljaa ja peukku-palaute ei tallentunut.
+    const dbQuizId = searchParams.get("quiz_id") ?? quiz?.dbId ?? null;
     if (!dbQuizId) return; // hardcoded fallback-visat eivät tallennu
     try {
       const sb = getSupabase();
