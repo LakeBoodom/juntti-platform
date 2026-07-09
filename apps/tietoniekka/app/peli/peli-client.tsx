@@ -123,6 +123,9 @@ function PeliInner({ preloadedQuiz }: { preloadedQuiz: QuizConfig | null }) {
   const [dailyStreak, setDailyStreak] = useState<number | null>(null);
   const [feedback, setFeedback] = useState<0 | 1 | -1>(0);
   const playIdRef = useRef<string | null>(null);
+  // Jos pelaaja ehtii antaa peukun ennen kuin recordPlay():n insert on valmis (nopea pelaaja,
+  // hidas verkko), talletetaan arvo tähän ja kirjoitetaan kantaan heti kun playIdRef saadaan.
+  const pendingFeedbackRef = useRef<1 | -1 | null>(null);
   // Jaetun linkin haaste: ?tulos=8-10 → "Kaverisi sai 8/10 — pystytkö parempaan?"
   // (parametrin nimi EI saa olla "t" — linkkisiivoajat poistavat sen seurantaparametrina)
   const challenge = parseTulosParam(searchParams.get("tulos"));
@@ -150,6 +153,7 @@ function PeliInner({ preloadedQuiz }: { preloadedQuiz: QuizConfig | null }) {
     setAnswerLog([]);
     setFeedback(0);
     playIdRef.current = null;
+    pendingFeedbackRef.current = null;
     setStreak(0);
     setAnswered(false);
     setChosen(null);
@@ -322,7 +326,15 @@ function PeliInner({ preloadedQuiz }: { preloadedQuiz: QuizConfig | null }) {
         session_id: getOrCreateSessionId(),
         shared: false,
       });
-      if (!error) playIdRef.current = playId;
+      if (!error) {
+        playIdRef.current = playId;
+        // Pelaaja ehti jo antaa peukun ennen kuin tämä insert valmistui — kirjoita se nyt.
+        if (pendingFeedbackRef.current !== null) {
+          const pending = pendingFeedbackRef.current;
+          pendingFeedbackRef.current = null;
+          void sb.from("quiz_plays").update({ feedback: pending }).eq("id", playId);
+        }
+      }
     } catch (e) {
       // best-effort: ei kaadeta tulosnäkymää jos tallennus epäonnistuu
       console.error("recordPlay failed", e);
@@ -450,7 +462,13 @@ function PeliInner({ preloadedQuiz }: { preloadedQuiz: QuizConfig | null }) {
     if (feedback !== 0) return;
     setFeedback(value);
     soundClick();
-    if (typeof window === "undefined" || !playIdRef.current) return;
+    if (typeof window === "undefined") return;
+    // recordPlay()-insert saattaa olla vielä kesken (nopea pelaaja) — jonota arvo,
+    // recordPlay() kirjoittaa sen kantaan heti kun playId on saatu.
+    if (!playIdRef.current) {
+      pendingFeedbackRef.current = value;
+      return;
+    }
     try {
       const sb = getSupabase();
       if (!sb) return;
