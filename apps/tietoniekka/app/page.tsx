@@ -3,6 +3,7 @@ import {
   getTodaysQuiz,
   getRandomQuizzesPerCategory,
   getPinnallaEvents,
+  getSankariQuizPreview,
 } from "../lib/queries";
 import { CATEGORIES } from "../lib/categories";
 import { HomeClient } from "./home-client";
@@ -18,6 +19,10 @@ export default async function HomePage() {
     getRandomQuizzesPerCategory(CATEGORIES.map((c) => c.slug)),
     getPinnallaEvents(),
   ]);
+  // Sankarin oma visa vasta kun tiedämme trivia_quiz_id:n (riippuu yllä olevasta hausta)
+  const sankariQuiz = todaysCelebrity?.trivia_quiz_id
+    ? await getSankariQuizPreview(todaysCelebrity.trivia_quiz_id)
+    : null;
 
   return (
     <HomeClient
@@ -25,6 +30,7 @@ export default async function HomePage() {
       todaysQuiz={todaysQuiz}
       categoryQuizzes={categoryQuizzes}
       pinnallaEvents={pinnallaEvents}
+      sankariQuiz={sankariQuiz}
     />
   );
 }

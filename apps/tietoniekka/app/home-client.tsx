@@ -33,13 +33,15 @@ export type HomeClientProps = {
   todaysQuiz: CategoryPreview | null;
   categoryQuizzes: CategoryQuizMap;
   pinnallaEvents: PinnallaEvent[];
+  sankariQuiz: CategoryPreview | null;
 };
 
 export function HomeClient({
   todaysCelebrity,
   todaysQuiz,
   categoryQuizzes,
-  pinnallaEvents
+  pinnallaEvents,
+  sankariQuiz
 }: HomeClientProps) {
   const [todaysDateLabel, setTodaysDateLabel] = useState<string>("");
 
@@ -336,50 +338,71 @@ export function HomeClient({
         </section>
       )}
 
-      {/* 4. PÄIVÄN SANKARI — kuva + featured-quiz CTA (Heikki 2026-04-26) */}
+      {/* 4. PÄIVÄN SANKARI 2.0 — iso "Päivän sankari" -hero-otsikko, kysymys+vaihtoehdot bion tilalla (Heikki 2026-07-15) */}
       <section className="paivan-sankari" id="paivan-sankari">
         <div className="container-wide">
           <h2 className="section-header">Päivän sankari</h2>
-          <p className="section-subtitle">{todaysCelebrity ? `Tietoniekka onnittelee! Tunnetko sankarin?` : "Pieni hengähdys, ei sankaria tänään."}</p>
+          <p className="section-subtitle">{todaysCelebrity ? "Tietoniekka onnittelee! Tänään juhlistamme erityistä ihmistä." : "Pieni hengähdys, ei sankaria tänään."}</p>
           {todaysCelebrity ? (() => {
             const today = new Date();
             const b = new Date(todaysCelebrity.birth_date);
             const age = today.getFullYear() - b.getFullYear();
             const sankariSlug = todaysCelebrity.slug ?? todaysCelebrity.id;
-            const peliHref = `/peli?paivan_sankari=1${todaysCelebrity.trivia_quiz_id ? `&quiz_id=${todaysCelebrity.trivia_quiz_id}` : ""}`;
+            const bornLabel = `Syntynyt ${b.getDate()}.${b.getMonth() + 1}.${b.getFullYear()}`;
+            const peliHref = sankariQuiz ? `/peli?paivan_sankari=1&quiz_id=${sankariQuiz.id}` : null;
             return (
-              <div className="sankari-card">
-                <Link href={`/sankari/${sankariSlug}`} className="sankari-photo">
+              <div className="psankari-card">
+                <Link href={`/sankari/${sankariSlug}`} className="psankari-photo">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src={todaysCelebrity.image_url ?? `https://placehold.co/600x750/1a3a45/e8a320?text=${encodeURIComponent(todaysCelebrity.name)}`} alt={todaysCelebrity.name} />
-                  <div className="age-pill">🎂 Tänään {age} vuotta</div>
-                  <div className="sankari-overlay">
-                    <h3 className="sankari-name">{todaysCelebrity.name.toUpperCase()}</h3>
-                    <p className="sankari-meta">{todaysCelebrity.role} · Syntynyt {b.getDate()}.{b.getMonth() + 1}.{b.getFullYear()}</p>
-                  </div>
+                  <span className="psankari-photo-pill">Tänään juhlii</span>
                   {todaysCelebrity.wikipedia_url && <span className="wiki-credit">📷 Wikipedia</span>}
                 </Link>
-                <div className="sankari-right">
-                  <div className="sankari-onnittelu">
-                    <span className="gold">Tänään {age} vuotta! 🎂</span>
-                    <p className="sankari-right-name">{todaysCelebrity.name.toUpperCase()}</p>
-                    <p className="sankari-right-role">{todaysCelebrity.role}</p>
+                <div className="psankari-content">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img className="psankari-cake" src="/kakku-ikoni-transparent.png" alt="" />
+                  <h3 className="psankari-hero-title">
+                    <span className="l1">Päivän</span>
+                    <span className="l2">Sankari</span>
+                  </h3>
+                  <div className="psankari-sub-row">
+                    <span className="psankari-age">{age} vuotta</span>
+                    <span className="psankari-name">— {todaysCelebrity.name}</span>
                   </div>
-                  <div className="sankari-quiz-info">
-                    {todaysCelebrity.bio_short && <p>{todaysCelebrity.bio_short}</p>}
-                    <h4>Testaa tietosi sankarin elämästä</h4>
-                    {todaysCelebrity.trivia_quiz_id ? (
-                      <a href={peliHref} className="btn btn-primary btn-large">PELAA TÄSTÄ! →</a>
-                    ) : (
-                      <Link href={`/sankari/${sankariSlug}`} className="btn btn-primary btn-large">TUTUSTU SANKARIIN →</Link>
-                    )}
-                  </div>
+                  <p className="psankari-meta-line">
+                    {bornLabel}
+                    <span className="dot" />
+                    {todaysCelebrity.role}
+                  </p>
+
+                  {sankariQuiz?.firstQuestion && peliHref ? (
+                    <>
+                      <p className="psankari-q-label">Kokeile — Kysymys 1 / {sankariQuiz.questionCount}</p>
+                      <h4 className="psankari-q-text">{sankariQuiz.firstQuestion.question}</h4>
+                      <div className="psankari-options">
+                        {sankariQuiz.firstQuestion.options.map((opt, i) => {
+                          const letter = ["A", "B", "C", "D"][i];
+                          return (
+                            <Link key={i} href={`${peliHref}&first=${letter}`} className="visa-option">
+                              <span className="badge">{letter}</span> {opt}
+                            </Link>
+                          );
+                        })}
+                      </div>
+                      <Link href={peliHref} className="btn btn-primary btn-large psankari-cta">ALOITA VISA →</Link>
+                    </>
+                  ) : (
+                    <>
+                      {todaysCelebrity.bio_short && <p className="psankari-bio-fallback">{todaysCelebrity.bio_short}</p>}
+                      <Link href={`/sankari/${sankariSlug}`} className="btn btn-primary btn-large psankari-cta">TUTUSTU SANKARIIN →</Link>
+                    </>
+                  )}
                 </div>
               </div>
             );
           })() : (
-            <div className="sankari-card" style={{ padding: "var(--space-xl)" }}>
-              <p className="sankari-meta" style={{ color: "var(--color-text-muted-light)", textAlign: "center" }}>
+            <div className="psankari-card psankari-card--empty">
+              <p style={{ color: "var(--color-text-muted-light)", textAlign: "center", padding: "var(--space-xl)" }}>
                 Ei sankaria tänään — pelaa muita visoja!
               </p>
             </div>

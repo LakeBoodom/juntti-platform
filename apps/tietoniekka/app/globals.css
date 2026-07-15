@@ -15,6 +15,7 @@
   --color-surface-card-dark: #1a2130;
   --color-brand-gold: #e8a320;
   --color-brand-gold-light: #f5bc45;
+  --color-coral: #e0446f;  /* Päivän sankari -osion oma juhla-aksentti */
   --color-surface-light: #f4ede0;
   --color-surface-light-2: #ece3d1;
   --color-state-correct: #2e7d52;
@@ -730,6 +731,132 @@ img { display: block; max-width: 100%; }
   font-size: 10px;
   color: rgba(255, 255, 255, 0.6);
   z-index: 2;
+}
+
+/* ─── PÄIVÄN SANKARI 2.0 (2026-07-15) — koralli-aksentti, kysymys bion tilalla ── */
+.psankari-card {
+  display: grid;
+  grid-template-columns: 400px 1fr;
+  max-width: var(--container-medium, 1080px);
+  margin: 0 auto;
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  box-shadow: var(--shadow-md);
+}
+.psankari-card--empty { display: block; }
+
+.psankari-photo {
+  position: relative;
+  display: block;
+  min-height: 420px;
+  overflow: hidden;
+  background: var(--color-surface-card-dark);
+}
+.psankari-photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.psankari-photo::after {
+  content: '';
+  position: absolute; inset: 0;
+  background: linear-gradient(180deg, rgba(15, 21, 32, 0) 55%, rgba(15, 21, 32, 0.9) 100%);
+}
+.psankari-photo-pill {
+  position: absolute; top: var(--space-md); left: var(--space-md); z-index: 2;
+  background: rgba(15, 21, 32, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: var(--color-text-light);
+  font-family: var(--font-display); font-weight: 700; font-size: 12px;
+  letter-spacing: 0.08em; text-transform: uppercase;
+  padding: 7px 14px; border-radius: var(--radius-pill);
+}
+
+.psankari-content {
+  position: relative;
+  background: var(--color-surface-light);
+  color: var(--color-surface-dark);
+  padding: var(--space-lg) var(--space-xl);
+  display: flex; flex-direction: column; justify-content: center;
+  overflow: hidden;
+}
+.psankari-cake {
+  position: absolute; top: 6px; right: 6px;
+  width: 130px; height: 130px; object-fit: contain;
+  pointer-events: none; z-index: 0;
+}
+.psankari-hero-title {
+  position: relative; z-index: 1;
+  font-family: var(--font-display); font-weight: 900;
+  font-size: clamp(34px, 5vw, 54px);
+  line-height: 0.88; text-transform: uppercase; letter-spacing: -0.01em;
+  margin: 0 0 var(--space-sm);
+  max-width: 78%;
+}
+.psankari-hero-title .l1 { display: block; color: var(--color-surface-dark); }
+.psankari-hero-title .l2 { display: block; color: var(--color-coral, #e0446f); }
+
+.psankari-sub-row {
+  position: relative; z-index: 1;
+  display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap;
+  font-family: var(--font-display); font-weight: 800; font-size: 18px;
+  margin-bottom: 4px;
+}
+.psankari-age { color: var(--color-brand-gold); font-size: 22px; }
+.psankari-name { color: var(--color-surface-dark); }
+
+.psankari-meta-line {
+  position: relative; z-index: 1;
+  font-family: var(--font-body); font-weight: 600; font-size: 13.5px;
+  color: var(--color-text-muted-dark);
+  margin: 0 0 var(--space-md);
+  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+}
+.psankari-meta-line .dot { width: 3px; height: 3px; border-radius: 50%; background: rgba(15, 21, 32, 0.35); }
+
+.psankari-q-label {
+  position: relative; z-index: 1;
+  font-family: var(--font-display); font-weight: 700; font-size: 12px;
+  letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--color-coral, #e0446f);
+  margin: 0 0 6px;
+}
+.psankari-q-text {
+  position: relative; z-index: 1;
+  font-family: var(--font-display); font-weight: 800; font-size: 20px; line-height: 1.2;
+  margin: 0 0 var(--space-sm); max-width: 480px;
+}
+.psankari-options {
+  position: relative; z-index: 1;
+  display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-sm);
+  margin-bottom: var(--space-lg);
+}
+.psankari-options .visa-option {
+  background: #fff;
+  border: 1.5px solid rgba(15, 21, 32, 0.1);
+  color: var(--color-surface-dark);
+}
+.psankari-options .visa-option:hover { border-color: var(--color-coral, #e0446f); }
+.psankari-options .visa-option .badge { background: rgba(15, 21, 32, 0.07); color: var(--color-surface-dark); }
+
+.psankari-bio-fallback {
+  position: relative; z-index: 1;
+  font-family: var(--font-body); font-size: 15px; line-height: 1.55;
+  color: var(--color-text-muted-dark);
+  margin-bottom: var(--space-lg); max-width: 480px;
+}
+
+.psankari-cta {
+  position: relative; z-index: 1;
+  align-self: flex-start;
+  background: var(--color-coral, #e0446f) !important;
+  color: #fff !important;
+  box-shadow: 0 12px 24px -10px var(--color-coral, #e0446f);
+}
+.psankari-cta:hover { background: color-mix(in srgb, var(--color-coral, #e0446f) 85%, white) !important; }
+
+@media (max-width: 860px) {
+  .psankari-card { grid-template-columns: 1fr; }
+  .psankari-hero-title { max-width: 100%; }
+  .psankari-cake { width: 90px; height: 90px; }
+  .psankari-options { grid-template-columns: 1fr; }
 }
 
 /* ─── 4. KATEGORIAT ──────────────────────────────────────────────── */
