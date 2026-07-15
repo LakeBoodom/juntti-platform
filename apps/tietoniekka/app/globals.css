@@ -583,11 +583,22 @@ img { display: block; max-width: 100%; }
   gap: var(--space-sm);
 }
 
-/* Vastausvaihtoehdot pelimoodi-tyyliin (beige, tumma teksti) */
+/* Vastausvaihtoehdot pelimoodi-tyyliin (beige, tumma teksti) — sama rakenne/muoto
+   kuin .kategoria-card-quiz .visa-option (2026-07-15: yhdenmukaistettu, Heikin huomio
+   että kirjain-badge ei "hengittänyt" täällä samalla tavalla kuin Kategorioissa) */
 .paivan-visa-right .visa-option {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  padding: 14px 16px;
+  border-radius: var(--radius-md);
   background: #f4ede0;
   border: 1.5px solid rgba(15, 21, 32, 0.10);
   color: #0f1520;
+  font-family: var(--font-body);
+  font-weight: 500;
+  font-size: 17px;
+  transition: border-color 0.2s, background 0.2s, transform 0.18s var(--ease-out);
 }
 .paivan-visa-right .visa-option:hover {
   border-color: var(--color-brand-gold);
@@ -595,7 +606,17 @@ img { display: block; max-width: 100%; }
   transform: translateY(-1px);
 }
 .paivan-visa-right .visa-option .badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
   background: rgba(15, 21, 32, 0.08);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 14px;
   color: #0f1520;
 }
 
@@ -829,12 +850,37 @@ img { display: block; max-width: 100%; }
   margin-bottom: var(--space-lg);
 }
 .psankari-options .visa-option {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  padding: 14px 16px;
+  border-radius: var(--radius-md);
   background: #fff;
   border: 1.5px solid rgba(15, 21, 32, 0.1);
   color: var(--color-surface-dark);
+  font-family: var(--font-body);
+  font-weight: 500;
+  font-size: 15px;
+  transition: border-color 0.2s, background 0.2s, transform 0.18s var(--ease-out);
 }
-.psankari-options .visa-option:hover { border-color: var(--color-coral, #e0446f); }
-.psankari-options .visa-option .badge { background: rgba(15, 21, 32, 0.07); color: var(--color-surface-dark); }
+.psankari-options .visa-option:hover {
+  border-color: var(--color-coral, #e0446f);
+  transform: translateY(-1px);
+}
+.psankari-options .visa-option .badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  flex-shrink: 0;
+  background: rgba(15, 21, 32, 0.07);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 13px;
+  color: var(--color-surface-dark);
+}
 
 .psankari-bio-fallback {
   position: relative; z-index: 1;
