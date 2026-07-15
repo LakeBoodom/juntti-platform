@@ -3037,6 +3037,30 @@ a.sankari-photo {
 .pinnalla-event-card {
   margin-bottom: var(--space-lg);
 }
+
+/* ─── Pinnalla nyt -neon-aksentti (kokeilu 2026-07-15, vain MM-futis + Festarikesä) ── */
+div.pinnalla-event-card.pinnalla-event-card--neon {
+  border: 1.5px solid var(--neon-color);
+  box-shadow: 0 0 0 1px var(--neon-color) inset, 0 0 32px -10px var(--neon-color);
+}
+.pinnalla-event-card--neon .paivan-visa-eyebrow { color: var(--neon-color); }
+.pinnalla-event-card--neon .btn-primary {
+  background: var(--neon-color);
+  color: #0c1018;
+  box-shadow: 0 0 20px -6px var(--neon-color);
+}
+.pinnalla-event-card--neon .btn-primary:hover {
+  background: color-mix(in srgb, var(--neon-color) 85%, white);
+}
+.pinnalla-event-card--neon .pinnalla-chip:hover {
+  border-color: var(--neon-color);
+  color: var(--neon-color);
+}
+.pinnalla-event-card--neon .pinnalla-chip.active {
+  border-color: var(--neon-color);
+  background: color-mix(in srgb, var(--neon-color) 16%, transparent);
+  color: var(--neon-color);
+}
 .pinnalla-badge {
   font-family: var(--font-display);
   font-weight: 800;
