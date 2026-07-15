@@ -281,6 +281,20 @@ async function withFirstQuestion(quiz: QuizMeta): Promise<CategoryPreview> {
   return { ...quiz, questionCount: total, firstQuestion };
 }
 
+/** Hae Päivän sankarin oma visa (kysymys+vaihtoehdot+määrä) etusivukorttia varten. */
+export async function getSankariQuizPreview(quizId: string): Promise<CategoryPreview | null> {
+  const sb = getSupabase();
+  if (!sb) return null;
+  const { data: quiz } = await sb
+    .from("quizzes")
+    .select("id, slug, title, description, category, difficulty, status, emoji_hint")
+    .eq("id", quizId)
+    .eq("status", "published")
+    .maybeSingle();
+  if (!quiz) return null;
+  return withFirstQuestion(quiz);
+}
+
 export async function getTodaysQuiz(): Promise<CategoryPreview | null> {
   const siteId = await getSiteId();
   if (!siteId) return null;
