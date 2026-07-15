@@ -13,6 +13,13 @@ import Link from "next/link";
 import type { SankariData, CategoryPreview, PinnallaEvent } from "../lib/queries";
 import { CATEGORIES, CATEGORY_BY_SLUG } from "../lib/categories";
 
+/** Kokeilu 2026-07-15: neon-aksentti vain näille kahdelle Pinnalla nyt -tapahtumalle.
+ *  Muut kategoriat/tapahtumat pysyvät ennallaan kunnes Heikki päättää laajentaa. */
+const PINNALLA_NEON: Record<string, string> = {
+  "mm-futis-2026": "#4fd6ff",
+  "festarikesa-2026": "#ff5fb0",
+};
+
 type CategoryQuizMap = Record<string, CategoryPreview | null>;
 
 /** Lyhennä pitkä visaotsikko korttiin: katkaise ensimmäiseen väliviiva-erottimeen. */
@@ -249,12 +256,13 @@ export function HomeClient({
               return (
                 <div
                   key={ev.id}
-                  className="featured-quiz paivan-visa-card paivan-visa-card--split pinnalla-event-card"
+                  className={`featured-quiz paivan-visa-card paivan-visa-card--split pinnalla-event-card${PINNALLA_NEON[ev.slug] ? " pinnalla-event-card--neon" : ""}`}
                   data-watermark=""
                   style={{
                     ["--quiz-tint" as string]: "rgba(15, 21, 32, 0.78)",
                     ["--kat-color" as string]: "var(--color-surface-card-dark)",
                     ["--bg-image" as string]: `url(${bgImage})`,
+                    ...(PINNALLA_NEON[ev.slug] ? { ["--neon-color" as string]: PINNALLA_NEON[ev.slug] } : {}),
                   } as React.CSSProperties}
                 >
                   {/* Vasen: tapahtuma + päivän kisavisa + CTA */}
