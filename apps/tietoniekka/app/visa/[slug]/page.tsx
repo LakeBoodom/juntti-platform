@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { getQuizBySlug } from "../../../lib/queries";
+import { getQuizBySlug, getRelatedQuizzes } from "../../../lib/queries";
 import { buildQuizConfig } from "../../../lib/buildQuizConfig";
 import { PeliClient } from "../../peli/peli-client";
 
@@ -85,6 +85,7 @@ export default async function VisaPage({
     quiz.questions,
     { kat: quiz.category },
   );
+  config.relatedQuizzes = await getRelatedQuizzes(quiz.category, quiz.id);
 
   return <PeliClient preloadedQuiz={config} />;
 }

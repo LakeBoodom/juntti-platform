@@ -2,6 +2,7 @@
 // V1.0: ei kakkuksen, kaikki request-time. Voidaan lisätä Next-cache myöhemmin.
 
 import { getSupabase, SITE_SLUG } from "./supabase";
+import type { RelatedQuiz } from "../app/peli/questions";
 
 let _siteId: string | null = null;
 async function getSiteId(): Promise<string | null> {
@@ -140,6 +141,26 @@ export async function getQuizBySlug(slug: string): Promise<FullQuiz | null> {
       answers: q.answers as never,
     })),
   };
+}
+
+/** Muut julkaistut visat samasta kategoriasta — peli-lopun "Pelaa lisää" -suositukset. */
+export async function getRelatedQuizzes(
+  category: string | undefined,
+  excludeId: string,
+  limit = 6,
+): Promise<RelatedQuiz[]> {
+  if (!category) return [];
+  const sb = getSupabase();
+  if (!sb) return [];
+  const { data } = await sb
+    .from("quizzes")
+    .select("id, title, slug")
+    .eq("category", category)
+    .eq("status", "published")
+    .neq("id", excludeId)
+    .order("title", { ascending: true })
+    .limit(limit);
+  return data ?? [];
 }
 
 /** Kaikkien julkaistujen visojen slugit + päivitysaika sitemapia varten. */

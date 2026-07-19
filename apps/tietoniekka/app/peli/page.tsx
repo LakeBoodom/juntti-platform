@@ -1,7 +1,7 @@
 import { Suspense } from "react";
 import type { Metadata } from "next";
 import { CATEGORIES } from "../../lib/categories";
-import { getQuizById, getKuvavisat, getRandomQuizByCategory, getTodaysQuiz } from "../../lib/queries";
+import { getQuizById, getKuvavisat, getRandomQuizByCategory, getRelatedQuizzes, getTodaysQuiz } from "../../lib/queries";
 import { PeliClient } from "./peli-client";
 import { buildQuizConfig } from "../../lib/buildQuizConfig";
 import type { QuizConfig, Question } from "./questions";
@@ -147,6 +147,7 @@ export default async function PeliPage({
           kuvavisa: typeof params.kuvavisa === "string" ? params.kuvavisa : undefined,
         },
       );
+      preloadedQuiz.relatedQuizzes = await getRelatedQuizzes(full.category, full.id);
     }
   }
 
@@ -161,6 +162,7 @@ export default async function PeliPage({
           full.questions,
           { paivan_visa: true },
         );
+        preloadedQuiz.relatedQuizzes = await getRelatedQuizzes(full.category, full.id);
       }
     }
   }
@@ -177,6 +179,7 @@ export default async function PeliPage({
           full.questions,
           { kat: params.kat },
         );
+        preloadedQuiz.relatedQuizzes = await getRelatedQuizzes(full.category, full.id);
       }
     }
   }
@@ -194,6 +197,7 @@ export default async function PeliPage({
           full.questions,
           { kat: randomSlug },
         );
+        preloadedQuiz.relatedQuizzes = await getRelatedQuizzes(full.category, full.id);
       }
     }
   }

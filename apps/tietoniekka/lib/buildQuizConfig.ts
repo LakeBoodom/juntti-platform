@@ -45,7 +45,10 @@ export function buildQuizConfig(
     };
   });
 
-  const catSlug = meta.kat;
+  // Kategoria tulee AINA quiz.category-kentästä (DB), ei vain kun pelireitti on ?kat=...
+  // — ennen tätä "UUSI X-VISA" -nappi ja kategoriasuositukset puuttuivat kokonaan kun
+  // visaa pelattiin suoraan quiz_id:llä tai /visa/[slug]-jakolinkin kautta.
+  const catSlug = quiz.category || meta.kat;
   const categoryLabel = catSlug
     ? CATEGORY_BY_SLUG[catSlug]?.title ?? catSlug.toUpperCase()
     : undefined;
@@ -56,6 +59,7 @@ export function buildQuizConfig(
     titleRaw: quiz.title,
     slug: quiz.slug ?? undefined,
     dbId: quiz.id,
+    categorySlug: catSlug || undefined,
     categoryLabel,
     intro: quiz.description ?? "Pelataan!",
     questions: mappedQuestions,

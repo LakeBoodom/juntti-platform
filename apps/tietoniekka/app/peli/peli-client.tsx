@@ -518,7 +518,7 @@ function PeliInner({ preloadedQuiz }: { preloadedQuiz: QuizConfig | null }) {
   const q = quiz.questions[idx];
   const progressPct = phase === "end" ? 100 : (idx / totalQ) * 100;
   const result = resultTier(correctCount, totalQ);
-  const currentCatSlug = quiz.id.startsWith("kat:") ? quiz.id.split(":")[1] : null;
+  const currentCatSlug = quiz.categorySlug ?? null;
   const timerPct = (timeLeft / TIME_PER_Q) * 100;
   const timerClass = timeLeft <= 5 ? "danger" : timeLeft <= 10 ? "warn" : "";
 
@@ -693,9 +693,9 @@ function PeliInner({ preloadedQuiz }: { preloadedQuiz: QuizConfig | null }) {
               )}
             </div>
             <div className="peli-end-actions">
-              {quiz.categoryLabel && (
+              {quiz.categoryLabel && currentCatSlug && (
                 <Link
-                  href={`/peli?kat=${encodeURIComponent(quiz.id.split(":")[1])}${quiz.dbId ? `&exclude=${quiz.dbId}` : ""}`}
+                  href={`/peli?kat=${encodeURIComponent(currentCatSlug)}${quiz.dbId ? `&exclude=${quiz.dbId}` : ""}`}
                   className="peli-btn-primary"
                   prefetch={false}
                 >
@@ -757,6 +757,24 @@ function PeliInner({ preloadedQuiz }: { preloadedQuiz: QuizConfig | null }) {
                 TAKAISIN ETUSIVULLE
               </Link>
             </div>
+
+            {quiz.relatedQuizzes && quiz.relatedQuizzes.length > 0 && (
+              <div className="peli-end-more">
+                <div className="peli-end-more-label">Pelaa lisää samasta aiheesta</div>
+                <div className="peli-end-cats">
+                  {quiz.relatedQuizzes.map((rq) => (
+                    <Link
+                      key={rq.id}
+                      href={rq.slug ? `/visa/${rq.slug}` : `/peli?quiz_id=${rq.id}`}
+                      className="peli-cat-chip"
+                      prefetch={false}
+                    >
+                      {rq.title}
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            )}
 
             <div className="peli-end-more">
               <div className="peli-end-more-label">Kokeile toista aihetta</div>

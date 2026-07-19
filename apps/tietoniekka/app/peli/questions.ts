@@ -12,13 +12,22 @@ export type Question = {
   image?: string;             // kuvavisalle URL
 };
 
+/** Toinen julkaistu visa samasta kategoriasta — tulosnäytön "Pelaa lisää" -suositukset. */
+export type RelatedQuiz = {
+  id: string;
+  title: string;
+  slug: string | null;
+};
+
 export type QuizConfig = {
   id: string;                 // route-tunniste (esim. "kat:urheilu")
   title: string;              // näkyy intro-screenissä isolla (UPPERCASE)
   titleRaw?: string;          // alkuperäinen otsikko (jakotekstiä varten)
   slug?: string;              // DB-slug → /visa/<slug> jakolinkkiä varten
   dbId?: string;              // visan oikea DB-id ("Uusi X-visa" exclude)
+  categorySlug?: string;      // DB-kategorian slug (esim. "tv-sarjat") — aina asetettu kun visa tulee tietokannasta
   categoryLabel?: string;     // kategorian näyttönimi ("LUONTO")
+  relatedQuizzes?: RelatedQuiz[]; // muut julkaistut visat samasta kategoriasta
   intro: string;              // intro-tekstinä
   questions: Question[];
   isImageQuiz?: boolean;      // näytetään flag-stage / kuvalaatikko
