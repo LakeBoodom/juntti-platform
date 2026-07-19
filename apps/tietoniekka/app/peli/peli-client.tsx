@@ -122,6 +122,9 @@ function PeliInner({ preloadedQuiz }: { preloadedQuiz: QuizConfig | null }) {
   const [answerLog, setAnswerLog] = useState<boolean[]>([]);
   const [dailyStreak, setDailyStreak] = useState<number | null>(null);
   const [feedback, setFeedback] = useState<0 | 1 | -1>(0);
+  // Oljenkorsi: kerran per pelikerta (ei per kysymys) saa poistaa 2 väärää vaihtoehtoa nykyisestä kysymyksestä.
+  const [oljenkorsiUsed, setOljenkorsiUsed] = useState(false);
+  const [hiddenOpts, setHiddenOpts] = useState<Set<string>>(new Set());
   const playIdRef = useRef<string | null>(null);
   // Jaetun linkin haaste: ?tulos=8-10 → "Kaverisi sai 8/10 — pystytkö parempaan?"
   // (parametrin nimi EI saa olla "t" — linkkisiivoajat poistavat sen seurantaparametrina)
@@ -156,6 +159,8 @@ function PeliInner({ preloadedQuiz }: { preloadedQuiz: QuizConfig | null }) {
     setShowFact(false);
     setShowNext(false);
     setTimeLeft(TIME_PER_Q);
+    setOljenkorsiUsed(false);
+    setHiddenOpts(new Set());
     // first-answer pre-select via URL — toimii vain ensimmäiseen kysymykseen
     const first = searchParams.get("first");
     if (first && ["A", "B", "C", "D"].includes(first)) {
@@ -175,6 +180,7 @@ function PeliInner({ preloadedQuiz }: { preloadedQuiz: QuizConfig | null }) {
     setTimeLeft(TIME_PER_Q);
     setShowFact(false);
     setShowNext(false);
+    setHiddenOpts(new Set());
   }, [phase, idx, quiz]);
 
   /* ─── Ajastin ─────────────────────────────────────────────── */
@@ -254,7 +260,7 @@ function PeliInner({ preloadedQuiz }: { preloadedQuiz: QuizConfig | null }) {
   }
 
   function choose(opt: string) {
-    if (answered || !quiz) return;
+    if (answered || !quiz || hiddenOpts.has(opt)) return;
     setAnswered(true);
     setChosen(opt);
     if (timerRef.current) clearInterval(timerRef.current);
@@ -289,6 +295,19 @@ function PeliInner({ preloadedQuiz }: { preloadedQuiz: QuizConfig | null }) {
     }
     setTimeout(() => setShowFact(true), 350);
     setTimeout(() => setShowNext(true), 700);
+  }
+
+  /** Oljenkorsi: kerran per pelikerta — poistaa 2 satunnaista väärää vaihtoehtoa nykyisestä kysymyksestä. */
+  function useOljenkorsi() {
+    if (oljenkorsiUsed || answered || !quiz) return;
+    const q = quiz.questions[idx];
+    const wrongOpts = q.options.filter((o) => o !== q.correct);
+    if (wrongOpts.length < 2) return; // ei tarpeeksi vääriä vaihtoehtoja poistettavaksi
+    const shuffled = [...wrongOpts].sort(() => Math.random() - 0.5);
+    setHiddenOpts(new Set(shuffled.slice(0, 2)));
+    setOljenkorsiUsed(true);
+    soundClick();
+    vibrate(30);
   }
 
   function nextQuestion() {
@@ -464,7 +483,7 @@ function PeliInner({ preloadedQuiz }: { preloadedQuiz: QuizConfig | null }) {
         if (e.key >= "1" && e.key <= "4") {
           const i = parseInt(e.key, 10) - 1;
           const opt = quiz?.questions[idx]?.options[i];
-          if (opt) choose(opt);
+          if (opt && !hiddenOpts.has(opt)) choose(opt);
         }
       }
       if (e.key === "Enter") {
@@ -476,7 +495,7 @@ function PeliInner({ preloadedQuiz }: { preloadedQuiz: QuizConfig | null }) {
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [phase, answered, quiz, idx, showNext]);
+  }, [phase, answered, quiz, idx, showNext, hiddenOpts]);
 
   if (!quiz) {
     return (
@@ -593,8 +612,22 @@ function PeliInner({ preloadedQuiz }: { preloadedQuiz: QuizConfig | null }) {
               </div>
 
               <div className="peli-card-right">
+                {!answered && !oljenkorsiUsed && q.options.filter((o) => o !== q.correct).length >= 2 && (
+                  <div className="peli-options-toolbar">
+                    <button
+                      className="peli-joker-btn"
+                      onClick={useOljenkorsi}
+                      type="button"
+                      aria-label="Käytä oljenkorsi — poista kaksi väärää vaihtoehtoa"
+                    >
+                      🌾 Oljenkorsi
+                      <span className="peli-joker-sub">poista 2 väärää · kerran per visa</span>
+                    </button>
+                  </div>
+                )}
                 <div className="peli-options">
                   {q.options.map((opt, i) => {
+                    if (hiddenOpts.has(opt)) return null;
                     const isCorrect = answered && opt === q.correct;
                     const isWrong = answered && chosen === opt && opt !== q.correct;
                     return (

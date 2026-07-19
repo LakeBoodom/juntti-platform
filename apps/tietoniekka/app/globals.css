@@ -2639,6 +2639,43 @@ a.sankari-photo {
   color: var(--peli-navy);
 }
 
+/* Oljenkorsi (50/50-vihje) */
+.peli-options-toolbar {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 8px;
+}
+.peli-joker-btn {
+  appearance: none;
+  background: var(--peli-cream);
+  border: 1.5px dashed rgba(15, 21, 32, 0.25);
+  color: var(--peli-navy);
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 13px;
+  padding: 8px 12px;
+  border-radius: 10px;
+  cursor: pointer;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1px;
+  line-height: 1.3;
+  transition: transform 0.15s, background 0.2s, border-color 0.2s;
+}
+.peli-joker-btn:hover {
+  background: var(--peli-cream-2);
+  border-color: var(--peli-gold);
+}
+.peli-joker-btn:active { transform: scale(0.97); }
+.peli-joker-sub {
+  font-family: var(--font-body);
+  font-weight: 500;
+  font-size: 10.5px;
+  letter-spacing: 0.01em;
+  color: var(--peli-muted);
+}
+
 /* Options */
 .peli-options {
   display: flex;
