@@ -586,6 +586,178 @@ export type Database = {
         }
         Relationships: []
       }
+      social_accounts: {
+        Row: {
+          access_token: string | null
+          created_at: string
+          external_account_id: string | null
+          external_account_name: string | null
+          id: string
+          last_error: string | null
+          platform: string
+          site_id: string
+          status: string
+          token_expires_at: string | null
+          updated_at: string
+        }
+        Insert: {
+          access_token?: string | null
+          created_at?: string
+          external_account_id?: string | null
+          external_account_name?: string | null
+          id?: string
+          last_error?: string | null
+          platform: string
+          site_id: string
+          status?: string
+          token_expires_at?: string | null
+          updated_at?: string
+        }
+        Update: {
+          access_token?: string | null
+          created_at?: string
+          external_account_id?: string | null
+          external_account_name?: string | null
+          id?: string
+          last_error?: string | null
+          platform?: string
+          site_id?: string
+          status?: string
+          token_expires_at?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "social_accounts_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: false
+            referencedRelation: "sites"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      social_posts: {
+        Row: {
+          copy_text: string | null
+          created_at: string
+          created_by: string | null
+          error_message: string | null
+          external_post_id: string | null
+          id: string
+          image_url: string | null
+          platform: string
+          posted_at: string | null
+          scheduled_at: string | null
+          site_id: string
+          source_id: string | null
+          source_type: string
+          status: string
+          target_date: string | null
+          template_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          copy_text?: string | null
+          created_at?: string
+          created_by?: string | null
+          error_message?: string | null
+          external_post_id?: string | null
+          id?: string
+          image_url?: string | null
+          platform: string
+          posted_at?: string | null
+          scheduled_at?: string | null
+          site_id: string
+          source_id?: string | null
+          source_type: string
+          status?: string
+          target_date?: string | null
+          template_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          copy_text?: string | null
+          created_at?: string
+          created_by?: string | null
+          error_message?: string | null
+          external_post_id?: string | null
+          id?: string
+          image_url?: string | null
+          platform?: string
+          posted_at?: string | null
+          scheduled_at?: string | null
+          site_id?: string
+          source_id?: string | null
+          source_type?: string
+          status?: string
+          target_date?: string | null
+          template_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "social_posts_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: false
+            referencedRelation: "sites"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "social_posts_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "social_templates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      social_templates: {
+        Row: {
+          active: boolean
+          aspect_ratio: string
+          content_scope: string
+          created_at: string
+          id: string
+          image_url: string
+          name: string
+          site_id: string
+          sort_order: number
+          theme_key: string
+        }
+        Insert: {
+          active?: boolean
+          aspect_ratio?: string
+          content_scope?: string
+          created_at?: string
+          id?: string
+          image_url: string
+          name: string
+          site_id: string
+          sort_order?: number
+          theme_key?: string
+        }
+        Update: {
+          active?: boolean
+          aspect_ratio?: string
+          content_scope?: string
+          created_at?: string
+          id?: string
+          image_url?: string
+          name?: string
+          site_id?: string
+          sort_order?: number
+          theme_key?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "social_templates_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: false
+            referencedRelation: "sites"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       celebrity_vote_counts: {
