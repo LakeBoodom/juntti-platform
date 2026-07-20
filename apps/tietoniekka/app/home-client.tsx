@@ -16,7 +16,7 @@ import { CATEGORIES, CATEGORY_BY_SLUG } from "../lib/categories";
 /** Kokeilu 2026-07-15: neon-aksentti vain näille kahdelle Pinnalla nyt -tapahtumalle.
  *  Muut kategoriat/tapahtumat pysyvät ennallaan kunnes Heikki päättää laajentaa. */
 const PINNALLA_NEON: Record<string, string> = {
-  "mm-futis-2026": "#4fd6ff",
+  "kesasuomi-2026": "#4fd67a",
   "festarikesa-2026": "#ff5fb0",
 };
 
