@@ -2,7 +2,7 @@
 
 import { useTransition } from "react";
 import { Button } from "@/components/ui/button";
-import { closePublicationNow, archivePublication, deletePublication } from "../actions";
+import { closePublicationNow, archivePublication, deletePublication, setPublicationFeatured } from "../actions";
 import type { PublicationRow } from "@/lib/diggaa";
 
 const FORMAT_NAMES: Record<string, string> = {
@@ -40,11 +40,30 @@ export function PublicationRowItem({ pub, state }: { pub: PublicationRow; state:
       <span className="w-28 shrink-0 text-xs text-muted-foreground">
         {FORMAT_NAMES[pub.content_type] ?? pub.content_type}
       </span>
-      <span className="flex-1 truncate text-sm font-medium">{pub.title}</span>
+      <span className="flex-1 truncate text-sm font-medium">
+        {pub.title}
+        {pub.featured && (
+          <span className="ml-2 rounded-full bg-amber-100 px-2 py-0.5 text-[11px] font-semibold text-amber-800">
+            ★ Nosto
+          </span>
+        )}
+      </span>
       <span className="shrink-0 text-xs text-muted-foreground">
         {fmtTime(pub.opens_at)} → {fmtTime(pub.closes_at)}
       </span>
       <div className="flex shrink-0 gap-1">
+        {(state === "live" || state === "tulossa") && (
+          <Button
+            variant="outline"
+            size="sm"
+            disabled={pending}
+            onClick={() =>
+              startTransition(async () => void (await setPublicationFeatured(pub.id, !pub.featured)))
+            }
+          >
+            {pub.featured ? "Poista nosto" : "Nosta"}
+          </Button>
+        )}
         {state === "live" && (
           <Button
             variant="outline"

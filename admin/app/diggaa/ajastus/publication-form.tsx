@@ -50,6 +50,7 @@ export function NewPublicationButton({ content }: { content: DiggaaContentSummar
   const [preset, setPreset] = useState("24h");
   const [closesAt, setClosesAt] = useState<string>("");
   const [status, setStatus] = useState<"draft" | "scheduled">("scheduled");
+  const [featured, setFeatured] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
 
@@ -80,6 +81,7 @@ export function NewPublicationButton({ content }: { content: DiggaaContentSummar
       duration_preset: preset,
       closes_at: preset === "custom" && closesAt ? new Date(closesAt).toISOString() : null,
       status,
+      featured,
     };
     startTransition(async () => {
       const res = await createPublication(payload);
@@ -171,6 +173,15 @@ export function NewPublicationButton({ content }: { content: DiggaaContentSummar
               </SelectContent>
             </Select>
           </div>
+          <label className="flex items-center gap-2 text-sm">
+            <input
+              type="checkbox"
+              checked={featured}
+              onChange={(e) => setFeatured(e.target.checked)}
+              className="h-4 w-4"
+            />
+            Nosta etusivulle (näytetään ensimmäisenä ja avataan suoraan)
+          </label>
           {error && <p className="text-sm text-red-600">{error}</p>}
           <Button type="submit" disabled={pending}>
             {pending ? "Tallennetaan…" : "Luo julkaisu"}

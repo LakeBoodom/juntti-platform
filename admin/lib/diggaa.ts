@@ -131,6 +131,7 @@ export type PublicationRow = {
   opens_at: string;
   closes_at: string;
   duration_preset: string;
+  featured: boolean;
 };
 
 export function publicationState(p: PublicationRow, now: Date): "live" | "tulossa" | "päättynyt" | "luonnos" | "arkistoitu" {
@@ -147,7 +148,7 @@ export async function listPublications(siteId: string): Promise<PublicationRow[]
   const sb = getSupabaseAdmin() as any;
   const { data } = await sb
     .from("diggaa_publications")
-    .select("id, content_type, content_id, title, status, opens_at, closes_at, duration_preset")
+    .select("id, content_type, content_id, title, status, opens_at, closes_at, duration_preset, featured")
     .eq("site_id", siteId)
     .order("opens_at", { ascending: false });
   return data ?? [];
