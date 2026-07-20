@@ -275,6 +275,7 @@ export type PublicationInput = {
   duration_preset: string;
   closes_at: string | null; // ISO, käytetään kun preset = custom
   status: "draft" | "scheduled";
+  featured: boolean; // nosto: näytetään etusivulla ensimmäisenä
 };
 
 export async function createPublication(input: PublicationInput) {
@@ -304,7 +305,19 @@ export async function createPublication(input: PublicationInput) {
     opens_at: opens.toISOString(),
     closes_at: closes.toISOString(),
     duration_preset: input.duration_preset,
+    featured: input.featured,
   });
+  if (error) return { ok: false as const, error: error.message };
+  revalidateDiggaa();
+  return { ok: true as const };
+}
+
+export async function setPublicationFeatured(id: string, featured: boolean) {
+  const sb = getSupabaseAdmin() as any;
+  const { error } = await sb
+    .from("diggaa_publications")
+    .update({ featured })
+    .eq("id", id);
   if (error) return { ok: false as const, error: error.message };
   revalidateDiggaa();
   return { ok: true as const };
