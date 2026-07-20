@@ -20,6 +20,17 @@ const PINNALLA_NEON: Record<string, string> = {
   "festarikesa-2026": "#ff5fb0",
 };
 
+/** Hero-ingressin 5 vaihtoehtoa (Heikin hyväksymät 2026-07-20). Ensimmäinen
+ *  (indeksi 0) renderöityy myös serverillä/ennen hydraatiota — loput arvotaan
+ *  clientillä mountin jälkeen, sama kuvio kuin todaysDateLabel alla. */
+const HERO_TAGLINES: string[] = [
+  "Naapurisi sai 7/10 — kyllä kai sinä hänet voitat?",
+  "Pelaatko muuten työajalla? Ei hätää — emme kerro pomollesi.",
+  "Kiva kun tulit käymään! Maistuisiko pari tietovisaa?",
+  "Kahvit siinä ja tietovisa tässä — aika hyvä yhdistelmä.",
+  "Hyvä kun tulit! Katsotaan, mitä tänään tiedetään.",
+];
+
 type CategoryQuizMap = Record<string, CategoryPreview | null>;
 
 /** Lyhennä pitkä visaotsikko korttiin: katkaise ensimmäiseen väliviiva-erottimeen. */
@@ -44,6 +55,11 @@ export function HomeClient({
   sankariQuiz
 }: HomeClientProps) {
   const [todaysDateLabel, setTodaysDateLabel] = useState<string>("");
+  const [heroTagline, setHeroTagline] = useState<string>(HERO_TAGLINES[0]);
+
+  useEffect(() => {
+    setHeroTagline(HERO_TAGLINES[Math.floor(Math.random() * HERO_TAGLINES.length)]);
+  }, []);
 
   useEffect(() => {
     const fmt = new Intl.DateTimeFormat("fi-FI", { weekday: "long", day: "numeric", month: "numeric" });
@@ -158,7 +174,7 @@ export function HomeClient({
               <span className="niekka-line">NIEKKA</span>
             </h1>
             <p className="hero-subtitle">
-              Naapurisi sai 7/10 — kyllä kai sinä hänet voitat?
+              {heroTagline}
             </p>
             <a href="#paivan-visa" className="btn btn-primary btn-large hero-cta">
               OTETAAN SELVÄÄ →
