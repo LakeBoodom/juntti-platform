@@ -103,7 +103,6 @@ function parseTulosParam(raw: string | null): { score: number; total: number } |
 type Phase = "intro" | "playing" | "end";
 
 function PeliInner({ preloadedQuiz }: { preloadedQuiz: QuizConfig | null }) {
-  console.log("[DEBUG peli] PeliInner render, preloadedQuiz.id=", preloadedQuiz?.id, preloadedQuiz?.title);
   const searchParams = useSearchParams();
   const [quiz, setQuiz] = useState<QuizConfig | null>(preloadedQuiz);
   const [phase, setPhase] = useState<Phase>("intro");
@@ -138,17 +137,18 @@ function PeliInner({ preloadedQuiz }: { preloadedQuiz: QuizConfig | null }) {
   // kun vaihdetaan vain hakuparametreja (esim. "UUSI X-VISA" tulosnäytöltä), joten pelkkä
   // setQuiz() alla EI riitä: ilman tätä idx/phase/score jäävät jumiin edellisen pelin tilaan
   // ja käyttäjä näkee saman tulosruudun vaikka uusi visa on jo ladattu taustalla.
-  const loadedQuizIdRef = useRef<string | null>(preloadedQuiz?.id ?? null);
+  // HUOM: verrataan dbId:hen (oikea Supabase-UUID), EI id:hen — QuizConfig.id on
+  // reittitilan tunniste (esim. "kat:musiikki") joka on SAMA jokaiselle kategoriasta
+  // arvotulle visalle, joten pelkkä id-vertailu ei koskaan huomannut visan vaihtuneen.
+  const loadedQuizIdRef = useRef<string | null>(preloadedQuiz?.dbId ?? null);
 
   /* ─── Quiz resolve — käyttää AINOASTAAN server-side preloadedQuiz:ia (Supabasesta).
      resolveQuiz-fallback hardcoded-questions.ts:stä poistettu Heikin pyynnöstä — kaikki
      visat tulevat admin-toolista. ─────────────────────────────────────────────── */
   useEffect(() => {
-    console.log("[DEBUG peli] effect fired, preloadedQuiz.id=", preloadedQuiz?.id, "loadedQuizIdRef=", loadedQuizIdRef.current, "current phase=", phase);
     if (!preloadedQuiz) return;
-    if (preloadedQuiz.id === loadedQuizIdRef.current) return; // sama visa jo ladattu — ei nollata pelitilaa turhaan
-    loadedQuizIdRef.current = preloadedQuiz.id;
-    console.log("[DEBUG peli] resetting to new quiz", preloadedQuiz.id, preloadedQuiz.title);
+    if (preloadedQuiz.dbId === loadedQuizIdRef.current) return; // sama visa jo ladattu — ei nollata pelitilaa turhaan
+    loadedQuizIdRef.current = preloadedQuiz.dbId ?? null;
     setQuiz(preloadedQuiz);
     // Uusi visa eri /peli-hakuparametreilla (esim. "UUSI X-VISA", satunnaisvisa) — nollaa koko
     // pelitila kuten startGame() tekisi, jotta ruutu palaa intro-näkymään eikä jää tulosnäytölle.
