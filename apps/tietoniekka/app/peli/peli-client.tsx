@@ -133,14 +133,43 @@ function PeliInner({ preloadedQuiz }: { preloadedQuiz: QuizConfig | null }) {
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const optionRefs = useRef<(HTMLButtonElement | null)[]>([]);
   const shareWrapRef = useRef<HTMLDivElement>(null);
+  // Seuraa mikä visa on viimeksi ladattu — sama /peli-reitti pysyy samana React-komponenttina
+  // kun vaihdetaan vain hakuparametreja (esim. "UUSI X-VISA" tulosnäytöltä), joten pelkkä
+  // setQuiz() alla EI riitä: ilman tätä idx/phase/score jäävät jumiin edellisen pelin tilaan
+  // ja käyttäjä näkee saman tulosruudun vaikka uusi visa on jo ladattu taustalla.
+  // HUOM: verrataan dbId:hen (oikea Supabase-UUID), EI id:hen — QuizConfig.id on
+  // reittitilan tunniste (esim. "kat:musiikki") joka on SAMA jokaiselle kategoriasta
+  // arvotulle visalle, joten pelkkä id-vertailu ei koskaan huomannut visan vaihtuneen.
+  const loadedQuizIdRef = useRef<string | null>(preloadedQuiz?.dbId ?? null);
 
   /* ─── Quiz resolve — käyttää AINOASTAAN server-side preloadedQuiz:ia (Supabasesta).
      resolveQuiz-fallback hardcoded-questions.ts:stä poistettu Heikin pyynnöstä — kaikki
      visat tulevat admin-toolista. ─────────────────────────────────────────────── */
   useEffect(() => {
-    if (preloadedQuiz) {
-      setQuiz(preloadedQuiz);
-    }
+    if (!preloadedQuiz) return;
+    if (preloadedQuiz.dbId === loadedQuizIdRef.current) return; // sama visa jo ladattu — ei nollata pelitilaa turhaan
+    loadedQuizIdRef.current = preloadedQuiz.dbId ?? null;
+    setQuiz(preloadedQuiz);
+    // Uusi visa eri /peli-hakuparametreilla (esim. "UUSI X-VISA", satunnaisvisa) — nollaa koko
+    // pelitila kuten startGame() tekisi, jotta ruutu palaa intro-näkymään eikä jää tulosnäytölle.
+    setPhase("intro");
+    setIdx(0);
+    setScore(0);
+    setCorrectCount(0);
+    setAnswerLog([]);
+    setFeedback(0);
+    playIdRef.current = null;
+    setStreak(0);
+    setStreakBump(0);
+    setAnswered(false);
+    setChosen(null);
+    setShowFact(false);
+    setShowNext(false);
+    setTimeLeft(TIME_PER_Q);
+    setOljenkorsiUsed(false);
+    setHiddenOpts(new Set());
+    setShareOpen(false);
+    setCopied(false);
   }, [preloadedQuiz]);
 
   const startGame = useCallback(() => {
