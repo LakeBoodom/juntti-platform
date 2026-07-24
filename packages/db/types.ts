@@ -270,6 +270,7 @@ export type Database = {
           options: Json
           question: string
           site_id: string
+          sort_order: number
           tag: string | null
           type: string
           updated_at: string
@@ -286,6 +287,7 @@ export type Database = {
           options: Json
           question: string
           site_id: string
+          sort_order?: number
           tag?: string | null
           type: string
           updated_at?: string
@@ -302,6 +304,7 @@ export type Database = {
           options?: Json
           question?: string
           site_id?: string
+          sort_order?: number
           tag?: string | null
           type?: string
           updated_at?: string

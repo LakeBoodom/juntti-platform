@@ -5,7 +5,16 @@
 import { getAnthropic, MODEL } from "./client";
 
 export type KuvavisaQuestionInput = {
-  type: "liput" | "vaakunat" | "linnut" | "kasvit" | "elaimet";
+  type:
+    | "liput"
+    | "vaakunat"
+    | "linnut"
+    | "kasvit"
+    | "elaimet"
+    | "henkilot"
+    | "rakennukset"
+    | "kaupungit"
+    | "maalaukset";
   /** Mitä kuvassa on, esim. "Jamaikan lippu" tai "Tampereen tuomiokirkko" */
   subject: string;
   /** Vaikeustaso */
@@ -42,6 +51,22 @@ const TYPE_GUIDE: Record<KuvavisaQuestionInput["type"], { question: string; dist
   elaimet: {
     question: "Mikä eläin?",
     distractor: "Muita samansukuisia tai samalla alueella eläviä eläimiä.",
+  },
+  henkilot: {
+    question: "Kuka henkilö?",
+    distractor: "Muita samalta alalta, aikakaudelta tai samannäköisiä tunnettuja henkilöitä.",
+  },
+  rakennukset: {
+    question: "Mikä rakennus?",
+    distractor: "Muita samantyylisiä, samalta aikakaudelta tai samalta alueelta olevia rakennuksia.",
+  },
+  kaupungit: {
+    question: "Mikä kaupunki?",
+    distractor: "Muita samankokoisia tai samalla alueella sijaitsevia kaupunkeja.",
+  },
+  maalaukset: {
+    question: "Mikä maalaus?",
+    distractor: "Muita saman taiteilijan, tyylisuunnan tai aikakauden maalauksia.",
   },
 };
 

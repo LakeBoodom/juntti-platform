@@ -12,16 +12,11 @@ import {
 import { NewKuvavisaButton } from "./new-button";
 import { KuvavisaRow } from "./kuvavisa-row";
 import type { KuvavisaType } from "./actions";
+import { KUVAVISA_TYPES } from "./types";
 
 export const dynamic = "force-dynamic";
 
-const TYPES: { slug: KuvavisaType; label: string }[] = [
-  { slug: "liput",    label: "Liput" },
-  { slug: "vaakunat", label: "Vaakunat" },
-  { slug: "linnut",   label: "Linnut" },
-  { slug: "kasvit",   label: "Kasvit" },
-  { slug: "elaimet",  label: "Eläimet" },
-];
+const TYPES = KUVAVISA_TYPES;
 
 export default async function KuvavisatPage({
   searchParams,
@@ -43,7 +38,8 @@ export default async function KuvavisatPage({
     .select("*")
     .eq("site_id", site.id)
     .eq("type", activeType)
-    .order("created_at", { ascending: false });
+    .order("sort_order", { ascending: true })
+    .order("created_at", { ascending: true });
 
   // Counts per type — näytetään tab-numerona
   const { data: counts } = await admin
@@ -63,8 +59,9 @@ export default async function KuvavisatPage({
           <div>
             <h1 className="text-2xl font-semibold">Kuvavisat</h1>
             <p className="text-sm text-muted-foreground">
-              Yksittäisiä kuva-kysymys -kombinaatioita. Pelinäkymä koostaa N kpl per
-              tyyppi sessiossa. Site: <strong>{site.name}</strong>.
+              Yksittäisiä kuva-kysymys -kombinaatioita. Pelinäkymä näyttää ne tässä
+              järjestyksessä (ylimpänä ensin) — säädä nuolilla. Site:{" "}
+              <strong>{site.name}</strong>.
             </p>
           </div>
           <NewKuvavisaButton
@@ -118,12 +115,14 @@ export default async function KuvavisatPage({
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {data.map((row) => (
+                {data.map((row, i) => (
                   <KuvavisaRow
                     key={row.id}
                     row={row as never}
                     siteId={site.id}
                     siteSlug={site.slug}
+                    isFirst={i === 0}
+                    isLast={i === data.length - 1}
                   />
                 ))}
               </TableBody>

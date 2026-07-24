@@ -204,17 +204,21 @@ export default async function PeliPage({
 
   // 4. Kuvavisa-flow (alkuperäinen)
   if (!preloadedQuiz && typeof params.kuvavisa === "string") {
-    // Kuvavisat: hae random N riviä DB:stä Heikin admin-toolista
+    // Kuvavisat: hae N riviä DB:stä Heikin admin-toolista (adminin järjestyksessä)
     const kvSlug = params.kuvavisa;
     const rows = await getKuvavisat(kvSlug, 10);
     if (rows.length > 0) {
       const KUVAVISA_TITLES: Record<string, { title: string; intro: string }> = {
-        liput:    { title: "LIPPUVISA",    intro: "Tunnista lippu — yksi kuva, neljä vaihtoehtoa." },
-        vaakuna:  { title: "VAAKUNAVISA",  intro: "Tunnista suomalainen kunnanvaakuna." },
-        vaakunat: { title: "VAAKUNAVISA",  intro: "Tunnista suomalainen kunnanvaakuna." },
-        linnut:   { title: "LINTUVISA",    intro: "Tunnista lintu kuvasta — eihän tämä ole varis." },
-        kasvit:   { title: "KASVIVISA",    intro: "Tunnista kasvi kuvasta." },
-        elaimet:  { title: "ELÄINVISA",    intro: "Tunnista eläin kuvasta." },
+        liput:       { title: "LIPPUVISA",    intro: "Tunnista lippu — yksi kuva, neljä vaihtoehtoa." },
+        vaakuna:     { title: "VAAKUNAVISA",  intro: "Tunnista suomalainen kunnanvaakuna." },
+        vaakunat:    { title: "VAAKUNAVISA",  intro: "Tunnista suomalainen kunnanvaakuna." },
+        linnut:      { title: "LINTUVISA",    intro: "Tunnista lintu kuvasta — eihän tämä ole varis." },
+        kasvit:      { title: "KASVIVISA",    intro: "Tunnista kasvi kuvasta." },
+        elaimet:     { title: "ELÄINVISA",    intro: "Tunnista eläin kuvasta." },
+        henkilot:    { title: "HENKILÖVISA",  intro: "Tunnista henkilö kuvasta." },
+        rakennukset: { title: "RAKENNUSVISA", intro: "Tunnista rakennus kuvasta." },
+        kaupungit:   { title: "KAUPUNKIVISA", intro: "Tunnista kaupunki kuvasta." },
+        maalaukset:  { title: "MAALAUSVISA",  intro: "Tunnista maalaus kuvasta." },
       };
       const meta = KUVAVISA_TITLES[kvSlug] ?? { title: "KUVAVISA", intro: "Tunnista kuvasta." };
       const mappedQuestions: Question[] = rows.map((r) => {

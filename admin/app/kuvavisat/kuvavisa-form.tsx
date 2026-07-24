@@ -22,16 +22,9 @@ import {
   type KuvavisaType,
 } from "./actions";
 import { aiGenerateKuvavisa } from "./ai-actions";
+import { KUVAVISA_TYPES } from "./types";
 
 export type KuvavisaFormValue = KuvavisaInput & { id?: string };
-
-const TYPE_LABELS: Record<KuvavisaType, string> = {
-  liput: "Liput",
-  vaakunat: "Vaakunat",
-  linnut: "Linnut",
-  kasvit: "Kasvit",
-  elaimet: "Eläimet",
-};
 
 export function KuvavisaForm({
   initial,
@@ -158,9 +151,9 @@ export function KuvavisaForm({
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            {Object.entries(TYPE_LABELS).map(([k, v]) => (
-              <SelectItem key={k} value={k}>
-                {v}
+            {KUVAVISA_TYPES.map((t) => (
+              <SelectItem key={t.slug} value={t.slug}>
+                {t.label}
               </SelectItem>
             ))}
           </SelectContent>

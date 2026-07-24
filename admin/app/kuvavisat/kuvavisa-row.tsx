@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { Pencil, Trash2 } from "lucide-react";
+import { ArrowDown, ArrowUp, Pencil, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { TableCell, TableRow } from "@/components/ui/table";
 import {
@@ -13,20 +13,25 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { KuvavisaForm, type KuvavisaFormValue } from "./kuvavisa-form";
-import { deleteKuvavisa, type KuvavisaType } from "./actions";
+import { deleteKuvavisa, moveKuvavisa, type KuvavisaType } from "./actions";
 
 export function KuvavisaRow({
   row,
   siteId,
   siteSlug,
+  isFirst,
+  isLast,
 }: {
   row: KuvavisaFormValue;
   siteId: string;
   siteSlug: string;
+  isFirst?: boolean;
+  isLast?: boolean;
 }) {
   const [editOpen, setEditOpen] = useState(false);
   const [delOpen, setDelOpen] = useState(false);
   const [pending, startTransition] = useTransition();
+  const [moving, startMove] = useTransition();
   const [error, setError] = useState<string | null>(null);
 
   function doDelete() {
@@ -35,6 +40,12 @@ export function KuvavisaRow({
       const res = await deleteKuvavisa(row.id!);
       if (!res.ok) setError(res.error);
       else setDelOpen(false);
+    });
+  }
+
+  function move(direction: "up" | "down") {
+    startMove(async () => {
+      await moveKuvavisa(row.id!, direction);
     });
   }
 
@@ -59,6 +70,24 @@ export function KuvavisaRow({
       <TableCell>{row.active ? "✓ Aktiivinen" : "○ Pois"}</TableCell>
       <TableCell className="text-right">
         <div className="inline-flex gap-1">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => move("up")}
+            disabled={isFirst || moving}
+            aria-label="Siirrä ylös"
+          >
+            <ArrowUp />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => move("down")}
+            disabled={isLast || moving}
+            aria-label="Siirrä alas"
+          >
+            <ArrowDown />
+          </Button>
           <Button
             variant="ghost"
             size="icon"

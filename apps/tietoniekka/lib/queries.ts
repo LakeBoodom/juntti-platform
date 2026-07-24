@@ -579,9 +579,22 @@ const KUVAVISA_URL_TO_TYPE: Record<string, string> = {
   kasvit: "kasvit",
   elaimet: "elaimet",
   elaimia: "elaimet",
+  // Uudet kategoriat
+  henkilot: "henkilot",
+  henkilo: "henkilot",
+  rakennukset: "rakennukset",
+  rakennus: "rakennukset",
+  kaupungit: "kaupungit",
+  kaupunki: "kaupungit",
+  maalaukset: "maalaukset",
+  maalaus: "maalaukset",
 };
 
-/** Hakee aktiiviset kuvavisat-rivit annetulle tyypille, palauttaa shuffled. */
+/**
+ * Hakee aktiiviset kuvavisat-rivit annetulle tyypille adminissa asetetussa
+ * järjestyksessä (sort_order nouseva) — "mitkä liput tulee ensimmäisinä".
+ * Leikkaa listan pituuteen `limit`.
+ */
 export async function getKuvavisat(urlSlug: string, limit = 10): Promise<KuvavisaRow[]> {
   const type = KUVAVISA_URL_TO_TYPE[urlSlug] ?? urlSlug;
   const sb = getSupabase();
@@ -594,16 +607,12 @@ export async function getKuvavisat(urlSlug: string, limit = 10): Promise<Kuvavis
     .select("id, type, question, image_url, options, correct_option, fact")
     .eq("site_id", siteId)
     .eq("type", type)
-    .eq("active", true);
+    .eq("active", true)
+    .order("sort_order", { ascending: true })
+    .order("created_at", { ascending: true })
+    .limit(limit);
 
   if (error || !data) return [];
-
-  // Fisher-Yates shuffle, sitten leikkaa limit
-  const arr = [...data] as KuvavisaRow[];
-  for (let i = arr.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [arr[i], arr[j]] = [arr[j], arr[i]];
-  }
-  return arr.slice(0, limit);
+  return data as KuvavisaRow[];
 }
 
