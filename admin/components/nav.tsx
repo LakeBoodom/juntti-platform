@@ -58,6 +58,12 @@ export function Nav({ email }: { email?: string | null }) {
             Some
           </Link>
           <Link
+            href="/kaksintaistelut"
+            className="text-sm text-muted-foreground hover:text-foreground"
+          >
+            Kaksintaistelut
+          </Link>
+          <Link
             href="/diggaa"
             className="text-sm text-muted-foreground hover:text-foreground"
           >

@@ -163,6 +163,133 @@ export type Database = {
           },
         ]
       }
+      duel_entities: {
+        Row: {
+          id: string
+          name: string
+          kind: string
+          role_label: string | null
+          show_role: boolean
+          wiki_url: string | null
+          image_url: string | null
+          image_credit: string | null
+          celebrity_id: string | null
+          status: string
+          created_at: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          id?: string
+          name: string
+          kind: string
+          role_label?: string | null
+          show_role?: boolean
+          wiki_url?: string | null
+          image_url?: string | null
+          image_credit?: string | null
+          celebrity_id?: string | null
+          status?: string
+          created_at?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          id?: string
+          name?: string
+          kind?: string
+          role_label?: string | null
+          show_role?: boolean
+          wiki_url?: string | null
+          image_url?: string | null
+          image_credit?: string | null
+          celebrity_id?: string | null
+          status?: string
+          created_at?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "duel_entities_celebrity_id_fkey"
+            columns: ["celebrity_id"]
+            isOneToOne: false
+            referencedRelation: "celebrities"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      duel_attributes: {
+        Row: {
+          entity_id: string
+          attr_key: string
+          num_value: number
+          display_value: string | null
+          source: string | null
+          verified_at: string | null
+        }
+        Insert: {
+          entity_id: string
+          attr_key: string
+          num_value: number
+          display_value?: string | null
+          source?: string | null
+          verified_at?: string | null
+        }
+        Update: {
+          entity_id?: string
+          attr_key?: string
+          num_value?: number
+          display_value?: string | null
+          source?: string | null
+          verified_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "duel_attributes_entity_id_fkey"
+            columns: ["entity_id"]
+            isOneToOne: false
+            referencedRelation: "duel_entities"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      duel_attribute_defs: {
+        Row: {
+          attr_key: string
+          kind: string
+          theme: string
+          subject_label: string
+          question_text: string
+          winner: string
+          easy_gap: number
+          mid_gap: number
+          unit_label: string | null
+          enabled: boolean
+        }
+        Insert: {
+          attr_key: string
+          kind: string
+          theme?: string
+          subject_label?: string
+          question_text: string
+          winner: string
+          easy_gap: number
+          mid_gap: number
+          unit_label?: string | null
+          enabled?: boolean
+        }
+        Update: {
+          attr_key?: string
+          kind?: string
+          theme?: string
+          subject_label?: string
+          question_text?: string
+          winner?: string
+          easy_gap?: number
+          mid_gap?: number
+          unit_label?: string | null
+          enabled?: boolean
+        }
+        Relationships: []
+      }
       countdowns: {
         Row: {
           day: number
