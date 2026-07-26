@@ -23,6 +23,11 @@ export type EntityInput = {
   image_credit: string | null;
   wiki_url: string | null;
   status: "draft" | "published" | "hidden";
+  /** Sijainti. Vaaditaan etäisyyskysymyksiin ("kumpi on lähempänä Vaasaa"). */
+  lat: number | null;
+  lon: number | null;
+  /** Partitiivi ("Vaasaa") — käytetään kun tämä on kysymyksen vertailupisteenä. */
+  name_partitive: string | null;
   attributes: AttrValue[];
 };
 
@@ -33,6 +38,14 @@ function validate(i: EntityInput): string | null {
   if (!filled.length) return "Anna vähintään yksi attribuutti — muuten entiteetti ei tuota yhtään kysymystä";
   if (i.image_url && !i.image_url.includes("upload.wikimedia.org"))
     return "Kuvan pitää olla suora tiedostolinkki (upload.wikimedia.org), ei artikkelilinkki";
+  // Sijainti on joko kokonaan annettu tai kokonaan pois — puolikas ei kelpaa
+  // mihinkään ja jättäisi entiteetin hiljaa pois etäisyyskysymyksistä.
+  if ((i.lat === null) !== (i.lon === null))
+    return "Anna sekä leveys- että pituusaste, tai jätä molemmat tyhjiksi";
+  if (i.lat !== null && (i.lat < -90 || i.lat > 90)) return "Leveysasteen pitää olla -90…90";
+  if (i.lon !== null && (i.lon < -180 || i.lon > 180)) return "Pituusasteen pitää olla -180…180";
+  if (i.lat !== null && !i.name_partitive?.trim())
+    return 'Anna partitiivi (esim. "Vaasaa") — sitä tarvitaan kysymystekstissä "on lähempänä …"';
   return null;
 }
 
@@ -77,6 +90,9 @@ export async function createEntity(input: EntityInput) {
       image_credit: input.image_credit?.trim() || null,
       wiki_url: input.wiki_url?.trim() || null,
       status: input.status,
+      lat: input.lat,
+      lon: input.lon,
+      name_partitive: input.name_partitive?.trim() || null,
     })
     .select("id")
     .single();
@@ -101,6 +117,9 @@ export async function updateEntity(id: string, input: EntityInput) {
       image_credit: input.image_credit?.trim() || null,
       wiki_url: input.wiki_url?.trim() || null,
       status: input.status,
+      lat: input.lat,
+      lon: input.lon,
+      name_partitive: input.name_partitive?.trim() || null,
       updated_at: new Date().toISOString(),
     })
     .eq("id", id);
@@ -128,6 +147,7 @@ export type DefInput = {
   easy_gap: number | null;
   mid_gap: number | null;
   max_gap: number | null;
+  min_gap: number | null;
   max_domain_distance: number;
   unit_label: string | null;
   enabled: boolean;
@@ -144,6 +164,11 @@ export async function saveDef(input: DefInput, isNew: boolean) {
     return {
       ok: false as const,
       error: "Suurin sallittu ero pitää olla suurempi kuin helpon kynnys — muuten yksikään pari ei ole helppo",
+    };
+  if (input.min_gap !== null && input.max_gap !== null && input.min_gap >= input.max_gap)
+    return {
+      ok: false as const,
+      error: "Pienin sallittu ero pitää olla pienempi kuin suurin — muuten yksikään pari ei kelpaa",
     };
   const sb = getSupabaseAdmin();
   const row = { ...input, attr_key: input.attr_key.trim() };

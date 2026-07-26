@@ -34,6 +34,7 @@ const EMPTY: Def = {
   easy_gap: 0.13,
   mid_gap: 0.06,
   max_gap: 0.2,
+  min_gap: null,
   max_domain_distance: 1,
   unit_label: "",
   enabled: true,
@@ -152,6 +153,19 @@ function DefForm({ initial, isNew, onDone }: { initial: Def; isNew: boolean; onD
           Tätä suurempaa eroa ei generoida lainkaan — kysymys olisi itsestään selvä.
           Vuosipohjaisissa (birth, year) luku on vuosia, muissa suhteellinen osuus
           (0.2 = 20 %). Tyhjä = ei ylärajaa.
+        </p>
+        <Label className="pt-2">Pienin sallittu ero</Label>
+        <Input
+          type="number"
+          step="any"
+          value={f.min_gap ?? ""}
+          onChange={(e) => set("min_gap", e.target.value === "" ? null : Number(e.target.value))}
+          placeholder="esim. 0.04 (= 4 %)"
+        />
+        <p className="text-xs text-muted-foreground">
+          Tätä pienempää eroa ei generoida — vastausta ei voisi tietää, vain arvata.
+          Tarpeen etenkin etäisyyksissä, joissa kaksi kaupunkia on usein lähes yhtä
+          kaukana. Tyhjä = ei alarajaa.
         </p>
         <Label className="pt-2">Harhauttimen suurin etäisyys (lippu)</Label>
         <Select

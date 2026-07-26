@@ -37,7 +37,7 @@ export default async function KaksintaistelutPage() {
     admin
       .from("duel_entities")
       .select(
-        "id, name, kind, role_label, show_role, image_url, image_credit, wiki_url, status, duel_attributes(attr_key, num_value, display_value, source, verified_at)",
+        "id, name, kind, role_label, show_role, image_url, image_credit, wiki_url, status, lat, lon, name_partitive, duel_attributes(attr_key, num_value, display_value, source, verified_at)",
       )
       .order("kind")
       .order("name"),

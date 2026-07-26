@@ -25,7 +25,7 @@ export default async function HomePage() {
   // Yksi oikea kaksintaistelu etusivun nostoon — ei mock-dataa
   const duel = duelData ? makeDuel(duelData, "sekoitus", new Set()) : null;
   const kumpiPreview = duel
-    ? { subject: duel.def.subject, question: duel.def.question, a: duel.a.name, b: duel.b.name }
+    ? { subject: duel.def.subject, question: duel.question, a: duel.a.name, b: duel.b.name }
     : null;
   // Sankarin oma visa vasta kun tiedämme trivia_quiz_id:n (riippuu yllä olevasta hausta)
   const sankariQuiz = todaysCelebrity?.trivia_quiz_id

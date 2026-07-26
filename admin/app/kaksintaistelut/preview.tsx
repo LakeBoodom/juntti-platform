@@ -12,20 +12,40 @@ type Row = {
   kind: string;
   status: string;
   image_url: string | null;
+  lat: number | string | null;
+  lon: number | string | null;
+  name_partitive: string | null;
   duel_attributes?: Attr[];
 };
 
+/** Sama etäisyyslaskenta kuin pelissä (lib/duel.ts, haversineKm). */
+function haversineKm(a: Row, b: Row) {
+  const rad = (x: number) => (x * Math.PI) / 180;
+  const la1 = rad(Number(a.lat));
+  const la2 = rad(Number(b.lat));
+  const h =
+    Math.sin((la2 - la1) / 2) ** 2 +
+    Math.cos(la1) * Math.cos(la2) * Math.sin(rad(Number(b.lon) - Number(a.lon)) / 2) ** 2;
+  return 2 * 6371 * Math.asin(Math.min(1, Math.sqrt(h)));
+}
+
+const hasCoords = (e: Row) => e.lat !== null && e.lon !== null;
+
 /** Sama vaikeustasologiikka kuin pelissä. */
 function difficulty(def: Def, a: number, b: number) {
-  const gap =
-    def.attr_key === "birth"
-      ? Math.abs(a - b) / (365.25 * 86400)
-      : def.attr_key === "year"
-        ? Math.abs(a - b)
-        : Math.abs(a - b) / Math.max(Math.abs(a), Math.abs(b), 1);
+  const gap = gapOf(def, a, b);
   if (def.easy_gap !== null && gap >= def.easy_gap) return { t: "Helppo", c: "text-emerald-600" };
   if (def.mid_gap !== null && gap >= def.mid_gap) return { t: "Keski", c: "text-amber-600" };
   return { t: "Vaikea", c: "text-red-600" };
+}
+
+function gapOf(def: Def, a: number, b: number) {
+  if (def.compare_mode === "distance") return Math.abs(a - b) / Math.max(a, b, 1);
+  return def.attr_key === "birth"
+    ? Math.abs(a - b) / (365.25 * 86400)
+    : def.attr_key === "year"
+      ? Math.abs(a - b)
+      : Math.abs(a - b) / Math.max(Math.abs(a), Math.abs(b), 1);
 }
 
 export function Preview({ defs, entities }: { defs: Def[]; entities: Row[] }) {
@@ -36,32 +56,46 @@ export function Preview({ defs, entities }: { defs: Def[]; entities: Row[] }) {
     for (let i = 0; i < 200; i++) {
       const def = usable[Math.floor(Math.random() * usable.length)];
       if (!def) return null;
+      const isDist = def.compare_mode === "distance";
       const pool = entities.filter(
         (e) =>
           e.status === "published" &&
           e.kind === def.kind &&
-          (e.duel_attributes ?? []).some((a) => a.attr_key === def.attr_key),
+          (isDist
+            ? hasCoords(e)
+            : (e.duel_attributes ?? []).some((x) => x.attr_key === def.attr_key)),
       );
-      if (pool.length < 2) continue;
-      const a = pool[Math.floor(Math.random() * pool.length)];
-      const b = pool[Math.floor(Math.random() * pool.length)];
-      if (a.id === b.id) continue;
-      const va = (a.duel_attributes ?? []).find((x) => x.attr_key === def.attr_key)!;
-      const vb = (b.duel_attributes ?? []).find((x) => x.attr_key === def.attr_key)!;
-      if (va.num_value === vb.num_value) continue;
-      // Sama yläraja kuin pelissä: liian suurta eroa ei näytetä
-      if (def.compare_mode !== "flag" && def.max_gap !== null) {
-        const g =
-          def.attr_key === "birth"
-            ? Math.abs(va.num_value - vb.num_value) / (365.25 * 86400)
-            : def.attr_key === "year"
-              ? Math.abs(va.num_value - vb.num_value)
-              : Math.abs(va.num_value - vb.num_value) /
-                Math.max(Math.abs(va.num_value), Math.abs(vb.num_value), 1);
-        if (g > def.max_gap) continue;
+      if (pool.length < (isDist ? 3 : 2)) continue;
+
+      // Etäisyyskysymyksessä vertailupiste arvotaan samasta joukosta.
+      const ref = isDist ? pool[Math.floor(Math.random() * pool.length)] : null;
+      const cands = ref ? pool.filter((e) => e.id !== ref.id) : pool;
+      const a = cands[Math.floor(Math.random() * cands.length)];
+      const b = cands[Math.floor(Math.random() * cands.length)];
+      if (!a || !b || a.id === b.id) continue;
+
+      const na = ref ? haversineKm(ref, a) : (a.duel_attributes ?? []).find((x) => x.attr_key === def.attr_key)!.num_value;
+      const nb = ref ? haversineKm(ref, b) : (b.duel_attributes ?? []).find((x) => x.attr_key === def.attr_key)!.num_value;
+      if (na === nb) continue;
+      const va: Attr = ref
+        ? { attr_key: def.attr_key, num_value: na, display_value: `${Math.round(na)} km` }
+        : (a.duel_attributes ?? []).find((x) => x.attr_key === def.attr_key)!;
+      const vb: Attr = ref
+        ? { attr_key: def.attr_key, num_value: nb, display_value: `${Math.round(nb)} km` }
+        : (b.duel_attributes ?? []).find((x) => x.attr_key === def.attr_key)!;
+
+      // Samat rajat kuin pelissä: liian suurta eikä liian pientä eroa ei näytetä
+      if (def.compare_mode !== "flag") {
+        const g = gapOf(def, na, nb);
+        if (def.max_gap !== null && g > def.max_gap) continue;
+        if (def.min_gap !== null && g < def.min_gap) continue;
       }
-      const aWins = def.winner === "low" ? va.num_value < vb.num_value : va.num_value > vb.num_value;
-      return { def, a, b, va, vb, aWins, diff: difficulty(def, va.num_value, vb.num_value) };
+      const aWins = def.winner === "low" ? na < nb : na > nb;
+      const question = def.question_text.replaceAll(
+        "{ref}",
+        ref ? (ref.name_partitive ?? ref.name) : "",
+      );
+      return { def, a, b, va, vb, aWins, question, diff: difficulty(def, na, nb) };
     }
     return null;
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -91,7 +125,7 @@ export function Preview({ defs, entities }: { defs: Def[]; entities: Row[] }) {
           <div className="text-xs tracking-[0.3em] text-muted-foreground">
             {duel.def.subject_label}
           </div>
-          <div className="text-2xl font-semibold uppercase">{duel.def.question_text}</div>
+          <div className="text-2xl font-semibold uppercase">{duel.question}</div>
           <div className="mt-1 text-xs">
             <span className={duel.diff.c}>{duel.diff.t}</span>
             <span className="text-muted-foreground"> · {duel.def.attr_key}</span>

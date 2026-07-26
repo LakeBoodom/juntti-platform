@@ -176,6 +176,9 @@ export type Database = {
           image_credit: string | null
           celebrity_id: string | null
           status: string
+          lat: number | null
+          lon: number | null
+          name_partitive: string | null
           created_at: string | null
           updated_at: string | null
         }
@@ -191,6 +194,9 @@ export type Database = {
           image_credit?: string | null
           celebrity_id?: string | null
           status?: string
+          lat?: number | null
+          lon?: number | null
+          name_partitive?: string | null
           created_at?: string | null
           updated_at?: string | null
         }
@@ -206,6 +212,9 @@ export type Database = {
           image_credit?: string | null
           celebrity_id?: string | null
           status?: string
+          lat?: number | null
+          lon?: number | null
+          name_partitive?: string | null
           created_at?: string | null
           updated_at?: string | null
         }
@@ -268,6 +277,7 @@ export type Database = {
           easy_gap: number | null
           mid_gap: number | null
           max_gap: number | null
+          min_gap: number | null
           max_domain_distance: number
           unit_label: string | null
           enabled: boolean
@@ -285,6 +295,7 @@ export type Database = {
           easy_gap?: number | null
           mid_gap?: number | null
           max_gap?: number | null
+          min_gap?: number | null
           max_domain_distance?: number
           unit_label?: string | null
           enabled?: boolean
@@ -302,6 +313,7 @@ export type Database = {
           easy_gap?: number | null
           mid_gap?: number | null
           max_gap?: number | null
+          min_gap?: number | null
           max_domain_distance?: number
           unit_label?: string | null
           enabled?: boolean

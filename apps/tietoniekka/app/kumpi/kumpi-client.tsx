@@ -265,10 +265,10 @@ export function KumpiClient({ data }: { data: DuelData }) {
           className="kumpi-ask"
           style={{
             fontSize:
-              duel.def.question.length > 24 ? 31 : duel.def.question.length > 16 ? 35 : 38,
+              duel.question.length > 24 ? 31 : duel.question.length > 16 ? 35 : 38,
           }}
         >
-          {duel.def.question}
+          {duel.question}
         </h1>
       </div>
 
@@ -311,7 +311,7 @@ export function KumpiClient({ data }: { data: DuelData }) {
                   {e.name}
                   {showRoleOnCard(duel.def, e) && <small>{e.role}</small>}
                 </span>
-                <span className="kumpi-value">{revealed ? revealValue(duel.def, e) : ""}</span>
+                <span className="kumpi-value">{revealed ? revealValue(duel, e) : ""}</span>
                 <span className="kumpi-mark" aria-hidden>
                   {revealed && i === duel.correct ? "✓" : revealed && i === picked ? "✗" : ""}
                 </span>

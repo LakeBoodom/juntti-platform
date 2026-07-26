@@ -23,8 +23,9 @@ export type Def = {
   easy_gap: number | null;
   mid_gap: number | null;
   max_gap: number | null;
+  min_gap: number | null;
   max_domain_distance: number;
-  compare_mode?: "numeric" | "flag";
+  compare_mode?: "numeric" | "flag" | "distance";
   unit_label: string | null;
   enabled: boolean;
 };
@@ -39,6 +40,9 @@ export type EntityValue = {
   image_credit: string | null;
   wiki_url: string | null;
   status: "draft" | "published" | "hidden";
+  lat: number | null;
+  lon: number | null;
+  name_partitive: string | null;
   duel_attributes?: AttrValue[];
 };
 
@@ -63,6 +67,9 @@ export function EntityForm({
   const [imageUrl, setImageUrl] = useState(initial?.image_url ?? "");
   const [imageCredit, setImageCredit] = useState(initial?.image_credit ?? "");
   const [wikiUrl, setWikiUrl] = useState(initial?.wiki_url ?? "");
+  const [lat, setLat] = useState(initial?.lat === null || initial?.lat === undefined ? "" : String(initial.lat));
+  const [lon, setLon] = useState(initial?.lon === null || initial?.lon === undefined ? "" : String(initial.lon));
+  const [partitive, setPartitive] = useState(initial?.name_partitive ?? "");
   const [status, setStatus] = useState<"draft" | "published" | "hidden">(
     initial?.status ?? "published",
   );
@@ -86,6 +93,8 @@ export function EntityForm({
   const [pending, startTransition] = useTransition();
 
   const kindDefs = defs.filter((d) => d.kind === kind);
+  // Sijaintikentät näytetään vain jos tälle lajille on etäisyyskysymys.
+  const needsCoords = kindDefs.some((d) => d.compare_mode === "distance");
 
   function buildAttributes(): AttrValue[] {
     return kindDefs.map((d) => {
@@ -122,6 +131,9 @@ export function EntityForm({
       image_credit: imageCredit || null,
       wiki_url: wikiUrl || null,
       status,
+      lat: lat.trim() === "" ? null : Number(lat.replace(",", ".")),
+      lon: lon.trim() === "" ? null : Number(lon.replace(",", ".")),
+      name_partitive: partitive.trim() || null,
       attributes: buildAttributes(),
     };
     startTransition(async () => {
@@ -215,6 +227,54 @@ export function EntityForm({
           </div>
         ))}
       </div>
+
+      {needsCoords && (
+        <div className="space-y-3 rounded-md border bg-muted/30 p-3">
+          <div className="text-sm font-medium">Sijainti</div>
+          <p className="text-xs text-muted-foreground">
+            Etäisyyskysymykset (&quot;kumpi on lähempänä Vaasaa&quot;) lasketaan sijainnista,
+            joten ilman näitä {kind} ei näy niissä lainkaan. Koordinaatit saa Wikipedian
+            artikkelin oikeasta yläkulmasta.
+          </p>
+          <div className="grid grid-cols-3 gap-3">
+            <div className="space-y-1.5">
+              <Label htmlFor="dlat">Leveysaste</Label>
+              <Input
+                id="dlat"
+                type="number"
+                step="any"
+                value={lat}
+                onChange={(e) => setLat(e.target.value)}
+                placeholder="63.0951"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="dlon">Pituusaste</Label>
+              <Input
+                id="dlon"
+                type="number"
+                step="any"
+                value={lon}
+                onChange={(e) => setLon(e.target.value)}
+                placeholder="21.6165"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="dpart">Partitiivi</Label>
+              <Input
+                id="dpart"
+                value={partitive}
+                onChange={(e) => setPartitive(e.target.value)}
+                placeholder="Vaasaa"
+              />
+            </div>
+          </div>
+          <p className="text-xs text-muted-foreground">
+            Partitiivi luetaan kysymyksessä muodossa &quot;on lähempänä{" "}
+            <strong>{partitive || "Vaasaa"}</strong>?&quot; — tarkista että se taipuu oikein.
+          </p>
+        </div>
+      )}
 
       <div className="space-y-1.5">
         <Label htmlFor="dimg">Kuva (suora upload.wikimedia.org-linkki)</Label>
