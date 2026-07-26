@@ -33,6 +33,8 @@ export type RankTask = {
   shuffled: RankItem[];
   /** Näytettävä ohje ("suurimmasta pienimpään"). */
   label: string;
+  /** true = järjestys on käännetty def.winner-suunnasta. */
+  reversed: boolean;
   /**
    * Vain kaksi tasoa. "Helppo" on rakenteellisesti mahdoton: jos jokainen
    * peräkkäinen ero ylittäisi helppo-kynnyksen, tehtävä hylätään triviaalina.
@@ -153,10 +155,13 @@ export function makeRankTask(
       return { entity: e, value, display };
     });
 
-    // winner = "low" -> nouseva (vanhin, lähin, pienin ensin)
-    // winner = "high" -> laskeva (suurin ensin)
+    // Suunta arvotaan kun käänteinen ohje on olemassa. Ilman tätä sama
+    // attribuutti kysyisi aina samaan suuntaan ja tehtävät alkaisivat
+    // tuntua samalta, vaikka sisältö vaihtuisi.
+    const reversed = def.rankLabelRev !== null && Math.random() < 0.5;
+    const ascending = (def.winner === "low") !== reversed;
     const solution = [...items].sort((x, y) =>
-      def.winner === "low" ? x.value - y.value : y.value - x.value,
+      ascending ? x.value - y.value : y.value - x.value,
     );
 
     // Peräkkäisten erojen tarkistus. Yksikin liian pieni ero pilaa tehtävän.
@@ -193,10 +198,11 @@ export function makeRankTask(
       def,
       solution,
       shuffled,
-      label: (def.rankLabel ?? "").replaceAll(
+      label: ((reversed ? def.rankLabelRev : def.rankLabel) ?? "").replaceAll(
         "{ref}",
         ref ? ref.partitive ?? ref.name : "",
       ),
+      reversed,
       difficulty,
       ref,
       taskKey,

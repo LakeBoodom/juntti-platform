@@ -3735,3 +3735,31 @@ div.pinnalla-event-card.pinnalla-event-card--neon {
 }
 .jrj-bigscore span { font-size: 1.5rem; opacity: .55; margin-left: 6px; color: inherit; }
 .jrj-resulttext { margin-bottom: 26px; opacity: .85; line-height: 1.5; }
+
+/* Raahaus: rivi seuraa sormea, muut siirtyvät pehmeästi tieltä. */
+.jrj-row {
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  cursor: grab;
+  transition: transform .16s ease, background .16s ease, border-color .16s ease;
+}
+.jrj-list.is-dragging .jrj-row { transition: transform .16s ease; }
+.jrj-row.is-dragged {
+  cursor: grabbing;
+  transition: none;
+  z-index: 5;
+  position: relative;
+  border-color: var(--color-accent, #E8A320);
+  background: rgba(232,163,32,.14);
+  box-shadow: 0 10px 24px rgba(0,0,0,.45);
+}
+.jrj-row.is-right, .jrj-row.is-wrong { cursor: default; touch-action: auto; }
+.jrj-moves button { touch-action: manipulation; }
+
+.jrj-hint {
+  text-align: center;
+  font-size: .82rem;
+  opacity: .45;
+  margin-bottom: 12px;
+}

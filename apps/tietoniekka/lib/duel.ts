@@ -60,6 +60,8 @@ export type DuelDef = {
    * suurempi?") ei taivu järjestystehtävään, siksi oma kenttä.
    */
   rankLabel: string | null;
+  /** Sama ohje käänteiseen suuntaan. Null = kysytään vain yhteen suuntaan. */
+  rankLabelRev: string | null;
   factTemplate: string | null;
 };
 
@@ -408,6 +410,7 @@ export async function getDuelData(): Promise<DuelData | null> {
     gapDivisor: d.gap_divisor === null || d.gap_divisor === undefined ? 1 : Number(d.gap_divisor),
     maxDomainDistance: d.max_domain_distance ?? 1,
     rankLabel: d.rank_label ?? null,
+    rankLabelRev: d.rank_label_rev ?? null,
     factTemplate: d.fact_template,
   }));
 
