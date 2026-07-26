@@ -54,6 +54,12 @@ export type DuelDef = {
   gapDivisor: number;
   /** Lipuille: kuinka kaukaa harhautin saa tulla (alojen etäisyys 0–3). */
   maxDomainDistance: number;
+  /**
+   * Järjestysohje "Järjestä oikein" -pelimuotoon ("suurimmasta pienimpään").
+   * Null = attribuutti ei tule järjestyspeliin. Kumpi-pelin question ("on
+   * suurempi?") ei taivu järjestystehtävään, siksi oma kenttä.
+   */
+  rankLabel: string | null;
   factTemplate: string | null;
 };
 
@@ -401,6 +407,7 @@ export async function getDuelData(): Promise<DuelData | null> {
     gapMode: d.gap_mode === "absolute" ? "absolute" : "relative",
     gapDivisor: d.gap_divisor === null || d.gap_divisor === undefined ? 1 : Number(d.gap_divisor),
     maxDomainDistance: d.max_domain_distance ?? 1,
+    rankLabel: d.rank_label ?? null,
     factTemplate: d.fact_template,
   }));
 
