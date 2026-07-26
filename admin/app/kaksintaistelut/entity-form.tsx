@@ -20,8 +20,11 @@ export type Def = {
   subject_label: string;
   question_text: string;
   winner: "low" | "high";
-  easy_gap: number;
-  mid_gap: number;
+  easy_gap: number | null;
+  mid_gap: number | null;
+  max_gap: number | null;
+  max_domain_distance: number;
+  compare_mode?: "numeric" | "flag";
   unit_label: string | null;
   enabled: boolean;
 };

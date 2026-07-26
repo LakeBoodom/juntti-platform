@@ -170,6 +170,7 @@ export type Database = {
           kind: string
           role_label: string | null
           show_role: boolean
+          domain: string | null
           wiki_url: string | null
           image_url: string | null
           image_credit: string | null
@@ -184,6 +185,7 @@ export type Database = {
           kind: string
           role_label?: string | null
           show_role?: boolean
+          domain?: string | null
           wiki_url?: string | null
           image_url?: string | null
           image_credit?: string | null
@@ -198,6 +200,7 @@ export type Database = {
           kind?: string
           role_label?: string | null
           show_role?: boolean
+          domain?: string | null
           wiki_url?: string | null
           image_url?: string | null
           image_credit?: string | null
@@ -259,8 +262,13 @@ export type Database = {
           subject_label: string
           question_text: string
           winner: string
-          easy_gap: number
-          mid_gap: number
+          compare_mode: string
+          flag_difficulty: string
+          fact_template: string | null
+          easy_gap: number | null
+          mid_gap: number | null
+          max_gap: number | null
+          max_domain_distance: number
           unit_label: string | null
           enabled: boolean
         }
@@ -271,8 +279,13 @@ export type Database = {
           subject_label?: string
           question_text: string
           winner: string
-          easy_gap: number
-          mid_gap: number
+          compare_mode?: string
+          flag_difficulty?: string
+          fact_template?: string | null
+          easy_gap?: number | null
+          mid_gap?: number | null
+          max_gap?: number | null
+          max_domain_distance?: number
           unit_label?: string | null
           enabled?: boolean
         }
@@ -283,8 +296,13 @@ export type Database = {
           subject_label?: string
           question_text?: string
           winner?: string
-          easy_gap?: number
-          mid_gap?: number
+          compare_mode?: string
+          flag_difficulty?: string
+          fact_template?: string | null
+          easy_gap?: number | null
+          mid_gap?: number | null
+          max_gap?: number | null
+          max_domain_distance?: number
           unit_label?: string | null
           enabled?: boolean
         }

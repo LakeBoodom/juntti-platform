@@ -28,6 +28,10 @@ export type DuelDef = {
   mode: "numeric" | "flag";
   easyGap: number | null;
   midGap: number | null;
+  /** Yläraja erolle. Sitä suurempi ero = itsestään selvä kysymys, ei generoida. */
+  maxGap: number | null;
+  /** Lipuille: kuinka kaukaa harhautin saa tulla (alojen etäisyys 0–3). */
+  maxDomainDistance: number;
   factTemplate: string | null;
 };
 
@@ -79,8 +83,9 @@ function gap(def: DuelDef, a: DuelEntity, b: DuelEntity): number {
 
 function difficultyOf(def: DuelDef, a: DuelEntity, b: DuelEntity): Duel["difficulty"] {
   if (def.mode === "flag") {
-    const d = domainDistance(a.domain, b.domain);
-    return d <= 1 ? "vaikea" : d === 2 ? "keski" : "helppo";
+    // Sama ala = vaikein mahdollinen, naapuriala = keski. Kauempaa ei generoida
+    // lainkaan (ks. maxDomainDistance) koska ne ovat itsestään selviä.
+    return domainDistance(a.domain, b.domain) === 0 ? "vaikea" : "keski";
   }
   const g = gap(def, a, b);
   if (def.easyGap !== null && g >= def.easyGap) return "helppo";
@@ -161,13 +166,13 @@ export function makeDuel(
       const no = pool.filter((e) => e.v[def.key] === 0);
       if (!yes.length || !no.length) continue;
       const w = pick(yes);
-      // Kolme ehdokasta, painotus lähimpään alaan → vaikeampia ja
-      // kiinnostavampia pareja kuin sokea arvonta.
-      const cands = [pick(no), pick(no), pick(no)].sort(
-        (p, q) => domainDistance(w.domain, p.domain) - domainDistance(w.domain, q.domain),
+      // Harhautin saa tulla vain riittävän läheiseltä alalta. Ilman tätä
+      // valtaosa kysymyksistä olisi "poliitikko vai jääkiekkoilija".
+      const near = no.filter(
+        (e) => domainDistance(w.domain, e.domain) <= def.maxDomainDistance,
       );
-      const r = Math.random();
-      const x = cands[r < 0.6 ? 0 : r < 0.9 ? Math.min(1, cands.length - 1) : cands.length - 1];
+      if (!near.length) continue;
+      const x = pick(near);
       if (!x || x.id === w.id) continue;
       [a, b] = Math.random() < 0.5 ? [w, x] : [x, w];
     } else {
@@ -179,6 +184,10 @@ export function makeDuel(
     const va = a.v[def.key];
     const vb = b.v[def.key];
     if (va === vb) continue; // ei tasapelejä, koskaan
+
+    // Liian suuri ero = itsestään selvä kysymys. "Kummassa on enemmän
+    // asukkaita, Suomi vai Yhdysvallat" ei ole kysymys vaan toteamus.
+    if (def.mode === "numeric" && def.maxGap !== null && gap(def, a, b) > def.maxGap) continue;
 
     const pairKey = pairKeyOf(def.key, a, b);
     if (used.has(pairKey) || blocked.has(pairKey)) continue;
@@ -260,6 +269,8 @@ export async function getDuelData(): Promise<DuelData | null> {
     mode: d.compare_mode ?? "numeric",
     easyGap: d.easy_gap === null ? null : Number(d.easy_gap),
     midGap: d.mid_gap === null ? null : Number(d.mid_gap),
+    maxGap: d.max_gap === null || d.max_gap === undefined ? null : Number(d.max_gap),
+    maxDomainDistance: d.max_domain_distance ?? 1,
     factTemplate: d.fact_template,
   }));
 
@@ -272,9 +283,19 @@ export async function getDuelData(): Promise<DuelData | null> {
   const usable = defs.filter((def) => {
     const pool = entities.filter((e) => e.kind === def.kind && e.v[def.key] !== undefined);
     if (def.mode === "flag") {
-      return pool.some((e) => e.v[def.key] === 1) && pool.some((e) => e.v[def.key] === 0);
+      const yes = pool.filter((e) => e.v[def.key] === 1);
+      const no = pool.filter((e) => e.v[def.key] === 0);
+      return yes.some((w) =>
+        no.some((x) => domainDistance(w.domain, x.domain) <= def.maxDomainDistance),
+      );
     }
-    return pool.length >= 2;
+    if (def.maxGap === null) return pool.length >= 2;
+    // Vähintään yksi pari ylärajan sisällä
+    for (let i = 0; i < pool.length; i++)
+      for (let j = i + 1; j < pool.length; j++)
+        if (pool[i].v[def.key] !== pool[j].v[def.key] && gap(def, pool[i], pool[j]) <= def.maxGap)
+          return true;
+    return false;
   });
 
   return { entities, defs: usable, blocks };

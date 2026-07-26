@@ -31,8 +31,10 @@ const EMPTY: Def = {
   subject_label: "KUMPI",
   question_text: "",
   winner: "high",
-  easy_gap: 0.45,
-  mid_gap: 0.15,
+  easy_gap: 0.13,
+  mid_gap: 0.06,
+  max_gap: 0.2,
+  max_domain_distance: 1,
   unit_label: "",
   enabled: true,
 };
@@ -122,8 +124,8 @@ function DefForm({ initial, isNew, onDone }: { initial: Def; isNew: boolean; onD
           <Input
             type="number"
             step="any"
-            value={f.easy_gap}
-            onChange={(e) => set("easy_gap", Number(e.target.value))}
+            value={f.easy_gap ?? ""}
+            onChange={(e) => set("easy_gap", e.target.value === "" ? null : Number(e.target.value))}
           />
         </div>
         <div className="space-y-1.5">
@@ -131,10 +133,41 @@ function DefForm({ initial, isNew, onDone }: { initial: Def; isNew: boolean; onD
           <Input
             type="number"
             step="any"
-            value={f.mid_gap}
-            onChange={(e) => set("mid_gap", Number(e.target.value))}
+            value={f.mid_gap ?? ""}
+            onChange={(e) => set("mid_gap", e.target.value === "" ? null : Number(e.target.value))}
           />
         </div>
+      </div>
+
+      <div className="space-y-1.5 rounded-md border bg-muted/30 p-3">
+        <Label>Suurin sallittu ero</Label>
+        <Input
+          type="number"
+          step="any"
+          value={f.max_gap ?? ""}
+          onChange={(e) => set("max_gap", e.target.value === "" ? null : Number(e.target.value))}
+          placeholder="esim. 10 (vuotta) tai 0.2 (= 20 %)"
+        />
+        <p className="text-xs text-muted-foreground">
+          Tätä suurempaa eroa ei generoida lainkaan — kysymys olisi itsestään selvä.
+          Vuosipohjaisissa (birth, year) luku on vuosia, muissa suhteellinen osuus
+          (0.2 = 20 %). Tyhjä = ei ylärajaa.
+        </p>
+        <Label className="pt-2">Harhauttimen suurin etäisyys (lippu)</Label>
+        <Select
+          value={String(f.max_domain_distance ?? 1)}
+          onValueChange={(v) => set("max_domain_distance", Number(v))}
+        >
+          <SelectTrigger>
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="0">0 — vain sama ala (vaikein)</SelectItem>
+            <SelectItem value="1">1 — sama tai naapuriala</SelectItem>
+            <SelectItem value="2">2 — myös etäisemmät</SelectItem>
+            <SelectItem value="3">3 — mikä tahansa (usein itsestään selvä)</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
 
       <div className="grid grid-cols-2 gap-3">

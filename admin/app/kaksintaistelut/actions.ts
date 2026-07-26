@@ -125,8 +125,10 @@ export type DefInput = {
   subject_label: string;
   question_text: string;
   winner: "low" | "high";
-  easy_gap: number;
-  mid_gap: number;
+  easy_gap: number | null;
+  mid_gap: number | null;
+  max_gap: number | null;
+  max_domain_distance: number;
   unit_label: string | null;
   enabled: boolean;
 };
@@ -136,8 +138,13 @@ export async function saveDef(input: DefInput, isNew: boolean) {
   if (!input.question_text.trim()) return { ok: false as const, error: "Kysymysteksti puuttuu" };
   if (/^kumpi/i.test(input.question_text.trim()))
     return { ok: false as const, error: 'Älä aloita sanalla "kumpi" — se tulee automaattisesti otsikosta' };
-  if (!(input.easy_gap > input.mid_gap))
+  if (input.easy_gap !== null && input.mid_gap !== null && !(input.easy_gap > input.mid_gap))
     return { ok: false as const, error: "Helpon kynnyksen pitää olla suurempi kuin keskitason" };
+  if (input.max_gap !== null && input.easy_gap !== null && input.max_gap <= input.easy_gap)
+    return {
+      ok: false as const,
+      error: "Suurin sallittu ero pitää olla suurempi kuin helpon kynnys — muuten yksikään pari ei ole helppo",
+    };
   const sb = getSupabaseAdmin();
   const row = { ...input, attr_key: input.attr_key.trim() };
   const { error } = isNew

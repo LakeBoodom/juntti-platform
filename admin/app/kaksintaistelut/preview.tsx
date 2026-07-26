@@ -23,8 +23,8 @@ function difficulty(def: Def, a: number, b: number) {
       : def.attr_key === "year"
         ? Math.abs(a - b)
         : Math.abs(a - b) / Math.max(Math.abs(a), Math.abs(b), 1);
-  if (gap >= def.easy_gap) return { t: "Helppo", c: "text-emerald-600" };
-  if (gap >= def.mid_gap) return { t: "Keski", c: "text-amber-600" };
+  if (def.easy_gap !== null && gap >= def.easy_gap) return { t: "Helppo", c: "text-emerald-600" };
+  if (def.mid_gap !== null && gap >= def.mid_gap) return { t: "Keski", c: "text-amber-600" };
   return { t: "Vaikea", c: "text-red-600" };
 }
 
@@ -49,6 +49,17 @@ export function Preview({ defs, entities }: { defs: Def[]; entities: Row[] }) {
       const va = (a.duel_attributes ?? []).find((x) => x.attr_key === def.attr_key)!;
       const vb = (b.duel_attributes ?? []).find((x) => x.attr_key === def.attr_key)!;
       if (va.num_value === vb.num_value) continue;
+      // Sama yläraja kuin pelissä: liian suurta eroa ei näytetä
+      if (def.compare_mode !== "flag" && def.max_gap !== null) {
+        const g =
+          def.attr_key === "birth"
+            ? Math.abs(va.num_value - vb.num_value) / (365.25 * 86400)
+            : def.attr_key === "year"
+              ? Math.abs(va.num_value - vb.num_value)
+              : Math.abs(va.num_value - vb.num_value) /
+                Math.max(Math.abs(va.num_value), Math.abs(vb.num_value), 1);
+        if (g > def.max_gap) continue;
+      }
       const aWins = def.winner === "low" ? va.num_value < vb.num_value : va.num_value > vb.num_value;
       return { def, a, b, va, vb, aWins, diff: difficulty(def, va.num_value, vb.num_value) };
     }
