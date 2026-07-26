@@ -24,7 +24,7 @@ export function EntityRow({ row, defs }: { row: EntityValue & { id: string }; de
   const [open, setOpen] = useState(false);
   const [pending, startTransition] = useTransition();
   const router = useRouter();
-  const attrs = row.duel_attributes ?? [];
+  const attrs = row.fact_attributes ?? [];
 
   function remove() {
     if (!confirm(`Poistetaanko ${row.name}? Tämä poistaa myös sen attribuutit.`)) return;

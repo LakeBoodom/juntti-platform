@@ -33,11 +33,11 @@ export default async function KaksintaistelutPage() {
   const admin = getSupabaseAdmin();
 
   const [{ data: defs }, { data: entities }] = await Promise.all([
-    admin.from("duel_attribute_defs").select("*").order("theme").order("attr_key"),
+    admin.from("fact_attribute_defs").select("*").order("theme").order("attr_key"),
     admin
-      .from("duel_entities")
+      .from("fact_entities")
       .select(
-        "id, name, kind, role_label, show_role, image_url, image_credit, wiki_url, status, lat, lon, name_partitive, duel_attributes(attr_key, num_value, display_value, source, verified_at)",
+        "id, name, kind, role_label, show_role, image_url, image_credit, wiki_url, status, lat, lon, name_partitive, fact_attributes(attr_key, num_value, display_value, source, verified_at)",
       )
       .order("kind")
       .order("name"),
@@ -50,7 +50,7 @@ export default async function KaksintaistelutPage() {
   const counts = new Map<string, number>();
   for (const e of rows) {
     if (e.status !== "published") continue;
-    for (const a of (e.duel_attributes ?? []) as Attr[])
+    for (const a of (e.fact_attributes ?? []) as Attr[])
       counts.set(a.attr_key, (counts.get(a.attr_key) ?? 0) + 1);
   }
   const pairsFor = (k: string) => {
@@ -65,16 +65,16 @@ export default async function KaksintaistelutPage() {
   const yearAgo = new Date(Date.now() - 365 * 864e5).toISOString().slice(0, 10);
   const noImage = rows.filter((e) => e.status === "published" && !e.image_url && e.kind === "person");
   const noSource = rows.flatMap((e) =>
-    ((e.duel_attributes ?? []) as Attr[])
+    ((e.fact_attributes ?? []) as Attr[])
       .filter((a) => !a.source)
       .map((a) => `${e.name} · ${a.attr_key}`),
   );
   const stale = rows.flatMap((e) =>
-    ((e.duel_attributes ?? []) as Attr[])
+    ((e.fact_attributes ?? []) as Attr[])
       .filter((a) => !a.verified_at || a.verified_at < yearAgo)
       .map((a) => `${e.name} · ${a.attr_key}`),
   );
-  const noAttrs = rows.filter((e) => !(e.duel_attributes ?? []).length);
+  const noAttrs = rows.filter((e) => !(e.fact_attributes ?? []).length);
 
   // --- Liian lähellä toisiaan olevat parit (alle 2 % ero) = epäreilu kysymys ---
   const tooClose: string[] = [];
@@ -83,7 +83,7 @@ export default async function KaksintaistelutPage() {
       .filter((e) => e.status === "published")
       .map((e) => ({
         name: e.name,
-        v: ((e.duel_attributes ?? []) as Attr[]).find((a) => a.attr_key === d.attr_key)?.num_value,
+        v: ((e.fact_attributes ?? []) as Attr[]).find((a) => a.attr_key === d.attr_key)?.num_value,
       }))
       .filter((x) => x.v !== undefined) as { name: string; v: number }[];
     for (let i = 0; i < withAttr.length; i++)

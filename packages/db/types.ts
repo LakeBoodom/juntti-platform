@@ -1,6 +1,3 @@
-// Auto-generated from Supabase schema. Do not edit manually.
-// Regenerate via Supabase MCP or `supabase gen types typescript`.
-
 export type Json =
   | string
   | number
@@ -163,163 +160,6 @@ export type Database = {
           },
         ]
       }
-      duel_entities: {
-        Row: {
-          id: string
-          name: string
-          kind: string
-          role_label: string | null
-          show_role: boolean
-          domain: string | null
-          wiki_url: string | null
-          image_url: string | null
-          image_credit: string | null
-          celebrity_id: string | null
-          status: string
-          lat: number | null
-          lon: number | null
-          name_partitive: string | null
-          created_at: string | null
-          updated_at: string | null
-        }
-        Insert: {
-          id?: string
-          name: string
-          kind: string
-          role_label?: string | null
-          show_role?: boolean
-          domain?: string | null
-          wiki_url?: string | null
-          image_url?: string | null
-          image_credit?: string | null
-          celebrity_id?: string | null
-          status?: string
-          lat?: number | null
-          lon?: number | null
-          name_partitive?: string | null
-          created_at?: string | null
-          updated_at?: string | null
-        }
-        Update: {
-          id?: string
-          name?: string
-          kind?: string
-          role_label?: string | null
-          show_role?: boolean
-          domain?: string | null
-          wiki_url?: string | null
-          image_url?: string | null
-          image_credit?: string | null
-          celebrity_id?: string | null
-          status?: string
-          lat?: number | null
-          lon?: number | null
-          name_partitive?: string | null
-          created_at?: string | null
-          updated_at?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "duel_entities_celebrity_id_fkey"
-            columns: ["celebrity_id"]
-            isOneToOne: false
-            referencedRelation: "celebrities"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      duel_attributes: {
-        Row: {
-          entity_id: string
-          attr_key: string
-          num_value: number
-          display_value: string | null
-          source: string | null
-          verified_at: string | null
-        }
-        Insert: {
-          entity_id: string
-          attr_key: string
-          num_value: number
-          display_value?: string | null
-          source?: string | null
-          verified_at?: string | null
-        }
-        Update: {
-          entity_id?: string
-          attr_key?: string
-          num_value?: number
-          display_value?: string | null
-          source?: string | null
-          verified_at?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "duel_attributes_entity_id_fkey"
-            columns: ["entity_id"]
-            isOneToOne: false
-            referencedRelation: "duel_entities"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      duel_attribute_defs: {
-        Row: {
-          attr_key: string
-          kind: string
-          theme: string
-          subject_label: string
-          question_text: string
-          winner: string
-          compare_mode: string
-          flag_difficulty: string
-          fact_template: string | null
-          easy_gap: number | null
-          mid_gap: number | null
-          max_gap: number | null
-          min_gap: number | null
-          max_domain_distance: number
-          unit_label: string | null
-          enabled: boolean
-        }
-        Insert: {
-          attr_key: string
-          kind: string
-          theme?: string
-          subject_label?: string
-          question_text: string
-          winner: string
-          compare_mode?: string
-          flag_difficulty?: string
-          fact_template?: string | null
-          easy_gap?: number | null
-          mid_gap?: number | null
-          max_gap?: number | null
-          min_gap?: number | null
-          max_domain_distance?: number
-          unit_label?: string | null
-          enabled?: boolean
-        }
-        Update: {
-          attr_key?: string
-          kind?: string
-          theme?: string
-          subject_label?: string
-          question_text?: string
-          winner?: string
-          compare_mode?: string
-          flag_difficulty?: string
-          fact_template?: string | null
-          easy_gap?: number | null
-          mid_gap?: number | null
-          max_gap?: number | null
-          min_gap?: number | null
-          max_domain_distance?: number
-          unit_label?: string | null
-          enabled?: boolean
-        }
-        Relationships: []
-      }
       countdowns: {
         Row: {
           day: number
@@ -411,6 +251,754 @@ export type Database = {
             columns: ["quiz_id"]
             isOneToOne: false
             referencedRelation: "quizzes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      diggaa_decks: {
+        Row: {
+          category: string
+          created_at: string
+          deck_date: string | null
+          id: string
+          site_id: string
+          slug: string
+          title: string
+        }
+        Insert: {
+          category?: string
+          created_at?: string
+          deck_date?: string | null
+          id?: string
+          site_id: string
+          slug: string
+          title: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          deck_date?: string | null
+          id?: string
+          site_id?: string
+          slug?: string
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "diggaa_decks_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: false
+            referencedRelation: "sites"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      diggaa_knockout_battles: {
+        Row: {
+          battle_index: number
+          created_at: string
+          id: string
+          knockout_session_id: string
+          option_a_id: string
+          option_b_id: string
+          round: number
+          winner_option_id: string
+        }
+        Insert: {
+          battle_index: number
+          created_at?: string
+          id?: string
+          knockout_session_id: string
+          option_a_id: string
+          option_b_id: string
+          round: number
+          winner_option_id: string
+        }
+        Update: {
+          battle_index?: number
+          created_at?: string
+          id?: string
+          knockout_session_id?: string
+          option_a_id?: string
+          option_b_id?: string
+          round?: number
+          winner_option_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "diggaa_knockout_battles_knockout_session_id_fkey"
+            columns: ["knockout_session_id"]
+            isOneToOne: false
+            referencedRelation: "diggaa_knockout_sessions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "diggaa_knockout_battles_option_a_id_fkey"
+            columns: ["option_a_id"]
+            isOneToOne: false
+            referencedRelation: "diggaa_knockout_option_stats"
+            referencedColumns: ["option_id"]
+          },
+          {
+            foreignKeyName: "diggaa_knockout_battles_option_a_id_fkey"
+            columns: ["option_a_id"]
+            isOneToOne: false
+            referencedRelation: "diggaa_knockout_options"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "diggaa_knockout_battles_option_b_id_fkey"
+            columns: ["option_b_id"]
+            isOneToOne: false
+            referencedRelation: "diggaa_knockout_option_stats"
+            referencedColumns: ["option_id"]
+          },
+          {
+            foreignKeyName: "diggaa_knockout_battles_option_b_id_fkey"
+            columns: ["option_b_id"]
+            isOneToOne: false
+            referencedRelation: "diggaa_knockout_options"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "diggaa_knockout_battles_winner_option_id_fkey"
+            columns: ["winner_option_id"]
+            isOneToOne: false
+            referencedRelation: "diggaa_knockout_option_stats"
+            referencedColumns: ["option_id"]
+          },
+          {
+            foreignKeyName: "diggaa_knockout_battles_winner_option_id_fkey"
+            columns: ["winner_option_id"]
+            isOneToOne: false
+            referencedRelation: "diggaa_knockout_options"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      diggaa_knockout_options: {
+        Row: {
+          accent_color: string
+          bg_color: string
+          created_at: string
+          id: string
+          image_url: string | null
+          knockout_id: string
+          label: string
+          label_genitive: string | null
+          letter: string
+          position: number
+        }
+        Insert: {
+          accent_color: string
+          bg_color: string
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          knockout_id: string
+          label: string
+          label_genitive?: string | null
+          letter: string
+          position: number
+        }
+        Update: {
+          accent_color?: string
+          bg_color?: string
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          knockout_id?: string
+          label?: string
+          label_genitive?: string | null
+          letter?: string
+          position?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "diggaa_knockout_options_knockout_id_fkey"
+            columns: ["knockout_id"]
+            isOneToOne: false
+            referencedRelation: "diggaa_knockouts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      diggaa_knockout_sessions: {
+        Row: {
+          completed_at: string
+          id: string
+          knockout_id: string
+          seed: string
+          session_id: string
+          winner_option_id: string
+        }
+        Insert: {
+          completed_at?: string
+          id?: string
+          knockout_id: string
+          seed: string
+          session_id: string
+          winner_option_id: string
+        }
+        Update: {
+          completed_at?: string
+          id?: string
+          knockout_id?: string
+          seed?: string
+          session_id?: string
+          winner_option_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "diggaa_knockout_sessions_knockout_id_fkey"
+            columns: ["knockout_id"]
+            isOneToOne: false
+            referencedRelation: "diggaa_knockouts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "diggaa_knockout_sessions_winner_option_id_fkey"
+            columns: ["winner_option_id"]
+            isOneToOne: false
+            referencedRelation: "diggaa_knockout_option_stats"
+            referencedColumns: ["option_id"]
+          },
+          {
+            foreignKeyName: "diggaa_knockout_sessions_winner_option_id_fkey"
+            columns: ["winner_option_id"]
+            isOneToOne: false
+            referencedRelation: "diggaa_knockout_options"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      diggaa_knockouts: {
+        Row: {
+          category: string
+          created_at: string
+          id: string
+          knockout_date: string | null
+          question: string
+          site_id: string
+          slug: string
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          id?: string
+          knockout_date?: string | null
+          question: string
+          site_id: string
+          slug: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          id?: string
+          knockout_date?: string | null
+          question?: string
+          site_id?: string
+          slug?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "diggaa_knockouts_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: false
+            referencedRelation: "sites"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      diggaa_polls: {
+        Row: {
+          category: string
+          closes_at: string | null
+          created_at: string
+          id: string
+          option_a: string
+          option_b: string
+          poll_date: string | null
+          question: string
+          site_id: string
+        }
+        Insert: {
+          category: string
+          closes_at?: string | null
+          created_at?: string
+          id?: string
+          option_a: string
+          option_b: string
+          poll_date?: string | null
+          question: string
+          site_id: string
+        }
+        Update: {
+          category?: string
+          closes_at?: string | null
+          created_at?: string
+          id?: string
+          option_a?: string
+          option_b?: string
+          poll_date?: string | null
+          question?: string
+          site_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "diggaa_polls_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: false
+            referencedRelation: "sites"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      diggaa_publications: {
+        Row: {
+          closes_at: string
+          content_id: string
+          content_type: string
+          created_at: string
+          duration_preset: string
+          featured: boolean
+          id: string
+          opens_at: string
+          site_id: string
+          status: string
+          title: string
+        }
+        Insert: {
+          closes_at: string
+          content_id: string
+          content_type: string
+          created_at?: string
+          duration_preset?: string
+          featured?: boolean
+          id?: string
+          opens_at: string
+          site_id: string
+          status?: string
+          title: string
+        }
+        Update: {
+          closes_at?: string
+          content_id?: string
+          content_type?: string
+          created_at?: string
+          duration_preset?: string
+          featured?: boolean
+          id?: string
+          opens_at?: string
+          site_id?: string
+          status?: string
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "diggaa_publications_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: false
+            referencedRelation: "sites"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      diggaa_swipe_cards: {
+        Row: {
+          card_type: string
+          created_at: string
+          deck_id: string
+          emblem: string | null
+          id: string
+          image_url: string | null
+          kicker: string | null
+          position: number
+          subtitle: string | null
+          title: string
+        }
+        Insert: {
+          card_type?: string
+          created_at?: string
+          deck_id: string
+          emblem?: string | null
+          id?: string
+          image_url?: string | null
+          kicker?: string | null
+          position: number
+          subtitle?: string | null
+          title: string
+        }
+        Update: {
+          card_type?: string
+          created_at?: string
+          deck_id?: string
+          emblem?: string | null
+          id?: string
+          image_url?: string | null
+          kicker?: string | null
+          position?: number
+          subtitle?: string | null
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "diggaa_swipe_cards_deck_id_fkey"
+            columns: ["deck_id"]
+            isOneToOne: false
+            referencedRelation: "diggaa_decks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      diggaa_swipe_votes: {
+        Row: {
+          card_id: string
+          choice: string
+          id: string
+          session_id: string
+          voted_at: string
+        }
+        Insert: {
+          card_id: string
+          choice: string
+          id?: string
+          session_id: string
+          voted_at?: string
+        }
+        Update: {
+          card_id?: string
+          choice?: string
+          id?: string
+          session_id?: string
+          voted_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "diggaa_swipe_votes_card_id_fkey"
+            columns: ["card_id"]
+            isOneToOne: false
+            referencedRelation: "diggaa_swipe_cards"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      diggaa_votes: {
+        Row: {
+          choice: string
+          id: string
+          poll_id: string
+          session_id: string
+          voted_at: string
+        }
+        Insert: {
+          choice: string
+          id?: string
+          poll_id: string
+          session_id: string
+          voted_at?: string
+        }
+        Update: {
+          choice?: string
+          id?: string
+          poll_id?: string
+          session_id?: string
+          voted_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "diggaa_votes_poll_id_fkey"
+            columns: ["poll_id"]
+            isOneToOne: false
+            referencedRelation: "diggaa_polls"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      duel_pair_blocks: {
+        Row: {
+          attr_key: string
+          created_at: string | null
+          entity_a: string
+          entity_b: string
+          reason: string | null
+        }
+        Insert: {
+          attr_key: string
+          created_at?: string | null
+          entity_a: string
+          entity_b: string
+          reason?: string | null
+        }
+        Update: {
+          attr_key?: string
+          created_at?: string | null
+          entity_a?: string
+          entity_b?: string
+          reason?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "duel_pair_blocks_entity_a_fkey"
+            columns: ["entity_a"]
+            isOneToOne: false
+            referencedRelation: "duel_entities"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "duel_pair_blocks_entity_a_fkey"
+            columns: ["entity_a"]
+            isOneToOne: false
+            referencedRelation: "fact_entities"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "duel_pair_blocks_entity_b_fkey"
+            columns: ["entity_b"]
+            isOneToOne: false
+            referencedRelation: "duel_entities"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "duel_pair_blocks_entity_b_fkey"
+            columns: ["entity_b"]
+            isOneToOne: false
+            referencedRelation: "fact_entities"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      duel_pair_stats: {
+        Row: {
+          attr_key: string
+          correct: number
+          entity_a: string
+          entity_b: string
+          shown: number
+          updated_at: string | null
+        }
+        Insert: {
+          attr_key: string
+          correct?: number
+          entity_a: string
+          entity_b: string
+          shown?: number
+          updated_at?: string | null
+        }
+        Update: {
+          attr_key?: string
+          correct?: number
+          entity_a?: string
+          entity_b?: string
+          shown?: number
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "duel_pair_stats_entity_a_fkey"
+            columns: ["entity_a"]
+            isOneToOne: false
+            referencedRelation: "duel_entities"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "duel_pair_stats_entity_a_fkey"
+            columns: ["entity_a"]
+            isOneToOne: false
+            referencedRelation: "fact_entities"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "duel_pair_stats_entity_b_fkey"
+            columns: ["entity_b"]
+            isOneToOne: false
+            referencedRelation: "duel_entities"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "duel_pair_stats_entity_b_fkey"
+            columns: ["entity_b"]
+            isOneToOne: false
+            referencedRelation: "fact_entities"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      fact_attribute_defs: {
+        Row: {
+          attr_key: string
+          compare_mode: string
+          easy_gap: number | null
+          enabled: boolean
+          fact_template: string | null
+          flag_difficulty: string
+          gap_divisor: number
+          gap_mode: string
+          kind: string
+          max_domain_distance: number
+          max_gap: number | null
+          mid_gap: number | null
+          min_gap: number | null
+          question_text: string
+          subject_label: string
+          theme: string
+          unit_label: string | null
+          winner: string
+        }
+        Insert: {
+          attr_key: string
+          compare_mode?: string
+          easy_gap?: number | null
+          enabled?: boolean
+          fact_template?: string | null
+          flag_difficulty?: string
+          gap_divisor?: number
+          gap_mode?: string
+          kind: string
+          max_domain_distance?: number
+          max_gap?: number | null
+          mid_gap?: number | null
+          min_gap?: number | null
+          question_text: string
+          subject_label?: string
+          theme?: string
+          unit_label?: string | null
+          winner: string
+        }
+        Update: {
+          attr_key?: string
+          compare_mode?: string
+          easy_gap?: number | null
+          enabled?: boolean
+          fact_template?: string | null
+          flag_difficulty?: string
+          gap_divisor?: number
+          gap_mode?: string
+          kind?: string
+          max_domain_distance?: number
+          max_gap?: number | null
+          mid_gap?: number | null
+          min_gap?: number | null
+          question_text?: string
+          subject_label?: string
+          theme?: string
+          unit_label?: string | null
+          winner?: string
+        }
+        Relationships: []
+      }
+      fact_attributes: {
+        Row: {
+          attr_key: string
+          display_value: string | null
+          entity_id: string
+          next_review_at: string | null
+          num_value: number | null
+          source: string | null
+          text_value: string | null
+          verified_at: string | null
+          volatility: string
+        }
+        Insert: {
+          attr_key: string
+          display_value?: string | null
+          entity_id: string
+          next_review_at?: string | null
+          num_value?: number | null
+          source?: string | null
+          text_value?: string | null
+          verified_at?: string | null
+          volatility?: string
+        }
+        Update: {
+          attr_key?: string
+          display_value?: string | null
+          entity_id?: string
+          next_review_at?: string | null
+          num_value?: number | null
+          source?: string | null
+          text_value?: string | null
+          verified_at?: string | null
+          volatility?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "duel_attributes_entity_id_fkey"
+            columns: ["entity_id"]
+            isOneToOne: false
+            referencedRelation: "duel_entities"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "duel_attributes_entity_id_fkey"
+            columns: ["entity_id"]
+            isOneToOne: false
+            referencedRelation: "fact_entities"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      fact_entities: {
+        Row: {
+          celebrity_id: string | null
+          created_at: string | null
+          domain: string | null
+          id: string
+          image_credit: string | null
+          image_url: string | null
+          kind: string
+          lat: number | null
+          lon: number | null
+          name: string
+          name_partitive: string | null
+          role_label: string | null
+          show_role: boolean
+          status: string
+          updated_at: string | null
+          wiki_url: string | null
+        }
+        Insert: {
+          celebrity_id?: string | null
+          created_at?: string | null
+          domain?: string | null
+          id?: string
+          image_credit?: string | null
+          image_url?: string | null
+          kind: string
+          lat?: number | null
+          lon?: number | null
+          name: string
+          name_partitive?: string | null
+          role_label?: string | null
+          show_role?: boolean
+          status?: string
+          updated_at?: string | null
+          wiki_url?: string | null
+        }
+        Update: {
+          celebrity_id?: string | null
+          created_at?: string | null
+          domain?: string | null
+          id?: string
+          image_credit?: string | null
+          image_url?: string | null
+          kind?: string
+          lat?: number | null
+          lon?: number | null
+          name?: string
+          name_partitive?: string | null
+          role_label?: string | null
+          show_role?: boolean
+          status?: string
+          updated_at?: string | null
+          wiki_url?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "duel_entities_celebrity_id_fkey"
+            columns: ["celebrity_id"]
+            isOneToOne: false
+            referencedRelation: "celebrities"
             referencedColumns: ["id"]
           },
         ]
@@ -597,6 +1185,7 @@ export type Database = {
           category: string
           created_at: string | null
           created_by: string | null
+          custom_slug: string | null
           description: string | null
           difficulty: string
           emoji_hint: string | null
@@ -620,6 +1209,7 @@ export type Database = {
           category: string
           created_at?: string | null
           created_by?: string | null
+          custom_slug?: string | null
           description?: string | null
           difficulty: string
           emoji_hint?: string | null
@@ -643,6 +1233,7 @@ export type Database = {
           category?: string
           created_at?: string | null
           created_by?: string | null
+          custom_slug?: string | null
           description?: string | null
           difficulty?: string
           emoji_hint?: string | null
@@ -936,6 +1527,229 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "celebrity_votes_celebrity_id_fkey"
+            columns: ["celebrity_id"]
+            isOneToOne: false
+            referencedRelation: "celebrities"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      diggaa_knockout_option_stats: {
+        Row: {
+          appearances: number | null
+          knockout_id: string | null
+          option_id: string | null
+          tournament_wins: number | null
+          wins: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "diggaa_knockout_options_knockout_id_fkey"
+            columns: ["knockout_id"]
+            isOneToOne: false
+            referencedRelation: "diggaa_knockouts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      diggaa_knockout_pair_stats: {
+        Row: {
+          knockout_id: string | null
+          opt_hi: string | null
+          opt_lo: string | null
+          winner_option_id: string | null
+          wins: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "diggaa_knockout_battles_winner_option_id_fkey"
+            columns: ["winner_option_id"]
+            isOneToOne: false
+            referencedRelation: "diggaa_knockout_option_stats"
+            referencedColumns: ["option_id"]
+          },
+          {
+            foreignKeyName: "diggaa_knockout_battles_winner_option_id_fkey"
+            columns: ["winner_option_id"]
+            isOneToOne: false
+            referencedRelation: "diggaa_knockout_options"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "diggaa_knockout_sessions_knockout_id_fkey"
+            columns: ["knockout_id"]
+            isOneToOne: false
+            referencedRelation: "diggaa_knockouts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      duel_attribute_defs: {
+        Row: {
+          attr_key: string | null
+          compare_mode: string | null
+          easy_gap: number | null
+          enabled: boolean | null
+          fact_template: string | null
+          flag_difficulty: string | null
+          kind: string | null
+          max_domain_distance: number | null
+          max_gap: number | null
+          mid_gap: number | null
+          min_gap: number | null
+          question_text: string | null
+          subject_label: string | null
+          theme: string | null
+          unit_label: string | null
+          winner: string | null
+        }
+        Insert: {
+          attr_key?: string | null
+          compare_mode?: string | null
+          easy_gap?: number | null
+          enabled?: boolean | null
+          fact_template?: string | null
+          flag_difficulty?: string | null
+          kind?: string | null
+          max_domain_distance?: number | null
+          max_gap?: number | null
+          mid_gap?: number | null
+          min_gap?: number | null
+          question_text?: string | null
+          subject_label?: string | null
+          theme?: string | null
+          unit_label?: string | null
+          winner?: string | null
+        }
+        Update: {
+          attr_key?: string | null
+          compare_mode?: string | null
+          easy_gap?: number | null
+          enabled?: boolean | null
+          fact_template?: string | null
+          flag_difficulty?: string | null
+          kind?: string | null
+          max_domain_distance?: number | null
+          max_gap?: number | null
+          mid_gap?: number | null
+          min_gap?: number | null
+          question_text?: string | null
+          subject_label?: string | null
+          theme?: string | null
+          unit_label?: string | null
+          winner?: string | null
+        }
+        Relationships: []
+      }
+      duel_attributes: {
+        Row: {
+          attr_key: string | null
+          display_value: string | null
+          entity_id: string | null
+          next_review_at: string | null
+          num_value: number | null
+          source: string | null
+          text_value: string | null
+          verified_at: string | null
+          volatility: string | null
+        }
+        Insert: {
+          attr_key?: string | null
+          display_value?: string | null
+          entity_id?: string | null
+          next_review_at?: string | null
+          num_value?: number | null
+          source?: string | null
+          text_value?: string | null
+          verified_at?: string | null
+          volatility?: string | null
+        }
+        Update: {
+          attr_key?: string | null
+          display_value?: string | null
+          entity_id?: string | null
+          next_review_at?: string | null
+          num_value?: number | null
+          source?: string | null
+          text_value?: string | null
+          verified_at?: string | null
+          volatility?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "duel_attributes_entity_id_fkey"
+            columns: ["entity_id"]
+            isOneToOne: false
+            referencedRelation: "duel_entities"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "duel_attributes_entity_id_fkey"
+            columns: ["entity_id"]
+            isOneToOne: false
+            referencedRelation: "fact_entities"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      duel_entities: {
+        Row: {
+          celebrity_id: string | null
+          created_at: string | null
+          domain: string | null
+          id: string | null
+          image_credit: string | null
+          image_url: string | null
+          kind: string | null
+          lat: number | null
+          lon: number | null
+          name: string | null
+          name_partitive: string | null
+          role_label: string | null
+          show_role: boolean | null
+          status: string | null
+          updated_at: string | null
+          wiki_url: string | null
+        }
+        Insert: {
+          celebrity_id?: string | null
+          created_at?: string | null
+          domain?: string | null
+          id?: string | null
+          image_credit?: string | null
+          image_url?: string | null
+          kind?: string | null
+          lat?: number | null
+          lon?: number | null
+          name?: string | null
+          name_partitive?: string | null
+          role_label?: string | null
+          show_role?: boolean | null
+          status?: string | null
+          updated_at?: string | null
+          wiki_url?: string | null
+        }
+        Update: {
+          celebrity_id?: string | null
+          created_at?: string | null
+          domain?: string | null
+          id?: string | null
+          image_credit?: string | null
+          image_url?: string | null
+          kind?: string | null
+          lat?: number | null
+          lon?: number | null
+          name?: string | null
+          name_partitive?: string | null
+          role_label?: string | null
+          show_role?: boolean | null
+          status?: string | null
+          updated_at?: string | null
+          wiki_url?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "duel_entities_celebrity_id_fkey"
             columns: ["celebrity_id"]
             isOneToOne: false
             referencedRelation: "celebrities"

@@ -43,7 +43,7 @@ export type EntityValue = {
   lat: number | null;
   lon: number | null;
   name_partitive: string | null;
-  duel_attributes?: AttrValue[];
+  fact_attributes?: AttrValue[];
 };
 
 const epochToDate = (n: number) => new Date(n * 1000).toISOString().slice(0, 10);
@@ -74,10 +74,10 @@ export function EntityForm({
     initial?.status ?? "published",
   );
 
-  const existing = new Map((initial?.duel_attributes ?? []).map((a) => [a.attr_key, a]));
+  const existing = new Map((initial?.fact_attributes ?? []).map((a) => [a.attr_key, a]));
   const [vals, setVals] = useState<Record<string, string>>(() => {
     const o: Record<string, string> = {};
-    for (const a of initial?.duel_attributes ?? [])
+    for (const a of initial?.fact_attributes ?? [])
       o[a.attr_key] = DATE_ATTRS.includes(a.attr_key)
         ? epochToDate(a.num_value ?? 0)
         : String(a.num_value ?? "");
@@ -85,7 +85,7 @@ export function EntityForm({
   });
   const [sources, setSources] = useState<Record<string, string>>(() => {
     const o: Record<string, string> = {};
-    for (const a of initial?.duel_attributes ?? []) o[a.attr_key] = a.source ?? "";
+    for (const a of initial?.fact_attributes ?? []) o[a.attr_key] = a.source ?? "";
     return o;
   });
 

@@ -55,13 +55,13 @@ async function writeAttributes(entityId: string, attributes: AttrValue[]) {
   const drop = attributes.filter((a) => a.num_value === null || Number.isNaN(a.num_value));
   if (drop.length) {
     await sb
-      .from("duel_attributes")
+      .from("fact_attributes")
       .delete()
       .eq("entity_id", entityId)
       .in("attr_key", drop.map((a) => a.attr_key));
   }
   if (keep.length) {
-    await sb.from("duel_attributes").upsert(
+    await sb.from("fact_attributes").upsert(
       keep.map((a) => ({
         entity_id: entityId,
         attr_key: a.attr_key,
@@ -80,7 +80,7 @@ export async function createEntity(input: EntityInput) {
   if (err) return { ok: false as const, error: err };
   const sb = getSupabaseAdmin();
   const { data, error } = await sb
-    .from("duel_entities")
+    .from("fact_entities")
     .insert({
       name: input.name.trim(),
       kind: input.kind,
@@ -107,7 +107,7 @@ export async function updateEntity(id: string, input: EntityInput) {
   if (err) return { ok: false as const, error: err };
   const sb = getSupabaseAdmin();
   const { error } = await sb
-    .from("duel_entities")
+    .from("fact_entities")
     .update({
       name: input.name.trim(),
       kind: input.kind,
@@ -131,7 +131,7 @@ export async function updateEntity(id: string, input: EntityInput) {
 
 export async function deleteEntity(id: string) {
   const sb = getSupabaseAdmin();
-  const { error } = await sb.from("duel_entities").delete().eq("id", id);
+  const { error } = await sb.from("fact_entities").delete().eq("id", id);
   if (error) return { ok: false as const, error: error.message };
   revalidatePath("/kaksintaistelut");
   return { ok: true as const };
@@ -173,8 +173,8 @@ export async function saveDef(input: DefInput, isNew: boolean) {
   const sb = getSupabaseAdmin();
   const row = { ...input, attr_key: input.attr_key.trim() };
   const { error } = isNew
-    ? await sb.from("duel_attribute_defs").insert(row)
-    : await sb.from("duel_attribute_defs").update(row).eq("attr_key", row.attr_key);
+    ? await sb.from("fact_attribute_defs").insert(row)
+    : await sb.from("fact_attribute_defs").update(row).eq("attr_key", row.attr_key);
   if (error) return { ok: false as const, error: error.message };
   revalidatePath("/kaksintaistelut");
   return { ok: true as const };

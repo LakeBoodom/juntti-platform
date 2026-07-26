@@ -43,6 +43,15 @@ export type DuelDef = {
   maxGap: number | null;
   /** Alaraja erolle. Sitä pienempi ero = arvauskysymys, ei generoida. */
   minGap: number | null;
+  /**
+   * Miten ero lasketaan. "relative" = osuus suuremmasta arvosta (väkiluvut,
+   * pinta-alat, lukumäärät). "absolute" = arvojen erotus sellaisenaan
+   * (vuosiluvut). Vuosiluvuilla suhteellinen ero on aina lähes nolla, joten
+   * väärä moodi hylkäisi kaikki parit hiljaisesti.
+   */
+  gapMode: "relative" | "absolute";
+  /** Jakaja absolute-moodissa: birth on tallennettu sekunteina, ei vuosina. */
+  gapDivisor: number;
   /** Lipuille: kuinka kaukaa harhautin saa tulla (alojen etäisyys 0–3). */
   maxDomainDistance: number;
   factTemplate: string | null;
@@ -126,8 +135,7 @@ function gap(def: DuelDef, a: DuelEntity, b: DuelEntity, ref?: DuelEntity | null
   }
   const va = a.v[def.key];
   const vb = b.v[def.key];
-  if (def.key === "birth") return Math.abs(va - vb) / YEAR_S;
-  if (def.key === "year") return Math.abs(va - vb);
+  if (def.gapMode === "absolute") return Math.abs(va - vb) / def.gapDivisor;
   return relGap(va, vb);
 }
 
@@ -334,14 +342,14 @@ export async function getDuelData(): Promise<DuelData | null> {
   const [entRes, defRes, blockRes] = await Promise.all([
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (sb as any)
-      .from("duel_entities")
+      .from("fact_entities")
       .select(
-        "id, name, kind, role_label, show_role, domain, image_url, lat, lon, name_partitive, duel_attributes(attr_key, num_value, display_value)",
+        "id, name, kind, role_label, show_role, domain, image_url, lat, lon, name_partitive, fact_attributes(attr_key, num_value, display_value)",
       )
       .eq("status", "published")
       .limit(2000),
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (sb as any).from("duel_attribute_defs").select("*").eq("enabled", true),
+    (sb as any).from("fact_attribute_defs").select("*").eq("enabled", true),
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (sb as any).from("duel_pair_blocks").select("attr_key, entity_a, entity_b"),
   ]);
@@ -356,7 +364,7 @@ export async function getDuelData(): Promise<DuelData | null> {
     const v: Record<string, number> = {};
     const d: Record<string, string> = {};
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    for (const a of x.duel_attributes ?? []) {
+    for (const a of x.fact_attributes ?? []) {
       v[a.attr_key] = Number(a.num_value);
       if (a.display_value) d[a.attr_key] = a.display_value;
     }
@@ -390,6 +398,8 @@ export async function getDuelData(): Promise<DuelData | null> {
     midGap: d.mid_gap === null ? null : Number(d.mid_gap),
     maxGap: d.max_gap === null || d.max_gap === undefined ? null : Number(d.max_gap),
     minGap: d.min_gap === null || d.min_gap === undefined ? null : Number(d.min_gap),
+    gapMode: d.gap_mode === "absolute" ? "absolute" : "relative",
+    gapDivisor: d.gap_divisor === null || d.gap_divisor === undefined ? 1 : Number(d.gap_divisor),
     maxDomainDistance: d.max_domain_distance ?? 1,
     factTemplate: d.fact_template,
   }));

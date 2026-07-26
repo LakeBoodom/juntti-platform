@@ -15,7 +15,7 @@ type Row = {
   lat: number | string | null;
   lon: number | string | null;
   name_partitive: string | null;
-  duel_attributes?: Attr[];
+  fact_attributes?: Attr[];
 };
 
 /** Sama etäisyyslaskenta kuin pelissä (lib/duel.ts, haversineKm). */
@@ -63,7 +63,7 @@ export function Preview({ defs, entities }: { defs: Def[]; entities: Row[] }) {
           e.kind === def.kind &&
           (isDist
             ? hasCoords(e)
-            : (e.duel_attributes ?? []).some((x) => x.attr_key === def.attr_key)),
+            : (e.fact_attributes ?? []).some((x) => x.attr_key === def.attr_key)),
       );
       if (pool.length < (isDist ? 3 : 2)) continue;
 
@@ -74,15 +74,15 @@ export function Preview({ defs, entities }: { defs: Def[]; entities: Row[] }) {
       const b = cands[Math.floor(Math.random() * cands.length)];
       if (!a || !b || a.id === b.id) continue;
 
-      const na = ref ? haversineKm(ref, a) : (a.duel_attributes ?? []).find((x) => x.attr_key === def.attr_key)!.num_value;
-      const nb = ref ? haversineKm(ref, b) : (b.duel_attributes ?? []).find((x) => x.attr_key === def.attr_key)!.num_value;
+      const na = ref ? haversineKm(ref, a) : (a.fact_attributes ?? []).find((x) => x.attr_key === def.attr_key)!.num_value;
+      const nb = ref ? haversineKm(ref, b) : (b.fact_attributes ?? []).find((x) => x.attr_key === def.attr_key)!.num_value;
       if (na === nb) continue;
       const va: Attr = ref
         ? { attr_key: def.attr_key, num_value: na, display_value: `${Math.round(na)} km` }
-        : (a.duel_attributes ?? []).find((x) => x.attr_key === def.attr_key)!;
+        : (a.fact_attributes ?? []).find((x) => x.attr_key === def.attr_key)!;
       const vb: Attr = ref
         ? { attr_key: def.attr_key, num_value: nb, display_value: `${Math.round(nb)} km` }
-        : (b.duel_attributes ?? []).find((x) => x.attr_key === def.attr_key)!;
+        : (b.fact_attributes ?? []).find((x) => x.attr_key === def.attr_key)!;
 
       // Samat rajat kuin pelissä: liian suurta eikä liian pientä eroa ei näytetä
       if (def.compare_mode !== "flag") {
