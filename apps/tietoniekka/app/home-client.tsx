@@ -45,14 +45,19 @@ export type HomeClientProps = {
   categoryQuizzes: CategoryQuizMap;
   pinnallaEvents: PinnallaEvent[];
   sankariQuiz: CategoryPreview | null;
+  kumpiPreview: KumpiPreview | null;
 };
+
+/** Yksi valmis kaksintaistelu etusivun nostoa varten (ks. lib/duel.ts). */
+export type KumpiPreview = { subject: string; question: string; a: string; b: string };
 
 export function HomeClient({
   todaysCelebrity,
   todaysQuiz,
   categoryQuizzes,
   pinnallaEvents,
-  sankariQuiz
+  sankariQuiz,
+  kumpiPreview
 }: HomeClientProps) {
   const [todaysDateLabel, setTodaysDateLabel] = useState<string>("");
   const [heroTagline, setHeroTagline] = useState<string>(HERO_TAGLINES[0]);
@@ -426,7 +431,41 @@ export function HomeClient({
         </div>
       </section>
 
-      {/* 5. MID-PROMO */}
+      {/* 5. KUMPI? — kaksintaistelu. Sijoitettu heti Päivän sankarin perään:
+          sankariosio on sivun hitain kohta (siinä luetaan bio), joten nopea
+          kahden sekunnin kaksintaistelu on siinä hyvä rytminvaihdos, ja
+          osion vahvin sisältö on julkkisvertailuja eli sama aihe jatkuu. */}
+      <section className="kumpi-promo" id="kumpi">
+        <div className="container">
+          <h2 className="section-header">Kumpi?</h2>
+          <p className="section-subtitle">Kaksi vaihtoehtoa. Vain toinen on oikein.</p>
+          <div className="kumpi-promo-card">
+            {kumpiPreview ? (
+              <>
+                <span className="kumpi-promo-kicker">{kumpiPreview.subject}</span>
+                <p className="kumpi-promo-ask">{kumpiPreview.question}</p>
+                <div className="kumpi-promo-pair">
+                  <span className="kumpi-promo-opt">{kumpiPreview.a}</span>
+                  <span className="kumpi-promo-vs">vs</span>
+                  <span className="kumpi-promo-opt">{kumpiPreview.b}</span>
+                </div>
+              </>
+            ) : (
+              <>
+                <span className="kumpi-promo-kicker">Kumpi heistä</span>
+                <p className="kumpi-promo-ask">on vanhempi?</p>
+              </>
+            )}
+            <div className="kumpi-promo-cta">
+              <Link href="/kumpi" className="btn btn-primary btn-large">
+                PELAA KUMPI? →
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 6. MID-PROMO */}
       <section className="mid-promo">
         <div className="promo-image">
           <img src="/Header1.png" alt="" />
@@ -440,7 +479,7 @@ export function HomeClient({
         </div>
       </section>
 
-      {/* 6. KATEGORIAT — silmukka CATEGORIES + categoryQuizzes (random per kategoria, päivittyy 1 h välein) */}
+      {/* 7. KATEGORIAT — silmukka CATEGORIES + categoryQuizzes (random per kategoria, päivittyy 1 h välein) */}
       <section className="kategoriat" id="kategoriat">
         <div className="container-wide">
           <h2 className="section-header">Testaa tietosi eri aiheissa</h2>
@@ -519,7 +558,7 @@ export function HomeClient({
         </div>
       </section>
 
-      {/* 7. TUNNISTA TÄMÄ — kuvavisat (5 kategoriaa) */}
+      {/* 8. TUNNISTA TÄMÄ — kuvavisat (5 kategoriaa) */}
       <section className="tunnista-tama" id="tunnista-tama">
         <div className="container-wide">
           <h2 className="section-header">Tunnistatko kuvasta</h2>
@@ -572,7 +611,7 @@ export function HomeClient({
         </div>
       </section>
 
-      {/* 8. ARVO SATUNNAINEN */}
+      {/* 9. ARVO SATUNNAINEN */}
       <section className="arvo-satunnainen" id="arvo-satunnainen">
         <div className="container-wide">
           <div className="arvo-card">
@@ -583,7 +622,7 @@ export function HomeClient({
         </div>
       </section>
 
-      {/* 9. FOOTER */}
+      {/* 10. FOOTER */}
       <footer className="footer">
         <div className="footer-logo">TIETONIEKKA</div>
         <p className="footer-meta">
