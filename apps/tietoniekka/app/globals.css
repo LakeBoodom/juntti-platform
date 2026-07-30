@@ -3566,3 +3566,200 @@ div.pinnalla-event-card.pinnalla-event-card--neon {
 }
 .kumpi-promo-vs { font-family: "Barlow Condensed", sans-serif; font-size: 13px; letter-spacing: 0.14em; text-transform: uppercase; color: rgba(255,255,255,0.4); }
 .kumpi-promo-cta { margin-top: var(--space-md); }
+
+/* ── JÄRJESTÄ OIKEIN ──────────────────────────────────────────────────
+   Sama tumma pelitila kuin Kumpi-pelissä. Mobiili edellä: rivit ovat
+   isoja kosketuskohteita ja nuolinapit ovat peukalon ulottuvilla. */
+
+.jrj-intro,
+.jrj-result,
+.jrj-play {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 32px 20px 48px;
+  background: var(--color-surface-dark);
+  color: var(--color-text-light);
+}
+
+.jrj-intro, .jrj-result { justify-content: center; text-align: center; }
+.jrj-intro-inner, .jrj-result-inner { width: 100%; max-width: 460px; }
+
+.jrj-eyebrow {
+  display: block;
+  font-family: "Barlow Condensed", sans-serif;
+  text-transform: uppercase;
+  letter-spacing: .18em;
+  font-size: .78rem;
+  color: var(--color-accent, #E8A320);
+  margin-bottom: 6px;
+}
+
+.jrj-title {
+  font-family: "Barlow Condensed", sans-serif;
+  font-weight: 700;
+  font-size: clamp(2.4rem, 11vw, 3.4rem);
+  line-height: 1;
+  text-transform: uppercase;
+  margin-bottom: 14px;
+}
+
+.jrj-lede { font-size: 1.02rem; line-height: 1.5; opacity: .82; margin-bottom: 26px; }
+
+.jrj-themelabel {
+  display: block;
+  font-family: "Barlow Condensed", sans-serif;
+  text-transform: uppercase;
+  letter-spacing: .14em;
+  font-size: .74rem;
+  opacity: .6;
+  margin-bottom: 8px;
+}
+
+.jrj-themes {
+  display: flex; flex-wrap: wrap; gap: 8px;
+  justify-content: center; margin-bottom: 28px;
+}
+
+.jrj-theme {
+  font-family: "Barlow Condensed", sans-serif;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  font-size: .9rem;
+  padding: 8px 16px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,.22);
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+.jrj-theme.is-selected {
+  background: var(--color-accent, #E8A320);
+  border-color: var(--color-accent, #E8A320);
+  color: #0F1520;
+  font-weight: 600;
+}
+
+.jrj-cta {
+  display: inline-block;
+  width: 100%;
+  font-family: "Barlow Condensed", sans-serif;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  font-size: 1.1rem;
+  padding: 15px 24px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--color-accent, #E8A320);
+  color: #0F1520;
+  cursor: pointer;
+  text-align: center;
+}
+
+.jrj-sidelink {
+  display: inline-block;
+  margin-top: 16px;
+  font-size: .9rem;
+  opacity: .65;
+  color: inherit;
+}
+
+/* ── Pelinäkymä ─────────────────────────────────────────────────────── */
+
+.jrj-play { justify-content: flex-start; }
+.jrj-play > * { width: 100%; max-width: 460px; }
+
+.jrj-bar {
+  display: flex; align-items: center; justify-content: space-between;
+  font-family: "Barlow Condensed", sans-serif;
+  text-transform: uppercase; letter-spacing: .1em; font-size: .78rem;
+  opacity: .75; margin-bottom: 22px;
+}
+.jrj-score { color: var(--color-accent, #E8A320); font-weight: 700; }
+.jrj-diff { padding: 2px 10px; border-radius: 999px; font-size: .68rem; }
+.jrj-diff--keski  { background: rgba(232,163,32,.18); color: #E8A320; }
+.jrj-diff--vaikea { background: rgba(192,57,43,.22);  color: #E57368; }
+
+.jrj-instruction {
+  font-size: 1.18rem; line-height: 1.4; margin-bottom: 18px; text-align: center;
+}
+.jrj-instruction strong { color: var(--color-accent, #E8A320); font-weight: 600; }
+
+.jrj-list { list-style: none; margin: 0 0 22px; padding: 0; display: grid; gap: 8px; }
+
+.jrj-row {
+  display: flex; align-items: center; gap: 12px;
+  padding: 13px 14px;
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,.14);
+  background: rgba(255,255,255,.045);
+}
+.jrj-row.is-right { border-color: rgba(76,175,80,.55); background: rgba(76,175,80,.12); }
+.jrj-row.is-wrong { border-color: rgba(192,57,43,.45); background: rgba(192,57,43,.10); }
+
+.jrj-pos {
+  flex: 0 0 26px; height: 26px;
+  display: grid; place-items: center;
+  border-radius: 50%;
+  background: rgba(255,255,255,.12);
+  font-family: "Barlow Condensed", sans-serif;
+  font-weight: 700; font-size: .88rem;
+}
+.jrj-name { flex: 1 1 auto; font-weight: 500; line-height: 1.25; }
+.jrj-value {
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: .95rem; opacity: .78; white-space: nowrap;
+}
+
+.jrj-moves { display: flex; gap: 6px; }
+.jrj-moves button {
+  width: 38px; height: 38px;
+  border-radius: 9px;
+  border: 1px solid rgba(255,255,255,.2);
+  background: rgba(255,255,255,.06);
+  color: inherit;
+  font-size: 1.05rem;
+  cursor: pointer;
+}
+.jrj-moves button:disabled { opacity: .28; cursor: default; }
+
+.jrj-reveal { text-align: center; }
+.jrj-revealtext { margin-bottom: 14px; opacity: .85; }
+
+.jrj-bigscore {
+  font-family: "Barlow Condensed", sans-serif;
+  font-weight: 700; font-size: 4.2rem; line-height: 1;
+  color: var(--color-accent, #E8A320); margin-bottom: 6px;
+}
+.jrj-bigscore span { font-size: 1.5rem; opacity: .55; margin-left: 6px; color: inherit; }
+.jrj-resulttext { margin-bottom: 26px; opacity: .85; line-height: 1.5; }
+
+/* Raahaus: rivi seuraa sormea, muut siirtyvät pehmeästi tieltä. */
+.jrj-row {
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  cursor: grab;
+  transition: transform .16s ease, background .16s ease, border-color .16s ease;
+}
+.jrj-list.is-dragging .jrj-row { transition: transform .16s ease; }
+.jrj-row.is-dragged {
+  cursor: grabbing;
+  transition: none;
+  z-index: 5;
+  position: relative;
+  border-color: var(--color-accent, #E8A320);
+  background: rgba(232,163,32,.14);
+  box-shadow: 0 10px 24px rgba(0,0,0,.45);
+}
+.jrj-row.is-right, .jrj-row.is-wrong { cursor: default; touch-action: auto; }
+.jrj-moves button { touch-action: manipulation; }
+
+.jrj-hint {
+  text-align: center;
+  font-size: .82rem;
+  opacity: .45;
+  margin-bottom: 12px;
+}
