@@ -1,0 +1,384 @@
+// TIETONIEKKA 2.0 — ETUSIVU (Vaihe 3, lukittu runko: TOTEUTUSSUUNNITELMA §2.3)
+// HERO (ei arvontaa) → PÄIVÄ (sankari + Putki) → ALOITA NÄISTÄ → SELAA LISÄÄ
+// → MEGA → 🔥 TÄNÄÄN SUOSITUINTA (vain kun dataa) → KAUSIHERO → ALANAVI + FOOTER.
+// Kuori staattinen, luvut dynaamisia kannasta.
+
+import { getSupabase, SITE_SLUG } from "@/lib/supabase";
+import { ModeMotif } from "@/components/tn20/motifs";
+import PutkiCard from "./PutkiCard";
+
+export const dynamic = "force-dynamic";
+
+type Celeb = {
+  id: string;
+  slug: string | null;
+  name: string;
+  role: string | null;
+  image_url: string | null;
+  birth_date: string;
+  trivia_quiz_id: string | null;
+};
+
+function fiDate(d: Date) {
+  const days = ["Sunnuntai", "Maanantai", "Tiistai", "Keskiviikko", "Torstai", "Perjantai", "Lauantai"];
+  return `${days[d.getDay()]} ${d.getDate()}.${d.getMonth() + 1}.`;
+}
+
+async function getData() {
+  const sb = getSupabase();
+  if (!sb) return null;
+
+  const [cardsRes, celebsRes, playsRes] = await Promise.all([
+    sb.from("quiz_cards" as never).select("id, slug, custom_slug, title, display_title, collection, play_count"),
+    sb.from("celebrities").select("id, slug, name, role, image_url, birth_date, trivia_quiz_id"),
+    sb
+      .from("quiz_plays")
+      .select("quiz_id, played_at")
+      .gte("played_at", new Date(Date.now() - 24 * 3600 * 1000).toISOString()),
+  ]);
+
+  const cards = (cardsRes.data ?? []) as Array<{
+    id: string; slug: string; custom_slug: string | null; title: string;
+    display_title: string | null; collection: string | null; play_count: number;
+  }>;
+  const celebs = (celebsRes.data ?? []) as Celeb[];
+  const plays = (playsRes.data ?? []) as Array<{ quiz_id: string }>;
+
+  // Kokoelmien visamäärät
+  const counts: Record<string, number> = {};
+  for (const c of cards) if (c.collection) counts[c.collection] = (counts[c.collection] ?? 0) + 1;
+
+  // Päivän sankari: tämän päivän synttärit, muuten seuraava tuleva
+  const today = new Date();
+  const key = (m: number, d: number) => m * 100 + d;
+  const todayKey = key(today.getMonth() + 1, today.getDate());
+  const sorted = celebs
+    .map((c) => {
+      const b = new Date(c.birth_date);
+      const k = key(b.getMonth() + 1, b.getDate());
+      return { c, dist: k >= todayKey ? k - todayKey : k + 1300 - todayKey };
+    })
+    .sort((a, b) => a.dist - b.dist);
+  const hero = sorted[0] ?? null;
+
+  // Trending: pelatuimmat 24 h — näytetään vasta kun volyymiä on (kynnys)
+  const playCounts: Record<string, number> = {};
+  for (const p of plays) playCounts[p.quiz_id] = (playCounts[p.quiz_id] ?? 0) + 1;
+  const trendingIds = Object.entries(playCounts).sort((a, b) => b[1] - a[1]).slice(0, 6);
+  const totalPlays24h = plays.length;
+  const trending =
+    totalPlays24h >= 30
+      ? trendingIds
+          .map(([id, n]) => {
+            const q = cards.find((c) => c.id === id);
+            return q ? { ...q, plays: n } : null;
+          })
+          .filter(Boolean)
+      : [];
+
+  return { counts, total: cards.length, hero, sankariIsToday: hero?.dist === 0, trending, today };
+}
+
+function age(birth: string, onNextBirthday: boolean) {
+  const b = new Date(birth);
+  const t = new Date();
+  let a = t.getFullYear() - b.getFullYear();
+  const m = t.getMonth() - b.getMonth();
+  if (m < 0 || (m === 0 && t.getDate() < b.getDate())) a--;
+  return onNextBirthday ? a : a + 1;
+}
+
+export default async function Etusivu20() {
+  const data = await getData();
+  if (!data) return <main style={{ padding: 32 }}>Ei tietokantayhteyttä.</main>;
+  const { counts, total, hero, sankariIsToday, trending, today } = data;
+
+  const n = (k: string) => counts[k] ?? 0;
+  const rankColors = ["var(--tn-magenta)", "var(--tn-lime)", "var(--tn-violet)", "var(--tn-teal)", "var(--tn-orange)", "var(--tn-gold)"];
+
+  return (
+    <main style={{ minHeight: "100dvh" }}>
+      {/* ─── HEADER ─── */}
+      <header className="tn-header">
+        <a className="tn-logo" href="/2-0">
+          <b>TIETO</b>
+          <span>NIEKKA</span>
+        </a>
+        <nav className="tn-nav">
+          <a href="#kokoelmat">Kokoelmat</a>
+          <a href="#pelimuodot">Pelimuodot</a>
+          <a href="#paiva">Tänään</a>
+        </nav>
+        <a className="tn-header-cta" href={hero?.c.slug ? `/sankari/${hero.c.slug}` : "#paiva"}>
+          Pelaa päivän sankari
+        </a>
+      </header>
+
+      {/* ─── HERO: editorial spotlight, EI arvontanappia ─── */}
+      <section className="tn-hero">
+        <div className="tn-hero-media">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/20/hero-mikko-laura.webp" alt="" />
+        </div>
+        <div className="tn-shell">
+          <div className="tn-hero-inner">
+            <span className="tn-eyebrow">Uutta joka päivä</span>
+            <h1 className="tn-display">
+              Tiedätkö <em>enemmän</em> kuin luulet?
+            </h1>
+            <p>
+              Mikko ja Laura kokosivat yli {Math.floor(total / 10) * 10} visaa Netflix-sarjoista
+              maajoukkueisiin. Uutta joka päivä, aina ilmaista.
+            </p>
+            <div className="tn-hero-chips">
+              <span className="tn-trustchip">{total}+ visaa</span>
+              <span className="tn-trustchip">3 pelimuotoa</span>
+              <span className="tn-trustchip">Ei kirjautumista</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ─── PÄIVÄ-SLOTTI ─── */}
+      <section className="tn-section" id="paiva">
+        <div className="tn-shell">
+          <span className="tn-eyebrow" style={{ color: "var(--tn-gold)" }}>Tänään</span>
+          <div className="tn-section-head">
+            <h2 className="tn-section-title">Päivän sankari</h2>
+            <span className="tn-section-sub" style={{ margin: 0 }}>{fiDate(today)} · vaihtuu klo 06:00</span>
+          </div>
+          <div className="tn-day-grid" style={{ marginTop: 18 }}>
+            {hero ? (
+              <article className="tn-sankari-card">
+                <div className="tn-sankari-photo">
+                  {hero.c.image_url && (
+                    /* eslint-disable-next-line @next/next/no-img-element */
+                    <img src={hero.c.image_url} alt={hero.c.name} />
+                  )}
+                </div>
+                <div className="tn-sankari-body">
+                  <span className="tn-chip" style={{ color: "var(--tn-amber)", alignSelf: "start" }}>
+                    {sankariIsToday ? "🔥 Tänään juhlii" : "🎂 Seuraavaksi juhlii"}
+                  </span>
+                  <div className="tn-sankari-age">
+                    <b>{age(hero.c.birth_date, sankariIsToday)} vuotta</b> — {hero.c.name}
+                  </div>
+                  <div className="tn-sankari-meta">
+                    Syntynyt {new Date(hero.c.birth_date).getDate()}.{new Date(hero.c.birth_date).getMonth() + 1}.
+                    {new Date(hero.c.birth_date).getFullYear()} · {hero.c.role}
+                  </div>
+                  <a className="tn-cta" href={hero.c.slug ? `/sankari/${hero.c.slug}` : "#"}>
+                    Aloita visa →
+                  </a>
+                  <a className="tn-textlink" href="/2-0/kortit">
+                    Selaa tunnettuja henkilöitä →
+                  </a>
+                </div>
+              </article>
+            ) : (
+              <div className="tn-empty">Päivän sankari palaa huomenna.</div>
+            )}
+            <PutkiCard />
+          </div>
+        </div>
+      </section>
+
+      {/* ─── ALOITA NÄISTÄ: isot hero-nostot syy-eyebrowein ─── */}
+      <section className="tn-section" id="kokoelmat">
+        <div className="tn-shell">
+          <span className="tn-eyebrow" style={{ color: "var(--tn-text-muted)" }}>Kokoelmat</span>
+          <div className="tn-section-head">
+            <h2 className="tn-section-title">Aloita näistä</h2>
+            <a className="tn-morelink" href="#selaa">Kaikki kokoelmat →</a>
+          </div>
+          <div className="tn-feature-grid" style={{ marginTop: 18 }}>
+            <a className="tn-feature" href="/kategoria/tv-sarjat" style={{ ["--tn-feature-accent" as string]: "var(--tn-magenta)" }}>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/20/hero-tv-laura.webp" alt="" />
+              <div className="tn-feature-body">
+                <span className="tn-chip">Kokoelma · {n("tv")} visaa</span>
+                <div className="tn-feature-title">TV &amp; Suoratoisto</div>
+                <p className="tn-feature-desc">Netflix-hitit, kotimaiset sarjat ja ne joita et myönnä katsoneesi.</p>
+                <div className="tn-feature-tags">
+                  <span className="tn-chip">Suosituimmat</span>
+                  <span className="tn-chip">Kotimaiset</span>
+                  <span className="tn-chip">Klassikot</span>
+                </div>
+              </div>
+            </a>
+            <a className="tn-feature" href="/kategoria/urheilu" style={{ ["--tn-feature-accent" as string]: "var(--tn-lime)" }}>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/20/hero-urheilu-mikko.webp" alt="" />
+              <div className="tn-feature-body">
+                <span className="tn-chip">Kokoelma · {n("urheilu")} visaa</span>
+                <div className="tn-feature-title">Urheilu</div>
+                <p className="tn-feature-desc">Maajoukkueet, F1, tennis ja MM-kisat. Joukkue kerrallaan, omilla väreillä.</p>
+                <div className="tn-feature-tags">
+                  <span className="tn-chip">Jalkapallo</span>
+                  <span className="tn-chip">F1</span>
+                  <span className="tn-chip">Tennis</span>
+                </div>
+              </div>
+            </a>
+          </div>
+        </div>
+      </section>
+
+      {/* ─── SELAA LISÄÄ: kompakti ruudukko ─── */}
+      <section className="tn-section" id="selaa" style={{ paddingTop: 0 }}>
+        <div className="tn-shell">
+          <div className="tn-section-head">
+            <h2 className="tn-section-title">Selaa lisää</h2>
+          </div>
+          <div className="tn-browse-grid" style={{ marginTop: 18 }}>
+            {[
+              { href: "/kategoria/elokuvat", img: "/20/teema-elokuvat.webp", chip: "Kokoelma", title: "Elokuvat", meta: `${n("elokuvat")} visaa`, accent: "var(--tn-acc-elokuvat)" },
+              { href: "/kategoria/musiikki", img: "/20/teema-musiikki.webp", chip: "Kokoelma", title: "Musiikki", meta: `${n("musiikki")} visaa`, accent: "var(--tn-acc-musiikki)" },
+              { href: "/kumpi", motif: "kumpi", chip: "Pelimuoto", title: "Kumpi?", meta: "Kaksi vaihtoehtoa", accent: "var(--tn-teal)" },
+              { href: "/peli?kuvavisa=liput", img: "/20/teema-liput.webp", chip: "Kuvavisa", title: "Liput", meta: "Tunnista liput", accent: "var(--tn-teal)" },
+              { href: "/kategoria/maantieto", img: "/20/teema-maantieto.webp", chip: "Kokoelma", title: "Matkakohteet", meta: `${n("matkakohteet")} visaa`, accent: "var(--tn-acc-matkakohteet)" },
+              { href: "/jarjesta", motif: "jarjesta", chip: "Pelimuoto", title: "Järjestä", meta: "Laita riviin", accent: "var(--tn-violet)" },
+              { href: "/2-0/kortit", img: "/20/teema-tunnetut-henkilot.webp", chip: "Kokoelma", title: "Tunnetut henkilöt", meta: "Tutut kasvot", accent: "var(--tn-amber)" },
+              { href: "/kategoria/luonto", img: "/20/teema-luonto.webp", chip: "Ajankohtainen", title: "Luonnon ihmeet", meta: `${counts["matkakohteet"] ? "Osa Matkakohteita" : ""}`, accent: "var(--tn-green)" },
+              { href: "/kategoria/ruoka-juoma", img: "/20/teema-ruoka-juoma.webp", chip: "Kokoelma", title: "Ruoka & juoma", meta: "Osa Yleistietoa", accent: "var(--tn-gold)" },
+            ].map((c) => (
+              <a key={c.title} className="tn-browse" href={c.href} style={{ ["--tn-browse-accent" as string]: c.accent }}>
+                {c.img ? (
+                  /* eslint-disable-next-line @next/next/no-img-element */
+                  <img src={c.img} alt="" loading="lazy" />
+                ) : (
+                  <div className="tn-browse-motif">
+                    <ModeMotif mode={c.motif as "kumpi" | "jarjesta"} />
+                  </div>
+                )}
+                <span className="tn-chip tn-browse-chip">{c.chip}</span>
+                <div className="tn-browse-body">
+                  <div className="tn-browse-title">{c.title}</div>
+                  {c.meta && <div className="tn-browse-meta">{c.meta}</div>}
+                </div>
+              </a>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ─── MEGA-PANEELI (kulta) — tulossa Vaihe 7:ssä ─── */}
+      <section className="tn-section" id="pelimuodot">
+        <div className="tn-shell">
+          <div className="tn-mega">
+            <div className="tn-mega-grid">
+              <div>
+                <span className="tn-chip" style={{ color: "var(--tn-gold)" }}>Megavisat · tulossa</span>
+                <div className="tn-display" style={{ fontSize: "clamp(28px, 4vw, 44px)", marginTop: 12 }}>Mega</div>
+                <div className="tn-mega-num">100</div>
+                <p style={{ color: "var(--tn-text-soft)", maxWidth: "40ch" }}>
+                  <b style={{ color: "var(--tn-gold)" }}>100 kysymystä.</b> Yksi istunto. Ei taukoja, ei tekosyitä.
+                  Avautuu, kun aggregaattipoolit ovat valmiit.
+                </p>
+              </div>
+              <div style={{ display: "grid", gap: 10 }}>
+                <div className="tn-mega-fact"><span>Kysymyksiä</span><b>100</b></div>
+                <div className="tn-mega-fact"><span>Kesto</span><b>~35 min</b></div>
+                <div className="tn-mega-fact"><span>Aihe</span><b>Yleistieto</b></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ─── 🔥 TÄNÄÄN SUOSITUINTA — näkyy vasta kun pelidataa on ─── */}
+      {trending.length >= 3 && (
+        <section className="tn-section">
+          <div className="tn-shell">
+            <div className="tn-section-head">
+              <h2 className="tn-section-title">🔥 Tänään suosituinta</h2>
+              <span className="tn-section-sub" style={{ margin: 0 }}>Päivittyy tunnin välein</span>
+            </div>
+            <div className="tn-rank-grid" style={{ marginTop: 18 }}>
+              {trending.map((t, i) => (
+                <a key={t!.id} className="tn-rank" href={`/visa/${t!.custom_slug ?? t!.slug}`}>
+                  <span className="tn-rank-num" style={{ color: rankColors[i % 6] }}>{i + 1}</span>
+                  <span>
+                    <span className="tn-rank-title">{t!.display_title ?? t!.title}</span>
+                    <span className="tn-rank-meta" style={{ display: "block" }}>{t!.plays} pelattu tänään</span>
+                  </span>
+                </a>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* ─── KAUSIHERO: Festarikesä (musiikki) ─── */}
+      <section className="tn-section">
+        <div className="tn-shell">
+          <div className="tn-season">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/20/teema-musiikki.webp" alt="" loading="lazy" />
+            <div className="tn-season-body">
+              <span className="tn-chip" style={{ color: "#c9a1f5" }}>Kokoelma · Musiikki</span>
+              <h2 className="tn-display tn-season-title">Festarikesä ilman rannekkeita</h2>
+              <p style={{ color: "var(--tn-text-soft)", margin: "0 0 18px" }}>
+                {n("musiikki")} visaa suomirockista, Euroviisuista ja siitä yhdestä biisistä joka jäi päähän.
+              </p>
+              <a className="tn-cta" data-tone="violet" href="/kategoria/musiikki">Avaa kokoelma →</a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ─── ALANAVIGAATIO ─── */}
+      <section className="tn-section" style={{ paddingBottom: 0 }}>
+        <div className="tn-shell">
+          <h4 style={{ fontSize: 12, letterSpacing: "0.14em", textTransform: "uppercase", color: "var(--tn-text-dim)", marginBottom: 12 }}>
+            Kaikki aiheet
+          </h4>
+          <nav className="tn-chipnav">
+            <a href="/kategoria/tv-sarjat">TV &amp; Suoratoisto</a>
+            <a href="/kategoria/urheilu">Urheilu</a>
+            <a href="/kategoria/musiikki">Musiikki</a>
+            <a href="/kategoria/elokuvat">Elokuvat</a>
+            <a href="/kategoria/maantieto">Matkakohteet</a>
+            <a href="/2-0/kortit">Tunnetut henkilöt</a>
+            <a href="/kumpi">Kumpi?</a>
+            <a href="/jarjesta">Järjestä</a>
+            <a href="/peli?kuvavisa=liput">Liput</a>
+            <a href="/kategoria/historia">Historia</a>
+            <a href="/kategoria/ruoka-juoma">Ruoka &amp; juoma</a>
+            <a href="/kategoria/muoti-design">Muoti &amp; design</a>
+            <a href="/kategoria/luonto">Luonto</a>
+          </nav>
+
+          <footer className="tn-footer">
+            <div className="tn-footer-grid">
+              <div>
+                <a className="tn-logo" href="/2-0" style={{ fontSize: 19 }}>
+                  <b>TIETO</b>
+                  <span>NIEKKA</span>
+                </a>
+                <p style={{ maxWidth: "36ch" }}>Visoja jotka eivät tunnu koulukokeelta. Uutta päivittäin, ilman rekisteröitymistä.</p>
+              </div>
+              <div>
+                <h4>Kokoelmat</h4>
+                <a href="/kategoria/tv-sarjat">TV &amp; Suoratoisto</a>
+                <a href="/kategoria/urheilu">Urheilu</a>
+                <a href="/kategoria/elokuvat">Elokuvat</a>
+                <a href="/kategoria/musiikki">Musiikki</a>
+              </div>
+              <div>
+                <h4>Pelimuodot</h4>
+                <a href="/peli">Klassinen</a>
+                <a href="/kumpi">Kumpi?</a>
+                <a href="/jarjesta">Järjestä</a>
+              </div>
+            </div>
+            <div style={{ display: "flex", justifyContent: "space-between", gap: 16, marginTop: 28, fontSize: 12.5 }}>
+              <span>© {today.getFullYear()} Tietoniekka</span>
+              <a href="/tietosuoja" style={{ color: "var(--tn-text-dim)", textDecoration: "none" }}>Tietosuoja</a>
+            </div>
+          </footer>
+        </div>
+      </section>
+    </main>
+  );
+}

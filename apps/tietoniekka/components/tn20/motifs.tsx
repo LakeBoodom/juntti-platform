@@ -305,3 +305,28 @@ export function PersonSilhouette() {
     </svg>
   );
 }
+
+/** Pelimuotomotiivit (etusivun Selaa lisää -kortit): Kumpi = kaksi vaihtoehtoa, Järjestä = rivit. */
+export function ModeMotif({ mode }: { mode: "kumpi" | "jarjesta" }) {
+  if (mode === "kumpi") {
+    return (
+      <svg viewBox="0 0 120 120" aria-hidden>
+        <g fill="none" stroke="currentColor" strokeWidth={3} strokeLinecap="round" strokeLinejoin="round">
+          <rect x="18" y="30" width="36" height="60" rx="8" />
+          <rect x="66" y="30" width="36" height="60" rx="8" />
+          <path d="M60 46 v28" opacity={0.5} />
+        </g>
+      </svg>
+    );
+  }
+  return (
+    <svg viewBox="0 0 120 120" aria-hidden>
+      <g fill="none" stroke="currentColor" strokeWidth={3} strokeLinecap="round" strokeLinejoin="round">
+        <rect x="26" y="26" width="68" height="16" rx="8" />
+        <rect x="26" y="52" width="68" height="16" rx="8" />
+        <rect x="26" y="78" width="68" height="16" rx="8" />
+        <path d="M104 34 v52 m0 0 l-5 -6 m5 6 l5 -6" opacity={0.7} />
+      </g>
+    </svg>
+  );
+}
