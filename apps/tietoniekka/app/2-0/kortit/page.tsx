@@ -69,7 +69,7 @@ export default async function KortitPreview() {
       .in("collection", ["elokuvat", "matkakohteet", "yleistieto", "musiikki"])
       .order("published_at", { ascending: false })
       .limit(10),
-    sb.from("celebrities").select("id, slug, name, role, image_url, birth_date").limit(400),
+    sb.from("celebrities").select("id, slug, name, role, image_url, birth_date, trivia_quiz_id").limit(400),
   ]);
 
   const tv = (tvRes.data ?? []) as unknown as QuizCardData[];
@@ -77,7 +77,7 @@ export default async function KortitPreview() {
   const other = (otherRes.data ?? []) as unknown as QuizCardData[];
   const celebs = (celebRes.data ?? []) as Array<{
     id: string; slug: string | null; name: string; role: string | null;
-    image_url: string | null; birth_date: string;
+    image_url: string | null; birth_date: string; trivia_quiz_id: string | null;
   }>;
 
   const today = new Date();
@@ -137,6 +137,7 @@ export default async function KortitPreview() {
                 person={r}
                 dateChip={chip}
                 ageLabel={`${ageOn(r.birth_date, today) + (sort === 0 ? 0 : 1)} vuotta`}
+                href={r.trivia_quiz_id ? `/peli?quiz_id=${r.trivia_quiz_id}` : undefined}
               />
             );
           })}

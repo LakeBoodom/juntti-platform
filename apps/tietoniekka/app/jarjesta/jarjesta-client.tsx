@@ -198,6 +198,20 @@ export function JarjestaClient({ data }: { data: DuelData }) {
           <button type="button" className="jrj-cta" onClick={() => start(theme)}>
             PELAA UUDESTAAN →
           </button>
+          {themes.filter((t) => t.id !== theme).length > 0 && (
+            <div className="jrj-result-themes">
+              <span className="jrj-themelabel">Tai kokeile toista teemaa</span>
+              <div className="jrj-themes">
+                {themes
+                  .filter((t) => t.id !== theme)
+                  .map((t) => (
+                    <button key={t.id} type="button" className="jrj-theme" onClick={() => start(t.id)}>
+                      {t.label}
+                    </button>
+                  ))}
+              </div>
+            </div>
+          )}
           <Link href="/" className="jrj-sidelink">
             Takaisin etusivulle
           </Link>

@@ -299,10 +299,13 @@
 .tn20 .tn-nav a:hover { color: var(--tn-text); }
 @media (min-width: 760px) { .tn20 .tn-nav { display: flex; } }
 .tn20 .tn-header-cta {
+  display: none;
   font-weight: 700; font-size: 13px; text-decoration: none; white-space: nowrap;
   color: var(--tn-bg); background: var(--tn-lime);
   padding: 9px 14px; border-radius: 999px;
 }
+/* Mobiilissa CTA piilossa — Päivän sankari -kortti hoitaa saman heti alla */
+@media (min-width: 640px) { .tn20 .tn-header-cta { display: inline-block; } }
 
 /* Hero */
 .tn20 .tn-hero { position: relative; overflow: hidden; }

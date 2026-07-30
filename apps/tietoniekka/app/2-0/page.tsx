@@ -5,6 +5,7 @@
 
 import { getSupabase, SITE_SLUG } from "@/lib/supabase";
 import { ModeMotif } from "@/components/tn20/motifs";
+import { QuizCard, type QuizCardData } from "@/components/tn20/cards";
 import PutkiCard from "./PutkiCard";
 
 export const dynamic = "force-dynamic";
@@ -29,7 +30,7 @@ async function getData() {
   if (!sb) return null;
 
   const [cardsRes, celebsRes, playsRes] = await Promise.all([
-    sb.from("quiz_cards" as never).select("id, slug, custom_slug, title, display_title, collection, play_count"),
+    sb.from("quiz_cards" as never).select("*"),
     sb.from("celebrities").select("id, slug, name, role, image_url, birth_date, trivia_quiz_id"),
     sb
       .from("quiz_plays")
@@ -40,7 +41,8 @@ async function getData() {
   const cards = (cardsRes.data ?? []) as Array<{
     id: string; slug: string; custom_slug: string | null; title: string;
     display_title: string | null; collection: string | null; play_count: number;
-  }>;
+    published_at: string | null;
+  } & Record<string, unknown>>;
   const celebs = (celebsRes.data ?? []) as Celeb[];
   const plays = (playsRes.data ?? []) as Array<{ quiz_id: string }>;
 
@@ -76,7 +78,17 @@ async function getData() {
           .filter(Boolean)
       : [];
 
-  return { counts, total: cards.length, hero, sankariIsToday: hero?.dist === 0, trending, today };
+  const newestByCollection = Object.values(
+    cards
+      .filter((c) => c.collection && c.published_at)
+      .sort((a, b) => (b.published_at! > a.published_at! ? 1 : -1))
+      .reduce<Record<string, (typeof cards)[number]>>((acc, c) => {
+        if (!acc[c.collection!]) acc[c.collection!] = c;
+        return acc;
+      }, {})
+  ).sort((a, b) => (b.published_at! > a.published_at! ? 1 : -1));
+
+  return { counts, total: cards.length, hero, sankariIsToday: hero?.dist === 0, trending, today, newestByCollection };
 }
 
 function age(birth: string, onNextBirthday: boolean) {
@@ -91,7 +103,7 @@ function age(birth: string, onNextBirthday: boolean) {
 export default async function Etusivu20() {
   const data = await getData();
   if (!data) return <main style={{ padding: 32 }}>Ei tietokantayhteyttä.</main>;
-  const { counts, total, hero, sankariIsToday, trending, today } = data;
+  const { counts, total, hero, sankariIsToday, trending, today, newestByCollection } = data;
 
   const n = (k: string) => counts[k] ?? 0;
   const rankColors = ["var(--tn-magenta)", "var(--tn-lime)", "var(--tn-violet)", "var(--tn-teal)", "var(--tn-orange)", "var(--tn-gold)"];
@@ -109,7 +121,7 @@ export default async function Etusivu20() {
           <a href="#pelimuodot">Pelimuodot</a>
           <a href="#paiva">Tänään</a>
         </nav>
-        <a className="tn-header-cta" href={hero?.c.slug ? `/sankari/${hero.c.slug}` : "#paiva"}>
+        <a className="tn-header-cta" href={hero?.c.trivia_quiz_id ? `/peli?quiz_id=${hero.c.trivia_quiz_id}` : "#paiva"}>
           Pelaa päivän sankari
         </a>
       </header>
@@ -167,10 +179,10 @@ export default async function Etusivu20() {
                     Syntynyt {new Date(hero.c.birth_date).getDate()}.{new Date(hero.c.birth_date).getMonth() + 1}.
                     {new Date(hero.c.birth_date).getFullYear()} · {hero.c.role}
                   </div>
-                  <a className="tn-cta" href={hero.c.slug ? `/sankari/${hero.c.slug}` : "#"}>
+                  <a className="tn-cta" href={hero.c.trivia_quiz_id ? `/peli?quiz_id=${hero.c.trivia_quiz_id}` : hero.c.slug ? `/sankari/${hero.c.slug}` : "#"}>
                     Aloita visa →
                   </a>
-                  <a className="tn-textlink" href="/2-0/kortit">
+                  <a className="tn-textlink" href="/2-0/kokoelma/tunnetut-henkilot">
                     Selaa tunnettuja henkilöitä →
                   </a>
                 </div>
@@ -192,7 +204,7 @@ export default async function Etusivu20() {
             <a className="tn-morelink" href="#selaa">Kaikki kokoelmat →</a>
           </div>
           <div className="tn-feature-grid" style={{ marginTop: 18 }}>
-            <a className="tn-feature" href="/kategoria/tv-sarjat" style={{ ["--tn-feature-accent" as string]: "var(--tn-magenta)" }}>
+            <a className="tn-feature" href="/2-0/kokoelma/tv" style={{ ["--tn-feature-accent" as string]: "var(--tn-magenta)" }}>
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src="/20/hero-tv-laura.webp" alt="" />
               <div className="tn-feature-body">
@@ -206,7 +218,7 @@ export default async function Etusivu20() {
                 </div>
               </div>
             </a>
-            <a className="tn-feature" href="/kategoria/urheilu" style={{ ["--tn-feature-accent" as string]: "var(--tn-lime)" }}>
+            <a className="tn-feature" href="/2-0/kokoelma/urheilu" style={{ ["--tn-feature-accent" as string]: "var(--tn-lime)" }}>
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src="/20/hero-urheilu-mikko.webp" alt="" />
               <div className="tn-feature-body">
@@ -232,15 +244,15 @@ export default async function Etusivu20() {
           </div>
           <div className="tn-browse-grid" style={{ marginTop: 18 }}>
             {[
-              { href: "/kategoria/elokuvat", img: "/20/teema-elokuvat.webp", chip: "Kokoelma", title: "Elokuvat", meta: `${n("elokuvat")} visaa`, accent: "var(--tn-acc-elokuvat)" },
-              { href: "/kategoria/musiikki", img: "/20/teema-musiikki.webp", chip: "Kokoelma", title: "Musiikki", meta: `${n("musiikki")} visaa`, accent: "var(--tn-acc-musiikki)" },
+              { href: "/2-0/kokoelma/elokuvat", img: "/20/teema-elokuvat.webp", chip: "Kokoelma", title: "Elokuvat", meta: `${n("elokuvat")} visaa`, accent: "var(--tn-acc-elokuvat)" },
+              { href: "/2-0/kokoelma/musiikki", img: "/20/teema-musiikki.webp", chip: "Kokoelma", title: "Musiikki", meta: `${n("musiikki")} visaa`, accent: "var(--tn-acc-musiikki)" },
               { href: "/kumpi", motif: "kumpi", chip: "Pelimuoto", title: "Kumpi?", meta: "Kaksi vaihtoehtoa", accent: "var(--tn-teal)" },
               { href: "/peli?kuvavisa=liput", img: "/20/teema-liput.webp", chip: "Kuvavisa", title: "Liput", meta: "Tunnista liput", accent: "var(--tn-teal)" },
-              { href: "/kategoria/maantieto", img: "/20/teema-maantieto.webp", chip: "Kokoelma", title: "Matkakohteet", meta: `${n("matkakohteet")} visaa`, accent: "var(--tn-acc-matkakohteet)" },
+              { href: "/2-0/kokoelma/matkakohteet", img: "/20/teema-maantieto.webp", chip: "Kokoelma", title: "Matkakohteet", meta: `${n("matkakohteet")} visaa`, accent: "var(--tn-acc-matkakohteet)" },
               { href: "/jarjesta", motif: "jarjesta", chip: "Pelimuoto", title: "Järjestä", meta: "Laita riviin", accent: "var(--tn-violet)" },
-              { href: "/2-0/kortit", img: "/20/teema-tunnetut-henkilot.webp", chip: "Kokoelma", title: "Tunnetut henkilöt", meta: "Tutut kasvot", accent: "var(--tn-amber)" },
-              { href: "/kategoria/luonto", img: "/20/teema-luonto.webp", chip: "Ajankohtainen", title: "Luonnon ihmeet", meta: `${counts["matkakohteet"] ? "Osa Matkakohteita" : ""}`, accent: "var(--tn-green)" },
-              { href: "/kategoria/ruoka-juoma", img: "/20/teema-ruoka-juoma.webp", chip: "Kokoelma", title: "Ruoka & juoma", meta: "Osa Yleistietoa", accent: "var(--tn-gold)" },
+              { href: "/2-0/kokoelma/tunnetut-henkilot", img: "/20/teema-tunnetut-henkilot.webp", chip: "Kokoelma", title: "Tunnetut henkilöt", meta: "Tutut kasvot", accent: "var(--tn-amber)" },
+              { href: "/2-0/kokoelma/matkakohteet", img: "/20/teema-luonto.webp", chip: "Ajankohtainen", title: "Luonnon ihmeet", meta: `${counts["matkakohteet"] ? "Osa Matkakohteita" : ""}`, accent: "var(--tn-green)" },
+              { href: "/2-0/kokoelma/yleistieto", img: "/20/teema-ruoka-juoma.webp", chip: "Kokoelma", title: "Ruoka & juoma", meta: "Osa Yleistietoa", accent: "var(--tn-gold)" },
             ].map((c) => (
               <a key={c.title} className="tn-browse" href={c.href} style={{ ["--tn-browse-accent" as string]: c.accent }}>
                 {c.img ? (
@@ -286,6 +298,21 @@ export default async function Etusivu20() {
         </div>
       </section>
 
+      {/* ─── UUSIMMAT VISAT: eri kokoelmien uusimmat suoraan kannasta ─── */}
+      <section className="tn-section">
+        <div className="tn-shell">
+          <div className="tn-section-head">
+            <h2 className="tn-section-title">Uusimmat visat</h2>
+            <span className="tn-section-sub" style={{ margin: 0 }}>Jokaisen kokoelman tuorein</span>
+          </div>
+          <div className="tn-card-row" style={{ marginTop: 18 }}>
+            {newestByCollection.map((q) => (
+              <QuizCard key={q.id} quiz={q as unknown as QuizCardData} />
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* ─── 🔥 TÄNÄÄN SUOSITUINTA — näkyy vasta kun pelidataa on ─── */}
       {trending.length >= 3 && (
         <section className="tn-section">
@@ -321,7 +348,7 @@ export default async function Etusivu20() {
               <p style={{ color: "var(--tn-text-soft)", margin: "0 0 18px" }}>
                 {n("musiikki")} visaa suomirockista, Euroviisuista ja siitä yhdestä biisistä joka jäi päähän.
               </p>
-              <a className="tn-cta" data-tone="violet" href="/kategoria/musiikki">Avaa kokoelma →</a>
+              <a className="tn-cta" data-tone="violet" href="/2-0/kokoelma/musiikki">Avaa kokoelma →</a>
             </div>
           </div>
         </div>
@@ -334,19 +361,19 @@ export default async function Etusivu20() {
             Kaikki aiheet
           </h4>
           <nav className="tn-chipnav">
-            <a href="/kategoria/tv-sarjat">TV &amp; Suoratoisto</a>
-            <a href="/kategoria/urheilu">Urheilu</a>
-            <a href="/kategoria/musiikki">Musiikki</a>
-            <a href="/kategoria/elokuvat">Elokuvat</a>
-            <a href="/kategoria/maantieto">Matkakohteet</a>
-            <a href="/2-0/kortit">Tunnetut henkilöt</a>
+            <a href="/2-0/kokoelma/tv">TV &amp; Suoratoisto</a>
+            <a href="/2-0/kokoelma/urheilu">Urheilu</a>
+            <a href="/2-0/kokoelma/musiikki">Musiikki</a>
+            <a href="/2-0/kokoelma/elokuvat">Elokuvat</a>
+            <a href="/2-0/kokoelma/matkakohteet">Matkakohteet</a>
+            <a href="/2-0/kokoelma/tunnetut-henkilot">Tunnetut henkilöt</a>
             <a href="/kumpi">Kumpi?</a>
             <a href="/jarjesta">Järjestä</a>
             <a href="/peli?kuvavisa=liput">Liput</a>
-            <a href="/kategoria/historia">Historia</a>
-            <a href="/kategoria/ruoka-juoma">Ruoka &amp; juoma</a>
-            <a href="/kategoria/muoti-design">Muoti &amp; design</a>
-            <a href="/kategoria/luonto">Luonto</a>
+            <a href="/2-0/kokoelma/yleistieto">Historia</a>
+            <a href="/2-0/kokoelma/yleistieto">Ruoka &amp; juoma</a>
+            <a href="/2-0/kokoelma/yleistieto">Muoti &amp; design</a>
+            <a href="/2-0/kokoelma/matkakohteet">Luonto</a>
           </nav>
 
           <footer className="tn-footer">
@@ -360,10 +387,10 @@ export default async function Etusivu20() {
               </div>
               <div>
                 <h4>Kokoelmat</h4>
-                <a href="/kategoria/tv-sarjat">TV &amp; Suoratoisto</a>
-                <a href="/kategoria/urheilu">Urheilu</a>
-                <a href="/kategoria/elokuvat">Elokuvat</a>
-                <a href="/kategoria/musiikki">Musiikki</a>
+                <a href="/2-0/kokoelma/tv">TV &amp; Suoratoisto</a>
+                <a href="/2-0/kokoelma/urheilu">Urheilu</a>
+                <a href="/2-0/kokoelma/elokuvat">Elokuvat</a>
+                <a href="/2-0/kokoelma/musiikki">Musiikki</a>
               </div>
               <div>
                 <h4>Pelimuodot</h4>
