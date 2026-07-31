@@ -137,7 +137,7 @@ export default async function KortitPreview() {
                 person={r}
                 dateChip={chip}
                 ageLabel={`${ageOn(r.birth_date, today) + (sort === 0 ? 0 : 1)} vuotta`}
-                href={r.trivia_quiz_id ? `/peli?quiz_id=${r.trivia_quiz_id}` : undefined}
+                href={r.trivia_quiz_id ? `/2-0/peli?quiz_id=${r.trivia_quiz_id}` : undefined}
               />
             );
           })}

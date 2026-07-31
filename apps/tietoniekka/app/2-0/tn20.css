@@ -546,3 +546,83 @@
 .tn20 .tn-deck-body { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: flex-end; padding: clamp(10px, 1.15cqw, 15px); }
 .tn20 .tn-deck-title { font-family: var(--tn-font-display); font-weight: 900; text-transform: uppercase; font-size: clamp(17px, 2.15cqw, 27px); line-height: 0.94; letter-spacing: -0.01em; color: var(--tn-text); }
 .tn20 .tn-deck-note { font-size: clamp(10px, 0.95cqw, 12px); font-weight: 600; color: #b9af9b; margin-top: 5px; }
+
+/* ============================================================
+   PELIKUORI 1C "TÄYSI LAVA" (CD 2026-07-31, Heikki vahvisti C)
+   Ei korttia — typografia täyttää ruudun, vastaukset täysleveinä
+   nauhoina jotka täyttyvät värillä. Kokoelmaväri = --tn-game-accent.
+   ============================================================ */
+
+.tn20 .tn-game { min-height: 100dvh; display: flex; flex-direction: column; background: var(--tn-bg); }
+.tn20 .tn-game-segs { display: flex; gap: 3px; }
+.tn20 .tn-game-segs i { flex: 1 1 0; height: 5px; background: #241e13; transition: background 200ms ease; }
+.tn20 .tn-game-segs i[data-on="true"] { background: var(--tn-game-accent); }
+.tn20 .tn-game-top {
+  display: flex; align-items: center; justify-content: space-between; gap: 14px;
+  padding: 14px clamp(18px, 4vw, 48px) 0;
+  font-size: 11px; font-weight: 700; color: #8e8676;
+  letter-spacing: 0.12em; text-transform: uppercase;
+}
+.tn20 .tn-game-top a { color: inherit; text-decoration: none; }
+.tn20 .tn-game-top a:hover { color: var(--tn-text); }
+.tn20 .tn-game-q { padding: clamp(20px, 4.5vh, 40px) clamp(18px, 4vw, 48px) 0; }
+.tn20 .tn-game-q h1 {
+  font-family: var(--tn-font-display); font-weight: 900; text-transform: uppercase;
+  font-size: clamp(26px, 5.6vw, 46px); line-height: 0.98; letter-spacing: -0.02em;
+  margin: 0; max-width: 22ch; text-wrap: pretty;
+}
+.tn20 .tn-game-sub { font-size: 13px; font-weight: 600; color: #8e8676; margin-top: 12px; }
+.tn20 .tn-game-bands { margin-top: clamp(18px, 4vh, 32px); display: flex; flex-direction: column; }
+.tn20 .tn-band {
+  display: flex; align-items: center; gap: 16px; width: 100%; text-align: left;
+  padding: clamp(14px, 2.4vh, 19px) clamp(18px, 4vw, 48px);
+  border: 0; border-top: 1px solid #241e13; background: transparent;
+  cursor: pointer; color: var(--tn-text-soft);
+  font-family: var(--tn-font-display); font-weight: 900; font-size: clamp(17px, 2.4vw, 22px); line-height: 1.05;
+  transition: background 140ms ease, color 140ms ease, opacity 200ms ease;
+}
+.tn20 .tn-band:hover:not(:disabled) { background: color-mix(in srgb, var(--tn-game-accent) 8%, transparent); }
+.tn20 .tn-band:disabled { cursor: default; }
+.tn20 .tn-band .tn-band-k { flex: 0 0 auto; width: 20px; font-size: 15px; color: #5f594c; }
+.tn20 .tn-band .tn-band-label { flex: 1 1 auto; min-width: 0; }
+.tn20 .tn-band .tn-band-mark { flex: 0 0 auto; font-size: 16px; font-weight: 800; font-family: var(--tn-font-body); }
+.tn20 .tn-band[data-state="correct"] { background: rgb(182 255 60 / 0.12); color: var(--tn-lime); }
+.tn20 .tn-band[data-state="correct"] .tn-band-k { color: var(--tn-lime); }
+.tn20 .tn-band[data-state="wrong"] { background: rgb(255 92 61 / 0.12); color: #ff8566; }
+.tn20 .tn-band[data-state="wrong"] .tn-band-k { color: #ff8566; }
+.tn20 .tn-band[data-state="dim"] { color: #5f594c; }
+.tn20 .tn-band[data-hidden="true"] { opacity: 0.22; }
+.tn20 .tn-game-fact {
+  margin: 14px clamp(18px, 4vw, 48px) 0; padding: 13px 15px; border-radius: 13px;
+  background: rgb(182 255 60 / 0.07); border-left: 3px solid var(--tn-lime);
+}
+.tn20 .tn-game-fact b { display: block; font-size: 10px; font-weight: 800; letter-spacing: 0.16em; text-transform: uppercase; color: var(--tn-lime); margin-bottom: 5px; }
+.tn20 .tn-game-fact p { margin: 0; font-size: 13.5px; line-height: 1.5; color: #b9af9b; }
+.tn20 .tn-game-foot {
+  margin-top: auto; border-top: 1px solid #241e13;
+  padding: 14px clamp(18px, 4vw, 48px) max(18px, env(safe-area-inset-bottom));
+  display: flex; align-items: center; justify-content: space-between; gap: 14px;
+}
+.tn20 .tn-game-lifeline {
+  display: inline-flex; align-items: center; gap: 8px; padding: 9px 13px; border-radius: 11px;
+  border: 1px dashed var(--tn-line); background: transparent; color: #a79e8c;
+  font-size: 11.5px; font-weight: 700; cursor: pointer;
+}
+.tn20 .tn-game-lifeline:disabled { color: #5f594c; cursor: default; opacity: 0.7; }
+.tn20 .tn-game-next {
+  padding: 12px 24px; border-radius: 12px; border: 0; cursor: pointer;
+  background: var(--tn-game-accent); color: var(--tn-bg);
+  font-family: var(--tn-font-display); font-weight: 900; font-size: 14px;
+  letter-spacing: 0.04em; text-transform: uppercase;
+}
+.tn20 .tn-game-next:hover { filter: brightness(1.08); }
+.tn20 .tn-game-center { flex: 1; display: flex; flex-direction: column; justify-content: center; padding: clamp(24px, 6vh, 60px) clamp(18px, 4vw, 48px); }
+.tn20 .tn-game-bigscore { font-family: var(--tn-font-display); font-weight: 900; font-size: clamp(56px, 12vw, 110px); line-height: 0.9; color: var(--tn-game-accent); }
+.tn20 .tn-game-crosslinks { display: flex; flex-direction: column; border-top: 1px solid #241e13; margin-top: clamp(18px, 4vh, 30px); }
+.tn20 .tn-game-crosslinks a {
+  display: flex; align-items: center; gap: 14px; padding: 15px 0; border-bottom: 1px solid #241e13;
+  text-decoration: none; color: var(--tn-text-soft);
+  font-family: var(--tn-font-display); font-weight: 900; font-size: clamp(16px, 2.2vw, 20px);
+}
+.tn20 .tn-game-crosslinks a:hover { color: var(--tn-text); }
+.tn20 .tn-game-crosslinks .tn-cross-tag { font-family: var(--tn-font-body); font-size: 10.5px; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; color: var(--tn-game-accent); flex: 0 0 auto; width: 92px; }

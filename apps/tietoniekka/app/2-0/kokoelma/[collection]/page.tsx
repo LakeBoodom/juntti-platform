@@ -221,7 +221,7 @@ function toWide(hub: HubMeta, q: Card, genreLabel: Map<string, string>) {
     (q.collection === "urheilu" ? sportLabel(q.title) : null) ||
     (q.subcollection ? q.subcollection.charAt(0).toUpperCase() + q.subcollection.slice(1) : null);
   return {
-    href: `/visa/${q.custom_slug ?? q.slug}`,
+    href: `/2-0/peli?quiz_id=${q.id}`,
     color: cardColor(hub, q),
     motifPath: motifPathFor(q.collection, q.genre, q.title),
     genreChip: chip ?? undefined,
@@ -519,7 +519,7 @@ type Celeb = {
   image_url: string | null; birth_date: string; trivia_quiz_id: string | null;
 };
 function playHref(c: Celeb): string {
-  if (c.trivia_quiz_id) return `/peli?quiz_id=${c.trivia_quiz_id}`;
+  if (c.trivia_quiz_id) return `/2-0/peli?quiz_id=${c.trivia_quiz_id}`;
   return c.slug ? `/sankari/${c.slug}` : "#";
 }
 

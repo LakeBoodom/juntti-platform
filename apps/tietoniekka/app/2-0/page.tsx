@@ -121,7 +121,7 @@ export default async function Etusivu20() {
           <a href="#pelimuodot">Pelimuodot</a>
           <a href="#paiva">Tänään</a>
         </nav>
-        <a className="tn-header-cta" href={hero?.c.trivia_quiz_id ? `/peli?quiz_id=${hero.c.trivia_quiz_id}` : "#paiva"}>
+        <a className="tn-header-cta" href={hero?.c.trivia_quiz_id ? `/2-0/peli?quiz_id=${hero.c.trivia_quiz_id}&paivan_sankari=1` : "#paiva"}>
           Pelaa päivän sankari
         </a>
       </header>
@@ -179,7 +179,7 @@ export default async function Etusivu20() {
                     Syntynyt {new Date(hero.c.birth_date).getDate()}.{new Date(hero.c.birth_date).getMonth() + 1}.
                     {new Date(hero.c.birth_date).getFullYear()} · {hero.c.role}
                   </div>
-                  <a className="tn-cta" href={hero.c.trivia_quiz_id ? `/peli?quiz_id=${hero.c.trivia_quiz_id}` : hero.c.slug ? `/sankari/${hero.c.slug}` : "#"}>
+                  <a className="tn-cta" href={hero.c.trivia_quiz_id ? `/2-0/peli?quiz_id=${hero.c.trivia_quiz_id}&paivan_sankari=1` : hero.c.slug ? `/sankari/${hero.c.slug}` : "#"}>
                     Aloita visa →
                   </a>
                   <a className="tn-textlink" href="/2-0/kokoelma/tunnetut-henkilot">
