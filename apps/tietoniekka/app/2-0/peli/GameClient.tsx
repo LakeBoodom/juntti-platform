@@ -9,6 +9,7 @@
 import { useEffect, useRef, useState } from "react";
 import confetti from "canvas-confetti";
 import { getSupabase } from "../../../lib/supabase";
+import { WideCard } from "../../../components/tn20/WideCard";
 
 const BASE_POINTS = 100;
 const STREAK_BONUS = 50;
@@ -23,7 +24,7 @@ export type GameQuiz = {
   accent: string;
   isSankari: boolean;
   questions: Array<{ question: string; options: string[]; correct: string; fact: string | null }>;
-  related: Array<{ id: string; title: string }>;
+  related: Array<{ id: string; title: string; teaser: string | null; color: string; motifPath: string; meta: string }>;
 };
 
 function localDate(d: Date): string {
@@ -204,6 +205,7 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
   if (phase === "intro") {
     return (
       <main className="tn-game" style={shellStyle}>
+        <div className="tn-game-inner">
         <div className="tn-game-segs">{Array.from({ length: total }, (_, i) => <i key={i} />)}</div>
         <Header quiz={quiz} right={`${total} kysymystä`} />
         <div className="tn-game-center">
@@ -220,6 +222,7 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
           <span style={{ fontSize: 11.5, fontWeight: 700, color: "#5F594C" }}>🌾 Oljenkorsi käytettävissä kerran · ei kirjautumista</span>
           <a href={quiz.hubHref} style={{ fontSize: 11.5, fontWeight: 700, color: "#8E8676", textDecoration: "none" }}>Takaisin kokoelmaan</a>
         </div>
+        </div>
       </main>
     );
   }
@@ -229,34 +232,56 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
     const tier = resultTier(correctCount, total);
     return (
       <main className="tn-game" style={shellStyle}>
-        <div className="tn-game-segs">{Array.from({ length: total }, (_, i) => <i key={i} data-on="true" />)}</div>
-        <Header quiz={quiz} right={`Pisteet ${score}`} />
-        <div className="tn-game-center">
-          <span className="tn-eyebrow" style={{ color: quiz.accent }}>Tulos · {quiz.title}</span>
-          <h1 className="tn-display" style={{ fontSize: "clamp(30px, 6vw, 54px)", margin: "14px 0 4px" }}>
-            {tier.emoji} {tier.heading}
-          </h1>
-          <div className="tn-game-bigscore">{correctCount}/{total}</div>
-          <p style={{ color: "var(--tn-text-soft)", margin: "10px 0 0" }}>
-            {score} pistettä{tier.blurb ? ` · ${tier.blurb}` : ""}
-            {quiz.isSankari && dailyStreak > 0 && <> · 🔥 {dailyStreak} päivän putki</>}
-          </p>
+        <div className="tn-game-inner">
+          <div className="tn-game-segs">{Array.from({ length: total }, (_, i) => <i key={i} data-on="true" />)}</div>
+          <Header quiz={quiz} right={`Pisteet ${score}`} />
+          <div className="tn-game-center" style={{ justifyContent: "flex-start", paddingTop: "clamp(20px, 5vh, 48px)" }}>
+            <span className="tn-eyebrow" style={{ color: quiz.accent }}>Tulos · {quiz.title}</span>
+            <h1 className="tn-display" style={{ fontSize: "clamp(28px, 5vw, 48px)", margin: "12px 0 2px" }}>
+              {tier.emoji} {tier.heading}
+            </h1>
+            <div className="tn-game-bigscore">{correctCount}/{total}</div>
+            <p style={{ color: "var(--tn-text-soft)", margin: "8px 0 22px" }}>
+              {score} pistettä{tier.blurb ? ` · ${tier.blurb}` : ""}
+              {quiz.isSankari && dailyStreak > 0 && <> · 🔥 {dailyStreak} päivän putki</>}
+            </p>
 
-          <div className="tn-game-crosslinks">
-            <a href="#" onClick={(e) => { e.preventDefault(); restart(); }}>
-              <span className="tn-cross-tag">Uudestaan</span>Pelaa sama visa uudestaan
-            </a>
-            {quiz.related.map((r) => (
-              <a key={r.id} href={`/2-0/peli?quiz_id=${r.id}`}>
-                <span className="tn-cross-tag">Sama teema</span>{r.title}
-              </a>
-            ))}
-            <a href={quiz.hubHref}>
-              <span className="tn-cross-tag">Kokoelma</span>Selaa: {quiz.collectionLabel}
-            </a>
-            <a href="#" onClick={(e) => { e.preventDefault(); void share(); }}>
-              <span className="tn-cross-tag">Haasta</span>Haasta kaveri — jaa tulos
-            </a>
+            {/* a) Jako ensin — päähuomio */}
+            <button className="tn-game-share" onClick={() => void share()}>
+              Haasta kaverit — jaa tulos →
+            </button>
+
+            {/* b) Pelaa uudelleen / etusivulle */}
+            <div style={{ display: "flex", gap: 10, marginTop: 10 }}>
+              <button className="tn-game-ghost" onClick={restart}>Pelaa uudestaan</button>
+              <a className="tn-game-ghost" href="/2-0">Etusivulle</a>
+            </div>
+
+            {/* c) Muut saman teeman visat kortteina */}
+            {quiz.related.length > 0 && (
+              <div style={{ marginTop: "clamp(24px, 5vh, 40px)" }}>
+                <div style={{ fontSize: 12, fontWeight: 800, letterSpacing: "0.16em", textTransform: "uppercase", color: "#8E8676", marginBottom: 14 }}>
+                  Jatka putkea — lisää aiheesta {quiz.collectionLabel}
+                </div>
+                <div className="tn-wide-grid">
+                  {quiz.related.map((r) => (
+                    <WideCard
+                      key={r.id}
+                      href={`/2-0/peli?quiz_id=${r.id}`}
+                      color={r.color}
+                      motifPath={r.motifPath}
+                      title={r.title}
+                      desc={r.teaser}
+                      mode="Klassinen"
+                      meta={r.meta}
+                    />
+                  ))}
+                </div>
+                <a href={quiz.hubHref} className="tn-morelink" style={{ display: "inline-block", marginTop: 14, color: quiz.accent }}>
+                  Selaa koko kokoelma: {quiz.collectionLabel} →
+                </a>
+              </div>
+            )}
           </div>
         </div>
       </main>
@@ -264,8 +289,10 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
   }
 
   /* ─── Peli ─── */
+  const qLen = q.question.length > 140 ? "xlong" : q.question.length > 85 ? "long" : "normal";
   return (
     <main className="tn-game" style={shellStyle}>
+      <div className="tn-game-inner">
       <div className="tn-game-segs">
         {Array.from({ length: total }, (_, i) => (
           <i key={i} data-on={i < idx + (answered ? 1 : 0)} />
@@ -273,7 +300,7 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
       </div>
       <Header quiz={quiz} right={<>Pisteet <b style={{ color: "var(--tn-text)" }}>{score}</b>{streak >= 2 ? <> · 🔥 {streak}</> : null}</>} />
       <div className="tn-game-q">
-        <h1>{q.question}</h1>
+        <h1 data-len={qLen}>{q.question}</h1>
         <div className="tn-game-sub">
           Kysymys {idx + 1} / {total}
           {quiz.genreLabel ? ` · ${quiz.genreLabel.toLowerCase()}` : ""}
@@ -292,6 +319,7 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
               key={opt + i}
               className="tn-band"
               data-state={state}
+              data-long={opt.length > 42}
               data-hidden={!answered && hidden.has(opt)}
               disabled={answered || hidden.has(opt)}
               onClick={() => pick(opt)}
@@ -321,6 +349,7 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
             {idx >= total - 1 ? "Näytä tulos →" : "Seuraava →"}
           </button>
         )}
+      </div>
       </div>
     </main>
   );

@@ -554,6 +554,8 @@
    ============================================================ */
 
 .tn20 .tn-game { min-height: 100dvh; display: flex; flex-direction: column; background: var(--tn-bg); }
+/* Desktopilla peli elää rajatussa palstassa (CD:n 1c-kehys), ei koko ruudun leveydellä */
+.tn20 .tn-game-inner { width: 100%; max-width: 920px; margin: 0 auto; display: flex; flex-direction: column; flex: 1; }
 .tn20 .tn-game-segs { display: flex; gap: 3px; }
 .tn20 .tn-game-segs i { flex: 1 1 0; height: 5px; background: #241e13; transition: background 200ms ease; }
 .tn20 .tn-game-segs i[data-on="true"] { background: var(--tn-game-accent); }
@@ -568,9 +570,12 @@
 .tn20 .tn-game-q { padding: clamp(20px, 4.5vh, 40px) clamp(18px, 4vw, 48px) 0; }
 .tn20 .tn-game-q h1 {
   font-family: var(--tn-font-display); font-weight: 900; text-transform: uppercase;
-  font-size: clamp(26px, 5.6vw, 46px); line-height: 0.98; letter-spacing: -0.02em;
-  margin: 0; max-width: 22ch; text-wrap: pretty;
+  font-size: clamp(28px, 4.6vw, 54px); line-height: 0.98; letter-spacing: -0.02em;
+  margin: 0; max-width: 24ch; text-wrap: pretty;
 }
+/* Pitkä kysymys → automaattisesti pienempi koko, jotta nauhat + nappi pysyvät näkyvissä */
+.tn20 .tn-game-q h1[data-len="long"] { font-size: clamp(22px, 3.4vw, 40px); }
+.tn20 .tn-game-q h1[data-len="xlong"] { font-size: clamp(19px, 2.8vw, 32px); line-height: 1.04; }
 .tn20 .tn-game-sub { font-size: 13px; font-weight: 600; color: #8e8676; margin-top: 12px; }
 .tn20 .tn-game-bands { margin-top: clamp(18px, 4vh, 32px); display: flex; flex-direction: column; }
 .tn20 .tn-band {
@@ -578,9 +583,11 @@
   padding: clamp(14px, 2.4vh, 19px) clamp(18px, 4vw, 48px);
   border: 0; border-top: 1px solid #241e13; background: transparent;
   cursor: pointer; color: var(--tn-text-soft);
-  font-family: var(--tn-font-display); font-weight: 900; font-size: clamp(17px, 2.4vw, 22px); line-height: 1.05;
+  font-family: var(--tn-font-display); font-weight: 900; font-size: clamp(18px, 2.2vw, 25px); line-height: 1.05;
   transition: background 140ms ease, color 140ms ease, opacity 200ms ease;
 }
+/* Pitkä vastausteksti → pienempi fontti ja tiiviimpi riviväli */
+.tn20 .tn-band[data-long="true"] { font-size: clamp(15px, 1.8vw, 19px); line-height: 1.2; }
 .tn20 .tn-band:hover:not(:disabled) { background: color-mix(in srgb, var(--tn-game-accent) 8%, transparent); }
 .tn20 .tn-band:disabled { cursor: default; }
 .tn20 .tn-band .tn-band-k { flex: 0 0 auto; width: 20px; font-size: 15px; color: #5f594c; }
@@ -600,9 +607,14 @@
 .tn20 .tn-game-fact p { margin: 0; font-size: 13.5px; line-height: 1.5; color: #b9af9b; }
 .tn20 .tn-game-foot {
   margin-top: auto; border-top: 1px solid #241e13;
-  padding: 14px clamp(18px, 4vw, 48px) max(18px, env(safe-area-inset-bottom));
+  padding: 12px clamp(18px, 4vw, 48px) max(14px, env(safe-area-inset-bottom));
   display: flex; align-items: center; justify-content: space-between; gap: 14px;
+  /* Aina näkyvissä — pitkilläkin kysymyksillä Seuraava ei katoa ruudulta */
+  position: sticky; bottom: 0; z-index: 10;
+  background: color-mix(in srgb, var(--tn-bg) 90%, transparent);
+  backdrop-filter: blur(10px);
 }
+@media (max-width: 520px) { .tn20 .tn-game-foot .tn-game-lifeline span.tn-lifeline-hint { display: none; } }
 .tn20 .tn-game-lifeline {
   display: inline-flex; align-items: center; gap: 8px; padding: 9px 13px; border-radius: 11px;
   border: 1px dashed var(--tn-line); background: transparent; color: #a79e8c;
@@ -618,6 +630,22 @@
 .tn20 .tn-game-next:hover { filter: brightness(1.08); }
 .tn20 .tn-game-center { flex: 1; display: flex; flex-direction: column; justify-content: center; padding: clamp(24px, 6vh, 60px) clamp(18px, 4vw, 48px); }
 .tn20 .tn-game-bigscore { font-family: var(--tn-font-display); font-weight: 900; font-size: clamp(56px, 12vw, 110px); line-height: 0.9; color: var(--tn-game-accent); }
+.tn20 .tn-game-share {
+  display: block; width: 100%; text-align: center; border: 0; cursor: pointer;
+  padding: 16px 28px; border-radius: 14px;
+  background: var(--tn-game-accent); color: var(--tn-bg);
+  font-family: var(--tn-font-display); font-weight: 900; font-size: clamp(15px, 1.8vw, 19px);
+  letter-spacing: 0.04em; text-transform: uppercase;
+}
+.tn20 .tn-game-share:hover { filter: brightness(1.08); }
+.tn20 .tn-game-ghost {
+  flex: 1 1 0; text-align: center; cursor: pointer; text-decoration: none;
+  padding: 13px 20px; border-radius: 12px;
+  border: 1px solid var(--tn-line); background: var(--tn-surface); color: var(--tn-text-soft);
+  font-family: var(--tn-font-display); font-weight: 900; font-size: clamp(13px, 1.5vw, 15px);
+  letter-spacing: 0.04em; text-transform: uppercase;
+}
+.tn20 .tn-game-ghost:hover { border-color: var(--tn-text-dim); color: var(--tn-text); }
 .tn20 .tn-game-crosslinks { display: flex; flex-direction: column; border-top: 1px solid #241e13; margin-top: clamp(18px, 4vh, 30px); }
 .tn20 .tn-game-crosslinks a {
   display: flex; align-items: center; gap: 14px; padding: 15px 0; border-bottom: 1px solid #241e13;

@@ -4,6 +4,7 @@
 // Oljenkorsi, quiz_plays) — vain kuori on uusi.
 
 import { getSupabase } from "@/lib/supabase";
+import { motifPathFor } from "@/components/tn20/motif-paths";
 import GameClient, { type GameQuiz } from "./GameClient";
 
 export const dynamic = "force-dynamic";
@@ -87,7 +88,7 @@ export default async function Peli20({
       : Promise.resolve({ data: null }),
     sb
       .from("quiz_cards" as never)
-      .select("id, display_title, title, collection")
+      .select("id, display_title, title, teaser, collection, genre, question_count")
       .eq("collection", quiz.collection ?? "yleistieto")
       .neq("id", quiz.id)
       .order("published_at", { ascending: false })
@@ -121,9 +122,19 @@ export default async function Peli20({
         fact: row.explanation,
       };
     }),
-    related: ((relatedRes.data ?? []) as Array<{ id: string; display_title: string | null; title: string }>).map(
-      (r) => ({ id: r.id, title: r.display_title ?? r.title }),
-    ),
+    related: (
+      (relatedRes.data ?? []) as Array<{
+        id: string; display_title: string | null; title: string; teaser: string | null;
+        collection: string | null; genre: string | null; question_count: number;
+      }>
+    ).map((r) => ({
+      id: r.id,
+      title: r.display_title ?? r.title,
+      teaser: r.teaser,
+      color: COLLECTION_ACCENT[r.collection ?? ""] ?? "#E8A320",
+      motifPath: motifPathFor(r.collection, r.genre, r.title),
+      meta: `${r.question_count} kysymystä`,
+    })),
   };
 
   if (game.questions.length === 0) {
