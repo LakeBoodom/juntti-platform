@@ -6,7 +6,7 @@ export type WideCardProps = {
   href: string;
   color: string;          // kortin aksentti (joukkueväri / genren sävy / kokoelma)
   motifPath: string;      // MOTIF_PATHS-polku (viewBox 0 0 200 260)
-  genreChip: string;      // esim. "Rikosdraama" | "Liiga · Tappara"
+  genreChip?: string;     // esim. "Rikosdraama" | "Jääkiekko" — undefined = ei chippiä (aihe selvä kontekstista)
   title: string;          // visan nimi — pääosassa
   desc?: string | null;   // teaser
   mode: string;           // "Klassinen" | "Kumpi?" | ...
@@ -25,7 +25,7 @@ export function WideCard({ href, color, motifPath, genreChip, title, desc, mode,
             <path d={motifPath} fill="none" stroke="currentColor" strokeWidth={7} strokeLinecap="round" strokeLinejoin="round" />
           </svg>
           <div className="tn-wide-fade" />
-          <span className="tn-wide-genre">{genreChip}</span>
+          {genreChip && <span className="tn-wide-genre">{genreChip}</span>}
           {badge && (
             <span className="tn-badge tn-wide-badge" data-badge={badge}>
               {badge}

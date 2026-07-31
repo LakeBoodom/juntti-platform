@@ -17,6 +17,8 @@ export const dynamic = "force-dynamic";
 
 type HubSource = { kind: "collection" | "category"; value: string } | { kind: "kuvavisa" } | { kind: "person" };
 type HubMeta = {
+  name: string;          // breadcrumbiin ja muihin yhteyksiin — aina kokonainen sana/nimi
+  oneWord?: boolean;     // true = otsikko on yksi sana → yhdelle riville (ei rivinvaihtoa)
   titleTop: string;
   titleAccent: string;
   accent: string;
@@ -36,6 +38,7 @@ const MODE_JARJESTA = { label: "Järjestä", icon: "⇅", href: "/jarjesta" };
 
 const HUBS: Record<string, HubMeta> = {
   tv: {
+    name: "TV & Suoratoisto",
     titleTop: "TV &", titleAccent: "Suoratoisto",
     accent: "#FF3D9E", accentLight: "#FF6FB5",
     img: "/20/hero-tv-laura.webp",
@@ -47,6 +50,7 @@ const HUBS: Record<string, HubMeta> = {
     ctaDesc: "Valitse genre tai selaa koko katalogi — Frendeistä Sopranosiin.",
   },
   urheilu: {
+    name: "Urheilu", oneWord: true,
     titleTop: "Urhei", titleAccent: "lu",
     accent: "#B6FF3C", accentLight: "#CFFF7A",
     img: "/20/hero-urheilu-mikko.webp",
@@ -58,6 +62,7 @@ const HUBS: Record<string, HubMeta> = {
     ctaDesc: "Valitse laji, sarja tai oma joukkue.",
   },
   elokuvat: {
+    name: "Elokuvat", oneWord: true,
     titleTop: "Elo", titleAccent: "kuvat",
     accent: "#FF5C3D", accentLight: "#FF8566",
     img: "/20/teema-elokuvat.webp",
@@ -69,6 +74,7 @@ const HUBS: Record<string, HubMeta> = {
     ctaDesc: "Selaa koko katalogi tai poimi klassikko.",
   },
   musiikki: {
+    name: "Musiikki", oneWord: true,
     titleTop: "Mu", titleAccent: "siikki",
     accent: "#A855F7", accentLight: "#C79BFB",
     img: "/20/teema-musiikki.webp",
@@ -80,6 +86,7 @@ const HUBS: Record<string, HubMeta> = {
     ctaDesc: "Artistit, bändit ja festarit — valitse omasi.",
   },
   matkakohteet: {
+    name: "Matkakohteet", oneWord: true,
     titleTop: "Matka", titleAccent: "kohteet",
     accent: "#E8A320", accentLight: "#F5C462",
     img: "/20/teema-maantieto.webp",
@@ -91,6 +98,7 @@ const HUBS: Record<string, HubMeta> = {
     ctaDesc: "Valitse maanosa tai kohde — tai ota satunnainen matka.",
   },
   ruokajuoma: {
+    name: "Ruoka & juoma",
     titleTop: "Ruoka &", titleAccent: "juoma",
     accent: "#F2C230", accentLight: "#F9D971",
     img: "/20/teema-ruoka-juoma.webp",
@@ -102,6 +110,7 @@ const HUBS: Record<string, HubMeta> = {
     ctaDesc: "Katalogi kasvaa — uusia keittiöitä tulossa.",
   },
   luonnonihmeet: {
+    name: "Luonnon ihmeet",
     titleTop: "Luonnon", titleAccent: "ihmeet",
     accent: "#2FD9A5", accentLight: "#7CEBC8",
     img: "/20/teema-luonto.webp",
@@ -113,6 +122,7 @@ const HUBS: Record<string, HubMeta> = {
     ctaDesc: "Eläimet, kasvit ja ilmiöt — tunnetko lähimetsäsi?",
   },
   kuvavisat: {
+    name: "Kuvavisat", oneWord: true,
     titleTop: "Kuva", titleAccent: "visat",
     accent: "#4C9AFF", accentLight: "#8FC0FF",
     img: "/20/teema-liput.webp",
@@ -124,6 +134,7 @@ const HUBS: Record<string, HubMeta> = {
     ctaDesc: "Yksi kuva, neljä vaihtoehtoa — kuinka tarkka silmäsi on?",
   },
   yleistieto: {
+    name: "Yleistieto", oneWord: true,
     titleTop: "Yleis", titleAccent: "tieto",
     accent: "#E8A320", accentLight: "#F5C462",
     img: "/20/teema-ruoka-juoma.webp",
@@ -135,6 +146,7 @@ const HUBS: Record<string, HubMeta> = {
     ctaDesc: "Historia, ruoka, muoti ja loput.",
   },
   "tunnetut-henkilot": {
+    name: "Tunnetut henkilöt",
     titleTop: "Tunnetut", titleAccent: "henkilöt",
     accent: "#C9A96A", accentLight: "#E3CFA6",
     img: "/20/teema-tunnetut-henkilot.webp",
@@ -187,23 +199,32 @@ function cardColor(hub: HubMeta, q: Card): string {
   return hub.accentLight;
 }
 
-function hubChipFallback(q: Card): string {
-  const map: Record<string, string> = {
-    urheilu: "Urheilu", elokuvat: "Elokuvat", musiikki: "Musiikki",
-    matkakohteet: "Matkakohteet", yleistieto: "Yleistieto", tv: "TV",
-  };
-  return map[q.collection ?? ""] ?? "Visa";
+/* Urheilun laji-chip titlestä — tarkempi kuin "Urheilu" (Heikin toive 2026-07-31).
+   Oikea laji-backfill kantaan tehdään urheilukokoelman vuorolla. */
+const SPORT_LABEL: Array<[RegExp, string]> = [
+  [/formula|f1/i, "Formula 1"], [/ralli/i, "Ralli"],
+  [/tennik|federer|us open/i, "Tennis"], [/golf|the open/i, "Golf"],
+  [/koripallo|nba|susijengi/i, "Koripallo"], [/kiekko|nhl|liiga(?!ssa)|leijon/i, "Jääkiekko"],
+  [/yleisurheilu|keihä/i, "Yleisurheilu"], [/olympiastadion|stadion/i, "Stadionit"],
+  [/maajoukkue|jalkapallo|futis|fc |mm-kisat|mm-finaal|huuhkaja|arsenal|liverpool/i, "Jalkapallo"],
+];
+function sportLabel(title: string): string | null {
+  for (const [re, label] of SPORT_LABEL) if (re.test(title)) return label;
+  return null;
 }
 
 function toWide(hub: HubMeta, q: Card, genreLabel: Map<string, string>) {
+  // Hubissa aihe on jo selvä — chip näytetään vain kun se kertoo jotain LISÄÄ:
+  // genre (TV), laji (urheilu) tai alakokoelma. Muuten ei chippiä.
   const chip =
     (q.genre && (genreLabel.get(q.genre) ?? q.genre)) ||
-    (q.subcollection ? q.subcollection.charAt(0).toUpperCase() + q.subcollection.slice(1) : hubChipFallback(q));
+    (q.collection === "urheilu" ? sportLabel(q.title) : null) ||
+    (q.subcollection ? q.subcollection.charAt(0).toUpperCase() + q.subcollection.slice(1) : null);
   return {
     href: `/visa/${q.custom_slug ?? q.slug}`,
     color: cardColor(hub, q),
     motifPath: motifPathFor(q.collection, q.genre, q.title),
-    genreChip: chip,
+    genreChip: chip ?? undefined,
     title: q.display_title ?? q.title,
     desc: q.teaser,
     mode: "Klassinen",
@@ -402,11 +423,11 @@ function HubShell({
             <nav style={{ fontSize: 13, fontWeight: 700, color: "#8E8676", marginBottom: 14 }}>
               <a href="/2-0" style={{ color: "inherit", textDecoration: "none" }}>Kokoelmat</a>
               {" / "}
-              <span style={{ color: hub.accentLight }}>{hub.titleTop} {hub.titleAccent}</span>
+              <span style={{ color: hub.accentLight }}>{hub.name}</span>
             </nav>
-            <h1 className="tn-display" style={{ fontSize: "clamp(38px, 7.4vw, 96px)", lineHeight: 0.86, letterSpacing: "-0.02em", margin: "0 0 16px" }}>
+            <h1 className="tn-display" style={{ fontSize: hub.oneWord ? "clamp(34px, 6.2vw, 84px)" : "clamp(38px, 7.4vw, 96px)", lineHeight: 0.9, letterSpacing: "-0.02em", margin: "0 0 16px" }}>
               {hub.titleTop}
-              <br />
+              {hub.oneWord ? null : <br />}
               <span style={{ color: hub.accent }}>{hub.titleAccent}</span>
             </h1>
             <p style={{ margin: "0 0 18px", color: "var(--tn-text-soft)", fontSize: "clamp(14px, 1.5vw, 20px)", lineHeight: 1.5, maxWidth: "40ch" }}>
