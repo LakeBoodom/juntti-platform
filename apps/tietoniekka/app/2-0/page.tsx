@@ -247,12 +247,12 @@ export default async function Etusivu20() {
               { href: "/2-0/kokoelma/elokuvat", img: "/20/teema-elokuvat.webp", chip: "Kokoelma", title: "Elokuvat", meta: `${n("elokuvat")} visaa`, accent: "var(--tn-acc-elokuvat)" },
               { href: "/2-0/kokoelma/musiikki", img: "/20/teema-musiikki.webp", chip: "Kokoelma", title: "Musiikki", meta: `${n("musiikki")} visaa`, accent: "var(--tn-acc-musiikki)" },
               { href: "/kumpi", motif: "kumpi", chip: "Pelimuoto", title: "Kumpi?", meta: "Kaksi vaihtoehtoa", accent: "var(--tn-teal)" },
-              { href: "/peli?kuvavisa=liput", img: "/20/teema-liput.webp", chip: "Kuvavisa", title: "Liput", meta: "Tunnista liput", accent: "var(--tn-teal)" },
+              { href: "/2-0/kokoelma/kuvavisat", img: "/20/teema-liput.webp", chip: "Kuvakokoelma", title: "Kuvavisat", meta: "Liput, vaakunat, eläimet…", accent: "var(--tn-azure)" },
               { href: "/2-0/kokoelma/matkakohteet", img: "/20/teema-maantieto.webp", chip: "Kokoelma", title: "Matkakohteet", meta: `${n("matkakohteet")} visaa`, accent: "var(--tn-acc-matkakohteet)" },
               { href: "/jarjesta", motif: "jarjesta", chip: "Pelimuoto", title: "Järjestä", meta: "Laita riviin", accent: "var(--tn-violet)" },
               { href: "/2-0/kokoelma/tunnetut-henkilot", img: "/20/teema-tunnetut-henkilot.webp", chip: "Kokoelma", title: "Tunnetut henkilöt", meta: "Tutut kasvot", accent: "var(--tn-amber)" },
-              { href: "/2-0/kokoelma/matkakohteet", img: "/20/teema-luonto.webp", chip: "Ajankohtainen", title: "Luonnon ihmeet", meta: `${counts["matkakohteet"] ? "Osa Matkakohteita" : ""}`, accent: "var(--tn-green)" },
-              { href: "/2-0/kokoelma/yleistieto", img: "/20/teema-ruoka-juoma.webp", chip: "Kokoelma", title: "Ruoka & juoma", meta: "Osa Yleistietoa", accent: "var(--tn-gold)" },
+              { href: "/2-0/kokoelma/luonnonihmeet", img: "/20/teema-luonto.webp", chip: "Kokoelma", title: "Luonnon ihmeet", meta: "Eläimet & luonto", accent: "var(--tn-mint)" },
+              { href: "/2-0/kokoelma/ruokajuoma", img: "/20/teema-ruoka-juoma.webp", chip: "Kokoelma", title: "Ruoka & juoma", meta: "Keittiöt & juomat", accent: "var(--tn-gold)" },
             ].map((c) => (
               <a key={c.title} className="tn-browse" href={c.href} style={{ ["--tn-browse-accent" as string]: c.accent }}>
                 {c.img ? (
@@ -278,7 +278,9 @@ export default async function Etusivu20() {
       <section className="tn-section" id="pelimuodot">
         <div className="tn-shell">
           <div className="tn-mega">
-            <div className="tn-mega-grid">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/20/mega100.webp" alt="" style={{ position: "absolute", right: 0, top: 0, height: "100%", width: "42%", objectFit: "cover", objectPosition: "center", opacity: 0.35, maskImage: "linear-gradient(90deg, transparent, black 40%)", WebkitMaskImage: "linear-gradient(90deg, transparent, black 40%)" }} />
+            <div className="tn-mega-grid" style={{ position: "relative" }}>
               <div>
                 <span className="tn-chip" style={{ color: "var(--tn-gold)" }}>Megavisat · tulossa</span>
                 <div className="tn-display" style={{ fontSize: "clamp(28px, 4vw, 44px)", marginTop: 12 }}>Mega</div>

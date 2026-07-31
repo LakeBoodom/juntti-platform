@@ -467,3 +467,82 @@
 .tn20 .tn-footer h4 { font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--tn-text-dim); margin: 0 0 10px; }
 .tn20 .tn-footer a { display: block; color: var(--tn-text-soft); text-decoration: none; padding: 3px 0; }
 .tn20 .tn-footer a:hover { color: var(--tn-text); }
+
+/* ============================================================
+   HUB 2.1 — CD:n päivitetty hub-design (2026-07-31)
+   Leveä visakortti + kokoelmahero + suodatinryhmät + CTA-paneeli
+   ============================================================ */
+
+.tn20 { --tn-mint: #2fd9a5; --tn-mint-light: #7cebc8; --tn-azure: #4c9aff; --tn-azure-light: #8fc0ff; }
+
+/* Leveä visakortti — visa pääosassa, motiivi sivuosassa */
+.tn20 .tn-wide { display: block; text-decoration: none; transition: transform 160ms ease; }
+.tn20 .tn-wide:hover { transform: translateY(-4px); }
+.tn20 .tn-wide-box {
+  border-radius: clamp(13px, 1.6cqw, 20px); overflow: hidden;
+  border: 1px solid var(--tn-line); background: var(--tn-surface); height: 100%;
+}
+.tn20 .tn-wide-visual { position: relative; aspect-ratio: 16 / 9; }
+.tn20 .tn-wide-wash { position: absolute; inset: 0; background: currentColor; opacity: 0.13; }
+.tn20 .tn-wide-glowspot { position: absolute; inset: 0; background: radial-gradient(circle at 84% 22%, currentColor, transparent 58%); opacity: 0.3; }
+.tn20 .tn-wide-motif { position: absolute; right: clamp(8px, 0.9cqw, 13px); top: clamp(7px, 0.8cqw, 11px); width: 34%; height: 78%; opacity: 0.55; }
+.tn20 .tn-wide-fade { position: absolute; inset: 0; background: linear-gradient(to top, rgb(19 17 9 / 0.9) 4%, transparent 60%); }
+.tn20 .tn-wide-genre {
+  position: absolute; left: clamp(9px, 1cqw, 14px); bottom: clamp(8px, 0.9cqw, 12px);
+  padding: 3px 8px; border-radius: 999px; background: rgb(19 17 9 / 0.78); border: 1px solid currentColor;
+  font-size: clamp(8px, 0.75cqw, 10px); font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase;
+}
+.tn20 .tn-wide-badge { position: absolute; right: clamp(9px, 1cqw, 14px); bottom: clamp(8px, 0.9cqw, 12px); }
+.tn20 .tn-wide-body { padding: clamp(10px, 1.15cqw, 16px) clamp(11px, 1.2cqw, 17px) clamp(12px, 1.3cqw, 18px); }
+.tn20 .tn-wide-title {
+  font-family: var(--tn-font-display); font-weight: 900; text-transform: none;
+  font-size: clamp(16px, 1.85cqw, 25px); line-height: 0.99; letter-spacing: -0.012em; color: var(--tn-text);
+  text-wrap: pretty;
+}
+.tn20 .tn-wide-desc { font-size: clamp(11px, 1.05cqw, 13px); line-height: 1.45; color: #b9af9b; margin-top: clamp(5px, 0.6cqw, 9px); }
+.tn20 .tn-wide-meta { display: flex; align-items: center; gap: 6px; margin-top: clamp(8px, 0.9cqw, 12px); font-size: clamp(10px, 0.95cqw, 12px); font-weight: 700; color: var(--tn-text-dim); }
+.tn20 .tn-wide-dot { color: var(--tn-line); }
+
+/* Hub-rivit: otsikko + huomio + vaakascrolleri */
+.tn20 .tn-hubrow-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-bottom: clamp(12px, 1.6cqw, 22px); }
+.tn20 .tn-hubrow-note { font-size: clamp(11px, 1.1cqw, 14px); color: #8e8676; font-weight: 600; margin-top: 6px; }
+.tn20 .tn-hubrow-scroller { display: flex; gap: clamp(10px, 1.3cqw, 18px); overflow-x: auto; padding: 2px 0 clamp(8px, 1cqw, 14px); scrollbar-width: none; }
+.tn20 .tn-hubrow-scroller::-webkit-scrollbar { display: none; }
+.tn20 .tn-hubrow-scroller > * { flex: 0 0 clamp(230px, 24.5cqw, 330px); }
+.tn20 .tn-wide-grid { display: grid; gap: clamp(10px, 1.3cqw, 18px); grid-template-columns: repeat(auto-fill, minmax(min(100%, 260px), 1fr)); }
+
+/* Suodatinryhmät */
+.tn20 .tn-filters { display: flex; flex-wrap: wrap; gap: clamp(16px, 2.4cqw, 44px); }
+.tn20 .tn-filtergroup { flex: 1 1 min(100%, 300px); }
+.tn20 .tn-filterlabel { font-size: clamp(10px, 0.95cqw, 12px); font-weight: 800; letter-spacing: 0.16em; text-transform: uppercase; color: #5f594c; margin-bottom: clamp(9px, 1.1cqw, 14px); }
+.tn20 .tn-lockchip {
+  display: inline-flex; align-items: center; gap: 7px;
+  padding: clamp(8px, 0.95cqw, 12px) clamp(11px, 1.3cqw, 17px); border-radius: 999px;
+  border: 1px dashed var(--tn-line); color: #5f594c; font-size: clamp(11px, 1.1cqw, 14px); font-weight: 700;
+}
+.tn20 .tn-filternote { margin-top: clamp(8px, 1cqw, 12px); font-size: clamp(10px, 1cqw, 12px); color: #5f594c; font-weight: 600; }
+
+/* Selaa kaikki -CTA-paneeli */
+.tn20 .tn-ctapanel {
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between;
+  gap: clamp(14px, 2cqw, 32px); padding: clamp(20px, 2.8cqw, 44px);
+  border-radius: clamp(18px, 2.2cqw, 28px);
+  border: 1px solid color-mix(in srgb, var(--tn-hub-accent, var(--tn-gold)) 35%, transparent);
+  background: linear-gradient(120deg, color-mix(in srgb, var(--tn-hub-accent, var(--tn-gold)) 13%, transparent), #1a160e);
+}
+.tn20 .tn-ctapanel .tn-cta { background: var(--tn-hub-accent, var(--tn-gold)); }
+
+/* Kortistokortti (Kuvavisat) — 3:4, motiivi isona, nimi alareunassa */
+.tn20 .tn-deck {
+  position: relative; display: block; border-radius: clamp(14px, 1.7cqw, 22px); overflow: hidden;
+  border: 1px solid var(--tn-line); background: var(--tn-surface); transition: transform 160ms ease, border-color 160ms ease;
+}
+.tn20 .tn-deck:hover { transform: translateY(-4px); border-color: currentColor; }
+.tn20 .tn-deck-inner { position: relative; aspect-ratio: 3 / 4; }
+.tn20 .tn-deck-wash { position: absolute; inset: 0; background: currentColor; opacity: 0.13; }
+.tn20 .tn-deck-glow { position: absolute; inset: 0; background: radial-gradient(circle at 74% 14%, currentColor, transparent 60%); opacity: 0.32; }
+.tn20 .tn-deck-motif { position: absolute; left: 12%; top: 10%; width: 76%; height: 56%; opacity: 0.5; }
+.tn20 .tn-deck-fade { position: absolute; inset: 0; background: linear-gradient(to top, #131109 12%, rgb(19 17 9 / 0.4) 52%, transparent 84%); }
+.tn20 .tn-deck-body { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: flex-end; padding: clamp(10px, 1.15cqw, 15px); }
+.tn20 .tn-deck-title { font-family: var(--tn-font-display); font-weight: 900; text-transform: uppercase; font-size: clamp(17px, 2.15cqw, 27px); line-height: 0.94; letter-spacing: -0.01em; color: var(--tn-text); }
+.tn20 .tn-deck-note { font-size: clamp(10px, 0.95cqw, 12px); font-weight: 600; color: #b9af9b; margin-top: 5px; }
