@@ -817,9 +817,9 @@
   .tn20 .tn-rescard-in { padding: 28px 28px 24px; }
   .tn20 .tn-res-headline { font-family: var(--tn-font-display); font-weight: 900; text-transform: uppercase; letter-spacing: -0.02em; }
 }
-@media (min-width: 1280px) {
+@media (min-width: 1200px) {
   /* Leveällä ruudulla ristiinnostot omaan sarakkeeseen — täyttää oikean laidan */
-  .tn20 .tn-res-right { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 48px; align-items: start; }
+  .tn20 .tn-res-right { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 44px; align-items: start; }
 }
 
 /* ── Visan aloitusnäkymä: julistemainen intro (Heikki 1.8.2026) ──
