@@ -1,15 +1,20 @@
 "use client";
-// TIETONIEKKA 2.0 — Klassinen pelikuoressa 1c "Täysi lava" (Heikki vahvisti C 2026-07-31)
-// Kysymys on näkymän isoin asia · vastaukset täysleveinä nauhoina · kokoelmaväri
-// johtaa · palaute värillä + merkillä · ei tyhjää alalaitaa.
+// TIETONIEKKA 2.0 — pelikuori 2A "Jaettu lava" + Tuloskortti A + Logo C
+// (CD pelinäkymä2, Heikki vahvisti 2026-08-01)
+// Mobiili: kysymys keskittyy vapaaseen tilaan, nauhat ankkuroituvat alas.
+// Desktop: vasen puoli = kysymys + kokoelmakuva, oikea = nauhat täyskorkeana.
+// Logo = hiljainen allekirjoitus alalaidassa; täysi merkki palaa tuloskorttiin.
+// Tuloskortti A: jaettava kortti on sisältö; WhatsApp pääkanava, muut jaot
+// NYKYISET kanavat (Facebook · Telegram · X · Kopioi linkki) — Instagram Story
+// lisätään myöhemmin kuvajaon kautta.
 // Mekaniikka identtinen tuotannon kanssa: 100 p + striikkibonus 50/porras,
-// Oljenkorsi poistaa 2 väärää (kerran/visa), quiz_plays-tallennus, Putki
-// (tn_paivan_visa_putki) päivittyy vain Päivän sankarista. Ei ajastinta (v1).
+// Oljenkorsi 2 väärää pois, quiz_plays-tallennus + shared-merkintä, Putki
+// (tn_paivan_visa_putki) vain Päivän sankarista. Ei ajastinta (v1).
 
 import { useEffect, useRef, useState } from "react";
 import confetti from "canvas-confetti";
 import { getSupabase } from "../../../lib/supabase";
-import { WideCard } from "../../../components/tn20/WideCard";
+import { MOTIF_PATHS } from "../../../components/tn20/motif-paths";
 
 const BASE_POINTS = 100;
 const STREAK_BONUS = 50;
@@ -21,6 +26,7 @@ export type GameQuiz = {
   collectionLabel: string;
   genreLabel: string | null;
   hubHref: string;
+  bgImg: string;
   accent: string;
   isSankari: boolean;
   questions: Array<{ question: string; options: string[]; correct: string; fact: string | null }>;
@@ -43,7 +49,7 @@ function updateDailyStreak(): number {
     let count = 1;
     if (raw) {
       const prev = JSON.parse(raw) as { count: number; last: string };
-      if (prev.last === today) return prev.count; // sama päivä ei kasvata putkea
+      if (prev.last === today) return prev.count;
       count = prev.last === yd ? prev.count + 1 : 1;
     }
     window.localStorage.setItem(KEY, JSON.stringify({ count, last: today }));
@@ -76,6 +82,8 @@ function resultTier(correct: number, total: number) {
   return { emoji: "😭", heading: "Lisää harjoittelua vaan", blurb: "Uusi yritys auttaa." };
 }
 
+const enc = encodeURIComponent;
+
 export default function GameClient({ quiz }: { quiz: GameQuiz }) {
   const total = quiz.questions.length;
   const [phase, setPhase] = useState<"intro" | "play" | "end">("intro");
@@ -87,17 +95,21 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
   const [hidden, setHidden] = useState<Set<string>>(new Set());
   const [oljenkorsiUsed, setOljenkorsiUsed] = useState(false);
   const [dailyStreak, setDailyStreak] = useState(0);
+  const [ansLog, setAnsLog] = useState<boolean[]>([]);
+  const [copied, setCopied] = useState(false);
   const recorded = useRef(false);
+  const playIdRef = useRef<string | null>(null);
 
   const q = quiz.questions[idx];
   const answered = picked !== null;
-  // Sama maksimikaava kuin tuotannossa (TIME_BONUS = 0)
   const maxScore = total * BASE_POINTS + ((total * (total - 1)) / 2) * STREAK_BONUS;
 
   function pick(option: string) {
     if (answered) return;
     setPicked(option);
-    if (option === q.correct) {
+    const ok = option === q.correct;
+    setAnsLog((l) => [...l, ok]);
+    if (ok) {
       const ns = streak + 1;
       const gained = BASE_POINTS + (ns > 1 ? (ns - 1) * STREAK_BONUS : 0);
       setStreak(ns);
@@ -136,8 +148,9 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
     try {
       const sb = getSupabase();
       if (!sb) return;
-      await sb.from("quiz_plays").insert({
-        id: crypto.randomUUID(),
+      const playId = crypto.randomUUID();
+      const { error } = await sb.from("quiz_plays").insert({
+        id: playId,
         quiz_id: quiz.id,
         platform: "tietoniekka",
         score: finalScore,
@@ -145,7 +158,17 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
         session_id: getOrCreateSessionId(),
         shared: false,
       });
+      if (!error) playIdRef.current = playId;
     } catch { /* best-effort */ }
+  }
+
+  /** Sama shared-merkintä kuin tuotannossa — best-effort. */
+  async function markShared() {
+    try {
+      const sb = getSupabase();
+      if (!sb || !playIdRef.current) return;
+      await sb.from("quiz_plays").update({ shared: true }).eq("id", playIdRef.current);
+    } catch { /* no-op */ }
   }
 
   function endGame() {
@@ -171,23 +194,26 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
     setPicked(null);
     setHidden(new Set());
     setOljenkorsiUsed(false);
+    setAnsLog([]);
+    setCopied(false);
     recorded.current = false;
+    playIdRef.current = null;
   }
 
-  async function share() {
-    const text = `Sain ${correctCount}/${total} oikein Tietoniekan visassa "${quiz.title}" — pystytkö parempaan?`;
-    const url = window.location.href;
+  const shareText = () =>
+    `Sain ${correctCount}/${total} oikein Tietoniekan visassa "${quiz.title}" — pystytkö parempaan?`;
+  const shareUrl = () => (typeof window !== "undefined" ? window.location.href : "https://tietoniekka.fi");
+
+  async function copyShareLink() {
     try {
-      if (navigator.share) await navigator.share({ text, url });
-      else {
-        await navigator.clipboard.writeText(`${text}\n${url}`);
-        alert("Linkki kopioitu!");
-      }
-    } catch { /* peruttu */ }
+      await navigator.clipboard.writeText(`${shareText()}\n${shareUrl()}`);
+      setCopied(true);
+      void markShared();
+      setTimeout(() => setCopied(false), 2000);
+    } catch { /* no-op */ }
   }
 
   useEffect(() => {
-    // Näppäimistö: A–D valitsee, Enter jatkaa
     function onKey(e: KeyboardEvent) {
       if (phase !== "play") return;
       const i = ["a", "b", "c", "d"].indexOf(e.key.toLowerCase());
@@ -200,17 +226,25 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
 
   const shellStyle = { ["--tn-game-accent" as string]: quiz.accent };
   const letters = ["A", "B", "C", "D"];
+  const Signature = () => (
+    <span className="tn-game-signature">
+      <b>TIETO</b>
+      <b>NIEKKA</b>
+    </span>
+  );
+  const collLine = `${quiz.collectionLabel}${quiz.genreLabel ? ` · ${quiz.genreLabel}` : ""}`;
 
   /* ─── Aloitus ─── */
   if (phase === "intro") {
     return (
       <main className="tn-game" style={shellStyle}>
-        <div className="tn-game-inner">
         <div className="tn-game-segs">{Array.from({ length: total }, (_, i) => <i key={i} />)}</div>
-        <Header quiz={quiz} right={`${total} kysymystä`} />
-        <div className="tn-game-center">
-          <span className="tn-eyebrow" style={{ color: quiz.accent }}>{quiz.collectionLabel}{quiz.genreLabel ? ` · ${quiz.genreLabel}` : ""}</span>
-          <h1 className="tn-display" style={{ fontSize: "clamp(34px, 7vw, 64px)", lineHeight: 0.94, margin: "14px 0 12px", maxWidth: "18ch" }}>
+        <div className="tn-game2-top">
+          <a className="tn-game2-coll" href={quiz.hubHref}><i />{collLine}</a>
+          <span className="tn-game2-meta">{total} kysymystä</span>
+        </div>
+        <div className="tn-game-qwrap" style={{ maxWidth: 920, margin: "0 auto", width: "100%", boxSizing: "border-box" }}>
+          <h1 className="tn-display" style={{ fontSize: "clamp(34px, 7vw, 64px)", lineHeight: 0.94, margin: "0 0 12px", maxWidth: "18ch" }}>
             {quiz.title}
           </h1>
           {quiz.teaser && <p style={{ color: "var(--tn-text-soft)", fontSize: 15, maxWidth: "44ch", margin: "0 0 22px" }}>{quiz.teaser}</p>}
@@ -219,66 +253,123 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
           </button>
         </div>
         <div className="tn-game-foot">
-          <span style={{ fontSize: 11.5, fontWeight: 700, color: "#5F594C" }}>🌾 Oljenkorsi käytettävissä kerran · ei kirjautumista</span>
+          <span style={{ display: "flex", alignItems: "center", gap: 14 }}>
+            <Signature />
+            <span style={{ fontSize: 11.5, fontWeight: 700, color: "#5F594C" }}>🌾 Oljenkorsi käytettävissä kerran · ei kirjautumista</span>
+          </span>
           <a href={quiz.hubHref} style={{ fontSize: 11.5, fontWeight: 700, color: "#8E8676", textDecoration: "none" }}>Takaisin kokoelmaan</a>
-        </div>
         </div>
       </main>
     );
   }
 
-  /* ─── Tulos ─── */
+  /* ─── Tulos: Tuloskortti A ─── */
   if (phase === "end") {
     const tier = resultTier(correctCount, total);
+    const today = new Date();
+    const wa = `https://wa.me/?text=${enc(`${shareText()}\n${shareUrl()}`)}`;
+    const fb = `https://www.facebook.com/sharer/sharer.php?u=${enc(shareUrl())}`;
+    const tg = `https://t.me/share/url?url=${enc(shareUrl())}&text=${enc(shareText())}`;
+    const x = `https://twitter.com/intent/tweet?text=${enc(shareText())}&url=${enc(shareUrl())}`;
+
     return (
       <main className="tn-game" style={shellStyle}>
-        <div className="tn-game-inner">
-          <div className="tn-game-segs">{Array.from({ length: total }, (_, i) => <i key={i} data-on="true" />)}</div>
-          <Header quiz={quiz} right={`Pisteet ${score}`} />
-          <div className="tn-game-center" style={{ justifyContent: "flex-start", paddingTop: "clamp(20px, 5vh, 48px)" }}>
-            <span className="tn-eyebrow" style={{ color: quiz.accent }}>Tulos · {quiz.title}</span>
-            <h1 className="tn-display" style={{ fontSize: "clamp(28px, 5vw, 48px)", margin: "12px 0 2px" }}>
-              {tier.emoji} {tier.heading}
-            </h1>
-            <div className="tn-game-bigscore">{correctCount}/{total}</div>
-            <p style={{ color: "var(--tn-text-soft)", margin: "8px 0 22px" }}>
-              {score} pistettä{tier.blurb ? ` · ${tier.blurb}` : ""}
-              {quiz.isSankari && dailyStreak > 0 && <> · 🔥 {dailyStreak} päivän putki</>}
-            </p>
+        <div className="tn-game-segs">{Array.from({ length: total }, (_, i) => <i key={i} data-on="true" />)}</div>
+        <div className="tn-game2-top">
+          <a className="tn-game2-coll" href={quiz.hubHref}><i />{collLine} · valmis</a>
+          <span className="tn-game2-meta">Pisteet <b>{score}</b>{quiz.isSankari && dailyStreak > 0 ? <> · 🔥 {dailyStreak}</> : null}</span>
+        </div>
 
-            {/* a) Jako ensin — päähuomio */}
-            <button className="tn-game-share" onClick={() => void share()}>
-              Haasta kaverit — jaa tulos →
-            </button>
+        <div className="tn-res-grid">
+          {/* Jaettava tuloskortti — tämä kuva on itse sisältö */}
+          <div className="tn-res-left">
+            <div className="tn-rescard">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img className="tn-rescard-bg" src={quiz.bgImg} alt="" />
+              <div className="tn-rescard-in">
+                <div className="tn-rescard-toprow">
+                  <span style={{ color: quiz.accent }}>{collLine}</span>
+                  <span style={{ color: "#5F594C" }}>{today.getDate()}.{today.getMonth() + 1}.{today.getFullYear()}</span>
+                </div>
+                <div className="tn-rescard-score">
+                  {correctCount}
+                  <i>/</i>
+                  <b>{total}</b>
+                </div>
+                <div className="tn-rescard-tier">{tier.emoji} {tier.heading}</div>
+                <div className="tn-rescard-sub">{quiz.title} · {score} pistettä</div>
+                <div className="tn-rescard-foot">
+                  <Signature />
+                  <span className="tn-rescard-url">tietoniekka.fi</span>
+                </div>
+              </div>
+            </div>
+          </div>
 
-            {/* b) Pelaa uudelleen / etusivulle */}
-            <div style={{ display: "flex", gap: 10, marginTop: 10 }}>
-              <button className="tn-game-ghost" onClick={restart}>Pelaa uudestaan</button>
-              <a className="tn-game-ghost" href="/2-0">Etusivulle</a>
+          <div className="tn-res-right" style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+            <div>
+              <div className="tn-display tn-res-headline" style={{ fontSize: "clamp(24px, 3vw, 42px)", lineHeight: 0.98 }}>
+                Haasta kaveri — kumpi tietää enemmän?
+              </div>
+              <div style={{ fontSize: 13.5, fontWeight: 600, color: "#8E8676", marginTop: 8 }}>
+                Kaveri saa saman visan ja sama pistelasku ratkaisee.
+              </div>
             </div>
 
-            {/* c) Muut saman teeman visat kortteina */}
-            {quiz.related.length > 0 && (
-              <div style={{ marginTop: "clamp(24px, 5vh, 40px)" }}>
-                <div style={{ fontSize: 12, fontWeight: 800, letterSpacing: "0.16em", textTransform: "uppercase", color: "#8E8676", marginBottom: 14 }}>
-                  Jatka putkea — lisää aiheesta {quiz.collectionLabel}
-                </div>
-                <div className="tn-wide-grid">
-                  {quiz.related.map((r) => (
-                    <WideCard
-                      key={r.id}
-                      href={`/2-0/peli?quiz_id=${r.id}`}
-                      color={r.color}
-                      motifPath={r.motifPath}
-                      title={r.title}
-                      desc={r.teaser}
-                      mode="Klassinen"
-                      meta={r.meta}
-                    />
+            {/* a) WhatsApp pääkanavana + nykyiset jakokanavat */}
+            <a className="tn-share-wa" href={wa} target="_blank" rel="noopener noreferrer" onClick={() => void markShared()}>
+              Haasta kaveri WhatsAppissa
+            </a>
+            <div className="tn-share-grid">
+              <a className="tn-share-chip" href={fb} target="_blank" rel="noopener noreferrer" onClick={() => void markShared()}>📘 Facebook</a>
+              <a className="tn-share-chip" href={tg} target="_blank" rel="noopener noreferrer" onClick={() => void markShared()}>✈️ Telegram</a>
+              <a className="tn-share-chip" href={x} target="_blank" rel="noopener noreferrer" onClick={() => void markShared()}>𝕏 Jaa X:ssä</a>
+              <button className="tn-share-chip" type="button" onClick={() => void copyShareLink()}>
+                {copied ? "✓ Kopioitu!" : "🔗 Kopioi linkki"}
+              </button>
+            </div>
+
+            {/* b) Pelaa uudelleen / etusivu */}
+            <div className="tn-res-actions">
+              <button className="tn-primary" type="button" onClick={restart}>↻ Pelaa uudelleen</button>
+              <a className="tn-ghost" href="/2-0">Etusivu</a>
+            </div>
+
+            {/* Vastauksesi-kertaus */}
+            {ansLog.length === total && (
+              <div>
+                <div className="tn-res-more-label" style={{ marginBottom: 8 }}>Vastauksesi</div>
+                <div className="tn-res-recap">
+                  {ansLog.map((ok, i) => (
+                    <span key={i} style={{ background: ok ? "rgba(182,255,60,.18)" : "rgba(255,92,61,.16)", color: ok ? "var(--tn-lime)" : "#FF8566" }}>
+                      {i + 1}
+                    </span>
                   ))}
                 </div>
-                <a href={quiz.hubHref} className="tn-morelink" style={{ display: "inline-block", marginTop: 14, color: quiz.accent }}>
-                  Selaa koko kokoelma: {quiz.collectionLabel} →
+              </div>
+            )}
+
+            {/* c) Muut saman teeman visat */}
+            {quiz.related.length > 0 && (
+              <div style={{ display: "flex", flexDirection: "column", gap: 8, marginTop: 6 }}>
+                <div className="tn-res-more-label">Lisää: {quiz.collectionLabel}</div>
+                {quiz.related.map((r) => (
+                  <a key={r.id} className="tn-res-mini" href={`/2-0/peli?quiz_id=${r.id}`}>
+                    <span className="tn-res-mini-thumb" style={{ color: r.color }}>
+                      <span className="wash" />
+                      <svg viewBox="0 0 200 260" aria-hidden>
+                        <path d={r.motifPath} fill="none" stroke="currentColor" strokeWidth={9} strokeLinecap="round" strokeLinejoin="round" />
+                      </svg>
+                    </span>
+                    <span style={{ flex: "1 1 auto", minWidth: 0 }}>
+                      <span className="tn-res-mini-title" style={{ display: "block" }}>{r.title}</span>
+                      <span className="tn-res-mini-meta" style={{ display: "block" }}>{r.meta}</span>
+                    </span>
+                    <span style={{ color: "#3A3122", fontSize: 16, paddingRight: 6 }}>›</span>
+                  </a>
+                ))}
+                <a href={quiz.hubHref} className="tn-morelink" style={{ color: quiz.accent, marginTop: 4 }}>
+                  Selaa koko kokoelma →
                 </a>
               </div>
             )}
@@ -288,82 +379,97 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
     );
   }
 
-  /* ─── Peli ─── */
+  /* ─── Peli: 2A jaettu lava ─── */
   const qLen = q.question.length > 140 ? "xlong" : q.question.length > 85 ? "long" : "normal";
   return (
     <main className="tn-game" style={shellStyle}>
-      <div className="tn-game-inner">
       <div className="tn-game-segs">
         {Array.from({ length: total }, (_, i) => (
           <i key={i} data-on={i < idx + (answered ? 1 : 0)} />
         ))}
       </div>
-      <Header quiz={quiz} right={<>Pisteet <b style={{ color: "var(--tn-text)" }}>{score}</b>{streak >= 2 ? <> · 🔥 {streak}</> : null}</>} />
-      <div className="tn-game-q">
-        <h1 data-len={qLen}>{q.question}</h1>
-        <div className="tn-game-sub">
-          Kysymys {idx + 1} / {total}
-          {quiz.genreLabel ? ` · ${quiz.genreLabel.toLowerCase()}` : ""}
-        </div>
-      </div>
-      <div className="tn-game-bands">
-        {q.options.map((opt, i) => {
-          let state: string | undefined;
-          if (answered) {
-            if (opt === q.correct) state = "correct";
-            else if (opt === picked) state = "wrong";
-            else state = "dim";
-          }
-          return (
-            <button
-              key={opt + i}
-              className="tn-band"
-              data-state={state}
-              data-long={opt.length > 42}
-              data-hidden={!answered && hidden.has(opt)}
-              disabled={answered || hidden.has(opt)}
-              onClick={() => pick(opt)}
-            >
-              <span className="tn-band-k">{letters[i]}</span>
-              <span className="tn-band-label">{opt}</span>
-              <span className="tn-band-mark">
-                {state === "correct" ? "✓" : state === "wrong" ? "✕" : ""}
+      <div className="tn-game-stage">
+        {/* Vasen lava: kokoelma, kysymys, allekirjoitus */}
+        <div className="tn-game-left">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img className="tn-game-left-bg" src={quiz.bgImg} alt="" />
+          <div className="tn-game-left-grad" />
+          <div className="tn-game2-top" style={{ position: "relative" }}>
+            <a className="tn-game2-coll" href={quiz.hubHref}><i />{collLine}</a>
+            <span className="tn-game2-meta tn-game2-meta-mobile">
+              Pisteet <b>{score}</b>
+              {streak >= 2 ? <> · 🔥 {streak}</> : null}
+            </span>
+          </div>
+          <div className="tn-game-qwrap">
+            <div className="tn-game-qnum">Kysymys {idx + 1} / {total}</div>
+            <h1 className="tn-game-qtext" data-len={qLen}>{q.question}</h1>
+          </div>
+          <div className="tn-game-leftfoot">
+            <Signature />
+            <span style={{ display: "flex", alignItems: "center", gap: 16 }}>
+              {quiz.isSankari && <span style={{ fontSize: 12, fontWeight: 800, letterSpacing: "0.14em", textTransform: "uppercase", color: "var(--tn-gold)" }}>🔥 Putki</span>}
+              <span className="tn-game-scorebig">
+                {score}
+                <small>pistettä{streak >= 2 ? ` · 🔥 ${streak}` : ""}</small>
               </span>
-            </button>
-          );
-        })}
-        <div style={{ borderTop: "1px solid #241E13" }} />
-      </div>
-      {answered && q.fact && (
-        <div className="tn-game-fact">
-          <b>Tiesitkö?</b>
-          <p>{q.fact}</p>
+            </span>
+          </div>
         </div>
-      )}
-      <div className="tn-game-foot">
-        <button className="tn-game-lifeline" onClick={oljenkorsi} disabled={oljenkorsiUsed || answered}>
-          🌾 Oljenkorsi {oljenkorsiUsed ? "· käytetty" : "· poista 2 väärää"}
-        </button>
-        {answered && (
-          <button className="tn-game-next" onClick={next}>
-            {idx >= total - 1 ? "Näytä tulos →" : "Seuraava →"}
-          </button>
-        )}
-      </div>
+
+        {/* Oikea lava: nauhat täyskorkeana + fakta + alalaita */}
+        <div className="tn-game-right">
+          <div className="tn-game-bands" style={{ marginTop: "auto" }}>
+            {q.options.map((opt, i) => {
+              let state: string | undefined;
+              if (answered) {
+                if (opt === q.correct) state = "correct";
+                else if (opt === picked) state = "wrong";
+                else state = "dim";
+              }
+              return (
+                <button
+                  key={opt + i}
+                  className="tn-band"
+                  data-state={state}
+                  data-long={opt.length > 42}
+                  data-hidden={!answered && hidden.has(opt)}
+                  disabled={answered || hidden.has(opt)}
+                  onClick={() => pick(opt)}
+                >
+                  <span className="tn-band-k">{letters[i]}</span>
+                  <span className="tn-band-label">{opt}</span>
+                  <span className="tn-band-mark">
+                    {state === "correct" ? "✓" : state === "wrong" ? "✕" : ""}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+          {answered && q.fact && (
+            <div className="tn-game2-fact">
+              <b>Tiesitkö?</b>
+              <p>{q.fact}</p>
+            </div>
+          )}
+          <div className="tn-game-foot">
+            <span style={{ display: "flex", alignItems: "center", gap: 14, minWidth: 0 }}>
+              <span className="tn-game-signature tn-game-sig-mobile">
+                <b style={{ color: "var(--tn-gold)" }}>TIETO</b>
+                <b style={{ color: "var(--tn-text)" }}>NIEKKA</b>
+              </span>
+              <button className="tn-game-lifeline" onClick={oljenkorsi} disabled={oljenkorsiUsed || answered}>
+                🌾 {oljenkorsiUsed ? "Käytetty" : "Oljenkorsi"}
+              </button>
+            </span>
+            {answered && (
+              <button className="tn-game-next" onClick={next}>
+                {idx >= total - 1 ? "Näytä tulos →" : "Seuraava →"}
+              </button>
+            )}
+          </div>
+        </div>
       </div>
     </main>
-  );
-}
-
-function Header({ quiz, right }: { quiz: GameQuiz; right: React.ReactNode }) {
-  return (
-    <div className="tn-game-top">
-      <span>
-        <a href="/2-0"><b style={{ color: "var(--tn-gold)" }}>TIETO</b><b style={{ color: "var(--tn-text)" }}>NIEKKA</b></a>
-        <span style={{ color: "#3A3122", margin: "0 7px" }}>/</span>
-        <a href={quiz.hubHref} style={{ color: "var(--tn-game-accent)" }}>{quiz.collectionLabel}</a>
-      </span>
-      <span>{right}</span>
-    </div>
   );
 }

@@ -27,6 +27,15 @@ const COLLECTION_HUB: Record<string, string> = {
   yleistieto: "/2-0/kokoelma/yleistieto",
   "tunnetut-henkilot": "/2-0/kokoelma/tunnetut-henkilot",
 };
+const COLLECTION_BG: Record<string, string> = {
+  tv: "/20/hero-tv-laura.webp",
+  urheilu: "/20/hero-urheilu-mikko.webp",
+  elokuvat: "/20/teema-elokuvat.webp",
+  musiikki: "/20/teema-musiikki.webp",
+  matkakohteet: "/20/teema-maantieto.webp",
+  yleistieto: "/20/teema-ruoka-juoma.webp",
+  "tunnetut-henkilot": "/20/teema-tunnetut-henkilot.webp",
+};
 const COLLECTION_LABEL: Record<string, string> = {
   tv: "TV & Suoratoisto",
   urheilu: "Urheilu",
@@ -110,6 +119,7 @@ export default async function Peli20({
     collectionLabel: COLLECTION_LABEL[collection] ?? "Visa",
     genreLabel,
     hubHref: COLLECTION_HUB[collection] ?? "/2-0",
+    bgImg: COLLECTION_BG[collection] ?? "/20/teema-ruoka-juoma.webp",
     accent,
     isSankari,
     questions: (qs ?? []).map((row) => {
