@@ -110,20 +110,22 @@ export default async function Etusivu20() {
 
   return (
     <main style={{ minHeight: "100dvh" }}>
-      {/* ─── HEADER ─── */}
+      {/* ─── HEADER — sisältö samassa 1280px-linjassa kuin muu sivu ─── */}
       <header className="tn-header">
-        <a className="tn-logo" href="/2-0">
-          <b>TIETO</b>
-          <span>NIEKKA</span>
-        </a>
-        <nav className="tn-nav">
-          <a href="#kokoelmat">Kokoelmat</a>
-          <a href="#pelimuodot">Pelimuodot</a>
-          <a href="#paiva">Tänään</a>
-        </nav>
-        <a className="tn-header-cta" href={hero?.c.trivia_quiz_id ? `/2-0/peli?quiz_id=${hero.c.trivia_quiz_id}&paivan_sankari=1` : "#paiva"}>
-          Pelaa päivän sankari
-        </a>
+        <div className="tn-header-in">
+          <a className="tn-logo" href="/2-0">
+            <b>TIETO</b>
+            <span>NIEKKA</span>
+          </a>
+          <nav className="tn-nav">
+            <a href="#kokoelmat">Kokoelmat</a>
+            <a href="#pelimuodot">Pelimuodot</a>
+            <a href="#paiva">Tänään</a>
+          </nav>
+          <a className="tn-header-cta" href={hero?.c.trivia_quiz_id ? `/2-0/peli?quiz_id=${hero.c.trivia_quiz_id}&paivan_sankari=1` : "#paiva"}>
+            Pelaa päivän sankari
+          </a>
+        </div>
       </header>
 
       {/* ─── HERO: editorial spotlight, EI arvontanappia ─── */}
@@ -145,7 +147,7 @@ export default async function Etusivu20() {
             <div className="tn-hero-chips">
               <span className="tn-trustchip">{total}+ visaa</span>
               <span className="tn-trustchip">3 pelimuotoa</span>
-              <span className="tn-trustchip">Ei kirjautumista</span>
+              <span className="tn-trustchip">Aina ilmainen</span>
             </div>
           </div>
         </div>
