@@ -23,6 +23,9 @@ export type GameQuiz = {
   id: string;
   title: string;
   teaser: string | null;
+  /* TIETOMEDIA (1.8.2026): loppunäkymän oppimisyhteenveto */
+  learnHeading: string | null;
+  keyFacts: Array<{ k: string; v: string; qi?: number }>;
   collectionLabel: string;
   genreLabel: string | null;
   hubHref: string;
@@ -370,6 +373,41 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
             )}
           </div>
         </div>
+
+        {/* TIETOMEDIA kerros 3: visan tärkeimmät opit + henkilökohtainen
+            kertauskortti (Nämä tiesit / Kertaa vielä nämä) */}
+        {quiz.keyFacts.length > 0 && (
+          <section className="tn-know">
+            <div className="tn-know-in">
+              <h2 className="tn-know-title">{quiz.learnHeading ?? `Nyt tiedät nämä`}</h2>
+              <div className="tn-know-facts">
+                {quiz.keyFacts.map((f) => {
+                  const knew = typeof f.qi === "number" && ansLog[f.qi] === true;
+                  return (
+                    <div key={f.k} className="tn-know-fact" data-knew={knew || undefined}>
+                      <b>{f.k}</b>
+                      <p>{f.v}</p>
+                      {knew && <span className="tn-know-badge">✓ Tiesit tämän</span>}
+                    </div>
+                  );
+                })}
+              </div>
+              {ansLog.length === total && ansLog.some((ok) => !ok) && (
+                <div className="tn-know-review">
+                  <h3>Kertaa vielä nämä</h3>
+                  {quiz.questions.map((qq, i) =>
+                    ansLog[i] === false && qq.fact ? (
+                      <div key={i} className="tn-know-review-item">
+                        <b>{qq.question}</b>
+                        <p>{qq.fact}</p>
+                      </div>
+                    ) : null
+                  )}
+                </div>
+              )}
+            </div>
+          </section>
+        )}
       </main>
     );
   }
@@ -441,10 +479,14 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
               );
             })}
           </div>
-          {answered && q.fact && (
+          {/* TIETOMEDIA kerros 2: väärän vastauksen jälkeen kerrotaan aina
+              suoraan mikä oli oikein; selitys opettaa muistettavan faktan */}
+          {answered && (q.fact || picked !== q.correct) && (
             <div className="tn-game2-fact">
-              <b>Tiesitkö?</b>
-              <p>{q.fact}</p>
+              {picked !== q.correct
+                ? <b className="tn-fact-answer">Oikea vastaus: {q.correct}</b>
+                : <b>Tiesitkö?</b>}
+              {q.fact && <p>{q.fact}</p>}
             </div>
           )}
           {/* Alalaita: Oljenkorsi vasen · logo keskellä (mobiili) · Seuraava oikea */}
