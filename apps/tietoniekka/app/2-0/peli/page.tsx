@@ -99,11 +99,11 @@ export default async function Peli20({
       : Promise.resolve({ data: null }),
     sb
       .from("quiz_cards" as never)
-      .select("id, display_title, title, teaser, collection, genre, question_count")
+      .select("id, slug, custom_slug, display_title, title, teaser, collection, genre, question_count")
       .eq("collection", quiz.collection ?? "yleistieto")
       .neq("id", quiz.id)
       .order("published_at", { ascending: false })
-      .limit(3),
+      .limit(6),
   ]);
 
   const collection = quiz.collection ?? "yleistieto";
@@ -115,6 +115,15 @@ export default async function Peli20({
   const genreLabel = (genreRes.data as { label: string } | null)?.label ?? null;
 
   const learn = quiz.learn ?? null;
+
+  type RelatedRow = {
+    id: string; slug: string | null; custom_slug: string | null;
+    display_title: string | null; title: string; teaser: string | null;
+    collection: string | null; genre: string | null; question_count: number;
+  };
+  const relatedRows = (relatedRes.data ?? []) as RelatedRow[];
+  const relHref = (r: RelatedRow) =>
+    r.custom_slug || r.slug ? `/2-0/peli?visa=${r.custom_slug ?? r.slug}` : `/2-0/peli?quiz_id=${r.id}`;
 
   const game: GameQuiz = {
     id: quiz.id,
@@ -139,12 +148,7 @@ export default async function Peli20({
         fact: row.explanation,
       };
     }),
-    related: (
-      (relatedRes.data ?? []) as Array<{
-        id: string; display_title: string | null; title: string; teaser: string | null;
-        collection: string | null; genre: string | null; question_count: number;
-      }>
-    ).map((r) => ({
+    related: (relatedRows.slice(0, 3)).map((r) => ({
       id: r.id,
       title: r.display_title ?? r.title,
       teaser: r.teaser,
@@ -158,15 +162,51 @@ export default async function Peli20({
     return <main style={{ padding: 32 }}>Visassa ei ole vielä kysymyksiä. <a href="/2-0">Takaisin</a></main>;
   }
 
+  const collectionLabel = COLLECTION_LABEL[collection] ?? "Visa";
+  const hubHref = COLLECTION_HUB[collection] ?? "/2-0";
+
   return (
     <>
       <GameClient quiz={game} />
       {/* TIETOMEDIA kerros 4: SEO-kopio aiheoppaasta renderöidään
           PALVELIMELTA — Google ei pelaa visaa, joten opas on HTML:ssä
-          alusta asti. Selaimessa tämä kopio piilotetaan (tn-learn-ssr)
-          ja pelaaja näkee saman sisällön loppunäkymän kohdassa 5.
+          alusta asti. Aloitusnäkymässä opas on myös kävijälle näkyvissä;
+          se piilotetaan vain pelin ajaksi ja loppunäkymässä, jossa sama
+          sisältö näkyy kohdassa 5. (SEO_STRATEGIA.md §13.2)
           (Indeksointi aukeaa 2.0-julkaisussa slug-URLeilla; /2-0 on noindex.) */}
       {learn && <LearnArticle learn={learn} fallbackTitle={quiz.title} accent={accent} ssr />}
+
+      {/* Crawlattavat sisäiset linkit: murupolku + ristiinnostot. Ennen näitä
+          sivulla oli vain kaksi sisäistä linkkiä mutta neljä ulkoista
+          lähdelinkkiä. (SEO_STRATEGIA.md §13.6) */}
+      <nav className="tn-seo-nav tn-learn-ssr" aria-label="Murupolku">
+        <div className="tn-seo-in">
+          <a href="/2-0">Etusivu</a>
+          <span aria-hidden="true"> / </span>
+          <a href={hubHref}>{collectionLabel}</a>
+          <span aria-hidden="true"> / </span>
+          <span aria-current="page">{quiz.display_title ?? quiz.title}</span>
+        </div>
+      </nav>
+
+      {relatedRows.length > 0 && (
+        <section className="tn-seo-related tn-learn-ssr">
+          <div className="tn-seo-in">
+            <h2>Lisää {collectionLabel.toLowerCase()}-visoja</h2>
+            <ul>
+              {relatedRows.map((r) => (
+                <li key={r.id}>
+                  <a href={relHref(r)}>{r.display_title ?? r.title}</a>
+                  <span> · {r.question_count} kysymystä</span>
+                </li>
+              ))}
+            </ul>
+            <a className="tn-seo-hub" href={hubHref}>
+              Kaikki {collectionLabel.toLowerCase()}-visat →
+            </a>
+          </div>
+        </section>
+      )}
     </>
   );
 }

@@ -27,7 +27,11 @@ export function LearnArticle({
 }) {
   if (!learn.sections || learn.sections.length === 0) return null;
   return (
-    <section className={`tn-learn${ssr ? " tn-learn-ssr" : ""}`} style={{ ["--tn-game-accent" as string]: accent }}>
+    <section
+      id={ssr ? "opas" : undefined}
+      className={`tn-learn${ssr ? " tn-learn-ssr" : ""}`}
+      style={{ ["--tn-game-accent" as string]: accent }}
+    >
       <div className="tn-learn-in">
         <h2 className="tn-learn-title">{learn.title ?? `${fallbackTitle} pähkinänkuoressa`}</h2>
         {learn.sections.map((s) => (
@@ -36,12 +40,29 @@ export function LearnArticle({
             {s.p.map((p, i) => <p key={i}>{p}</p>)}
           </div>
         ))}
+        {/* Pikafaktat: vain SSR-kopiossa. Loppunäkymässä samat faktat
+            näytetään henkilökohtaistettuina ("✓ Tiesit tämän") kohdassa 3,
+            joten client-kopioon niitä ei toisteta. Kysymys→vastaus-muoto on
+            se, jonka hakukoneet ja kielimallit poimivat. (§13.3) */}
+        {ssr && learn.key_facts && learn.key_facts.length > 0 && (
+          <div className="tn-learn-sec">
+            <h3>Pikafaktat</h3>
+            <dl className="tn-learn-facts">
+              {learn.key_facts.map((f) => (
+                <div key={f.k} className="tn-learn-fact">
+                  <dt>{f.k}</dt>
+                  <dd>{f.v}</dd>
+                </div>
+              ))}
+            </dl>
+          </div>
+        )}
         {learn.faq && learn.faq.length > 0 && (
           <div className="tn-learn-sec">
             <h3>Usein kysyttyä</h3>
             {learn.faq.map((f) => (
               <div key={f.q} className="tn-learn-faq">
-                <b>{f.q}</b>
+                <h4>{f.q}</h4>
                 <p>{f.a}</p>
               </div>
             ))}

@@ -221,14 +221,20 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
     } catch { /* no-op */ }
   }
 
-  /* SEO-kopio artikkelista (SSR pelin alla) piilotetaan aina selaimessa:
-     pelin aikana sieltä ei voi lukea vastauksia, ja loppunäkymässä pelaaja
-     näkee saman sisällön oikeassa kohdassa (5.) pelinäkymän sisällä.
-     Hakukoneet näkevät SSR-kopion alkuperäisessä HTML:ssä. */
+  /* SEO-kopio artikkelista (SSR pelin alla) piilotetaan VAIN silloin kun se
+     häiritsisi: pelin aikana (vastaukset luettavissa) ja loppunäkymässä
+     (sama sisältö näkyy siellä kohdassa 5.). Aloitusnäkymässä opas jää
+     näkyviin — se on samaa sisältöä sekä kävijälle että hakukoneelle,
+     eikä sivulla ole koskaan kahta näkyvää kopiota.
+     HUOM: aiempi versio lisäsi luokan mount-hetkellä tyhjällä riippuvuus-
+     listalla, jolloin opas oli piilossa kaikilta selaimen käyttäjiltä koko
+     ajan — myös Googlebotilta, joka suorittaa JS:n ja indeksoi renderöidyn
+     DOM:in. (SEO_STRATEGIA.md §13.2) */
   useEffect(() => {
-    document.body.classList.add("tn-game-playing");
+    const hide = phase !== "intro";
+    document.body.classList.toggle("tn-game-playing", hide);
     return () => document.body.classList.remove("tn-game-playing");
-  }, []);
+  }, [phase]);
 
   useEffect(() => {
     function onKey(e: KeyboardEvent) {

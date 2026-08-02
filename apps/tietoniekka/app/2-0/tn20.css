@@ -914,7 +914,21 @@
 }
 .tn20 .tn-learn-sec p { margin: 0 0 12px; font-size: 15px; line-height: 1.65; color: #cfc7b6; }
 .tn20 .tn-learn-faq { margin-bottom: 14px; }
-.tn20 .tn-learn-faq b { display: block; font-size: 14.5px; font-weight: 800; color: var(--tn-text); margin-bottom: 4px; }
+/* h4 korvasi b:n (rakenteinen merkkaus, sama ulkoasu) — SEO_STRATEGIA §13.4 */
+.tn20 .tn-learn-faq h4 {
+  font-family: inherit; display: block; font-size: 14.5px; font-weight: 800;
+  color: var(--tn-text); margin: 0 0 4px; text-transform: none; letter-spacing: normal;
+}
+
+/* Pikafaktat (vain SSR-kopiossa) — kysymys/vastaus-parit dl-listana */
+.tn20 .tn-learn-facts { margin: 0; display: grid; gap: 12px; }
+@media (min-width: 760px) { .tn20 .tn-learn-facts { grid-template-columns: 1fr 1fr; } }
+.tn20 .tn-learn-fact {
+  border: 1px solid #241e13; border-radius: 14px; background: var(--tn-bg-deep);
+  padding: 14px 16px 13px;
+}
+.tn20 .tn-learn-fact dt { font-size: 13.5px; font-weight: 800; color: var(--tn-text); margin-bottom: 5px; }
+.tn20 .tn-learn-fact dd { margin: 0; font-size: 13.5px; line-height: 1.55; color: #b9af9b; }
 .tn20 .tn-learn-faq p { margin: 0; font-size: 14px; line-height: 1.55; color: #b9af9b; }
 .tn20 .tn-learn-sources { margin-top: 30px; padding-top: 16px; border-top: 1px solid #241e13; font-size: 12px; line-height: 1.7; color: #5f594c; }
 .tn20 .tn-learn-sources a { color: #8e8676; text-decoration: underline; text-underline-offset: 2px; }
@@ -948,3 +962,22 @@
 /* SSR-kopio artikkelista piilotetaan aina selaimessa (pelaaja näkee
    saman sisällön loppunäkymän kohdassa 5) — hakukoneille HTML:ssä */
 .tn-game-playing .tn20 .tn-learn-ssr { display: none; }
+
+/* Murupolku + ristiinnostot (SSR, crawlattavat sisäiset linkit) — §13.6 */
+.tn20 .tn-seo-nav { border-top: 1px solid #241e13; background: var(--tn-bg); }
+.tn20 .tn-seo-in { max-width: 820px; margin: 0 auto; padding: 18px clamp(18px, 3vw, 32px); box-sizing: border-box; }
+.tn20 .tn-seo-nav .tn-seo-in { padding-top: 22px; padding-bottom: 0; font-size: 13px; font-weight: 700; color: #5f594c; }
+.tn20 .tn-seo-nav a { color: #8e8676; text-decoration: none; }
+.tn20 .tn-seo-nav a:hover { color: var(--tn-text); text-decoration: underline; }
+.tn20 .tn-seo-related { background: var(--tn-bg); padding-bottom: 40px; }
+.tn20 .tn-seo-related h2 {
+  font-family: var(--tn-font-display); font-weight: 900; text-transform: uppercase;
+  font-size: 20px; letter-spacing: 0.01em; color: var(--tn-text); margin: 10px 0 12px;
+}
+.tn20 .tn-seo-related ul { list-style: none; margin: 0 0 16px; padding: 0; display: grid; gap: 8px; }
+.tn20 .tn-seo-related li { font-size: 14px; line-height: 1.5; }
+.tn20 .tn-seo-related li a { color: var(--tn-text); text-decoration: none; font-weight: 700; }
+.tn20 .tn-seo-related li a:hover { color: var(--tn-game-accent, var(--tn-gold)); text-decoration: underline; }
+.tn20 .tn-seo-related li span { color: #5f594c; font-size: 12.5px; }
+.tn20 .tn-seo-hub { font-size: 13.5px; font-weight: 800; color: var(--tn-game-accent, var(--tn-gold)); text-decoration: none; }
+.tn20 .tn-seo-hub:hover { text-decoration: underline; }
