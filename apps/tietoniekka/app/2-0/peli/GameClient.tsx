@@ -177,6 +177,7 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
 
   function endGame() {
     setPhase("end");
+    try { window.scrollTo(0, 0); } catch { /* no-op */ }
     void recordPlay(score);
     if (quiz.isSankari) {
       const s = updateDailyStreak();
@@ -191,6 +192,7 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
 
   function restart() {
     setPhase("play");
+    try { window.scrollTo(0, 0); } catch { /* no-op */ }
     setIdx(0);
     setScore(0);
     setStreak(0);
@@ -216,6 +218,14 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
       setTimeout(() => setCopied(false), 2000);
     } catch { /* no-op */ }
   }
+
+  /* SEO-artikkeli (SSR pelin alla) piilotetaan pelin ajaksi, ettei sieltä voi
+     lukea vastauksia kesken pelin. Piilotus tehdään vasta selaimessa, joten
+     hakukoneet näkevät artikkelin aina alkuperäisessä HTML:ssä. */
+  useEffect(() => {
+    document.body.classList.toggle("tn-game-playing", phase !== "end");
+    return () => document.body.classList.remove("tn-game-playing");
+  }, [phase]);
 
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
@@ -346,36 +356,11 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
                 </div>
               )}
             </div>
-
-            {/* c) Muut saman teeman visat */}
-            {quiz.related.length > 0 && (
-              <div className="tn-res-col-b">
-                <div className="tn-res-more-label">Lisää: {quiz.collectionLabel}</div>
-                {quiz.related.map((r) => (
-                  <a key={r.id} className="tn-res-mini" href={`/2-0/peli?quiz_id=${r.id}`}>
-                    <span className="tn-res-mini-thumb" style={{ color: r.color }}>
-                      <span className="wash" />
-                      <svg viewBox="0 0 200 260" aria-hidden>
-                        <path d={r.motifPath} fill="none" stroke="currentColor" strokeWidth={9} strokeLinecap="round" strokeLinejoin="round" />
-                      </svg>
-                    </span>
-                    <span style={{ flex: "1 1 auto", minWidth: 0 }}>
-                      <span className="tn-res-mini-title" style={{ display: "block" }}>{r.title}</span>
-                      <span className="tn-res-mini-meta" style={{ display: "block" }}>{r.meta}</span>
-                    </span>
-                    <span style={{ color: "#3A3122", fontSize: 16, paddingRight: 6 }}>›</span>
-                  </a>
-                ))}
-                <a href={quiz.hubHref} className="tn-morelink" style={{ color: quiz.accent, marginTop: 4 }}>
-                  Selaa koko kokoelma →
-                </a>
-              </div>
-            )}
           </div>
         </div>
 
-        {/* TIETOMEDIA kerros 3: visan tärkeimmät opit + henkilökohtainen
-            kertauskortti (Nämä tiesit / Kertaa vielä nämä) */}
+        {/* TIETOMEDIA kerros 3 ENNEN suositusvisoja (Heikki 1.8.2026):
+            henkilökohtainen kertaus on erottautumistekijä — ei liian alas */}
         {quiz.keyFacts.length > 0 && (
           <section className="tn-know">
             <div className="tn-know-in">
@@ -405,6 +390,35 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
                   )}
                 </div>
               )}
+            </div>
+          </section>
+        )}
+
+        {/* Muut saman teeman visat — oppimisyhteenvedon jälkeen */}
+        {quiz.related.length > 0 && (
+          <section className="tn-res-morewrap">
+            <div className="tn-res-more-in">
+              <div className="tn-res-more-label">Lisää: {quiz.collectionLabel}</div>
+              <div className="tn-res-more-grid">
+                {quiz.related.map((r) => (
+                  <a key={r.id} className="tn-res-mini" href={`/2-0/peli?quiz_id=${r.id}`}>
+                    <span className="tn-res-mini-thumb" style={{ color: r.color }}>
+                      <span className="wash" />
+                      <svg viewBox="0 0 200 260" aria-hidden>
+                        <path d={r.motifPath} fill="none" stroke="currentColor" strokeWidth={9} strokeLinecap="round" strokeLinejoin="round" />
+                      </svg>
+                    </span>
+                    <span style={{ flex: "1 1 auto", minWidth: 0 }}>
+                      <span className="tn-res-mini-title" style={{ display: "block" }}>{r.title}</span>
+                      <span className="tn-res-mini-meta" style={{ display: "block" }}>{r.meta}</span>
+                    </span>
+                    <span style={{ color: "#3A3122", fontSize: 16, paddingRight: 6 }}>›</span>
+                  </a>
+                ))}
+              </div>
+              <a href={quiz.hubHref} className="tn-morelink" style={{ color: quiz.accent, marginTop: 12, display: "inline-block" }}>
+                Selaa koko kokoelma →
+              </a>
             </div>
           </section>
         )}

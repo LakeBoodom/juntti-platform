@@ -817,12 +817,7 @@
   .tn20 .tn-rescard-in { padding: 28px 28px 24px; }
   .tn20 .tn-res-headline { font-family: var(--tn-font-display); font-weight: 900; text-transform: uppercase; letter-spacing: -0.02em; }
 }
-@media (min-width: 1440px) {
-  /* Hyvin leveällä ruudulla ristiinnostot omaan sarakkeeseen — jakosarakkeelle
-     jää silti ≥430px, jotta otsikko ei murru rumasti */
-  .tn20 .tn-res-grid { max-width: 1400px; }
-  .tn20 .tn-res-right { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 48px; align-items: start; }
-}
+/* (1.8.2026: ristiinnostot omaan osioonsa .tn-res-morewrap — res-right aina yksi sarake) */
 
 /* ── Visan aloitusnäkymä: julistemainen intro (Heikki 1.8.2026) ──
    Kokoelmakuva täyttää ruudun, sisältö keskittyy 1280px-linjaan.
@@ -925,3 +920,13 @@
 .tn20 .tn-learn-sources a { color: #8e8676; text-decoration: underline; text-underline-offset: 2px; }
 .tn20 .tn-learn-sources a:hover { color: var(--tn-text); }
 .tn20 .tn-learn-date { white-space: nowrap; }
+
+/* Pelin aikana SEO-artikkeli piilotetaan (asetetaan selaimessa body-luokalla,
+   joten SSR-HTML sisältää artikkelin aina hakukoneille) */
+.tn-game-playing .tn20 .tn-learn { display: none; }
+
+/* Ristiinnostot tulosruudussa oppimisyhteenvedon JÄLKEEN (Heikki 1.8.2026) */
+.tn20 .tn-res-morewrap { border-top: 1px solid #241e13; background: var(--tn-bg); }
+.tn20 .tn-res-more-in { max-width: 1184px; margin: 0 auto; padding: clamp(28px, 4vh, 44px) clamp(18px, 3vw, 32px) clamp(40px, 6vh, 60px); box-sizing: border-box; }
+.tn20 .tn-res-more-grid { display: grid; grid-template-columns: 1fr; gap: 10px; margin-top: 12px; }
+@media (min-width: 760px) { .tn20 .tn-res-more-grid { grid-template-columns: 1fr 1fr 1fr; } }
