@@ -15,6 +15,7 @@ import { useEffect, useRef, useState } from "react";
 import confetti from "canvas-confetti";
 import { getSupabase } from "../../../lib/supabase";
 import { MOTIF_PATHS } from "../../../components/tn20/motif-paths";
+import { LearnArticle, type Learn } from "../../../components/tn20/LearnArticle";
 
 const BASE_POINTS = 100;
 const STREAK_BONUS = 50;
@@ -23,9 +24,10 @@ export type GameQuiz = {
   id: string;
   title: string;
   teaser: string | null;
-  /* TIETOMEDIA (1.8.2026): loppunäkymän oppimisyhteenveto */
+  /* TIETOMEDIA (1.8.2026): loppunäkymän oppimisyhteenveto + aiheopas */
   learnHeading: string | null;
   keyFacts: Array<{ k: string; v: string; qi?: number }>;
+  learn: Learn | null;
   collectionLabel: string;
   genreLabel: string | null;
   hubHref: string;
@@ -219,13 +221,14 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
     } catch { /* no-op */ }
   }
 
-  /* SEO-artikkeli (SSR pelin alla) piilotetaan pelin ajaksi, ettei sieltä voi
-     lukea vastauksia kesken pelin. Piilotus tehdään vasta selaimessa, joten
-     hakukoneet näkevät artikkelin aina alkuperäisessä HTML:ssä. */
+  /* SEO-kopio artikkelista (SSR pelin alla) piilotetaan aina selaimessa:
+     pelin aikana sieltä ei voi lukea vastauksia, ja loppunäkymässä pelaaja
+     näkee saman sisällön oikeassa kohdassa (5.) pelinäkymän sisällä.
+     Hakukoneet näkevät SSR-kopion alkuperäisessä HTML:ssä. */
   useEffect(() => {
-    document.body.classList.toggle("tn-game-playing", phase !== "end");
+    document.body.classList.add("tn-game-playing");
     return () => document.body.classList.remove("tn-game-playing");
-  }, [phase]);
+  }, []);
 
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
@@ -290,77 +293,45 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
           <span className="tn-game2-meta">Pisteet <b>{score}</b>{quiz.isSankari && dailyStreak > 0 ? <> · 🔥 {dailyStreak}</> : null}</span>
         </div>
 
-        <div className="tn-res-grid">
-          {/* Jaettava tuloskortti — tämä kuva on itse sisältö */}
-          <div className="tn-res-left">
-            <div className="tn-rescard">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img className="tn-rescard-bg" src={quiz.bgImg} alt="" />
-              <div className="tn-rescard-in">
-                <div className="tn-rescard-toprow">
-                  <span style={{ color: quiz.accent }}>{collLine}</span>
-                  <span style={{ color: "#5F594C" }}>{today.getDate()}.{today.getMonth() + 1}.{today.getFullYear()}</span>
-                </div>
-                <div className="tn-rescard-score">
-                  {correctCount}
-                  <i>/</i>
-                  <b>{total}</b>
-                </div>
-                <div className="tn-rescard-tier">{tier.heading}</div>
-                <div className="tn-rescard-sub">{quiz.title} · {score} pistettä</div>
+        {/* Loppunäkymän järjestys (Heikki 2.8.2026): 1 tuloskortti ·
+            2 Vastauksesi · 3 Nyt tiedät nämä · 4 Kertaa vielä nämä ·
+            5 aiheopas + UKK · 6 Haasta kaveri + toiminnot · 7 Lisää */}
+        <div className="tn-res-flow">
+          {/* 1. Jaettava tuloskortti */}
+          <div className="tn-rescard">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img className="tn-rescard-bg" src={quiz.bgImg} alt="" />
+            <div className="tn-rescard-in">
+              <div className="tn-rescard-toprow">
+                <span style={{ color: quiz.accent }}>{collLine}</span>
+                <span style={{ color: "#5F594C" }}>{today.getDate()}.{today.getMonth() + 1}.{today.getFullYear()}</span>
               </div>
+              <div className="tn-rescard-score">
+                {correctCount}
+                <i>/</i>
+                <b>{total}</b>
+              </div>
+              <div className="tn-rescard-tier">{tier.heading}</div>
+              <div className="tn-rescard-sub">{quiz.title} · {score} pistettä</div>
             </div>
           </div>
 
-          <div className="tn-res-right">
-            <div className="tn-res-col-a">
-              <div>
-                <div className="tn-display tn-res-headline" style={{ fontSize: "clamp(24px, 2.6vw, 40px)", lineHeight: 0.98 }}>
-                  Haasta kaveri — kumpi tietää enemmän?
-                </div>
-                <div style={{ fontSize: 13.5, fontWeight: 600, color: "#8E8676", marginTop: 8 }}>
-                  Kaveri saa saman visan ja sama pistelasku ratkaisee.
-                </div>
+          {/* 2. Vastauksesi-rivi */}
+          {ansLog.length === total && (
+            <div>
+              <div className="tn-res-more-label" style={{ marginBottom: 8 }}>Vastauksesi</div>
+              <div className="tn-res-recap">
+                {ansLog.map((ok, i) => (
+                  <span key={i} style={{ background: ok ? "rgba(182,255,60,.18)" : "rgba(255,92,61,.16)", color: ok ? "var(--tn-lime)" : "#FF8566" }}>
+                    {i + 1}
+                  </span>
+                ))}
               </div>
-
-              {/* a) WhatsApp pääkanavana + nykyiset jakokanavat */}
-              <a className="tn-share-wa" href={wa} target="_blank" rel="noopener noreferrer" onClick={() => void markShared()}>
-                Haasta kaveri WhatsAppissa
-              </a>
-              <div className="tn-share-grid">
-                <a className="tn-share-chip" href={fb} target="_blank" rel="noopener noreferrer" onClick={() => void markShared()}>📘 Facebook</a>
-                <a className="tn-share-chip" href={tg} target="_blank" rel="noopener noreferrer" onClick={() => void markShared()}>✈️ Telegram</a>
-                <a className="tn-share-chip" href={x} target="_blank" rel="noopener noreferrer" onClick={() => void markShared()}>𝕏 Jaa X:ssä</a>
-                <button className="tn-share-chip" type="button" onClick={() => void copyShareLink()}>
-                  {copied ? "✓ Kopioitu!" : "🔗 Kopioi linkki"}
-                </button>
-              </div>
-
-              {/* b) Pelaa uudelleen / etusivu — ei korostusväriä (Heikki 1.8.2026) */}
-              <div className="tn-res-actions">
-                <button className="tn-primary" type="button" onClick={restart}>↻ Pelaa uudelleen</button>
-                <a className="tn-ghost" href="/2-0">Etusivu</a>
-              </div>
-
-              {/* Vastauksesi-kertaus */}
-              {ansLog.length === total && (
-                <div>
-                  <div className="tn-res-more-label" style={{ marginBottom: 8 }}>Vastauksesi</div>
-                  <div className="tn-res-recap">
-                    {ansLog.map((ok, i) => (
-                      <span key={i} style={{ background: ok ? "rgba(182,255,60,.18)" : "rgba(255,92,61,.16)", color: ok ? "var(--tn-lime)" : "#FF8566" }}>
-                        {i + 1}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              )}
             </div>
-          </div>
+          )}
         </div>
 
-        {/* TIETOMEDIA kerros 3 ENNEN suositusvisoja (Heikki 1.8.2026):
-            henkilökohtainen kertaus on erottautumistekijä — ei liian alas */}
+        {/* 3.–4. Nyt tiedät nämä + Kertaa vielä nämä */}
         {quiz.keyFacts.length > 0 && (
           <section className="tn-know">
             <div className="tn-know-in">
@@ -394,7 +365,41 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
           </section>
         )}
 
-        {/* Muut saman teeman visat — oppimisyhteenvedon jälkeen */}
+        {/* 5. Aiheopas + UKK (sama sisältö kuin SSR-kopio hakukoneille) */}
+        {quiz.learn && (
+          <LearnArticle learn={quiz.learn} fallbackTitle={quiz.title} accent={quiz.accent} />
+        )}
+
+        {/* 6. Haasta kaveri + toiminnot */}
+        <section className="tn-res-share">
+          <div className="tn-res-share-in">
+            <div>
+              <div className="tn-display tn-res-headline" style={{ fontSize: "clamp(24px, 2.6vw, 40px)", lineHeight: 0.98 }}>
+                Haasta kaveri — kumpi tietää enemmän?
+              </div>
+              <div style={{ fontSize: 13.5, fontWeight: 600, color: "#8E8676", marginTop: 8 }}>
+                Kaveri saa saman visan ja sama pistelasku ratkaisee.
+              </div>
+            </div>
+            <a className="tn-share-wa" href={wa} target="_blank" rel="noopener noreferrer" onClick={() => void markShared()}>
+              Haasta kaveri WhatsAppissa
+            </a>
+            <div className="tn-share-grid">
+              <a className="tn-share-chip" href={fb} target="_blank" rel="noopener noreferrer" onClick={() => void markShared()}>📘 Facebook</a>
+              <a className="tn-share-chip" href={tg} target="_blank" rel="noopener noreferrer" onClick={() => void markShared()}>✈️ Telegram</a>
+              <a className="tn-share-chip" href={x} target="_blank" rel="noopener noreferrer" onClick={() => void markShared()}>𝕏 Jaa X:ssä</a>
+              <button className="tn-share-chip" type="button" onClick={() => void copyShareLink()}>
+                {copied ? "✓ Kopioitu!" : "🔗 Kopioi linkki"}
+              </button>
+            </div>
+            <div className="tn-res-actions">
+              <button className="tn-primary" type="button" onClick={restart}>↻ Pelaa uudelleen</button>
+              <a className="tn-ghost" href="/2-0">Etusivu</a>
+            </div>
+          </div>
+        </section>
+
+        {/* 7. Muut saman teeman visat */}
         {quiz.related.length > 0 && (
           <section className="tn-res-morewrap">
             <div className="tn-res-more-in">

@@ -5,6 +5,7 @@
 
 import { getSupabase } from "@/lib/supabase";
 import { motifPathFor } from "@/components/tn20/motif-paths";
+import { LearnArticle, type Learn } from "@/components/tn20/LearnArticle";
 import GameClient, { type GameQuiz } from "./GameClient";
 
 export const dynamic = "force-dynamic";
@@ -55,18 +56,6 @@ const TEAM_COLORS: Array<[RegExp, string]> = [
   [/ralli/i, "#4D9FFF"], [/tennik|federer|us open/i, "#DFFF4F"], [/golf|the open/i, "#4ADE80"],
   [/italia/i, "#4A85E0"],
 ];
-
-/* TIETOMEDIA (1.8.2026): visan oppimissisältö — ks. TIETOMEDIA_SPEC.md */
-export type Learn = {
-  intro?: string;
-  heading?: string;
-  key_facts?: Array<{ k: string; v: string; qi?: number }>;
-  title?: string;
-  sections?: Array<{ h: string; p: string[] }>;
-  faq?: Array<{ q: string; a: string }>;
-  sources?: Array<{ name: string; url: string }>;
-  last_reviewed?: string;
-};
 
 type QuizRow = {
   id: string; slug: string | null; title: string; display_title: string | null;
@@ -133,6 +122,7 @@ export default async function Peli20({
     teaser: learn?.intro ?? quiz.teaser,
     learnHeading: learn?.heading ?? null,
     keyFacts: learn?.key_facts ?? [],
+    learn,
     collectionLabel: COLLECTION_LABEL[collection] ?? "Visa",
     genreLabel,
     hubHref: COLLECTION_HUB[collection] ?? "/2-0",
@@ -171,45 +161,12 @@ export default async function Peli20({
   return (
     <>
       <GameClient quiz={game} />
-      {/* TIETOMEDIA kerros 4: SEO-aiheopas renderöidään PALVELIMELTA pelin
-          alle — Google ei pelaa visaa, joten opas on sivulla alusta asti.
+      {/* TIETOMEDIA kerros 4: SEO-kopio aiheoppaasta renderöidään
+          PALVELIMELTA — Google ei pelaa visaa, joten opas on HTML:ssä
+          alusta asti. Selaimessa tämä kopio piilotetaan (tn-learn-ssr)
+          ja pelaaja näkee saman sisällön loppunäkymän kohdassa 5.
           (Indeksointi aukeaa 2.0-julkaisussa slug-URLeilla; /2-0 on noindex.) */}
-      {learn?.sections && learn.sections.length > 0 && (
-        <section className="tn-learn" style={{ ["--tn-game-accent" as string]: accent }}>
-          <div className="tn-learn-in">
-            <h2 className="tn-learn-title">{learn.title ?? `${quiz.title} pähkinänkuoressa`}</h2>
-            {learn.sections.map((s) => (
-              <div key={s.h} className="tn-learn-sec">
-                <h3>{s.h}</h3>
-                {s.p.map((p, i) => <p key={i}>{p}</p>)}
-              </div>
-            ))}
-            {learn.faq && learn.faq.length > 0 && (
-              <div className="tn-learn-sec">
-                <h3>Usein kysyttyä</h3>
-                {learn.faq.map((f) => (
-                  <div key={f.q} className="tn-learn-faq">
-                    <b>{f.q}</b>
-                    <p>{f.a}</p>
-                  </div>
-                ))}
-              </div>
-            )}
-            {learn.sources && learn.sources.length > 0 && (
-              <div className="tn-learn-sources">
-                <span>Lähteet:</span>{" "}
-                {learn.sources.map((src, i) => (
-                  <span key={src.url}>
-                    {i > 0 && " · "}
-                    <a href={src.url} target="_blank" rel="noopener noreferrer">{src.name}</a>
-                  </span>
-                ))}
-                {learn.last_reviewed && <span className="tn-learn-date"> · Tarkistettu {learn.last_reviewed.split("-").reverse().join(".")}</span>}
-              </div>
-            )}
-          </div>
-        </section>
-      )}
+      {learn && <LearnArticle learn={learn} fallbackTitle={quiz.title} accent={accent} ssr />}
     </>
   );
 }

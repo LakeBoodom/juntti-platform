@@ -923,10 +923,28 @@
 
 /* Pelin aikana SEO-artikkeli piilotetaan (asetetaan selaimessa body-luokalla,
    joten SSR-HTML sisältää artikkelin aina hakukoneille) */
-.tn-game-playing .tn20 .tn-learn { display: none; }
+/* (2.8.2026: piilotus siirtyi .tn-learn-ssr-luokkaan, ks. alla) */
 
 /* Ristiinnostot tulosruudussa oppimisyhteenvedon JÄLKEEN (Heikki 1.8.2026) */
 .tn20 .tn-res-morewrap { border-top: 1px solid #241e13; background: var(--tn-bg); }
 .tn20 .tn-res-more-in { max-width: 1184px; margin: 0 auto; padding: clamp(28px, 4vh, 44px) clamp(18px, 3vw, 32px) clamp(40px, 6vh, 60px); box-sizing: border-box; }
 .tn20 .tn-res-more-grid { display: grid; grid-template-columns: 1fr; gap: 10px; margin-top: 12px; }
 @media (min-width: 760px) { .tn20 .tn-res-more-grid { grid-template-columns: 1fr 1fr 1fr; } }
+
+/* Loppunäkymän uusi järjestys (Heikki 2.8.2026): keskitetty pystyvirta —
+   1 tuloskortti · 2 Vastauksesi · 3–4 opit · 5 opas · 6 jako · 7 lisää */
+.tn20 .tn-res-flow {
+  width: 100%; max-width: 560px; margin: 0 auto; box-sizing: border-box;
+  padding: 20px clamp(18px, 3vw, 32px) 28px;
+  display: flex; flex-direction: column; gap: 16px;
+}
+@media (min-width: 1024px) { .tn20 .tn-res-flow { max-width: 640px; padding-top: 36px; } }
+.tn20 .tn-res-share { border-top: 1px solid #241e13; background: var(--tn-bg); }
+.tn20 .tn-res-share-in {
+  width: 100%; max-width: 640px; margin: 0 auto; box-sizing: border-box;
+  padding: clamp(28px, 4vh, 44px) clamp(18px, 3vw, 32px) clamp(36px, 5vh, 56px);
+  display: flex; flex-direction: column; gap: 14px;
+}
+/* SSR-kopio artikkelista piilotetaan aina selaimessa (pelaaja näkee
+   saman sisällön loppunäkymän kohdassa 5) — hakukoneille HTML:ssä */
+.tn-game-playing .tn20 .tn-learn-ssr { display: none; }
