@@ -73,11 +73,89 @@ export default async function Peli20({
   const quizId = typeof params.quiz_id === "string" ? params.quiz_id : null;
   const slug = typeof params.visa === "string" ? params.visa : null;
   const kuvavisa = typeof params.kuvavisa === "string" ? params.kuvavisa : null;
+  const mega = typeof params.mega === "string" ? params.mega : null;
   const isSankari = params.paivan_sankari === "1";
 
   const sb = getSupabase();
-  if (!sb || (!quizId && !slug && !kuvavisa)) {
+  if (!sb || (!quizId && !slug && !kuvavisa && !mega)) {
     return <main style={{ padding: 32 }}>Visaa ei löytynyt. <a href="/2-0">Takaisin etusivulle</a></main>;
+  }
+
+  /* ── MEGA (3.8.2026, MEGA_SPEC §1): viittauskooste mega_questions-taulusta.
+     Mega-rivi voi olla draft (RLS "Mega preview readable") — tuotantosivun
+     listaukset eivät näytä sitä ennen julkaisua. Ultimate = kulta. ── */
+  if (mega) {
+    const { data: mq } = await sb
+      .from("quizzes")
+      .select("id, slug, title, display_title, teaser, learn")
+      .eq("slug", mega)
+      // game_mode puuttuu generoiduista tyypeistä (lisätty Portti 1:ssä)
+      .eq("game_mode" as unknown as "status", "mega")
+      .maybeSingle<{ id: string; slug: string; title: string; display_title: string | null; teaser: string | null; learn: Learn | null }>();
+    if (!mq) {
+      return <main style={{ padding: 32 }}>Megaa ei löytynyt. <a href="/2-0">Takaisin etusivulle</a></main>;
+    }
+    const { data: links } = await sb
+      .from("mega_questions" as never)
+      .select("sort_order, questions(question_text, explanation, answers)")
+      .eq("mega_quiz_id", mq.id)
+      .order("sort_order", { ascending: true });
+
+    const questions = ((links ?? []) as unknown as Array<{
+      sort_order: number;
+      questions: { question_text: string; explanation: string | null; answers: Array<{ text: string; is_correct: boolean }> } | null;
+    }>)
+      .filter((l) => l.questions)
+      .map((l) => {
+        const answers = l.questions!.answers ?? [];
+        const correct = answers.find((a) => a.is_correct)?.text ?? answers[0]?.text ?? "";
+        return {
+          question: l.questions!.question_text,
+          options: answers.slice(0, 4).map((a) => a.text),
+          correct,
+          fact: l.questions!.explanation,
+        };
+      });
+
+    if (questions.length === 0) {
+      return <main style={{ padding: 32 }}>Megassa ei ole vielä kysymyksiä. <a href="/2-0">Takaisin</a></main>;
+    }
+
+    const { data: rel } = await sb
+      .from("quiz_cards" as never)
+      .select("id, display_title, title, teaser, collection, genre, question_count")
+      .order("published_at", { ascending: false })
+      .limit(3);
+
+    const game: GameQuiz = {
+      id: mq.id,
+      title: mq.display_title ?? mq.title,
+      teaser: mq.teaser,
+      learnHeading: null,
+      keyFacts: [],
+      learn: null,
+      collectionLabel: "Mega",
+      genreLabel: `${questions.length} kysymystä · kaikki kokoelmat`,
+      hubHref: "/2-0",
+      bgImg: "/20/mega100.webp",
+      accent: "#E8A320",
+      isSankari: false,
+      questions,
+      related: (
+        (rel ?? []) as unknown as Array<{
+          id: string; display_title: string | null; title: string; teaser: string | null;
+          collection: string | null; genre: string | null; question_count: number;
+        }>
+      ).map((r) => ({
+        id: r.id,
+        title: r.display_title ?? r.title,
+        teaser: r.teaser,
+        color: COLLECTION_ACCENT[r.collection ?? ""] ?? "#E8A320",
+        motifPath: motifPathFor(r.collection, r.genre, r.title),
+        meta: `${r.question_count} kysymystä`,
+      })),
+    };
+    return <GameClient quiz={game} />;
   }
 
   /* ── Kuvavisat 2.0-kuoressa (Heikki 3.8.2026): vasen lava = kuva ──

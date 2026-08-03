@@ -284,18 +284,21 @@ export default async function Etusivu20() {
             <img src="/20/mega100.webp" alt="" style={{ position: "absolute", right: 0, top: 0, height: "100%", width: "42%", objectFit: "cover", objectPosition: "center", opacity: 0.35, maskImage: "linear-gradient(90deg, transparent, black 40%)", WebkitMaskImage: "linear-gradient(90deg, transparent, black 40%)" }} />
             <div className="tn-mega-grid" style={{ position: "relative" }}>
               <div>
-                <span className="tn-chip" style={{ color: "var(--tn-gold)" }}>Megavisat · tulossa</span>
-                <div className="tn-display" style={{ fontSize: "clamp(28px, 4vw, 44px)", marginTop: 12 }}>Mega</div>
-                <div className="tn-mega-num">100</div>
+                <span className="tn-chip" style={{ color: "var(--tn-gold)" }}>Megavisat</span>
+                <div className="tn-display" style={{ fontSize: "clamp(28px, 4vw, 44px)", marginTop: 12 }}>Suuri Mega</div>
+                <div className="tn-mega-num">50</div>
                 <p style={{ color: "var(--tn-text-soft)", maxWidth: "40ch" }}>
-                  <b style={{ color: "var(--tn-gold)" }}>100 kysymystä.</b> Yksi istunto. Ei taukoja, ei tekosyitä.
-                  Avautuu, kun aggregaattipoolit ovat valmiit.
+                  <b style={{ color: "var(--tn-gold)" }}>50 kysymystä kaikista kokoelmista.</b> Yksi istunto.
+                  Ei taukoja, ei tekosyitä.
                 </p>
+                <a className="tn-game-next" href="/2-0/peli?mega=suuri-mega-50" style={{ display: "inline-block", marginTop: 14, background: "var(--tn-gold)", textDecoration: "none", padding: "14px 28px", fontSize: 15 }}>
+                  Aloita Mega →
+                </a>
               </div>
               <div style={{ display: "grid", gap: 10 }}>
-                <div className="tn-mega-fact"><span>Kysymyksiä</span><b>100</b></div>
-                <div className="tn-mega-fact"><span>Kesto</span><b>~35 min</b></div>
-                <div className="tn-mega-fact"><span>Aihe</span><b>Yleistieto</b></div>
+                <div className="tn-mega-fact"><span>Kysymyksiä</span><b>50</b></div>
+                <div className="tn-mega-fact"><span>Kesto</span><b>~20 min</b></div>
+                <div className="tn-mega-fact"><span>Aihe</span><b>Kaikki kokoelmat</b></div>
               </div>
             </div>
           </div>
