@@ -1,3 +1,5 @@
+import "./learn-article.css";
+
 // TIETOMEDIA — aiheopas ("pähkinänkuoressa" + UKK + lähteet).
 // Jaettu komponentti: page.tsx renderöi SSR-kopion hakukoneille
 // (piilotetaan selaimessa, luokka tn-learn-ssr) ja GameClient näyttää

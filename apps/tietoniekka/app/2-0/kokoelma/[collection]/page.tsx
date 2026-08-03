@@ -5,13 +5,47 @@
 // Kuvavisat: oma kortistoruudukko suoraan kannasta.
 // Tunnetut henkilöt: oma hub (ennallaan, Heikin ohje 2026-07-31).
 
+import type { Metadata } from "next";
 import { getSupabase } from "@/lib/supabase";
 import { PersonCard, type QuizCardData } from "@/components/tn20/cards";
 import { WideCard } from "@/components/tn20/WideCard";
 import { MOTIF_PATHS, motifPathFor } from "@/components/tn20/motif-paths";
+import { LearnArticle } from "@/components/tn20/LearnArticle";
+import { getPageContent } from "@/lib/pageContent";
 import { notFound } from "next/navigation";
 
 export const dynamic = "force-dynamic";
+
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://tietoniekka.fi";
+
+/* Hubin metadata page_content-taulusta. Aiemmin hubit perivät 2.0-layoutin
+   geneerisen "esikatselu"-otsikon — ks. SEO_STRATEGIA.md §3.2. */
+export async function generateMetadata(
+  { params }: { params: Promise<{ collection: string }> }
+): Promise<Metadata> {
+  const { collection } = await params;
+  const pc = await getPageContent(collection);
+  const hub = HUBS[collection];
+  if (!pc && !hub) return {};
+
+  const title = pc?.seo_title ?? `${hub?.name ?? "Kokoelma"} — tietovisat`;
+  const description = pc?.seo_description ?? hub?.lede(0) ?? undefined;
+  const canonical = `${SITE_URL}/2-0/kokoelma/${collection}`;
+
+  return {
+    title,
+    description,
+    alternates: { canonical },
+    openGraph: {
+      type: "website",
+      locale: "fi_FI",
+      siteName: "Tietoniekka",
+      url: canonical,
+      title,
+      description,
+    },
+  };
+}
 
 /* ─────────── Hub-konfiguraatio (CD:n designit) ─────────── */
 
@@ -250,9 +284,15 @@ export default async function KokoelmaHub({
   const sb = getSupabase();
   if (!sb) return <main style={{ padding: 32 }}>Ei tietokantayhteyttä.</main>;
 
+  /* Kokoelman oma aiheopas (page_content) — SEO_STRATEGIA.md §5.2 */
+  const pc = await getPageContent(collection);
+  const article = pc?.learn ? (
+    <LearnArticle learn={pc.learn} fallbackTitle={hub.name} accent={hub.accent} />
+  ) : null;
+
   /* ── Tunnetut henkilöt (ennallaan) ── */
   if (hub.source.kind === "person") {
-    return <PersonHub hub={hub} filter={filter} />;
+    return <PersonHub hub={hub} filter={filter} article={article} />;
   }
 
   /* ── Kuvavisat: kortistoruudukko kannasta ── */
@@ -270,7 +310,7 @@ export default async function KokoelmaHub({
     const deckWord = words[decks.length] ?? `${decks.length}`;
 
     return (
-      <HubShell hub={hub} count={total} filter={filter} filters={[]}>
+      <HubShell hub={hub} count={total} filter={filter} filters={[]} article={article}>
         <section className="tn-section" style={{ paddingTop: 8 }}>
           <div className="tn-hubrow-head">
             <div>
@@ -351,7 +391,7 @@ export default async function KokoelmaHub({
   }
 
   return (
-    <HubShell hub={hub} count={cards.length} filter={filter} filters={filters} basePath={`/2-0/kokoelma/${collection}`}>
+    <HubShell hub={hub} count={cards.length} filter={filter} filters={filters} basePath={`/2-0/kokoelma/${collection}`} article={article}>
       {rowsOut.map((row) => (
         <section key={row.title} className="tn-section" style={{ paddingTop: 8, paddingBottom: 0 }}>
           <div className="tn-hubrow-head">
@@ -405,11 +445,14 @@ export default async function KokoelmaHub({
 /* ─────────── Kuori: hero + suodattimet ─────────── */
 
 function HubShell({
-  hub, count, filter, filters, basePath, children,
+  hub, count, filter, filters, basePath, children, article,
 }: {
   hub: HubMeta; count: number; filter: string;
   filters: Array<{ key: string; label: string }>; basePath?: string;
   children: React.ReactNode;
+  /* Kokoelman oma aiheopas (page_content). Renderöidään palvelimelta
+     visalistan alle — SEO_STRATEGIA.md §5.2. */
+  article?: React.ReactNode;
 }) {
   return (
     <main style={{ minHeight: "100dvh", paddingBottom: 60 }}>
@@ -483,6 +526,7 @@ function HubShell({
         </section>
         {children}
       </div>
+      {article}
     </main>
   );
 }
@@ -523,7 +567,7 @@ function playHref(c: Celeb): string {
   return c.slug ? `/sankari/${c.slug}` : "#";
 }
 
-async function PersonHub({ hub, filter }: { hub: HubMeta; filter: string }) {
+async function PersonHub({ hub, filter, article }: { hub: HubMeta; filter: string; article?: React.ReactNode }) {
   const sb = getSupabase();
   if (!sb) return <main style={{ padding: 32 }}>Ei tietokantayhteyttä.</main>;
   const { data } = await sb
@@ -626,6 +670,7 @@ async function PersonHub({ hub, filter }: { hub: HubMeta; filter: string }) {
           )}
         </section>
       </div>
+      {article}
     </main>
   );
 }

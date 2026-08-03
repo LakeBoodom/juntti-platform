@@ -1,0 +1,75 @@
+/* Aiheoppaan perustyylit ilman .tn20-skooppia, jotta LearnArticle toimii myös
+   nykyisillä sivuilla (/kumpi, /jarjesta). 2.0-puolella tn20.css:n säännöt
+   (.tn20 .tn-learn…) ovat spesifisempiä ja voittavat nämä — ulkoasu siellä
+   ei siis muutu. Ks. SEO_STRATEGIA.md §5.2–§5.3. */
+
+.tn-learn {
+  border-top: 1px solid #241e13;
+  background: var(--color-surface-dark, #0f1520);
+  color: #cfc7b6;
+}
+.tn-learn-in {
+  max-width: 820px;
+  margin: 0 auto;
+  padding: clamp(36px, 6vh, 64px) clamp(18px, 3vw, 32px) clamp(48px, 7vh, 80px);
+  box-sizing: border-box;
+}
+.tn-learn-title {
+  font-family: var(--font-display, system-ui);
+  font-weight: 900;
+  text-transform: uppercase;
+  font-size: clamp(26px, 3.4vw, 42px);
+  line-height: 0.98;
+  letter-spacing: -0.02em;
+  color: #fff;
+  margin: 0 0 10px;
+}
+.tn-learn-sec h3 {
+  font-family: var(--font-display, system-ui);
+  font-weight: 900;
+  text-transform: uppercase;
+  font-size: 18px;
+  letter-spacing: 0.01em;
+  color: var(--tn-game-accent, var(--color-brand-gold, #E8A320));
+  margin: 28px 0 10px;
+}
+.tn-learn-sec p {
+  margin: 0 0 12px;
+  font-size: 15px;
+  line-height: 1.65;
+  color: #cfc7b6;
+}
+.tn-learn-faq { margin-bottom: 14px; }
+.tn-learn-faq h4 {
+  font-family: inherit;
+  font-size: 14.5px;
+  font-weight: 800;
+  color: #fff;
+  margin: 0 0 4px;
+  text-transform: none;
+  letter-spacing: normal;
+}
+.tn-learn-faq p { margin: 0; font-size: 14px; line-height: 1.55; color: #b9af9b; }
+
+.tn-learn-facts { margin: 0; display: grid; gap: 12px; }
+@media (min-width: 760px) { .tn-learn-facts { grid-template-columns: 1fr 1fr; } }
+.tn-learn-fact {
+  border: 1px solid #241e13;
+  border-radius: 14px;
+  background: rgba(0, 0, 0, 0.22);
+  padding: 14px 16px 13px;
+}
+.tn-learn-fact dt { font-size: 13.5px; font-weight: 800; color: #fff; margin-bottom: 5px; }
+.tn-learn-fact dd { margin: 0; font-size: 13.5px; line-height: 1.55; color: #b9af9b; }
+
+.tn-learn-sources {
+  margin-top: 30px;
+  padding-top: 16px;
+  border-top: 1px solid #241e13;
+  font-size: 12px;
+  line-height: 1.7;
+  color: #5f594c;
+}
+.tn-learn-sources a { color: #8e8676; text-decoration: underline; text-underline-offset: 2px; }
+.tn-learn-sources a:hover { color: #fff; }
+.tn-learn-date { white-space: nowrap; }
