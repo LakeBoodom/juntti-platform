@@ -13,7 +13,7 @@ const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://tietoniekka.fi";
    Jos riviä ei ole, käytetään aiempia kiinteitä tekstejä. */
 export async function generateMetadata(): Promise<Metadata> {
   const pc = await getPageContent("kumpi");
-  const title = pc?.seo_title ? `${pc.seo_title} | Tietoniekka` : "Kumpi? — kaksi vaihtoehtoa, vain toinen on oikein | Tietoniekka";
+  const title = pc?.seo_title ?? "Kumpi? — kaksi vaihtoehtoa, vain toinen on oikein";
   const description = pc?.seo_description ?? "Kumpi on vanhempi? Kumpi heistä on näyttelijä? Kaksi vaihtoehtoa, kaksi sekuntia. Kuinka pitkälle pääset?";
   return {
     title,
