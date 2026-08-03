@@ -4,7 +4,8 @@
 // Oljenkorsi, quiz_plays) — vain kuori on uusi.
 
 import { getSupabase } from "@/lib/supabase";
-import { motifPathFor } from "@/components/tn20/motif-paths";
+import { getKuvavisat } from "@/lib/queries";
+import { MOTIF_PATHS, motifPathFor } from "@/components/tn20/motif-paths";
 import { LearnArticle, type Learn } from "@/components/tn20/LearnArticle";
 import GameClient, { type GameQuiz } from "./GameClient";
 
@@ -71,11 +72,82 @@ export default async function Peli20({
   const params = await searchParams;
   const quizId = typeof params.quiz_id === "string" ? params.quiz_id : null;
   const slug = typeof params.visa === "string" ? params.visa : null;
+  const kuvavisa = typeof params.kuvavisa === "string" ? params.kuvavisa : null;
   const isSankari = params.paivan_sankari === "1";
 
   const sb = getSupabase();
-  if (!sb || (!quizId && !slug)) {
+  if (!sb || (!quizId && !slug && !kuvavisa)) {
     return <main style={{ padding: 32 }}>Visaa ei löytynyt. <a href="/2-0">Takaisin etusivulle</a></main>;
+  }
+
+  /* ── Kuvavisat 2.0-kuoressa (Heikki 3.8.2026): vasen lava = kuva ──
+     Data kuvavisas-taulusta adminin järjestyksessä; mekaniikka sama.
+     Pelikertoja ei tallenneta (kuten tuotannossa — ei quizzes-riviä). */
+  if (kuvavisa) {
+    const DECKS: Record<string, { title: string; teaser: string; motif: string; color: string }> = {
+      liput: { title: "Lippuvisa", teaser: "Yksi lippu, neljä maata — kuinka tarkka silmäsi on?", motif: "lippu", color: "#4C9AFF" },
+      vaakuna: { title: "Vaakunavisa", teaser: "Tunnista suomalainen kunnanvaakuna kilvestä.", motif: "vaakuna", color: "#8FC0FF" },
+      vaakunat: { title: "Vaakunavisa", teaser: "Tunnista suomalainen kunnanvaakuna kilvestä.", motif: "vaakuna", color: "#8FC0FF" },
+      linnut: { title: "Lintuvisa", teaser: "Siivet, nokat ja höyhenpuvut — tunnista laji kuvasta.", motif: "lintu", color: "#7CEBC8" },
+      elaimet: { title: "Eläinvisa", teaser: "Tunnista eläinlaji lähikuvasta.", motif: "elain", color: "#2FD9A5" },
+      kasvit: { title: "Kasvivisa", teaser: "Lehti, kukka vai kaarna — tunnista kasvi.", motif: "kasvi", color: "#4ADE80" },
+      henkilot: { title: "Henkilövisa", teaser: "Tunnista henkilö kuvasta.", motif: "kasvot", color: "#F0A24B" },
+      rakennukset: { title: "Rakennusvisa", teaser: "Tunnista rakennus kuvasta.", motif: "torni", color: "#F2C230" },
+      kaupungit: { title: "Kaupunkivisa", teaser: "Tunnista kaupunki yhdestä näkymästä.", motif: "kaupunki", color: "#F5C462" },
+      maalaukset: { title: "Maalausvisa", teaser: "Tunnista taideteos tai tekijä.", motif: "naamio", color: "#E85D9E" },
+    };
+    const deck = DECKS[kuvavisa] ?? { title: "Kuvavisa", teaser: "Tunnista kuvasta.", motif: "kysymys", color: "#4C9AFF" };
+
+    const rows = await getKuvavisat(kuvavisa, 10);
+    if (rows.length === 0) {
+      return <main style={{ padding: 32 }}>Kortistossa ei ole vielä kuvia. <a href="/2-0/kokoelma/kuvavisat">Takaisin kuvavisoihin</a></main>;
+    }
+
+    /* Ristiinnostot: muut aktiiviset kortistot */
+    const { data: deckRows } = await sb.from("kuvavisas").select("type, active");
+    const counts = new Map<string, number>();
+    for (const r of (deckRows ?? []) as Array<{ type: string; active: boolean }>) {
+      if (r.active) counts.set(r.type, (counts.get(r.type) ?? 0) + 1);
+    }
+    const related = [...counts.entries()]
+      .filter(([type, n]) => n >= 5 && type !== kuvavisa && DECKS[type])
+      .slice(0, 3)
+      .map(([type, n]) => ({
+        id: `kv-${type}`,
+        title: DECKS[type].title,
+        teaser: null,
+        color: DECKS[type].color,
+        motifPath: MOTIF_PATHS[DECKS[type].motif] ?? motifPathFor(null, null, DECKS[type].title),
+        meta: `${Math.min(n, 10)} kuvaa`,
+        href: `/2-0/peli?kuvavisa=${type}`,
+      }));
+
+    const game: GameQuiz = {
+      id: "", // ei quizzes-riviä → pelikertaa ei tallenneta
+      title: deck.title,
+      teaser: deck.teaser,
+      learnHeading: null,
+      keyFacts: [],
+      learn: null,
+      collectionLabel: "Kuvavisat",
+      genreLabel: null,
+      hubHref: "/2-0/kokoelma/kuvavisat",
+      bgImg: "/20/teema-liput.webp",
+      accent: deck.color,
+      isSankari: false,
+      questions: rows.map((r) => {
+        const opts = (r.options ?? []).slice(0, 4);
+        return {
+          question: r.question,
+          options: opts,
+          correct: r.correct_option,
+          fact: r.fact ?? null,
+          image: r.image_url,
+        };
+      }),
+      related,
+    };
+    return <GameClient quiz={game} />;
   }
 
   let q = sb

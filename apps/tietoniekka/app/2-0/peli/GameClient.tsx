@@ -34,8 +34,9 @@ export type GameQuiz = {
   bgImg: string;
   accent: string;
   isSankari: boolean;
-  questions: Array<{ question: string; options: string[]; correct: string; fact: string | null }>;
-  related: Array<{ id: string; title: string; teaser: string | null; color: string; motifPath: string; meta: string }>;
+  /* image = kuvavisan tunnistettava kuva (Heikki 3.8.2026) */
+  questions: Array<{ question: string; options: string[]; correct: string; fact: string | null; image?: string }>;
+  related: Array<{ id: string; title: string; teaser: string | null; color: string; motifPath: string; meta: string; href?: string }>;
 };
 
 function localDate(d: Date): string {
@@ -150,6 +151,7 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
 
   async function recordPlay(finalScore: number) {
     if (recorded.current) return;
+    if (!quiz.id) return; // kuvavisat: ei quizzes-riviä → ei tallennusta (kuten tuotannossa)
     recorded.current = true;
     try {
       const sb = getSupabase();
@@ -412,7 +414,7 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
               <div className="tn-res-more-label">Lisää: {quiz.collectionLabel}</div>
               <div className="tn-res-more-grid">
                 {quiz.related.map((r) => (
-                  <a key={r.id} className="tn-res-mini" href={`/2-0/peli?quiz_id=${r.id}`}>
+                  <a key={r.id} className="tn-res-mini" href={r.href ?? `/2-0/peli?quiz_id=${r.id}`}>
                     <span className="tn-res-mini-thumb" style={{ color: r.color }}>
                       <span className="wash" />
                       <svg viewBox="0 0 200 260" aria-hidden>
@@ -459,9 +461,16 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
               {streak >= 2 ? <> · 🔥 {streak}</> : null}
             </span>
           </div>
-          <div className="tn-game-qwrap">
+          <div className="tn-game-qwrap" data-img={q.image ? "true" : undefined}>
+            {/* Kuvavisa: tunnistettava kuva on pääosassa, kysymysteksti pieneksi */}
+            {q.image && (
+              <div className="tn-game-imgstage">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={q.image} alt="" />
+              </div>
+            )}
             <div className="tn-game-qnum">Kysymys {idx + 1} / {total}</div>
-            <h1 className="tn-game-qtext" data-len={qLen}>{q.question}</h1>
+            <h1 className="tn-game-qtext" data-len={q.image ? "img" : qLen}>{q.question}</h1>
           </div>
           <div className="tn-game-leftfoot">
             <Signature />

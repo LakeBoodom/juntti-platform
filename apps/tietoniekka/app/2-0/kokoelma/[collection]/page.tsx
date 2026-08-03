@@ -320,7 +320,7 @@ export default async function KokoelmaHub({
           </div>
           <div className="tn-card-grid">
             {decks.map((d) => (
-              <a key={d.type} className="tn-deck" href={`/peli?kuvavisa=${d.type}`} style={{ color: d.meta.color }}>
+              <a key={d.type} className="tn-deck" href={`/2-0/peli?kuvavisa=${d.type}`} style={{ color: d.meta.color }}>
                 <div className="tn-deck-inner">
                   <div className="tn-deck-wash" />
                   <div className="tn-deck-glow" />
@@ -343,7 +343,7 @@ export default async function KokoelmaHub({
               <h2 className="tn-display" style={{ fontSize: "clamp(24px, 3.4cqw, 44px)", margin: "0 0 10px" }}>{hub.ctaTitle(total)}</h2>
               <p style={{ margin: 0, color: "#B9AF9B", maxWidth: "38ch" }}>{hub.ctaDesc}</p>
             </div>
-            <a className="tn-cta" href={`/peli?kuvavisa=${decks[0]?.type ?? "liput"}`} style={{ color: "var(--tn-bg)" }}>
+            <a className="tn-cta" href={`/2-0/peli?kuvavisa=${decks[0]?.type ?? "liput"}`} style={{ color: "var(--tn-bg)" }}>
               Pelaa heti →
             </a>
           </div>
