@@ -106,6 +106,15 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
   const [copied, setCopied] = useState(false);
   const recorded = useRef(false);
   const playIdRef = useRef<string | null>(null);
+  const factRef = useRef<HTMLDivElement | null>(null);
+
+  /* Mobiili: vastauksen jälkeen selitys rullataan näkyviin — muuten se voi
+     jäädä sticky-alapalkin taakse pitkillä sisällöillä (Heikki 3.8.2026) */
+  useEffect(() => {
+    if (picked !== null && factRef.current) {
+      try { factRef.current.scrollIntoView({ behavior: "smooth", block: "nearest" }); } catch { /* no-op */ }
+    }
+  }, [picked]);
 
   const q = quiz.questions[idx];
   const answered = picked !== null;
@@ -516,7 +525,7 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
           {/* TIETOMEDIA kerros 2: väärän vastauksen jälkeen kerrotaan aina
               suoraan mikä oli oikein; selitys opettaa muistettavan faktan */}
           {answered && (q.fact || picked !== q.correct) && (
-            <div className="tn-game2-fact">
+            <div className="tn-game2-fact" ref={factRef}>
               {picked !== q.correct
                 ? <b className="tn-fact-answer">Oikea vastaus: {q.correct}</b>
                 : <b>Tiesitkö?</b>}
@@ -528,7 +537,9 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
             <button className="tn-game-lifeline" onClick={oljenkorsi} disabled={oljenkorsiUsed || answered}>
               🌾 {oljenkorsiUsed ? "Käytetty" : "Oljenkorsi"}
             </button>
-            <Signature className="tn-game-sig-center" />
+            {/* Keskilogo väistyy kun Seuraava ilmestyy — ei päällekkäisyyttä
+                kapealla näytöllä (Heikki 3.8.2026) */}
+            {!answered && <Signature className="tn-game-sig-center" />}
             {answered && (
               <button className="tn-game-next" onClick={next}>
                 {idx >= total - 1 ? "Näytä tulos →" : "Seuraava →"}

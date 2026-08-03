@@ -697,7 +697,7 @@
 .tn20 .tn-game-scorebig small { font-family: var(--tn-font-body); font-size: 12px; font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase; color: #5f594c; margin-left: 8px; }
 .tn20 .tn-game-right { display: flex; flex-direction: column; min-width: 0; }
 .tn20 .tn-game-right .tn-game-bands { margin-top: auto; }
-.tn20 .tn-game2-fact { border-top: 1px solid #241e13; background: var(--tn-bg); padding: 13px clamp(18px, 3vw, 32px); }
+.tn20 .tn-game2-fact { border-top: 1px solid #241e13; background: var(--tn-bg); padding: 13px clamp(18px, 3vw, 32px); scroll-margin-bottom: 84px; }
 .tn20 .tn-game2-fact b { display: block; font-size: 10px; font-weight: 800; letter-spacing: 0.16em; text-transform: uppercase; color: var(--tn-lime); margin-bottom: 5px; }
 .tn20 .tn-game2-fact p { margin: 0; font-size: 13px; line-height: 1.45; color: #8e8676; max-width: 70ch; }
 
@@ -992,7 +992,7 @@
 }
 .tn20 .tn-game-imgstage img {
   width: 100%; height: auto;
-  max-height: clamp(200px, 36vh, 340px);
+  max-height: clamp(170px, 30vh, 340px);
   object-fit: contain; display: block;
 }
 .tn20 .tn-game-qwrap[data-img] { justify-content: flex-start; padding-top: 14px; }
