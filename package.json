@@ -14,7 +14,8 @@
     "dev:admin": "npm run dev --workspace=admin",
     "build": "npm run build --workspaces --if-present",
     "lint": "npm run lint --workspaces --if-present",
-    "typecheck": "npm run typecheck --workspaces --if-present"
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "ingest:wikidata": "tsx scripts/wikidata-ingest.ts"
   },
   "engines": {
     "node": ">=20.0.0"
