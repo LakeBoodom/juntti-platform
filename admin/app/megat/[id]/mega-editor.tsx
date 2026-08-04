@@ -23,12 +23,14 @@ export type MegaRow = {
   image: string | null;        // kuvakortin kuva
   sourceKey: string;           // lähdevisan id tai "kv:<type>"
   sourceTitle: string;
-  bucket: string;              // kokoelma tai "kv:<type>"
+  bucket: string;              // kategoria tai "kv:<type>"
 };
 
 const BUCKET_LABEL: Record<string, string> = {
-  tv: "TV", urheilu: "Urheilu", elokuvat: "Elokuvat", musiikki: "Musiikki",
-  matkakohteet: "Matkakohteet", yleistieto: "Yleistieto", "tunnetut-henkilot": "Henkilöt",
+  "henkilö": "Henkilöt", musiikki: "Musiikki", "tv-sarjat": "TV-sarjat", elokuvat: "Elokuvat",
+  urheilu: "Urheilu", maantieto: "Maantieto", luonto: "Luonto", kulttuuri: "Kulttuuri",
+  historia: "Historia", politiikka: "Politiikka", "ruoka-juoma": "Ruoka & juoma",
+  "muoti-design": "Muoti & design",
   "kv:liput": "🖼 Liput", "kv:vaakunat": "🖼 Vaakunat", "kv:linnut": "🖼 Linnut",
   "kv:elaimet": "🖼 Eläimet", "kv:kasvit": "🖼 Kasvit", "kv:henkilot": "🖼 Henkilöt",
   "kv:rakennukset": "🖼 Rakennukset", "kv:kaupungit": "🖼 Kaupungit", "kv:maalaukset": "🖼 Maalaukset",
@@ -232,7 +234,7 @@ function SourceBrowser({ megaId, state, perSource, existing, onClose, onDone }: 
   onDone: () => void;
 }) {
   const [term, setTerm] = useState("");
-  const [quizzes, setQuizzes] = useState<Array<{ id: string; title: string; collection: string | null }>>([]);
+  const [quizzes, setQuizzes] = useState<Array<{ id: string; title: string; category: string | null }>>([]);
   const [decks, setDecks] = useState<Array<{ type: string; n: number }>>([]);
   const [openSource, setOpenSource] = useState<{ key: string; title: string } | null>(null);
   const [items, setItems] = useState<Array<{ key: string; question_text: string; correct: string; image_url: string | null }>>([]);
@@ -304,7 +306,7 @@ function SourceBrowser({ megaId, state, perSource, existing, onClose, onDone }: 
               >
                 <span className="truncate">{z.title}</span>
                 <span className="ml-3 shrink-0 text-xs text-muted-foreground">
-                  {BUCKET_LABEL[z.collection ?? ""] ?? z.collection}
+                  {BUCKET_LABEL[z.category ?? ""] ?? z.category}
                   {(perSource.get(z.id) ?? 0) > 0 && ` · Megassa jo ${perSource.get(z.id)}`}
                 </span>
               </button>

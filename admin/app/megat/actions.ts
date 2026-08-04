@@ -44,21 +44,22 @@ async function getLinks(megaId: string): Promise<Link[]> {
 /* Pooli: kind-bucket = kokoelma tai kv:<kortisto>; source = lähdevisa tai kortisto */
 type PoolItem = { key: string; source: string; bucket: string };
 
-async function loadPool(collections: string[], decks: string[]): Promise<PoolItem[]> {
+async function loadPool(categories: string[] | "all", decks: string[] | "all"): Promise<PoolItem[]> {
   const sb = getSupabaseAdmin();
   const site = await getCurrentSite();
   const pool: PoolItem[] = [];
 
-  if (collections.length > 0) {
-    const { data: quizzes } = await sb
+  if (categories === "all" || categories.length > 0) {
+    let qq = sb
       .from("quizzes")
-      .select("id, collection" as never)
+      .select("id, category" as never)
       .eq("status", "published")
       .eq("site_id", site.id)
-      .neq("game_mode" as never, "mega" as never)
-      .in("collection" as never, collections as never[]);
-    const rows = (quizzes ?? []) as unknown as Array<{ id: string; collection: string | null }>;
-    const collOf = new Map(rows.map((r) => [r.id, r.collection ?? ""]));
+      .neq("game_mode" as never, "mega" as never);
+    if (categories !== "all") qq = qq.in("category" as never, categories as never[]);
+    const { data: quizzes } = await qq;
+    const rows = (quizzes ?? []) as unknown as Array<{ id: string; category: string | null }>;
+    const collOf = new Map(rows.map((r) => [r.id, r.category ?? ""]));
     const ids = rows.map((r) => r.id);
     for (let i = 0; i < ids.length; i += 100) {
       const { data: qs } = await sb
@@ -71,13 +72,14 @@ async function loadPool(collections: string[], decks: string[]): Promise<PoolIte
     }
   }
 
-  if (decks.length > 0) {
-    const { data: kvs } = await sb
+  if (decks === "all" || decks.length > 0) {
+    let kq = sb
       .from("kuvavisas")
       .select("id, type" as never)
       .eq("site_id" as never, site.id as never)
-      .eq("active" as never, true as never)
-      .in("type" as never, decks as never[]);
+      .eq("active" as never, true as never);
+    if (decks !== "all") kq = kq.in("type" as never, decks as never[]);
+    const { data: kvs } = await kq;
     for (const k of ((kvs ?? []) as unknown as Array<{ id: string; type: string }>)) {
       pool.push({ key: `kv:${k.id}`, source: `kv:${k.type}`, bucket: `kv:${k.type}` });
     }
@@ -119,17 +121,17 @@ function keyToInsert(megaId: string, key: string, sortOrder: number) {
 }
 
 /** Koosta uusi Mega valituista teemoista (visakokoelmat + kuvakortistot). */
-export async function composeMega(input: { title: string; size: number; collections: string[]; decks: string[] }) {
+export async function composeMega(input: { title: string; size: number; categories: string[]; decks: string[] }) {
   const title = input.title.trim();
   if (!title) return { ok: false as const, error: "Nimi puuttuu" };
   if (!ALLOWED_SIZES.includes(input.size)) return { ok: false as const, error: "Koko: 20, 50 tai 100" };
-  if (input.collections.length + input.decks.length === 0) {
+  if (input.categories.length + input.decks.length === 0) {
     return { ok: false as const, error: "Valitse vähintään yksi teema" };
   }
   const sb = getSupabaseAdmin();
   const site = await getCurrentSite();
 
-  const pool = await loadPool(input.collections, input.decks);
+  const pool = await loadPool(input.categories, input.decks);
   const picked = pickWithGuardrails(pool, input.size);
   if (picked.length < input.size) {
     return { ok: false as const, error: `Valituissa teemoissa vain ${picked.length} kelvollista kysymystä (tavoite ${input.size})` };
@@ -145,7 +147,7 @@ export async function composeMega(input: { title: string; size: number; collecti
       display_title: title,
       teaser: null,
       category: "mega",
-      collection: input.collections[0] ?? "yleistieto",
+      collection: "yleistieto",
       game_mode: "mega",
       status: "draft",
       site_id: site.id,
@@ -191,10 +193,7 @@ export async function swapMegaRow(megaId: string, rowKey: string) {
   if (!target) return { ok: false as const, error: "Rivi ei ole Megassa" };
 
   // Koko pooli (kaikki kokoelmat + kaikki kortistot), jotta bucket löytyy
-  const pool = await loadPool(
-    ["tv", "urheilu", "elokuvat", "musiikki", "matkakohteet", "yleistieto", "tunnetut-henkilot"],
-    ["liput", "vaakunat", "linnut", "elaimet", "kasvit", "henkilot", "rakennukset", "kaupungit", "maalaukset"],
-  );
+  const pool = await loadPool("all", "all");
   const self = pool.find((p) => p.key === rowKey);
   if (!self) return { ok: false as const, error: "Rivin lähdettä ei löytynyt poolista" };
   const inMega = new Set(links.map((l) => l.key));
@@ -306,7 +305,7 @@ export async function searchSourceQuizzes(term: string) {
   const sb = getSupabaseAdmin();
   const site = await getCurrentSite();
   let q = sb.from("quizzes")
-    .select("id, title, collection" as never)
+    .select("id, title, category" as never)
     .eq("status", "published")
     .eq("site_id", site.id)
     .neq("game_mode" as never, "mega" as never)
@@ -314,7 +313,29 @@ export async function searchSourceQuizzes(term: string) {
     .limit(25);
   if (term.trim()) q = q.ilike("title", `%${term.trim()}%`);
   const { data } = await q;
-  return (data ?? []) as unknown as Array<{ id: string; title: string; collection: string | null }>;
+  return (data ?? []) as unknown as Array<{ id: string; title: string; category: string | null }>;
+}
+
+/** Teemavaihtoehdot koostajalle: kategoriat + kuvakortistot määrineen. */
+export async function listThemeOptions() {
+  const sb = getSupabaseAdmin();
+  const site = await getCurrentSite();
+  const { data: quizzes } = await sb
+    .from("quizzes")
+    .select("category" as never)
+    .eq("status", "published")
+    .eq("site_id", site.id)
+    .neq("game_mode" as never, "mega" as never);
+  const catCounts = new Map<string, number>();
+  for (const r of ((quizzes ?? []) as unknown as Array<{ category: string | null }>)) {
+    const c = r.category ?? "";
+    if (c) catCounts.set(c, (catCounts.get(c) ?? 0) + 1);
+  }
+  const decks = await listDecks();
+  return {
+    categories: [...catCounts.entries()].sort((a, b) => b[1] - a[1]).map(([value, n]) => ({ value, n })),
+    decks,
+  };
 }
 
 /** Aktiiviset kuvakortistot määrineen selaimen listaan. */

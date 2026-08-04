@@ -50,10 +50,10 @@ export default async function MegaDetailPage({ params }: { params: Promise<{ id:
   }
   const sourceIds = [...new Set([...qMap.values()].map((q) => q.quiz_id))];
   const { data: sources } = sourceIds.length > 0
-    ? await admin.from("quizzes").select("id, title, collection" as never).in("id", sourceIds)
+    ? await admin.from("quizzes").select("id, title, category" as never).in("id", sourceIds)
     : { data: [] };
   const sMap = new Map(
-    ((sources ?? []) as unknown as Array<{ id: string; title: string; collection: string | null }>).map((s) => [s.id, s]),
+    ((sources ?? []) as unknown as Array<{ id: string; title: string; category: string | null }>).map((s) => [s.id, s]),
   );
 
   /* Kuvakortit */
@@ -84,7 +84,7 @@ export default async function MegaDetailPage({ params }: { params: Promise<{ id:
         image: null,
         sourceKey: q.quiz_id,
         sourceTitle: src?.title ?? "?",
-        bucket: src?.collection ?? "",
+        bucket: src?.category ?? "",
       });
     } else if (l.kuvavisa_id) {
       const k = kvMap.get(l.kuvavisa_id);
