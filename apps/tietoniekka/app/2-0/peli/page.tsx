@@ -96,31 +96,45 @@ export default async function Peli20({
       return <main style={{ padding: 32 }}>Megaa ei löytynyt. <a href="/2-0">Takaisin etusivulle</a></main>;
     }
     /* Konteksti mukaan (Heikki 4.8.2026): irrotettu kysymys tarvitsee
-       lähdevisan nimen ("Mistä Tommi haaveilee?" → chip "Luottomies: All in") */
-    const { data: links } = await sb
+       lähdevisan nimen ("Mistä Tommi haaveilee?" → chip "Luottomies: All in").
+       Kolme litteää kyselyä — syvä sisäkkäisjoin ei toimi PostgRESTissä. */
+    const { data: linkRows } = await sb
       .from("mega_questions" as never)
-      .select("sort_order, questions(question_text, explanation, answers, quizzes(title, display_title))")
+      .select("question_id, sort_order")
       .eq("mega_quiz_id", mq.id)
       .order("sort_order", { ascending: true });
+    const links = (linkRows ?? []) as unknown as Array<{ question_id: string; sort_order: number }>;
 
-    const questions = ((links ?? []) as unknown as Array<{
-      sort_order: number;
-      questions: {
-        question_text: string; explanation: string | null;
-        answers: Array<{ text: string; is_correct: boolean }>;
-        quizzes: { title: string; display_title: string | null } | null;
-      } | null;
-    }>)
-      .filter((l) => l.questions)
-      .map((l) => {
-        const answers = l.questions!.answers ?? [];
+    type MegaQ = { id: string; question_text: string; explanation: string | null; answers: Array<{ text: string; is_correct: boolean }>; quiz_id: string };
+    const qMap = new Map<string, MegaQ>();
+    for (let i = 0; i < links.length; i += 100) {
+      const { data: qs } = await sb
+        .from("questions")
+        .select("id, question_text, explanation, answers, quiz_id")
+        .in("id", links.slice(i, i + 100).map((l) => l.question_id));
+      for (const q of (qs ?? []) as unknown as MegaQ[]) qMap.set(q.id, q);
+    }
+    const sourceIds = [...new Set([...qMap.values()].map((q) => q.quiz_id))];
+    const { data: sources } = sourceIds.length > 0
+      ? await sb.from("quizzes").select("id, title, display_title").in("id", sourceIds)
+      : { data: [] };
+    const srcName = new Map(
+      ((sources ?? []) as unknown as Array<{ id: string; title: string; display_title: string | null }>)
+        .map((s) => [s.id, s.display_title ?? s.title]),
+    );
+
+    const questions = links
+      .map((l) => qMap.get(l.question_id))
+      .filter((q): q is MegaQ => Boolean(q))
+      .map((q) => {
+        const answers = q.answers ?? [];
         const correct = answers.find((a) => a.is_correct)?.text ?? answers[0]?.text ?? "";
         return {
-          question: l.questions!.question_text,
+          question: q.question_text,
           options: answers.slice(0, 4).map((a) => a.text),
           correct,
-          fact: l.questions!.explanation,
-          context: l.questions!.quizzes?.display_title ?? l.questions!.quizzes?.title ?? undefined,
+          fact: q.explanation,
+          context: srcName.get(q.quiz_id),
         };
       });
 
