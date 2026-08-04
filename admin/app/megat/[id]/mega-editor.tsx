@@ -1,14 +1,17 @@
 "use client";
 
-// Mega-editorin client-osa: rivit (avaa/vaihda/poista/siirrä) +
-// kysymysselain yksittäisten kysymysten poimintaan lähdevisoista.
+// Mega-editorin client-osa: rivit (avaa/arvo/valitse tilalle/poista/siirrä)
+// + kysymysselain, joka toimii kahdessa tilassa (Heikki 4.8.2026):
+//   'add'     = poimi yksittäisiä kysymyksiä lisättäväksi (checkboxit)
+//   'replace' = valitse yksi kysymys tietyn rivin tilalle
 
 import { useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import {
   addMegaQuestions, deleteMega, loadQuizQuestions, moveMegaQuestion,
-  removeMegaQuestion, searchSourceQuizzes, swapMegaQuestion, toggleMegaPublish,
+  removeMegaQuestion, replaceMegaQuestion, searchSourceQuizzes,
+  swapMegaQuestion, toggleMegaPublish,
 } from "../actions";
 
 export type MegaRow = {
@@ -27,10 +30,16 @@ const COLL_LABEL: Record<string, string> = {
   matkakohteet: "Matkakohteet", yleistieto: "Yleistieto", "tunnetut-henkilot": "Henkilöt",
 };
 
+type BrowserState =
+  | { mode: "add" }
+  | { mode: "replace"; questionId: string; question: string }
+  | null;
+
 export function MegaEditor({ mega, rows }: { mega: { id: string; title: string; slug: string | null; status: string }; rows: MegaRow[] }) {
   const router = useRouter();
   const [pending, start] = useTransition();
   const [error, setError] = useState<string | null>(null);
+  const [browser, setBrowser] = useState<BrowserState>(null);
 
   const perSource = useMemo(() => {
     const m = new Map<string, number>();
@@ -124,7 +133,8 @@ export function MegaEditor({ mega, rows }: { mega: { id: string; title: string; 
                 <span className="flex shrink-0 items-center gap-1">
                   <Button variant="ghost" size="sm" disabled={pending || i === 0} onClick={(e) => { e.preventDefault(); run(() => moveMegaQuestion(mega.id, r.questionId, "up")); }}>↑</Button>
                   <Button variant="ghost" size="sm" disabled={pending || i === rows.length - 1} onClick={(e) => { e.preventDefault(); run(() => moveMegaQuestion(mega.id, r.questionId, "down")); }}>↓</Button>
-                  <Button variant="ghost" size="sm" disabled={pending} onClick={(e) => { e.preventDefault(); run(() => swapMegaQuestion(mega.id, r.questionId)); }}>Vaihda</Button>
+                  <Button variant="ghost" size="sm" disabled={pending} title="Arvo tilalle satunnainen samasta kokoelmasta" onClick={(e) => { e.preventDefault(); run(() => swapMegaQuestion(mega.id, r.questionId)); }}>Arvo</Button>
+                  <Button variant="ghost" size="sm" disabled={pending} title="Valitse korvaaja itse kysymysselaimesta" onClick={(e) => { e.preventDefault(); setBrowser({ mode: "replace", questionId: r.questionId, question: r.question }); }}>Valitse…</Button>
                   <Button variant="ghost" size="sm" className="text-destructive" disabled={pending} onClick={(e) => { e.preventDefault(); run(() => removeMegaQuestion(mega.id, r.questionId)); }}>Poista</Button>
                 </span>
               </summary>
@@ -142,35 +152,55 @@ export function MegaEditor({ mega, rows }: { mega: { id: string; title: string; 
         })}
       </div>
 
-      <QuestionBrowser megaId={mega.id} perSource={perSource} existing={new Set(rows.map((r) => r.questionId))} onDone={() => router.refresh()} />
+      {browser === null ? (
+        <Button variant="outline" onClick={() => setBrowser({ mode: "add" })}>+ Lisää kysymys lähdevisasta</Button>
+      ) : (
+        <QuestionBrowser
+          megaId={mega.id}
+          state={browser}
+          perSource={perSource}
+          existing={new Set(rows.map((r) => r.questionId))}
+          onClose={() => setBrowser(null)}
+          onDone={() => { setBrowser(null); router.refresh(); }}
+        />
+      )}
     </div>
   );
 }
 
-/* ── Kysymysselain: poimi yksittäisiä kysymyksiä lähdevisoista ── */
-function QuestionBrowser({ megaId, perSource, existing, onDone }: {
+/* ── Kysymysselain: 'add' = poimi useita · 'replace' = valitse yksi tilalle ── */
+function QuestionBrowser({ megaId, state, perSource, existing, onClose, onDone }: {
   megaId: string;
+  state: Exclude<BrowserState, null>;
   perSource: Map<string, number>;
   existing: Set<string>;
+  onClose: () => void;
   onDone: () => void;
 }) {
-  const [open, setOpen] = useState(false);
   const [term, setTerm] = useState("");
   const [quizzes, setQuizzes] = useState<Array<{ id: string; title: string; collection: string | null }>>([]);
   const [openQuiz, setOpenQuiz] = useState<{ id: string; title: string } | null>(null);
   const [questions, setQuestions] = useState<Array<{ id: string; question_text: string; correct: string }>>([]);
   const [picked, setPicked] = useState<Set<string>>(new Set());
+  const [loaded, setLoaded] = useState(false);
   const [pending, start] = useTransition();
 
-  if (!open) {
-    return <Button variant="outline" onClick={() => { setOpen(true); start(async () => setQuizzes(await searchSourceQuizzes(""))); }}>+ Lisää kysymys lähdevisasta</Button>;
+  if (!loaded) {
+    setLoaded(true);
+    start(async () => setQuizzes(await searchSourceQuizzes("")));
   }
+
+  const replaceMode = state.mode === "replace";
 
   return (
     <div className="space-y-3 rounded-md border p-4">
       <div className="flex items-center justify-between">
-        <div className="text-sm font-semibold">Kysymysselain — poimi yksittäisiä kysymyksiä</div>
-        <Button variant="ghost" size="sm" onClick={() => { setOpen(false); setOpenQuiz(null); setPicked(new Set()); }}>Sulje</Button>
+        <div className="text-sm font-semibold">
+          {replaceMode
+            ? <>Valitse tilalle → <span className="font-normal text-muted-foreground">korvaa: &rdquo;{state.mode === "replace" ? state.question : ""}&rdquo;</span></>
+            : "Kysymysselain — poimi yksittäisiä kysymyksiä"}
+        </div>
+        <Button variant="ghost" size="sm" onClick={onClose}>Sulje</Button>
       </div>
       {!openQuiz ? (
         <>
@@ -216,6 +246,28 @@ function QuestionBrowser({ megaId, perSource, existing, onDone }: {
           <div className="max-h-72 divide-y overflow-auto rounded-md border">
             {questions.map((q) => {
               const already = existing.has(q.id);
+              if (replaceMode) {
+                return (
+                  <div key={q.id} className={`flex items-center gap-3 px-3 py-2 text-sm ${already ? "opacity-50" : ""}`}>
+                    <span className="min-w-0 flex-1">
+                      <span className="block">{q.question_text}</span>
+                      <span className="block text-xs text-muted-foreground">Oikea: {q.correct}{already ? " · jo Megassa" : ""}</span>
+                    </span>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      disabled={pending || already}
+                      onClick={() => start(async () => {
+                        if (state.mode !== "replace") return;
+                        await replaceMegaQuestion(megaId, state.questionId, q.id);
+                        onDone();
+                      })}
+                    >
+                      Vaihda tähän
+                    </Button>
+                  </div>
+                );
+              }
               return (
                 <label key={q.id} className={`flex items-start gap-3 px-3 py-2 text-sm ${already ? "opacity-50" : "cursor-pointer hover:bg-muted/50"}`}>
                   <input
@@ -237,17 +289,18 @@ function QuestionBrowser({ megaId, perSource, existing, onDone }: {
               );
             })}
           </div>
-          <Button
-            disabled={pending || picked.size === 0}
-            onClick={() => start(async () => {
-              await addMegaQuestions(megaId, [...picked]);
-              setPicked(new Set());
-              setOpenQuiz(null);
-              onDone();
-            })}
-          >
-            Lisää valitut ({picked.size})
-          </Button>
+          {!replaceMode && (
+            <Button
+              disabled={pending || picked.size === 0}
+              onClick={() => start(async () => {
+                await addMegaQuestions(megaId, [...picked]);
+                setPicked(new Set());
+                onDone();
+              })}
+            >
+              Lisää valitut ({picked.size})
+            </Button>
+          )}
         </>
       )}
     </div>

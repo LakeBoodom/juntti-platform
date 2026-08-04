@@ -161,6 +161,26 @@ export async function swapMegaQuestion(megaId: string, questionId: string) {
   return { ok: true as const };
 }
 
+/** Manuaalinen vaihto (Heikki 4.8.2026): käyttäjä valitsee korvaajan
+    kysymysselaimesta — vanha rivi pois, uusi samaan kohtaan. */
+export async function replaceMegaQuestion(megaId: string, oldQuestionId: string, newQuestionId: string) {
+  const sb = getSupabaseAdmin();
+  const links = await getLinks(megaId);
+  const target = links.find((l) => l.question_id === oldQuestionId);
+  if (!target) return { ok: false as const, error: "Vaihdettava kysymys ei ole Megassa" };
+  if (links.some((l) => l.question_id === newQuestionId)) {
+    return { ok: false as const, error: "Valittu kysymys on jo Megassa" };
+  }
+  const { error: eDel } = await sb.from("mega_questions" as never).delete()
+    .eq("mega_quiz_id", megaId).eq("question_id", oldQuestionId);
+  if (eDel) return { ok: false as const, error: eDel.message };
+  const { error: eIns } = await sb.from("mega_questions" as never)
+    .insert({ mega_quiz_id: megaId, question_id: newQuestionId, sort_order: target.sort_order } as never);
+  if (eIns) return { ok: false as const, error: eIns.message };
+  revalidatePath(`/megat/${megaId}`);
+  return { ok: true as const };
+}
+
 export async function removeMegaQuestion(megaId: string, questionId: string) {
   const sb = getSupabaseAdmin();
   const { error } = await sb.from("mega_questions" as never).delete()

@@ -116,11 +116,17 @@ export default async function Peli20({
     }
     const sourceIds = [...new Set([...qMap.values()].map((q) => q.quiz_id))];
     const { data: sources } = sourceIds.length > 0
-      ? await sb.from("quizzes").select("id, title, display_title").in("id", sourceIds)
+      ? await sb.from("quizzes").select("id, title, display_title, collection").in("id", sourceIds)
       : { data: [] };
+    /* Konteksti tarvitsee myös LAJIN (Heikki 4.8.2026): pelkkä "Erikoisjoukot"
+       ei kerro että kyse on tv-sarjasta → "TV & Suoratoisto · Erikoisjoukot" */
     const srcName = new Map(
-      ((sources ?? []) as unknown as Array<{ id: string; title: string; display_title: string | null }>)
-        .map((s) => [s.id, s.display_title ?? s.title]),
+      ((sources ?? []) as unknown as Array<{ id: string; title: string; display_title: string | null; collection: string | null }>)
+        .map((s) => {
+          const name = s.display_title ?? s.title;
+          const label = COLLECTION_LABEL[s.collection ?? ""];
+          return [s.id, label ? `${label} · ${name}` : name];
+        }),
     );
 
     const questions = links
