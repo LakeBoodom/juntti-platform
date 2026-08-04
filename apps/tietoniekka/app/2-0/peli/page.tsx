@@ -74,7 +74,9 @@ export default async function Peli20({
   const slug = typeof params.visa === "string" ? params.visa : null;
   const kuvavisa = typeof params.kuvavisa === "string" ? params.kuvavisa : null;
   const mega = typeof params.mega === "string" ? params.mega : null;
-  const isSankari = params.paivan_sankari === "1";
+  // Putki kertyy päivän nostosta: paivan_visa=1 (manuaalinen Päivän visa,
+  // Heikki 4.8.2026) tai paivan_sankari=1 (synttärisankari-fallback).
+  const isSankari = params.paivan_sankari === "1" || params.paivan_visa === "1";
 
   const sb = getSupabase();
   if (!sb || (!quizId && !slug && !kuvavisa && !mega)) {

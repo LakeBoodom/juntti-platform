@@ -6,7 +6,16 @@
 import { getSupabase, SITE_SLUG } from "@/lib/supabase";
 import { ModeMotif } from "@/components/tn20/motifs";
 import { QuizCard, type QuizCardData } from "@/components/tn20/cards";
+import { WideCard } from "@/components/tn20/WideCard";
+import { motifPathFor } from "@/components/tn20/motif-paths";
 import PutkiCard from "./PutkiCard";
+
+/** Kokoelmien aksentit (sama paletti kuin hubeissa). */
+const DAY_ACCENT: Record<string, string> = {
+  tv: "#FF3D9E", urheilu: "#B6FF3C", elokuvat: "#FF5C3D", musiikki: "#A855F7",
+  matkakohteet: "#E8A320", ruokajuoma: "#F2C230", luonnonihmeet: "#2FD9A5",
+  kuvavisat: "#4C9AFF", yleistieto: "#E8A320", "tunnetut-henkilot": "#C9A96A",
+};
 
 export const dynamic = "force-dynamic";
 
@@ -63,6 +72,39 @@ async function getData() {
     .sort((a, b) => a.dist - b.dist);
   const hero = sorted[0] ?? null;
 
+  // Päivän visa: manuaalinen valinta administa (schedule_rules — sama sääntö
+  // ohjaa myös 1.0-etusivun Päivän visaa). Heikki 4.8.2026: mikä tahansa visa;
+  // jos valintaa ei ole, fallback on automaattinen synttärisankari (yllä).
+  type DayPick =
+    | { kind: "celeb"; celeb: Celeb; isToday: boolean }
+    | { kind: "quiz"; card: (typeof cards)[number] }
+    | null;
+  let dayPick: DayPick = null;
+  const todayIso = new Date().toISOString().slice(0, 10);
+  const { data: siteRow } = await sb.from("sites").select("id").eq("slug", SITE_SLUG).maybeSingle();
+  if (siteRow) {
+    const { data: rule } = await sb
+      .from("schedule_rules")
+      .select("content_id")
+      .eq("site_id", siteRow.id)
+      .eq("content_type", "quiz")
+      .eq("strategy", "date")
+      .eq("scheduled_date", todayIso)
+      .eq("active", true)
+      .maybeSingle();
+    const pickedId = rule?.content_id ?? null;
+    if (pickedId) {
+      const celeb = celebs.find((c) => c.trivia_quiz_id === pickedId);
+      if (celeb) {
+        const b = new Date(celeb.birth_date);
+        dayPick = { kind: "celeb", celeb, isToday: key(b.getMonth() + 1, b.getDate()) === todayKey };
+      } else {
+        const card = cards.find((c) => c.id === pickedId);
+        if (card) dayPick = { kind: "quiz", card };
+      }
+    }
+  }
+
   // Trending: pelatuimmat 24 h — näytetään vasta kun volyymiä on (kynnys)
   const playCounts: Record<string, number> = {};
   for (const p of plays) playCounts[p.quiz_id] = (playCounts[p.quiz_id] ?? 0) + 1;
@@ -88,7 +130,7 @@ async function getData() {
       }, {})
   ).sort((a, b) => (b.published_at! > a.published_at! ? 1 : -1));
 
-  return { counts, total: cards.length, hero, sankariIsToday: hero?.dist === 0, trending, today, newestByCollection };
+  return { counts, total: cards.length, hero, sankariIsToday: hero?.dist === 0, dayPick, trending, today, newestByCollection };
 }
 
 function age(birth: string, onNextBirthday: boolean) {
@@ -103,10 +145,22 @@ function age(birth: string, onNextBirthday: boolean) {
 export default async function Etusivu20() {
   const data = await getData();
   if (!data) return <main style={{ padding: 32 }}>Ei tietokantayhteyttä.</main>;
-  const { counts, total, hero, sankariIsToday, trending, today, newestByCollection } = data;
+  const { counts, total, hero, sankariIsToday, dayPick, trending, today, newestByCollection } = data;
 
   const n = (k: string) => counts[k] ?? 0;
   const rankColors = ["var(--tn-magenta)", "var(--tn-lime)", "var(--tn-violet)", "var(--tn-teal)", "var(--tn-orange)", "var(--tn-gold)"];
+
+  // Tänään-slotin sisältö: manuaalinen Päivän visa (dayPick) tai sankari-fallback.
+  // Kaikki päivän nostot kerryttävät Putkea (paivan_visa=1 / paivan_sankari=1).
+  const sankariCeleb = dayPick?.kind === "celeb" ? dayPick.celeb : !dayPick ? hero?.c ?? null : null;
+  const sankariToday = dayPick?.kind === "celeb" ? dayPick.isToday : sankariIsToday;
+  const dayParam = dayPick ? "paivan_visa" : "paivan_sankari";
+  const dayHref =
+    dayPick?.kind === "quiz"
+      ? `/2-0/peli?quiz_id=${dayPick.card.id}&paivan_visa=1`
+      : sankariCeleb?.trivia_quiz_id
+        ? `/2-0/peli?quiz_id=${sankariCeleb.trivia_quiz_id}&${dayParam}=1`
+        : "#paiva";
 
   return (
     <main style={{ minHeight: "100dvh" }}>
@@ -122,8 +176,8 @@ export default async function Etusivu20() {
             <a href="#pelimuodot">Pelimuodot</a>
             <a href="#paiva">Tänään</a>
           </nav>
-          <a className="tn-header-cta" href={hero?.c.trivia_quiz_id ? `/2-0/peli?quiz_id=${hero.c.trivia_quiz_id}&paivan_sankari=1` : "#paiva"}>
-            Pelaa päivän sankari
+          <a className="tn-header-cta" href={dayHref}>
+            {dayPick ? "Pelaa päivän visa" : "Pelaa päivän sankari"}
           </a>
         </div>
       </header>
@@ -158,30 +212,40 @@ export default async function Etusivu20() {
         <div className="tn-shell">
           <span className="tn-eyebrow" style={{ color: "var(--tn-gold)" }}>Tänään</span>
           <div className="tn-section-head">
-            <h2 className="tn-section-title">Päivän sankari</h2>
-            <span className="tn-section-sub" style={{ margin: 0 }}>{fiDate(today)} · vaihtuu klo 06:00</span>
+            <h2 className="tn-section-title">{dayPick ? "Päivän visa" : "Päivän sankari"}</h2>
+            <span className="tn-section-sub" style={{ margin: 0 }}>{fiDate(today)} · uusi joka päivä</span>
           </div>
           <div className="tn-day-grid" style={{ marginTop: 18 }}>
-            {hero ? (
+            {dayPick?.kind === "quiz" ? (
+              <WideCard
+                href={dayHref}
+                color={DAY_ACCENT[dayPick.card.collection ?? ""] ?? "var(--tn-gold)"}
+                motifPath={motifPathFor(dayPick.card.collection, (dayPick.card.genre as string | null) ?? null, dayPick.card.title)}
+                title={dayPick.card.display_title ?? dayPick.card.title}
+                desc={(dayPick.card.teaser as string | null) ?? null}
+                mode="Klassinen"
+                meta={`${(dayPick.card.question_count as number | null) ?? "?"} kysymystä`}
+              />
+            ) : sankariCeleb ? (
               <article className="tn-sankari-card">
                 <div className="tn-sankari-photo">
-                  {hero.c.image_url && (
+                  {sankariCeleb.image_url && (
                     /* eslint-disable-next-line @next/next/no-img-element */
-                    <img src={hero.c.image_url} alt={hero.c.name} />
+                    <img src={sankariCeleb.image_url} alt={sankariCeleb.name} />
                   )}
                 </div>
                 <div className="tn-sankari-body">
                   <span className="tn-chip" style={{ color: "var(--tn-amber)", alignSelf: "start" }}>
-                    {sankariIsToday ? "🔥 Tänään juhlii" : "🎂 Seuraavaksi juhlii"}
+                    {sankariToday ? "🔥 Tänään juhlii" : "🎂 Seuraavaksi juhlii"}
                   </span>
                   <div className="tn-sankari-age">
-                    <b>{age(hero.c.birth_date, sankariIsToday)} vuotta</b> — {hero.c.name}
+                    <b>{age(sankariCeleb.birth_date, sankariToday)} vuotta</b> — {sankariCeleb.name}
                   </div>
                   <div className="tn-sankari-meta">
-                    Syntynyt {new Date(hero.c.birth_date).getDate()}.{new Date(hero.c.birth_date).getMonth() + 1}.
-                    {new Date(hero.c.birth_date).getFullYear()} · {hero.c.role}
+                    Syntynyt {new Date(sankariCeleb.birth_date).getDate()}.{new Date(sankariCeleb.birth_date).getMonth() + 1}.
+                    {new Date(sankariCeleb.birth_date).getFullYear()} · {sankariCeleb.role}
                   </div>
-                  <a className="tn-cta" href={hero.c.trivia_quiz_id ? `/2-0/peli?quiz_id=${hero.c.trivia_quiz_id}&paivan_sankari=1` : hero.c.slug ? `/sankari/${hero.c.slug}` : "#"}>
+                  <a className="tn-cta" href={sankariCeleb.trivia_quiz_id ? dayHref : sankariCeleb.slug ? `/sankari/${sankariCeleb.slug}` : "#"}>
                     Aloita visa →
                   </a>
                   <a className="tn-textlink" href="/2-0/kokoelma/tunnetut-henkilot">

@@ -52,6 +52,22 @@ export default async function PaivanVisaPage({
     .gte("scheduled_date", fromIso)
     .lte("scheduled_date", toIso);
 
+  // Synttärivihjeet (Heikki 4.8.2026): näytä per päivä keillä julkkiksilla on
+  // synttärit ja onko heillä oma visa — "synttäri vai ajankohtainen" -päätös
+  // syntyy suoraan listassa yhdellä klikillä.
+  const { data: celebRows } = await admin
+    .from("celebrities")
+    .select("name, birth_date, trivia_quiz_id");
+  const celebsByMonthDay = new Map<string, Array<{ name: string; quizId: string | null }>>();
+  for (const c of (celebRows ?? []) as Array<{ name: string; birth_date: string | null; trivia_quiz_id: string | null }>) {
+    if (!c.birth_date) continue;
+    const b = new Date(c.birth_date);
+    const md = `${b.getMonth() + 1}-${b.getDate()}`;
+    const list = celebsByMonthDay.get(md) ?? [];
+    list.push({ name: c.name, quizId: c.trivia_quiz_id });
+    celebsByMonthDay.set(md, list);
+  }
+
   const ruleByDate = new Map<string, string>();
   for (const r of rules ?? []) {
     if (r.active && r.scheduled_date && r.content_id) {
@@ -140,6 +156,7 @@ export default async function PaivanVisaPage({
                   siteId={site.id}
                   currentQuiz={r.current}
                   quizOptions={quizOptions}
+                  birthdays={celebsByMonthDay.get(`${r.date.getMonth() + 1}-${r.date.getDate()}`) ?? []}
                 />
               ))}
             </TableBody>

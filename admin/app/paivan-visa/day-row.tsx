@@ -32,12 +32,15 @@ export function DayRow({
   siteId,
   currentQuiz,
   quizOptions,
+  birthdays = [],
 }: {
   date: Date;
   isoDate: string;
   siteId: string;
   currentQuiz: { id: string; title: string; category: string } | null;
   quizOptions: QuizOption[];
+  /** Synttärivihjeet: keillä julkkiksilla on tänä päivänä synttärit (+ oma visa jos on). */
+  birthdays?: Array<{ name: string; quizId: string | null }>;
 }) {
   const [setOpen, setSetOpen] = useState(false);
   const [selectedQuizId, setSelectedQuizId] = useState<string>(currentQuiz?.id ?? "");
@@ -60,6 +63,15 @@ export function DayRow({
   function doClear() {
     startTransition(async () => {
       await clearQuizForDate(siteId, isoDate);
+    });
+  }
+
+  /** Aseta synttärisankarin visa suoraan päivän visaksi. */
+  function applyBirthdayQuiz(quizId: string) {
+    setError(null);
+    startTransition(async () => {
+      const res = await setQuizForDate(siteId, isoDate, quizId);
+      if (!res.ok) setError(res.error);
     });
   }
 
@@ -86,6 +98,31 @@ export function DayRow({
           </Link>
         ) : (
           <span className="text-sm text-muted-foreground italic">— tyhjä —</span>
+        )}
+        {birthdays.length > 0 && (
+          <div className="mt-1 space-y-0.5">
+            {birthdays.map((b) => (
+              <div key={b.name} className="flex items-center gap-2 text-xs text-muted-foreground">
+                <span>
+                  🎂 {b.name}
+                  {!b.quizId && <span className="italic"> — ei visaa</span>}
+                </span>
+                {b.quizId && currentQuiz?.id !== b.quizId && (
+                  <button
+                    className="rounded border px-1.5 py-0.5 text-[11px] hover:bg-muted disabled:opacity-50"
+                    disabled={pending}
+                    onClick={() => applyBirthdayQuiz(b.quizId!)}
+                  >
+                    Käytä
+                  </button>
+                )}
+                {b.quizId && currentQuiz?.id === b.quizId && (
+                  <span className="text-[11px] text-green-600">✓ valittu</span>
+                )}
+              </div>
+            ))}
+            {error && <p className="text-xs text-destructive">{error}</p>}
+          </div>
         )}
       </TableCell>
       <TableCell className="text-sm text-muted-foreground">
