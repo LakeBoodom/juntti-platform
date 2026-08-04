@@ -17,12 +17,12 @@ export default async function MegaDetailPage({ params }: { params: Promise<{ id:
 
   const { data: quiz } = await admin
     .from("quizzes")
-    .select("id, title, slug, status" as never)
+    .select("id, title, slug, status, teaser" as never)
     .eq("id", id)
     .eq("game_mode" as never, "mega" as never)
     .maybeSingle();
   if (!quiz) return notFound();
-  const mega = quiz as unknown as { id: string; title: string; slug: string | null; status: string };
+  const mega = quiz as unknown as { id: string; title: string; slug: string | null; status: string; teaser: string | null };
 
   const { data: linkRows } = await admin
     .from("mega_questions" as never)

@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button";
 import {
   addMegaRows, deleteMega, listDecks, loadDeckImages, loadQuizQuestions,
   moveMegaRow, removeMegaRow, replaceMegaRow, searchSourceQuizzes,
-  swapMegaRow, toggleMegaPublish,
+  swapMegaRow, toggleMegaPublish, updateMegaMeta,
 } from "../actions";
 
 export type MegaRow = {
@@ -39,11 +39,14 @@ type BrowserState =
   | { mode: "replace"; rowKey: string; question: string }
   | null;
 
-export function MegaEditor({ mega, rows }: { mega: { id: string; title: string; slug: string | null; status: string }; rows: MegaRow[] }) {
+export function MegaEditor({ mega, rows }: { mega: { id: string; title: string; slug: string | null; status: string; teaser: string | null }; rows: MegaRow[] }) {
   const router = useRouter();
   const [pending, start] = useTransition();
   const [error, setError] = useState<string | null>(null);
   const [browser, setBrowser] = useState<BrowserState>(null);
+  const [editMeta, setEditMeta] = useState(false);
+  const [title, setTitle] = useState(mega.title);
+  const [teaser, setTeaser] = useState(mega.teaser ?? "");
 
   const perSource = useMemo(() => {
     const m = new Map<string, number>();
@@ -79,7 +82,16 @@ export function MegaEditor({ mega, rows }: { mega: { id: string; title: string; 
             {mega.slug && (
               <> · <a className="underline" href={`https://tietoniekka-git-feat-tietoniekka-2-0-lakeboodoms-projects.vercel.app/2-0/peli?mega=${mega.slug}`} target="_blank" rel="noreferrer">Avaa previewssä ↗</a></>
             )}
+            {" · "}
+            <button className="underline" onClick={() => { setTitle(mega.title); setTeaser(mega.teaser ?? ""); setEditMeta(true); }}>Muokkaa nimeä ja kuvausta</button>
           </p>
+          {!editMeta && (
+            <p className="mt-1 max-w-xl text-sm text-muted-foreground">
+              {mega.teaser
+                ? <>Kuvaus pelaajalle: &rdquo;{mega.teaser}&rdquo;</>
+                : <span className="text-yellow-700">Ei vielä kuvausta — pelaaja näkee aloitusnäkymässä vain nimen.</span>}
+            </p>
+          )}
         </div>
         <div className="flex items-center gap-2">
           <Button
@@ -99,6 +111,32 @@ export function MegaEditor({ mega, rows }: { mega: { id: string; title: string; 
           </Button>
         </div>
       </div>
+
+      {editMeta && (
+        <div className="space-y-2 rounded-md border p-4">
+          <label className="flex flex-col gap-1 text-xs text-muted-foreground">
+            Nimi
+            <input
+              className="h-9 w-full max-w-md rounded-md border bg-background px-3 text-sm text-foreground"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+            />
+          </label>
+          <label className="flex flex-col gap-1 text-xs text-muted-foreground">
+            Kuvaus pelaajalle (näkyy pelisivun aloitusnäkymässä otsikon alla)
+            <textarea
+              className="min-h-20 w-full max-w-xl rounded-md border bg-background px-3 py-2 text-sm text-foreground"
+              value={teaser}
+              onChange={(e) => setTeaser(e.target.value)}
+              placeholder="esim. Viisikymmentä kysymystä viihteen maailmasta — sarjoista, leffoista ja tähdistä."
+            />
+          </label>
+          <div className="flex gap-2">
+            <Button size="sm" disabled={pending || !title.trim()} onClick={() => { run(() => updateMegaMeta(mega.id, { title, teaser })); setEditMeta(false); }}>Tallenna</Button>
+            <Button size="sm" variant="ghost" onClick={() => setEditMeta(false)}>Peru</Button>
+          </div>
+        </div>
+      )}
 
       <div className="flex flex-wrap items-center gap-2 text-xs">
         {bucketCounts.map(([b, n]) => (

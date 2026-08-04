@@ -167,6 +167,22 @@ export async function composeMega(input: { title: string; size: number; collecti
   redirect(`/megat/${megaId}`);
 }
 
+/** Nimen ja kuvauksen muokkaus (Heikki 4.8.2026). Kuvaus = teaser,
+    joka näkyy pelaajalle pelisivun aloitusnäkymässä otsikon alla.
+    Slug ei muutu, joten linkit eivät hajoa. */
+export async function updateMegaMeta(megaId: string, input: { title: string; teaser: string }) {
+  const title = input.title.trim();
+  if (!title) return { ok: false as const, error: "Nimi ei voi olla tyhjä" };
+  const sb = getSupabaseAdmin();
+  const { error } = await sb.from("quizzes")
+    .update({ title, display_title: title, teaser: input.teaser.trim() || null } as never)
+    .eq("id", megaId);
+  if (error) return { ok: false as const, error: error.message };
+  revalidatePath(`/megat/${megaId}`);
+  revalidatePath("/megat");
+  return { ok: true as const };
+}
+
 /** Arvo tilalle satunnainen samasta teemasta (bucketista). */
 export async function swapMegaRow(megaId: string, rowKey: string) {
   const sb = getSupabaseAdmin();
