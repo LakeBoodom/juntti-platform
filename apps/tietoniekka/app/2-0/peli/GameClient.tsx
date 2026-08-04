@@ -34,8 +34,10 @@ export type GameQuiz = {
   bgImg: string;
   accent: string;
   isSankari: boolean;
-  /* image = kuvavisan tunnistettava kuva (Heikki 3.8.2026) */
-  questions: Array<{ question: string; options: string[]; correct: string; fact: string | null; image?: string }>;
+  /* image = kuvavisan tunnistettava kuva (3.8.2026)
+     context = lähdevisan nimi Megassa — irrotettu kysymys tarvitsee
+     kontekstin, esim. "Luottomies: All in" (Heikki 4.8.2026) */
+  questions: Array<{ question: string; options: string[]; correct: string; fact: string | null; image?: string; context?: string }>;
   related: Array<{ id: string; title: string; teaser: string | null; color: string; motifPath: string; meta: string; href?: string }>;
 };
 
@@ -479,6 +481,7 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
               </div>
             )}
             <div className="tn-game-qnum">Kysymys {idx + 1} / {total}</div>
+            {q.context && <div className="tn-game-qcontext">{q.context}</div>}
             <h1 className="tn-game-qtext" data-len={q.image ? "img" : qLen}>{q.question}</h1>
           </div>
           <div className="tn-game-leftfoot">

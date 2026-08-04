@@ -14,7 +14,9 @@ import { getCurrentSite } from "@/lib/sites";
 const MAIN_COLLECTIONS = [
   "tv", "urheilu", "elokuvat", "musiikki", "matkakohteet", "yleistieto", "tunnetut-henkilot",
 ];
-export const ALLOWED_SIZES = [20, 50, 100];
+// HUOM: "use server" -tiedostosta saa exportata VAIN async-funktioita —
+// tämän vakion export kaatoi kaikki actionit ajossa (Heikin bugiraportti 4.8.2026)
+const ALLOWED_SIZES = [20, 50, 100];
 const MAX_PER_SOURCE = 2;
 
 function shuffle<T>(arr: T[]): T[] {

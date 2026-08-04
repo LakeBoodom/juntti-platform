@@ -1002,3 +1002,14 @@
   .tn20 .tn-game-imgstage img { max-height: clamp(280px, 48vh, 520px); }
   .tn20 .tn-game-qtext[data-len="img"] { font-size: clamp(21px, 1.8vw, 28px); max-width: none; }
 }
+
+/* Megan kontekstichippi: irrotettu kysymys kertoo mistä visasta se tulee
+   ("Luottomies: All in" ennen kysymystä) — Heikki 4.8.2026 */
+.tn20 .tn-game-qcontext {
+  display: inline-block; margin-bottom: 10px;
+  padding: 5px 11px; border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--tn-game-accent) 45%, transparent);
+  color: var(--tn-game-accent);
+  font-size: 12px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase;
+  max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}

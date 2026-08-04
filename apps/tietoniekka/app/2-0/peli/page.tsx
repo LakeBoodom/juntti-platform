@@ -95,15 +95,21 @@ export default async function Peli20({
     if (!mq) {
       return <main style={{ padding: 32 }}>Megaa ei löytynyt. <a href="/2-0">Takaisin etusivulle</a></main>;
     }
+    /* Konteksti mukaan (Heikki 4.8.2026): irrotettu kysymys tarvitsee
+       lähdevisan nimen ("Mistä Tommi haaveilee?" → chip "Luottomies: All in") */
     const { data: links } = await sb
       .from("mega_questions" as never)
-      .select("sort_order, questions(question_text, explanation, answers)")
+      .select("sort_order, questions(question_text, explanation, answers, quizzes(title, display_title))")
       .eq("mega_quiz_id", mq.id)
       .order("sort_order", { ascending: true });
 
     const questions = ((links ?? []) as unknown as Array<{
       sort_order: number;
-      questions: { question_text: string; explanation: string | null; answers: Array<{ text: string; is_correct: boolean }> } | null;
+      questions: {
+        question_text: string; explanation: string | null;
+        answers: Array<{ text: string; is_correct: boolean }>;
+        quizzes: { title: string; display_title: string | null } | null;
+      } | null;
     }>)
       .filter((l) => l.questions)
       .map((l) => {
@@ -114,6 +120,7 @@ export default async function Peli20({
           options: answers.slice(0, 4).map((a) => a.text),
           correct,
           fact: l.questions!.explanation,
+          context: l.questions!.quizzes?.display_title ?? l.questions!.quizzes?.title ?? undefined,
         };
       });
 
