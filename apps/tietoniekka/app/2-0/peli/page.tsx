@@ -100,20 +100,38 @@ export default async function Peli20({
        Kolme litteää kyselyä — syvä sisäkkäisjoin ei toimi PostgRESTissä. */
     const { data: linkRows } = await sb
       .from("mega_questions" as never)
-      .select("question_id, sort_order")
+      .select("question_id, kuvavisa_id, sort_order")
       .eq("mega_quiz_id", mq.id)
       .order("sort_order", { ascending: true });
-    const links = (linkRows ?? []) as unknown as Array<{ question_id: string; sort_order: number }>;
+    const links = (linkRows ?? []) as unknown as Array<{ question_id: string | null; kuvavisa_id: string | null; sort_order: number }>;
 
     type MegaQ = { id: string; question_text: string; explanation: string | null; answers: Array<{ text: string; is_correct: boolean }>; quiz_id: string };
     const qMap = new Map<string, MegaQ>();
-    for (let i = 0; i < links.length; i += 100) {
+    const qLinkIds = links.filter((l) => l.question_id).map((l) => l.question_id!);
+    for (let i = 0; i < qLinkIds.length; i += 100) {
       const { data: qs } = await sb
         .from("questions")
         .select("id, question_text, explanation, answers, quiz_id")
-        .in("id", links.slice(i, i + 100).map((l) => l.question_id));
+        .in("id", qLinkIds.slice(i, i + 100));
       for (const q of (qs ?? []) as unknown as MegaQ[]) qMap.set(q.id, q);
     }
+
+    /* Sekamuotoinen Mega (Heikki 4.8.2026): kuvarivit kuvavisas-taulusta */
+    type MegaKv = { id: string; question: string; image_url: string; options: string[] | null; correct_option: string; fact: string | null; type: string };
+    const kvMap = new Map<string, MegaKv>();
+    const kvLinkIds = links.filter((l) => l.kuvavisa_id).map((l) => l.kuvavisa_id!);
+    if (kvLinkIds.length > 0) {
+      const { data: kvs } = await sb
+        .from("kuvavisas")
+        .select("id, question, image_url, options, correct_option, fact, type")
+        .in("id", kvLinkIds);
+      for (const k of (kvs ?? []) as unknown as MegaKv[]) kvMap.set(k.id, k);
+    }
+    const KV_CONTEXT: Record<string, string> = {
+      liput: "Kuvavisat · Liput", vaakunat: "Kuvavisat · Vaakunat", linnut: "Kuvavisat · Linnut",
+      elaimet: "Kuvavisat · Eläimet", kasvit: "Kuvavisat · Kasvit", henkilot: "Kuvavisat · Henkilöt",
+      rakennukset: "Kuvavisat · Rakennukset", kaupungit: "Kuvavisat · Kaupungit", maalaukset: "Kuvavisat · Maalaukset",
+    };
     const sourceIds = [...new Set([...qMap.values()].map((q) => q.quiz_id))];
     const { data: sources } = sourceIds.length > 0
       ? await sb.from("quizzes").select("id, title, display_title, collection").in("id", sourceIds)
@@ -130,19 +148,35 @@ export default async function Peli20({
     );
 
     const questions = links
-      .map((l) => qMap.get(l.question_id))
-      .filter((q): q is MegaQ => Boolean(q))
-      .map((q) => {
-        const answers = q.answers ?? [];
-        const correct = answers.find((a) => a.is_correct)?.text ?? answers[0]?.text ?? "";
-        return {
-          question: q.question_text,
-          options: answers.slice(0, 4).map((a) => a.text),
-          correct,
-          fact: q.explanation,
-          context: srcName.get(q.quiz_id),
-        };
-      });
+      .map((l) => {
+        if (l.question_id) {
+          const q = qMap.get(l.question_id);
+          if (!q) return null;
+          const answers = q.answers ?? [];
+          const correct = answers.find((a) => a.is_correct)?.text ?? answers[0]?.text ?? "";
+          return {
+            question: q.question_text,
+            options: answers.slice(0, 4).map((a) => a.text),
+            correct,
+            fact: q.explanation,
+            context: srcName.get(q.quiz_id),
+          };
+        }
+        if (l.kuvavisa_id) {
+          const k = kvMap.get(l.kuvavisa_id);
+          if (!k) return null;
+          return {
+            question: k.question,
+            options: (k.options ?? []).slice(0, 4),
+            correct: k.correct_option,
+            fact: k.fact,
+            image: k.image_url,
+            context: KV_CONTEXT[k.type] ?? "Kuvavisat",
+          };
+        }
+        return null;
+      })
+      .filter((q): q is NonNullable<typeof q> => Boolean(q));
 
     if (questions.length === 0) {
       return <main style={{ padding: 32 }}>Megassa ei ole vielä kysymyksiä. <a href="/2-0">Takaisin</a></main>;
