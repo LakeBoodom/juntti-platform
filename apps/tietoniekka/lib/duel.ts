@@ -21,6 +21,8 @@ export type DuelEntity = {
   lon: number | null;
   /** Partitiivi ("Vaasaa"). Käytetään kun entiteetti on vertailupisteenä. */
   partitive: string | null;
+  /** Lyhyt taustakuvaus paljastukseen. Ilman tätä paljastus toistaa kysymyksen. */
+  bio: string | null;
 };
 
 export type DuelDef = {
@@ -62,6 +64,8 @@ export type DuelDef = {
   rankLabel: string | null;
   /** Sama ohje käänteiseen suuntaan. Null = kysytään vain yhteen suuntaan. */
   rankLabelRev: string | null;
+  /** Kelvollisten parien määrä. Lasketaan kerran, ohjaa valinnan painotusta. */
+  pairCount?: number;
   factTemplate: string | null;
 };
 
@@ -85,6 +89,48 @@ export type Duel = {
   /** Etäisyydet vertailupisteeseen kilometreinä, vain distance-moodissa. */
   dist: { a: number; b: number } | null;
 };
+
+/* ─── Sisällön määrä ohjaa valintaa ──────────────────────────────────
+   Aiemmin attribuutti arvottiin tasajakaumalla, jolloin 7 parin järvet
+   saivat yhtä paljon kysymyksiä kuin 4 290 parin syntymäajat. Ohuet
+   attribuutit kiersivät samoja pareja ja peli tuntui toistavan itseään.
+   Nyt paino on kelvollisten parien määrä, katkaistuna ylhäältä ettei
+   rikkain attribuutti nielaise koko peliä.                          */
+
+const WEIGHT_CAP = 200;
+/** Alle tämän jäävä attribuutti ei tule sekoitukseen — se ei voi olla toistumatta. */
+const MIN_PAIRS_FOR_MIX = 12;
+
+function countValidPairs(entities: DuelEntity[], def: DuelDef, blocked: Set<string>): number {
+  const pool = poolFor(entities, def);
+  if (pool.length < 2) return 0;
+  let n = 0;
+  if (def.mode === "distance") {
+    for (const ref of pool)
+      for (let i = 0; i < pool.length; i++)
+        for (let j = i + 1; j < pool.length; j++) {
+          const a = pool[i], b = pool[j];
+          if (a.id === ref.id || b.id === ref.id) continue;
+          const da = haversineKm(ref, a), db = haversineKm(ref, b);
+          if (da === db) continue;
+          if (!gapOk(def, relGap(da, db))) continue;
+          if (blocked.has(pairKeyOf(def.key, a, b, ref))) continue;
+          n++;
+        }
+    return n;
+  }
+  for (let i = 0; i < pool.length; i++)
+    for (let j = i + 1; j < pool.length; j++) {
+      const a = pool[i], b = pool[j];
+      if (a.v[def.key] === b.v[def.key]) continue;
+      if (def.mode === "flag") {
+        if (domainDistance(a.domain, b.domain) > def.maxDomainDistance) continue;
+      } else if (!gapOk(def, gap(def, a, b))) continue;
+      if (blocked.has(pairKeyOf(def.key, a, b))) continue;
+      n++;
+    }
+  return n;
+}
 
 /* ─── Alojen etäisyys ────────────────────────────────────────────────
    Numeerisessa kysymyksessä vaikeus tulee arvojen erosta. Lipussa
@@ -250,15 +296,36 @@ export function makeDuel(
   data: DuelData,
   theme: string,
   used: Set<string>,
+  /** Viimeksi nähdyt entiteetit. Estää saman kasvon toistumisen kierroksella. */
+  recent?: Set<string>,
 ): Duel | null {
   const blocked = new Set(data.blocks);
-  const usableDefs = data.defs.filter(
-    (d) => theme === "sekoitus" || d.theme === theme,
-  );
+  const mixed = theme === "sekoitus";
+  let usableDefs = data.defs.filter((d) => mixed || d.theme === theme);
+
+  // Paino lasketaan kerran per datalataus ja säilötään määritykseen.
+  for (const d of usableDefs)
+    if (d.pairCount === undefined) d.pairCount = countValidPairs(data.entities, d, blocked);
+
+  // Sekoituksessa ohuet attribuutit jätetään pois: ne eivät voi olla
+  // toistumatta. Omassa teemassaan ne ovat edelleen mukana.
+  if (mixed) {
+    const riittavat = usableDefs.filter((d) => (d.pairCount ?? 0) >= MIN_PAIRS_FOR_MIX);
+    if (riittavat.length) usableDefs = riittavat;
+  }
+  usableDefs = usableDefs.filter((d) => (d.pairCount ?? 0) > 0);
   if (!usableDefs.length) return null;
 
+  const painot = usableDefs.map((d) => Math.min(d.pairCount ?? 0, WEIGHT_CAP));
+  const summa = painot.reduce((a, b) => a + b, 0);
+
   for (let attempt = 0; attempt < 400; attempt++) {
-    const def = pick(usableDefs);
+    // Jäähy löysätään loppua kohti, ettei kysymys jää kokonaan syntymättä.
+    const kunnioitaJaahya = attempt < 250;
+    let r = Math.random() * summa;
+    let di = 0;
+    while (di < usableDefs.length - 1 && (r -= painot[di]) > 0) di++;
+    const def = usableDefs[di];
     const pool = poolFor(data.entities, def);
     if (pool.length < 2) continue;
 
@@ -293,6 +360,7 @@ export function makeDuel(
     }
 
     if (a.id === b.id) continue;
+    if (kunnioitaJaahya && recent && (recent.has(a.id) || recent.has(b.id))) continue;
 
     // Distance-moodissa vertailtava arvo lasketaan, muissa se on tallennettu.
     const dist =
@@ -352,7 +420,7 @@ export async function getDuelData(): Promise<DuelData | null> {
     (sb as any)
       .from("fact_entities")
       .select(
-        "id, name, kind, role_label, show_role, domain, image_url, lat, lon, name_partitive, fact_attributes(attr_key, num_value, display_value)",
+        "id, name, kind, role_label, show_role, domain, image_url, lat, lon, name_partitive, celebrities(bio_short), fact_attributes(attr_key, num_value, display_value)",
       )
       .eq("status", "published")
       .limit(2000),
@@ -389,6 +457,12 @@ export async function getDuelData(): Promise<DuelData | null> {
       lat: x.lat === null || x.lat === undefined ? null : Number(x.lat),
       lon: x.lon === null || x.lon === undefined ? null : Number(x.lon),
       partitive: x.name_partitive ?? null,
+      // PostgREST palauttaa upotuksen joko objektina tai taulukkona sen mukaan
+      // miten se päättelee suhteen. Hiljainen null olisi juuri se virhe jota
+      // ei huomaisi mistään, joten käsitellään molemmat.
+      bio:
+        (Array.isArray(x.celebrities) ? x.celebrities[0]?.bio_short : x.celebrities?.bio_short) ??
+        null,
     };
     // Sijainti yksinään riittää: etäisyyskysymys ei tarvitse tallennettua arvoa.
   }).filter((e: DuelEntity) => Object.keys(e.v).length > 0 || hasCoords(e));

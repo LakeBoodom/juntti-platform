@@ -12,6 +12,8 @@ import {
 } from "../../lib/duel";
 
 const ROUND_LEN = 10;
+/** Montako viimeksi nähtyä entiteettiä pidetään jäähyllä. */
+const RECENT_WINDOW = 8;
 const REVEAL_MS = 2500;
 
 // Yleisövertailu ("48 % valitsi väärin") kytketään päälle vasta kun
@@ -41,6 +43,8 @@ export function KumpiClient({ data }: { data: DuelData }) {
   const [best, setBest] = useState(0);
 
   const used = useRef<Set<string>>(new Set());
+  /** Viimeksi nähdyt entiteetit — estää saman kasvon toistumisen kierroksella. */
+  const recent = useRef<Set<string>>(new Set());
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const roundOver = useRef(false);
 
@@ -51,12 +55,20 @@ export function KumpiClient({ data }: { data: DuelData }) {
 
   const nextDuel = useCallback(
     (t: string) => {
-      const d = makeDuel(data, t, used.current);
-      if (!d) {
-        used.current.clear();
-        setDuel(makeDuel(data, t, used.current));
-      } else {
-        setDuel(d);
+      const d = makeDuel(data, t, used.current, recent.current) ??
+        (() => {
+          used.current.clear();
+          return makeDuel(data, t, used.current, recent.current);
+        })();
+      setDuel(d);
+      if (d) {
+        // Liukuva ikkuna: viimeksi nähdyt kasvot eivät palaa heti uudelleen.
+        recent.current = new Set([...recent.current, d.a.id, d.b.id]);
+        while (recent.current.size > RECENT_WINDOW) {
+          const eka = recent.current.values().next().value;
+          if (eka === undefined) break;
+          recent.current.delete(eka);
+        }
       }
       setPicked(null);
     },
@@ -66,6 +78,7 @@ export function KumpiClient({ data }: { data: DuelData }) {
   const start = (m: Mode) => {
     if (timer.current) clearTimeout(timer.current);
     used.current = new Set();
+    recent.current = new Set();
     roundOver.current = false;
     setMode(m);
     setIndex(0);
@@ -327,6 +340,7 @@ export function KumpiClient({ data }: { data: DuelData }) {
             <div className="kumpi-fact">
               <span>Tiesitkö?</span>
               <p>{duel.fact}</p>
+              {bioteksti(duel) && <p className="kumpi-bio">{bioteksti(duel)}</p>}
             </div>
             {SHOW_CROWD_STATS && <div className="kumpi-crowd" />}
             <p className="kumpi-next">
@@ -337,4 +351,14 @@ export function KumpiClient({ data }: { data: DuelData }) {
       </div>
     </main>
   );
+}
+
+/**
+ * Paljastuksen taustatieto. Pelkkä arvojen toisto ei anna mitään lisää —
+ * "Vappu Pimiä on juontaja, Timo Soini on poliitikko" ei opeta kenellekään
+ * mitään. Julkkiskalenterissa on valmiina lyhyt kuvaus; näytetään se.
+ */
+function bioteksti(duel: Duel): string | null {
+  const w = duel.correct === 0 ? duel.a : duel.b;
+  return w.bio && w.bio.length > 20 ? w.bio : null;
 }
