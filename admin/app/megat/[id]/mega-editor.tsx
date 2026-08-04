@@ -5,7 +5,7 @@
 // Selain toimii kahdessa tilassa: 'add' (poimi useita) / 'replace' (valitse yksi).
 // Lähteinä sekä visat että kuvakortistot.
 
-import { useMemo, useState, useTransition } from "react";
+import { useEffect, useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import {
@@ -199,16 +199,16 @@ function SourceBrowser({ megaId, state, perSource, existing, onClose, onDone }: 
   const [openSource, setOpenSource] = useState<{ key: string; title: string } | null>(null);
   const [items, setItems] = useState<Array<{ key: string; question_text: string; correct: string; image_url: string | null }>>([]);
   const [picked, setPicked] = useState<Set<string>>(new Set());
-  const [loaded, setLoaded] = useState(false);
   const [pending, start] = useTransition();
 
-  if (!loaded) {
-    setLoaded(true);
+  /* Alkulataus effectissä — datahaku renderin aikana kaataa Reactin */
+  useEffect(() => {
     start(async () => {
       setQuizzes(await searchSourceQuizzes(""));
       setDecks(await listDecks());
     });
-  }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const replaceMode = state.mode === "replace";
 
