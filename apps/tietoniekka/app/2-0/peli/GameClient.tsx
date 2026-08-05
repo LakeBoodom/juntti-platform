@@ -151,6 +151,12 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
   }
 
   function next() {
+    /* Konfetti jäi joskus roikkumaan seuraavan kysymyksen päälle, kun
+       "Seuraava" klikattiin ennen kuin edellisen vastauksen animaatio
+       ehti loppua (Heikki 4.8.2026). canvas-confetti piirtää yhteiselle,
+       koko sivun peittävälle canvasille, joten se pitää nollata eksplisiittisesti
+       kysymyksen vaihtuessa sen sijaan että jäädään odottamaan sen omaa loppumista. */
+    try { confetti.reset(); } catch { /* no-op */ }
     if (idx >= total - 1) {
       endGame();
     } else {
@@ -206,6 +212,7 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
   }
 
   function restart() {
+    try { confetti.reset(); } catch { /* no-op */ }
     setPhase("play");
     try { window.scrollTo(0, 0); } catch { /* no-op */ }
     setIdx(0);

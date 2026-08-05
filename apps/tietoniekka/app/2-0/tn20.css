@@ -460,7 +460,8 @@
 
 /* Alanavi + footer */
 .tn20 .tn-chipnav { display: flex; flex-wrap: wrap; gap: 8px; }
-.tn20 .tn-chipnav a {
+.tn20 .tn-chipnav a,
+.tn20 .tn-chipnav a:visited {
   text-decoration: none; color: var(--tn-text-soft); font-size: 13px; font-weight: 600;
   border: 1px solid var(--tn-line); border-radius: 999px; padding: 8px 14px;
 }
