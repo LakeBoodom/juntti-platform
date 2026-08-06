@@ -202,6 +202,19 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
   function endGame() {
     setPhase("end");
     try { window.scrollTo(0, 0); } catch { /* no-op */ }
+    /* Pelatut visat talteen client-puolelle (tn_played_quizzes) —
+       Historia-aikajanan "pelattu"-merkinnät lukevat tätä (6.8.2026).
+       Sama periaate kuin Putki: ei kirjautumista, localStorage riittää. */
+    try {
+      if (quiz.id) {
+        const KEY = "tn_played_quizzes";
+        const arr = JSON.parse(window.localStorage.getItem(KEY) ?? "[]") as string[];
+        if (!arr.includes(quiz.id)) {
+          arr.push(quiz.id);
+          window.localStorage.setItem(KEY, JSON.stringify(arr));
+        }
+      }
+    } catch { /* no-op */ }
     void recordPlay(score);
     if (quiz.isSankari) {
       const s = updateDailyStreak();

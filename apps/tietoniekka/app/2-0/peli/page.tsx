@@ -20,6 +20,7 @@ const COLLECTION_ACCENT: Record<string, string> = {
   matkakohteet: "#E8A320",
   yleistieto: "#E8A320",
   kulttuuri: "#E8A320",
+  historia: "#E8A320",
   "tunnetut-henkilot": "#C9A96A",
 };
 const COLLECTION_HUB: Record<string, string> = {
@@ -30,6 +31,7 @@ const COLLECTION_HUB: Record<string, string> = {
   matkakohteet: "/2-0/kokoelma/matkakohteet",
   yleistieto: "/2-0/kokoelma/yleistieto",
   kulttuuri: "/2-0/kokoelma/kulttuuri",
+  historia: "/2-0/kokoelma/historia",
   "tunnetut-henkilot": "/2-0/kokoelma/tunnetut-henkilot",
 };
 const COLLECTION_BG: Record<string, string> = {
@@ -40,6 +42,9 @@ const COLLECTION_BG: Record<string, string> = {
   matkakohteet: "/20/teema-maantieto.webp",
   yleistieto: "/20/teema-ruoka-juoma.webp",
   kulttuuri: "/20/kulttuuri/hero-kollaasi.webp",
+  /* Historia: väliaikainen neutraali tausta kunnes kokoelma saa omat kuvat
+     (Heikin visio 6.8.2026: kulttuurin malli laajenee historiaan) */
+  historia: "/20/teema-maantieto.webp",
   "tunnetut-henkilot": "/20/teema-tunnetut-henkilot.webp",
 };
 const COLLECTION_LABEL: Record<string, string> = {
@@ -50,6 +55,7 @@ const COLLECTION_LABEL: Record<string, string> = {
   matkakohteet: "Matkakohteet",
   yleistieto: "Yleistieto",
   kulttuuri: "Kulttuuri",
+  historia: "Historia",
   "tunnetut-henkilot": "Tunnetut henkilöt",
 };
 

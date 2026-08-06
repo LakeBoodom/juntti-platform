@@ -7,7 +7,7 @@ import { getSupabase, SITE_SLUG } from "@/lib/supabase";
 import { ModeMotif } from "@/components/tn20/motifs";
 import { QuizCard, type QuizCardData } from "@/components/tn20/cards";
 import { WideCard } from "@/components/tn20/WideCard";
-import { motifPathFor } from "@/components/tn20/motif-paths";
+import { MOTIF_PATHS, motifPathFor } from "@/components/tn20/motif-paths";
 import PutkiCard from "./PutkiCard";
 
 /** Kokoelmien aksentit (sama paletti kuin hubeissa). */
@@ -312,6 +312,8 @@ export default async function Etusivu20() {
             {[
               /* KULTTUURI-flagship (Heikki 6.8.2026): teemakokoelma omalla landingilla */
               { href: "/2-0/kokoelma/kulttuuri", img: "/20/kulttuuri/hero-kollaasi.webp", chip: "Teemakokoelma", title: "Kulttuuri", meta: `${n("kulttuuri")} visaa · Suomen tarinat`, accent: "var(--tn-gold)" },
+              /* Historia-aikajana (6.8.2026) — motiivikortti kunnes kokoelma saa omat kuvat */
+              { href: "/2-0/kokoelma/historia", motif: "torni", chip: "Teemakokoelma", title: "Historia", meta: `${n("historia")} visaa · Aikajana`, accent: "var(--tn-gold)" },
               { href: "/2-0/kokoelma/elokuvat", img: "/20/teema-elokuvat.webp", chip: "Kokoelma", title: "Elokuvat", meta: `${n("elokuvat")} visaa`, accent: "var(--tn-acc-elokuvat)" },
               { href: "/2-0/kokoelma/musiikki", img: "/20/teema-musiikki.webp", chip: "Kokoelma", title: "Musiikki", meta: `${n("musiikki")} visaa`, accent: "var(--tn-acc-musiikki)" },
               { href: "/kumpi", motif: "kumpi", chip: "Pelimuoto", title: "Kumpi?", meta: "Kaksi vaihtoehtoa", accent: "var(--tn-teal)" },
@@ -326,9 +328,15 @@ export default async function Etusivu20() {
                 {c.img ? (
                   /* eslint-disable-next-line @next/next/no-img-element */
                   <img src={c.img} alt="" loading="lazy" />
+                ) : c.motif === "kumpi" || c.motif === "jarjesta" ? (
+                  <div className="tn-browse-motif">
+                    <ModeMotif mode={c.motif} />
+                  </div>
                 ) : (
                   <div className="tn-browse-motif">
-                    <ModeMotif mode={c.motif as "kumpi" | "jarjesta"} />
+                    <svg viewBox="0 0 200 260" aria-hidden style={{ width: "58%", height: "68%" }}>
+                      <path d={MOTIF_PATHS[c.motif as string] ?? MOTIF_PATHS.kysymys} fill="none" stroke="currentColor" strokeWidth={7} strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
                   </div>
                 )}
                 <span className="tn-chip tn-browse-chip">{c.chip}</span>
@@ -444,7 +452,7 @@ export default async function Etusivu20() {
             <a href="/jarjesta">Järjestä</a>
             <a href="/peli?kuvavisa=liput">Liput</a>
             <a href="/2-0/kokoelma/kulttuuri">Kulttuuri</a>
-            <a href="/2-0/kokoelma/yleistieto">Historia</a>
+            <a href="/2-0/kokoelma/historia">Historia</a>
             <a href="/2-0/kokoelma/yleistieto">Ruoka &amp; juoma</a>
             <a href="/2-0/kokoelma/yleistieto">Muoti &amp; design</a>
             <a href="/2-0/kokoelma/matkakohteet">Luonto</a>
