@@ -313,7 +313,7 @@ export default async function Etusivu20() {
               /* KULTTUURI-flagship (Heikki 6.8.2026): teemakokoelma omalla landingilla */
               { href: "/2-0/kokoelma/kulttuuri", img: "/20/kulttuuri/hero-kollaasi.webp", chip: "Teemakokoelma", title: "Kulttuuri", meta: `${n("kulttuuri")} visaa · Suomen tarinat`, accent: "var(--tn-gold)" },
               /* Historia-aikajana (6.8.2026) — motiivikortti kunnes kokoelma saa omat kuvat */
-              { href: "/2-0/kokoelma/historia", motif: "torni", chip: "Teemakokoelma", title: "Historia", meta: `${n("historia")} visaa · Aikajana`, accent: "var(--tn-gold)" },
+              { href: "/2-0/kokoelma/historia", img: "/20/historia/hero-aikajana.webp", chip: "Teemakokoelma", title: "Historia", meta: `${n("historia")} visaa · Aikajana`, accent: "var(--tn-gold)" },
               { href: "/2-0/kokoelma/elokuvat", img: "/20/teema-elokuvat.webp", chip: "Kokoelma", title: "Elokuvat", meta: `${n("elokuvat")} visaa`, accent: "var(--tn-acc-elokuvat)" },
               { href: "/2-0/kokoelma/musiikki", img: "/20/teema-musiikki.webp", chip: "Kokoelma", title: "Musiikki", meta: `${n("musiikki")} visaa`, accent: "var(--tn-acc-musiikki)" },
               { href: "/kumpi", motif: "kumpi", chip: "Pelimuoto", title: "Kumpi?", meta: "Kaksi vaihtoehtoa", accent: "var(--tn-teal)" },

@@ -42,9 +42,7 @@ const COLLECTION_BG: Record<string, string> = {
   matkakohteet: "/20/teema-maantieto.webp",
   yleistieto: "/20/teema-ruoka-juoma.webp",
   kulttuuri: "/20/kulttuuri/hero-kollaasi.webp",
-  /* Historia: väliaikainen neutraali tausta kunnes kokoelma saa omat kuvat
-     (Heikin visio 6.8.2026: kulttuurin malli laajenee historiaan) */
-  historia: "/20/teema-maantieto.webp",
+  historia: "/20/historia/hero-aikajana.webp",
   "tunnetut-henkilot": "/20/teema-tunnetut-henkilot.webp",
 };
 const COLLECTION_LABEL: Record<string, string> = {

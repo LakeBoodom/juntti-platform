@@ -56,7 +56,6 @@ export default function HistoriaClient({ data }: { data: HistoriaData }) {
           <div className="tnh-chips">
             <span className="tnh-chip" data-accent="true">{totalQuizzes} visaa</span>
             <span className="tnh-chip">{data.eras.length} aikakautta</span>
-            <span className="tnh-chip">Aina ilmainen</span>
           </div>
 
           {/* Oma edistyminen — näytetään vasta kun jotain on pelattu */}
@@ -77,6 +76,12 @@ export default function HistoriaClient({ data }: { data: HistoriaData }) {
             </div>
           )}
         </section>
+
+        {/* ─── Herokuva: aikajanapanoraama kivikaudesta nykypäivään (Heikki 6.8.) ─── */}
+        <div className="tnh-heroimg">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/20/historia/hero-aikajana.webp" alt="Suomen historia kivikaudesta nykypäivään" />
+        </div>
 
         {/* ─── Aikakausien pikanavi ─── */}
         <nav className="tnh-eranav" aria-label="Aikakaudet">
