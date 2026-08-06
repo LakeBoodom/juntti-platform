@@ -11,7 +11,7 @@ import { getSupabase } from "@/lib/supabase";
 import { getPageContent } from "@/lib/pageContent";
 import { LearnArticle } from "@/components/tn20/LearnArticle";
 import {
-  KULTTUURI_HERO, KULTTUURI_SUBS, KULTTUURI_CURATED, DIFF_LABEL, kulttuuriImg,
+  KULTTUURI_HERO, KULTTUURI_SUBS, KULTTUURI_CURATED, kulttuuriImg,
 } from "@/lib/kulttuuri";
 
 export const dynamic = "force-dynamic";
@@ -45,8 +45,6 @@ const playHref = (c: Card) =>
 function CardMeta({ c }: { c: Card }) {
   return (
     <span className="tnk-cardmeta">
-      <b>{DIFF_LABEL[c.difficulty ?? ""] ?? "Keskitaso"}</b>
-      <i aria-hidden>•</i>
       {c.question_count} kysymystä
     </span>
   );
@@ -91,7 +89,9 @@ export default async function KulttuuriLanding({
   return (
     <main className="tnk" style={{ minHeight: "100dvh", paddingBottom: 60 }}>
       {/* ─── Hero: kollaasi + kaksivärinen otsikko (CD) ─── */}
-      <section className="tnk-hero">
+      <section className="tnk-herowrap">
+        <div className="tn-shell">
+        <div className="tnk-hero">
         <div className="tnk-hero-text">
           <nav style={{ fontSize: 13, fontWeight: 700, color: "#8E8676", marginBottom: 16 }}>
             <a href="/2-0" style={{ color: "inherit", textDecoration: "none" }}>Kokoelmat</a>
@@ -117,6 +117,8 @@ export default async function KulttuuriLanding({
         <div className="tnk-hero-media">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={KULTTUURI_HERO} alt="" />
+        </div>
+        </div>
         </div>
       </section>
 
@@ -162,7 +164,7 @@ export default async function KulttuuriLanding({
             <a className="tnk-pick" href={playHref(pick)}>
               <span className="tnk-pick-media">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={kulttuuriImg(pick.slug) ?? KULTTUURI_HERO} alt="" loading="lazy" />
+                <img src="/20/kulttuuri/laura-mikko.webp" alt="Laura ja Mikko" loading="lazy" />
               </span>
               <span className="tnk-pick-body">
                 <span className="tnk-pick-label">★ Lauran ja Mikon valinta</span>

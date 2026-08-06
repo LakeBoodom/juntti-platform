@@ -1030,9 +1030,10 @@
 
 /* Hero: teksti + kollaasi. Mobiilissa teksti ensin, kuva täysleveänä alla
    (CD:n mobiilimockup); desktopissa rinnakkain. */
+.tn20 .tnk-herowrap { padding-top: clamp(14px, 2vw, 26px); }
 .tn20 .tnk-hero {
   display: grid; background: linear-gradient(180deg, var(--tnk-navy) 0%, #0C1120 100%);
-  border-bottom: 1px solid var(--tnk-line);
+  border: 1px solid var(--tnk-line); border-radius: 20px; overflow: hidden;
 }
 .tn20 .tnk-hero-text { padding: clamp(28px, 5vw, 72px) clamp(18px, 4vw, 56px) clamp(24px, 3vw, 56px); max-width: 640px; }
 .tn20 .tnk-hero-media { position: relative; min-height: 240px; }
