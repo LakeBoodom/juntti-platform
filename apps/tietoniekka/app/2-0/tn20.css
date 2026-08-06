@@ -1014,3 +1014,122 @@
   font-size: 12px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase;
   max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
 }
+
+/* ============================================================
+   KULTTUURI — FLAGSHIP-TEEMAKOKOELMA (Heikki + CD 6.8.2026)
+   Väriratkaisu CD:n mukaan: yönsininen VAIN pintoina (hero, kortit),
+   kulta aksenttina (eyebrow, vaikeustaso, valittu chippi), lime vain
+   toiminnoissa (CTA). Header/footer pysyvät perusmustassa.
+   ============================================================ */
+.tn20 .tnk {
+  --tnk-navy: #0F1428;
+  --tnk-navy-2: #141B33;
+  --tnk-line: #24304F;
+  --tnk-gold-light: #F2C874;
+}
+
+/* Hero: teksti + kollaasi. Mobiilissa teksti ensin, kuva täysleveänä alla
+   (CD:n mobiilimockup); desktopissa rinnakkain. */
+.tn20 .tnk-hero {
+  display: grid; background: linear-gradient(180deg, var(--tnk-navy) 0%, #0C1120 100%);
+  border-bottom: 1px solid var(--tnk-line);
+}
+.tn20 .tnk-hero-text { padding: clamp(28px, 5vw, 72px) clamp(18px, 4vw, 56px) clamp(24px, 3vw, 56px); max-width: 640px; }
+.tn20 .tnk-hero-media { position: relative; min-height: 240px; }
+.tn20 .tnk-hero-media img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+@media (min-width: 900px) {
+  .tn20 .tnk-hero { grid-template-columns: minmax(420px, 46%) 1fr; }
+  .tn20 .tnk-hero-media { min-height: clamp(380px, 36vw, 520px); }
+  .tn20 .tnk-hero-media::before {
+    content: ""; position: absolute; inset: 0; z-index: 1;
+    background: linear-gradient(90deg, var(--tnk-navy) 0%, transparent 18%);
+  }
+}
+.tn20 .tnk-eyebrow {
+  display: inline-block; color: var(--tn-gold); font-size: 12px; font-weight: 800;
+  letter-spacing: 0.22em; text-transform: uppercase; margin-bottom: 14px;
+}
+.tn20 .tnk-title { font-size: clamp(34px, 5.2vw, 68px); line-height: 0.95; letter-spacing: -0.015em; text-transform: uppercase; margin: 0 0 16px; }
+.tn20 .tnk-title span { color: var(--tn-gold); }
+.tn20 .tnk-lede { margin: 0 0 20px; color: var(--tn-text-soft); font-size: clamp(14.5px, 1.4vw, 18px); line-height: 1.55; max-width: 42ch; }
+.tn20 .tnk-cta {
+  display: inline-block; padding: 14px 26px; border-radius: 12px; text-decoration: none;
+  background: var(--tn-lime); color: var(--tn-bg);
+  font-family: var(--tn-font-display); font-weight: 900; font-size: 14px;
+  letter-spacing: 0.05em; text-transform: uppercase;
+}
+.tn20 .tnk-cta:hover { filter: brightness(1.08); }
+.tn20 .tnk-hero-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 18px; font-size: 13px; font-weight: 700; color: var(--tn-text-soft); }
+.tn20 .tnk-chip {
+  display: inline-flex; align-items: center; gap: 6px; padding: 8px 13px; border-radius: 999px;
+  border: 1px solid var(--tnk-line); background: color-mix(in srgb, var(--tnk-navy-2) 70%, transparent);
+}
+.tn20 .tnk-chip b { color: var(--tnk-gold-light); }
+
+/* Suodatinchipit: valittu = kulta (CD) */
+.tn20 .tnk-filters { margin-top: 22px; }
+.tn20 .tnk-filters a[data-active] { background: var(--tn-gold); border-color: var(--tn-gold); color: var(--tn-bg); font-weight: 800; }
+
+/* Kuvakortit — yönsininen pinta, visan kuva 16:9, kulta-vaikeustaso */
+.tn20 .tnk-grid { display: grid; gap: 16px; margin-top: 18px; }
+@media (min-width: 640px) { .tn20 .tnk-grid { grid-template-columns: 1fr 1fr; } }
+@media (min-width: 1024px) { .tn20 .tnk-grid { grid-template-columns: 1fr 1fr 1fr; } }
+.tn20 .tnk-card, .tn20 .tnk-feature, .tn20 .tnk-pick {
+  display: flex; flex-direction: column; text-decoration: none; color: var(--tn-text);
+  background: var(--tnk-navy-2); border: 1px solid var(--tnk-line); border-radius: 16px; overflow: hidden;
+  transition: border-color 0.15s ease, transform 0.15s ease;
+}
+.tn20 .tnk-card:hover, .tn20 .tnk-feature:hover, .tn20 .tnk-pick:hover { border-color: var(--tn-gold); transform: translateY(-2px); }
+.tn20 .tnk-card-media, .tn20 .tnk-feature-media { position: relative; aspect-ratio: 16 / 10; overflow: hidden; }
+.tn20 .tnk-card-media img, .tn20 .tnk-feature-media img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.tn20 .tnk-badge {
+  position: absolute; top: 10px; left: 10px; padding: 5px 10px; border-radius: 999px;
+  background: var(--tn-lime); color: var(--tn-bg); font-size: 10.5px; font-weight: 900;
+  letter-spacing: 0.1em; text-transform: uppercase;
+}
+.tn20 .tnk-card-body, .tn20 .tnk-feature-body { position: relative; display: flex; flex-direction: column; gap: 7px; padding: 14px 46px 16px 16px; }
+.tn20 .tnk-cardtitle { font-family: var(--tn-font-display); font-weight: 900; font-size: clamp(17px, 1.6vw, 21px); line-height: 1.05; }
+.tn20 .tnk-cardmeta { display: flex; align-items: center; gap: 8px; font-size: 11.5px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; color: var(--tn-text-muted); }
+.tn20 .tnk-cardmeta b { color: var(--tnk-gold-light); }
+.tn20 .tnk-cardmeta i { font-style: normal; color: #3A4364; }
+.tn20 .tnk-cardteaser { font-size: 13.5px; line-height: 1.45; color: var(--tn-text-soft); }
+.tn20 .tnk-arrow {
+  position: absolute; right: 14px; bottom: 14px; width: 30px; height: 30px; border-radius: 50%;
+  display: inline-flex; align-items: center; justify-content: center;
+  border: 1px solid var(--tnk-line); color: var(--tnk-gold-light); font-size: 14px;
+}
+.tn20 .tnk-card:hover .tnk-arrow, .tn20 .tnk-feature:hover .tnk-arrow, .tn20 .tnk-pick:hover .tnk-arrow { background: var(--tn-gold); border-color: var(--tn-gold); color: var(--tn-bg); }
+
+/* Aloita näistä: 3 nostoa, ensimmäinen korostettu limellä (CD) */
+.tn20 .tnk-feature-grid { display: grid; gap: 16px; margin-top: 18px; }
+@media (min-width: 900px) { .tn20 .tnk-feature-grid { grid-template-columns: 1fr 1fr 1fr; } }
+.tn20 .tnk-feature[data-first] { border-color: color-mix(in srgb, var(--tn-lime) 55%, var(--tnk-line)); }
+
+/* Lauran ja Mikon valinta — pilleri (CD) */
+.tn20 .tnk-pick { flex-direction: row; align-items: center; gap: 14px; padding: 10px 18px 10px 10px; border-radius: 14px; }
+.tn20 .tnk-pick-media { flex: 0 0 92px; aspect-ratio: 4 / 3; border-radius: 10px; overflow: hidden; }
+.tn20 .tnk-pick-media img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.tn20 .tnk-pick-body { display: flex; flex-direction: column; gap: 5px; min-width: 0; }
+.tn20 .tnk-pick-label { color: var(--tn-gold); font-size: 11px; font-weight: 800; letter-spacing: 0.16em; text-transform: uppercase; }
+.tn20 .tnk-pick .tnk-arrow { position: static; margin-left: auto; flex: 0 0 auto; }
+
+/* ── Pelinäkymä visan omalla kuvalla (topic image) ──
+   Desktop: vasen lava näyttää kuvan värillisenä (ei grayscale-pesua).
+   Mobiili: hillitty kuvakaista kysymyksen yllä (CD "Visan aihe") —
+   vastausnauhojen osuma-alueet ja luettavuus eivät muutu. */
+.tn20 .tn-game[data-topic="true"] .tn-game-left-bg { filter: none; opacity: 0.42; }
+.tn20 .tn-game-topicband {
+  position: relative; margin: 12px clamp(18px, 3vw, 32px) 0; height: 104px;
+  border-radius: 12px; overflow: hidden; flex: 0 0 auto;
+}
+.tn20 .tn-game-topicband img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.tn20 .tn-game-topicband::after {
+  content: ""; position: absolute; inset: 0;
+  background: linear-gradient(180deg, transparent 30%, rgba(10, 8, 4, 0.72) 100%);
+}
+.tn20 .tn-game-topicband span {
+  position: absolute; left: 12px; bottom: 9px; z-index: 1; color: var(--tn-game-accent);
+  font-size: 10px; font-weight: 800; letter-spacing: 0.16em; text-transform: uppercase;
+}
+@media (min-width: 1024px) { .tn20 .tn-game-topicband { display: none; } }
+@media (max-height: 700px) { .tn20 .tn-game-topicband { height: 72px; } }

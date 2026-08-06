@@ -5,6 +5,7 @@
 
 import { getSupabase } from "@/lib/supabase";
 import { getKuvavisat } from "@/lib/queries";
+import { kulttuuriImg } from "@/lib/kulttuuri";
 import { MOTIF_PATHS, motifPathFor } from "@/components/tn20/motif-paths";
 import { LearnArticle, type Learn } from "@/components/tn20/LearnArticle";
 import GameClient, { type GameQuiz } from "./GameClient";
@@ -18,6 +19,7 @@ const COLLECTION_ACCENT: Record<string, string> = {
   musiikki: "#A855F7",
   matkakohteet: "#E8A320",
   yleistieto: "#E8A320",
+  kulttuuri: "#E8A320",
   "tunnetut-henkilot": "#C9A96A",
 };
 const COLLECTION_HUB: Record<string, string> = {
@@ -27,6 +29,7 @@ const COLLECTION_HUB: Record<string, string> = {
   musiikki: "/2-0/kokoelma/musiikki",
   matkakohteet: "/2-0/kokoelma/matkakohteet",
   yleistieto: "/2-0/kokoelma/yleistieto",
+  kulttuuri: "/2-0/kokoelma/kulttuuri",
   "tunnetut-henkilot": "/2-0/kokoelma/tunnetut-henkilot",
 };
 const COLLECTION_BG: Record<string, string> = {
@@ -36,6 +39,7 @@ const COLLECTION_BG: Record<string, string> = {
   musiikki: "/20/teema-musiikki.webp",
   matkakohteet: "/20/teema-maantieto.webp",
   yleistieto: "/20/teema-ruoka-juoma.webp",
+  kulttuuri: "/20/kulttuuri/hero-kollaasi.webp",
   "tunnetut-henkilot": "/20/teema-tunnetut-henkilot.webp",
 };
 const COLLECTION_LABEL: Record<string, string> = {
@@ -45,6 +49,7 @@ const COLLECTION_LABEL: Record<string, string> = {
   musiikki: "Musiikki",
   matkakohteet: "Matkakohteet",
   yleistieto: "Yleistieto",
+  kulttuuri: "Kulttuuri",
   "tunnetut-henkilot": "Tunnetut henkilöt",
 };
 
@@ -325,6 +330,11 @@ export default async function Peli20({
     for (const [re, c] of TEAM_COLORS) if (re.test(quiz.title)) { accent = c; break; }
   }
 
+  /* KULTTUURI-flagship (Heikki 6.8.2026): visan oma kuva pelinäkymään —
+     intro, desktop-lava, mobiilin kuvakaista ja tuloskortti. Fallback
+     kokoelman kollaasiheroon jos uudelle visalle ei ole vielä kuvaa. */
+  const topicImg = collection === "kulttuuri" ? kulttuuriImg(quiz.slug) : null;
+
   const genreLabel = (genreRes.data as { label: string } | null)?.label ?? null;
 
   const learn = quiz.learn ?? null;
@@ -348,7 +358,8 @@ export default async function Peli20({
     collectionLabel: COLLECTION_LABEL[collection] ?? "Visa",
     genreLabel,
     hubHref: COLLECTION_HUB[collection] ?? "/2-0",
-    bgImg: COLLECTION_BG[collection] ?? "/20/teema-ruoka-juoma.webp",
+    bgImg: topicImg ?? COLLECTION_BG[collection] ?? "/20/teema-ruoka-juoma.webp",
+    topicImg,
     accent,
     isSankari,
     questions: (qs ?? []).map((row) => {

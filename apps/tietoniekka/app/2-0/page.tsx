@@ -310,6 +310,8 @@ export default async function Etusivu20() {
           </div>
           <div className="tn-browse-grid" style={{ marginTop: 18 }}>
             {[
+              /* KULTTUURI-flagship (Heikki 6.8.2026): teemakokoelma omalla landingilla */
+              { href: "/2-0/kokoelma/kulttuuri", img: "/20/kulttuuri/hero-kollaasi.webp", chip: "Teemakokoelma", title: "Kulttuuri", meta: `${n("kulttuuri")} visaa · Suomen tarinat`, accent: "var(--tn-gold)" },
               { href: "/2-0/kokoelma/elokuvat", img: "/20/teema-elokuvat.webp", chip: "Kokoelma", title: "Elokuvat", meta: `${n("elokuvat")} visaa`, accent: "var(--tn-acc-elokuvat)" },
               { href: "/2-0/kokoelma/musiikki", img: "/20/teema-musiikki.webp", chip: "Kokoelma", title: "Musiikki", meta: `${n("musiikki")} visaa`, accent: "var(--tn-acc-musiikki)" },
               { href: "/kumpi", motif: "kumpi", chip: "Pelimuoto", title: "Kumpi?", meta: "Kaksi vaihtoehtoa", accent: "var(--tn-teal)" },
@@ -441,6 +443,7 @@ export default async function Etusivu20() {
             <a href="/kumpi">Kumpi?</a>
             <a href="/jarjesta">Järjestä</a>
             <a href="/peli?kuvavisa=liput">Liput</a>
+            <a href="/2-0/kokoelma/kulttuuri">Kulttuuri</a>
             <a href="/2-0/kokoelma/yleistieto">Historia</a>
             <a href="/2-0/kokoelma/yleistieto">Ruoka &amp; juoma</a>
             <a href="/2-0/kokoelma/yleistieto">Muoti &amp; design</a>

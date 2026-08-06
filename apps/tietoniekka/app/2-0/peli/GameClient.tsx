@@ -32,6 +32,9 @@ export type GameQuiz = {
   genreLabel: string | null;
   hubHref: string;
   bgImg: string;
+  /* KULTTUURI-flagship (6.8.2026): visan oma kuva. Kun asetettu, desktop-lava
+     näyttää kuvan värillisenä ja mobiilipeliin tulee "Visan aihe" -kuvakaista. */
+  topicImg?: string | null;
   accent: string;
   isSankari: boolean;
   /* image = kuvavisan tunnistettava kuva (3.8.2026)
@@ -460,7 +463,7 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
   /* ─── Peli: 2A jaettu lava ─── */
   const qLen = q.question.length > 140 ? "xlong" : q.question.length > 85 ? "long" : "normal";
   return (
-    <main className="tn-game" style={shellStyle}>
+    <main className="tn-game" style={shellStyle} data-topic={quiz.topicImg ? "true" : undefined}>
       <div className="tn-game-segs">
         {Array.from({ length: total }, (_, i) => (
           <i key={i} data-on={i < idx + (answered ? 1 : 0)} />
@@ -479,6 +482,15 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
               {streak >= 2 ? <> · 🔥 {streak}</> : null}
             </span>
           </div>
+          {/* KULTTUURI: mobiilin hillitty kuvakaista (CD "Visan aihe") —
+              piilossa desktopissa, jossa kuva on jo lavan taustana */}
+          {quiz.topicImg && !q.image && (
+            <div className="tn-game-topicband">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={quiz.topicImg} alt="" />
+              <span>Visan aihe</span>
+            </div>
+          )}
           <div className="tn-game-qwrap" data-img={q.image ? "true" : undefined}>
             {/* Kuvavisa: tunnistettava kuva on pääosassa, kysymysteksti pieneksi */}
             {q.image && (
