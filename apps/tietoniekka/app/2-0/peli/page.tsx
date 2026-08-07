@@ -346,7 +346,6 @@ export default async function Peli20({
     collection === "kulttuuri" ? kulttuuriImg(quiz.slug) :
     collection === "luonto" ? luontoImg(quiz.slug) :
     null;
-  
 
   const genreLabel = (genreRes.data as { label: string } | null)?.label ?? null;
 
