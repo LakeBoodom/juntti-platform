@@ -13,7 +13,7 @@ import PutkiCard from "./PutkiCard";
 /** Kokoelmien aksentit (sama paletti kuin hubeissa). */
 const DAY_ACCENT: Record<string, string> = {
   tv: "#FF3D9E", urheilu: "#B6FF3C", elokuvat: "#FF5C3D", musiikki: "#A855F7",
-  matkakohteet: "#E8A320", ruokajuoma: "#F2C230", luonnonihmeet: "#2FD9A5",
+  matkakohteet: "#E8A320", ruokajuoma: "#F2C230", luonto: "#2FD9A5",
   kuvavisat: "#4C9AFF", yleistieto: "#E8A320", "tunnetut-henkilot": "#C9A96A",
 };
 
@@ -314,6 +314,7 @@ export default async function Etusivu20() {
               { href: "/2-0/kokoelma/kulttuuri", img: "/20/kulttuuri/hero-kollaasi.webp", chip: "Teemakokoelma", title: "Kulttuuri", meta: `${n("kulttuuri")} visaa · Suomen tarinat`, accent: "var(--tn-gold)" },
               /* Historia-aikajana (6.8.2026) — motiivikortti kunnes kokoelma saa omat kuvat */
               { href: "/2-0/kokoelma/historia", img: "/20/historia/hero-aikajana.webp", chip: "Teemakokoelma", title: "Historia", meta: `${n("historia")} visaa · Aikajana`, accent: "var(--tn-gold)" },
+              { href: "/2-0/kokoelma/luonto", img: "/20/luonto/hero-landing.webp", chip: "Teemakokoelma", title: "Suomen luonto", meta: `${n("luonto")} visaa · Eläimet & ilmiöt`, accent: "#3FBF7F" },
               { href: "/2-0/kokoelma/elokuvat", img: "/20/teema-elokuvat.webp", chip: "Kokoelma", title: "Elokuvat", meta: `${n("elokuvat")} visaa`, accent: "var(--tn-acc-elokuvat)" },
               { href: "/2-0/kokoelma/musiikki", img: "/20/teema-musiikki.webp", chip: "Kokoelma", title: "Musiikki", meta: `${n("musiikki")} visaa`, accent: "var(--tn-acc-musiikki)" },
               { href: "/kumpi", motif: "kumpi", chip: "Pelimuoto", title: "Kumpi?", meta: "Kaksi vaihtoehtoa", accent: "var(--tn-teal)" },
@@ -321,7 +322,6 @@ export default async function Etusivu20() {
               { href: "/2-0/kokoelma/matkakohteet", img: "/20/teema-maantieto.webp", chip: "Kokoelma", title: "Matkakohteet", meta: `${n("matkakohteet")} visaa`, accent: "var(--tn-acc-matkakohteet)" },
               { href: "/jarjesta", motif: "jarjesta", chip: "Pelimuoto", title: "Järjestä", meta: "Laita riviin", accent: "var(--tn-violet)" },
               { href: "/2-0/kokoelma/tunnetut-henkilot", img: "/20/teema-tunnetut-henkilot.webp", chip: "Kokoelma", title: "Tunnetut henkilöt", meta: "Tutut kasvot", accent: "var(--tn-amber)" },
-              { href: "/2-0/kokoelma/luonnonihmeet", img: "/20/teema-luonto.webp", chip: "Kokoelma", title: "Luonnon ihmeet", meta: "Eläimet & luonto", accent: "var(--tn-mint)" },
               { href: "/2-0/kokoelma/ruokajuoma", img: "/20/teema-ruoka-juoma.webp", chip: "Kokoelma", title: "Ruoka & juoma", meta: "Keittiöt & juomat", accent: "var(--tn-gold)" },
             ].map((c) => (
               <a key={c.title} className="tn-browse" href={c.href} style={{ ["--tn-browse-accent" as string]: c.accent }}>
@@ -455,7 +455,7 @@ export default async function Etusivu20() {
             <a href="/2-0/kokoelma/historia">Historia</a>
             <a href="/2-0/kokoelma/yleistieto">Ruoka &amp; juoma</a>
             <a href="/2-0/kokoelma/yleistieto">Muoti &amp; design</a>
-            <a href="/2-0/kokoelma/matkakohteet">Luonto</a>
+            <a href="/2-0/kokoelma/luonto">Luonto</a>
           </nav>
 
           <footer className="tn-footer">
