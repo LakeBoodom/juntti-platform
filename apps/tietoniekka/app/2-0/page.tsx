@@ -13,7 +13,7 @@ import PutkiCard from "./PutkiCard";
 /** Kokoelmien aksentit (sama paletti kuin hubeissa). */
 const DAY_ACCENT: Record<string, string> = {
   tv: "#FF3D9E", urheilu: "#B6FF3C", elokuvat: "#FF5C3D", musiikki: "#A855F7",
-  matkakohteet: "#E8A320", ruokajuoma: "#F2C230", luonto: "#2FD9A5",
+  matkakohteet: "#E8A320", ruokajuoma: "#F2C230", luonto: "#3FBF7F",
   kuvavisat: "#4C9AFF", yleistieto: "#E8A320", "tunnetut-henkilot": "#C9A96A",
 };
 
