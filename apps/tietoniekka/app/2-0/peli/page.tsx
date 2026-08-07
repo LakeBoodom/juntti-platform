@@ -6,6 +6,7 @@
 import { getSupabase } from "@/lib/supabase";
 import { getKuvavisat } from "@/lib/queries";
 import { kulttuuriImg } from "@/lib/kulttuuri";
+import { luontoImg } from "@/lib/luonto";
 import { MOTIF_PATHS, motifPathFor } from "@/components/tn20/motif-paths";
 import { LearnArticle, type Learn } from "@/components/tn20/LearnArticle";
 import GameClient, { type GameQuiz } from "./GameClient";
@@ -21,6 +22,7 @@ const COLLECTION_ACCENT: Record<string, string> = {
   yleistieto: "#E8A320",
   kulttuuri: "#E8A320",
   historia: "#E8A320",
+  luonto: "#3FBF7F",
   "tunnetut-henkilot": "#C9A96A",
 };
 const COLLECTION_HUB: Record<string, string> = {
@@ -32,6 +34,7 @@ const COLLECTION_HUB: Record<string, string> = {
   yleistieto: "/2-0/kokoelma/yleistieto",
   kulttuuri: "/2-0/kokoelma/kulttuuri",
   historia: "/2-0/kokoelma/historia",
+  luonto: "/2-0/kokoelma/luonto",
   "tunnetut-henkilot": "/2-0/kokoelma/tunnetut-henkilot",
 };
 const COLLECTION_BG: Record<string, string> = {
@@ -43,6 +46,7 @@ const COLLECTION_BG: Record<string, string> = {
   yleistieto: "/20/teema-ruoka-juoma.webp",
   kulttuuri: "/20/kulttuuri/hero-kollaasi.webp",
   historia: "/20/historia/hero-aikajana.webp",
+  luonto: "/20/luonto/hero-landing.webp",
   "tunnetut-henkilot": "/20/teema-tunnetut-henkilot.webp",
 };
 const COLLECTION_LABEL: Record<string, string> = {
@@ -54,6 +58,7 @@ const COLLECTION_LABEL: Record<string, string> = {
   yleistieto: "Yleistieto",
   kulttuuri: "Kulttuuri",
   historia: "Historia",
+  luonto: "Luonto",
   "tunnetut-henkilot": "Tunnetut henkilöt",
 };
 
@@ -334,10 +339,14 @@ export default async function Peli20({
     for (const [re, c] of TEAM_COLORS) if (re.test(quiz.title)) { accent = c; break; }
   }
 
-  /* KULTTUURI-flagship (Heikki 6.8.2026): visan oma kuva pelinäkymään —
-     intro, desktop-lava, mobiilin kuvakaista ja tuloskortti. Fallback
-     kokoelman kollaasiheroon jos uudelle visalle ei ole vielä kuvaa. */
-  const topicImg = collection === "kulttuuri" ? kulttuuriImg(quiz.slug) : null;
+  /* KULTTUURI/LUONTO-flagshipit (Heikki 6.8.-7.8.2026): visan oma kuva
+     pelinakymaan - intro, desktop-lava, mobiilin kuvakaista ja tuloskortti.
+     Fallback kokoelman herokuvaan jos uudelle visalle ei ole viela kuvaa. */
+  const topicImg =
+    collection === "kulttuuri" ? kulttuuriImg(quiz.slug) :
+    collection === "luonto" ? luontoImg(quiz.slug) :
+    null;
+  
 
   const genreLabel = (genreRes.data as { label: string } | null)?.label ?? null;
 
