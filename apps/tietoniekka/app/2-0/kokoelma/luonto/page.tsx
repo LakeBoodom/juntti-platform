@@ -5,6 +5,12 @@
 // "Luonnon ihmeet" -hub-sivun (joka käytti dynaamista [collection]-reittiä
 // category='luonto' -suodattimella osana Matkakohteita).
 // Staattinen segmentti ohittaa dynaamisen [collection]-reitin Next.js:ssä.
+//
+// Responsiivinen uudistus (Heikki 8.8.2026): oma 1240px-sisältölinja
+// (.tnl-shell), hero 44/56-jaolla desktopilla ja kuva ylhäällä kapealla,
+// suodattimet siirretty "Kaikki luontovisat" -osioon (eivät näytä
+// vaikuttavan Aloita näistä -nostoihin, jotka näkyvät aina), mobiilissa
+// ruudukko avataan ShowAllCards-napilla 8 kortin jälkeen.
 
 import type { Metadata } from "next";
 import { getSupabase } from "@/lib/supabase";
@@ -13,6 +19,7 @@ import { LearnArticle } from "@/components/tn20/LearnArticle";
 import {
   LUONTO_HERO, LUONTO_SUBS, LUONTO_CURATED, luontoImg,
 } from "@/lib/luonto";
+import { ShowAllCards } from "./ShowAllCards";
 
 export const dynamic = "force-dynamic";
 
@@ -88,9 +95,9 @@ export default async function LuontoLanding({
 
   return (
     <main className="tnl" style={{ minHeight: "100dvh", paddingBottom: 60 }}>
-      {/* ─── Hero: kuva + kaksivärinen otsikko (sama rakenne kuin Kulttuuri) ─── */}
+      {/* ─── Hero: teksti 44 % + kuva 56 % desktopilla, kuva ylhäällä kapealla ─── */}
       <section className="tnl-herowrap">
-        <div className="tn-shell">
+        <div className="tnl-shell">
         <div className="tnl-hero">
         <div className="tnl-hero-text">
           <nav style={{ fontSize: 13, fontWeight: 700, color: "#8E8676", marginBottom: 16 }}>
@@ -122,20 +129,10 @@ export default async function LuontoLanding({
         </div>
       </section>
 
-      <div className="tn-shell">
-        {/* ─── Alakokoelmasuodattimet ─── */}
-        <nav className="tn-chipnav tnl-filters" aria-label="Alakokoelmat">
-          <a href="/2-0/kokoelma/luonto" data-active={filter === "kaikki" || undefined}>Kaikki</a>
-          {presentSubs.map((s) => (
-            <a key={s.key} href={`/2-0/kokoelma/luonto?suodata=${s.key}`} data-active={filter === s.key || undefined}>
-              {s.label}
-            </a>
-          ))}
-        </nav>
-
-        {/* ─── Aloita näistä: kuratoidut nostot ─── */}
-        {filter === "kaikki" && features.length > 0 && (
-          <section className="tn-section" style={{ paddingTop: 20, paddingBottom: 0 }}>
+      <div className="tnl-shell">
+        {/* ─── Aloita näistä: kuratoidut nostot — näkyvät aina, suodatin ei vaikuta ─── */}
+        {features.length > 0 && (
+          <section className="tnl-section">
             <div className="tn-section-head">
               <h2 className="tn-section-title">Aloita näistä</h2>
             </div>
@@ -158,9 +155,9 @@ export default async function LuontoLanding({
           </section>
         )}
 
-        {/* ─── Lauran ja Mikon valinta ─── */}
-        {filter === "kaikki" && pick && (
-          <section className="tn-section" style={{ paddingTop: 16, paddingBottom: 0 }}>
+        {/* ─── Lauran ja Mikon valinta — editorial-nosto ─── */}
+        {pick && (
+          <section className="tnl-section tnl-section-tight">
             <a className="tnl-pick" href={playHref(pick)}>
               <span className="tnl-pick-media">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -176,18 +173,24 @@ export default async function LuontoLanding({
           </section>
         )}
 
-        {/* ─── Kaikki visat kuvakortteina ─── */}
-        <section className="tn-section" id="kaikki">
+        {/* ─── Kaikki luontovisat: otsikko + kokonaismäärä + suodattimet + ruudukko ─── */}
+        <section className="tnl-section" id="kaikki">
           <div className="tn-section-head">
-            <h2 className="tn-section-title">
-              {filter === "kaikki" ? "Kokeile myös näitä" : LUONTO_SUBS.find((s) => s.key === filter)?.label ?? "Visat"}
-            </h2>
-            <div className="tn-hubrow-note">{(filter === "kaikki" ? rest : visible).length} visaa</div>
+            <h2 className="tn-section-title">Kaikki luontovisat</h2>
+            <div className="tn-hubrow-note">{count} visaa</div>
           </div>
+          <nav className="tn-chipnav tnl-filters" aria-label="Alakokoelmat">
+            <a href="/2-0/kokoelma/luonto#kaikki" data-active={filter === "kaikki" || undefined}>Kaikki</a>
+            {presentSubs.map((s) => (
+              <a key={s.key} href={`/2-0/kokoelma/luonto?suodata=${s.key}#kaikki`} data-active={filter === s.key || undefined}>
+                {s.label}
+              </a>
+            ))}
+          </nav>
           {visible.length === 0 ? (
             <div className="tn-empty">Tällä suodattimella ei löytynyt visoja. Kokeile toista.</div>
           ) : (
-            <div className="tnl-grid">
+            <ShowAllCards total={visible.length}>
               {visible.map((c) => (
                 <a key={c.id} className="tnl-card" href={playHref(c)}>
                   <span className="tnl-card-media">
@@ -203,7 +206,7 @@ export default async function LuontoLanding({
                   </span>
                 </a>
               ))}
-            </div>
+            </ShowAllCards>
           )}
         </section>
       </div>
