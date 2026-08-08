@@ -1274,6 +1274,10 @@
    Sama rakenne kuin Kulttuuri (.tnk-*), vain väripaletti vaihtuu:
    metsänvihreä pintoina, --tn-luonto-accent tekstin/reunusten
    korostuksena, lime edelleen ainoa toimintaväri (värikuri).
+   Responsiivinen uudistus 8.8.2026: oma 1240px-sisältölinja,
+   hero 44/56, suodattimet ruudukon yhteydessä, mobiilissa
+   8+Näytä kaikki. Breakpointit: ≤640 mobiili · 641–960 tablet ·
+   ≥961 desktop.
    ============================================================ */
 .tn20 .tnl {
      --tn-luonto-accent: #3FBF7F;
@@ -1283,37 +1287,74 @@
      --tnl-accent-light: #7EDBA8;
 }
 
-/* Hero: teksti + kuva, sama rakenne kuin Kulttuurin .tnk-hero */
+/* Oma sisältölinja: max 1240px, desktopilla 32px sivutilat,
+   tabletilla 24–28px, mobiilissa 16px */
+.tn20 .tnl-shell { max-width: 1240px; margin: 0 auto; width: calc(100% - 64px); }
+@media (max-width: 960px) { .tn20 .tnl-shell { width: calc(100% - 52px); } }
+@media (max-width: 640px) { .tn20 .tnl-shell { width: calc(100% - 32px); } }
+
+/* Osiovälit: mobiili 32–40 · tablet 40–48 · desktop 56–68 */
+.tn20 .tnl-section { margin-top: clamp(32px, 5.5vw, 68px); }
+.tn20 .tnl-section-tight { margin-top: 24px; }
+
+/* ── Hero: kapealla kuva ylhäällä (column-reverse), desktopilla 44/56 ── */
 .tn20 .tnl-herowrap { padding-top: clamp(14px, 2vw, 26px); }
 .tn20 .tnl-hero {
-     display: grid; background: linear-gradient(180deg, var(--tnl-forest) 0%, #0B1912 100%);
+     display: flex; flex-direction: column-reverse;
+     background: linear-gradient(180deg, var(--tnl-forest) 0%, #0B1912 100%);
      border: 1px solid var(--tnl-line); border-radius: 20px; overflow: hidden;
 }
-.tn20 .tnl-hero-text { padding: clamp(28px, 5vw, 72px) clamp(18px, 4vw, 56px) clamp(24px, 3vw, 56px); max-width: 640px; }
-.tn20 .tnl-hero-media { position: relative; min-height: 240px; }
-.tn20 .tnl-hero-media img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
-@media (min-width: 900px) {
-     .tn20 .tnl-hero { grid-template-columns: minmax(420px, 46%) 1fr; }
-     .tn20 .tnl-hero-media { min-height: clamp(380px, 36vw, 520px); }
+.tn20 .tnl-hero-text { padding: 24px; }
+.tn20 .tnl-hero-media { position: relative; aspect-ratio: 16 / 10; }
+.tn20 .tnl-hero-media img {
+     position: absolute; inset: 0; width: 100%; height: 100%;
+     object-fit: cover; object-position: 65% center;
+}
+@media (min-width: 641px) and (max-width: 960px) {
+     .tn20 .tnl-hero-media { aspect-ratio: 16 / 9; }
+     .tn20 .tnl-hero-text { padding: clamp(32px, 4.5vw, 40px); }
+}
+@media (min-width: 961px) {
+     .tn20 .tnl-hero {
+            display: grid; grid-template-columns: 44% 56%; min-height: 460px;
+     }
+     .tn20 .tnl-hero-text {
+            display: flex; flex-direction: column; justify-content: center; align-items: flex-start;
+            padding: clamp(48px, 4.5vw, 64px) clamp(40px, 4.5vw, 64px);
+     }
+     .tn20 .tnl-hero-media { aspect-ratio: auto; min-height: 100%; }
+     .tn20 .tnl-hero-media img { object-position: center; }
+     /* Pehmeä, leveä gradientti tekstialueesta kuvaan */
      .tn20 .tnl-hero-media::before {
             content: ""; position: absolute; inset: 0; z-index: 1;
-            background: linear-gradient(90deg, var(--tnl-forest) 0%, transparent 18%);
+            background: linear-gradient(90deg,
+                 var(--tnl-forest) 0%,
+                 color-mix(in srgb, var(--tnl-forest) 55%, transparent) 14%,
+                 transparent 34%);
      }
 }
+@media (min-width: 1280px) { .tn20 .tnl-hero { min-height: 500px; max-height: 560px; } }
+
 .tn20 .tnl-eyebrow {
      display: inline-block; color: var(--tn-luonto-accent); font-size: 12px; font-weight: 800;
      letter-spacing: 0.22em; text-transform: uppercase; margin-bottom: 14px;
 }
-.tn20 .tnl-title { font-size: clamp(34px, 5.2vw, 68px); line-height: 0.95; letter-spacing: -0.015em; text-transform: uppercase; margin: 0 0 16px; }
+/* Otsikko: mobiili 38–46 · tablet 46–54 · desktop 56–68 */
+.tn20 .tnl-title { font-size: clamp(38px, 11vw, 46px); line-height: 0.92; letter-spacing: -0.015em; text-transform: uppercase; margin: 0 0 16px; overflow-wrap: anywhere; hyphens: auto; }
+@media (min-width: 641px) { .tn20 .tnl-title { font-size: clamp(46px, 6vw, 54px); } }
+@media (min-width: 961px) { .tn20 .tnl-title { font-size: clamp(56px, 4vw, 68px); line-height: 0.9; } }
 .tn20 .tnl-title span { color: var(--tn-luonto-accent); }
-.tn20 .tnl-lede { margin: 0 0 20px; color: var(--tn-text-soft); font-size: clamp(14.5px, 1.4vw, 18px); line-height: 1.55; max-width: 42ch; }
+.tn20 .tnl-lede { margin: 0 0 22px; color: var(--tn-text-soft); font-size: 17.5px; line-height: 1.55; max-width: 420px; }
 .tn20 .tnl-cta {
-     display: inline-block; padding: 14px 26px; border-radius: 12px; text-decoration: none;
+     display: inline-flex; align-items: center; justify-content: center;
+     min-height: 52px; padding: 14px 28px; border-radius: 12px; text-decoration: none;
      background: var(--tn-lime); color: var(--tn-bg);
      font-family: var(--tn-font-display); font-weight: 900; font-size: 14px;
      letter-spacing: 0.05em; text-transform: uppercase;
 }
 .tn20 .tnl-cta:hover { filter: brightness(1.08); }
+.tn20 .tnl-cta:focus-visible { outline: 2px solid var(--tn-lime); outline-offset: 3px; }
+@media (max-width: 640px) { .tn20 .tnl-cta { width: 100%; } }
 .tn20 .tnl-hero-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 18px; font-size: 13px; font-weight: 700; color: var(--tn-text-soft); }
 .tn20 .tnl-chip {
      display: inline-flex; align-items: center; gap: 6px; padding: 8px 13px; border-radius: 999px;
@@ -1321,55 +1362,102 @@
 }
 .tn20 .tnl-chip b { color: var(--tnl-accent-light); }
 
-/* Suodatinchipit: valittu = metsänvihreä */
-.tn20 .tnl-filters { margin-top: 22px; }
-.tn20 .tnl-filters a[data-active] { background: var(--tn-luonto-accent); border-color: var(--tn-luonto-accent); color: var(--tnl-forest); font-weight: 800; }
+/* ── Suodatinchipit "Kaikki luontovisat" -osiossa: valittu/hover/focus = lime,
+      kapealla yksi vaakasuunnassa vieritettävä rivi ilman scrollbaria ── */
+.tn20 .tnl-filters { margin-top: 14px; }
+.tn20 .tnl-filters a, .tn20 .tnl-filters a:visited { min-height: 44px; display: inline-flex; align-items: center; padding: 10px 16px; border-color: var(--tnl-line); }
+.tn20 .tnl-filters a:hover, .tn20 .tnl-filters a:focus-visible { border-color: var(--tn-lime); color: var(--tn-text); }
+.tn20 .tnl-filters a:focus-visible { outline: 2px solid var(--tn-lime); outline-offset: 2px; }
+.tn20 .tnl-filters a[data-active] { background: var(--tn-lime); border-color: var(--tn-lime); color: var(--tn-bg); font-weight: 800; }
+@media (max-width: 960px) {
+     .tn20 .tnl-filters {
+            flex-wrap: nowrap; overflow-x: auto; -webkit-overflow-scrolling: touch;
+            scrollbar-width: none; margin-inline: -16px; padding-inline: 16px;
+     }
+     .tn20 .tnl-filters::-webkit-scrollbar { display: none; }
+     .tn20 .tnl-filters a { flex: 0 0 auto; }
+}
 
-/* Kuvakortit — sama rakenne kuin .tnk-card, vihreä pinta + reunustus */
-.tn20 .tnl-grid { display: grid; gap: 16px; margin-top: 18px; }
-@media (min-width: 640px) { .tn20 .tnl-grid { grid-template-columns: 1fr 1fr; } }
-@media (min-width: 1024px) { .tn20 .tnl-grid { grid-template-columns: 1fr 1fr 1fr; } }
+/* ── Kuvakorttiruudukko: mobiili 1 · tablet 2 · desktop 3 palstaa ──
+      Reunus oletuksena hillitty vihreä; lime vain hover/focus-tiloissa. */
+.tn20 .tnl-grid { display: grid; gap: 16px; margin-top: 20px; }
+@media (min-width: 641px) { .tn20 .tnl-grid { grid-template-columns: 1fr 1fr; gap: 18px; } }
+@media (min-width: 961px) { .tn20 .tnl-grid { grid-template-columns: 1fr 1fr 1fr; gap: 22px; } }
 .tn20 .tnl-card, .tn20 .tnl-feature {
-     display: flex; flex-direction: column; text-decoration: none; color: var(--tn-text);
+     display: flex; flex-direction: column; height: 100%; text-decoration: none; color: var(--tn-text);
      background: var(--tnl-forest-2); border: 1px solid var(--tnl-line); border-radius: 16px; overflow: hidden;
      transition: border-color 0.15s ease, transform 0.15s ease;
 }
-.tn20 .tnl-card:hover, .tn20 .tnl-feature:hover { border-color: var(--tn-luonto-accent); transform: translateY(-2px); }
-.tn20 .tnl-card-media, .tn20 .tnl-feature-media { position: relative; aspect-ratio: 16 / 10; overflow: hidden; }
-.tn20 .tnl-card-media img, .tn20 .tnl-feature-media img { width: 100%; height: 100%; object-fit: cover; display: block; }
+@media (hover: hover) {
+     .tn20 .tnl-card:hover, .tn20 .tnl-feature:hover { border-color: var(--tn-lime); transform: translateY(-3px); }
+     .tn20 .tnl-card:hover .tnl-card-media img, .tn20 .tnl-feature:hover .tnl-feature-media img { transform: scale(1.03); }
+}
+.tn20 .tnl-card:focus-visible, .tn20 .tnl-feature:focus-visible, .tn20 .tnl-pick:focus-visible {
+     outline: 2px solid var(--tn-lime); outline-offset: 3px; border-color: var(--tn-lime);
+}
+.tn20 .tnl-card-media, .tn20 .tnl-feature-media { position: relative; aspect-ratio: 16 / 9; overflow: hidden; }
+.tn20 .tnl-card-media img, .tn20 .tnl-feature-media img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.25s ease; }
 .tn20 .tnl-badge {
      position: absolute; top: 10px; left: 10px; padding: 5px 10px; border-radius: 999px;
      background: var(--tn-lime); color: var(--tn-bg); font-size: 10.5px; font-weight: 900;
      letter-spacing: 0.1em; text-transform: uppercase;
 }
-.tn20 .tnl-card-body, .tn20 .tnl-feature-body { position: relative; display: flex; flex-direction: column; gap: 7px; padding: 14px 46px 16px 16px; }
-.tn20 .tnl-cardtitle { font-family: var(--tn-font-display); font-weight: 900; font-size: clamp(17px, 1.6vw, 21px); line-height: 1.05; }
-.tn20 .tnl-cardmeta { display: flex; align-items: center; gap: 8px; font-size: 11.5px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; color: var(--tn-text-muted); }
-.tn20 .tnl-cardmeta b { color: var(--tnl-accent-light); }
-.tn20 .tnl-cardteaser { font-size: 13.5px; line-height: 1.45; color: var(--tn-text-soft); }
-.tn20 .tnl-arrow {
-     position: absolute; right: 14px; bottom: 14px; width: 30px; height: 30px; border-radius: 50%;
-     display: inline-flex; align-items: center; justify-content: center;
-     border: 1px solid var(--tnl-line); color: var(--tnl-accent-light); font-size: 14px;
+.tn20 .tnl-card-body, .tn20 .tnl-feature-body { position: relative; flex: 1; display: flex; flex-direction: column; gap: 7px; padding: 16px 56px 18px 16px; }
+.tn20 .tnl-cardtitle {
+     font-family: var(--tn-font-display); font-weight: 800; font-size: clamp(18px, 1.5vw, 20px); line-height: 1.1;
+     display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
 }
-.tn20 .tnl-card:hover .tnl-arrow, .tn20 .tnl-feature:hover .tnl-arrow { background: var(--tn-luonto-accent); border-color: var(--tn-luonto-accent); color: var(--tnl-forest); }
+.tn20 .tnl-cardteaser {
+     font-size: 13.5px; line-height: 1.45; color: var(--tn-text-soft);
+     display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+}
+.tn20 .tnl-arrow {
+     position: absolute; right: 14px; bottom: 14px; width: 34px; height: 34px; border-radius: 50%;
+     display: inline-flex; align-items: center; justify-content: center;
+     border: 1px solid var(--tnl-line); color: var(--tnl-accent-light); font-size: 15px;
+}
+@media (hover: hover) {
+     .tn20 .tnl-card:hover .tnl-arrow, .tn20 .tnl-feature:hover .tnl-arrow, .tn20 .tnl-pick:hover .tnl-arrow {
+            background: var(--tn-lime); border-color: var(--tn-lime); color: var(--tn-bg);
+     }
+}
 
-/* Aloita näistä: 3 nostoa, ensimmäinen korostettu limellä */
-.tn20 .tnl-feature-grid { display: grid; gap: 16px; margin-top: 18px; }
-@media (min-width: 900px) { .tn20 .tnl-feature-grid { grid-template-columns: 1fr 1fr 1fr; } }
+/* ── Aloita näistä: 3 nostoa; tabletilla ensimmäinen 2 palstan levyinen ── */
+.tn20 .tnl-feature-grid { display: grid; gap: 16px; margin-top: 20px; }
+@media (min-width: 641px) and (max-width: 960px) {
+     .tn20 .tnl-feature-grid { grid-template-columns: 1fr 1fr; gap: 18px; }
+     .tn20 .tnl-feature[data-first] { grid-column: span 2; }
+}
+@media (min-width: 961px) { .tn20 .tnl-feature-grid { grid-template-columns: 1fr 1fr 1fr; gap: 22px; } }
 .tn20 .tnl-feature[data-first] { border-color: color-mix(in srgb, var(--tn-lime) 55%, var(--tnl-line)); }
 
-/* Lauran ja Mikon valinta — pilleri (sama malli kuin Kulttuurin .tnk-pick) */
+/* ── Lauran ja Mikon valinta — editorial-nosto (96–110 px, kuva 80 px) ── */
 .tn20 .tnl-pick {
-     display: flex; flex-direction: row; align-items: center; gap: 14px; padding: 10px 18px 10px 10px;
+     display: flex; flex-direction: row; align-items: center; gap: 16px;
+     min-height: 100px; padding: 12px 20px 12px 12px;
      text-decoration: none; color: var(--tn-text);
-     background: var(--tnl-forest-2); border: 1px solid var(--tnl-line); border-radius: 14px;
+     background: var(--tnl-forest-2); border: 1px solid var(--tnl-line); border-radius: 16px;
      transition: border-color 0.15s ease, transform 0.15s ease;
 }
-.tn20 .tnl-pick:hover { border-color: var(--tn-luonto-accent); transform: translateY(-2px); }
-.tn20 .tnl-pick-media { flex: 0 0 92px; aspect-ratio: 4 / 3; border-radius: 10px; overflow: hidden; }
+@media (hover: hover) { .tn20 .tnl-pick:hover { border-color: var(--tn-lime); transform: translateY(-3px); } }
+.tn20 .tnl-pick-media { flex: 0 0 80px; width: 80px; height: 80px; border-radius: 12px; overflow: hidden; }
 .tn20 .tnl-pick-media img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .tn20 .tnl-pick-body { display: flex; flex-direction: column; gap: 5px; min-width: 0; }
 .tn20 .tnl-pick-label { color: var(--tn-luonto-accent); font-size: 11px; font-weight: 800; letter-spacing: 0.16em; text-transform: uppercase; }
+.tn20 .tnl-pick .tnl-cardtitle { -webkit-line-clamp: 2; }
 .tn20 .tnl-pick .tnl-arrow { position: static; margin-left: auto; flex: 0 0 auto; }
-.tn20 .tnl-pick:hover .tnl-arrow { background: var(--tn-luonto-accent); border-color: var(--tn-luonto-accent); color: var(--tnl-forest); }
+
+/* ── Mobiili: 8 korttia + "Näytä kaikki N visaa" (ShowAllCards) ── */
+.tn20 .tnl-showall { display: none; }
+@media (max-width: 640px) {
+     .tn20 .tnl-gridwrap:not([data-open]) .tnl-grid > .tnl-card:nth-child(n + 9) { display: none; }
+     .tn20 .tnl-showall {
+            display: flex; align-items: center; justify-content: center;
+            width: 100%; min-height: 48px; margin-top: 16px;
+            border: 1px solid var(--tnl-line); border-radius: 12px;
+            background: var(--tnl-forest-2); color: var(--tnl-accent-light);
+            font: inherit; font-weight: 800; font-size: 14px; cursor: pointer;
+     }
+     .tn20 .tnl-showall:hover, .tn20 .tnl-showall:focus-visible { border-color: var(--tn-lime); color: var(--tn-text); }
+     .tn20 .tnl-showall:focus-visible { outline: 2px solid var(--tn-lime); outline-offset: 2px; }
+}
