@@ -1333,7 +1333,7 @@
                  transparent 34%);
      }
 }
-@media (min-width: 1280px) { .tn20 .tnl-hero { min-height: 500px; max-height: 560px; } }
+@media (min-width: 1280px) { .tn20 .tnl-hero { min-height: 500px; } }
 
 .tn20 .tnl-eyebrow {
      display: inline-block; color: var(--tn-luonto-accent); font-size: 12px; font-weight: 800;
@@ -1344,6 +1344,11 @@
 @media (min-width: 641px) { .tn20 .tnl-title { font-size: clamp(46px, 6vw, 54px); } }
 @media (min-width: 961px) { .tn20 .tnl-title { font-size: clamp(56px, 4vw, 68px); line-height: 0.9; } }
 .tn20 .tnl-title span { color: var(--tn-luonto-accent); }
+/* Alarivi "lähimetsästä tunturiin" pienempänä omana rivinään: pitkä
+   yhdyssana ei mahdu 44 %:n palstaan pääotsikon koossa — hierarkia
+   vahvistuu ja tavutus poistuu (Heikki 8.8.2026: "älä kasvata
+   tasaisesti, vahvista typografista hierarkiaa") */
+.tn20 .tnl-title-l2 { display: block; font-style: normal; font-size: 0.7em; line-height: 1.02; letter-spacing: -0.01em; margin-top: 6px; }
 .tn20 .tnl-lede { margin: 0 0 22px; color: var(--tn-text-soft); font-size: 17.5px; line-height: 1.55; max-width: 420px; }
 .tn20 .tnl-cta {
      display: inline-flex; align-items: center; justify-content: center;
