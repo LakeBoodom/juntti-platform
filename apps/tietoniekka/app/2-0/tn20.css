@@ -1342,7 +1342,8 @@
 /* Otsikko: mobiili 38–46 · tablet 46–54 · desktop 56–68 */
 .tn20 .tnl-title { font-size: clamp(38px, 11vw, 46px); line-height: 0.92; letter-spacing: -0.015em; text-transform: uppercase; margin: 0 0 16px; overflow-wrap: anywhere; hyphens: auto; }
 @media (min-width: 641px) { .tn20 .tnl-title { font-size: clamp(46px, 6vw, 54px); } }
-@media (min-width: 961px) { .tn20 .tnl-title { font-size: clamp(56px, 4vw, 68px); line-height: 0.9; } }
+@media (min-width: 961px) { .tn20 .tnl-title { font-size: clamp(44px, 4.4vw, 56px); line-height: 0.9; } }
+@media (min-width: 1280px) { .tn20 .tnl-title { font-size: clamp(56px, 4vw, 68px); } }
 .tn20 .tnl-title span { color: var(--tn-luonto-accent); }
 /* Alarivi "lähimetsästä tunturiin" pienempänä omana rivinään: pitkä
    yhdyssana ei mahdu 44 %:n palstaan pääotsikon koossa — hierarkia
