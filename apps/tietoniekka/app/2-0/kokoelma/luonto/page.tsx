@@ -107,7 +107,8 @@ export default async function LuontoLanding({
           </nav>
           <span className="tnl-eyebrow">— Teemakokoelma</span>
           <h1 className="tn-display tnl-title">
-            <span>Suomen luonto</span><br />lähimetsästä tunturiin
+            <span>Suomen luonto</span>
+            <i className="tnl-title-l2">lähimetsästä tunturiin</i>
           </h1>
           <p className="tnl-lede">
             {count} visaa eläimistä, kasveista, maastoista ja luonnon ilmiöistä. Tunnetko oikeasti lähimetsäsi?
