@@ -4,10 +4,9 @@
 // Kuori staattinen, luvut dynaamisia kannasta.
 
 import { getSupabase, SITE_SLUG } from "@/lib/supabase";
-import { ModeMotif } from "@/components/tn20/motifs";
 import { QuizCard, type QuizCardData } from "@/components/tn20/cards";
 import { WideCard } from "@/components/tn20/WideCard";
-import { MOTIF_PATHS, motifPathFor } from "@/components/tn20/motif-paths";
+import { motifPathFor } from "@/components/tn20/motif-paths";
 import PutkiCard from "./PutkiCard";
 
 /** Kokoelmien aksentit (sama paletti kuin hubeissa). */
@@ -25,6 +24,7 @@ type Celeb = {
   name: string;
   role: string | null;
   image_url: string | null;
+  wikipedia_url: string | null;
   birth_date: string;
   trivia_quiz_id: string | null;
 };
@@ -40,7 +40,7 @@ async function getData() {
 
   const [cardsRes, celebsRes, playsRes] = await Promise.all([
     sb.from("quiz_cards" as never).select("*"),
-    sb.from("celebrities").select("id, slug, name, role, image_url, birth_date, trivia_quiz_id"),
+    sb.from("celebrities").select("id, slug, name, role, image_url, wikipedia_url, birth_date, trivia_quiz_id"),
     sb
       .from("quiz_plays")
       .select("quiz_id, played_at")
@@ -200,7 +200,7 @@ export default async function Etusivu20() {
             </p>
             <div className="tn-hero-chips">
               <span className="tn-trustchip">{total}+ visaa</span>
-              <span className="tn-trustchip">3 pelimuotoa</span>
+              <span className="tn-trustchip">Kuvavisat &amp; Megavisat</span>
               <span className="tn-trustchip">Aina ilmainen</span>
             </div>
           </div>
@@ -232,6 +232,12 @@ export default async function Etusivu20() {
                   {sankariCeleb.image_url && (
                     /* eslint-disable-next-line @next/next/no-img-element */
                     <img src={sankariCeleb.image_url} alt={sankariCeleb.name} />
+                  )}
+                  {/* Wikipedia-kuvien lähde + lisenssi (CC) — lisenssiehto (Heikki 10.8.2026) */}
+                  {sankariCeleb.image_url && sankariCeleb.wikipedia_url && (
+                    <a className="tn-photo-credit" href={sankariCeleb.wikipedia_url} target="_blank" rel="noopener noreferrer">
+                      Kuva: Wikipedia (CC)
+                    </a>
                   )}
                 </div>
                 <div className="tn-sankari-body">
@@ -269,32 +275,35 @@ export default async function Etusivu20() {
             <h2 className="tn-section-title">Aloita näistä</h2>
             <a className="tn-morelink" href="#selaa">Kaikki kokoelmat →</a>
           </div>
+          {/* Uudelleenpriorisointi (Heikki 10.8.2026): Suomen luonto + Suomen
+              tarinat (kulttuuri) päänostoiksi — TV & Urheilu siirtyivät Selaa
+              lisää -ruudukkoon. */}
           <div className="tn-feature-grid" style={{ marginTop: 18 }}>
-            <a className="tn-feature" href="/2-0/kokoelma/tv" style={{ ["--tn-feature-accent" as string]: "var(--tn-magenta)" }}>
+            <a className="tn-feature" href="/2-0/kokoelma/luonto" style={{ ["--tn-feature-accent" as string]: "#3FBF7F" }}>
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/20/hero-tv-laura.webp" alt="" />
+              <img src="/20/luonto/hero-landing.webp" alt="" />
               <div className="tn-feature-body">
-                <span className="tn-chip">Kokoelma · {n("tv")} visaa</span>
-                <div className="tn-feature-title">TV &amp; Suoratoisto</div>
-                <p className="tn-feature-desc">Netflix-hitit, kotimaiset sarjat ja ne joita et myönnä katsoneesi.</p>
+                <span className="tn-chip">Teemakokoelma · {n("luonto")} visaa</span>
+                <div className="tn-feature-title">Suomen luonto</div>
+                <p className="tn-feature-desc">Suurpedoista revontuliin ja soista saimaannorppaan — tunnetko oikeasti lähimetsäsi?</p>
                 <div className="tn-feature-tags">
-                  <span className="tn-chip">Suosituimmat</span>
-                  <span className="tn-chip">Kotimaiset</span>
-                  <span className="tn-chip">Klassikot</span>
+                  <span className="tn-chip">Eläimet</span>
+                  <span className="tn-chip">Maastot &amp; vedet</span>
+                  <span className="tn-chip">Ilmiöt</span>
                 </div>
               </div>
             </a>
-            <a className="tn-feature" href="/2-0/kokoelma/urheilu" style={{ ["--tn-feature-accent" as string]: "var(--tn-lime)" }}>
+            <a className="tn-feature" href="/2-0/kokoelma/kulttuuri" style={{ ["--tn-feature-accent" as string]: "var(--tn-gold)" }}>
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/20/hero-urheilu-mikko.webp" alt="" />
+              <img src="/20/kulttuuri/hero-kollaasi.webp" alt="" />
               <div className="tn-feature-body">
-                <span className="tn-chip">Kokoelma · {n("urheilu")} visaa</span>
-                <div className="tn-feature-title">Urheilu</div>
-                <p className="tn-feature-desc">Maajoukkueet, F1, tennis ja MM-kisat. Joukkue kerrallaan, omilla väreillä.</p>
+                <span className="tn-chip">Teemakokoelma · {n("kulttuuri")} visaa</span>
+                <div className="tn-feature-title">Suomen tarinat</div>
+                <p className="tn-feature-desc">Tekijät ja klassikot Muumeista kultakauteen — kulttuuri joka jäi elämään.</p>
                 <div className="tn-feature-tags">
-                  <span className="tn-chip">Jalkapallo</span>
-                  <span className="tn-chip">F1</span>
-                  <span className="tn-chip">Tennis</span>
+                  <span className="tn-chip">Taide &amp; design</span>
+                  <span className="tn-chip">Kirjallisuus</span>
+                  <span className="tn-chip">Musiikki &amp; näyttämö</span>
                 </div>
               </div>
             </a>
@@ -310,35 +319,22 @@ export default async function Etusivu20() {
           </div>
           <div className="tn-browse-grid" style={{ marginTop: 18 }}>
             {[
-              /* KULTTUURI-flagship (Heikki 6.8.2026): teemakokoelma omalla landingilla */
-              { href: "/2-0/kokoelma/kulttuuri", img: "/20/kulttuuri/hero-kollaasi.webp", chip: "Teemakokoelma", title: "Kulttuuri", meta: `${n("kulttuuri")} visaa · Suomen tarinat`, accent: "var(--tn-gold)" },
+              /* 10.8.2026: TV & Urheilu tänne päänostojen tieltä. Kumpi/Järjestä
+                 piilotettu 2.0:sta (siirretty 2.5:een) ja Ruoka & juoma piilossa
+                 kunnes sisältöä on enemmän. */
+              { href: "/2-0/kokoelma/tv", img: "/20/hero-tv-laura.webp", chip: "Kokoelma", title: "TV & Suoratoisto", meta: `${n("tv")} visaa · Netflix-hitit & kotimaiset`, accent: "var(--tn-magenta)" },
+              { href: "/2-0/kokoelma/urheilu", img: "/20/hero-urheilu-mikko.webp", chip: "Kokoelma", title: "Urheilu", meta: `${n("urheilu")} visaa · Joukkueväreissä`, accent: "var(--tn-lime)" },
               /* Historia-aikajana (6.8.2026) — motiivikortti kunnes kokoelma saa omat kuvat */
               { href: "/2-0/kokoelma/historia", img: "/20/historia/hero-aikajana.webp", chip: "Teemakokoelma", title: "Historia", meta: `${n("historia")} visaa · Aikajana`, accent: "var(--tn-gold)" },
-              { href: "/2-0/kokoelma/luonto", img: "/20/luonto/hero-landing.webp", chip: "Teemakokoelma", title: "Suomen luonto", meta: `${n("luonto")} visaa · Eläimet & ilmiöt`, accent: "#3FBF7F" },
               { href: "/2-0/kokoelma/elokuvat", img: "/20/teema-elokuvat.webp", chip: "Kokoelma", title: "Elokuvat", meta: `${n("elokuvat")} visaa`, accent: "var(--tn-acc-elokuvat)" },
               { href: "/2-0/kokoelma/musiikki", img: "/20/teema-musiikki.webp", chip: "Kokoelma", title: "Musiikki", meta: `${n("musiikki")} visaa`, accent: "var(--tn-acc-musiikki)" },
-              { href: "/kumpi", motif: "kumpi", chip: "Pelimuoto", title: "Kumpi?", meta: "Kaksi vaihtoehtoa", accent: "var(--tn-teal)" },
               { href: "/2-0/kokoelma/kuvavisat", img: "/20/teema-liput.webp", chip: "Kuvakokoelma", title: "Kuvavisat", meta: "Liput, vaakunat, eläimet…", accent: "var(--tn-azure)" },
               { href: "/2-0/kokoelma/matkakohteet", img: "/20/teema-maantieto.webp", chip: "Kokoelma", title: "Matkakohteet", meta: `${n("matkakohteet")} visaa`, accent: "var(--tn-acc-matkakohteet)" },
-              { href: "/jarjesta", motif: "jarjesta", chip: "Pelimuoto", title: "Järjestä", meta: "Laita riviin", accent: "var(--tn-violet)" },
               { href: "/2-0/kokoelma/tunnetut-henkilot", img: "/20/teema-tunnetut-henkilot.webp", chip: "Kokoelma", title: "Tunnetut henkilöt", meta: "Tutut kasvot", accent: "var(--tn-amber)" },
-              { href: "/2-0/kokoelma/ruokajuoma", img: "/20/teema-ruoka-juoma.webp", chip: "Kokoelma", title: "Ruoka & juoma", meta: "Keittiöt & juomat", accent: "var(--tn-gold)" },
             ].map((c) => (
               <a key={c.title} className="tn-browse" href={c.href} style={{ ["--tn-browse-accent" as string]: c.accent }}>
-                {c.img ? (
-                  /* eslint-disable-next-line @next/next/no-img-element */
-                  <img src={c.img} alt="" loading="lazy" />
-                ) : c.motif === "kumpi" || c.motif === "jarjesta" ? (
-                  <div className="tn-browse-motif">
-                    <ModeMotif mode={c.motif} />
-                  </div>
-                ) : (
-                  <div className="tn-browse-motif">
-                    <svg viewBox="0 0 200 260" aria-hidden style={{ width: "58%", height: "68%" }}>
-                      <path d={MOTIF_PATHS[c.motif as string] ?? MOTIF_PATHS.kysymys} fill="none" stroke="currentColor" strokeWidth={7} strokeLinecap="round" strokeLinejoin="round" />
-                    </svg>
-                  </div>
-                )}
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={c.img} alt="" loading="lazy" />
                 <span className="tn-chip tn-browse-chip">{c.chip}</span>
                 <div className="tn-browse-body">
                   <div className="tn-browse-title">{c.title}</div>
@@ -417,23 +413,8 @@ export default async function Etusivu20() {
         </section>
       )}
 
-      {/* ─── KAUSIHERO: Festarikesä (musiikki) ─── */}
-      <section className="tn-section">
-        <div className="tn-shell">
-          <div className="tn-season">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/20/teema-musiikki.webp" alt="" loading="lazy" />
-            <div className="tn-season-body">
-              <span className="tn-chip" style={{ color: "#c9a1f5" }}>Kokoelma · Musiikki</span>
-              <h2 className="tn-display tn-season-title">Festarikesä ilman rannekkeita</h2>
-              <p style={{ color: "var(--tn-text-soft)", margin: "0 0 18px" }}>
-                {n("musiikki")} visaa suomirockista, Euroviisuista ja siitä yhdestä biisistä joka jäi päähän.
-              </p>
-              <a className="tn-cta" data-tone="violet" href="/2-0/kokoelma/musiikki">Avaa kokoelma →</a>
-            </div>
-          </div>
-        </div>
-      </section>
+      {/* Kausihero (Festarikesä) poistettu 10.8.2026 — kausi ohi (Heikki).
+          Paikalle ei uutta kausinostoa ennen kuin ajankohtainen teema löytyy. */}
 
       {/* ─── ALANAVIGAATIO ─── */}
       <section className="tn-section" style={{ paddingBottom: 0 }}>
@@ -441,6 +422,8 @@ export default async function Etusivu20() {
           <h4 style={{ fontSize: 12, letterSpacing: "0.14em", textTransform: "uppercase", color: "var(--tn-text-dim)", marginBottom: 12 }}>
             Kaikki aiheet
           </h4>
+          {/* 10.8.2026: Kumpi/Järjestä piilotettu (2.5), tyhjät kategoriat
+              (Ruoka & juoma, Muoti & design) piilossa kunnes sisältöä on. */}
           <nav className="tn-chipnav">
             <a href="/2-0/kokoelma/tv">TV &amp; Suoratoisto</a>
             <a href="/2-0/kokoelma/urheilu">Urheilu</a>
@@ -448,13 +431,9 @@ export default async function Etusivu20() {
             <a href="/2-0/kokoelma/elokuvat">Elokuvat</a>
             <a href="/2-0/kokoelma/matkakohteet">Matkakohteet</a>
             <a href="/2-0/kokoelma/tunnetut-henkilot">Tunnetut henkilöt</a>
-            <a href="/kumpi">Kumpi?</a>
-            <a href="/jarjesta">Järjestä</a>
-            <a href="/peli?kuvavisa=liput">Liput</a>
+            <a href="/2-0/peli?kuvavisa=liput">Liput</a>
             <a href="/2-0/kokoelma/kulttuuri">Kulttuuri</a>
             <a href="/2-0/kokoelma/historia">Historia</a>
-            <a href="/2-0/kokoelma/yleistieto">Ruoka &amp; juoma</a>
-            <a href="/2-0/kokoelma/yleistieto">Muoti &amp; design</a>
             <a href="/2-0/kokoelma/luonto">Luonto</a>
           </nav>
 
@@ -477,8 +456,8 @@ export default async function Etusivu20() {
               <div>
                 <h4>Pelimuodot</h4>
                 <a href="/peli">Klassinen</a>
-                <a href="/kumpi">Kumpi?</a>
-                <a href="/jarjesta">Järjestä</a>
+                <a href="/2-0/peli?mega=suuri-mega-50">Megavisat</a>
+                <a href="/2-0/kokoelma/kuvavisat">Kuvavisat</a>
               </div>
             </div>
             <div style={{ display: "flex", justifyContent: "space-between", gap: 16, marginTop: 28, fontSize: 12.5 }}>
