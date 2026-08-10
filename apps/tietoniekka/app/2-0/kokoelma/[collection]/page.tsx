@@ -67,8 +67,8 @@ type HubMeta = {
   ctaDesc: string;
 };
 
-const MODE_KUMPI = { label: "Kumpi?", icon: "◑", href: "/kumpi" };
-const MODE_JARJESTA = { label: "Järjestä", icon: "⇅", href: "/jarjesta" };
+/* Kumpi?/Järjestä piilotettu 2.0:sta 10.8.2026 (siirretty 2.5-versioon) —
+   pelitapasuodattimissa ei enää linkkejä vanhoihin pelimuotoihin. */
 
 const HUBS: Record<string, HubMeta> = {
   tv: {
@@ -89,9 +89,9 @@ const HUBS: Record<string, HubMeta> = {
     accent: "#B6FF3C", accentLight: "#CFFF7A",
     img: "/20/hero-urheilu-mikko.webp",
     lede: (n) => `${n} visaa joukkue kerrallaan. Jokainen kortti kantaa joukkueen omat värit — ei kokoelmaväriä.`,
-    chips: (n) => [`${n} visaa`, "Maajoukkueet & seurat", "3 pelimuotoa"],
+    chips: (n) => [`${n} visaa`, "Maajoukkueet & seurat"],
     source: { kind: "collection", value: "urheilu" },
-    modes: [MODE_KUMPI, MODE_JARJESTA],
+    modes: [],
     ctaTitle: (n) => `Kaikki ${n} urheiluvisaa`,
     ctaDesc: "Valitse laji, sarja tai oma joukkue.",
   },
@@ -113,9 +113,9 @@ const HUBS: Record<string, HubMeta> = {
     accent: "#A855F7", accentLight: "#C79BFB",
     img: "/20/teema-musiikki.webp",
     lede: (n) => `${n} visaa levyistä, riimeistä ja festareista. Iskelmästä metalliin, Spotifysta vinyyliin.`,
-    chips: (n) => [`${n} visaa`, "Suomi & maailma", "2 pelimuotoa"],
+    chips: (n) => [`${n} visaa`, "Suomi & maailma"],
     source: { kind: "collection", value: "musiikki" },
-    modes: [MODE_KUMPI],
+    modes: [],
     ctaTitle: (n) => `Kaikki ${n} musiikkivisaa`,
     ctaDesc: "Artistit, bändit ja festarit — valitse omasi.",
   },
@@ -125,9 +125,9 @@ const HUBS: Record<string, HubMeta> = {
     accent: "#E8A320", accentLight: "#F5C462",
     img: "/20/teema-maantieto.webp",
     lede: (n) => `${n} visaa kaupungeista, saarista ja maanosista. Maailma pääkaupungeista pikkukyliin.`,
-    chips: (n) => [`${n} visaa`, "Maantieto", "3 pelimuotoa"],
+    chips: (n) => [`${n} visaa`, "Maantieto"],
     source: { kind: "collection", value: "matkakohteet" },
-    modes: [MODE_KUMPI, MODE_JARJESTA],
+    modes: [],
     ctaTitle: (n) => `Kaikki ${n} matkavisaa`,
     ctaDesc: "Valitse maanosa tai kohde — tai ota satunnainen matka.",
   },
@@ -163,7 +163,7 @@ const HUBS: Record<string, HubMeta> = {
     lede: (n) => `${n} visaa historiasta, kulttuurista ja kaikesta siltä väliltä.`,
     chips: (n) => [`${n} visaa`, "Pitkä häntä asuu täällä"],
     source: { kind: "collection", value: "yleistieto" },
-    modes: [MODE_JARJESTA],
+    modes: [],
     ctaTitle: (n) => `Kaikki ${n} yleistietovisaa`,
     ctaDesc: "Historia, ruoka, muoti ja loput.",
   },
@@ -173,9 +173,9 @@ const HUBS: Record<string, HubMeta> = {
     accent: "#C9A96A", accentLight: "#E3CFA6",
     img: "/20/teema-tunnetut-henkilot.webp",
     lede: () => "Näyttelijät, artistit, urheilijat ja muut tutut kasvot — kuinka hyvin tunnet heidät?",
-    chips: () => ["3 pelitapaa", "Uusia henkilöitä joka viikko"],
+    chips: () => ["Synttärisankarit joka päivä", "Uusia henkilöitä joka viikko"],
     source: { kind: "person" },
-    modes: [MODE_KUMPI],
+    modes: [],
     ctaTitle: () => "Selaa kaikkia",
     ctaDesc: "",
   },
@@ -656,6 +656,11 @@ async function PersonHub({ hub, filter, article }: { hub: HubMeta; filter: strin
               ))}
             </div>
           )}
+          {/* Wikipedia-kuvien lähde + lisenssi — lisenssiehto (Heikki 10.8.2026) */}
+          <p className="tn-photo-credit-note">
+            Henkilökuvat: Wikipedia / Wikimedia Commons (CC-lisenssit). Kuvan lähde- ja
+            lisenssitiedot löytyvät henkilön Wikipedia-sivulta.
+          </p>
         </section>
       </div>
       {article}
