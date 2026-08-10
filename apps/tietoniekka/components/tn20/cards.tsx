@@ -187,6 +187,10 @@ export function PersonCard({
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img className="tn-person-photo" src={person.image_url} alt="" loading="lazy" />
               <div className="tn-person-tint" />
+              {/* Henkilökuvat tulevat Wikipediasta (CC) — lähdemaininta on
+                  lisenssiehto (Heikki 10.8.2026). Lisenssitiedot henkilön
+                  Wikipedia-sivulla (linkki /sankari-sivulla). */}
+              <span className="tn-person-credit" aria-hidden>📷 Wikipedia</span>
             </>
           ) : (
             <div className="tn-person-silhouette">
