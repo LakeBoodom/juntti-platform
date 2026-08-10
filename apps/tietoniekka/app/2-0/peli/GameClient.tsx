@@ -8,7 +8,7 @@
 // NYKYISET kanavat (Facebook · Telegram · X · Kopioi linkki) — Instagram Story
 // lisätään myöhemmin kuvajaon kautta.
 // Mekaniikka identtinen tuotannon kanssa: 100 p + striikkibonus 50/porras,
-// Oljenkorsi 2 väärää pois, quiz_plays-tallennus + shared-merkintä, Putki
+// Oljenkorsi 2 väärää pois (1 per 10 kys., min 1 — 10.8.2026), quiz_plays-tallennus + shared-merkintä, Putki
 // (tn_paivan_visa_putki) vain Päivän sankarista. Ei ajastinta (v1).
 
 import { useEffect, useRef, useState } from "react";
@@ -105,7 +105,12 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
   const [correctCount, setCorrectCount] = useState(0);
   const [picked, setPicked] = useState<string | null>(null);
   const [hidden, setHidden] = useState<Set<string>>(new Set());
-  const [oljenkorsiUsed, setOljenkorsiUsed] = useState(false);
+  /* Oljenkorsien dynamiikka (Heikki 10.8.2026): 1 per 10 kysymystä, aina
+     vähintään 1 — tavallinen 10 kys. visa = 1 (kuten ennen), Mega 20 = 2,
+     Mega 50 = 5, Mega 100 = 10. Yksi korsi poistaa 2 väärää nykyisestä
+     kysymyksestä; samaan kysymykseen voi käyttää vain yhden. */
+  const oljenkorsiTotal = Math.max(1, Math.floor(total / 10));
+  const [oljenkorsiLeft, setOljenkorsiLeft] = useState(oljenkorsiTotal);
   const [dailyStreak, setDailyStreak] = useState(0);
   const [ansLog, setAnsLog] = useState<boolean[]>([]);
   const [copied, setCopied] = useState(false);
@@ -145,12 +150,12 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
   }
 
   function oljenkorsi() {
-    if (oljenkorsiUsed || answered) return;
+    if (oljenkorsiLeft <= 0 || answered || hidden.size > 0) return;
     const wrong = q.options.filter((o) => o !== q.correct);
     if (wrong.length < 2) return;
     const shuffled = [...wrong].sort(() => Math.random() - 0.5);
     setHidden(new Set(shuffled.slice(0, 2)));
-    setOljenkorsiUsed(true);
+    setOljenkorsiLeft((l) => l - 1);
   }
 
   function next() {
@@ -237,7 +242,7 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
     setCorrectCount(0);
     setPicked(null);
     setHidden(new Set());
-    setOljenkorsiUsed(false);
+    setOljenkorsiLeft(oljenkorsiTotal);
     setAnsLog([]);
     setCopied(false);
     recorded.current = false;
@@ -569,8 +574,12 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
           )}
           {/* Alalaita: Oljenkorsi vasen · logo keskellä (mobiili) · Seuraava oikea */}
           <div className="tn-game-foot">
-            <button className="tn-game-lifeline" onClick={oljenkorsi} disabled={oljenkorsiUsed || answered}>
-              🌾 {oljenkorsiUsed ? "Käytetty" : "Oljenkorsi"}
+            <button className="tn-game-lifeline" onClick={oljenkorsi} disabled={oljenkorsiLeft <= 0 || answered || hidden.size > 0}>
+              🌾 {oljenkorsiLeft <= 0
+                ? "Käytetty"
+                : oljenkorsiTotal > 1
+                  ? `Oljenkorsi ×${oljenkorsiLeft}`
+                  : "Oljenkorsi"}
             </button>
             {/* Keskilogo väistyy kun Seuraava ilmestyy — ei päällekkäisyyttä
                 kapealla näytöllä (Heikki 3.8.2026) */}
