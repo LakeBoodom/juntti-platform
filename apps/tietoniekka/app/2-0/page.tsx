@@ -7,7 +7,14 @@ import { getSupabase, SITE_SLUG } from "@/lib/supabase";
 import { QuizCard, type QuizCardData } from "@/components/tn20/cards";
 import { WideCard } from "@/components/tn20/WideCard";
 import { motifPathFor } from "@/components/tn20/motif-paths";
+import { kulttuuriImg } from "@/lib/kulttuuri";
+import { luontoImg } from "@/lib/luonto";
 import PutkiCard from "./PutkiCard";
+
+/** Visan oma kuva (flagship-kokoelmien topicImg) — sama putki kuin pelinäkymässä.
+    Palauttaa null jos kokoelmalla ei ole visakohtaisia kuvia (→ SVG-motiivi). */
+const topicImgFor = (collection: string | null | undefined, slug: string | null | undefined): string | null =>
+  collection === "kulttuuri" ? kulttuuriImg(slug) : collection === "luonto" ? luontoImg(slug) : null;
 
 /** Kokoelmien aksentit (sama paletti kuin hubeissa). */
 const DAY_ACCENT: Record<string, string> = {
@@ -221,6 +228,7 @@ export default async function Etusivu20() {
                 href={dayHref}
                 color={DAY_ACCENT[dayPick.card.collection ?? ""] ?? "var(--tn-gold)"}
                 motifPath={motifPathFor(dayPick.card.collection, (dayPick.card.genre as string | null) ?? null, dayPick.card.title)}
+                img={topicImgFor(dayPick.card.collection, dayPick.card.slug)}
                 title={dayPick.card.display_title ?? dayPick.card.title}
                 desc={(dayPick.card.teaser as string | null) ?? null}
                 mode="Klassinen"
@@ -351,7 +359,8 @@ export default async function Etusivu20() {
         <div className="tn-shell">
           <div className="tn-mega">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/20/mega100.webp" alt="" style={{ position: "absolute", right: 0, top: 0, height: "100%", width: "42%", objectFit: "cover", objectPosition: "center", opacity: 0.35, maskImage: "linear-gradient(90deg, transparent, black 40%)", WebkitMaskImage: "linear-gradient(90deg, transparent, black 40%)" }} />
+            {/* 11.8.2026: Heikin tekstivapaa Megavisu (ei leivottuja lukuja) */}
+            <img src="/20/megavisa.webp" alt="" style={{ position: "absolute", right: 0, top: 0, height: "100%", width: "42%", objectFit: "cover", objectPosition: "center", opacity: 0.35, maskImage: "linear-gradient(90deg, transparent, black 40%)", WebkitMaskImage: "linear-gradient(90deg, transparent, black 40%)" }} />
             <div className="tn-mega-grid" style={{ position: "relative" }}>
               <div>
                 <span className="tn-chip" style={{ color: "var(--tn-gold)" }}>Megavisat</span>
@@ -382,9 +391,16 @@ export default async function Etusivu20() {
             <h2 className="tn-section-title">Uusimmat visat</h2>
             <span className="tn-section-sub" style={{ margin: 0 }}>Jokaisen kokoelman tuorein</span>
           </div>
+          {/* 11.8.2026: visan oma kuva mukaan kun sellainen on (kulttuuri/luonto)
+              + linkit 2.0-kuoreen (aiemmin oletus /visa/ vei 1.0-peliin). */}
           <div className="tn-card-row" style={{ marginTop: 18 }}>
             {newestByCollection.map((q) => (
-              <QuizCard key={q.id} quiz={q as unknown as QuizCardData} />
+              <QuizCard
+                key={q.id}
+                quiz={q as unknown as QuizCardData}
+                img={topicImgFor(q.collection, q.slug)}
+                href={`/2-0/peli?quiz_id=${q.id}`}
+              />
             ))}
           </div>
         </div>
