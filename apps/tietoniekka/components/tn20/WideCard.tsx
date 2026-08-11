@@ -12,18 +12,28 @@ export type WideCardProps = {
   mode: string;           // "Klassinen" | "Kumpi?" | ...
   meta: string;           // "10 kysymystä" (+ pelattu-määrä kun dataa)
   badge?: string | null;
+  /** Visan oma kuva (kulttuuri/luonto topicImg) — korvaa väripesun ja
+      motiivin kun kuva on olemassa (Heikki 11.8.2026). */
+  img?: string | null;
 };
 
-export function WideCard({ href, color, motifPath, genreChip, title, desc, mode, meta, badge }: WideCardProps) {
+export function WideCard({ href, color, motifPath, genreChip, title, desc, mode, meta, badge, img }: WideCardProps) {
   return (
     <a className="tn-wide" href={href} style={{ color }}>
       <div className="tn-wide-box">
         <div className="tn-wide-visual">
-          <div className="tn-wide-wash" />
-          <div className="tn-wide-glowspot" />
-          <svg viewBox="0 0 200 260" className="tn-wide-motif" aria-hidden>
-            <path d={motifPath} fill="none" stroke="currentColor" strokeWidth={7} strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
+          {img ? (
+            /* eslint-disable-next-line @next/next/no-img-element */
+            <img className="tn-wide-img" src={img} alt="" />
+          ) : (
+            <>
+              <div className="tn-wide-wash" />
+              <div className="tn-wide-glowspot" />
+              <svg viewBox="0 0 200 260" className="tn-wide-motif" aria-hidden>
+                <path d={motifPath} fill="none" stroke="currentColor" strokeWidth={7} strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </>
+          )}
           <div className="tn-wide-fade" />
           {genreChip && <span className="tn-wide-genre">{genreChip}</span>}
           {badge && (
