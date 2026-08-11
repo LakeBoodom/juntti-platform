@@ -262,7 +262,7 @@ export default async function Etusivu20() {
             ) : (
               <div className="tn-empty">Päivän sankari palaa huomenna.</div>
             )}
-            <PutkiCard />
+            <PutkiCard dayHref={dayHref} />
           </div>
         </div>
       </section>
