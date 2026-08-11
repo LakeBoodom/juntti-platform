@@ -72,8 +72,10 @@ export type QuizCardData = {
   question_count: number;
 };
 
-/** Genrekortti (TV, elokuvat, yleinen visakortti). */
-export function QuizCard({ quiz, href }: { quiz: QuizCardData; href?: string }) {
+/** Genrekortti (TV, elokuvat, yleinen visakortti).
+    img (11.8.2026): visan oma kuva (kulttuuri/luonto topicImg) korvaa
+    SVG-motiivin, kun kuva on olemassa — chipit ja badge pysyvät koodissa. */
+export function QuizCard({ quiz, href, img }: { quiz: QuizCardData; href?: string; img?: string | null }) {
   const accent = cardAccent(quiz.collection, quiz.genre);
   const variant = cardVariant(quiz.id);
   const title = quiz.display_title ?? quiz.title;
@@ -85,9 +87,17 @@ export function QuizCard({ quiz, href }: { quiz: QuizCardData; href?: string }) 
     <article className="tn-card" style={{ ["--tn-card-accent" as string]: accent }}>
       <a href={link} aria-label={title}>
         <div className="tn-card-face" data-variant={variant}>
-          <div className="tn-card-motif">
-            <Motif collection={quiz.collection} genre={quiz.genre} uid={quiz.id} />
-          </div>
+          {img ? (
+            <>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img className="tn-card-img" src={img} alt="" loading="lazy" />
+              <div className="tn-card-img-shade" />
+            </>
+          ) : (
+            <div className="tn-card-motif">
+              <Motif collection={quiz.collection} genre={quiz.genre} uid={quiz.id} />
+            </div>
+          )}
           <div className="tn-card-top">
             <span className="tn-chip">{COLLECTION_LABEL[quiz.collection ?? ""] ?? "Visa"}</span>
             {quiz.badge && (
