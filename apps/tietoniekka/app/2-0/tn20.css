@@ -374,11 +374,18 @@
   border: 1px solid color-mix(in srgb, var(--tn-amber) 35%, var(--tn-line));
   background: var(--tn-surface);
 }
-@container (min-width: 620px) { .tn20 .tn-sankari-card { grid-template-columns: 240px 1fr; } }
+/* Kuvapalsta leveämpänä isolla näytöllä — kortti venyy Liekkikortin
+   korkuiseksi, joten 240px-palsta jäi suhteettoman kapeaksi (Heikki 11.8.2026). */
+@container (min-width: 620px) { .tn20 .tn-sankari-card { grid-template-columns: clamp(240px, 34cqw, 340px) 1fr; } }
 .tn20 .tn-sankari-photo { position: relative; min-height: 240px; background: linear-gradient(175deg, #6b4e86, #2c1f38 70%); }
-.tn20 .tn-sankari-photo img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; filter: grayscale(1) contrast(1.05) brightness(1.08); }
+/* object-position 50% 18%: Wikipedia-henkilökuvissa kasvot ovat kuvan
+   yläosassa — keskirajaus leikkasi pään pois kapealla näytöllä (Heikki 11.8.2026). */
+.tn20 .tn-sankari-photo img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 18%; filter: grayscale(1) contrast(1.05) brightness(1.08); }
 .tn20 .tn-sankari-photo::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, #b17ae0, #7a4ba8 60%, #3a2a55); mix-blend-mode: color; opacity: 0.55; }
-.tn20 .tn-sankari-body { padding: clamp(18px, 3cqw, 28px); display: flex; flex-direction: column; gap: 12px; }
+/* justify-content: center — kun kortti venyy viereisen Liekkikortin
+   korkuiseksi, sisältö keskittyy pystysuunnassa eikä jää ylälaitaan
+   (ahdas yläosa + tyhjä alaosa, Heikki 11.8.2026). */
+.tn20 .tn-sankari-body { padding: clamp(18px, 3cqw, 28px); display: flex; flex-direction: column; gap: 12px; justify-content: center; }
 .tn20 .tn-sankari-age { font-family: var(--tn-font-display); font-weight: 900; text-transform: uppercase; font-size: clamp(24px, 3.4cqw, 34px); line-height: 1; }
 .tn20 .tn-sankari-age b { color: var(--tn-gold); }
 .tn20 .tn-sankari-meta { color: var(--tn-text-muted); font-size: 13.5px; }
