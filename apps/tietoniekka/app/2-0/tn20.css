@@ -154,6 +154,12 @@
 .tn20 .tn-card-face[data-variant="b"] .tn-card-motif svg { width: 78%; transform: translate(14%, 6%) rotate(-8deg); }
 .tn20 .tn-card-face[data-variant="c"] .tn-card-motif svg { width: 125%; opacity: 0.45; transform: rotate(6deg); }
 
+/* Visan oma kuva kortin naamassa (11.8.2026): kulttuuri/luonto-visat saavat
+   topicImg-kuvansa myös etusivun korteissa — chipit pysyvät luettavina
+   kevyellä ylävarjolla. */
+.tn20 .tn-card-img { position: absolute; inset: 0; z-index: -1; width: 100%; height: 100%; object-fit: cover; }
+.tn20 .tn-card-img-shade { position: absolute; inset: 0; z-index: -1; background: linear-gradient(180deg, rgba(14,12,6,0.5), transparent 40%); }
+
 /* Kortin sisäiset kerrokset */
 .tn20 .tn-card-top {
   position: absolute; top: 10px; left: 10px; right: 10px;
@@ -580,6 +586,8 @@
   border: 1px solid var(--tn-line); background: var(--tn-surface); height: 100%;
 }
 .tn20 .tn-wide-visual { position: relative; aspect-ratio: 16 / 9; }
+/* Visan oma kuva leveässä kortissa (11.8.2026) — korvaa väripesun+motiivin */
+.tn20 .tn-wide-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
 .tn20 .tn-wide-wash { position: absolute; inset: 0; background: currentColor; opacity: 0.13; }
 .tn20 .tn-wide-glowspot { position: absolute; inset: 0; background: radial-gradient(circle at 84% 22%, currentColor, transparent 58%); opacity: 0.3; }
 .tn20 .tn-wide-motif { position: absolute; right: clamp(8px, 0.9cqw, 13px); top: clamp(7px, 0.8cqw, 11px); width: 34%; height: 78%; opacity: 0.55; }
