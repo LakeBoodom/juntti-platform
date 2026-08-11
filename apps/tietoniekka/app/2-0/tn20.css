@@ -392,16 +392,75 @@
 .tn20 .tn-cta[data-tone="gold"] { background: var(--tn-gold); }
 .tn20 .tn-textlink { color: var(--tn-amber); font-weight: 700; font-size: 13.5px; text-decoration: none; }
 .tn20 .tn-textlink:hover { text-decoration: underline; }
+/* PÄIVÄN PUTKI — Liekkikortti (CD 1b, Heikki valitsi 10.8.2026).
+   Lime johtaa (toimintaväri), tummat pinnat syvyyteen. Sama kortti
+   etusivun Tänään-slotissa ja pelin loppunäkymässä. */
 .tn20 .tn-putki-card {
-  border-radius: var(--tn-radius-lg); padding: clamp(18px, 3cqw, 26px);
-  border: 1px solid color-mix(in srgb, var(--tn-gold) 40%, var(--tn-line));
-  background: linear-gradient(165deg, color-mix(in srgb, var(--tn-gold) 13%, var(--tn-surface)), var(--tn-surface-2));
-  display: flex; flex-direction: column; gap: 10px;
+  position: relative; overflow: hidden;
+  border-radius: 24px; border: 1px solid var(--tn-line);
+  background: var(--tn-surface);
+  padding: clamp(20px, 3cqw, 26px) clamp(18px, 2.8cqw, 24px);
 }
-.tn20 .tn-putki-count { font-family: var(--tn-font-display); font-weight: 900; font-size: 34px; color: var(--tn-gold); line-height: 1; }
-.tn20 .tn-putki-dots { display: flex; gap: 6px; }
-.tn20 .tn-putki-dots i { height: 6px; flex: 1; border-radius: 3px; background: var(--tn-line); }
-.tn20 .tn-putki-dots i[data-on="true"] { background: var(--tn-gold); }
+.tn20 .tn-putki-glow {
+  position: absolute; top: -90px; right: -60px; width: 280px; height: 280px;
+  border-radius: 50%; background: var(--tn-lime);
+  filter: blur(120px); opacity: 0.15; pointer-events: none;
+}
+.tn20 .tn-putki-head { position: relative; display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 22px; }
+.tn20 .tn-putki-brand { display: flex; align-items: center; gap: 11px; }
+.tn20 .tn-putki-flame {
+  width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center;
+  border: 1px solid #42611F; background: var(--tn-bg-deep);
+  font-size: 21px; color: var(--tn-lime);
+  animation: tn-putki-flame 2.4s ease-in-out infinite;
+}
+.tn20 .tn-putki-label { font-size: 11px; font-weight: 800; letter-spacing: 0.18em; text-transform: uppercase; color: var(--tn-lime); }
+.tn20 .tn-putki-pill {
+  display: inline-flex; align-items: center; gap: 7px; padding: 8px 13px;
+  border-radius: 999px; border: 1px solid var(--tn-line); background: var(--tn-bg-deep);
+  font-size: 12px; font-weight: 700; color: var(--tn-text-soft); white-space: nowrap;
+}
+.tn20 .tn-putki-pill i { width: 6px; height: 6px; border-radius: 50%; background: var(--tn-lime); }
+.tn20 .tn-putki-pill[data-off] i { background: var(--tn-text-dim); animation: tn-putki-pulse 1.6s ease-in-out infinite; }
+.tn20 .tn-putki-num { position: relative; display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+.tn20 .tn-putki-num b {
+  font-family: var(--tn-font-display); font-weight: 900;
+  font-variation-settings: "wdth" 68;
+  font-size: clamp(64px, 9cqw, 96px); line-height: 0.82; color: var(--tn-lime);
+  animation: tn-putki-glowanim 3.4s ease-in-out infinite;
+}
+.tn20 .tn-putki-num span {
+  font-family: var(--tn-font-display); font-weight: 900;
+  font-variation-settings: "wdth" 72;
+  font-size: clamp(26px, 3.6cqw, 38px); line-height: 1;
+  text-transform: uppercase; letter-spacing: -0.01em;
+}
+.tn20 .tn-putki-msg { position: relative; margin: 14px 0 22px; font-size: 15px; line-height: 1.5; color: var(--tn-text-muted); max-width: 32ch; text-wrap: pretty; }
+.tn20 .tn-putki-week {
+  position: relative; display: flex; align-items: center;
+  padding: 16px 14px; border-radius: 16px; border: 1px solid #2C2517; background: var(--tn-bg-deep);
+}
+.tn20 .tn-putki-day { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 8px; }
+.tn20 .tn-putki-day > b {
+  width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center;
+  background: linear-gradient(160deg, #C9FF6B, #8FD41F); color: var(--tn-bg);
+  font-size: 14px; font-weight: 800; box-shadow: 0 0 14px rgba(182,255,60,0.3);
+}
+.tn20 .tn-putki-day > i { width: 30px; height: 30px; border-radius: 50%; border: 1px dashed #4A4030; }
+.tn20 .tn-putki-day > span { font-size: 11px; font-weight: 700; color: var(--tn-text-dim); }
+.tn20 .tn-putki-stats { position: relative; display: flex; gap: 10px; margin-top: 16px; }
+.tn20 .tn-putki-stat { flex: 1; padding: 12px 14px; border-radius: 14px; border: 1px solid #2C2517; background: var(--tn-bg-deep); }
+.tn20 .tn-putki-stat span { display: block; font-size: 11px; color: var(--tn-text-dim); font-weight: 700; margin-bottom: 4px; }
+.tn20 .tn-putki-stat b { font-size: 16px; font-weight: 800; color: var(--tn-text); }
+.tn20 .tn-putki-cta {
+  position: relative; display: block; margin-top: 16px; padding: 16px;
+  border-radius: 14px; background: var(--tn-lime); color: var(--tn-bg);
+  text-align: center; font-size: 16px; font-weight: 800; text-decoration: none;
+}
+.tn20 .tn-putki-cta:hover { filter: brightness(1.06); }
+@keyframes tn-putki-flame { 0%, 100% { transform: translateY(0) scale(1); } 50% { transform: translateY(-2px) scale(1.06); } }
+@keyframes tn-putki-pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.35; } }
+@keyframes tn-putki-glowanim { 0%, 100% { filter: drop-shadow(0 0 12px rgba(182,255,60,0.4)); } 50% { filter: drop-shadow(0 0 28px rgba(182,255,60,0.7)); } }
 
 /* Isot hero-nostot */
 .tn20 .tn-feature-grid { display: grid; gap: var(--tn-space-md); }
