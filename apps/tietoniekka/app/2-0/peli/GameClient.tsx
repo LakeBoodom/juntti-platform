@@ -16,6 +16,7 @@ import confetti from "canvas-confetti";
 import { getSupabase } from "../../../lib/supabase";
 import { MOTIF_PATHS } from "../../../components/tn20/motif-paths";
 import { LearnArticle, type Learn } from "../../../components/tn20/LearnArticle";
+import PutkiCard from "../PutkiCard";
 
 const BASE_POINTS = 100;
 const STREAK_BONUS = 50;
@@ -64,6 +65,10 @@ function updateDailyStreak(): number {
       count = prev.last === yd ? prev.count + 1 : 1;
     }
     window.localStorage.setItem(KEY, JSON.stringify({ count, last: today }));
+    /* Paras putki talteen Liekkikorttia varten (CD 1b, 10.8.2026) */
+    const BEST = "tn_paivan_visa_putki_paras";
+    const prevBest = Number(window.localStorage.getItem(BEST) ?? "0") || 0;
+    if (count > prevBest) window.localStorage.setItem(BEST, String(count));
     return count;
   } catch {
     return 0;
@@ -376,6 +381,11 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
               </div>
             </div>
           )}
+
+          {/* Päivän visan palkinto: Liekkikortti (CD 1b, Heikki 10.8.2026) —
+              sama komponentti kuin etusivun Tänään-slotissa. Näytetään vain
+              päivän visan jälkeen, jolloin putki on juuri päivittynyt. */}
+          {quiz.isSankari && <PutkiCard />}
         </div>
 
         {/* 3.–4. Nyt tiedät nämä + Kertaa vielä nämä */}
