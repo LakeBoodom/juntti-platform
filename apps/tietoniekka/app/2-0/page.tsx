@@ -129,7 +129,11 @@ async function getData() {
 
   const newestByCollection = Object.values(
     cards
-      .filter((c) => c.collection && c.published_at)
+      /* Henkilövisat pois Uusimmista (Heikki 11.8.2026): niitä tehdään
+         varastoon kuukausia etukäteen synttärinostoiksi — "uusin" julkaisu
+         ei kerro mitään ajankohtaista. Ne elävät Tänään-slotissa ja
+         Tunnetut henkilöt -hubissa. */
+      .filter((c) => c.collection && c.collection !== "tunnetut-henkilot" && c.published_at)
       .sort((a, b) => (b.published_at! > a.published_at! ? 1 : -1))
       .reduce<Record<string, (typeof cards)[number]>>((acc, c) => {
         if (!acc[c.collection!]) acc[c.collection!] = c;
