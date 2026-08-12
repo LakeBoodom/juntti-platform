@@ -284,6 +284,19 @@
   max-width: 62ch;
 }
 
+/* Näytä lisää -nappi pitkiin visalistoihin (ShowMoreGrid, 11.8.2026) */
+.tn20 .tn-showmore {
+  display: flex; align-items: center; justify-content: center;
+  width: 100%; min-height: 48px; margin-top: 18px;
+  border-radius: 14px;
+  border: 1px solid color-mix(in srgb, var(--tn-lime) 45%, var(--tn-line));
+  background: color-mix(in srgb, var(--tn-lime) 10%, var(--tn-surface));
+  color: var(--tn-lime);
+  font-family: inherit; font-size: 15px; font-weight: 800;
+  cursor: pointer;
+}
+.tn20 .tn-showmore:hover { border-color: var(--tn-lime); }
+
 /* ---------- Tilat ---------- */
 
 .tn20 .tn-skeleton {
