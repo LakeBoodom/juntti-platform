@@ -11,6 +11,7 @@ import { PersonCard, type QuizCardData } from "@/components/tn20/cards";
 import { WideCard } from "@/components/tn20/WideCard";
 import { MOTIF_PATHS, motifPathFor } from "@/components/tn20/motif-paths";
 import { LearnArticle } from "@/components/tn20/LearnArticle";
+import { ShowMoreGrid } from "@/components/tn20/ShowMoreGrid";
 import { getPageContent } from "@/lib/pageContent";
 import { notFound } from "next/navigation";
 
@@ -84,12 +85,15 @@ const HUBS: Record<string, HubMeta> = {
     ctaDesc: "Valitse genre tai selaa koko katalogi — Frendeistä Sopranosiin.",
   },
   urheilu: {
+    /* Rakenneuudistus 11.8.2026 (Heikin analyysi): kaksitasoinen malli —
+       lajisuodatus + kontekstuaalinen sarjataso. Hero-copy päivitetty
+       kuvaamaan koko sisältöä (ei vain joukkueita). */
     name: "Urheilu", oneWord: true,
     titleTop: "Urhei", titleAccent: "lu",
     accent: "#B6FF3C", accentLight: "#CFFF7A",
     img: "/20/hero-urheilu-mikko.webp",
-    lede: (n) => `${n} visaa joukkue kerrallaan. Jokainen kortti kantaa joukkueen omat värit — ei kokoelmaväriä.`,
-    chips: (n) => [`${n} visaa`, "Maajoukkueet & seurat"],
+    lede: (n) => `Seurat, sarjat, mestaruudet ja unohtumattomat urheiluhetket. Testaa tietosi jalkapallosta jääkiekkoon ja moottoriurheiluun — ${n} visaa.`,
+    chips: (n) => [`${n} urheiluvisaa`, "Jalkapallo, jääkiekko ja muut lajit", "Uusia visoja viikoittain"],
     source: { kind: "collection", value: "urheilu" },
     modes: [],
     ctaTitle: (n) => `Kaikki ${n} urheiluvisaa`,
@@ -221,27 +225,29 @@ function cardColor(hub: HubMeta, q: Card): string {
   return hub.accentLight;
 }
 
-/* Urheilun laji-chip titlestä — tarkempi kuin "Urheilu" (Heikin toive 2026-07-31).
-   Oikea laji-backfill kantaan tehdään urheilukokoelman vuorolla. */
-const SPORT_LABEL: Array<[RegExp, string]> = [
-  [/formula|f1/i, "Formula 1"], [/ralli/i, "Ralli"],
-  [/tennik|federer|us open/i, "Tennis"], [/golf|the open/i, "Golf"],
-  [/koripallo|nba|susijengi/i, "Koripallo"], [/kiekko|nhl|liiga(?!ssa)|leijon/i, "Jääkiekko"],
-  [/yleisurheilu|keihä/i, "Yleisurheilu"], [/olympiastadion|stadion/i, "Stadionit"],
-  [/maajoukkue|jalkapallo|futis|fc |mm-kisat|mm-finaal|huuhkaja|arsenal|liverpool/i, "Jalkapallo"],
-];
-function sportLabel(title: string): string | null {
-  for (const [re, label] of SPORT_LABEL) if (re.test(title)) return label;
-  return null;
-}
+/* Urheilun sarja-/kilpailulabelit (subcollection → näyttönimi).
+   Laji-labelit tulevat genres-taulusta (backfill 11.8.2026) — vanha
+   nimestä päättelevä SPORT_LABEL-regex poistettu samalla. */
+const SARJA_LABEL: Record<string, string> = {
+  valioliiga: "Valioliiga",
+  "mestarien-liiga": "Mestarien liiga",
+  maajoukkueet: "Maajoukkueet",
+  arvokisat: "Arvokisat",
+  liiga: "Liiga",
+  "formula-1": "Formula 1",
+  ralli: "Ralli",
+  "suomalaiset-klassikot": "Suomalaiset klassikot",
+  "grand-slam": "Grand Slam",
+  major: "Major-turnaukset",
+};
+const subLabel = (s: string) => SARJA_LABEL[s] ?? s.charAt(0).toUpperCase() + s.slice(1);
 
 function toWide(hub: HubMeta, q: Card, genreLabel: Map<string, string>) {
   // Hubissa aihe on jo selvä — chip näytetään vain kun se kertoo jotain LISÄÄ:
-  // genre (TV), laji (urheilu) tai alakokoelma. Muuten ei chippiä.
+  // genre/laji (datasta, ei enää nimipäättelyä) tai alakokoelma.
   const chip =
     (q.genre && (genreLabel.get(q.genre) ?? q.genre)) ||
-    (q.collection === "urheilu" ? sportLabel(q.title) : null) ||
-    (q.subcollection ? q.subcollection.charAt(0).toUpperCase() + q.subcollection.slice(1) : null);
+    (q.subcollection ? subLabel(q.subcollection) : null);
   return {
     href: `/2-0/peli?quiz_id=${q.id}`,
     color: cardColor(hub, q),
@@ -355,22 +361,62 @@ export default async function KokoelmaHub({
   const present = new Set(cards.map((c) => c.genre).filter(Boolean));
   const subs = [...new Set(cards.map((c) => c.subcollection).filter(Boolean))] as string[];
   const filters: Array<{ key: string; label: string }> = [
-    ...subs.map((s) => ({ key: s, label: s.charAt(0).toUpperCase() + s.slice(1) })),
+    ...subs.map((s) => ({ key: s, label: subLabel(s) })),
     ...genres.filter((g) => present.has(g.genre_key)).map((g) => ({ key: g.genre_key, label: g.label })),
   ];
 
-  const visible = filter === "kaikki" ? cards : cards.filter((c) => c.genre === filter || c.subcollection === filter);
+  /* ── Urheilu: kaksitasoinen suodatus (Heikin rakenne, lukittu 11.8.2026) ──
+     Taso 1 "Selaa lajeittain" (genre) aina näkyvissä; taso 2 "Sarja tai
+     kilpailu" (subcollection) näytetään vasta kun laji on valittu — UI pysyy
+     rauhallisena. Pelitapa-rivi pois urheilusta (laji on olennaisempi). */
+  const isUrheilu = collection === "urheilu";
+  const laji = isUrheilu && typeof sp.laji === "string" ? sp.laji : "kaikki";
+  const sarja = isUrheilu && typeof sp.sarja === "string" ? sp.sarja : "kaikki";
+  const basePath = `/2-0/kokoelma/${collection}`;
+
+  let filterGroups: Array<{ label: string; items: Array<{ key: string; label: string; href: string; active: boolean }> }> | undefined;
+  let effectiveFilter = filter;
+  let visible: Card[];
+
+  if (isUrheilu) {
+    const lajiCards = laji === "kaikki" ? cards : cards.filter((c) => c.genre === laji);
+    visible = sarja === "kaikki" ? lajiCards : lajiCards.filter((c) => c.subcollection === sarja);
+    effectiveFilter = laji === "kaikki" && sarja === "kaikki" ? "kaikki" : "suodatettu";
+
+    const lajiItems = [
+      { key: "kaikki", label: "Kaikki", href: basePath, active: laji === "kaikki" },
+      ...genres
+        .filter((g) => g.collection === "urheilu" && present.has(g.genre_key))
+        .map((g) => ({ key: g.genre_key, label: g.label, href: `${basePath}?laji=${g.genre_key}`, active: laji === g.genre_key })),
+    ];
+    filterGroups = [{ label: "Selaa lajeittain", items: lajiItems }];
+
+    if (laji !== "kaikki") {
+      const lajiSarjat = [...new Set(lajiCards.map((c) => c.subcollection).filter(Boolean))] as string[];
+      if (lajiSarjat.length >= 2) {
+        filterGroups.push({
+          label: "Sarja tai kilpailu",
+          items: [
+            { key: "kaikki", label: "Kaikki", href: `${basePath}?laji=${laji}`, active: sarja === "kaikki" },
+            ...lajiSarjat.map((s) => ({ key: s, label: subLabel(s), href: `${basePath}?laji=${laji}&sarja=${s}`, active: sarja === s })),
+          ],
+        });
+      }
+    }
+  } else {
+    visible = filter === "kaikki" ? cards : cards.filter((c) => c.genre === filter || c.subcollection === filter);
+  }
 
   // Rivit (vain ne joissa on sisältöä): Uusimmat + alakokoelmat + Vaikeimmat
   const rowsOut: Array<{ title: string; note: string; cards: Card[] }> = [];
-  if (filter === "kaikki") {
+  if (effectiveFilter === "kaikki") {
     rowsOut.push({ title: "Uusimmat", note: "Tuoreimmat lisäykset kokoelmaan", cards: cards.slice(0, 8) });
     for (const s of subs) {
       const sc = cards.filter((c) => c.subcollection === s);
       if (sc.length >= 3)
         rowsOut.push({
-          title: s.charAt(0).toUpperCase() + s.slice(1),
-          note: s === "kotimaiset" ? "Suomessa tehtyä" : "Maailmalta",
+          title: subLabel(s),
+          note: s === "kotimaiset" ? "Suomessa tehtyä" : isUrheilu ? "Sarjan visat yhdessä" : "Maailmalta",
           cards: sc.slice(0, 8),
         });
     }
@@ -379,7 +425,7 @@ export default async function KokoelmaHub({
   }
 
   return (
-    <HubShell hub={hub} count={cards.length} filter={filter} filters={filters} basePath={`/2-0/kokoelma/${collection}`} article={article}>
+    <HubShell hub={hub} count={cards.length} filter={filter} filters={filters} basePath={basePath} filterGroups={filterGroups} article={article}>
       {rowsOut.map((row) => (
         <section key={row.title} className="tn-section" style={{ paddingTop: 8, paddingBottom: 0 }}>
           <div className="tn-hubrow-head">
@@ -397,27 +443,49 @@ export default async function KokoelmaHub({
         </section>
       ))}
 
-      <section className="tn-section" style={{ paddingBottom: 0 }}>
-        <div className="tn-ctapanel" style={{ ["--tn-hub-accent" as string]: hub.accent }}>
-          <div style={{ flex: "2 1 min(100%, 280px)" }}>
-            <h2 className="tn-display" style={{ fontSize: "clamp(24px, 3.4cqw, 44px)", margin: "0 0 10px" }}>{hub.ctaTitle(cards.length)}</h2>
-            <p style={{ margin: 0, color: "#B9AF9B", maxWidth: "38ch" }}>{hub.ctaDesc}</p>
+      {/* CTA-paneeli pois urheilusta 11.8.2026 (Heikki: turha välivaihe —
+          lajisuodattimet ajavat saman asian heron alla). */}
+      {!isUrheilu && (
+        <section className="tn-section" style={{ paddingBottom: 0 }}>
+          <div className="tn-ctapanel" style={{ ["--tn-hub-accent" as string]: hub.accent }}>
+            <div style={{ flex: "2 1 min(100%, 280px)" }}>
+              <h2 className="tn-display" style={{ fontSize: "clamp(24px, 3.4cqw, 44px)", margin: "0 0 10px" }}>{hub.ctaTitle(cards.length)}</h2>
+              <p style={{ margin: 0, color: "#B9AF9B", maxWidth: "38ch" }}>{hub.ctaDesc}</p>
+            </div>
+            <a className="tn-cta" href="#kaikki" style={{ color: "var(--tn-bg)" }}>
+              Selaa kaikki {cards.length} →
+            </a>
           </div>
-          <a className="tn-cta" href="#kaikki" style={{ color: "var(--tn-bg)" }}>
-            Selaa kaikki {cards.length} →
-          </a>
-        </div>
-      </section>
+        </section>
+      )}
 
       <section className="tn-section" id="kaikki">
         <div className="tn-hubrow-head">
           <div>
-            <h2 className="tn-section-title">{filter === "kaikki" ? "Kaikki visat" : filters.find((f) => f.key === filter)?.label ?? filter}</h2>
+            <h2 className="tn-section-title">
+              {isUrheilu
+                ? sarja !== "kaikki"
+                  ? subLabel(sarja)
+                  : laji !== "kaikki"
+                    ? genreLabel.get(laji) ?? laji
+                    : "Kaikki urheiluvisat"
+                : filter === "kaikki"
+                  ? "Kaikki visat"
+                  : filters.find((f) => f.key === filter)?.label ?? filter}
+            </h2>
             <div className="tn-hubrow-note">{visible.length} visaa</div>
           </div>
         </div>
         {visible.length === 0 ? (
           <div className="tn-empty">Tällä suodattimella ei löytynyt visoja. Kokeile toista.</div>
+        ) : isUrheilu ? (
+          /* Pagination 11.8.2026: 12 korttia + Näytä lisää — yli 60 visan
+             lista olisi ilman rajausta raskas selata (Heikin analyysi). */
+          <ShowMoreGrid initial={12} moreLabel="Näytä lisää urheiluvisoja" className="tn-wide-grid">
+            {visible.map((c) => (
+              <WideCard key={c.id} {...toWide(hub, c, genreLabel)} />
+            ))}
+          </ShowMoreGrid>
         ) : (
           <div className="tn-wide-grid">
             {visible.map((c) => (
@@ -433,7 +501,7 @@ export default async function KokoelmaHub({
 /* ─────────── Kuori: hero + suodattimet ─────────── */
 
 function HubShell({
-  hub, count, filter, filters, basePath, children, article,
+  hub, count, filter, filters, basePath, children, article, filterGroups,
 }: {
   hub: HubMeta; count: number; filter: string;
   filters: Array<{ key: string; label: string }>; basePath?: string;
@@ -441,6 +509,9 @@ function HubShell({
   /* Kokoelman oma aiheopas (page_content). Renderöidään palvelimelta
      visalistan alle — SEO_STRATEGIA.md §5.2. */
   article?: React.ReactNode;
+  /* Kokoelman omat suodatinrivit (urheilun laji + sarja, 11.8.2026) —
+     kun annettu, geneerinen Pelitapa + Sarja/laji -pari ohitetaan. */
+  filterGroups?: Array<{ label: string; items: Array<{ key: string; label: string; href: string; active: boolean }> }>;
 }) {
   return (
     <main style={{ minHeight: "100dvh", paddingBottom: 60 }}>
@@ -482,6 +553,28 @@ function HubShell({
       <div className="tn-shell">
         <section className="tn-section" style={{ paddingBottom: 0 }}>
           <div className="tn-filters">
+            {/* filterGroups (11.8.2026): kokoelma voi tuoda omat suodatinrivinsä
+                (urheilun laji + kontekstuaalinen sarja) — silloin geneerinen
+                Pelitapa + Sarja/laji -pari ohitetaan kokonaan. */}
+            {filterGroups ? (
+              filterGroups.map((g) => (
+                <div key={g.label} className="tn-filtergroup">
+                  <div className="tn-filterlabel">{g.label}</div>
+                  <nav className="tn-chipnav">
+                    {g.items.map((it) => (
+                      <a
+                        key={it.key}
+                        href={it.href}
+                        style={it.active ? { background: "var(--tn-lime)", color: "var(--tn-bg)", borderColor: "var(--tn-lime)", fontWeight: 800 } : undefined}
+                      >
+                        {it.label}
+                      </a>
+                    ))}
+                  </nav>
+                </div>
+              ))
+            ) : (
+              <>
             <div className="tn-filtergroup">
               <div className="tn-filterlabel">Pelitapa</div>
               <nav className="tn-chipnav">
@@ -509,6 +602,8 @@ function HubShell({
                   ))}
                 </nav>
               </div>
+            )}
+              </>
             )}
           </div>
         </section>
