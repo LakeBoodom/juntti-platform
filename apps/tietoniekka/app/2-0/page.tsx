@@ -9,12 +9,16 @@ import { WideCard } from "@/components/tn20/WideCard";
 import { motifPathFor } from "@/components/tn20/motif-paths";
 import { kulttuuriImg } from "@/lib/kulttuuri";
 import { luontoImg } from "@/lib/luonto";
+import { urheiluImg } from "@/lib/urheilu";
 import PutkiCard from "./PutkiCard";
 
 /** Visan oma kuva (flagship-kokoelmien topicImg) — sama putki kuin pelinäkymässä.
     Palauttaa null jos kokoelmalla ei ole visakohtaisia kuvia (→ SVG-motiivi). */
 const topicImgFor = (collection: string | null | undefined, slug: string | null | undefined): string | null =>
-  collection === "kulttuuri" ? kulttuuriImg(slug) : collection === "luonto" ? luontoImg(slug) : null;
+  collection === "kulttuuri" ? kulttuuriImg(slug)
+  : collection === "luonto" ? luontoImg(slug)
+  : collection === "urheilu" ? urheiluImg(slug)
+  : null;
 
 /** Kokoelmien aksentit (sama paletti kuin hubeissa). */
 const DAY_ACCENT: Record<string, string> = {
