@@ -12,6 +12,7 @@ import { WideCard } from "@/components/tn20/WideCard";
 import { MOTIF_PATHS, motifPathFor } from "@/components/tn20/motif-paths";
 import { LearnArticle } from "@/components/tn20/LearnArticle";
 import { ShowMoreGrid } from "@/components/tn20/ShowMoreGrid";
+import { urheiluImg } from "@/lib/urheilu";
 import { getPageContent } from "@/lib/pageContent";
 import { notFound } from "next/navigation";
 
@@ -258,6 +259,9 @@ function toWide(hub: HubMeta, q: Card, genreLabel: Map<string, string>) {
     mode: "Klassinen",
     meta: `${q.question_count} kysymystä`,
     badge: q.badge,
+    /* Visan oma kuvakortti kun sellainen on (urheilu 13.8.2026 — sama
+       periaate kuin etusivulla: kuva korvaa väripesun+motiivin). */
+    img: q.collection === "urheilu" ? urheiluImg(q.slug) : null,
   };
 }
 
