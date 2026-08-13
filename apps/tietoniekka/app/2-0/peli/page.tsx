@@ -7,6 +7,7 @@ import { getSupabase } from "@/lib/supabase";
 import { getKuvavisat } from "@/lib/queries";
 import { kulttuuriImg } from "@/lib/kulttuuri";
 import { luontoImg } from "@/lib/luonto";
+import { urheiluImg } from "@/lib/urheilu";
 import { MOTIF_PATHS, motifPathFor } from "@/components/tn20/motif-paths";
 import { LearnArticle, type Learn } from "@/components/tn20/LearnArticle";
 import GameClient, { type GameQuiz } from "./GameClient";
@@ -339,12 +340,13 @@ export default async function Peli20({
     for (const [re, c] of TEAM_COLORS) if (re.test(quiz.title)) { accent = c; break; }
   }
 
-  /* KULTTUURI/LUONTO-flagshipit (Heikki 6.8.-7.8.2026): visan oma kuva
+  /* KULTTUURI/LUONTO/URHEILU (Heikki 6.8.-13.8.2026): visan oma kuva
      pelinakymaan - intro, desktop-lava, mobiilin kuvakaista ja tuloskortti.
      Fallback kokoelman herokuvaan jos uudelle visalle ei ole viela kuvaa. */
   const topicImg =
     collection === "kulttuuri" ? kulttuuriImg(quiz.slug) :
     collection === "luonto" ? luontoImg(quiz.slug) :
+    collection === "urheilu" ? urheiluImg(quiz.slug) :
     null;
 
   const genreLabel = (genreRes.data as { label: string } | null)?.label ?? null;
