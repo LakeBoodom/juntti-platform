@@ -10,6 +10,7 @@ import { motifPathFor } from "@/components/tn20/motif-paths";
 import { kulttuuriImg } from "@/lib/kulttuuri";
 import { luontoImg } from "@/lib/luonto";
 import { urheiluImg } from "@/lib/urheilu";
+import { maantietoImg } from "@/lib/maantieto";
 import PutkiCard from "./PutkiCard";
 
 /** Visan oma kuva (flagship-kokoelmien topicImg) — sama putki kuin pelinäkymässä.
@@ -18,6 +19,7 @@ const topicImgFor = (collection: string | null | undefined, slug: string | null 
   collection === "kulttuuri" ? kulttuuriImg(slug)
   : collection === "luonto" ? luontoImg(slug)
   : collection === "urheilu" ? urheiluImg(slug)
+  : collection === "matkakohteet" ? maantietoImg(slug)
   : null;
 
 /** Kokoelmien aksentit (sama paletti kuin hubeissa). */
@@ -348,7 +350,8 @@ export default async function Etusivu20() {
               { href: "/2-0/kokoelma/elokuvat", img: "/20/teema-elokuvat.webp", chip: "Kokoelma", title: "Elokuvat", meta: `${n("elokuvat")} visaa`, accent: "var(--tn-acc-elokuvat)" },
               { href: "/2-0/kokoelma/musiikki", img: "/20/teema-musiikki.webp", chip: "Kokoelma", title: "Musiikki", meta: `${n("musiikki")} visaa`, accent: "var(--tn-acc-musiikki)" },
               { href: "/2-0/kokoelma/kuvavisat", img: "/20/teema-liput.webp", chip: "Kuvakokoelma", title: "Kuvavisat", meta: "Liput, vaakunat, eläimet…", accent: "var(--tn-azure)" },
-              { href: "/2-0/kokoelma/matkakohteet", img: "/20/teema-maantieto.webp", chip: "Kokoelma", title: "Matkakohteet", meta: `${n("matkakohteet")} visaa`, accent: "var(--tn-acc-matkakohteet)" },
+              /* 15.8.2026: Matkakohteet → Maantieto-flagship (CD:n design) */
+              { href: "/2-0/kokoelma/matkakohteet", img: "/20/maantieto/hero-landing.webp", chip: "Teemakokoelma", title: "Maantieto", meta: `${n("matkakohteet")} visaa · Maailman ääriltä kotia kohti`, accent: "#46D6C8" },
               { href: "/2-0/kokoelma/tunnetut-henkilot", img: "/20/teema-tunnetut-henkilot.webp", chip: "Kokoelma", title: "Tunnetut henkilöt", meta: "Tutut kasvot", accent: "var(--tn-amber)" },
             ].map((c) => (
               <a key={c.title} className="tn-browse" href={c.href} style={{ ["--tn-browse-accent" as string]: c.accent }}>
@@ -461,7 +464,7 @@ export default async function Etusivu20() {
             <a href="/2-0/kokoelma/urheilu">Urheilu</a>
             <a href="/2-0/kokoelma/musiikki">Musiikki</a>
             <a href="/2-0/kokoelma/elokuvat">Elokuvat</a>
-            <a href="/2-0/kokoelma/matkakohteet">Matkakohteet</a>
+            <a href="/2-0/kokoelma/matkakohteet">Maantieto</a>
             <a href="/2-0/kokoelma/tunnetut-henkilot">Tunnetut henkilöt</a>
             <a href="/2-0/peli?kuvavisa=liput">Liput</a>
             <a href="/2-0/kokoelma/kulttuuri">Kulttuuri</a>
