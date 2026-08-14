@@ -1600,8 +1600,9 @@
    korttien taustalla. cqw skaalaa .tn20-containerissa. */
 
 .tn20 .tnm { background: var(--tn-bg); }
-.tn20 .tnm-section { padding: clamp(30px, 4.6cqw, 84px) 0 0; }
-.tn20 .tnm-section:last-of-type { padding-bottom: clamp(30px, 4.6cqw, 84px); }
+/* padding-block (ei shorthand!) — .tn-shellin sivupadding sailyy */
+.tn20 .tnm-section { padding-block: clamp(30px, 4.6cqw, 84px) 0; }
+.tn20 .tnm-section:last-of-type { padding-block-end: clamp(30px, 4.6cqw, 84px); }
 
 /* Hero */
 .tn20 .tnm-herowrap {
