@@ -338,6 +338,9 @@ export default async function Etusivu20() {
               /* 10.8.2026: TV & Urheilu tänne päänostojen tieltä. Kumpi/Järjestä
                  piilotettu 2.0:sta (siirretty 2.5:een) ja Ruoka & juoma piilossa
                  kunnes sisältöä on enemmän. */
+              /* 14.8.2026: Megavisat teemakokoelmien joukkoon (Heikin päätös,
+                 työjärjestys kohta 4) — landari /2-0/megavisat. */
+              { href: "/2-0/megavisat", img: "/20/megavisat/mega-hero.webp", chip: "Pelimuoto", title: "Megavisat", meta: "20 · 50 · 100 kysymystä", accent: "var(--tn-gold)" },
               { href: "/2-0/kokoelma/tv", img: "/20/hero-tv-laura.webp", chip: "Kokoelma", title: "TV & Suoratoisto", meta: `${n("tv")} visaa · Netflix-hitit & kotimaiset`, accent: "var(--tn-magenta)" },
               { href: "/2-0/kokoelma/urheilu", img: "/20/hero-urheilu-mikko.webp", chip: "Kokoelma", title: "Urheilu", meta: `${n("urheilu")} visaa · Joukkueväreissä`, accent: "var(--tn-lime)" },
               /* Historia-aikajana (6.8.2026) — motiivikortti kunnes kokoelma saa omat kuvat */
@@ -380,6 +383,9 @@ export default async function Etusivu20() {
                 </p>
                 <a className="tn-game-next" href="/2-0/peli?mega=suuri-mega-50" style={{ display: "inline-block", marginTop: 14, background: "var(--tn-gold)", textDecoration: "none", padding: "14px 28px", fontSize: 15 }}>
                   Aloita Mega →
+                </a>
+                <a href="/2-0/megavisat" style={{ display: "inline-block", marginTop: 14, marginLeft: 18, color: "var(--tn-gold)", fontWeight: 800, fontSize: 14, textDecoration: "none" }}>
+                  Kaikki megavisat →
                 </a>
               </div>
               <div style={{ display: "grid", gap: 10, alignContent: "center" }}>
@@ -482,7 +488,7 @@ export default async function Etusivu20() {
               <div>
                 <h4>Pelimuodot</h4>
                 <a href="/peli">Klassinen</a>
-                <a href="/2-0/peli?mega=suuri-mega-50">Megavisat</a>
+                <a href="/2-0/megavisat">Megavisat</a>
                 <a href="/2-0/kokoelma/kuvavisat">Kuvavisat</a>
               </div>
             </div>
