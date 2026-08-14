@@ -8,6 +8,7 @@ import { getKuvavisat } from "@/lib/queries";
 import { kulttuuriImg } from "@/lib/kulttuuri";
 import { luontoImg } from "@/lib/luonto";
 import { urheiluImg } from "@/lib/urheilu";
+import { maantietoImg } from "@/lib/maantieto";
 import { MOTIF_PATHS, motifPathFor } from "@/components/tn20/motif-paths";
 import { LearnArticle, type Learn } from "@/components/tn20/LearnArticle";
 import GameClient, { type GameQuiz } from "./GameClient";
@@ -19,7 +20,7 @@ const COLLECTION_ACCENT: Record<string, string> = {
   urheilu: "#B6FF3C",
   elokuvat: "#FF5C3D",
   musiikki: "#A855F7",
-  matkakohteet: "#E8A320",
+  matkakohteet: "#46D6C8",
   yleistieto: "#E8A320",
   kulttuuri: "#E8A320",
   historia: "#E8A320",
@@ -43,7 +44,7 @@ const COLLECTION_BG: Record<string, string> = {
   urheilu: "/20/hero-urheilu-mikko.webp",
   elokuvat: "/20/teema-elokuvat.webp",
   musiikki: "/20/teema-musiikki.webp",
-  matkakohteet: "/20/teema-maantieto.webp",
+  matkakohteet: "/20/maantieto/hero-landing.webp",
   yleistieto: "/20/teema-ruoka-juoma.webp",
   kulttuuri: "/20/kulttuuri/hero-kollaasi.webp",
   historia: "/20/historia/hero-aikajana.webp",
@@ -55,7 +56,7 @@ const COLLECTION_LABEL: Record<string, string> = {
   urheilu: "Urheilu",
   elokuvat: "Elokuvat",
   musiikki: "Musiikki",
-  matkakohteet: "Matkakohteet",
+  matkakohteet: "Maantieto",
   yleistieto: "Yleistieto",
   kulttuuri: "Kulttuuri",
   historia: "Historia",
@@ -347,6 +348,7 @@ export default async function Peli20({
     collection === "kulttuuri" ? kulttuuriImg(quiz.slug) :
     collection === "luonto" ? luontoImg(quiz.slug) :
     collection === "urheilu" ? urheiluImg(quiz.slug) :
+    collection === "matkakohteet" ? maantietoImg(quiz.slug) :
     null;
 
   const genreLabel = (genreRes.data as { label: string } | null)?.label ?? null;
