@@ -1,23 +1,19 @@
 // TIETONIEKKA 2.0 — MEGAVISAT-LANDING (CD:n design 13.8.2026,
 // design_handoff_megavisat: hero "Pitkä peli" + juliste + juontajanostot →
-// pituusvalinta 20/50/100 → aihekorttiruudukko → Näin mega toimii).
+// aihekorttiruudukko → Näin mega toimii).
 // Heikki lukitsi 14.8.2026: kaikki aihekortit näkyvät heti; Aloita vain
 // aiheissa joihin mega on koottu adminissa, muut himmennettyinä (kasvukoukku
-// — korttia ei piiloteta eikä lukita, CD:n sääntö). Pituus on sivun tila
-// URL-parametrissa (?pituus=50) — toteutettu server-linkeillä kuten muutkin
-// 2.0-suodattimet (koodikannan käytäntö voittaa prototyypin toteutustavan).
-// Suodattimista mukana Kaikki + Uudet; Suosituimmat aktivoituu kun pelidataa
-// on, Kesken jääneet vaatii kirjautumisen (3.0) — sama periaate kuin
-// hubien Suosituimmat-riveissä.
+// — korttia ei piiloteta eikä lukita, CD:n sääntö).
+// Katselmuskierros 14.8. (Heikki, CD:n lopullisten screenshotien mukaan):
+// EI pituus/suodatin-pillereitä ruudukossa, EI CTA-nappia julisteen alla —
+// kortin numero on kootun megan oikea pituus. Mobiilissa juliste piilotetaan
+// (CSS): hero-teksti → nostot → suoraan megalista.
 // TODO (työjärjestys kohta 9): megat ovat draftina — näkyvät 2.0-previewssä
 // tarkoituksella; hallittu julkaisu tehdään 2.0-launchissa.
 
 import type { Metadata } from "next";
 import { getSupabase } from "@/lib/supabase";
-import {
-  MEGA_TOPICS, MEGA_NOSTOT, MEGA_LENGTHS, MEGA_POSTER, MEGA_HERO_CTA_SLUG,
-  type MegaLength,
-} from "@/lib/megavisat";
+import { MEGA_TOPICS, MEGA_NOSTOT, MEGA_LENGTHS, MEGA_POSTER } from "@/lib/megavisat";
 
 export const dynamic = "force-dynamic";
 
@@ -37,18 +33,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
 type MegaRow = { id: string; slug: string | null; title: string; teaser: string | null; created_at: string | null };
 
-const NEW_WINDOW_MS = 7 * 24 * 60 * 60 * 1000; // sama 7 pv sääntö kuin UUSI-badge
-
-export default async function MegavisatLanding({
-  searchParams,
-}: {
-  searchParams: Promise<Record<string, string | string[] | undefined>>;
-}) {
-  const sp = await searchParams;
-  const rawPituus = typeof sp.pituus === "string" ? parseInt(sp.pituus, 10) : 50;
-  const pituus: MegaLength = (MEGA_LENGTHS as number[]).includes(rawPituus) ? (rawPituus as MegaLength) : 50;
-  const suodata = sp.suodata === "uudet" ? "uudet" : "kaikki";
-
+export default async function MegavisatLanding() {
   const sb = getSupabase();
   if (!sb) return <main style={{ padding: 32 }}>Ei tietokantayhteyttä.</main>;
 
@@ -59,28 +44,15 @@ export default async function MegavisatLanding({
   const megas = new Map<string, MegaRow>();
   for (const m of (data ?? []) as unknown as MegaRow[]) if (m.slug) megas.set(m.slug, m);
 
-  const isNewMega = (slug: string | undefined) => {
-    const m = slug ? megas.get(slug) : undefined;
-    return !!m?.created_at && Date.now() - new Date(m.created_at).getTime() < NEW_WINDOW_MS;
-  };
-
-  // Aiheen tila valitulla pituudella
+  // Aiheen tila: kortin numero on kootun megan oikea pituus (ei valitsinta —
+  // Heikin katselmus 14.8.). Ilman megaa kortti himmenee ("Tulossa", numero 50).
   const topicState = MEGA_TOPICS.map((t) => {
-    const slug = t.megaSlugs[pituus];
-    const playable = !!(slug && megas.has(slug));
-    // Kasvukoukku: jos valittu pituus puuttuu mutta jokin toinen on koottu
-    const altLength = MEGA_LENGTHS.find((l) => l !== pituus && t.megaSlugs[l] && megas.has(t.megaSlugs[l]!));
-    const anyNew = MEGA_LENGTHS.some((l) => isNewMega(t.megaSlugs[l]));
-    return { t, slug, playable, altLength, anyNew };
-  }).filter((s) => suodata !== "uudet" || s.anyNew);
+    const firstLen = MEGA_LENGTHS.find((l) => t.megaSlugs[l] && megas.has(t.megaSlugs[l]!));
+    return { t, slug: firstLen ? t.megaSlugs[firstLen] : undefined, playable: !!firstLen, num: firstLen ?? 50 };
+  });
 
   const availableCount = topicState.filter((s) => s.playable).length;
-  const totalMegas = megas.size;
-
-  const heroCta = megas.get(MEGA_HERO_CTA_SLUG);
   const nostot = MEGA_NOSTOT.filter((n) => megas.has(n.megaSlug));
-  const gridHref = (p: number, f: string) =>
-    `/2-0/megavisat?pituus=${p}${f === "uudet" ? "&suodata=uudet" : ""}#megat`;
 
   return (
     <main className="tnm" style={{ minHeight: "100dvh" }}>
@@ -137,14 +109,11 @@ export default async function MegavisatLanding({
             )}
           </div>
 
+          {/* Juliste vain leveillä näytöillä (Heikki 14.8.: mobiilissa se vie
+              tilaa tuomatta lisäarvoa — CSS piilottaa, lista nousee ylös). */}
           <div className="tnm-hero-right">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img className="tnm-poster" src={MEGA_POSTER} alt="Megavisan juliste" fetchPriority="high" />
-            {heroCta && (
-              <a className="tnm-cta" href={`/2-0/peli?mega=${MEGA_HERO_CTA_SLUG}`}>
-                Aloita suuri mega 50 →
-              </a>
-            )}
           </div>
         </div>
       </section>
@@ -155,67 +124,42 @@ export default async function MegavisatLanding({
           <div>
             <h2 className="tnm-h2">Kaikki megavisat</h2>
             <p className="tnm-gridnote">
-              {availableCount} aihetta tarjoaa juuri nyt mega {pituus} -kierroksen · {totalMegas} megaa yhteensä
+              {availableCount} megaa pelattavissa juuri nyt — uusia aiheita kootaan jatkuvasti
             </p>
-          </div>
-          <div className="tnm-controls">
-            <span className="tnm-ctrl-label">Pituus</span>
-            {MEGA_LENGTHS.map((l) => (
-              <a key={l} className="tnm-pill" data-tone="gold" data-active={l === pituus || undefined} href={gridHref(l, suodata)}>
-                {l}
-              </a>
-            ))}
-            <span className="tnm-ctrl-sep" aria-hidden="true" />
-            <a className="tnm-pill" data-active={suodata === "kaikki" || undefined} href={gridHref(pituus, "kaikki")}>Kaikki</a>
-            <a className="tnm-pill" data-active={suodata === "uudet" || undefined} href={gridHref(pituus, "uudet")}>Uudet</a>
           </div>
         </div>
 
-        {topicState.length === 0 ? (
-          <div className="tn-empty">Ei uusia megoja juuri nyt — katso kaikki aiheet.</div>
-        ) : (
-          <div className="tnm-grid">
-            {topicState.map(({ t, slug, playable, altLength }) => {
-              const inner = (
-                <>
-                  <span className="tnm-card-top">
-                    <span className="tnm-card-tag">
-                      <i style={{ background: t.tagColor }} />
-                      {t.tag}
-                    </span>
-                    <span className="tnm-card-row">
-                      <span className="tnm-card-title">{t.title}</span>
-                      <span className="tnm-card-num">{pituus}</span>
-                    </span>
+        <div className="tnm-grid">
+          {topicState.map(({ t, slug, playable, num }) => {
+            const inner = (
+              <>
+                <span className="tnm-card-top">
+                  <span className="tnm-card-tag">
+                    <i style={{ background: t.tagColor }} />
+                    {t.tag}
                   </span>
-                  <span className="tnm-card-desc">{t.desc}</span>
-                  <span className="tnm-card-foot">
-                    {playable ? (
-                      <span className="tnm-card-cta">Aloita →</span>
-                    ) : altLength ? (
-                      <span className="tnm-card-cta" data-dim>Pelaa mega {altLength} →</span>
-                    ) : (
-                      <span className="tnm-card-cta" data-dim>Tulossa</span>
-                    )}
+                  <span className="tnm-card-row">
+                    <span className="tnm-card-title">{t.title}</span>
+                    <span className="tnm-card-num">{num}</span>
                   </span>
-                </>
-              );
-              if (playable) {
-                return (
-                  <a key={t.key} className="tnm-card" href={`/2-0/peli?mega=${slug}`}>{inner}</a>
-                );
-              }
-              if (altLength) {
-                return (
-                  <a key={t.key} className="tnm-card" data-dim href={`/2-0/peli?mega=${t.megaSlugs[altLength]}`}>{inner}</a>
-                );
-              }
-              return (
-                <div key={t.key} className="tnm-card" data-dim>{inner}</div>
-              );
-            })}
-          </div>
-        )}
+                </span>
+                <span className="tnm-card-desc">{t.desc}</span>
+                <span className="tnm-card-foot">
+                  {playable ? (
+                    <span className="tnm-card-cta">Aloita →</span>
+                  ) : (
+                    <span className="tnm-card-cta" data-dim>Tulossa</span>
+                  )}
+                </span>
+              </>
+            );
+            return playable ? (
+              <a key={t.key} className="tnm-card" href={`/2-0/peli?mega=${slug}`}>{inner}</a>
+            ) : (
+              <div key={t.key} className="tnm-card" data-dim>{inner}</div>
+            );
+          })}
+        </div>
       </section>
 
       {/* ─── Näin mega toimii ─── */}
