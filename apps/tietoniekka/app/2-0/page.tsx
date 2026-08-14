@@ -366,9 +366,9 @@ export default async function Etusivu20() {
       <section className="tn-section" id="pelimuodot">
         <div className="tn-shell">
           <div className="tn-mega">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            {/* 11.8.2026: Heikin tekstivapaa Megavisu (ei leivottuja lukuja) */}
-            <img src="/20/megavisa.webp" alt="" style={{ position: "absolute", right: 0, top: 0, height: "100%", width: "42%", objectFit: "cover", objectPosition: "center", opacity: 0.35, maskImage: "linear-gradient(90deg, transparent, black 40%)", WebkitMaskImage: "linear-gradient(90deg, transparent, black 40%)" }} />
+            {/* 13.8.2026: MEGA-juliste kehystettynä korttina (CD:n Megavisat-
+                designin malli) — ei enää taustakuvana, jonka MEGA-teksti jäi
+                faktarivien alle. Faktat puhtaalla taustalla julisteen vieressä. */}
             <div className="tn-mega-grid" style={{ position: "relative" }}>
               <div>
                 <span className="tn-chip" style={{ color: "var(--tn-gold)" }}>Megavisat</span>
@@ -382,11 +382,13 @@ export default async function Etusivu20() {
                   Aloita Mega →
                 </a>
               </div>
-              <div style={{ display: "grid", gap: 10 }}>
+              <div style={{ display: "grid", gap: 10, alignContent: "center" }}>
                 <div className="tn-mega-fact"><span>Kysymyksiä</span><b>50</b></div>
                 <div className="tn-mega-fact"><span>Kesto</span><b>~20 min</b></div>
                 <div className="tn-mega-fact"><span>Aihe</span><b>Kaikki kokoelmat</b></div>
               </div>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img className="tn-mega-poster" src="/20/megavisat/mega-hero.webp" alt="" />
             </div>
           </div>
         </div>
