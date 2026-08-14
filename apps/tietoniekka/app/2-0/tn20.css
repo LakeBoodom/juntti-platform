@@ -1626,7 +1626,10 @@
   padding-top: clamp(26px, 3.8cqw, 68px); padding-bottom: clamp(28px, 3.6cqw, 60px);
 }
 .tn20 .tnm-hero-left { flex: 1.35 1 min(100%, 420px); }
-.tn20 .tnm-hero-right { flex: 1 1 min(100%, 300px); max-width: 460px; }
+/* Juliste vain levealla (Heikki 14.8.): mobiilissa piilossa -> heron
+   jalkeen tulee suoraan megalista. */
+.tn20 .tnm-hero-right { display: none; flex: 1 1 min(100%, 300px); max-width: 460px; }
+@container (min-width: 740px) { .tn20 .tnm-hero-right { display: block; } }
 
 .tn20 .tnm-crumb { font-size: clamp(10px, 1.05cqw, 13px); font-weight: 700; color: #8E8676; margin-bottom: 14px; }
 .tn20 .tnm-crumb a { color: inherit; text-decoration: none; }
