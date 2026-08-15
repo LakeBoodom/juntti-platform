@@ -5,13 +5,20 @@
 
 import { getSupabase, SITE_SLUG } from "@/lib/supabase";
 import { QuizCard, type QuizCardData } from "@/components/tn20/cards";
-import { WideCard } from "@/components/tn20/WideCard";
-import { motifPathFor } from "@/components/tn20/motif-paths";
 import { kulttuuriImg } from "@/lib/kulttuuri";
 import { luontoImg } from "@/lib/luonto";
 import { urheiluImg } from "@/lib/urheilu";
 import { maantietoImg } from "@/lib/maantieto";
+import { DailyQuizCard, type DailyQuizCardData, type DailyQuizVariant } from "@/components/tn20/DailyQuizCard";
 import PutkiCard from "./PutkiCard";
+
+/* Kokoelman nimi DailyQuizCardin chippiin (image/plain-tila) — sama
+   sanasto kuin pelin loaderissa (app/2-0/peli/page.tsx COLLECTION_LABEL). */
+const COLLECTION_NAME: Record<string, string> = {
+  tv: "TV & Suoratoisto", urheilu: "Urheilu", elokuvat: "Elokuvat", musiikki: "Musiikki",
+  matkakohteet: "Maantieto", yleistieto: "Yleistieto", kulttuuri: "Kulttuuri",
+  historia: "Historia", luonto: "Luonto", "tunnetut-henkilot": "Tunnetut henkilöt",
+};
 
 /** Visan oma kuva (flagship-kokoelmien topicImg) — sama putki kuin pelinäkymässä.
     Palauttaa null jos kokoelmalla ei ole visakohtaisia kuvia (→ SVG-motiivi). */
@@ -118,6 +125,35 @@ async function getData() {
     }
   }
 
+  // DailyQuizCard (15.8.2026): ensimmäinen kysymys pitää olla mukana
+  // ENSIMMÄISESSÄ latauksessa (SSR) — muuten kortti välkkyy skeletonina.
+  // Haetaan sen visan sort_order=0 -kysymys jonka Tänään-slotti näyttää
+  // (manuaalinen Päivän visa TAI fallback-sankarin visa).
+  const dayQuizId =
+    dayPick?.kind === "quiz"
+      ? dayPick.card.id
+      : dayPick?.kind === "celeb"
+        ? dayPick.celeb.trivia_quiz_id
+        : hero?.c.trivia_quiz_id ?? null;
+  let firstQuestion: { text: string; options: string[]; correct: string } | null = null;
+  if (dayQuizId) {
+    const { data: q0 } = await sb
+      .from("questions")
+      .select("question_text, answers")
+      .eq("quiz_id", dayQuizId)
+      .order("sort_order", { ascending: true })
+      .limit(1)
+      .maybeSingle();
+    if (q0) {
+      const answers = (q0.answers as Array<{ text: string; is_correct: boolean }>) ?? [];
+      firstQuestion = {
+        text: q0.question_text as string,
+        options: answers.slice(0, 4).map((a) => a.text),
+        correct: answers.find((a) => a.is_correct)?.text ?? answers[0]?.text ?? "",
+      };
+    }
+  }
+
   // Trending: pelatuimmat 24 h — näytetään vasta kun volyymiä on (kynnys)
   const playCounts: Record<string, number> = {};
   for (const p of plays) playCounts[p.quiz_id] = (playCounts[p.quiz_id] ?? 0) + 1;
@@ -147,7 +183,7 @@ async function getData() {
       }, {})
   ).sort((a, b) => (b.published_at! > a.published_at! ? 1 : -1));
 
-  return { counts, total: cards.length, hero, sankariIsToday: hero?.dist === 0, dayPick, trending, today, newestByCollection };
+  return { counts, total: cards.length, hero, sankariIsToday: hero?.dist === 0, dayPick, firstQuestion, trending, today, newestByCollection };
 }
 
 function age(birth: string, onNextBirthday: boolean) {
@@ -162,7 +198,7 @@ function age(birth: string, onNextBirthday: boolean) {
 export default async function Etusivu20() {
   const data = await getData();
   if (!data) return <main style={{ padding: 32 }}>Ei tietokantayhteyttä.</main>;
-  const { counts, total, hero, sankariIsToday, dayPick, trending, today, newestByCollection } = data;
+  const { counts, total, hero, sankariIsToday, dayPick, firstQuestion, trending, today, newestByCollection } = data;
 
   const n = (k: string) => counts[k] ?? 0;
   const rankColors = ["var(--tn-magenta)", "var(--tn-lime)", "var(--tn-violet)", "var(--tn-teal)", "var(--tn-orange)", "var(--tn-gold)"];
@@ -178,6 +214,79 @@ export default async function Etusivu20() {
       : sankariCeleb?.trivia_quiz_id
         ? `/2-0/peli?quiz_id=${sankariCeleb.trivia_quiz_id}&${dayParam}=1`
         : "#paiva";
+
+  // DailyQuizCard (15.8.2026, design_handoff_paivan_visa) — variantin
+  // päättely YHDESSÄ paikassa: person → birthday, muutoin image jos visalla
+  // on oma kuva, muutoin plain. Sankari joka ei juhli tänään (fallback,
+  // "Seuraavaksi juhlii") ei saa birthday-nauhaa — se on plain (README:
+  // reunatapaus "Portretti puuttuu" laajennettu kattamaan myös "ei tänään").
+  let dailyVariant: DailyQuizVariant = "plain";
+  let dailyData: DailyQuizCardData | null = null;
+
+  if (firstQuestion) {
+    if (sankariCeleb && sankariToday) {
+      dailyVariant = "birthday";
+      dailyData = {
+        quizId: sankariCeleb.trivia_quiz_id ?? "",
+        title: sankariCeleb.name,
+        questionCount: 5,
+        collectionName: "Tunnetut henkilöt",
+        accent: "#C9A96A",
+        playedToday: false,
+        person: {
+          name: sankariCeleb.name,
+          age: age(sankariCeleb.birth_date, true),
+          birthDateLabel: `${new Date(sankariCeleb.birth_date).getDate()}.${new Date(sankariCeleb.birth_date).getMonth() + 1}.${new Date(sankariCeleb.birth_date).getFullYear()}`,
+          role: sankariCeleb.role ?? "",
+          portraitUrl: sankariCeleb.image_url,
+          creditUrl: sankariCeleb.wikipedia_url,
+          isToday: true,
+        },
+        image: null,
+        firstQuestion,
+        browseHref: "/2-0/kokoelma/tunnetut-henkilot",
+        browseLabel: "Lisää tunnettuja henkilöitä →",
+        playHref: dayHref,
+      };
+    } else if (dayPick?.kind === "quiz") {
+      const collection = dayPick.card.collection ?? "yleistieto";
+      const img = topicImgFor(collection, dayPick.card.slug);
+      dailyVariant = img ? "image" : "plain";
+      dailyData = {
+        quizId: dayPick.card.id,
+        title: dayPick.card.display_title ?? dayPick.card.title,
+        tagline: (dayPick.card.teaser as string | null) ?? null,
+        questionCount: (dayPick.card.question_count as number | null) ?? 10,
+        collectionName: COLLECTION_NAME[collection] ?? "Visa",
+        accent: DAY_ACCENT[collection] ?? "#E8A320",
+        playedToday: false,
+        person: null,
+        image: img ? { url: img, focalX: 0.5, focalY: 0.46 } : null,
+        firstQuestion,
+        browseHref: `/2-0/peli?quiz_id=${dayPick.card.id}`,
+        browseLabel: "Katso koko visa ensin →",
+        playHref: dayHref,
+      };
+    } else if (sankariCeleb && !sankariToday) {
+      // Fallback-sankari, mutta ei tänään juhli — plain-nauha kokoelmavärillä.
+      dailyVariant = "plain";
+      dailyData = {
+        quizId: sankariCeleb.trivia_quiz_id ?? "",
+        title: sankariCeleb.name,
+        tagline: `Seuraavaksi juhlii · ${sankariCeleb.role ?? ""}`,
+        questionCount: 5,
+        collectionName: "Tunnetut henkilöt",
+        accent: "#C9A96A",
+        playedToday: false,
+        person: null,
+        image: null,
+        firstQuestion,
+        browseHref: "/2-0/kokoelma/tunnetut-henkilot",
+        browseLabel: "Lisää tunnettuja henkilöitä →",
+        playHref: dayHref,
+      };
+    }
+  }
 
   return (
     <main style={{ minHeight: "100dvh" }}>
@@ -233,50 +342,8 @@ export default async function Etusivu20() {
             <span className="tn-section-sub" style={{ margin: 0 }}>{fiDate(today)} · uusi joka päivä</span>
           </div>
           <div className="tn-day-grid" style={{ marginTop: 18 }}>
-            {dayPick?.kind === "quiz" ? (
-              <WideCard
-                href={dayHref}
-                color={DAY_ACCENT[dayPick.card.collection ?? ""] ?? "var(--tn-gold)"}
-                motifPath={motifPathFor(dayPick.card.collection, (dayPick.card.genre as string | null) ?? null, dayPick.card.title)}
-                img={topicImgFor(dayPick.card.collection, dayPick.card.slug)}
-                title={dayPick.card.display_title ?? dayPick.card.title}
-                desc={(dayPick.card.teaser as string | null) ?? null}
-                mode="Klassinen"
-                meta={`${(dayPick.card.question_count as number | null) ?? "?"} kysymystä`}
-              />
-            ) : sankariCeleb ? (
-              <article className="tn-sankari-card">
-                <div className="tn-sankari-photo">
-                  {sankariCeleb.image_url && (
-                    /* eslint-disable-next-line @next/next/no-img-element */
-                    <img src={sankariCeleb.image_url} alt={sankariCeleb.name} />
-                  )}
-                  {/* Wikipedia-kuvien lähde + lisenssi (CC) — lisenssiehto (Heikki 10.8.2026) */}
-                  {sankariCeleb.image_url && sankariCeleb.wikipedia_url && (
-                    <a className="tn-photo-credit" href={sankariCeleb.wikipedia_url} target="_blank" rel="noopener noreferrer">
-                      Kuva: Wikipedia (CC)
-                    </a>
-                  )}
-                </div>
-                <div className="tn-sankari-body">
-                  <span className="tn-chip" style={{ color: "var(--tn-amber)", alignSelf: "start" }}>
-                    {sankariToday ? "🔥 Tänään juhlii" : "🎂 Seuraavaksi juhlii"}
-                  </span>
-                  <div className="tn-sankari-age">
-                    <b>{age(sankariCeleb.birth_date, sankariToday)} vuotta</b> — {sankariCeleb.name}
-                  </div>
-                  <div className="tn-sankari-meta">
-                    Syntynyt {new Date(sankariCeleb.birth_date).getDate()}.{new Date(sankariCeleb.birth_date).getMonth() + 1}.
-                    {new Date(sankariCeleb.birth_date).getFullYear()} · {sankariCeleb.role}
-                  </div>
-                  <a className="tn-cta" href={sankariCeleb.trivia_quiz_id ? dayHref : sankariCeleb.slug ? `/sankari/${sankariCeleb.slug}` : "#"}>
-                    Aloita visa →
-                  </a>
-                  <a className="tn-textlink" href="/2-0/kokoelma/tunnetut-henkilot">
-                    Selaa tunnettuja henkilöitä →
-                  </a>
-                </div>
-              </article>
+            {dailyData ? (
+              <DailyQuizCard variant={dailyVariant} data={dailyData} />
             ) : (
               <div className="tn-empty">Päivän sankari palaa huomenna.</div>
             )}
