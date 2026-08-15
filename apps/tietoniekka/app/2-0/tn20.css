@@ -516,11 +516,22 @@
 .tn20 .tn-dqc-foot-link { font-size: 13px; font-weight: 700; color: var(--tn-text-muted); text-decoration: none; }
 .tn20 .tn-dqc-foot-link:hover { color: var(--tn-gold); }
 
-/* "Tänään pelattu" -väliaikatila (ei vielä CD-designattu, Heikki 15.8.2026) —
-   sama padding/rytmi kuin kysymysalueella, jotta kortin korkeus ei hyppää. */
-.tn20 .tn-dqc-played { justify-content: center; align-items: flex-start; gap: 8px; min-height: 120px; }
+/* "Tänään pelattu" -väliaikatila (ei vielä CD-designattu, Heikki 15.8.2026).
+   Täyttää koko kortin jäljellä olevan korkeuden ja keskittää sisällön —
+   .tn-day-grid venyttää kortin Putki-paneelin korkuiseksi, joten ilman
+   tätä alle jäi paljon tyhjää tilaa (Heikin korjauspyyntö 15.8.2026). */
+.tn20 .tn-dqc-played {
+  flex: 1; justify-content: center; align-items: center; gap: 10px;
+  text-align: center; padding: clamp(24px, 4cqw, 40px);
+}
+.tn20 .tn-dqc-played-icon {
+  width: 44px; height: 44px; border-radius: 50%;
+  display: grid; place-items: center; font-size: 20px; font-weight: 800;
+  color: var(--tn-bg-deep); background: var(--tn-lime); margin-bottom: 4px;
+}
 .tn20 .tn-dqc-played .tn-dqc-meta { color: var(--tn-lime); }
-.tn20 .tn-dqc-played-msg { margin: 0; font-size: 15px; color: var(--tn-text-soft); }
+.tn20 .tn-dqc-played-msg { margin: 0; font-size: 15px; color: var(--tn-text-soft); max-width: 34ch; }
+.tn20 .tn-dqc-played-msg:last-child { color: var(--tn-text-muted); font-size: 13.5px; }
 
 /* ---------- Responsiivisuus ---------- */
 @container (max-width: 767px) {
