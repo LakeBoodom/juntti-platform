@@ -17,6 +17,7 @@ import { getSupabase } from "../../../lib/supabase";
 import { MOTIF_PATHS } from "../../../components/tn20/motif-paths";
 import { LearnArticle, type Learn } from "../../../components/tn20/LearnArticle";
 import PutkiCard from "../PutkiCard";
+import { DAILY_ANSWER_KEY } from "../../../components/tn20/DailyQuizCard";
 
 const BASE_POINTS = 100;
 const STREAK_BONUS = 50;
@@ -101,6 +102,27 @@ function resultTier(correct: number, total: number) {
 
 const enc = encodeURIComponent;
 
+/** DailyQuizCard-silta (15.8.2026): jos käyttäjä vastasi jo etusivun kortista
+    ("kortista=1" URL-parametri + tuore sessionStorage-vastaus samalle
+    quizId:lle), peli käynnistyy suoraan play-vaiheesta valmiiksi merkityllä
+    ensimmäisellä vastauksella — ei näytetä introa uudelleen. sessionStorage
+    (ei localStorage) koska vastaus on kertakäyttöinen tämän navigoinnin ajan;
+    5 min TTL suojaa vanhentuneelta/väärän quizin datalta jos käyttäjä
+    esim. palaa selaimen "edellinen"-napilla toiseen visaan. */
+function readCardAnswer(quizId: string): string | null {
+  try {
+    const raw = window.sessionStorage.getItem(DAILY_ANSWER_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as { quizId: string; option: string; ts: number };
+    window.sessionStorage.removeItem(DAILY_ANSWER_KEY);
+    if (parsed.quizId !== quizId) return null;
+    if (Date.now() - parsed.ts > 5 * 60 * 1000) return null;
+    return parsed.option;
+  } catch {
+    return null;
+  }
+}
+
 export default function GameClient({ quiz }: { quiz: GameQuiz }) {
   const total = quiz.questions.length;
   const [phase, setPhase] = useState<"intro" | "play" | "end">("intro");
@@ -110,6 +132,7 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
   const [correctCount, setCorrectCount] = useState(0);
   const [picked, setPicked] = useState<string | null>(null);
   const [hidden, setHidden] = useState<Set<string>>(new Set());
+  const cardAnswerChecked = useRef(false);
   /* Oljenkorsien dynamiikka (Heikki 10.8.2026): 1 per 10 kysymystä, aina
      vähintään 1 — tavallinen 10 kys. visa = 1 (kuten ennen), Mega 20 = 2,
      Mega 50 = 5, Mega 100 = 10. Yksi korsi poistaa 2 väärää nykyisestä
@@ -281,6 +304,41 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
     document.body.classList.toggle("tn-game-playing", hide);
     return () => document.body.classList.remove("tn-game-playing");
   }, [phase]);
+
+  /* DailyQuizCard-silta: käynnistä suoraan kysymyksestä 2 esitäytetyllä
+     1. vastauksella, jos tultiin etusivun kortista. Pisteytys/streak-logiikka
+     toistettu tässä (ei kutsuta pick()ia) koska käyttäjä ei enää näe
+     kysymystä 1 uudelleen — vain lopputulos (piste/streak) kirjataan, ei
+     UI-sivuvaikutuksia (confetti, scrollIntoView) joita kukaan ei näkisi. */
+  useEffect(() => {
+    if (cardAnswerChecked.current) return;
+    cardAnswerChecked.current = true;
+    if (!quiz.id || total === 0) return;
+    let fromCard = false;
+    try {
+      fromCard = new URLSearchParams(window.location.search).get("kortista") === "1";
+    } catch { /* no-op */ }
+    if (!fromCard) return;
+    const answer = readCardAnswer(quiz.id);
+    if (!answer) return;
+    const firstQ = quiz.questions[0];
+    const ok = answer === firstQ.correct;
+    setAnsLog([ok]);
+    if (ok) {
+      setStreak(1);
+      setScore(BASE_POINTS);
+      setCorrectCount(1);
+    }
+    if (total > 1) {
+      setIdx(1);
+      setPhase("play");
+    } else {
+      // Yhden kysymyksen visa: ensimmäinen vastaus on jo koko peli.
+      void recordPlay(ok ? BASE_POINTS : 0);
+      setPhase("end");
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
