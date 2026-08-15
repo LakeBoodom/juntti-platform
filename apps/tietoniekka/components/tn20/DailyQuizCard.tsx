@@ -163,11 +163,16 @@ export function DailyQuizCard({ variant, data }: { variant: DailyQuizVariant; da
 
       {/* ─── Vyöhyke 2 · Kysymys — identtinen kaikissa tiloissa,
              PAITSI kun päivän visa on jo pelattu tänään (väliaikainen
-             ratkaisu, ei vielä CD-designattu — Heikki 15.8.2026). ─── */}
+             ratkaisu, ei vielä CD-designattu — Heikki 15.8.2026).
+             Täyttää koko jäljellä olevan korkeuden (flex:1 + keskitys),
+             koska .tn-day-grid venyttää kortin Putki-paneelin korkuiseksi
+             — Heikin korjauspyyntö 15.8.2026: ei tyhjää tilaa alle. ─── */}
       {playedToday ? (
         <div className="tn-dqc-question tn-dqc-played">
-          <div className="tn-dqc-meta">Tänään pelattu</div>
-          <p className="tn-dqc-played-msg">Palaat huomenna uuteen päivän visaan.</p>
+          <div className="tn-dqc-played-icon" aria-hidden>✓</div>
+          <div className="tn-dqc-meta">Tämän päivän visa on pelattu</div>
+          <p className="tn-dqc-played-msg">Seuraava Päivän visa avautuu huomenna.</p>
+          <p className="tn-dqc-played-msg">Muista palata huomenna jatkamaan putkea!</p>
         </div>
       ) : (
         <div className="tn-dqc-question">
@@ -197,15 +202,18 @@ export function DailyQuizCard({ variant, data }: { variant: DailyQuizVariant; da
         </div>
       )}
 
-      {/* ─── Vyöhyke 3 · Jatkopolku ─── */}
-      <div className="tn-dqc-foot">
-        <span className="tn-dqc-foot-hint">
-          {playedToday ? "Putki jatkuu huomenna." : "Vastaus aloittaa päivän visan ja kirjaa putken."}
-        </span>
-        <a className="tn-dqc-foot-link" href={data.browseHref}>
-          {data.browseLabel}
-        </a>
-      </div>
+      {/* ─── Vyöhyke 3 · Jatkopolku — piilotetaan kokonaan kun tänään on jo
+             pelattu (Heikin korjauspyyntö 15.8.2026: "Katso koko visa
+             ensin →" ei ole relevantti pelatulle visalle, eikä muutakaan
+             jatkopolkua vielä ole tälle tilalle suunniteltu). ─── */}
+      {!playedToday && (
+        <div className="tn-dqc-foot">
+          <span className="tn-dqc-foot-hint">Vastaus aloittaa päivän visan ja kirjaa putken.</span>
+          <a className="tn-dqc-foot-link" href={data.browseHref}>
+            {data.browseLabel}
+          </a>
+        </div>
+      )}
     </article>
   );
 }
