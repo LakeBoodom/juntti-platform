@@ -386,29 +386,169 @@
 .tn20 .tn-morelink:hover { text-decoration: underline; }
 
 /* Päivä-slotti */
-.tn20 .tn-day-grid { display: grid; gap: var(--tn-space-md); }
-@container (min-width: 900px) { .tn20 .tn-day-grid { grid-template-columns: 1.7fr 1fr; } }
-.tn20 .tn-sankari-card {
-  display: grid; overflow: hidden; border-radius: var(--tn-radius-lg);
-  border: 1px solid color-mix(in srgb, var(--tn-amber) 35%, var(--tn-line));
-  background: var(--tn-surface);
+.tn20 .tn-day-grid { display: grid; gap: 22px; align-items: stretch; }
+@container (min-width: 1000px) { .tn20 .tn-day-grid { grid-template-columns: minmax(0, 1.55fr) minmax(300px, 0.85fr); } }
+
+/* ============================================================
+   PÄIVÄN VISA — DailyQuizCard (CD-design 15.8.2026)
+   design_handoff_paivan_visa/README.md — yksi komponentti, 3 tilaa.
+   Vain aihenauha (vyöhyke 1) vaihtuu; kysymys + jatkopolku identtiset.
+   ============================================================ */
+.tn20 .tn-dqc {
+  display: flex; flex-direction: column; overflow: hidden;
+  border-radius: 22px; border: 1px solid var(--tn-surface-3);
+  background: var(--tn-surface-2);
 }
-/* Kuvapalsta leveämpänä isolla näytöllä — kortti venyy Liekkikortin
-   korkuiseksi, joten 240px-palsta jäi suhteettoman kapeaksi (Heikki 11.8.2026). */
-@container (min-width: 620px) { .tn20 .tn-sankari-card { grid-template-columns: clamp(240px, 34cqw, 340px) 1fr; } }
-.tn20 .tn-sankari-photo { position: relative; min-height: 240px; background: linear-gradient(175deg, #6b4e86, #2c1f38 70%); }
-/* object-position top: Wikipedia-henkilökuvissa kasvot ovat kuvan
-   yläreunassa — keskirajaus leikkasi pään pois kapealla näytöllä.
-   Yläreunasta rajattuna päälaki ei leikkaudu koskaan (Heikki 11.8.2026). */
-.tn20 .tn-sankari-photo img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 0%; filter: grayscale(1) contrast(1.05) brightness(1.08); }
-.tn20 .tn-sankari-photo::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, #b17ae0, #7a4ba8 60%, #3a2a55); mix-blend-mode: color; opacity: 0.55; }
-/* justify-content: center — kun kortti venyy viereisen Liekkikortin
-   korkuiseksi, sisältö keskittyy pystysuunnassa eikä jää ylälaitaan
-   (ahdas yläosa + tyhjä alaosa, Heikki 11.8.2026). */
-.tn20 .tn-sankari-body { padding: clamp(18px, 3cqw, 28px); display: flex; flex-direction: column; gap: 12px; justify-content: center; }
-.tn20 .tn-sankari-age { font-family: var(--tn-font-display); font-weight: 900; text-transform: uppercase; font-size: clamp(24px, 3.4cqw, 34px); line-height: 1; }
-.tn20 .tn-sankari-age b { color: var(--tn-gold); }
-.tn20 .tn-sankari-meta { color: var(--tn-text-muted); font-size: 13.5px; }
+
+/* ---------- Vyöhyke 1 · Aihenauha (yhteiset säännöt) ---------- */
+.tn20 .tn-dqc-band {
+  position: relative; min-height: 150px; flex: none;
+  border-bottom: 1px solid var(--tn-surface-3);
+  display: flex; flex-direction: column; justify-content: flex-end;
+  gap: 6px; padding: 16px clamp(16px, 1.8cqw, 24px);
+}
+.tn20 .tn-dqc-chip {
+  align-self: flex-start; border-radius: 999px; padding: 5px 11px;
+  font-size: 10px; font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase;
+  border: 1px solid color-mix(in srgb, var(--tn-dqc-accent) 50%, transparent);
+  background: color-mix(in srgb, var(--tn-dqc-accent) 16%, transparent);
+  color: color-mix(in srgb, var(--tn-dqc-accent) 70%, white 30%);
+}
+.tn20 .tn-dqc-chip-birthday {
+  border-color: rgba(232, 163, 32, 0.5); background: rgba(232, 163, 32, 0.14); color: #F2C874;
+}
+.tn20 .tn-dqc-title {
+  margin: 0; font-family: var(--tn-font-display); font-weight: 900;
+  font-variation-settings: "wdth" 76; font-size: clamp(22px, 2.3vw, 32px);
+  line-height: 1; letter-spacing: -0.01em; text-transform: uppercase;
+  text-wrap: balance; color: var(--tn-text);
+}
+.tn20 .tn-dqc-title b { color: var(--tn-gold); font-weight: inherit; }
+.tn20 .tn-dqc-sub { font-size: 13px; color: var(--tn-text-muted); }
+.tn20 .tn-dqc-band-image .tn-dqc-sub,
+.tn20 .tn-dqc-band-plain .tn-dqc-sub { color: var(--tn-text-soft); }
+.tn20 .tn-dqc-clamp1 {
+  display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden;
+}
+.tn20 .tn-dqc-band-text { position: relative; display: flex; flex-direction: column; gap: 6px; z-index: 1; }
+
+/* Tila A — birthday: neliökuva vasemmalla + teksti oikealla */
+.tn20 .tn-dqc-band-birthday {
+  flex-direction: row; align-items: stretch; gap: 0; padding: 0;
+  background: linear-gradient(100deg, rgba(124, 79, 201, 0.32), rgba(20, 18, 12, 0) 66%), var(--tn-bg-deep);
+}
+.tn20 .tn-dqc-portrait { position: relative; width: 150px; flex: none; align-self: stretch; }
+.tn20 .tn-dqc-portrait img {
+  position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 32%;
+  filter: grayscale(1) sepia(1) hue-rotate(215deg) saturate(3.2) brightness(0.95);
+}
+.tn20 .tn-dqc-credit {
+  position: absolute; right: 6px; bottom: 6px; font-size: 10px; color: rgba(245, 240, 230, 0.45);
+  text-decoration: none; pointer-events: none;
+}
+.tn20 .tn-dqc-band-birthday .tn-dqc-band-text {
+  justify-content: center; padding: 16px clamp(16px, 1.8cqw, 24px); gap: 6px;
+}
+
+/* Tila B — image: kuva täyttää nauhan, scrim alta ylös */
+.tn20 .tn-dqc-band-image { padding: 0; background: var(--tn-bg-deep); }
+.tn20 .tn-dqc-bandimg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.tn20 .tn-dqc-scrim {
+  position: absolute; inset: 0;
+  background: linear-gradient(to top, rgba(13, 11, 6, 0.95) 4%, rgba(13, 11, 6, 0.62) 42%, rgba(13, 11, 6, 0.12) 100%);
+}
+.tn20 .tn-dqc-band-image .tn-dqc-band-text { padding: 16px clamp(16px, 1.8cqw, 24px); }
+
+/* Tila C — plain: kokoelmaväri gradienttina + viivakuvio, sama korkeus */
+.tn20 .tn-dqc-band-plain {
+  background: radial-gradient(120% 150% at 6% 0%,
+    color-mix(in srgb, var(--tn-dqc-accent) 34%, transparent),
+    color-mix(in srgb, var(--tn-dqc-accent) 5%, transparent) 56%,
+    var(--tn-bg-deep) 84%);
+}
+.tn20 .tn-dqc-plain-lines {
+  position: absolute; inset: 0; opacity: 0.5; pointer-events: none;
+  background-image: repeating-linear-gradient(135deg, rgba(245, 240, 230, 0.05) 0 1px, transparent 1px 26px);
+}
+
+/* ---------- Vyöhyke 2 · Kysymys (identtinen kaikissa tiloissa) ---------- */
+.tn20 .tn-dqc-question {
+  display: flex; flex-direction: column; gap: 16px;
+  padding: clamp(18px, 2vw, 26px);
+}
+.tn20 .tn-dqc-meta {
+  font-size: 12px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--tn-text-dim);
+}
+.tn20 .tn-dqc-bars { display: flex; gap: 4px; }
+.tn20 .tn-dqc-bar { flex: 1; height: 5px; border-radius: 99px; background: var(--tn-surface-3); }
+.tn20 .tn-dqc-bar[data-active] { background: var(--tn-lime); }
+.tn20 .tn-dqc-qtext {
+  margin: 0; font-family: var(--tn-font-display); font-weight: 800;
+  font-variation-settings: "wdth" 88; font-size: clamp(22px, 2.2vw, 31px);
+  line-height: 1.12; letter-spacing: -0.015em; text-wrap: balance; color: var(--tn-text);
+}
+.tn20 .tn-dqc-options {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr)); gap: 10px;
+}
+.tn20 .tn-dqc-opt {
+  display: flex; align-items: center; gap: 12px; min-height: 56px;
+  padding: 14px 16px; border-radius: 14px; border: 1px solid var(--tn-surface-3);
+  background: var(--tn-bg-deep); cursor: pointer; text-align: left;
+  transition: border-color 0.15s ease;
+}
+.tn20 .tn-dqc-opt:hover:not(:disabled) { border-color: var(--tn-gold); }
+.tn20 .tn-dqc-opt:focus-visible { border-color: var(--tn-gold); outline: 2px solid var(--tn-gold); outline-offset: 1px; }
+.tn20 .tn-dqc-opt[data-picked] { border-color: var(--tn-gold); background: rgba(232, 163, 32, 0.14); }
+.tn20 .tn-dqc-opt:disabled { cursor: default; }
+.tn20 .tn-dqc-optletter {
+  flex: none; width: 28px; height: 28px; border-radius: 8px; background: var(--tn-surface-3);
+  display: grid; place-items: center; font-size: 13px; font-weight: 800; color: var(--tn-text-muted);
+}
+.tn20 .tn-dqc-opttext { font-size: 16px; font-weight: 600; color: var(--tn-text-soft); }
+
+/* ---------- Vyöhyke 3 · Jatkopolku ---------- */
+.tn20 .tn-dqc-foot {
+  margin-top: auto; padding: 0 clamp(18px, 2vw, 26px) clamp(18px, 2vw, 26px);
+  padding-top: 6px; display: flex; justify-content: space-between; gap: 14px; flex-wrap: wrap;
+}
+.tn20 .tn-dqc-foot-hint { font-size: 13px; color: var(--tn-text-dim); }
+.tn20 .tn-dqc-foot-link { font-size: 13px; font-weight: 700; color: var(--tn-text-muted); text-decoration: none; }
+.tn20 .tn-dqc-foot-link:hover { color: var(--tn-gold); }
+
+/* "Tänään pelattu" -väliaikatila (ei vielä CD-designattu, Heikki 15.8.2026) —
+   sama padding/rytmi kuin kysymysalueella, jotta kortin korkeus ei hyppää. */
+.tn20 .tn-dqc-played { justify-content: center; align-items: flex-start; gap: 8px; min-height: 120px; }
+.tn20 .tn-dqc-played .tn-dqc-meta { color: var(--tn-lime); }
+.tn20 .tn-dqc-played-msg { margin: 0; font-size: 15px; color: var(--tn-text-soft); }
+
+/* ---------- Responsiivisuus ---------- */
+@container (max-width: 767px) {
+  .tn20 .tn-dqc-band { min-height: 104px; padding: 12px 14px; gap: 6px; }
+  .tn20 .tn-dqc-portrait { width: 104px; }
+  .tn20 .tn-dqc-band-birthday .tn-dqc-band-text { padding: 12px 14px; }
+  .tn20 .tn-dqc-band-image .tn-dqc-band-text,
+  .tn20 .tn-dqc-band-plain .tn-dqc-band-text:not(.tn-dqc-band-birthday .tn-dqc-band-text) { padding: 12px 14px; }
+  .tn20 .tn-dqc-chip { padding: 4px 9px; font-size: 9px; letter-spacing: 0.13em; }
+  .tn20 .tn-dqc-title { font-size: clamp(19px, 5vw, 21px); }
+  .tn20 .tn-dqc { border-radius: 18px; }
+  .tn20 .tn-dqc-question { padding: 14px; gap: 12px; }
+  .tn20 .tn-dqc-bars { gap: 3px; }
+  .tn20 .tn-dqc-bar { height: 4px; }
+  .tn20 .tn-dqc-qtext { font-size: 20px; line-height: 1.14; }
+  .tn20 .tn-dqc-options { grid-template-columns: 1fr; gap: 8px; }
+  .tn20 .tn-dqc-opt { min-height: 52px; padding: 12px 14px; border-radius: 13px; gap: 11px; }
+  .tn20 .tn-dqc-optletter { width: 26px; height: 26px; border-radius: 7px; }
+  .tn20 .tn-dqc-opttext { font-size: 15px; }
+  .tn20 .tn-dqc-foot { padding: 0 14px 14px; }
+  .tn20 .tn-dqc-foot-hint { display: none; }
+  .tn20 .tn-dqc-foot-link { font-size: 12px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tn20 .tn-dqc-opt { transition: none; }
+}
+
 .tn20 .tn-cta {
   display: inline-block; text-align: center; text-decoration: none;
   font-family: var(--tn-font-display); font-weight: 900; letter-spacing: 0.06em; text-transform: uppercase;
