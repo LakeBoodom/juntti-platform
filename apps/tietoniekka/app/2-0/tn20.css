@@ -2119,3 +2119,175 @@
   .tn20 .tnt-pick:hover, .tn20 .tnt-card:hover { transform: none; }
   .tn20 .tnt-card:hover img { transform: none; }
 }
+
+/* ══════════════════════════════════════════════════════════════════
+   ELOKUVAT — teemasivu (CD "TN Elokuvat -teemasivu" 15.8.2026)
+   design_handoff_elokuvat/README.md — hi-fi, arvot pikselintarkasti sieltä.
+   Kokoelmaväri oranssi (#FF5C3D/#FF8566), visakortit vaakakuvia (16:9→16:10).
+   Container queryt (cqw), ei viewport-yksiköitä — .tn20-juuri asettaa jo
+   container-type: inline-size (rivi 56), joten tämä osio nojaa siihen.
+   Ei vaikeustasoja, pelimuotoja, putkea, suosituin/trendaa-merkintöjä —
+   tietoinen poisjättö, ks. README. ══════════════════════════════════ */
+
+.tn20 .tne-hero {
+  position: relative;
+  min-height: clamp(340px, 42cqw, 540px);
+  display: flex; align-items: flex-end;
+  overflow: hidden;
+  border-radius: clamp(16px, 1.8cqw, 24px);
+}
+.tn20 .tne-hero-img {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  object-fit: cover; object-position: 56% 44%;
+}
+.tn20 .tne-hero::before, .tn20 .tne-hero::after {
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+}
+.tn20 .tne-hero::before {
+  background: linear-gradient(96deg, #131109 2%, rgba(19,17,9,.9) 34%, rgba(19,17,9,.36) 66%, rgba(255,92,61,.14) 100%);
+}
+.tn20 .tne-hero::after {
+  background: linear-gradient(to top, #131109 2%, rgba(19,17,9,.5) 26%, transparent 62%);
+}
+.tn20 .tne-hero-body {
+  position: relative; z-index: 1;
+  padding: clamp(24px,3.4cqw,60px) clamp(18px,4cqw,72px) clamp(26px,3.6cqw,62px);
+  max-width: min(100%, 660px);
+}
+.tn20 .tne-crumb { font-size: clamp(10px, 1.1cqw, 13px); font-weight: 700; color: #8E8676; margin-bottom: 16px; }
+.tn20 .tne-crumb a { color: inherit; text-decoration: none; }
+.tn20 .tne-crumb a:hover { color: #F5F0E6; }
+.tn20 .tne-crumb span { color: #FF8566; }
+.tn20 .tne-title {
+  margin: 0 0 14px; font-family: var(--tn-font-display); font-weight: 900;
+  font-variation-settings: "wdth" 70;
+  font-size: clamp(40px,7.6cqw,98px); line-height: .86; letter-spacing: -.02em;
+  text-transform: uppercase; color: #F5F0E6;
+}
+.tn20 .tne-title b { display: block; font-weight: inherit; color: #FF5C3D; }
+.tn20 .tne-lede {
+  margin: 0 0 18px; font-size: clamp(15px,1.55cqw,21px); line-height: 1.5;
+  color: #CFC7B6; max-width: 42ch;
+}
+.tn20 .tne-pills { display: flex; flex-wrap: wrap; gap: 8px; }
+.tn20 .tne-pill {
+  white-space: nowrap; font-size: 12.5px; font-weight: 700; border-radius: 999px;
+  padding: 7px 14px; border: 1px solid #4A4030; color: #CFC7B6;
+}
+.tn20 .tne-pill[data-accent] {
+  background: rgba(255,92,61,.16); border-color: rgba(255,92,61,.5); color: #FF8566;
+}
+
+/* ── Osion otsikkorivi (yhteinen "Tietoniekka suosittelee" + 01–04) ── */
+.tn20 .tne-eyebrow {
+  display: flex; align-items: center; gap: 10px; margin-bottom: 8px;
+  font-size: clamp(9px,1cqw,12px); font-weight: 800; letter-spacing: .18em;
+  text-transform: uppercase; color: #FF8566;
+}
+.tn20 .tne-eyebrow i { width: clamp(20px,2.4cqw,32px); height: 2px; background: #FF5C3D; display: block; }
+.tn20 .tne-section-head {
+  display: flex; align-items: flex-end; justify-content: space-between; gap: 24px;
+  flex-wrap: wrap; margin-bottom: clamp(14px,1.6cqw,20px);
+}
+.tn20 .tne-section-head h2 {
+  margin: 0; font-family: var(--tn-font-display); font-weight: 900;
+  font-variation-settings: "wdth" 72;
+  font-size: clamp(26px,3.6cqw,46px); line-height: 1.02; text-transform: uppercase; color: #F5F0E6;
+}
+.tn20 .tne-section-desc { margin: 0; color: #8E8676; font-size: clamp(13px,1.2cqw,15px); line-height: 1.5; max-width: 44ch; }
+
+/* ── Tietoniekka suosittelee: 3 nostettua, aina 3 saraketta ≥1000px ── */
+.tn20 .tne-feat-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%,300px),1fr));
+  gap: clamp(12px,1.5cqw,22px);
+}
+.tn20 .tne-feat {
+  display: block; text-decoration: none; border-radius: clamp(16px,1.8cqw,24px);
+  border: 1px solid #3A3122; background: #1A1710; overflow: hidden;
+  transition: transform .18s ease, border-color .18s ease;
+}
+.tn20 .tne-feat:hover, .tn20 .tne-feat:focus-visible {
+  transform: translateY(-5px); border-color: #FF5C3D;
+}
+.tn20 .tne-feat:focus-visible { outline: 2px solid #FF5C3D; outline-offset: 2px; }
+.tn20 .tne-feat-media { position: relative; aspect-ratio: 16/9; }
+.tn20 .tne-feat-media img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.tn20 .tne-feat-media::after {
+  content: ""; position: absolute; inset: 0;
+  background: linear-gradient(to top, rgba(19,17,9,.96) 4%, rgba(19,17,9,.4) 46%, rgba(19,17,9,.05) 80%);
+}
+.tn20 .tne-feat-media[data-noimg] {
+  background: linear-gradient(158deg, var(--tne-fallback-accent, #FF5C3D) 32%, rgba(19,17,9,.16) 54%), #1C1810;
+}
+.tn20 .tne-feat-media[data-noimg]::before {
+  content: ""; position: absolute; inset: 0; opacity: .42;
+  background: repeating-linear-gradient(132deg, rgba(245,240,230,.055) 0 1px, transparent 1px 22px);
+}
+.tn20 .tne-feat-rank {
+  position: relative; z-index: 1; float: left; margin: clamp(10px,1.2cqw,16px) 0 0 clamp(10px,1.2cqw,16px);
+  font-family: var(--tn-font-display); font-weight: 900; font-variation-settings: "wdth" 66;
+  font-size: clamp(30px,3.4cqw,46px); line-height: 1;
+}
+.tn20 .tne-feat-name {
+  margin: 0; position: absolute; left: clamp(14px,1.6cqw,20px); right: clamp(14px,1.6cqw,20px); bottom: clamp(12px,1.4cqw,18px);
+  z-index: 1; font-family: var(--tn-font-display); font-weight: 900; font-variation-settings: "wdth" 74;
+  font-size: clamp(22px,2.5cqw,34px); line-height: .96; text-transform: uppercase; color: #F5F0E6;
+  text-wrap: balance;
+}
+.tn20 .tne-feat-body { padding: clamp(12px,1.4cqw,18px) clamp(14px,1.6cqw,20px) clamp(14px,1.6cqw,18px); }
+.tn20 .tne-feat-hook { margin: 0 0 8px; font-size: clamp(12px,1.25cqw,16px); line-height: 1.5; color: #B9AF9B; text-wrap: pretty; }
+.tn20 .tne-feat-cta { font-size: clamp(11px,1.1cqw,14px); font-weight: 800; color: #FF8566; }
+
+/* ── Aihepiiriosiot 01–04 ── */
+.tn20 .tne-section { margin-top: clamp(38px,4.8cqw,74px); }
+.tn20 .tne-section-title-row {
+  display: flex; align-items: baseline; gap: clamp(11px,1.4cqw,20px);
+  border-bottom: 1px solid #241E13; padding-bottom: clamp(12px,1.4cqw,18px);
+  margin-bottom: clamp(14px,1.6cqw,20px);
+}
+.tn20 .tne-section-num {
+  flex: none; font-family: var(--tn-font-display); font-weight: 900; font-variation-settings: "wdth" 66;
+  font-size: clamp(20px,2.3cqw,32px); color: var(--tne-accent, #FF5C3D);
+}
+.tn20 .tne-section-title {
+  flex: 1; margin: 0; font-family: var(--tn-font-display); font-weight: 900; font-variation-settings: "wdth" 74;
+  font-size: clamp(20px,2.5cqw,34px); text-transform: uppercase; color: #F5F0E6; text-wrap: balance;
+}
+.tn20 .tne-section-count { flex: none; font-size: clamp(10px,1.1cqw,13px); font-weight: 700; color: #5F594C; }
+
+.tn20 .tne-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(clamp(152px,17cqw,248px),1fr));
+  gap: clamp(10px,1.2cqw,18px);
+}
+.tn20 .tne-card {
+  position: relative; display: block; aspect-ratio: 16/10; border-radius: clamp(12px,1.4cqw,18px);
+  border: 1px solid #3A3122; background: #1C1810; overflow: hidden; text-decoration: none;
+  transition: transform .18s ease, border-color .18s ease;
+}
+.tn20 .tne-card img {
+  position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;
+}
+.tn20 .tne-card[data-noimg] {
+  background: linear-gradient(158deg, var(--tne-accent, #FF5C3D) 32%, rgba(19,17,9,.16) 54%), #1C1810;
+}
+.tn20 .tne-card[data-noimg]::before {
+  content: ""; position: absolute; inset: 0; opacity: .42;
+  background: repeating-linear-gradient(132deg, rgba(245,240,230,.055) 0 1px, transparent 1px 22px);
+}
+.tn20 .tne-card::after {
+  content: ""; position: absolute; inset: 0;
+  background: linear-gradient(to top, rgba(19,17,9,.95) 6%, rgba(19,17,9,.34) 48%, rgba(19,17,9,.04) 84%);
+}
+.tn20 .tne-card-name {
+  margin: 0; position: absolute; left: clamp(10px,1.05cqw,15px); right: clamp(10px,1.05cqw,15px); bottom: clamp(9px,1cqw,14px);
+  z-index: 1; font-family: var(--tn-font-display); font-weight: 900; font-variation-settings: "wdth" 74;
+  font-size: clamp(14px,1.45cqw,20px); line-height: .98; letter-spacing: -.01em; text-transform: uppercase;
+  color: #F5F0E6; text-wrap: balance;
+}
+.tn20 .tne-card:hover, .tn20 .tne-card:focus-visible { transform: translateY(-4px); border-color: var(--tne-accent, #FF5C3D); }
+.tn20 .tne-card:focus-visible { outline: 2px solid var(--tne-accent, #FF5C3D); outline-offset: 2px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .tn20 .tne-feat, .tn20 .tne-card { transition: none; }
+  .tn20 .tne-feat:hover, .tn20 .tne-card:hover { transform: none; }
+}
