@@ -1,0 +1,391 @@
+/* TIETONIEKKA 2.0 — NAVIGAATIOJÄRJESTELMÄ (CD:n Navigaatiokonsepti, lukittu 17.8.2026).
+   Skoopattu .tn20-luokkaan kuten muutkin 2.0-tyylit. Mitat ja liike CD:n speksistä:
+   palkki 72 → 54 px (kynnys 48 px, 160 ms ease-out), valikon avaus 140 ms / sulku 100 ms,
+   ei liikettä yli 6 px:n, prefers-reduced-motion poistaa siirtymät.
+   Tunnusvärit vain 9 px:n pisteinä ja hover-reunuksina — ei täytteinä. */
+
+/* ── Yläpalkki ─────────────────────────────────────────────────────────── */
+.tn20 .tn-topbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 60;
+  height: 72px;
+  display: flex;
+  align-items: center;
+  background: transparent;
+  border-bottom: 1px solid transparent;
+  transition: height 160ms ease-out, background-color 160ms ease-out, border-color 160ms ease-out;
+}
+/* Alasivuilla palkki on aina umpinainen; etusivulla vasta vieritettäessä */
+.tn20 .tn-nav-root[data-variant="page"] .tn-topbar,
+.tn20 .tn-nav-root[data-scrolled] .tn-topbar {
+  background: rgba(19, 17, 9, 0.97);
+  border-bottom-color: var(--tn-line);
+}
+.tn20 .tn-nav-root[data-scrolled] .tn-topbar { height: 54px; }
+.tn20 .tn-topbar-spacer { height: 72px; }
+
+.tn20 .tn-topbar-in {
+  width: 100%;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 clamp(16px, 4vw, 48px);
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+.tn20 .tn-topbar-in .tn-logo { flex: none; }
+.tn20 .tn-topbar-right { margin-left: auto; display: flex; align-items: center; gap: 10px; }
+
+/* ── Valikkopainikkeet (lepo / hover / aktiivinen / focus / auki) ──────── */
+.tn20 .tn-topnav { display: none; align-items: center; gap: 6px; }
+@media (min-width: 760px) { .tn20 .tn-topnav { display: flex; } }
+.tn20 .tn-topnav-item { position: relative; }
+
+.tn20 .tn-topnav-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  height: 44px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--tn-text-soft);
+  font: inherit;
+  font-weight: 600;
+  font-size: 14.5px;
+  cursor: pointer;
+  position: relative;
+}
+.tn20 .tn-topnav-btn:hover { color: var(--tn-text); background: rgba(255, 255, 255, 0.06); }
+.tn20 .tn-topnav-btn:focus-visible {
+  outline: 2px solid var(--tn-lime);
+  outline-offset: 2px;
+}
+/* Aktiivinen sijainti: lihavointi + 3 px lime-alleviivaus (kaksi vihjettä) */
+.tn20 .tn-topnav-btn.tn-active { color: var(--tn-text); font-weight: 800; }
+.tn20 .tn-topnav-btn.tn-active::after {
+  content: "";
+  position: absolute;
+  left: 14px;
+  right: 14px;
+  bottom: 2px;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--tn-lime);
+}
+.tn20 .tn-caret {
+  width: 8px;
+  height: 8px;
+  border-right: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  transform: rotate(45deg) translateY(-2px);
+  transition: transform 140ms ease-out;
+}
+.tn20 .tn-topnav-btn[aria-expanded="true"] .tn-caret { transform: rotate(-135deg) translateY(-2px); }
+
+/* ── Putki-pilleri ─────────────────────────────────────────────────────── */
+.tn20 .tn-streak-pill {
+  display: none;
+  align-items: center;
+  gap: 6px;
+  height: 34px;
+  padding: 0 13px;
+  border: 1px solid var(--tn-line);
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 13px;
+  color: var(--tn-text-soft);
+  white-space: nowrap;
+}
+@media (min-width: 760px) { .tn20 .tn-streak-pill { display: inline-flex; } }
+
+/* ── Pudotusvalikot ────────────────────────────────────────────────────── */
+.tn20 .tn-menu {
+  position: absolute;
+  top: calc(100% + 10px);
+  left: 0;
+  background: #191509;
+  border: 1px solid var(--tn-line);
+  border-radius: 16px;
+  padding: 10px;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.55);
+  animation: tn-menu-in 140ms ease-out;
+  z-index: 70;
+}
+@keyframes tn-menu-in {
+  from { opacity: 0; transform: translateY(-6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.tn20 .tn-menu-kokoelmat { width: min(560px, calc(100vw - 32px)); }
+.tn20 .tn-menu-pelimuodot { width: min(360px, calc(100vw - 32px)); }
+
+.tn20 .tn-menu-all {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 46px;
+  padding: 0 12px;
+  border-radius: 10px;
+  color: var(--tn-lime);
+  font-weight: 800;
+  font-size: 14px;
+  text-decoration: none;
+}
+.tn20 .tn-menu-all:hover { background: rgba(255, 255, 255, 0.05); }
+
+.tn20 .tn-menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2px; }
+
+.tn20 .tn-menu-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 52px;
+  padding: 0 12px;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  color: var(--tn-text);
+  font-weight: 700;
+  font-size: 14.5px;
+  text-decoration: none;
+}
+.tn20 .tn-menu-row:hover {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: color-mix(in srgb, var(--dot, #ffffff) 55%, transparent);
+}
+.tn20 .tn-menu-row:focus-visible,
+.tn20 .tn-menu-all:focus-visible,
+.tn20 .tn-menu-close:focus-visible,
+.tn20 .tn-selaa:focus-visible {
+  outline: 2px solid var(--tn-lime);
+  outline-offset: 2px;
+}
+.tn20 .tn-menu-dot {
+  flex: none;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--dot, var(--tn-text-dim));
+}
+.tn20 .tn-menu-label { min-width: 0; }
+.tn20 .tn-menu-count {
+  margin-left: auto;
+  color: var(--tn-text-dim);
+  font-weight: 600;
+  font-size: 12.5px;
+  white-space: nowrap;
+}
+.tn20 .tn-menu-mode { height: auto; min-height: 56px; padding-block: 8px; }
+.tn20 .tn-menu-modetext { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.tn20 .tn-menu-desc { color: var(--tn-text-muted); font-weight: 500; font-size: 12.5px; }
+
+.tn20 .tn-menu-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 8px;
+  padding: 10px 12px 4px;
+  border-top: 1px solid var(--tn-line);
+}
+.tn20 .tn-menu-foot p { margin: 0; color: var(--tn-text-dim); font-size: 12px; }
+.tn20 .tn-menu-foot em { font-style: normal; color: var(--tn-text-muted); }
+.tn20 .tn-menu-close {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 0;
+  background: transparent;
+  color: var(--tn-text-soft);
+  font: inherit;
+  font-weight: 700;
+  font-size: 12.5px;
+  cursor: pointer;
+  padding: 6px 8px;
+  border-radius: 8px;
+}
+.tn20 .tn-menu-close:hover { background: rgba(255, 255, 255, 0.06); color: var(--tn-text); }
+.tn20 .tn-menu-close kbd {
+  font: inherit;
+  font-size: 11px;
+  border: 1px solid var(--tn-line);
+  border-radius: 5px;
+  padding: 1px 5px;
+  color: var(--tn-text-dim);
+}
+
+/* ── Mobiili: 56 px palkki + Selaa ─────────────────────────────────────── */
+.tn20 .tn-selaa {
+  display: inline-flex;
+  align-items: center;
+  height: 40px;
+  padding: 0 16px;
+  border: 1px solid var(--tn-line);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--tn-text);
+  font: inherit;
+  font-weight: 700;
+  font-size: 14px;
+  cursor: pointer;
+}
+@media (min-width: 760px) { .tn20 .tn-selaa { display: none; } }
+@media (max-width: 759px) {
+  .tn20 .tn-topbar { height: 56px; }
+  .tn20 .tn-nav-root[data-scrolled] .tn-topbar { height: 56px; }
+  .tn20 .tn-topbar-spacer { height: 56px; }
+}
+
+/* ── Selaa-alapaneeli ──────────────────────────────────────────────────── */
+.tn20 .tn-sheet-root { position: fixed; inset: 0; z-index: 90; }
+.tn20 .tn-sheet-backdrop {
+  position: absolute;
+  inset: 0;
+  border: 0;
+  background: rgba(0, 0, 0, 0.55);
+  cursor: pointer;
+}
+.tn20 .tn-sheet {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  max-height: 84dvh;
+  overflow-y: auto;
+  background: #191509;
+  border-top: 1px solid var(--tn-line);
+  border-radius: 20px 20px 0 0;
+  padding: 8px 18px calc(20px + env(safe-area-inset-bottom, 0px));
+  animation: tn-sheet-in 160ms ease-out;
+}
+@keyframes tn-sheet-in {
+  from { transform: translateY(24px); opacity: 0.6; }
+  to { transform: translateY(0); opacity: 1; }
+}
+.tn20 .tn-sheet-handle {
+  display: block;
+  width: 44px;
+  height: 20px;
+  margin: 0 auto;
+  border: 0;
+  background:
+    linear-gradient(var(--tn-line), var(--tn-line)) center / 44px 4px no-repeat;
+  border-radius: 999px;
+  cursor: pointer;
+}
+.tn20 .tn-sheet-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 2px 0 6px;
+}
+.tn20 .tn-sheet-title {
+  font-family: Archivo, sans-serif;
+  font-weight: 900;
+  font-size: 18px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.tn20 .tn-sheet-x {
+  width: 48px;
+  height: 48px;
+  border: 0;
+  background: transparent;
+  color: var(--tn-text-soft);
+  font-size: 17px;
+  cursor: pointer;
+  border-radius: 12px;
+}
+.tn20 .tn-sheet-x:hover { background: rgba(255, 255, 255, 0.06); }
+.tn20 .tn-sheet-group {
+  margin: 14px 0 4px;
+  color: var(--tn-text-dim);
+  font-weight: 800;
+  font-size: 11.5px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+.tn20 .tn-sheet-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 48px;
+  padding: 4px 10px;
+  border-radius: 10px;
+  color: var(--tn-text);
+  font-weight: 700;
+  font-size: 15px;
+  text-decoration: none;
+}
+.tn20 .tn-sheet-row:active { background: rgba(255, 255, 255, 0.06); }
+.tn20 .tn-sheet-all {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 50px;
+  margin-top: 12px;
+  border: 1px solid var(--tn-line);
+  border-radius: 12px;
+  color: var(--tn-lime);
+  font-weight: 800;
+  font-size: 14.5px;
+  text-decoration: none;
+}
+
+/* ── Reduced motion: tilat vaihtuvat välittömästi ──────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .tn20 .tn-topbar,
+  .tn20 .tn-caret { transition: none; }
+  .tn20 .tn-menu,
+  .tn20 .tn-sheet { animation: none; }
+}
+
+/* ── /2-0/kokoelmat — Kaikki kokoelmat -indeksi ────────────────────────── */
+.tn20 .tn-colx-head { padding: clamp(26px, 4vw, 54px) 0 clamp(12px, 2vw, 22px); }
+.tn20 .tn-colx-title {
+  margin: 0 0 10px;
+  font-size: clamp(34px, 5.4vw, 64px);
+  line-height: 0.92;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+}
+.tn20 .tn-colx-title span { color: var(--tn-lime); }
+.tn20 .tn-colx-lede { margin: 0; color: var(--tn-text-soft); max-width: 56ch; font-size: clamp(14px, 1.3vw, 17px); }
+.tn20 .tn-colx-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 10px;
+  padding: 18px 0 8px;
+}
+.tn20 .tn-colx-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 64px;
+  padding: 10px 16px;
+  border: 1px solid var(--tn-line);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.02);
+  color: var(--tn-text);
+  font-weight: 800;
+  font-size: 15.5px;
+  text-decoration: none;
+}
+.tn20 .tn-colx-card:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: color-mix(in srgb, var(--dot, #ffffff) 55%, transparent);
+}
+.tn20 .tn-colx-card:focus-visible { outline: 2px solid var(--tn-lime); outline-offset: 2px; }
+.tn20 .tn-colx-count { margin-left: auto; color: var(--tn-text-dim); font-weight: 600; font-size: 12.5px; white-space: nowrap; }
+.tn20 .tn-colx-sub {
+  margin: 26px 0 4px;
+  color: var(--tn-text-dim);
+  font-weight: 800;
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+.tn20 .tn-colx-foot { padding: 26px 0 60px; }
