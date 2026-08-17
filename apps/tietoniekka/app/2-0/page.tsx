@@ -290,26 +290,13 @@ export default async function Etusivu20() {
 
   return (
     <main style={{ minHeight: "100dvh" }}>
-      {/* ─── HEADER — sisältö samassa 1280px-linjassa kuin muu sivu ─── */}
-      <header className="tn-header">
-        <div className="tn-header-in">
-          <a className="tn-logo" href="/2-0">
-            <b>TIETO</b>
-            <span>NIEKKA</span>
-          </a>
-          <nav className="tn-nav">
-            <a href="#kokoelmat">Kokoelmat</a>
-            <a href="#pelimuodot">Pelimuodot</a>
-            <a href="#paiva">Tänään</a>
-          </nav>
-          <a className="tn-header-cta" href={dayHref}>
-            {dayPick ? "Pelaa päivän visa" : "Pelaa päivän sankari"}
-          </a>
-        </div>
-      </header>
+      {/* HEADER: uusi TopBar tulee layoutista (navigaatiojärjestelmä, lukittu
+          17.8.2026) — vanha tn-header + header-CTA poistettu. Etusivulla palkki
+          kelluu läpikuultavana heron päällä; herolle 72 px:n yläpehmuste, jottei
+          sisältö jää palkin alle. */}
 
       {/* ─── HERO: editorial spotlight, EI arvontanappia ─── */}
-      <section className="tn-hero">
+      <section className="tn-hero" style={{ paddingTop: 72 }}>
         <div className="tn-hero-media">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/20/hero-mikko-laura.webp" alt="" />
