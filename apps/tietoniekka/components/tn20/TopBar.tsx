@@ -1,10 +1,10 @@
 "use client";
 // TIETONIEKKA 2.0 — NAVIGAATIOJÄRJESTELMÄ (CD:n Navigaatiokonsepti, lukittu 17.8.2026).
 // Kaksi valikkoa: Kokoelmat ("mistä aiheesta") + Pelimuodot ("miten pelataan").
-// - Palkki 72 → 54 px kun scrollY > 48 px (160 ms ease-out; prefers-reduced-motion
-//   poistaa animaation, korkeus vaihtuu silti).
-// - Etusivulla palkki kelluu läpikuultavana heron päällä (ei spaceria); alasivuilla
-//   umpinainen tausta + alaraja + 72 px:n spacer, jottei sisältö hypähdä.
+// - Palkki on VAKIOKORKEUS 72 px (mobiilissa 56 px) — ei madallu scrollissa.
+//   Tausta rgba(19,17,9,.86) + backdrop-blur(18px) + alaraja #241E13 aina
+//   (etusivu-README 17.8.2026 voitti nav-konseptin 72→54-madalluksen, Heikki
+//   vahvisti B-kohdassa). Alasivuilla 72 px:n spacer, jottei sisältö hypähdä.
 // - Valikot aukeavat klikistä tai Enteristä — EI hoverista. Esc, uusi klikkaus
 //   painikkeeseen tai klikkaus ulkopuolelle sulkee; fokus palaa avanneeseen
 //   painikkeeseen. Nuolinäppäimet liikkuvat valikon riveillä (eivät vieritä sivua).
@@ -15,8 +15,8 @@
 //   (Heikki 17.8.: lippuvisat yms. ovat Kuvavisoja — eri navigaatio kuin kokoelmilla).
 // - Mobiili (<760 px): yksi 56 px:n palkki + Selaa-alapaneeli (Pelimuodot ja
 //   Kokoelmat ryhminä, kosketuskohteet ≥48 px, sulku kahvasta/X:stä/Escistä/taustasta).
-// - 🔥 Putki -pilleri lukee samaa localStorage-avainta kuin PutkiCard
-//   (tn_paivan_visa_putki: putki elossa jos viimeisin peli tänään tai eilen).
+// - EI Putki-pilleriä navissa (etusivu-README 17.8.2026 voitti nav-konseptin,
+//   Heikki vahvisti A-kohdassa) — putkitieto näkyy etusivun putkinauhassa.
 // - Piilossa pelinäkymässä (/2-0/peli) — pelikuoren omat logosäännöt (lukittu 1.8.2026).
 // - Ei Tänään-kohtaa, ei Klassista, ei hakua eikä tiliä (CD:n säännöt).
 //   Kaikki linkit vievät todellisille sivuille — ei etusivun ankkureihin.
@@ -27,43 +27,15 @@ import { NAV_COLLECTIONS, NAV_MODES, hubHref } from "@/lib/nav";
 
 type MenuId = "kokoelmat" | "pelimuodot";
 
-function readPutkiCount(): number {
-  try {
-    const d = (n: Date) =>
-      `${n.getFullYear()}-${String(n.getMonth() + 1).padStart(2, "0")}-${String(n.getDate()).padStart(2, "0")}`;
-    const raw = window.localStorage.getItem("tn_paivan_visa_putki");
-    if (!raw) return 0;
-    const { count, last } = JSON.parse(raw) as { count: number; last: string };
-    const today = new Date();
-    const yesterday = new Date(today);
-    yesterday.setDate(today.getDate() - 1);
-    return last === d(today) || last === d(yesterday) ? count : 0;
-  } catch {
-    return 0;
-  }
-}
-
 export default function TopBar() {
   const pathname = usePathname() ?? "";
-  const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState<MenuId | null>(null);
   const [sheet, setSheet] = useState(false);
-  const [putki, setPutki] = useState(0);
 
   const rootRef = useRef<HTMLDivElement>(null);
   const kokoelmatBtn = useRef<HTMLButtonElement>(null);
   const pelimuodotBtn = useRef<HTMLButtonElement>(null);
   const menuRef = useRef<HTMLDivElement>(null);
-
-  /* Palkin madallus: kynnys 48 px vieritystä */
-  useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 48);
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
-
-  useEffect(() => setPutki(readPutkiCount()), []);
 
   /* Sulje valikko: klikkaus ulkopuolelle */
   useEffect(() => {
@@ -135,12 +107,7 @@ export default function TopBar() {
   const toggle = (id: MenuId) => setOpen((cur) => (cur === id ? null : id));
 
   return (
-    <div
-      ref={rootRef}
-      className="tn-nav-root"
-      data-variant={home ? "home" : "page"}
-      data-scrolled={scrolled ? "" : undefined}
-    >
+    <div ref={rootRef} className="tn-nav-root" data-variant={home ? "home" : "page"}>
       <header className="tn-topbar">
         <div className="tn-topbar-in">
           <a className="tn-logo" href="/2-0">
@@ -218,11 +185,6 @@ export default function TopBar() {
           </nav>
 
           <div className="tn-topbar-right">
-            {putki > 0 && (
-              <span className="tn-streak-pill" title="Päivän visan putki">
-                <span aria-hidden>🔥</span> Putki {putki}
-              </span>
-            )}
             <button type="button" className="tn-selaa" onClick={() => setSheet(true)}>
               Selaa
             </button>

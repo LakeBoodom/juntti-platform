@@ -4,7 +4,7 @@
    ei liikettä yli 6 px:n, prefers-reduced-motion poistaa siirtymät.
    Tunnusvärit vain 9 px:n pisteinä ja hover-reunuksina — ei täytteinä. */
 
-/* ── Yläpalkki ─────────────────────────────────────────────────────────── */
+/* ── Yläpalkki — vakiokorkeus 72 px, ei madallu (etusivu-README 17.8.2026) ── */
 .tn20 .tn-topbar {
   position: fixed;
   top: 0;
@@ -14,17 +14,11 @@
   height: 72px;
   display: flex;
   align-items: center;
-  background: transparent;
-  border-bottom: 1px solid transparent;
-  transition: height 160ms ease-out, background-color 160ms ease-out, border-color 160ms ease-out;
+  background: rgba(19, 17, 9, 0.86);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border-bottom: 1px solid #241e13;
 }
-/* Alasivuilla palkki on aina umpinainen; etusivulla vasta vieritettäessä */
-.tn20 .tn-nav-root[data-variant="page"] .tn-topbar,
-.tn20 .tn-nav-root[data-scrolled] .tn-topbar {
-  background: rgba(19, 17, 9, 0.97);
-  border-bottom-color: var(--tn-line);
-}
-.tn20 .tn-nav-root[data-scrolled] .tn-topbar { height: 54px; }
 .tn20 .tn-topbar-spacer { height: 72px; }
 
 .tn20 .tn-topbar-in {
@@ -87,21 +81,7 @@
 }
 .tn20 .tn-topnav-btn[aria-expanded="true"] .tn-caret { transform: rotate(-135deg) translateY(-2px); }
 
-/* ── Putki-pilleri ─────────────────────────────────────────────────────── */
-.tn20 .tn-streak-pill {
-  display: none;
-  align-items: center;
-  gap: 6px;
-  height: 34px;
-  padding: 0 13px;
-  border: 1px solid var(--tn-line);
-  border-radius: 999px;
-  font-weight: 700;
-  font-size: 13px;
-  color: var(--tn-text-soft);
-  white-space: nowrap;
-}
-@media (min-width: 760px) { .tn20 .tn-streak-pill { display: inline-flex; } }
+/* Putki-pilleri poistettu navista (etusivu-README 17.8.2026, Heikin A-päätös) */
 
 /* ── Pudotusvalikot ────────────────────────────────────────────────────── */
 .tn20 .tn-menu {
@@ -194,9 +174,25 @@
 @media (min-width: 760px) { .tn20 .tn-selaa { display: none; } }
 @media (max-width: 759px) {
   .tn20 .tn-topbar { height: 56px; }
-  .tn20 .tn-nav-root[data-scrolled] .tn-topbar { height: 56px; }
   .tn20 .tn-topbar-spacer { height: 56px; }
 }
+
+/* ── Murupolkurivi (44 px palkin alla — nav-speksin näkymä 03) ─────────── */
+.tn20 .tn-crumbrow {
+  height: 44px;
+  display: flex;
+  align-items: center;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--tn-text-dim);
+}
+.tn20 .tn-crumbrow-in { display: flex; align-items: center; gap: 8px; width: 100%; }
+.tn20 .tn-crumbrow a { color: var(--tn-text-dim); text-decoration: none; }
+.tn20 .tn-crumbrow a:hover { color: var(--tn-text-soft); }
+.tn20 .tn-crumbrow a:focus-visible { outline: 2px solid var(--tn-lime); outline-offset: 2px; }
+.tn20 .tn-crumbrow-seg { display: inline-flex; align-items: center; gap: 8px; }
+.tn20 .tn-crumbrow-sep { color: #3a3122; }
+.tn20 .tn-crumbrow-cur { color: var(--tn-text-soft); }
 
 /* ── Selaa-alapaneeli ──────────────────────────────────────────────────── */
 .tn20 .tn-sheet-root { position: fixed; inset: 0; z-index: 90; }
