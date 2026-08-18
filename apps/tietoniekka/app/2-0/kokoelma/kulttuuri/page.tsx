@@ -10,6 +10,7 @@ import type { Metadata } from "next";
 import { getSupabase } from "@/lib/supabase";
 import { getPageContent } from "@/lib/pageContent";
 import { LearnArticle } from "@/components/tn20/LearnArticle";
+import Crumbs from "@/components/tn20/Crumbs";
 import {
   KULTTUURI_HERO, KULTTUURI_SUBS, KULTTUURI_CURATED, kulttuuriImg,
 } from "@/lib/kulttuuri";
@@ -88,16 +89,13 @@ export default async function KulttuuriLanding({
 
   return (
     <main className="tnk" style={{ minHeight: "100dvh", paddingBottom: 60 }}>
+      {/* Murupolkurivi palkin alla (nav-speksi 17.8.2026) — korvasi heron inline-navin */}
+      <Crumbs items={[{ label: "Kokoelmat", href: "/2-0/kokoelmat" }, { label: "Kulttuuri" }]} />
       {/* ─── Hero: kollaasi + kaksivärinen otsikko (CD) ─── */}
       <section className="tnk-herowrap">
         <div className="tn-shell">
         <div className="tnk-hero">
         <div className="tnk-hero-text">
-          <nav style={{ fontSize: 13, fontWeight: 700, color: "#8E8676", marginBottom: 16 }}>
-            <a href="/2-0" style={{ color: "inherit", textDecoration: "none" }}>Kokoelmat</a>
-            {" / "}
-            <span style={{ color: "var(--tn-gold)" }}>Kulttuuri</span>
-          </nav>
           <span className="tnk-eyebrow">— Teemakokoelma</span>
           <h1 className="tn-display tnk-title">
             <span>Suomen tarinat,</span><br />tekijät ja klassikot
