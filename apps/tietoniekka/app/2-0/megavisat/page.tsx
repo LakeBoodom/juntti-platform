@@ -13,6 +13,7 @@
 
 import type { Metadata } from "next";
 import { getSupabase } from "@/lib/supabase";
+import Crumbs from "@/components/tn20/Crumbs";
 import { MEGA_TOPICS, MEGA_NOSTOT, MEGA_LENGTHS, MEGA_POSTER } from "@/lib/megavisat";
 
 export const dynamic = "force-dynamic";
@@ -56,15 +57,13 @@ export default async function MegavisatLanding() {
 
   return (
     <main className="tnm" style={{ minHeight: "100dvh" }}>
+      {/* Murupolkurivi palkin alla (nav-speksi 17.8.2026) — korvasi heron
+          inline-navin, jonka Pelimuodot-linkki osoitti etusivun ankkuriin */}
+      <Crumbs items={[{ label: "Megavisat" }]} />
       {/* ─── Hero: Pitkä peli + juliste (sädeviuhka) ─── */}
       <section className="tnm-herowrap">
         <div className="tn-shell tnm-hero">
           <div className="tnm-hero-left">
-            <nav className="tnm-crumb">
-              <a href="/2-0#pelimuodot">Pelimuodot</a>
-              {" / "}
-              <span>Megavisat</span>
-            </nav>
             <span className="tnm-badge">Megavisat</span>
             <h1 className="tnm-h1">Pitkä<br />peli</h1>
             <div className="tnm-h1sub">20 · 50 · 100 kysymystä</div>
