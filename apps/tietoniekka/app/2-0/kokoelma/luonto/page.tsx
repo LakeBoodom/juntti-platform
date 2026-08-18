@@ -16,6 +16,7 @@ import type { Metadata } from "next";
 import { getSupabase } from "@/lib/supabase";
 import { getPageContent } from "@/lib/pageContent";
 import { LearnArticle } from "@/components/tn20/LearnArticle";
+import Crumbs from "@/components/tn20/Crumbs";
 import {
   LUONTO_HERO, LUONTO_SUBS, LUONTO_CURATED, luontoImg,
 } from "@/lib/luonto";
@@ -95,16 +96,13 @@ export default async function LuontoLanding({
 
   return (
     <main className="tnl" style={{ minHeight: "100dvh", paddingBottom: 60 }}>
+      {/* Murupolkurivi palkin alla (nav-speksi 17.8.2026) — korvasi heron inline-navin */}
+      <Crumbs items={[{ label: "Kokoelmat", href: "/2-0/kokoelmat" }, { label: "Luonto" }]} />
       {/* ─── Hero: teksti 44 % + kuva 56 % desktopilla, kuva ylhäällä kapealla ─── */}
       <section className="tnl-herowrap">
         <div className="tnl-shell">
         <div className="tnl-hero">
         <div className="tnl-hero-text">
-          <nav style={{ fontSize: 13, fontWeight: 700, color: "#8E8676", marginBottom: 16 }}>
-            <a href="/2-0" style={{ color: "inherit", textDecoration: "none" }}>Kokoelmat</a>
-            {" / "}
-            <span style={{ color: "var(--tn-luonto-accent)" }}>Luonto</span>
-          </nav>
           <span className="tnl-eyebrow">— Teemakokoelma</span>
           <h1 className="tn-display tnl-title">
             <span>Suomen luonto</span>
