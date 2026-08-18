@@ -1,23 +1,25 @@
 "use client";
-// TIETONIEKKA 2.0 — Päivän visa: yhtenäinen kortti, 3 tilaa (CD-design 15.8.2026)
-// design_handoff_paivan_visa/README.md — yksi komponentti, kolme skiniä.
-// Vain aihenauha (vyöhyke 1) vaihtuu tilan mukaan; kysymys (vyöhyke 2) ja
-// jatkopolku (vyöhyke 3) ovat identtiset kaikissa tiloissa. Kuva ei enää vie
-// puolta ruudusta — kiinteän korkuinen nauha (150px / 104px mobiili), josta
-// ensimmäinen kysymys näkyy heti. Vastaus kortista käynnistää pelin
-// kysymyksestä 2 samassa sessiossa kuin "Pelaa päivän visa" (ks. GameClient
-// DAILY_ANSWER_KEY-sessionStorage-silta).
+// TIETONIEKKA 2.0 — Päivän visa -kortti (design_handoff_etusivu_2026 §3,
+// toteutettu 18.8.2026 — korvasi 15.8. CD-paketin kuoren; toimintalogiikka
+// säilyi: vastaus käynnistää pelin ja vie kysymykseen 2 samaan sessioon).
 //
-// Variantin päättely tehdään YHDESSÄ paikassa (app/2-0/page.tsx:n getData/
-// render), ei täällä — tämä komponentti vain piirtää sen minkä propina saa.
+// Identiteettinauha, kolme tapausta (dataohjattu, README):
+//  1. portrait  — henkilökuva NELIÖNÄ 140×140 vasemmalla, violetti duotone
+//                 (CSS-filter), tausta violetti liuku + #1B1710. Ei koskaan
+//                 venytetä vaakabanneriksi.
+//  2. landscape — visan topicImg täyttää 140 px:n nauhan, tumma liuku päällä.
+//  3. none      — mediakaistaa EI varata; pelkkä tekstirivi (chip + otsikko).
+// Kysymysalue: "KYSYMYS n/N" + N-osainen edistymispalkki + kysymys +
+// vastaukset 2×2-ruudukossa (min 64 px). Vastaukset ovat sivun ENSISIJAINEN
+// toiminto — kortissa ei ole erillistä pelinappia eikä jatkopolkulinkkiä
+// (Heikin C-päätös 17.8.2026 poisti "Katso koko visa ensin →" -linkin).
+// Interaktio (README): klikkaus → palautetila (oikea lime + ✓, muut vaimenevat)
+// → 900 ms → siirtymä peliin kysymykseen 2 (sessionStorage-silta GameClientiin).
+// "Tänään jo pelattu" -tila säilyy 15.8. toteutuksesta (README ei speksaa sitä).
 
 import { useEffect, useState } from "react";
 
-/** Sama avain kuin PutkiCardissa/GameClientissa (tn_paivan_visa_putki).
-    Client-only tieto — SSR ei tiedä onko tänään jo pelattu, joten kortti
-    tarkistaa sen itse mountissa ja vaihtaa kysymysalueen "pelattu"-tekstiksi.
-    VÄLIAIKAINEN RATKAISU (Heikki 15.8.2026): README:n mukaan tälle tilalle
-    ei ole vielä designia — vaihdetaan pois kun CD toimittaa sen. */
+/** Sama avain kuin PutkiCardissa/GameClientissa (tn_paivan_visa_putki). */
 function isPlayedToday(): boolean {
   try {
     const d = (n: Date) => `${n.getFullYear()}-${String(n.getMonth() + 1).padStart(2, "0")}-${String(n.getDate()).padStart(2, "0")}`;
@@ -37,38 +39,33 @@ export type DailyQuizCardData = {
   title: string;
   tagline?: string | null;
   questionCount: number;
-  collectionName: string; // chipin teksti plain/image-tilassa
-  accent: string; // kokoelmaväri hex, esim. "#46D6C8"
+  collectionName: string;
+  accent: string;
   playedToday: boolean;
-  /** birthday-tilan lisätiedot */
   person?: {
     name: string;
     age: number;
-    birthDateLabel: string; // "14.8.1971"
+    birthDateLabel: string;
     role: string;
     portraitUrl: string | null;
     creditUrl: string | null;
     isToday: boolean;
   } | null;
-  /** image-tilan kuva (kulttuuri/luonto/urheilu/matkakohteet topicImg) */
   image?: { url: string; focalX?: number; focalY?: number } | null;
   firstQuestion: {
     text: string;
-    options: string[]; // A–D järjestyksessä, kirjain päätellään indeksistä
+    options: string[];
     correct: string;
   };
-  /** Kuvaton/synttäri ilman kuvaa -tilan jatkolinkki oikealla (vyöhyke 3) */
-  browseHref: string;
-  browseLabel: string; // "Lisää tunnettuja henkilöitä →" | "Katso koko visa ensin →"
   /** Peliin siirryttäessä käytettävä perus-URL (ilman vastaus-parametria) */
   playHref: string;
 };
 
-/** sessionStorage-silta: kortin vastaus siirtyy GameClientille, joka
-    käynnistyy suoraan play-vaiheesta esitäytetyllä 1. vastauksella sen
-    sijaan että näyttäisi intron uudelleen. Avain jaettu GameClient.tsx:n
-    kanssa (DAILY_ANSWER_KEY). */
+/** sessionStorage-silta GameClientiin (esitäytetty 1. vastaus → kysymys 2). */
 const DAILY_ANSWER_KEY = "tn_daily_card_answer";
+
+/** README: palautetila näkyy 900 ms ennen siirtymää kysymykseen 2. */
+const FEEDBACK_MS = 900;
 
 function letterFor(i: number): string {
   return ["A", "B", "C", "D"][i] ?? String(i + 1);
@@ -76,14 +73,12 @@ function letterFor(i: number): string {
 
 export function DailyQuizCard({ variant, data }: { variant: DailyQuizVariant; data: DailyQuizCardData }) {
   const [picked, setPicked] = useState<string | null>(null);
-  const [navigating, setNavigating] = useState(false);
   const [playedToday, setPlayedToday] = useState(false);
   useEffect(() => setPlayedToday(isPlayedToday()), []);
 
   function pick(option: string) {
-    if (picked || navigating) return;
+    if (picked) return;
     setPicked(option);
-    setNavigating(true);
     try {
       window.sessionStorage.setItem(
         DAILY_ANSWER_KEY,
@@ -92,126 +87,119 @@ export function DailyQuizCard({ variant, data }: { variant: DailyQuizVariant; da
     } catch {
       /* no-op */
     }
-    // Optimistinen siirtymä — ei odoteta mitään verkkokutsua. GameClient
+    // Palautetila 900 ms (README) → sitten peliin kysymykseen 2. GameClient
     // tekee varsinaisen quiz_plays-tallennuksen kuten ennenkin.
-    window.location.href = `${data.playHref}${data.playHref.includes("?") ? "&" : "?"}kortista=1`;
+    window.setTimeout(() => {
+      window.location.href = `${data.playHref}${data.playHref.includes("?") ? "&" : "?"}kortista=1`;
+    }, FEEDBACK_MS);
   }
 
   const q = data.firstQuestion;
+  const feedback = picked !== null;
 
   return (
-    <article className="tn-dqc" style={{ ["--tn-dqc-accent" as string]: data.accent }}>
-      {/* ─── Vyöhyke 1 · Aihenauha — ainoa muuttuva osa ─── */}
+    <article className="tn-es-dq" style={{ ["--dq-accent" as string]: data.accent }}>
+      {/* ─── Identiteettinauha (3 tapausta) ─── */}
       {variant === "birthday" && data.person ? (
-        <div className="tn-dqc-band tn-dqc-band-birthday">
-          {data.person.portraitUrl ? (
-            <div className="tn-dqc-portrait">
+        <div className="tn-es-dq-band tn-es-dq-band-portrait">
+          {data.person.portraitUrl && (
+            <div className="tn-es-dq-portrait">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={data.person.portraitUrl} alt={data.person.name} />
               {data.person.creditUrl && (
                 <a
-                  className="tn-dqc-credit"
+                  className="tn-es-dq-credit"
                   href={data.person.creditUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  aria-hidden="true"
-                  tabIndex={-1}
+                  aria-label={`${data.person.name} — kuva: Wikipedia`}
                 >
                   Wikipedia
                 </a>
               )}
             </div>
-          ) : null}
-          <div className="tn-dqc-band-text">
-            <span className="tn-dqc-chip tn-dqc-chip-birthday">Tänään juhlii</span>
-            <h2 className="tn-dqc-title">
+          )}
+          <div className="tn-es-dq-band-text">
+            <span className="tn-es-dq-chip">Tänään juhlii</span>
+            <h2 className="tn-es-dq-name">
               <b>{data.person.age} vuotta</b> — {data.person.name}
             </h2>
-            <div className="tn-dqc-sub">
+            <div className="tn-es-dq-meta2">
               Syntynyt {data.person.birthDateLabel} · {data.person.role}
             </div>
           </div>
         </div>
       ) : variant === "image" && data.image ? (
-        <div className="tn-dqc-band tn-dqc-band-image">
+        <div className="tn-es-dq-band tn-es-dq-band-landscape">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            className="tn-dqc-bandimg"
+            className="tn-es-dq-bandimg"
             src={data.image.url}
             alt=""
-            style={{
-              objectPosition: `${(data.image.focalX ?? 0.5) * 100}% ${(data.image.focalY ?? 0.46) * 100}%`,
-            }}
+            style={{ objectPosition: `${(data.image.focalX ?? 0.5) * 100}% ${(data.image.focalY ?? 0.46) * 100}%` }}
           />
-          <div className="tn-dqc-scrim" aria-hidden />
-          <div className="tn-dqc-band-text">
-            <span className="tn-dqc-chip">{data.collectionName}</span>
-            <h2 className="tn-dqc-title">{data.title}</h2>
-            {data.tagline && <div className="tn-dqc-sub tn-dqc-clamp1">{data.tagline}</div>}
+          <div className="tn-es-dq-scrim" aria-hidden />
+          <div className="tn-es-dq-band-text">
+            <span className="tn-es-dq-chip">{data.collectionName}</span>
+            <h2 className="tn-es-dq-name">{data.title}</h2>
+            {data.tagline && <div className="tn-es-dq-meta2">{data.tagline}</div>}
           </div>
         </div>
       ) : (
-        <div className="tn-dqc-band tn-dqc-band-plain">
-          <div className="tn-dqc-plain-lines" aria-hidden />
-          <div className="tn-dqc-band-text">
-            <span className="tn-dqc-chip">{data.collectionName}</span>
-            <h2 className="tn-dqc-title">{data.title}</h2>
-            {data.tagline && <div className="tn-dqc-sub tn-dqc-clamp1">{data.tagline}</div>}
+        /* Ei kuvaa → mediakaistaa ei varata (README) — pelkkä tekstirivi */
+        <div className="tn-es-dq-band tn-es-dq-band-none">
+          <div className="tn-es-dq-band-text">
+            <span className="tn-es-dq-chip">{data.collectionName}</span>
+            <h2 className="tn-es-dq-name">{data.title}</h2>
+            {data.tagline && <div className="tn-es-dq-meta2">{data.tagline}</div>}
           </div>
         </div>
       )}
 
-      {/* ─── Vyöhyke 2 · Kysymys — identtinen kaikissa tiloissa,
-             PAITSI kun päivän visa on jo pelattu tänään (väliaikainen
-             ratkaisu, ei vielä CD-designattu — Heikki 15.8.2026).
-             Täyttää koko jäljellä olevan korkeuden (flex:1 + keskitys),
-             koska .tn-day-grid venyttää kortin Putki-paneelin korkuiseksi
-             — Heikin korjauspyyntö 15.8.2026: ei tyhjää tilaa alle. ─── */}
+      {/* ─── Kysymysalue ─── */}
       {playedToday ? (
-        <div className="tn-dqc-question tn-dqc-played">
-          <div className="tn-dqc-played-icon" aria-hidden>✓</div>
-          <div className="tn-dqc-meta">Tämän päivän visa on pelattu</div>
-          <p className="tn-dqc-played-msg">Seuraava Päivän visa avautuu huomenna.</p>
-          <p className="tn-dqc-played-msg">Muista palata huomenna jatkamaan putkea!</p>
+        <div className="tn-es-dq-q tn-es-dq-played">
+          <div className="tn-es-dq-played-icon" aria-hidden>
+            ✓
+          </div>
+          <div className="tn-es-dq-label">Tämän päivän visa on pelattu</div>
+          <p className="tn-es-dq-played-msg">Seuraava Päivän visa avautuu huomenna.</p>
+          <p className="tn-es-dq-played-msg">Muista palata huomenna jatkamaan putkea!</p>
         </div>
       ) : (
-        <div className="tn-dqc-question">
-          <div className="tn-dqc-meta">Kysymys 1/{data.questionCount}</div>
-          <div className="tn-dqc-bars" aria-hidden>
+        <div className="tn-es-dq-q">
+          <div className="tn-es-dq-label">Kysymys 1/{data.questionCount}</div>
+          <div className="tn-es-dq-bars" aria-hidden>
             {Array.from({ length: data.questionCount }, (_, i) => (
-              <span key={i} className="tn-dqc-bar" data-active={i === 0 || undefined} />
+              <span key={i} className="tn-es-dq-bar" data-state={i === 0 ? "current" : undefined} />
             ))}
           </div>
-          <h3 className="tn-dqc-qtext">{q.text}</h3>
-          <div className="tn-dqc-options">
-            {q.options.map((opt, i) => (
-              <button
-                key={opt}
-                type="button"
-                className="tn-dqc-opt"
-                data-picked={picked === opt || undefined}
-                aria-label={`Vaihtoehto ${letterFor(i)}: ${opt}`}
-                onClick={() => pick(opt)}
-                disabled={navigating}
-              >
-                <span className="tn-dqc-optletter">{letterFor(i)}</span>
-                <span className="tn-dqc-opttext">{opt}</span>
-              </button>
-            ))}
+          <h3 className="tn-es-dq-qtext">{q.text}</h3>
+          <div className="tn-es-dq-opts">
+            {q.options.map((opt, i) => {
+              const isCorrect = opt === q.correct;
+              const state = !feedback ? undefined : isCorrect ? "correct" : "dim";
+              return (
+                <button
+                  key={opt}
+                  type="button"
+                  className="tn-es-dq-opt"
+                  data-state={state}
+                  aria-label={`Vaihtoehto ${letterFor(i)}: ${opt}`}
+                  onClick={() => pick(opt)}
+                  disabled={feedback}
+                >
+                  <span className="tn-es-dq-optletter">{letterFor(i)}</span>
+                  <span className="tn-es-dq-opttext">{opt}</span>
+                  {feedback && isCorrect && (
+                    <span className="tn-es-dq-optcheck" aria-hidden>
+                      ✓
+                    </span>
+                  )}
+                </button>
+              );
+            })}
           </div>
-        </div>
-      )}
-
-      {/* ─── Vyöhyke 3 · Jatkopolku — piilotetaan kokonaan kun tänään on jo
-             pelattu (Heikin korjauspyyntö 15.8.2026: "Katso koko visa
-             ensin →" ei ole relevantti pelatulle visalle, eikä muutakaan
-             jatkopolkua vielä ole tälle tilalle suunniteltu). ─── */}
-      {!playedToday && (
-        <div className="tn-dqc-foot">
-          <span className="tn-dqc-foot-hint">Vastaus aloittaa päivän visan ja kirjaa putken.</span>
-          <a className="tn-dqc-foot-link" href={data.browseHref}>
-            {data.browseLabel}
-          </a>
         </div>
       )}
     </article>
