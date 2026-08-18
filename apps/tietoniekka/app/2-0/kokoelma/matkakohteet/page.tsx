@@ -13,6 +13,7 @@ import type { Metadata } from "next";
 import { getSupabase } from "@/lib/supabase";
 import { getPageContent } from "@/lib/pageContent";
 import { LearnArticle } from "@/components/tn20/LearnArticle";
+import Crumbs from "@/components/tn20/Crumbs";
 import {
   MAANTIETO_HERO, MAANTIETO_LM, MAANTIETO_DESC, MAANTIETO_CURATED,
   MAANTIETO_GRID_ORDER, maantietoImg,
@@ -82,14 +83,11 @@ export default async function MaantietoLanding() {
 
   return (
     <main className="tnt" style={{ minHeight: "100dvh" }}>
+      {/* Murupolkurivi palkin alla (nav-speksi 17.8.2026) — korvasi heron inline-navin */}
+      <Crumbs items={[{ label: "Kokoelmat", href: "/2-0/kokoelmat" }, { label: "Maantieto" }]} />
       {/* ─── Hero: petrooli + teal, kuva oikealla (CD) ─── */}
       <section className="tnt-hero">
         <div className="tnt-hero-text">
-          <nav className="tnt-crumb">
-            <a href="/2-0">Kokoelmat</a>
-            {" / "}
-            <span>Maantieto</span>
-          </nav>
           <span className="tnt-eyebrow">Teemakokoelma</span>
           <h1 className="tnt-title">
             <span>Maailman ääriltä</span>
