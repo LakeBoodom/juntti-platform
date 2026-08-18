@@ -3,6 +3,7 @@
 // sivuille, eivät etusivun ankkureihin — tämä sivu on se todellinen sivu.
 // Luvut kannasta (quiz_cards), lista lib/nav.ts-kokoonpanosta (sama kuin valikoissa).
 import { getSupabase } from "@/lib/supabase";
+import Crumbs from "@/components/tn20/Crumbs";
 import { NAV_COLLECTIONS, NAV_MODES, hubHref } from "@/lib/nav";
 
 export const dynamic = "force-dynamic";
@@ -26,15 +27,10 @@ export default async function KokoelmatPage() {
   const counts = await getCounts();
 
   return (
-    <main className="tn-shell" style={{ minHeight: "100dvh" }}>
+    <main style={{ minHeight: "100dvh" }}>
+      <Crumbs items={[{ label: "Kokoelmat" }]} />
+      <div className="tn-shell">
       <header className="tn-colx-head">
-        <nav aria-label="Murupolku" style={{ fontSize: 13, color: "var(--tn-text-dim)", marginBottom: 14 }}>
-          <a href="/2-0" style={{ color: "inherit", textDecoration: "none" }}>
-            Etusivu
-          </a>
-          <span aria-hidden> / </span>
-          <span>Kokoelmat</span>
-        </nav>
         <h1 className="tn-colx-title">
           Kaikki <span>kokoelmat</span>
         </h1>
@@ -76,6 +72,7 @@ export default async function KokoelmatPage() {
       </div>
 
       <div className="tn-colx-foot" />
+      </div>
     </main>
   );
 }
