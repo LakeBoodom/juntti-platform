@@ -12,6 +12,7 @@ import { WideCard } from "@/components/tn20/WideCard";
 import { MOTIF_PATHS, motifPathFor } from "@/components/tn20/motif-paths";
 import { LearnArticle } from "@/components/tn20/LearnArticle";
 import { ShowMoreGrid } from "@/components/tn20/ShowMoreGrid";
+import Crumbs from "@/components/tn20/Crumbs";
 import { urheiluImg } from "@/lib/urheilu";
 import { getPageContent } from "@/lib/pageContent";
 import { notFound } from "next/navigation";
@@ -519,6 +520,8 @@ function HubShell({
 }) {
   return (
     <main style={{ minHeight: "100dvh", paddingBottom: 60 }}>
+      {/* Murupolkurivi palkin alla (nav-speksi 17.8.2026) — korvasi heron inline-navin */}
+      <Crumbs items={[{ label: "Kokoelmat", href: "/2-0/kokoelmat" }, { label: hub.name }]} />
       <section className="tn-hero" style={{ minHeight: "clamp(320px, 40vw, 520px)", display: "flex", alignItems: "flex-end" }}>
         <div className="tn-hero-media">
           {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -526,11 +529,6 @@ function HubShell({
         </div>
         <div className="tn-shell" style={{ position: "relative", width: "100%" }}>
           <div style={{ padding: "clamp(80px, 12vw, 140px) 0 clamp(26px, 3.6vw, 62px)", maxWidth: 640 }}>
-            <nav style={{ fontSize: 13, fontWeight: 700, color: "#8E8676", marginBottom: 14 }}>
-              <a href="/2-0" style={{ color: "inherit", textDecoration: "none" }}>Kokoelmat</a>
-              {" / "}
-              <span style={{ color: hub.accentLight }}>{hub.name}</span>
-            </nav>
             <h1 className="tn-display" style={{ fontSize: hub.oneWord ? "clamp(34px, 6.2vw, 84px)" : "clamp(38px, 7.4vw, 96px)", lineHeight: 0.9, letterSpacing: "-0.02em", margin: "0 0 16px" }}>
               {hub.titleTop}
               {hub.oneWord ? null : <br />}
@@ -679,6 +677,8 @@ async function PersonHub({ hub, filter, article }: { hub: HubMeta; filter: strin
 
   return (
     <main style={{ minHeight: "100dvh", paddingBottom: 80 }}>
+      {/* Murupolkurivi palkin alla (nav-speksi 17.8.2026) — korvasi heron inline-navin */}
+      <Crumbs items={[{ label: "Kokoelmat", href: "/2-0/kokoelmat" }, { label: "Tunnetut henkilöt" }]} />
       <section className="tn-hero" style={{ minHeight: "clamp(300px, 34vw, 460px)", display: "flex", alignItems: "flex-end" }}>
         <div className="tn-hero-media">
           {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -686,11 +686,6 @@ async function PersonHub({ hub, filter, article }: { hub: HubMeta; filter: strin
         </div>
         <div className="tn-shell" style={{ position: "relative", width: "100%" }}>
           <div style={{ padding: "clamp(70px, 10vw, 120px) 0 clamp(26px, 3.6vw, 52px)", maxWidth: 640 }}>
-            <nav style={{ fontSize: 13, fontWeight: 700, color: "#8E8676", marginBottom: 14 }}>
-              <a href="/2-0" style={{ color: "inherit", textDecoration: "none" }}>Kokoelmat</a>
-              {" / "}
-              <span style={{ color: hub.accentLight }}>Tunnetut henkilöt</span>
-            </nav>
             <h1 className="tn-display" style={{ fontSize: "clamp(36px, 6.6vw, 84px)", lineHeight: 0.88, margin: "0 0 14px" }}>
               {hub.titleTop}
               <br />
