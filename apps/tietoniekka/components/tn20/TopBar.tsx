@@ -5,9 +5,11 @@
 //   poistaa animaation, korkeus vaihtuu silti).
 // - Etusivulla palkki kelluu läpikuultavana heron päällä (ei spaceria); alasivuilla
 //   umpinainen tausta + alaraja + 72 px:n spacer, jottei sisältö hypähdä.
-// - Valikot aukeavat klikistä tai Enteristä — EI hoverista. Esc, sulkupainike tai
-//   klikkaus ulkopuolelle sulkee; fokus palaa avanneeseen painikkeeseen.
-//   Nuolinäppäimet liikkuvat valikon riveillä (eivät vieritä sivua).
+// - Valikot aukeavat klikistä tai Enteristä — EI hoverista. Esc, uusi klikkaus
+//   painikkeeseen tai klikkaus ulkopuolelle sulkee; fokus palaa avanneeseen
+//   painikkeeseen. Nuolinäppäimet liikkuvat valikon riveillä (eivät vieritä sivua).
+// - Heikin katselmus 17.8.: valikoissa EI selitetekstejä (footnotet), EI
+//   visamääriä eikä erillistä Sulje-nappia — valikko on pelkkä linkkilista.
 // - Aktiivinen sijainti: lihavointi + 3 px lime-alleviivaus + aria-current="page".
 //   Etusivulla mikään kohta ei ole aktiivinen. Kuvavisat-hub lasketaan Pelimuodoksi
 //   (Heikki 17.8.: lippuvisat yms. ovat Kuvavisoja — eri navigaatio kuin kokoelmilla).
@@ -21,9 +23,8 @@
 import "./topbar.css";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
-import { NAV_COLLECTIONS, NAV_MODES, hubHref, type NavCollection } from "@/lib/nav";
+import { NAV_COLLECTIONS, NAV_MODES, hubHref } from "@/lib/nav";
 
-export type NavCounts = Record<string, number>;
 type MenuId = "kokoelmat" | "pelimuodot";
 
 function readPutkiCount(): number {
@@ -42,7 +43,7 @@ function readPutkiCount(): number {
   }
 }
 
-export default function TopBar({ counts }: { counts: NavCounts }) {
+export default function TopBar() {
   const pathname = usePathname() ?? "";
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState<MenuId | null>(null);
@@ -133,8 +134,6 @@ export default function TopBar({ counts }: { counts: NavCounts }) {
 
   const toggle = (id: MenuId) => setOpen((cur) => (cur === id ? null : id));
 
-  const countOf = (c: NavCollection) => counts[c.slug] ?? 0;
-
   return (
     <div
       ref={rootRef}
@@ -178,17 +177,8 @@ export default function TopBar({ counts }: { counts: NavCounts }) {
                       >
                         <span className="tn-menu-dot" aria-hidden />
                         <span className="tn-menu-label">{c.label}</span>
-                        <span className="tn-menu-count">{countOf(c)} visaa</span>
                       </a>
                     ))}
-                  </div>
-                  <div className="tn-menu-foot">
-                    <p>
-                      Kokoelma vastaa kysymykseen <em>mistä aiheesta</em> haluan pelata.
-                    </p>
-                    <button type="button" className="tn-menu-close" onClick={() => closeMenu()}>
-                      Sulje <kbd>Esc</kbd>
-                    </button>
                   </div>
                 </div>
               )}
@@ -222,12 +212,6 @@ export default function TopBar({ counts }: { counts: NavCounts }) {
                       </span>
                     </a>
                   ))}
-                  <div className="tn-menu-foot">
-                    <p>Klassinen on visojen oletusmuoto.</p>
-                    <button type="button" className="tn-menu-close" onClick={() => closeMenu()}>
-                      Sulje <kbd>Esc</kbd>
-                    </button>
-                  </div>
                 </div>
               )}
             </div>
@@ -293,7 +277,6 @@ export default function TopBar({ counts }: { counts: NavCounts }) {
               >
                 <span className="tn-menu-dot" aria-hidden />
                 <span className="tn-menu-label">{c.label}</span>
-                <span className="tn-menu-count">{countOf(c)}</span>
               </a>
             ))}
             <a className="tn-sheet-all" href="/2-0/kokoelmat" onClick={() => setSheet(false)}>

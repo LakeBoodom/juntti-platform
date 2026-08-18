@@ -158,7 +158,6 @@
 }
 .tn20 .tn-menu-row:focus-visible,
 .tn20 .tn-menu-all:focus-visible,
-.tn20 .tn-menu-close:focus-visible,
 .tn20 .tn-selaa:focus-visible {
   outline: 2px solid var(--tn-lime);
   outline-offset: 2px;
@@ -171,51 +170,11 @@
   background: var(--dot, var(--tn-text-dim));
 }
 .tn20 .tn-menu-label { min-width: 0; }
-.tn20 .tn-menu-count {
-  margin-left: auto;
-  color: var(--tn-text-dim);
-  font-weight: 600;
-  font-size: 12.5px;
-  white-space: nowrap;
-}
 .tn20 .tn-menu-mode { height: auto; min-height: 56px; padding-block: 8px; }
 .tn20 .tn-menu-modetext { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
 .tn20 .tn-menu-desc { color: var(--tn-text-muted); font-weight: 500; font-size: 12.5px; }
 
-.tn20 .tn-menu-foot {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  margin-top: 8px;
-  padding: 10px 12px 4px;
-  border-top: 1px solid var(--tn-line);
-}
-.tn20 .tn-menu-foot p { margin: 0; color: var(--tn-text-dim); font-size: 12px; }
-.tn20 .tn-menu-foot em { font-style: normal; color: var(--tn-text-muted); }
-.tn20 .tn-menu-close {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  border: 0;
-  background: transparent;
-  color: var(--tn-text-soft);
-  font: inherit;
-  font-weight: 700;
-  font-size: 12.5px;
-  cursor: pointer;
-  padding: 6px 8px;
-  border-radius: 8px;
-}
-.tn20 .tn-menu-close:hover { background: rgba(255, 255, 255, 0.06); color: var(--tn-text); }
-.tn20 .tn-menu-close kbd {
-  font: inherit;
-  font-size: 11px;
-  border: 1px solid var(--tn-line);
-  border-radius: 5px;
-  padding: 1px 5px;
-  color: var(--tn-text-dim);
-}
+/* Valikoiden footnotet + Sulje-nappi poistettu (Heikin katselmus 17.8.) */
 
 /* ── Mobiili: 56 px palkki + Selaa ─────────────────────────────────────── */
 .tn20 .tn-selaa {
