@@ -13,6 +13,7 @@ import type { Metadata } from "next";
 import { getSupabase } from "@/lib/supabase";
 import { getPageContent } from "@/lib/pageContent";
 import { LearnArticle } from "@/components/tn20/LearnArticle";
+import Crumbs from "@/components/tn20/Crumbs";
 import {
   ELOKUVAT_HERO, ELOKUVAT_FEATURED, ELOKUVAT_SECTIONS, elokuvatImg,
 } from "@/lib/elokuvat";
@@ -74,17 +75,14 @@ export default async function ElokuvatLanding() {
 
   return (
     <main className="tnk" style={{ minHeight: "100dvh", paddingBottom: 60 }}>
+      {/* Murupolkurivi palkin alla (nav-speksi 17.8.2026) — korvasi heron inline-navin */}
+      <Crumbs items={[{ label: "Kokoelmat", href: "/2-0/kokoelmat" }, { label: "Elokuvat" }]} />
       <div className="tn-shell" style={{ paddingTop: "clamp(14px,2vw,26px)" }}>
         {/* ─── Hero ─── */}
         <section className="tne-hero">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img className="tne-hero-img" src={ELOKUVAT_HERO} alt="" />
           <div className="tne-hero-body">
-            <nav className="tne-crumb">
-              <a href="/2-0">Kokoelmat</a>
-              {" / "}
-              <span>Elokuvat</span>
-            </nav>
             <h1 className="tne-title">
               Elo<b>kuvat</b>
             </h1>
