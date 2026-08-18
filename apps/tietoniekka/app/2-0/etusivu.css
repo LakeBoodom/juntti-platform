@@ -314,16 +314,48 @@
 .tn20 .tn-es-dq-opttext { min-width: 0; }
 .tn20 .tn-es-dq-optcheck { margin-left: auto; color: var(--tn-lime); font-weight: 800; }
 
-/* Pelattu tänään -tila (väliaikainen, ei CD-designattu) */
-.tn20 .tn-es-dq-played {
+/* Pelattu tänään -tila — tekstit kuvan päällä, kompakti (Heikki 18.8.2026) */
+.tn20 .tn-es-dq-done {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-height: 260px;
+}
+.tn20 .tn-es-dq-donebg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.tn20 .tn-es-dq-donebg[data-duotone] {
+  object-position: 50% 25%;
+  filter: grayscale(1) sepia(1) hue-rotate(215deg) saturate(3.2) brightness(0.95);
+}
+.tn20 .tn-es-dq-donescrim {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(0deg, rgba(19, 17, 9, 0.9) 0%, rgba(19, 17, 9, 0.55) 55%, rgba(19, 17, 9, 0.3) 100%);
+}
+.tn20 .tn-es-dq-donehead {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 24px 30px 0;
+}
+.tn20 .tn-es-dq-donemsg {
+  position: relative;
+  flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   text-align: center;
   gap: 8px;
-  min-height: 220px;
+  padding: 16px 30px 26px;
 }
+.tn20 .tn-es-dq-done .tn-es-dq-label { color: #e6dfd0; }
 .tn20 .tn-es-dq-played-icon {
   width: 44px;
   height: 44px;
@@ -701,8 +733,39 @@
   .tn20 .tn-es-ticker-head { padding-left: 32px; padding-right: 32px; }
 }
 @media (max-width: 767px) {
-  .tn20 .tn-es-hero { padding-top: 28px; padding-bottom: 30px; }
-  .tn20 .tn-es-hero-media { height: 220px; }
+  /* Hero kompaktiksi (Heikki 18.8.2026): otsikko kuvan päälle vasempaan
+     laitaan, duo oikealle, kappale + proof pointit piiloon — Päivän visa
+     nousee heti näkyviin. */
+  .tn20 .tn-es-hero {
+    display: block;
+    position: relative;
+    padding-top: 12px;
+    padding-bottom: 18px;
+  }
+  .tn20 .tn-es-hero-media {
+    height: 300px;
+    order: 0;
+  }
+  .tn20 .tn-es-hero-media img { object-position: 74% center !important; }
+  .tn20 .tn-es-hero-media::before {
+    background: linear-gradient(90deg, rgba(19, 17, 9, 0.85) 0%, rgba(19, 17, 9, 0.45) 42%, rgba(19, 17, 9, 0) 70%);
+  }
+  .tn20 .tn-es-hero-text {
+    position: absolute;
+    left: 40px;
+    right: 40px;
+    bottom: 40px;
+    z-index: 1;
+  }
+  .tn20 .tn-es-hero h1 { font-size: 38px; max-width: 8ch; }
+  .tn20 .tn-es-hero-p,
+  .tn20 .tn-es-proofs { display: none; }
+  /* Historia-aikajana kapealla: vain pisteet + vuosiluvut (aikakausien
+     nimet menivät päällekkäin — Heikin havainto 18.8.2026) */
+  .tn20 .tn-es-tl-era { display: none; }
+  .tn20 .tn-es-dq-done { min-height: 220px; }
+  .tn20 .tn-es-dq-donehead { padding: 18px 18px 0; }
+  .tn20 .tn-es-dq-donemsg { padding: 12px 18px 20px; }
   .tn20 .tn-es-dq-band-portrait { height: 104px; }
   .tn20 .tn-es-dq-portrait { width: 104px; height: 104px; }
   .tn20 .tn-es-dq-band-landscape { height: 104px; }

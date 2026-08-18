@@ -261,9 +261,11 @@ export default async function Etusivu20() {
 
   return (
     <main style={{ minHeight: "100dvh" }}>
-      {/* ─── Kompakti hero ─── */}
+      {/* ─── Kompakti hero — mobiilissa otsikko kuvan päälle vasempaan
+             laitaan (Heikin katselmus 18.8.2026), jotta Päivän visa näkyy
+             heti; kappale + proof pointit piilossa kapealla ─── */}
       <section className="tn-es-shell tn-es-hero" style={{ marginTop: 72 }}>
-        <div>
+        <div className="tn-es-hero-text">
           <h1>
             Tiedätkö <em>enemmän</em> kuin luulet?
           </h1>
@@ -374,8 +376,22 @@ export default async function Etusivu20() {
             <p className="tn-es-foot-desc">
               Suomalainen tietovisasivusto. Uusia tietovisoja jatkuvasti.
             </p>
-            {/* Someblokki (Instagram) lisätään kun tilin osoite on olemassa —
-                ei keksittyjä linkkejä (CD-sääntö). */}
+            <div className="tn-es-foot-some">
+              <span>Seuraa Tietoniekkaa somessa</span>
+              <a
+                className="tn-es-foot-ig"
+                href="https://www.instagram.com/tietoniekka/"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Tietoniekka Instagramissa"
+              >
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden>
+                  <rect x="2.6" y="2.6" width="18.8" height="18.8" rx="5.4" />
+                  <circle cx="12" cy="12" r="4.3" />
+                  <circle cx="17.5" cy="6.5" r="1.2" fill="currentColor" stroke="none" />
+                </svg>
+              </a>
+            </div>
           </div>
           <div>
             <h4>Kokoelmat</h4>
