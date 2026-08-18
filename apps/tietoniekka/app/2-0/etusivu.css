@@ -614,8 +614,10 @@
 }
 
 /* ── Footer ────────────────────────────────────────────────────────────── */
+/* HUOM: padding-block, EI padding-shorthandia — shorthand nollaisi
+   .tn-es-shellin sivupehmusteet (sama oppi kuin tnm-sectionissa 14.8.2026) */
 .tn20 .tn-es-foot {
-  padding: 56px 0 40px;
+  padding-block: 56px 40px;
 }
 .tn20 .tn-es-foot-grid {
   display: grid;
