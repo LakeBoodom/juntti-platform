@@ -156,20 +156,30 @@
 
 /* Valikoiden footnotet + Sulje-nappi poistettu (Heikin katselmus 17.8.) */
 
-/* ── Mobiili: 56 px palkki + Selaa ─────────────────────────────────────── */
+/* ── Mobiili: 56 px palkki + hampurilaisvalikko ────────────────────────── */
 .tn20 .tn-selaa {
-  display: inline-flex;
-  align-items: center;
-  height: 40px;
-  padding: 0 16px;
-  border: 1px solid var(--tn-line);
-  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 0;
+  border-radius: 12px;
   background: transparent;
   color: var(--tn-text);
-  font: inherit;
-  font-weight: 700;
-  font-size: 14px;
   cursor: pointer;
+}
+.tn20 .tn-selaa:active { background: rgba(255, 255, 255, 0.08); }
+.tn20 .tn-selaa-icon {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.tn20 .tn-selaa-icon i {
+  width: 20px;
+  height: 2px;
+  border-radius: 2px;
+  background: currentColor;
 }
 @media (min-width: 760px) { .tn20 .tn-selaa { display: none; } }
 @media (max-width: 759px) {

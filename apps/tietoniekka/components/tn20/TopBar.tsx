@@ -185,8 +185,14 @@ export default function TopBar() {
           </nav>
 
           <div className="tn-topbar-right">
-            <button type="button" className="tn-selaa" onClick={() => setSheet(true)}>
-              Selaa
+            {/* Mobiilivalikko: hampurilaisikoni (Heikin katselmus 18.8.2026 —
+                korvasi "Selaa"-tekstinapin) */}
+            <button type="button" className="tn-selaa" aria-label="Avaa valikko" onClick={() => setSheet(true)}>
+              <span className="tn-selaa-icon" aria-hidden>
+                <i />
+                <i />
+                <i />
+              </span>
             </button>
           </div>
         </div>
