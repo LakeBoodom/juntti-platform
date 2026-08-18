@@ -9,6 +9,7 @@ import type { Metadata } from "next";
 import { getSupabase } from "@/lib/supabase";
 import { getPageContent } from "@/lib/pageContent";
 import { LearnArticle } from "@/components/tn20/LearnArticle";
+import Crumbs from "@/components/tn20/Crumbs";
 import HistoriaClient, { type HistoriaData, type HistoriaCard } from "./HistoriaClient";
 
 export const dynamic = "force-dynamic";
@@ -92,6 +93,9 @@ export default async function HistoriaPage() {
 
   return (
     <>
+      {/* Murupolkurivi palkin alla (nav-speksi 17.8.2026) — HistoriaClientin
+          heron inline-nav poistettu samassa yhteydessä */}
+      <Crumbs items={[{ label: "Kokoelmat", href: "/2-0/kokoelmat" }, { label: "Historia" }]} />
       <HistoriaClient data={data} />
       {article}
     </>

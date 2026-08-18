@@ -42,11 +42,7 @@ export default function HistoriaClient({ data }: { data: HistoriaData }) {
       {/* ─── Hero: typografinen (CD) ─── */}
       <div className="tn-shell">
         <section className="tnh-hero">
-          <nav style={{ fontSize: 13, fontWeight: 700, color: "#8E8676", marginBottom: 14 }}>
-            <a href="/2-0" style={{ color: "inherit", textDecoration: "none" }}>Kokoelmat</a>
-            {" / "}
-            <span style={{ color: "var(--tn-gold)" }}>Historia</span>
-          </nav>
+          {/* Inline-murupolku poistettu — Crumbs-rivi tulee page.tsx:stä (17.8.2026) */}
           <h1 className="tn-display tnh-title">
             Suomen<br /><span>historia</span>
           </h1>
