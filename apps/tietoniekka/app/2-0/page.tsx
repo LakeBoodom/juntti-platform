@@ -385,11 +385,9 @@ export default async function Etusivu20() {
                 rel="noopener noreferrer"
                 aria-label="Tietoniekka Instagramissa"
               >
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden>
-                  <rect x="2.6" y="2.6" width="18.8" height="18.8" rx="5.4" />
-                  <circle cx="12" cy="12" r="4.3" />
-                  <circle cx="17.5" cy="6.5" r="1.2" fill="currentColor" stroke="none" />
-                </svg>
+                {/* Instagramin virallinen värillinen logo (CD:n design-paketista) */}
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src="/20/etusivu/ig-logo.svg" alt="" width={20} height={20} />
               </a>
             </div>
           </div>

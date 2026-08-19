@@ -356,6 +356,42 @@
   padding: 16px 30px 26px;
 }
 .tn20 .tn-es-dq-done .tn-es-dq-label { color: #e6dfd0; }
+/* Henkilövisan pelattu-tila: sama asettelu kuin alkunäkymässä — neliökuva
+   vasemmalla, lopputekstit oikealla (Heikki 19.8.2026) */
+.tn20 .tn-es-dq-doneperson {
+  flex-direction: row;
+  align-items: stretch;
+  min-height: 180px;
+  background: linear-gradient(100deg, rgba(124, 79, 201, 0.3), rgba(23, 20, 13, 0) 62%), #1b1710;
+}
+.tn20 .tn-es-dq-doneperson .tn-es-dq-portrait {
+  width: 180px;
+  height: auto;
+  min-height: 180px;
+}
+.tn20 .tn-es-dq-doneside {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 8px;
+  padding: 22px 30px;
+}
+.tn20 .tn-es-dq-donerow {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-top: 10px;
+}
+.tn20 .tn-es-dq-donerow .tn-es-dq-played-icon {
+  width: 36px;
+  height: 36px;
+  font-size: 16px;
+  flex: none;
+}
+.tn20 .tn-es-dq-donerow .tn-es-dq-played-msg { font-size: 14px; }
 .tn20 .tn-es-dq-played-icon {
   width: 44px;
   height: 44px;
@@ -685,7 +721,8 @@
   color: #cfc7b6;
 }
 .tn20 .tn-es-foot-ig:hover { border-color: #4a3f28; background: #1a1610; }
-.tn20 .tn-es-foot-ig svg { width: 20px; height: 20px; }
+.tn20 .tn-es-foot-ig svg,
+.tn20 .tn-es-foot-ig img { width: 20px; height: 20px; display: block; }
 .tn20 .tn-es-foot h4 {
   margin: 0 0 14px;
   font-size: 11px;
@@ -766,6 +803,9 @@
   .tn20 .tn-es-dq-done { min-height: 220px; }
   .tn20 .tn-es-dq-donehead { padding: 18px 18px 0; }
   .tn20 .tn-es-dq-donemsg { padding: 12px 18px 20px; }
+  .tn20 .tn-es-dq-doneperson { min-height: 160px; }
+  .tn20 .tn-es-dq-doneperson .tn-es-dq-portrait { width: 104px; min-height: 160px; }
+  .tn20 .tn-es-dq-doneside { padding: 16px 18px; }
   .tn20 .tn-es-dq-band-portrait { height: 104px; }
   .tn20 .tn-es-dq-portrait { width: 104px; height: 104px; }
   .tn20 .tn-es-dq-band-landscape { height: 104px; }
