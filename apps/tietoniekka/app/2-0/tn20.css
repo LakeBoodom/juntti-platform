@@ -2291,3 +2291,42 @@
   .tn20 .tne-feat, .tn20 .tne-card { transition: none; }
   .tn20 .tne-feat:hover, .tn20 .tne-card:hover { transform: none; }
 }
+
+/* ══════════ TV & SUORATOISTO -TEEMASIVU (.tne-tv) — CD 19.8.2026 ══════════
+   design_handoff_tv_suoratoisto/README.md. Elokuvat-osion (.tne-) sisarus:
+   samat perusluokat, tässä vain TV:n tarkoitukselliset erot ("Erot Elokuvat-
+   sivuun"): magenta kokoelmaväri #FF3D9E/#FF6FB5, ruudukkokortin koukkuteksti
+   + tummempi/korkeampi scrim (kalibroitu vaaleimpiin kuviin — Simpsonit,
+   Muumit, Frendit — ÄLÄ kevennä). Osioväri vain numerossa ja hover-reunassa. */
+
+.tn20 .tne-tv .tne-hero::before {
+  background: linear-gradient(96deg, #131109 2%, rgba(19,17,9,.9) 34%, rgba(19,17,9,.36) 66%, rgba(255,61,158,.16) 100%);
+}
+.tn20 .tne-tv .tne-title b { color: #FF3D9E; }
+.tn20 .tne-tv .tne-pill[data-accent] {
+  background: rgba(255,61,158,.16); border-color: rgba(255,61,158,.5); color: #FF6FB5;
+}
+.tn20 .tne-tv .tne-eyebrow { color: #FF6FB5; }
+.tn20 .tne-tv .tne-eyebrow i { background: #FF3D9E; }
+.tn20 .tne-tv .tne-feat:hover, .tn20 .tne-tv .tne-feat:focus-visible { border-color: #FF3D9E; }
+.tn20 .tne-tv .tne-feat:focus-visible { outline-color: #FF3D9E; }
+.tn20 .tne-tv .tne-feat-cta { color: #FF6FB5; }
+
+/* Ruudukkokortin scrim — sivun tärkein yksittäinen arvo (README).
+   Tummempi ja korkeampi kuin Elokuvissa, koska koukkuteksti on kuvan päällä. */
+.tn20 .tne-tv .tne-card::after {
+  background: linear-gradient(to top, rgba(19,17,9,.98) 0%, rgba(19,17,9,.82) 42%, rgba(19,17,9,.26) 70%, rgba(19,17,9,0) 92%);
+}
+
+/* Nimi + koukku yhtenä alareunaan ankkuroituna lohkona: pitkä koukku kasvaa
+   ylöspäin scrimin sisällä eikä työnnä nimeä ulos kortista (README §Resp.). */
+.tn20 .tne-card-text {
+  position: absolute; z-index: 1;
+  left: clamp(10px,1.05cqw,15px); right: clamp(10px,1.05cqw,15px); bottom: clamp(9px,1cqw,14px);
+}
+.tn20 .tne-card-text .tne-card-name { position: static; left: auto; right: auto; bottom: auto; }
+.tn20 .tne-card-hook {
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+  margin-top: 5px; font-size: clamp(10px,1.02cqw,13px); line-height: 1.35;
+  font-weight: 500; color: #CFC7B6; text-wrap: pretty;
+}
