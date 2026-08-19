@@ -98,15 +98,42 @@ export function DailyQuizCard({ variant, data }: { variant: DailyQuizVariant; da
   const feedback = picked !== null;
 
   /* Pelattu tänään -tila (Heikin katselmus 18.8.2026): tekstit kortin KUVAN
-     päälle — kompakti kortti ilman tyhjää tilaa, sama molemmilla laitteilla.
-     Copy tiivistetty: "Seuraava Päivän visa avautuu huomenna." poistettu. */
+     päälle — kompakti kortti ilman tyhjää tilaa.
+     Henkilövisa (Heikin katselmus 19.8.2026): duotone-kuva EI toimi koko
+     kortin taustana (rajaus leikkaa henkilön) → sama asettelu kuin
+     alkunäkymässä: pieni neliökuva vasemmalla, lopputekstit oikealla. */
   if (playedToday) {
-    const coverUrl =
-      variant === "image" && data.image
-        ? data.image.url
-        : variant === "birthday" && data.person?.portraitUrl
-          ? data.person.portraitUrl
-          : null;
+    if (variant === "birthday" && data.person) {
+      return (
+        <article className="tn-es-dq tn-es-dq-done tn-es-dq-doneperson" style={{ ["--dq-accent" as string]: data.accent }}>
+          {data.person.portraitUrl && (
+            <div className="tn-es-dq-portrait">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={data.person.portraitUrl} alt={data.person.name} />
+            </div>
+          )}
+          <div className="tn-es-dq-doneside">
+            <span className="tn-es-dq-chip">Tänään juhlii</span>
+            <h2 className="tn-es-dq-name">
+              <b>{data.person.age} vuotta</b> — {data.person.name}
+            </h2>
+            <div className="tn-es-dq-meta2">
+              Syntynyt {data.person.birthDateLabel} · {data.person.role}
+            </div>
+            <div className="tn-es-dq-donerow">
+              <div className="tn-es-dq-played-icon" aria-hidden>
+                ✓
+              </div>
+              <div>
+                <div className="tn-es-dq-label">Tämän päivän visa on pelattu</div>
+                <p className="tn-es-dq-played-msg">Muista palata huomenna jatkamaan putkea!</p>
+              </div>
+            </div>
+          </div>
+        </article>
+      );
+    }
+    const coverUrl = variant === "image" && data.image ? data.image.url : null;
     return (
       <article className="tn-es-dq tn-es-dq-done" style={{ ["--dq-accent" as string]: data.accent }}>
         {coverUrl && (
@@ -115,9 +142,8 @@ export function DailyQuizCard({ variant, data }: { variant: DailyQuizVariant; da
             className="tn-es-dq-donebg"
             src={coverUrl}
             alt=""
-            data-duotone={variant === "birthday" || undefined}
             style={
-              variant === "image" && data.image
+              data.image
                 ? { objectPosition: `${(data.image.focalX ?? 0.5) * 100}% ${(data.image.focalY ?? 0.46) * 100}%` }
                 : undefined
             }
@@ -125,16 +151,8 @@ export function DailyQuizCard({ variant, data }: { variant: DailyQuizVariant; da
         )}
         <div className="tn-es-dq-donescrim" aria-hidden />
         <div className="tn-es-dq-donehead">
-          <span className="tn-es-dq-chip">{variant === "birthday" ? "Tänään juhlii" : data.collectionName}</span>
-          <h2 className="tn-es-dq-name">
-            {variant === "birthday" && data.person ? (
-              <>
-                <b>{data.person.age} vuotta</b> — {data.person.name}
-              </>
-            ) : (
-              data.title
-            )}
-          </h2>
+          <span className="tn-es-dq-chip">{data.collectionName}</span>
+          <h2 className="tn-es-dq-name">{data.title}</h2>
         </div>
         <div className="tn-es-dq-donemsg">
           <div className="tn-es-dq-played-icon" aria-hidden>
