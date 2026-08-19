@@ -2330,3 +2330,26 @@
   margin-top: 5px; font-size: clamp(10px,1.02cqw,13px); line-height: 1.35;
   font-weight: 500; color: #CFC7B6; text-wrap: pretty;
 }
+
+/* ══════════ MUSIIKKI-TEEMASIVU (.tne-mus) — CD 19.8.2026 ══════════
+   design_handoff_musiikki/README.md. Rakenteellisesti identtinen TV-sivun
+   (.tne-tv) kanssa — vain kokoelmaväri vaihtuu: violetti #A24BFF/#C68BFF.
+   Ruudukkokortin tummempi scrim + koukkulohko jaetaan TV:n kanssa (alla). */
+
+.tn20 .tne-mus .tne-hero::before {
+  background: linear-gradient(96deg, #131109 2%, rgba(19,17,9,.9) 34%, rgba(19,17,9,.36) 66%, rgba(162,75,255,.18) 100%);
+}
+.tn20 .tne-mus .tne-title b { color: #A24BFF; }
+.tn20 .tne-mus .tne-pill[data-accent] {
+  background: rgba(162,75,255,.16); border-color: rgba(162,75,255,.5); color: #C68BFF;
+}
+.tn20 .tne-mus .tne-eyebrow { color: #C68BFF; }
+.tn20 .tne-mus .tne-eyebrow i { background: #A24BFF; }
+.tn20 .tne-mus .tne-feat:hover, .tn20 .tne-mus .tne-feat:focus-visible { border-color: #A24BFF; }
+.tn20 .tne-mus .tne-feat:focus-visible { outline-color: #A24BFF; }
+.tn20 .tne-mus .tne-feat-cta { color: #C68BFF; }
+/* Sama kalibroitu scrim kuin TV:llä (README: älä kevennä — vaaleimmat kuvat
+   Bad Bunny, J Balvin, ABBA, PMMP, Justin Bieber) */
+.tn20 .tne-mus .tne-card::after {
+  background: linear-gradient(to top, rgba(19,17,9,.98) 0%, rgba(19,17,9,.82) 42%, rgba(19,17,9,.26) 70%, rgba(19,17,9,0) 92%);
+}
