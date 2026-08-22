@@ -44,9 +44,15 @@ export default function PutkiCard({ dayHref }: { dayHref?: string }) {
   const best = Math.max(s?.best ?? 0, count);
   const nextTarget = TARGETS.find((t) => t > count) ?? count + 100;
 
-  /* Viikkorivi: 7 palloa, täysi viikko näyttää kaikki — kahdeksas päivä
-     aloittaa uuden rivin (sama rytmi kuin vanhassa kortissa). */
+  /* Viikkorivi = KULUVAN VIIKON edistymä: 7 palloa, nollautuu joka viikko
+     (8. päivä aloittaa uuden rivin). Tarkoituksellista — putken TODELLINEN
+     pituus näkyy aina isosta lukemasta ({count} päivää) ja "Seuraava
+     tavoite" -statista, ei tästä rivistä. */
   const filled = count === 0 ? 0 : ((count - 1) % 7) + 1;
+  /* Pallojen alla oleva numero = todellinen putkipäivä, ei 1–7 joka viikko.
+     Viikko 1 → 1–7, viikko 2 → 8–14 jne. Näin jatkuva putki ei näytä
+     palaavan alkuun kahdeksantena päivänä (Heikki 22.8.2026). */
+  const weekStartDay = count === 0 ? 1 : Math.floor((count - 1) / 7) * 7 + 1;
 
   const msg =
     count === 0
@@ -84,7 +90,7 @@ export default function PutkiCard({ dayHref }: { dayHref?: string }) {
         {Array.from({ length: 7 }, (_, i) => (
           <div key={i} className="tn-putki-day">
             {i < filled ? <b>✓</b> : <i />}
-            <span>{i + 1}</span>
+            <span>{weekStartDay + i}</span>
           </div>
         ))}
       </div>

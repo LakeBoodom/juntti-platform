@@ -38,9 +38,11 @@ export default function StreakStrip() {
   const days = s?.days ?? 0;
   const playedToday = s?.playedToday ?? false;
 
-  /* Viikkorivi: sama rytmi kuin Liekkikortissa — täysi viikko näyttää kaikki,
-     kahdeksas päivä aloittaa uuden rivin. Tämä päivä = seuraava tyhjä pallo
-     (tai viimeisin täysi, jos tänään on jo pelattu). */
+  /* Viikkorivi = KULUVAN VIIKON edistymä: 7 palloa, nollautuu joka viikko
+     (8. päivä aloittaa uuden rivin). Tämä on tarkoituksellista — putken
+     TODELLINEN pituus näkyy aina isosta lukemasta ("N päivän putki"), ei
+     tästä rivistä. Tämä päivä = seuraava tyhjä pallo (tai viimeisin täysi,
+     jos tänään on jo pelattu). */
   const filled = days === 0 ? 0 : ((days - 1) % 7) + 1;
   const todayIdx = playedToday ? filled - 1 : filled;
 
