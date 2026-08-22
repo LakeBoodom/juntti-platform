@@ -37,7 +37,8 @@ export const SPOTLIGHTS: Spotlight[] = [
     img: "/20/etusivu/sp-latka.webp",
     imgPos: "50% 40%",
     side: "left",
-    href: "/2-0/kokoelma/urheilu?laji=jaakiekko",
+    // 22.8.2026: Jääkiekko-teemasivu valmistui → placeholder-linkki hubiin vaihdettu
+    href: "/2-0/kokoelma/jaakiekko",
   },
   {
     key: "tv",
@@ -96,7 +97,7 @@ export const HISTORIA_STOPS = [
 /* Footerin kokoelmalinkit (README + Heikin 17.8. nimistölinjaus:
    "Maailman ihmeet" → Maantieto; Suomilätkä placeholder-urheilulinkillä). */
 export const FOOTER_COLLECTIONS = [
-  { label: "Suomilätkä", href: "/2-0/kokoelma/urheilu?laji=jaakiekko" },
+  { label: "Suomilätkä", href: "/2-0/kokoelma/jaakiekko" },
   { label: "TV & suoratoisto", href: "/2-0/kokoelma/tv" },
   { label: "Suomen historia", href: "/2-0/kokoelma/historia" },
   { label: "Urheilu", href: "/2-0/kokoelma/urheilu" },
