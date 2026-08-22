@@ -48,7 +48,9 @@
 .tn20 .tnj-title {
   margin: 0 0 14px; font-family: var(--tn-font-display); font-weight: 900;
   font-variation-settings: "wdth" 68;
-  font-size: clamp(42px,9.4cqw,138px); line-height: .82; letter-spacing: -.025em;
+  /* line-height .94: KAIKKI-rivillä ei alapidennyksiä, joten JÄÄKIEKOSTA-rivin
+     Ä-pisteet tarvitsevat ~.9em baseline-välin — .82 upotti ne ylärivin päälle */
+  font-size: clamp(42px,9.4cqw,138px); line-height: .94; letter-spacing: -.025em;
   text-transform: uppercase; color: #F5F0E6; max-width: 16ch;
 }
 .tn20 .tnj-title b { display: block; font-weight: inherit; color: #4FD1F5; }
@@ -337,9 +339,21 @@
   font-variation-settings: "wdth" 74; font-size: clamp(16px,1.85cqw,24px);
   line-height: .98; letter-spacing: -.01em; text-transform: uppercase; color: #F5F0E6;
   text-wrap: balance;
+  /* overflow-wrap: break-word — pitkät yhdyssanat (esim. "ulkomaalaislegendat"
+     pienissä s-korteissa) EIVÄT muuten mahdu kortin leveyteen. */
+  overflow-wrap: break-word;
 }
 .tn20 .tnj-grid[data-size="l"] .tnj-card-title {
-  font-variation-settings: "wdth" 72; font-size: clamp(19px,2.3cqw,31px); line-height: .94;
+  font-variation-settings: "wdth" 72; font-size: clamp(19px,2.1cqw,28px); line-height: .94;
+  /* l-koon korteissa jokainen sana mahtuu jo kokonaisena kortin leveyteen
+     (mitattu) — mutta overflow-wrap: break-word (peritty yllä) sallii
+     spekin mukaan katkaisun KESKELTÄ SANAA aina kun se auttaisi tasapainoa,
+     vaikka sana mahtuisikin. Se katkoi pisimmän otsikon
+     ("Kuriositeetit ja tilastotarinat") niin että yksittäinen kirjain jäi
+     omalle rivilleen. EI riitä pelkkä word-break: keep-all — overflow-wrap
+     pitää nollata myös, koska se ohittaa word-breakin. */
+  overflow-wrap: normal;
+  word-break: keep-all;
 }
 .tn20 .tnj-card-desc {
   margin: 6px 0 0; color: #CFC7B6; font-size: clamp(10.5px,1.08cqw,13.5px);
