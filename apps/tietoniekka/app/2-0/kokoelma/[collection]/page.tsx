@@ -236,6 +236,7 @@ const SARJA_LABEL: Record<string, string> = {
   maajoukkueet: "Maajoukkueet",
   arvokisat: "Arvokisat",
   liiga: "Liiga",
+  nhl: "NHL",
   "formula-1": "Formula 1",
   ralli: "Ralli",
   "suomalaiset-klassikot": "Suomalaiset klassikot",
