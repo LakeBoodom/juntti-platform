@@ -16,7 +16,7 @@
 // - Julkaisematon visa: CTA → "Visa tulossa" -tilamerkki (README luku 3).
 // Tyylit: app/2-0/jaakiekko.css (.tnj-*).
 
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { JK_MAP_IMG, type JkTeam } from "@/lib/jaakiekko";
 
 export type KarttaTeam = JkTeam & {
@@ -36,6 +36,31 @@ export default function KiekkoKartta({
   const defaultIndex = Math.max(0, teams.findIndex((t) => t.id === defaultTeamId));
   const [sel, setSel] = useState(defaultIndex);
   const team = teams[sel] ?? teams[0];
+  const groupRef = useRef<HTMLDivElement>(null);
+
+  /** Pallonapautus valitsee LÄHIMMÄN pallon napautuspisteestä. Miksi: 44 px:n
+      kosketusalueet menevät limittäin tiheissä pareissa (HIFK/Jokerit ~19 px
+      päässä toisistaan mobiilikartalla) → päällimmäinen nappi kaappasi myös
+      naapurin pallon päälle osuneet napautukset, eikä HIFK:ta voinut valita
+      kapealla, jossa nimilaput ovat piilossa. Näppäimistöaktivointi (detail 0)
+      valitsee suoraan oman seuransa. */
+  const pickNearest = (e: React.MouseEvent, fallback: number) => {
+    const el = groupRef.current;
+    if (!el || e.detail === 0) return setSel(fallback);
+    const r = el.getBoundingClientRect();
+    if (!r.width || !r.height) return setSel(fallback);
+    const px = ((e.clientX - r.left) / r.width) * 100;
+    const py = ((e.clientY - r.top) / r.height) * 100;
+    let best = fallback;
+    let bd = Infinity;
+    teams.forEach((t, i) => {
+      const dx = (t.x - px) * r.width;
+      const dy = (t.y - py) * r.height;
+      const d = dx * dx + dy * dy;
+      if (d < bd) { bd = d; best = i; }
+    });
+    setSel(best);
+  };
 
   /* Pallon koko designyksiköissä (README 1a: 13 + sm * 0.62 → 13…26) */
   const dots = useMemo(
@@ -70,7 +95,7 @@ export default function KiekkoKartta({
               />
             ))}
           </svg>
-          <div role="group" aria-label="Seurat kartalla" className="tnj-map-group">
+          <div role="group" aria-label="Seurat kartalla" className="tnj-map-group" ref={groupRef}>
             {teams.map((t, i) => (
               <button
                 key={t.id}
@@ -87,7 +112,7 @@ export default function KiekkoKartta({
                   background: t.color,
                   ["--dot" as string]: dots[i].size,
                 }}
-                onClick={() => setSel(i)}
+                onClick={(e) => pickNearest(e, i)}
               />
             ))}
             {teams.map((t, i) => (
@@ -100,7 +125,7 @@ export default function KiekkoKartta({
                 aria-label={`${t.name} · ${t.city}`}
                 aria-pressed={i === sel}
                 style={{ left: `${t.labelX}%`, top: `${t.labelY}%` }}
-                onClick={() => setSel(i)}
+                onClick={(e) => pickNearest(e, i)}
               >
                 {t.short}
               </button>
