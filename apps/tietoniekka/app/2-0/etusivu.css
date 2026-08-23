@@ -144,7 +144,7 @@
   align-items: center;
 }
 .tn20 .tn-es-dq-band-portrait {
-  height: 140px;
+  min-height: 140px;
   background: linear-gradient(100deg, rgba(124, 79, 201, 0.3), rgba(23, 20, 13, 0) 62%), #1b1710;
 }
 .tn20 .tn-es-dq-portrait {
@@ -220,12 +220,20 @@
   font-weight: 900;
   font-variation-settings: "wdth" 76;
   font-size: clamp(22px, 2.4vw, 34px);
-  line-height: 1;
+  line-height: 1.08;
   letter-spacing: -0.01em;
   text-transform: uppercase;
+  /* Henkilön nimi on kortin tärkein tieto (Heikki 23.8.2026) — aiempi
+     white-space:nowrap + ellipsis katkaisi sen mobiilissa ("58 VUOTTA —
+     T…"), koska kapea kortti (kiinteä 104 px:n kuvakaista) ei mahduta
+     nimeä yhdelle riville. Sallitaan rivitys enintään 3 riville (kattaa
+     todella pitkätkin nimet ilman että kortti venyy loputtomiin) sen
+     sijaan että teksti leikattaisiin piiloon. */
+  overflow-wrap: break-word;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
   overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
 .tn20 .tn-es-dq-name b { color: #e8a320; font-weight: inherit; }
 .tn20 .tn-es-dq-meta2 {
@@ -806,8 +814,8 @@
   .tn20 .tn-es-dq-doneperson { min-height: 160px; }
   .tn20 .tn-es-dq-doneperson .tn-es-dq-portrait { width: 104px; min-height: 160px; }
   .tn20 .tn-es-dq-doneside { padding: 16px 18px; }
-  .tn20 .tn-es-dq-band-portrait { height: 104px; }
-  .tn20 .tn-es-dq-portrait { width: 104px; height: 104px; }
+  .tn20 .tn-es-dq-band-portrait { min-height: 104px; }
+  .tn20 .tn-es-dq-portrait { width: 104px; height: 104px; align-self: flex-start; }
   .tn20 .tn-es-dq-band-landscape { height: 104px; }
   .tn20 .tn-es-dq-band-text { padding: 0 18px; }
   .tn20 .tn-es-dq-q { padding: 20px 18px; }
