@@ -223,17 +223,16 @@
   line-height: 1.08;
   letter-spacing: -0.01em;
   text-transform: uppercase;
-  /* Henkilön nimi on kortin tärkein tieto (Heikki 23.8.2026) — aiempi
-     white-space:nowrap + ellipsis katkaisi sen mobiilissa ("58 VUOTTA —
-     T…"), koska kapea kortti (kiinteä 104 px:n kuvakaista) ei mahduta
-     nimeä yhdelle riville. Sallitaan rivitys enintään 3 riville (kattaa
-     todella pitkätkin nimet ilman että kortti venyy loputtomiin) sen
-     sijaan että teksti leikattaisiin piiloon. */
+  /* Henkilön nimi on kortin tärkein tieto eikä sitä SAA KOSKAAN katkaista
+     (Heikki 23.8.2026, kahdesti täsmennetty — myös poikkeuksellisen pitkä
+     nimi kuten "Sirkka-Liisa Anttila-Jääskeläinen" pitää näkyä kokonaan).
+     Aiempi white-space:nowrap + ellipsis katkaisi nimen mobiilissa, ja
+     ensimmäinen korjaus (line-clamp: 3) olisi silti katkaissut äärimmäisen
+     pitkän nimen. Siksi EI mitään rivimäärän kattoa — rivitys sallittu
+     vapaasti niin monelle riville kuin nimi tarvitsee, ja kortti (ks.
+     .tn-es-dq-band-portrait/.tn-es-dq-doneperson min-height alla) kasvaa
+     mukana. */
   overflow-wrap: break-word;
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 3;
-  overflow: hidden;
 }
 .tn20 .tn-es-dq-name b { color: #e8a320; font-weight: inherit; }
 .tn20 .tn-es-dq-meta2 {
