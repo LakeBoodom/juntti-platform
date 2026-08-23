@@ -443,32 +443,9 @@
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-.tn20 .tn-es-streak-week { display: flex; gap: 7px; flex: none; }
-.tn20 .tn-es-streak-day {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-}
-.tn20 .tn-es-streak-daylabel {
-  font-size: 10px;
-  font-weight: 700;
-  color: #5f594c;
-  text-transform: lowercase;
-}
-.tn20 .tn-es-streak-dot2 {
-  width: 9px;
-  height: 9px;
-  border-radius: 999px;
-  border: 1px solid #2c2517;
-}
-.tn20 .tn-es-streak-day[data-on] .tn-es-streak-daylabel { color: var(--tn-lime); }
-.tn20 .tn-es-streak-day[data-on] .tn-es-streak-dot2 {
-  background: var(--tn-lime);
-  border-color: var(--tn-lime);
-}
-.tn20 .tn-es-streak-day[data-today]:not([data-on]) .tn-es-streak-daylabel { color: #a79e8c; }
-.tn20 .tn-es-streak-day[data-today]:not([data-on]) .tn-es-streak-dot2 { border-color: #5f594c; }
+/* Viikkorivi (.tn-es-streak-week/-day/-daylabel/-dot2) poistettu 23.8.2026
+   (Heikin päätös) — nollautui joka viikko, sekoitti kuukausien mittaisilla
+   putkilla. Iso lukema (.tn-es-streak-text b) on ainoa totuus pituudesta. */
 
 /* ── Kuratoidut nostot (Pinnalla nyt) ──────────────────────────────────── */
 .tn20 .tn-es-spots { display: flex; flex-direction: column; gap: 16px; }
@@ -825,6 +802,14 @@
     gap: 10px;
     padding: 14px 18px;
   }
+  /* Bugi (havaittu 23.8.2026, viikkorivin poiston yhteydessä — oli
+     olemassa jo ennen sitäkin): align-items:flex-start yllä jättää
+     .tn-es-streak-left:n leveyden rajoittamattomaksi, joten sen sisällä
+     oleva .tn-es-streak-sub ei koskaan törmää reunaan eikä siksi
+     leikkaannu "…"-merkillä (vaikka overflow/ellipsis on asetettu) —
+     teksti valuu kortin ulkopuolelle "Aloita putkesi" -tilassa kapealla.
+     width:100% palauttaa rajan, jolloin ellipsis toimii kuten pitää. */
+  .tn20 .tn-es-streak-left { width: 100%; }
   /* Aikajana supistuu neljään pysäkkiin kapealla (README) */
   .tn20 .tn-es-tl-stop[data-narrow-hide] { display: none; }
   .tn20 .tn-es-ticker-head { padding-left: 20px; padding-right: 20px; }

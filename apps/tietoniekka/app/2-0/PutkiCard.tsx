@@ -7,6 +7,11 @@
 // päivän visaan) ja pelin loppunäkymä päivän visan jälkeen (palkinto).
 // Copy-huomio: CD:n "klo 6 jälkeen" vaihdettu pelkkään "huomenna" —
 // putki vaihtuu keskiyöllä (localDate), ei klo 6.
+//
+// Viikkorivi (7 palloa, ma–su-tyylinen edistymä) POISTETTU 23.8.2026
+// (Heikin päätös, sama kuin StreakStrip). Nollautui joka viikko ja
+// sekoitti kun putket venyvät kuukausien mittaisiksi — iso lukema
+// ({count} päivää) + "Paras putki"/"Seuraava tavoite" -statit riittävät.
 
 import { useEffect, useState } from "react";
 
@@ -44,16 +49,6 @@ export default function PutkiCard({ dayHref }: { dayHref?: string }) {
   const best = Math.max(s?.best ?? 0, count);
   const nextTarget = TARGETS.find((t) => t > count) ?? count + 100;
 
-  /* Viikkorivi = KULUVAN VIIKON edistymä: 7 palloa, nollautuu joka viikko
-     (8. päivä aloittaa uuden rivin). Tarkoituksellista — putken TODELLINEN
-     pituus näkyy aina isosta lukemasta ({count} päivää) ja "Seuraava
-     tavoite" -statista, ei tästä rivistä. */
-  const filled = count === 0 ? 0 : ((count - 1) % 7) + 1;
-  /* Pallojen alla oleva numero = todellinen putkipäivä, ei 1–7 joka viikko.
-     Viikko 1 → 1–7, viikko 2 → 8–14 jne. Näin jatkuva putki ei näytä
-     palaavan alkuun kahdeksantena päivänä (Heikki 22.8.2026). */
-  const weekStartDay = count === 0 ? 1 : Math.floor((count - 1) / 7) * 7 + 1;
-
   const msg =
     count === 0
       ? "Aloita putki tänään."
@@ -85,15 +80,6 @@ export default function PutkiCard({ dayHref }: { dayHref?: string }) {
         <span>{count === 1 ? "päivä" : "päivää"}</span>
       </div>
       <p className="tn-putki-msg">{msg}</p>
-
-      <div className="tn-putki-week" aria-hidden>
-        {Array.from({ length: 7 }, (_, i) => (
-          <div key={i} className="tn-putki-day">
-            {i < filled ? <b>✓</b> : <i />}
-            <span>{weekStartDay + i}</span>
-          </div>
-        ))}
-      </div>
 
       <div className="tn-putki-stats">
         <div className="tn-putki-stat">
