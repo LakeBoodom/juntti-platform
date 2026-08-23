@@ -6,6 +6,11 @@
 // ei toista pelinappia. Selvästi toissijainen pinta (#141108, kevyempi kuin
 // visakortti). Lukee samaa localStorage-avainta kuin PutkiCard/GameClient
 // (tn_paivan_visa_putki {count, last}) — striikit säilyvät.
+//
+// Viikkorivi (ma–su, 7 palloa) POISTETTU 23.8.2026 (Heikin päätös). Se
+// nollautui joka viikko ja sekoitti kun putket venyvät kuukausien
+// mittaisiksi — iso lukema ("N päivän putki") on ainoa totuus putken
+// pituudesta, eikä sille tarvita rinnalle viikkotason visualisointia.
 
 import { useEffect, useState } from "react";
 
@@ -29,22 +34,12 @@ function readStreak(): StreakState {
   }
 }
 
-const DAY_LABELS = ["ma", "ti", "ke", "to", "pe", "la", "su"];
-
 export default function StreakStrip() {
   const [s, setS] = useState<StreakState | null>(null);
   useEffect(() => setS(readStreak()), []);
 
   const days = s?.days ?? 0;
   const playedToday = s?.playedToday ?? false;
-
-  /* Viikkorivi = KULUVAN VIIKON edistymä: 7 palloa, nollautuu joka viikko
-     (8. päivä aloittaa uuden rivin). Tämä on tarkoituksellista — putken
-     TODELLINEN pituus näkyy aina isosta lukemasta ("N päivän putki"), ei
-     tästä rivistä. Tämä päivä = seuraava tyhjä pallo (tai viimeisin täysi,
-     jos tänään on jo pelattu). */
-  const filled = days === 0 ? 0 : ((days - 1) % 7) + 1;
-  const todayIdx = playedToday ? filled - 1 : filled;
 
   return (
     <aside className="tn-es-streak" aria-label="Päivän putki">
@@ -71,19 +66,6 @@ export default function StreakStrip() {
             <span className="tn-es-streak-sub">{playedToday ? "Tänään pelattu" : "Tänään pelaamatta"}</span>
           </span>
         )}
-      </div>
-      <div className="tn-es-streak-week" aria-hidden>
-        {DAY_LABELS.map((label, i) => (
-          <span
-            key={label}
-            className="tn-es-streak-day"
-            data-on={i < filled || undefined}
-            data-today={i === todayIdx || undefined}
-          >
-            <span className="tn-es-streak-daylabel">{label}</span>
-            <span className="tn-es-streak-dot2" />
-          </span>
-        ))}
       </div>
     </aside>
   );
