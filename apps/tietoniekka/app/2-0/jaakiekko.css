@@ -296,6 +296,27 @@
 .tn20 .tnj-grid[data-size="s"] {
   grid-template-columns: repeat(auto-fill, minmax(min(100%,192px),1fr));
 }
+/* Liigan kohokohdat (6 korttia, 24.8. lisäys): auto-fill mahduttaisi vain 5×
+   192px-korttia leveälle riville (shell 1184px sisältöleveydellä) ja jättäisi
+   6. kortin yksin omalle, 1fr:n venyttämälle täysleveälle rivilleen — rumaa
+   epäsymmetriaa. Heikin toive: kaksi riviä. Nimetty container sallii kynnyksen
+   mitata TÄMÄN gridin omasta leveydestä (ei viewportista/medialta, vakiosääntö
+   README:issä), ja 3 saraketta jaetaan vain kun 6×192px+gapit oikeasti mahtuu
+   kahdelle kolmen kortin riville — muuten auto-fill hoitaa kapeammat leveydet
+   luonnollisesti (esim. mobiilissa 1–2 saraketta). */
+/* Container asetetaan GRIDIN VANHEMMALLE (.tnj-general-wrap-elementti tulee
+   sivun JSX:stä), ei gridille itselleen — container query kuuntelee aina
+   vanhempaa provider-containeria, ei omaa elementtiään (sama elementti ei voi
+   mitata omaa lopullista leveyttään ratkaistakseen omat
+   grid-template-columns-arvonsa). Ensimmäinen yritys asetti containerin
+   suoraan .tnj-grid[data-variant="general"]:lle, mikä ei koskaan lauennut —
+   auto-fill jäi pysyvästi voimaan. */
+.tn20 .tnj-general-wrap { container: tnj-general / inline-size; }
+@container tnj-general (min-width: 620px) {
+  .tn20 .tnj-grid[data-variant="general"] {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
 .tn20 .tnj-card {
   position: relative; display: block; aspect-ratio: 4 / 5; overflow: hidden;
   border-radius: clamp(12px,1.5cqw,18px); border: 1px solid #3A3122; background: #1C1810;
@@ -352,6 +373,21 @@
      ("Kuriositeetit ja tilastotarinat") niin että yksittäinen kirjain jäi
      omalle rivilleen. EI riitä pelkkä word-break: keep-all — overflow-wrap
      pitää nollata myös, koska se ohittaa word-breakin. */
+  overflow-wrap: normal;
+  word-break: keep-all;
+}
+/* s-koon korteissa (Kohokohdat, Leijonat) sama bugi kuin yllä l:ssä:
+   text-wrap: balance + overflow-wrap: break-word yhdistelmä katkaisi sanoja
+   KESKELTÄ tasapainottaakseen rivit, vaikka sana olisi mahtunut kokonaisena
+   ("Ensimmäinen" → "Ensimmäine n", "Ulkomaalaislegendat" → "Ulkomaalai
+   slegendat", Heikin kuvakaappaukset 24.8.). Korjaus sama periaate: nollaa
+   overflow-wrap ja käytä word-break: keep-all, joka katkaisee vain sanojen
+   VÄLISTÄ. Aidosti kortin leveyttä pidemmät yhdyssanat (esim.
+   "ulkomaalaislegendat" pienessä s-kortissa, PAATOKSET.md 22.8. bugi 3
+   -historia) ylivuotavat tällöin sen sijaan että katkeaisivat rumasti
+   keskeltä — hyväksyttävä kompromissi, koska otsikot ovat lyhyitä eivätkä
+   yksittäiset sanat ole näissä korteissa kortin leveyttä pidempiä (mitattu). */
+.tn20 .tnj-grid[data-size="s"] .tnj-card-title {
   overflow-wrap: normal;
   word-break: keep-all;
 }
