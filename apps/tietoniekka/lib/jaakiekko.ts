@@ -164,6 +164,7 @@ export const JK_GENERAL: JkCard[] = [
   { quizSlug: "sm-liiga-finaalidraamat", tag: "Finaalit", title: "Kolmannen jatkoerän sankarit", img: IMG("jk-liiga-finaalidraamat"), accent: "#E8A320" },
   { quizSlug: "sm-liiga-valmentajadraamat-tulisielut", tag: "Penkin takana", title: "Aidot tulisielut", img: IMG("jk-liiga-valmentajat"), accent: "#E2231A" },
   { quizSlug: "sm-liiga-ulkomaalaisvahvistukset", tag: "Tuontitavara", title: "Liigan ulkomaalaislegendat", img: IMG("jk-liiga-ulkomaalaiset"), accent: "#F26B21" },
+  { quizSlug: "sm-liigan-legendaariset-pomot-visa", tag: "Seurapatruunat", title: "Sikarit, faksit ja seurapatruunat", img: IMG("jk-liiga-pomot"), accent: "#B6FF3C" },
 ];
 
 export const JK_LIONS: JkCard[] = [
