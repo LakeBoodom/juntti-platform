@@ -58,9 +58,20 @@ function orderCards(cards: Array<JkCard & { playHref: string | null }>) {
   return [...cards.filter((c) => c.playHref), ...cards.filter((c) => !c.playHref)];
 }
 
-function CardGrid({ cards, size }: { cards: Array<JkCard & { playHref: string | null }>; size: "l" | "s" }) {
+function CardGrid({
+  cards,
+  size,
+  variant,
+}: {
+  cards: Array<JkCard & { playHref: string | null }>;
+  size: "l" | "s";
+  /** "general" = Liigan kohokohdat: 6 korttia jaetaan kahdelle riville
+      desktopissa sen sijaan että auto-fill jättäisi 6. kortin yksin
+      omalle, koko leveyteen venytetylle rivilleen (Heikin katselmus 24.8.). */
+  variant?: "general";
+}) {
   return (
-    <div className="tnj-grid" data-size={size}>
+    <div className="tnj-grid" data-size={size} data-variant={variant}>
       {cards.map((c) => {
         const inner = (
           <>
@@ -193,7 +204,9 @@ export default async function JaakiekkoLanding() {
               <h2 className="tnj-h2">{JK_COPY.generalTitle}</h2>
               <p className="tnj-intro">{JK_COPY.generalIntro}</p>
             </div>
-            <CardGrid cards={general} size="s" />
+            <div className="tnj-general-wrap">
+              <CardGrid cards={general} size="s" variant="general" />
+            </div>
           </section>
         </div>
       </div>
