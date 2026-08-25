@@ -14,6 +14,9 @@ import { kulttuuriImg } from "@/lib/kulttuuri";
 import { luontoImg } from "@/lib/luonto";
 import { urheiluImg } from "@/lib/urheilu";
 import { maantietoImg } from "@/lib/maantieto";
+import { tvImg } from "@/lib/tv";
+import { musiikkiImg } from "@/lib/musiikki";
+import { elokuvatImg } from "@/lib/elokuvat";
 import { DailyQuizCard, type DailyQuizCardData, type DailyQuizVariant } from "@/components/tn20/DailyQuizCard";
 import StreakStrip from "@/components/tn20/StreakStrip";
 import { ETUSIVU_HERO, SPOTLIGHTS, HISTORIA_STOPS, FOOTER_COLLECTIONS, FOOTER_MODES } from "@/lib/etusivu";
@@ -27,12 +30,21 @@ const COLLECTION_NAME: Record<string, string> = {
   historia: "Historia", luonto: "Luonto", "tunnetut-henkilot": "Tunnetut henkilöt",
 };
 
-/** Visan oma kuva (flagship-kokoelmien topicImg) — sama putki kuin pelinäkymässä. */
+/** Visan oma kuva (teemakokoelmien topicImg). Bugikorjaus 25.8.2026 (Heikin
+    kuvakaappaus): TV/Musiikki/Elokuvat-haarat puuttuivat — teemasivut ja
+    kuvat (lib/tv.ts jne.) lisättiin 22.–23.8. mutta tätä dispatcheria ei
+    laajennettu, joten esim. Putous-päivän visa renderöityi "plain"-korttina
+    ilman kuvaa vaikka /20/tv/<slug>.webp oli olemassa. Kuvan asettelu
+    (140px-nauha, object-fit: cover, focal 50%/46%) on sama huolella
+    määritelty putki kuin muillakin — vain haku puuttui. */
 const topicImgFor = (collection: string | null | undefined, slug: string | null | undefined): string | null =>
   collection === "kulttuuri" ? kulttuuriImg(slug)
   : collection === "luonto" ? luontoImg(slug)
   : collection === "urheilu" ? urheiluImg(slug)
   : collection === "matkakohteet" ? maantietoImg(slug)
+  : collection === "tv" ? tvImg(slug)
+  : collection === "musiikki" ? musiikkiImg(slug)
+  : collection === "elokuvat" ? elokuvatImg(slug)
   : null;
 
 /** Kokoelmien aksentit (sama paletti kuin hubeissa). */
