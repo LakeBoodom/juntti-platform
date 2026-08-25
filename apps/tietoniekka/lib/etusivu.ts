@@ -4,10 +4,10 @@
 // versio (copy-passi ja kausivaihdot tehdään tästä yhdestä paikasta, kunnes
 // nostot siirretään kantaan/adminiin).
 //
-// Linkkihuomiot (Heikki 17.8.2026):
-// - Suomilätkä ja Futiskausi EIVÄT ole kokoelmia — linkit ovat placeholdereita
-//   urheiluhubiin (?laji=...) kunnes jääkiekko ja jalkapallo saavat omat
-//   teemakokoelmasivut (työlistalla kun visatuotanto valmistuu).
+// Linkkihuomiot (Heikki 17.8.2026, päivitetty 25.8.2026):
+// - Suomilätkä ja Futiskausi olivat placeholder-linkkejä urheiluhubiin kunnes
+//   jääkiekko (22.8.) ja jalkapallo (25.8.) saivat omat teemakokoelmasivut —
+//   molemmat osoittavat nyt niille.
 
 export type Spotlight = {
   key: string;
@@ -58,7 +58,8 @@ export const SPOTLIGHTS: Spotlight[] = [
     img: "/20/etusivu/sp-futis.webp",
     imgPos: "50% 24%",
     side: "left",
-    href: "/2-0/kokoelma/urheilu?laji=jalkapallo",
+    // 25.8.2026: Jalkapallo-teemasivu valmistui → placeholder-linkki hubiin vaihdettu
+    href: "/2-0/kokoelma/jalkapallo",
   },
   {
     key: "luonto",
@@ -98,6 +99,7 @@ export const HISTORIA_STOPS = [
    "Maailman ihmeet" → Maantieto; Suomilätkä placeholder-urheilulinkillä). */
 export const FOOTER_COLLECTIONS = [
   { label: "Suomilätkä", href: "/2-0/kokoelma/jaakiekko" },
+  { label: "Futiskausi", href: "/2-0/kokoelma/jalkapallo" },
   { label: "TV & suoratoisto", href: "/2-0/kokoelma/tv" },
   { label: "Suomen historia", href: "/2-0/kokoelma/historia" },
   { label: "Urheilu", href: "/2-0/kokoelma/urheilu" },
