@@ -13,6 +13,12 @@ export type NavCollection = {
 export const NAV_COLLECTIONS: NavCollection[] = [
   { slug: "tv", label: "TV & suoratoisto", color: "#FF3D9E" },
   { slug: "urheilu", label: "Urheilu", color: "#B6FF3C" },
+  /* Jääkiekko ja Jalkapallo (Heikki 25.8.2026): omat teemakokoelmat, jotka
+     nostetaan navigaatioon omina kohtinaan heti Urheilun perään, vaikka
+     niiden visat ovat kannassa urheilu-kokoelmaa — /2-0/kokoelmat-sivu
+     laskee näiden visamäärät teemasivujen visalistoista (ei collectionista). */
+  { slug: "jaakiekko", label: "Jääkiekko", color: "#4FD1F5" },
+  { slug: "jalkapallo", label: "Jalkapallo", color: "#35D6A0" },
   { slug: "elokuvat", label: "Elokuvat", color: "#FF5C3D" },
   { slug: "musiikki", label: "Musiikki", color: "#A855F7" },
   { slug: "matkakohteet", label: "Maantieto", color: "#46D6C8" },
