@@ -188,3 +188,18 @@ export const JK_NHL: JkCard[] = [
 export function jkTeamImg(id: string): string {
   return `/20/jaakiekko/jk-${id}.webp`;
 }
+
+/** Päivän visa -kortin kuvahaku (etusivu, 25.8.2026): jääkiekkovisan
+    quiz-slug → sivun kuvakortti. Kattaa seuravisat (paitakuvat) ja kaikki
+    korttiruudukot. Sama periaate kuin jalkapalloQuizImg — avaimena
+    quiz-slug, koska kuvatiedostot on nimetty design-id:n mukaan. */
+const QUIZ_IMG = new Map<string, string>([
+  ...JK_TEAMS.filter((t) => t.quizSlug).map((t) => [t.quizSlug!, jkTeamImg(t.id)] as const),
+  ...[...JK_DERBIES, ...JK_GENERAL, ...JK_LIONS, ...JK_NHL]
+    .filter((c) => c.quizSlug)
+    .map((c) => [c.quizSlug!, c.img] as const),
+]);
+
+export function jaakiekkoQuizImg(slug: string | null | undefined): string | null {
+  return slug ? QUIZ_IMG.get(slug) ?? null : null;
+}
