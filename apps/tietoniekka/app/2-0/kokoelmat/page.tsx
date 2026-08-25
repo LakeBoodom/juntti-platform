@@ -5,17 +5,34 @@
 import { getSupabase } from "@/lib/supabase";
 import Crumbs from "@/components/tn20/Crumbs";
 import { NAV_COLLECTIONS, NAV_MODES, hubHref } from "@/lib/nav";
+import { JP_CLUBS, JP_EURO, JP_PL_GENERAL, JP_CL, JP_FINNS } from "@/lib/jalkapallo";
+import { JK_TEAMS, JK_DERBIES, JK_GENERAL, JK_LIONS, JK_NHL } from "@/lib/jaakiekko";
 
 export const dynamic = "force-dynamic";
+
+/* Jääkiekko ja Jalkapallo eivät ole kannassa omia kokoelmia (visat ovat
+   urheilua) — niiden visamäärät lasketaan teemasivujen visalistoista
+   (julkaistut slugit), samat listat jotka sivut itse renderöivät. */
+const JP_SLUGS = new Set(
+  [...JP_CLUBS, ...JP_EURO, ...JP_PL_GENERAL, ...JP_CL, ...JP_FINNS].map((c) => c.quizSlug),
+);
+const JK_SLUGS = new Set(
+  [
+    ...JK_TEAMS.map((t) => t.quizSlug),
+    ...[...JK_DERBIES, ...JK_GENERAL, ...JK_LIONS, ...JK_NHL].map((c) => c.quizSlug),
+  ].filter((s): s is string => Boolean(s)),
+);
 
 async function getCounts(): Promise<Record<string, number>> {
   try {
     const sb = getSupabase();
     if (!sb) return {};
-    const { data } = await sb.from("quiz_cards" as never).select("collection");
+    const { data } = await sb.from("quiz_cards" as never).select("collection, slug");
     const counts: Record<string, number> = {};
-    for (const r of (data ?? []) as Array<{ collection: string | null }>) {
+    for (const r of (data ?? []) as Array<{ collection: string | null; slug: string | null }>) {
       if (r.collection) counts[r.collection] = (counts[r.collection] ?? 0) + 1;
+      if (r.slug && JP_SLUGS.has(r.slug)) counts.jalkapallo = (counts.jalkapallo ?? 0) + 1;
+      if (r.slug && JK_SLUGS.has(r.slug)) counts.jaakiekko = (counts.jaakiekko ?? 0) + 1;
     }
     return counts;
   } catch {
