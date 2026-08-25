@@ -17,6 +17,8 @@ import { maantietoImg } from "@/lib/maantieto";
 import { tvImg } from "@/lib/tv";
 import { musiikkiImg } from "@/lib/musiikki";
 import { elokuvatImg } from "@/lib/elokuvat";
+import { jalkapalloQuizImg } from "@/lib/jalkapallo";
+import { jaakiekkoQuizImg } from "@/lib/jaakiekko";
 import { DailyQuizCard, type DailyQuizCardData, type DailyQuizVariant } from "@/components/tn20/DailyQuizCard";
 import StreakStrip from "@/components/tn20/StreakStrip";
 import { ETUSIVU_HERO, SPOTLIGHTS, HISTORIA_STOPS, FOOTER_COLLECTIONS, FOOTER_MODES } from "@/lib/etusivu";
@@ -40,7 +42,10 @@ const COLLECTION_NAME: Record<string, string> = {
 const topicImgFor = (collection: string | null | undefined, slug: string | null | undefined): string | null =>
   collection === "kulttuuri" ? kulttuuriImg(slug)
   : collection === "luonto" ? luontoImg(slug)
-  : collection === "urheilu" ? urheiluImg(slug)
+  /* urheilu kattaa myös jalkapallo- ja jääkiekkoteemasivujen visat (Heikin
+     muistutus 25.8.): niiden kuvakortit on nimetty design-id:n mukaan, joten
+     haku menee quiz-slug-mäppäysten kautta jos urheiluImg ei osu. */
+  : collection === "urheilu" ? urheiluImg(slug) ?? jalkapalloQuizImg(slug) ?? jaakiekkoQuizImg(slug)
   : collection === "matkakohteet" ? maantietoImg(slug)
   : collection === "tv" ? tvImg(slug)
   : collection === "musiikki" ? musiikkiImg(slug)
