@@ -43,7 +43,11 @@
 .tn20 .tnjp-h1 {
   margin: 0 0 clamp(14px,1.8cqw,24px); font-family: var(--tn-font-display);
   font-weight: 900; font-variation-settings: "wdth" 68;
-  font-size: clamp(42px,9.4cqw,138px); line-height: .82; letter-spacing: -.025em;
+  /* min 30px (CD: 42px): "JALKAPALLOSTA" on 13 merkkiä ja fonttimme on
+     staattinen (wdth-akseli ei kavenna glyyfejä kuten CD:n prototyypissä) —
+     42px vuoti ~11px yli 390px leveydellä (mitattu livenä 25.8.).
+     9.4cqw pitää desktop-koon täsmälleen designin mukaisena. */
+  font-size: clamp(30px,9.4cqw,138px); line-height: .82; letter-spacing: -.025em;
   text-transform: uppercase; color: #F5F0E6; max-width: 16ch;
 }
 .tn20 .tnjp-lede {
