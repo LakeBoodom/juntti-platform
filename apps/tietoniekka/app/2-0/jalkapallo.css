@@ -46,8 +46,9 @@
   /* min 30px (CD: 42px): "JALKAPALLOSTA" on 13 merkkiä ja fonttimme on
      staattinen (wdth-akseli ei kavenna glyyfejä kuten CD:n prototyypissä) —
      42px vuoti ~11px yli 390px leveydellä (mitattu livenä 25.8.).
-     9.4cqw pitää desktop-koon täsmälleen designin mukaisena. */
-  font-size: clamp(30px,9.4cqw,138px); line-height: .82; letter-spacing: -.025em;
+     Max 122px (CD: 138px): "JALKAPALLOSTA" ei mahdu shellin 1184px:iin
+     138px:llä (mitattu tarve ≤130.4px, 26.8.). */
+  font-size: clamp(30px,9.4cqw,122px); line-height: .82; letter-spacing: -.025em;
   text-transform: uppercase; color: #F5F0E6; max-width: 16ch;
 }
 .tn20 .tnjp-lede {
@@ -299,7 +300,9 @@
 }
 .tn20 .tnjp-plcard-title {
   font-family: var(--tn-font-display); font-weight: 900; font-variation-settings: "wdth" 72;
-  font-size: clamp(19px,2.3cqw,31px); line-height: .94; letter-spacing: -.018em;
+  /* max 25px (CD: 31px) — KORTTISÄÄNTÖ: 31px leikkasi "Legendaariset"-sanan
+     (mitattu tarve ≤26.5px, marginaali 5%; staattinen fontti leveämpi kuin CD:n) */
+  font-size: clamp(19px,2.3cqw,25px); line-height: .94; letter-spacing: -.018em;
   text-transform: uppercase; color: #F5F0E6;
   text-wrap: balance; overflow-wrap: normal; word-break: keep-all;
 }
@@ -348,7 +351,8 @@
 .tn20 .tnjp-ecard-name {
   position: absolute; z-index: 1; left: clamp(12px,1.3cqw,18px); right: clamp(12px,1.3cqw,18px);
   bottom: clamp(11px,1.2cqw,16px); font-family: var(--tn-font-display); font-weight: 900;
-  font-variation-settings: "wdth" 72; font-size: clamp(20px,2.5cqw,34px); line-height: .94;
+  /* max 31px (CD: 34px) — "Leverkusen"/"Comebackit" leikkautuivat (tarve ≤32.8px) */
+  font-variation-settings: "wdth" 72; font-size: clamp(20px,2.5cqw,31px); line-height: .94;
   letter-spacing: -.02em; text-transform: uppercase; color: #F5F0E6;
   text-wrap: balance; overflow-wrap: normal; word-break: keep-all;
 }
