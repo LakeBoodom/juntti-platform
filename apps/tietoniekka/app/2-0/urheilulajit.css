@@ -1,0 +1,257 @@
+/* ══════════ URHEILUN TEEMASIVU (.tnu-*) — CD 26.8.2026 ══════════
+   design_handoff_urheilu_teemasivu/README.md. Sama design-systeemi kuin
+   Jääkiekko (.tnj-) ja Jalkapallo (.tnjp-) — urheilun "muut lajit" -sivu.
+   Ei varjoja; syvyys rajaviivoilla, taustaeroilla ja kuvagradienteilla.
+   Kaksi korttianatomiaa (README): 16/10 = kuva + tekstiosa; 21/9 (lead),
+   4/5, 16/9 ja portit = kaikki teksti kuvan päällä. Lohkon tausta, kirjain
+   ja kicker-väri johdetaan järjestyksestä sivukoodissa — CSS:ssä vain
+   data-dark-variantti. Otsikoiden sanankatkaisusäännöt jääkiekon opeista:
+   balance vain yhdessä overflow-wrap: normal + keep-all kanssa. */
+
+/* ── Hero ── */
+.tn20 .tnu-herowrap { position: relative; border-bottom: 1px solid #241E13; }
+.tn20 .tnu-hero-bg { position: absolute; inset: 0; overflow: hidden; }
+.tn20 .tnu-hero-bg img {
+  width: 100%; height: 100%; object-fit: cover; object-position: center 38%; opacity: .44;
+}
+.tn20 .tnu-hero-bg::before, .tn20 .tnu-hero-bg::after {
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+}
+.tn20 .tnu-hero-bg::before {
+  background: linear-gradient(100deg, #131109 6%, rgba(19,17,9,.88) 38%, rgba(19,17,9,.34) 78%);
+}
+.tn20 .tnu-hero-bg::after {
+  background: linear-gradient(to top, #131109 2%, transparent 38%);
+}
+.tn20 .tnu-hero { position: relative; padding-block: clamp(26px,4cqw,64px) 0; }
+.tn20 .tnu-h1 {
+  margin: 0 0 clamp(14px,1.8cqw,24px); font-family: var(--tn-font-display);
+  font-weight: 900; font-variation-settings: "wdth" 68;
+  /* min 28px (CD: 40px): "KAASUA, MAILOJA" on 15 merkkiä ja fonttimme on
+     staattinen (wdth-akseli ei kavenna) — sama kompensaatio kuin
+     jalkapallon herossa 25.8. 8.8cqw pitää desktop-koon designin mukaisena. */
+  font-size: clamp(28px,8.8cqw,128px); line-height: .82; letter-spacing: -.025em;
+  text-transform: uppercase; color: #F5F0E6; max-width: 17ch;
+}
+.tn20 .tnu-lede {
+  margin: 0 0 clamp(22px,3cqw,46px); font-size: clamp(14px,1.55cqw,21px);
+  line-height: 1.5; color: #CFC7B6; max-width: 50ch; text-wrap: pretty;
+}
+
+/* Lohkovalinta-nauha heron alareunassa — generoidaan lohkolistasta */
+.tn20 .tnu-parts {
+  position: relative;
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%,180px),1fr));
+  border-top: 1px solid #3A3122;
+}
+.tn20 .tnu-part {
+  display: block; padding: clamp(14px,1.8cqw,24px) clamp(14px,2cqw,26px);
+  border-right: 1px solid #241E13; background: rgba(19,17,9,.72); text-decoration: none;
+}
+.tn20 .tnu-part:last-child { border-right: 0; }
+.tn20 .tnu-part:hover { background: #1C1810; }
+.tn20 .tnu-part:focus-visible { outline: 2px solid #B6FF3C; outline-offset: -2px; }
+.tn20 .tnu-part-kicker {
+  display: block; font-family: var(--tn-font-display); font-weight: 900;
+  font-variation-settings: "wdth" 62; font-size: clamp(9px,.95cqw,12px);
+  letter-spacing: .2em; text-transform: uppercase; color: currentColor; margin-bottom: 7px;
+}
+.tn20 .tnu-part-title {
+  display: block; font-family: var(--tn-font-display); font-weight: 900;
+  font-variation-settings: "wdth" 74; font-size: clamp(16px,1.9cqw,26px);
+  line-height: 1; letter-spacing: -.015em; text-transform: uppercase; color: #F5F0E6;
+}
+.tn20 .tnu-part-meta {
+  display: block; font-size: clamp(10px,1.05cqw,13px); color: #8E8676;
+  font-weight: 600; margin-top: 6px;
+}
+
+/* ── Lohko ── */
+.tn20 .tnu-block { padding-block: clamp(34px,4.6cqw,76px) clamp(24px,3cqw,44px); }
+.tn20 .tnu-block[data-dark] {
+  background: #0F0D07; border-top: 1px solid #241E13; border-bottom: 1px solid #241E13;
+  padding-block: clamp(34px,4.6cqw,76px);
+}
+.tn20 .tnu-kickrow {
+  display: flex; align-items: baseline; gap: clamp(10px,1.4cqw,18px);
+  margin-bottom: clamp(10px,1.2cqw,16px);
+}
+.tn20 .tnu-kicker {
+  font-family: var(--tn-font-display); font-weight: 900; font-variation-settings: "wdth" 62;
+  font-size: clamp(10px,1.05cqw,13px); letter-spacing: .22em; text-transform: uppercase;
+  white-space: nowrap;
+}
+.tn20 .tnu-kickrow i { flex: 1; height: 1px; background: #241E13; display: block; }
+.tn20 .tnu-count { font-size: clamp(10px,1.05cqw,13px); font-weight: 700; color: #8E8676; white-space: nowrap; }
+.tn20 .tnu-headrow {
+  display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between;
+  gap: clamp(12px,1.8cqw,28px); margin-bottom: clamp(18px,2.4cqw,34px);
+}
+.tn20 .tnu-h2 {
+  margin: 0; font-family: var(--tn-font-display); font-weight: 900;
+  font-variation-settings: "wdth" 70; font-size: clamp(30px,5cqw,72px);
+  line-height: .88; letter-spacing: -.02em; text-transform: uppercase; color: #F5F0E6;
+  max-width: 20ch;
+}
+.tn20 .tnu-intro {
+  margin: 0; flex: 1 1 min(100%,260px); font-size: clamp(12.5px,1.35cqw,17px);
+  line-height: 1.5; color: #B9AF9B; max-width: 44ch; text-wrap: pretty;
+}
+
+/* Otsikko · viiva · meta -rivi (Omat teemasivut) */
+.tn20 .tnu-subhead {
+  display: flex; flex-wrap: wrap; align-items: baseline; gap: clamp(10px,1.4cqw,18px);
+  margin-bottom: clamp(14px,1.8cqw,26px);
+}
+.tn20 .tnu-h3 {
+  margin: 0; font-family: var(--tn-font-display); font-weight: 900;
+  font-variation-settings: "wdth" 72; font-size: clamp(22px,3.2cqw,44px);
+  line-height: 1; letter-spacing: -.015em; text-transform: uppercase; color: #F5F0E6;
+}
+.tn20 .tnu-subhead i { flex: 1; height: 1px; background: #241E13; display: block; }
+
+/* ── Kortit ── */
+.tn20 .tnu-grid { display: grid; gap: clamp(10px,1.4cqw,20px); }
+.tn20 .tnu-card { display: block; text-decoration: none; transition: transform 160ms ease-out; }
+.tn20 .tnu-card:hover, .tn20 .tnu-card:focus-visible { transform: translateY(-4px); }
+.tn20 .tnu-card:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }
+.tn20 .tnu-card-tag {
+  position: absolute; z-index: 1; left: clamp(11px,1.2cqw,16px); top: clamp(10px,1.1cqw,14px);
+  padding: 4px 9px; border-radius: 999px; background: rgba(19,17,9,.82);
+  border: 1px solid currentColor; color: currentColor;
+  font-size: clamp(9px,.95cqw,11.5px); font-weight: 800; letter-spacing: .1em;
+  text-transform: uppercase; white-space: nowrap; max-width: calc(100% - 22px);
+  overflow: hidden; text-overflow: ellipsis;
+}
+.tn20 .tnu-start {
+  font-family: var(--tn-font-display); font-weight: 900; font-variation-settings: "wdth" 76;
+  font-size: clamp(11px,1.1cqw,14px); text-transform: uppercase; letter-spacing: .04em;
+  color: currentColor; white-space: nowrap;
+}
+
+/* Overlay-kortti (21/9 lead, 4/5, 16/9, portit): kaikki teksti kuvan päällä */
+.tn20 .tnu-ocard {
+  position: relative; display: block; overflow: hidden;
+  border-radius: clamp(13px,1.6cqw,20px); border: 1px solid #3A3122; background: #0F0D07;
+}
+.tn20 .tnu-ocard[data-wide] { border-radius: clamp(14px,1.8cqw,22px); }
+.tn20 .tnu-ocard img {
+  position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;
+}
+.tn20 .tnu-ocard::after {
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(to top, rgba(19,17,9,.95) 4%, rgba(19,17,9,.1) 52%, transparent 74%);
+}
+.tn20 .tnu-ocard[data-wide]::after {
+  background: linear-gradient(to top, rgba(19,17,9,.95) 6%, rgba(19,17,9,.18) 58%, transparent 82%);
+}
+.tn20 .tnu-ocard-text {
+  position: absolute; z-index: 1; left: clamp(12px,1.4cqw,20px); right: clamp(12px,1.4cqw,20px);
+  bottom: clamp(11px,1.3cqw,18px);
+}
+.tn20 .tnu-ocard-title {
+  font-family: var(--tn-font-display); font-weight: 900; font-variation-settings: "wdth" 72;
+  font-size: clamp(20px,2.5cqw,34px); line-height: .93; letter-spacing: -.02em;
+  text-transform: uppercase; color: #F5F0E6;
+  text-wrap: balance; overflow-wrap: normal; word-break: keep-all;
+}
+.tn20 .tnu-ocard[data-ratio="21/9"] .tnu-ocard-title { font-size: clamp(26px,3.4cqw,48px); line-height: .9; letter-spacing: -.024em; }
+.tn20 .tnu-ocard[data-ratio="16/9"] .tnu-ocard-title { font-size: clamp(22px,2.8cqw,38px); line-height: .92; letter-spacing: -.022em; }
+.tn20 .tnu-ocard-sub {
+  display: block; font-size: clamp(10.5px,1.1cqw,13.5px); line-height: 1.45;
+  color: #CFC7B6; margin-top: 7px; text-wrap: pretty; max-width: 46ch;
+}
+.tn20 .tnu-ocard-foot {
+  display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between;
+  gap: 10px; margin-top: 9px;
+}
+
+/* Split-kortti (16/10): kuva + tekstiosa */
+.tn20 .tnu-scard-in {
+  display: block; border-radius: clamp(13px,1.6cqw,20px); overflow: hidden;
+  border: 1px solid #3A3122; background: #1C1810;
+}
+.tn20 .tnu-scard-media { position: relative; display: block; aspect-ratio: 16 / 10; }
+.tn20 .tnu-scard-media img {
+  position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;
+}
+.tn20 .tnu-scard-media::after {
+  content: ""; position: absolute; inset: 0;
+  background: linear-gradient(to top, rgba(19,17,9,.94) 4%, rgba(19,17,9,.1) 56%, transparent 78%);
+}
+.tn20 .tnu-scard-title {
+  position: absolute; z-index: 1; left: clamp(12px,1.3cqw,18px); right: clamp(12px,1.3cqw,18px);
+  bottom: clamp(11px,1.2cqw,16px); font-family: var(--tn-font-display); font-weight: 900;
+  font-variation-settings: "wdth" 72; font-size: clamp(20px,2.5cqw,34px); line-height: .94;
+  letter-spacing: -.02em; text-transform: uppercase; color: #F5F0E6;
+  text-wrap: balance; overflow-wrap: normal; word-break: keep-all;
+}
+.tn20 .tnu-scard-body { display: block; padding: clamp(12px,1.4cqw,18px); }
+.tn20 .tnu-scard-sub {
+  display: block; font-size: clamp(11px,1.15cqw,14px); line-height: 1.45; color: #B9AF9B;
+  text-wrap: pretty; margin-bottom: clamp(9px,1.1cqw,14px);
+}
+.tn20 .tnu-scard-foot {
+  display: flex; align-items: center; justify-content: flex-end; gap: 12px;
+}
+
+/* Porttikortit (Omat teemasivut) */
+.tn20 .tnu-gates {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%,340px),1fr));
+  gap: clamp(12px,1.6cqw,24px);
+}
+.tn20 .tnu-gate-in {
+  position: relative; display: block; overflow: hidden; aspect-ratio: 16 / 9;
+  border-radius: clamp(15px,1.9cqw,24px); border: 1px solid #3A3122; background: #0F0D07;
+}
+.tn20 .tnu-gate-in img {
+  position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;
+}
+.tn20 .tnu-gate-in::after {
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(to top, rgba(19,17,9,.95) 6%, rgba(19,17,9,.2) 58%, transparent 82%);
+}
+.tn20 .tnu-gate-tag {
+  position: absolute; z-index: 1; left: clamp(14px,1.6cqw,22px); top: clamp(12px,1.4cqw,18px);
+  padding: 5px 11px; border-radius: 999px; background: rgba(19,17,9,.82);
+  border: 1px solid currentColor; color: currentColor;
+  font-size: clamp(9px,.95cqw,12px); font-weight: 800; letter-spacing: .12em;
+  text-transform: uppercase; white-space: nowrap;
+}
+.tn20 .tnu-gate-text {
+  position: absolute; z-index: 1; left: clamp(14px,1.7cqw,24px); right: clamp(14px,1.7cqw,24px);
+  bottom: clamp(13px,1.5cqw,20px);
+}
+.tn20 .tnu-gate-title {
+  font-family: var(--tn-font-display); font-weight: 900; font-variation-settings: "wdth" 72;
+  font-size: clamp(28px,3.6cqw,52px); line-height: .9; letter-spacing: -.025em;
+  text-transform: uppercase; color: #F5F0E6;
+  overflow-wrap: normal; word-break: keep-all;
+}
+.tn20 .tnu-gate-foot {
+  display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between;
+  gap: 10px; margin-top: 9px;
+}
+.tn20 .tnu-gate-desc {
+  font-size: clamp(11.5px,1.2cqw,15px); line-height: 1.45; color: #CFC7B6;
+  max-width: 40ch; text-wrap: pretty;
+}
+
+/* Portit-osio sivun alaosassa */
+.tn20 .tnu-gatesec {
+  padding-block: clamp(20px,2.6cqw,40px) clamp(44px,5.6cqw,92px);
+  border-top: 1px solid #241E13;
+}
+
+/* ── Footer ── */
+.tn20 .tnu-footer { border-top: 1px solid #241E13; }
+.tn20 .tnu-footer > div {
+  display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px;
+  padding-top: 18px; padding-bottom: 22px; color: #5F594C; font-weight: 600; font-size: 13px;
+}
+.tn20 .tnu-footer a { color: inherit; text-decoration: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  .tn20 .tnu-card { transition: none; }
+  .tn20 .tnu-card:hover { transform: none; }
+}
