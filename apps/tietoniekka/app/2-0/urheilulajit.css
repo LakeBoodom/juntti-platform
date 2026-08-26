@@ -29,8 +29,10 @@
   font-weight: 900; font-variation-settings: "wdth" 68;
   /* min 28px (CD: 40px): "KAASUA, MAILOJA" on 15 merkkiä ja fonttimme on
      staattinen (wdth-akseli ei kavenna) — sama kompensaatio kuin
-     jalkapallon herossa 25.8. 8.8cqw pitää desktop-koon designin mukaisena. */
-  font-size: clamp(28px,8.8cqw,128px); line-height: .82; letter-spacing: -.025em;
+     jalkapallon herossa 25.8. Max 116px (CD: 128px): 128px:llä
+     "KAASUA, MAILOJA" ei mahdu shellin 1184px:iin yhdellä rivillä
+     staattisella fontilla → rivittyisi kolmelle. */
+  font-size: clamp(28px,8.8cqw,116px); line-height: .82; letter-spacing: -.025em;
   text-transform: uppercase; color: #F5F0E6; max-width: 17ch;
 }
 .tn20 .tnu-lede {
@@ -151,7 +153,10 @@
 }
 .tn20 .tnu-ocard-title {
   font-family: var(--tn-font-display); font-weight: 900; font-variation-settings: "wdth" 72;
-  font-size: clamp(20px,2.5cqw,34px); line-height: .93; letter-spacing: -.02em;
+  /* max 27px (CD: 34px) — KORTTISÄÄNTÖ: staattinen fontti on ~18% CD:n
+     wdth-72:ta leveämpi; 34px leikkasi "Valloittajat"-sanan (mitattu
+     Range-rivinleveydellä, tarve ≤29.9px, marginaali 5%). */
+  font-size: clamp(20px,2.5cqw,27px); line-height: .93; letter-spacing: -.02em;
   text-transform: uppercase; color: #F5F0E6;
   text-wrap: balance; overflow-wrap: normal; word-break: keep-all;
 }
@@ -182,7 +187,8 @@
 .tn20 .tnu-scard-title {
   position: absolute; z-index: 1; left: clamp(12px,1.3cqw,18px); right: clamp(12px,1.3cqw,18px);
   bottom: clamp(11px,1.2cqw,16px); font-family: var(--tn-font-display); font-weight: 900;
-  font-variation-settings: "wdth" 72; font-size: clamp(20px,2.5cqw,34px); line-height: .94;
+  /* max 27px (CD: 34px) — "Sinivalkoiset" leikkautui 34px:llä (tarve ≤29.1px) */
+  font-variation-settings: "wdth" 72; font-size: clamp(20px,2.5cqw,27px); line-height: .94;
   letter-spacing: -.02em; text-transform: uppercase; color: #F5F0E6;
   text-wrap: balance; overflow-wrap: normal; word-break: keep-all;
 }
