@@ -131,3 +131,33 @@ not yet processed.
 See `docs/PROGRESS.md`. Short version: Phase 4 shipped, Phase 2 has two
 remaining items (Murresanat CRUD + manual quiz authoring), Phase 5 lines
 up next (social share, AdSense, cron, sitemap, tietovisa.fi).
+
+## KORTTISÄÄNTÖ — tekstien on mahduttava kortteihin (lukittu 2026-08-26)
+
+Sama bugi toistui kolmesti ennen tämän säännön kirjaamista: 2.0-sivujen
+otsikot leikkautuivat korttien reunaan, koska Claude Designin prototyypit
+käyttävät variaabelia Archivoa (wdth 62–76) mutta tuotannon
+@fontsource-Archivo on **staattinen** — `font-variation-settings: "wdth"`
+ei tee mitään ja glyyfit ovat ~15–20 % CD:n mitoitusta leveämpiä.
+Otsikoissa vaadittu `overflow-wrap: normal; word-break: keep-all`
+(suomen sanat eivät saa katketa keskeltä) tarkoittaa, että liian iso
+sana ei rivity vaan leikkautuu `overflow: hidden`iin.
+
+1. Jokaisen kortti-/hero-/otsikkotekstin on mahduttava elementtiinsä
+   kokonaan kaikilla leveyksillä 320–2560 px. Leikkautunut teksti on
+   julkaisublokkeri.
+2. CD-paketin fonttikokoja ei koskaan käytetä sellaisenaan — jokainen
+   otsikkokoko kalibroidaan mittaamalla ennen valmiiksi raportointia.
+   Lähtöarvo: max ≈ 0.95 × (leveys / (0.67 × pisimmän sanan merkkimäärä)).
+3. Ainoa kelvollinen mittaus on Range-pohjainen:
+   `Range.selectNodeContents(el)` → `getClientRects()` → suurin
+   rivileveys vs. lähimmän block-esivanhemman `clientWidth`.
+   **`scrollWidth` EI kelpaa** — inline-elementeillä (span-otsikot) se
+   palauttaa 0 ja piilottaa ylivuodon.
+4. Mittaus jokaiselle otsikkoselektorille vähintään leveyksillä
+   320/390/768/1024/1440/1920/2450 px. "0 ylivuotoa" on osa valmiin
+   työn määritelmää.
+5. `text-wrap: balance` vain yhdessä `overflow-wrap: normal` +
+   `word-break: keep-all` kanssa.
+6. Kalibroitu koko dokumentoidaan CSS-kommenttiin (mitattu tarve +
+   CD:n alkuperäinen arvo + marginaali).
