@@ -52,11 +52,17 @@ function normalize(s: string): string {
 /* A–Ö-lajittelu sukunimen mukaan (Heikin toive 27.8.2026), ei etunimen.
    Nimet ovat muotoa "Etunimi Sukunimi" (myös yhdysmerkkiset sukunimet,
    esim. "Anttila-Jääskeläinen", pysyvät yhtenä viimeisenä tokenina).
+   Osalla kannan nimistä on sulkuihin lisätty tarkenne, esim.
+   "Sanni (laulaja)", "Daniel (Ruotsin prinssi)" — sulkuosa EI ole
+   sukunimi, joten se pudotetaan pois ennen viimeisen sanan poimintaa.
    Viimeinen välilyönnillä erotettu pätkä = sukunimi; jos nimessä ei ole
-   välilyöntiä lainkaan, käytetään koko nimeä (ei kaadu yksisanaisiin
-   taiteilijanimiin kuten "VilleGalle"). */
+   välilyöntiä lainkaan (tarkenteen poiston jälkeenkään), käytetään koko
+   alkuperäistä nimeä (ei kaadu yksisanaisiin taiteilijanimiin kuten
+   "VilleGalle"). */
 function surname(name: string): string {
-  const parts = name.trim().split(/\s+/);
+  const withoutParen = name.replace(/\s*\([^)]*\)\s*$/, "").trim();
+  const base = withoutParen || name.trim();
+  const parts = base.split(/\s+/);
   return parts[parts.length - 1] ?? name;
 }
 
