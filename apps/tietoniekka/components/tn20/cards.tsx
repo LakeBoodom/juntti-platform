@@ -170,6 +170,8 @@ export type PersonCardData = {
   image_url: string | null;
   birth_date?: string | null;
   question_count?: number;
+  /** Karkea ryhmä ("Selaa kaikkia" -kategoriasuodatinta varten, PersonBrowser). */
+  category?: string;
 };
 
 /** Henkilökortti: duotone-valokuva + nimi + tarkka ammatti + "5 kys.".
