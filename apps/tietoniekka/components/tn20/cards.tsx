@@ -200,9 +200,10 @@ export function PersonCard({
               <img className="tn-person-photo" src={person.image_url} alt="" loading="lazy" />
               <div className="tn-person-tint" />
               {/* Henkilökuvat tulevat Wikipediasta (CC) — lähdemaininta on
-                  lisenssiehto (Heikki 10.8.2026). Lisenssitiedot henkilön
-                  Wikipedia-sivulla (linkki /sankari-sivulla). */}
-              <span className="tn-person-credit" aria-hidden>📷 Wikipedia</span>
+                  lisenssiehto (Heikki 10.8.2026), mutta Heikin toiveesta
+                  (27.8.2026) se ei enää näy kuvan päällä jokaisessa kortissa —
+                  lisenssitiedot ovat edelleen henkilön Wikipedia-sivulla
+                  (linkki /sankari-sivulla). */}
             </>
           ) : (
             <div className="tn-person-silhouette">
