@@ -2344,3 +2344,156 @@
 .tn20 .tne-mus .tne-card::after {
   background: linear-gradient(to top, rgba(19,17,9,.98) 0%, rgba(19,17,9,.82) 42%, rgba(19,17,9,.26) 70%, rgba(19,17,9,0) 92%);
 }
+
+/* ══════════ TUNNETUT HENKILÖT — "Selaa kaikkia" -selain (.tn-personbrowser) ══════════
+   design_handoff_tunnetut_henkilot/README.md, 26.8.2026. Haku + kategoriat +
+   lajittelu + sivutus asuvat PersonBrowser-client-komponentissa; tämä lohko
+   on sen ainoa CSS. Container query korvaa README:n bucketit (xs ≤480,
+   mobile ≤640, tablet 641–1023, desktop ≥1024) — .tn20-juuri on jo
+   container-type:inline-size (rivi 56), joten mitataan komponentin oma
+   leveys, ei ikkunaa, kuten README nimenomaisesti vaatii. */
+
+.tn20 .tn-personbrowser { margin-top: clamp(28px, 4vw, 44px); }
+.tn20 .tn-personbrowser-head {
+  display: flex; align-items: baseline; justify-content: space-between; gap: 12px;
+  flex-wrap: wrap; margin-bottom: 18px;
+}
+.tn20 .tn-personbrowser-count { color: var(--tn-text-muted); font-size: 14px; font-weight: 600; }
+
+/* Hakukenttä */
+.tn20 .tn-personsearch {
+  display: flex; align-items: center; gap: 10px;
+  max-width: 620px; width: 100%;
+  padding: clamp(13px, 1.5cqw, 19px) clamp(16px, 2cqw, 22px);
+  border-radius: 14px; border: 1px solid var(--tn-line);
+  background: var(--tn-surface); color: var(--tn-text);
+  margin-bottom: 18px;
+}
+.tn20 .tn-personsearch:focus-within {
+  border-color: var(--tn-lime);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--tn-lime) 16%, transparent);
+}
+.tn20 .tn-personsearch svg { flex: none; color: var(--tn-text-dim); }
+.tn20 .tn-personsearch input {
+  flex: 1; min-width: 0; border: 0; background: transparent; color: inherit;
+  font-family: inherit; font-size: clamp(14px, 1.4cqw, 18px); outline: none;
+}
+.tn20 .tn-personsearch input::placeholder { color: var(--tn-text-dim); }
+
+/* Kategoriat + lajittelu */
+.tn20 .tn-personbrowser-controls {
+  display: flex; flex-direction: column; gap: 14px; margin-bottom: 22px;
+}
+@container (min-width: 1024px) {
+  .tn20 .tn-personbrowser-controls { flex-direction: row; align-items: center; justify-content: space-between; }
+}
+
+.tn20 .tn-catnav {
+  position: relative;
+  display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none;
+  padding-right: 40px; /* README: ≥ faden leveys, ettei viimeinen chip jää alle */
+  -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 34px), transparent 100%);
+  mask-image: linear-gradient(to right, #000 calc(100% - 34px), transparent 100%);
+}
+.tn20 .tn-catnav::-webkit-scrollbar { display: none; }
+.tn20 .tn-catnav button {
+  flex: none; font-family: inherit; cursor: pointer;
+  min-height: 44px; padding: 0 16px; font-size: 14px; font-weight: 700;
+  border-radius: 999px; border: 1px solid var(--tn-line);
+  background: var(--tn-surface); color: var(--tn-text-soft);
+  white-space: nowrap;
+}
+.tn20 .tn-catnav button.is-active {
+  background: var(--tn-lime); color: var(--tn-bg); border-color: var(--tn-lime);
+}
+@container (min-width: 1024px) {
+  .tn20 .tn-catnav button {
+    min-height: 0; padding: clamp(9px, 1cqw, 13px) clamp(12px, 1.4cqw, 18px);
+    font-size: clamp(11px, 1.1cqw, 14px);
+  }
+}
+
+.tn20 .tn-sortselect {
+  display: flex; align-items: center; gap: 10px; flex: none;
+}
+.tn20 .tn-sortselect span {
+  font-size: 11px; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--tn-text-dim);
+}
+.tn20 .tn-sortselect select {
+  min-height: 44px; padding: 0 34px 0 16px; border-radius: 999px;
+  border: 1px solid var(--tn-line); background: var(--tn-surface); color: var(--tn-text);
+  font-family: inherit; font-size: 14px; font-weight: 700; cursor: pointer;
+}
+@container (min-width: 1024px) { .tn20 .tn-sortselect select { min-height: 0; padding: 8px 30px 8px 14px; } }
+
+/* Ruudukko (tablet/desktop) — sama tn-card-grid, mutta piilossa mobiilissa
+   kompaktin listan hyväksi (README: ≤640px = lista, ei ruudukko). */
+.tn20 .tn-personbrowser-grid { display: none; }
+@container (min-width: 641px) { .tn20 .tn-personbrowser-grid { display: grid; } }
+
+/* Mobiililista ≤640px — rivi = koko kortti, kuva 64×80, "Pelaa →" oikealla */
+.tn20 .tn-personlist { display: flex; flex-direction: column; }
+@container (min-width: 641px) { .tn20 .tn-personlist { display: none; } }
+.tn20 .tn-personlist-row {
+  display: flex; align-items: center; gap: 14px;
+  min-height: 88px; padding: 12px 14px;
+  border-bottom: 1px solid var(--tn-line);
+  background: var(--tn-surface-2); text-decoration: none; color: inherit;
+}
+.tn20 .tn-personlist-row:hover, .tn20 .tn-personlist-row:focus-visible {
+  background: var(--tn-surface-3);
+}
+.tn20 .tn-personlist-row:focus-visible { outline: 2px solid var(--tn-lime); outline-offset: -2px; }
+.tn20 .tn-personlist-photo {
+  flex: none; width: 64px; height: 80px; border-radius: 12px; overflow: hidden;
+  position: relative; isolation: isolate;
+  background: linear-gradient(175deg, #6b4e86 0%, #2c1f38 55%, var(--tn-bg-deep) 100%);
+}
+.tn20 .tn-personlist-photo img {
+  position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;
+  filter: grayscale(1) contrast(1.05) brightness(1.08);
+}
+.tn20 .tn-personlist-photo .tn-person-tint { position: absolute; inset: 0; background: linear-gradient(180deg, #b17ae0 0%, #7a4ba8 55%, #3a2a55 100%); mix-blend-mode: color; opacity: 0.55; }
+.tn20 .tn-personlist-photo .tn-person-silhouette { position: absolute; inset: 0; display: grid; place-items: center; color: rgba(19,17,9,0.45); }
+.tn20 .tn-personlist-photo .tn-person-silhouette svg { width: 72%; height: auto; }
+.tn20 .tn-personlist-body { flex: 1; min-width: 0; }
+/* KORTTISÄÄNTÖ (CLAUDE.md): 320px-leveydellä kuva(64) + gap×2(28) + CTA(~60)
+   jättää nimelle/ammatille vain ~130px — pisimmät ammattinimikkeet
+   ("Formulakuljettaja" 18 merkkiä, mitattu tarve ≤118px 14px/700 fontilla)
+   eivät mahdu yhdelle riville. overflow-wrap:break-word + word-break:normal
+   sallii rivityksen sanan sisältä vain kun koko sana ei mahdu edes omalle
+   rivilleen (harvinaista tällä leveydellä) — README ei vaadi keep-allia
+   tälle listalle (ei otsikko), joten rivitys riittää eikä katkaisu näy. */
+.tn20 .tn-personlist-name {
+  font-size: 16px; font-weight: 700; line-height: 1.25;
+  overflow-wrap: break-word;
+}
+.tn20 .tn-personlist-role {
+  font-size: 14px; font-weight: 600; color: #b0a794; margin-top: 2px;
+  overflow-wrap: break-word;
+}
+.tn20 .tn-personlist-cta {
+  flex: none; min-height: 44px; padding: 0 14px; border-radius: 999px;
+  display: inline-flex; align-items: center;
+  border: 1px solid color-mix(in srgb, var(--tn-lime) 50%, transparent);
+  color: var(--tn-lime); font-size: 13px; font-weight: 800; white-space: nowrap;
+}
+
+.tn20 .tn-personbrowser-progress {
+  margin-top: 16px; color: var(--tn-text-dim); font-size: 13px;
+}
+.tn20 .tn-personbrowser-done { margin-top: 16px; color: var(--tn-text-dim); font-size: 13px; }
+
+.tn20 .tn-personempty {
+  border: 1px dashed var(--tn-line); border-radius: var(--tn-radius-lg);
+  background: var(--tn-surface); padding: var(--tn-space-lg); text-align: center;
+}
+.tn20 .tn-personempty-title { font-family: var(--tn-font-display); font-weight: 900; text-transform: uppercase; font-size: 20px; }
+.tn20 .tn-personempty p { color: var(--tn-text-muted); margin: 8px 0 16px; }
+.tn20 .tn-personempty button {
+  min-height: 44px; padding: 0 20px; border-radius: 999px; cursor: pointer;
+  border: 1px solid color-mix(in srgb, var(--tn-lime) 45%, var(--tn-line));
+  background: color-mix(in srgb, var(--tn-lime) 10%, var(--tn-surface));
+  color: var(--tn-lime); font-family: inherit; font-size: 14px; font-weight: 800;
+}
