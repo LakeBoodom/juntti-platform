@@ -8,6 +8,7 @@
 import type { Metadata } from "next";
 import { getSupabase } from "@/lib/supabase";
 import { PersonCard, type QuizCardData } from "@/components/tn20/cards";
+import { PersonBrowser, type BrowserPerson } from "@/components/tn20/PersonBrowser";
 import { WideCard } from "@/components/tn20/WideCard";
 import { MOTIF_PATHS, motifPathFor } from "@/components/tn20/motif-paths";
 import { LearnArticle } from "@/components/tn20/LearnArticle";
@@ -292,7 +293,7 @@ export default async function KokoelmaHub({
 
   /* ── Tunnetut henkilöt (ennallaan) ── */
   if (hub.source.kind === "person") {
-    return <PersonHub hub={hub} filter={filter} article={article} />;
+    return <PersonHub hub={hub} article={article} />;
   }
 
   /* ── Kuvavisat: kortistoruudukko kannasta ── */
@@ -647,18 +648,19 @@ function roleGroup(role: string | null): string {
 type Celeb = {
   id: string; slug: string | null; name: string; role: string | null;
   image_url: string | null; birth_date: string; trivia_quiz_id: string | null;
+  priority: number | null; created_at: string;
 };
 function playHref(c: Celeb): string {
   if (c.trivia_quiz_id) return `/2-0/peli?quiz_id=${c.trivia_quiz_id}`;
   return c.slug ? `/sankari/${c.slug}` : "#";
 }
 
-async function PersonHub({ hub, filter, article }: { hub: HubMeta; filter: string; article?: React.ReactNode }) {
+async function PersonHub({ hub, article }: { hub: HubMeta; article?: React.ReactNode }) {
   const sb = getSupabase();
   if (!sb) return <main style={{ padding: 32 }}>Ei tietokantayhteyttä.</main>;
   const { data } = await sb
     .from("celebrities")
-    .select("id, slug, name, role, image_url, birth_date, trivia_quiz_id")
+    .select("id, slug, name, role, image_url, birth_date, trivia_quiz_id, priority, created_at")
     .order("name");
   const celebs = (data ?? []) as Celeb[];
 
@@ -674,7 +676,22 @@ async function PersonHub({ hub, filter, article }: { hub: HubMeta; filter: strin
     })
     .sort((a, b) => a.dist - b.dist)
     .slice(0, 12);
-  const filtered = filter === "kaikki" ? celebs : celebs.filter((c) => roleGroup(c.role) === filter);
+
+  // Vain pelattavat henkilöt "Selaa kaikkia" -selaimeen (README:n Person-malli
+  // olettaa quizId:n aina — ilman visaa henkilö ei kuulu hakemistoon vielä).
+  const browserPeople: BrowserPerson[] = celebs
+    .filter((c) => c.trivia_quiz_id)
+    .map((c) => ({
+      id: c.id,
+      slug: c.slug,
+      name: c.name,
+      role: c.role,
+      image_url: c.image_url,
+      category: roleGroup(c.role),
+      priority: c.priority,
+      created_at: c.created_at,
+      href: playHref(c),
+    }));
 
   return (
     <main style={{ minHeight: "100dvh", paddingBottom: 80 }}>
@@ -725,37 +742,7 @@ async function PersonHub({ hub, filter, article }: { hub: HubMeta; filter: strin
         </section>
 
         <section className="tn-section" style={{ paddingTop: 0 }}>
-          <div className="tn-hubrow-head">
-            <div>
-              <h2 className="tn-section-title">Selaa kaikkia</h2>
-              <div className="tn-hubrow-note">Kortti vie suoraan henkilön visaan (5 kysymystä).</div>
-            </div>
-          </div>
-          <nav className="tn-chipnav" style={{ marginBottom: 24 }}>
-            {GROUP_LABELS.map((f) => {
-              const active = filter === f.key;
-              const href = f.key === "kaikki" ? "/2-0/kokoelma/tunnetut-henkilot" : `/2-0/kokoelma/tunnetut-henkilot?suodata=${f.key}`;
-              return (
-                <a key={f.key} href={href} style={active ? { background: "var(--tn-lime)", color: "var(--tn-bg)", borderColor: "var(--tn-lime)", fontWeight: 700 } : undefined}>
-                  {f.label}
-                </a>
-              );
-            })}
-          </nav>
-          {filtered.length === 0 ? (
-            <div className="tn-empty">Tästä ryhmästä ei löytynyt vielä henkilöitä.</div>
-          ) : (
-            <div className="tn-card-grid">
-              {filtered.map((c) => (
-                <PersonCard key={c.id} person={c} href={playHref(c)} />
-              ))}
-            </div>
-          )}
-          {/* Wikipedia-kuvien lähde + lisenssi — lisenssiehto (Heikki 10.8.2026) */}
-          <p className="tn-photo-credit-note">
-            Henkilökuvat: Wikipedia / Wikimedia Commons (CC-lisenssit). Kuvan lähde- ja
-            lisenssitiedot löytyvät henkilön Wikipedia-sivulta.
-          </p>
+          <PersonBrowser people={browserPeople} />
         </section>
       </div>
       {article}
