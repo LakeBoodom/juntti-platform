@@ -49,6 +49,17 @@ function normalize(s: string): string {
     .toLowerCase();
 }
 
+/* A–Ö-lajittelu sukunimen mukaan (Heikin toive 27.8.2026), ei etunimen.
+   Nimet ovat muotoa "Etunimi Sukunimi" (myös yhdysmerkkiset sukunimet,
+   esim. "Anttila-Jääskeläinen", pysyvät yhtenä viimeisenä tokenina).
+   Viimeinen välilyönnillä erotettu pätkä = sukunimi; jos nimessä ei ole
+   välilyöntiä lainkaan, käytetään koko nimeä (ei kaadu yksisanaisiin
+   taiteilijanimiin kuten "VilleGalle"). */
+function surname(name: string): string {
+  const parts = name.trim().split(/\s+/);
+  return parts[parts.length - 1] ?? name;
+}
+
 /* useSearchParams() vaatii Suspense-rajan server-renderöidyssä puussa
    (Next 15 App Router) — [collection]/page.tsx on server component eikä
    tarjoa sitä, joten ulompi export kääräisee sisäisen komponentin. */
@@ -111,7 +122,7 @@ function PersonBrowserInner({ people }: { people: BrowserPerson[] }) {
     }
     const sorted = [...list];
     if (sort === "aakkoset") {
-      sorted.sort((a, b) => a.name.localeCompare(b.name, "fi"));
+      sorted.sort((a, b) => surname(a.name).localeCompare(surname(b.name), "fi") || a.name.localeCompare(b.name, "fi"));
     } else if (sort === "uusimmat") {
       sorted.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
     } else {
