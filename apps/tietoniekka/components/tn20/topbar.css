@@ -1,41 +1,131 @@
-/* TIETONIEKKA 2.0 — NAVIGAATIOJÄRJESTELMÄ (CD:n Navigaatiokonsepti, lukittu 17.8.2026).
-   Skoopattu .tn20-luokkaan kuten muutkin 2.0-tyylit. Mitat ja liike CD:n speksistä:
-   palkki 72 → 54 px (kynnys 48 px, 160 ms ease-out), valikon avaus 140 ms / sulku 100 ms,
-   ei liikettä yli 6 px:n, prefers-reduced-motion poistaa siirtymät.
-   Tunnusvärit vain 9 px:n pisteinä ja hover-reunuksina — ei täytteinä. */
+/* TIETONIEKKA 2.0 — NAVIGAATIOJÄRJESTELMÄ (CD:n Navigaatiokonsepti, lukittu 17.8.2026;
+   ylätunniste päivitetty etusivun 2026 prod -designiin 28.8.2026).
+   Skoopattu .tn20-luokkaan kuten muutkin 2.0-tyylit. Valikon avaus 140 ms / sulku 100 ms,
+   prefers-reduced-motion poistaa siirtymät. Tunnusvärit vain 9 px:n pisteinä ja
+   hover-reunuksina — ei täytteinä. */
 
-/* ── Yläpalkki — vakiokorkeus 72 px, ei madallu (etusivu-README 17.8.2026) ── */
+/* ── Yläpalkki — sticky normaalivirrassa (design: header + border-bottom #241E13).
+   Korkeus elää sisällön mukana (logo + tagline), joten spaceria ei tarvita. ── */
 .tn20 .tn-topbar {
-  position: fixed;
+  position: sticky;
   top: 0;
-  left: 0;
-  right: 0;
   z-index: 60;
-  height: 72px;
   display: flex;
   align-items: center;
-  background: rgba(19, 17, 9, 0.86);
+  background: rgba(15, 13, 7, 0.9);
   backdrop-filter: blur(18px);
   -webkit-backdrop-filter: blur(18px);
   border-bottom: 1px solid #241e13;
 }
-.tn20 .tn-topbar-spacer { height: 72px; }
 
 .tn20 .tn-topbar-in {
   width: 100%;
   max-width: 1280px;
   margin: 0 auto;
-  padding: 0 clamp(16px, 4vw, 48px);
+  padding: clamp(12px, 1.5vw, 18px) clamp(16px, 3.4vw, 48px);
   display: flex;
   align-items: center;
-  gap: 18px;
+  gap: 0;
 }
-.tn20 .tn-topbar-in .tn-logo { flex: none; }
-.tn20 .tn-topbar-right { margin-left: auto; display: flex; align-items: center; gap: 10px; }
+.tn20 .tn-brand { flex: none; display: flex; flex-direction: column; gap: 4px; }
+/* < 700 px: brändi saa kutistua ja tagline lyhenee (…) — mitattu 28.8.2026: 320px:ssä
+   tagline (188px @10px) ei mahdu putki-napin + hampurilaisen rinnalle. Leveämmällä
+   brändi on aina max-content-levyinen, tagline kokonaan näkyvissä. */
+@media (max-width: 699px) { .tn20 .tn-brand { flex: 0 1 auto; min-width: 0; } }
+.tn20 .tn-topbar-in .tn-logo {
+  display: flex;
+  align-items: baseline;
+  gap: 1px;
+  font-size: clamp(20px, 2.1vw, 29px);
+  line-height: 1;
+  letter-spacing: -0.012em;
+}
+.tn20 .tn-tagline {
+  font-size: clamp(10px, calc(8.7px + 0.34vw), 12px);
+  font-weight: 500;
+  line-height: 1.2;
+  color: #b9af9b;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis; /* < ~340px: tagline lyhenee, ei vaakavieritystä */
+}
+.tn20 .tn-topbar-right { margin-left: auto; display: flex; align-items: center; gap: 0; }
+
+/* ── Nostot (Uusin kokoelma ≥ 1100 px · Suosittu nyt ≥ 700 px) ──────────── */
+.tn20 .tn-promo {
+  display: none;
+  align-items: center;
+  gap: 9px;
+  margin-left: 26px;
+  color: #b9af9b;
+  white-space: nowrap;
+  text-decoration: none;
+}
+.tn20 .tn-promo:hover { color: var(--tn-text); }
+.tn20 .tn-promo:focus-visible { outline: 2px solid var(--tn-lime); outline-offset: 2px; border-radius: 6px; }
+.tn20 .tn-promo-dot { width: 7px; height: 7px; border-radius: 999px; background: var(--tn-gold); }
+.tn20 .tn-promo-kicker { font-size: 11px; font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase; color: var(--tn-gold); }
+.tn20 .tn-promo-label { font-size: 14px; font-weight: 700; }
+.tn20 .tn-promo[data-promo="suosittu"] .tn-promo-dot { background: var(--tn-lime); }
+.tn20 .tn-promo[data-promo="suosittu"] .tn-promo-kicker { color: var(--tn-lime); }
+@media (min-width: 700px) { .tn20 .tn-promo[data-promo="suosittu"] { display: flex; } }
+@media (min-width: 1100px) { .tn20 .tn-promo[data-promo="uusin"] { display: flex; } }
+
+/* ── Päivän putki -nappi + popover (StreakButton) ────────────────────────── */
+.tn20 .tn-putki { position: relative; flex: none; margin-left: clamp(10px, 1.2vw, 20px); }
+.tn20 .tn-putki-btn {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0 clamp(10px, 1.1vw, 14px);
+  border: 1px solid rgba(232, 163, 32, 0.45);
+  border-radius: 999px;
+  background: rgba(232, 163, 32, 0.1);
+  color: var(--tn-gold);
+  font-family: var(--tn-font-body);
+  font-size: 14px;
+  font-weight: 800;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.tn20 .tn-putki-btn:hover { border-color: var(--tn-gold); background: rgba(232, 163, 32, 0.18); }
+.tn20 .tn-putki-btn:focus-visible { outline: 2px solid var(--tn-gold); outline-offset: 2px; }
+.tn20 .tn-putki-flame { flex: none; display: block; width: clamp(17px, calc(20px - 0.3vw), 20px); height: clamp(17px, calc(20px - 0.3vw), 20px); }
+.tn20 .tn-putki-txt { display: flex; align-items: center; gap: 5px; }
+.tn20 .tn-putki-done { display: flex; align-items: center; gap: 5px; color: var(--tn-lime); }
+.tn20 .tn-putki-donetxt { color: #8e8676; }
+.tn20 .tn-putki-wide { display: none; }
+@media (min-width: 1100px) { .tn20 .tn-putki-wide { display: inline; } }
+.tn20 .tn-putki-pop {
+  position: absolute;
+  top: calc(100% + 12px);
+  right: 0;
+  z-index: 70;
+  width: min(74vw, 296px);
+  padding: 16px;
+  border: 1px solid var(--tn-line);
+  border-radius: 16px;
+  background: #15120a;
+  box-shadow: 0 22px 48px rgba(0, 0, 0, 0.55);
+  animation: tn-menu-in 140ms ease-out;
+}
+.tn20 .tn-putki-pop-head { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
+.tn20 .tn-putki-pop-title {
+  font-family: var(--tn-font-display);
+  font-weight: 900;
+  font-size: 15px;
+  letter-spacing: -0.01em;
+  text-transform: uppercase;
+  color: var(--tn-text);
+}
+.tn20 .tn-putki-pop-count { font-size: 13px; font-weight: 800; color: var(--tn-gold); white-space: nowrap; }
+.tn20 .tn-putki-pop-hint { margin: 13px 0 0; font-size: 12.5px; line-height: 1.45; color: #b9af9b; text-wrap: pretty; }
 
 /* ── Valikkopainikkeet (lepo / hover / aktiivinen / focus / auki) ──────── */
-.tn20 .tn-topnav { display: none; align-items: center; gap: 6px; }
-@media (min-width: 760px) { .tn20 .tn-topnav { display: flex; } }
+.tn20 .tn-topnav { display: none; align-items: center; gap: 6px; margin-left: 20px; }
+@media (min-width: 1100px) { .tn20 .tn-topnav { display: flex; } }
 .tn20 .tn-topnav-item { position: relative; }
 
 .tn20 .tn-topnav-btn {
@@ -156,19 +246,21 @@
 
 /* Valikoiden footnotet + Sulje-nappi poistettu (Heikin katselmus 17.8.) */
 
-/* ── Mobiili: 56 px palkki + hampurilaisvalikko ────────────────────────── */
+/* ── Hampurilaisvalikko < 1100 px (design: 44 px, reuna #3A3122, r11) ────── */
 .tn20 .tn-selaa {
   display: grid;
   place-items: center;
   width: 44px;
   height: 44px;
+  margin-left: 14px;
   padding: 0;
-  border: 0;
-  border-radius: 12px;
+  border: 1px solid var(--tn-line);
+  border-radius: 11px;
   background: transparent;
   color: var(--tn-text);
   cursor: pointer;
 }
+.tn20 .tn-selaa:hover { border-color: var(--tn-lime); }
 .tn20 .tn-selaa:active { background: rgba(255, 255, 255, 0.08); }
 .tn20 .tn-selaa-icon {
   display: flex;
@@ -181,11 +273,7 @@
   border-radius: 2px;
   background: currentColor;
 }
-@media (min-width: 760px) { .tn20 .tn-selaa { display: none; } }
-@media (max-width: 759px) {
-  .tn20 .tn-topbar { height: 56px; }
-  .tn20 .tn-topbar-spacer { height: 56px; }
-}
+@media (min-width: 1100px) { .tn20 .tn-selaa { display: none; } }
 
 /* ── Murupolkurivi (44 px palkin alla — nav-speksin näkymä 03) ─────────── */
 .tn20 .tn-crumbrow {
