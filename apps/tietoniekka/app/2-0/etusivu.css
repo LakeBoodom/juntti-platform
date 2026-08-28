@@ -1,818 +1,378 @@
-/* TIETONIEKKA 2.0 — ETUSIVU 2026 (design_handoff_etusivu_2026, 18.8.2026).
-   Kaikki uuden etusivun tyylit .tn-es-*-luokissa, .tn20-skoopissa. Tokenit
-   READMEstä: lime #B6FF3C vain interaktiolle/fokukselle/edistymiselle,
-   oranssi #E8A320 brändiaksentti (ei nappi). Ei laatikkovarjoja — ainoa
-   box-shadow on aikajanapisteen hehkurengas. Reunat aina 1 px.
-   Sisältö max 1440 px, sivupehmuste 80 px (kapenee breakpointeissa).
-   HUOM: vanhat etusivuluokat (tn-hero-chips, tn-feature, tn-mega, tn-rank,
-   tn-chipnav, tn-footer, tn-dqc, tn-day-grid) jäivät orvoiksi tn20.css:ään —
-   siivotaan copy/SEO-passissa (tn-hero + tn-browse ovat yhä hubien käytössä). */
+/* TIETONIEKKA 2.0 — ETUSIVU 2026 PROD (design_handoff_etusivu_2026_prod,
+   toteutettu 28.8.2026 — korvasi 18.8. etusivu.css:n kokonaan).
+   Kaikki mitat, värit ja fonttikoot designin inline-tyyleistä; container-kyselyt
+   (.tn20 on inline-size-container → cqw) kuten designissa. KORTTISÄÄNTÖ:
+   otsikkokoot kalibroitu mittaamalla (staattinen Archivo, ei wdth-akselia) —
+   kalibroidut arvot ja CD:n alkuperäiset dokumentoitu kunkin säännön kommentissa.
+   Skoopattu .tn20 .tn-es-*. */
 
-.tn20 .tn-es-shell {
-  max-width: 1440px;
-  margin: 0 auto;
-  padding-left: 80px;
-  padding-right: 80px;
+.tn20 .tn-es-page {
+  min-height: 100dvh;
+  background: #0f0d07;
+  background-image: repeating-linear-gradient(45deg, rgba(245, 240, 230, 0.016) 0 1px, transparent 1px 7px);
+  color: #f5f0e6;
 }
-@media (max-width: 1279px) {
-  .tn20 .tn-es-shell { padding-left: 48px; padding-right: 48px; }
-}
-@media (max-width: 1023px) {
-  .tn20 .tn-es-shell { padding-left: 32px; padding-right: 32px; }
-}
-@media (max-width: 767px) {
-  .tn20 .tn-es-shell { padding-left: 20px; padding-right: 20px; }
-}
+.tn20 .tn-es-page a { text-decoration: none; }
 
-/* ── Hero (kompakti, grid 1fr/552px) ───────────────────────────────────── */
-.tn20 .tn-es-hero {
-  display: grid;
-  grid-template-columns: 1fr 552px;
-  gap: 56px;
-  align-items: center;
-  padding-top: 56px;
-  padding-bottom: 44px;
-}
-.tn20 .tn-es-hero h1 {
-  margin: 0;
-  font-family: Archivo, sans-serif;
+/* ── Yhteiset: otsikot, nappi, nuolivihje ─────────────────────────────── */
+.tn20 .tn-es-h1,
+.tn20 .tn-es-h2,
+.tn20 .tn-es-card-title,
+.tn20 .tn-es-host-name,
+.tn20 .tn-es-day-title {
+  font-family: var(--tn-font-display);
   font-weight: 900;
-  font-variation-settings: "wdth" 70;
-  font-size: clamp(40px, 5.6vw, 80px);
-  line-height: 0.9;
-  letter-spacing: -0.02em;
   text-transform: uppercase;
-  text-wrap: balance;
+  overflow-wrap: normal;
+  word-break: keep-all;
 }
-.tn20 .tn-es-hero h1 em {
-  font-style: normal;
-  color: var(--tn-lime);
-}
-.tn20 .tn-es-hero-p {
-  margin: 22px 0 0;
-  color: var(--tn-text-soft);
-  font-size: 18px;
-  line-height: 1.5;
-  max-width: 44ch;
-}
-.tn20 .tn-es-proofs {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 14px;
-  margin-top: 26px;
-  font-size: 14px;
-  font-weight: 500;
-  color: #8e8676;
-}
-.tn20 .tn-es-proofs i {
-  font-style: normal;
-  color: #3a3122;
-}
-.tn20 .tn-es-hero-media {
-  position: relative;
-  height: 392px;
-  border-radius: 20px;
-  overflow: hidden;
-}
-.tn20 .tn-es-hero-media img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-}
-.tn20 .tn-es-hero-media::before,
-.tn20 .tn-es-hero-media::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-}
-.tn20 .tn-es-hero-media::before {
-  background: linear-gradient(90deg, #131109 0%, rgba(19, 17, 9, 0.55) 26%, rgba(19, 17, 9, 0) 62%);
-}
-.tn20 .tn-es-hero-media::after {
-  background: linear-gradient(0deg, #131109 0%, rgba(19, 17, 9, 0) 46%);
-}
-
-/* ── Osiotunnukset ─────────────────────────────────────────────────────── */
-.tn20 .tn-es-kicker {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  margin-bottom: 16px;
-}
-.tn20 .tn-es-kicker-dot {
-  width: 9px;
-  height: 9px;
-  border-radius: 999px;
-  background: var(--tn-lime);
-  flex: none;
-}
-.tn20 .tn-es-kicker-label {
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.22em;
-  text-transform: uppercase;
-  color: var(--tn-lime);
-}
-.tn20 .tn-es-kicker-date {
-  font-size: 13px;
-  color: #8e8676;
-}
+/* h2: CD 36px max / 21px min */
 .tn20 .tn-es-h2 {
-  margin: 0 0 20px;
-  font-family: Archivo, sans-serif;
+  margin: 0;
+  font-size: clamp(21px, 2.4cqw, 36px);
+  line-height: 1;
+  letter-spacing: -0.018em;
+}
+.tn20 .tn-es-h2--nowrap { white-space: nowrap; }
+.tn20 .tn-es-head { display: flex; flex-direction: column; gap: clamp(4px, 0.5cqw, 8px); margin-bottom: clamp(13px, 1.4cqw, 20px); }
+.tn20 .tn-es-head--row { flex-direction: row; align-items: baseline; gap: clamp(8px, 1cqw, 14px); }
+.tn20 .tn-es-sub { margin: 0; font-size: clamp(12.5px, 1.2cqw, 16px); line-height: 1.4; color: #b9af9b; }
+.tn20 .tn-es-date { font-size: clamp(11px, 1.05cqw, 14px); font-weight: 700; color: #8e8676; white-space: nowrap; }
+
+.tn20 .tn-es-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  min-height: 48px;
+  padding: clamp(12px, 1.2cqw, 16px) clamp(20px, 2cqw, 30px);
+  border-radius: 12px;
+  background: var(--tn-lime);
+  color: #131109;
+  font-family: var(--tn-font-display);
   font-weight: 900;
-  font-variation-settings: "wdth" 74;
-  font-size: 38px;
+  font-size: clamp(13.5px, 1.35cqw, 18px);
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.tn20 .tn-es-btn:hover { background: #c9ff6e; }
+.tn20 .tn-es-btn:focus-visible { outline: 2px solid var(--tn-lime); outline-offset: 3px; }
+
+.tn20 .tn-es-arrow {
+  flex: 0 0 auto;
+  font-size: clamp(15px, 1.5cqw, 20px);
+  line-height: 1;
+  font-weight: 700;
+  color: #8e8676;
+  transition: color 0.18s ease, transform 0.18s ease;
+}
+.tn20 a:hover .tn-es-arrow,
+.tn20 a:focus-visible .tn-es-arrow { color: #f5f0e6; transform: translateX(3px); }
+
+/* ── Kategoriarivi ────────────────────────────────────────────────────── */
+.tn20 .tn-es-catbar { border-bottom: 1px solid #241e13; }
+.tn20 .tn-es-cats {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 8px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  width: 100%;
+  max-width: 1280px;
+  margin-inline: auto;
+  padding: clamp(10px, 1.2cqw, 14px) clamp(16px, 3.4cqw, 48px);
+}
+.tn20 .tn-es-cats::-webkit-scrollbar { display: none; }
+.tn20 .tn-es-cat {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  min-height: 38px;
+  padding: 0 clamp(13px, 1.3cqw, 18px);
+  border: 1px solid var(--tn-line);
+  border-radius: 999px;
+  color: #b9af9b;
+  font-size: clamp(12px, 1.05cqw, 14px);
+  font-weight: 700;
+  white-space: nowrap;
+}
+.tn20 .tn-es-cat:hover { border-color: #8e8676; color: #f5f0e6; }
+.tn20 .tn-es-cat:focus-visible { outline: 2px solid var(--tn-lime); outline-offset: 2px; }
+
+/* ── Pääsisältö ───────────────────────────────────────────────────────── */
+.tn20 .tn-es-main {
+  width: 100%;
+  max-width: 1280px;
+  margin-inline: auto;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(26px, 2.8cqw, 46px);
+  padding: clamp(16px, 3.4cqw, 48px);
+}
+
+/* ── Lippuvisa-hero ───────────────────────────────────────────────────── */
+.tn20 .tn-es-hero {
+  position: relative;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  border: 1px solid var(--tn-line);
+  border-radius: clamp(14px, 1.5cqw, 20px);
+  min-height: clamp(230px, calc(189px + 10.5cqw), 340px);
+  color: #f5f0e6;
+}
+.tn20 .tn-es-hero:hover { border-color: var(--tn-lime); }
+.tn20 .tn-es-hero:focus-visible { outline: 2px solid var(--tn-lime); outline-offset: 3px; }
+.tn20 .tn-es-hero-bg { position: absolute; inset: 0; background-size: cover; background-repeat: no-repeat; }
+.tn20 .tn-es-hero-panel {
+  position: relative;
+  z-index: 2;
+  display: block;
+  width: min(100%, max(320px, 52cqw));
+  padding: clamp(18px, 2cqw, 34px);
+  background: linear-gradient(90deg, rgba(11, 10, 6, 0.97) 0%, rgba(11, 10, 6, 0.94) 46%, rgba(11, 10, 6, 0.66) 76%, rgba(11, 10, 6, 0.16) 95%, rgba(11, 10, 6, 0) 100%);
+}
+/* h1: CD clamp(30px, 20px + 2.2cqw, 54px) — kalibroitu mittaamalla (ks. alla) */
+.tn20 .tn-es-h1 {
+  margin: 0 0 clamp(7px, 0.7cqw, 11px);
+  font-size: clamp(30px, calc(20px + 2.2cqw), 54px);
+  line-height: 0.9;
+  letter-spacing: -0.024em;
+  text-wrap: balance;
+  color: var(--tn-gold);
+}
+.tn20 .tn-es-hero-lede { margin: 0 0 clamp(14px, 1.3cqw, 20px); font-size: clamp(13.5px, 1.35cqw, 19px); line-height: 1.35; color: #cfc7b6; }
+
+/* ── Korttiruudukko (Suositut kokoelmat) — 2 / 3 / 6 saraketta ───────── */
+.tn20 .tn-es-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(48%, max(200px, 24cqw)), 1fr));
+  gap: clamp(10px, 1.2cqw, 18px);
+}
+.tn20 .tn-es-card,
+.tn20 .tn-es-hcard {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  border: 1px solid var(--tn-line);
+  border-radius: clamp(12px, 1.3cqw, 18px);
+  background: #1c1810;
+  color: #f5f0e6;
+}
+.tn20 .tn-es-card { aspect-ratio: 4 / 3; }
+.tn20 .tn-es-card:hover { border-color: var(--tn-lime); }
+.tn20 .tn-es-card:focus-visible,
+.tn20 .tn-es-hcard:focus-visible { outline: 2px solid var(--tn-lime); outline-offset: 3px; }
+.tn20 .tn-es-card-bg { position: absolute; inset: 0; background-size: cover; background-repeat: no-repeat; }
+.tn20 .tn-es-card-shade { position: absolute; inset: 0; background: linear-gradient(to top, rgba(11, 10, 6, 0.95) 6%, rgba(11, 10, 6, 0.35) 48%, rgba(11, 10, 6, 0.05) 82%); }
+.tn20 .tn-es-card-shade--h { background: linear-gradient(to top, rgba(11, 10, 6, 0.95) 5%, rgba(11, 10, 6, 0.35) 46%, rgba(11, 10, 6, 0.05) 80%); }
+.tn20 .tn-es-card-foot {
+  position: absolute;
+  left: clamp(11px, 1.1cqw, 18px);
+  right: clamp(11px, 1.1cqw, 18px);
+  bottom: clamp(12px, 1.2cqw, 18px);
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 10px;
+}
+.tn20 .tn-es-card-foot--h { bottom: clamp(10px, 1.1cqw, 16px); }
+/* Kortin otsikko: CD clamp(16px, 1.6cqw, 25px). KORTTISÄÄNTÖ-kalibrointi 28.8.2026
+   (Range-mittaus 320–2450px, staattinen Archivo): 2 sarakkeen mobiilissa pisin sana
+   "SUORATOISTO" (11 merkkiä) tarvitsi 320px:ssä ≤10.9px ja 390px:ssä ≤15.2px
+   (5 % marginaali) → kapealla koko seuraa säiliötä calc(6.14cqw − 8.75px), muuten
+   CD:n arvo. ≥ 768px CD:n koko mahtuu (tarve ≤19.7px, 3 saraketta). */
+.tn20 .tn-es-card-title {
+  display: block;
+  min-width: 0;
+  font-size: min(clamp(16px, 1.6cqw, 25px), calc(6.14cqw - 8.75px));
   line-height: 1;
   letter-spacing: -0.015em;
-  text-transform: uppercase;
+  color: #f5f0e6;
 }
 
-/* ── Päivän visa -kortti ───────────────────────────────────────────────── */
-.tn20 .tn-es-dq {
-  border: 1px solid #2c2517;
-  border-radius: 24px;
-  background: #17140d;
-  overflow: hidden;
-}
-.tn20 .tn-es-dq-band {
-  position: relative;
+/* ── Laura ja Mikko ───────────────────────────────────────────────────── */
+.tn20 .tn-es-hosts { display: flex; flex-direction: column; gap: clamp(10px, 1.2cqw, 18px); }
+.tn20 .tn-es-hosts-lede { margin: 0 0 clamp(3px, 0.4cqw, 7px); max-width: 92ch; font-size: clamp(12.5px, 1.25cqw, 17px); line-height: 1.45; color: #cfc7b6; text-wrap: pretty; }
+.tn20 .tn-es-hosts-grid { display: flex; flex-wrap: wrap; gap: clamp(10px, 1.2cqw, 18px); }
+.tn20 .tn-es-host { flex: 1 1 min(100%, 460px); min-width: 0; display: flex; flex-direction: column; gap: clamp(10px, 1.2cqw, 18px); }
+.tn20 .tn-es-host-profile {
   display: flex;
   align-items: center;
+  gap: clamp(12px, 1.3cqw, 20px);
+  padding: clamp(13px, 1.3cqw, 20px);
+  border: 1px solid #2a2416;
+  border-radius: clamp(12px, 1.3cqw, 18px);
+  background: #1c1810;
+  min-height: clamp(132px, calc(104px + 4cqw), 178px);
 }
-.tn20 .tn-es-dq-band-portrait {
-  min-height: 140px;
-  background: linear-gradient(100deg, rgba(124, 79, 201, 0.3), rgba(23, 20, 13, 0) 62%), #1b1710;
+.tn20 .tn-es-host-img {
+  flex: 0 0 auto;
+  width: clamp(126px, 24cqw, 150px);
+  aspect-ratio: 1 / 1;
+  border-radius: clamp(10px, 1.1cqw, 14px);
+  background-color: #141109;
+  background-size: cover;
+  background-position: center;
 }
-.tn20 .tn-es-dq-portrait {
+.tn20 .tn-es-host-text { flex: 1 1 0; min-width: 0; }
+/* CD clamp(17px, 1.7cqw, 25px) — "SUOSITTELEE" (11 merkkiä) tarvitsi 320px:ssä
+   ≤15.3px (mitattu 128.5px @17px vs. 122px tilaa) → min(CD, 4.7cqw) = 15.0px @320,
+   ≥ 362px CD:n arvo (28.8.2026). */
+.tn20 .tn-es-host-name { font-size: min(clamp(17px, 1.7cqw, 25px), 4.7cqw); line-height: 1; letter-spacing: -0.018em; color: #f5f0e6; }
+.tn20 .tn-es-host-role { margin-top: 6px; font-size: clamp(10.5px, 1cqw, 13px); font-weight: 700; color: var(--tn-gold); }
+.tn20 .tn-es-host[data-accent="lime"] .tn-es-host-role { color: var(--tn-lime); }
+.tn20 .tn-es-host-cards { display: flex; flex-wrap: wrap; gap: clamp(10px, 1.2cqw, 18px); }
+.tn20 .tn-es-hcard { flex: 1 1 min(46%, 150px); min-height: clamp(140px, calc(60px + 11cqw), 210px); }
+.tn20 .tn-es-host[data-accent="gold"] .tn-es-hcard:hover { border-color: var(--tn-gold); }
+.tn20 .tn-es-host[data-accent="gold"] .tn-es-hcard:focus-visible { outline-color: var(--tn-gold); }
+.tn20 .tn-es-host[data-accent="lime"] .tn-es-hcard:hover { border-color: var(--tn-lime); }
+.tn20 .tn-es-hcard-text { min-width: 0; display: block; }
+.tn20 .tn-es-hcard-desc { display: block; margin-top: 6px; font-size: clamp(10.5px, 1cqw, 13px); font-weight: 600; color: #b9af9b; text-wrap: pretty; }
+
+/* ── Päivän visa ──────────────────────────────────────────────────────── */
+.tn20 .tn-es-day {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: stretch;
+  gap: clamp(12px, 1.3cqw, 20px);
+  padding: clamp(12px, 1.3cqw, 20px);
+  border: 1px solid var(--tn-line);
+  border-radius: clamp(14px, 1.5cqw, 20px);
+  background: #1c1810;
+  min-height: clamp(200px, calc(140px + 8cqw), 260px);
+}
+.tn20 .tn-es-day--empty { align-items: center; justify-content: center; color: #8e8676; font-weight: 600; }
+.tn20 .tn-es-day-media {
   position: relative;
-  flex: none;
-  width: 140px;
-  height: 140px;
+  flex: 26 1 min(100%, 210px);
+  min-height: clamp(140px, 15cqw, 260px);
+  overflow: hidden;
+  border-radius: clamp(10px, 1.1cqw, 14px);
+  background: repeating-linear-gradient(135deg, #1a160d 0 11px, #221c10 11px 22px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px;
 }
-.tn20 .tn-es-dq-portrait img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: 50% 30%;
-  display: block;
-  /* Violetti duotone sitoo vaihtelevat Wikipedia-kuvat brändiin (README) */
-  filter: grayscale(1) sepia(1) hue-rotate(215deg) saturate(3.2) brightness(0.95);
-}
-.tn20 .tn-es-dq-credit {
-  position: absolute;
-  left: 6px;
-  bottom: 6px;
-  font-size: 9px;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  color: rgba(245, 240, 230, 0.75);
-  background: rgba(14, 12, 6, 0.6);
-  padding: 2px 6px;
-  border-radius: 6px;
-  text-decoration: none;
-}
-.tn20 .tn-es-dq-band-landscape { height: 140px; }
-.tn20 .tn-es-dq-bandimg {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-.tn20 .tn-es-dq-scrim {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(90deg, rgba(19, 17, 9, 0.92) 0%, rgba(19, 17, 9, 0.6) 40%, rgba(19, 17, 9, 0.15) 100%);
-}
-.tn20 .tn-es-dq-band-none {
-  background: #1b1710;
-  border-bottom: 1px solid #241e13;
-}
-.tn20 .tn-es-dq-band-none .tn-es-dq-band-text { padding-top: 20px; padding-bottom: 20px; }
-.tn20 .tn-es-dq-band-text {
-  position: relative;
+.tn20 .tn-es-day-media img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
+.tn20 .tn-es-day-ph { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: clamp(9px, 0.95cqw, 12px); letter-spacing: 0.14em; text-transform: uppercase; color: #8e8676; text-align: center; }
+.tn20 .tn-es-day-body {
+  flex: 74 1 min(100%, 300px);
+  min-width: 0;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  gap: 8px;
-  padding: 0 30px;
-  min-width: 0;
+  gap: clamp(8px, 0.9cqw, 13px);
 }
-.tn20 .tn-es-dq-chip {
+.tn20 .tn-es-day-badge {
   align-self: flex-start;
-  font-size: 10px;
+  padding: 5px 11px;
+  border-radius: 999px;
+  border: 1px solid rgba(232, 163, 32, 0.5);
+  background: rgba(232, 163, 32, 0.12);
+  font-size: clamp(9.5px, 0.9cqw, 11.5px);
   font-weight: 800;
   letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: #f2c874;
-  border: 1px solid rgba(232, 163, 32, 0.5);
-  background: rgba(232, 163, 32, 0.14);
-  border-radius: 999px;
-  padding: 4px 10px;
+  color: var(--tn-gold);
 }
-.tn20 .tn-es-dq-name {
-  margin: 0;
-  font-family: Archivo, sans-serif;
-  font-weight: 900;
-  font-variation-settings: "wdth" 76;
-  font-size: clamp(22px, 2.4vw, 34px);
-  line-height: 1.08;
-  letter-spacing: -0.01em;
-  text-transform: uppercase;
-  /* Henkilön nimi on kortin tärkein tieto eikä sitä SAA KOSKAAN katkaista
-     (Heikki 23.8.2026, kahdesti täsmennetty — myös poikkeuksellisen pitkä
-     nimi kuten "Sirkka-Liisa Anttila-Jääskeläinen" pitää näkyä kokonaan).
-     Aiempi white-space:nowrap + ellipsis katkaisi nimen mobiilissa, ja
-     ensimmäinen korjaus (line-clamp: 3) olisi silti katkaissut äärimmäisen
-     pitkän nimen. Siksi EI mitään rivimäärän kattoa — rivitys sallittu
-     vapaasti niin monelle riville kuin nimi tarvitsee, ja kortti (ks.
-     .tn-es-dq-band-portrait/.tn-es-dq-doneperson min-height alla) kasvaa
-     mukana. */
-  overflow-wrap: break-word;
-}
-.tn20 .tn-es-dq-name b { color: #e8a320; font-weight: inherit; }
-.tn20 .tn-es-dq-meta2 {
-  font-size: 14px;
-  color: #a79e8c;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
+.tn20 .tn-es-day-badge--done { border-color: rgba(182, 255, 60, 0.5); background: rgba(182, 255, 60, 0.12); color: var(--tn-lime); }
+/* CD clamp(20px, 2.1cqw, 32px); nimi voi olla mikä tahansa (ei koskaan katkaista
+   — 23.8. vaatimus) → rivitys sallittu sanojen välistä, kortti kasvaa. */
+.tn20 .tn-es-day-title { margin: 0; font-size: clamp(20px, 2.1cqw, 32px); line-height: 0.98; letter-spacing: -0.02em; text-wrap: balance; }
+.tn20 .tn-es-day-meta { font-size: clamp(11px, 1.05cqw, 14px); font-weight: 700; color: #8e8676; }
+.tn20 .tn-es-day-lede { margin: 0; max-width: 60ch; font-size: clamp(12.5px, 1.2cqw, 16px); line-height: 1.45; color: #cfc7b6; text-wrap: pretty; }
+.tn20 .tn-es-day-actions { display: flex; flex-wrap: wrap; align-items: center; gap: clamp(10px, 1.2cqw, 20px); margin-top: clamp(2px, 0.4cqw, 6px); }
+.tn20 .tn-es-day-actions .tn-es-btn { font-size: clamp(13px, 1.3cqw, 17px); }
 
-.tn20 .tn-es-dq-q { padding: 30px; }
-.tn20 .tn-es-dq-label {
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: #8e8676;
-}
-.tn20 .tn-es-dq-bars {
-  display: flex;
-  gap: 4px;
-  margin: 12px 0 26px;
-}
-.tn20 .tn-es-dq-bar {
-  flex: 1;
-  height: 5px;
-  border-radius: 99px;
-  background: #2c2517;
-}
-.tn20 .tn-es-dq-bar[data-state="done"] { background: var(--tn-lime); }
-.tn20 .tn-es-dq-bar[data-state="current"] { background: #e8a320; }
-.tn20 .tn-es-dq-qtext {
-  margin: 0 0 22px;
-  font-family: Archivo, sans-serif;
-  font-weight: 800;
-  font-variation-settings: "wdth" 88;
-  font-size: clamp(22px, 2.3vw, 32px);
-  line-height: 1.14;
-  letter-spacing: -0.015em;
-  text-wrap: balance;
-}
-.tn20 .tn-es-dq-opts {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-}
-.tn20 .tn-es-dq-opt {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  min-height: 64px;
-  padding: 14px 20px;
-  border: 1px solid #2c2517;
-  border-radius: 14px;
-  background: #0e0c06;
-  color: var(--tn-text);
-  font: inherit;
-  font-size: 17px;
-  font-weight: 600;
-  text-align: left;
-  cursor: pointer;
-}
-.tn20 .tn-es-dq-opt:hover { border-color: var(--tn-lime); background: #141208; }
-.tn20 .tn-es-dq-opt:focus-visible { outline: 2px solid var(--tn-lime); outline-offset: 2px; }
-.tn20 .tn-es-dq-opt[data-state="correct"] {
-  border-color: var(--tn-lime);
-  background: rgba(182, 255, 60, 0.1);
-}
-.tn20 .tn-es-dq-opt[data-state="dim"] {
-  color: #5f594c;
-  cursor: default;
-}
-.tn20 .tn-es-dq-opt[data-state="dim"] .tn-es-dq-optletter { background: #1a1610; }
-.tn20 .tn-es-dq-optletter {
-  flex: none;
-  width: 28px;
-  height: 28px;
-  display: grid;
-  place-items: center;
-  border-radius: 8px;
-  background: #221c11;
-  color: #a79e8c;
-  font-size: 13px;
-  font-weight: 800;
-}
-.tn20 .tn-es-dq-opttext { min-width: 0; }
-.tn20 .tn-es-dq-optcheck { margin-left: auto; color: var(--tn-lime); font-weight: 800; }
-
-/* Pelattu tänään -tila — tekstit kuvan päällä, kompakti (Heikki 18.8.2026) */
-.tn20 .tn-es-dq-done {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  min-height: 260px;
-}
-.tn20 .tn-es-dq-donebg {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-.tn20 .tn-es-dq-donebg[data-duotone] {
-  object-position: 50% 25%;
-  filter: grayscale(1) sepia(1) hue-rotate(215deg) saturate(3.2) brightness(0.95);
-}
-.tn20 .tn-es-dq-donescrim {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(0deg, rgba(19, 17, 9, 0.9) 0%, rgba(19, 17, 9, 0.55) 55%, rgba(19, 17, 9, 0.3) 100%);
-}
-.tn20 .tn-es-dq-donehead {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  padding: 24px 30px 0;
-}
-.tn20 .tn-es-dq-donemsg {
-  position: relative;
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  gap: 8px;
-  padding: 16px 30px 26px;
-}
-.tn20 .tn-es-dq-done .tn-es-dq-label { color: #e6dfd0; }
-/* Henkilövisan pelattu-tila: sama asettelu kuin alkunäkymässä — neliökuva
-   vasemmalla, lopputekstit oikealla (Heikki 19.8.2026) */
-.tn20 .tn-es-dq-doneperson {
-  flex-direction: row;
-  align-items: stretch;
-  min-height: 180px;
-  background: linear-gradient(100deg, rgba(124, 79, 201, 0.3), rgba(23, 20, 13, 0) 62%), #1b1710;
-}
-.tn20 .tn-es-dq-doneperson .tn-es-dq-portrait {
-  width: 180px;
-  height: auto;
-  min-height: 180px;
-}
-.tn20 .tn-es-dq-doneside {
-  position: relative;
-  flex: 1;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: 8px;
-  padding: 22px 30px;
-}
-.tn20 .tn-es-dq-donerow {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  margin-top: 10px;
-}
-.tn20 .tn-es-dq-donerow .tn-es-dq-played-icon {
-  width: 36px;
-  height: 36px;
-  font-size: 16px;
-  flex: none;
-}
-.tn20 .tn-es-dq-donerow .tn-es-dq-played-msg { font-size: 14px; }
-.tn20 .tn-es-dq-played-icon {
-  width: 44px;
-  height: 44px;
-  display: grid;
-  place-items: center;
-  border-radius: 999px;
-  background: var(--tn-lime);
-  color: #131109;
-  font-weight: 900;
-  font-size: 20px;
-}
-.tn20 .tn-es-dq-played-msg { margin: 0; color: var(--tn-text-soft); font-size: 15px; }
-
-/* ── Putkinauha (64 px, toissijainen) ──────────────────────────────────── */
-.tn20 .tn-es-streak {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 18px;
-  min-height: 64px;
-  margin-top: 12px;
-  padding: 8px 24px;
-  border: 1px solid #241e13;
-  border-radius: 16px;
-  background: #141108;
-}
-.tn20 .tn-es-streak-left { display: flex; align-items: center; gap: 12px; min-width: 0; }
-.tn20 .tn-es-streak-flame { font-size: 18px; }
-.tn20 .tn-es-streak-text {
-  display: flex;
-  align-items: baseline;
-  gap: 8px;
-  min-width: 0;
-  font-size: 15px;
-}
-.tn20 .tn-es-streak-text b { font-weight: 700; color: var(--tn-text); white-space: nowrap; }
-.tn20 .tn-es-streak-dot { color: #3a3122; }
-.tn20 .tn-es-streak-sub {
-  color: #8e8676;
-  font-weight: 400;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-/* Viikkorivi (.tn-es-streak-week/-day/-daylabel/-dot2) poistettu 23.8.2026
-   (Heikin päätös) — nollautui joka viikko, sekoitti kuukausien mittaisilla
-   putkilla. Iso lukema (.tn-es-streak-text b) on ainoa totuus pituudesta. */
-
-/* ── Kuratoidut nostot (Pinnalla nyt) ──────────────────────────────────── */
-.tn20 .tn-es-spots { display: flex; flex-direction: column; gap: 16px; }
-.tn20 .tn-es-spot {
-  display: flex;
-  height: 284px;
-  border: 1px solid #2c2517;
-  border-radius: 20px;
-  background: #17140d;
-  overflow: hidden;
-  text-decoration: none;
-  color: inherit;
-}
-.tn20 .tn-es-spot:hover { border-color: #4a3f28; }
-.tn20 .tn-es-spot:focus-visible { outline: 2px solid var(--tn-lime); outline-offset: 2px; }
-.tn20 .tn-es-spot[data-side="right"] { flex-direction: row-reverse; }
-.tn20 .tn-es-spot-media {
-  position: relative;
-  flex: none;
-  width: 63%;
-  overflow: hidden;
-}
-.tn20 .tn-es-spot-media img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-}
-.tn20 .tn-es-spot-media::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  background: linear-gradient(90deg, rgba(23, 20, 13, 0) 62%, #17140d 100%);
-}
-.tn20 .tn-es-spot[data-side="right"] .tn-es-spot-media::after {
-  background: linear-gradient(270deg, rgba(23, 20, 13, 0) 62%, #17140d 100%);
-}
-.tn20 .tn-es-spot-body {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: 14px;
-  padding: 0 34px;
-  min-width: 0;
-}
-.tn20 .tn-es-spot-eyebrow {
-  font-size: 11px;
-  font-weight: 800;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  color: #e8a320;
-}
-.tn20 .tn-es-spot-title {
-  margin: 0;
-  font-family: Archivo, sans-serif;
-  font-weight: 900;
-  font-variation-settings: "wdth" 76;
-  font-size: clamp(30px, 2.9vw, 42px);
-  line-height: 0.94;
-  letter-spacing: -0.015em;
-  text-transform: uppercase;
-}
-.tn20 .tn-es-spot-desc {
-  margin: 0;
-  color: #a79e8c;
-  font-size: 16px;
-  line-height: 1.5;
-}
-.tn20 .tn-es-spot-action {
-  font-size: 14px;
-  font-weight: 700;
-  color: var(--tn-lime);
-}
-.tn20 .tn-es-spot:hover .tn-es-spot-action { color: #cbff6e; }
-
-/* Suomen historia -noston aikajanaoverlay (koristeellinen, README) */
-.tn20 .tn-es-tl-shade {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  height: 112px;
-  background: linear-gradient(0deg, rgba(14, 12, 6, 0.92) 0%, rgba(14, 12, 6, 0.72) 52%, rgba(14, 12, 6, 0) 100%);
-}
-.tn20 .tn-es-tl {
-  position: absolute;
-  left: 26px;
-  right: 34px;
-  bottom: 22px;
-  display: flex;
-  align-items: flex-end;
-}
-.tn20 .tn-es-tl-stop { flex: 1; min-width: 0; }
-.tn20 .tn-es-tl-stop:last-child { flex: none; }
-.tn20 .tn-es-tl-era {
-  font-family: Archivo, sans-serif;
-  font-weight: 800;
-  font-variation-settings: "wdth" 84;
-  font-size: 12px;
-  line-height: 1;
-  letter-spacing: 0.02em;
-  text-transform: uppercase;
-  color: #f5f0e6;
-  white-space: nowrap;
-}
-.tn20 .tn-es-tl-row {
-  display: flex;
-  align-items: center;
-  margin: 9px 0 7px;
-}
-.tn20 .tn-es-tl-dot {
-  flex: none;
-  width: 8px;
-  height: 8px;
-  border-radius: 999px;
-  background: rgba(182, 255, 60, 0.72);
-}
-.tn20 .tn-es-tl-stop:first-child .tn-es-tl-dot,
-.tn20 .tn-es-tl-stop:last-child .tn-es-tl-dot {
-  background: var(--tn-lime);
-  box-shadow: 0 0 0 3px rgba(182, 255, 60, 0.18);
-}
-.tn20 .tn-es-tl-line {
-  flex: 1;
-  height: 1px;
-  background: rgba(245, 240, 230, 0.3);
-}
-.tn20 .tn-es-tl-year {
-  font-size: 9.5px;
-  font-weight: 700;
-  letter-spacing: 0.09em;
-  color: #a79e8c;
-  white-space: nowrap;
-}
-
-/* ── Uusimmat visat -tikkeri ───────────────────────────────────────────── */
+/* ── Uusimmat visat -ticker ───────────────────────────────────────────── */
 .tn20 .tn-es-ticker {
-  margin-top: 64px;
-  padding: 26px 0;
-  border-top: 1px solid #241e13;
-  border-bottom: 1px solid #241e13;
-  background: #0f0d07;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scrollbar-width: none;
+  mask-image: linear-gradient(90deg, transparent 0, #000 3%, #000 92%, transparent 100%);
+  -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 3%, #000 92%, transparent 100%);
 }
-.tn20 .tn-es-ticker-head {
-  display: flex;
-  align-items: center;
-  gap: 18px;
-  padding: 0 80px 18px;
-  max-width: 1440px;
-  margin: 0 auto;
-}
-.tn20 .tn-es-ticker-label {
-  flex: none;
-  font-size: 12px;
-  font-weight: 800;
-  letter-spacing: 0.22em;
-  text-transform: uppercase;
-  color: #8e8676;
-}
-.tn20 .tn-es-ticker-rule { flex: 1; height: 1px; background: #241e13; }
+.tn20 .tn-es-ticker::-webkit-scrollbar { display: none; }
 .tn20 .tn-es-ticker-track {
-  position: relative;
-  overflow: hidden;
-}
-.tn20 .tn-es-ticker-track::before,
-.tn20 .tn-es-ticker-track::after {
-  content: "";
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  width: 120px;
-  z-index: 1;
-  pointer-events: none;
-}
-.tn20 .tn-es-ticker-track::before {
-  left: 0;
-  background: linear-gradient(90deg, #0f0d07, rgba(15, 13, 7, 0));
-}
-.tn20 .tn-es-ticker-track::after {
-  right: 0;
-  background: linear-gradient(270deg, #0f0d07, rgba(15, 13, 7, 0));
-}
-.tn20 .tn-es-ticker-row {
   display: flex;
-  gap: 12px;
+  flex-wrap: nowrap;
+  gap: clamp(9px, 1cqw, 14px);
   width: max-content;
-  animation: tn-es-ticker 46s linear infinite;
+  padding: 2px 0 4px;
+  animation: tnTicker 52s linear infinite;
 }
-@keyframes tn-es-ticker {
-  from { transform: translateX(0); }
-  to { transform: translateX(-50%); }
+.tn20 .tn-es-ticker:hover .tn-es-ticker-track,
+.tn20 .tn-es-ticker:focus-within .tn-es-ticker-track { animation-play-state: paused; }
+@keyframes tnTicker { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+@container (max-width: 1100px) { .tn20 .tn-es-ticker-track { animation: none; } }
+.tn20 .tn-es-chip {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  min-height: 44px;
+  padding: 0 clamp(13px, 1.3cqw, 18px);
+  border: 1px solid var(--tn-line);
+  border-radius: 999px;
+  background: #15120a;
+  color: #cfc7b6;
+  font-size: clamp(12px, 1.1cqw, 14.5px);
+  font-weight: 600;
+  white-space: nowrap;
 }
-.tn20 .tn-es-ticker-chip {
-  display: flex;
+.tn20 .tn-es-chip i { width: 7px; height: 7px; border-radius: 999px; background: var(--tn-lime); }
+.tn20 .tn-es-chip:hover { border-color: var(--tn-lime); color: #f5f0e6; }
+.tn20 .tn-es-chip:focus-visible { outline: 2px solid var(--tn-lime); outline-offset: 2px; }
+.tn20 .tn-es-chip-mode { font-size: 11px; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; color: var(--tn-gold); }
+
+/* ── Footer ───────────────────────────────────────────────────────────── */
+.tn20 .tn-es-foot { border-top: 1px solid #241e13; background: #0b0a06; }
+.tn20 .tn-es-foot-in { width: 100%; max-width: 1280px; margin-inline: auto; padding: clamp(26px, 3cqw, 52px) clamp(16px, 3.4cqw, 48px) clamp(18px, 2cqw, 30px); }
+.tn20 .tn-es-foot-grid { display: flex; flex-wrap: wrap; gap: clamp(20px, 2.4cqw, 40px); }
+.tn20 .tn-es-foot-brand { flex: 1.4 1 min(100%, 300px); min-width: 0; }
+.tn20 .tn-es-foot-logo { display: flex; align-items: baseline; gap: 1px; font-size: clamp(20px, 2cqw, 28px); line-height: 1; letter-spacing: -0.012em; }
+.tn20 .tn-es-foot-desc { margin: 10px 0 0; max-width: 38ch; font-size: clamp(12.5px, 1.15cqw, 15px); line-height: 1.5; color: #b9af9b; text-wrap: pretty; }
+.tn20 .tn-es-foot-h { margin-bottom: 3px; font-size: clamp(10px, 0.9cqw, 11.5px); font-weight: 800; letter-spacing: 0.16em; text-transform: uppercase; color: #8e8676; }
+.tn20 .tn-es-foot-brand .tn-es-foot-h { margin: clamp(16px, 1.8cqw, 26px) 0 0; }
+.tn20 .tn-es-foot-ig {
+  display: inline-flex;
   align-items: center;
   gap: 10px;
-  height: 52px;
-  padding: 0 20px;
-  border: 1px solid #241e13;
+  margin-top: 10px;
+  min-height: 44px;
+  padding: 0 16px 0 13px;
+  border: 1px solid var(--tn-line);
   border-radius: 12px;
-  background: #141108;
-  white-space: nowrap;
-  text-decoration: none;
-}
-.tn20 .tn-es-ticker-chip i {
-  width: 6px;
-  height: 6px;
-  border-radius: 999px;
-  background: var(--tn-lime);
-}
-.tn20 .tn-es-ticker-chip b { font-size: 15px; font-weight: 600; color: #e6dfd0; }
-.tn20 .tn-es-ticker-chip span { font-size: 12px; font-weight: 600; color: #7c7462; }
-@media (prefers-reduced-motion: reduce) {
-  .tn20 .tn-es-ticker-row { animation: none; }
-  .tn20 .tn-es-ticker-track { overflow-x: auto; }
-}
-
-/* ── Footer ────────────────────────────────────────────────────────────── */
-/* HUOM: padding-block, EI padding-shorthandia — shorthand nollaisi
-   .tn-es-shellin sivupehmusteet (sama oppi kuin tnm-sectionissa 14.8.2026) */
-.tn20 .tn-es-foot {
-  padding-block: 56px 40px;
-}
-.tn20 .tn-es-foot-grid {
-  display: grid;
-  grid-template-columns: 1.4fr 1fr 1fr 1fr;
-  gap: 40px;
-  border-bottom: 1px solid #241e13;
-  padding-bottom: 36px;
-}
-.tn20 .tn-es-foot-desc {
-  margin: 14px 0 0;
-  font-size: 14px;
-  line-height: 1.55;
-  color: #7c7462;
-  max-width: 34ch;
-}
-.tn20 .tn-es-foot-some {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-top: 22px;
-  font-size: 13px;
-  font-weight: 600;
-  color: #a79e8c;
-}
-.tn20 .tn-es-foot-ig {
-  display: grid;
-  place-items: center;
-  width: 36px;
-  height: 36px;
-  border: 1px solid #2c2517;
-  border-radius: 10px;
-  background: #141108;
   color: #cfc7b6;
+  font-size: clamp(12.5px, 1.15cqw, 14.5px);
+  font-weight: 700;
 }
-.tn20 .tn-es-foot-ig:hover { border-color: #4a3f28; background: #1a1610; }
-.tn20 .tn-es-foot-ig svg,
-.tn20 .tn-es-foot-ig img { width: 20px; height: 20px; display: block; }
-.tn20 .tn-es-foot h4 {
-  margin: 0 0 14px;
-  font-size: 11px;
-  font-weight: 800;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  color: #5f594c;
-}
-.tn20 .tn-es-foot-col { display: flex; flex-direction: column; gap: 11px; }
-.tn20 .tn-es-foot-col a {
-  font-size: 14px;
-  color: #a79e8c;
-  text-decoration: none;
-}
-.tn20 .tn-es-foot-col a:hover { color: #f5f0e6; }
+.tn20 .tn-es-foot-ig:hover { border-color: var(--tn-gold); color: #f5f0e6; }
+.tn20 .tn-es-foot-col { flex: 1 1 min(46%, 170px); min-width: 0; display: flex; flex-direction: column; gap: 9px; }
+.tn20 .tn-es-foot-col a { font-size: clamp(12.5px, 1.15cqw, 14.5px); font-weight: 600; color: #cfc7b6; }
+.tn20 .tn-es-foot-col a:hover { color: var(--tn-lime); }
+.tn20 .tn-es-foot a:focus-visible { outline: 2px solid var(--tn-lime); outline-offset: 2px; border-radius: 4px; }
 .tn20 .tn-es-foot-base {
+  margin-top: clamp(20px, 2.2cqw, 34px);
+  padding-top: clamp(14px, 1.5cqw, 22px);
+  border-top: 1px solid #241e13;
   display: flex;
+  flex-wrap: wrap;
+  align-items: center;
   justify-content: space-between;
-  gap: 16px;
-  padding-top: 22px;
-  font-size: 13px;
-  color: #5f594c;
+  gap: 10px;
+  font-size: clamp(11px, 1cqw, 13px);
+  font-weight: 600;
+  color: #8e8676;
 }
 
-/* ── Responsiivisuus (README) ──────────────────────────────────────────── */
-@media (max-width: 1279px) {
-  .tn20 .tn-es-spot { height: 260px; }
-  .tn20 .tn-es-spot-media { width: 60%; }
-  .tn20 .tn-es-ticker-head { padding-left: 48px; padding-right: 48px; }
-}
-@media (max-width: 1023px) {
-  .tn20 .tn-es-hero {
-    grid-template-columns: 1fr;
-    gap: 26px;
-  }
-  .tn20 .tn-es-hero-media { order: -1; height: 280px; }
-  .tn20 .tn-es-spot { flex-direction: column !important; height: auto; }
-  .tn20 .tn-es-spot-media { width: 100%; aspect-ratio: 16 / 9; }
-  .tn20 .tn-es-spot-media::after {
-    background: linear-gradient(0deg, #17140d 0%, rgba(23, 20, 13, 0) 40%) !important;
-  }
-  .tn20 .tn-es-spot-body { padding: 22px 26px 26px; }
-  .tn20 .tn-es-dq-opts { grid-template-columns: 1fr; }
-  .tn20 .tn-es-foot-grid { grid-template-columns: 1fr 1fr; }
-  .tn20 .tn-es-ticker-head { padding-left: 32px; padding-right: 32px; }
-}
-@media (max-width: 767px) {
-  /* Hero kompaktiksi (Heikki 18.8.2026): otsikko kuvan päälle vasempaan
-     laitaan, duo oikealle, kappale + proof pointit piiloon — Päivän visa
-     nousee heti näkyviin. */
-  .tn20 .tn-es-hero {
-    display: block;
-    position: relative;
-    padding-top: 12px;
-    padding-bottom: 18px;
-  }
-  .tn20 .tn-es-hero-media {
-    height: 300px;
-    order: 0;
-  }
-  .tn20 .tn-es-hero-media img { object-position: 74% center !important; }
-  .tn20 .tn-es-hero-media::before {
-    background: linear-gradient(90deg, rgba(19, 17, 9, 0.85) 0%, rgba(19, 17, 9, 0.45) 42%, rgba(19, 17, 9, 0) 70%);
-  }
-  .tn20 .tn-es-hero-text {
-    position: absolute;
-    left: 40px;
-    right: 40px;
-    bottom: 40px;
-    z-index: 1;
-  }
-  .tn20 .tn-es-hero h1 { font-size: 38px; max-width: 8ch; }
-  .tn20 .tn-es-hero-p,
-  .tn20 .tn-es-proofs { display: none; }
-  /* Historia-aikajana kapealla: vain pisteet + vuosiluvut (aikakausien
-     nimet menivät päällekkäin — Heikin havainto 18.8.2026) */
-  .tn20 .tn-es-tl-era { display: none; }
-  .tn20 .tn-es-dq-done { min-height: 220px; }
-  .tn20 .tn-es-dq-donehead { padding: 18px 18px 0; }
-  .tn20 .tn-es-dq-donemsg { padding: 12px 18px 20px; }
-  .tn20 .tn-es-dq-doneperson { min-height: 160px; }
-  .tn20 .tn-es-dq-doneperson .tn-es-dq-portrait { width: 104px; min-height: 160px; }
-  .tn20 .tn-es-dq-doneside { padding: 16px 18px; }
-  .tn20 .tn-es-dq-band-portrait { min-height: 104px; }
-  .tn20 .tn-es-dq-portrait { width: 104px; height: 104px; align-self: flex-start; }
-  .tn20 .tn-es-dq-band-landscape { height: 104px; }
-  .tn20 .tn-es-dq-band-text { padding: 0 18px; }
-  .tn20 .tn-es-dq-q { padding: 20px 18px; }
-  .tn20 .tn-es-h2 { font-size: 30px; }
-  .tn20 .tn-es-streak {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 10px;
-    padding: 14px 18px;
-  }
-  /* Bugi (havaittu 23.8.2026, viikkorivin poiston yhteydessä — oli
-     olemassa jo ennen sitäkin): align-items:flex-start yllä jättää
-     .tn-es-streak-left:n leveyden rajoittamattomaksi, joten sen sisällä
-     oleva .tn-es-streak-sub ei koskaan törmää reunaan eikä siksi
-     leikkaannu "…"-merkillä (vaikka overflow/ellipsis on asetettu) —
-     teksti valuu kortin ulkopuolelle "Aloita putkesi" -tilassa kapealla.
-     width:100% palauttaa rajan, jolloin ellipsis toimii kuten pitää. */
-  .tn20 .tn-es-streak-left { width: 100%; }
-  /* Aikajana supistuu neljään pysäkkiin kapealla (README) */
-  .tn20 .tn-es-tl-stop[data-narrow-hide] { display: none; }
-  .tn20 .tn-es-ticker-head { padding-left: 20px; padding-right: 20px; }
-  .tn20 .tn-es-foot-grid { grid-template-columns: 1fr; gap: 26px; }
-  .tn20 .tn-es-foot-base { flex-direction: column; gap: 8px; }
+/* ── Reduced motion ───────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .tn20 .tn-es-ticker-track { animation: none; }
+  .tn20 .tn-es-arrow { transition: none; }
+  .tn20 a:hover .tn-es-arrow,
+  .tn20 a:focus-visible .tn-es-arrow { transform: none; }
 }
