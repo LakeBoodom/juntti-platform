@@ -9,6 +9,7 @@ import { kulttuuriImg } from "@/lib/kulttuuri";
 import { luontoImg } from "@/lib/luonto";
 import { urheiluImg } from "@/lib/urheilu";
 import { maantietoImg } from "@/lib/maantieto";
+import { KAUPUNGIT } from "@/lib/kaupungit";
 import { MOTIF_PATHS, motifPathFor } from "@/components/tn20/motif-paths";
 import { LearnArticle, type Learn } from "@/components/tn20/LearnArticle";
 import GameClient, { type GameQuiz } from "./GameClient";
@@ -378,6 +379,10 @@ export default async function Peli20({
     topicImg,
     accent,
     isSankari,
+    /* SUOMEN KAUPUNGIT -matkapassi (28.8.2026): kun visa on yksi 20:sta
+       kaupunkivisasta, GameClient kirjoittaa leiman localStorageen pelin
+       päättyessä (ks. lib/kaupungit.ts, KaupunkiPelilauta.tsx). */
+    citySlug: KAUPUNGIT.find((c) => c.quizSlug === quiz.slug)?.id ?? null,
     questions: (qs ?? []).map((row) => {
       const answers = (row.answers as Array<{ text: string; is_correct: boolean }>) ?? [];
       const correct = answers.find((a) => a.is_correct)?.text ?? answers[0]?.text ?? "";
