@@ -7,6 +7,7 @@ import Crumbs from "@/components/tn20/Crumbs";
 import { NAV_COLLECTIONS, NAV_MODES, hubHref } from "@/lib/nav";
 import { JP_CLUBS, JP_EURO, JP_PL_GENERAL, JP_CL, JP_FINNS } from "@/lib/jalkapallo";
 import { JK_TEAMS, JK_DERBIES, JK_GENERAL, JK_LIONS, JK_NHL } from "@/lib/jaakiekko";
+import { KAUPUNGIT } from "@/lib/kaupungit";
 
 export const dynamic = "force-dynamic";
 
@@ -22,6 +23,9 @@ const JK_SLUGS = new Set(
     ...[...JK_DERBIES, ...JK_GENERAL, ...JK_LIONS, ...JK_NHL].map((c) => c.quizSlug),
   ].filter((s): s is string => Boolean(s)),
 );
+/* Suomen kaupungit (28.8.2026): visat ovat kannassa yleistieto-kokoelmaa,
+   sama laskentaperiaate kuin Jääkiekko/Jalkapallo. */
+const KAUPUNGIT_SLUGS = new Set(KAUPUNGIT.map((c) => c.quizSlug));
 
 async function getCounts(): Promise<Record<string, number>> {
   try {
@@ -33,6 +37,7 @@ async function getCounts(): Promise<Record<string, number>> {
       if (r.collection) counts[r.collection] = (counts[r.collection] ?? 0) + 1;
       if (r.slug && JP_SLUGS.has(r.slug)) counts.jalkapallo = (counts.jalkapallo ?? 0) + 1;
       if (r.slug && JK_SLUGS.has(r.slug)) counts.jaakiekko = (counts.jaakiekko ?? 0) + 1;
+      if (r.slug && KAUPUNGIT_SLUGS.has(r.slug)) counts.kaupungit = (counts.kaupungit ?? 0) + 1;
     }
     return counts;
   } catch {
