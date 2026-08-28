@@ -107,6 +107,7 @@ export const FOOTER_COLLECTIONS = [
   { label: "Elokuvat", href: "/2-0/kokoelma/elokuvat" },
   { label: "Maantieto", href: "/2-0/kokoelma/matkakohteet" },
   { label: "Suomen luonto", href: "/2-0/kokoelma/luonto" },
+  { label: "Suomen kaupungit", href: "/2-0/kokoelma/kaupungit" },
 ];
 
 export const FOOTER_MODES = [
