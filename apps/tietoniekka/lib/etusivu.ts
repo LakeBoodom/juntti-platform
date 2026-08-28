@@ -1,116 +1,129 @@
-// TIETONIEKKA 2.0 — ETUSIVUN KURATOITU SISÄLTÖ (design_handoff_etusivu_2026,
-// toteutettu 18.8.2026). Nostojen järjestys, tekstit ja kuvat vaihtuvat kauden
-// mukaan — README vaatii CMS-ohjatun listan; tämä config on sen ensimmäinen
-// versio (copy-passi ja kausivaihdot tehdään tästä yhdestä paikasta, kunnes
-// nostot siirretään kantaan/adminiin).
+// TIETONIEKKA 2.0 — ETUSIVUN KURATOITU SISÄLTÖ (design_handoff_etusivu_2026_prod,
+// toteutettu 28.8.2026 — korvasi 18.8. version: hero-duo, viisi nostoa, aikajana
+// ja putkinauha poistuivat). Kaikki etusivun kuratoidut listat yhdestä paikasta:
+// ylätunnisteen nostot, kategoriarivi, lippuhero, Suositut kokoelmat, Laura &
+// Mikko -kortit ja footer. Kausivaihdot ja copy-passi tehdään tästä tiedostosta.
 //
-// Linkkihuomiot (Heikki 17.8.2026, päivitetty 25.8.2026):
-// - Suomilätkä ja Futiskausi olivat placeholder-linkkejä urheiluhubiin kunnes
-//   jääkiekko (22.8.) ja jalkapallo (25.8.) saivat omat teemakokoelmasivut —
-//   molemmat osoittavat nyt niille.
+// Kuvat: public/20/etusivu/*.webp (CD-paketin img/, muunnettu 28.8.2026; kortit
+// 960 px, hero 1600 px, juontajat 300 px neliö). `pos` = designin
+// background-position per kuva (README: "kuvien rajaukset — älä arvaa").
 
-export type Spotlight = {
-  key: string;
-  eyebrow: string; // pieni oranssi yläotsikko
-  title: string; // iso Archivo-otsikko
-  desc: string; // enintään yksi lyhyt kuvaus
-  img: string;
-  imgPos: string; // object-position (README:n asseteista)
-  side: "left" | "right"; // kuvan puoli — vuorottelee riveittäin
-  href: string;
-  timeline?: boolean; // Suomen historia -noston aikajanaoverlay
-};
+/** Ylätunnisteen tagline (design: "500+ visaa" = enemmän kuin 500, Heikki 28.8.:
+    riittävä tarkkuus — ei lasketa kannasta). */
+export const SITE_TAGLINE = "Suomalainen tietovisasivusto · 500+ visaa";
 
-export const ETUSIVU_HERO = {
-  img: "/20/etusivu/hero-duo.webp",
-  imgPos: "50% 32%",
-  /* Proof pointit (design): yksi inline-rivi, ei pillereitä eikä nappeja */
-  proofs: ["Testaa tietosi ja opi samalla", "Valtavasti pelattavaa", "Jatkuvasti uutta sisältöä"],
-};
+export type HeaderPromo = { key: "uusin" | "suosittu"; kicker: string; label: string; href: string };
 
-export const SPOTLIGHTS: Spotlight[] = [
-  {
-    key: "suomilatka",
-    eyebrow: "Kotimainen superkausi ja tähtemme maailmalla",
-    title: "Suomilätkä",
-    desc: "Liigan legendat, leijonat ja ne maalit jotka muistat ulkoa.",
-    img: "/20/etusivu/sp-latka.webp",
-    imgPos: "50% 40%",
-    side: "left",
-    // 22.8.2026: Jääkiekko-teemasivu valmistui → placeholder-linkki hubiin vaihdettu
-    href: "/2-0/kokoelma/jaakiekko",
-  },
-  {
-    key: "tv",
-    eyebrow: "Ahmi vaikka kaikki samana iltana",
-    title: "TV & suoratoisto",
-    desc: "Sarjat, jotka katsoit loppuun yhdessä illassa — ja ne joita et myönnä.",
-    img: "/20/etusivu/sp-tv.webp",
-    imgPos: "50% 34%",
-    side: "right",
-    href: "/2-0/kokoelma/tv",
-  },
-  {
-    key: "futiskausi",
-    eyebrow: "Lajitietosi puntarissa",
-    title: "Futiskausi",
-    desc: "Valioliiga, maajoukkueet ja Euroopan illat. Pelaa kaikki kerralla tai yksitellen.",
-    img: "/20/etusivu/sp-futis.webp",
-    imgPos: "50% 24%",
-    side: "left",
-    // 25.8.2026: Jalkapallo-teemasivu valmistui → placeholder-linkki hubiin vaihdettu
-    href: "/2-0/kokoelma/jalkapallo",
-  },
-  {
-    key: "luonto",
-    eyebrow: "Yöttömästä yöstä kaamoksen pakkasiin",
-    title: "Suomen luonto",
-    desc: "Kuikan huuto, karhun jäljet ja järvet joiden nimet osaat.",
-    img: "/20/etusivu/sp-kuikka.webp",
-    imgPos: "50% 46%",
-    side: "right",
-    href: "/2-0/kokoelma/luonto",
-  },
-  {
-    key: "historia",
-    eyebrow: "Pelaa ja opi",
-    title: "Suomen historia",
-    desc: "Aikamatkusta halki Suomen kehityksen aina nykypäivään asti.",
-    img: "/20/etusivu/sp-historia.webp",
-    imgPos: "50% 52%",
-    side: "left",
-    href: "/2-0/kokoelma/historia",
-    timeline: true,
-  },
+/* Ylätunnisteen nostot: "Uusin kokoelma" näkyy ≥ 1100 px, "Suosittu nyt" ≥ 700 px. */
+export const HEADER_PROMOS: HeaderPromo[] = [
+  { key: "uusin", kicker: "Uusin kokoelma", label: "Suomen historia", href: "/2-0/kokoelma/historia" },
+  { key: "suosittu", kicker: "Suosittu nyt", label: "Elokuvat", href: "/2-0/kokoelma/elokuvat" },
 ];
 
-/* Historia-noston koristeellinen aikajana (README) — ei klikkikohteita,
-   koko kortti on yksi linkki. */
-export const HISTORIA_STOPS = [
-  { label: "Esihistoria", year: "N. 9000 EAA." },
-  { label: "Ruotsin aika", year: "1100-LUKU" },
-  { label: "Autonomia", year: "1809" },
-  { label: "Itsenäisyys", year: "1917" },
-  { label: "Sodat", year: "1939" },
-  { label: "Jälleenrakennus", year: "1945→" },
-];
-
-/* Footerin kokoelmalinkit (README + Heikin 17.8. nimistölinjaus:
-   "Maailman ihmeet" → Maantieto; Suomilätkä placeholder-urheilulinkillä). */
-export const FOOTER_COLLECTIONS = [
-  { label: "Suomilätkä", href: "/2-0/kokoelma/jaakiekko" },
-  { label: "Futiskausi", href: "/2-0/kokoelma/jalkapallo" },
-  { label: "TV & suoratoisto", href: "/2-0/kokoelma/tv" },
-  { label: "Suomen historia", href: "/2-0/kokoelma/historia" },
+/* Kategoriarivi (7 chippiä designin lopullisen HTML:n mukaan — README:n 9:n lista
+   hävisi HTML:lle, CD:n sääntö). */
+export const CATEGORY_CHIPS = [
   { label: "Urheilu", href: "/2-0/kokoelma/urheilu" },
-  { label: "Tunnetut henkilöt", href: "/2-0/kokoelma/tunnetut-henkilot" },
-  { label: "Elokuvat", href: "/2-0/kokoelma/elokuvat" },
+  { label: "Historia", href: "/2-0/kokoelma/historia" },
+  { label: "Luonto", href: "/2-0/kokoelma/luonto" },
   { label: "Maantieto", href: "/2-0/kokoelma/matkakohteet" },
-  { label: "Suomen luonto", href: "/2-0/kokoelma/luonto" },
+  { label: "Elokuvat", href: "/2-0/kokoelma/elokuvat" },
+  { label: "Kuvavisat", href: "/2-0/kokoelma/kuvavisat" },
+  { label: "Kaikki", href: "/2-0/kokoelmat" },
+];
+
+/* Lippuvisa-hero: CTA vie suoraan lippukortistoon (kuvavisas.type = liput). */
+export const ETUSIVU_HERO = {
+  title: "Tunnistatko tämän maan lipun?",
+  lede: "Testaa, tiedätkö vastauksen.",
+  cta: "Aloita visa →",
+  href: "/2-0/peli?kuvavisa=liput",
+  img: "/20/etusivu/hero-lippu-namibia.webp",
+  pos: "55% 48%",
+};
+
+export type CollectionCard = { key: string; title: string; href: string; img: string; pos: string; desc?: string };
+
+/* Suositut kokoelmat — 6 korttia (4:3), ei visamääriä (HTML voittaa README:n). */
+export const POPULAR_COLLECTIONS: CollectionCard[] = [
+  { key: "jaakiekko", title: "Jääkiekko", href: "/2-0/kokoelma/jaakiekko", img: "/20/etusivu/sp-latka.webp", pos: "center 28%" },
+  { key: "historia", title: "Historia", href: "/2-0/kokoelma/historia", img: "/20/etusivu/sp-historia-2026.webp", pos: "center 40%" },
+  { key: "luonto", title: "Luonto", href: "/2-0/kokoelma/luonto", img: "/20/etusivu/sp-kuikka.webp", pos: "center 46%" },
+  { key: "maantieto", title: "Maantieto", href: "/2-0/kokoelma/matkakohteet", img: "/20/etusivu/coll-maantieto.webp", pos: "center 46%" },
+  { key: "kaupungit", title: "Suomen kaupungit", href: "/2-0/kokoelma/kaupungit", img: "/20/etusivu/coll-kaupungit.webp", pos: "center 46%" },
+  { key: "elokuvat", title: "Elokuvat", href: "/2-0/kokoelma/elokuvat", img: "/20/etusivu/coll-elokuvat.webp", pos: "center 44%" },
+];
+
+export type Host = {
+  key: "laura" | "mikko";
+  name: string;
+  heading: string;
+  role: string;
+  img: string;
+  accent: "gold" | "lime";
+  cards: CollectionCard[];
+};
+
+/* Laura ja Mikko — juontajaprofiilit + 2 kokoelmakorttia kummallekin. */
+export const HOSTS: Host[] = [
+  {
+    key: "laura",
+    name: "Laura",
+    heading: "Laura suosittelee",
+    role: "Tietoniekan visaemäntä",
+    img: "/20/etusivu/host-laura.webp",
+    accent: "gold",
+    cards: [
+      { key: "tv", title: "TV & suoratoisto", desc: "Sarjat, tähdet ja suoratoistohitit", href: "/2-0/kokoelma/tv", img: "/20/etusivu/l-tv.webp", pos: "center 34%" },
+      { key: "jalkapallo", title: "Jalkapallo", desc: "Seurat, pelaajat ja arvokisat", href: "/2-0/kokoelma/jalkapallo", img: "/20/etusivu/l-jalkapallo.webp", pos: "center 38%" },
+    ],
+  },
+  {
+    key: "mikko",
+    name: "Mikko",
+    heading: "Mikko suosittelee",
+    role: "Tietoniekan visaisäntä",
+    img: "/20/etusivu/host-mikko.webp",
+    accent: "lime",
+    cards: [
+      { key: "megavisat", title: "Megavisat", desc: "Pitkät visat todellisille tietoniekoille", href: "/2-0/megavisat", img: "/20/etusivu/coll-megavisat.webp", pos: "center 50%" },
+      { key: "urheilu", title: "Urheilu", desc: "Lajit, legendat ja ennätykset", href: "/2-0/kokoelma/urheilu", img: "/20/etusivu/m-urheilu.webp", pos: "center 42%" },
+    ],
+  },
+];
+
+export const HOSTS_INTRO = {
+  title: "Laura ja Mikko – Tietoniekan visajuontajat",
+  lede: "Laura ja Mikko johdattavat Tietoniekan visoihin ja nostavat esiin omat suosikkiaiheensa.",
+};
+
+/* Footerin kokoelmalinkit — KAIKKI kokoelmat (Heikki 28.8.2026, designin
+   "Suomi"-rivin tilalle täysi lista teemasivujen järjestyksessä). */
+export const FOOTER_COLLECTIONS = [
+  { label: "TV & suoratoisto", href: "/2-0/kokoelma/tv" },
+  { label: "Urheilu", href: "/2-0/kokoelma/urheilu" },
+  { label: "Jääkiekko", href: "/2-0/kokoelma/jaakiekko" },
+  { label: "Jalkapallo", href: "/2-0/kokoelma/jalkapallo" },
+  { label: "Elokuvat", href: "/2-0/kokoelma/elokuvat" },
+  { label: "Musiikki", href: "/2-0/kokoelma/musiikki" },
+  { label: "Maantieto", href: "/2-0/kokoelma/matkakohteet" },
   { label: "Suomen kaupungit", href: "/2-0/kokoelma/kaupungit" },
+  { label: "Tunnetut henkilöt", href: "/2-0/kokoelma/tunnetut-henkilot" },
+  { label: "Kulttuuri", href: "/2-0/kokoelma/kulttuuri" },
+  { label: "Historia", href: "/2-0/kokoelma/historia" },
+  { label: "Luonto", href: "/2-0/kokoelma/luonto" },
 ];
 
 export const FOOTER_MODES = [
   { label: "Kuvavisat", href: "/2-0/kokoelma/kuvavisat" },
   { label: "Megavisat", href: "/2-0/megavisat" },
+  { label: "Päivän visa", href: "/2-0#paivan-visa" },
+  { label: "Henkilövisat", href: "/2-0/kokoelma/tunnetut-henkilot" },
 ];
+
+/* Tietoniekka-sarake: samat linkit kuin nykyisellä tietoniekka.fi:llä (Heikki
+   28.8.2026 — Tietoa/Yhteystiedot/Käyttöehdot/Saavutettavuus/Evästeet lisätään
+   vasta kun sivut ovat olemassa). */
+export const FOOTER_SITE = [{ label: "Tietosuoja", href: "/tietosuoja" }];
+
+export const FOOTER_INSTAGRAM = "https://www.instagram.com/tietoniekka/";
