@@ -39,6 +39,10 @@ export type GameQuiz = {
   topicImg?: string | null;
   accent: string;
   isSankari: boolean;
+  /** SUOMEN KAUPUNGIT -matkapassi (28.8.2026): kaupungin id (lib/kaupungit.ts)
+      kun visa on yksi 20 kaupunkivisasta, muuten null/undefined. Pelin
+      päättyessä leimataan tn_kaupunkileimat-localStorageen (ks. stampCity()). */
+  citySlug?: string | null;
   /* image = kuvavisan tunnistettava kuva (3.8.2026)
      context = lähdevisan nimi Megassa — irrotettu kysymys tarvitsee
      kontekstin, esim. "Luottomies: All in" (Heikki 4.8.2026) */
@@ -74,6 +78,24 @@ function updateDailyStreak(): number {
   } catch {
     return 0;
   }
+}
+
+/** SUOMEN KAUPUNGIT -matkapassi (28.8.2026): leima ansaitaan PELAAMALLA
+    (Heikin päätös), ei tuloksesta riippuen — sama "ei kirjautumista"
+    -periaate kuin Putki. Avain jaettu KaupunkiPelilauta.tsx:n kanssa
+    (KAUPUNKILEIMAT_KEY = "tn_kaupunkileimat"), pidetty tässä string-
+    literaalina jotta pelikuori ei tuo koko lib/kaupungit.ts-riippuvuutta. */
+function stampCity(cityId: string): void {
+  try {
+    const KEY = "tn_kaupunkileimat";
+    const raw = window.localStorage.getItem(KEY);
+    const arr = raw ? (JSON.parse(raw) as string[]) : [];
+    const set = new Set(Array.isArray(arr) ? arr : []);
+    if (!set.has(cityId)) {
+      set.add(cityId);
+      window.localStorage.setItem(KEY, JSON.stringify([...set]));
+    }
+  } catch { /* best-effort, kuten Putki */ }
 }
 
 function getOrCreateSessionId(): string {
@@ -253,6 +275,7 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
       const s = updateDailyStreak();
       if (s > 0) setDailyStreak(s);
     }
+    if (quiz.citySlug) stampCity(quiz.citySlug);
     if (total > 0 && correctCount / total >= 0.8) {
       try {
         confetti({ particleCount: 90, spread: 100, origin: { x: 0.5, y: 0.4 }, colors: [quiz.accent, "#B6FF3C", "#E8A320"] });
