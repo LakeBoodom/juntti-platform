@@ -223,7 +223,8 @@ export default async function Etusivu20() {
           <div className="tn-es-grid">
             {POPULAR_COLLECTIONS.map((c) => (
               <a key={c.key} className="tn-es-card" href={c.href}>
-                <span className="tn-es-card-bg" aria-hidden style={{ backgroundImage: `url(${c.img})`, backgroundPosition: c.pos }} />
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img className="tn-es-card-img" src={c.img} alt="" loading="lazy" style={{ objectPosition: c.pos }} />
                 <span className="tn-es-card-shade" aria-hidden />
                 <span className="tn-es-card-foot">
                   <span className="tn-es-card-title">{c.title}</span>
