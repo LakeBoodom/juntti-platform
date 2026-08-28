@@ -8,8 +8,11 @@
 // NYKYISET kanavat (Facebook · Telegram · X · Kopioi linkki) — Instagram Story
 // lisätään myöhemmin kuvajaon kautta.
 // Mekaniikka identtinen tuotannon kanssa: 100 p + striikkibonus 50/porras,
-// Oljenkorsi 2 väärää pois (1 per 10 kys., min 1 — 10.8.2026), quiz_plays-tallennus + shared-merkintä, Putki
-// (tn_paivan_visa_putki) vain Päivän sankarista. Ei ajastinta (v1).
+// Oljenkorsi 2 väärää pois (1 per 10 kys., min 1 — 10.8.2026), quiz_plays-tallennus + shared-merkintä.
+// PUTKI (tn_paivan_visa_putki): 28.8.2026 alkaen MIKÄ TAHANSA loppuun pelattu visa
+// jatkaa päivän putkea (Heikin päätös, etusivu 2026 prod) — aiemmin vain Päivän
+// visa/sankari. Päivän visan oma "pelattu tänään" -tila kirjataan erikseen
+// (PAIVAN_VISA_KEY, PaivanVisaCard). Ei ajastinta (v1).
 
 import { useEffect, useRef, useState } from "react";
 import confetti from "canvas-confetti";
@@ -17,7 +20,11 @@ import { getSupabase } from "../../../lib/supabase";
 import { MOTIF_PATHS } from "../../../components/tn20/motif-paths";
 import { LearnArticle, type Learn } from "../../../components/tn20/LearnArticle";
 import PutkiCard from "../PutkiCard";
-import { DAILY_ANSWER_KEY } from "../../../components/tn20/DailyQuizCard";
+import { PAIVAN_VISA_KEY, localDateKey } from "../../../components/tn20/PaivanVisaCard";
+
+/* Vanhan upotetun etusivukortin (DailyQuizCard, poistettu 28.8.2026) sessionStorage-
+   silta — avain säilytetty, jotta mahdollinen vanha välilehti ei riko peliä. */
+const DAILY_ANSWER_KEY = "tn_daily_card_answer";
 
 const BASE_POINTS = 100;
 const STREAK_BONUS = 50;
@@ -271,9 +278,13 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
       }
     } catch { /* no-op */ }
     void recordPlay(score);
-    if (quiz.isSankari) {
+    /* Putki jatkuu mistä tahansa visasta (28.8.2026) */
+    {
       const s = updateDailyStreak();
       if (s > 0) setDailyStreak(s);
+    }
+    if (quiz.isSankari) {
+      try { window.localStorage.setItem(PAIVAN_VISA_KEY, localDateKey()); } catch { /* no-op */ }
     }
     if (quiz.citySlug) stampCity(quiz.citySlug);
     if (total > 0 && correctCount / total >= 0.8) {
@@ -423,7 +434,7 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
         <div className="tn-game-segs">{Array.from({ length: total }, (_, i) => <i key={i} data-on="true" />)}</div>
         <div className="tn-game2-top">
           <a className="tn-game2-coll" href={quiz.hubHref}><i />{collLine} · valmis</a>
-          <span className="tn-game2-meta">Pisteet <b>{score}</b>{quiz.isSankari && dailyStreak > 0 ? <> · 🔥 {dailyStreak}</> : null}</span>
+          <span className="tn-game2-meta">Pisteet <b>{score}</b>{dailyStreak > 0 ? <> · 🔥 {dailyStreak}</> : null}</span>
         </div>
 
         {/* Loppunäkymän järjestys (Heikki 2.8.2026): 1 tuloskortti ·
