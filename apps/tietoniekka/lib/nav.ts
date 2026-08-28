@@ -22,6 +22,11 @@ export const NAV_COLLECTIONS: NavCollection[] = [
   { slug: "elokuvat", label: "Elokuvat", color: "#FF5C3D" },
   { slug: "musiikki", label: "Musiikki", color: "#A855F7" },
   { slug: "matkakohteet", label: "Maantieto", color: "#46D6C8" },
+  /* Suomen kaupungit (Heikki 28.8.2026): oma teemakokoelma matkapassi-
+     konseptilla, vaikka visat ovat kannassa yleistieto-kokoelmaa — sama
+     nosto-periaate kuin Jääkiekko/Jalkapallo. Visamäärä lasketaan
+     lib/kaupungit.ts:n omasta 20 kaupungin slugilistasta (ks. kokoelmat/page.tsx). */
+  { slug: "kaupungit", label: "Suomen kaupungit", color: "#E8A320" },
   { slug: "tunnetut-henkilot", label: "Tunnetut henkilöt", color: "#C9A96A" },
   { slug: "kulttuuri", label: "Kulttuuri", color: "#E8A320" },
   { slug: "historia", label: "Historia", color: "#E8A320" },
