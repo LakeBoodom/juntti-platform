@@ -1,13 +1,13 @@
-// TIETONIEKKA 2.0 — ETUSIVU 2026 (design_handoff_etusivu_2026, toteutettu
-// 18.8.2026 — korvasi 28.7. lukitun rungon, Heikki vahvisti 17.8.: "uusi
-// design on totuus"). Rakenne ylhäältä alas:
-//   sticky navi (TopBar layoutista) → kompakti hero → Päivän visa →
-//   putkinauha (64px) → viisi täysleveää kuratoitua nostoa → "Uusimmat
-//   visat" -tikkeri → footer.
-// Poistuneet osiot: Aloita näistä, Selaa lisää -ruudukko, Mega-paneeli,
-// trending, chipnav (Megavisat elää valikossa, footerissa ja tikkerissä).
-// Kuori staattinen, luvut ja sisältö dynaamisia kannasta; nostot
-// lib/etusivu.ts-configista (kuratoitu, kausivaihdot yhdestä paikasta).
+// TIETONIEKKA 2.0 — ETUSIVU 2026 PROD (design_handoff_etusivu_2026_prod, toteutettu
+// 28.8.2026 — korvasi 18.8. version kokonaan; Heikki: "uusi design korvaa nykyisen
+// 2.0 työhaaran"). Rakenne ylhäältä alas:
+//   ylätunniste (TopBar layoutista: tagline, nostot, Päivän putki) → kategoriarivi →
+//   lippuvisa-hero → Suositut kokoelmat (6) → Laura ja Mikko (profiilit + 4 korttia)
+//   → Päivän visa → Uusimmat visat -ticker → footer.
+// Poistuneet: Laura & Mikko -duohero, upotettu ensimmäinen kysymys, putkinauha,
+// viisi täysleveää nostoa, historia-aikajana.
+// Kuori staattinen (lib/etusivu.ts), Päivän visa ja ticker dynaamisia kannasta.
+// Sivu käyttää container-kyselyitä (.tn20 on inline-size-container → cqw).
 
 import { getSupabase, SITE_SLUG } from "@/lib/supabase";
 import { kulttuuriImg } from "@/lib/kulttuuri";
@@ -20,45 +20,30 @@ import { elokuvatImg } from "@/lib/elokuvat";
 import { jalkapalloQuizImg } from "@/lib/jalkapallo";
 import { jaakiekkoQuizImg } from "@/lib/jaakiekko";
 import { urheilulajitQuizImg } from "@/lib/urheilulajit";
-import { DailyQuizCard, type DailyQuizCardData, type DailyQuizVariant } from "@/components/tn20/DailyQuizCard";
-import StreakStrip from "@/components/tn20/StreakStrip";
-import { ETUSIVU_HERO, SPOTLIGHTS, HISTORIA_STOPS, FOOTER_COLLECTIONS, FOOTER_MODES } from "@/lib/etusivu";
+import PaivanVisaCard, { type PaivanVisaData } from "@/components/tn20/PaivanVisaCard";
+import {
+  CATEGORY_CHIPS, ETUSIVU_HERO, POPULAR_COLLECTIONS, HOSTS, HOSTS_INTRO,
+  FOOTER_COLLECTIONS, FOOTER_MODES, FOOTER_SITE, FOOTER_INSTAGRAM,
+} from "@/lib/etusivu";
 import "./etusivu.css";
 
-/* Kokoelman nimi DailyQuizCardin chippiin — sama sanasto kuin pelin
-   loaderissa (app/2-0/peli/page.tsx COLLECTION_LABEL). */
+/* Kokoelman nimi Päivän visan merkkiin — sama sanasto kuin pelin loaderissa. */
 const COLLECTION_NAME: Record<string, string> = {
   tv: "TV & Suoratoisto", urheilu: "Urheilu", elokuvat: "Elokuvat", musiikki: "Musiikki",
   matkakohteet: "Maantieto", yleistieto: "Yleistieto", kulttuuri: "Kulttuuri",
   historia: "Historia", luonto: "Luonto", "tunnetut-henkilot": "Tunnetut henkilöt",
 };
 
-/** Visan oma kuva (teemakokoelmien topicImg). Bugikorjaus 25.8.2026 (Heikin
-    kuvakaappaus): TV/Musiikki/Elokuvat-haarat puuttuivat — teemasivut ja
-    kuvat (lib/tv.ts jne.) lisättiin 22.–23.8. mutta tätä dispatcheria ei
-    laajennettu, joten esim. Putous-päivän visa renderöityi "plain"-korttina
-    ilman kuvaa vaikka /20/tv/<slug>.webp oli olemassa. Kuvan asettelu
-    (140px-nauha, object-fit: cover, focal 50%/46%) on sama huolella
-    määritelty putki kuin muillakin — vain haku puuttui. */
+/** Visan oma kuva (teemakokoelmien topicImg) — sama dispatcher kuin 25.–26.8. */
 const topicImgFor = (collection: string | null | undefined, slug: string | null | undefined): string | null =>
   collection === "kulttuuri" ? kulttuuriImg(slug)
   : collection === "luonto" ? luontoImg(slug)
-  /* urheilu kattaa myös jalkapallo- ja jääkiekkoteemasivujen visat (Heikin
-     muistutus 25.8.): niiden kuvakortit on nimetty design-id:n mukaan, joten
-     haku menee quiz-slug-mäppäysten kautta jos urheiluImg ei osu. */
   : collection === "urheilu" ? urheiluImg(slug) ?? jalkapalloQuizImg(slug) ?? jaakiekkoQuizImg(slug) ?? urheilulajitQuizImg(slug)
   : collection === "matkakohteet" ? maantietoImg(slug)
   : collection === "tv" ? tvImg(slug)
   : collection === "musiikki" ? musiikkiImg(slug)
   : collection === "elokuvat" ? elokuvatImg(slug)
   : null;
-
-/** Kokoelmien aksentit (sama paletti kuin hubeissa). */
-const DAY_ACCENT: Record<string, string> = {
-  tv: "#FF3D9E", urheilu: "#B6FF3C", elokuvat: "#FF5C3D", musiikki: "#A855F7",
-  matkakohteet: "#46D6C8", ruokajuoma: "#F2C230", luonto: "#3FBF7F",
-  kuvavisat: "#4C9AFF", yleistieto: "#E8A320", "tunnetut-henkilot": "#C9A96A",
-};
 
 export const dynamic = "force-dynamic";
 
@@ -73,10 +58,12 @@ type Celeb = {
   trivia_quiz_id: string | null;
 };
 
-function fiDate(d: Date) {
-  const days = ["Sunnuntai", "Maanantai", "Tiistai", "Keskiviikko", "Torstai", "Perjantai", "Lauantai"];
-  return `${days[d.getDay()]} ${d.getDate()}.${d.getMonth() + 1}.`;
-}
+type Card = {
+  id: string; slug: string; custom_slug: string | null; title: string;
+  display_title: string | null; collection: string | null; play_count: number;
+  published_at: string | null; game_mode?: string | null; teaser?: string | null;
+  question_count?: number | null;
+};
 
 async function getData() {
   const sb = getSupabase();
@@ -86,12 +73,7 @@ async function getData() {
     sb.from("quiz_cards" as never).select("*"),
     sb.from("celebrities").select("id, slug, name, role, image_url, wikipedia_url, birth_date, trivia_quiz_id"),
   ]);
-
-  const cards = (cardsRes.data ?? []) as Array<{
-    id: string; slug: string; custom_slug: string | null; title: string;
-    display_title: string | null; collection: string | null; play_count: number;
-    published_at: string | null; game_mode?: string | null;
-  } & Record<string, unknown>>;
+  const cards = (cardsRes.data ?? []) as Card[];
   const celebs = (celebsRes.data ?? []) as Celeb[];
 
   // Päivän sankari: tämän päivän synttärit, muuten seuraava tuleva
@@ -99,6 +81,7 @@ async function getData() {
   const key = (m: number, d: number) => m * 100 + d;
   const todayKey = key(today.getMonth() + 1, today.getDate());
   const sorted = celebs
+    .filter((c) => c.trivia_quiz_id)
     .map((c) => {
       const b = new Date(c.birth_date);
       const k = key(b.getMonth() + 1, b.getDate());
@@ -107,12 +90,8 @@ async function getData() {
     .sort((a, b) => a.dist - b.dist);
   const hero = sorted[0] ?? null;
 
-  // Päivän visa: manuaalinen valinta administa (schedule_rules — sama sääntö
-  // ohjaa myös 1.0-etusivun Päivän visaa). Fallback = synttärisankari.
-  type DayPick =
-    | { kind: "celeb"; celeb: Celeb; isToday: boolean }
-    | { kind: "quiz"; card: (typeof cards)[number] }
-    | null;
+  // Päivän visa: manuaalinen valinta administa (schedule_rules). Fallback = sankari.
+  type DayPick = { kind: "celeb"; celeb: Celeb; isToday: boolean } | { kind: "quiz"; card: Card } | null;
   let dayPick: DayPick = null;
   const todayIso = new Date().toISOString().slice(0, 10);
   const { data: siteRow } = await sb.from("sites").select("id").eq("slug", SITE_SLUG).maybeSingle();
@@ -139,39 +118,12 @@ async function getData() {
     }
   }
 
-  // Ensimmäinen kysymys mukaan SSR:ään (DailyQuizCard, 15.8.2026).
-  const dayQuizId =
-    dayPick?.kind === "quiz"
-      ? dayPick.card.id
-      : dayPick?.kind === "celeb"
-        ? dayPick.celeb.trivia_quiz_id
-        : hero?.c.trivia_quiz_id ?? null;
-  let firstQuestion: { text: string; options: string[]; correct: string } | null = null;
-  if (dayQuizId) {
-    const { data: q0 } = await sb
-      .from("questions")
-      .select("question_text, answers")
-      .eq("quiz_id", dayQuizId)
-      .order("sort_order", { ascending: true })
-      .limit(1)
-      .maybeSingle();
-    if (q0) {
-      const answers = (q0.answers as Array<{ text: string; is_correct: boolean }>) ?? [];
-      firstQuestion = {
-        text: q0.question_text as string,
-        options: answers.slice(0, 4).map((a) => a.text),
-        correct: answers.find((a) => a.is_correct)?.text ?? answers[0]?.text ?? "",
-      };
-    }
-  }
-
-  /* Tikkeri: uusimmat visat julkaisujärjestyksessä. Henkilövisat pois
-     (Heikki 11.8.2026: tehdään varastoon — uusin julkaisu ei ole
-     ajankohtainen). Pelimuototunnus vain erikoismuodoille (README). */
+  /* Ticker: uusimmat visat julkaisujärjestyksessä. Henkilövisat pois
+     (Heikki 11.8.2026: tehdään varastoon). Pelimuototunnus vain Megalle. */
   const latest = cards
     .filter((c) => c.collection && c.collection !== "tunnetut-henkilot" && c.published_at)
     .sort((a, b) => (b.published_at! > a.published_at! ? 1 : -1))
-    .slice(0, 14)
+    .slice(0, 12)
     .map((c) => ({
       id: c.id,
       name: (c.display_title ?? c.title) as string,
@@ -179,7 +131,7 @@ async function getData() {
       href: `/2-0/peli?quiz_id=${c.id}`,
     }));
 
-  return { total: cards.length, hero, sankariIsToday: hero?.dist === 0, dayPick, firstQuestion, today, latest };
+  return { hero, sankariIsToday: hero?.dist === 0, dayPick, today, latest };
 }
 
 function age(birth: string, onNextBirthday: boolean) {
@@ -191,255 +143,200 @@ function age(birth: string, onNextBirthday: boolean) {
   return onNextBirthday ? a : a + 1;
 }
 
+const fiBirth = (iso: string) => {
+  const b = new Date(iso);
+  return `${b.getDate()}.${b.getMonth() + 1}.${b.getFullYear()}`;
+};
+
 export default async function Etusivu20() {
   const data = await getData();
   if (!data) return <main style={{ padding: 32 }}>Ei tietokantayhteyttä.</main>;
-  const { total, hero, sankariIsToday, dayPick, firstQuestion, today, latest } = data;
+  const { hero, sankariIsToday, dayPick, today, latest } = data;
 
-  // Tänään-slotin sisältö: manuaalinen Päivän visa (dayPick) tai sankari-fallback.
-  const sankariCeleb = dayPick?.kind === "celeb" ? dayPick.celeb : !dayPick ? hero?.c ?? null : null;
-  const sankariToday = dayPick?.kind === "celeb" ? dayPick.isToday : sankariIsToday;
-  const dayParam = dayPick ? "paivan_visa" : "paivan_sankari";
-  const dayHref =
-    dayPick?.kind === "quiz"
-      ? `/2-0/peli?quiz_id=${dayPick.card.id}&paivan_visa=1`
-      : sankariCeleb?.trivia_quiz_id
-        ? `/2-0/peli?quiz_id=${sankariCeleb.trivia_quiz_id}&${dayParam}=1`
-        : "#";
+  /* Päivän visan sisältö: adminin valinta (visa tai sankari) tai synttärisankari. */
+  let daily: PaivanVisaData | null = null;
+  const celeb = dayPick?.kind === "celeb" ? dayPick.celeb : !dayPick ? hero?.c ?? null : null;
+  const celebToday = dayPick?.kind === "celeb" ? dayPick.isToday : sankariIsToday;
 
-  // Variantin päättely (README:n dailyMedia): portrait = synttärisankari
-  // kuvineen · landscape = visan topicImg · none = ei kuvaa.
-  let dailyVariant: DailyQuizVariant = "plain";
-  let dailyData: DailyQuizCardData | null = null;
-
-  if (firstQuestion) {
-    if (sankariCeleb && sankariToday) {
-      dailyVariant = "birthday";
-      dailyData = {
-        quizId: sankariCeleb.trivia_quiz_id ?? "",
-        title: sankariCeleb.name,
-        questionCount: 5,
-        collectionName: "Tunnetut henkilöt",
-        accent: "#C9A96A",
-        playedToday: false,
-        person: {
-          name: sankariCeleb.name,
-          age: age(sankariCeleb.birth_date, true),
-          birthDateLabel: `${new Date(sankariCeleb.birth_date).getDate()}.${new Date(sankariCeleb.birth_date).getMonth() + 1}.${new Date(sankariCeleb.birth_date).getFullYear()}`,
-          role: sankariCeleb.role ?? "",
-          portraitUrl: sankariCeleb.image_url,
-          creditUrl: sankariCeleb.wikipedia_url,
-          isToday: true,
-        },
-        image: null,
-        firstQuestion,
-        playHref: dayHref,
-      };
-    } else if (dayPick?.kind === "quiz") {
-      const collection = dayPick.card.collection ?? "yleistieto";
-      const img = topicImgFor(collection, dayPick.card.slug);
-      dailyVariant = img ? "image" : "plain";
-      dailyData = {
-        quizId: dayPick.card.id,
-        title: dayPick.card.display_title ?? dayPick.card.title,
-        tagline: (dayPick.card.teaser as string | null) ?? null,
-        questionCount: (dayPick.card.question_count as number | null) ?? 10,
-        collectionName: COLLECTION_NAME[collection] ?? "Visa",
-        accent: DAY_ACCENT[collection] ?? "#E8A320",
-        playedToday: false,
-        person: null,
-        image: img ? { url: img, focalX: 0.5, focalY: 0.46 } : null,
-        firstQuestion,
-        playHref: dayHref,
-      };
-    } else if (sankariCeleb && !sankariToday) {
-      dailyVariant = "plain";
-      dailyData = {
-        quizId: sankariCeleb.trivia_quiz_id ?? "",
-        title: sankariCeleb.name,
-        tagline: `Seuraavaksi juhlii · ${sankariCeleb.role ?? ""}`,
-        questionCount: 5,
-        collectionName: "Tunnetut henkilöt",
-        accent: "#C9A96A",
-        playedToday: false,
-        person: null,
-        image: null,
-        firstQuestion,
-        playHref: dayHref,
-      };
-    }
+  if (dayPick?.kind === "quiz") {
+    const c = dayPick.card;
+    const collection = c.collection ?? "yleistieto";
+    const img = topicImgFor(collection, c.slug);
+    daily = {
+      badge: COLLECTION_NAME[collection] ?? "Päivän visa",
+      title: c.display_title ?? c.title,
+      meta: c.question_count ? `${c.question_count} kysymystä` : null,
+      lede: c.teaser ?? null,
+      imageUrl: img,
+      imagePos: "50% 46%",
+      imageAlt: "Päivän visan kuva",
+      playHref: `/2-0/peli?quiz_id=${c.id}&paivan_visa=1`,
+      playedHref: `/2-0/kokoelma/${collection}`,
+      playedCta: "Lisää visoja →",
+    };
+  } else if (celeb?.trivia_quiz_id) {
+    daily = {
+      badge: celebToday ? "Tänään juhlii" : "Seuraavaksi juhlii",
+      title: celebToday ? `${age(celeb.birth_date, true)} vuotta — ${celeb.name}` : celeb.name,
+      meta: `Syntynyt ${fiBirth(celeb.birth_date)}${celeb.role ? ` · ${celeb.role}` : ""}`,
+      lede: "Kuinka hyvin tunnet päivänsankarin uran ja tunnetuimmat saavutukset?",
+      imageUrl: celeb.image_url,
+      imagePos: "50% 30%",
+      imageAlt: "Päivänsankarin kuva",
+      playHref: `/2-0/peli?quiz_id=${celeb.trivia_quiz_id}&${dayPick ? "paivan_visa" : "paivan_sankari"}=1`,
+      playedHref: "/2-0/kokoelma/tunnetut-henkilot",
+      playedCta: "Pelaa henkilövisoja →",
+    };
   }
 
-  /* Tikkeri duplikoidaan kertaalleen saumattomaan looppiin (README). */
+  /* Ticker duplikoidaan kertaalleen saumattomaan looppiin (design). */
   const tickerItems = [...latest, ...latest];
 
-  /* Kapealla aikajana supistuu neljään pysäkkiin (README): Esihistoria,
-     Autonomia, Itsenäisyys, 1945→ — muut piilotetaan CSS:llä. */
-  const narrowKeep = new Set([0, 2, 3, 5]);
-
   return (
-    <main style={{ minHeight: "100dvh" }}>
-      {/* ─── Kompakti hero — mobiilissa otsikko kuvan päälle vasempaan
-             laitaan (Heikin katselmus 18.8.2026), jotta Päivän visa näkyy
-             heti; kappale + proof pointit piilossa kapealla ─── */}
-      <section className="tn-es-shell tn-es-hero" style={{ marginTop: 72 }}>
-        <div className="tn-es-hero-text">
-          <h1>
-            Tiedätkö <em>enemmän</em> kuin luulet?
-          </h1>
-          <p className="tn-es-hero-p">
-            Laura ja Mikko loivat uuden tietovisasivuston. Kaikki Suomen historiasta, luonnosta,
-            urheilusta ja siitä sarjasta jota et myönnä katsovasi — yli {Math.floor(total / 10) * 10}{" "}
-            visaa, uutta joka päivä.
-          </p>
-          <div className="tn-es-proofs">
-            {ETUSIVU_HERO.proofs.map((p, i) => (
-              <span key={p} style={{ display: "inline-flex", alignItems: "center", gap: 14 }}>
-                {i > 0 && <i aria-hidden>·</i>}
-                {p}
-              </span>
-            ))}
-          </div>
-        </div>
-        <div className="tn-es-hero-media">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={ETUSIVU_HERO.img} alt="Laura ja Mikko, Tietoniekan juontajat" style={{ objectPosition: ETUSIVU_HERO.imgPos }} />
-        </div>
-      </section>
-
-      {/* ─── Päivän visa + putkinauha (sama tuotealue) ─── */}
-      <section className="tn-es-shell" id="paiva">
-        <div className="tn-es-kicker">
-          <span className="tn-es-kicker-dot" aria-hidden />
-          <span className="tn-es-kicker-label">Päivän visa</span>
-          <span className="tn-es-kicker-date">{fiDate(today)}</span>
-        </div>
-        {dailyData ? (
-          <DailyQuizCard variant={dailyVariant} data={dailyData} />
-        ) : (
-          <div className="tn-empty">Päivän visa palaa huomenna.</div>
-        )}
-        <StreakStrip />
-      </section>
-
-      {/* ─── Pinnalla nyt: viisi täysleveää kuratoitua nostoa ─── */}
-      <section className="tn-es-shell" style={{ paddingTop: 64 }} id="kokoelmat">
-        <h2 className="tn-es-h2">Pinnalla nyt</h2>
-        <div className="tn-es-spots">
-          {SPOTLIGHTS.map((s) => (
-            <a key={s.key} className="tn-es-spot" href={s.href} data-side={s.side}>
-              <span className="tn-es-spot-media">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={s.img} alt="" loading="lazy" style={{ objectPosition: s.imgPos }} />
-                {s.timeline && (
-                  <>
-                    <span className="tn-es-tl-shade" aria-hidden />
-                    <span className="tn-es-tl" aria-hidden>
-                      {HISTORIA_STOPS.map((stop, i) => (
-                        <span
-                          key={stop.label}
-                          className="tn-es-tl-stop"
-                          data-narrow-hide={narrowKeep.has(i) ? undefined : ""}
-                        >
-                          <span className="tn-es-tl-era">{stop.label}</span>
-                          <span className="tn-es-tl-row">
-                            <span className="tn-es-tl-dot" />
-                            {i < HISTORIA_STOPS.length - 1 && <span className="tn-es-tl-line" />}
-                          </span>
-                          <span className="tn-es-tl-year">{stop.year}</span>
-                        </span>
-                      ))}
-                    </span>
-                  </>
-                )}
-              </span>
-              <span className="tn-es-spot-body">
-                <span className="tn-es-spot-eyebrow">{s.eyebrow}</span>
-                <span className="tn-es-spot-title">{s.title}</span>
-                <span className="tn-es-spot-desc">{s.desc}</span>
-                <span className="tn-es-spot-action">Avaa kokoelma →</span>
-              </span>
-            </a>
+    <main className="tn-es-page">
+      {/* ─── Kategoriarivi ─── */}
+      <div className="tn-es-catbar">
+        <nav className="tn-es-cats" aria-label="Kategoriat">
+          {CATEGORY_CHIPS.map((c) => (
+            <a key={c.label} className="tn-es-cat" href={c.href}>{c.label}</a>
           ))}
-        </div>
-      </section>
+        </nav>
+      </div>
 
-      {/* ─── Uusimmat visat -tikkeri ─── */}
-      <section className="tn-es-ticker" aria-label="Uusimmat visat">
-        <div className="tn-es-ticker-head">
-          <span className="tn-es-ticker-label">Uusimmat visat</span>
-          <span className="tn-es-ticker-rule" aria-hidden />
-        </div>
-        <div className="tn-es-ticker-track">
-          <div className="tn-es-ticker-row">
-            {tickerItems.map((t, i) => (
-              <a key={`${t.id}-${i}`} className="tn-es-ticker-chip" href={t.href} aria-hidden={i >= latest.length || undefined} tabIndex={i >= latest.length ? -1 : undefined}>
-                <i aria-hidden />
-                <b>{t.name}</b>
-                {t.mode && <span>{t.mode}</span>}
+      <div className="tn-es-main">
+        {/* ─── Lippuvisa-hero ─── */}
+        <a className="tn-es-hero" href={ETUSIVU_HERO.href}>
+          <span className="tn-es-hero-bg" aria-hidden style={{ backgroundImage: `url(${ETUSIVU_HERO.img})`, backgroundPosition: ETUSIVU_HERO.pos }} />
+          <span className="tn-es-hero-panel">
+            <h1 className="tn-es-h1">{ETUSIVU_HERO.title}</h1>
+            <p className="tn-es-hero-lede">{ETUSIVU_HERO.lede}</p>
+            <span className="tn-es-btn">{ETUSIVU_HERO.cta}</span>
+          </span>
+        </a>
+
+        {/* ─── Suositut kokoelmat ─── */}
+        <section aria-labelledby="suositut">
+          <div className="tn-es-head">
+            <h2 className="tn-es-h2" id="suositut">Suositut kokoelmat</h2>
+            <p className="tn-es-sub">Valitse aihe ja löydä seuraava visasi.</p>
+          </div>
+          <div className="tn-es-grid">
+            {POPULAR_COLLECTIONS.map((c) => (
+              <a key={c.key} className="tn-es-card" href={c.href}>
+                <span className="tn-es-card-bg" aria-hidden style={{ backgroundImage: `url(${c.img})`, backgroundPosition: c.pos }} />
+                <span className="tn-es-card-shade" aria-hidden />
+                <span className="tn-es-card-foot">
+                  <span className="tn-es-card-title">{c.title}</span>
+                  <span className="tn-es-arrow" aria-hidden>→</span>
+                </span>
               </a>
             ))}
           </div>
-        </div>
-      </section>
+        </section>
+
+        {/* ─── Laura ja Mikko ─── */}
+        <section className="tn-es-hosts" aria-labelledby="juontajat">
+          <h2 className="tn-es-h2" id="juontajat">{HOSTS_INTRO.title}</h2>
+          <p className="tn-es-hosts-lede">{HOSTS_INTRO.lede}</p>
+          <div className="tn-es-hosts-grid">
+            {HOSTS.map((h) => (
+              <div key={h.key} className="tn-es-host" data-accent={h.accent}>
+                <div className="tn-es-host-profile">
+                  <div className="tn-es-host-img" role="img" aria-label={h.name} style={{ backgroundImage: `url(${h.img})` }} />
+                  <div className="tn-es-host-text">
+                    <div className="tn-es-host-name">{h.heading}</div>
+                    <div className="tn-es-host-role">{h.role}</div>
+                  </div>
+                </div>
+                <div className="tn-es-host-cards">
+                  {h.cards.map((c) => (
+                    <a key={c.key} className="tn-es-hcard" href={c.href}>
+                      <span className="tn-es-card-bg" aria-hidden style={{ backgroundImage: `url(${c.img})`, backgroundPosition: c.pos }} />
+                      <span className="tn-es-card-shade tn-es-card-shade--h" aria-hidden />
+                      <span className="tn-es-card-foot tn-es-card-foot--h">
+                        <span className="tn-es-hcard-text">
+                          <span className="tn-es-card-title">{c.title}</span>
+                          <span className="tn-es-hcard-desc">{c.desc}</span>
+                        </span>
+                        <span className="tn-es-arrow" aria-hidden>→</span>
+                      </span>
+                    </a>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* ─── Päivän visa ─── */}
+        <section id="paivan-visa" aria-labelledby="paivan-visa-h">
+          <div className="tn-es-head tn-es-head--row">
+            <h2 className="tn-es-h2 tn-es-h2--nowrap" id="paivan-visa-h">Päivän visa</h2>
+            <span className="tn-es-date">Tänään {today.getDate()}.{today.getMonth() + 1}.</span>
+          </div>
+          {daily ? <PaivanVisaCard data={daily} /> : <div className="tn-es-day tn-es-day--empty">Päivän visa palaa huomenna.</div>}
+        </section>
+
+        {/* ─── Uusimmat visat ─── */}
+        <section aria-labelledby="uusimmat">
+          <div className="tn-es-head">
+            <h2 className="tn-es-h2" id="uusimmat">Uusimmat visat</h2>
+          </div>
+          <div className="tn-es-ticker" data-ticker>
+            <div className="tn-es-ticker-track" data-ticker-track>
+              {tickerItems.map((t, i) => (
+                <a
+                  key={`${t.id}-${i}`}
+                  className="tn-es-chip"
+                  href={t.href}
+                  aria-hidden={i >= latest.length || undefined}
+                  tabIndex={i >= latest.length ? -1 : undefined}
+                >
+                  <i aria-hidden />
+                  {t.name}
+                  {t.mode && <span className="tn-es-chip-mode">{t.mode}</span>}
+                </a>
+              ))}
+            </div>
+          </div>
+        </section>
+      </div>
 
       {/* ─── Footer ─── */}
-      <footer className="tn-es-shell tn-es-foot">
-        <div className="tn-es-foot-grid">
-          <div>
-            <a className="tn-logo" href="/2-0" style={{ fontSize: 24 }}>
-              <b>TIETO</b>
-              <span>NIEKKA</span>
-            </a>
-            <p className="tn-es-foot-desc">
-              Suomalainen tietovisasivusto. Uusia tietovisoja jatkuvasti.
-            </p>
-            <div className="tn-es-foot-some">
-              <span>Seuraa Tietoniekkaa somessa</span>
-              <a
-                className="tn-es-foot-ig"
-                href="https://www.instagram.com/tietoniekka/"
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="Tietoniekka Instagramissa"
-              >
-                {/* Instagramin virallinen värillinen logo (CD:n design-paketista) */}
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src="/20/etusivu/ig-logo.svg" alt="" width={20} height={20} />
+      <footer className="tn-es-foot">
+        <div className="tn-es-foot-in">
+          <div className="tn-es-foot-grid">
+            <div className="tn-es-foot-brand">
+              <a className="tn-logo tn-es-foot-logo" href="/2-0">
+                <b>TIETO</b>
+                <span>NIEKKA</span>
+              </a>
+              <p className="tn-es-foot-desc">Suomalainen tietovisasivusto. Uusia tietovisoja jatkuvasti.</p>
+              <div className="tn-es-foot-h">Seuraa Tietoniekkaa somessa</div>
+              <a className="tn-es-foot-ig" href={FOOTER_INSTAGRAM} target="_blank" rel="noopener noreferrer" aria-label="Tietoniekka Instagramissa">
+                <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <rect x="3" y="3" width="18" height="18" rx="5" /><circle cx="12" cy="12" r="4" /><circle cx="17.2" cy="6.8" r="1" />
+                </svg>
+                Instagram
               </a>
             </div>
+            <nav className="tn-es-foot-col" aria-label="Kokoelmat">
+              <div className="tn-es-foot-h">Kokoelmat</div>
+              {FOOTER_COLLECTIONS.map((c) => <a key={c.href} href={c.href}>{c.label}</a>)}
+            </nav>
+            <nav className="tn-es-foot-col" aria-label="Pelimuodot">
+              <div className="tn-es-foot-h">Pelimuodot</div>
+              {FOOTER_MODES.map((m) => <a key={m.href} href={m.href}>{m.label}</a>)}
+            </nav>
+            <nav className="tn-es-foot-col" aria-label="Tietoniekka">
+              <div className="tn-es-foot-h">Tietoniekka</div>
+              {FOOTER_SITE.map((m) => <a key={m.href} href={m.href}>{m.label}</a>)}
+            </nav>
           </div>
-          <div>
-            <h4>Kokoelmat</h4>
-            <div className="tn-es-foot-col">
-              {FOOTER_COLLECTIONS.map((c) => (
-                <a key={c.label} href={c.href}>
-                  {c.label}
-                </a>
-              ))}
-            </div>
+          <div className="tn-es-foot-base">
+            <span>© {today.getFullYear()} Tietoniekka</span>
+            <span>Tehty Suomessa</span>
           </div>
-          <div>
-            <h4>Pelimuodot</h4>
-            <div className="tn-es-foot-col">
-              {FOOTER_MODES.map((m) => (
-                <a key={m.label} href={m.href}>
-                  {m.label}
-                </a>
-              ))}
-            </div>
-          </div>
-          <div>
-            <h4>Tietoniekka</h4>
-            <div className="tn-es-foot-col">
-              {/* "Tietoa meistä" ja "Palaute" lisätään kun sivut ovat olemassa */}
-              <a href="/tietosuoja">Tietosuoja</a>
-            </div>
-          </div>
-        </div>
-        <div className="tn-es-foot-base">
-          <span>© {today.getFullYear()} Tietoniekka</span>
-          <span>Tehty Suomessa</span>
         </div>
       </footer>
     </main>
