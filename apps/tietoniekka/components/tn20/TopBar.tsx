@@ -15,8 +15,13 @@
 //   (Heikki 17.8.: lippuvisat yms. ovat Kuvavisoja — eri navigaatio kuin kokoelmilla).
 // - Mobiili (<760 px): yksi 56 px:n palkki + Selaa-alapaneeli (Pelimuodot ja
 //   Kokoelmat ryhminä, kosketuskohteet ≥48 px, sulku kahvasta/X:stä/Escistä/taustasta).
-// - EI Putki-pilleriä navissa (etusivu-README 17.8.2026 voitti nav-konseptin,
-//   Heikki vahvisti A-kohdassa) — putkitieto näkyy etusivun putkinauhassa.
+// - ETUSIVU 2026 PROD (design_handoff_etusivu_2026_prod, 28.8.2026): logon alle
+//   tagline "Suomalainen tietovisasivusto · 500+ visaa", nostot "Uusin kokoelma"
+//   (piiloon < 1100 px) ja "Suosittu nyt" (piiloon < 700 px), Päivän putki -nappi
+//   popoverilla (StreakButton) ja hampurilaisvalikko < 1100 px (aiemmin 760).
+//   Palkki on nyt sticky NORMAALIVIRRASSA (ei fixed + spacer) — korkeus elää
+//   taglinen mukana. Nostojen sisältö lib/etusivu.ts HEADER_PROMOS (kausivaihto
+//   yhdestä paikasta).
 // - Piilossa pelinäkymässä (/2-0/peli) — pelikuoren omat logosäännöt (lukittu 1.8.2026).
 // - Ei Tänään-kohtaa, ei Klassista, ei hakua eikä tiliä (CD:n säännöt).
 //   Kaikki linkit vievät todellisille sivuille — ei etusivun ankkureihin.
@@ -24,6 +29,8 @@ import "./topbar.css";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
 import { NAV_COLLECTIONS, NAV_MODES, hubHref } from "@/lib/nav";
+import { HEADER_PROMOS, SITE_TAGLINE } from "@/lib/etusivu";
+import StreakButton from "./StreakButton";
 
 type MenuId = "kokoelmat" | "pelimuodot";
 
@@ -110,10 +117,13 @@ export default function TopBar() {
     <div ref={rootRef} className="tn-nav-root" data-variant={home ? "home" : "page"}>
       <header className="tn-topbar">
         <div className="tn-topbar-in">
-          <a className="tn-logo" href="/2-0">
-            <b>TIETO</b>
-            <span>NIEKKA</span>
-          </a>
+          <div className="tn-brand">
+            <a className="tn-logo" href="/2-0">
+              <b>TIETO</b>
+              <span>NIEKKA</span>
+            </a>
+            <span className="tn-tagline">{SITE_TAGLINE}</span>
+          </div>
 
           {/* Työpöytävalikot */}
           <nav className="tn-topnav" aria-label="Päävalikko">
@@ -185,9 +195,18 @@ export default function TopBar() {
           </nav>
 
           <div className="tn-topbar-right">
+            {/* Nostot: Uusin kokoelma (≥1100 px) · Suosittu nyt (≥700 px) */}
+            {HEADER_PROMOS.map((p) => (
+              <a key={p.key} className="tn-promo" data-promo={p.key} href={p.href}>
+                <span className="tn-promo-dot" aria-hidden />
+                <span className="tn-promo-kicker">{p.kicker}</span>
+                <span className="tn-promo-label">{p.label} →</span>
+              </a>
+            ))}
+            <StreakButton />
             {/* Mobiilivalikko: hampurilaisikoni (Heikin katselmus 18.8.2026 —
-                korvasi "Selaa"-tekstinapin) */}
-            <button type="button" className="tn-selaa" aria-label="Avaa valikko" onClick={() => setSheet(true)}>
+                korvasi "Selaa"-tekstinapin); < 1100 px (etusivu 2026 prod) */}
+            <button type="button" className="tn-selaa" aria-label="Valikko" onClick={() => setSheet(true)}>
               <span className="tn-selaa-icon" aria-hidden>
                 <i />
                 <i />
@@ -197,9 +216,6 @@ export default function TopBar() {
           </div>
         </div>
       </header>
-
-      {/* Alasivuilla sisältö alkaa palkin alta — varataan aina 72 px */}
-      {!home && <div className="tn-topbar-spacer" aria-hidden />}
 
       {/* Mobiilin Selaa-paneeli */}
       {sheet && (
