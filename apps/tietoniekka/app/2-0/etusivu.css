@@ -144,10 +144,15 @@
 }
 .tn20 .tn-es-hero-lede { margin: 0 0 clamp(14px, 1.3cqw, 20px); font-size: clamp(13.5px, 1.35cqw, 19px); line-height: 1.35; color: #cfc7b6; }
 
-/* ── Korttiruudukko (Suositut kokoelmat) — 2 / 3 / 6 saraketta ───────── */
+/* ── Korttiruudukko (Suositut kokoelmat) — 2 saraketta mobiilissa, 3 × 2
+   tabletista ylöspäin (Heikin katselmus 28.8. ilta). Sarakemäärä perustuu
+   ruudukon OMAAN leveyteen (48 % = kaksi korttia kapealla). CD:n alkuperäinen
+   minimi `max(200px, 24cqw)` kasvoi viewportin mukana rajatta, joten leveillä
+   näytöillä (≥ ~1650px) 1280px-säiliöön mahtui enää 2 saraketta → minimi
+   katkaistaan 360px:iin (3 × 360 + 2 × 18 = 1116 ≤ 1184px sisältöleveys). */
 .tn20 .tn-es-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(min(48%, max(200px, 24cqw)), 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(48%, clamp(200px, 24cqw, 360px)), 1fr));
   gap: clamp(10px, 1.2cqw, 18px);
 }
 .tn20 .tn-es-card,
@@ -165,6 +170,9 @@
 .tn20 .tn-es-card:focus-visible,
 .tn20 .tn-es-hcard:focus-visible { outline: 2px solid var(--tn-lime); outline-offset: 3px; }
 .tn20 .tn-es-card-bg { position: absolute; inset: 0; background-size: cover; background-repeat: no-repeat; }
+/* Suositut kokoelmat -kortin kuva <img>-elementtinä (object-fit: cover,
+   object-position = CD:n background-position; 28.8. ilta) */
+.tn20 .tn-es-card-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
 .tn20 .tn-es-card-shade { position: absolute; inset: 0; background: linear-gradient(to top, rgba(11, 10, 6, 0.95) 6%, rgba(11, 10, 6, 0.35) 48%, rgba(11, 10, 6, 0.05) 82%); }
 .tn20 .tn-es-card-shade--h { background: linear-gradient(to top, rgba(11, 10, 6, 0.95) 5%, rgba(11, 10, 6, 0.35) 46%, rgba(11, 10, 6, 0.05) 80%); }
 .tn20 .tn-es-card-foot {
@@ -292,8 +300,10 @@
   overflow-x: auto;
   overscroll-behavior-x: contain;
   scrollbar-width: none;
-  mask-image: linear-gradient(90deg, transparent 0, #000 3%, #000 92%, transparent 100%);
-  -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 3%, #000 92%, transparent 100%);
+  /* Reunahäivytys: symmetrinen 64px kummassakin reunassa (CD:ssä 3 % / 8 %
+     epäsymmetrinen — Heikin katselmus 28.8. ilta). Maski ei estä klikkauksia. */
+  mask-image: linear-gradient(90deg, transparent 0, #000 64px, #000 calc(100% - 64px), transparent 100%);
+  -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 64px, #000 calc(100% - 64px), transparent 100%);
 }
 .tn20 .tn-es-ticker::-webkit-scrollbar { display: none; }
 .tn20 .tn-es-ticker-track {
