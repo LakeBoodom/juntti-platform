@@ -1,16 +1,17 @@
-// TIETONIEKKA 2.0 — pelikuori 1c "Täysi lava" (server-loader)
-// Lataa visan + kysymykset + ristiinnostot ja antaa pelin clientille.
+// TIETONIEKKA 2.0 — pelinäkymän server-loader (pelikuori 2026 prod, 28.–29.8.2026)
+// Lataa visan + kysymykset + ristiinnostot ja antaa pelin clientille (GameClient).
 // Mekaniikka on identtinen tuotannon Klassisen kanssa (pisteet, putki,
-// Oljenkorsi, quiz_plays) — vain kuori on uusi.
+// Oljenkorsi, quiz_plays). Haastelinkki (Heikki 3a, 28.8.2026) = visan oma
+// polku; kuvavisoissa pelattu kuvasarja kulkee ?ids=-parametrissa, jotta
+// kaveri saa täsmälleen saman sarjan.
 
 import { getSupabase } from "@/lib/supabase";
-import { getKuvavisat } from "@/lib/queries";
+import { getKuvavisat, getKuvavisatByIds } from "@/lib/queries";
 import { kulttuuriImg } from "@/lib/kulttuuri";
 import { luontoImg } from "@/lib/luonto";
 import { urheiluImg } from "@/lib/urheilu";
 import { maantietoImg } from "@/lib/maantieto";
 import { KAUPUNGIT } from "@/lib/kaupungit";
-import { MOTIF_PATHS, motifPathFor } from "@/components/tn20/motif-paths";
 import { LearnArticle, type Learn } from "@/components/tn20/LearnArticle";
 import GameClient, { type GameQuiz } from "./GameClient";
 
@@ -211,15 +212,14 @@ export default async function Peli20({
       id: mq.id,
       title: mq.display_title ?? mq.title,
       teaser: mq.teaser,
-      learnHeading: null,
-      keyFacts: [],
-      learn: null,
-      collectionLabel: "Mega",
+      collectionLabel: "Megavisat",
       genreLabel: `${questions.length} kysymystä · kaikki kokoelmat`,
-      hubHref: "/2-0",
-      bgImg: "/20/mega100.webp",
+      hubHref: "/2-0/megavisat",
+      bgImg: "/20/megavisa.webp",
       accent: "#E8A320",
       isSankari: false,
+      kind: "teksti",
+      challengePath: `/2-0/peli?mega=${encodeURIComponent(mega)}`,
       questions,
       related: (
         (rel ?? []) as unknown as Array<{
@@ -229,9 +229,6 @@ export default async function Peli20({
       ).map((r) => ({
         id: r.id,
         title: r.display_title ?? r.title,
-        teaser: r.teaser,
-        color: COLLECTION_ACCENT[r.collection ?? ""] ?? "#E8A320",
-        motifPath: motifPathFor(r.collection, r.genre, r.title),
         meta: `${r.question_count} kysymystä`,
       })),
     };
@@ -256,7 +253,14 @@ export default async function Peli20({
     };
     const deck = DECKS[kuvavisa] ?? { title: "Kuvavisa", teaser: "Tunnista kuvasta.", motif: "kysymys", color: "#4C9AFF" };
 
-    const rows = await getKuvavisat(kuvavisa, 10);
+    /* Haastelinkin kuvasarja: ?ids=a,b,c → täsmälleen samat kortit samassa
+       järjestyksessä. Muuten kortiston oletussarja + 2 varakorttia teknistä
+       ohitusta varten (README: rikkinäinen kysymys korvataan ensin). */
+    const idsParam = typeof params.ids === "string" ? params.ids : null;
+    const wantedIds = idsParam ? idsParam.split(",").map((x) => x.trim()).filter((x) => /^[0-9a-f-]{20,}$/i.test(x)).slice(0, 20) : [];
+    const allRows = wantedIds.length > 0 ? await getKuvavisatByIds(wantedIds) : await getKuvavisat(kuvavisa, 12);
+    const rows = wantedIds.length > 0 ? allRows : allRows.slice(0, 10);
+    const spareRows = wantedIds.length > 0 ? [] : allRows.slice(10);
     if (rows.length === 0) {
       return <main style={{ padding: 32 }}>Kortistossa ei ole vielä kuvia. <a href="/2-0/kokoelma/kuvavisat">Takaisin kuvavisoihin</a></main>;
     }
@@ -273,36 +277,32 @@ export default async function Peli20({
       .map(([type, n]) => ({
         id: `kv-${type}`,
         title: DECKS[type].title,
-        teaser: null,
-        color: DECKS[type].color,
-        motifPath: MOTIF_PATHS[DECKS[type].motif] ?? motifPathFor(null, null, DECKS[type].title),
         meta: `${Math.min(n, 10)} kuvaa`,
         href: `/2-0/peli?kuvavisa=${type}`,
       }));
 
+    const toQ = (r: (typeof rows)[number]) => ({
+      question: r.question,
+      options: (r.options ?? []).slice(0, 4),
+      correct: r.correct_option,
+      fact: r.fact ?? null,
+      image: r.image_url,
+    });
     const game: GameQuiz = {
       id: "", // ei quizzes-riviä → pelikertaa ei tallenneta
       title: deck.title,
       teaser: deck.teaser,
-      learnHeading: null,
-      keyFacts: [],
-      learn: null,
       collectionLabel: "Kuvavisat",
       genreLabel: null,
       hubHref: "/2-0/kokoelma/kuvavisat",
       bgImg: "/20/teema-liput.webp",
-      accent: deck.color,
+      /* Kuvavisat = designin sininen (kuvavisa-README) */
+      accent: "#3B82F6",
       isSankari: false,
-      questions: rows.map((r) => {
-        const opts = (r.options ?? []).slice(0, 4);
-        return {
-          question: r.question,
-          options: opts,
-          correct: r.correct_option,
-          fact: r.fact ?? null,
-          image: r.image_url,
-        };
-      }),
+      kind: "kuva",
+      challengePath: `/2-0/peli?kuvavisa=${encodeURIComponent(kuvavisa)}&ids=${rows.map((r) => r.id).join(",")}`,
+      spare: spareRows.map(toQ),
+      questions: rows.map(toQ),
       related,
     };
     return <GameClient quiz={game} />;
@@ -332,6 +332,9 @@ export default async function Peli20({
       .select("id, slug, custom_slug, display_title, title, teaser, collection, genre, question_count")
       .eq("collection", quiz.collection ?? "yleistieto")
       .neq("id", quiz.id)
+      /* Megat eivät kuulu "Lisää: <kokoelma>" -suosituksiin (question_count 0,
+         oma landing) — pelinäkymä 2026, 29.8. */
+      .neq("game_mode" as never, "mega")
       .order("published_at", { ascending: false })
       .limit(6),
   ]);
@@ -369,9 +372,6 @@ export default async function Peli20({
     id: quiz.id,
     title: quiz.display_title ?? quiz.title,
     teaser: learn?.intro ?? quiz.teaser,
-    learnHeading: learn?.heading ?? null,
-    keyFacts: learn?.key_facts ?? [],
-    learn,
     collectionLabel: COLLECTION_LABEL[collection] ?? "Visa",
     genreLabel,
     hubHref: COLLECTION_HUB[collection] ?? "/2-0",
@@ -379,6 +379,8 @@ export default async function Peli20({
     topicImg,
     accent,
     isSankari,
+    kind: "teksti",
+    challengePath: quiz.slug ? `/2-0/peli?visa=${encodeURIComponent(quiz.slug)}` : `/2-0/peli?quiz_id=${quiz.id}`,
     /* SUOMEN KAUPUNGIT -matkapassi (28.8.2026): kun visa on yksi 20:sta
        kaupunkivisasta, GameClient kirjoittaa leiman localStorageen pelin
        päättyessä (ks. lib/kaupungit.ts, KaupunkiPelilauta.tsx). */
@@ -396,10 +398,8 @@ export default async function Peli20({
     related: (relatedRows.slice(0, 3)).map((r) => ({
       id: r.id,
       title: r.display_title ?? r.title,
-      teaser: r.teaser,
-      color: COLLECTION_ACCENT[r.collection ?? ""] ?? "#E8A320",
-      motifPath: motifPathFor(r.collection, r.genre, r.title),
       meta: `${r.question_count} kysymystä`,
+      href: relHref(r),
     })),
   };
 
