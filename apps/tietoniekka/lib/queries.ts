@@ -616,3 +616,19 @@ export async function getKuvavisat(urlSlug: string, limit = 10): Promise<Kuvavis
   return data as KuvavisaRow[];
 }
 
+/** PELINÄKYMÄ 2026 (28.8.2026): haastelinkin kuvasarja — samat kortit samassa
+    järjestyksessä kuin haastajalla (README: haastelinkki muodostetaan visan
+    ALKUPERÄISESTÄ kysymyssarjasta). Vain aktiiviset kortit; puuttuvat ohitetaan. */
+export async function getKuvavisatByIds(ids: string[]): Promise<KuvavisaRow[]> {
+  const sb = getSupabase();
+  if (!sb || ids.length === 0) return [];
+  const { data, error } = await sb
+    .from("kuvavisas")
+    .select("id, type, question, image_url, options, correct_option, fact")
+    .in("id", ids.slice(0, 50))
+    .eq("active", true);
+  if (error || !data) return [];
+  const map = new Map((data as KuvavisaRow[]).map((r) => [r.id, r]));
+  return ids.map((id) => map.get(id)).filter((r): r is KuvavisaRow => Boolean(r));
+}
+
