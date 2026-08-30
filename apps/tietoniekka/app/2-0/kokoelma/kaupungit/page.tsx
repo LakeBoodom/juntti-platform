@@ -14,8 +14,8 @@
 // 28.8.2026 (olivat draft, 10 kysymystä/visa — löydettiin ja varmistettiin
 // Heikin toimittamalla kaupunki→otsikko-mäppäyksellä, koska README:n
 // design-id ei vastaa visojen oikeita slugeja). Suomi-megavisa-CTA linkkaa
-// olemassa olevaan "kaikki-suomesta-mega":an (draft, sama kuin muutkin
-// megat 2.0-launchiin asti — ei uusi päätös, seuraa 26.8. linjausta).
+// Suomen kaupungit -megavisaan ?mega=-osoitteella (QA-001, 29.8.2026; aiemmin
+// ?visa=kaikki-suomesta-mega, joka antoi tyhjän sivun).
 
 import "../../kaupungit.css";
 import type { Metadata } from "next";
@@ -122,21 +122,12 @@ export default async function KaupungitLanding() {
                 Suomen.
               </p>
             </div>
-            <a className="tnk2-ctabox-btn" href={`/2-0/peli?visa=${SUOMI_MEGA_SLUG}`}>Pelaa Suomi-megavisa</a>
+            <a className="tnk2-ctabox-btn" href={`/2-0/peli?mega=${SUOMI_MEGA_SLUG}`}>Pelaa Suomen kaupungit -megavisa</a>
           </div>
         </div>
       </section>
 
-      <footer className="tnk2-footer">
-        <div className="tn-shell">
-          <span>Suomen kaupungit -kokoelma</span>
-          <span>
-            <a href="/2-0">Etusivu</a>
-            {"  ·  "}
-            <a href="/tietosuoja">Tietosuoja</a>
-          </span>
-        </div>
-      </footer>
+      {/* Alatunniste tulee layoutista (SiteFooter, QA-005 29.8.2026) */}
     </main>
   );
 }
