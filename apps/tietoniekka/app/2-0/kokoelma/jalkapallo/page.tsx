@@ -295,16 +295,7 @@ export default async function JalkapalloLanding({
         </div>
       </section>
 
-      <footer className="tnjp-footer">
-        <div className="tn-shell">
-          <span>Jalkapallo-kokoelma</span>
-          <span>
-            <a href="/2-0">Etusivu</a>
-            {"  ·  "}
-            <a href="/tietosuoja">Tietosuoja</a>
-          </span>
-        </div>
-      </footer>
+      {/* Alatunniste tulee layoutista (SiteFooter, QA-005 29.8.2026) */}
     </main>
   );
 }
