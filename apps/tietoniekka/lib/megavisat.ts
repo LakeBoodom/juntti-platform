@@ -69,6 +69,13 @@ export const MEGA_GRID: MegaCard[] = [
     pos: "center 42%",
   },
   {
+    slug: "suomen-kaupungit-mega",
+    tag: "Suomen kaupungit",
+    desc: "Kiertomatka 20 kaupunkiin: vaakunat, kuuluisat asukkaat ja lempinimet.",
+    img: "/20/kaupungit/hero-laura-mikko.webp",
+    pos: "center 30%",
+  },
+  {
     slug: "maailman-kolkat-mega",
     tag: "Maantieto",
     desc: "Syrjäisimmät saaret, ääripäät ja paikat kartan reunoilla.",

@@ -81,8 +81,6 @@ export const KAUPUNGIT_HERO_IMG = "/20/kaupungit/hero-laura-mikko.webp";
 export const SUOMI_PATH =
   "M398.629,137.806L392.836,213.579L452.89,283.551L416.716,360.233L462.357,471.82L435.933,552.51L471.259,620.603L455.292,678.699L513.367,738.397L498.53,781.868L462.074,830.234L378.14,934.172L306.924,940.506L237.827,969.416L173.958,986L151.208,942.927L113.198,916.844L121.959,836.548L102.883,760.731L121.676,710.419L157.284,655.171L247.011,556.899L273.152,537.402L269.196,497.62L214.512,452.454L201.371,414.587L200.24,258.741L139.056,186.581L86.633,133.339L110.23,104.103L153.893,162.225L205.045,156.881L247.153,183.116L284.598,134.829L303.956,52.839L364.858,14L415.162,59.571Z";
 
-/** Suomi-megavisa CTA-kohde: "kaikki-suomesta-mega" on jo olemassa Supabasessa
-    (draft, kuten kaikki muutkin megat 26.8.2026 asti — Heikin päätös: ei
-    julkaista ennen 2.0-launchia). Sama linkkitapa kuin megavisat-sivulla:
-    pelattava suoralla slugilla RLS:n ansiosta vaikka status on draft. */
-export const SUOMI_MEGA_SLUG = "kaikki-suomesta-mega";
+/** Suomi-megavisa CTA-kohde (QA-001, 29.8.2026): Suomen kaupungit -megavisa
+    (50 kysymystä, julkaistu 28.8.) pelataan ?mega=<slug>-osoitteessa. */
+export const SUOMI_MEGA_SLUG = "suomen-kaupungit-mega";

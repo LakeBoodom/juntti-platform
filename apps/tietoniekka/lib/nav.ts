@@ -43,7 +43,7 @@ export type NavMode = {
 /* Klassista ei nosteta navigaatioon (CD:n sääntö: se on visojen oletusmuoto).
    Rakenne kestää uudet rivit sellaisenaan → Kumpi? ja Järjestä lisätään 2.5:ssä. */
 export const NAV_MODES: NavMode[] = [
-  { href: "/2-0/megavisat", label: "Megavisat", desc: "Jopa 100 kysymystä — pitkä peli", color: "#E8A320" },
+  { href: "/2-0/megavisat", label: "Megavisat", desc: "20–50 kysymystä — pitkä peli", color: "#E8A320" },
   { href: "/2-0/kokoelma/kuvavisat", label: "Kuvavisat", desc: "Tunnista kuvasta — liput, vaakunat, linnut", color: "#4C9AFF" },
 ];
 
