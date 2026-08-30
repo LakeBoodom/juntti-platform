@@ -195,12 +195,7 @@ export default async function MegavisatLanding() {
         </div>
       </section>
 
-      <footer className="tnm2-footer">
-        <div className="tn-shell">
-          <span>© 2026 Tietoniekka</span>
-          <a href="/2-0">Etusivu</a>
-        </div>
-      </footer>
+      {/* Alatunniste tulee layoutista (SiteFooter, QA-005 29.8.2026) */}
     </main>
   );
 }
