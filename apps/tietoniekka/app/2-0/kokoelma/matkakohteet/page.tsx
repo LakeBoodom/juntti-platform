@@ -172,16 +172,7 @@ export default async function MaantietoLanding() {
         {article}
       </div>
 
-      <footer className="tnt-footer">
-        <div className="tn-shell">
-          <span>© 2026 Tietoniekka</span>
-          <span>
-            <a href="/2-0">Etusivu</a>
-            {"  ·  "}
-            <a href="/tietosuoja">Tietosuoja</a>
-          </span>
-        </div>
-      </footer>
+      {/* Alatunniste tulee layoutista (SiteFooter, QA-005 29.8.2026) */}
     </main>
   );
 }
