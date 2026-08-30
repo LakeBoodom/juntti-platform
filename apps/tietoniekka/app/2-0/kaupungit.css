@@ -379,6 +379,11 @@
 
 /* ── Responsiivisuus ── */
 @media (max-width: 640px) {
-  .tn20 .tnk2-ctabox-content { flex-direction: column; align-items: flex-start; }
-  .tn20 .tnk2-ctabox-btn { width: 100%; }
+  /* QA-004 (29.8.2026): column + wrap + tekstin 380 px flex-basis rivitti napin
+     TOISEEN SARAKKEESEEN viewportin ulkopuolelle. Ei rivitystä, teksti auto. */
+  .tn20 .tnk2-ctabox { min-height: 0; }
+  .tn20 .tnk2-ctabox-content { flex-direction: column; flex-wrap: nowrap; align-items: stretch; }
+  .tn20 .tnk2-ctabox-text { flex: 0 0 auto; }
+  .tn20 .tnk2-ctabox-btn { width: 100%; white-space: normal; }
+  .tn20 .tnk2-ctabox::before { background: rgba(19,17,9,.86); }
 }

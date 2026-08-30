@@ -9,9 +9,15 @@ import "@fontsource/instrument-sans/600.css";
 import "@fontsource/instrument-sans/700.css";
 import "./tn20.css";
 import TopBar from "@/components/tn20/TopBar";
+import SiteFooter from "@/components/tn20/SiteFooter";
 
+/* QA-006 (29.8.2026): oletusotsikko ja -kuvaus etusivulle; alasivut
+   (kokoelmat, pelisivut) antavat omansa. noindex säilyy haaralla julkaisuun
+   asti (poistetaan mergen yhteydessä, ks. Vielä auki). */
 export const metadata: Metadata = {
-  title: "Tietoniekka 2.0 — esikatselu",
+  title: "Tietoniekka – suomalainen tietovisasivusto · 500+ visaa",
+  description:
+    "Ilmaisia tietovisoja jääkiekosta, jalkapallosta, elokuvista, musiikista, historiasta ja luonnosta. Päivän visa, megavisat ja kuvavisat – pelaa ilman kirjautumista.",
   robots: { index: false, follow: false },
 };
 
@@ -23,6 +29,8 @@ export default function Tn20Layout({ children }: { children: React.ReactNode }) 
       {/* Navigaatiojärjestelmä (lukittu 17.8.2026) — piiloutuu itse pelinäkymässä */}
       <TopBar />
       {children}
+      {/* Yhteinen alatunniste kaikille sivuille (QA-005, 29.8.2026) */}
+      <SiteFooter />
     </div>
   );
 }

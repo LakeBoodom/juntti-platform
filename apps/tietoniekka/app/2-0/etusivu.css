@@ -338,47 +338,6 @@
 .tn20 .tn-es-chip:focus-visible { outline: 2px solid var(--tn-lime); outline-offset: 2px; }
 .tn20 .tn-es-chip-mode { font-size: 11px; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; color: var(--tn-gold); }
 
-/* ── Footer ───────────────────────────────────────────────────────────── */
-.tn20 .tn-es-foot { border-top: 1px solid #241e13; background: #0b0a06; }
-.tn20 .tn-es-foot-in { width: 100%; max-width: 1280px; margin-inline: auto; padding: clamp(26px, 3cqw, 52px) clamp(16px, 3.4cqw, 48px) clamp(18px, 2cqw, 30px); }
-.tn20 .tn-es-foot-grid { display: flex; flex-wrap: wrap; gap: clamp(20px, 2.4cqw, 40px); }
-.tn20 .tn-es-foot-brand { flex: 1.4 1 min(100%, 300px); min-width: 0; }
-.tn20 .tn-es-foot-logo { display: flex; align-items: baseline; gap: 1px; font-size: clamp(20px, 2cqw, 28px); line-height: 1; letter-spacing: -0.012em; }
-.tn20 .tn-es-foot-desc { margin: 10px 0 0; max-width: 38ch; font-size: clamp(12.5px, 1.15cqw, 15px); line-height: 1.5; color: #b9af9b; text-wrap: pretty; }
-.tn20 .tn-es-foot-h { margin-bottom: 3px; font-size: clamp(10px, 0.9cqw, 11.5px); font-weight: 800; letter-spacing: 0.16em; text-transform: uppercase; color: #8e8676; }
-.tn20 .tn-es-foot-brand .tn-es-foot-h { margin: clamp(16px, 1.8cqw, 26px) 0 0; }
-.tn20 .tn-es-foot-ig {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  margin-top: 10px;
-  min-height: 44px;
-  padding: 0 16px 0 13px;
-  border: 1px solid var(--tn-line);
-  border-radius: 12px;
-  color: #cfc7b6;
-  font-size: clamp(12.5px, 1.15cqw, 14.5px);
-  font-weight: 700;
-}
-.tn20 .tn-es-foot-ig:hover { border-color: var(--tn-gold); color: #f5f0e6; }
-.tn20 .tn-es-foot-col { flex: 1 1 min(46%, 170px); min-width: 0; display: flex; flex-direction: column; gap: 9px; }
-.tn20 .tn-es-foot-col a { font-size: clamp(12.5px, 1.15cqw, 14.5px); font-weight: 600; color: #cfc7b6; }
-.tn20 .tn-es-foot-col a:hover { color: var(--tn-lime); }
-.tn20 .tn-es-foot a:focus-visible { outline: 2px solid var(--tn-lime); outline-offset: 2px; border-radius: 4px; }
-.tn20 .tn-es-foot-base {
-  margin-top: clamp(20px, 2.2cqw, 34px);
-  padding-top: clamp(14px, 1.5cqw, 22px);
-  border-top: 1px solid #241e13;
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  font-size: clamp(11px, 1cqw, 13px);
-  font-weight: 600;
-  color: #8e8676;
-}
-
 /* ── Reduced motion ───────────────────────────────────────────────────── */
 @media (prefers-reduced-motion: reduce) {
   .tn20 .tn-es-ticker-track { animation: none; }

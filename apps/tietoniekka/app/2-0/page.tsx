@@ -23,7 +23,6 @@ import { urheilulajitQuizImg } from "@/lib/urheilulajit";
 import PaivanVisaCard, { type PaivanVisaData } from "@/components/tn20/PaivanVisaCard";
 import {
   CATEGORY_CHIPS, ETUSIVU_HERO, POPULAR_COLLECTIONS, HOSTS, HOSTS_INTRO,
-  FOOTER_COLLECTIONS, FOOTER_MODES, FOOTER_SITE, FOOTER_INSTAGRAM,
 } from "@/lib/etusivu";
 import "./etusivu.css";
 
@@ -62,7 +61,7 @@ type Card = {
   id: string; slug: string; custom_slug: string | null; title: string;
   display_title: string | null; collection: string | null; play_count: number;
   published_at: string | null; game_mode?: string | null; teaser?: string | null;
-  question_count?: number | null;
+  question_count?: number | null; category?: string | null;
 };
 
 async function getData() {
@@ -120,15 +119,20 @@ async function getData() {
 
   /* Ticker: uusimmat visat julkaisujärjestyksessä. Henkilövisat pois
      (Heikki 11.8.2026: tehdään varastoon). Pelimuototunnus vain Megalle. */
+  /* QA-001 (29.8.2026): megat linkitetään ?mega=<slug> (kysymykset
+     mega_questions-taulussa, ?quiz_id antoi tyhjän sivun). Yleistieto ei ole
+     2.0:ssa omana kokoelmana (Heikki 3) → sen visoista mukana vain
+     kaupunkivisat ja megat. */
   const latest = cards
     .filter((c) => c.collection && c.collection !== "tunnetut-henkilot" && c.published_at)
+    .filter((c) => c.collection !== "yleistieto" || c.category === "kaupungit" || c.game_mode === "mega")
     .sort((a, b) => (b.published_at! > a.published_at! ? 1 : -1))
     .slice(0, 12)
     .map((c) => ({
       id: c.id,
       name: (c.display_title ?? c.title) as string,
       mode: c.game_mode === "mega" ? "Megavisa" : undefined,
-      href: `/2-0/peli?quiz_id=${c.id}`,
+      href: c.game_mode === "mega" && c.slug ? `/2-0/peli?mega=${c.slug}` : `/2-0/peli?quiz_id=${c.id}`,
     }));
 
   return { hero, sankariIsToday: hero?.dist === 0, dayPick, today, latest };
@@ -304,42 +308,6 @@ export default async function Etusivu20() {
       </div>
 
       {/* ─── Footer ─── */}
-      <footer className="tn-es-foot">
-        <div className="tn-es-foot-in">
-          <div className="tn-es-foot-grid">
-            <div className="tn-es-foot-brand">
-              <a className="tn-logo tn-es-foot-logo" href="/2-0">
-                <b>TIETO</b>
-                <span>NIEKKA</span>
-              </a>
-              <p className="tn-es-foot-desc">Suomalainen tietovisasivusto. Uusia tietovisoja jatkuvasti.</p>
-              <div className="tn-es-foot-h">Seuraa Tietoniekkaa somessa</div>
-              <a className="tn-es-foot-ig" href={FOOTER_INSTAGRAM} target="_blank" rel="noopener noreferrer" aria-label="Tietoniekka Instagramissa">
-                <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                  <rect x="3" y="3" width="18" height="18" rx="5" /><circle cx="12" cy="12" r="4" /><circle cx="17.2" cy="6.8" r="1" />
-                </svg>
-                Instagram
-              </a>
-            </div>
-            <nav className="tn-es-foot-col" aria-label="Kokoelmat">
-              <div className="tn-es-foot-h">Kokoelmat</div>
-              {FOOTER_COLLECTIONS.map((c) => <a key={c.href} href={c.href}>{c.label}</a>)}
-            </nav>
-            <nav className="tn-es-foot-col" aria-label="Pelimuodot">
-              <div className="tn-es-foot-h">Pelimuodot</div>
-              {FOOTER_MODES.map((m) => <a key={m.href} href={m.href}>{m.label}</a>)}
-            </nav>
-            <nav className="tn-es-foot-col" aria-label="Tietoniekka">
-              <div className="tn-es-foot-h">Tietoniekka</div>
-              {FOOTER_SITE.map((m) => <a key={m.href} href={m.href}>{m.label}</a>)}
-            </nav>
-          </div>
-          <div className="tn-es-foot-base">
-            <span>© {today.getFullYear()} Tietoniekka</span>
-            <span>Tehty Suomessa</span>
-          </div>
-        </div>
-      </footer>
     </main>
   );
 }
