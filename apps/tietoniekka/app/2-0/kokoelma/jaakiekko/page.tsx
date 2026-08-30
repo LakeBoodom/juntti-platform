@@ -239,16 +239,7 @@ export default async function JaakiekkoLanding() {
         </section>
       </div>
 
-      <footer className="tnj-footer" style={{ borderTop: "1px solid #241E13", marginTop: "clamp(30px,4.6cqw,72px)" }}>
-        <div className="tn-shell" style={{ display: "flex", justifyContent: "space-between", flexWrap: "wrap", gap: 12, paddingTop: 18, paddingBottom: 22, color: "#5F594C", fontWeight: 600, fontSize: 13 }}>
-          <span>Jääkiekko-kokoelma</span>
-          <span>
-            <a href="/2-0" style={{ color: "inherit", textDecoration: "none" }}>Etusivu</a>
-            {"  ·  "}
-            <a href="/tietosuoja" style={{ color: "inherit", textDecoration: "none" }}>Tietosuoja</a>
-          </span>
-        </div>
-      </footer>
+      {/* Alatunniste tulee layoutista (SiteFooter, QA-005 29.8.2026) */}
     </main>
   );
 }
