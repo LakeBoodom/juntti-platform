@@ -11,11 +11,51 @@ import { kulttuuriImg } from "@/lib/kulttuuri";
 import { luontoImg } from "@/lib/luonto";
 import { urheiluImg } from "@/lib/urheilu";
 import { maantietoImg } from "@/lib/maantieto";
-import { KAUPUNGIT } from "@/lib/kaupungit";
+import { KAUPUNGIT, KAUPUNGIT_HERO_IMG } from "@/lib/kaupungit";
+import { JK_HERO, JK_ACCENT } from "@/lib/jaakiekko";
+import { JP_HERO } from "@/lib/jalkapallo";
 import { LearnArticle, type Learn } from "@/components/tn20/LearnArticle";
 import GameClient, { type GameQuiz } from "./GameClient";
+import { notFound } from "next/navigation";
+import type { Metadata } from "next";
 
 export const dynamic = "force-dynamic";
+
+/* ── Sivukohtainen title/description (QA-006, 29.8.2026): aiemmin kaikki
+   371 pelisivua perivät layoutin "esikatselu"-otsikon. ── */
+export async function generateMetadata(
+  { searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }
+): Promise<Metadata> {
+  const p = await searchParams;
+  const sb = getSupabase();
+  const str = (k: string) => (typeof p[k] === "string" ? (p[k] as string) : null);
+  const kuvavisa = str("kuvavisa"), mega = str("mega"), slug = str("visa"), quizId = str("quiz_id");
+  const suffix = " | Tietoniekka";
+  if (kuvavisa) {
+    const t = KUVAVISA_TITLES[kuvavisa] ?? "Kuvavisa";
+    return { title: `${t} – tunnista kuvasta${suffix}`, description: "Yksi kuva, neljä vaihtoehtoa. Pelaa ilmainen kuvavisa Tietoniekassa." };
+  }
+  if (!sb) return {};
+  if (mega) {
+    const { data } = await sb.from("quizzes").select("title, display_title, teaser").eq("slug", mega).maybeSingle<{ title: string; display_title: string | null; teaser: string | null }>();
+    if (!data) return { title: `Visaa ei löytynyt${suffix}` };
+    return { title: `${data.display_title ?? data.title}${suffix}`, description: data.teaser ?? "Megavisa: yksi istunto ilman taukoja. Pelaa ilmaiseksi Tietoniekassa." };
+  }
+  if (slug || quizId) {
+    let q = sb.from("quizzes").select("title, display_title, teaser").eq("status", "published");
+    q = quizId ? q.eq("id", quizId) : q.eq("slug", slug!);
+    const { data } = await q.maybeSingle<{ title: string; display_title: string | null; teaser: string | null }>();
+    if (!data) return { title: `Visaa ei löytynyt${suffix}` };
+    const name = data.display_title ?? data.title;
+    return { title: `${name}${suffix}`, description: data.teaser ?? `${name} – ilmainen tietovisa Tietoniekassa.` };
+  }
+  return { title: `Visaa ei löytynyt${suffix}` };
+}
+
+const KUVAVISA_TITLES: Record<string, string> = {
+  liput: "Lippuvisa", vaakunat: "Vaakunavisa", vaakuna: "Vaakunavisa", linnut: "Lintuvisa",
+  elaimet: "Eläinvisa", kasvit: "Kasvivisa", maalaukset: "Maalausvisa",
+};
 
 const COLLECTION_ACCENT: Record<string, string> = {
   tv: "#FF3D9E",
@@ -35,19 +75,39 @@ const COLLECTION_HUB: Record<string, string> = {
   elokuvat: "/2-0/kokoelma/elokuvat",
   musiikki: "/2-0/kokoelma/musiikki",
   matkakohteet: "/2-0/kokoelma/matkakohteet",
-  yleistieto: "/2-0/kokoelma/yleistieto",
   kulttuuri: "/2-0/kokoelma/kulttuuri",
   historia: "/2-0/kokoelma/historia",
   luonto: "/2-0/kokoelma/luonto",
   "tunnetut-henkilot": "/2-0/kokoelma/tunnetut-henkilot",
 };
+/* ── Kokoelman tunnistus (QA-003/013 + Heikki 1, 2, 5 — 29.8.2026):
+   kaupunkivisat ovat kannassa collection=yleistieto/category=kaupungit,
+   jääkiekko ja jalkapallo collection=urheilu → tunnistetaan category/genre-
+   kentästä ja ohjataan omille teemasivuilleen. Yleistieto ei ole 2.0:ssa
+   omana kokoelmana (Heikki 3) → hub /2-0/kokoelmat. ── */
+type Resolved = { key: string; label: string; hub: string; bg: string; accent: string };
+function resolveCollection(q: { collection: string | null; category: string | null; genre: string | null }): Resolved {
+  const collection = q.collection ?? "yleistieto";
+  const cat = q.category ?? "", genre = q.genre ?? "";
+  if (cat === "kaupungit") return { key: "kaupungit", label: "Suomen kaupungit", hub: "/2-0/kokoelma/kaupungit", bg: KAUPUNGIT_HERO_IMG, accent: "#E8A320" };
+  if (cat === "jaakiekko" || genre === "jaakiekko") return { key: "jaakiekko", label: "Jääkiekko", hub: "/2-0/kokoelma/jaakiekko", bg: JK_HERO.img, accent: JK_ACCENT };
+  if (genre === "jalkapallo") return { key: "jalkapallo", label: "Jalkapallo", hub: "/2-0/kokoelma/jalkapallo", bg: JP_HERO.img, accent: "#B6FF3C" };
+  if (collection === "yleistieto") return { key: "yleistieto", label: "Yleistieto", hub: "/2-0/kokoelmat", bg: "/20/hero-mikko-laura.webp", accent: "#E8A320" };
+  return {
+    key: collection,
+    label: COLLECTION_LABEL[collection] ?? "Visa",
+    hub: COLLECTION_HUB[collection] ?? "/2-0/kokoelmat",
+    bg: COLLECTION_BG[collection] ?? "/20/hero-mikko-laura.webp",
+    accent: COLLECTION_ACCENT[collection] ?? "#E8A320",
+  };
+}
+
 const COLLECTION_BG: Record<string, string> = {
   tv: "/20/hero-tv-laura.webp",
   urheilu: "/20/hero-urheilu-mikko.webp",
   elokuvat: "/20/teema-elokuvat.webp",
   musiikki: "/20/teema-musiikki.webp",
   matkakohteet: "/20/maantieto/hero-landing.webp",
-  yleistieto: "/20/teema-ruoka-juoma.webp",
   kulttuuri: "/20/kulttuuri/hero-kollaasi.webp",
   historia: "/20/historia/hero-aikajana.webp",
   luonto: "/20/luonto/hero-landing.webp",
@@ -97,9 +157,8 @@ export default async function Peli20({
   const isSankari = params.paivan_sankari === "1" || params.paivan_visa === "1";
 
   const sb = getSupabase();
-  if (!sb || (!quizId && !slug && !kuvavisa && !mega)) {
-    return <main style={{ padding: 32 }}>Visaa ei löytynyt. <a href="/2-0">Takaisin etusivulle</a></main>;
-  }
+  /* Virhetilat → tyylitelty 404 (QA-007, 29.8.2026) */
+  if (!sb || (!quizId && !slug && !kuvavisa && !mega)) notFound();
 
   /* ── MEGA (3.8.2026, MEGA_SPEC §1): viittauskooste mega_questions-taulusta.
      Mega-rivi voi olla draft (RLS "Mega preview readable") — tuotantosivun
@@ -112,9 +171,7 @@ export default async function Peli20({
       // game_mode puuttuu generoiduista tyypeistä (lisätty Portti 1:ssä)
       .eq("game_mode" as unknown as "status", "mega")
       .maybeSingle<{ id: string; slug: string; title: string; display_title: string | null; teaser: string | null; learn: Learn | null }>();
-    if (!mq) {
-      return <main style={{ padding: 32 }}>Megaa ei löytynyt. <a href="/2-0">Takaisin etusivulle</a></main>;
-    }
+    if (!mq) notFound();
     /* Konteksti mukaan (Heikki 4.8.2026): irrotettu kysymys tarvitsee
        lähdevisan nimen ("Mistä Tommi haaveilee?" → chip "Luottomies: All in").
        Kolme litteää kyselyä — syvä sisäkkäisjoin ei toimi PostgRESTissä. */
@@ -198,15 +255,30 @@ export default async function Peli20({
       })
       .filter((q): q is NonNullable<typeof q> => Boolean(q));
 
-    if (questions.length === 0) {
-      return <main style={{ padding: 32 }}>Megassa ei ole vielä kysymyksiä. <a href="/2-0">Takaisin</a></main>;
-    }
+    if (questions.length === 0) notFound();
 
-    const { data: rel } = await sb
-      .from("quiz_cards" as never)
-      .select("id, display_title, title, teaser, collection, genre, question_count")
-      .order("published_at", { ascending: false })
+    /* "Lisää: Megavisat" = muut julkaistut megat oikeilla ?mega=-linkeillä ja
+       oikealla kysymysmäärällä (QA-001, 29.8.2026 — aiemmin quiz_cards-
+       listaus antoi megoille "0 kysymystä" ja rikkinäisen quiz_id-linkin). */
+    const { data: otherMegas } = await sb
+      .from("quizzes")
+      .select("id, slug, title, display_title")
+      .eq("game_mode" as unknown as "status", "mega")
+      .eq("status", "published")
+      .neq("id", mq.id)
+      .order("created_at", { ascending: false })
       .limit(3);
+    const megaIds = ((otherMegas ?? []) as unknown as Array<{ id: string }>).map((m) => m.id);
+    const { data: megaLinks } = megaIds.length
+      ? await sb.from("mega_questions" as never).select("mega_quiz_id").in("mega_quiz_id", megaIds)
+      : { data: [] };
+    const megaCount = new Map<string, number>();
+    for (const l of (megaLinks ?? []) as unknown as Array<{ mega_quiz_id: string }>) {
+      megaCount.set(l.mega_quiz_id, (megaCount.get(l.mega_quiz_id) ?? 0) + 1);
+    }
+    const rel = ((otherMegas ?? []) as unknown as Array<{ id: string; slug: string; title: string; display_title: string | null }>)
+      .filter((m) => (megaCount.get(m.id) ?? 0) > 0)
+      .map((m) => ({ id: m.id, display_title: m.display_title, title: m.title, teaser: null, collection: null, genre: null, question_count: megaCount.get(m.id) ?? 0, slug: m.slug }));
 
     const game: GameQuiz = {
       id: mq.id,
@@ -221,15 +293,11 @@ export default async function Peli20({
       kind: "teksti",
       challengePath: `/2-0/peli?mega=${encodeURIComponent(mega)}`,
       questions,
-      related: (
-        (rel ?? []) as unknown as Array<{
-          id: string; display_title: string | null; title: string; teaser: string | null;
-          collection: string | null; genre: string | null; question_count: number;
-        }>
-      ).map((r) => ({
+      related: rel.map((r) => ({
         id: r.id,
         title: r.display_title ?? r.title,
         meta: `${r.question_count} kysymystä`,
+        href: `/2-0/peli?mega=${encodeURIComponent(r.slug)}`,
       })),
     };
     return <GameClient quiz={game} />;
@@ -261,9 +329,7 @@ export default async function Peli20({
     const allRows = wantedIds.length > 0 ? await getKuvavisatByIds(wantedIds) : await getKuvavisat(kuvavisa, 12);
     const rows = wantedIds.length > 0 ? allRows : allRows.slice(0, 10);
     const spareRows = wantedIds.length > 0 ? [] : allRows.slice(10);
-    if (rows.length === 0) {
-      return <main style={{ padding: 32 }}>Kortistossa ei ole vielä kuvia. <a href="/2-0/kokoelma/kuvavisat">Takaisin kuvavisoihin</a></main>;
-    }
+    if (rows.length === 0) notFound();
 
     /* Ristiinnostot: muut aktiiviset kortistot */
     const { data: deckRows } = await sb.from("kuvavisas").select("type, active");
@@ -314,9 +380,22 @@ export default async function Peli20({
     .eq("status", "published");
   q = quizId ? q.eq("id", quizId) : q.eq("slug", slug!);
   const { data: quiz } = await q.maybeSingle<QuizRow>();
-  if (!quiz) {
-    return <main style={{ padding: 32 }}>Visaa ei löytynyt. <a href="/2-0">Takaisin etusivulle</a></main>;
-  }
+  if (!quiz) notFound();
+
+  const resolved = resolveCollection(quiz);
+  /* Ristiinnostot samasta teemasta: kaupungit/jääkiekko/jalkapallo omista
+     joukoistaan, muut kokoelmasta. Megat pois (question_count 0, oma landing). */
+  let relQ = sb
+    .from("quiz_cards" as never)
+    .select("id, slug, custom_slug, display_title, title, teaser, collection, genre, question_count")
+    .neq("id", quiz.id)
+    .neq("game_mode" as never, "mega");
+  relQ =
+    resolved.key === "kaupungit" ? relQ.eq("category", "kaupungit") :
+    resolved.key === "jaakiekko" ? relQ.or("category.eq.jaakiekko,genre.eq.jaakiekko") :
+    resolved.key === "jalkapallo" ? relQ.eq("genre", "jalkapallo") :
+    resolved.key === "yleistieto" ? relQ.eq("collection", "yleistieto").neq("category", "kaupungit").neq("category", "ruoka-juoma") :
+    relQ.eq("collection", quiz.collection ?? "yleistieto");
 
   const [{ data: qs }, genreRes, relatedRes] = await Promise.all([
     sb
@@ -327,20 +406,11 @@ export default async function Peli20({
     quiz.genre
       ? sb.from("genres" as never).select("label").eq("collection", quiz.collection ?? "").eq("genre_key", quiz.genre).maybeSingle()
       : Promise.resolve({ data: null }),
-    sb
-      .from("quiz_cards" as never)
-      .select("id, slug, custom_slug, display_title, title, teaser, collection, genre, question_count")
-      .eq("collection", quiz.collection ?? "yleistieto")
-      .neq("id", quiz.id)
-      /* Megat eivät kuulu "Lisää: <kokoelma>" -suosituksiin (question_count 0,
-         oma landing) — pelinäkymä 2026, 29.8. */
-      .neq("game_mode" as never, "mega")
-      .order("published_at", { ascending: false })
-      .limit(6),
+    relQ.order("published_at", { ascending: false }).limit(6),
   ]);
 
   const collection = quiz.collection ?? "yleistieto";
-  let accent = COLLECTION_ACCENT[collection] ?? "#E8A320";
+  let accent = resolved.accent;
   if (collection === "urheilu") {
     for (const [re, c] of TEAM_COLORS) if (re.test(quiz.title)) { accent = c; break; }
   }
@@ -372,10 +442,10 @@ export default async function Peli20({
     id: quiz.id,
     title: quiz.display_title ?? quiz.title,
     teaser: learn?.intro ?? quiz.teaser,
-    collectionLabel: COLLECTION_LABEL[collection] ?? "Visa",
+    collectionLabel: resolved.label,
     genreLabel,
-    hubHref: COLLECTION_HUB[collection] ?? "/2-0",
-    bgImg: topicImg ?? COLLECTION_BG[collection] ?? "/20/teema-ruoka-juoma.webp",
+    hubHref: resolved.hub,
+    bgImg: topicImg ?? resolved.bg,
     topicImg,
     accent,
     isSankari,
@@ -403,12 +473,10 @@ export default async function Peli20({
     })),
   };
 
-  if (game.questions.length === 0) {
-    return <main style={{ padding: 32 }}>Visassa ei ole vielä kysymyksiä. <a href="/2-0">Takaisin</a></main>;
-  }
+  if (game.questions.length === 0) notFound();
 
-  const collectionLabel = COLLECTION_LABEL[collection] ?? "Visa";
-  const hubHref = COLLECTION_HUB[collection] ?? "/2-0";
+  const collectionLabel = resolved.label;
+  const hubHref = resolved.hub;
 
   return (
     <>
