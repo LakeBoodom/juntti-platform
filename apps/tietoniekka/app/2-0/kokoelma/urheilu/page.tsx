@@ -232,16 +232,7 @@ export default async function UrheiluLanding() {
         </div>
       </section>
 
-      <footer className="tnu-footer">
-        <div className="tn-shell">
-          <span>Urheilu-kokoelma</span>
-          <span>
-            <a href="/2-0">Etusivu</a>
-            {"  ·  "}
-            <a href="/tietosuoja">Tietosuoja</a>
-          </span>
-        </div>
-      </footer>
+      {/* Alatunniste tulee layoutista (SiteFooter, QA-005 29.8.2026) */}
     </main>
   );
 }
