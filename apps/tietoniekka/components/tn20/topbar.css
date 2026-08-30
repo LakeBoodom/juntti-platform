@@ -49,9 +49,13 @@
   overflow: hidden;
   text-overflow: ellipsis; /* < ~340px: tagline lyhenee, ei vaakavieritystä */
 }
-.tn20 .tn-topbar-right { margin-left: auto; display: flex; align-items: center; gap: 0; }
+.tn20 .tn-topbar-right { margin-left: auto; display: flex; align-items: center; gap: 0; min-width: 0; }
 
-/* ── Nostot (Uusin kokoelma ≥ 1100 px · Suosittu nyt ≥ 700 px) ──────────── */
+/* ── Nostot (Uusin kokoelma ≥ 1500 px · Suosittu nyt ≥ 700 px) ────────────
+   QA-002 (29.8.2026): mitattu putki päällä ("1 päivän putki · Tänään pelattu ✓")
+   rivi vuoti 1100 px: +254, 1200: +161, 1280: +86, 1366: +47, 1440: +13 px →
+   vaakavieritys. "Uusin kokoelma" (≈216 px) näytetään vasta ≥ 1500 px ja
+   putkinapin pitkä teksti (≈150 px) vasta ≥ 1240 px. */
 .tn20 .tn-promo {
   display: none;
   align-items: center;
@@ -69,7 +73,7 @@
 .tn20 .tn-promo[data-promo="suosittu"] .tn-promo-dot { background: var(--tn-lime); }
 .tn20 .tn-promo[data-promo="suosittu"] .tn-promo-kicker { color: var(--tn-lime); }
 @media (min-width: 700px) { .tn20 .tn-promo[data-promo="suosittu"] { display: flex; } }
-@media (min-width: 1100px) { .tn20 .tn-promo[data-promo="uusin"] { display: flex; } }
+@media (min-width: 1500px) { .tn20 .tn-promo[data-promo="uusin"] { display: flex; } }
 
 /* ── Päivän putki -nappi + popover (StreakButton) ────────────────────────── */
 .tn20 .tn-putki { position: relative; flex: none; margin-left: clamp(10px, 1.2vw, 20px); }
@@ -97,7 +101,7 @@
 .tn20 .tn-putki-done { display: flex; align-items: center; gap: 5px; color: var(--tn-lime); }
 .tn20 .tn-putki-donetxt { color: #8e8676; }
 .tn20 .tn-putki-wide { display: none; }
-@media (min-width: 1100px) { .tn20 .tn-putki-wide { display: inline; } }
+@media (min-width: 1240px) { .tn20 .tn-putki-wide { display: inline; } }
 .tn20 .tn-putki-pop {
   position: absolute;
   top: calc(100% + 12px);
