@@ -74,6 +74,10 @@ type HubMeta = {
 /* Kumpi?/Järjestä piilotettu 2.0:sta 10.8.2026 (siirretty 2.5-versioon) —
    pelitapasuodattimissa ei enää linkkejä vanhoihin pelimuotoihin. */
 
+/* Yleistieto ja Ruoka & juoma eivät ole 2.0-julkaisussa omina kokoelmina
+   (Heikki 29.8.2026): hubit poistettu → /2-0/kokoelma/yleistieto ja
+   /ruokajuoma antavat 404. Kategoriat ja visat säilyvät kannassa; yleistieto
+   tuodaan myöhemmin omalla paketilla. */
 const HUBS: Record<string, HubMeta> = {
   tv: {
     name: "TV & Suoratoisto",
@@ -138,18 +142,6 @@ const HUBS: Record<string, HubMeta> = {
     ctaTitle: (n) => `Kaikki ${n} matkavisaa`,
     ctaDesc: "Valitse maanosa tai kohde — tai ota satunnainen matka.",
   },
-  ruokajuoma: {
-    name: "Ruoka & juoma",
-    titleTop: "Ruoka &", titleAccent: "juoma",
-    accent: "#F2C230", accentLight: "#F9D971",
-    img: "/20/teema-ruoka-juoma.webp",
-    lede: (n) => `${n} visaa keittiöistä, resepteistä ja juomista. Kotiruoasta Michelin-tähtiin.`,
-    chips: (n) => [`${n} visaa`, "Osa Yleistietoa"],
-    source: { kind: "category", value: "ruoka-juoma" },
-    modes: [],
-    ctaTitle: (n) => `Kaikki ${n} ruokavisaa`,
-    ctaDesc: "Katalogi kasvaa — uusia keittiöitä tulossa.",
-  },
   kuvavisat: {
     name: "Kuvavisat", oneWord: true,
     titleTop: "Kuva", titleAccent: "visat",
@@ -161,18 +153,6 @@ const HUBS: Record<string, HubMeta> = {
     modes: [],
     ctaTitle: () => "Ota satunnainen kortisto",
     ctaDesc: "Yksi kuva, neljä vaihtoehtoa — kuinka tarkka silmäsi on?",
-  },
-  yleistieto: {
-    name: "Yleistieto", oneWord: true,
-    titleTop: "Yleis", titleAccent: "tieto",
-    accent: "#E8A320", accentLight: "#F5C462",
-    img: "/20/teema-ruoka-juoma.webp",
-    lede: (n) => `${n} visaa historiasta, kulttuurista ja kaikesta siltä väliltä.`,
-    chips: (n) => [`${n} visaa`, "Pitkä häntä asuu täällä"],
-    source: { kind: "collection", value: "yleistieto" },
-    modes: [],
-    ctaTitle: (n) => `Kaikki ${n} yleistietovisaa`,
-    ctaDesc: "Historia, ruoka, muoti ja loput.",
   },
   "tunnetut-henkilot": {
     name: "Tunnetut henkilöt",
