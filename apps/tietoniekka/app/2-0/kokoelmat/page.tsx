@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 // TIETONIEKKA 2.0 — KAIKKI KOKOELMAT -indeksi (navigaation "Kaikki kokoelmat →" -kohde).
 // CD:n navigaatiosääntö (lukittu 17.8.2026): kaikki valikkolinkit vievät todellisille
 // sivuille, eivät etusivun ankkureihin — tämä sivu on se todellinen sivu.
@@ -8,6 +9,11 @@ import { NAV_COLLECTIONS, NAV_MODES, hubHref } from "@/lib/nav";
 import { JP_CLUBS, JP_EURO, JP_PL_GENERAL, JP_CL, JP_FINNS } from "@/lib/jalkapallo";
 import { JK_TEAMS, JK_DERBIES, JK_GENERAL, JK_LIONS, JK_NHL } from "@/lib/jaakiekko";
 import { KAUPUNGIT } from "@/lib/kaupungit";
+
+export const metadata: Metadata = {
+  title: "Kaikki kokoelmat – tietovisat aiheittain | Tietoniekka",
+  description: "Valitse aihe: TV & suoratoisto, urheilu, jääkiekko, jalkapallo, elokuvat, musiikki, maantieto, Suomen kaupungit, tunnetut henkilöt, kulttuuri, historia ja luonto.",
+};
 
 export const dynamic = "force-dynamic";
 
