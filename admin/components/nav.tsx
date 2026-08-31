@@ -28,6 +28,12 @@ export function Nav({ email }: { email?: string | null }) {
             Kuvavisat
           </Link>
           <Link
+            href="/megat"
+            className="text-sm text-muted-foreground hover:text-foreground"
+          >
+            Megat
+          </Link>
+          <Link
             href="/celebrities"
             className="text-sm text-muted-foreground hover:text-foreground"
           >

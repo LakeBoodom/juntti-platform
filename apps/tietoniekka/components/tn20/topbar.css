@@ -1,0 +1,448 @@
+/* TIETONIEKKA 2.0 — NAVIGAATIOJÄRJESTELMÄ (CD:n Navigaatiokonsepti, lukittu 17.8.2026;
+   ylätunniste päivitetty etusivun 2026 prod -designiin 28.8.2026).
+   Skoopattu .tn20-luokkaan kuten muutkin 2.0-tyylit. Valikon avaus 140 ms / sulku 100 ms,
+   prefers-reduced-motion poistaa siirtymät. Tunnusvärit vain 9 px:n pisteinä ja
+   hover-reunuksina — ei täytteinä. */
+
+/* ── Yläpalkki — sticky normaalivirrassa (design: header + border-bottom #241E13).
+   Korkeus elää sisällön mukana (logo + tagline), joten spaceria ei tarvita. ── */
+.tn20 .tn-topbar {
+  position: sticky;
+  top: 0;
+  z-index: 60;
+  display: flex;
+  align-items: center;
+  background: rgba(15, 13, 7, 0.9);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border-bottom: 1px solid #241e13;
+}
+
+.tn20 .tn-topbar-in {
+  width: 100%;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: clamp(12px, 1.5vw, 18px) clamp(16px, 3.4vw, 48px);
+  display: flex;
+  align-items: center;
+  gap: 0;
+}
+.tn20 .tn-brand { flex: none; display: flex; flex-direction: column; gap: 4px; }
+/* < 700 px: brändi saa kutistua ja tagline lyhenee (…) — mitattu 28.8.2026: 320px:ssä
+   tagline (188px @10px) ei mahdu putki-napin + hampurilaisen rinnalle. Leveämmällä
+   brändi on aina max-content-levyinen, tagline kokonaan näkyvissä. */
+@media (max-width: 699px) { .tn20 .tn-brand { flex: 0 1 auto; min-width: 0; } }
+.tn20 .tn-topbar-in .tn-logo {
+  display: flex;
+  align-items: baseline;
+  gap: 1px;
+  font-size: clamp(20px, 2.1vw, 29px);
+  line-height: 1;
+  letter-spacing: -0.012em;
+}
+.tn20 .tn-tagline {
+  font-size: clamp(10px, calc(8.7px + 0.34vw), 12px);
+  font-weight: 500;
+  line-height: 1.2;
+  color: #b9af9b;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis; /* < ~340px: tagline lyhenee, ei vaakavieritystä */
+}
+.tn20 .tn-topbar-right { margin-left: auto; display: flex; align-items: center; gap: 0; min-width: 0; }
+
+/* ── Nostot (Uusin kokoelma ≥ 1500 px · Suosittu nyt ≥ 700 px) ────────────
+   QA-002 (29.8.2026): mitattu putki päällä ("1 päivän putki · Tänään pelattu ✓")
+   rivi vuoti 1100 px: +254, 1200: +161, 1280: +86, 1366: +47, 1440: +13 px →
+   vaakavieritys. "Uusin kokoelma" (≈216 px) näytetään vasta ≥ 1500 px ja
+   putkinapin pitkä teksti (≈150 px) vasta ≥ 1240 px. */
+.tn20 .tn-promo {
+  display: none;
+  align-items: center;
+  gap: 9px;
+  margin-left: 26px;
+  color: #b9af9b;
+  white-space: nowrap;
+  text-decoration: none;
+}
+.tn20 .tn-promo:hover { color: var(--tn-text); }
+.tn20 .tn-promo:focus-visible { outline: 2px solid var(--tn-lime); outline-offset: 2px; border-radius: 6px; }
+.tn20 .tn-promo-dot { width: 7px; height: 7px; border-radius: 999px; background: var(--tn-gold); }
+.tn20 .tn-promo-kicker { font-size: 11px; font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase; color: var(--tn-gold); }
+.tn20 .tn-promo-label { font-size: 14px; font-weight: 700; }
+.tn20 .tn-promo[data-promo="suosittu"] .tn-promo-dot { background: var(--tn-lime); }
+.tn20 .tn-promo[data-promo="suosittu"] .tn-promo-kicker { color: var(--tn-lime); }
+@media (min-width: 700px) { .tn20 .tn-promo[data-promo="suosittu"] { display: flex; } }
+@media (min-width: 1500px) { .tn20 .tn-promo[data-promo="uusin"] { display: flex; } }
+
+/* ── Päivän putki -nappi + popover (StreakButton) ────────────────────────── */
+.tn20 .tn-putki { position: relative; flex: none; margin-left: clamp(10px, 1.2vw, 20px); }
+.tn20 .tn-putki-btn {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0 clamp(10px, 1.1vw, 14px);
+  border: 1px solid rgba(232, 163, 32, 0.45);
+  border-radius: 999px;
+  background: rgba(232, 163, 32, 0.1);
+  color: var(--tn-gold);
+  font-family: var(--tn-font-body);
+  font-size: 14px;
+  font-weight: 800;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.tn20 .tn-putki-btn:hover { border-color: var(--tn-gold); background: rgba(232, 163, 32, 0.18); }
+.tn20 .tn-putki-btn:focus-visible { outline: 2px solid var(--tn-gold); outline-offset: 2px; }
+.tn20 .tn-putki-flame { flex: none; display: block; width: clamp(17px, calc(20px - 0.3vw), 20px); height: clamp(17px, calc(20px - 0.3vw), 20px); }
+.tn20 .tn-putki-txt { display: flex; align-items: center; gap: 5px; }
+.tn20 .tn-putki-done { display: flex; align-items: center; gap: 5px; color: var(--tn-lime); }
+.tn20 .tn-putki-donetxt { color: #8e8676; }
+.tn20 .tn-putki-wide { display: none; }
+@media (min-width: 1240px) { .tn20 .tn-putki-wide { display: inline; } }
+.tn20 .tn-putki-pop {
+  position: absolute;
+  top: calc(100% + 12px);
+  right: 0;
+  z-index: 70;
+  width: min(74vw, 296px);
+  padding: 16px;
+  border: 1px solid var(--tn-line);
+  border-radius: 16px;
+  background: #15120a;
+  box-shadow: 0 22px 48px rgba(0, 0, 0, 0.55);
+  animation: tn-menu-in 140ms ease-out;
+}
+.tn20 .tn-putki-pop-head { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
+.tn20 .tn-putki-pop-title {
+  font-family: var(--tn-font-display);
+  font-weight: 900;
+  font-size: 15px;
+  letter-spacing: -0.01em;
+  text-transform: uppercase;
+  color: var(--tn-text);
+}
+.tn20 .tn-putki-pop-count { font-size: 13px; font-weight: 800; color: var(--tn-gold); white-space: nowrap; }
+.tn20 .tn-putki-pop-hint { margin: 13px 0 0; font-size: 12.5px; line-height: 1.45; color: #b9af9b; text-wrap: pretty; }
+
+/* ── Valikkopainikkeet (lepo / hover / aktiivinen / focus / auki) ──────── */
+.tn20 .tn-topnav { display: none; align-items: center; gap: 6px; margin-left: 20px; }
+@media (min-width: 1100px) { .tn20 .tn-topnav { display: flex; } }
+.tn20 .tn-topnav-item { position: relative; }
+
+.tn20 .tn-topnav-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  height: 44px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--tn-text-soft);
+  font: inherit;
+  font-weight: 600;
+  font-size: 14.5px;
+  cursor: pointer;
+  position: relative;
+}
+.tn20 .tn-topnav-btn:hover { color: var(--tn-text); background: rgba(255, 255, 255, 0.06); }
+.tn20 .tn-topnav-btn:focus-visible {
+  outline: 2px solid var(--tn-lime);
+  outline-offset: 2px;
+}
+/* Aktiivinen sijainti: lihavointi + 3 px lime-alleviivaus (kaksi vihjettä) */
+.tn20 .tn-topnav-btn.tn-active { color: var(--tn-text); font-weight: 800; }
+.tn20 .tn-topnav-btn.tn-active::after {
+  content: "";
+  position: absolute;
+  left: 14px;
+  right: 14px;
+  bottom: 2px;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--tn-lime);
+}
+.tn20 .tn-caret {
+  width: 8px;
+  height: 8px;
+  border-right: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  transform: rotate(45deg) translateY(-2px);
+  transition: transform 140ms ease-out;
+}
+.tn20 .tn-topnav-btn[aria-expanded="true"] .tn-caret { transform: rotate(-135deg) translateY(-2px); }
+
+/* Putki-pilleri poistettu navista (etusivu-README 17.8.2026, Heikin A-päätös) */
+
+/* ── Pudotusvalikot ────────────────────────────────────────────────────── */
+.tn20 .tn-menu {
+  position: absolute;
+  top: calc(100% + 10px);
+  left: 0;
+  background: #191509;
+  border: 1px solid var(--tn-line);
+  border-radius: 16px;
+  padding: 10px;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.55);
+  animation: tn-menu-in 140ms ease-out;
+  z-index: 70;
+}
+@keyframes tn-menu-in {
+  from { opacity: 0; transform: translateY(-6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.tn20 .tn-menu-kokoelmat { width: min(560px, calc(100vw - 32px)); }
+.tn20 .tn-menu-pelimuodot { width: min(360px, calc(100vw - 32px)); }
+
+.tn20 .tn-menu-all {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 46px;
+  padding: 0 12px;
+  border-radius: 10px;
+  color: var(--tn-lime);
+  font-weight: 800;
+  font-size: 14px;
+  text-decoration: none;
+}
+.tn20 .tn-menu-all:hover { background: rgba(255, 255, 255, 0.05); }
+
+.tn20 .tn-menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2px; }
+
+.tn20 .tn-menu-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 52px;
+  padding: 0 12px;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  color: var(--tn-text);
+  font-weight: 700;
+  font-size: 14.5px;
+  text-decoration: none;
+}
+.tn20 .tn-menu-row:hover {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: color-mix(in srgb, var(--dot, #ffffff) 55%, transparent);
+}
+.tn20 .tn-menu-row:focus-visible,
+.tn20 .tn-menu-all:focus-visible,
+.tn20 .tn-selaa:focus-visible {
+  outline: 2px solid var(--tn-lime);
+  outline-offset: 2px;
+}
+.tn20 .tn-menu-dot {
+  flex: none;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--dot, var(--tn-text-dim));
+}
+.tn20 .tn-menu-label { min-width: 0; }
+.tn20 .tn-menu-mode { height: auto; min-height: 56px; padding-block: 8px; }
+.tn20 .tn-menu-modetext { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.tn20 .tn-menu-desc { color: var(--tn-text-muted); font-weight: 500; font-size: 12.5px; }
+
+/* Valikoiden footnotet + Sulje-nappi poistettu (Heikin katselmus 17.8.) */
+
+/* ── Hampurilaisvalikko < 1100 px (design: 44 px, reuna #3A3122, r11) ────── */
+.tn20 .tn-selaa {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  margin-left: 14px;
+  padding: 0;
+  border: 1px solid var(--tn-line);
+  border-radius: 11px;
+  background: transparent;
+  color: var(--tn-text);
+  cursor: pointer;
+}
+.tn20 .tn-selaa:hover { border-color: var(--tn-lime); }
+.tn20 .tn-selaa:active { background: rgba(255, 255, 255, 0.08); }
+.tn20 .tn-selaa-icon {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.tn20 .tn-selaa-icon i {
+  width: 20px;
+  height: 2px;
+  border-radius: 2px;
+  background: currentColor;
+}
+@media (min-width: 1100px) { .tn20 .tn-selaa { display: none; } }
+
+/* ── Murupolkurivi (44 px palkin alla — nav-speksin näkymä 03) ─────────── */
+.tn20 .tn-crumbrow {
+  height: 44px;
+  display: flex;
+  align-items: center;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--tn-text-dim);
+}
+.tn20 .tn-crumbrow-in { display: flex; align-items: center; gap: 8px; width: 100%; }
+.tn20 .tn-crumbrow a { color: var(--tn-text-dim); text-decoration: none; }
+.tn20 .tn-crumbrow a:hover { color: var(--tn-text-soft); }
+.tn20 .tn-crumbrow a:focus-visible { outline: 2px solid var(--tn-lime); outline-offset: 2px; }
+.tn20 .tn-crumbrow-seg { display: inline-flex; align-items: center; gap: 8px; }
+.tn20 .tn-crumbrow-sep { color: #3a3122; }
+.tn20 .tn-crumbrow-cur { color: var(--tn-text-soft); }
+
+/* ── Selaa-alapaneeli ──────────────────────────────────────────────────── */
+.tn20 .tn-sheet-root { position: fixed; inset: 0; z-index: 90; }
+.tn20 .tn-sheet-backdrop {
+  position: absolute;
+  inset: 0;
+  border: 0;
+  background: rgba(0, 0, 0, 0.55);
+  cursor: pointer;
+}
+.tn20 .tn-sheet {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  max-height: 84dvh;
+  overflow-y: auto;
+  background: #191509;
+  border-top: 1px solid var(--tn-line);
+  border-radius: 20px 20px 0 0;
+  padding: 8px 18px calc(20px + env(safe-area-inset-bottom, 0px));
+  animation: tn-sheet-in 160ms ease-out;
+}
+@keyframes tn-sheet-in {
+  from { transform: translateY(24px); opacity: 0.6; }
+  to { transform: translateY(0); opacity: 1; }
+}
+.tn20 .tn-sheet-handle {
+  display: block;
+  width: 44px;
+  height: 20px;
+  margin: 0 auto;
+  border: 0;
+  background:
+    linear-gradient(var(--tn-line), var(--tn-line)) center / 44px 4px no-repeat;
+  border-radius: 999px;
+  cursor: pointer;
+}
+.tn20 .tn-sheet-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 2px 0 6px;
+}
+.tn20 .tn-sheet-title {
+  font-family: Archivo, sans-serif;
+  font-weight: 900;
+  font-size: 18px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.tn20 .tn-sheet-x {
+  width: 48px;
+  height: 48px;
+  border: 0;
+  background: transparent;
+  color: var(--tn-text-soft);
+  font-size: 17px;
+  cursor: pointer;
+  border-radius: 12px;
+}
+.tn20 .tn-sheet-x:hover { background: rgba(255, 255, 255, 0.06); }
+.tn20 .tn-sheet-group {
+  margin: 14px 0 4px;
+  color: var(--tn-text-dim);
+  font-weight: 800;
+  font-size: 11.5px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+.tn20 .tn-sheet-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 48px;
+  padding: 4px 10px;
+  border-radius: 10px;
+  color: var(--tn-text);
+  font-weight: 700;
+  font-size: 15px;
+  text-decoration: none;
+}
+.tn20 .tn-sheet-row:active { background: rgba(255, 255, 255, 0.06); }
+.tn20 .tn-sheet-all {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 50px;
+  margin-top: 12px;
+  border: 1px solid var(--tn-line);
+  border-radius: 12px;
+  color: var(--tn-lime);
+  font-weight: 800;
+  font-size: 14.5px;
+  text-decoration: none;
+}
+
+/* ── Reduced motion: tilat vaihtuvat välittömästi ──────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .tn20 .tn-topbar,
+  .tn20 .tn-caret { transition: none; }
+  .tn20 .tn-menu,
+  .tn20 .tn-sheet { animation: none; }
+}
+
+/* ── /kokoelmat — Kaikki kokoelmat -indeksi ────────────────────────── */
+.tn20 .tn-colx-head { padding: clamp(26px, 4vw, 54px) 0 clamp(12px, 2vw, 22px); }
+.tn20 .tn-colx-title {
+  margin: 0 0 10px;
+  font-size: clamp(34px, 5.4vw, 64px);
+  line-height: 0.92;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+}
+.tn20 .tn-colx-title span { color: var(--tn-lime); }
+.tn20 .tn-colx-lede { margin: 0; color: var(--tn-text-soft); max-width: 56ch; font-size: clamp(14px, 1.3vw, 17px); }
+.tn20 .tn-colx-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 10px;
+  padding: 18px 0 8px;
+}
+.tn20 .tn-colx-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 64px;
+  padding: 10px 16px;
+  border: 1px solid var(--tn-line);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.02);
+  color: var(--tn-text);
+  font-weight: 800;
+  font-size: 15.5px;
+  text-decoration: none;
+}
+.tn20 .tn-colx-card:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: color-mix(in srgb, var(--dot, #ffffff) 55%, transparent);
+}
+.tn20 .tn-colx-card:focus-visible { outline: 2px solid var(--tn-lime); outline-offset: 2px; }
+.tn20 .tn-colx-count { margin-left: auto; color: var(--tn-text-dim); font-weight: 600; font-size: 12.5px; white-space: nowrap; }
+.tn20 .tn-colx-sub {
+  margin: 26px 0 4px;
+  color: var(--tn-text-dim);
+  font-weight: 800;
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+.tn20 .tn-colx-foot { padding: 26px 0 60px; }

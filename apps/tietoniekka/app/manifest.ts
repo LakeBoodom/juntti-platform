@@ -6,7 +6,7 @@ export default function manifest(): MetadataRoute.Manifest {
     name: "Tietoniekka",
     short_name: "Tietoniekka",
     description:
-      "Tietoniekka — päivittäin vaihtuva visa, julkkisten synttärit. Aina ilmainen.",
+      "Tietoniekka — suomalainen tietovisasivusto. Yli 500 visaa, aina ilmainen.",
     start_url: "/",
     display: "standalone",
     background_color: "#0f1520",

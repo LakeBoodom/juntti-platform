@@ -23,7 +23,7 @@ export const metadata: Metadata = {
     default: `${brand.name} — testaa tietosi`,
     template: `%s | ${brand.name}`,
   },
-  description: `${brand.name} — päivittäin vaihtuva visa, julkkisten synttärit. Aina ilmainen.`,
+  description: `${brand.name} — suomalainen tietovisasivusto. Yli 500 visaa, Päivän visa, megavisat ja kuvavisat. Aina ilmainen.`,
   applicationName: brand.name,
   keywords: [
     "visa",
@@ -40,7 +40,7 @@ export const metadata: Metadata = {
     url: SITE_URL,
     siteName: brand.name,
     title: `${brand.name} — testaa tietosi`,
-    description: `Päivittäin vaihtuva visa, julkkisten synttärit. Aina ilmainen.`,
+    description: `Suomalainen tietovisasivusto — yli 500 visaa, Päivän visa, megavisat ja kuvavisat. Aina ilmainen.`,
     images: [
       {
         url: "/og-image.png",
@@ -53,7 +53,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: `${brand.name} — testaa tietosi`,
-    description: `Päivittäin vaihtuva visa, julkkisten synttärit.`,
+    description: `Suomalainen tietovisasivusto — yli 500 visaa, aina ilmainen.`,
     images: ["/og-image.png"],
   },
   robots: {
@@ -95,7 +95,7 @@ export default function RootLayout({
             name: brand.name,
             url: SITE_URL,
             logo: `${SITE_URL}/og-image.png`,
-            description: `${brand.name} — suomalainen tietovisa-sivusto. Päivittäin vaihtuva visa, yli 9 kategoriaa, päivän sankari -profiilit. Aina ilmainen, ei rekisteröitymistä.`,
+            description: `${brand.name} — suomalainen tietovisasivusto. Yli 500 visaa: Päivän visa, kokoelmat, megavisat ja kuvavisat. Aina ilmainen, ei rekisteröitymistä.`,
             sameAs: [],
           })}
         </Script>
@@ -110,7 +110,7 @@ export default function RootLayout({
             name: brand.name,
             url: SITE_URL,
             inLanguage: "fi-FI",
-            description: `Suomenkielisiä tietovisoja: päivän visa, kategoriat (urheilu, maantieto, luonto, historia, tv-sarjat, elokuvat, musiikki, ruoka & juoma, muoti & design), kuvavisat (liput, vaakunat, linnut, kasvit, eläimet) ja päivän sankari -profiilit. Tietoniekka on ilmainen suomalainen visa-sivusto.`,
+            description: `Suomenkielisiä tietovisoja: Päivän visa, kokoelmat (urheilu, jääkiekko, jalkapallo, elokuvat, tv, musiikki, historia, luonto, matkakohteet, kulttuuri, Suomen kaupungit, tunnetut henkilöt), megavisat ja kuvavisat (liput, vaakunat, linnut, kasvit, eläimet). Tietoniekka on ilmainen suomalainen tietovisasivusto.`,
             publisher: {
               "@type": "Organization",
               name: brand.name,

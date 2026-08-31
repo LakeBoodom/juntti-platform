@@ -1,54 +1,59 @@
+// TIETONIEKKA — sitemap 2.0-rakenteesta (julkaisu 31.8.2026).
+// 1.0:n /kategoria/* ja /sankari/* poistuivat julkaisussa (301-ohjaukset
+// next.config.mjs:ssä) eivätkä kuulu enää sitemapiin. Visasivujen kanoninen
+// osoite on /visa/<slug> (SEO_STRATEGIA §3.1).
 import type { MetadataRoute } from "next";
-import { CATEGORIES } from "@/lib/categories";
-import { SANKARIT } from "@/lib/sankarit";
 import { getPublishedQuizSlugs } from "@/lib/queries";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://tietoniekka.fi";
 
 export const revalidate = 3600;
 
+/* Kokoelmahubit = app/(tn20)/kokoelma/* -sivut. Pidetään listana tässä, koska
+   reitit ovat staattisia sivuja (11 omaa hakemistoa + kuvavisat ja
+   tunnetut-henkilot [collection]-reitin HUBS-taulusta). Uusi hub → lisää rivi. */
+const COLLECTION_HUBS = [
+  "elokuvat",
+  "historia",
+  "jaakiekko",
+  "jalkapallo",
+  "kaupungit",
+  "kulttuuri",
+  "kuvavisat",
+  "luonto",
+  "matkakohteet",
+  "musiikki",
+  "tunnetut-henkilot",
+  "tv",
+  "urheilu",
+];
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const now = new Date();
 
   const staticPages: MetadataRoute.Sitemap = [
-    {
-      url: `${SITE_URL}/`,
-      lastModified: now,
-      changeFrequency: "daily",
-      priority: 1.0,
-    },
-    {
-      url: `${SITE_URL}/tietosuoja`,
-      lastModified: now,
-      changeFrequency: "yearly",
-      priority: 0.2,
-    },
+    { url: `${SITE_URL}/`, lastModified: now, changeFrequency: "daily", priority: 1.0 },
+    { url: `${SITE_URL}/kokoelmat`, lastModified: now, changeFrequency: "weekly", priority: 0.9 },
+    { url: `${SITE_URL}/megavisat`, lastModified: now, changeFrequency: "weekly", priority: 0.8 },
+    { url: `${SITE_URL}/tietosuoja`, lastModified: now, changeFrequency: "yearly", priority: 0.2 },
   ];
 
-  const categoryPages: MetadataRoute.Sitemap = CATEGORIES.map((c) => ({
-    url: `${SITE_URL}/kategoria/${c.slug}`,
+  const collectionPages: MetadataRoute.Sitemap = COLLECTION_HUBS.map((slug) => ({
+    url: `${SITE_URL}/kokoelma/${slug}`,
     lastModified: now,
-    changeFrequency: "weekly",
-    priority: 0.8,
+    changeFrequency: "weekly" as const,
+    priority: 0.9,
   }));
 
-  const sankariPages: MetadataRoute.Sitemap = SANKARIT.map((s) => ({
-    url: `${SITE_URL}/sankari/${s.slug}`,
-    lastModified: now,
-    changeFrequency: "monthly",
-    priority: 0.6,
-  }));
-
-  // Yksittäiset visat — /visa/<slug> (löytyy myös jakolinkeistä)
   const quizzes = await getPublishedQuizSlugs();
   const quizPages: MetadataRoute.Sitemap = quizzes
     .filter((q) => q.slug)
     .map((q) => ({
       url: `${SITE_URL}/visa/${q.slug}`,
       lastModified: q.updated_at ? new Date(q.updated_at) : now,
-      changeFrequency: "monthly",
+      changeFrequency: "monthly" as const,
       priority: 0.7,
     }));
 
-  return [...staticPages, ...categoryPages, ...sankariPages, ...quizPages];
+  return [...staticPages, ...collectionPages, ...quizPages];
 }
