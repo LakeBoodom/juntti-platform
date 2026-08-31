@@ -119,6 +119,10 @@ export default function RootLayout({
           })}
         </Script>
         {children}
+        {/* Vercel Web Analytics (31.8.2026) — Hobby-taso, sivulataukset ilman
+            evästeitä. Skripti suoraan (ei @vercel/analytics-pakettia, jottei
+            lockfile muutu); toimii vain Vercel-domaineilla, muualla 404 on ok. */}
+        <script defer src="/_vercel/insights/script.js" />
         {PLAUSIBLE_DOMAIN && (
           <Script
             defer
