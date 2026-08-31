@@ -50,7 +50,7 @@ export default function NotFound() {
           }}
         >
           Etsitty sivu on joko poistunut tai sitä ei ole koskaan ollutkaan.
-          Veikko ei tähän osaa vastata.
+          Laura ja Mikko eivät tähän osaa vastata.
         </p>
         <Link
           href="/"
