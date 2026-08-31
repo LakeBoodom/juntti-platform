@@ -37,3 +37,5 @@ const nextConfig = {
 };
 
 export default nextConfig;
+
+// Julkaisu 31.8.2026: 2.0 juuressa, 1.0-reitit poistettu.
