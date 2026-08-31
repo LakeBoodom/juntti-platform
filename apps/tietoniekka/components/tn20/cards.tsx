@@ -133,7 +133,7 @@ export function SportCard({
 }) {
   const variant = cardVariant(quiz.id);
   const title = quiz.display_title ?? quiz.title;
-  const link = href ?? `/2-0/peli?quiz_id=${quiz.id}`;
+  const link = href ?? `/peli?quiz_id=${quiz.id}`;
   const meta = `${MODE_LABEL[quiz.game_mode ?? "klassinen"] ?? quiz.game_mode} · ${quiz.question_count} kys.`;
 
   return (

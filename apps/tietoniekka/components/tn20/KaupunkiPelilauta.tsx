@@ -72,7 +72,7 @@ export default function KaupunkiPelilauta({ publishedIds, questionCounts }: Prop
   const sel = KAUPUNGIT.find((c) => c.id === selId) ?? KAUPUNGIT[0];
   const selStamped = stamps.has(sel.id);
   const selPlayable = publishedIds.has(sel.id);
-  const selHref = selPlayable ? `/2-0/peli?visa=${sel.quizSlug}` : null;
+  const selHref = selPlayable ? `/peli?visa=${sel.quizSlug}` : null;
 
   function pick(id: string, scroll: boolean) {
     setSelId(id);

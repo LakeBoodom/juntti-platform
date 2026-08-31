@@ -400,7 +400,7 @@
   .tn20 .tn-sheet { animation: none; }
 }
 
-/* ── /2-0/kokoelmat — Kaikki kokoelmat -indeksi ────────────────────────── */
+/* ── /kokoelmat — Kaikki kokoelmat -indeksi ────────────────────────── */
 .tn20 .tn-colx-head { padding: clamp(26px, 4vw, 54px) 0 clamp(12px, 2vw, 22px); }
 .tn20 .tn-colx-title {
   margin: 0 0 10px;

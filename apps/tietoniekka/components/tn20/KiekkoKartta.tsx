@@ -14,7 +14,7 @@
 // - Kosketusalue 44×44 px joka pallolle (::before); päällekkäisissä pareissa
 //   (Tappara/Ilves, HIFK/Jokerit) pienemmän SM-määrän seura on päällä.
 // - Julkaisematon visa: CTA → "Visa tulossa" -tilamerkki (README luku 3).
-// Tyylit: app/2-0/jaakiekko.css (.tnj-*).
+// Tyylit: app/jaakiekko.css (.tnj-*).
 
 import { useMemo, useRef, useState } from "react";
 import { JK_MAP_IMG, type JkTeam } from "@/lib/jaakiekko";

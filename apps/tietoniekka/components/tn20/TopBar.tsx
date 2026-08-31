@@ -22,7 +22,7 @@
 //   Palkki on nyt sticky NORMAALIVIRRASSA (ei fixed + spacer) — korkeus elää
 //   taglinen mukana. Nostojen sisältö lib/etusivu.ts HEADER_PROMOS (kausivaihto
 //   yhdestä paikasta).
-// - Piilossa pelinäkymässä (/2-0/peli) — pelikuoren omat logosäännöt (lukittu 1.8.2026).
+// - Piilossa pelinäkymässä (/peli) — pelikuoren omat logosäännöt (lukittu 1.8.2026).
 // - Ei Tänään-kohtaa, ei Klassista, ei hakua eikä tiliä (CD:n säännöt).
 //   Kaikki linkit vievät todellisille sivuille — ei etusivun ankkureihin.
 import "./topbar.css";
@@ -92,14 +92,15 @@ export default function TopBar() {
     return () => document.removeEventListener("keydown", onKey);
   }, [open, sheet, closeMenu]);
 
-  /* Pelinäkymä on headeriton (pelikuoren logosäännöt, lukittu 1.8.2026) */
-  if (pathname.startsWith("/2-0/peli")) return null;
+  /* Pelinäkymä on headeriton (pelikuoren logosäännöt, lukittu 1.8.2026).
+     /visa/<slug> on pelisivun kanoninen osoite (julkaisu 31.8.2026) → sama sääntö. */
+  if (pathname.startsWith("/peli") || pathname.startsWith("/visa")) return null;
 
-  const home = pathname === "/2-0" || pathname === "/2-0/";
-  const isKuvavisat = pathname.startsWith("/2-0/kokoelma/kuvavisat");
+  const home = pathname === "/";
+  const isKuvavisat = pathname.startsWith("/kokoelma/kuvavisat");
   const activeKokoelmat =
-    (pathname.startsWith("/2-0/kokoelma") && !isKuvavisat) || pathname.startsWith("/2-0/kokoelmat");
-  const activePelimuodot = pathname.startsWith("/2-0/megavisat") || isKuvavisat;
+    (pathname.startsWith("/kokoelma") && !isKuvavisat) || pathname.startsWith("/kokoelmat");
+  const activePelimuodot = pathname.startsWith("/megavisat") || isKuvavisat;
 
   /* Nuolinäppäimet valikon riveillä — eivät vieritä sivua */
   const onMenuKeyDown = (e: React.KeyboardEvent) => {
@@ -118,7 +119,7 @@ export default function TopBar() {
       <header className="tn-topbar">
         <div className="tn-topbar-in">
           <div className="tn-brand">
-            <a className="tn-logo" href="/2-0">
+            <a className="tn-logo" href="/">
               <b>TIETO</b>
               <span>NIEKKA</span>
             </a>
@@ -140,7 +141,7 @@ export default function TopBar() {
               </button>
               {open === "kokoelmat" && (
                 <div ref={menuRef} className="tn-menu tn-menu-kokoelmat" onKeyDown={onMenuKeyDown}>
-                  <a className="tn-menu-all" href="/2-0/kokoelmat" onClick={() => closeMenu(false)}>
+                  <a className="tn-menu-all" href="/kokoelmat" onClick={() => closeMenu(false)}>
                     Kaikki kokoelmat <span aria-hidden>→</span>
                   </a>
                   <div className="tn-menu-grid">
@@ -263,7 +264,7 @@ export default function TopBar() {
                 <span className="tn-menu-label">{c.label}</span>
               </a>
             ))}
-            <a className="tn-sheet-all" href="/2-0/kokoelmat" onClick={() => setSheet(false)}>
+            <a className="tn-sheet-all" href="/kokoelmat" onClick={() => setSheet(false)}>
               Kaikki kokoelmat →
             </a>
           </div>
