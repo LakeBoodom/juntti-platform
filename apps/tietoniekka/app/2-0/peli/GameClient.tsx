@@ -208,6 +208,7 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
   const openerRef = useRef<HTMLElement | null>(null);
   const zoomOpenerRef = useRef<HTMLElement | null>(null);
   const anchorTop = useRef<number | null>(null);
+  const fbSlotRef = useRef<HTMLDivElement>(null);
   const recorded = useRef(false);
   const playIdRef = useRef<string | null>(null);
   const rafRef = useRef<number | null>(null);
@@ -266,6 +267,24 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
     m.style.setProperty("padding-top", `${pad}px`, "important");
   }, [locked]);
   useLayoutEffect(() => { applyFreeze(); }, [applyFreeze, qi, phase]);
+
+  /* MOBIILI (Heikki 30.8.2026, QA-kierros 2): kapealla näytöllä palaute ja
+     Seuraava-nappi jäävät vastausten alle piiloon → vieritetään palaute
+     näkyviin heti lukituksen jälkeen (HUD:n korkeus huomioiden), kuten
+     aiemmassa pelinäkymässä. Desktopilla (≥880) freeze hoitaa vakauden. */
+  useEffect(() => {
+    if (!locked || phase !== "play") return;
+    const m = mainRef.current, el = fbSlotRef.current, root = rootRef.current;
+    if (!m || !el || m.clientWidth >= 880) return;
+    const id = window.setTimeout(() => {
+      const hud = root?.querySelector<HTMLElement>(".tng-top");
+      const hudH = hud ? hud.getBoundingClientRect().height : 0;
+      const top = el.getBoundingClientRect().top + window.scrollY - hudH - 10;
+      const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      try { window.scrollTo({ top, behavior: reduce ? "auto" : "smooth" }); } catch { /* no-op */ }
+    }, 80);
+    return () => window.clearTimeout(id);
+  }, [locked, phase]);
 
   /* ── Dialogien fokus + inert-tausta ── */
   useEffect(() => {
@@ -693,7 +712,7 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
                 </div>
 
                 {locked && (
-                  <div className="tng-fbslot">
+                  <div className="tng-fbslot" ref={fbSlotRef}>
                     <div className="tng-fb" data-fb={sel != null && q.options[sel] === q.correct ? "ok" : "bad"} role="status" aria-live="polite">
                       <div className="tng-fb-head">
                         <span className="tng-fbicon" aria-hidden>{sel != null && q.options[sel] === q.correct ? "✓" : "✕"}</span>
