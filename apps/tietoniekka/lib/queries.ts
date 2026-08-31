@@ -2,7 +2,8 @@
 // V1.0: ei kakkuksen, kaikki request-time. Voidaan lisätä Next-cache myöhemmin.
 
 import { getSupabase, SITE_SLUG } from "./supabase";
-import type { RelatedQuiz } from "../app/peli/questions";
+/* 1.0:n app/peli/questions.ts poistui julkaisussa 31.8.2026 — tyyppi siirretty tähän. */
+type RelatedQuiz = { id: string; title: string; slug: string | null };
 
 let _siteId: string | null = null;
 async function getSiteId(): Promise<string | null> {

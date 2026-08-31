@@ -1,5 +1,5 @@
 // TIETONIEKKA 2.0 — NAVIGAATION KOKOONPANO (CD:n Navigaatiokonsepti, lukittu 17.8.2026).
-// Yksi lähde valikoille, mobiilin Selaa-paneelille ja /2-0/kokoelmat-indeksille.
+// Yksi lähde valikoille, mobiilin Selaa-paneelille ja /kokoelmat-indeksille.
 // HUOM: Liput EI ole tässä listassa (Heikki 17.8.: lippuvisat ovat osa Kuvavisoja,
 // joiden navigaatio kulkee Pelimuodot-valikon kautta). Visamäärät tulevat AINA
 // kannasta (layout laskee quiz_cards-näkymästä) — ei kovakoodattuja lukuja.
@@ -15,7 +15,7 @@ export const NAV_COLLECTIONS: NavCollection[] = [
   { slug: "urheilu", label: "Urheilu", color: "#B6FF3C" },
   /* Jääkiekko ja Jalkapallo (Heikki 25.8.2026): omat teemakokoelmat, jotka
      nostetaan navigaatioon omina kohtinaan heti Urheilun perään, vaikka
-     niiden visat ovat kannassa urheilu-kokoelmaa — /2-0/kokoelmat-sivu
+     niiden visat ovat kannassa urheilu-kokoelmaa — /kokoelmat-sivu
      laskee näiden visamäärät teemasivujen visalistoista (ei collectionista). */
   { slug: "jaakiekko", label: "Jääkiekko", color: "#4FD1F5" },
   { slug: "jalkapallo", label: "Jalkapallo", color: "#35D6A0" },
@@ -43,8 +43,8 @@ export type NavMode = {
 /* Klassista ei nosteta navigaatioon (CD:n sääntö: se on visojen oletusmuoto).
    Rakenne kestää uudet rivit sellaisenaan → Kumpi? ja Järjestä lisätään 2.5:ssä. */
 export const NAV_MODES: NavMode[] = [
-  { href: "/2-0/megavisat", label: "Megavisat", desc: "20–50 kysymystä — pitkä peli", color: "#E8A320" },
-  { href: "/2-0/kokoelma/kuvavisat", label: "Kuvavisat", desc: "Tunnista kuvasta — liput, vaakunat, linnut", color: "#4C9AFF" },
+  { href: "/megavisat", label: "Megavisat", desc: "20–50 kysymystä — pitkä peli", color: "#E8A320" },
+  { href: "/kokoelma/kuvavisat", label: "Kuvavisat", desc: "Tunnista kuvasta — liput, vaakunat, linnut", color: "#4C9AFF" },
 ];
 
-export const hubHref = (slug: string) => `/2-0/kokoelma/${slug}`;
+export const hubHref = (slug: string) => `/kokoelma/${slug}`;

@@ -109,8 +109,8 @@ export const UL_LOHKOT: UlLohko[] = [
 /** Omat teemasivut -porttikortit (README: portteja, EI visalistoja —
     eivät koskaan avaudu paikan päällä eivätkä näytä yksittäisiä visoja). */
 export const UL_GATES = [
-  { title: "Jääkiekko", desc: "Liigajoukkueet, Leijonat ja suomalaiset NHL:ssä. Kokonainen teemasivu omalla rakenteellaan.", href: "/2-0/kokoelma/jaakiekko", img: ulImg("gate-hockey"), pos: "center 40%", color: "#4FD1F5" },
-  { title: "Jalkapallo", desc: "Valioliiga, Euroopan suurseurat ja Mestarien liiga. Yli 40 visaa omalla teemasivullaan.", href: "/2-0/kokoelma/jalkapallo", img: ulImg("gate-football"), pos: "center 38%", color: "#B6FF3C" },
+  { title: "Jääkiekko", desc: "Liigajoukkueet, Leijonat ja suomalaiset NHL:ssä. Kokonainen teemasivu omalla rakenteellaan.", href: "/kokoelma/jaakiekko", img: ulImg("gate-hockey"), pos: "center 40%", color: "#4FD1F5" },
+  { title: "Jalkapallo", desc: "Valioliiga, Euroopan suurseurat ja Mestarien liiga. Yli 40 visaa omalla teemasivullaan.", href: "/kokoelma/jalkapallo", img: ulImg("gate-football"), pos: "center 38%", color: "#B6FF3C" },
 ] as const;
 
 /** Johdetut arvot (README §Laajennettavuus — ei koskaan kovakoodata):
