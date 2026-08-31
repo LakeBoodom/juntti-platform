@@ -1,0 +1,389 @@
+/* ══════════ SUOMEN KAUPUNGIT -teemasivu (.tnk2-*) — CD 27.8.2026 ══════════
+   design_handoff_suomen_kaupungit/README.md. Matkapassi-konsepti: kartta on
+   pelilauta, leimat kertyvät localStorageen pelaamalla (ei kirjautumista).
+   Design-tokenit portattu suoraan README:n taulukoista. Otsikkokoot
+   KORTTISÄÄNTÖ-kalibroitu (ks. CLAUDE.md) — kalibrointi dokumentoitu
+   kunkin säännön kohdalla mittauksen jälkeen. */
+
+:root {
+  --tnk2-bg: #131109;
+  --tnk2-bg-deep: #0F0D07;
+  --tnk2-card: #1C1810;
+  --tnk2-map-bg: #191509;
+  --tnk2-map-land: #221C10;
+  --tnk2-map-line: #4A3F28;
+  --tnk2-border-hair: #241E13;
+  --tnk2-border: #3A3122;
+  --tnk2-border-strong: #4A3F28;
+  --tnk2-track: #2A2416;
+  --tnk2-ink-strong: #F5F0E6;
+  --tnk2-ink: #CFC7B6;
+  --tnk2-ink-dim: #B9AF9B;
+  --tnk2-meta: #8E8676;
+  --tnk2-meta-weak: #5F594C;
+  --tnk2-accent: #E8A320;
+  --tnk2-accent-hover: #F5C462;
+  --tnk2-stamp: #35D6A0;
+  --tnk2-cta: #B6FF3C;
+  --tnk2-cta-hover: #C9FF6E;
+}
+
+@keyframes tnk2Pulse { 0%,100% { opacity:.4; transform:scale(1); } 50% { opacity:0; transform:scale(2.6); } }
+@keyframes tnk2Dash { to { stroke-dashoffset:-28; } }
+
+.tn20 .tnk2 { background: var(--tnk2-bg); color: var(--tnk2-ink-strong); }
+
+/* ── Hero ── */
+.tn20 .tnk2-herowrap { position: relative; border-bottom: 1px solid var(--tnk2-border-hair); overflow: hidden; }
+.tn20 .tnk2-hero-bg { position: absolute; inset: 0; pointer-events: none; }
+.tn20 .tnk2-hero-bg img { width: 100%; height: 100%; object-fit: cover; object-position: right 34%; }
+.tn20 .tnk2-hero-bg::before, .tn20 .tnk2-hero-bg::after { content: ""; position: absolute; inset: 0; }
+.tn20 .tnk2-hero-bg::before {
+  background: linear-gradient(to right, var(--tnk2-bg) 0%, rgba(19,17,9,.94) 24%, rgba(19,17,9,.72) 42%, rgba(19,17,9,.34) 66%, rgba(19,17,9,.1) 100%);
+}
+.tn20 .tnk2-hero-bg::after {
+  background: linear-gradient(to top, var(--tnk2-bg) 0%, rgba(19,17,9,.45) 22%, rgba(19,17,9,0) 58%);
+}
+.tn20 .tnk2-hero {
+  position: relative; z-index: 2; padding-block: clamp(26px,4cqw,64px) clamp(30px,4cqw,54px);
+  min-height: clamp(370px,40cqw,600px); display: flex; flex-direction: column; justify-content: center;
+}
+.tn20 .tnk2-badge {
+  display: inline-flex; align-items: center; gap: 9px; width: fit-content;
+  padding: clamp(6px,.8cqw,10px) clamp(11px,1.3cqw,16px); border-radius: 999px;
+  background: rgba(232,163,32,.13); border: 1px solid rgba(232,163,32,.45);
+  font-size: clamp(9px,1cqw,12px); font-weight: 800; letter-spacing: .14em;
+  text-transform: uppercase; color: var(--tnk2-accent); margin-bottom: clamp(12px,1.5cqw,20px);
+}
+.tn20 .tnk2-badge i { position: relative; width: 7px; height: 7px; display: block; }
+.tn20 .tnk2-badge i::before, .tn20 .tnk2-badge i::after {
+  content: ""; position: absolute; inset: 0; border-radius: 999px; background: var(--tnk2-accent);
+}
+.tn20 .tnk2-badge i::after { animation: tnk2Pulse 2s ease-out infinite; }
+
+.tn20 .tnk2-h1 {
+  margin: 0 0 clamp(14px,1.8cqw,24px); font-family: var(--tn-font-display); font-weight: 900;
+  font-variation-settings: "wdth" 68;
+  /* KORTTISÄÄNTÖ-kalibrointi tehdään mittauksella ennen julkaisua (ks. build-vaihe) */
+  font-size: clamp(40px,8.6cqw,126px); line-height: .82; letter-spacing: -.025em;
+  text-transform: uppercase; max-width: 14ch;
+  overflow-wrap: normal; word-break: keep-all;
+}
+.tn20 .tnk2-lede {
+  margin: 0 0 clamp(22px,3cqw,44px); font-size: clamp(14px,1.55cqw,21px); line-height: 1.5;
+  color: var(--tnk2-ink); max-width: 44ch; text-wrap: pretty;
+}
+
+/* ── Matkapassikortti ── */
+.tn20 .tnk2-passport {
+  width: min(100%,380px); border: 1px solid rgba(90,78,52,.9); border-radius: clamp(14px,1.8cqw,22px);
+  background: rgba(22,19,11,.78); backdrop-filter: blur(14px); padding: clamp(16px,1.9cqw,26px);
+}
+.tn20 .tnk2-passport-row1 {
+  display: flex; align-items: baseline; justify-content: space-between; gap: 12px;
+  margin-bottom: clamp(10px,1.2cqw,15px);
+}
+.tn20 .tnk2-passport-label {
+  font-size: clamp(9px,.95cqw,12px); font-weight: 800; letter-spacing: .18em;
+  text-transform: uppercase; color: var(--tnk2-meta);
+}
+.tn20 .tnk2-passport-pct {
+  font-size: clamp(9px,.95cqw,12px); font-weight: 800; letter-spacing: .1em;
+  text-transform: uppercase; color: var(--tnk2-stamp);
+}
+.tn20 .tnk2-passport-num {
+  display: flex; align-items: baseline; gap: 8px; font-family: var(--tn-font-display); font-weight: 900;
+  font-variation-settings: "wdth" 66; line-height: .85; letter-spacing: -.03em;
+  margin-bottom: clamp(12px,1.4cqw,18px);
+}
+.tn20 .tnk2-passport-num b { font-size: clamp(46px,5.6cqw,78px); color: var(--tnk2-stamp); font-weight: 900; }
+.tn20 .tnk2-passport-num span.tot { font-size: clamp(20px,2.2cqw,32px); color: var(--tnk2-meta-weak); }
+.tn20 .tnk2-passport-num span.lbl {
+  font-size: clamp(11px,1.15cqw,14px); font-family: var(--tn-font-body); font-weight: 700; line-height: 1.25;
+  color: var(--tnk2-ink-dim); align-self: flex-end; padding-bottom: 4px;
+}
+.tn20 .tnk2-passport-bar { height: 8px; border-radius: 999px; background: var(--tnk2-track); overflow: hidden; margin-bottom: clamp(12px,1.4cqw,18px); }
+.tn20 .tnk2-passport-bar > i { display: block; height: 100%; background: var(--tnk2-stamp); border-radius: 999px; }
+.tn20 .tnk2-passport-stats {
+  display: flex; gap: 1px; background: var(--tnk2-border); border: 1px solid var(--tnk2-border);
+  border-radius: 10px; overflow: hidden;
+}
+.tn20 .tnk2-passport-stats > div { flex: 1; background: var(--tnk2-card); padding: clamp(9px,1.05cqw,13px) clamp(8px,1cqw,12px); }
+.tn20 .tnk2-passport-stat-v {
+  font-family: var(--tn-font-display); font-weight: 900; font-variation-settings: "wdth" 70;
+  font-size: clamp(15px,1.7cqw,22px); line-height: 1; color: var(--tnk2-ink-strong);
+  overflow-wrap: normal; word-break: keep-all;
+}
+.tn20 .tnk2-passport-stat-k { font-size: clamp(9px,.92cqw,11.5px); font-weight: 700; color: var(--tnk2-meta); margin-top: 5px; }
+
+/* ── Osio-otsikko (yhteinen Pelilaudalle ja Kaikki kaupungit -osiolle) ── */
+.tn20 .tnk2-eyebrow-row { display: flex; align-items: baseline; gap: clamp(10px,1.4cqw,18px); margin-bottom: clamp(10px,1.2cqw,16px); }
+.tn20 .tnk2-eyebrow {
+  font-family: var(--tn-font-display); font-weight: 900; font-variation-settings: "wdth" 62;
+  font-size: clamp(10px,1.05cqw,13px); letter-spacing: .22em; text-transform: uppercase;
+  color: var(--tnk2-accent); white-space: nowrap; flex: 0 0 auto;
+}
+.tn20 .tnk2-eyebrow-line { flex: 1; height: 1px; background: var(--tnk2-border-hair); }
+.tn20 .tnk2-headrow {
+  display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between;
+  gap: clamp(14px,2cqw,32px); margin-bottom: clamp(20px,2.6cqw,40px);
+}
+.tn20 .tnk2-h2 {
+  font-family: var(--tn-font-display); font-weight: 900; font-variation-settings: "wdth" 70;
+  font-size: clamp(30px,5cqw,72px); line-height: .88; letter-spacing: -.02em;
+  text-transform: uppercase; margin: 0; overflow-wrap: normal; word-break: keep-all;
+}
+.tn20 .tnk2-intro {
+  margin: 0; flex: 1 1 min(100%,260px); font-size: clamp(12.5px,1.35cqw,17px); line-height: 1.5;
+  color: var(--tnk2-ink-dim); max-width: 42ch; text-wrap: pretty;
+}
+
+/* ── Pelilauta ── */
+.tn20 .tnk2-lauta { padding: clamp(36px,4.8cqw,80px) clamp(18px,4cqw,72px) clamp(28px,3.6cqw,56px); }
+.tn20 .tnk2-lauta-cols { display: flex; flex-wrap: wrap; gap: clamp(18px,2.8cqw,48px); align-items: flex-start; }
+
+/* Kartta */
+.tn20 .tnk2-mapwrap { flex: 1 1 min(100%,320px); max-width: 520px; }
+.tn20 .tnk2-mappanel {
+  position: relative; border: 1px solid var(--tnk2-border); border-radius: clamp(14px,1.8cqw,22px);
+  background: var(--tnk2-map-bg); padding: clamp(14px,1.6cqw,22px);
+}
+.tn20 .tnk2-mapstage { position: relative; width: 100%; aspect-ratio: 600/1000; }
+.tn20 .tnk2-mapstage svg.tnk2-land { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+.tn20 .tnk2-mapstage svg.tnk2-route { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; overflow: visible; }
+.tn20 .tnk2-route path { animation: tnk2Dash 1.8s linear infinite; }
+.tn20 .tnk2-dot-btn {
+  position: absolute; transform: translate(-50%,-50%); padding: 0; border: 0; background: transparent;
+  cursor: pointer; z-index: 3; line-height: 0; min-width: 32px; min-height: 32px;
+  display: flex; align-items: center; justify-content: center;
+}
+.tn20 .tnk2-dot { display: block; border-radius: 999px; transition: transform .14s ease; }
+.tn20 .tnk2-dot-btn:hover .tnk2-dot, .tn20 .tnk2-dot-btn:focus-visible .tnk2-dot { transform: scale(1.45); }
+.tn20 .tnk2-dot-btn:focus-visible { outline: 2px solid var(--tnk2-ink-strong); outline-offset: 2px; border-radius: 999px; }
+.tn20 .tnk2-flag {
+  position: absolute; transform: translate(-50%,-190%); z-index: 5; pointer-events: none;
+  padding: 5px 10px; border-radius: 7px; background: var(--tnk2-ink-strong); color: var(--tnk2-bg);
+  font-family: var(--tn-font-display); font-weight: 900; font-variation-settings: "wdth" 68;
+  font-size: clamp(10px,1.15cqw,14px); letter-spacing: .03em; text-transform: uppercase;
+  white-space: nowrap; box-shadow: 0 6px 18px rgba(0,0,0,.55); overflow-wrap: normal; word-break: keep-all;
+}
+.tn20 .tnk2-legend {
+  display: flex; flex-wrap: wrap; gap: clamp(10px,1.3cqw,18px); margin-top: clamp(12px,1.4cqw,18px);
+  padding-top: clamp(12px,1.4cqw,18px); border-top: 1px solid var(--tnk2-track);
+  font-size: clamp(9.5px,.98cqw,12px); font-weight: 700; color: var(--tnk2-meta); white-space: nowrap;
+}
+.tn20 .tnk2-legend span.item { display: flex; align-items: center; gap: 7px; }
+.tn20 .tnk2-legend span.dot { width: 11px; height: 11px; border-radius: 999px; display: inline-block; }
+
+/* Valitun kaupungin paneeli */
+.tn20 .tnk2-panelwrap { flex: 1.3 1 min(100%,340px); min-width: 0; }
+.tn20 .tnk2-panel { border-radius: clamp(15px,1.9cqw,24px); overflow: hidden; border: 1px solid var(--tnk2-border); background: var(--tnk2-card); }
+.tn20 .tnk2-panel-media { position: relative; aspect-ratio: 16/10; background: var(--tnk2-bg-deep); }
+.tn20 .tnk2-panel-media img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center 26%; }
+.tn20 .tnk2-panel-media::after {
+  content: ""; position: absolute; inset: 0;
+  background: linear-gradient(to top, rgba(19,17,9,.95) 3%, rgba(19,17,9,.2) 46%, transparent 74%);
+}
+.tn20 .tnk2-panel-pills { position: absolute; z-index: 2; left: clamp(14px,1.7cqw,24px); top: clamp(12px,1.5cqw,20px); display: flex; gap: 7px; flex-wrap: wrap; }
+.tn20 .tnk2-pill {
+  padding: 5px 10px; border-radius: 999px; background: rgba(19,17,9,.82);
+  font-size: clamp(9px,.95cqw,12px); font-weight: 800; letter-spacing: .1em; text-transform: uppercase;
+}
+.tn20 .tnk2-pill-stamp { border: 1px solid var(--tnk2-stamp); color: var(--tnk2-stamp); }
+.tn20 .tnk2-pill-region { border: 1px solid rgba(245,240,230,.22); color: var(--tnk2-ink-strong); }
+.tn20 .tnk2-panel-name {
+  position: absolute; z-index: 2; left: clamp(14px,1.7cqw,24px); right: clamp(14px,1.7cqw,24px);
+  bottom: clamp(12px,1.5cqw,20px);
+  font-family: var(--tn-font-display); font-weight: 900; font-variation-settings: "wdth" 68;
+  line-height: .86; letter-spacing: -.025em; text-transform: uppercase;
+  color: var(--tnk2-ink-strong); overflow-wrap: normal; word-break: keep-all;
+  /* KORTTISÄÄNTÖ-kalibrointi 28.8.2026 — Range-mittaus/binäärihaku paikallista
+     serveriä vasten, kaikki 20 kaupunkia klikattu läpi joka leveydellä. Pisin
+     "Lappeenranta" (12 merkkiä, cross-check "Hämeenlinna" 11 merkkiä) leikkautui
+     CD:n clamp(32px,5.6cqw,78px):lla 320/1024/1440px:ssä (löytyi vasta kun
+     jokainen valittu kaupunki testattiin, ei vain oletusvalintaa). Arvot =
+     mitattu max-fit miinus n. 1–2px marginaali jokaisella leveysaskeleella. */
+  font-size: 28px; /* 320px: mitattu maxFit 29.4 (CD 32) */
+}
+@media (min-width: 375px) { .tn20 .tnk2-panel-name { font-size: 31px; } /* 390px: mitattu maxFit 32 (CD 32) */ }
+@media (min-width: 640px) { .tn20 .tnk2-panel-name { font-size: 36.5px; } /* 768px: mitattu maxFit 37.8 (CD 43) */ }
+@media (min-width: 960px) { .tn20 .tnk2-panel-name { font-size: 50px; } /* 1024px: mitattu maxFit 51.9 (CD 57.3) */ }
+@media (min-width: 1280px) { .tn20 .tnk2-panel-name { font-size: 63px; } /* 1440px: mitattu maxFit 64.2 (CD 78) */ }
+@media (min-width: 1800px) { .tn20 .tnk2-panel-name { font-size: 60px; } /* 1920/2450px: mitattu maxFit 61.6 (CD 78) */ }
+.tn20 .tnk2-panel-body { padding: clamp(14px,1.7cqw,24px); }
+.tn20 .tnk2-panel-slogan {
+  margin: 0 0 clamp(14px,1.7cqw,22px); font-family: var(--tn-font-display); font-weight: 900;
+  font-variation-settings: "wdth" 76; font-size: clamp(17px,2cqw,27px); line-height: 1.08;
+  letter-spacing: -.012em; color: var(--tnk2-accent); max-width: 24ch; text-wrap: pretty;
+  overflow-wrap: normal; word-break: keep-all;
+}
+.tn20 .tnk2-panel-stats {
+  display: grid; grid-template-columns: repeat(auto-fit,minmax(min(100%,100px),1fr)); gap: 1px;
+  background: var(--tnk2-border); border: 1px solid var(--tnk2-border); border-radius: 12px; overflow: hidden;
+  margin-bottom: clamp(14px,1.7cqw,22px);
+}
+.tn20 .tnk2-panel-stats > div { background: var(--tnk2-card); padding: clamp(10px,1.2cqw,15px) clamp(9px,1.1cqw,14px); }
+.tn20 .tnk2-panel-stat-v {
+  font-family: var(--tn-font-display); font-weight: 900; font-variation-settings: "wdth" 70;
+  font-size: clamp(15px,1.7cqw,22px); line-height: 1.15; color: var(--tnk2-ink-strong);
+  overflow-wrap: normal; word-break: keep-all;
+}
+/* KORTTISÄÄNTÖ-kalibrointi 28.8.2026 — Range-mittaus/binäärihaku paikallista
+   serveriä vasten. "suunta"-solun arvo on yksi katkeamaton suomen sana
+   (esim. "Pääkaupunkiseutu", 16 merkkiä) kapeassa grid-solussa — CD:n
+   yhteinen clamp(15px,1.7cqw,22px) leikkautui KAIKILLA 7 mitatulla
+   leveydellä juuri tässä solussa (muut kaksi tilastoa — kysymysmäärä ja
+   leimastatus — eivät ylivuotaneet, joten niille jätettiin CD:n alkuperäinen
+   koko). Oma --region-luokka pienemmällä, mitatulla koolla: arvo = mitattu
+   max-fit miinus n. 1px marginaali jokaisella leveysaskeleella. */
+.tn20 .tnk2-panel-stat-v--region { font-size: 10.2px; line-height: 1.05; } /* 320px: mitattu maxFit 11.2 (CD 15) */
+@media (min-width: 375px) { .tn20 .tnk2-panel-stat-v--region { font-size: 7.2px; } /* 390/768px: mitattu maxFit 8.2 (CD 15) */ }
+@media (min-width: 960px) { .tn20 .tnk2-panel-stat-v--region { font-size: 11.7px; } /* 1024px: mitattu maxFit 12.7 (CD 17.4) */ }
+@media (min-width: 1280px) { .tn20 .tnk2-panel-stat-v--region { font-size: 13.2px; } /* 1440px: mitattu maxFit 15.7 (CD 22) — varovainen marginaali */ }
+@media (min-width: 1800px) { .tn20 .tnk2-panel-stat-v--region { font-size: 13.2px; } /* 1920/2450px: mitattu maxFit 14.2 (CD 22) */ }
+.tn20 .tnk2-panel-stat-k { font-size: clamp(9px,.92cqw,11.5px); font-weight: 700; color: var(--tnk2-meta); margin-top: 5px; }
+.tn20 .tnk2-panel-actions { display: flex; flex-wrap: wrap; align-items: center; gap: clamp(8px,1cqw,13px); }
+.tn20 .tnk2-cta {
+  flex: 1 1 260px; max-width: 480px; text-align: center; padding: clamp(12px,1.4cqw,18px) clamp(18px,2.2cqw,30px);
+  border-radius: 12px; background: var(--tnk2-cta); color: var(--tnk2-bg); font-family: var(--tn-font-display);
+  font-weight: 900; font-variation-settings: "wdth" 76; font-size: clamp(13px,1.4cqw,18px);
+  text-transform: uppercase; white-space: nowrap; min-height: 44px; display: inline-flex;
+  align-items: center; justify-content: center; overflow-wrap: normal; word-break: keep-all;
+}
+.tn20 .tnk2-cta:hover { background: var(--tnk2-cta-hover); color: var(--tnk2-bg); }
+
+/* ── Kaikki kaupungit ── */
+.tn20 .tnk2-allsection {
+  padding: clamp(34px,4.6cqw,76px) clamp(18px,4cqw,72px); background: var(--tnk2-bg-deep);
+  border-top: 1px solid var(--tnk2-border-hair); border-bottom: 1px solid var(--tnk2-border-hair);
+}
+.tn20 .tnk2-filters {
+  display: flex; flex-wrap: nowrap; gap: clamp(6px,.8cqw,10px); margin-bottom: clamp(18px,2.2cqw,32px);
+  overflow-x: auto; padding: 2px 24px 6px 2px; scrollbar-width: none;
+}
+.tn20 .tnk2-filters::-webkit-scrollbar { display: none; }
+.tn20 .tnk2-filter {
+  display: inline-flex; align-items: center; gap: 8px; min-height: 44px;
+  padding: clamp(8px,.95cqw,12px) clamp(12px,1.4cqw,19px); border-radius: 999px;
+  border: 1px solid var(--tnk2-border); background: transparent; color: var(--tnk2-ink-dim);
+  font-family: var(--tn-font-body); font-weight: 700; font-size: clamp(11px,1.15cqw,14px);
+  cursor: pointer; white-space: nowrap; flex: 0 0 auto;
+}
+.tn20 .tnk2-filter:hover { border-color: var(--tnk2-meta); }
+.tn20 .tnk2-filter[aria-pressed="true"] { background: var(--tnk2-ink-strong); color: var(--tnk2-bg); border-color: var(--tnk2-ink-strong); }
+.tn20 .tnk2-filter-count {
+  display: inline-flex; align-items: center; justify-content: center; min-width: 20px; height: 20px;
+  padding: 0 5px; border-radius: 999px; background: var(--tnk2-track); color: var(--tnk2-meta);
+  font-size: 10.5px; font-weight: 800;
+}
+.tn20 .tnk2-filter[aria-pressed="true"] .tnk2-filter-count { background: rgba(19,17,9,.14); color: var(--tnk2-bg); }
+
+.tn20 .tnk2-grid { display: grid; grid-template-columns: repeat(auto-fill,minmax(min(46%,max(200px,17cqw)),1fr)); gap: clamp(9px,1.2cqw,17px); }
+.tn20 .tnk2-card {
+  display: block; text-align: left; padding: 0; border: 0; border-radius: clamp(12px,1.5cqw,18px);
+  background: transparent; cursor: pointer; transition: transform .15s ease;
+}
+.tn20 .tnk2-card:hover { transform: translateY(-4px); }
+.tn20 .tnk2-card:focus-visible { outline: 3px solid var(--tnk2-ink-strong); outline-offset: 3px; }
+.tn20 .tnk2-card-face {
+  position: relative; border-radius: clamp(12px,1.5cqw,18px); overflow: hidden; border: 1px solid var(--tnk2-border);
+  background: var(--tnk2-card); aspect-ratio: 4/5;
+}
+.tn20 .tnk2-card-face[data-sel="true"] { border: 2px solid var(--tnk2-ink-strong); }
+.tn20 .tnk2-card-face[data-stamped="true"] { border-color: rgba(53,214,160,.45); }
+.tn20 .tnk2-card-face img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center 32%; }
+.tn20 .tnk2-card-face::after {
+  content: ""; position: absolute; inset: 0;
+  background: linear-gradient(to top, rgba(19,17,9,.96) 4%, rgba(19,17,9,.22) 52%, transparent 78%);
+}
+.tn20 .tnk2-card-stamp {
+  position: absolute; z-index: 2; left: clamp(10px,1.1cqw,14px); top: clamp(9px,1cqw,13px);
+  display: flex; align-items: center; gap: 6px; padding: 4px 9px; border-radius: 999px;
+  background: rgba(19,17,9,.85); border: 1px solid var(--tnk2-stamp); color: var(--tnk2-stamp);
+  font-size: clamp(8.5px,.9cqw,11px); font-weight: 800; letter-spacing: .1em; text-transform: uppercase; white-space: nowrap;
+}
+.tn20 .tnk2-card-text { position: absolute; z-index: 2; left: clamp(11px,1.2cqw,16px); right: clamp(11px,1.2cqw,16px); bottom: clamp(10px,1.1cqw,15px); }
+.tn20 .tnk2-card-name {
+  font-family: var(--tn-font-display); font-weight: 900; font-variation-settings: "wdth" 74;
+  /* KORTTISÄÄNTÖ-kalibrointi 28.8.2026 — Range-mittaus/binäärihaku paikallista
+     serveriä vasten, pisin kaupunki "Lappeenranta" (12 merkkiä, cross-check
+     "Hämeenlinna" 11 merkkiä). Kortin cqw-leveys EI skaalaudu lineaarisesti
+     viewportin kanssa (auto-fill-grid vaihtaa sarakemäärää hyppäyksittäin),
+     joten kalibrointi on tehty leveyskohtaisin @media-askelin, ei yhdellä
+     clamp-kaarella. CD:n alkuperäinen arvo oli kiinteä clamp(19px,2.2cqw,29px)
+     kaikilla leveyksillä — se leikkautui 320/390/1024/1440px:ssä. Jokainen
+     alla oleva arvo on mitattu max-fit miinus n. 1px marginaali. */
+  font-size: 10.2px; /* 320px: mitattu maxFit 11.2 (CD 19) */
+  line-height: .96; letter-spacing: -.018em; text-transform: uppercase;
+  color: var(--tnk2-ink-strong); overflow-wrap: normal; word-break: keep-all;
+}
+@media (min-width: 375px) { .tn20 .tnk2-card-name { font-size: 14px; } /* 390px: mitattu maxFit 15 (CD 19) */ }
+@media (min-width: 640px) { .tn20 .tnk2-card-name { font-size: 18px; } /* 768px: mitattu maxFit 19 (CD 19) */ }
+@media (min-width: 960px) { .tn20 .tnk2-card-name { font-size: 19.2px; } /* 1024px: mitattu maxFit 20.2 (CD 22.5) */ }
+@media (min-width: 1280px) { .tn20 .tnk2-card-name { font-size: 27px; } /* 1440px: mitattu maxFit 28.4 (CD 29) */ }
+@media (min-width: 1800px) { .tn20 .tnk2-card-name { font-size: 29px; } /* 1920/2450px: mitattu maxFit 29 = CD-arvo, mahtuu täytenä */ }
+.tn20 .tnk2-card-slogan { font-size: clamp(10.5px,1.08cqw,13px); line-height: 1.35; color: var(--tnk2-ink-dim); margin-top: 7px; text-wrap: pretty; }
+.tn20 .tnk2-card-tint { position: absolute; z-index: 2; left: 0; right: 0; bottom: 0; height: 4px; background: var(--tnk2-stamp); }
+
+/* ── CTA (Suomi-megavisa) ── */
+.tn20 .tnk2-ctasection { padding: clamp(40px,5.4cqw,88px) clamp(18px,4cqw,72px); }
+.tn20 .tnk2-ctabox {
+  position: relative; overflow: hidden; border: 1px solid var(--tnk2-border); border-radius: clamp(16px,2cqw,26px);
+  background: #15120A; min-height: clamp(300px,30cqw,440px); display: flex;
+}
+.tn20 .tnk2-ctabox-bg { position: absolute; inset: 0; display: grid; grid-template-columns: repeat(4,1fr); gap: 2px; opacity: .85; }
+.tn20 .tnk2-ctabox-bg img { width: 100%; height: 100%; object-fit: cover; }
+.tn20 .tnk2-ctabox::before {
+  content: ""; position: absolute; inset: 0;
+  background: linear-gradient(100deg, rgba(19,17,9,.99) 0%, rgba(19,17,9,.95) 38%, rgba(19,17,9,.76) 66%, rgba(19,17,9,.58) 100%);
+}
+.tn20 .tnk2-ctabox::after {
+  content: ""; position: absolute; inset: 0;
+  background: linear-gradient(to bottom, rgba(19,17,9,.75) 0%, rgba(19,17,9,0) 34%, rgba(19,17,9,0) 62%, rgba(19,17,9,.82) 100%);
+}
+.tn20 .tnk2-ctabox-route { position: absolute; left: 46%; top: 0; width: 54%; height: 100%; opacity: .5; z-index: 1; }
+.tn20 .tnk2-ctabox-route path { animation: tnk2Dash 1.8s linear infinite; }
+.tn20 .tnk2-ctabox-content {
+  position: relative; z-index: 2; width: 100%; padding: clamp(24px,3.2cqw,54px); display: flex; flex-wrap: wrap;
+  align-items: center; justify-content: space-between; gap: clamp(18px,2.4cqw,40px);
+}
+.tn20 .tnk2-ctabox-text { flex: 1 1 min(100%,380px); }
+.tn20 .tnk2-ctabox-badge {
+  display: inline-flex; align-items: center; gap: 8px; padding: 6px 12px; border-radius: 999px;
+  border: 1px solid var(--tnk2-stamp); background: rgba(19,17,9,.6); font-size: clamp(9.5px,1cqw,12px);
+  font-weight: 800; letter-spacing: .14em; text-transform: uppercase; color: var(--tnk2-stamp);
+  margin-bottom: clamp(14px,1.7cqw,22px);
+}
+.tn20 .tnk2-h3 {
+  font-family: var(--tn-font-display); font-weight: 900; font-variation-settings: "wdth" 70;
+  font-size: clamp(26px,4cqw,56px); line-height: .9; letter-spacing: -.02em; text-transform: uppercase;
+  margin: 0 0 clamp(10px,1.2cqw,16px); max-width: 20ch; overflow-wrap: normal; word-break: keep-all;
+}
+.tn20 .tnk2-ctabox-desc { margin: 0; font-size: clamp(13px,1.4cqw,18px); line-height: 1.5; color: var(--tnk2-ink); max-width: 46ch; text-wrap: pretty; }
+.tn20 .tnk2-ctabox-btn {
+  padding: clamp(14px,1.6cqw,21px) clamp(24px,3cqw,44px); border-radius: 14px; background: var(--tnk2-cta);
+  color: var(--tnk2-bg); font-family: var(--tn-font-display); font-weight: 900; font-variation-settings: "wdth" 76;
+  font-size: clamp(14px,1.55cqw,20px); text-transform: uppercase; white-space: nowrap; min-height: 44px;
+  display: inline-flex; align-items: center; justify-content: center; overflow-wrap: normal; word-break: keep-all;
+}
+.tn20 .tnk2-ctabox-btn:hover { background: var(--tnk2-cta-hover); color: var(--tnk2-bg); }
+
+/* ── Footer (sivukohtainen, sama malli kuin muut teemasivut) ── */
+.tn20 .tnk2-footer { border-top: 1px solid var(--tnk2-border-hair); padding: 22px clamp(18px,4cqw,72px); }
+.tn20 .tnk2-footer .tn-shell {
+  display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px;
+  font-size: 13px; color: var(--tnk2-meta);
+}
+.tn20 .tnk2-footer a { color: var(--tnk2-meta); }
+.tn20 .tnk2-footer a:hover { color: var(--tnk2-accent); }
+
+/* ── Responsiivisuus ── */
+@media (max-width: 640px) {
+  /* QA-004 (29.8.2026): column + wrap + tekstin 380 px flex-basis rivitti napin
+     TOISEEN SARAKKEESEEN viewportin ulkopuolelle. Ei rivitystä, teksti auto. */
+  .tn20 .tnk2-ctabox { min-height: 0; }
+  .tn20 .tnk2-ctabox-content { flex-direction: column; flex-wrap: nowrap; align-items: stretch; }
+  .tn20 .tnk2-ctabox-text { flex: 0 0 auto; }
+  .tn20 .tnk2-ctabox-btn { width: 100%; white-space: normal; }
+  .tn20 .tnk2-ctabox::before { background: rgba(19,17,9,.86); }
+}

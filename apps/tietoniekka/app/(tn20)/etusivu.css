@@ -1,0 +1,347 @@
+/* TIETONIEKKA 2.0 — ETUSIVU 2026 PROD (design_handoff_etusivu_2026_prod,
+   toteutettu 28.8.2026 — korvasi 18.8. etusivu.css:n kokonaan).
+   Kaikki mitat, värit ja fonttikoot designin inline-tyyleistä; container-kyselyt
+   (.tn20 on inline-size-container → cqw) kuten designissa. KORTTISÄÄNTÖ:
+   otsikkokoot kalibroitu mittaamalla (staattinen Archivo, ei wdth-akselia) —
+   kalibroidut arvot ja CD:n alkuperäiset dokumentoitu kunkin säännön kommentissa.
+   Skoopattu .tn20 .tn-es-*. */
+
+.tn20 .tn-es-page {
+  min-height: 100dvh;
+  background: #0f0d07;
+  background-image: repeating-linear-gradient(45deg, rgba(245, 240, 230, 0.016) 0 1px, transparent 1px 7px);
+  color: #f5f0e6;
+}
+.tn20 .tn-es-page a { text-decoration: none; }
+
+/* ── Yhteiset: otsikot, nappi, nuolivihje ─────────────────────────────── */
+.tn20 .tn-es-h1,
+.tn20 .tn-es-h2,
+.tn20 .tn-es-card-title,
+.tn20 .tn-es-host-name,
+.tn20 .tn-es-day-title {
+  font-family: var(--tn-font-display);
+  font-weight: 900;
+  text-transform: uppercase;
+  overflow-wrap: normal;
+  word-break: keep-all;
+}
+/* h2: CD 36px max / 21px min */
+.tn20 .tn-es-h2 {
+  margin: 0;
+  font-size: clamp(21px, 2.4cqw, 36px);
+  line-height: 1;
+  letter-spacing: -0.018em;
+}
+.tn20 .tn-es-h2--nowrap { white-space: nowrap; }
+.tn20 .tn-es-head { display: flex; flex-direction: column; gap: clamp(4px, 0.5cqw, 8px); margin-bottom: clamp(13px, 1.4cqw, 20px); }
+.tn20 .tn-es-head--row { flex-direction: row; align-items: baseline; gap: clamp(8px, 1cqw, 14px); }
+.tn20 .tn-es-sub { margin: 0; font-size: clamp(12.5px, 1.2cqw, 16px); line-height: 1.4; color: #b9af9b; }
+.tn20 .tn-es-date { font-size: clamp(11px, 1.05cqw, 14px); font-weight: 700; color: #8e8676; white-space: nowrap; }
+
+.tn20 .tn-es-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  min-height: 48px;
+  padding: clamp(12px, 1.2cqw, 16px) clamp(20px, 2cqw, 30px);
+  border-radius: 12px;
+  background: var(--tn-lime);
+  color: #131109;
+  font-family: var(--tn-font-display);
+  font-weight: 900;
+  font-size: clamp(13.5px, 1.35cqw, 18px);
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.tn20 .tn-es-btn:hover { background: #c9ff6e; }
+.tn20 .tn-es-btn:focus-visible { outline: 2px solid var(--tn-lime); outline-offset: 3px; }
+
+.tn20 .tn-es-arrow {
+  flex: 0 0 auto;
+  font-size: clamp(15px, 1.5cqw, 20px);
+  line-height: 1;
+  font-weight: 700;
+  color: #8e8676;
+  transition: color 0.18s ease, transform 0.18s ease;
+}
+.tn20 a:hover .tn-es-arrow,
+.tn20 a:focus-visible .tn-es-arrow { color: #f5f0e6; transform: translateX(3px); }
+
+/* ── Kategoriarivi ────────────────────────────────────────────────────── */
+.tn20 .tn-es-catbar { border-bottom: 1px solid #241e13; }
+.tn20 .tn-es-cats {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 8px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  width: 100%;
+  max-width: 1280px;
+  margin-inline: auto;
+  padding: clamp(10px, 1.2cqw, 14px) clamp(16px, 3.4cqw, 48px);
+}
+.tn20 .tn-es-cats::-webkit-scrollbar { display: none; }
+.tn20 .tn-es-cat {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  min-height: 38px;
+  padding: 0 clamp(13px, 1.3cqw, 18px);
+  border: 1px solid var(--tn-line);
+  border-radius: 999px;
+  color: #b9af9b;
+  font-size: clamp(12px, 1.05cqw, 14px);
+  font-weight: 700;
+  white-space: nowrap;
+}
+.tn20 .tn-es-cat:hover { border-color: #8e8676; color: #f5f0e6; }
+.tn20 .tn-es-cat:focus-visible { outline: 2px solid var(--tn-lime); outline-offset: 2px; }
+
+/* ── Pääsisältö ───────────────────────────────────────────────────────── */
+.tn20 .tn-es-main {
+  width: 100%;
+  max-width: 1280px;
+  margin-inline: auto;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(26px, 2.8cqw, 46px);
+  padding: clamp(16px, 3.4cqw, 48px);
+}
+
+/* ── Lippuvisa-hero ───────────────────────────────────────────────────── */
+.tn20 .tn-es-hero {
+  position: relative;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  border: 1px solid var(--tn-line);
+  border-radius: clamp(14px, 1.5cqw, 20px);
+  min-height: clamp(230px, calc(189px + 10.5cqw), 340px);
+  color: #f5f0e6;
+}
+.tn20 .tn-es-hero:hover { border-color: var(--tn-lime); }
+.tn20 .tn-es-hero:focus-visible { outline: 2px solid var(--tn-lime); outline-offset: 3px; }
+.tn20 .tn-es-hero-bg { position: absolute; inset: 0; background-size: cover; background-repeat: no-repeat; }
+.tn20 .tn-es-hero-panel {
+  position: relative;
+  z-index: 2;
+  display: block;
+  width: min(100%, max(320px, 52cqw));
+  padding: clamp(18px, 2cqw, 34px);
+  background: linear-gradient(90deg, rgba(11, 10, 6, 0.97) 0%, rgba(11, 10, 6, 0.94) 46%, rgba(11, 10, 6, 0.66) 76%, rgba(11, 10, 6, 0.16) 95%, rgba(11, 10, 6, 0) 100%);
+}
+/* h1: CD clamp(30px, 20px + 2.2cqw, 54px) — kalibroitu mittaamalla (ks. alla) */
+.tn20 .tn-es-h1 {
+  margin: 0 0 clamp(7px, 0.7cqw, 11px);
+  font-size: clamp(30px, calc(20px + 2.2cqw), 54px);
+  line-height: 0.9;
+  letter-spacing: -0.024em;
+  text-wrap: balance;
+  color: var(--tn-gold);
+}
+.tn20 .tn-es-hero-lede { margin: 0 0 clamp(14px, 1.3cqw, 20px); font-size: clamp(13.5px, 1.35cqw, 19px); line-height: 1.35; color: #cfc7b6; }
+
+/* ── Korttiruudukko (Suositut kokoelmat) — 2 saraketta mobiilissa, 3 × 2
+   tabletista ylöspäin (Heikin katselmus 28.8. ilta). Sarakemäärä perustuu
+   ruudukon OMAAN leveyteen (48 % = kaksi korttia kapealla). CD:n alkuperäinen
+   minimi `max(200px, 24cqw)` kasvoi viewportin mukana rajatta, joten leveillä
+   näytöillä (≥ ~1650px) 1280px-säiliöön mahtui enää 2 saraketta → minimi
+   katkaistaan 360px:iin (3 × 360 + 2 × 18 = 1116 ≤ 1184px sisältöleveys). */
+.tn20 .tn-es-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(48%, clamp(200px, 24cqw, 360px)), 1fr));
+  gap: clamp(10px, 1.2cqw, 18px);
+}
+.tn20 .tn-es-card,
+.tn20 .tn-es-hcard {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  border: 1px solid var(--tn-line);
+  border-radius: clamp(12px, 1.3cqw, 18px);
+  background: #1c1810;
+  color: #f5f0e6;
+}
+.tn20 .tn-es-card { aspect-ratio: 4 / 3; }
+.tn20 .tn-es-card:hover { border-color: var(--tn-lime); }
+.tn20 .tn-es-card:focus-visible,
+.tn20 .tn-es-hcard:focus-visible { outline: 2px solid var(--tn-lime); outline-offset: 3px; }
+.tn20 .tn-es-card-bg { position: absolute; inset: 0; background-size: cover; background-repeat: no-repeat; }
+/* Suositut kokoelmat -kortin kuva <img>-elementtinä (object-fit: cover,
+   object-position = CD:n background-position; 28.8. ilta) */
+.tn20 .tn-es-card-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
+.tn20 .tn-es-card-shade { position: absolute; inset: 0; background: linear-gradient(to top, rgba(11, 10, 6, 0.95) 6%, rgba(11, 10, 6, 0.35) 48%, rgba(11, 10, 6, 0.05) 82%); }
+.tn20 .tn-es-card-shade--h { background: linear-gradient(to top, rgba(11, 10, 6, 0.95) 5%, rgba(11, 10, 6, 0.35) 46%, rgba(11, 10, 6, 0.05) 80%); }
+.tn20 .tn-es-card-foot {
+  position: absolute;
+  left: clamp(11px, 1.1cqw, 18px);
+  right: clamp(11px, 1.1cqw, 18px);
+  bottom: clamp(12px, 1.2cqw, 18px);
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 10px;
+}
+.tn20 .tn-es-card-foot--h { bottom: clamp(10px, 1.1cqw, 16px); }
+/* Kortin otsikko: CD clamp(16px, 1.6cqw, 25px). KORTTISÄÄNTÖ-kalibrointi 28.8.2026
+   (Range-mittaus 320–2450px, staattinen Archivo): 2 sarakkeen mobiilissa pisin sana
+   "SUORATOISTO" (11 merkkiä) tarvitsi 320px:ssä ≤10.9px ja 390px:ssä ≤15.2px
+   (5 % marginaali) → kapealla koko seuraa säiliötä calc(6.14cqw − 8.75px), muuten
+   CD:n arvo. ≥ 768px CD:n koko mahtuu (tarve ≤19.7px, 3 saraketta). */
+.tn20 .tn-es-card-title {
+  display: block;
+  min-width: 0;
+  font-size: min(clamp(16px, 1.6cqw, 25px), calc(6.14cqw - 8.75px));
+  line-height: 1;
+  letter-spacing: -0.015em;
+  color: #f5f0e6;
+}
+
+/* ── Laura ja Mikko ───────────────────────────────────────────────────── */
+.tn20 .tn-es-hosts { display: flex; flex-direction: column; gap: clamp(10px, 1.2cqw, 18px); }
+.tn20 .tn-es-hosts-lede { margin: 0 0 clamp(3px, 0.4cqw, 7px); max-width: 92ch; font-size: clamp(12.5px, 1.25cqw, 17px); line-height: 1.45; color: #cfc7b6; text-wrap: pretty; }
+.tn20 .tn-es-hosts-grid { display: flex; flex-wrap: wrap; gap: clamp(10px, 1.2cqw, 18px); }
+.tn20 .tn-es-host { flex: 1 1 min(100%, 460px); min-width: 0; display: flex; flex-direction: column; gap: clamp(10px, 1.2cqw, 18px); }
+.tn20 .tn-es-host-profile {
+  display: flex;
+  align-items: center;
+  gap: clamp(12px, 1.3cqw, 20px);
+  padding: clamp(13px, 1.3cqw, 20px);
+  border: 1px solid #2a2416;
+  border-radius: clamp(12px, 1.3cqw, 18px);
+  background: #1c1810;
+  min-height: clamp(132px, calc(104px + 4cqw), 178px);
+}
+.tn20 .tn-es-host-img {
+  flex: 0 0 auto;
+  width: clamp(126px, 24cqw, 150px);
+  aspect-ratio: 1 / 1;
+  border-radius: clamp(10px, 1.1cqw, 14px);
+  background-color: #141109;
+  background-size: cover;
+  background-position: center;
+}
+.tn20 .tn-es-host-text { flex: 1 1 0; min-width: 0; }
+/* CD clamp(17px, 1.7cqw, 25px) — "SUOSITTELEE" (11 merkkiä) tarvitsi 320px:ssä
+   ≤15.3px (mitattu 128.5px @17px vs. 122px tilaa) → min(CD, 4.7cqw) = 15.0px @320,
+   ≥ 362px CD:n arvo (28.8.2026). */
+.tn20 .tn-es-host-name { font-size: min(clamp(17px, 1.7cqw, 25px), 4.7cqw); line-height: 1; letter-spacing: -0.018em; color: #f5f0e6; }
+.tn20 .tn-es-host-role { margin-top: 6px; font-size: clamp(10.5px, 1cqw, 13px); font-weight: 700; color: var(--tn-gold); }
+.tn20 .tn-es-host[data-accent="lime"] .tn-es-host-role { color: var(--tn-lime); }
+.tn20 .tn-es-host-cards { display: flex; flex-wrap: wrap; gap: clamp(10px, 1.2cqw, 18px); }
+.tn20 .tn-es-hcard { flex: 1 1 min(46%, 150px); min-height: clamp(140px, calc(60px + 11cqw), 210px); }
+.tn20 .tn-es-host[data-accent="gold"] .tn-es-hcard:hover { border-color: var(--tn-gold); }
+.tn20 .tn-es-host[data-accent="gold"] .tn-es-hcard:focus-visible { outline-color: var(--tn-gold); }
+.tn20 .tn-es-host[data-accent="lime"] .tn-es-hcard:hover { border-color: var(--tn-lime); }
+.tn20 .tn-es-hcard-text { min-width: 0; display: block; }
+.tn20 .tn-es-hcard-desc { display: block; margin-top: 6px; font-size: clamp(10.5px, 1cqw, 13px); font-weight: 600; color: #b9af9b; text-wrap: pretty; }
+
+/* ── Päivän visa ──────────────────────────────────────────────────────── */
+.tn20 .tn-es-day {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: stretch;
+  gap: clamp(12px, 1.3cqw, 20px);
+  padding: clamp(12px, 1.3cqw, 20px);
+  border: 1px solid var(--tn-line);
+  border-radius: clamp(14px, 1.5cqw, 20px);
+  background: #1c1810;
+  min-height: clamp(200px, calc(140px + 8cqw), 260px);
+}
+.tn20 .tn-es-day--empty { align-items: center; justify-content: center; color: #8e8676; font-weight: 600; }
+.tn20 .tn-es-day-media {
+  position: relative;
+  flex: 26 1 min(100%, 210px);
+  min-height: clamp(140px, 15cqw, 260px);
+  overflow: hidden;
+  border-radius: clamp(10px, 1.1cqw, 14px);
+  background: repeating-linear-gradient(135deg, #1a160d 0 11px, #221c10 11px 22px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px;
+}
+.tn20 .tn-es-day-media img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
+.tn20 .tn-es-day-ph { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: clamp(9px, 0.95cqw, 12px); letter-spacing: 0.14em; text-transform: uppercase; color: #8e8676; text-align: center; }
+.tn20 .tn-es-day-body {
+  flex: 74 1 min(100%, 300px);
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: clamp(8px, 0.9cqw, 13px);
+}
+.tn20 .tn-es-day-badge {
+  align-self: flex-start;
+  padding: 5px 11px;
+  border-radius: 999px;
+  border: 1px solid rgba(232, 163, 32, 0.5);
+  background: rgba(232, 163, 32, 0.12);
+  font-size: clamp(9.5px, 0.9cqw, 11.5px);
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--tn-gold);
+}
+.tn20 .tn-es-day-badge--done { border-color: rgba(182, 255, 60, 0.5); background: rgba(182, 255, 60, 0.12); color: var(--tn-lime); }
+/* CD clamp(20px, 2.1cqw, 32px); nimi voi olla mikä tahansa (ei koskaan katkaista
+   — 23.8. vaatimus) → rivitys sallittu sanojen välistä, kortti kasvaa. */
+.tn20 .tn-es-day-title { margin: 0; font-size: clamp(20px, 2.1cqw, 32px); line-height: 0.98; letter-spacing: -0.02em; text-wrap: balance; }
+.tn20 .tn-es-day-meta { font-size: clamp(11px, 1.05cqw, 14px); font-weight: 700; color: #8e8676; }
+.tn20 .tn-es-day-lede { margin: 0; max-width: 60ch; font-size: clamp(12.5px, 1.2cqw, 16px); line-height: 1.45; color: #cfc7b6; text-wrap: pretty; }
+.tn20 .tn-es-day-actions { display: flex; flex-wrap: wrap; align-items: center; gap: clamp(10px, 1.2cqw, 20px); margin-top: clamp(2px, 0.4cqw, 6px); }
+.tn20 .tn-es-day-actions .tn-es-btn { font-size: clamp(13px, 1.3cqw, 17px); }
+
+/* ── Uusimmat visat -ticker ───────────────────────────────────────────── */
+.tn20 .tn-es-ticker {
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scrollbar-width: none;
+  /* Reunahäivytys: symmetrinen 64px kummassakin reunassa (CD:ssä 3 % / 8 %
+     epäsymmetrinen — Heikin katselmus 28.8. ilta). Maski ei estä klikkauksia. */
+  mask-image: linear-gradient(90deg, transparent 0, #000 64px, #000 calc(100% - 64px), transparent 100%);
+  -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 64px, #000 calc(100% - 64px), transparent 100%);
+}
+.tn20 .tn-es-ticker::-webkit-scrollbar { display: none; }
+.tn20 .tn-es-ticker-track {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: clamp(9px, 1cqw, 14px);
+  width: max-content;
+  padding: 2px 0 4px;
+  animation: tnTicker 52s linear infinite;
+}
+.tn20 .tn-es-ticker:hover .tn-es-ticker-track,
+.tn20 .tn-es-ticker:focus-within .tn-es-ticker-track { animation-play-state: paused; }
+@keyframes tnTicker { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+@container (max-width: 1100px) { .tn20 .tn-es-ticker-track { animation: none; } }
+.tn20 .tn-es-chip {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  min-height: 44px;
+  padding: 0 clamp(13px, 1.3cqw, 18px);
+  border: 1px solid var(--tn-line);
+  border-radius: 999px;
+  background: #15120a;
+  color: #cfc7b6;
+  font-size: clamp(12px, 1.1cqw, 14.5px);
+  font-weight: 600;
+  white-space: nowrap;
+}
+.tn20 .tn-es-chip i { width: 7px; height: 7px; border-radius: 999px; background: var(--tn-lime); }
+.tn20 .tn-es-chip:hover { border-color: var(--tn-lime); color: #f5f0e6; }
+.tn20 .tn-es-chip:focus-visible { outline: 2px solid var(--tn-lime); outline-offset: 2px; }
+.tn20 .tn-es-chip-mode { font-size: 11px; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; color: var(--tn-gold); }
+
+/* ── Reduced motion ───────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .tn20 .tn-es-ticker-track { animation: none; }
+  .tn20 .tn-es-arrow { transition: none; }
+  .tn20 a:hover .tn-es-arrow,
+  .tn20 a:focus-visible .tn-es-arrow { transform: none; }
+}
