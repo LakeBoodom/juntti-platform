@@ -42,15 +42,15 @@ export async function generateMetadata(
     return { title: `${data.display_title ?? data.title}${suffix}`, description: data.teaser ?? "Megavisa: yksi istunto ilman taukoja. Pelaa ilmaiseksi Tietoniekassa." };
   }
   if (slug || quizId) {
-    let q = sb.from("quizzes").select("title, display_title, teaser, slug").eq("status", "published");
+    let q = sb.from("quizzes").select("title, display_title, teaser, description, slug").eq("status", "published");
     q = quizId ? q.eq("id", quizId) : q.eq("slug", slug!);
-    const { data } = await q.maybeSingle<{ title: string; display_title: string | null; teaser: string | null; slug: string | null }>();
+    const { data } = await q.maybeSingle<{ title: string; display_title: string | null; teaser: string | null; description: string | null; slug: string | null }>();
     if (!data) return { title: `Visaa ei löytynyt${suffix}` };
     const name = data.display_title ?? data.title;
     /* Kanoninen osoite on /visa/<slug> (julkaisu 31.8.2026) — myös silloin kun
        sivulle tultiin ?quiz_id=-parametrilla. metadataBase tulee juurilayoutista. */
     const canonical = data.slug ? { alternates: { canonical: `/visa/${data.slug}` } } : {};
-    return { title: `${name}${suffix}`, description: data.teaser ?? `${name} – ilmainen tietovisa Tietoniekassa.`, ...canonical };
+    return { title: `${name}${suffix}`, description: data.teaser ?? data.description ?? `${name} – ilmainen tietovisa Tietoniekassa.`, ...canonical };
   }
   return { title: `Visaa ei löytynyt${suffix}` };
 }
@@ -444,7 +444,7 @@ export default async function Peli20({
   const game: GameQuiz = {
     id: quiz.id,
     title: quiz.display_title ?? quiz.title,
-    teaser: learn?.intro ?? quiz.teaser,
+    teaser: learn?.intro ?? quiz.teaser ?? quiz.description,
     collectionLabel: resolved.label,
     genreLabel,
     hubHref: resolved.hub,
