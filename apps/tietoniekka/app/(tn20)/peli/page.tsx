@@ -50,6 +50,10 @@ export async function generateMetadata(
     /* Kanoninen osoite on /visa/<slug> (julkaisu 31.8.2026) — myös silloin kun
        sivulle tultiin ?quiz_id=-parametrilla. metadataBase tulee juurilayoutista. */
     const canonical = data.slug ? { alternates: { canonical: `/visa/${data.slug}` } } : {};
+    /* SEO-pikakorjaus (1.9.2026): teaser on täytetty vain 29 %:lle visoista,
+       description sen sijaan 97 %:lle (ks. claude/SEO_PIKATARKISTUS_2026_09_01.md
+       kohta 2) — käytetään description-kenttää fallbackina ennen geneeristä
+       lausetta, jotta hakutuloksen kuvaus on oikea lähes kaikilla visoilla. */
     return { title: `${name}${suffix}`, description: data.teaser ?? data.description ?? `${name} – ilmainen tietovisa Tietoniekassa.`, ...canonical };
   }
   return { title: `Visaa ei löytynyt${suffix}` };
@@ -141,7 +145,7 @@ const TEAM_COLORS: Array<[RegExp, string]> = [
 
 type QuizRow = {
   id: string; slug: string | null; title: string; display_title: string | null;
-  teaser: string | null; category: string; collection: string | null; genre: string | null;
+  teaser: string | null; description: string | null; category: string; collection: string | null; genre: string | null;
   learn: Learn | null;
 };
 
@@ -379,7 +383,7 @@ export default async function Peli20({
 
   let q = sb
     .from("quizzes")
-    .select("id, slug, title, display_title, teaser, category, collection, genre, learn")
+    .select("id, slug, title, display_title, teaser, description, category, collection, genre, learn")
     .eq("status", "published");
   q = quizId ? q.eq("id", quizId) : q.eq("slug", slug!);
   const { data: quiz } = await q.maybeSingle<QuizRow>();
@@ -444,6 +448,10 @@ export default async function Peli20({
   const game: GameQuiz = {
     id: quiz.id,
     title: quiz.display_title ?? quiz.title,
+    /* SEO-pikakorjaus (1.9.2026): teaser täytetty vain 29 %:lle visoista,
+       description 97 %:lle (claude/SEO_PIKATARKISTUS_2026_09_01.md kohta 2).
+       description toimii nyt fallbackina, jotta hero-teksti ei jää tyhjäksi
+       lähes millekään visalle. */
     teaser: learn?.intro ?? quiz.teaser ?? quiz.description,
     collectionLabel: resolved.label,
     genreLabel,
