@@ -73,7 +73,7 @@ export const KUVALAHTEET: Kuvalahde[] = [
   { slug: "jyvaskyla", kokoelma: "kaupungit", kuvaus: "Jyväskylän satama", tiedosto: "Jyväskylä harbour.jpg", tekija: "Roland Struwe", lisenssi: "CC BY-SA 3.0", lisenssiUrl: CC("by-sa/3.0"), vuosi: "2008" },
   { slug: "kouvola", kokoelma: "kaupungit", kuvaus: "Pyhän Ristin kirkko, Kouvola", tiedosto: "Kouvolan pyhän ristin kirkko.jpg", tekija: "Motopark", lisenssi: "CC BY-SA 3.0", lisenssiUrl: CC("by-sa/3.0"), vuosi: "2013" },
   { slug: "kuopio", kokoelma: "kaupungit", kuvaus: "Kuopion keskusta Puijolta", tiedosto: "Kuopio-center-from-Puijo.jpg", tekija: "Tumi-1983", lisenssi: "Public domain", lisenssiUrl: "", vuosi: "2011" },
-  { slug: "lahti", kokoelma: "kaupungit", kuvaus: "Lahden hyppyrimäet", tiedosto: "Lahti - ski jump.jpg", tekija: "Tiia Monto", lisenssi: "CC BY-SA 3.0", lisenssiUrl: CC("by-sa/3.0"), vuosi: "2013" },
+  { slug: "lahti", kokoelma: "kaupungit", kuvaus: "Salpausselän hyppyrimäet, Lahti", tiedosto: "Lahti skijumps.jpg", tekija: "sdbj", lisenssi: "CC BY 2.0", lisenssiUrl: CC("by/2.0"), vuosi: "2005" },
   { slug: "lappeenranta", kokoelma: "kaupungit", kuvaus: "Lappeenrannan satama", tiedosto: "Lappeenranta harbour.JPG", tekija: "MKFI", lisenssi: "Public domain", lisenssiUrl: "", vuosi: "2011" },
   { slug: "mikkeli", kokoelma: "kaupungit", kuvaus: "Mikkelin keskusta Naisvuorelta", tiedosto: "Mikkelin keskusta Naisvuorelta.JPG", tekija: "MKFI", lisenssi: "Public domain", lisenssiUrl: "", vuosi: "2011" },
   { slug: "oulu", kokoelma: "kaupungit", kuvaus: "Oulun toriranta", tiedosto: "Oulun-torinranta.jpg", tekija: "Tumi-1983", lisenssi: "CC BY-SA 3.0", lisenssiUrl: CC("by-sa/3.0"), vuosi: "2010" },
