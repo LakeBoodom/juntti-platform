@@ -124,6 +124,9 @@ export const FOOTER_MODES = [
 /* Tietoniekka-sarake: samat linkit kuin nykyisellä tietoniekka.fi:llä (Heikki
    28.8.2026 — Tietoa/Yhteystiedot/Käyttöehdot/Saavutettavuus/Evästeet lisätään
    vasta kun sivut ovat olemassa). */
-export const FOOTER_SITE = [{ label: "Tietosuoja", href: "/tietosuoja" }];
+export const FOOTER_SITE = [
+  { label: "Tietosuoja", href: "/tietosuoja" },
+  { label: "Kuvien lähteet", href: "/kuvien-lahteet" },
+];
 
 export const FOOTER_INSTAGRAM = "https://www.instagram.com/tietoniekka/";
