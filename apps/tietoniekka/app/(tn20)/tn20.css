@@ -2497,3 +2497,19 @@
   background: color-mix(in srgb, var(--tn-lime) 10%, var(--tn-surface));
   color: var(--tn-lime); font-family: inherit; font-size: 14px; font-weight: 800;
 }
+
+/* ─── Kuvakrediitti (12.9.2026) ───────────────────────────────────────────
+   Vapaasti lisensoidut valokuvat vaativat tekijämaininnan (CC BY / CC BY-SA).
+   Pienikokoinen rivi kokoelmasivun lopussa; tekijäluettelo /kuvien-lahteet. */
+.tn20 .tne-kuvakrediitti {
+  margin: clamp(28px,3.4cqw,48px) 0 0;
+  font-size: 13px;
+  line-height: 1.5;
+  color: rgba(255,255,255,0.42);
+}
+.tn20 .tne-kuvakrediitti a {
+  color: rgba(255,255,255,0.62);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.tn20 .tne-kuvakrediitti a:hover { color: #fff; }

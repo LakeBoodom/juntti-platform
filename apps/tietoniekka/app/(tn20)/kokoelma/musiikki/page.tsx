@@ -182,6 +182,13 @@ export default async function MusiikkiLanding() {
         ))}
 
         {article}
+
+        {/* Kuvakrediitti — CC BY / CC BY-SA vaativat tekijämaininnan.
+            Tekijät ja lisenssit listattu sivulla /kuvien-lahteet (12.9.2026). */}
+        <p className="tne-kuvakrediitti">
+          Artistikuvat: Wikimedia Commons, CC BY / CC BY-SA ·{" "}
+          <a href="/kuvien-lahteet">tekijät ja lisenssit</a>
+        </p>
       </div>
 
       {/* Alatunniste tulee layoutista (SiteFooter, QA-005 29.8.2026) */}
