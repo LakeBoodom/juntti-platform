@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { KUVALAHTEET, commonsUrl } from "@/lib/kuvalahteet";
+import { KUVALAHTEET, commonsUrl, type Kuvalahde } from "@/lib/kuvalahteet";
 
 export const metadata: Metadata = {
   title: "Kuvien lähteet",
@@ -13,6 +13,7 @@ const PAIVITETTY = "12.9.2026";
 
 export default function KuvienLahteetPage() {
   const musiikki = KUVALAHTEET.filter((k) => k.kokoelma === "musiikki");
+  const kaupungit = KUVALAHTEET.filter((k) => k.kokoelma === "kaupungit");
 
   return (
     <main
@@ -72,37 +73,10 @@ export default function KuvienLahteetPage() {
         </p>
 
         <h2 style={{ fontSize: 22, margin: "0 0 14px" }}>Musiikki-kokoelma</h2>
+        <Lista rivit={musiikki} />
 
-        <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "grid", gap: 14 }}>
-          {musiikki.map((k) => (
-            <li
-              key={k.slug}
-              style={{
-                background: "rgba(255,255,255,0.04)",
-                border: "1px solid rgba(255,255,255,0.08)",
-                borderRadius: 10,
-                padding: "12px 14px",
-              }}
-            >
-              <div style={{ fontWeight: 600, marginBottom: 4 }}>{k.kuvaus}</div>
-              <div style={{ fontSize: 14, color: "rgba(255,255,255,0.72)" }}>
-                Kuva:{" "}
-                <a href={commonsUrl(k.tiedosto)} target="_blank" rel="noopener noreferrer" style={linkki}>
-                  {k.tiedosto.replace(/\.[a-z]+$/i, "")}
-                </a>{" "}
-                · {k.tekija} ·{" "}
-                {k.lisenssiUrl ? (
-                  <a href={k.lisenssiUrl} target="_blank" rel="noopener noreferrer" style={linkki}>
-                    {k.lisenssi}
-                  </a>
-                ) : (
-                  k.lisenssi
-                )}
-                {k.vuosi ? ` · ${k.vuosi}` : ""} · rajattu
-              </div>
-            </li>
-          ))}
-        </ul>
+        <h2 style={{ fontSize: 22, margin: "34px 0 14px" }}>Kaupungit-kokoelma</h2>
+        <Lista rivit={kaupungit} />
 
         <p style={{ color: "rgba(255,255,255,0.55)", fontSize: 14, marginTop: 28 }}>
           Huomasitko virheen kuvan tekijä- tai lisenssitiedossa? Kerro siitä, niin korjaamme tai
@@ -110,6 +84,41 @@ export default function KuvienLahteetPage() {
         </p>
       </article>
     </main>
+  );
+}
+
+function Lista({ rivit }: { rivit: Kuvalahde[] }) {
+  return (
+    <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "grid", gap: 14 }}>
+      {rivit.map((k) => (
+        <li
+          key={k.kokoelma + "-" + k.slug}
+          style={{
+            background: "rgba(255,255,255,0.04)",
+            border: "1px solid rgba(255,255,255,0.08)",
+            borderRadius: 10,
+            padding: "12px 14px",
+          }}
+        >
+          <div style={{ fontWeight: 600, marginBottom: 4 }}>{k.kuvaus}</div>
+          <div style={{ fontSize: 14, color: "rgba(255,255,255,0.72)" }}>
+            Kuva:{" "}
+            <a href={commonsUrl(k.tiedosto)} target="_blank" rel="noopener noreferrer" style={linkki}>
+              {k.tiedosto.replace(/\.[a-z]+$/i, "")}
+            </a>{" "}
+            · {k.tekija} ·{" "}
+            {k.lisenssiUrl ? (
+              <a href={k.lisenssiUrl} target="_blank" rel="noopener noreferrer" style={linkki}>
+                {k.lisenssi}
+              </a>
+            ) : (
+              k.lisenssi
+            )}
+            {k.vuosi ? ` · ${k.vuosi}` : ""} · rajattu
+          </div>
+        </li>
+      ))}
+    </ul>
   );
 }
 

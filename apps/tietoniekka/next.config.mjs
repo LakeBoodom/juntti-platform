@@ -28,6 +28,13 @@ const nextConfig = {
       { source: "/kategoria/:slug*", destination: "/kokoelmat", permanent: true },
       /* 1.0 henkilösivut → Tunnetut henkilöt -hub (2.0:n henkilösivut tulevat myöhemmin) */
       { source: "/sankari/:slug*", destination: "/kokoelma/tunnetut-henkilot", permanent: true },
+      /* Kouvolan visan osoite vaihtui 12.9.2026 (vanha sisälsi ilmaisun,
+         josta luovuttiin). Vanha osoite ohjataan uuteen, ettei linkkejä katkea. */
+      {
+        source: "/visa/kouvola-visa-tervetuloa-kouvostoliittoon",
+        destination: "/visa/kouvola-visa-raiteiden-risteyksessa",
+        permanent: true,
+      },
       /* 1.0 pelimuodot */
       { source: "/mega", destination: "/megavisat", permanent: true },
       { source: "/kumpi", destination: "/", permanent: true },

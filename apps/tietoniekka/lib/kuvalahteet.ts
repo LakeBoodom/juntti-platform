@@ -21,7 +21,7 @@ export type Kuvalahde = {
   /** Visan slug = kuvatiedoston nimi kansiossa public/20/<kokoelma>/ */
   slug: string;
   /** Kokoelma, jonka kansiossa kuva on. */
-  kokoelma: "musiikki";
+  kokoelma: "musiikki" | "kaupungit";
   /** Mitä kuvassa on — näytetään lähdesivulla. */
   kuvaus: string;
   /** Tiedoston nimi Wikimedia Commonsissa (ilman File:-etuliitettä). */
@@ -64,6 +64,28 @@ export const KUVALAHTEET: Kuvalahde[] = [
   { slug: "sanni-visa-prinsessoja-astronautteja", kokoelma: "musiikki", kuvaus: "SANNI, Ilosaarirock 2016", tiedosto: "Sanni - Ilosaarirock 2016 - 06.jpg", tekija: "Tuomas Vitikainen", lisenssi: "CC BY-SA 4.0", lisenssiUrl: CC("by-sa/4.0"), vuosi: "2016" },
   { slug: "taylor-swift-visa-tunnetko-supertahden", kokoelma: "musiikki", kuvaus: "Taylor Swift lavalla 2016", tiedosto: "Taylor Swift Performance (31592454132).jpg", tekija: "el_ave (Flickr)", lisenssi: "CC BY 2.0", lisenssiUrl: CC("by/2.0"), vuosi: "2016" },
   { slug: "ultra-bra-tietovisa", kokoelma: "musiikki", kuvaus: "Ultra Bra lavalla 1997", tiedosto: "Ultra Bra 1997.tif", tekija: "Tuomas Jääskeläinen", lisenssi: "CC BY 4.0", lisenssiUrl: CC("by/4.0"), vuosi: "1997" },
+
+  // ─── Kaupungit (12.9.2026) ───
+  { slug: "espoo", kokoelma: "kaupungit", kuvaus: "Hanasaari ja Espoon saaristo ilmasta", tiedosto: "Hanasaari, Espoo 2019-10-05.jpg", tekija: "Joneikifi", lisenssi: "CC BY-SA 4.0", lisenssiUrl: CC("by-sa/4.0"), vuosi: "2019" },
+  { slug: "hameenlinna", kokoelma: "kaupungit", kuvaus: "Hämeen linna", tiedosto: "Häme Castle (23499025921).jpg", tekija: "দেবর্ষি রায় (Debarshi Ray)", lisenssi: "CC BY-SA 2.0", lisenssiUrl: CC("by-sa/2.0"), vuosi: "2015" },
+  { slug: "helsinki", kokoelma: "kaupungit", kuvaus: "Senaatintori, Helsinki", tiedosto: "Helsinki Senate Square Terrace East 2020-07-01.jpg", tekija: "JoAlanen", lisenssi: "CC0", lisenssiUrl: "https://creativecommons.org/publicdomain/zero/1.0/", vuosi: "2020" },
+  { slug: "joensuu", kokoelma: "kaupungit", kuvaus: "Pielisjoen ranta, Joensuu", tiedosto: "East bank of Pielisjoki-river in Joensuu.jpg", tekija: "Zache", lisenssi: "CC BY-SA 3.0", lisenssiUrl: CC("by-sa/3.0"), vuosi: "2006" },
+  { slug: "jyvaskyla", kokoelma: "kaupungit", kuvaus: "Jyväskylän satama", tiedosto: "Jyväskylä harbour.jpg", tekija: "Roland Struwe", lisenssi: "CC BY-SA 3.0", lisenssiUrl: CC("by-sa/3.0"), vuosi: "2008" },
+  { slug: "kouvola", kokoelma: "kaupungit", kuvaus: "Pyhän Ristin kirkko, Kouvola", tiedosto: "Kouvolan pyhän ristin kirkko.jpg", tekija: "Motopark", lisenssi: "CC BY-SA 3.0", lisenssiUrl: CC("by-sa/3.0"), vuosi: "2013" },
+  { slug: "kuopio", kokoelma: "kaupungit", kuvaus: "Kuopion keskusta Puijolta", tiedosto: "Kuopio-center-from-Puijo.jpg", tekija: "Tumi-1983", lisenssi: "Public domain", lisenssiUrl: "", vuosi: "2011" },
+  { slug: "lahti", kokoelma: "kaupungit", kuvaus: "Salpausselän hyppyrimäet, Lahti", tiedosto: "Lahti skijumps.jpg", tekija: "sdbj", lisenssi: "CC BY 2.0", lisenssiUrl: CC("by/2.0"), vuosi: "2005" },
+  { slug: "lappeenranta", kokoelma: "kaupungit", kuvaus: "Lappeenrannan satama", tiedosto: "Lappeenranta harbour.JPG", tekija: "MKFI", lisenssi: "Public domain", lisenssiUrl: "", vuosi: "2011" },
+  { slug: "mikkeli", kokoelma: "kaupungit", kuvaus: "Mikkelin keskusta Naisvuorelta", tiedosto: "Mikkelin keskusta Naisvuorelta.JPG", tekija: "MKFI", lisenssi: "Public domain", lisenssiUrl: "", vuosi: "2011" },
+  { slug: "oulu", kokoelma: "kaupungit", kuvaus: "Oulun toriranta", tiedosto: "Oulun-torinranta.jpg", tekija: "Tumi-1983", lisenssi: "CC BY-SA 3.0", lisenssiUrl: CC("by-sa/3.0"), vuosi: "2010" },
+  { slug: "pori", kokoelma: "kaupungit", kuvaus: "Keski-Porin kirkko", tiedosto: "Keski Porin kirkko.jpg", tekija: "Silenzio", lisenssi: "Public domain", lisenssiUrl: "", vuosi: "2006" },
+  { slug: "porvoo", kokoelma: "kaupungit", kuvaus: "Porvoon vanhat rantamakasiinit", tiedosto: "Old Porvoo riverside.jpg", tekija: "kallerna", lisenssi: "CC BY-SA 3.0", lisenssiUrl: CC("by-sa/3.0"), vuosi: "2010" },
+  { slug: "rovaniemi", kokoelma: "kaupungit", kuvaus: "Jätkänkynttiläsilta, Rovaniemi", tiedosto: "Rovaniemi Lumberjack’s Candle Bridge.jpg", tekija: "themadpenguin", lisenssi: "CC BY 2.0", lisenssiUrl: CC("by/2.0"), vuosi: "2012" },
+  { slug: "salo", kokoelma: "kaupungit", kuvaus: "Salon kaupungintalo", tiedosto: "Salon kaupungintalo.jpg", tekija: "Motopark", lisenssi: "CC BY-SA 3.0", lisenssiUrl: CC("by-sa/3.0"), vuosi: "2011" },
+  { slug: "seinajoki", kokoelma: "kaupungit", kuvaus: "Aalto-keskus ja Lakeuden Ristin kellotorni, Seinäjoki", tiedosto: "Seinäjoki 2023.jpg", tekija: "Zache", lisenssi: "CC BY 4.0", lisenssiUrl: CC("by/4.0"), vuosi: "2023" },
+  { slug: "tampere", kokoelma: "kaupungit", kuvaus: "Tampereen keskusta Näsinneulasta", tiedosto: "Tampere center from Näsinneula.jpg", tekija: "Leo-setä", lisenssi: "CC BY 2.0", lisenssiUrl: CC("by/2.0"), vuosi: "2011" },
+  { slug: "turku", kokoelma: "kaupungit", kuvaus: "Turun tuomiokirkko ja Aurajoki", tiedosto: "Kirjastosilta, Aurajoki ja Turun tuomiokirkko, kuvattuna Itäiseltä Rantakadulta, Turku, 8.12.2013.jpg", tekija: "Markus Rantala (Makele-90)", lisenssi: "CC BY-SA 3.0", lisenssiUrl: CC("by-sa/3.0"), vuosi: "2013" },
+  { slug: "vaasa", kokoelma: "kaupungit", kuvaus: "Vaasan kirkko ja keskusta vesitornista", tiedosto: "Vaasa Church from water tower.jpg", tekija: "Roland Struwe", lisenssi: "CC BY-SA 3.0", lisenssiUrl: CC("by-sa/3.0"), vuosi: "2008" },
+  { slug: "vantaa", kokoelma: "kaupungit", kuvaus: "Tiedekeskus Heureka, Vantaa", tiedosto: "Heureka.jpg", tekija: "Danila Talikov", lisenssi: "CC BY-SA 3.0", lisenssiUrl: CC("by-sa/3.0"), vuosi: "2013" },
 ];
 
 /** Commons-tiedostosivun osoite — lisenssiehtojen vaatima linkki lähteeseen. */

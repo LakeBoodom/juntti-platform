@@ -45,7 +45,7 @@ export const KAUPUNGIT: Kaupunki[] = [
   { id: "porvoo", name: "Porvoo", slogan: "Vanhan kaupungin kujilla", region: "Etelä-Suomi", px: 49.8, py: 94.6, quizSlug: "porvoo-punaiset-aitat-historia-visa" },
   { id: "lahti", name: "Lahti", slogan: "Suomen Chicagon salaisuudet", region: "Etelä-Suomi", px: 47.3, py: 89.6, quizSlug: "lahti-suomen-chicagon-salaisuudet" },
   { id: "hameenlinna", name: "Hämeenlinna", slogan: "Hämptonin harmaakivi ja Aulangon salat", region: "Etelä-Suomi", px: 39.4, py: 89.5, quizSlug: "hameenlinna-harmaakivi-aulanko-visa" },
-  { id: "kouvola", name: "Kouvola", slogan: "Kouvostoliittoon", region: "Etelä-Suomi", px: 54.1, py: 90.5, quizSlug: "kouvola-visa-tervetuloa-kouvostoliittoon" },
+  { id: "kouvola", name: "Kouvola", slogan: "Aktiivisten kaupunki", region: "Etelä-Suomi", px: 54.1, py: 90.5, quizSlug: "kouvola-visa-raiteiden-risteyksessa" },
   { id: "lappeenranta", name: "Lappeenranta", slogan: "Rajakaupungin salat", region: "Etelä-Suomi", px: 63.8, py: 89.0, quizSlug: "lappeenranta-rajakaupungin-salat" },
   { id: "turku", name: "Turku", slogan: "Aurajoen arvoitukset", region: "Lounais-Suomi", px: 25.1, py: 93.8, quizSlug: "aurajoen-arvoitukset-turku-visa" },
   { id: "salo", name: "Salo", slogan: "Signaalien kaupunki", region: "Lounais-Suomi", px: 30.7, py: 94.4, quizSlug: "kannykkakaupungin-arvoitukset-salo" },
