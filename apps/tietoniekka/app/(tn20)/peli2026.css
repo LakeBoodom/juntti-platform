@@ -34,6 +34,9 @@
 .tn20 .tng-topline { position: absolute; left: 0; right: 0; top: 0; height: 3px; background: linear-gradient(90deg, #e8a320, #f2c46b 40%, rgba(242, 196, 107, 0)); z-index: 6; }
 
 @keyframes tngRise { from { transform: translateY(10px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+/* Palautekortin tulo (CD kierros 5, arvo 5): 160 ms + 120 ms viive, jotta
+   kysymyksen kevennys (180 ms) ehtii alkaa ennen kuin palaute ilmestyy. */
+@keyframes tngFbIn { from { transform: translateY(6px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 @keyframes tngPop { 0% { transform: scale(0.94); opacity: 0; } 60% { transform: scale(1.03); } 100% { transform: scale(1); opacity: 1; } }
 @keyframes tngGlow { 0%, 100% { box-shadow: 0 0 0 0 rgba(182, 255, 60, 0); } 40% { box-shadow: 0 0 0 6px rgba(182, 255, 60, 0.18); } }
 @keyframes tngFlame { 0%, 100% { transform: scale(1) rotate(-2deg); } 50% { transform: scale(1.1) rotate(2deg); } }
@@ -88,7 +91,9 @@
   display: grid; grid-template-columns: minmax(0, 1fr);
   gap: clamp(14px, 2cqw, 28px);
   padding: clamp(16px, 2.2cqw, 40px) 0 0;
-  min-height: calc(100dvh - 92px);
+  /* --tngHud = HUD:n mitattu korkeus (GameClient asettaa); 92 px on vara-arvo
+     ennen ensimmäistä mittausta. Kiinteä arvio aiheutti 3 px sivuvierityksen. */
+  min-height: calc(100dvh - var(--tngHud, 92px));
   align-content: start;
 }
 .tn20 .tng-qcol { min-width: 0; display: flex; flex-direction: column; gap: clamp(12px, 1.5cqw, 20px); padding: 0 clamp(16px, 2.6cqw, 44px); }
@@ -104,6 +109,9 @@
   text-transform: uppercase; color: #fffbf2; text-wrap: balance;
   hyphens: none; -webkit-hyphens: none; overflow-wrap: normal; word-break: keep-all;
   text-shadow: 0 2px 30px rgba(0, 0, 0, 0.6);
+  /* 1a (CD kierros 5, arvo 5): kevennys lukituksessa 180 ms — vastauslista ei
+     liiku, koska se on omassa palstassaan ja rivit 1/2 jakavat saman korkeuden. */
+  transition: font-size 180ms cubic-bezier(0.2, 0.7, 0.3, 1), line-height 180ms cubic-bezier(0.2, 0.7, 0.3, 1);
 }
 .tn20 .tng-qh[data-img="1"] { max-width: 26ch; font-size: clamp(24px, min(3.2cqw, 6.4dvh), 46px); line-height: 1.02; }
 .tn20 .tng-qh[data-qlen="med"] { font-size: clamp(26px, min(4cqw, 7.8dvh), 58px); max-width: 27ch; line-height: 1.02; }
@@ -177,7 +185,7 @@
 
 /* Palautekortti */
 .tn20 .tng-fbslot { display: flex; flex-direction: column; }
-.tn20 .tng-fb { display: flex; flex-direction: column; gap: clamp(10px, 1.1cqw, 15px); padding: clamp(15px, 1.7cqw, 24px); border-radius: 16px; border: 1px solid #2e2718; background: #17130b; animation: tngRise 0.3s ease-out; }
+.tn20 .tng-fb { display: flex; flex-direction: column; gap: clamp(10px, 1.1cqw, 15px); padding: clamp(15px, 1.7cqw, 24px); border-radius: 16px; border: 1px solid #2e2718; background: #17130b; animation: tngFbIn 160ms ease-out 120ms both; }
 .tn20 .tng-fb[data-fb="ok"] { border-color: rgba(182, 255, 60, 0.42); background: linear-gradient(180deg, rgba(182, 255, 60, 0.11), rgba(23, 19, 11, 0.96)); }
 .tn20 .tng-fb[data-fb="bad"] { border-color: rgba(255, 107, 74, 0.42); background: linear-gradient(180deg, rgba(255, 107, 74, 0.11), rgba(23, 19, 11, 0.96)); }
 .tn20 .tng-fb-head { display: flex; align-items: center; gap: clamp(10px, 1.1cqw, 14px); flex-wrap: wrap; }
@@ -192,6 +200,16 @@
 .tn20 .tng-kicker { font-size: clamp(10.5px, 1cqw, 13px); font-weight: 800; letter-spacing: 0.16em; text-transform: uppercase; color: #f7ce7e; }
 .tn20 .tng-fb-correct { font-size: clamp(13px, 1.2cqw, 16px); font-weight: 700; color: #cbff75; }
 .tn20 .tng-tip { font-size: clamp(14.5px, 1.35cqw, 19px); line-height: 1.55; color: #e3daca; text-wrap: pretty; max-width: 66ch; }
+/* «Tiesitkö?» -selitys (CD kierros 5, arvo 4): selitys ei pienennä fonttia vaan
+   leikkautuu riveihin ja avautuu paikallaan. Kannan mediaanipituus on 174 merkkiä
+   ja 80 % selityksistä ylittää CD:n 130 merkin kirjoitusohjeen, joten leikkaus
+   tehdään todellisen ylivuodon mukaan (JS mittaa), ei merkkirajalla — muuten
+   nappi näkyisi lähes joka kysymyksessä. */
+.tn20 .tng-tip[data-clamp="1"] { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 5; overflow: hidden; }
+@media (max-height: 820px) { .tn20 .tng-tip[data-clamp="1"] { -webkit-line-clamp: 3; } }
+.tn20 .tng-tipmore { align-self: flex-start; margin-top: 2px; padding: 6px 0; border: 0; background: none; color: var(--tnAccText); font-size: clamp(12.5px, 1.15cqw, 15px); font-weight: 800; letter-spacing: 0.02em; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+.tn20 .tng-tipmore:hover { color: #ffe0a3; }
+.tn20 .tng-tipmore:focus-visible { outline: 2px solid #f2c46b; outline-offset: 3px; border-radius: 6px; }
 
 /* Toimintorivi */
 .tn20 .tng-act {
@@ -226,7 +244,7 @@
 .tn20 .tng-hint { margin-left: auto; font-size: clamp(11px, 1.05cqw, 14px); font-weight: 700; color: #a79e8c; text-align: right; white-space: nowrap; }
 
 /* ── Aloitusnäkymä ────────────────────────────────────────────────────── */
-.tn20 .tng-main[data-mode="aloitus"] { align-content: center; min-height: calc(100dvh - 92px); }
+.tn20 .tng-main[data-mode="aloitus"] { align-content: center; min-height: calc(100dvh - var(--tngHud, 92px)); }
 .tn20 .tng-start { min-width: 0; display: flex; flex-direction: column; align-items: flex-start; gap: clamp(14px, 1.6cqw, 24px); max-width: 1000px; padding: clamp(20px, 3cqw, 60px) clamp(16px, 2.6cqw, 44px) clamp(28px, 3cqw, 60px); }
 .tn20 .tng-start-cat { display: inline-flex; align-items: center; gap: 9px; font-size: clamp(11px, 1cqw, 14px); font-weight: 800; letter-spacing: 0.16em; text-transform: uppercase; color: var(--tnAccText); }
 .tn20 .tng-start-cat i { width: 8px; height: 8px; border-radius: 50%; background: var(--tnAcc); }
@@ -238,6 +256,158 @@
 .tn20 .tng-start-btn:hover { filter: brightness(1.08); transform: translateY(-1px); }
 .tn20 .tng-start-btn:focus-visible { outline: 2px solid #fffbf2; outline-offset: 3px; }
 .tn20 .tng-start-count { font-size: clamp(11.5px, 1.05cqw, 14px); font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase; color: #a79e8c; white-space: nowrap; }
+
+/* ── HERO: visan aloitusnäkymä (CD kierros 4–5 + Heikin spesifikaatio 13.9.2026)
+   Korvaa .tng-start-näkymän visoilla joilla on hero-data (hero_image) tai kun
+   osoitteessa on ?hero=uusi. Vanha .tng-start jää muille visoille.
+
+   Periaate (CD kierros 5, R1): kuvalle EI anneta korkeutta — mitoitetaan
+   sisältölohko ja kuva täyttää kaiken mitä jää. Siksi sama sääntö kattaa
+   360 × 640:n, 390 × 844:n ja pystytabletin ilman vh-lukuja.
+   Pysty (myös pystytabletti) = 2b pystyjuliste, vaaka ≥ 768 = 1c. Vaihtokohta on
+   kuvasuhde, ei leveys. ── */
+
+.tn20 .tng-main[data-mode="hero"] { display: block; padding: 0; gap: 0; }
+.tn20 .tng-hero { position: relative; }
+.tn20 .tng-heroview {
+  position: relative; overflow: hidden;
+  /* svh eikä dvh: pienin näkymä eli osoitepalkki näkyvissä. Näin "Aloita visa"
+     mahtuu ruudulle myös silloin kun mobiiliselaimen palkit ovat esillä —
+     dvh:lla hero olisi juuri sen verran korkeampi että nappi jäisi rajalle. */
+  min-height: calc(100svh - var(--tngHud, 92px));
+  display: flex; flex-direction: column; justify-content: flex-end;
+}
+.tn20 .tng-heroimg { position: absolute; inset: 0; z-index: 0; width: 100%; height: 100%; object-fit: cover; }
+/* Henkilövisan käsittely = sivuston vakioduotone (sama resepti kuin
+   henkilökorteissa ja päivän sankarin kuvanauhassa, tn20.css): harmaasävy →
+   violetti. Näin Wikipedian vaihtelevalaatuiset kuvat näyttävät saman perheen
+   jäseniltä eivätkä satunnaisilta valokuvilta. Pystyssä kuva on juliste kuten
+   muillakin visoilla — ei kelluvaa korttia. */
+.tn20 .tng-hero[data-kind="henkilo"] .tng-heroimg { filter: grayscale(1) sepia(1) hue-rotate(215deg) saturate(3.2) brightness(0.95); }
+.tn20 .tng-hero[data-kind="henkilo"] .tng-heroview::before {
+  content: ""; position: absolute; inset: 0; z-index: 1; pointer-events: none;
+  background: linear-gradient(100deg, rgba(124, 79, 201, 0.34), rgba(20, 18, 12, 0) 66%);
+}
+.tn20 .tng-hero[data-kind="henkilo"][data-side="right"] .tng-heroview::before { background: linear-gradient(260deg, rgba(124, 79, 201, 0.34), rgba(20, 18, 12, 0) 66%); }
+/* Gradientti = sisältölohko (37 %) + 16 prosenttiyksikköä = 53 %, eli kuvan ylin
+   47 % jää kirkkaaksi (CD kierros 5, sääntö 2). Keskivaiheen alphat nostettu
+   CD:n arvoista (.94/.58/.18 → .96/.80/.32), koska viisiriviselle otsikolle
+   venyvä teksti nousi vaaleammalle alueelle ja leipätekstin kontrasti jäi 4.4:ään. */
+.tn20 .tng-heroshade { position: absolute; inset: auto 0 0; z-index: 1; height: 53%; background: linear-gradient(0deg, rgba(15, 13, 7, 0.985) 0%, rgba(15, 13, 7, 0.96) 70%, rgba(15, 13, 7, 0.8) 84%, rgba(15, 13, 7, 0.32) 93%, rgba(15, 13, 7, 0) 100%); }
+/* Kuvaton visa: kategoriaväri tulee oikeaan yläkulmaan, juuri sinne mistä kuva puuttuu */
+.tn20 .tng-hero[data-kind="ei-kuvaa"] .tng-heroshade { inset: 0; height: auto; background: radial-gradient(120% 90% at 88% 12%, var(--tnAccWash), rgba(15, 13, 7, 0) 62%), linear-gradient(0deg, rgba(15, 13, 7, 0.9) 0%, rgba(15, 13, 7, 0.5) 60%, rgba(15, 13, 7, 0.3) 100%); }
+
+.tn20 .tng-herobody {
+  position: relative; z-index: 2;
+  display: flex; flex-direction: column; gap: clamp(12px, 2.2vh, 22px);
+  max-height: 37%;
+  padding: 0 clamp(16px, 5vw, 28px) clamp(18px, 3.4vh, 30px);
+}
+.tn20 .tng-crumbs { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font-size: clamp(11.5px, 1cqw, 13px); font-weight: 600; color: #8e8676; }
+.tn20 .tng-crumbs a { color: #a79e8c; }
+.tn20 .tng-crumbs a:hover { color: #f2c46b; }
+.tn20 .tng-crumbs [aria-current] { color: #cfc7b6; }
+.tn20 .tng-herocat { display: inline-flex; align-items: center; gap: 9px; font-size: clamp(11px, 1cqw, 13px); font-weight: 800; letter-spacing: 0.16em; text-transform: uppercase; color: var(--tnAccText); }
+.tn20 .tng-herocat i { width: 7px; height: 7px; border-radius: 50%; background: var(--tnAcc); }
+/* Otsikon koko tulee NIMEN PITUUDESTA, ei kategoriasta (CD kierros 4).
+   Mobiili: clamp(28px, 7vw, 36px) kaikille pituuksille; pitkillä nimillä
+   porrastus alkaa vasta vaakanäkymässä. Kova katto 78 px. */
+.tn20 .tng-heroh1 {
+  margin: 0; font-family: var(--tn-font-display); font-weight: 900;
+  font-size: clamp(28px, 7vw, 36px); line-height: 0.96; letter-spacing: -0.025em;
+  text-transform: uppercase; color: #fffbf2; text-wrap: balance;
+  hyphens: none; -webkit-hyphens: none; overflow-wrap: normal; word-break: keep-all;
+  text-shadow: 0 4px 40px rgba(0, 0, 0, 0.7);
+}
+.tn20 .tng-herop { margin: 0; max-width: 44ch; font-size: clamp(14.5px, 1.4cqw, 18px); line-height: 1.5; color: #ded5c2; text-wrap: pretty; }
+.tn20 .tng-herorow { display: flex; align-items: center; gap: clamp(12px, 1.6cqw, 20px); flex-wrap: wrap; }
+.tn20 .tng-herobtn { display: inline-flex; align-items: center; justify-content: center; gap: 12px; min-height: clamp(52px, 4.8cqw, 58px); padding: 16px clamp(24px, 2.6cqw, 34px); border-radius: 14px; border: 0; background: var(--tnAcc); color: #0c0a05; font-family: var(--tn-font-display); font-weight: 900; font-size: clamp(14px, 1.4cqw, 16px); letter-spacing: 0.04em; text-transform: uppercase; white-space: nowrap; cursor: pointer; box-shadow: 0 12px 30px -18px rgba(0, 0, 0, 0.9); transition: filter 0.15s, transform 0.15s; }
+.tn20 .tng-herobtn:hover { filter: brightness(1.08); transform: translateY(-1px); }
+.tn20 .tng-herobtn:focus-visible { outline: 2px solid #fffbf2; outline-offset: 3px; }
+.tn20 .tng-herometa { font-size: clamp(11.5px, 1.05cqw, 13px); font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase; color: #a79e8c; }
+/* Kuvalähde: mobiilissa kysymysmäärän perässä, ei koskaan kuvan päällä pillerissä */
+.tn20 .tng-herocredit { font-size: clamp(10.5px, 0.95cqw, 12px); font-weight: 700; letter-spacing: 0.02em; color: rgba(255, 251, 242, 0.55); }
+
+/* Henkilövisan kuvakortti: kiinteä 3:4, ei koskaan koko taustakuvaksi.
+   Pystyssä kortti nousee tekstin yläpuolelle (order: -1) — muuten henkilöstä
+   näkyisi mobiilissa vain sumennettu tausta. */
+.tn20 .tng-herocard { position: relative; z-index: 2; display: none; flex-direction: column; gap: 8px; }
+/* Pystyssä kuvakorttia ei tarvita: kuva itse on juliste. Kuvalähde kulkee
+   kysymysmäärän perässä samalla rivillä (ei koskaan pillerinä kuvan päällä). */
+.tn20 .tng-hero[data-kind="henkilo"] .tng-herocard { display: none; }
+.tn20 .tng-herocard img { display: block; width: 100%; aspect-ratio: 3 / 4; object-fit: cover; object-position: 50% 15%; border-radius: 18px; border: 1px solid rgba(255, 251, 242, 0.14); background: #17130b; box-shadow: 0 30px 60px -34px rgba(0, 0, 0, 0.95); }
+
+/* "Lisää X-visoja": mobiilissa pino heron JÄLKEEN (ei heti napin alle),
+   vaakanäkymässä 3 sarakkeen ruudukko heron alalaidassa. */
+.tn20 .tng-heromore { position: relative; z-index: 2; display: flex; flex-direction: column; gap: clamp(10px, 1.4vh, 15px); padding: clamp(18px, 3vh, 26px) clamp(16px, 5vw, 28px) clamp(24px, 4vh, 32px); border-top: 1px solid rgba(255, 251, 242, 0.12); }
+.tn20 .tng-heromore-head { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; }
+.tn20 .tng-heromore-t { font-family: var(--tn-font-display); font-weight: 900; font-size: clamp(15px, 1.5cqw, 17px); letter-spacing: 0.02em; text-transform: uppercase; color: #fffbf2; }
+.tn20 .tng-heromore-all { font-size: clamp(12px, 1.15cqw, 13px); font-weight: 700; color: var(--tnAccText); white-space: nowrap; }
+.tn20 .tng-heromore-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: clamp(9px, 1cqw, 14px); }
+.tn20 .tng-herorec { display: flex; flex-direction: column; justify-content: flex-end; gap: 6px; min-height: 78px; padding: 14px 16px; border-radius: 13px; border: 1px solid #2a2317; background: rgba(22, 18, 10, 0.9); font-size: clamp(14px, 1.45cqw, 15.5px); font-weight: 600; line-height: 1.25; color: #ede4d2; transition: border-color 0.15s, transform 0.15s; }
+.tn20 .tng-herorec:hover { border-color: #7a6740; transform: translateY(-2px); color: #fffbf2; }
+.tn20 .tng-herorec:focus-visible { outline: 2px solid #f2c46b; outline-offset: 3px; }
+.tn20 .tng-herorec span { font-size: clamp(10.5px, 1cqw, 11.5px); font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; color: #8a806d; }
+
+/* Matalat pystyruudut: kuvaus antaa periksi, ei otsikko eikä nappi (CD sääntö 3) */
+@media (max-height: 800px) { .tn20 .tng-herop { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; } }
+@media (max-height: 700px) { .tn20 .tng-herop { display: none; } }
+
+/* ── 1c: vaaka (myös vaakatabletti) — kuva kirkkaana, tummennus tekstin puolella ── */
+@media (min-aspect-ratio: 1/1) and (min-width: 768px) {
+  .tn20 .tng-heroview { justify-content: center; padding-bottom: clamp(150px, 21dvh, 210px); }
+  /* CD:n stopit (.9 @30 %, .52 @55 %) mitattiin artboardin tummaa kuvaa vasten.
+     Kirkkaalla valokuvalla (esim. taivas) leipätekstin kontrasti jäi 3.6:een, joten
+     tekstipuolen tummennusta vahvistettiin: tekstipalstan alla (≤ 52 %) alpha on
+     aina ≥ .82 → mitattu kontrasti ≥ 6 gradientin vaaleimmalta kohdalta.
+     Kuvapuoli (≥ 70 %) on edelleen käytännössä kirkas. 94° eikä 90°, jotta
+     yläkulma tummenee hieman enemmän ja logo pysyy luettavana. */
+  .tn20 .tng-heroshade { inset: 0; height: auto; background: linear-gradient(94deg, rgba(15, 13, 7, 0.96) 0%, rgba(15, 13, 7, 0.93) 32%, rgba(15, 13, 7, 0.82) 50%, rgba(15, 13, 7, 0.45) 70%, rgba(15, 13, 7, 0.12) 88%, rgba(15, 13, 7, 0) 100%); }
+  /* heroSide = right → sama gradientti peilattuna (266deg, ei -94deg) */
+  .tn20 .tng-hero[data-side="right"] .tng-heroshade { background: linear-gradient(266deg, rgba(15, 13, 7, 0.96) 0%, rgba(15, 13, 7, 0.93) 32%, rgba(15, 13, 7, 0.82) 50%, rgba(15, 13, 7, 0.45) 70%, rgba(15, 13, 7, 0.12) 88%, rgba(15, 13, 7, 0) 100%); }
+  .tn20 .tng-hero[data-kind="ei-kuvaa"] .tng-heroshade { background: radial-gradient(120% 90% at 88% 12%, var(--tnAccWash), rgba(15, 13, 7, 0) 62%), linear-gradient(94deg, rgba(15, 13, 7, 0.94) 0%, rgba(15, 13, 7, 0.86) 46%, rgba(15, 13, 7, 0.7) 100%); }
+  /* Tekstipalsta enintään 660 px JA enintään 52 % leveydestä, jotta se ei koskaan
+     ulotu gradientin vaalealle puolelle kapeammilla vaakanäytöillä. */
+  .tn20 .tng-herobody { max-height: none; max-width: min(660px, 52%); padding: 0 clamp(28px, 3.4cqw, 48px); gap: clamp(14px, 1.8cqw, 24px); }
+  .tn20 .tng-hero[data-side="right"] .tng-herobody { margin-left: auto; }
+  .tn20 .tng-hero[data-kind="ei-kuvaa"] .tng-herobody { max-width: none; }
+  .tn20 .tng-hero[data-kind="ei-kuvaa"] .tng-herop { max-width: 60ch; }
+  /* Otsikkoportaat nimen pituuden mukaan (CD kierros 4; kova katto 78 px) */
+  .tn20 .tng-heroh1 { font-size: clamp(34px, 4.6cqw, 78px); max-width: 12ch; line-height: 0.92; }
+  .tn20 .tng-heroh1[data-len="s"] { font-size: clamp(34px, 4.4cqw, 72px); max-width: 14ch; }
+  .tn20 .tng-heroh1[data-len="m"] { font-size: clamp(30px, 3.6cqw, 56px); max-width: 18ch; line-height: 0.96; }
+  .tn20 .tng-heroh1[data-len="l"] { font-size: clamp(26px, 3cqw, 46px); max-width: 22ch; line-height: 0.98; }
+  /* Vaakanäkymässä lisävisat asettuvat heron alalaitaan kuvan päälle; pystyssä
+     ne jäävät heron jälkeen, jolloin ne löytyvät vierittämällä (CD kierros 5, P4). */
+  .tn20 .tng-heromore { position: absolute; left: 0; right: 0; bottom: 0; border-top: 0; padding: clamp(18px, 2.2cqw, 26px) clamp(28px, 3.4cqw, 48px) clamp(22px, 2.6cqw, 30px); background: linear-gradient(0deg, rgba(15, 13, 7, 0.97) 0%, rgba(15, 13, 7, 0.93) 55%, rgba(15, 13, 7, 0.72) 85%, rgba(15, 13, 7, 0.34) 100%); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); }
+  .tn20 .tng-heromore-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  /* Henkilövisa vaakanäkymässä: kuva on täyskorkea paneeli oikeassa laidassa,
+     ei kelluva kortti — muuten kuvan ympärille jää tyhjää, mitä muissa visoissa
+     ei ole. Vasen reuna häivytetään maskilla, jolloin paneeli sulautuu
+     sumennettuun taustaan. Focal-sääntöä ei ajeta: paneeli on aina oikealla. */
+  .tn20 .tng-hero[data-kind="henkilo"] .tng-heroimg { filter: grayscale(1) sepia(1) hue-rotate(215deg) saturate(3.2) brightness(0.62) blur(30px); transform: scale(1.15); }
+  .tn20 .tng-hero[data-kind="henkilo"] .tng-herocard {
+    display: block; position: absolute; z-index: 1; top: 0; right: 0; bottom: 0;
+    width: min(44%, 660px); padding: 0; margin: 0;
+  }
+  .tn20 .tng-hero[data-kind="henkilo"] .tng-herocard img {
+    width: 100%; height: 100%; max-height: none; object-fit: cover; object-position: 50% 15%;
+    border: 0; border-radius: 0; box-shadow: none; aspect-ratio: auto;
+    filter: grayscale(1) sepia(1) hue-rotate(215deg) saturate(3.2) brightness(0.95);
+    -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 26%);
+    mask-image: linear-gradient(90deg, transparent 0%, #000 26%);
+  }
+  .tn20 .tng-hero[data-kind="henkilo"] .tng-herobody { max-width: min(660px, 52%); }
+  .tn20 .tng-herocredit { position: absolute; right: 24px; bottom: 8px; z-index: 3; }
+  .tn20 .tng-hero[data-kind="henkilo"] .tng-herocredit { position: static; text-align: right; }
+}
+/* Pystytabletti: sama 2b kuin mobiilissa, vain typografia kasvaa */
+@media (max-aspect-ratio: 1/1) and (min-width: 700px) {
+  .tn20 .tng-heroh1 { font-size: clamp(40px, 5.2vw, 56px); }
+  .tn20 .tng-herobody { padding: 0 32px 32px; }
+  .tn20 .tng-heromore { padding-left: 32px; padding-right: 32px; }
+  .tn20 .tng-heromore-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
 
 /* ── Tulosnäkymä ──────────────────────────────────────────────────────── */
 .tn20 .tng-resleft { min-width: 0; display: flex; flex-direction: column; gap: clamp(14px, 1.6cqw, 22px); padding: 0 clamp(16px, 2.6cqw, 44px); }
@@ -394,20 +564,56 @@
   .tn20 .tng-mediaframe { max-width: 100%; max-height: min(38dvh, 340px); }
   .tn20 .tng-media { gap: 8px; }
 }
-/* Tablet landscape + desktop: kaksipalstainen päärivi */
+/* Tablet landscape + desktop: kaksipalstainen päärivi.
+   1a (CD kierros 5): palaute laskeutuu KYSYMYKSEN alle vasempaan palstaan, ei
+   enää vastauslistan alle. Ruudukko on kaksirivinen (auto + 1fr) ja korkeus on
+   sidottu näkymään, joten vastauslista (rivit 1–2, keskitetty) ei liiku
+   pikseliäkään kun kysymys kevenee ja palaute ilmestyy. Tämä korvaa aiemman
+   JS-freezen (padding-top-kompensaatio), joka poistettiin GameClientistä. */
 @container tnq (min-width: 880px) {
   .tn20 .tng-main[data-mode="peli"] {
     grid-template-columns: minmax(0, 1.06fr) minmax(0, 0.94fr);
+    /* Rivi 1 = kysymys (min 0 → ei koskaan työnnä ruudukkoa näkymää suuremmaksi),
+       rivi 2 = palaute. Korkeus on sidottu näkymään (ei sisältöön), joten
+       vastauslista rivien 1–2 yli keskitettynä ei liiku pikseliäkään edes kannan
+       pisimmällä kysymyksellä (449 merkkiä), joka ennen siirsi rivejä 430 px. */
+    grid-template-rows: minmax(0, auto) minmax(0, 1fr);
+    height: calc(100dvh - var(--tngHud, 92px));
+    min-height: calc(100dvh - var(--tngHud, 92px));
     column-gap: clamp(22px, 2.4cqw, 48px); row-gap: clamp(16px, 1.5cqw, 22px);
-    align-items: start; align-content: safe center;
+    align-items: start; align-content: stretch;
     padding: clamp(24px, 3.4cqw, 64px) clamp(16px, 2.6cqw, 48px) clamp(28px, 3.4cqw, 64px);
   }
-  .tn20 .tng-main[data-mode="peli"] .tng-qcol { grid-column: 1; grid-row: 1; align-self: center; padding: 0; }
+  /* Poikkeuksellisen pitkä kysymys tai selitys vierittyy omassa palstassaan eikä
+     työnnä koko sivua — teksti pysyy kokonaan luettavana (KORTTISÄÄNTÖ). */
+  .tn20 .tng-main[data-mode="peli"] .tng-qcol { grid-column: 1; grid-row: 1; align-self: stretch; min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: 0; }
   .tn20 .tng-main[data-mode="peli"] .tng-acol { display: contents; }
-  .tn20 .tng-main[data-mode="peli"] .tng-agroup { grid-column: 2; grid-row: 1; width: 100%; max-width: 900px; align-self: center; }
-  .tn20 .tng-main[data-mode="peli"] .tng-wait { grid-column: 2; width: 100%; max-width: 900px; }
-  .tn20 .tng-main[data-mode="peli"] .tng-fbslot { grid-column: 2; width: 100%; max-width: 900px; min-height: 0; }
-  .tn20 .tng-main[data-mode="peli"] .tng-act { grid-column: 2; width: 100%; max-width: 900px; position: sticky; bottom: 0; margin: 0; padding: 10px 0; background: linear-gradient(180deg, rgba(15, 13, 7, 0), rgba(15, 13, 7, 0.92) 55%); backdrop-filter: none; -webkit-backdrop-filter: none; border-top: 0; }
+  .tn20 .tng-main[data-mode="peli"] .tng-agroup { grid-column: 2; grid-row: 1 / span 2; width: 100%; max-width: 900px; align-self: center; }
+  .tn20 .tng-main[data-mode="peli"] .tng-wait { grid-column: 2; grid-row: 1; width: 100%; max-width: 900px; }
+  .tn20 .tng-main[data-mode="peli"] .tng-fbslot { grid-column: 1; grid-row: 2; width: 100%; max-width: 900px; min-height: 0; align-self: stretch; overflow-y: auto; overscroll-behavior: contain; }
+  .tn20 .tng-main[data-mode="peli"] .tng-act { grid-column: 2; grid-row: 2; align-self: end; width: 100%; max-width: 900px; position: sticky; bottom: 0; margin: 0; padding: 10px 0; background: linear-gradient(180deg, rgba(15, 13, 7, 0), rgba(15, 13, 7, 0.92) 55%); backdrop-filter: none; -webkit-backdrop-filter: none; border-top: 0; }
+
+  /* Lukittu kysymys kevenee (CD: 58 → 34 px), jotta palaute mahtuu sen alle
+     ilman vieritystä. JS-auto-fit (KORTTISÄÄNTÖ) ajetaan uudelleen lukituksessa,
+     joten pisin sana mahtuu myös kevennetyssä koossa. */
+  .tn20 .tng-main[data-mode="peli"][data-locked="1"] .tng-qh,
+  .tn20 .tng-main[data-mode="peli"][data-locked="1"] .tng-qh[data-qlen="med"],
+  .tn20 .tng-main[data-mode="peli"][data-locked="1"] .tng-qh[data-qlen="long"],
+  .tn20 .tng-main[data-mode="peli"][data-locked="1"] .tng-qh[data-img="1"] {
+    font-size: clamp(20px, min(2.6cqw, 5.2dvh), 34px); max-width: 42ch; line-height: 1.14; letter-spacing: -0.005em;
+  }
+  .tn20 .tng-main[data-mode="peli"][data-locked="1"] .tng-qh[data-qlen="xlong"] {
+    font-size: clamp(18px, min(2.1cqw, 4.4dvh), 28px); max-width: 52ch; line-height: 1.16;
+  }
+  /* Kuvakysymyksessä kuva on kysymys: se ei saa kutistua nollaan, mutta antaa
+     tilaa palautteelle lukituksessa (CD: kuvalava 46 % → 28 %). */
+  .tn20 .tng-main[data-mode="peli"][data-locked="1"] .tng-mediaframe { max-height: min(30dvh, 300px); }
+  /* Lukituksessa kysymys saa enintään puolet korkeudesta, jotta palaute mahtuu
+     aina kokonaan näkyviin. Kannan pisimmät kysymykset (yli ~300 merkkiä) saavat
+     oman vierityksensä — ne on jo luettu ennen vastaamista, ja opetushetki eli
+     selitys on se joka ei saa jäädä ruudun ulkopuolelle. */
+  .tn20 .tng-main[data-mode="peli"][data-locked="1"] { grid-template-rows: fit-content(50%) minmax(0, 1fr); }
+  .tn20 .tng-main[data-mode="peli"][data-locked="1"] .tng-qcol { scrollbar-width: thin; }
   .tn20 .tng-main[data-mode="valmis"] { grid-template-columns: minmax(0, 1.06fr) minmax(0, 0.94fr); column-gap: clamp(22px, 2.4cqw, 48px); row-gap: clamp(16px, 1.5cqw, 22px); align-items: start; padding: clamp(24px, 3.4cqw, 64px) clamp(16px, 2.6cqw, 48px) clamp(28px, 3.4cqw, 64px); }
   .tn20 .tng-main[data-mode="valmis"] .tng-resleft { grid-column: 1; grid-row: 1; align-self: start; padding: 0; }
   .tn20 .tng-main[data-mode="valmis"] .tng-resright { grid-column: 2; grid-row: 1; align-self: start; width: 100%; max-width: 900px; padding: 0; }
@@ -452,6 +658,19 @@
     .tn20 .tng-sharepreview { display: none; }
     .tn20 .tng-chalbullets { gap: 5px; }
     .tn20 .tng-chalbullets li { font-size: 13px; }
+  }
+}
+/* Matalat desktop-ruudut (CD kierros 5): alle 800 px korkeudella kysymys putoaa
+   vielä askeleen ja vastausrivit 66 px:ään — selitys mahtuu myös 1280 × 720:ssä. */
+@media (max-height: 800px) {
+  @container tnq (min-width: 880px) {
+    .tn20 .tng-ans { min-height: 66px; padding-top: 10px; padding-bottom: 10px; }
+    .tn20 .tng-main[data-mode="peli"][data-locked="1"] .tng-qh,
+    .tn20 .tng-main[data-mode="peli"][data-locked="1"] .tng-qh[data-qlen="med"],
+    .tn20 .tng-main[data-mode="peli"][data-locked="1"] .tng-qh[data-qlen="long"],
+    .tn20 .tng-main[data-mode="peli"][data-locked="1"] .tng-qh[data-img="1"] { font-size: clamp(18px, min(2.2cqw, 4.6dvh), 28px); max-width: 48ch; }
+    .tn20 .tng-main[data-mode="peli"][data-locked="1"] .tng-qh[data-qlen="xlong"] { font-size: clamp(17px, min(1.9cqw, 4dvh), 24px); max-width: 58ch; }
+    .tn20 .tng-main[data-mode="peli"][data-locked="1"] .tng-mediaframe { max-height: min(26dvh, 220px); }
   }
 }
 /* Matala näkymä (mobiili vaaka): HUD ja typografia tiivistyvät */
