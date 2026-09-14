@@ -144,8 +144,10 @@
 @container tnq (min-width: 880px) {
   .tn20 .tng-main[data-mode="peli"][data-img="1"] { grid-template-rows: minmax(0, 1fr) minmax(0, auto); }
   .tn20 .tng-main[data-mode="peli"][data-img="1"] .tng-qcol { min-height: 0; overflow: visible; }
-  .tn20 .tng-main[data-mode="peli"][data-img="1"] .tng-media { flex: 1 1 auto; min-height: 0; }
-  .tn20 .tng-main[data-mode="peli"][data-img="1"] .tng-mediaframe { flex: 1 1 auto; min-height: 0; height: auto; aspect-ratio: auto; max-height: 56%; }
+  /* Katto on 56 % PALSTAN korkeudesta (levy + suurennuslinkki ≈ 62 % mediablokista),
+     ei 56 % mediablokista — muuten levy jäi puoleen siitä mitä CD tarkoitti. */
+  .tn20 .tng-main[data-mode="peli"][data-img="1"] .tng-media { flex: 1 1 auto; min-height: 0; max-height: 62%; }
+  .tn20 .tng-main[data-mode="peli"][data-img="1"] .tng-mediaframe { flex: 1 1 auto; min-height: 0; height: auto; aspect-ratio: auto; max-height: none; }
 }
 .tn20 .tng-skeleton { position: absolute; inset: 0; background: linear-gradient(100deg, #e8e1d2 30%, #f4efe4 50%, #e8e1d2 70%); background-size: 220% 100%; animation: tngShimmer 1.5s linear infinite; }
 .tn20 .tng-zoombtn { position: absolute; inset: 0; display: block; width: 100%; height: 100%; padding: 22px; border: 0; background: transparent; cursor: zoom-in; }
