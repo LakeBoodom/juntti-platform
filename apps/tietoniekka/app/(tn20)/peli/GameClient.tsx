@@ -635,7 +635,9 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
 
   return (
     <div ref={rootRef} className="tng" style={accentVars}>
-      {mode !== "hero" && (
+      {/* Kuvavisassa taustakuva on pois (CD kierros 7): kysymyskuva on itse sisältö,
+          eikä sen kanssa saa kilpailla toinen kuvakerros. */}
+      {mode !== "hero" && !isKuva && (
         <>
           <div className="tng-bg" aria-hidden style={{ backgroundImage: `url(${quiz.bgImg})` }} />
           <div className="tng-bgshade" aria-hidden />
@@ -793,12 +795,6 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
                         disabled={curImgState !== "ready"}
                         onClick={(e) => { zoomOpenerRef.current = e.currentTarget; setZoom(true); }}
                       >
-                        {curImgState === "ready" && (
-                          <span className="tng-zoomhint" aria-hidden>
-                            <svg width="15" height="15" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"><circle cx="8.6" cy="8.6" r="5.6" /><path d="M12.8 12.8L17 17M6.4 8.6h4.4M8.6 6.4v4.4" /></svg>
-                            Suurenna kuva
-                          </span>
-                        )}
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img
                           key={curImgKey ?? "img"}
@@ -829,6 +825,21 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
                         </div>
                       )}
                     </div>
+                    {/* CD kierros 7: suurennuslinkki ja kuvalähde omalla rivillään levyn
+                        ALLA — kuvan päälle ei tule mitään, koska grafiikassa (vaakuna,
+                        lippu, logo) jokainen peittävä elementti vie osan kysymyksestä. */}
+                    {curImgState === "ready" && (
+                      <div className="tng-medialine">
+                        <button
+                          type="button"
+                          className="tng-zoomhint"
+                          onClick={(e) => { zoomOpenerRef.current = e.currentTarget; setZoom(true); }}
+                        >
+                          <svg width="15" height="15" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" aria-hidden="true"><circle cx="8.6" cy="8.6" r="5.6" /><path d="M12.8 12.8L17 17M6.4 8.6h4.4M8.6 6.4v4.4" /></svg>
+                          Suurenna kuva
+                        </button>
+                      </div>
+                    )}
                     <span className="tng-sr" role="status" aria-live="polite">
                       {curImgState === "loading" ? "Kuva latautuu…" : curImgState === "error" ? "Kuvaa ei voitu ladata." : ""}
                     </span>
