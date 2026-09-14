@@ -8,14 +8,20 @@ import type { Metadata } from "next";
 
 export const dynamic = "force-dynamic";
 
-type Props = { params: Promise<{ slug: string }> };
+type Props = {
+  params: Promise<{ slug: string }>;
+  /* Hero-testiparametri (?hero=uusi) välitetään myös kanoniselle polulle, jotta
+     uutta aloitusnäkymää voi katsoa /visa/<slug>-osoitteessa. */
+  searchParams?: Promise<Record<string, string | string[] | undefined>>;
+};
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   return peliMetadata({ searchParams: Promise.resolve({ visa: slug }) });
 }
 
-export default async function VisaPage({ params }: Props) {
+export default async function VisaPage({ params, searchParams }: Props) {
   const { slug } = await params;
-  return PeliPage({ searchParams: Promise.resolve({ visa: slug }) });
+  const sp = (await searchParams) ?? {};
+  return PeliPage({ searchParams: Promise.resolve({ ...sp, visa: slug }) });
 }
