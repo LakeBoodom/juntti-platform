@@ -127,20 +127,28 @@
   .tn20 .tng-ans { min-height: 70px; }
 }
 
-/* Mediakortti (kuvakysymys) */
+/* Mediakortti (kuvakysymys) — CD kierros 7: kuvavisan kuva on usein litteää
+   grafiikkaa (vaakuna, lippu, logo) eikä valokuva. Siksi se saa oman VAALEAN
+   levyn, jossa on ilmaa joka reunalla, eikä sen päälle tule mitään: kuva on
+   kysymyksen sisältö, ei tausta. Läpinäkyvä PNG tummalla viivalla toimii
+   vaaleaa levyä vasten, kirkas väripintakin. */
 .tn20 .tng-media { margin: 0; display: flex; flex-direction: column; gap: 9px; }
 .tn20 .tng-mediaframe {
   position: relative; width: 100%; max-width: min(100%, 620px); aspect-ratio: 3 / 2; max-height: min(46dvh, 460px);
-  border-radius: 16px; border: 1px solid var(--tnAccBorder); background: #12100a; overflow: hidden;
+  border-radius: 16px; border: 1px solid #2e2718; background: #f4efe4; padding: 22px; overflow: hidden;
   box-shadow: 0 18px 40px -28px rgba(0, 0, 0, 0.9);
 }
-.tn20 .tng-skeleton { position: absolute; inset: 0; background: linear-gradient(100deg, #17130b 30%, #221c11 50%, #17130b 70%); background-size: 220% 100%; animation: tngShimmer 1.5s linear infinite; }
-.tn20 .tng-zoombtn { position: absolute; inset: 0; display: block; width: 100%; height: 100%; padding: 0; border: 0; background: transparent; cursor: zoom-in; }
-.tn20 .tng-zoombtn:focus-visible { outline: 2px solid #f2c46b; outline-offset: -3px; }
-.tn20 .tng-zoomhint { position: absolute; right: 10px; bottom: 10px; z-index: 2; display: inline-flex; align-items: center; gap: 7px; padding: 8px 13px; border-radius: 11px; border: 1px solid rgba(232, 226, 212, 0.28); background: rgba(10, 8, 4, 0.72); backdrop-filter: blur(6px); color: #f4eee0; font-size: 12.5px; font-weight: 800; }
-.tn20 .tng-qimg { display: block; width: 100%; height: 100%; object-fit: contain; opacity: 0; transition: opacity 0.25s; }
+/* Desktopissa levy saa enintään 56 % näyttämön korkeudesta (CD kierros 7) */
+@container tnq (min-width: 880px) { .tn20 .tng-mediaframe { max-height: min(56dvh, 520px); } }
+.tn20 .tng-skeleton { position: absolute; inset: 0; background: linear-gradient(100deg, #e8e1d2 30%, #f4efe4 50%, #e8e1d2 70%); background-size: 220% 100%; animation: tngShimmer 1.5s linear infinite; }
+.tn20 .tng-zoombtn { position: absolute; inset: 0; display: block; width: 100%; height: 100%; padding: 22px; border: 0; background: transparent; cursor: zoom-in; }
+/* Suurennuslinkki EI ole kuvan päällä (CD kierros 7: se peitti vaakunan alareunan) */
+.tn20 .tng-zoomhint { display: inline-flex; align-items: center; gap: 7px; padding: 0; border: 0; background: none; color: var(--tnAccText); font-size: clamp(12px, 1.1cqw, 13.5px); font-weight: 800; text-decoration: underline; text-underline-offset: 3px; }
+.tn20 .tng-medialine { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+.tn20 .tng-zoombtn:focus-visible { outline: 2px solid #f2c46b; outline-offset: 2px; }
+.tn20 .tng-qimg { display: block; width: 100%; height: 100%; max-width: 100%; max-height: 100%; object-fit: contain; opacity: 0; transition: opacity 0.25s; }
 .tn20 .tng-qimg[data-ready="1"] { opacity: 1; }
-.tn20 .tng-imgerr { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; padding: 20px; background: #141009; text-align: center; }
+.tn20 .tng-imgerr { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; padding: 20px; background: #141009; text-align: center; z-index: 2; }
 .tn20 .tng-imgerr-t { font-size: clamp(13px, 1.2cqw, 16px); font-weight: 800; color: #ffa88f; }
 .tn20 .tng-imgerr-p { max-width: 36ch; font-size: clamp(11.5px, 1.05cqw, 14px); line-height: 1.45; color: #beb4a0; }
 .tn20 .tng-imgerr-row { display: flex; align-items: center; gap: 9px; flex-wrap: wrap; justify-content: center; }
@@ -186,8 +194,10 @@
 /* Palautekortti */
 .tn20 .tng-fbslot { display: flex; flex-direction: column; }
 .tn20 .tng-fb { display: flex; flex-direction: column; gap: clamp(10px, 1.1cqw, 15px); padding: clamp(15px, 1.7cqw, 24px); border-radius: 16px; border: 1px solid #2e2718; background: #17130b; animation: tngFbIn 160ms ease-out 120ms both; }
-.tn20 .tng-fb[data-fb="ok"] { border-color: rgba(182, 255, 60, 0.42); background: linear-gradient(180deg, rgba(182, 255, 60, 0.11), rgba(23, 19, 11, 0.96)); }
-.tn20 .tng-fb[data-fb="bad"] { border-color: rgba(255, 107, 74, 0.42); background: linear-gradient(180deg, rgba(255, 107, 74, 0.11), rgba(23, 19, 11, 0.96)); }
+/* CD kierros 6: palautekortti oli visuaalisesti raskaampi kuin vaihtoehtolista —
+   kehys ja täyttö laskettu askeleella, jotta huomio pysyy vastauksissa. */
+.tn20 .tng-fb[data-fb="ok"] { border-color: rgba(182, 255, 60, 0.28); background: linear-gradient(180deg, rgba(182, 255, 60, 0.07), rgba(23, 19, 11, 0.92)); }
+.tn20 .tng-fb[data-fb="bad"] { border-color: rgba(255, 107, 74, 0.28); background: linear-gradient(180deg, rgba(255, 107, 74, 0.07), rgba(23, 19, 11, 0.92)); }
 .tn20 .tng-fb-head { display: flex; align-items: center; gap: clamp(10px, 1.1cqw, 14px); flex-wrap: wrap; }
 .tn20 .tng-fbicon { display: grid; place-items: center; width: clamp(28px, 2.6cqw, 36px); height: clamp(28px, 2.6cqw, 36px); border-radius: 50%; font-size: clamp(15px, 1.4cqw, 19px); font-weight: 900; animation: tngPop 0.35s ease-out; }
 .tn20 .tng-fb[data-fb="ok"] .tng-fbicon { background: #b6ff3c; color: #0f0d07; }
@@ -314,10 +324,24 @@
    porrastus alkaa vasta vaakanäkymässä. Kova katto 78 px. */
 .tn20 .tng-heroh1 {
   margin: 0; font-family: var(--tn-font-display); font-weight: 900;
-  font-size: clamp(28px, 7vw, 36px); line-height: 0.96; letter-spacing: -0.025em;
+  /* Pystynäkymän portaat nimen pituuden mukaan (CD kierros 5, arvo 2):
+     ≤18 → 38 px · 19–32 → 34 px · 33–44 → 28 px · 45+ → 24 px, enintään 4 riviä.
+     Alle 700 px korkealla jokainen porras laskee 4 px. */
+  font-size: clamp(30px, 8.6vw, 38px); max-width: 12ch;
+  display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 4; overflow: hidden;
+  line-height: 0.96; letter-spacing: -0.025em;
   text-transform: uppercase; color: #fffbf2; text-wrap: balance;
   hyphens: none; -webkit-hyphens: none; overflow-wrap: normal; word-break: keep-all;
   text-shadow: 0 4px 40px rgba(0, 0, 0, 0.7);
+}
+.tn20 .tng-heroh1[data-len="s"] { font-size: clamp(28px, 7.8vw, 34px); max-width: 15ch; }
+.tn20 .tng-heroh1[data-len="m"] { font-size: clamp(24px, 6.4vw, 28px); max-width: 18ch; line-height: 1; }
+.tn20 .tng-heroh1[data-len="l"] { font-size: clamp(21px, 5.6vw, 24px); max-width: 20ch; line-height: 1.02; }
+@media (max-height: 700px) and (max-aspect-ratio: 1/1) {
+  .tn20 .tng-heroh1 { font-size: clamp(26px, 8vw, 34px); }
+  .tn20 .tng-heroh1[data-len="s"] { font-size: clamp(24px, 7.2vw, 30px); }
+  .tn20 .tng-heroh1[data-len="m"] { font-size: clamp(21px, 6vw, 24px); }
+  .tn20 .tng-heroh1[data-len="l"] { font-size: clamp(19px, 5.2vw, 20px); }
 }
 .tn20 .tng-herop { margin: 0; max-width: 44ch; font-size: clamp(14.5px, 1.4cqw, 18px); line-height: 1.5; color: #ded5c2; text-wrap: pretty; }
 .tn20 .tng-herorow { display: flex; align-items: center; gap: clamp(12px, 1.6cqw, 20px); flex-wrap: wrap; }
@@ -575,7 +599,8 @@
   .tn20 .tng-act > .tng-next { flex: 1 1 100%; margin-left: 0; }
   .tn20 .tng-act > .tng-hint { flex: 1 1 100%; margin-left: 0; text-align: center; }
   .tn20 .tng-acol { gap: clamp(12px, 2.4vw, 18px); }
-  .tn20 .tng-mediaframe { max-width: 100%; max-height: min(38dvh, 340px); }
+  .tn20 .tng-mediaframe { max-width: 100%; max-height: min(34svh, 340px); padding: 16px; }
+  .tn20 .tng-zoombtn { padding: 16px; }
   .tn20 .tng-media { gap: 8px; }
 }
 /* Tablet landscape + desktop: kaksipalstainen päärivi.
