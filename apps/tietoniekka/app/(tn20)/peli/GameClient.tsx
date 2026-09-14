@@ -60,6 +60,19 @@ export type GameQuiz = {
   kind?: "teksti" | "kuva";
   /** Haastelinkin polku (origin lisätään selaimessa). */
   challengePath: string;
+  /** Uusi aloitusnäkymä (CD kierros 4–5). null = vanha .tng-start-näkymä. */
+  hero?: {
+    image: string | null;
+    focalX: number;
+    focalY: number;
+    side: "left" | "right";
+    alt: string | null;
+    kind: "henkilo" | "kuva" | "ei-kuvaa";
+    /** Wikimedia-kuville 330w + 1280w, jottei mobiili lataa 340 kt:n kuvaa */
+    srcSet?: string | null;
+    /** Henkilövisan ammatti kannasta (esim. "Jääkiekkoilija") */
+    roleLabel?: string | null;
+  } | null;
   /** Varakysymykset teknistä ohitusta varten (kuvavisat) */
   spare?: GameQuestion[];
   questions: GameQuestion[];
@@ -143,28 +156,48 @@ const mix = (hex: string, a: number) => { const [r, g, b] = hexToRgb(hex); retur
 const lift = (hex: string) => { const up = (v: number) => Math.round(v + (255 - v) * 0.42); const [r, g, b] = hexToRgb(hex); return `rgb(${up(r)},${up(g)},${up(b)})`; };
 
 /** KORTTISÄÄNTÖ: pienennä otsikkoa kunnes pisin sana mahtuu elementtiin.
-    Mittaa canvasilla (nopea, ei reflow-silmukkaa). Palauttaa käytetyn koon. */
-function fitHeading(el: HTMLElement | null) {
+    Mittaa canvasilla (nopea, ei reflow-silmukkaa).
+
+    Siirtymä (font-size 180 ms, lisätty 14.9.2026 pelinäkymän 1a:ta varten) pakottaa
+    mittaamaan transition pois päältä: kesken animaation getComputedStyle palauttaa
+    välivaiheen koon, jolloin sovitus laskettiin väärästä lähtöarvosta ja pitkä
+    kysymys jäi leikkautumaan lukituksessa. Siksi: transition pois → lue CSS:n
+    lopullinen koko → laske sovitus → palauta lähtökoko ilman siirtymää → kytke
+    siirtymä takaisin → aseta kohdekoko, jolloin animaatio kulkee oikein. */
+function fitHeading(el: HTMLElement | null, animate = false) {
   if (!el) return;
+  const startSize = parseFloat(getComputedStyle(el).fontSize);
+  const prevTransition = el.style.transition;
+  el.style.transition = "none";
   el.style.fontSize = "";
   const cs = getComputedStyle(el);
   let size = parseFloat(cs.fontSize);
   const min = 14;
   const avail = el.clientWidth;
-  if (!avail) return;
   const words = (el.textContent ?? "").split(/\s+/).filter(Boolean);
-  if (words.length === 0) return;
   const canvas = document.createElement("canvas");
   const ctx = canvas.getContext("2d");
-  if (!ctx) return;
-  const ls = parseFloat(cs.letterSpacing) || 0;
-  const widthAt = (s: number) => {
-    ctx.font = `${cs.fontStyle} ${cs.fontWeight} ${s}px ${cs.fontFamily}`;
-    return Math.max(...words.map((w) => ctx.measureText(w.toUpperCase()).width + ls * (s / size) * w.length));
-  };
-  let guard = 0;
-  while (size > min && widthAt(size) > avail * 0.97 && guard++ < 40) size = Math.floor(size * 0.95);
-  if (guard > 0) el.style.fontSize = `${size}px`;
+  let target: number | null = null;
+  if (avail && words.length > 0 && ctx) {
+    const ls = parseFloat(cs.letterSpacing) || 0;
+    const widthAt = (s: number) => {
+      ctx.font = `${cs.fontStyle} ${cs.fontWeight} ${s}px ${cs.fontFamily}`;
+      return Math.max(...words.map((w) => ctx.measureText(w.toUpperCase()).width + ls * (s / size) * w.length));
+    };
+    let guard = 0;
+    while (size > min && widthAt(size) > avail * 0.97 && guard++ < 40) size = Math.floor(size * 0.95);
+    if (guard > 0) target = size;
+  }
+  if (animate && Number.isFinite(startSize)) {
+    el.style.fontSize = `${startSize}px`;
+    void el.offsetWidth; // pakota reflow, jotta lähtökoko on animaation alku
+    el.style.transition = prevTransition;
+    el.style.fontSize = target != null ? `${target}px` : "";
+    return;
+  }
+  el.style.fontSize = target != null ? `${target}px` : "";
+  void el.offsetWidth;
+  el.style.transition = prevTransition;
 }
 
 const enc = encodeURIComponent;
@@ -193,6 +226,9 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
   const [bust, setBust] = useState<Record<number, number>>({});
   const [shownScore, setShownScore] = useState(0);
   const [copyState, setCopyState] = useState<"copied" | "error" | "sharefail" | null>(null);
+  /* «Tiesitkö?» -selitys: leikataan vain jos se ei mahdu (CD kierros 5, arvo 4) */
+  const [tipClamped, setTipClamped] = useState(false);
+  const [tipOpen, setTipOpen] = useState(false);
   const [hasShare, setHasShare] = useState(false);
   const [origin, setOrigin] = useState("https://tietoniekka.fi");
 
@@ -207,8 +243,9 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
   const imgRef = useRef<HTMLImageElement>(null);
   const openerRef = useRef<HTMLElement | null>(null);
   const zoomOpenerRef = useRef<HTMLElement | null>(null);
-  const anchorTop = useRef<number | null>(null);
   const fbSlotRef = useRef<HTMLDivElement>(null);
+  const nextBtnRef = useRef<HTMLButtonElement>(null);
+  const tipRef = useRef<HTMLSpanElement>(null);
   const recorded = useRef(false);
   const playIdRef = useRef<string | null>(null);
   const rafRef = useRef<number | null>(null);
@@ -243,30 +280,71 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
 
   /* ── KORTTISÄÄNTÖ: otsikoiden sovitus ── */
   useLayoutEffect(() => {
-    fitHeading(qhRef.current);
+    /* Lukituksessa kysymys kevenee animoiden (180 ms), muissa tapauksissa
+       (uusi kysymys, vaiheen vaihto) koko asetetaan suoraan ilman siirtymää. */
+    fitHeading(qhRef.current, locked && phase === "play");
     fitHeading(startH1Ref.current);
-  }, [phase, qi, questions]);
+  }, [phase, qi, questions, locked]);
+
+  /* HUD:n todellinen korkeus muuttujaan: pelinäkymän ruudukon korkeus lasketaan
+     tästä (100dvh − HUD), jotta vastauslista ei liiku eikä sivu vierity 3 px
+     kiinteän 92 px:n arvion takia. */
   useEffect(() => {
-    const onR = () => { fitHeading(qhRef.current); fitHeading(startH1Ref.current); anchorTop.current = null; applyFreeze(); };
+    const root = rootRef.current;
+    const hud = root?.querySelector<HTMLElement>(".tng-top");
+    if (!root || !hud) return;
+    const apply = () => root.style.setProperty("--tngHud", `${Math.round(hud.getBoundingClientRect().height)}px`);
+    apply();
+    const ro = new ResizeObserver(apply);
+    ro.observe(hud);
+    return () => ro.disconnect();
+  }, [phase]);
+  useEffect(() => {
+    const onR = () => { fitHeading(qhRef.current); fitHeading(startH1Ref.current); };
     window.addEventListener("resize", onR);
     return () => window.removeEventListener("resize", onR);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  /* ── Freeze: lukitussa tilassa vastauslistan ylätila pidetään samana kuin
-        vastaamattomassa, keskitetyssä tilassa — palaute kasvaa vain alaspäin ── */
-  const applyFreeze = useCallback(() => {
-    const m = mainRef.current, g = groupRef.current;
+  /* Freeze poistettu 14.9.2026 (pelinäkymä 1a): palaute laskeutuu nyt kysymyksen
+     alle vasempaan palstaan ja ruudukon rivit pitävät vastauslistan paikallaan
+     ilman JS-kompensaatiota. Siivotaan vanhat inline-tyylit varmuuden vuoksi,
+     jos selaimeen on jäänyt aiempi tila (esim. HMR tai takaisinnavigointi). */
+  useLayoutEffect(() => {
+    const m = mainRef.current;
     if (!m) return;
-    const clear = () => { m.style.removeProperty("padding-top"); m.style.removeProperty("align-content"); };
-    if (!g || !locked || m.clientWidth < 880 || anchorTop.current == null) { clear(); return; }
-    clear();
-    m.style.setProperty("align-content", "start", "important");
-    const zero = g.offsetTop;
-    const pad = Math.max(0, anchorTop.current - zero + parseFloat(getComputedStyle(m).paddingTop || "0"));
-    m.style.setProperty("padding-top", `${pad}px`, "important");
-  }, [locked]);
-  useLayoutEffect(() => { applyFreeze(); }, [applyFreeze, qi, phase]);
+    m.style.removeProperty("padding-top");
+    m.style.removeProperty("align-content");
+  }, [locked, qi, phase]);
+
+  /* ── Fokus lukituksen jälkeen (CD kierros 5, arvo 6) ──
+     Fokus siirtyy "Seuraava"-nappiin 120 ms viiveellä (palautteen tuloanimaation
+     alku ehtii ohi), joten koko peli toimii näppäimistöllä ilman hiirtä. */
+  useEffect(() => {
+    if (!locked || phase !== "play") return;
+    const id = window.setTimeout(() => {
+      try { nextBtnRef.current?.focus({ preventScroll: true }); } catch { /* no-op */ }
+    }, 120);
+    return () => window.clearTimeout(id);
+  }, [locked, phase, qi]);
+
+  /* ── Selityksen leikkaus vain todellisen ylivuodon mukaan ──
+     Ei merkkirajaa: kannan selityksistä 80 % ylittäisi CD:n 130 merkin
+     kirjoitusohjeen, joten kiinteä raja näyttäisi "Lue koko selitys" -napin
+     lähes joka kysymyksessä. Mitataan sen sijaan mahtuuko teksti riveihinsä. */
+  useLayoutEffect(() => {
+    setTipOpen(false);
+    setTipClamped(false);
+    if (!locked || phase !== "play") return;
+    const el = tipRef.current;
+    if (!el) return;
+    const id = window.requestAnimationFrame(() => {
+      const node = tipRef.current;
+      if (!node) return;
+      setTipClamped(node.scrollHeight - node.clientHeight > 2);
+    });
+    return () => window.cancelAnimationFrame(id);
+  }, [locked, phase, qi]);
 
   /* MOBIILI (Heikki 30.8.2026, QA-kierros 2): kapealla näytöllä palaute ja
      Seuraava-nappi jäävät vastausten alle piiloon → vieritetään palaute
@@ -358,7 +436,6 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
   }
 
   function finish(finalScore: number) {
-    anchorTop.current = null;
     setPhase("end");
     setReview(null);
     setCopyState(null);
@@ -379,8 +456,6 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
 
   function lock(i: number) {
     if (phase !== "play" || locked || removed.includes(i) || answersLocked || !q) return;
-    const m = mainRef.current, g = groupRef.current;
-    anchorTop.current = m && g && m.clientWidth >= 880 ? g.offsetTop : null;
     const ok = q.options[i] === q.correct;
     const ns = ok ? streak + 1 : 0;
     const gained = ok ? BASE_POINTS + (ns > 1 ? (ns - 1) * STREAK_BONUS : 0) : 0;
@@ -396,7 +471,6 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
     setSel(i);
   }
   function next() {
-    anchorTop.current = null;
     setQi((n) => n + 1);
     setSel(null);
     setLocked(false);
@@ -426,7 +500,6 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
       setSel(null); setLocked(false); setRemoved([]);
       return;
     }
-    anchorTop.current = null;
     const h = hist.slice(); h[qi] = "skipped";
     const p = picks.slice(); p[qi] = null;
     setHist(h); setPicks(p); setSel(null); setLocked(false); setRemoved([]);
@@ -440,7 +513,6 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
     try { window.scrollTo(0, 0); } catch { /* no-op */ }
   }
   function restart() {
-    anchorTop.current = null;
     setPhase("play"); setQi(0); setSel(null); setLocked(false); setScore(0); setStreak(0); setRight(0);
     setHist([]); setPicks([]); setRemoved([]); setLifeLeft(oljenkorsiTotal); setReview(null); setShownScore(0); setCopyState(null);
     recorded.current = false; playIdRef.current = null;
@@ -519,7 +591,16 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
 
   const category = quiz.collectionLabel;
   const countLabel = `${total} ${isKuva ? "kuvaa" : "kysymystä"}`;
-  const mode = phase === "start" ? "aloitus" : done ? "valmis" : "peli";
+  const hero = quiz.hero ?? null;
+  const mode = phase === "start" ? (hero ? "hero" : "aloitus") : done ? "valmis" : "peli";
+  /* Otsikon koko tulee visan NIMEN PITUUDESTA, ei kategoriasta (CD kierros 4):
+     ≤18 → 78 px · 19–32 → 72 px · 33–44 → 56 px · 45+ → 46 px. */
+  const nameLen = quiz.title.length;
+  const heroLen = nameLen <= 18 ? "xs" : nameLen <= 32 ? "s" : nameLen <= 44 ? "m" : "l";
+  /* hero_alt sisältää saavutettavuustekstin JA mahdollisen kuvalähteen. Näkyviin
+     tulee vain lähdeosuus ("Kuva: …"), ei koko alt-tekstiä: vapaasti lisensoitu
+     kuva vaatii näkyvän merkinnän, AI-kuvitus ei vaadi mitään. */
+  const heroCredit = hero?.alt && /kuva:/i.test(hero.alt) ? hero.alt.slice(hero.alt.search(/kuva:/i)).trim() : null;
 
   /* ── Tulosnäkymän arvot ── */
   const skipped = hist.filter((v) => v === "skipped").length;
@@ -554,8 +635,12 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
 
   return (
     <div ref={rootRef} className="tng" style={accentVars}>
-      <div className="tng-bg" aria-hidden style={{ backgroundImage: `url(${quiz.bgImg})` }} />
-      <div className="tng-bgshade" aria-hidden />
+      {mode !== "hero" && (
+        <>
+          <div className="tng-bg" aria-hidden style={{ backgroundImage: `url(${quiz.bgImg})` }} />
+          <div className="tng-bgshade" aria-hidden />
+        </>
+      )}
       <div className="tng-topline" aria-hidden />
 
       <div ref={pageRef}>
@@ -600,9 +685,86 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
           </div>
         </header>
 
-        <main ref={mainRef} className="tng-main" data-mode={mode}>
-          {/* ── Aloitusnäkymä ── */}
-          {phase === "start" && (
+        <main ref={mainRef} className="tng-main" data-mode={mode} data-locked={phase === "play" && locked ? "1" : undefined}>
+          {/* ── Aloitusnäkymä: HERO (CD kierros 4–5) ──
+              Kuvaa ei mitoiteta: sisältölohko saa enintään 37 % korkeudesta ja
+              kuva täyttää kaiken mitä jää, joten "Aloita visa" on aina näkyvissä
+              ilman vieritystä myös 360 × 640:ssä. Vaaka ≥ 768 px = 1c (kuva
+              kirkkaana, tummennus vain tekstin puolella), pysty = 2b pystyjuliste. */}
+          {phase === "start" && hero && (
+            <section className="tng-hero" data-kind={hero.kind} data-side={hero.side} aria-label="Visan aloitus">
+              <div className="tng-heroview">
+                {hero.image && (
+                  /* eslint-disable-next-line @next/next/no-img-element */
+                  <img
+                    className="tng-heroimg"
+                    src={hero.image}
+                    srcSet={hero.srcSet ?? undefined}
+                    sizes="100vw"
+                    alt={hero.alt ?? ""}
+                    fetchPriority="high"
+                    decoding="async"
+                    style={{ objectPosition: `${Math.round(hero.focalX * 100)}% ${Math.round(hero.focalY * 100)}%` }}
+                  />
+                )}
+                <div className="tng-heroshade" aria-hidden />
+
+                <div className="tng-herobody">
+                  <nav className="tng-crumbs" aria-label="Murupolku">
+                    <a href="/">Etusivu</a>
+                    <span aria-hidden>/</span>
+                    <a href={quiz.hubHref}>{quiz.collectionLabel}</a>
+                    <span aria-hidden>/</span>
+                    <span aria-current="page">{quiz.title}</span>
+                  </nav>
+                  <span className="tng-herocat"><i aria-hidden />{hero.roleLabel ? `${category} · ${hero.roleLabel}` : quiz.genreLabel ? `${category} · ${quiz.genreLabel}` : category}</span>
+                  <h1 ref={startH1Ref} className="tng-heroh1" data-len={heroLen}>{quiz.title}</h1>
+                  {quiz.teaser && <p className="tng-herop">{quiz.teaser}</p>}
+                  <div className="tng-herorow">
+                    <button type="button" className="tng-herobtn" onClick={startGame}>Aloita visa <span aria-hidden>→</span></button>
+                    <span className="tng-herometa">{countLabel}</span>
+                    {heroCredit && <span className="tng-herocredit">{heroCredit}</span>}
+                  </div>
+                </div>
+
+                {/* Henkilövisan kuvapaneeli: vaakanäkymässä täyskorkea oikea laita,
+                    pystyssä piilossa (kuva näkyy julisteena taustalla). */}
+                {hero.kind === "henkilo" && hero.image && (
+                  <div className="tng-herocard" aria-hidden>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={hero.image}
+                      srcSet={hero.srcSet ?? undefined}
+                      sizes="(min-aspect-ratio: 1/1) 44vw, 100vw"
+                      alt=""
+                      decoding="async"
+                    />
+                  </div>
+                )}
+
+              </div>
+
+                {quiz.related.length > 0 && (
+                <div className="tng-heromore">
+                  <div className="tng-heromore-head">
+                    <span className="tng-heromore-t">Lisää {quiz.collectionLabel.toLowerCase()}-visoja</span>
+                    <a className="tng-heromore-all" href={quiz.hubHref}>Kaikki {quiz.collectionLabel.toLowerCase()}-visat →</a>
+                  </div>
+                  <div className="tng-heromore-grid">
+                    {quiz.related.slice(0, 3).map((r) => (
+                      <a key={r.id} className="tng-herorec" href={r.href ?? quiz.hubHref}>
+                        {r.title}
+                        <span>{r.meta}</span>
+                      </a>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </section>
+          )}
+
+          {/* ── Aloitusnäkymä: vanha malli (visat joilla ei vielä hero-dataa) ── */}
+          {phase === "start" && !hero && (
             <section className="tng-start" aria-label="Visan aloitus">
               <span className="tng-start-cat"><i aria-hidden />{category}</span>
               <h1 ref={startH1Ref} className="tng-start-h1">{quiz.title}</h1>
@@ -682,12 +844,15 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
                   {q.options.map((text, i) => {
                     const gone = removed.includes(i);
                     let state = "", note = "", mark = "";
+                    /* srNote: ruudunlukijalle tila kerrotaan sanoina, ei pelkällä
+                       värillä (CD kierros 5, arvo 6) — "Savella, valintasi, väärin". */
+                    let srNote = "";
                     if (gone) state = "gone";
                     else if (locked) {
-                      if (text === q.correct) { state = "correct"; note = "Oikea vastaus"; mark = "✓"; }
-                      else if (i === sel) { state = "wrong"; note = "Sinun valintasi"; mark = "✕"; }
-                      else state = "dim";
-                    } else if (sel === i) { state = "sel"; note = "Valittu"; mark = "•"; }
+                      if (text === q.correct) { state = "correct"; note = "Oikea vastaus"; mark = "✓"; srNote = "oikea vastaus"; }
+                      else if (i === sel) { state = "wrong"; note = "Sinun valintasi"; mark = "✕"; srNote = "sinun valintasi, väärin"; }
+                      else { state = "dim"; srNote = "väärä vaihtoehto"; }
+                    } else if (sel === i) { state = "sel"; note = "Valittu"; mark = "•"; srNote = "valittu"; }
                     return (
                       <button
                         key={`${qi}-${i}`}
@@ -696,7 +861,7 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
                         data-state={state || undefined}
                         disabled={gone || locked || answersLocked}
                         aria-pressed={sel === i}
-                        aria-label={`${KEYS[i]}. ${text}${gone ? " — poistettu oljenkorrella" : note ? ` — ${note}` : ""}`}
+                        aria-label={`${KEYS[i]}. ${text}${gone ? " — poistettu oljenkorrella" : srNote ? `, ${srNote}` : ""}`}
                         onClick={() => lock(i)}
                       >
                         <span className="tng-badge" aria-hidden>{KEYS[i]}</span>
@@ -717,7 +882,10 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
                       <div className="tng-fb-head">
                         <span className="tng-fbicon" aria-hidden>{sel != null && q.options[sel] === q.correct ? "✓" : "✕"}</span>
                         <span className="tng-fbtitle">{sel != null && q.options[sel] === q.correct ? "Oikein!" : "Väärin"}</span>
-                        <span className="tng-fbpts">
+                        {/* Pisteet näkyvät oikeassa yläkulmassa, mutta ruudunlukija
+                            saa ne vasta oikean vastauksen jälkeen (CD kierros 5,
+                            arvo 6: väärin/oikein → oikea vastaus → pisteet → selitys). */}
+                        <span className="tng-fbpts" aria-hidden="true">
                           {sel != null && q.options[sel] === q.correct
                             ? `+${BASE_POINTS + (streak > 1 ? (streak - 1) * STREAK_BONUS : 0)} pistettä`
                             : "+0 pistettä"}
@@ -727,10 +895,20 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
                         {sel != null && q.options[sel] !== q.correct && (
                           <span className="tng-fb-correct">Oikea vastaus: {q.correct}</span>
                         )}
+                        <span className="tng-sr">
+                          {sel != null && q.options[sel] === q.correct
+                            ? `+${BASE_POINTS + (streak > 1 ? (streak - 1) * STREAK_BONUS : 0)} pistettä`
+                            : "+0 pistettä"}
+                        </span>
                         {q.fact && (
                           <>
                             <span className="tng-kicker">Tiesitkö?</span>
-                            <span className="tng-tip">{q.fact}</span>
+                            <span ref={tipRef} className="tng-tip" data-clamp={tipOpen ? undefined : "1"}>{q.fact}</span>
+                            {tipClamped && !tipOpen && (
+                              <button type="button" className="tng-tipmore" onClick={() => setTipOpen(true)}>
+                                Lue koko selitys
+                              </button>
+                            )}
                           </>
                         )}
                       </div>
@@ -752,7 +930,7 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
                     </span>
                   </button>
                   {locked ? (
-                    <button type="button" className="tng-next" onClick={advance}>
+                    <button ref={nextBtnRef} type="button" className="tng-next" onClick={advance}>
                       {qi >= total - 1 ? "Näytä tulos" : "Seuraava"} <span aria-hidden>→</span>
                     </button>
                   ) : (

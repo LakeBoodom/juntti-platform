@@ -147,6 +147,11 @@ type QuizRow = {
   id: string; slug: string | null; title: string; display_title: string | null;
   teaser: string | null; description: string | null; category: string; collection: string | null; genre: string | null;
   learn: Learn | null;
+  /* Hero-kuvan data (migraatio 20260914_quiz_hero_fields) — visan OMA kuva ja
+     sen rajaus; aiemmin kuva tuli kokoelman oletuksesta, jolloin esim.
+     golfvisassa näkyi tennisvisan kuva. */
+  hero_image: string | null; hero_focal_x: number | null; hero_focal_y: number | null;
+  hero_side: string | null; hero_alt: string | null;
 };
 
 export default async function Peli20({
@@ -383,7 +388,7 @@ export default async function Peli20({
 
   let q = sb
     .from("quizzes")
-    .select("id, slug, title, display_title, teaser, description, category, collection, genre, learn")
+    .select("id, slug, title, display_title, teaser, description, category, collection, genre, learn, hero_image, hero_focal_x, hero_focal_y, hero_side, hero_alt")
     .eq("status", "published");
   q = quizId ? q.eq("id", quizId) : q.eq("slug", slug!);
   const { data: quiz } = await q.maybeSingle<QuizRow>();
@@ -404,7 +409,7 @@ export default async function Peli20({
     resolved.key === "yleistieto" ? relQ.eq("collection", "yleistieto").neq("category", "kaupungit").neq("category", "ruoka-juoma") :
     relQ.eq("collection", quiz.collection ?? "yleistieto");
 
-  const [{ data: qs }, genreRes, relatedRes] = await Promise.all([
+  const [{ data: qs }, genreRes, relatedRes, celebRes] = await Promise.all([
     sb
       .from("questions")
       .select("sort_order, question_text, explanation, answers")
@@ -414,6 +419,11 @@ export default async function Peli20({
       ? sb.from("genres" as never).select("label").eq("collection", quiz.collection ?? "").eq("genre_key", quiz.genre).maybeSingle()
       : Promise.resolve({ data: null }),
     relQ.order("published_at", { ascending: false }).limit(6),
+    /* Henkilövisan kuva tulee celebrities-riviltä (Wikipedia/Wikimedia), ei
+       kokoelmakartasta — henkilövisoja on 243 eikä niille ole omia kuvia. */
+    quiz.collection === "tunnetut-henkilot"
+      ? sb.from("celebrities").select("name, role, image_url").eq("trivia_quiz_id", quiz.id).maybeSingle()
+      : Promise.resolve({ data: null }),
   ]);
 
   const collection = quiz.collection ?? "yleistieto";
@@ -435,6 +445,54 @@ export default async function Peli20({
   const genreLabel = (genreRes.data as { label: string } | null)?.label ?? null;
 
   const learn = quiz.learn ?? null;
+
+  /* ── HERO (CD kierros 4–5, Heikin spesifikaatio 13.9.2026) ──
+     Uusi aloitusnäkymä otetaan käyttöön visakohtaisesti: kun visalla on oma
+     hero-kuva, tai kun osoitteessa on ?hero=uusi (kuvattoman heron testaus).
+     Näin 584 julkaistua visaa säilyy ennallaan testivaiheen ajan.
+     Kuvan lähde: visan oma hero_image → kokoelman visakohtainen kuvakartta
+     (topicImg) → ei kuvaa. Kokoelman geneeristä kuvaa EI käytetä herona —
+     se on juuri se virhe, jossa golfvisa sai tennisvisan kuvan. */
+  const heroParam = typeof params.hero === "string" ? params.hero : null;
+  const isPerson = collection === "tunnetut-henkilot";
+  const celeb = (celebRes.data ?? null) as { name: string; role: string | null; image_url: string | null } | null;
+  /* Wikimedian thumb-osoitteessa leveys on polussa (".../330px-Tiedosto.jpg").
+     Kannassa olevat kuvat ovat 330 px leveitä — liian pieniä 3:4-kortille — ja
+     Wikimedia hyväksyy vain tietyt kokoportaat, joista 1280 on suurin toimiva.
+     Alkuperäistä tiedostoa ei käytetä (voi olla useita megatavuja). */
+  const wikiThumb = (url: string | null, width: number): string | null =>
+    url && /\/thumb\//.test(url) ? url.replace(/\/(\d+)px-/, `/${width}px-`) : url;
+  const heroImage = quiz.hero_image ?? (isPerson ? wikiThumb(celeb?.image_url ?? null, 1280) : topicImg);
+  const heroSrcSet = !quiz.hero_image && isPerson && celeb?.image_url
+    ? [wikiThumb(celeb.image_url, 330), wikiThumb(celeb.image_url, 1280)]
+        .filter(Boolean)
+        .map((u, i) => `${u} ${i === 0 ? 330 : 1280}w`)
+        .join(", ")
+    : null;
+  const heroOn = quiz.hero_image != null || heroParam === "uusi";
+  const heroFocalX = quiz.hero_focal_x != null ? Number(quiz.hero_focal_x) : 0.5;
+  /* Kasvokuvissa kiinnostava kohta on ylhäällä (CD: 0.12–0.18) */
+  const heroFocalY = quiz.hero_focal_y != null ? Number(quiz.hero_focal_y) : isPerson ? 0.15 : 0.4;
+  /* hero_side on tallennettu kenttä: asetettu arvo voittaa laskennan aina.
+     Henkilövisassa sääntöä ei ajeta lainkaan — kortti on aina oikealla. */
+  const heroSide: "left" | "right" =
+    isPerson ? "left"
+    : quiz.hero_side === "left" || quiz.hero_side === "right" ? quiz.hero_side
+    : heroFocalX > 0.5 ? "left" : "right";
+  const hero = heroOn
+    ? {
+        image: heroImage,
+        focalX: heroFocalX,
+        focalY: heroFocalY,
+        side: heroSide,
+        alt: quiz.hero_alt ?? (isPerson && celeb ? `${celeb.name}. Kuva: Wikimedia Commons` : null),
+        srcSet: heroSrcSet,
+        /* Henkilövisan yläotsikko: ammatti suoraan kannasta (TEEMAKARTTA:
+           kortti näyttää tarkan ammatin, ei geneeristä "urheilija"). */
+        roleLabel: isPerson ? celeb?.role ?? null : null,
+        kind: (isPerson ? "henkilo" : heroImage ? "kuva" : "ei-kuvaa") as "henkilo" | "kuva" | "ei-kuvaa",
+      }
+    : null;
 
   type RelatedRow = {
     id: string; slug: string | null; custom_slug: string | null;
@@ -458,6 +516,7 @@ export default async function Peli20({
     hubHref: resolved.hub,
     bgImg: topicImg ?? resolved.bg,
     topicImg,
+    hero,
     accent,
     isSankari,
     kind: "teksti",
