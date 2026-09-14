@@ -687,7 +687,7 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
           </div>
         </header>
 
-        <main ref={mainRef} className="tng-main" data-mode={mode} data-locked={phase === "play" && locked ? "1" : undefined}>
+        <main ref={mainRef} className="tng-main" data-mode={mode} data-locked={phase === "play" && locked ? "1" : undefined} data-img={phase === "play" && q?.image ? "1" : undefined}>
           {/* ── Aloitusnäkymä: HERO (CD kierros 4–5) ──
               Kuvaa ei mitoiteta: sisältölohko saa enintään 37 % korkeudesta ja
               kuva täyttää kaiken mitä jää, joten "Aloita visa" on aina näkyvissä
