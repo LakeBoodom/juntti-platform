@@ -349,9 +349,15 @@
 .tn20 .tng-herorec:focus-visible { outline: 2px solid #f2c46b; outline-offset: 3px; }
 .tn20 .tng-herorec span { font-size: clamp(10.5px, 1cqw, 11.5px); font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; color: #8a806d; }
 
-/* Matalat pystyruudut: kuvaus antaa periksi, ei otsikko eikä nappi (CD sääntö 3) */
-@media (max-height: 800px) { .tn20 .tng-herop { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; } }
-@media (max-height: 700px) { .tn20 .tng-herop { display: none; } }
+/* Matalat PYSTYruudut: kuvaus antaa periksi, ei otsikko eikä nappi (CD sääntö 3).
+   Vain pystyssä: vaakanäkymässä teksti on omassa palstassaan ja tilaa riittää,
+   joten pienessä desktop-ikkunassa (< 800 px korkea) kuvausta ei pidä leikata. */
+@media (max-height: 800px) and (max-aspect-ratio: 1/1) { .tn20 .tng-herop { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; } }
+@media (max-height: 700px) and (max-aspect-ratio: 1/1) { .tn20 .tng-herop { display: none; } }
+/* Matalat VAAKAruudut (esim. 1280 × 720): kuvaus lyhenee riveihin mutta ei katoa —
+   ilman tätä pitkänimisen visan teksti kasvaa alalaidan lisävisa-lohkon päälle. */
+@media (max-height: 800px) and (min-aspect-ratio: 1/1) { .tn20 .tng-herop { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; overflow: hidden; } }
+@media (max-height: 700px) and (min-aspect-ratio: 1/1) { .tn20 .tng-herop { -webkit-line-clamp: 2; } }
 
 /* ── 1c: vaaka (myös vaakatabletti) — kuva kirkkaana, tummennus tekstin puolella ── */
 @media (min-aspect-ratio: 1/1) and (min-width: 768px) {
@@ -407,6 +413,14 @@
   .tn20 .tng-herobody { padding: 0 32px 32px; }
   .tn20 .tng-heromore { padding-left: 32px; padding-right: 32px; }
   .tn20 .tng-heromore-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+/* Matalassa vaakanäkymässä pitkä nimi latistuu vielä askeleen ja saa leveämmän
+   rivin, jolloin se mahtuu kolmelle riville viiden sijaan eikä sisältölohko kasva
+   alalaidan lisävisojen päälle. CD:n linjaus: pitkän nimen tylsä koko on merkki
+   siitä että nimi pitää uusia, ei asettelun ongelma. */
+@media (max-height: 800px) and (min-aspect-ratio: 1/1) {
+  .tn20 .tng-heroh1[data-len="m"] { font-size: clamp(26px, 2.8cqw, 42px); max-width: 24ch; }
+  .tn20 .tng-heroh1[data-len="l"] { font-size: clamp(22px, 2.2cqw, 32px); max-width: 34ch; line-height: 1.04; }
 }
 
 /* ── Tulosnäkymä ──────────────────────────────────────────────────────── */
