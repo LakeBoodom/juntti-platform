@@ -6,7 +6,9 @@ import { getSupabase, SITE_SLUG } from "./supabase";
 type RelatedQuiz = { id: string; title: string; slug: string | null };
 
 let _siteId: string | null = null;
-async function getSiteId(): Promise<string | null> {
+/* export (11.9.2026, Tietoketju: Ikäjärjestys): sama site_id-haku tarvitaan
+   uudessa lib/ikajarjestys.ts:ssä — ei kahta erillistä kyselyä samaan riviin. */
+export async function getSiteId(): Promise<string | null> {
   if (_siteId) return _siteId;
   const sb = getSupabase();
   if (!sb) return null;

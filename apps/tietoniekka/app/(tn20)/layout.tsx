@@ -8,6 +8,7 @@ import "@fontsource/instrument-sans/400.css";
 import "@fontsource/instrument-sans/600.css";
 import "@fontsource/instrument-sans/700.css";
 import "./tn20.css";
+import "./tietoketju.css";
 import TopBar from "@/components/tn20/TopBar";
 import SiteFooter from "@/components/tn20/SiteFooter";
 

@@ -7,8 +7,10 @@
 
 import type { Metadata } from "next";
 import { getSupabase } from "@/lib/supabase";
+import { getSiteId } from "@/lib/queries";
 import { PersonCard, type QuizCardData } from "@/components/tn20/cards";
 import { PersonBrowser, type BrowserPerson } from "@/components/tn20/PersonBrowser";
+import { CollectionPageGamePromo } from "@/components/tn20/CollectionPageGamePromo";
 import { WideCard } from "@/components/tn20/WideCard";
 import { MOTIF_PATHS, motifPathFor } from "@/components/tn20/motif-paths";
 import { LearnArticle } from "@/components/tn20/LearnArticle";
@@ -641,9 +643,12 @@ function playHref(c: Celeb): string {
 async function PersonHub({ hub, article }: { hub: HubMeta; article?: React.ReactNode }) {
   const sb = getSupabase();
   if (!sb) return <main style={{ padding: 32 }}>Ei tietokantayhteyttä.</main>;
+  const siteId = await getSiteId();
+  if (!siteId) return <main style={{ padding: 32 }}>Ei tietokantayhteyttä.</main>;
   const { data } = await sb
     .from("celebrities")
     .select("id, slug, name, role, image_url, birth_date, trivia_quiz_id, priority, created_at")
+    .eq("site_id", siteId)
     .order("name");
   const celebs = (data ?? []) as Celeb[];
 
@@ -675,6 +680,14 @@ async function PersonHub({ hub, article }: { hub: HubMeta; article?: React.React
       created_at: c.created_at,
       href: playHref(c),
     }));
+
+  // Tietoketju: Ikäjärjestys -pelinoston peek-esikatselu (koristeellinen, aria-hidden) —
+  // ei vaadi trivia_quiz_id:tä (tämä pelimuoto ei linkitä yksittäiseen visaan),
+  // joten poolina koko celebs-lista. Priorisoidaan henkilöt joilla on kuva.
+  const peekPeople = [...celebs]
+    .sort((a, b) => (b.image_url ? 1 : 0) - (a.image_url ? 1 : 0) || (b.priority ?? 0) - (a.priority ?? 0))
+    .slice(0, 4)
+    .map((c) => ({ id: c.id, name: c.name, role: c.role ?? "", image_url: c.image_url }));
 
   return (
     <main style={{ minHeight: "100dvh", paddingBottom: 80 }}>
@@ -722,6 +735,12 @@ async function PersonHub({ hub, article }: { hub: HubMeta; article?: React.React
               );
             })}
           </div>
+        </section>
+
+        {/* Tietoketju: Ikäjärjestys -pelinosto — heti "Tänään & tulevat synttärit"
+            -rivin jälkeen, ennen "Selaa kaikkia" -selainta (tehtävänanto kohta 6). */}
+        <section className="tn-section" style={{ paddingTop: 0 }}>
+          <CollectionPageGamePromo peekPeople={peekPeople} />
         </section>
 
         <section className="tn-section" style={{ paddingTop: 0 }}>
