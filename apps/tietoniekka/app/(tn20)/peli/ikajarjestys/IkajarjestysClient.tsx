@@ -1,7 +1,9 @@
 "use client";
 // TIETOKETJU: IKÄJÄRJESTYS — pelinäkymän tilakone.
 // Vaiheet: aloitus (CategoryPicker) → järjestäminen (ReorderableChainList)
-// → paljastus (RevealSequencer) → tulos (ChainResultSummary) → arvo uudet.
+// → paljastus (RevealSequencer, sisältää nyt myös pisteet+jatkonapit samalla
+// sivulla, ks. RevealSequencer-kommentti "LIVE-QA-LÖYDÖS 2") → arvo uudet.
+// Erillinen kolmas "tulos"-vaihe on poistettu 2026-09-16 Heikin pyynnöstä.
 //
 // "Sama henkilö ei toistu peräkkäisillä kierroksilla" (tehtävänanto kohta 5):
 // kevyt client-puolen sessionStorage-tila muistaa edellisen kierroksen
@@ -22,7 +24,7 @@ import { CategoryPicker } from "@/components/tn20/CategoryPicker";
 import { ReorderableChainList } from "@/components/tn20/ReorderableChainList";
 import { SuuntaindikaattoriBadge } from "@/components/tn20/SuuntaindikaattoriBadge";
 import { RevealSequencer, type RevealItem } from "@/components/tn20/RevealSequencer";
-import { ChainResultSummary, calculateChainScore, type ChainScoreResult } from "@/components/tn20/ChainResultSummary";
+import { calculateChainScore } from "@/components/tn20/ChainResultSummary";
 
 const LAST_SEEN_KEY = "tk-ikajarjestys-viimeksi-nahdyt";
 
@@ -44,7 +46,7 @@ function writeLastSeen(ids: string[]) {
   }
 }
 
-type Phase = "start" | "loading" | "ordering" | "revealing" | "result";
+type Phase = "start" | "loading" | "ordering" | "revealing";
 
 export default function IkajarjestysClient({
   initialCategory,
@@ -65,7 +67,6 @@ export default function IkajarjestysClient({
   // ?autostart=1 -linkiltä). Käytä palvelimen palauttamaa järjestystä sellaisenaan.
   const [order, setOrder] = useState<ChainPerson[]>(() => initialRound ?? []);
   const [phase, setPhase] = useState<Phase>(initialRound && initialRound.length > 0 ? "ordering" : "start");
-  const [scoreResult, setScoreResult] = useState<ChainScoreResult | null>(null);
   const [emptyNotice, setEmptyNotice] = useState<string | null>(null);
   const [partialRoundNotice, setPartialRoundNotice] = useState<string | null>(null);
 
@@ -96,13 +97,6 @@ export default function IkajarjestysClient({
     }
   }
 
-  function handleRevealComplete() {
-    if (!round) return;
-    const result = calculateChainScore(order, correctOrder);
-    setScoreResult(result);
-    setPhase("result");
-  }
-
   const revealItems: RevealItem[] = useMemo(() => {
     if (!round) return [];
     const correctIndexById = new Map(correctOrder.map((p, i) => [p.id, i]));
@@ -116,6 +110,11 @@ export default function IkajarjestysClient({
       birthDateLabel: formatBirthDate(person.birthDate),
     }));
   }, [order, round, correctOrder]);
+
+  // Pisteet lasketaan suoraan renderissä (ei enää erillisen "paljastus valmis"
+  // -callbackin varassa) — RevealSequencer näyttää tuloksen korttilistan alla
+  // heti kun kaikki on paljastettu, samalla sivulla (ks. RevealSequencer-kommentti).
+  const scoreResult = useMemo(() => (round ? calculateChainScore(order, correctOrder) : null), [order, round, correctOrder]);
 
   if (phase === "start" || phase === "loading") {
     return (
@@ -141,18 +140,11 @@ export default function IkajarjestysClient({
     );
   }
 
-  if (phase === "revealing") {
+  if (phase === "revealing" && scoreResult) {
     return (
       <main className="tk-page">
-        <RevealSequencer items={revealItems} onComplete={handleRevealComplete} />
-      </main>
-    );
-  }
-
-  if (phase === "result" && scoreResult) {
-    return (
-      <main className="tk-page">
-        <ChainResultSummary
+        <RevealSequencer
+          items={revealItems}
           result={scoreResult}
           onNewRound={() => startRound(category)}
           onChangeCategory={() => {

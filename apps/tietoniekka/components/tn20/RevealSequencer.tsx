@@ -15,13 +15,23 @@
 // vain ~1,4 s (BASE_DELAY + 10 × STAGGER + 320 ms), koska sarjan päätyttyä
 // onComplete() kutsuttiin ajastimesta ja peli hyppäsi itse tulosnäkymään.
 // Pelaaja ei ehtinyt katsoa mikä meni oikein ja mikä väärin. Korjattu:
-// tämä komponentti EI enää koskaan kutsu onCompletea itse — ajastimet vain
-// paljastavat kortit, ja siirtymä tulosnäkymään vaatii pelaajan oman
-// "Näytä tulos" -klikkauksen. Paljastus jää siis näkyviin niin pitkäksi
-// aikaa kuin pelaaja haluaa.
+// ajastimet vain paljastavat kortit, eivät koskaan vaihda näkymää.
+//
+// LIVE-QA-LÖYDÖS 2 (2026-09-16, Heikki): erillinen "Näytä tulos" -näkymä
+// (entinen kolmas vaihe, ChainResultSummary omalla sivullaan) poistettu
+// kokonaan. Heikin huomio: pelaaja näkee paljastuksessa jo koko tuloksen
+// (oikein/väärin per kortti), joten "Näytä tulos" -sanamuoto oli harhaanjohtava
+// eikä erillinen näkymä tuonut mitään — pisteet ja jatkonapit ("Arvo 10 uutta"/
+// "Vaihda aihetta") renderöidään nyt SUORAAN tämän listan alla heti kun kaikki
+// kortit on paljastettu, samalla sivulla. Mobiilissa tämä vaatii scrollausta
+// (10 korttia + pistelaatikko ei mahdu yhteen ruutuun), mikä on hyväksytty
+// kompromissi — Heikin oma arvio: "mobiilissa tietää kyllä scrollausta".
+// onReveal-callback on siis pelkkä ilmoitus ("kaikki paljastettu, laske
+// pisteet nyt") — ei enää näkymänvaihto.
 
 import { useEffect, useState } from "react";
 import { RankingCard, type RankingCardState } from "./RankingCard";
+import { ChainResultSummary, type ChainScoreResult } from "./ChainResultSummary";
 import { usePrefersReducedMotion } from "@/lib/usePrefersReducedMotion";
 
 export type RevealItem = {
@@ -39,7 +49,18 @@ export type RevealItem = {
 const STAGGER_MS = 90;
 const BASE_DELAY_MS = 220;
 
-export function RevealSequencer({ items, onComplete }: { items: RevealItem[]; onComplete: () => void }) {
+export function RevealSequencer({
+  items,
+  result,
+  onNewRound,
+  onChangeCategory,
+}: {
+  items: RevealItem[];
+  /** Valmiiksi laskettu pistetulos — näytetään korttilistan alla heti kun kaikki on paljastettu. */
+  result: ChainScoreResult;
+  onNewRound: () => void;
+  onChangeCategory: () => void;
+}) {
   const ordered = [...items].sort((a, b) => a.placedPosition - b.placedPosition);
   const reducedMotion = usePrefersReducedMotion();
   const [revealedCount, setRevealedCount] = useState(0);
@@ -68,7 +89,7 @@ export function RevealSequencer({ items, onComplete }: { items: RevealItem[]; on
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [items, reducedMotion]);
 
-  /** Ohita porrastus: näytä kaikki kortit heti. EI siirry tulokseen — se on aina pelaajan klikki. */
+  /** Ohita porrastus: näytä kaikki kortit heti. */
   function revealAllNow() {
     setRevealedCount(total);
   }
@@ -98,13 +119,7 @@ export function RevealSequencer({ items, onComplete }: { items: RevealItem[]; on
       </div>
 
       {allRevealed ? (
-        // tk-btn-secondary (ei tk-btn-primary): --tk-lime on tässä näkymässä
-        // varattu "oikein"-tilan reunaviivalle (korkeintaan 1 lime-käyttö per
-        // näkymä, ks. tokenikommentti tietoketju.css:ssä), joten tulos-CTA on
-        // neutraali reunaviivanappi.
-        <button type="button" className="tk-btn-secondary tk-reveal-cta" onClick={onComplete}>
-          Näytä tulos
-        </button>
+        <ChainResultSummary result={result} onNewRound={onNewRound} onChangeCategory={onChangeCategory} />
       ) : (
         <button type="button" className="tk-reveal-skip" onClick={revealAllNow}>
           Näytä heti →
