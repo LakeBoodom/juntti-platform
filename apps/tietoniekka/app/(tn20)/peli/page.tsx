@@ -14,7 +14,7 @@ import { maantietoImg } from "@/lib/maantieto";
 import { KAUPUNGIT, KAUPUNGIT_HERO_IMG } from "@/lib/kaupungit";
 import { JK_HERO, JK_ACCENT } from "@/lib/jaakiekko";
 import { JP_HERO } from "@/lib/jalkapallo";
-import { LearnArticle, type Learn } from "@/components/tn20/LearnArticle";
+import { type Learn } from "@/components/tn20/LearnArticle";
 import GameClient, { type GameQuiz } from "./GameClient";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
@@ -492,13 +492,16 @@ export default async function Peli20({
   return (
     <>
       <GameClient quiz={game} />
-      {/* TIETOMEDIA kerros 4: SEO-kopio aiheoppaasta renderöidään
-          PALVELIMELTA — Google ei pelaa visaa, joten opas on HTML:ssä
-          alusta asti. Aloitusnäkymässä opas on myös kävijälle näkyvissä;
-          se piilotetaan vain pelin ajaksi ja loppunäkymässä, jossa sama
-          sisältö näkyy kohdassa 5. (SEO_STRATEGIA.md §13.2)
-          (Indeksointi aukeaa 2.0-julkaisussa slug-URLeilla; / on noindex.) */}
-      {learn && <LearnArticle learn={learn} fallbackTitle={quiz.title} accent={accent} ssr />}
+      {/* AIHEOPAS POISTETTU ALOITUSNÄKYMÄSTÄ (Heikki 2026-09-16).
+          Aiempi ssr-LearnArticle näytti koko aiheoppaan (Pikafaktat + UKK)
+          visan aloitussivulla ja SSR-HTML:ssä. Se vuoti Suomen marjat -visassa
+          kaikki 10/10 vastausta ja teki sivusta "SEO-kalastelijan" oloisen.
+          Poistettu tietoisesti — SEO-hyöty menetetään ja ansaitaan takaisin
+          muulla, laadukkaammalla tavalla. ÄLÄ palauta tätä renderöimään learnia
+          aloitussivulle. (learn-data säilyy kannassa ja käytetään yhä metassa,
+          rivi ~455.) Loppunäkymän oppimissisältö on GameClientin oma (päätös 4a).
+          Murupolku + ristiinnostot (alla) jäävät: laillista sisäistä linkitystä,
+          ei vastausvuotoa. */}
 
       {/* Crawlattavat sisäiset linkit: murupolku + ristiinnostot. Ennen näitä
           sivulla oli vain kaksi sisäistä linkkiä mutta neljä ulkoista
