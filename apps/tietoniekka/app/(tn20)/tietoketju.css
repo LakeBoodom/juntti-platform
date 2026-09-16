@@ -244,16 +244,6 @@
   font-family: var(--tn-font-body); font-weight: 700; font-size: 13px; text-decoration: underline;
   cursor: pointer; padding: 8px;
 }
-/* Tulos-CTA (korvasi automaattisen siirtymän, ks. RevealSequencer-kommentti):
-   tk-btn-secondary-pohja, koska --tk-lime on tässä näkymässä varattu
-   "oikein"-tilan reunaviivalle (max 1 lime-käyttö per näkymä). Sticky, jotta
-   nappi on ulottuvilla myös pitkän listan alaosassa ilman erillistä vieritystä. */
-.tn20 .tk-reveal-cta {
-  align-self: center;
-  position: sticky;
-  bottom: 16px;
-}
-
 /* ---------- ChainResultSummary ---------- */
 
 .tn20 .tk-result {
