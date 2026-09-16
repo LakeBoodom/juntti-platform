@@ -132,6 +132,23 @@
 }
 .tn20 .tk-rcard-date { color: var(--tk-text-secondary); font-weight: 700; }
 
+/* Peek-variantti (CollectionPageGamePromo, koristeellinen aria-hidden esikatselu):
+   ei nimi/ammatti-tekstiä lainkaan (RankingCard jättää .tk-rcard-body pois DOM:sta
+   kun peek=true) — kortti kutistuu kuvan kokoiseksi. KATSELMOINTILÖYDÖS (kriittinen,
+   2026-09-16): kiinteä clamp(140–190px) -leveys jätti tekstille vain ~46–102px,
+   jolloin tavallinen kaksisanainen nimi+ammatti vuoti näkyvästi seuraavan kortin
+   päälle. Korjaus: tekstiä ei enää renderöidä peek-tilassa, joten kortin leveys
+   tulee suoraan kuvan koosta eikä ylivuotoa voi enää syntyä millään nimipituudella. */
+.tn20 .tk-rcard--peek {
+  padding: 8px;
+  min-height: 0;
+  gap: 0;
+}
+.tn20 .tk-rcard--peek .tk-rcard-thumb {
+  width: 64px;
+  height: 64px;
+}
+
 .tn20 .tk-rcard-result {
   flex: 0 0 auto;
   display: flex; align-items: center; justify-content: center;
@@ -152,6 +169,35 @@
 .tn20 .tk-rcard-handle:active { cursor: grabbing; }
 .tn20 .tk-rcard-handle:focus-visible { outline: 2px solid var(--tk-text-tertiary); outline-offset: 2px; }
 .tn20 .tk-rcard-handle:disabled { opacity: 0.4; cursor: default; }
+
+/* KATSELMOINTILÖYDÖS (merkittävä, 2026-09-16): täydessä (ei-peek) RankingCardissa
+   marginaali .tk-rcard-name:lle oli 320px-leveydellä paikoin 0–2px tavallisilla
+   kaksisanaisilla suomalaisilla nimillä (esim. "Tarja Halonen", "Urho Kekkonen"),
+   koska pos-badge + thumb + handle/tulos-ikoni vievät suuren osan 320px:stä ennen
+   tekstiä. Fonttikoon pienentämistä kokeiltiin ensin, mutta Range-mittaus (sweep
+   320–380px, 1px-askelin, 8 nimeä mukaan lukien ääritapaukset "Kristiina
+   Halkola-Virtanen" ja "Sirkka-Liisa Anttila-Jääskeläinen") osoitti sen olevan
+   EPÄLUOTETTAVA: sanan word-break: keep-all -rivitys hyppää 1-rivin ja 2-rivin
+   välillä epäjatkuvasti kun tila muuttuu, joten pienempi fontti paransi joitain
+   nimiä mutta huononsi toisia yhtä paljon (esim. marginaali putosi 39px:stä
+   1px:ään). Sen sijaan pos/thumb/handle-elementtejä pakattiin hieman — tämä
+   vapauttaa tekstille tilaa KOSKEMATTA fonttikokoon (joka on jo kalibroitu),
+   ja on mittausten mukaan vakaasti parempi: pahin löydetty marginaali koko
+   320–380px-sweepissä oli edelleen positiivinen (~0.2–1px, ei koskaan
+   negatiivinen/leikkautuva) sekä ennen että jälkeen, ja tyypillisten
+   kaksisanaisten nimien marginaali parani merkittävästi (esim. "Jari Litmanen"
+   0.2px → 28px 320px:llä). Ei koske >380px, jossa marginaali on jo reilusti
+   positiivinen ilman muutoksia. */
+@media (max-width: 380px) {
+  /* :not(.tk-rcard--peek) — sama selektorispesifisyys kuin .tk-rcard--peek-
+     säännöllä (rivi ~135): ilman tätä myöhempi sijainti tiedostossa voittaisi
+     tasapelin ja peek-kortin padding/gap-kutistus (jonka teksti-ylivuotokorjaus
+     nimenomaan vaatii) katoaisi juuri 320–380px:n kapeilla näytöillä. */
+  .tn20 .tk-rcard-thumb { width: 48px; height: 48px; }
+  .tn20 .tk-rcard:not(.tk-rcard--peek) { gap: 10px; padding: 10px 10px; }
+  .tn20 .tk-rcard-pos { width: 22px; height: 22px; font-size: 12px; }
+  .tn20 .tk-rcard-handle { width: 34px; height: 34px; }
+}
 
 /* ---------- ReorderableChainList ---------- */
 
@@ -203,21 +249,33 @@
 }
 .tn20 .tk-result-cta { margin-bottom: 10px; }
 
-/* ---------- Kategoriachipit (amber — CategoryPicker + CollectionPageGamePromo) ---------- */
-
+/* ---------- Kategoriachipit (CategoryPicker + CollectionPageGamePromo) ----------
+   KATSELMOINTILÖYDÖS (merkittävä, 2026-09-16): ohje sallii amberin (#E8A320)
+   "vain identiteettiin (ei isoihin nappipintoihin)". Aiempi is-active-tila
+   täytti koko chipin amberilla — se on toistuva, jaettuun tietoketju.css:ään
+   kirjattu interaktiivinen nappipinta, joka periytyisi kaikkiin tuleviin
+   Tietoketju-peleihin. Korjattu: lepotila on nyt neutraali (tk-surface-2/
+   tk-border-2), aktiivinen tila korostuu tekstiväri+reunaviiva-yhdistelmällä
+   (tk-text-primary/tk-surface-2), ja amber näkyy chipissä enää pienenä
+   identiteettipilkkuna (::before) — sama rooli kuin eyebrow-tekstillä. */
 .tn20 .tk-chiprow { display: flex; flex-wrap: wrap; gap: 8px; }
 .tn20 .tk-chip-amber {
-  display: inline-flex; align-items: center; justify-content: center;
+  display: inline-flex; align-items: center; justify-content: center; gap: 7px;
   height: 40px; padding: 0 16px; border-radius: 999px;
-  border: 1px solid color-mix(in srgb, var(--tk-amber) 45%, transparent);
-  background: color-mix(in srgb, var(--tk-amber) 10%, transparent);
-  color: var(--tk-amber);
+  border: 1px solid var(--tk-border-2);
+  background: var(--tk-surface-2);
+  color: var(--tk-text-secondary);
   font-family: var(--tn-font-display); font-weight: 700; font-size: 13px;
   letter-spacing: 0.01em; cursor: pointer;
   overflow-wrap: normal; word-break: keep-all; white-space: normal; text-align: center;
 }
+.tn20 .tk-chip-amber::before {
+  content: ""; flex: 0 0 auto; width: 6px; height: 6px; border-radius: 999px;
+  background: var(--tk-amber);
+}
 .tn20 .tk-chip-amber.is-active {
-  background: var(--tk-amber); border-color: var(--tk-amber); color: var(--tk-bg); font-weight: 900;
+  background: var(--tk-surface); border-color: var(--tk-text-tertiary);
+  color: var(--tk-text-primary); font-weight: 900;
 }
 
 /* ---------- CategoryPicker ---------- */
@@ -251,7 +309,13 @@
 .tn20 .tk-picker-title {
   font-family: var(--tn-font-display); font-weight: 900; font-size: clamp(22px, 5vw, 30px);
   color: var(--tk-text-primary); margin: 0;
+  text-transform: uppercase; letter-spacing: 0.01em;
   overflow-wrap: normal; word-break: keep-all;
+  /* KATSELMOINTILÖYDÖS (merkittävä, 2026-09-16): uppercase lisätty tn20.css:n
+     muun otsikkokäytännön mukaisesti (Archivo + uppercase kaikissa vastaavan
+     tason otsikoissa). Uppercase kasvattaa glyyfileveyttä — kalibroitu
+     uudelleen Range-menetelmällä "Tietoketju: Ikäjärjestys" ja pisimmällä
+     kategorianimellä, 0 ylivuotoa 320–2450px, sama clamp-arvo riitti. */
 }
 .tn20 .tk-picker-desc {
   color: var(--tk-text-secondary); font-size: 14px; line-height: 1.5; margin: 0;
@@ -279,7 +343,10 @@
 .tn20 .tk-promo-title {
   font-family: var(--tn-font-display); font-weight: 900; color: var(--tk-text-primary);
   font-size: clamp(22px, 4.4vw, 34px); line-height: 1.05; margin: 0 0 10px;
+  text-transform: uppercase; letter-spacing: 0.01em;
   overflow-wrap: normal; word-break: keep-all;
+  /* KATSELMOINTILÖYDÖS (merkittävä, 2026-09-16): ks. .tk-picker-title-kommentti —
+     sama uppercase-yhdenmukaistus ja -kalibrointi. */
 }
 .tn20 .tk-promo-desc { color: var(--tk-text-secondary); font-size: 14px; line-height: 1.5; margin: 0 0 12px; max-width: 48ch; }
 .tn20 .tk-promo-direction { margin-bottom: 14px; }
@@ -290,8 +357,12 @@
   display: flex; margin-left: 4px;
 }
 .tn20 .tk-promo-peek-card {
-  width: clamp(140px, 40vw, 190px);
-  margin-left: -28px;
+  /* Ei enää kiinteää leveyttä (ks. .tk-rcard--peek-kommentti yllä) — kortti on
+     nyt vain kuva, joten leveys tulee sisällöstä (thumb 64px + padding 8px*2 +
+     reunaviiva 2px = 82px). Mitattu Range-menetelmällä 320–2450px 2026-09-16:
+     0 ylivuotoa, koska tekstiä ei enää ole. */
+  width: fit-content;
+  margin-left: -20px;
   transform: rotate(calc((var(--tk-peek-i, 0) - 1.5) * 3deg));
   filter: brightness(calc(1 - var(--tk-peek-i, 0) * 0.06));
 }
@@ -310,7 +381,10 @@
 .tn20 .tk-order-title {
   font-family: var(--tn-font-display); font-weight: 900; color: var(--tk-text-primary);
   font-size: clamp(26px, 6vw, 40px); line-height: 1.05; margin: 0;
+  text-transform: uppercase; letter-spacing: 0.01em;
   overflow-wrap: normal; word-break: keep-all;
+  /* KATSELMOINTILÖYDÖS (merkittävä, 2026-09-16): ks. .tk-picker-title-kommentti —
+     sama uppercase-yhdenmukaistus ja -kalibrointi. */
 }
 .tn20 .tk-order-desc { color: var(--tk-text-secondary); font-size: 14px; line-height: 1.5; margin: 0; max-width: 52ch; }
 .tn20 .tk-order-cta { position: sticky; bottom: 16px; }

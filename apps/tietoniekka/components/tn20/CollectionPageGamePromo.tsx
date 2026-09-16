@@ -47,7 +47,7 @@ export function CollectionPageGamePromo({ peekPeople = [] }: { peekPeople?: Rank
         <div className="tk-promo-peek" aria-hidden="true">
           {peekPeople.slice(0, 4).map((p, i) => (
             <div className="tk-promo-peek-card" key={p.id} style={{ ["--tk-peek-i" as string]: i }}>
-              <RankingCard person={p} readOnly />
+              <RankingCard person={p} readOnly peek />
             </div>
           ))}
         </div>

@@ -13,6 +13,7 @@ import { useMemo, useState } from "react";
 import { getChainRound } from "@/lib/ikajarjestys";
 import {
   DEFAULT_DIRECTION,
+  ROUND_SIZE,
   formatBirthDate,
   shuffleChain,
   sortForDirection,
@@ -60,12 +61,14 @@ export default function IkajarjestysClient({
   const [phase, setPhase] = useState<Phase>(initialRound && initialRound.length > 0 ? "ordering" : "start");
   const [scoreResult, setScoreResult] = useState<ChainScoreResult | null>(null);
   const [emptyNotice, setEmptyNotice] = useState<string | null>(null);
+  const [partialRoundNotice, setPartialRoundNotice] = useState<string | null>(null);
 
   const correctOrder = useMemo(() => (round ? sortForDirection(round, DEFAULT_DIRECTION) : []), [round]);
 
   async function startRound(chosenCategory: string) {
     setPhase("loading");
     setEmptyNotice(null);
+    setPartialRoundNotice(null);
     const lastSeen = readLastSeen();
     const next = await getChainRound(chosenCategory, lastSeen);
     setCategory(chosenCategory);
@@ -73,6 +76,13 @@ export default function IkajarjestysClient({
     setOrder(shuffleChain(next));
     if (next.length > 0) {
       writeLastSeen(next.map((p) => p.id));
+      // Pieni kategoria voi palauttaa alle ROUND_SIZE henkilöä (ks. JULKAISUTEKSTI
+      // "Kierroksen koko") — kierros pelataan silti loppuun, mutta pelaajalle
+      // kerrotaan ettei tällä kertaa saatu täyttä kymmenikköä, koska muu UI
+      // (otsikko, "Arvo 10 uutta") muuten implikoi aina täyttä kierrosta.
+      if (next.length < ROUND_SIZE) {
+        setPartialRoundNotice(`Tästä kategoriasta löytyi vain ${next.length} henkilöä tällä kierroksella.`);
+      }
       setPhase("ordering");
     } else {
       setEmptyNotice("Tästä kategoriasta ei löytynyt tarpeeksi pelattavia henkilöitä juuri nyt. Kokeile toista kategoriaa.");
@@ -157,6 +167,11 @@ export default function IkajarjestysClient({
         <p className="tk-order-desc">
           Raahaa tai napauta korteista järjestääksesi ne. Kun järjestys tuntuu oikealta, paljasta tulos.
         </p>
+        {partialRoundNotice && (
+          <p className="tk-loading" role="status">
+            {partialRoundNotice}
+          </p>
+        )}
       </header>
       <ReorderableChainList items={order} onReorder={setOrder} />
       <button type="button" className="tk-btn-primary tk-order-cta" onClick={() => setPhase("revealing")}>

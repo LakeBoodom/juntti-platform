@@ -29,8 +29,14 @@ export interface RankingCardProps {
   state?: RankingCardState;
   /** Muotoiltu syntymäaika ("12.4.1985") — annetaan vain paljastusvaiheessa. */
   revealedDate?: string | null;
-  /** Ei kahvaa, ei interaktiota (peek-esikatselu promo-korteissa). */
+  /** Ei kahvaa, ei interaktiota (peek-esikatselu promo-korteissa, aave-kortti raahauksessa, paljastuskortti). */
   readOnly?: boolean;
+  /** Koristeellinen peek-esikatselu (CollectionPageGamePromo): piilottaa nimi/ammatti-tekstin
+      kokonaan, näyttää vain kuvan. Katselmointilöydös (kriittinen, 2026-09-16): kiinteän
+      kapean peek-kortin leveydellä (clamp 140–190px) mikään fonttikoko ei mahduta oikeaa
+      nimeä+ammattia leikkautumatta — teksti on koriste-esikatselussa aria-hidden eikä
+      pelin oikea kortti, joten sen poistaminen ei riko KORTTISÄÄNTÖÄ. */
+  peek?: boolean;
   /** Vetokahvan pointer/keyboard-käsittelijät (ReorderableChainList antaa nämä). */
   handleProps?: React.ButtonHTMLAttributes<HTMLButtonElement>;
   /** Koko kortin napautus — tap-to-place-kohteen valinta ReorderableChainListissä. */
@@ -55,7 +61,7 @@ const RESULT_ICON: Record<string, React.ReactElement | null> = {
 };
 
 export const RankingCard = forwardRef<HTMLDivElement, RankingCardProps>(function RankingCard(
-  { person, position, state = "idle", revealedDate, readOnly, handleProps, onActivate, grabbed, className, style, ariaLabel },
+  { person, position, state = "idle", revealedDate, readOnly, peek, handleProps, onActivate, grabbed, className, style, ariaLabel },
   ref,
 ) {
   const resultIcon = state === "correct" || state === "wrong" ? RESULT_ICON[state] : null;
@@ -63,7 +69,7 @@ export const RankingCard = forwardRef<HTMLDivElement, RankingCardProps>(function
   return (
     <div
       ref={ref}
-      className={["tk-rcard", `tk-rcard--${state}`, readOnly ? "tk-rcard--readonly" : "", className ?? ""].join(" ").trim()}
+      className={["tk-rcard", `tk-rcard--${state}`, readOnly ? "tk-rcard--readonly" : "", peek ? "tk-rcard--peek" : "", className ?? ""].join(" ").trim()}
       style={style}
       data-id={person.id}
       role={readOnly || !onActivate ? undefined : "button"}
@@ -85,13 +91,15 @@ export const RankingCard = forwardRef<HTMLDivElement, RankingCardProps>(function
         <div className="tk-rcard-duotone" aria-hidden="true" />
       </div>
 
-      <div className="tk-rcard-body">
-        <div className="tk-rcard-name">{person.name}</div>
-        <div className="tk-rcard-role">
-          {person.role}
-          {revealedDate && <span className="tk-rcard-date"> · s. {revealedDate}</span>}
+      {!peek && (
+        <div className="tk-rcard-body">
+          <div className="tk-rcard-name">{person.name}</div>
+          <div className="tk-rcard-role">
+            {person.role}
+            {revealedDate && <span className="tk-rcard-date"> · s. {revealedDate}</span>}
+          </div>
         </div>
-      </div>
+      )}
 
       {resultIcon && (
         <div className={`tk-rcard-result tk-rcard-result--${state}`} aria-hidden="true">

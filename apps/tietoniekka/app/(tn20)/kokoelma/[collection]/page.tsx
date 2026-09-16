@@ -7,6 +7,7 @@
 
 import type { Metadata } from "next";
 import { getSupabase } from "@/lib/supabase";
+import { getSiteId } from "@/lib/queries";
 import { PersonCard, type QuizCardData } from "@/components/tn20/cards";
 import { PersonBrowser, type BrowserPerson } from "@/components/tn20/PersonBrowser";
 import { CollectionPageGamePromo } from "@/components/tn20/CollectionPageGamePromo";
@@ -642,9 +643,12 @@ function playHref(c: Celeb): string {
 async function PersonHub({ hub, article }: { hub: HubMeta; article?: React.ReactNode }) {
   const sb = getSupabase();
   if (!sb) return <main style={{ padding: 32 }}>Ei tietokantayhteyttä.</main>;
+  const siteId = await getSiteId();
+  if (!siteId) return <main style={{ padding: 32 }}>Ei tietokantayhteyttä.</main>;
   const { data } = await sb
     .from("celebrities")
     .select("id, slug, name, role, image_url, birth_date, trivia_quiz_id, priority, created_at")
+    .eq("site_id", siteId)
     .order("name");
   const celebs = (data ?? []) as Celeb[];
 
