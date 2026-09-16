@@ -79,9 +79,28 @@
   border: 1px solid var(--tk-border);
   background: var(--tk-surface);
   box-shadow: none;
-  touch-action: none; /* raahaus ei saa laukaista selaimen omaa scrollia kortin päällä */
 }
-.tn20 .tk-rcard--readonly { touch-action: auto; }
+
+/* Raahattava kortti (ReorderableChainList antaa dragPropsin) — LIVE-QA-LÖYDÖS
+   (kriittinen, 2026-09-16, Heikki): aiemmin touch-action: none oli KAIKILLA
+   korteilla, mutta raahaus lähti vain 40×40px kahvasta. Kortin rungosta tehty
+   kosketus ei siis raahannut EIKÄ vierittänyt sivua — ele tuntui tahmealta ja
+   jumiutuneelta juuri siellä missä pelaaja luonnostaan tarttuu korttiin.
+   Nyt tartunta on koko kortissa ja touch-action on pan-y: lyhyt pyyhkäisy
+   vierittää sivua normaalisti (10 kortin lista ei mahdu näytölle, joten
+   vierityksen on pakko toimia kortinkin päältä), ja raahaus aktivoituu
+   kosketuksella pitkästä painalluksesta, jolloin JS estää vierityksen
+   ei-passiivisella touchmove-kuuntelijalla. Kahva pitää yhä oman
+   touch-action: none -arvonsa, joten sieltä raahaus lähtee heti. */
+.tn20 .tk-rcard--draggable {
+  cursor: grab;
+  touch-action: pan-y;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none; /* iOS: pitkä painallus ei avaa kuvan omaa valikkoa */
+}
+.tn20 .tk-rcard--draggable:active { cursor: grabbing; }
+.tn20 .tk-rcard--draggable img { -webkit-user-drag: none; }
 
 .tn20 .tk-rcard--selected { border-color: var(--tk-text-tertiary); background: color-mix(in srgb, var(--tk-surface) 70%, var(--tk-border-2)); }
 .tn20 .tk-rcard--target { border-color: var(--tk-border-2); border-style: dashed; }
@@ -224,6 +243,15 @@
   align-self: center; background: none; border: none; color: var(--tk-text-tertiary);
   font-family: var(--tn-font-body); font-weight: 700; font-size: 13px; text-decoration: underline;
   cursor: pointer; padding: 8px;
+}
+/* Tulos-CTA (korvasi automaattisen siirtymän, ks. RevealSequencer-kommentti):
+   tk-btn-secondary-pohja, koska --tk-lime on tässä näkymässä varattu
+   "oikein"-tilan reunaviivalle (max 1 lime-käyttö per näkymä). Sticky, jotta
+   nappi on ulottuvilla myös pitkän listan alaosassa ilman erillistä vieritystä. */
+.tn20 .tk-reveal-cta {
+  align-self: center;
+  position: sticky;
+  bottom: 16px;
 }
 
 /* ---------- ChainResultSummary ---------- */

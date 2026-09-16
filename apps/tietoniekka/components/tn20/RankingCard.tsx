@@ -39,6 +39,16 @@ export interface RankingCardProps {
   peek?: boolean;
   /** Vetokahvan pointer/keyboard-käsittelijät (ReorderableChainList antaa nämä). */
   handleProps?: React.ButtonHTMLAttributes<HTMLButtonElement>;
+  /** Koko kortin juureen levitettävät käsittelijät (pointer-raahaus mistä tahansa kortin
+      kohdasta). LIVE-QA-LÖYDÖS (kriittinen, 2026-09-16, Heikki): raahaus oli sidottu
+      pelkkään 40×40px kahvaan oikeassa reunassa, ja koska .tk-rcard esti selaimen oman
+      vierityksen (touch-action: none) jo koko kortin alueelta, kortin muualta tartuttu
+      kosketus ei tehnyt mitään EIKÄ vierittänyt sivua — mobiilissa tämä tuntui tahmealta
+      ja rikkinäiseltä. Nyt ReorderableChainList antaa tästä samat pointer-käsittelijät
+      koko kortille; kahva jää näkyväksi affordanssiksi ja näppäimistökäyttöön.
+      Levitetään juuren omien proppien JÄLKEEN, jotta lista voi tarvittaessa korvata
+      myös onClickin (napautus käsitellään pointerupissa, ks. ReorderableChainList). */
+  dragProps?: React.HTMLAttributes<HTMLDivElement>;
   /** Koko kortin napautus — tap-to-place-kohteen valinta ReorderableChainListissä. */
   onActivate?: () => void;
   grabbed?: boolean;
@@ -61,7 +71,7 @@ const RESULT_ICON: Record<string, React.ReactElement | null> = {
 };
 
 export const RankingCard = forwardRef<HTMLDivElement, RankingCardProps>(function RankingCard(
-  { person, position, state = "idle", revealedDate, readOnly, peek, handleProps, onActivate, grabbed, className, style, ariaLabel },
+  { person, position, state = "idle", revealedDate, readOnly, peek, handleProps, dragProps, onActivate, grabbed, className, style, ariaLabel },
   ref,
 ) {
   const resultIcon = state === "correct" || state === "wrong" ? RESULT_ICON[state] : null;
@@ -69,20 +79,35 @@ export const RankingCard = forwardRef<HTMLDivElement, RankingCardProps>(function
   return (
     <div
       ref={ref}
-      className={["tk-rcard", `tk-rcard--${state}`, readOnly ? "tk-rcard--readonly" : "", peek ? "tk-rcard--peek" : "", className ?? ""].join(" ").trim()}
+      className={[
+        "tk-rcard",
+        `tk-rcard--${state}`,
+        readOnly ? "tk-rcard--readonly" : "",
+        peek ? "tk-rcard--peek" : "",
+        // Raahattava koko kortti: erillinen luokka, jotta kursori/touch-action/
+        // user-select osuvat vain oikeisiin kortteihin (ei readOnly-esikatseluihin).
+        dragProps && !readOnly ? "tk-rcard--draggable" : "",
+        className ?? "",
+      ]
+        .join(" ")
+        .replace(/\s+/g, " ")
+        .trim()}
       style={style}
       data-id={person.id}
       role={readOnly || !onActivate ? undefined : "button"}
       tabIndex={readOnly || !onActivate ? undefined : -1}
       aria-label={ariaLabel}
       onClick={readOnly ? undefined : onActivate}
+      {...dragProps}
     >
       {typeof position === "number" && <div className="tk-rcard-pos" aria-hidden="true">{position}</div>}
 
       <div className="tk-rcard-thumb">
         {person.image_url ? (
+          // draggable={false}: ilman tätä hiiriraahaus kortin kuvasta käynnistäisi
+          // selaimen oman kuvanraahauksen ja keskeyttäisi kortin siirron.
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={person.image_url} alt="" loading="lazy" />
+          <img src={person.image_url} alt="" loading="lazy" draggable={false} />
         ) : (
           <div className="tk-rcard-silhouette">
             <PersonSilhouette />
@@ -111,7 +136,7 @@ export const RankingCard = forwardRef<HTMLDivElement, RankingCardProps>(function
         <button
           type="button"
           className="tk-rcard-handle"
-          aria-label={`Siirrä ${person.name} — pidä pohjassa ja raahaa, tai napauta valitaksesi`}
+          aria-label={`Siirrä ${person.name} — raahaa korttia mistä tahansa kohdasta, tai napauta valitaksesi`}
           aria-grabbed={grabbed ? "true" : "false"}
           {...handleProps}
         >

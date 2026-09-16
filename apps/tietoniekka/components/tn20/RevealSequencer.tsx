@@ -10,8 +10,17 @@
 // Liikeajat (speksi): enter 320ms, state-muutos 220ms,
 // easing cubic-bezier(.2,.8,.2,1). prefers-reduced-motion: sama lopputulos,
 // ei porrastettua animaatiota — kaikki paljastuu kerralla lyhyen viiveen jälkeen.
+//
+// LIVE-QA-LÖYDÖS (kriittinen, 2026-09-16, Heikki): paljastettu järjestys näkyi
+// vain ~1,4 s (BASE_DELAY + 10 × STAGGER + 320 ms), koska sarjan päätyttyä
+// onComplete() kutsuttiin ajastimesta ja peli hyppäsi itse tulosnäkymään.
+// Pelaaja ei ehtinyt katsoa mikä meni oikein ja mikä väärin. Korjattu:
+// tämä komponentti EI enää koskaan kutsu onCompletea itse — ajastimet vain
+// paljastavat kortit, ja siirtymä tulosnäkymään vaatii pelaajan oman
+// "Näytä tulos" -klikkauksen. Paljastus jää siis näkyviin niin pitkäksi
+// aikaa kuin pelaaja haluaa.
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { RankingCard, type RankingCardState } from "./RankingCard";
 import { usePrefersReducedMotion } from "@/lib/usePrefersReducedMotion";
 
@@ -34,21 +43,17 @@ export function RevealSequencer({ items, onComplete }: { items: RevealItem[]; on
   const ordered = [...items].sort((a, b) => a.placedPosition - b.placedPosition);
   const reducedMotion = usePrefersReducedMotion();
   const [revealedCount, setRevealedCount] = useState(0);
-  const doneRef = useRef(false);
+
+  const total = ordered.length;
+  const allRevealed = total > 0 && revealedCount >= total;
 
   useEffect(() => {
-    doneRef.current = false;
     setRevealedCount(0);
     const timers: ReturnType<typeof setTimeout>[] = [];
 
     if (reducedMotion) {
       // Sama lopputulos ilman porrastettua liikettä — yksi lyhyt viive, sitten kaikki kerralla.
-      timers.push(
-        setTimeout(() => {
-          setRevealedCount(ordered.length);
-          timers.push(setTimeout(() => finish(), 260));
-        }, 200),
-      );
+      timers.push(setTimeout(() => setRevealedCount(total), 200));
     } else {
       ordered.forEach((_, i) => {
         timers.push(
@@ -57,25 +62,15 @@ export function RevealSequencer({ items, onComplete }: { items: RevealItem[]; on
           }, BASE_DELAY_MS + i * STAGGER_MS),
         );
       });
-      const totalMs = BASE_DELAY_MS + ordered.length * STAGGER_MS + 320; // + enter-transition viimeiselle
-      timers.push(setTimeout(() => finish(), totalMs));
-    }
-
-    function finish() {
-      if (doneRef.current) return;
-      doneRef.current = true;
-      onComplete();
     }
 
     return () => timers.forEach(clearTimeout);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [items, reducedMotion]);
 
-  function skip() {
-    if (doneRef.current) return;
-    doneRef.current = true;
-    setRevealedCount(ordered.length);
-    onComplete();
+  /** Ohita porrastus: näytä kaikki kortit heti. EI siirry tulokseen — se on aina pelaajan klikki. */
+  function revealAllNow() {
+    setRevealedCount(total);
   }
 
   return (
@@ -101,9 +96,20 @@ export function RevealSequencer({ items, onComplete }: { items: RevealItem[]; on
           );
         })}
       </div>
-      <button type="button" className="tk-reveal-skip" onClick={skip}>
-        Näytä heti →
-      </button>
+
+      {allRevealed ? (
+        // tk-btn-secondary (ei tk-btn-primary): --tk-lime on tässä näkymässä
+        // varattu "oikein"-tilan reunaviivalle (korkeintaan 1 lime-käyttö per
+        // näkymä, ks. tokenikommentti tietoketju.css:ssä), joten tulos-CTA on
+        // neutraali reunaviivanappi.
+        <button type="button" className="tk-btn-secondary tk-reveal-cta" onClick={onComplete}>
+          Näytä tulos
+        </button>
+      ) : (
+        <button type="button" className="tk-reveal-skip" onClick={revealAllNow}>
+          Näytä heti →
+        </button>
+      )}
     </div>
   );
 }

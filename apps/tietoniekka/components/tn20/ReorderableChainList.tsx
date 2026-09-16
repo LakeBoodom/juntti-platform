@@ -12,6 +12,25 @@
 // korostuvat kohdepaikkoina (slot-highlight); napauta kohdetta siirtääksesi
 // valitun kortin sille paikalle. Napauta valittua uudelleen perataksesi.
 //
+// TARTUNTA-ALUE — LIVE-QA-LÖYDÖS (kriittinen, 2026-09-16, Heikki): raahaus
+// toimi vain oikean reunan 40×40px kahvasta, eikä kortin muusta osasta saanut
+// otetta lainkaan. Mobiilissa tämä tuntui tahmealta myös siksi, että
+// .tk-rcard esti selaimen oman vierityksen (touch-action: none) KOKO kortin
+// alueelta — kortin keskeltä pyyhkäisy ei siis raahannut eikä vierittänyt,
+// vaan näytti jumiutuneelta. Korjattu kahdella yhteen kuuluvalla muutoksella:
+//   1. Samat pointer-käsittelijät annetaan koko kortille (RankingCardin
+//      dragProps), joten ote lähtee mistä tahansa kortin kohdasta. Kahva jää
+//      näkyväksi affordanssiksi ja näppäimistöreitiksi.
+//   2. .tk-rcard--draggable saa touch-action: pan-y (ei none), joten sormella
+//      pyyhkäisy kortin päältä vierittää sivua normaalisti. Raahaus aktivoituu
+//      kosketuksella vasta pitkästä painalluksesta (TOUCH_LONG_PRESS_MS) —
+//      sama ele kuin mobiilikäyttöjärjestelmien omissa järjestyslistoissa.
+//      Aktivoituessa kiinnitetään ei-passiivinen touchmove-kuuntelija joka
+//      preventDefaultaa: selain ei ole vielä ehtinyt aloittaa vieritystä
+//      (sormi ei ole liikkunut), joten vieritys estyy raahauksen ajaksi
+//      vaikka touch-action sallisi sen. Hiirellä/kynällä raahaus alkaa heti
+//      liikkeestä kuten ennen (ei pitkää painallusta).
+//
 // Raahauksen tekniikka: valittu kortti saa näkymättömäksi jäävän paikkavarauksen
 // normaalissa virtauksessa (jotta muut rivit asettuvat oikeaan kohtaan), ja
 // erillinen "aave" (position: fixed) seuraa sormea/hiirtä suoraan. Muiden
@@ -31,6 +50,13 @@ import { usePrefersReducedMotion } from "@/lib/usePrefersReducedMotion";
 const EDGE_ZONE = 88; // px viewportin reunasta, jolloin autoscroll käynnistyy
 const MAX_SCROLL_SPEED = 16; // px / frame lähimpänä reunaa
 const TAP_MOVE_THRESHOLD = 6; // px — tätä pienempi liike pointerdown→up tulkitaan napautukseksi
+const TOUCH_LONG_PRESS_MS = 180; // kosketus kortin rungosta: pito ennen kuin raahaus aktivoituu
+
+/** Moduulitasoinen (vakaa referenssi add/removeEventListenerille): estää selaimen
+    oman vierityksen raahauksen ajaksi. Kiinnitetään vain kun raahaus on aktiivinen. */
+function blockTouchScroll(e: TouchEvent) {
+  if (e.cancelable) e.preventDefault();
+}
 
 export interface ReorderableChainListProps<T extends RankingCardPerson> {
   items: T[];
@@ -75,15 +101,24 @@ export function ReorderableChainList<T extends RankingCardPerson>({
   const dragRef = useRef<{
     id: string;
     pointerId: number;
+    pointerType: string;
+    /** true = tartunta kahvasta: raahaus alkaa heti liikkeestä, ei pitkää painallusta. */
+    immediate: boolean;
+    startX: number;
     startY: number;
     startIndex: number;
     grabOffsetY: number;
     left: number;
     width: number;
     height: number;
+    /** Raahaus on todella käynnissä (aave näkyvissä, rAF-silmukka pyörii). */
+    active: boolean;
+    /** Sormi/hiiri liikkui yli napautuskynnyksen — napautustulkinta perutaan. */
     moved: boolean;
     lastClientY: number;
     rafId: number | null;
+    longPressId: ReturnType<typeof setTimeout> | null;
+    captureEl: HTMLElement | null;
   } | null>(null);
 
   const setRowRef = useCallback((id: string, el: HTMLDivElement | null) => {
@@ -175,16 +210,43 @@ export function ReorderableChainList<T extends RankingCardPerson>({
     commitReorder(next, id, toIndex);
   }
 
-  // ---- Raahaus: pointer events (hiiri + kosketus) ----
+  // ---- Raahaus: pointer events (hiiri + kosketus), tartunta koko kortista ----
   function stopDragLoop() {
     const ds = dragRef.current;
     if (ds?.rafId) cancelAnimationFrame(ds.rafId);
+    if (ds?.longPressId) clearTimeout(ds.longPressId);
   }
 
   function endDrag() {
+    const ds = dragRef.current;
     stopDragLoop();
+    if (ds?.captureEl) {
+      try {
+        if (ds.captureEl.hasPointerCapture(ds.pointerId)) ds.captureEl.releasePointerCapture(ds.pointerId);
+      } catch {
+        // Ei estä mitään — capture vapautuu joka tapauksessa pointerin päättyessä.
+      }
+    }
+    document.removeEventListener("touchmove", blockTouchScroll);
     dragRef.current = null;
     setDragId(null);
+  }
+
+  /** Raahaus käyntiin: aave näkyviin, selaimen vieritys pois, rAF-silmukka päälle. */
+  function activateDrag() {
+    const ds = dragRef.current;
+    if (!ds || ds.active || disabled) return;
+    if (ds.longPressId) {
+      clearTimeout(ds.longPressId);
+      ds.longPressId = null;
+    }
+    ds.active = true;
+    ds.moved = true;
+    // Ei-passiivinen: estää vierityksen alkamisen raahauksen ajaksi (ks. tiedoston
+    // alun TARTUNTA-ALUE-kommentti). Autoscroll hoidetaan itse tickissä.
+    document.addEventListener("touchmove", blockTouchScroll, { passive: false });
+    setDragId(ds.id);
+    ds.rafId = requestAnimationFrame(tick);
   }
 
   function tick() {
@@ -235,61 +297,87 @@ export function ReorderableChainList<T extends RankingCardPerson>({
     ds.rafId = requestAnimationFrame(tick);
   }
 
-  function handlePointerDown(e: React.PointerEvent<HTMLButtonElement>, id: string) {
+  function handlePointerDown(e: React.PointerEvent<HTMLElement>, id: string, immediate = false) {
     if (disabled) return;
     if (e.pointerType === "mouse" && e.button !== 0) return;
+    // Toinen sormi kesken raahauksen: ei aloiteta rinnakkaista raahausta.
+    if (dragRef.current) return;
     const row = rowRefs.current.get(id);
     if (!row) return;
     const rect = row.getBoundingClientRect();
+    const captureEl = e.currentTarget as HTMLElement;
     try {
-      (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
+      captureEl.setPointerCapture(e.pointerId);
     } catch {
       // Safari < 13 fallback: raahaus toimii silti, vain pointer capture puuttuu.
     }
     dragRef.current = {
       id,
       pointerId: e.pointerId,
+      pointerType: e.pointerType,
+      immediate,
+      startX: e.clientX,
       startY: e.clientY,
       startIndex: itemsRef.current.findIndex((p) => p.id === id),
       grabOffsetY: e.clientY - rect.top,
       left: rect.left,
       width: rect.width,
       height: rect.height,
+      active: false,
       moved: false,
       lastClientY: e.clientY,
       rafId: null,
+      longPressId: null,
+      captureEl,
     };
-  }
-
-  function handlePointerMove(e: React.PointerEvent<HTMLButtonElement>, id: string) {
-    const ds = dragRef.current;
-    if (!ds || ds.pointerId !== e.pointerId || disabled) return;
-    ds.lastClientY = e.clientY;
-    if (!ds.moved && Math.abs(e.clientY - ds.startY) > TAP_MOVE_THRESHOLD) {
-      ds.moved = true;
-      setDragId(id);
-      ds.rafId = requestAnimationFrame(tick);
+    // Kosketus kortin rungosta: pitkä painallus aktivoi raahauksen, jotta lyhyt
+    // pyyhkäisy jää selaimen vieritykseksi (touch-action: pan-y).
+    if (!immediate && e.pointerType === "touch") {
+      dragRef.current.longPressId = setTimeout(() => activateDrag(), TOUCH_LONG_PRESS_MS);
     }
   }
 
-  function handlePointerUp(e: React.PointerEvent<HTMLButtonElement>, id: string) {
+  function handlePointerMove(e: React.PointerEvent<HTMLElement>) {
+    const ds = dragRef.current;
+    if (!ds || ds.pointerId !== e.pointerId || disabled) return;
+    ds.lastClientY = e.clientY;
+    if (ds.active) return;
+    const travel = Math.max(Math.abs(e.clientY - ds.startY), Math.abs(e.clientX - ds.startX));
+    if (travel <= TAP_MOVE_THRESHOLD) return;
+    if (ds.immediate || ds.pointerType !== "touch") {
+      activateDrag();
+    } else {
+      // Sormi liikkui ennen pitkän painalluksen laukeamista → ele on sivun vieritys:
+      // luovutaan raahausaikeesta (ja pointer capturesta) kokonaan.
+      endDrag();
+    }
+  }
+
+  function handlePointerUp(e: React.PointerEvent<HTMLElement>, id: string) {
     const ds = dragRef.current;
     if (!ds || ds.pointerId !== e.pointerId) return;
     e.stopPropagation();
-    const wasDrag = ds.moved;
+    const wasDrag = ds.active;
+    const wasMove = ds.moved;
     endDrag();
-    if (!wasDrag && !disabled) {
+    if (!wasDrag && !wasMove && !disabled) {
       handleCardActivate(id);
     }
   }
 
-  function handlePointerCancel(e: React.PointerEvent<HTMLButtonElement>) {
+  function handlePointerCancel(e: React.PointerEvent<HTMLElement>) {
     const ds = dragRef.current;
     if (!ds || ds.pointerId !== e.pointerId) return;
     endDrag();
   }
 
-  useEffect(() => () => stopDragLoop(), []);
+  useEffect(
+    () => () => {
+      stopDragLoop();
+      document.removeEventListener("touchmove", blockTouchScroll);
+    },
+    [],
+  );
 
   const draggedItem = dragId ? items.find((p) => p.id === dragId) ?? null : null;
   const draggedIndex = draggedItem ? items.findIndex((p) => p.id === dragId) : -1;
@@ -315,9 +403,29 @@ export function ReorderableChainList<T extends RankingCardPerson>({
             ariaLabel={`${person.name}, paikka ${index + 1} / ${items.length}`}
             onActivate={() => handleCardActivate(person.id)}
             className={isDragging ? "tk-rcard--ghost-source" : undefined}
-            handleProps={{
+            dragProps={{
               onPointerDown: (e) => handlePointerDown(e, person.id),
-              onPointerMove: (e) => handlePointerMove(e, person.id),
+              onPointerMove: handlePointerMove,
+              onPointerUp: (e) => handlePointerUp(e, person.id),
+              onPointerCancel: handlePointerCancel,
+              // Napautus käsitellään pointerupissa (handlePointerUp) — ilman tätä
+              // sama napautus laukaisisi vielä kortin onClickin ja valinta
+              // kumoutuisi heti (valitse → peru samalla napautuksella).
+              onClick: undefined,
+            }}
+            handleProps={{
+              // Kahvasta raahaus alkaa heti liikkeestä myös kosketuksella
+              // (kahvalla on touch-action: none, joten se ei koskaan vieritä).
+              // stopPropagation: sama ele ei saa käynnistyä toiseen kertaan
+              // kortin juuren käsittelijästä.
+              onPointerDown: (e) => {
+                e.stopPropagation();
+                handlePointerDown(e, person.id, true);
+              },
+              onPointerMove: (e) => {
+                e.stopPropagation();
+                handlePointerMove(e);
+              },
               onPointerUp: (e) => handlePointerUp(e, person.id),
               onPointerCancel: handlePointerCancel,
               onClick: (e) => e.stopPropagation(),
