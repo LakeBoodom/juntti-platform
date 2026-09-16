@@ -15,7 +15,6 @@ import {
   DEFAULT_DIRECTION,
   ROUND_SIZE,
   formatBirthDate,
-  shuffleChain,
   sortForDirection,
   type ChainPerson,
 } from "@/lib/ikajarjestysConstants";
@@ -57,7 +56,14 @@ export default function IkajarjestysClient({
   const [category, setCategory] = useState(initialCategory);
   const [pickerCategory, setPickerCategory] = useState(initialCategory);
   const [round, setRound] = useState<ChainPerson[] | null>(initialRound);
-  const [order, setOrder] = useState<ChainPerson[]>(() => (initialRound ? shuffleChain(initialRound) : []));
+  // HUOM (korjattu hydraatiovirhe): getChainRound palauttaa henkilöt jo
+  // satunnaisessa järjestyksessä (arpoo poolin ennen valintaa palvelimella),
+  // joten näyttöjärjestystä EI saa arpoa uudelleen täällä renderissä —
+  // Math.random() lazy useState-initializerissa antaa eri tuloksen SSR:ssä
+  // ja hydraatiossa, mikä aiheutti "Minified React error #418" -virheen
+  // JOKAISELLA latauksella kun initialRound oli asetettu (promo-CTA:n
+  // ?autostart=1 -linkiltä). Käytä palvelimen palauttamaa järjestystä sellaisenaan.
+  const [order, setOrder] = useState<ChainPerson[]>(() => initialRound ?? []);
   const [phase, setPhase] = useState<Phase>(initialRound && initialRound.length > 0 ? "ordering" : "start");
   const [scoreResult, setScoreResult] = useState<ChainScoreResult | null>(null);
   const [emptyNotice, setEmptyNotice] = useState<string | null>(null);
@@ -73,7 +79,7 @@ export default function IkajarjestysClient({
     const next = await getChainRound(chosenCategory, lastSeen);
     setCategory(chosenCategory);
     setRound(next);
-    setOrder(shuffleChain(next));
+    setOrder(next); // jo satunnaisessa järjestyksessä, ks. huomio yllä
     if (next.length > 0) {
       writeLastSeen(next.map((p) => p.id));
       // Pieni kategoria voi palauttaa alle ROUND_SIZE henkilöä (ks. JULKAISUTEKSTI
