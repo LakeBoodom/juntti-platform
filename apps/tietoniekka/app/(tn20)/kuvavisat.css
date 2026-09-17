@@ -466,3 +466,53 @@
     transition: none;
   }
 }
+
+/* ── VIIKKOVISA-PANEELI (design 1a, 17.9.2026) ───────────────────────────
+   Designin sininen (#2C6BE0 nappi, #0D1526 pohja) jää pois: BRAND.md:n
+   token-lohkossa ei ole sinistä, se sallii enintään kaksi taustaväriä per
+   näkymä ja lime on ainoa toimintoväri. Paneeli käyttää samaa limeä kuin
+   pelin Seuraava-nappi, ja pohja on sivun oma #17140d. */
+.tn20 .kv-viikko {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 14px;
+  margin: 0 0 34px;
+  padding: clamp(20px, 2.2vw, 34px);
+  border-radius: 22px;
+  border: 1px solid rgba(182, 255, 60, 0.32);
+  background: linear-gradient(150deg, rgba(182, 255, 60, 0.1) 0%, #17140d 46%, #17140d 100%);
+}
+.tn20 .kv-viikko-badge {
+  padding: 5px 11px; border-radius: 999px;
+  background: #b6ff3c; color: #0f1a05;
+  font-size: 10.5px; font-weight: 900; letter-spacing: 0.14em; text-transform: uppercase;
+}
+/* Mitattu tarve: "Viikkovisa" on 10 merkkiä, pisin sana sama — 320 px:llä
+   0.95 × (288 / (0.67 × 10)) ≈ 40 px, joten clampin alaraja on turvallinen.
+   CD:n arvo 52 px säilyy leveillä ruuduilla. */
+.tn20 .kv-viikko-title {
+  margin: 0;
+  font-family: var(--kv-display);
+  font-weight: 900; font-variation-settings: "wdth" 72;
+  font-size: clamp(34px, 4.4vw, 52px); line-height: 0.92; letter-spacing: -0.02em;
+  text-transform: uppercase; color: #f5f0e6;
+  overflow-wrap: normal; word-break: keep-all; hyphens: none;
+}
+.tn20 .kv-viikko-lede {
+  margin: 0; max-width: 72ch;
+  font-size: clamp(14px, 1.1vw, 16px); line-height: 1.55; color: #b9af9b;
+  text-wrap: pretty;
+}
+.tn20 .kv-viikko-row { display: flex; align-items: center; flex-wrap: wrap; gap: 16px; }
+.tn20 .kv-viikko-cta {
+  display: inline-flex; align-items: center; gap: 10px;
+  min-height: 52px; padding: 0 28px; border-radius: 12px;
+  background: #b6ff3c; color: #0f1a05;
+  font-family: var(--kv-display); font-weight: 900; font-variation-settings: "wdth" 84;
+  font-size: 16px; letter-spacing: 0.04em; text-transform: uppercase; white-space: nowrap;
+  text-decoration: none; transition: filter 150ms;
+}
+.tn20 .kv-viikko-cta:hover { filter: brightness(1.07); }
+.tn20 .kv-viikko-cta:focus-visible { outline: 2px solid #f5f0e6; outline-offset: 3px; }
+.tn20 .kv-viikko-meta { font-size: 12.5px; font-weight: 700; color: #8e8676; }

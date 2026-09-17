@@ -17,7 +17,7 @@ import { LearnArticle } from "@/components/tn20/LearnArticle";
 import { ShowMoreGrid } from "@/components/tn20/ShowMoreGrid";
 import Crumbs from "@/components/tn20/Crumbs";
 import { KuvavisatHub } from "@/components/tn20/KuvavisatHub";
-import { getKuvavisatHub } from "@/lib/kuvavisat2026";
+import { getKuvavisatHub, getViikkovisa } from "@/lib/kuvavisat2026";
 import { urheiluImg } from "@/lib/urheilu";
 import { getPageContent } from "@/lib/pageContent";
 import { notFound } from "next/navigation";
@@ -292,7 +292,10 @@ export default async function KokoelmaHub({
      design luopuu hero-taustakuvasta tekstiheron hyväksi — murupolku säilyy
      sivuston yhteisenä (Crumbs). */
   if (hub.source.kind === "kuvavisa") {
-    const { kategoriat, kuviaYhteensa, variaatioitaYhteensa } = await getKuvavisatHub();
+    const [{ kategoriat, kuviaYhteensa, variaatioitaYhteensa }, vv] = await Promise.all([
+      getKuvavisatHub(),
+      getViikkovisa(),
+    ]);
     if (kategoriat.length === 0) return <main style={{ padding: 32 }}>Kuvavisoja ei löytynyt.</main>;
 
     /* "Arvo satunnainen kuvavisa": arvonta tehdään palvelimella per pyyntö
@@ -309,6 +312,7 @@ export default async function KokoelmaHub({
             kuviaYhteensa={kuviaYhteensa}
             variaatioitaYhteensa={variaatioitaYhteensa}
             satunnainenHref={satunnainenHref}
+            viikkovisa={vv ? { viikko: vv.viikko, kuvia: vv.kuvaIdt.length } : null}
             article={article}
           />
         </div>

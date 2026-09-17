@@ -107,12 +107,15 @@ export function KuvavisatHub({
   kuviaYhteensa,
   variaatioitaYhteensa,
   satunnainenHref,
+  viikkovisa,
   article,
 }: {
   kategoriat: KategoriaData[];
   kuviaYhteensa: number;
   variaatioitaYhteensa: number;
   satunnainenHref: string | null;
+  /** Kuluvan viikon viikkovisa. null = ei vielä olemassa → paneeli jää pois. */
+  viikkovisa?: { viikko: number; kuvia: number } | null;
   article?: React.ReactNode;
 }) {
   return (
@@ -136,6 +139,34 @@ export function KuvavisatHub({
           </a>
         )}
       </header>
+
+      {/* VIIKKOVISA (design 1a -paneeli). Design käyttää sinistä #2C6BE0 ja
+          tummansinistä pohjaa #0D1526, mutta BRAND.md:n token-lohkossa ei ole
+          sinistä ja lime on ainoa toimintoväri — sama linjaus kuin painikkeissa.
+          Paneeli näkyy vain kun kuluvan viikon sarja on kannassa: sivulla ei
+          lueta lupauksia joita tuotanto ei lunasta. */}
+      {viikkovisa && (
+        <section className="kv-viikko" aria-labelledby="kv-viikko-title">
+          <span className="kv-viikko-badge">Tämän viikon kuvavisa</span>
+          <h2 className="kv-viikko-title" id="kv-viikko-title">Viikkovisa</h2>
+          <p className="kv-viikko-lede">
+            {viikkovisa.kuvia} kuvaa kaikista kortistoista: liput, vaakunat, linnut, eläimet, maalaukset,
+            rakennukset, henkilöt sekä kasvit ja puut. Sama visa kaikille koko viikon — uusi maanantaina.
+          </p>
+          <div className="kv-viikko-row">
+            <a className="kv-viikko-cta" href="/peli?viikkovisa=1">
+              Aloita viikkovisa <span aria-hidden="true">→</span>
+            </a>
+            <span className="kv-viikko-meta">
+              Viikko {viikkovisa.viikko}
+              <span aria-hidden="true"> · </span>
+              {viikkovisa.kuvia} kuvaa
+              <span aria-hidden="true"> · </span>
+              kaikki kategoriat
+            </span>
+          </div>
+        </section>
+      )}
 
       <section className="kv-section">
         <div className="kv-section-head">

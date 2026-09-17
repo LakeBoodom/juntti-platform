@@ -270,3 +270,42 @@ export function ryhmiteltyVariaatiot(v: Variaatio[]): Array<{ label: string | nu
   if (kaikki.length > 0) ryhmat.push({ label: null, items: kaikki });
   return ryhmat;
 }
+
+/* ── VIIKKOVISA (17.9.2026, Heikin pyyntö: "tee viikkovisa taulupohjaisena") ──
+   15 kuvaa kaikista kahdeksasta kortistosta, sama visa kaikille koko viikon,
+   vaihtuu maanantaina Suomen aikaa. Sarja on lukittu kantaan
+   (kuvavisa_viikot); arvonnan tekee kuvavisa_viikon_kuvat(), joka luo rivin
+   laiskasti ensimmäisellä pyynnöllä — alustalla ei ole vielä ajastimia.
+   Ks. supabase/migrations/20260917_kuvavisa_viikkovisa.sql. */
+
+export const VIIKKOVISA_KUVIA = 15;
+
+export type Viikkovisa = { vuosi: number; viikko: number; kuvaIdt: string[] };
+
+export async function getViikkovisa(): Promise<Viikkovisa | null> {
+  const sb = getSupabase();
+  if (!sb) return null;
+  const siteId = await getSiteId();
+  if (!siteId) return null;
+
+  /* packages/db/types.ts ei tunne funktiota (generoitu tiedosto on jäljessä:
+     38 taulua, kannassa 149) → tyypittämätön rpc-kutsu ja käsin kuvattu rivi.
+     Sama kierto kuin lib/haaste.ts:ssä; types.ts generoidaan omana passinaan. */
+  const rpc = (sb as unknown as {
+    rpc: (fn: string, args: Record<string, unknown>) => Promise<{ data: unknown; error: unknown }>;
+  }).rpc;
+  const { data, error } = await rpc("kuvavisa_viikon_kuvat", { p_site_id: siteId });
+  if (error) return null;
+  const rivi = (Array.isArray(data) ? data[0] : data) as
+    | { vuosi: number; viikko: number; idt: string[] | null }
+    | null
+    | undefined;
+  if (!rivi || !rivi.idt || rivi.idt.length === 0) return null;
+  return { vuosi: rivi.vuosi, viikko: rivi.viikko, kuvaIdt: rivi.idt };
+}
+
+/** Kuvalevyn sävy kortiston tyypin mukaan — viikkovisassa kuvat tulevat
+    kaikista kortistoista, joten sävy ratkaistaan kysymys kerrallaan. */
+export function levynSavy(type: string): "vaalea" | "tumma" {
+  return KATEGORIAT.find((k) => k.type === type)?.sovitus === "contain" ? "vaalea" : "tumma";
+}

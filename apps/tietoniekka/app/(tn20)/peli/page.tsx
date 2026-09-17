@@ -7,7 +7,7 @@
 
 import { getSupabase } from "@/lib/supabase";
 import { getKuvavisat, getKuvavisatByIds } from "@/lib/queries";
-import { TASOT, MAANOSAT, KATEGORIAT, variaationNimi } from "@/lib/kuvavisat2026";
+import { TASOT, MAANOSAT, KATEGORIAT, variaationNimi, getViikkovisa, levynSavy, VIIKKOVISA_KUVIA } from "@/lib/kuvavisat2026";
 import { haeHaaste } from "@/lib/haaste";
 import { kulttuuriImg } from "@/lib/kulttuuri";
 import { luontoImg } from "@/lib/luonto";
@@ -42,6 +42,7 @@ export async function generateMetadata(
   const sb = getSupabase();
   const str = (k: string) => (typeof p[k] === "string" ? (p[k] as string) : null);
   const kuvavisa = str("kuvavisa"), mega = str("mega"), slug = str("visa"), quizId = str("quiz_id");
+  const viikkovisa = str("viikkovisa") === "1";
   const suffix = " | Tietoniekka";
   /* Heikin havainto 17.9.2026: juurilayoutin openGraph.title on kaikilla
      sivuilla "Tietoniekka — testaa tietosi", ja koska tämä generateMetadata
@@ -52,6 +53,18 @@ export async function generateMetadata(
     openGraph: { type: "website", locale: "fi_FI", siteName: "Tietoniekka", title, description },
     twitter: { card: "summary_large_image", title, description },
   });
+  if (viikkovisa) {
+    const vv = await getViikkovisa();
+    const t = vv ? `Viikkovisa ${vv.viikko}` : "Viikkovisa";
+    const d = `${VIIKKOVISA_KUVIA} kuvaa kaikista kortistoista: liput, vaakunat, linnut, eläimet, maalaukset, rakennukset, henkilöt sekä kasvit ja puut. Sama visa kaikille koko viikon.`;
+    return {
+      title: `${t} – tunnista kuvasta${suffix}`,
+      description: d,
+      ...og(t, d),
+      /* Sarja vaihtuu maanantaisin, joten kanoninen osoite on parametriton. */
+      alternates: { canonical: "/peli?viikkovisa=1" },
+    };
+  }
   if (kuvavisa) {
     /* T4: variaatio näkyy otsikossa samalla nimellä kuin kokoelmasivun linkissä. */
     const taso = str("taso");
@@ -211,6 +224,7 @@ export default async function Peli20({
   const quizId = typeof params.quiz_id === "string" ? params.quiz_id : null;
   const slug = typeof params.visa === "string" ? params.visa : null;
   const kuvavisa = typeof params.kuvavisa === "string" ? params.kuvavisa : null;
+  const viikkovisa = params.viikkovisa === "1";
   const mega = typeof params.mega === "string" ? params.mega : null;
   // Putki kertyy päivän nostosta: paivan_visa=1 (manuaalinen Päivän visa,
   // Heikki 4.8.2026) tai paivan_sankari=1 (synttärisankari-fallback).
@@ -218,7 +232,60 @@ export default async function Peli20({
 
   const sb = getSupabase();
   /* Virhetilat → tyylitelty 404 (QA-007, 29.8.2026) */
-  if (!sb || (!quizId && !slug && !kuvavisa && !mega)) notFound();
+  if (!sb || (!quizId && !slug && !kuvavisa && !mega && !viikkovisa)) notFound();
+
+  /* ── VIIKKOVISA (17.9.2026) ──
+     15 kuvaa kaikista kahdeksasta kortistosta, sama visa kaikille koko viikon.
+     Sarja on lukittu kantaan (kuvavisa_viikot), joten tässä EI arvota mitään:
+     id:t haetaan sellaisenaan ja järjestys on kannan järjestys. Vaihtoehtojen
+     järjestys sekoitetaan kuten muissakin kuvavisoissa, koska se on
+     kysymyskohtainen eikä vaikuta siihen että visa on sama kaikille. */
+  if (viikkovisa) {
+    const vv = await getViikkovisa();
+    if (!vv) notFound();
+    const rows = await getKuvavisatByIds(vv.kuvaIdt);
+    if (rows.length === 0) notFound();
+
+    const game: GameQuiz = {
+      id: "", // ei quizzes-riviä → pelikertaa ei tallenneta
+      title: `Viikkovisa ${vv.viikko}`,
+      teaser:
+        `${rows.length} kuvaa kaikista kortistoista: liput, vaakunat, linnut, eläimet, ` +
+        "maalaukset, rakennukset, henkilöt sekä kasvit ja puut. Sama visa kaikille " +
+        "koko viikon — uusi maanantaina.",
+      collectionLabel: "Kuvavisat",
+      genreLabel: null,
+      hubHref: "/kokoelma/kuvavisat",
+      bgImg: "", // K1: kuvavisoissa ei taustakuvaa
+      accent: "#B6FF3C",
+      isSankari: false,
+      kind: "kuva",
+      /* Kuvat tulevat kaikista kortistoista, joten levyn sävy ratkaistaan
+         kysymys kerrallaan eikä visan tasolla (ks. GameQuestion.plate). */
+      plate: "tumma",
+      challengePath: `/peli?kuvavisa=${encodeURIComponent(rows[0].type)}&ids=${rows.map((r) => r.id).join(",")}`,
+      /* Sarja on lukittu viikoksi → "Pelaa uudelleen" antaa saman visan, ei
+         uudelleenlatausta. */
+      reloadOnRestart: false,
+      autoStart: false,
+      kuvaIdt: rows.map((r) => r.id),
+      kuvavisaSlug: rows[0].type,
+      taso: null,
+      maanosa: null,
+      spare: [],
+      questions: rows.map((r) => ({
+        question: r.question,
+        options: sekoita((r.options ?? []).slice(0, 4)),
+        correct: r.correct_option,
+        fact: r.fact ?? null,
+        image: r.image_url,
+        credit: r.source_credit ?? null,
+        plate: levynSavy(r.type),
+      })),
+      related: [],
+    };
+    return <GameClient quiz={game} />;
+  }
 
   /* ── MEGA (3.8.2026, MEGA_SPEC §1): viittauskooste mega_questions-taulusta.
      Mega-rivi voi olla draft (RLS "Mega preview readable") — tuotantosivun

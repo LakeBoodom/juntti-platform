@@ -42,6 +42,9 @@ export type GameQuestion = {
   context?: string;
   /** K6: kuvan lähdemerkintä (kuvavisas.source_credit). Tyhjä → rivi jää pois. */
   credit?: string | null;
+  /** Viikkovisa: levyn sävy kysymyskohtaisesti, koska kuvat tulevat kaikista
+      kortistoista. Ilman tätä käytetään visan tason quiz.plate-arvoa. */
+  plate?: "vaalea" | "tumma";
 };
 
 export type GameRelated = { id: string; title: string; meta: string; href?: string };
@@ -676,7 +679,7 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
   );
 
   return (
-    <div ref={rootRef} className="tng" style={accentVars} data-kuva={isKuva ? "1" : undefined} data-lock={lukittu ? "1" : undefined} data-plate={isKuva ? (quiz.plate ?? "tumma") : undefined}>
+    <div ref={rootRef} className="tng" style={accentVars} data-kuva={isKuva ? "1" : undefined} data-lock={lukittu ? "1" : undefined} data-plate={isKuva ? (q?.plate ?? quiz.plate ?? "tumma") : undefined}>
       {/* K1 (UX-korjaus 17.9.2026): kuvavisoissa EI taustakuvaa. Aiemmin tässä oli
           kovakoodattu /20/teema-liput.webp joka näkyi himmeänä kaikissa kortistoissa
           — myös vaakunavisassa lippuja taustalla — ja kilpaili kysymyskuvan kanssa.
