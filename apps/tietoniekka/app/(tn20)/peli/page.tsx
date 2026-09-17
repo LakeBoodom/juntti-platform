@@ -8,6 +8,7 @@
 import { getSupabase } from "@/lib/supabase";
 import { getKuvavisat, getKuvavisatByIds } from "@/lib/queries";
 import { TASOT, MAANOSAT, KATEGORIAT, variaationNimi } from "@/lib/kuvavisat2026";
+import { haeHaaste } from "@/lib/haaste";
 import { kulttuuriImg } from "@/lib/kulttuuri";
 import { luontoImg } from "@/lib/luonto";
 import { urheiluImg } from "@/lib/urheilu";
@@ -42,15 +43,26 @@ export async function generateMetadata(
   const str = (k: string) => (typeof p[k] === "string" ? (p[k] as string) : null);
   const kuvavisa = str("kuvavisa"), mega = str("mega"), slug = str("visa"), quizId = str("quiz_id");
   const suffix = " | Tietoniekka";
+  /* Heikin havainto 17.9.2026: juurilayoutin openGraph.title on kaikilla
+     sivuilla "Tietoniekka — testaa tietosi", ja koska tämä generateMetadata
+     asetti vain titlen ja descriptionin, JOKAINEN jaettu visalinkki näytti
+     WhatsAppissa ja Facebookissa saman otsikon. Jakaminen on kasvun pääkanava,
+     joten og ja twitter asetetaan nyt jokaisessa haarassa erikseen. */
+  const og = (title: string, description: string): Metadata => ({
+    openGraph: { type: "website", locale: "fi_FI", siteName: "Tietoniekka", title, description },
+    twitter: { card: "summary_large_image", title, description },
+  });
   if (kuvavisa) {
     /* T4: variaatio näkyy otsikossa samalla nimellä kuin kokoelmasivun linkissä. */
     const taso = str("taso");
     const maanosa = str("maanosa");
     const vari = variaationNimi(kuvavisa, taso, maanosa);
     const t = vari ?? KUVAVISA_TITLES[kuvavisa] ?? "Kuvavisa";
+    const kuvaDesc = KUVAVISA_DESC[kuvavisa] ?? "Yksi kuva, neljä vaihtoehtoa. Pelaa ilmainen kuvavisa Tietoniekassa.";
     return {
       title: `${t} – tunnista kuvasta${suffix}`,
-      description: KUVAVISA_DESC[kuvavisa] ?? "Yksi kuva, neljä vaihtoehtoa. Pelaa ilmainen kuvavisa Tietoniekassa.",
+      description: kuvaDesc,
+      ...og(`${t} – tunnista kuvasta`, kuvaDesc),
       /* T6: kanoninen osoite on kortiston perusvisa — variaatiot eivät kilpaile
          samasta hakutuloksesta keskenään. */
       alternates: { canonical: `/peli?kuvavisa=${encodeURIComponent(kuvavisa)}` },
@@ -60,7 +72,9 @@ export async function generateMetadata(
   if (mega) {
     const { data } = await sb.from("quizzes").select("title, display_title, teaser").eq("slug", mega).maybeSingle<{ title: string; display_title: string | null; teaser: string | null }>();
     if (!data) return { title: `Visaa ei löytynyt${suffix}` };
-    return { title: `${data.display_title ?? data.title}${suffix}`, description: data.teaser ?? "Megavisa: yksi istunto ilman taukoja. Pelaa ilmaiseksi Tietoniekassa." };
+    const megaNimi = data.display_title ?? data.title;
+    const megaDesc = data.teaser ?? "Megavisa: yksi istunto ilman taukoja. Pelaa ilmaiseksi Tietoniekassa.";
+    return { title: `${megaNimi}${suffix}`, description: megaDesc, ...og(megaNimi, megaDesc) };
   }
   if (slug || quizId) {
     let q = sb.from("quizzes").select("title, display_title, teaser, description, slug").eq("status", "published");
@@ -75,7 +89,8 @@ export async function generateMetadata(
        description sen sijaan 97 %:lle (ks. claude/SEO_PIKATARKISTUS_2026_09_01.md
        kohta 2) — käytetään description-kenttää fallbackina ennen geneeristä
        lausetta, jotta hakutuloksen kuvaus on oikea lähes kaikilla visoilla. */
-    return { title: `${name}${suffix}`, description: data.teaser ?? data.description ?? `${name} – ilmainen tietovisa Tietoniekassa.`, ...canonical };
+    const visaDesc = data.teaser ?? data.description ?? `${name} – ilmainen tietovisa Tietoniekassa.`;
+    return { title: `${name}${suffix}`, description: visaDesc, ...og(name, visaDesc), ...canonical };
   }
   return { title: `Visaa ei löytynyt${suffix}` };
 }
@@ -380,6 +395,12 @@ export default async function Peli20({
        rajaa lipun maanosalla. Tuntematon arvo ohitetaan (ei 404), jolloin
        pelaaja saa koko kortiston eikä rikkinäistä linkkiä. Haastelinkki (?ids)
        voittaa aina: siinä kortit on jo lukittu. */
+    /* K3 (17.9.2026): ?h=<koodi> tulee /h/<koodi>-reitiltä. Haastajan tulos
+       näytetään aloitusnäkymässä ja tulosvertailussa. Tuntematon tai vanhentunut
+       koodi ohitetaan hiljaa — peli toimii silti, se on vain tavallinen kierros. */
+    const hParam = typeof params.h === "string" ? params.h : null;
+    const haaste = hParam ? await haeHaaste(hParam) : null;
+
     const tasoParam = typeof params.taso === "string" ? params.taso : null;
     const taso = TASOT.some((t) => t.key === tasoParam) ? tasoParam : null;
     const maanosaParam = typeof params.maanosa === "string" ? params.maanosa : null;
@@ -455,6 +476,15 @@ export default async function Peli20({
       /* Haastelinkillä sarja on lukittu → ei uudelleenlatausta "Pelaa uudelleen" -napista. */
       reloadOnRestart: wantedIds.length === 0,
       autoStart: params.aloita === "1",
+      /* K3: kuvasarja selaimeen, jotta tulosnäkymä voi luoda lyhyen
+         haastetunnuksen (RPC) ilman että id:t ovat osoiteriville asti. */
+      kuvaIdt: rows.map((r) => r.id),
+      kuvavisaSlug: kuvavisa,
+      taso: taso ?? null,
+      maanosa: maanosa?.key ?? null,
+      haaste: haaste
+        ? { oikein: haaste.oikein, kysymyksia: haaste.kysymyksia, pisteet: haaste.pisteet }
+        : undefined,
       spare: spareRows.map(toQ),
       questions: rows.map(toQ),
       related,

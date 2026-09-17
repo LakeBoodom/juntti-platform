@@ -278,7 +278,16 @@
 .tn20 .tng-ghost--outline { border-color: #6b5a36; background: transparent; }
 .tn20 .tng-ghost--dashed { border: 1px dashed #4c4028; background: transparent; color: #cbc1ad; }
 .tn20 .tng-ghost--dashed:hover { border-color: #7a6740; color: #f4eee0; }
-.tn20 .tng-sumgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(clamp(52px, 4.4cqw, 66px), 1fr)); gap: clamp(7px, 0.8cqw, 11px); }
+/* P1 (17.9.2026): viisi merkkiä rivillä, kaksi riviä. auto-fill latoi
+   kymmenen kysymyksen visassa yhdeksän merkkiä ensimmäiselle riville ja jätti
+   yksinäisen kymmenennen toiselle — rivinvaihto näytti virheeltä. Viisi ja
+   viisi lukee kuin pistetaulukko. Kapealla ruudulla viisi 52 px merkkiä + gapit
+   eivät mahdu kaikkein kapeimmalle ruudulle, joten alle 340 px pudotaan
+   neljään (mitattu: 5 saraketta mahtuu 360 px:stä ylöspäin). */
+.tn20 .tng-sumgrid { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: clamp(7px, 0.8cqw, 11px); }
+@container tnq (max-width: 339px) {
+  .tn20 .tng-sumgrid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
 .tn20 .tng-sum { display: flex; align-items: center; justify-content: center; gap: 5px; min-height: 44px; padding: 10px 6px; border-radius: 12px; border: 1px solid #37301f; background: rgba(21, 17, 10, 0.9); color: #cbc1ad; font-family: var(--tn-font-display); font-weight: 900; font-size: clamp(13px, 1.2cqw, 16px); cursor: pointer; transition: border-color 0.15s, background 0.15s, transform 0.15s; }
 .tn20 .tng-sum i { font-style: normal; font-family: var(--tn-font-body); font-size: 0.86em; line-height: 1; }
 .tn20 .tng-sum:hover { transform: translateY(-2px); border-color: #7a6740; }
@@ -723,3 +732,36 @@
   .tn20 .tng[data-lock="1"] .tng-stat-l { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
   .tn20 .tng[data-lock="1"] .tng-stat-v { font-size: 18px; }
 }
+
+/* ── K3 (17.9.2026): haastelinkin vertailu ───────────────────────────────
+   Aloitusnäkymässä haastajan tulos, tulosnäkymässä rinnakkain oma ja kaverin.
+   Värit ovat samat kuin palautteessa (lime oikein, punainen väärin, gold
+   tasapeli) — ei uusia tokeneita. */
+.tn20 .tng-start-chal {
+  margin: 0; display: flex; flex-direction: column; gap: 4px;
+  padding: clamp(13px, 1.4cqw, 20px) clamp(15px, 1.6cqw, 22px);
+  border-radius: 14px; border: 1px solid rgba(182, 255, 60, 0.4);
+  background: rgba(182, 255, 60, 0.08);
+  font-size: clamp(15px, 1.4cqw, 20px); line-height: 1.35; color: #f4eee0;
+  text-wrap: pretty;
+}
+.tn20 .tng-start-chal b { color: #cbff75; font-weight: 800; }
+.tn20 .tng-start-chal span { font-size: clamp(12px, 1.05cqw, 14px); font-weight: 600; color: #a79e8c; }
+
+.tn20 .tng-vs {
+  display: flex; flex-direction: column; gap: 7px;
+  margin-top: clamp(8px, 0.9cqw, 13px);
+  padding: clamp(12px, 1.3cqw, 18px) clamp(13px, 1.4cqw, 20px);
+  border-radius: 14px; border: 1px solid #3f3624; background: rgba(15, 13, 7, 0.55);
+}
+.tn20 .tng-vs-row { display: flex; align-items: baseline; gap: 12px; }
+.tn20 .tng-vs-l { flex: 1 1 auto; font-size: clamp(12px, 1.1cqw, 15px); font-weight: 700; color: #cbc1ad; }
+.tn20 .tng-vs-v { flex: 0 0 auto; font-family: var(--tn-font-display); font-weight: 900; font-size: clamp(18px, 1.7cqw, 24px); line-height: 1; color: #fffbf2; }
+.tn20 .tng-vs-t { margin: 3px 0 0; font-family: var(--tn-font-display); font-weight: 900; font-size: clamp(15px, 1.4cqw, 20px); line-height: 1.1; text-transform: uppercase; letter-spacing: -0.01em; }
+.tn20 .tng-vs[data-vs="voitto"] { border-color: rgba(182, 255, 60, 0.42); }
+.tn20 .tng-vs[data-vs="voitto"] .tng-vs-t { color: #cbff75; }
+.tn20 .tng-vs[data-vs="havio"] { border-color: rgba(255, 107, 74, 0.42); }
+.tn20 .tng-vs[data-vs="havio"] .tng-vs-t { color: #ffa88f; }
+.tn20 .tng-vs[data-vs="tasan"] .tng-vs-t { color: #f7ce7e; }
+/* P2: jakoruudukko on nyt yksi nappi — ei kolmen sarakkeen jäänne. */
+.tn20 .tng-sharegrid[data-cols="1"] { grid-template-columns: minmax(0, 1fr); }

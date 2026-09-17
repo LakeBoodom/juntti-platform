@@ -23,7 +23,7 @@
 // staattinen Archivo, suomen sanoja ei katkaista.
 
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
-import { getSupabase } from "../../../lib/supabase";
+import { getSupabase, SITE_SLUG } from "../../../lib/supabase";
 import { PAIVAN_VISA_KEY, localDateKey } from "../../../components/tn20/PaivanVisaCard";
 import "../peli2026.css";
 
@@ -69,6 +69,14 @@ export type GameQuiz = {
   reloadOnRestart?: boolean;
   /** K2: ohita aloitusnäkymä (?aloita=1 uudelleenlatauksen jälkeen). */
   autoStart?: boolean;
+  /** K3: pelatun kuvasarjan id:t — lyhyen haastetunnuksen luontiin. */
+  kuvaIdt?: string[];
+  /** K3: kortiston URL-slug ja variaatio haasteriville. */
+  kuvavisaSlug?: string;
+  taso?: string | null;
+  maanosa?: string | null;
+  /** K3: haastajan tulos, kun sivulle tultiin /h/<koodi>-linkistä. */
+  haaste?: { oikein: number; kysymyksia: number; pisteet: number };
   /** Varakysymykset teknistä ohitusta varten (kuvavisat) */
   spare?: GameQuestion[];
   questions: GameQuestion[];
@@ -79,6 +87,16 @@ type Hist = "ok" | "bad" | "skipped";
 
 function localDate(d: Date): string {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+}
+
+/* K3: site_id haastetunnusta varten. Oma pieni haku eikä lib/queries.ts:n
+   getSiteId, jotta selainnippuun ei vedetä koko kyselymoduulia. */
+let _siteId: string | null = null;
+async function haeSiteId(sb: NonNullable<ReturnType<typeof getSupabase>>): Promise<string | null> {
+  if (_siteId) return _siteId;
+  const { data } = await sb.from("sites").select("id").eq("slug", SITE_SLUG).maybeSingle();
+  _siteId = (data as { id: string } | null)?.id ?? null;
+  return _siteId;
 }
 
 /** Sama putkilogiikka kuin tuotannon pelissä (tn_paivan_visa_putki). */
@@ -210,6 +228,10 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
   const [copyState, setCopyState] = useState<"copied" | "error" | "sharefail" | null>(null);
   const [hasShare, setHasShare] = useState(false);
   const [origin, setOrigin] = useState("https://tietoniekka.fi");
+  /* K3: tulosnäkymässä luotu lyhyt haastetunnus (/h/abc123). null = ei vielä
+     luotu tai luonti ei onnistunut → jaossa käytetään pitkää ?ids=-osoitetta,
+     joten jakaminen ei koskaan hajoa kannan takia. */
+  const [haasteKoodi, setHaasteKoodi] = useState<string | null>(null);
 
   const rootRef = useRef<HTMLDivElement>(null);
   const pageRef = useRef<HTMLDivElement>(null);
@@ -385,6 +407,39 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
       if (!error) playIdRef.current = playId;
     } catch { /* best-effort */ }
   }
+  /* K3: lyhyt haastetunnus luodaan vasta tulosnäkymässä ja vain kertaalleen.
+     Näin kantaan ei synny riviä jokaisesta pelistä jota ei koskaan jaeta.
+     Jos RPC epäonnistuu, haasteKoodi jää nulliksi ja jaossa käytetään pitkää
+     ?ids=-osoitetta — jakaminen ei ole koskaan kiinni kannasta. */
+  const haasteLuotu = useRef(false);
+  async function luoHaaste(oikeinYhteensa: number, pisteet: number) {
+    if (haasteLuotu.current) return;
+    const idt = quiz.kuvaIdt ?? [];
+    if (!isKuva || !quiz.kuvavisaSlug || idt.length === 0) return;
+    haasteLuotu.current = true;
+    try {
+      const sb = getSupabase();
+      if (!sb) return;
+      const siteId = await haeSiteId(sb);
+      if (!siteId) return;
+      /* packages/db/types.ts ei tunne kuvavisa_haaste_luo-funktiota (generoitu
+         tiedosto on jäljessä), joten rpc-kutsu tehdään tyypittämättömän
+         asiakkaan kautta. Kunnes types.ts generoidaan omana passinaan. */
+      const rpc = (sb as unknown as { rpc: (fn: string, args: Record<string, unknown>) => Promise<{ data: unknown; error: unknown }> }).rpc;
+      const { data, error } = await rpc("kuvavisa_haaste_luo", {
+        p_site_id: siteId,
+        p_kuvavisa: quiz.kuvavisaSlug,
+        p_kuva_idt: idt,
+        p_kysymyksia: total,
+        p_oikein: oikeinYhteensa,
+        p_pisteet: pisteet,
+        p_taso: quiz.taso ?? null,
+        p_maanosa: quiz.maanosa ?? null,
+      });
+      if (!error && typeof data === "string") setHaasteKoodi(data);
+    } catch { /* best-effort: pitkä osoite jää käyttöön */ }
+  }
+
   async function markShared() {
     try {
       const sb = getSupabase();
@@ -407,6 +462,9 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
       }
     } catch { /* no-op */ }
     void recordPlay(finalScore);
+    /* K3: haastetunnus tulosnäkymää varten. right ja finalScore ovat tässä
+       ajan tasalla, koska finish kutsutaan vasta seuraavassa klikkauksessa. */
+    void luoHaaste(right, finalScore);
     updateDailyStreak();
     if (quiz.isSankari) { try { window.localStorage.setItem(PAIVAN_VISA_KEY, localDateKey()); } catch { /* no-op */ } }
     if (quiz.citySlug) stampCity(quiz.citySlug);
@@ -545,7 +603,8 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
   });
 
   /* ── Haaste ja jaot (3a: linkki = visan oma osoite, aina valmis) ── */
-  const challengeUrl = `${origin}${quiz.challengePath}`;
+  /* K3: /h/abc123 kun tunnus on luotu, muuten pitkä ?ids=-osoite. */
+  const challengeUrl = haasteKoodi ? `${origin}/h/${haasteKoodi}` : `${origin}${quiz.challengePath}`;
   const shareText = `Sain ${right}/${total} Tietoniekan ${quiz.title} -visassa. Pystytkö parempaan?`;
   const linkReady = !!quiz.challengePath;
   function clearCopyLater() { if (copyTimer.current) clearTimeout(copyTimer.current); copyTimer.current = setTimeout(() => setCopyState(null), 3000); }
@@ -580,9 +639,6 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
     : copyState === "sharefail" ? "Jakaminen ei onnistunut. Yritä uudelleen."
     : linkReady ? "Haastelinkki valmis." : "Haastelinkkiä ei ole vielä luotu — jakaminen aktivoituu, kun linkki on olemassa.";
   const waHref = linkReady ? `https://wa.me/?text=${enc(`${shareText} ${challengeUrl}`)}` : undefined;
-  const fbHref = linkReady ? `https://www.facebook.com/sharer/sharer.php?u=${enc(challengeUrl)}` : undefined;
-  const tgHref = linkReady ? `https://t.me/share/url?url=${enc(challengeUrl)}&text=${enc(shareText)}` : undefined;
-  const xHref = linkReady ? `https://twitter.com/intent/tweet?text=${enc(shareText)}&url=${enc(challengeUrl)}` : undefined;
   const shareTab = linkReady ? undefined : -1;
 
   const openReview = (i: number, opener?: HTMLElement | null) => {
@@ -708,6 +764,14 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
                 </nav>
               )}
               <h1 ref={startH1Ref} className="tng-start-h1">{quiz.title}</h1>
+              {/* K3: haastelinkistä tultaessa kerrotaan heti paljonko on
+                  voitettavaa — se on koko linkin syy. */}
+              {quiz.haaste && (
+                <p className="tng-start-chal">
+                  <b>Kaverisi sai {quiz.haaste.oikein}/{quiz.haaste.kysymyksia}</b> — pystytkö parempaan?
+                  <span>Samat kuvat samassa järjestyksessä.</span>
+                </p>
+              )}
               {quiz.teaser && <p className="tng-start-p">{quiz.teaser}</p>}
               <div className="tng-start-row">
                 <button type="button" className="tng-start-btn" onClick={startGame}>Aloita visa <span aria-hidden>→</span></button>
@@ -922,6 +986,27 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
                   <h1 className="tng-restitle">{tier.title}</h1>
                   <p className="tng-resbody">{tier.body}</p>
                   <p className="tng-resname">{quiz.title}</p>
+                  {/* K3: vertailu haastajaan. Tasapeli on oma tapaus — "voitit"
+                      olisi väärin ja "häviisit" loukkaava kun tulos on sama. */}
+                  {quiz.haaste && (
+                    <div className="tng-vs" data-vs={right > quiz.haaste.oikein ? "voitto" : right < quiz.haaste.oikein ? "havio" : "tasan"}>
+                      <div className="tng-vs-row">
+                        <span className="tng-vs-l">Sinä</span>
+                        <span className="tng-vs-v">{right}/{total}</span>
+                      </div>
+                      <div className="tng-vs-row">
+                        <span className="tng-vs-l">Kaverisi</span>
+                        <span className="tng-vs-v">{quiz.haaste.oikein}/{quiz.haaste.kysymyksia}</span>
+                      </div>
+                      <p className="tng-vs-t">
+                        {right > quiz.haaste.oikein
+                          ? "Voitit haasteen."
+                          : right < quiz.haaste.oikein
+                            ? "Kaverisi vei tämän erän."
+                            : "Tasapeli."}
+                      </p>
+                    </div>
+                  )}
                 </div>
 
                 <div className="tng-sumwrap">
@@ -979,20 +1064,13 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
                       Haasta muissa sovelluksissa
                     </button>
                   )}
-                  <span className="tng-sumlabel">Jaa haaste</span>
-                  <div className="tng-sharegrid">
-                    <a className="tng-share" href={fbHref} target="_blank" rel="noopener" data-blocked={linkReady ? undefined : "true"} aria-disabled={!linkReady || undefined} tabIndex={shareTab} onClick={() => void markShared()}>
-                      <svg width="19" height="19" viewBox="0 0 24 24" fill="#1877F2" aria-hidden="true"><path d="M22 12.06C22 6.5 17.52 2 12 2S2 6.5 2 12.06c0 5.02 3.66 9.18 8.44 9.94v-7.03H7.9v-2.91h2.54V9.85c0-2.51 1.49-3.9 3.77-3.9 1.09 0 2.23.2 2.23.2v2.46h-1.26c-1.24 0-1.63.78-1.63 1.57v1.88h2.78l-.44 2.91h-2.34V22c4.78-.76 8.45-4.92 8.45-9.94z" /></svg>
-                      Facebook
-                    </a>
-                    <a className="tng-share" href={tgHref} target="_blank" rel="noopener" data-blocked={linkReady ? undefined : "true"} aria-disabled={!linkReady || undefined} tabIndex={shareTab} onClick={() => void markShared()}>
-                      <svg width="19" height="19" viewBox="0 0 24 24" fill="#2AABEE" aria-hidden="true"><path d="M12 2a10 10 0 100 20 10 10 0 000-20zm4.64 6.86-1.7 8.03c-.13.57-.47.71-.95.44l-2.62-1.93-1.27 1.22c-.14.14-.26.26-.53.26l.19-2.68 4.88-4.41c.21-.19-.05-.29-.33-.11l-6.03 3.8-2.6-.81c-.56-.18-.57-.56.12-.83l10.15-3.91c.47-.17.88.11.72.94z" /></svg>
-                      Telegram
-                    </a>
-                    <a className="tng-share" href={xHref} target="_blank" rel="noopener" data-blocked={linkReady ? undefined : "true"} aria-disabled={!linkReady || undefined} tabIndex={shareTab} onClick={() => void markShared()}>
-                      <svg width="17" height="17" viewBox="0 0 24 24" fill="#FFFBF2" aria-hidden="true"><path d="M17.53 3h3.2l-6.99 7.99L21.5 21h-5.3l-4.15-5.43L7.3 21H4.1l7.28-8.32L3.5 3h5.4l3.86 5.1L17.53 3zm-1.12 16.1h1.77L7.68 4.8H5.8l10.6 14.3z" /></svg>
-                      <span>X</span>
-                    </a>
+                  {/* P2 (17.9.2026): Facebook, Telegram ja X pois. Kuvavisan
+                      haaste on kahdenvälinen viesti, ei julkaisu: Facebookin
+                      sharer ei välitä saatetekstiä lainkaan, Telegramin osuus
+                      kohderyhmässä on olematon, ja X:n jakonappi näytti
+                      linkistä vain esikatselun. Jäljelle jää se mitä oikeasti
+                      käytetään: WhatsApp, laitteen oma jako ja linkin kopiointi. */}
+                  <div className="tng-sharegrid" data-cols="1">
                     <button type="button" className="tng-share" disabled={!linkReady} data-blocked={linkReady ? undefined : "true"} onClick={copyLink}>
                       <svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="#CBC1AD" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><rect x="7" y="7" width="10" height="10" rx="2.4" /><path d="M13 4.6A2.6 2.6 0 0010.4 2H5.6A2.6 2.6 0 003 4.6v4.8A2.6 2.6 0 005.6 12" /></svg>
                       <span style={{ whiteSpace: "nowrap" }}>{copyState === "copied" ? "Linkki kopioitu" : copyState === "error" ? "Kopiointi ei onnistunut" : "Kopioi linkki"}</span>
