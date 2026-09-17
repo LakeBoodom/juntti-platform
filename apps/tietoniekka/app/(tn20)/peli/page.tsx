@@ -7,7 +7,7 @@
 
 import { getSupabase } from "@/lib/supabase";
 import { getKuvavisat, getKuvavisatByIds } from "@/lib/queries";
-import { TASOT, MAANOSAT, variaationNimi } from "@/lib/kuvavisat2026";
+import { TASOT, MAANOSAT, KATEGORIAT, variaationNimi } from "@/lib/kuvavisat2026";
 import { kulttuuriImg } from "@/lib/kulttuuri";
 import { luontoImg } from "@/lib/luonto";
 import { urheiluImg } from "@/lib/urheilu";
@@ -423,7 +423,15 @@ export default async function Peli20({
       correct: r.correct_option,
       fact: r.fact ?? null,
       image: r.image_url,
+      /* K6: lähdemerkintä kuvalevyn alle, kannasta. 94 riviä on ilman → rivi
+         jää niillä pois kokonaan. Kovakoodattua "Wikimedia Commons" ei tule. */
+      credit: r.source_credit ?? null,
     });
+    /* K6: vaalea kuvalevy grafiikalle (liput, vaakunat, maalaukset), tumma
+       valokuville — sama laatikko ja sama object-fit: contain molemmissa.
+       Tyyppi luetaan riviltä eikä URL-slugista, koska slug ja kannan `type`
+       eroavat osassa kortistoja (esim. /peli?kuvavisa=vaakuna → "vaakunat"). */
+    const levy = KATEGORIAT.find((k) => k.type === rows[0]?.type)?.sovitus === "contain" ? "vaalea" : "tumma";
     const variaatio = variaationNimi(kuvavisa, taso, maanosa?.key ?? null);
     const game: GameQuiz = {
       id: "", // ei quizzes-riviä → pelikertaa ei tallenneta
@@ -439,6 +447,7 @@ export default async function Peli20({
       accent: "#3B82F6",
       isSankari: false,
       kind: "kuva",
+      plate: levy,
       challengePath: `/peli?kuvavisa=${encodeURIComponent(kuvavisa)}&ids=${rows.map((r) => r.id).join(",")}`,
       /* Haastelinkillä sarja on lukittu → ei uudelleenlatausta "Pelaa uudelleen" -napista. */
       reloadOnRestart: wantedIds.length === 0,

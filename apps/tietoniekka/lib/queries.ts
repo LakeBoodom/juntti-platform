@@ -571,6 +571,10 @@ export type KuvavisaRow = {
   options: string[];
   correct_option: string;
   fact: string | null;
+  /** K6 (17.9.2026): kuvalähde pelinäkymän kuvalevyn alle. Kannassa
+      "Wikipedia / Wikimedia Commons" 575 rivillä ja NULL 94 rivillä —
+      tyhjä = koko lähderivi jää pois, ei kovakoodattua oletusta. */
+  source_credit: string | null;
 };
 
 // URL-slug → DB type -mappaus (frontti käyttää yksikkö-muotoja, DB monikko)
@@ -617,7 +621,7 @@ export async function getKuvavisat(
 
   let q = sb
     .from("kuvavisas")
-    .select("id, type, question, image_url, options, correct_option, fact")
+    .select("id, type, question, image_url, options, correct_option, fact, source_credit")
     .eq("site_id", siteId)
     .eq("type", type)
     .eq("active", true);
@@ -631,7 +635,14 @@ export async function getKuvavisat(
     .limit(limit);
 
   if (error || !data) return [];
-  return data as KuvavisaRow[];
+  /* `as unknown as` eikä suora cast: `source_credit` on kannassa (575 riviä
+     arvollinen, 94 NULL) mutta puuttuu packages/db/types.ts:stä, joka on
+     jäänyt jälkeen — generoitu tiedosto tuntee 38 taulua, kanta 149. Types.ts
+     on CLAUDE.md:n mukaan generoitava Supabase MCP:llä, ei käsin, ja koko
+     tiedoston uudelleengenerointi on ~3 000 rivin muutos: se tehdään omana
+     passinaan, ei tämän korjauksen mukana. Sarakelista yllä on oikea, joten
+     ajonaikainen muoto vastaa KuvavisaRow'ta. */
+  return data as unknown as KuvavisaRow[];
 }
 
 /** PELINÄKYMÄ 2026 (28.8.2026): haastelinkin kuvasarja — samat kortit samassa
@@ -642,11 +653,12 @@ export async function getKuvavisatByIds(ids: string[]): Promise<KuvavisaRow[]> {
   if (!sb || ids.length === 0) return [];
   const { data, error } = await sb
     .from("kuvavisas")
-    .select("id, type, question, image_url, options, correct_option, fact")
+    .select("id, type, question, image_url, options, correct_option, fact, source_credit")
     .in("id", ids.slice(0, 50))
     .eq("active", true);
   if (error || !data) return [];
-  const map = new Map((data as KuvavisaRow[]).map((r) => [r.id, r]));
+  /* ks. getKuvavisat: source_credit puuttuu vanhentuneesta types.ts:stä. */
+  const map = new Map((data as unknown as KuvavisaRow[]).map((r) => [r.id, r]));
   return ids.map((id) => map.get(id)).filter((r): r is KuvavisaRow => Boolean(r));
 }
 

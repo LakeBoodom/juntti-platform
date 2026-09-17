@@ -40,6 +40,8 @@ export type GameQuestion = {
   image?: string;
   /** Megan lähdevisan konteksti (Heikki 4.8.2026) */
   context?: string;
+  /** K6: kuvan lähdemerkintä (kuvavisas.source_credit). Tyhjä → rivi jää pois. */
+  credit?: string | null;
 };
 
 export type GameRelated = { id: string; title: string; meta: string; href?: string };
@@ -58,6 +60,9 @@ export type GameQuiz = {
   citySlug?: string | null;
   /** "kuva" = kuvavisa (laskurit "N kuvaa", suositusten meta "N kuvaa") */
   kind?: "teksti" | "kuva";
+  /** K6: kuvalevyn sävy. "vaalea" grafiikalle (lippu, vaakuna, maalaus),
+      "tumma" valokuvalle — sama laatikko ja contain molemmissa. */
+  plate?: "vaalea" | "tumma";
   /** Haastelinkin polku (origin lisätään selaimessa). */
   challengePath: string;
   /** K2: "Pelaa uudelleen" lataa sivun uudelleen uuden arvonnan vuoksi (kuvavisat). */
@@ -225,6 +230,13 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
   const copyTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const done = phase === "end";
+  /* K6 (UX-korjaus 17.9.2026): kuvavisan kysymysnäkymä lukitaan ruudun
+     korkeuteen — sivu ei vieri lainkaan, Seuraava on aina näkyvissä eikä
+     vastauslista liiku lukituksessa. Koskee VAIN kuvavisoja: tekstivisojen
+     kysymykset ovat kannassa jopa ~440 merkkiä eivätkä mahtuisi kiinteään
+     korkeuteen, kun kuvavisojen pisin on 37 merkkiä. Tekstivisat pysyvät
+     entisellään (virtaava asettelu + freeze + mobiilin vieritys). */
+  const lukittu = isKuva && phase === "play";
   const q = questions[Math.min(qi, total - 1)];
   const imgKey = (i: number) => { const qq = questions[i]; return qq?.image ? qq.image + (bust[i] ? `?r=${bust[i]}` : "") : null; };
   const imgState = (i: number) => { const k = imgKey(i); return k ? (imgs[k] ?? "loading") : null; };
@@ -251,6 +263,14 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
     return () => document.body.classList.remove("tn-game-playing");
   }, [phase]);
 
+  /* K6: kuvavisan kysymysnäkymässä sivu ei vieri. Pelkkä height:100dvh ei riitä,
+     koska pelin alla on SSR-murupolku ja ristiinnostot — body-lukko estää sen
+     rippeen, joka muuten jää vieritettäväksi mobiilin osoitepalkin alla. */
+  useEffect(() => {
+    document.body.classList.toggle("tn-game-lock", lukittu);
+    return () => document.body.classList.remove("tn-game-lock");
+  }, [lukittu]);
+
   /* ── KORTTISÄÄNTÖ: otsikoiden sovitus ── */
   useLayoutEffect(() => {
     fitHeading(qhRef.current);
@@ -269,13 +289,15 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
     const m = mainRef.current, g = groupRef.current;
     if (!m) return;
     const clear = () => { m.style.removeProperty("padding-top"); m.style.removeProperty("align-content"); };
-    if (!g || !locked || m.clientWidth < 880 || anchorTop.current == null) { clear(); return; }
+    /* K6: lukitussa asettelussa vastauslista on pylvään yläreunassa flex:0 0 auto
+       eikä voi liikkua — freeze-paddingia ei tarvita eikä se saa häiritä. */
+    if (lukittu || !g || !locked || m.clientWidth < 880 || anchorTop.current == null) { clear(); return; }
     clear();
     m.style.setProperty("align-content", "start", "important");
     const zero = g.offsetTop;
     const pad = Math.max(0, anchorTop.current - zero + parseFloat(getComputedStyle(m).paddingTop || "0"));
     m.style.setProperty("padding-top", `${pad}px`, "important");
-  }, [locked]);
+  }, [locked, lukittu]);
   useLayoutEffect(() => { applyFreeze(); }, [applyFreeze, qi, phase]);
 
   /* MOBIILI (Heikki 30.8.2026, QA-kierros 2): kapealla näytöllä palaute ja
@@ -283,6 +305,10 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
      näkyviin heti lukituksen jälkeen (HUD:n korkeus huomioiden), kuten
      aiemmassa pelinäkymässä. Desktopilla (≥880) freeze hoitaa vakauden. */
   useEffect(() => {
+    /* K6: kuvavisassa vieritystä ei tehdä — palaute ja Seuraava ovat kiinteässä
+       alapalkissa ruudun pohjassa. Designin sääntö: automaattinen vieritys
+       rikkoo peukalon lihasmuistin ja aiheuttaa tahattomia klikkauksia. */
+    if (lukittu) return;
     if (!locked || phase !== "play") return;
     const m = mainRef.current, el = fbSlotRef.current, root = rootRef.current;
     if (!m || !el || m.clientWidth >= 880) return;
@@ -294,7 +320,7 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
       try { window.scrollTo({ top, behavior: reduce ? "auto" : "smooth" }); } catch { /* no-op */ }
     }, 80);
     return () => window.clearTimeout(id);
-  }, [locked, phase]);
+  }, [locked, phase, lukittu]);
 
   /* ── Dialogien fokus + inert-tausta ── */
   useEffect(() => {
@@ -571,9 +597,30 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
   const rq = questions[review ?? 0];
   const rp = review != null ? picks[review] : null;
   const rvKind: "ok" | "bad" | "tech" | "skip" = review == null ? "skip" : hist[review] === "ok" ? "ok" : hist[review] === "bad" ? "bad" : hist[review] === "skipped" ? "tech" : "skip";
+  const oikeinNyt = sel != null && !!q && q.options[sel] === q.correct;
+
+  /* K6: sama Oljenkorsi-nappi, kaksi paikkaa. Lukitussa asettelussa se asuu
+     palautelohkon varatussa tilassa (design: "ennen vastaamista siinä on
+     Oljenkorsi-nappi ja kierroksen tila"), muuten toimintorivillä kuten ennen.
+     Vastauksen jälkeen se POISTUU DOMista — ei himmennetä, koska se peittäisi
+     Tiesitkö-tekstin ja on siinä vaiheessa hyödytön. */
+  const oljenkorsiNappi = (
+    <button
+      type="button"
+      className="tng-life"
+      data-state={lifeLeft <= 0 ? "used" : undefined}
+      disabled={lifeLeft <= 0 || locked || removed.length > 0 || answersLocked}
+      onClick={useLife}
+    >
+      <svg width="17" height="17" viewBox="0 0 18 18" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" aria-hidden="true"><circle cx="9" cy="9" r="7.1" /><circle cx="9" cy="9" r="2.6" /><path d="M4 4l3.1 3.1M14 4l-3.1 3.1M4 14l3.1-3.1M14 14l-3.1-3.1" /></svg>
+      <span>
+        {lifeLeft <= 0 ? "Oljenkorsi käytetty" : oljenkorsiTotal > 1 ? `Oljenkorsi ×${lifeLeft} · poista 2 väärää` : "Oljenkorsi · poista 2 väärää"}
+      </span>
+    </button>
+  );
 
   return (
-    <div ref={rootRef} className="tng" style={accentVars}>
+    <div ref={rootRef} className="tng" style={accentVars} data-kuva={isKuva ? "1" : undefined} data-lock={lukittu ? "1" : undefined} data-plate={isKuva ? (quiz.plate ?? "tumma") : undefined}>
       {/* K1 (UX-korjaus 17.9.2026): kuvavisoissa EI taustakuvaa. Aiemmin tässä oli
           kovakoodattu /20/teema-liput.webp joka näkyi himmeänä kaikissa kortistoissa
           — myös vaakunavisassa lippuja taustalla — ja kilpaili kysymyskuvan kanssa.
@@ -587,7 +634,7 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
       ) : null}
       <div className="tng-topline" aria-hidden />
 
-      <div ref={pageRef}>
+      <div ref={pageRef} className="tng-page">
         {/* ── HUD ── */}
         <header className="tng-top">
           <div className="tng-brand">
@@ -626,14 +673,22 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
               <span className="tng-stat-l">Pisteet</span>
               <span className="tng-stat-v">{score}</span>
             </div>
-            <span className="tng-statsep" aria-hidden />
-            <div className="tng-stat tng-stat--streak">
-              <span className="tng-stat-l">Putki</span>
-              <span className="tng-stat-v tng-stat-v--streak">
-                <svg className="tng-flame" width="14" height="17" viewBox="0 0 13 16" aria-hidden="true"><path d="M6.4 15.6C3.6 15.6 1.4 13.6 1.4 11c0-3.7 3.4-5.2 3.4-8.5 0-.9-.2-1.7-.5-2.5 3 1.2 5 3.7 5 6.4 0 .8-.2 1.5-.5 2.1 1-.1 1.6-.8 1.8-1.7.7 1 1 2.1 1 3.2 0 3.1-2.4 5.6-5.2 5.6z" fill="#E8A320" /></svg>
-                {streak}
-              </span>
-            </div>
+            {/* Päätös 5 (17.9.2026): PUTKI ei näy kuvavisan pelinäkymässä.
+                Pisteytyksen logiikkaan ei kosketa — putkibonus lasketaan ja
+                näkyy palautteen pistemäärässä kuten ennen, vain HUD:n mittari
+                jää pois. Tekstivisoissa mittari säilyy. */}
+            {!isKuva && (
+              <>
+                <span className="tng-statsep" aria-hidden />
+                <div className="tng-stat tng-stat--streak">
+                  <span className="tng-stat-l">Putki</span>
+                  <span className="tng-stat-v tng-stat-v--streak">
+                    <svg className="tng-flame" width="14" height="17" viewBox="0 0 13 16" aria-hidden="true"><path d="M6.4 15.6C3.6 15.6 1.4 13.6 1.4 11c0-3.7 3.4-5.2 3.4-8.5 0-.9-.2-1.7-.5-2.5 3 1.2 5 3.7 5 6.4 0 .8-.2 1.5-.5 2.1 1-.1 1.6-.8 1.8-1.7.7 1 1 2.1 1 3.2 0 3.1-2.4 5.6-5.2 5.6z" fill="#E8A320" /></svg>
+                    {streak}
+                  </span>
+                </div>
+              </>
+            )}
           </div>
         </header>
 
@@ -714,6 +769,28 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
                         </div>
                       )}
                     </div>
+                    {/* K6: lähdemerkintä ja "Suurenna kuva" omalle rivilleen LEVYN ALLE.
+                        Kuvan päällä nappi peitti pystykuvassa juuri sen alareunan, josta
+                        vaakuna tai rakennus usein tunnistetaan. Ruudunlukijan ja
+                        näppäimistön suurennuspainike on yhä kuvalaatikko itse
+                        (.tng-zoombtn), joten tämä rivi on pelkkä hiiriaffordanssi —
+                        siksi aria-hidden ja tabIndex -1, ei kaksoiskontrollia. */}
+                    {lukittu && (
+                      <div className="tng-medialine">
+                        {q.credit ? <span className="tng-credit">Kuva · {q.credit}</span> : null}
+                        <button
+                          type="button"
+                          className="tng-zoomrow"
+                          tabIndex={-1}
+                          aria-hidden="true"
+                          disabled={curImgState !== "ready"}
+                          onClick={() => { zoomOpenerRef.current = imgRef.current?.parentElement ?? null; setZoom(true); }}
+                        >
+                          <svg width="14" height="14" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" aria-hidden="true"><circle cx="8.6" cy="8.6" r="5.6" /><path d="M12.8 12.8L17 17M6.4 8.6h4.4M8.6 6.4v4.4" /></svg>
+                          Suurenna kuva
+                        </button>
+                      </div>
+                    )}
                     <span className="tng-sr" role="status" aria-live="polite">
                       {curImgState === "loading" ? "Kuva latautuu…" : curImgState === "error" ? "Kuvaa ei voitu ladata." : ""}
                     </span>
@@ -758,46 +835,61 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
                   })}
                 </div>
 
-                {locked && (
+                {(locked || lukittu) && (
                   <div className="tng-fbslot" ref={fbSlotRef}>
-                    <div className="tng-fb" data-fb={sel != null && q.options[sel] === q.correct ? "ok" : "bad"} role="status" aria-live="polite">
-                      <div className="tng-fb-head">
-                        <span className="tng-fbicon" aria-hidden>{sel != null && q.options[sel] === q.correct ? "✓" : "✕"}</span>
-                        <span className="tng-fbtitle">{sel != null && q.options[sel] === q.correct ? "Oikein!" : "Väärin"}</span>
-                        <span className="tng-fbpts">
-                          {sel != null && q.options[sel] === q.correct
-                            ? `+${BASE_POINTS + (streak > 1 ? (streak - 1) * STREAK_BONUS : 0)} pistettä`
-                            : "+0 pistettä"}
-                        </span>
+                    {locked ? (
+                      <div className="tng-fb" data-fb={oikeinNyt ? "ok" : "bad"} role="status" aria-live="polite">
+                        {/* K6: mobiilissa palautteen otsikko siirtyy alapalkkiin, joten
+                            tulos on kerrottava ruudunlukijalle myös silloin kun otsikko
+                            on CSS:llä piilossa. Yksi live-alue, ei kahta. */}
+                        <span className="tng-sr">{oikeinNyt ? "Oikein." : `Väärin. Oikea vastaus: ${q.correct}.`}</span>
+                        <div className="tng-fb-head">
+                          <span className="tng-fbicon" aria-hidden>{oikeinNyt ? "✓" : "✕"}</span>
+                          <span className="tng-fbtitle">{oikeinNyt ? "Oikein!" : "Väärin"}</span>
+                          <span className="tng-fbpts">
+                            {oikeinNyt
+                              ? `+${BASE_POINTS + (streak > 1 ? (streak - 1) * STREAK_BONUS : 0)} pistettä`
+                              : "+0 pistettä"}
+                          </span>
+                        </div>
+                        <div className="tng-fb-body">
+                          {/* P7: oikealla vastauksella ei "Oikea vastaus: X" -riviä — se on
+                              jo vastauslistassa vihreänä. Väärällä rivi jää, lukitussa
+                              asettelussa vain mobiilin alapalkissa (ks. .tng-actres). */}
+                          {!oikeinNyt && (
+                            <span className="tng-fb-correct" data-dup={lukittu ? "1" : undefined}>Oikea vastaus: {q.correct}</span>
+                          )}
+                          {q.fact && (
+                            <>
+                              <span className="tng-kicker">Tiesitkö?</span>
+                              <span className="tng-tip">{q.fact}</span>
+                            </>
+                          )}
+                        </div>
                       </div>
-                      <div className="tng-fb-body">
-                        {sel != null && q.options[sel] !== q.correct && (
-                          <span className="tng-fb-correct">Oikea vastaus: {q.correct}</span>
-                        )}
-                        {q.fact && (
-                          <>
-                            <span className="tng-kicker">Tiesitkö?</span>
-                            <span className="tng-tip">{q.fact}</span>
-                          </>
-                        )}
+                    ) : (
+                      /* Varattu tila: sama korkeus, eri sisältö — siksi mikään ei hyppää
+                         vastaamisen hetkellä. */
+                      <div className="tng-fbwait">
+                        {oljenkorsiNappi}
+                        <span className="tng-fbwait-p">Palaute ja Tiesitkö-tieto ilmestyvät tähän.</span>
                       </div>
-                    </div>
+                    )}
                   </div>
                 )}
 
                 <div className="tng-act">
-                  <button
-                    type="button"
-                    className="tng-life"
-                    data-state={lifeLeft <= 0 ? "used" : undefined}
-                    disabled={lifeLeft <= 0 || locked || removed.length > 0 || answersLocked}
-                    onClick={useLife}
-                  >
-                    <svg width="17" height="17" viewBox="0 0 18 18" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" aria-hidden="true"><circle cx="9" cy="9" r="7.1" /><circle cx="9" cy="9" r="2.6" /><path d="M4 4l3.1 3.1M14 4l-3.1 3.1M4 14l3.1-3.1M14 14l-3.1-3.1" /></svg>
-                    <span>
-                      {lifeLeft <= 0 ? "Oljenkorsi käytetty" : oljenkorsiTotal > 1 ? `Oljenkorsi ×${lifeLeft} · poista 2 väärää` : "Oljenkorsi · poista 2 väärää"}
-                    </span>
-                  </button>
+                  {!lukittu && oljenkorsiNappi}
+                  {lukittu && locked && (
+                    /* Designin alapalkissa on myös "Oikein: <vastaus>", mutta pisin
+                       vaihtoehto kannassa on 36 merkkiä eikä mahdu 360 px leveään
+                       palkkiin ilman ellipsiä — KORTTISÄÄNTÖ (CLAUDE.md) kieltää
+                       leikkautuvan tekstin. Oikea vastaus näkyy joka tapauksessa
+                       vastauslistassa vihreänä ja merkinnällä "Oikea vastaus". */
+                    <div className="tng-actres" data-fb={oikeinNyt ? "ok" : "bad"} aria-hidden="true">
+                      <span className="tng-actres-t">{oikeinNyt ? "Oikein" : "Väärin"}</span>
+                    </div>
+                  )}
                   {locked ? (
                     <button type="button" className="tng-next" onClick={advance}>
                       {qi >= total - 1 ? "Näytä tulos" : "Seuraava"} <span aria-hidden>→</span>

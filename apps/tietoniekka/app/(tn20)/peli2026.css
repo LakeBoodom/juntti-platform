@@ -477,3 +477,249 @@
 @media (prefers-reduced-motion: reduce) {
   .tn20 .tng *, .tn20 .tng *::before, .tn20 .tng *::after { animation: none !important; transition: none !important; }
 }
+
+/* ══ K6 (UX-korjaus 17.9.2026) — KUVAVISAN PELINÄKYMÄ ILMAN VIERITYSTÄ ══════
+   Lähde: "TN Kuvavisa — selitys ilman scrollia", kierros 9 (näkymät 9a–9d).
+   Koskee VAIN kuvavisan kysymysvaihetta (.tng[data-lock="1"], asetetaan
+   GameClientissä). Tekstivisat jäävät virtaavaan asetteluun: niiden
+   kysymykset ovat kannassa jopa ~440 merkkiä, kuvavisojen pisin on 37
+   (mitattu 17.9.2026).
+
+   Lohko on kolmessa osassa, koska renderöinti on JS-ehtoista mutta lukko
+   mediaehtoista — osa A on siksi voimassa AINA kun kuvavisaa pelataan, myös
+   matalalla ruudulla jossa lukkoa ei ole. Muuten JS renderöisi kuvalevyn,
+   lähderivin ja varatun palautetilan ilman tyyliä.
+     A) kuvalevy, lähderivi, varattu palautetila — aina
+     B) korkeuslukko ≥880 × ≥620 px: kaksi palstaa (9a–9c)
+     C) korkeuslukko <880 × ≥760 px: yksi palsta + kiinteä alapalkki (9d)
+   Alle näiden rajojen (mobiilivaaka, pienet ikkunat, 360 × 640 -luokan
+   puhelimet) lukko jää pois ja näkymä virtaa kuten ennen — lukittu 640 px
+   korkea ruutu ei mahduttaisi 260 merkin selitystä ilman fontin
+   pienentämistä, ja fontin pienentäminen on kielletty.
+
+   KORKEUSBUDJETTI 1280 × 720 — laskettu, ei arvattu:
+     oikea palsta  720 − 62 header − 38 pehmuste (18 + 20) − 248 vastaukset
+                   (4 × 56 + 3 × 8 gap) − 48 Seuraava-rivi − 28 gap (2 × 14)
+                   = 296 px palautelohkolle
+     vasen palsta  620 käytettävissä − 68 kysymys (2 riviä 33 px / 1.06)
+                   − 28 lähderivi − 28 gap = 496 px kuvalevylle (design: 498)
+   Palautelohkon 296 px: 30 pehmuste + 26 otsikko + 12 viiva ja gapit + 15
+   kicker + 5 = 88 px kiinteää → 208 px selitykselle. 15 px / 1.45 = 21.8 px
+   riviä ja sisäleveys ≈ 569 px ≈ 76 merkkiä/rivi → 9 riviä ≈ 680 merkkiä.
+   Kannan pisin `fact` on 260 merkkiä (0 riviä yli, mitattu 17.9.2026) = 4
+   riviä = 87 px. Fonttia ei pienennetä eikä tekstiä katkaista;
+   .tng-fb-body:n overflow-y on varaventtiili siltä varalta, että kantaan
+   viedään joskus pidempi teksti. */
+
+/* ── A. Kuvalevy, lähderivi ja varattu palautetila (aina kuvavisassa) ──── */
+/* Vaalea levy grafiikalle (BRAND.md §5 + design): tumma letterbox hävittäisi
+   esim. Belgian mustan raidan ja Japanin lipun reunan. Valokuville sama
+   laatikko tummana — sama object-fit: contain, ei erillistä logiikkaa. */
+.tn20 .tng[data-lock="1"] .tng-mediaframe {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: clamp(12px, 1.25cqw, 20px);
+  border: 1px solid #cfc4ac;
+  background: #f4efe4;
+  box-shadow: none;
+}
+.tn20 .tng[data-plate="tumma"][data-lock="1"] .tng-mediaframe { border-color: #37301f; background: #12100a; }
+/* Suurennusnappi virtaa levyn sisällä (ei inset: 0), jotta pehmuste jää kuvan
+   ympärille. align-self: stretch antaa napille määräisen korkeuden, jota ilman
+   kuvan max-height: 100% ei ratkeaisi ja pystykuva vuotaisi levyn yli. */
+.tn20 .tng[data-lock="1"] .tng-zoombtn {
+  position: relative;
+  inset: auto;
+  flex: 1 1 auto;
+  align-self: stretch;
+  width: auto;
+  height: auto;
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.tn20 .tng[data-lock="1"] .tng-zoomhint { display: none; }
+.tn20 .tng[data-lock="1"] .tng-qimg { width: auto; height: auto; max-width: 100%; max-height: 100%; object-fit: contain; }
+
+/* Lähdemerkintä ja "Suurenna kuva" levyn ALLE (9a–9c). Kuvan päällä nappi
+   peitti pystykuvassa juuri sen alareunan, josta vaakuna tai rakennus
+   tunnistetaan. */
+.tn20 .tng-medialine { flex: 0 0 auto; display: flex; align-items: center; gap: 12px; min-height: 28px; }
+/* Ei ellipsiä: KORTTISÄÄNTÖ (CLAUDE.md) pitää leikkautunutta tekstiä
+   julkaisublokkerina, ja "Kuva · Wikipedia / Wikimedia Commons" on 36 merkkiä
+   eli se ei mahdu 390 px leveälle riville suurennusnapin viereen. Rivittyy
+   kahdelle riville sen sijaan että katkeaisi kolmeen pisteeseen. */
+.tn20 .tng-credit { flex: 0 1 auto; min-width: 0; font-size: clamp(9.5px, 0.85cqw, 11px); font-weight: 800; letter-spacing: 0.12em; line-height: 1.35; text-transform: uppercase; color: #8e8676; overflow-wrap: break-word; }
+.tn20 .tng-zoomrow {
+  flex: 0 0 auto; margin-left: auto;
+  display: inline-flex; align-items: center; gap: 7px;
+  height: 28px; padding: 0 13px; border-radius: 999px;
+  border: 1px solid #3a3120; background: transparent; color: #cfc7b6;
+  font-size: clamp(11.5px, 1cqw, 13px); font-weight: 600; cursor: zoom-in;
+  transition: border-color 0.15s, color 0.15s;
+}
+.tn20 .tng-zoomrow:hover:not(:disabled) { border-color: #6b5a36; color: #f4eee0; }
+.tn20 .tng-zoomrow:disabled { opacity: 0.4; cursor: default; }
+
+/* Varattu tila ennen vastaamista: Oljenkorsi asuu tässä, ei Seuraava-rivillä.
+   Sama korkeus, eri sisältö — siksi vastauslista ei liikahda vastaamisessa. */
+.tn20 .tng-fbwait {
+  display: flex; flex-direction: column;
+  align-items: flex-start; justify-content: center;
+  gap: clamp(8px, 0.85cqw, 12px);
+  padding: clamp(14px, 1.45cqw, 22px) clamp(15px, 1.55cqw, 24px);
+  border-radius: 16px; border: 1px dashed #2e2718; background: rgba(23, 19, 11, 0.45);
+}
+.tn20 .tng-fbwait-p { font-size: clamp(12px, 1.05cqw, 14px); font-weight: 600; color: #8e8676; }
+/* Tulos alapalkissa on vain mobiilin ratkaisu (9d) — muualla se on
+   palautelohkon otsikossa. */
+.tn20 .tng-actres { display: none; }
+.tn20 .tng-actres-t { font-family: var(--tn-font-display); font-weight: 900; font-size: 21px; line-height: 1; text-transform: uppercase; }
+.tn20 .tng-actres[data-fb="ok"] .tng-actres-t { color: #b6ff3c; }
+.tn20 .tng-actres[data-fb="bad"] .tng-actres-t { color: #ff6b4a; }
+/* Designin palauteotsikko on pelkkä sana + pistepilleri, ilman merkkiympyrää. */
+.tn20 .tng[data-lock="1"] .tng-fbicon { display: none; }
+.tn20 .tng[data-lock="1"] .tng-fb-head { flex: 0 0 auto; flex-wrap: nowrap; padding-bottom: clamp(8px, 0.85cqw, 12px); border-bottom: 1px solid transparent; }
+.tn20 .tng[data-lock="1"] .tng-fb[data-fb="ok"] .tng-fb-head { border-bottom-color: rgba(182, 255, 60, 0.34); }
+.tn20 .tng[data-lock="1"] .tng-fb[data-fb="bad"] .tng-fb-head { border-bottom-color: rgba(255, 107, 74, 0.34); }
+/* "Vastauslista ei liiku": hover nostaa rivin 1 px, ja kun rivi lukituksessa
+   disabloituu, nosto katoaa hiiren alta — se on liikettä. Pois kuvavisasta. */
+.tn20 .tng[data-lock="1"] .tng-ans:hover:not(:disabled),
+.tn20 .tng[data-lock="1"] .tng-ans:active:not(:disabled) { transform: none; }
+
+/* ── B + C yhteinen juuri: ruudun korkeuteen lukittu pystypylväs ───────── */
+@media (min-width: 880px) and (min-height: 620px), (max-width: 879px) and (min-height: 760px) {
+  body.tn-game-lock { overflow: hidden; }
+  /* Sivuston TopBar ja alatunniste pois lukitun pelin ajaksi: pelin oma header
+     kantaa saman logon ja paluulinkin, joten kaksi navipalkkia päällekkäin
+     veisi 82 px korkeutta ja pakottaisi vierityksen. */
+  body.tn-game-lock .tn20 > .tn-nav-root, body.tn-game-lock .tn20 > .tn-es-foot { display: none; }
+
+  .tn20 .tng[data-lock="1"] { height: 100dvh; min-height: 0; overflow: hidden; display: flex; flex-direction: column; }
+  /* pageRef-kääre on .tng:n ainoa varsinainen lapsi (dialogien inert-kohde),
+     joten flex-pylvään korkeus välitetään sen kautta headerille ja rungolle. */
+  .tn20 .tng[data-lock="1"] .tng-page { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; }
+  /* Header 62 px @1280, 68 px @1440 — korkeus tulee pehmusteesta, ei
+     numeroiden koosta (design: PISTEET säilyy sellaisena kuin se on). */
+  .tn20 .tng[data-lock="1"] .tng-top {
+    position: relative; flex: 0 0 auto; flex-wrap: nowrap;
+    padding-top: max(clamp(9px, 0.85cqw, 13px), env(safe-area-inset-top));
+    padding-bottom: clamp(9px, 0.85cqw, 13px);
+    gap: clamp(10px, 1.5cqw, 22px);
+  }
+  .tn20 .tng[data-lock="1"] .tng-main[data-mode="peli"] { flex: 1 1 auto; min-height: 0; }
+  .tn20 .tng[data-lock="1"] .tng-main[data-mode="peli"] .tng-agroup { flex: 0 0 auto; grid-column: auto; width: 100%; max-width: none; align-self: auto; }
+  .tn20 .tng[data-lock="1"] .tng-main[data-mode="peli"] .tng-fbslot { flex: 1 1 auto; min-height: 0; grid-column: auto; width: 100%; max-width: none; }
+  .tn20 .tng[data-lock="1"] .tng-fb, .tn20 .tng[data-lock="1"] .tng-fbwait { flex: 1 1 auto; min-height: 0; }
+  .tn20 .tng[data-lock="1"] .tng-fb { gap: clamp(8px, 0.85cqw, 12px); padding: clamp(14px, 1.45cqw, 22px) clamp(15px, 1.55cqw, 24px); }
+  .tn20 .tng[data-lock="1"] .tng-fb-body { flex: 1 1 auto; min-height: 0; gap: 5px; overflow-y: auto; overscroll-behavior: contain; }
+  .tn20 .tng[data-lock="1"] .tng-main[data-mode="peli"] .tng-act {
+    flex: 0 0 auto; grid-column: auto; width: 100%; max-width: none;
+    position: relative; bottom: auto; margin: 0;
+    border-top: 0; background: none; backdrop-filter: none; -webkit-backdrop-filter: none;
+    flex-wrap: nowrap;
+  }
+  /* Kuvalevy saa kaiken jäljelle jäävän tilan vasemmassa palstassa. */
+  .tn20 .tng[data-lock="1"] .tng-mediaframe { flex: 1 1 auto; min-height: 0; width: 100%; max-width: none; max-height: none; aspect-ratio: auto; }
+}
+
+/* ── B. Työpöytä ja tabletti vaakaan (9a–9c) ───────────────────────────── */
+@media (min-width: 880px) and (min-height: 620px) {
+  .tn20 .tng[data-lock="1"] .tng-main[data-mode="peli"] {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    column-gap: clamp(18px, 2cqw, 34px);
+    row-gap: 0;
+    align-items: stretch;
+    align-content: stretch;
+    padding: clamp(13px, 1.4cqw, 24px) clamp(16px, 1.8cqw, 28px) clamp(14px, 1.6cqw, 26px);
+  }
+  /* Kumoaa ≥880 px:n display: contents — lukitussa asettelussa oikea palsta on
+     oma flex-pylväs, jotta palautelohko voi olla flex: 1 min-height: 0. */
+  .tn20 .tng[data-lock="1"] .tng-main[data-mode="peli"] .tng-qcol,
+  .tn20 .tng[data-lock="1"] .tng-main[data-mode="peli"] .tng-acol {
+    display: flex; flex-direction: column;
+    min-width: 0; min-height: 0; padding: 0;
+    gap: clamp(10px, 1.1cqw, 16px);
+    align-self: stretch;
+  }
+  .tn20 .tng[data-lock="1"] .tng-qh {
+    flex: 0 0 auto; max-width: none;
+    /* Mitattu tarve: pisin kuvavisan kysymys on 37 merkkiä ("Mikä
+       historiallinen kohde kuvassa on?"), pisin sana 14 ("historiallinen").
+       CD: 32 px @1280 / 40 px @1440 → tämä antaa 33 / 37 px, marginaali
+       Rangella mitattuna ≥ 3 px kaikilla mitatuilla leveyksillä. */
+    font-size: clamp(22px, min(2.6cqw, 5.6dvh), 40px);
+    line-height: 1.06;
+  }
+  .tn20 .tng[data-lock="1"] .tng-media { flex: 1 1 auto; min-height: 0; gap: clamp(7px, 0.8cqw, 11px); }
+  /* 56 px @1280, 64 px @1440 — vakiokorkeus, ei min-height: rivi ei kasva eikä
+     kutistu lukituksessa, koska vain reunaväri, tausta ja merkki muuttuvat. */
+  .tn20 .tng[data-lock="1"] .tng-ans { min-height: 0; height: clamp(50px, 4.4cqw, 64px); padding: 0 clamp(13px, 1.4cqw, 18px); border-radius: 13px; }
+  .tn20 .tng[data-lock="1"] .tng-main[data-mode="peli"] .tng-agroup { gap: clamp(7px, 0.7cqw, 9px); }
+  .tn20 .tng[data-lock="1"] .tng-badge { width: clamp(24px, 2.05cqw, 28px); height: clamp(24px, 2.05cqw, 28px); border-radius: 7px; font-size: clamp(11px, 0.95cqw, 13px); }
+  .tn20 .tng[data-lock="1"] .tng-atext { font-size: clamp(15px, 1.33cqw, 18px); line-height: 1.2; }
+  .tn20 .tng[data-lock="1"] .tng-anote { min-width: clamp(92px, 7.8cqw, 124px); font-size: clamp(9.5px, 0.8cqw, 11px); }
+  .tn20 .tng[data-lock="1"] .tng-fbtitle { font-size: clamp(21px, 2.05cqw, 30px); }
+  .tn20 .tng[data-lock="1"] .tng-fbpts { padding: 5px 11px; font-size: clamp(11px, 0.95cqw, 12px); }
+  .tn20 .tng[data-lock="1"] .tng-tip { font-size: clamp(14px, 1.2cqw, 17px); line-height: 1.45; max-width: none; }
+  .tn20 .tng[data-lock="1"] .tng-main[data-mode="peli"] .tng-act { padding: 0; min-height: clamp(48px, 3.75cqw, 52px); gap: 14px; }
+  .tn20 .tng[data-lock="1"] .tng-next { min-height: clamp(48px, 3.75cqw, 52px); padding: 0 clamp(24px, 2.2cqw, 30px); border-radius: 999px; font-size: clamp(14px, 1.2cqw, 16px); }
+}
+
+/* ── C. Mobiili ja tabletti pystyyn (9d): yksi palsta, kiinteä alapalkki ── */
+@media (max-width: 879px) and (min-height: 760px) {
+  .tn20 .tng[data-lock="1"] .tng-main[data-mode="peli"] {
+    display: flex; flex-direction: column;
+    padding: clamp(12px, 3.4vw, 16px) clamp(14px, 4vw, 18px) 0;
+    gap: clamp(9px, 2.8vw, 12px);
+  }
+  /* display: contents → agroup, fbslot ja act ovat pääpylvään suoria lapsia,
+     jolloin alapalkki päätyy ruudun pohjaan eikä sisältövirran keskelle. */
+  .tn20 .tng[data-lock="1"] .tng-main[data-mode="peli"] .tng-acol { display: contents; }
+  .tn20 .tng[data-lock="1"] .tng-main[data-mode="peli"] .tng-qcol { display: flex; flex-direction: column; flex: 0 0 auto; min-width: 0; padding: 0; gap: clamp(9px, 2.8vw, 12px); }
+  /* Kuvalevy kiinteäksi (≈186 px @844): jos se joustaisi, palautteen
+     ilmestyminen kutistaisi levyä ja siirtäisi vastausrivejä. */
+  .tn20 .tng[data-lock="1"] .tng-media { flex: 0 0 auto; display: flex; flex-direction: column; gap: 7px; }
+  .tn20 .tng[data-lock="1"] .tng-mediaframe { flex: 0 0 clamp(150px, 21dvh, 210px); padding: 12px; border-radius: 13px; }
+  .tn20 .tng[data-lock="1"] .tng-qh { flex: 0 0 auto; max-width: none; font-size: clamp(18px, min(5.6vw, 3.1dvh), 26px); line-height: 1.08; }
+  .tn20 .tng[data-lock="1"] .tng-ans { min-height: 0; height: clamp(46px, 6.1dvh, 56px); padding: 0 13px; border-radius: 12px; }
+  .tn20 .tng[data-lock="1"] .tng-main[data-mode="peli"] .tng-agroup { gap: 7px; }
+  .tn20 .tng[data-lock="1"] .tng-badge { width: 24px; height: 24px; font-size: 11px; }
+  .tn20 .tng[data-lock="1"] .tng-atext { font-size: clamp(14px, 3.9vw, 16px); }
+  .tn20 .tng[data-lock="1"] .tng-fb, .tn20 .tng[data-lock="1"] .tng-fbwait { padding: 12px 14px; border-radius: 14px; gap: 6px; }
+  /* Tulos siirtyy alapalkkiin → otsikko pois lohkosta. Ruudunlukija saa
+     tuloksen .tng-fb:n sr-lauseesta samassa live-alueessa. */
+  .tn20 .tng[data-lock="1"] .tng-fb-head { display: none; }
+  .tn20 .tng[data-lock="1"] .tng-fb[data-fb] { border-color: #2c2517; background: #17140d; }
+  .tn20 .tng[data-lock="1"] .tng-fb-correct[data-dup="1"] { display: none; }
+  .tn20 .tng[data-lock="1"] .tng-tip { font-size: 14px; line-height: 1.42; max-width: none; }
+  .tn20 .tng[data-lock="1"] .tng-kicker { font-size: 9.5px; }
+  .tn20 .tng[data-lock="1"] .tng-medialine { min-height: 20px; gap: 10px; align-items: flex-start; }
+  .tn20 .tng[data-lock="1"] .tng-credit { font-size: 9px; letter-spacing: 0.1em; padding-top: 4px; }
+  .tn20 .tng[data-lock="1"] .tng-zoomrow { height: 26px; padding: 0 11px; font-size: 12px; }
+
+  .tn20 .tng[data-lock="1"] .tng-main[data-mode="peli"] .tng-act {
+    flex: 0 0 88px; align-items: center;
+    margin: 0 clamp(-18px, -4vw, -14px);
+    padding: 0 clamp(14px, 4vw, 18px) env(safe-area-inset-bottom);
+    border-top: 1px solid #2c2517; background: #17140d;
+    min-height: 0; gap: 12px;
+  }
+  .tn20 .tng[data-lock="1"] .tng-main[data-mode="peli"] .tng-act > .tng-next { flex: 0 0 auto; margin-left: auto; min-height: 52px; padding: 0 22px; border-radius: 999px; }
+  .tn20 .tng[data-lock="1"] .tng-main[data-mode="peli"] .tng-act > .tng-hint { flex: 1 1 auto; margin-left: 0; text-align: center; }
+  .tn20 .tng[data-lock="1"] .tng-actres { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+}
+/* Kapea: HUD yhdelle riville (logo + edistymispalkit + pisteet), kuten 9d.
+   Ilman tätä .tng-brand { flex: 0 0 100% } tekisi headerista kaksirivisen. */
+@media (max-width: 559px) and (min-height: 760px) {
+  .tn20 .tng[data-lock="1"] .tng-top { min-height: 52px; gap: 10px; }
+  .tn20 .tng[data-lock="1"] .tng-brand { flex: 0 0 auto; }
+  .tn20 .tng[data-lock="1"] .tng-cat, .tn20 .tng[data-lock="1"] .tng-brandsep { display: none; }
+  .tn20 .tng[data-lock="1"] .tng-progress-row { display: none; }
+  .tn20 .tng[data-lock="1"] .tng-stat-l { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+  .tn20 .tng[data-lock="1"] .tng-stat-v { font-size: 18px; }
+}
