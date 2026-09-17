@@ -352,17 +352,20 @@ export default async function Peli20({
      Data kuvavisas-taulusta adminin järjestyksessä; mekaniikka sama.
      Pelikertoja ei tallenneta (kuten tuotannossa — ei quizzes-riviä). */
   if (kuvavisa) {
+    /* T3 (17.9.2026): teaser = pelisivun aloitusnäkymän intro, Heikin hyväksymät
+       tekstit. Kategoriakortin lyhyt kuvaus (max 60 merkkiä) on eri teksti ja
+       asuu KATEGORIAT[].kuvaus:issa — näitä kahta ei saa yhdistää. */
     const DECKS: Record<string, { title: string; teaser: string; motif: string; color: string }> = {
-      liput: { title: "Lippuvisa", teaser: "Yksi lippu, neljä maata — kuinka tarkka silmäsi on?", motif: "lippu", color: "#4C9AFF" },
-      vaakuna: { title: "Vaakunavisa", teaser: "Maakuntien, kaupunkien ja kuntien vaakunat.", motif: "vaakuna", color: "#8FC0FF" },
-      vaakunat: { title: "Vaakunavisa", teaser: "Maakuntien, kaupunkien ja kuntien vaakunat.", motif: "vaakuna", color: "#8FC0FF" },
-      linnut: { title: "Lintuvisa", teaser: "Siivet, nokat ja höyhenpuvut — tunnista laji kuvasta.", motif: "lintu", color: "#7CEBC8" },
-      elaimet: { title: "Eläinvisa", teaser: "Tunnista eläinlaji lähikuvasta.", motif: "elain", color: "#2FD9A5" },
-      kasvit: { title: "Kasvivisa", teaser: "Lehti, kukka vai kaarna — tunnista kasvi.", motif: "kasvi", color: "#4ADE80" },
-      henkilot: { title: "Henkilövisa", teaser: "Tunnista henkilö kuvasta.", motif: "kasvot", color: "#F0A24B" },
-      rakennukset: { title: "Rakennusvisa", teaser: "Torneista temppeleihin — tunnista rakennus kuvasta.", motif: "torni", color: "#F2C230" },
+      liput: { title: "Lippuvisa", teaser: "Maailman valtioiden liput. Tunnistatko maan pelkän lipun perusteella — tutuimmista harvinaisempiin?", motif: "lippu", color: "#4C9AFF" },
+      vaakuna: { title: "Vaakunavisa", teaser: "Suomalaiset vaakunat: maakuntien, kaupunkien ja kuntien tunnukset. Harva tunnistaa edes oman kotiseutunsa — entä sinä?", motif: "vaakuna", color: "#8FC0FF" },
+      vaakunat: { title: "Vaakunavisa", teaser: "Suomalaiset vaakunat: maakuntien, kaupunkien ja kuntien tunnukset. Harva tunnistaa edes oman kotiseutunsa — entä sinä?", motif: "vaakuna", color: "#8FC0FF" },
+      linnut: { title: "Lintuvisa", teaser: "Nokasta, siivistä ja väreistä: tunnista lintu yhdestä kuvasta ennen kuin se lentää pois.", motif: "lintu", color: "#7CEBC8" },
+      elaimet: { title: "Eläinvisa", teaser: "Tunnista eläin yhdestä kuvasta. Tutut ja yllättävämmät lajit panevat lajintuntemuksen koetukselle.", motif: "elain", color: "#2FD9A5" },
+      kasvit: { title: "Kasvivisa", teaser: "Kukkia, puita ja muita kasveja lähikuvassa. Tunnistatko kasvin sen tuntomerkeistä ja löydätkö oikean nimen neljästä vaihtoehdosta?", motif: "kasvi", color: "#4ADE80" },
+      henkilot: { title: "Henkilövisa", teaser: "Tutut kasvot historiasta ja nykypäivästä. Riittääkö yksi kuva, että tunnistat henkilön?", motif: "kasvot", color: "#F0A24B" },
+      rakennukset: { title: "Rakennusvisa", teaser: "Torneista temppeleihin ja pyramideihin: tunnista rakennuksia ja rakennelmia yhdestä kuvasta. Kuinka monta kohdetta tunnistat?", motif: "torni", color: "#F2C230" },
       kaupungit: { title: "Kaupunkivisa", teaser: "Tunnista kaupunki yhdestä näkymästä.", motif: "kaupunki", color: "#F5C462" },
-      maalaukset: { title: "Maalausvisa", teaser: "Tunnista taideteos tai tekijä.", motif: "naamio", color: "#E85D9E" },
+      maalaukset: { title: "Maalausvisa", teaser: "Taiteen klassikot yhdestä kuvasta. Tunnistatko tunnetut teokset — ja niiden tekijät?", motif: "naamio", color: "#E85D9E" },
     };
     const deck = DECKS[kuvavisa] ?? { title: "Kuvavisa", teaser: "Tunnista kuvasta.", motif: "kysymys", color: "#4C9AFF" };
 

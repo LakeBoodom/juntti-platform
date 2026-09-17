@@ -49,15 +49,17 @@ function KuvaLaatikko({ k }: { k: KategoriaData }) {
   );
 }
 
-function KategoriaKortti({ k, avoin }: { k: KategoriaData; avoin: boolean }) {
+function KategoriaKortti({ k }: { k: KategoriaData }) {
   const ryhmat = ryhmiteltyVariaatiot(k.variaatiot);
   const visoja = k.variaatiot.length;
+  /* Kaikki kortit kiinni oletuksena (Heikin QA 17.9.2026). Design 1a:ssa
+     ensimmäinen on <details open>, mutta tuotannossa se jätti työpöytärivin
+     muut kortit lyhyiksi ja viereen ison tyhjän alueen, ja mobiilissa pelaaja
+     joutui vierittämään kahdeksan variaatiolinkin ohi päästäkseen seuraavaan
+     kategoriaan. */
   return (
     <details
       className="kv-card"
-      // Ensimmäinen kortti auki (design 1a: liput on <details open>) — pelaaja
-      // näkee heti mitä "Valitse visa" tekee, ilman että joutuu arvaamaan.
-      open={avoin}
       style={{ ["--kv-accent" as string]: k.meta.accent }}
     >
       <summary className="kv-card-summary">
@@ -141,8 +143,8 @@ export function KuvavisatHub({
           <span className="kv-section-note">Kategoria avaa visavariaatiot — peli ei käynnisty heti</span>
         </div>
         <div className="kv-grid">
-          {kategoriat.map((k, i) => (
-            <KategoriaKortti key={k.meta.type} k={k} avoin={i === 0} />
+          {kategoriat.map((k) => (
+            <KategoriaKortti key={k.meta.type} k={k} />
           ))}
         </div>
       </section>

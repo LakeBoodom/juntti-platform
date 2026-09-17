@@ -244,12 +244,22 @@
   inset: 0;
   display: grid;
   grid-template-columns: 1fr 1fr;
+  /* Rivi on nimenomaan 1fr, ei implisiittinen auto (Heikin QA 17.9.2026).
+     Auto-rivillä kuvan height:100% jää määrittelemättömäksi ja putoaa takaisin
+     kuvan omaan kuvasuhteeseen: mitattu 1440 px leveydellä kuva 189 × 283 px
+     vaikka laatikko on 189 × 235 px. Rivi kasvoi laatikkoa korkeammaksi,
+     overflow:hidden leikkasi ylimenevän osan ALAREUNASTA ja object-position
+     (henkilökuvien 50% 18%) menetti merkityksensä kokonaan. 1fr tekee rivistä
+     määräisen, jolloin height:100% ratkeaa ja object-fit: cover rajaa
+     keskeltä niin kuin on tarkoitus. */
+  grid-template-rows: 1fr;
   gap: 1px;
   background: #2c2517;
 }
 .tn20 .kv-media-photos img {
   width: 100%;
   height: 100%;
+  min-height: 0;
   object-fit: cover;
   display: block;
 }
