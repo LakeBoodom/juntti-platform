@@ -84,6 +84,12 @@ export function ChainResultSummary({
       <button type="button" className="tk-btn-secondary" onClick={onChangeCategory}>
         Vaihda aihetta
       </button>
+      {/* NAVIGAATIOKORJAUS (2026-09-17, Heikin pyyntö): tulosnäkymästä pitää
+          päästä myös Tunnetut henkilöt -kokoelman pääsivulle, ei vain uuteen
+          kierrokseen tai aiheen vaihtoon tämän pelin sisällä. */}
+      <a className="tk-result-collection-link" href="/kokoelma/tunnetut-henkilot">
+        Tunnetut henkilöt -kokoelmaan →
+      </a>
     </div>
   );
 }

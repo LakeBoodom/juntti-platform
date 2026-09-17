@@ -266,6 +266,13 @@
   overflow-wrap: normal; word-break: keep-all;
 }
 .tn20 .tk-result-cta { margin-bottom: 10px; }
+.tn20 .tk-result-collection-link {
+  color: var(--tk-text-tertiary); font-size: 13px; font-weight: 700;
+  text-decoration: underline; text-underline-offset: 3px;
+  margin-top: 4px; padding: 6px 4px; /* kosketusalue ilman visuaalista korostusta */
+  overflow-wrap: normal; word-break: keep-all;
+}
+.tn20 .tk-result-collection-link:hover { color: var(--tk-text-secondary); }
 
 /* ---------- Kategoriachipit (CategoryPicker + CollectionPageGamePromo) ----------
    KATSELMOINTILÖYDÖS (merkittävä, 2026-09-16): ohje sallii amberin (#E8A320)
@@ -395,6 +402,22 @@
   display: flex; flex-direction: column; gap: 20px;
 }
 .tn20 .tk-page--start { max-width: 100%; padding-left: 0; padding-right: 0; }
+
+/* NAVIGAATIOKORJAUS (2026-09-17): kevyt paluulinkki etusivulle — ainoa tie
+   pois pelisivulta, koska TopBar piiloutuu /peli-poluilla (ks. TopBar.tsx)
+   eikä Ikäjärjestyksellä ole tavallisen visan tng-top-HUD:ia. Sama logotyyli
+   kuin GameClientin tng-logo, jotta pelikuori tuntuu yhtenäiseltä. */
+.tn20 .tk-gamenav { display: flex; margin: 0 0 -4px; }
+.tn20 .tk-page--start .tk-gamenav { padding: 0 16px; }
+.tn20 .tk-gamenav-home {
+  display: flex; align-items: baseline; gap: 1px;
+  font-family: var(--tn-font-display); font-weight: 900;
+  font-size: 17px; line-height: 1; letter-spacing: 0.01em;
+  padding: 6px 2px; margin: -6px -2px; /* isompi kosketusalue ilman visuaalista siirtymää */
+}
+.tn20 .tk-gamenav-home b { color: #e8a320; font-weight: 900; }
+.tn20 .tk-gamenav-home span { color: var(--tk-text-primary); }
+
 .tn20 .tk-order-head { display: flex; flex-direction: column; gap: 10px; align-items: flex-start; }
 .tn20 .tk-order-title {
   font-family: var(--tn-font-display); font-weight: 900; color: var(--tk-text-primary);
