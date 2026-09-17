@@ -658,6 +658,20 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
   const rvKind: "ok" | "bad" | "tech" | "skip" = review == null ? "skip" : hist[review] === "ok" ? "ok" : hist[review] === "bad" ? "bad" : hist[review] === "skipped" ? "tech" : "skip";
   const oikeinNyt = sel != null && !!q && q.options[sel] === q.correct;
 
+  /* P5 (17.9.2026): HUD:n logo ja kortistomerkki vievät pois kesken kierroksen,
+     eikä tulosta tallenneta mihinkään — yksi harhaosuma hukkasi koko pelin.
+     Varmistus kysytään vain kun on jotain hukattavaa: vasta vastatusta
+     kysymyksestä eteenpäin. Ensimmäisessä kysymyksessä ennen vastaamista
+     poistuminen ei vie mitään, eikä turha dialogi saa olla tiellä. */
+  const kierrosKesken = phase === "play" && (qi > 0 || locked || sel != null);
+  const varmistaPoistuminen = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    if (!kierrosKesken) return;
+    const jatka = window.confirm(
+      `Kierros on kesken (kysymys ${Math.min(qi + 1, total)}/${total}). Jos poistut nyt, tulos ei tallennu. Poistutaanko?`,
+    );
+    if (!jatka) e.preventDefault();
+  };
+
   /* K6: sama Oljenkorsi-nappi, kaksi paikkaa. Lukitussa asettelussa se asuu
      palautelohkon varatussa tilassa (design: "ennen vastaamista siinä on
      Oljenkorsi-nappi ja kierroksen tila"), muuten toimintorivillä kuten ennen.
@@ -697,12 +711,12 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
         {/* ── HUD ── */}
         <header className="tng-top">
           <div className="tng-brand">
-            <a className="tng-logo" href="/" aria-label="Tietoniekka etusivu"><b>TIETO</b><span>NIEKKA</span></a>
+            <a className="tng-logo" href="/" aria-label="Tietoniekka etusivu" onClick={varmistaPoistuminen}><b>TIETO</b><span>NIEKKA</span></a>
             <span className="tng-brandsep" aria-hidden />
             {/* T5 (UX-korjaus 17.9.2026): kortistomerkki oli pelkkä teksti, joten
                 pelisivulta ei päässyt takaisin kokoelmaan kuin logon kautta (etusivu). */}
             {quiz.hubHref ? (
-              <a className="tng-cat" href={quiz.hubHref}>
+              <a className="tng-cat" href={quiz.hubHref} onClick={varmistaPoistuminen}>
                 {category}
               </a>
             ) : (
