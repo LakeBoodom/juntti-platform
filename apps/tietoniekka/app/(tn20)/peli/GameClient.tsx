@@ -427,9 +427,11 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
       if (!siteId) return;
       /* packages/db/types.ts ei tunne kuvavisa_haaste_luo-funktiota (generoitu
          tiedosto on jäljessä), joten rpc-kutsu tehdään tyypittämättömän
-         asiakkaan kautta. Kunnes types.ts generoidaan omana passinaan. */
-      const rpc = (sb as unknown as { rpc: (fn: string, args: Record<string, unknown>) => Promise<{ data: unknown; error: unknown }> }).rpc;
-      const { data, error } = await rpc("kuvavisa_haaste_luo", {
+         asiakkaan kautta. Kunnes types.ts generoidaan omana passinaan.
+         Kutsu on metodikutsu: irrotettuna funktiona `this` katoaa ja
+         Supabase-asiakas kaatuu (ks. lib/kuvavisat2026.ts). */
+      const sbAny = sb as unknown as { rpc: (fn: string, args: Record<string, unknown>) => Promise<{ data: unknown; error: unknown }> };
+      const { data, error } = await sbAny.rpc("kuvavisa_haaste_luo", {
         p_site_id: siteId,
         p_kuvavisa: quiz.kuvavisaSlug,
         p_kuva_idt: idt,

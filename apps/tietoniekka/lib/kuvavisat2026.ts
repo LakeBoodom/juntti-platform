@@ -290,18 +290,30 @@ export async function getViikkovisa(): Promise<Viikkovisa | null> {
 
   /* packages/db/types.ts ei tunne funktiota (generoitu tiedosto on jäljessä:
      38 taulua, kannassa 149) → tyypittämätön rpc-kutsu ja käsin kuvattu rivi.
-     Sama kierto kuin lib/haaste.ts:ssä; types.ts generoidaan omana passinaan. */
-  const rpc = (sb as unknown as {
+     Sama kierto kuin lib/haaste.ts:ssä; types.ts generoidaan omana passinaan.
+
+     HUOM: rpc kutsutaan metodina (sbAny.rpc(...)) eikä irrotettuna funktiona.
+     Aiemmin tässä oli `const rpc = (sb as ...).rpc`, mikä hukkasi `this`:n ja
+     kaatoi koko kokoelmasivun: "Cannot read properties of undefined (reading
+     'rest')". Älä irrota Supabase-asiakkaan metodeja. */
+  const sbAny = sb as unknown as {
     rpc: (fn: string, args: Record<string, unknown>) => Promise<{ data: unknown; error: unknown }>;
-  }).rpc;
-  const { data, error } = await rpc("kuvavisa_viikon_kuvat", { p_site_id: siteId });
-  if (error) return null;
-  const rivi = (Array.isArray(data) ? data[0] : data) as
-    | { vuosi: number; viikko: number; idt: string[] | null }
-    | null
-    | undefined;
-  if (!rivi || !rivi.idt || rivi.idt.length === 0) return null;
-  return { vuosi: rivi.vuosi, viikko: rivi.viikko, kuvaIdt: rivi.idt };
+  };
+
+  /* Viikkovisapaneeli on kokoelmasivulla lisä, ei sivun ehto: jos haku
+     kaatuu, paneeli jää pois eikä sivu mene rikki. */
+  try {
+    const { data, error } = await sbAny.rpc("kuvavisa_viikon_kuvat", { p_site_id: siteId });
+    if (error) return null;
+    const rivi = (Array.isArray(data) ? data[0] : data) as
+      | { vuosi: number; viikko: number; idt: string[] | null }
+      | null
+      | undefined;
+    if (!rivi || !rivi.idt || rivi.idt.length === 0) return null;
+    return { vuosi: rivi.vuosi, viikko: rivi.viikko, kuvaIdt: rivi.idt };
+  } catch {
+    return null;
+  }
 }
 
 /** Kuvalevyn sävy kortiston tyypin mukaan — viikkovisassa kuvat tulevat
