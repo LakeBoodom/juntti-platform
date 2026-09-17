@@ -2,7 +2,7 @@
 // ("kortti oli liian dominoiva" → leveä kortti, visa pääosassa)
 // Rakenne: kokoelmahero → suodattimet (pelitapa + 🔒 Mega + sarja/laji)
 // → rivit (data-vetoiset) → Selaa kaikki -CTA-paneeli → #kaikki-ruudukko.
-// Kuvavisat: oma kortistoruudukko suoraan kannasta.
+// Kuvavisat: oma hub (KUVAVISAT 2.0, 17.9.2026) — kategoriat avaavat visavariaatiot.
 // Tunnetut henkilöt: oma hub (ennallaan, Heikin ohje 2026-07-31).
 
 import type { Metadata } from "next";
@@ -16,6 +16,8 @@ import { MOTIF_PATHS, motifPathFor } from "@/components/tn20/motif-paths";
 import { LearnArticle } from "@/components/tn20/LearnArticle";
 import { ShowMoreGrid } from "@/components/tn20/ShowMoreGrid";
 import Crumbs from "@/components/tn20/Crumbs";
+import { KuvavisatHub } from "@/components/tn20/KuvavisatHub";
+import { getKuvavisatHub } from "@/lib/kuvavisat2026";
 import { urheiluImg } from "@/lib/urheilu";
 import { getPageContent } from "@/lib/pageContent";
 import { notFound } from "next/navigation";
@@ -149,7 +151,11 @@ const HUBS: Record<string, HubMeta> = {
     titleTop: "Kuva", titleAccent: "visat",
     accent: "#4C9AFF", accentLight: "#8FC0FF",
     img: "/20/teema-liput.webp",
-    lede: (n) => `Tunnistuspelit yhdessä paikassa: liput, vaakunat, eläimet ja muut. ${n} kuvaa, yksi silmäys kerrallaan.`,
+    /* KUVAVISAT 2.0 (17.9.2026): sivu ei enää käytä HubShelliä, joten lede
+       jää vain generateMetadatan varakuvaukseksi (kutsutaan lede(0), eli
+       kuvamäärää ei voi käyttää) ja chips/ctaTitle/ctaDesc ovat tälle hubille
+       käyttämättömiä — tyyppi vaatii ne, muut hubit käyttävät. */
+    lede: () => "Tunnista liput, vaakunat, linnut, eläimet, maalaukset, nähtävyydet ja kasvit. Valitse kategoria ja sinulle sopiva vaikeustaso.",
     chips: (n) => [`${n} kuvaa`, "Kortistot kannasta"],
     source: { kind: "kuvavisa" },
     modes: [],
@@ -278,60 +284,35 @@ export default async function KokoelmaHub({
     return <PersonHub hub={hub} article={article} />;
   }
 
-  /* ── Kuvavisat: kortistoruudukko kannasta ── */
+  /* ── Kuvavisat 2.0 (17.9.2026): kategoriat → visavariaatiot ──
+     Korvasi vanhan kortistoruudukon (SVG-motiivikortit, jotka käynnistivät pelin
+     suoraan). Uusi malli: kategoriakortti esikatselukuvilla avaa listan
+     visavariaatioita (vaikeustaso, lipuilla myös maanosa). Design:
+     Kuvavisat-2026-design.html näkymät 1a/1b. Oma kehys HubShellin sijaan, koska
+     design luopuu hero-taustakuvasta tekstiheron hyväksi — murupolku säilyy
+     sivuston yhteisenä (Crumbs). */
   if (hub.source.kind === "kuvavisa") {
-    const { data } = await sb.from("kuvavisas").select("type, active");
-    const rows = (data ?? []) as Array<{ type: string; active: boolean }>;
-    const counts: Record<string, number> = {};
-    for (const r of rows) if (r.active) counts[r.type] = (counts[r.type] ?? 0) + 1;
-    const decks = Object.entries(counts)
-      .filter(([, n]) => n >= 5)
-      .sort((a, b) => b[1] - a[1])
-      .map(([type, n]) => ({ type, n, meta: DECK_META[type] ?? { label: type, note: "", motif: "kysymys", color: hub.accentLight } }));
-    const total = decks.reduce((s, d) => s + d.n, 0);
-    const words: Record<number, string> = { 4: "Neljä", 5: "Viisi", 6: "Kuusi", 7: "Seitsemän", 8: "Kahdeksan" };
-    const deckWord = words[decks.length] ?? `${decks.length}`;
+    const { kategoriat, kuviaYhteensa, variaatioitaYhteensa } = await getKuvavisatHub();
+    if (kategoriat.length === 0) return <main style={{ padding: 32 }}>Kuvavisoja ei löytynyt.</main>;
+
+    /* "Arvo satunnainen kuvavisa": arvonta tehdään palvelimella per pyyntö
+       (sivu on force-dynamic), joten linkki vaihtuu joka latauksella. */
+    const kaikkiVariaatiot = kategoriat.flatMap((k) => k.variaatiot);
+    const satunnainenHref = kaikkiVariaatiot[Math.floor(Math.random() * kaikkiVariaatiot.length)]?.href ?? null;
 
     return (
-      <HubShell hub={hub} count={total} filter={filter} filters={[]} article={article}>
-        <section className="tn-section" style={{ paddingTop: 8 }}>
-          <div className="tn-hubrow-head">
-            <div>
-              <h2 className="tn-section-title">{deckWord} kuvakokoelmaa</h2>
-              <div className="tn-hubrow-note">Jokainen tunnistuspeli omalla kortistollaan — uudet kortistot ilmestyvät tähän suoraan kannasta</div>
-            </div>
-          </div>
-          <div className="tn-card-grid">
-            {decks.map((d) => (
-              <a key={d.type} className="tn-deck" href={`/peli?kuvavisa=${d.type}`} style={{ color: d.meta.color }}>
-                <div className="tn-deck-inner">
-                  <div className="tn-deck-wash" />
-                  <div className="tn-deck-glow" />
-                  <svg viewBox="0 0 200 260" className="tn-deck-motif" aria-hidden>
-                    <path d={MOTIF_PATHS[d.meta.motif]} fill="none" stroke="currentColor" strokeWidth={6} strokeLinecap="round" strokeLinejoin="round" />
-                  </svg>
-                  <div className="tn-deck-fade" />
-                  <div className="tn-deck-body">
-                    <div className="tn-deck-title">{d.meta.label}</div>
-                    <div className="tn-deck-note">{d.meta.note} · {d.n} kuvaa</div>
-                  </div>
-                </div>
-              </a>
-            ))}
-          </div>
-        </section>
-        <section className="tn-section">
-          <div className="tn-ctapanel" style={{ ["--tn-hub-accent" as string]: hub.accent }}>
-            <div style={{ flex: "2 1 min(100%, 280px)" }}>
-              <h2 className="tn-display" style={{ fontSize: "clamp(24px, 3.4cqw, 44px)", margin: "0 0 10px" }}>{hub.ctaTitle(total)}</h2>
-              <p style={{ margin: 0, color: "#B9AF9B", maxWidth: "38ch" }}>{hub.ctaDesc}</p>
-            </div>
-            <a className="tn-cta" href={`/peli?kuvavisa=${decks[0]?.type ?? "liput"}`} style={{ color: "var(--tn-bg)" }}>
-              Pelaa heti →
-            </a>
-          </div>
-        </section>
-      </HubShell>
+      <main style={{ minHeight: "100dvh" }}>
+        <Crumbs items={[{ label: "Kokoelmat", href: "/kokoelmat" }, { label: hub.name }]} />
+        <div className="tn-shell">
+          <KuvavisatHub
+            kategoriat={kategoriat}
+            kuviaYhteensa={kuviaYhteensa}
+            variaatioitaYhteensa={variaatioitaYhteensa}
+            satunnainenHref={satunnainenHref}
+            article={article}
+          />
+        </div>
+      </main>
     );
   }
 

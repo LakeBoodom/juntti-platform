@@ -598,19 +598,34 @@ const KUVAVISA_URL_TO_TYPE: Record<string, string> = {
  * järjestyksessä (sort_order nouseva) — "mitkä liput tulee ensimmäisinä".
  * Leikkaa listan pituuteen `limit`.
  */
-export async function getKuvavisat(urlSlug: string, limit = 10): Promise<KuvavisaRow[]> {
+export async function getKuvavisat(
+  urlSlug: string,
+  limit = 10,
+  /** KUVAVISAT 2.0 (2026-09-17): kokoelmasivun visavariaatiot rajaavat kortistoa
+      vaikeustasolla (`difficulty`) tai maanosalla (`tag`). Ilman rajausta haku
+      käyttäytyy täsmälleen kuten ennen — variaatiot ovat lisä, ei muutos.
+      `tagit` annetaan valmiina listana (maanosa→tagit puretaan kutsupaikalla),
+      jotta tämä moduuli ei tarvitse importtia kuvavisat2026.ts:stä — se
+      importoi getSiteId:n täältä ja syntyisi kehä. */
+  rajaus?: { taso?: string | null; tagit?: string[] | null },
+): Promise<KuvavisaRow[]> {
   const type = KUVAVISA_URL_TO_TYPE[urlSlug] ?? urlSlug;
   const sb = getSupabase();
   if (!sb) return [];
   const siteId = await getSiteId();
   if (!siteId) return [];
 
-  const { data, error } = await sb
+  let q = sb
     .from("kuvavisas")
     .select("id, type, question, image_url, options, correct_option, fact")
     .eq("site_id", siteId)
     .eq("type", type)
-    .eq("active", true)
+    .eq("active", true);
+
+  if (rajaus?.taso) q = q.eq("difficulty", rajaus.taso);
+  if (rajaus?.tagit && rajaus.tagit.length > 0) q = q.in("tag", rajaus.tagit);
+
+  const { data, error } = await q
     .order("sort_order", { ascending: true })
     .order("created_at", { ascending: true })
     .limit(limit);

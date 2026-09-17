@@ -7,6 +7,7 @@
 
 import { getSupabase } from "@/lib/supabase";
 import { getKuvavisat, getKuvavisatByIds } from "@/lib/queries";
+import { TASOT, MAANOSAT } from "@/lib/kuvavisat2026";
 import { kulttuuriImg } from "@/lib/kulttuuri";
 import { luontoImg } from "@/lib/luonto";
 import { urheiluImg } from "@/lib/urheilu";
@@ -333,7 +334,21 @@ export default async function Peli20({
        ohitusta varten (README: rikkinäinen kysymys korvataan ensin). */
     const idsParam = typeof params.ids === "string" ? params.ids : null;
     const wantedIds = idsParam ? idsParam.split(",").map((x) => x.trim()).filter((x) => /^[0-9a-f-]{20,}$/i.test(x)).slice(0, 20) : [];
-    const allRows = wantedIds.length > 0 ? await getKuvavisatByIds(wantedIds) : await getKuvavisat(kuvavisa, 12);
+
+    /* KUVAVISAT 2.0 (2026-09-17): kokoelmasivun visavariaatiot tulevat tänne
+       parametreina — ?taso=helppo|keski|vaikea rajaa vaikeustasolla, ?maanosa=
+       rajaa lipun maanosalla. Tuntematon arvo ohitetaan (ei 404), jolloin
+       pelaaja saa koko kortiston eikä rikkinäistä linkkiä. Haastelinkki (?ids)
+       voittaa aina: siinä kortit on jo lukittu. */
+    const tasoParam = typeof params.taso === "string" ? params.taso : null;
+    const taso = TASOT.some((t) => t.key === tasoParam) ? tasoParam : null;
+    const maanosaParam = typeof params.maanosa === "string" ? params.maanosa : null;
+    const maanosa = MAANOSAT.find((m) => m.key === maanosaParam) ?? null;
+
+    const allRows =
+      wantedIds.length > 0
+        ? await getKuvavisatByIds(wantedIds)
+        : await getKuvavisat(kuvavisa, 12, { taso, tagit: maanosa ? [...maanosa.tagit] : null });
     const rows = wantedIds.length > 0 ? allRows : allRows.slice(0, 10);
     const spareRows = wantedIds.length > 0 ? [] : allRows.slice(10);
     if (rows.length === 0) notFound();
