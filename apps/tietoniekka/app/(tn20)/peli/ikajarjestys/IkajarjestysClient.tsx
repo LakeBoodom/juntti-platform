@@ -48,6 +48,24 @@ function writeLastSeen(ids: string[]) {
 
 type Phase = "start" | "loading" | "ordering" | "revealing";
 
+// NAVIGAATIOKORJAUS (2026-09-17, Heikin live-QA-löydös): pelisivulta puuttui
+// kokonaan tie takaisin muualle sivustoon — TopBar piiloutuu /peli-poluilla
+// (pelikuoren omat logosäännöt, ks. TopBar-kommentti), ja tavallinen visa
+// (GameClient.tsx) korvaa sen omalla tng-top-HUD:llaan, mutta Ikäjärjestys
+// jäi ilman kumpaakaan. Kevyt oma paluulinkki kaikkiin kolmeen vaiheeseen
+// (aloitus, järjestäminen, paljastus+tulos) — ei täyttä HUD:ia, koska
+// Ikäjärjestyksellä ei ole tavallisen visan kysymyslaskuria/putkea.
+function TkGameNav() {
+  return (
+    <nav className="tk-gamenav" aria-label="Sivuston navigaatio">
+      <a className="tk-gamenav-home" href="/" aria-label="Tietoniekka etusivu">
+        <b>TIETO</b>
+        <span>NIEKKA</span>
+      </a>
+    </nav>
+  );
+}
+
 export default function IkajarjestysClient({
   initialCategory,
   initialRound,
@@ -119,6 +137,7 @@ export default function IkajarjestysClient({
   if (phase === "start" || phase === "loading") {
     return (
       <main className="tk-page tk-page--start">
+        <TkGameNav />
         <CategoryPicker
           open
           variant="inline"
@@ -143,6 +162,7 @@ export default function IkajarjestysClient({
   if (phase === "revealing" && scoreResult) {
     return (
       <main className="tk-page">
+        <TkGameNav />
         <RevealSequencer
           items={revealItems}
           result={scoreResult}
@@ -159,6 +179,7 @@ export default function IkajarjestysClient({
   // phase === "ordering"
   return (
     <main className="tk-page">
+      <TkGameNav />
       <header className="tk-order-head">
         <SuuntaindikaattoriBadge direction={DEFAULT_DIRECTION} />
         <h1 className="tk-order-title">Tietoketju: Ikäjärjestys</h1>
