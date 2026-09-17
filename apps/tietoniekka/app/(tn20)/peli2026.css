@@ -31,6 +31,12 @@
 /* Tausta: kokoelma-/visakuva designin tummennuksella (Heikki 7a, 28.8.) */
 .tn20 .tng-bg { position: fixed; inset: 0; z-index: -2; background-size: cover; background-position: 52% 22%; opacity: 0.36; filter: saturate(0.62) contrast(1.05); }
 .tn20 .tng-bgshade { position: fixed; inset: 0; z-index: -1; background: radial-gradient(62% 58% at 24% 60%, rgba(15, 13, 7, 0.95), rgba(15, 13, 7, 0.62) 62%, rgba(15, 13, 7, 0.12) 100%), radial-gradient(56% 66% at 76% 52%, rgba(15, 13, 7, 0.94), rgba(15, 13, 7, 0.5) 70%, rgba(15, 13, 7, 0.1) 100%), linear-gradient(180deg, rgba(15, 13, 7, 0.82) 0%, rgba(15, 13, 7, 0.3) 26%, rgba(15, 13, 7, 0.42) 70%, rgba(15, 13, 7, 0.78) 100%); }
+/* T5: murupolku aloitusnäkymässä. Pieni ja hillitty — ei kilpaile otsikon kanssa. */
+.tn20 .tng-start-crumbs { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; font-size: 12.5px; font-weight: 600; color: #8e8676; }
+.tn20 .tng .tng-start-crumbs a { color: #8e8676; }
+.tn20 .tng .tng-start-crumbs a:hover { color: #f2c46b; }
+.tn20 .tng-start-crumbs [aria-current="page"] { color: #f5f0e6; }
+
 .tn20 .tng-topline { position: absolute; left: 0; right: 0; top: 0; height: 3px; background: linear-gradient(90deg, #e8a320, #f2c46b 40%, rgba(242, 196, 107, 0)); z-index: 6; }
 
 @keyframes tngRise { from { transform: translateY(10px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
@@ -293,6 +299,12 @@
 .tn20 .tng-linkstatus[data-kind="error"] .tng-linkdot { background: #ff6b4a; }
 .tn20 .tng-linkstatus > span:not(.tng-linkdot) { flex: 1 1 auto; min-width: 0; }
 .tn20 .tng-wa { display: flex; align-items: center; justify-content: center; gap: 12px; min-height: clamp(54px, 4.6cqw, 62px); padding: 15px 24px; border-radius: 14px; background: #1ebe5d; color: #04220f; font-family: var(--tn-font-display); font-weight: 900; font-size: clamp(14px, 1.3cqw, 18px); letter-spacing: 0.03em; text-transform: uppercase; box-shadow: 0 8px 22px -14px rgba(30, 190, 93, 0.7); transition: filter 0.15s, transform 0.15s; }
+/* K4 (UX-korjaus 17.9.2026): ".tn20 .tng a" (rivi 27) on spesifisyydellä 0,2,1
+   vahvempi kuin ".tn20 .tng-wa" (0,2,0), joten globaali amber-linkkiväri #f2c46b
+   yliajoi napin oman tumman tekstin → kontrasti vihreällä pohjalla oli 1,5:1
+   (WCAG vaatii 4,5:1). Nostetaan spesifisyys samalle tasolle linkkisäännön kanssa.
+   #04220f vaaleanvihreällä #1ebe5d antaa n. 8:1. */
+.tn20 .tng a.tng-wa { color: #04220f; }
 .tn20 .tng-wa:hover { filter: brightness(1.06); transform: translateY(-1px); color: #04220f; }
 .tn20 .tng-wa:focus-visible { outline: 2px solid #7bf0ac; outline-offset: 3px; }
 .tn20 .tng-sharepreview { display: flex; flex-direction: column; gap: 6px; padding: clamp(11px, 1.2cqw, 16px); border-radius: 12px; border: 1px dashed #4c4028; background: rgba(15, 13, 7, 0.55); }

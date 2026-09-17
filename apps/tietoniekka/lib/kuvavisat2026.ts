@@ -59,16 +59,20 @@ export type KategoriaMeta = {
   sovitus: KuvaSovitus;
   /** Onko kategorialla maanosaryhmittely (vain liput on tagitettu) */
   maanosat?: boolean;
+  /** object-position esikatselukuville. Henkilökuvissa 50% 18% — muuten kasvot
+      jäävät 16:10-rajauksen alle (Claude Designin korjaus, kohta 5). */
+  kuvaKohdistus?: string;
 };
 
 /** Kahdeksan kategoriaa designin järjestyksessä (1a: liput → vaakunat → linnut →
-    eläimet → maalaukset → nähtävyydet → henkilöt → kasvit). Kannan `type`
-    `rakennukset` = designin "Maailman nähtävyydet". */
+    eläimet → maalaukset → rakennukset → henkilöt → kasvit). Kortiston nimi on
+    Rakennukset — EI "nähtävyydet" (Heikin päätös 1, 17.9.2026), vaikka
+    kokonaissuunnitelman design käytti sitä sanaa. */
 export const KATEGORIAT: KategoriaMeta[] = [
   {
     type: "liput",
     otsikko: "Maiden liput",
-    kuvaus: "Tunnista maailman liput vaikeustasoittain ja maanosittain.",
+    kuvaus: "Tunnista maailman liput maanosittain.",
     yksikko: (n) => `${n} lippua`,
     monikko: "liput",
     accent: "#22D3EE",
@@ -77,8 +81,8 @@ export const KATEGORIAT: KategoriaMeta[] = [
   },
   {
     type: "vaakunat",
-    otsikko: "Vaakunoiden tunnistus",
-    kuvaus: "Suomen kuntien vaakunat — kilvet ja tunnukset.",
+    otsikko: "Vaakunat",
+    kuvaus: "Maakuntien, kaupunkien ja kuntien vaakunat.",
     yksikko: (n) => `${n} vaakunaa`,
     monikko: "vaakunat",
     accent: "#F2C874",
@@ -105,7 +109,7 @@ export const KATEGORIAT: KategoriaMeta[] = [
   {
     type: "maalaukset",
     otsikko: "Maalaukset",
-    kuvaus: "Klassikot ja tekijät — taide tunnistettavana.",
+    kuvaus: "Klassikot ja tekijät tunnistettavana.",
     yksikko: (n) => `${n} maalausta`,
     monikko: "maalaukset",
     accent: "#E85D9E",
@@ -113,21 +117,22 @@ export const KATEGORIAT: KategoriaMeta[] = [
   },
   {
     type: "rakennukset",
-    otsikko: "Maailman nähtävyydet",
-    kuvaus: "Tunnista rakennus, silta tai monumentti.",
-    yksikko: (n) => `${n} nähtävyyttä`,
-    monikko: "nähtävyydet",
+    otsikko: "Rakennukset",
+    kuvaus: "Torneista temppeleihin — tunnista rakennus kuvasta.",
+    yksikko: (n) => `${n} rakennusta`,
+    monikko: "rakennukset",
     accent: "#F5C462",
     sovitus: "cover",
   },
   {
     type: "henkilot",
     otsikko: "Henkilöt",
-    kuvaus: "Kasvot ja nimet — historiasta nykypäivään.",
+    kuvaus: "Kasvot ja nimet historiasta nykypäivään.",
     yksikko: (n) => `${n} henkilöä`,
     monikko: "henkilöt",
     accent: "#F0A24B",
     sovitus: "cover",
+    kuvaKohdistus: "50% 18%",
   },
   {
     type: "kasvit",
@@ -232,6 +237,26 @@ export async function getKuvavisatHub(): Promise<{ kategoriat: KategoriaData[]; 
     kuviaYhteensa: kategoriat.reduce((s, k) => s + k.kuvia, 0),
     variaatioitaYhteensa: kategoriat.reduce((s, k) => s + k.variaatiot.length, 0),
   };
+}
+
+/**
+ * T4 (UX-korjaus 17.9.2026): variaation nimi pelisivulle. Kokoelmasivun linkki lupaa
+ * "Afrikan liput", mutta pelisivu näytti silti "Lippuvisa" — sama nimi molemmissa,
+ * myös <title>-tagissa ja jakoteksteissä. Palauttaa null kun kortisto pelataan
+ * kokonaan (silloin käytetään kortiston omaa nimeä).
+ */
+export function variaationNimi(type: string, taso?: string | null, maanosaKey?: string | null): string | null {
+  const meta = KATEGORIAT.find((k) => k.type === type);
+  if (!meta) return null;
+  if (maanosaKey) {
+    const m = MAANOSAT.find((x) => x.key === maanosaKey);
+    if (m) return `${m.label} ${meta.monikko}`;
+  }
+  if (taso) {
+    const t = TASOT.find((x) => x.key === taso);
+    if (t) return `${t.label} ${meta.monikko}`;
+  }
+  return null;
 }
 
 /** Variaatioiden ryhmittely designin 1a-listaan: vaikeustasot ensin, sitten maanosat. */

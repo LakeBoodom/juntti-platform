@@ -157,19 +157,28 @@
 /* Design 1a: 3 saraketta 1440px:llä, 1b: 1 sarake mobiilissa. auto-fit hoitaa
    välileveydet ilman erillisiä breakpointeja. align-items: start — avattu
    kortti kasvaa alaspäin eikä veny sisarustensa korkeuteen. */
+/* Designin ruudukko: auto-fill + minmax(310px) + gap 22.
+   POIKKEAMA DESIGNIIN: align-items on start, ei stretch. Designin kortit eivät
+   laajene — täällä ne ovat <details>-elementtejä, ja stretchillä yhden kortin
+   avaaminen venytti saman rivin suljetut kortit sen korkeuteen, jolloin niiden
+   "Valitse visa" -napit valuivat satojen pikselien tyhjän tilan pohjalle
+   (havaittu mittauskuvasta 17.9.2026). Napit osuvat silti samalle linjalle ilman
+   stretchiä, koska suljetun kortin korkeus on rakenteeltaan vakio: kuvalaatikko
+   on kiinteä 16:10, otsikolla on min-height 53px (2 riviä) ja kuvauksella 42px. */
 .tn20 .kv-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 310px), 1fr));
   align-items: start;
-  gap: 18px;
+  gap: 22px;
 }
 
 .tn20 .kv-card {
-  align-self: start;
-  border: 1px solid #241e13;
-  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid #2c2517;
+  border-radius: 22px;
   overflow: hidden;
-  background: #16130c;
+  background: #17140d;
   color: var(--tn-text, #f5f0e6);
   transition: border-color 150ms cubic-bezier(0.2, 0.8, 0.2, 1);
 }
@@ -178,7 +187,9 @@
 }
 
 .tn20 .kv-card-summary {
-  display: block;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
   cursor: pointer;
   list-style: none;
 }
@@ -193,52 +204,109 @@
   outline-offset: -2px;
 }
 
-/* Esikatselu: kaksi kuvaa vierekkäin (design 1a, korkeus 170px).
-   BRAND.md §5 ratkaisee sovituksen, EI design: grafiikka (lippu, vaakuna,
-   maalaus) on contain vaalealla levyllä, koska cover rajaisi lipun reunoilta
-   pois juuri sen mitä pelaajan pitäisi tunnistaa. Valokuvat (linnut, eläimet,
-   nähtävyydet, henkilöt, kasvit) ovat cover. */
-.tn20 .kv-peek {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 2px;
-  height: clamp(140px, 18vw, 170px);
-  background: #241e13;
+/* ---------- Kuvalaatikko (Claude Designin korjaus 17.9.2026) ----------
+   Kiinteä 16:10 — kuvan oma kuvasuhde ei enää venytä korttia, joten pysty- ja
+   vaakakuva näyttävät samankokoisilta eikä mikään valu tekstin päälle.
+   Kaksi tyyppiä, ei koskaan sekaisin samassa kortissa:
+     Grafiikka (liput, vaakunat, maalaukset) = yksi yhtenäinen vaalea levy,
+       kuvat contain max-width 44% → mikään ei rajaudu.
+     Valokuva (linnut, eläimet, rakennukset, henkilöt, kasvit) = 2 saraketta,
+       1px hairline välissä, cover. */
+.tn20 .kv-media {
+  position: relative;
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  background: #0f0d07;
+  border-bottom: 1px solid #2c2517;
 }
-.tn20 .kv-peek img {
-  width: 100%;
-  height: 100%;
+
+.tn20 .kv-media-plate {
+  position: absolute;
+  inset: 0;
+  background: var(--kv-plate);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  padding: 20px;
+}
+.tn20 .kv-media-plate img {
+  max-width: 44%;
+  max-height: 100%;
+  width: auto;
+  height: auto;
+  object-fit: contain;
   display: block;
 }
-.tn20 .kv-peek--cover img {
-  object-fit: cover;
+
+.tn20 .kv-media-photos {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1px;
+  background: #2c2517;
 }
-.tn20 .kv-peek--contain img {
-  object-fit: contain;
-  background: var(--kv-plate);
-  padding: 14px;
+.tn20 .kv-media-photos img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Ainoa kuvan päällä oleva elementti — oma tumma pohja, jotta se on luettava
+   millä tahansa kuvalla. */
+.tn20 .kv-media-kind {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  padding: 0 10px;
+  border-radius: 999px;
+  background: rgba(15, 13, 7, 0.86);
+  border: 1px solid rgba(245, 240, 230, 0.16);
+  color: #cfc7b6;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
 }
 
 .tn20 .kv-card-body {
-  padding: 22px 22px 20px;
   display: flex;
   flex-direction: column;
+  flex: 1;
   gap: 10px;
+  padding: 20px 22px 22px;
 }
 
 /* KORTTISÄÄNTÖ-mitoitus. Pisimmät sanat kategorianimissä ovat 11 merkkiä
-   ("nähtävyydet", "Vaakunoiden"). Kapein kortti on 300px (kv-grid minmax),
+   ("Rakennukset", "Maalaukset"). Kapein kortti on 310px (kv-grid minmax),
    josta tekstille jää 300 − 44 padding = 256px:
    0.95 × 256 / (0.67 × 11) ≈ 33px. Designin arvot ovat 27px (1a) ja 19px (1b),
    eli molemmat mahtuvat lähtöarvoon selvällä marginaalilla. */
+/* Designin arvot: 25px / wdth 78 / line-height 1.06 / min-height 53px = kaksi riviä.
+   min-height varaa toisen rivin tilan myös yksiriviselle otsikolle, jotta kuvaus ja
+   nappi ovat samalla linjalla kaikissa korteissa (Designin korjaus, kohta 3).
+   KORTTISÄÄNTÖ: pisin sana kategorianimissä on 11 merkkiä ("Vaakunoiden" jäi pois
+   päätöksellä 2, nyt pisin on "Rakennukset"/"Maalaukset"). Kapein kortti 310px −
+   44px padding = 266px tekstille → 0.95 × 266 / (0.67 × 11) ≈ 34px mahtuisi, eli
+   25px on reilusti turvallinen. Mitattu Range-menetelmällä, ks. tiedoston loppu. */
 .tn20 .kv-card-title {
   margin: 0;
+  display: flex;
+  align-items: flex-start;
+  min-height: 53px;
   font-family: var(--kv-display);
   font-weight: 900;
   font-variation-settings: "wdth" 78;
-  font-size: clamp(19px, 1.9vw, 27px);
-  line-height: 1;
+  font-size: clamp(20px, 1.8vw, 25px);
+  line-height: 1.06;
+  letter-spacing: -0.015em;
   text-transform: uppercase;
+  color: var(--tn-text, #f5f0e6);
   overflow-wrap: normal;
   word-break: keep-all;
   text-wrap: balance;
@@ -246,9 +314,10 @@
 
 .tn20 .kv-card-desc {
   margin: 0;
-  font-size: 14.5px;
+  min-height: 42px;
+  font-size: 14px;
   line-height: 1.5;
-  color: #b9af9b;
+  color: #a79e8c;
   text-wrap: pretty;
 }
 
@@ -267,20 +336,26 @@
 }
 
 .tn20 .kv-card-cta {
-  min-height: 44px;
+  margin-top: auto;
+  height: 48px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  margin-top: 6px;
   padding: 0 18px;
-  border: 1px solid #3a3122;
-  border-radius: 10px;
-  font-size: 14px;
-  font-weight: 700;
+  border: 1px solid #3a3120;
+  border-radius: 999px;
+  font-size: 15px;
+  font-weight: 600;
+  transition: border-color 150ms cubic-bezier(0.2, 0.8, 0.2, 1), color 150ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.tn20 .kv-card:hover .kv-card-cta {
+  border-color: var(--tn-amber, #e8a320);
+  color: var(--tn-amber, #e8a320);
 }
 .tn20 .kv-card-cta .kv-caret {
-  color: var(--tn-amber, #e8a320);
+  font-size: 10px;
+  opacity: 0.55;
   transition: transform 220ms cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 .tn20 .kv-card[open] .kv-card-cta .kv-caret {

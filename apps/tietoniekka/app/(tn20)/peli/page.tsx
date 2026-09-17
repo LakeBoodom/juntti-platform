@@ -7,7 +7,7 @@
 
 import { getSupabase } from "@/lib/supabase";
 import { getKuvavisat, getKuvavisatByIds } from "@/lib/queries";
-import { TASOT, MAANOSAT } from "@/lib/kuvavisat2026";
+import { TASOT, MAANOSAT, variaationNimi } from "@/lib/kuvavisat2026";
 import { kulttuuriImg } from "@/lib/kulttuuri";
 import { luontoImg } from "@/lib/luonto";
 import { urheiluImg } from "@/lib/urheilu";
@@ -22,6 +22,16 @@ import type { Metadata } from "next";
 
 export const dynamic = "force-dynamic";
 
+/** Fisher–Yates. Palauttaa uuden taulukon — kutsutaan vain palvelimella (ks. K2). */
+function sekoita<T>(arr: T[]): T[] {
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
 /* ── Sivukohtainen title/description (QA-006, 29.8.2026): aiemmin kaikki
    371 pelisivua perivät layoutin "esikatselu"-otsikon. ── */
 export async function generateMetadata(
@@ -33,8 +43,18 @@ export async function generateMetadata(
   const kuvavisa = str("kuvavisa"), mega = str("mega"), slug = str("visa"), quizId = str("quiz_id");
   const suffix = " | Tietoniekka";
   if (kuvavisa) {
-    const t = KUVAVISA_TITLES[kuvavisa] ?? "Kuvavisa";
-    return { title: `${t} – tunnista kuvasta${suffix}`, description: "Yksi kuva, neljä vaihtoehtoa. Pelaa ilmainen kuvavisa Tietoniekassa." };
+    /* T4: variaatio näkyy otsikossa samalla nimellä kuin kokoelmasivun linkissä. */
+    const taso = str("taso");
+    const maanosa = str("maanosa");
+    const vari = variaationNimi(kuvavisa, taso, maanosa);
+    const t = vari ?? KUVAVISA_TITLES[kuvavisa] ?? "Kuvavisa";
+    return {
+      title: `${t} – tunnista kuvasta${suffix}`,
+      description: KUVAVISA_DESC[kuvavisa] ?? "Yksi kuva, neljä vaihtoehtoa. Pelaa ilmainen kuvavisa Tietoniekassa.",
+      /* T6: kanoninen osoite on kortiston perusvisa — variaatiot eivät kilpaile
+         samasta hakutuloksesta keskenään. */
+      alternates: { canonical: `/peli?kuvavisa=${encodeURIComponent(kuvavisa)}` },
+    };
   }
   if (!sb) return {};
   if (mega) {
@@ -60,9 +80,26 @@ export async function generateMetadata(
   return { title: `Visaa ei löytynyt${suffix}` };
 }
 
+/* T6 (UX-korjaus 17.9.2026): henkilot ja rakennukset puuttuivat → metadata näytti
+   niille geneerisen "Kuvavisa – tunnista kuvasta". Kaupungit lisätty samalla. */
 const KUVAVISA_TITLES: Record<string, string> = {
   liput: "Lippuvisa", vaakunat: "Vaakunavisa", vaakuna: "Vaakunavisa", linnut: "Lintuvisa",
   elaimet: "Eläinvisa", kasvit: "Kasvivisa", maalaukset: "Maalausvisa",
+  henkilot: "Henkilövisa", rakennukset: "Rakennusvisa", kaupungit: "Kaupunkivisa",
+};
+
+/* T6: kortistokohtainen meta description — aiemmin kaikilla kuvavisoilla oli sama
+   lause, joten hakutuloksissa kymmenen visaa näytti identtisiltä. */
+const KUVAVISA_DESC: Record<string, string> = {
+  liput: "Tunnista maailman valtioiden liput. Ilmainen kuvavisa Tietoniekassa — ei kirjautumista.",
+  vaakunat: "Tunnista maakuntien, kaupunkien ja kuntien vaakunat. Ilmainen kuvavisa Tietoniekassa.",
+  linnut: "Tunnista Suomen linnut kuvasta. Ilmainen kuvavisa Tietoniekassa — ei kirjautumista.",
+  elaimet: "Tunnista eläinlajit lähikuvasta. Ilmainen kuvavisa Tietoniekassa — ei kirjautumista.",
+  kasvit: "Tunnista Suomen kasvit ja puut kuvasta. Ilmainen kuvavisa Tietoniekassa.",
+  maalaukset: "Tunnista klassikkomaalaukset ja niiden tekijät. Ilmainen kuvavisa Tietoniekassa.",
+  henkilot: "Tunnista tunnetut henkilöt kuvasta. Ilmainen kuvavisa Tietoniekassa.",
+  rakennukset: "Tunnista maailman rakennukset kuvasta. Ilmainen kuvavisa Tietoniekassa.",
+  kaupungit: "Tunnista kaupungit yhdestä näkymästä. Ilmainen kuvavisa Tietoniekassa.",
 };
 
 const COLLECTION_ACCENT: Record<string, string> = {
@@ -317,13 +354,13 @@ export default async function Peli20({
   if (kuvavisa) {
     const DECKS: Record<string, { title: string; teaser: string; motif: string; color: string }> = {
       liput: { title: "Lippuvisa", teaser: "Yksi lippu, neljä maata — kuinka tarkka silmäsi on?", motif: "lippu", color: "#4C9AFF" },
-      vaakuna: { title: "Vaakunavisa", teaser: "Tunnista suomalainen kunnanvaakuna kilvestä.", motif: "vaakuna", color: "#8FC0FF" },
-      vaakunat: { title: "Vaakunavisa", teaser: "Tunnista suomalainen kunnanvaakuna kilvestä.", motif: "vaakuna", color: "#8FC0FF" },
+      vaakuna: { title: "Vaakunavisa", teaser: "Maakuntien, kaupunkien ja kuntien vaakunat.", motif: "vaakuna", color: "#8FC0FF" },
+      vaakunat: { title: "Vaakunavisa", teaser: "Maakuntien, kaupunkien ja kuntien vaakunat.", motif: "vaakuna", color: "#8FC0FF" },
       linnut: { title: "Lintuvisa", teaser: "Siivet, nokat ja höyhenpuvut — tunnista laji kuvasta.", motif: "lintu", color: "#7CEBC8" },
       elaimet: { title: "Eläinvisa", teaser: "Tunnista eläinlaji lähikuvasta.", motif: "elain", color: "#2FD9A5" },
       kasvit: { title: "Kasvivisa", teaser: "Lehti, kukka vai kaarna — tunnista kasvi.", motif: "kasvi", color: "#4ADE80" },
       henkilot: { title: "Henkilövisa", teaser: "Tunnista henkilö kuvasta.", motif: "kasvot", color: "#F0A24B" },
-      rakennukset: { title: "Rakennusvisa", teaser: "Tunnista rakennus kuvasta.", motif: "torni", color: "#F2C230" },
+      rakennukset: { title: "Rakennusvisa", teaser: "Torneista temppeleihin — tunnista rakennus kuvasta.", motif: "torni", color: "#F2C230" },
       kaupungit: { title: "Kaupunkivisa", teaser: "Tunnista kaupunki yhdestä näkymästä.", motif: "kaupunki", color: "#F5C462" },
       maalaukset: { title: "Maalausvisa", teaser: "Tunnista taideteos tai tekijä.", motif: "naamio", color: "#E85D9E" },
     };
@@ -345,12 +382,21 @@ export default async function Peli20({
     const maanosaParam = typeof params.maanosa === "string" ? params.maanosa : null;
     const maanosa = MAANOSAT.find((m) => m.key === maanosaParam) ?? null;
 
+    /* K2 (UX-korjaus 17.9.2026, päätös 3): jokainen peli arpoo 10 kuvaa kortistosta.
+       Aiemmin haku otti 12 ensimmäistä sort_order-järjestyksessä, joten Liput antoi
+       aina saman sarjan samassa järjestyksessä (Australia, Albania, Alankomaat…) niin
+       sivun latauksella kuin "Pelaa uudelleen" -napilla. Nyt koko (mahdollisesti
+       suodatettu) kortisto haetaan ja siitä arvotaan palvelimella 10 + 2 varakorttia.
+       Arvonta on palvelimella tarkoituksella: propseina tuleva valmis järjestys ei voi
+       tuottaa hydraatioeroa, toisin kuin renderissä tehty Math.random. Haastelinkki
+       (?ids=) ohittaa arvonnan kokonaan — siinä sarja on lukittu. */
     const allRows =
       wantedIds.length > 0
         ? await getKuvavisatByIds(wantedIds)
-        : await getKuvavisat(kuvavisa, 12, { taso, tagit: maanosa ? [...maanosa.tagit] : null });
-    const rows = wantedIds.length > 0 ? allRows : allRows.slice(0, 10);
-    const spareRows = wantedIds.length > 0 ? [] : allRows.slice(10);
+        : await getKuvavisat(kuvavisa, 500, { taso, tagit: maanosa ? [...maanosa.tagit] : null });
+    const arvottu = wantedIds.length > 0 ? allRows : sekoita(allRows);
+    const rows = wantedIds.length > 0 ? arvottu : arvottu.slice(0, 10);
+    const spareRows = wantedIds.length > 0 ? [] : arvottu.slice(10, 12);
     if (rows.length === 0) notFound();
 
     /* Ristiinnostot: muut aktiiviset kortistot */
@@ -369,26 +415,34 @@ export default async function Peli20({
         href: `/peli?kuvavisa=${type}`,
       }));
 
+    /* Vaihtoehtojen järjestys sekoitetaan per kysymys: aiemmin oikea vastaus oli
+       joka pelissä samalla paikalla, koska options tuli kannasta vakiojärjestyksessä. */
     const toQ = (r: (typeof rows)[number]) => ({
       question: r.question,
-      options: (r.options ?? []).slice(0, 4),
+      options: sekoita((r.options ?? []).slice(0, 4)),
       correct: r.correct_option,
       fact: r.fact ?? null,
       image: r.image_url,
     });
+    const variaatio = variaationNimi(kuvavisa, taso, maanosa?.key ?? null);
     const game: GameQuiz = {
       id: "", // ei quizzes-riviä → pelikertaa ei tallenneta
-      title: deck.title,
+      /* T4: "Afrikan liput" / "Vaikeat liput" — sama nimi kuin kokoelmasivun linkissä. */
+      title: variaatio ?? deck.title,
       teaser: deck.teaser,
       collectionLabel: "Kuvavisat",
       genreLabel: null,
       hubHref: "/kokoelma/kuvavisat",
-      bgImg: "/20/teema-liput.webp",
+      /* K1: ei taustakuvaa kuvavisoissa — tasainen brändipohja, ks. GameClient. */
+      bgImg: "",
       /* Kuvavisat = designin sininen (kuvavisa-README) */
       accent: "#3B82F6",
       isSankari: false,
       kind: "kuva",
       challengePath: `/peli?kuvavisa=${encodeURIComponent(kuvavisa)}&ids=${rows.map((r) => r.id).join(",")}`,
+      /* Haastelinkillä sarja on lukittu → ei uudelleenlatausta "Pelaa uudelleen" -napista. */
+      reloadOnRestart: wantedIds.length === 0,
+      autoStart: params.aloita === "1",
       spare: spareRows.map(toQ),
       questions: rows.map(toQ),
       related,

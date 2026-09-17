@@ -155,7 +155,7 @@ const HUBS: Record<string, HubMeta> = {
        jää vain generateMetadatan varakuvaukseksi (kutsutaan lede(0), eli
        kuvamäärää ei voi käyttää) ja chips/ctaTitle/ctaDesc ovat tälle hubille
        käyttämättömiä — tyyppi vaatii ne, muut hubit käyttävät. */
-    lede: () => "Tunnista liput, vaakunat, linnut, eläimet, maalaukset, nähtävyydet ja kasvit. Valitse kategoria ja sinulle sopiva vaikeustaso.",
+    lede: () => "Tunnista liput, vaakunat, linnut, eläimet, maalaukset, rakennukset ja kasvit. Valitse kategoria ja sinulle sopiva vaikeustaso.",
     chips: (n) => [`${n} kuvaa`, "Kortistot kannasta"],
     source: { kind: "kuvavisa" },
     modes: [],

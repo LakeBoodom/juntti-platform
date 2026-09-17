@@ -17,15 +17,34 @@
 
 import { ryhmiteltyVariaatiot, type KategoriaData } from "@/lib/kuvavisat2026";
 
-function EsikatseluKuvat({ k }: { k: KategoriaData }) {
+/* Kuvalaatikko — Claude Designin korjaus (README "Kategorianäkymä, korjaus", 17.9.2026).
+   JUURISYY jota tämä korjaa: kuvalaatikolla ei ollut kiinteää korkeutta, joten kuva
+   kasvoi oman kuvasuhteensa mukaan ja pystykuvat (Mona Lisa, Napoleon, Eiffel) valuivat
+   otsikon ja napin päälle. Nyt laatikko on aina 16:10 ja teksti on sen ULKOPUOLELLA
+   omana sisaruksenaan — ei päällekkäisiä kerroksia. Ainoa kuvan päällä oleva elementti
+   on tyyppimerkki, jolla on oma tumma pohja. */
+function KuvaLaatikko({ k }: { k: KategoriaData }) {
   const kuvat = k.esikatselut.slice(0, 2);
   if (kuvat.length === 0) return null;
+  const grafiikka = k.meta.sovitus === "contain";
   return (
-    <div className={`kv-peek kv-peek--${k.meta.sovitus}`} aria-hidden="true">
-      {kuvat.map((src, i) => (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img key={`${src}-${i}`} src={src} alt="" loading="lazy" draggable={false} />
-      ))}
+    <div className="kv-media">
+      <div className={grafiikka ? "kv-media-plate" : "kv-media-photos"} aria-hidden="true">
+        {kuvat.map((src, i) => (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            key={`${src}-${i}`}
+            src={src}
+            alt=""
+            loading="lazy"
+            draggable={false}
+            style={grafiikka || !k.meta.kuvaKohdistus ? undefined : { objectPosition: k.meta.kuvaKohdistus }}
+          />
+        ))}
+      </div>
+      {/* Tyyppimerkki: kertoo kumpaa kuvatyyppiä kortisto käyttää. Sama tieto ohjaa
+          sovitusta myös pelinäkymässä (KategoriaMeta.sovitus). */}
+      <span className="kv-media-kind">{grafiikka ? "Grafiikka" : "Valokuva"}</span>
     </div>
   );
 }
@@ -42,7 +61,7 @@ function KategoriaKortti({ k, avoin }: { k: KategoriaData; avoin: boolean }) {
       style={{ ["--kv-accent" as string]: k.meta.accent }}
     >
       <summary className="kv-card-summary">
-        <EsikatseluKuvat k={k} />
+        <KuvaLaatikko k={k} />
         <div className="kv-card-body">
           <h3 className="kv-card-title">{k.meta.otsikko}</h3>
           <p className="kv-card-desc">{k.meta.kuvaus}</p>
@@ -53,6 +72,8 @@ function KategoriaKortti({ k, avoin }: { k: KategoriaData; avoin: boolean }) {
               {visoja} {visoja === 1 ? "visa" : "visaa"}
             </span>
           </div>
+          {/* margin-top:auto pitää napit samalla linjalla vaikka otsikot ja
+              kuvaukset ovat eri pituisia (Designin korjaus, kohta 3). */}
           <span className="kv-card-cta">
             Valitse visa
             <span className="kv-caret" aria-hidden="true">
@@ -97,7 +118,7 @@ export function KuvavisatHub({
       <header className="kv-hero">
         <h1 className="kv-hero-title">Kuvavisat</h1>
         <p className="kv-hero-lede">
-          Tunnista liput, vaakunat, linnut, eläimet, maalaukset, nähtävyydet ja kasvit. Valitse kategoria, sitten sinulle
+          Tunnista liput, vaakunat, linnut, eläimet, maalaukset, rakennukset ja kasvit. Valitse kategoria, sitten sinulle
           sopiva vaikeustaso.
         </p>
         <div className="kv-hero-stats">

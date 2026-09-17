@@ -60,6 +60,10 @@ export type GameQuiz = {
   kind?: "teksti" | "kuva";
   /** Haastelinkin polku (origin lisätään selaimessa). */
   challengePath: string;
+  /** K2: "Pelaa uudelleen" lataa sivun uudelleen uuden arvonnan vuoksi (kuvavisat). */
+  reloadOnRestart?: boolean;
+  /** K2: ohita aloitusnäkymä (?aloita=1 uudelleenlatauksen jälkeen). */
+  autoStart?: boolean;
   /** Varakysymykset teknistä ohitusta varten (kuvavisat) */
   spare?: GameQuestion[];
   questions: GameQuestion[];
@@ -175,7 +179,13 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
   const spare = useRef<GameQuestion[]>([...(quiz.spare ?? [])]);
   const total = questions.length;
 
-  const [phase, setPhase] = useState<"start" | "play" | "end">("start");
+  /* K2 (UX-korjaus 17.9.2026): kuvavisan kierros arvotaan palvelimella joka
+     pyynnöllä, joten "Pelaa uudelleen" ei voi olla pelkkä client-tilan nollaus —
+     se antaisi saman kymmenikön uudelleen. Kun quiz.reloadOnRestart on tosi,
+     restart lataa sivun uudelleen ja aloitusvaihe ohitetaan (?aloita=1), jotta
+     pelaaja päätyy suoraan peliin kuten ennenkin. Haastelinkissä (?ids=) sarja on
+     tarkoituksella lukittu, eikä palvelin aseta tätä lippua. */
+  const [phase, setPhase] = useState<"start" | "play" | "end">(quiz.autoStart ? "play" : "start");
   const [qi, setQi] = useState(0);
   const [sel, setSel] = useState<number | null>(null);
   const [locked, setLocked] = useState(false);
@@ -440,6 +450,16 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
     try { window.scrollTo(0, 0); } catch { /* no-op */ }
   }
   function restart() {
+    if (quiz.reloadOnRestart) {
+      try {
+        const u = new URL(window.location.href);
+        u.searchParams.set("aloita", "1");
+        window.location.replace(u.toString());
+        return;
+      } catch {
+        /* URL-parsinta epäonnistui → jatka client-nollauksella (sama sarja, mutta peli toimii) */
+      }
+    }
     anchorTop.current = null;
     setPhase("play"); setQi(0); setSel(null); setLocked(false); setScore(0); setStreak(0); setRight(0);
     setHist([]); setPicks([]); setRemoved([]); setLifeLeft(oljenkorsiTotal); setReview(null); setShownScore(0); setCopyState(null);
@@ -554,8 +574,17 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
 
   return (
     <div ref={rootRef} className="tng" style={accentVars}>
-      <div className="tng-bg" aria-hidden style={{ backgroundImage: `url(${quiz.bgImg})` }} />
-      <div className="tng-bgshade" aria-hidden />
+      {/* K1 (UX-korjaus 17.9.2026): kuvavisoissa EI taustakuvaa. Aiemmin tässä oli
+          kovakoodattu /20/teema-liput.webp joka näkyi himmeänä kaikissa kortistoissa
+          — myös vaakunavisassa lippuja taustalla — ja kilpaili kysymyskuvan kanssa.
+          Tyhjä bgImg = tasainen brändipohja #131109: sekä kuvakerros että sen
+          vinjettigradientti jäävät renderöimättä. Tekstivisat säilyvät ennallaan. */}
+      {quiz.bgImg ? (
+        <>
+          <div className="tng-bg" aria-hidden style={{ backgroundImage: `url(${quiz.bgImg})` }} />
+          <div className="tng-bgshade" aria-hidden />
+        </>
+      ) : null}
       <div className="tng-topline" aria-hidden />
 
       <div ref={pageRef}>
@@ -564,7 +593,15 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
           <div className="tng-brand">
             <a className="tng-logo" href="/" aria-label="Tietoniekka etusivu"><b>TIETO</b><span>NIEKKA</span></a>
             <span className="tng-brandsep" aria-hidden />
-            <span className="tng-cat">{category}</span>
+            {/* T5 (UX-korjaus 17.9.2026): kortistomerkki oli pelkkä teksti, joten
+                pelisivulta ei päässyt takaisin kokoelmaan kuin logon kautta (etusivu). */}
+            {quiz.hubHref ? (
+              <a className="tng-cat" href={quiz.hubHref}>
+                {category}
+              </a>
+            ) : (
+              <span className="tng-cat">{category}</span>
+            )}
           </div>
           <div className="tng-progress" data-hide={phase === "start" ? "1" : "0"}>
             <div className="tng-pips" role="img" aria-label={`Kysymys ${Math.min(qi + 1, total)} / ${total}, ${right} oikein`}>
@@ -605,6 +642,16 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
           {phase === "start" && (
             <section className="tng-start" aria-label="Visan aloitus">
               <span className="tng-start-cat"><i aria-hidden />{category}</span>
+              {/* T5: murupolku aloitusnäkymään — Etusivu / Kuvavisat / Lippuvisa. */}
+              {quiz.hubHref && (
+                <nav className="tng-start-crumbs" aria-label="Murupolku">
+                  <a href="/">Etusivu</a>
+                  <span aria-hidden="true">/</span>
+                  <a href={quiz.hubHref}>{category}</a>
+                  <span aria-hidden="true">/</span>
+                  <span aria-current="page">{quiz.title}</span>
+                </nav>
+              )}
               <h1 ref={startH1Ref} className="tng-start-h1">{quiz.title}</h1>
               {quiz.teaser && <p className="tng-start-p">{quiz.teaser}</p>}
               <div className="tng-start-row">
@@ -866,7 +913,8 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
                     <svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M17 10a7 7 0 11-2.05-4.95M17 3v3.5h-3.5" /></svg>
                     Pelaa uudelleen
                   </button>
-                  <a href="/kokoelmat">Valitse uusi visa</a>
+                  {/* T5: vie kortiston kokoelmaan (esim. /kokoelma/kuvavisat), ei kaikkien kokoelmien listaan. */}
+                  <a href={quiz.hubHref || "/kokoelmat"}>Valitse uusi visa</a>
                 </div>
               </section>
 
