@@ -114,6 +114,7 @@ const KUVAVISA_TITLES: Record<string, string> = {
   liput: "Lippuvisa", vaakunat: "Vaakunavisa", vaakuna: "Vaakunavisa", linnut: "Lintuvisa",
   elaimet: "Eläinvisa", kasvit: "Kasvivisa", maalaukset: "Maalausvisa",
   henkilot: "Henkilövisa", rakennukset: "Rakennusvisa", kaupungit: "Kaupunkivisa",
+  viikko: "Viikkovisa",
 };
 
 /* T6: kortistokohtainen meta description — aiemmin kaikilla kuvavisoilla oli sama
@@ -128,6 +129,7 @@ const KUVAVISA_DESC: Record<string, string> = {
   henkilot: "Tunnista tunnetut henkilöt kuvasta. Ilmainen kuvavisa Tietoniekassa.",
   rakennukset: "Tunnista maailman rakennukset kuvasta. Ilmainen kuvavisa Tietoniekassa.",
   kaupungit: "Tunnista kaupungit yhdestä näkymästä. Ilmainen kuvavisa Tietoniekassa.",
+  viikko: "Viikkovisan kuvasarja kaikista kortistoista. Ilmainen kuvavisa Tietoniekassa — ei kirjautumista.",
 };
 
 const COLLECTION_ACCENT: Record<string, string> = {
@@ -263,13 +265,16 @@ export default async function Peli20({
       /* Kuvat tulevat kaikista kortistoista, joten levyn sävy ratkaistaan
          kysymys kerrallaan eikä visan tasolla (ks. GameQuestion.plate). */
       plate: "tumma",
-      challengePath: `/peli?kuvavisa=${encodeURIComponent(rows[0].type)}&ids=${rows.map((r) => r.id).join(",")}`,
+      challengePath: `/peli?kuvavisa=viikko&ids=${rows.map((r) => r.id).join(",")}`,
       /* Sarja on lukittu viikoksi → "Pelaa uudelleen" antaa saman visan, ei
          uudelleenlatausta. */
       reloadOnRestart: false,
       autoStart: false,
       kuvaIdt: rows.map((r) => r.id),
-      kuvavisaSlug: rows[0].type,
+      /* "viikko" eikä rows[0].type: haastelinkki tallentaa tämän arvon, ja
+         rows[0].type nimesi viikkovisasta jaetun haasteen sen ensimmäisen kuvan
+         kortiston mukaan ("Vaakunavisa", 15 kuvaa). Kuvat tulevat silti id:istä. */
+      kuvavisaSlug: "viikko",
       taso: null,
       maanosa: null,
       spare: [],
@@ -448,6 +453,9 @@ export default async function Peli20({
       rakennukset: { title: "Rakennusvisa", teaser: "Torneista temppeleihin ja pyramideihin: tunnista rakennuksia ja rakennelmia yhdestä kuvasta. Kuinka monta kohdetta tunnistat?", motif: "torni", color: "#F2C230" },
       kaupungit: { title: "Kaupunkivisa", teaser: "Tunnista kaupunki yhdestä näkymästä.", motif: "kaupunki", color: "#F5C462" },
       maalaukset: { title: "Maalausvisa", teaser: "Taiteen klassikot yhdestä kuvasta. Tunnistatko tunnetut teokset — ja niiden tekijät?", motif: "naamio", color: "#E85D9E" },
+      /* Viikkovisasta jaettu haaste tulee tähän (?kuvavisa=viikko&ids=...).
+         Ei kokoelmasivun kortisto — kuvat tulevat aina id-listasta. */
+      viikko: { title: "Viikkovisa", teaser: "Viikkovisan kuvasarja kaikista kortistoista: liput, vaakunat, linnut, eläimet, maalaukset, rakennukset, henkilöt sekä kasvit ja puut.", motif: "kysymys", color: "#B6FF3C" },
     };
     const deck = DECKS[kuvavisa] ?? { title: "Kuvavisa", teaser: "Tunnista kuvasta.", motif: "kysymys", color: "#4C9AFF" };
 
@@ -517,6 +525,10 @@ export default async function Peli20({
       /* K6: lähdemerkintä kuvalevyn alle, kannasta. 94 riviä on ilman → rivi
          jää niillä pois kokonaan. Kovakoodattua "Wikimedia Commons" ei tule. */
       credit: r.source_credit ?? null,
+      /* Levyn sävy kysymyskohtaisesti: haastelinkki voi kantaa sekakortistoisen
+         sarjan (viikkovisan haaste), jolloin visan tason arvo olisi väärä
+         osalle kuvista. Yhden kortiston visassa tulos on sama kuin ennen. */
+      plate: levynSavy(r.type),
     });
     /* K6: vaalea kuvalevy grafiikalle (liput, vaakunat, maalaukset), tumma
        valokuville — sama laatikko ja sama object-fit: contain molemmissa.
