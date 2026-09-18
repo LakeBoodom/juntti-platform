@@ -468,29 +468,3 @@
     transition: none;
   }
 }
-
-/* ── Viikkovisa: kapea kortti ruudukon vasemmassa laidassa (10A b) ───────
-   Kortin tyylit ovat viikkovisa.css:ssä (.vv-kortti). Tässä vain asettelu:
-   360 px palsta + kategoriaruudukko. Alle 1000 px kortti nousee ruudukon
-   yläpuolelle täysleveänä. Vanha lime-paneeli (.kv-viikko) poistettu. */
-.tn20 .kv-layout { display: block; }
-.tn20 .kv-layout[data-viikko="1"] {
-  display: grid;
-  grid-template-columns: 300px minmax(0, 1fr);
-  align-items: start;
-  gap: 22px;
-}
-@media (min-width: 1200px) {
-  .tn20 .kv-layout[data-viikko="1"] { grid-template-columns: 340px minmax(0, 1fr); }
-}
-@media (max-width: 999px) {
-  .tn20 .kv-layout[data-viikko="1"] { grid-template-columns: minmax(0, 1fr); }
-}
-/* Kortin vieressä ruudukolle jää ~620 px 1040 px:n ikkunassa: 310 px:n
-   minimillä se putosi yhteen jättisarakkeeseen. 280 px antaa kaksi saraketta
-   (2 × 280 + 22 = 582). Korttiotsikon KORTTISÄÄNTÖ-laskelma (256 px
-   tekstileveys) pätee yhä: 280 − 44 pehmuste = 236 px → 0.95 × 236 /
-   (0.67 × 11) ≈ 30 px > designin 27 px. */
-.tn20 .kv-layout[data-viikko="1"] .kv-grid {
-  grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr));
-}

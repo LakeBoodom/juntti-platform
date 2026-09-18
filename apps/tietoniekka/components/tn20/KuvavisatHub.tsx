@@ -1,14 +1,14 @@
 // KUVAVISAT 2.0 (2026-09-17) — kokoelmasivun hub. Design: näkymät 1a (työpöytä)
 // ja 1b (mobiili). Server-komponentti: kategorian laajennus on natiivi
-// <details>/<summary>, joten koko sivu toimii ilman JavaScriptiä (viikkovisakortti
+// <details>/<summary>, joten koko sivu toimii ilman JavaScriptiä (viikkovisapromo
 // on oma pieni asiakaskomponenttinsa, koska oma tulos luetaan selaimesta).
 //
 // KIERROS 4 (18.9.2026, Heikin muutospyynnöt + viikkovisan 10A Sinetti):
 //  - Herokuva kuten muilla kokoelmasivuilla (vrt. /kokoelma/historia). Hero on
 //    leveä ja kuvallinen, ja se pitää limen: "Arvo satunnainen kuvavisa" on
 //    näkymän ainoa täytetty lime-nappi.
-//  - Viikkovisa on kapea, kuvaton kortti kategoriaruudukon vasemmassa laidassa,
-//    syaani ääriviivanappi — hero ja kortti eivät kilpaile samalla värillä.
+//  - Viikkovisa on oma kaistansa heron alla ("Tämän viikon visa", kierros 5 V1),
+//    etusivun promon kokoluokassa. Nappi on syaani ääriviiva — hero pitää limen.
 //  - Ei eksakteja kuvamääriä (hero, kortit, variaatiorivit) eikä variaatiolukua:
 //    tilalla kuvaava teksti (variaatioKuvaus).
 //  - Tyyppimerkki (GRAFIIKKA / VALOKUVA) pois kuvan päältä — kuvan päällä ei
@@ -19,7 +19,7 @@
 // v1 on täysin anonyymi.
 
 import { ryhmiteltyVariaatiot, variaatioKuvaus, type KategoriaData } from "@/lib/kuvavisat2026";
-import { ViikkovisaKortti, type ViikkoPromoData } from "./ViikkovisaPromo";
+import { ViikkovisaPromo, type ViikkoPromoData } from "./ViikkovisaPromo";
 import Crumbs from "./Crumbs";
 
 /* Kuvalaatikko — Claude Designin korjaus (README "Kategorianäkymä, korjaus", 17.9.2026).
@@ -125,18 +125,28 @@ export function KuvavisatHub({
 
       <div className="tn-shell">
         <div className="kv-page">
+          {/* Kierros 5 (V1): viikkovisa omana kaistanaan heron alla, ENNEN
+              kategorioita ja omalla otsikollaan — ruudukon ruutuna se luettiin
+              yhdeksänneksi kategoriaksi. Ruudukkoon jää kahdeksan kortistoa. */}
+          {viikkovisa && (
+            <section className="kv-section" aria-labelledby="kv-viikko-otsikko">
+              <div className="kv-section-head">
+                <h2 className="kv-section-title" id="kv-viikko-otsikko">Tämän viikon visa</h2>
+                <span className="kv-section-note">Uusi visa maanantaina</span>
+              </div>
+              <ViikkovisaPromo data={viikkovisa} sijainti="kokoelma" />
+            </section>
+          )}
+
           <section className="kv-section">
             <div className="kv-section-head">
               <h2 className="kv-section-title">Valitse kategoria</h2>
               <span className="kv-section-note">Kategoria avaa visavariaatiot — peli ei käynnisty heti</span>
             </div>
-            <div className="kv-layout" data-viikko={viikkovisa ? "1" : undefined}>
-              {viikkovisa && <ViikkovisaKortti data={viikkovisa} />}
-              <div className="kv-grid">
-                {kategoriat.map((k) => (
-                  <KategoriaKortti key={k.meta.type} k={k} />
-                ))}
-              </div>
+            <div className="kv-grid">
+              {kategoriat.map((k) => (
+                <KategoriaKortti key={k.meta.type} k={k} />
+              ))}
             </div>
           </section>
         </div>

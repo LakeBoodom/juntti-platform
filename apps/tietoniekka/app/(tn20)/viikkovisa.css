@@ -110,24 +110,13 @@
 @media (max-width: 660px) {
   .tn20 .vv-promo { grid-template-columns: minmax(0, 1fr); }
   .tn20 .vv-promo-nro { display: none; }
-  .tn20 .vv-promo-row .vv-btn { flex: 1 1 100%; }
+  .tn20 .vv-promo-row .vv-btn, .tn20 .vv-promo-row .vv-btn-outline { flex: 1 1 100%; }
 }
 
-/* ── Kokoelmasivun kapea kortti (10A b) ────────────────────────────────── */
-.tn20 .vv-kortti {
-  display: flex; flex-direction: column; align-items: flex-start; gap: 14px;
-  padding: 22px; border-radius: 16px;
-  border: 1px solid #2c2517; border-top: 2px solid var(--vv-acc);
-  background: #17140d; color: #f5f0e6;
-}
-.tn20 .vv-kortti-h {
-  margin: 0;
-  font-family: var(--vv-display); font-weight: 900; font-variation-settings: "wdth" 80;
-  font-size: 19px; line-height: 1.1; text-transform: uppercase; color: #f5f0e6;
-}
-.tn20 .vv-kortti-p { margin: 0; font-size: 14px; line-height: 1.5; color: #a79e8c; text-wrap: pretty; }
-.tn20 .vv-kortti-meta { margin: 0; font-size: 12.5px; font-weight: 700; color: #8e8676; }
-.tn20 .vv-kortti .vv-btn-outline { margin-top: auto; align-self: stretch; }
+/* Kokoelmasivun kapea kortti (10A b) poistettu kierroksella 5 (V1): sama
+   .vv-promo palvelee nyt kokoelmasivua omana kaistanaan heron alla. Siellä
+   nappi on syaani ääriviiva, koska lime kuuluu heron pääpainikkeelle. */
+.tn20 .vv-btn-outline--l { display: inline-flex; min-height: 54px; padding: 0 28px; font-size: 16px; }
 
 /* ── Aloitusnäkymä (kierros 11, korjattu) ──────────────────────────────── */
 /* HUD:n oikea laita aloitusvaiheessa: "Viikko 38 · voimassa su 20.9. asti" */
@@ -165,22 +154,17 @@
 .tn20 .vv-start .vv-sinetti { grid-area: sinetti; }
 .tn20 .vv-kollaasi { grid-area: kollaasi; }
 
-/* Sanamerkki. Korjaus kierroksen 11 versioon: erotin EI katkaise sanaa
-   ("VI | KKOVISA" heikensi luettavuutta ja ruudunlukijaa) — syaani viiva on
-   nyt sanan edessä, ja sana on yhtenäinen tekstisolmu.
-   KORTTISÄÄNTÖ: "VIIKKOVISA" 10 merkkiä + viiva ≈ 0.3 em. Design 94 px (wdth 68)
-   @1440. Kapein palsta 320 px → sisäleveys 288 px; wdth 68 -leveydellä
-   mitattu ≈ 0.56 em/merkki → 288 / 5.9 ≈ 48 px. clamp-alaraja 40 px. */
+/* Sanamerkki. Kierroksen 11 versiossa erotin katkaisi sanan ("VI | KKOVISA");
+   kierroksella 4 se siirrettiin sanan eteen, mutta se luettiin irralliseksi
+   kauttaviivaksi ("/VIIKKOVISA"). Heikin päätös 18.9.2026 (V3): viiva pois
+   kokonaan. Syaani elää kategoriaikonissa, sinetissä ja hehkussa.
+   KORTTISÄÄNTÖ: "VIIKKOVISA" 10 merkkiä, wdth 68 ≈ 0.47 em/merkki (mitattu:
+   40 px → 186 px viivan kanssa). Kapein palsta 288 px @320. */
 .tn20 .vv-wordmark {
-  margin: 0; display: flex; align-items: flex-end; gap: 0.11em;
+  margin: 0;
   font-family: var(--vv-display); font-weight: 900; font-variation-settings: "wdth" 68;
   font-size: clamp(40px, min(6.4cqw, 11dvh), 94px); line-height: 0.85; letter-spacing: -0.03em;
   text-transform: uppercase; color: #f5f0e6; white-space: nowrap;
-}
-.tn20 .vv-wordmark-viiva {
-  flex: 0 0 auto; width: 0.16em; height: 0.7em; margin: 0 0 0.06em 0.09em; /* vasen marginaali: skew ei vuoda palstan yli */
-  background: var(--vv-acc); transform: skewX(-13deg); border-radius: 2px;
-  box-shadow: 0 0 18px rgba(34, 211, 238, 0.5);
 }
 .tn20 .vv-start-kat { display: flex; align-items: center; gap: 14px; }
 .tn20 .vv-start-katikoni {

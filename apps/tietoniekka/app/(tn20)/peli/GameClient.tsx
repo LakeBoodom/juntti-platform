@@ -173,6 +173,17 @@ const TIERS = [
   { min: 0, title: "Harjoiteltavaa jäi", body: "Tästä on hyvä lähteä. Katso oikeat vastaukset ja pelaa uusiksi — tulos nousee nopeasti." },
 ];
 
+/* Viikkovisan tulostasot (kierros 5, V2): uusintaa ei ole, joten kehotus
+   "pelaa uusiksi" olisi väärä lupaus. Tilalla "katso oikeat vastaukset" ja
+   "uusi visa maanantaina". Otsikot samat kuin kortistovisoissa. */
+const TIERS_VIIKKO = [
+  { min: 100, title: "Täydet pisteet!", body: "Virheetön viikko. Haasta kaveri samaan sarjaan — uusi visa maanantaina." },
+  { min: 80, title: "Erinomainen tulos", body: "Tämä on niekan tasoa. Haasta kaveri samaan sarjaan — uusi visa maanantaina." },
+  { min: 60, title: "Hyvä tulos", body: "Vahva suoritus. Katso oikeat vastaukset ja haasta kaveri — uusi visa maanantaina." },
+  { min: 40, title: "Keskitasoinen tulos", body: "Hyvä pohja. Katso oikeat vastaukset — uusi visa maanantaina." },
+  { min: 0, title: "Harjoiteltavaa jäi", body: "Tästä on hyvä lähteä. Katso oikeat vastaukset — uusi visa maanantaina." },
+];
+
 function hexToRgb(hex: string): [number, number, number] {
   const h = hex.replace("#", "");
   const f = h.length === 3 ? h.split("").map((c) => c + c).join("") : h;
@@ -699,7 +710,8 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
   const skipped = hist.filter((v) => v === "skipped").length;
   const scored = Math.max(1, total - skipped);
   const pct = Math.round((right / scored) * 100);
-  const tier = TIERS.find((t) => pct >= t.min) ?? TIERS[TIERS.length - 1];
+  const tasot = vk ? TIERS_VIIKKO : TIERS;
+  const tier = tasot.find((t) => pct >= t.min) ?? tasot[tasot.length - 1];
   const today = new Date();
   const playedDate = `${today.getDate()}.${today.getMonth() + 1}.${today.getFullYear()}`;
   const liveStatus =
@@ -843,7 +855,6 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
             <section className="vv-start" aria-label="Viikkovisan aloitus">
               <div className="vv-start-teksti">
                 <h1 className="vv-wordmark">
-                  <span className="vv-wordmark-viiva" aria-hidden />
                   Viikkovisa
                   <span className="tng-sr"> {vk.viikko} · {vk.kategoria}</span>
                 </h1>
@@ -1120,7 +1131,9 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
               <section className="tng-resleft" aria-label="Tulos">
                 <div className="tng-rescard" data-perfect={pct === 100 ? "1" : "0"}>
                   <div className="tng-rescard-top">
-                    <span className="tng-rescat"><i aria-hidden />{category}</span>
+                    {/* V4 (kierros 5): viikkovisassa yläotsikko on formaatin nimi
+                        ("Viikkovisa 38 · Kuvat"), ei kortiston kokoelma "Kuvavisat". */}
+                    <span className="tng-rescat"><i aria-hidden />{vk ? quiz.title : category}</span>
                     <span className="tng-resdate">{playedDate}</span>
                   </div>
                   <div className="tng-resnums">
@@ -1133,7 +1146,8 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
                   <span className="tng-sr">{right} oikein {total}:sta, osumatarkkuus {pct} prosenttia, {score} pistettä.</span>
                   <h1 className="tng-restitle">{tier.title}</h1>
                   <p className="tng-resbody">{tier.body}</p>
-                  <p className="tng-resname">{quiz.title}</p>
+                  {/* Viikkovisassa nimi on jo yläotsikossa — ei toisteta. */}
+                  {!vk && <p className="tng-resname">{quiz.title}</p>}
                   {/* K3: vertailu haastajaan. Tasapeli on oma tapaus — "voitit"
                       olisi väärin ja "häviisit" loukkaava kun tulos on sama. */}
                   {quiz.haaste && (

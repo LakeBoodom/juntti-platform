@@ -21,7 +21,7 @@ import { jalkapalloQuizImg } from "@/lib/jalkapallo";
 import { jaakiekkoQuizImg } from "@/lib/jaakiekko";
 import { urheilulajitQuizImg } from "@/lib/urheilulajit";
 import PaivanVisaCard, { type PaivanVisaData } from "@/components/tn20/PaivanVisaCard";
-import { ViikkovisaEtusivu } from "@/components/tn20/ViikkovisaPromo";
+import { ViikkovisaPromo } from "@/components/tn20/ViikkovisaPromo";
 import { getViikkovisa } from "@/lib/kuvavisat2026";
 import { viikkoInfo } from "@/lib/viikkovisa";
 import {
@@ -226,7 +226,7 @@ export default async function Etusivu20() {
         </a>
 
         {/* ─── Viikkovisa (10A Sinetti) ─── */}
-        {viikko && <ViikkovisaEtusivu data={viikko} />}
+        {viikko && <ViikkovisaPromo data={viikko} sijainti="etusivu" />}
 
         {/* ─── Suositut kokoelmat ─── */}
         <section aria-labelledby="suositut">
