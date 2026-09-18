@@ -7,8 +7,14 @@ import "@fontsource/archivo/900.css";
 import "@fontsource/instrument-sans/400.css";
 import "@fontsource/instrument-sans/600.css";
 import "@fontsource/instrument-sans/700.css";
+/* KUVAVISAT 2.0 (17.9.2026): variable-Archivo leveysakselilla (wdth 62–125).
+   Käytössä VAIN kuvavisat.css:n --kv-display-tokenin kautta — muu sivusto jää
+   staattiseen Archivoon, ks. kuvavisat.css:n fonttikommentti. */
+import "@fontsource-variable/archivo/wdth.css";
 import "./tn20.css";
 import "./tietoketju.css";
+import "./kuvavisat.css";
+import "./viikkovisa.css";
 import TopBar from "@/components/tn20/TopBar";
 import SiteFooter from "@/components/tn20/SiteFooter";
 

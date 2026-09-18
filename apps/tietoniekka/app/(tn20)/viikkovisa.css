@@ -1,0 +1,300 @@
+/* ============================================================
+   VIIKKOVISA — 10A SINETTI (kierros 4, 18.9.2026)
+   Lähde: Claude Design "TN Viikkovisa - visualisointisuunnitelma",
+   kierrokset 10A (merkki, promo, kapea kortti) ja 11 (aloitusnäkymä).
+
+   Aksentti syaani #22D3EE: kylmä siinä missä lime ja amber ovat lämpimiä,
+   eikä sitä käytetä sivustolla mihinkään toimintoon. Kontrasti #131109-
+   pohjalla ≈ 10:1. Aksentti on merkki, hairline, hehku ja ääriviivanappi —
+   täytetty nappi on aina lime (sivuston toimintoväri).
+
+   FONTTI: sama variable-Archivo kuin kuvavisat.css:n --kv-display (ks. sen
+   kommentti). Designin wdth-arvot toimivat vain tällä perheellä; staattisella
+   Archivolla glyyfit olisivat ~15–20 % leveämpiä ja KORTTISÄÄNTÖ rikkoutuisi.
+   ============================================================ */
+
+.tn20 {
+  --vv-acc: #22d3ee;
+  --vv-acc-soft: #7dd9ec;
+  --vv-display: "Archivo Variable", "Archivo", "Barlow Condensed", sans-serif;
+}
+
+/* ── Merkki: numerolohko + "Viikkovisa / uusi maanantaina" ─────────────── */
+.tn20 .vv-merkkirivi { display: inline-flex; align-items: center; flex-wrap: wrap; gap: 10px; }
+.tn20 .vv-merkki {
+  --nro: 27px; --nimi: 11px; --uusi: 10px; --pad: 13px; --r: 9px;
+  display: inline-flex; align-items: stretch; flex: 0 0 auto;
+  border: 1px solid var(--vv-acc); border-radius: var(--r);
+}
+.tn20 .vv-merkki[data-koko="s"] { --nro: 19px; --nimi: 10px; --uusi: 10px; --pad: 10px; --r: 8px; }
+.tn20 .vv-merkki[data-koko="l"] { --nro: 31px; --nimi: 12px; --uusi: 10px; --pad: 15px; --r: 10px; }
+.tn20 .vv-merkki-nro {
+  display: flex; align-items: center; padding: 0 var(--pad);
+  border-radius: calc(var(--r) - 1px) 0 0 calc(var(--r) - 1px);
+  background: var(--vv-acc); color: #0b0904;
+  font-family: var(--vv-display); font-weight: 900; font-variation-settings: "wdth" 84;
+  font-size: var(--nro); line-height: 1;
+}
+.tn20 .vv-merkki-teksti { display: flex; flex-direction: column; justify-content: center; gap: 3px; min-width: 0; padding: 6px calc(var(--pad) + 1px); }
+.tn20 .vv-merkki-nimi { font-size: var(--nimi); font-weight: 800; letter-spacing: 0.18em; text-transform: uppercase; color: var(--vv-acc); white-space: nowrap; }
+.tn20 .vv-merkki-uusi { font-size: var(--uusi); font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: #a79e8c; white-space: nowrap; }
+/* Kategoria on alaotsikko: neutraali, ei omaa väriä (design). */
+.tn20 .vv-pilleri {
+  height: 26px; display: inline-flex; align-items: center; padding: 0 11px;
+  border-radius: 7px; border: 1px solid #3a3120; color: #cfc7b6;
+  font-size: 11px; font-weight: 800; letter-spacing: 0.16em; text-transform: uppercase; white-space: nowrap;
+}
+.tn20 .vv-merkkirivi[data-koko="s"] .vv-pilleri { height: 22px; padding: 0 9px; font-size: 10px; letter-spacing: 0.14em; }
+
+/* ── Napit ─────────────────────────────────────────────────────────────── */
+.tn20 .vv-btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+  min-height: 54px; padding: 0 28px; border-radius: 999px; border: 0;
+  background: #b6ff3c; color: #131109 !important;
+  font-family: var(--vv-display); font-weight: 900; font-variation-settings: "wdth" 86;
+  font-size: 16px; letter-spacing: 0.01em; text-transform: uppercase; white-space: nowrap;
+  text-decoration: none; cursor: pointer; transition: filter 150ms, transform 150ms;
+}
+.tn20 .vv-btn:hover { filter: brightness(1.07); transform: translateY(-1px); }
+.tn20 .vv-btn:focus-visible { outline: 2px solid #f5f0e6; outline-offset: 3px; }
+.tn20 .vv-btn-outline {
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  min-height: 46px; padding: 0 20px; border-radius: 999px;
+  border: 1px solid var(--vv-acc); background: transparent; color: var(--vv-acc-soft);
+  font-family: var(--vv-display); font-weight: 900; font-variation-settings: "wdth" 86;
+  font-size: 14px; letter-spacing: 0.02em; text-transform: uppercase; white-space: nowrap;
+  text-decoration: none; transition: background 150ms, color 150ms;
+}
+.tn20 .vv-btn-outline:hover { background: rgba(34, 211, 238, 0.1); color: #b8f0fa; }
+.tn20 .vv-btn-outline:focus-visible { outline: 2px solid var(--vv-acc); outline-offset: 3px; }
+.tn20 .vv-link { font-size: 14px; font-weight: 700; color: #cfc7b6; text-decoration: none; white-space: nowrap; }
+.tn20 .vv-link:hover { color: var(--vv-acc-soft); }
+.tn20 .vv-meta { font-size: 14px; font-weight: 500; color: #8e8676; }
+.tn20 .vv-tulos { color: var(--vv-acc); white-space: nowrap; }
+
+/* ── Etusivun promo (10A a) ────────────────────────────────────────────── */
+.tn20 .vv-promo {
+  container-type: inline-size;
+  display: grid; grid-template-columns: minmax(0, 1fr) clamp(200px, 22cqw, 300px);
+  align-items: stretch; gap: clamp(24px, 3.2cqw, 46px);
+  padding: clamp(22px, 2.4cqw, 34px) clamp(22px, 2.8cqw, 40px);
+  border: 1px solid #2c2517; border-radius: clamp(14px, 1.5cqw, 20px);
+  background: #131109; color: #f5f0e6;
+}
+.tn20 .vv-promo-text { display: flex; flex-direction: column; justify-content: center; gap: 16px; min-width: 0; }
+/* KORTTISÄÄNTÖ: pisin sana "kaikille"/"tuloksesi" (9 merkkiä). Design 58 px
+   @1440 (wdth 72); kapeimmalla (320 px, sisäleveys ≈ 274 px) 0.95 × 274 /
+   (0.55 × 9) ≈ 52 px → alaraja 32 px jättää reilun marginaalin. Mitattu
+   Range-menetelmällä, ks. raportti. */
+.tn20 .vv-promo-h {
+  margin: 0; max-width: 22ch;
+  font-family: var(--vv-display); font-weight: 900; font-variation-settings: "wdth" 72;
+  font-size: clamp(32px, 4.2cqw, 58px); line-height: 0.92; letter-spacing: -0.02em;
+  text-transform: uppercase; color: #f5f0e6;
+  overflow-wrap: normal; word-break: keep-all; hyphens: none; text-wrap: balance;
+}
+.tn20 .vv-promo-p { margin: -4px 0 0; font-size: 15px; line-height: 1.5; color: #a79e8c; }
+.tn20 .vv-promo-row { display: flex; align-items: center; flex-wrap: wrap; gap: 12px 18px; }
+.tn20 .vv-promo-nro {
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 13px; border: 1px solid rgba(34, 211, 238, 0.28);
+  background: linear-gradient(160deg, rgba(34, 211, 238, 0.13), rgba(34, 211, 238, 0.02));
+  font-family: var(--vv-display); font-weight: 900; font-variation-settings: "wdth" 66;
+  font-size: clamp(110px, 13cqw, 160px); line-height: 0.82; letter-spacing: -0.04em;
+  color: var(--vv-acc); opacity: 0.92;
+}
+/* 390 px (10A a mobiili): numerolaatikko pois, merkki kantaa numeron. */
+@container (max-width: 620px) {
+  .tn20 .vv-promo-nro { display: none; }
+}
+@media (max-width: 660px) {
+  .tn20 .vv-promo { grid-template-columns: minmax(0, 1fr); }
+  .tn20 .vv-promo-nro { display: none; }
+  .tn20 .vv-promo-row .vv-btn, .tn20 .vv-promo-row .vv-btn-outline { flex: 1 1 100%; }
+}
+
+/* Kokoelmasivun kapea kortti (10A b) poistettu kierroksella 5 (V1): sama
+   .vv-promo palvelee nyt kokoelmasivua omana kaistanaan heron alla. Siellä
+   nappi on syaani ääriviiva, koska lime kuuluu heron pääpainikkeelle. */
+.tn20 .vv-btn-outline--l { display: inline-flex; min-height: 54px; padding: 0 28px; font-size: 16px; }
+
+/* ── Aloitusnäkymä (kierros 11, korjattu) ──────────────────────────────── */
+/* HUD:n oikea laita aloitusvaiheessa: "Viikko 38 · voimassa su 20.9. asti" */
+.tn20 .vv-hud {
+  margin-left: auto; font-size: clamp(10px, 0.9cqw, 12px); font-weight: 800;
+  letter-spacing: 0.14em; text-transform: uppercase; color: #8e8676; white-space: nowrap;
+}
+.tn20 .vv-hud-lyhyt { display: none; }
+@container tnq (max-width: 559px) {
+  .tn20 .vv-hud-pitka { display: none; }
+  .tn20 .vv-hud-lyhyt { display: inline; }
+}
+/* Alle 480 px brändi vie HUD:n koko rivin, jolloin päiväys pakottaisi toisen
+   rivin. Sama tieto on sinetissä ja Aloita-rivillä ("2 pv jäljellä"). */
+@container tnq (max-width: 479px) {
+  .tn20 .vv-hud { display: none; }
+}
+
+.tn20 .tng-main[data-mode="aloitus"]:has(.vv-start) {
+  background: radial-gradient(120% 150% at 62% 50%, rgba(34, 211, 238, 0.1), rgba(19, 17, 9, 0) 62%);
+}
+.tn20 .vv-start {
+  width: 100%; max-width: 1440px; margin: 0 auto;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 300px 372px;
+  grid-template-areas: "teksti sinetti kollaasi";
+  align-items: center; column-gap: 40px;
+  padding: clamp(24px, 3cqw, 48px) clamp(16px, 3.8cqw, 54px);
+  /* Sädekehä (400 px) on sinetin palstaa (300 px) leveämpi: 768 ja 1024 px:n
+     kaksipalstaisessa asettelussa se ylsi ruudun oikean reunan yli ja teki
+     sivusta vaakavieritettävän (mitattu 18.9.2026). */
+  overflow-x: clip;
+}
+.tn20 .vv-start-teksti { grid-area: teksti; display: flex; flex-direction: column; align-items: flex-start; gap: 20px; min-width: 0; }
+.tn20 .vv-start .vv-sinetti { grid-area: sinetti; }
+.tn20 .vv-kollaasi { grid-area: kollaasi; }
+
+/* Sanamerkki. Kierroksen 11 versiossa erotin katkaisi sanan ("VI | KKOVISA");
+   kierroksella 4 se siirrettiin sanan eteen, mutta se luettiin irralliseksi
+   kauttaviivaksi ("/VIIKKOVISA"). Heikin päätös 18.9.2026 (V3): viiva pois
+   kokonaan. Syaani elää kategoriaikonissa, sinetissä ja hehkussa.
+   KORTTISÄÄNTÖ: "VIIKKOVISA" 10 merkkiä, wdth 68 ≈ 0.47 em/merkki (mitattu:
+   40 px → 186 px viivan kanssa). Kapein palsta 288 px @320. */
+.tn20 .vv-wordmark {
+  margin: 0;
+  font-family: var(--vv-display); font-weight: 900; font-variation-settings: "wdth" 68;
+  font-size: clamp(40px, min(6.4cqw, 11dvh), 94px); line-height: 0.85; letter-spacing: -0.03em;
+  text-transform: uppercase; color: #f5f0e6; white-space: nowrap;
+}
+.tn20 .vv-start-kat { display: flex; align-items: center; gap: 14px; }
+.tn20 .vv-start-katikoni {
+  width: clamp(36px, 3.2cqw, 46px); height: clamp(36px, 3.2cqw, 46px); flex: 0 0 auto;
+  border-radius: 11px; background: var(--vv-acc);
+  display: flex; align-items: center; justify-content: center;
+}
+.tn20 .vv-start-katikoni svg { width: 58%; height: 58%; }
+.tn20 .vv-start-katnimi {
+  font-family: var(--vv-display); font-weight: 900; font-variation-settings: "wdth" 78;
+  font-size: clamp(28px, 2.9cqw, 42px); line-height: 1; letter-spacing: -0.01em;
+  text-transform: uppercase; color: #f5f0e6;
+}
+.tn20 .vv-start-meta { display: flex; align-items: center; flex-wrap: wrap; gap: 10px 16px; font-size: 15px; font-weight: 600; color: #cfc7b6; }
+.tn20 .vv-start-meta > span { display: inline-flex; align-items: center; gap: 8px; }
+.tn20 .vv-start-meta i { width: 1px; height: 17px; background: #3a3120; }
+.tn20 .vv-start-p { margin: 0; max-width: 46ch; font-size: clamp(15px, 1.25cqw, 18px); line-height: 1.5; color: #a79e8c; text-wrap: pretty; }
+.tn20 .vv-start-row { display: flex; align-items: center; flex-wrap: wrap; gap: 14px 18px; margin-top: 6px; min-height: 60px; }
+.tn20 .vv-start-row[data-odottaa="1"] { visibility: hidden; }
+.tn20 .vv-start .vv-btn { min-height: 60px; padding: 0 34px; font-size: 19px; box-shadow: 0 0 0 1px rgba(182, 255, 60, 0.35), 0 14px 34px -14px rgba(182, 255, 60, 0.6); }
+.tn20 .vv-start-aika { font-size: 14px; font-weight: 500; color: #8e8676; white-space: nowrap; }
+/* Pelattu viikko: oma tulos Aloita-napin paikalla */
+.tn20 .vv-start-tulos {
+  display: flex; flex-direction: column; gap: 6px;
+  padding: 16px 20px; border-radius: 14px;
+  border: 1px solid rgba(34, 211, 238, 0.35); background: rgba(34, 211, 238, 0.06);
+}
+.tn20 .vv-start-tulos-l { font-size: 11px; font-weight: 800; letter-spacing: 0.18em; text-transform: uppercase; color: var(--vv-acc-soft); }
+.tn20 .vv-start-tulos-v { font-family: var(--vv-display); font-weight: 900; font-variation-settings: "wdth" 72; font-size: clamp(38px, 3.6cqw, 52px); line-height: 0.9; color: #f5f0e6; }
+.tn20 .vv-start-tulos-v i { font-style: normal; color: #8e8676; }
+.tn20 .vv-start-tulos-p { font-size: 13.5px; font-weight: 600; color: #a79e8c; }
+.tn20 .tng .vv-start .vv-link { color: #cfc7b6; }
+.tn20 .tng .vv-start .vv-link:hover { color: var(--vv-acc-soft); }
+
+/* Sinetti (kierros 11): sädekehä, hehku, kuusikulmio. Mitat skaalautuvat
+   yhdestä muuttujasta, jotta sama rakenne toimii 390 px:ssä. */
+.tn20 .vv-sinetti {
+  --s: 1;
+  position: relative; justify-self: center;
+  width: calc(300px * var(--s)); height: calc(390px * var(--s));
+  display: flex; align-items: center; justify-content: center;
+}
+.tn20 .vv-sinetti > span { position: absolute; }
+.tn20 .vv-sinetti-sateet {
+  width: calc(400px * var(--s)); height: calc(400px * var(--s));
+  background: repeating-conic-gradient(rgba(34, 211, 238, 0.85) 0deg 0.55deg, rgba(34, 211, 238, 0) 0.55deg 4.2deg);
+  -webkit-mask-image: radial-gradient(circle, transparent 38%, #000 47%, transparent 76%);
+  mask-image: radial-gradient(circle, transparent 38%, #000 47%, transparent 76%);
+  opacity: 0.5;
+}
+.tn20 .vv-sinetti-hehku {
+  width: calc(250px * var(--s)); height: calc(290px * var(--s));
+  background: var(--vv-acc); filter: blur(26px); opacity: 0.5;
+  clip-path: polygon(50% 0%, 100% 12%, 100% 66%, 50% 100%, 0% 66%, 0% 12%);
+}
+.tn20 .vv-sinetti-reuna {
+  position: relative !important;
+  width: calc(236px * var(--s)); height: calc(278px * var(--s));
+  background: linear-gradient(#5be7fa, #22d3ee 45%, #0e93aa);
+  clip-path: polygon(50% 0%, 100% 12%, 100% 66%, 50% 100%, 0% 66%, 0% 12%);
+  display: flex; align-items: center; justify-content: center;
+}
+.tn20 .vv-sinetti-sisus {
+  width: calc(228px * var(--s)); height: calc(269px * var(--s));
+  background: radial-gradient(120% 90% at 50% 12%, #1b2a2e, #0b1114 70%);
+  clip-path: polygon(50% 0%, 100% 12%, 100% 66%, 50% 100%, 0% 66%, 0% 12%);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 2px; padding-bottom: calc(16px * var(--s));
+}
+.tn20 .vv-sinetti-vko {
+  font-family: var(--vv-display); font-weight: 900; font-variation-settings: "wdth" 82;
+  font-size: calc(26px * var(--s)); line-height: 1; letter-spacing: 0.1em; text-transform: uppercase; color: var(--vv-acc);
+}
+.tn20 .vv-sinetti-nro {
+  font-family: var(--vv-display); font-weight: 900; font-variation-settings: "wdth" 68;
+  font-size: calc(120px * var(--s)); line-height: 0.82; letter-spacing: -0.04em; color: #f5f0e6;
+}
+.tn20 .vv-sinetti-viiva { width: calc(96px * var(--s)); height: 1px; background: rgba(34, 211, 238, 0.55); margin: calc(8px * var(--s)) 0 calc(7px * var(--s)); }
+.tn20 .vv-sinetti-vali { font-size: max(10px, calc(12px * var(--s))); font-weight: 800; letter-spacing: 0.06em; color: var(--vv-acc-soft); white-space: nowrap; }
+
+/* Kuvakollaasi (kierros 11, korjattu): kuvat valitaan palvelimella niin,
+   ettei yksikään ole kuluvan viikon visassa — promo ei saa antaa vastauksia
+   ennen peliä. "+12 kuvaa" -laatta poistettu (ei eksakteja kuvamääriä). */
+.tn20 .vv-kollaasi { position: relative; width: 372px; height: 404px; }
+.tn20 .vv-kollaasi-kuva {
+  position: absolute; width: 182px; height: 186px; margin: 0;
+  border-radius: 12px; overflow: hidden;
+  border: 1px solid rgba(34, 211, 238, 0.3);
+  box-shadow: 0 22px 44px -22px rgba(0, 0, 0, 0.9);
+  background: #12100a;
+}
+.tn20 .vv-kollaasi-kuva[data-grafiikka="1"] { background: #f4efe4; display: flex; align-items: center; justify-content: center; padding: 16px; }
+.tn20 .vv-kollaasi-kuva img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: 50% 42%; }
+.tn20 .vv-kollaasi-kuva[data-grafiikka="1"] img { object-fit: contain; object-position: 50% 50%; }
+.tn20 .vv-kollaasi-kuva:nth-child(1) { left: 0; top: 6px; transform: rotate(-2.4deg); }
+.tn20 .vv-kollaasi-kuva:nth-child(2) { right: 0; top: 0; transform: rotate(2deg); }
+.tn20 .vv-kollaasi-kuva:nth-child(3) { left: 6px; bottom: 0; transform: rotate(1.6deg); }
+.tn20 .vv-kollaasi-kuva:nth-child(4) { right: 4px; bottom: 8px; transform: rotate(-2deg); }
+
+/* Keskileveys: kollaasi pois, teksti + sinetti. */
+@container tnq (max-width: 1180px) {
+  .tn20 .vv-start { grid-template-columns: minmax(0, 1fr) 300px; grid-template-areas: "teksti sinetti"; }
+  .tn20 .vv-kollaasi { display: none; }
+}
+/* Mobiili (10A c 390 px): yksi palsta — merkki, sinetti pienempänä, teksti, nappi. */
+@container tnq (max-width: 759px) {
+  .tn20 .vv-start {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas: "teksti";
+    padding-top: 18px;
+  }
+  .tn20 .vv-start-teksti { gap: 16px; }
+  /* Mitattu 18.9.2026: 40 px:llä sana + viiva = 186 px, palsta 288 px @320.
+     16cqw → 51 px @320 (≈ 237 px) ja katto 60 px @390 (≈ 279 / 358 px). */
+  .tn20 .vv-wordmark { font-size: min(60px, 16cqw); }
+  .tn20 .vv-start .vv-sinetti { --s: 0.56; order: 0; margin: -6px auto -4px; }
+  .tn20 .vv-start-row { width: 100%; }
+  /* 320 px: "Tarkastele vastauksia" 19 px:llä + 34 px pehmuste = 317 px
+     ylitti 288 px:n palstan (mitattu 18.9.2026) → mobiilissa 16 px / 20 px. */
+  .tn20 .vv-start .vv-btn { flex: 1 1 100%; min-width: 0; padding: 0 20px; font-size: 16px; }
+  .tn20 .vv-start-aika { flex: 1 1 100%; text-align: center; }
+}
+/* Mobiilissa sinetti renderöidään tekstipalstan sisään (ks. GameClient) —
+   työpöydällä se on oma palstansa. */
+.tn20 .vv-start-teksti .vv-sinetti { display: none; }
+@container tnq (max-width: 759px) {
+  .tn20 .vv-start > .vv-sinetti { display: none; }
+  .tn20 .vv-start-teksti .vv-sinetti { display: flex; align-self: center; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tn20 .vv-btn, .tn20 .vv-btn-outline { transition: none; }
+}

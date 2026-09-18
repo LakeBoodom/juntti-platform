@@ -2,15 +2,16 @@
 // TIETONIEKKA 2.0 — yhteinen alatunniste (QA-005, 29.8.2026).
 // Aiemmin vain etusivulla; kokoelmasivuilla oli minifooter tai ei footeria
 // lainkaan → Tietosuoja-linkki puuttui 8 sivulta. Renderöidään layoutista
-// kaikille sivuille; pelinäkymä (/peli, /visa) on headeriton ja footeriton (pelikuoren
+// kaikille sivuille; pelinäkymä (/peli, /visa, /h) on headeriton ja footeriton (pelikuoren
 // säännöt), samoin kuin TopBar.
 import { usePathname } from "next/navigation";
+import { isGameRoute } from "@/lib/nav";
 import { FOOTER_COLLECTIONS, FOOTER_MODES, FOOTER_SITE, FOOTER_INSTAGRAM } from "@/lib/etusivu";
 import "./footer.css";
 
 export default function SiteFooter() {
   const pathname = usePathname() ?? "";
-  if (pathname.startsWith("/peli") || pathname.startsWith("/visa")) return null;
+  if (isGameRoute(pathname)) return null;
   const year = new Date().getFullYear();
   return (
       <footer className="tn-es-foot">

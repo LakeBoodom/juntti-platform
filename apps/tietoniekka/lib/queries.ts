@@ -571,6 +571,10 @@ export type KuvavisaRow = {
   options: string[];
   correct_option: string;
   fact: string | null;
+  /** K6 (17.9.2026): kuvalähde pelinäkymän kuvalevyn alle. Kannassa
+      "Wikipedia / Wikimedia Commons" 575 rivillä ja NULL 94 rivillä —
+      tyhjä = koko lähderivi jää pois, ei kovakoodattua oletusta. */
+  source_credit: string | null;
 };
 
 // URL-slug → DB type -mappaus (frontti käyttää yksikkö-muotoja, DB monikko)
@@ -598,25 +602,47 @@ const KUVAVISA_URL_TO_TYPE: Record<string, string> = {
  * järjestyksessä (sort_order nouseva) — "mitkä liput tulee ensimmäisinä".
  * Leikkaa listan pituuteen `limit`.
  */
-export async function getKuvavisat(urlSlug: string, limit = 10): Promise<KuvavisaRow[]> {
+export async function getKuvavisat(
+  urlSlug: string,
+  limit = 10,
+  /** KUVAVISAT 2.0 (2026-09-17): kokoelmasivun visavariaatiot rajaavat kortistoa
+      vaikeustasolla (`difficulty`) tai maanosalla (`tag`). Ilman rajausta haku
+      käyttäytyy täsmälleen kuten ennen — variaatiot ovat lisä, ei muutos.
+      `tagit` annetaan valmiina listana (maanosa→tagit puretaan kutsupaikalla),
+      jotta tämä moduuli ei tarvitse importtia kuvavisat2026.ts:stä — se
+      importoi getSiteId:n täältä ja syntyisi kehä. */
+  rajaus?: { taso?: string | null; tagit?: string[] | null },
+): Promise<KuvavisaRow[]> {
   const type = KUVAVISA_URL_TO_TYPE[urlSlug] ?? urlSlug;
   const sb = getSupabase();
   if (!sb) return [];
   const siteId = await getSiteId();
   if (!siteId) return [];
 
-  const { data, error } = await sb
+  let q = sb
     .from("kuvavisas")
-    .select("id, type, question, image_url, options, correct_option, fact")
+    .select("id, type, question, image_url, options, correct_option, fact, source_credit")
     .eq("site_id", siteId)
     .eq("type", type)
-    .eq("active", true)
+    .eq("active", true);
+
+  if (rajaus?.taso) q = q.eq("difficulty", rajaus.taso);
+  if (rajaus?.tagit && rajaus.tagit.length > 0) q = q.in("tag", rajaus.tagit);
+
+  const { data, error } = await q
     .order("sort_order", { ascending: true })
     .order("created_at", { ascending: true })
     .limit(limit);
 
   if (error || !data) return [];
-  return data as KuvavisaRow[];
+  /* `as unknown as` eikä suora cast: `source_credit` on kannassa (575 riviä
+     arvollinen, 94 NULL) mutta puuttuu packages/db/types.ts:stä, joka on
+     jäänyt jälkeen — generoitu tiedosto tuntee 38 taulua, kanta 149. Types.ts
+     on CLAUDE.md:n mukaan generoitava Supabase MCP:llä, ei käsin, ja koko
+     tiedoston uudelleengenerointi on ~3 000 rivin muutos: se tehdään omana
+     passinaan, ei tämän korjauksen mukana. Sarakelista yllä on oikea, joten
+     ajonaikainen muoto vastaa KuvavisaRow'ta. */
+  return data as unknown as KuvavisaRow[];
 }
 
 /** PELINÄKYMÄ 2026 (28.8.2026): haastelinkin kuvasarja — samat kortit samassa
@@ -627,11 +653,12 @@ export async function getKuvavisatByIds(ids: string[]): Promise<KuvavisaRow[]> {
   if (!sb || ids.length === 0) return [];
   const { data, error } = await sb
     .from("kuvavisas")
-    .select("id, type, question, image_url, options, correct_option, fact")
+    .select("id, type, question, image_url, options, correct_option, fact, source_credit")
     .in("id", ids.slice(0, 50))
     .eq("active", true);
   if (error || !data) return [];
-  const map = new Map((data as KuvavisaRow[]).map((r) => [r.id, r]));
+  /* ks. getKuvavisat: source_credit puuttuu vanhentuneesta types.ts:stä. */
+  const map = new Map((data as unknown as KuvavisaRow[]).map((r) => [r.id, r]));
   return ids.map((id) => map.get(id)).filter((r): r is KuvavisaRow => Boolean(r));
 }
 
