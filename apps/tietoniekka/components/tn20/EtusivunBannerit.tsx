@@ -16,8 +16,8 @@
 //  - Henkilökuvat kannasta (design: "oikeat kasvokuvat kannasta tuotannossa").
 //
 // Kolme asettelua yhdestä DOMista banneri-kontin leveyden mukaan
-// (container query, ks. etusivun-bannerit.css): desktop ≥ 980, tabletti
-// 600–979, mobiili < 600. Server-komponentti — ei JavaScriptiä.
+// (container query, ks. etusivun-bannerit.css): desktop ≥ 860, tabletti
+// 640–859, mobiili < 640. Desktopin kuva-alue joustaa leveyden mukaan. Server-komponentti — ei JavaScriptiä.
 
 import { ROUND_SIZE } from "@/lib/ikajarjestysConstants";
 import type { BanneriHenkilo, KuvavisaYhteenveto } from "@/lib/etusivunBannerit";
