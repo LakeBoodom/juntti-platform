@@ -3,7 +3,12 @@
    12A Kuvavisat + Viikkovisa, 12B Kuka on vanhin? (ikäjärjestys).
    Mitat designista: desktop 1160 × 268, tabletti 760 × 230, mobiili 380.
    Asettelu valitaan BANNERIN leveydestä (container "eb"), ei ikkunasta:
-     desktop ≥ 980 px · tabletti 600–979 px · mobiili < 600 px.
+     desktop ≥ 860 px · tabletti 640–859 px · mobiili < 640 px.
+   Korjaus 18.9.2026 (Heikin havainto tuotannossa): raja oli 980 px, jolloin
+   ~1000–1060 px:n ikkunassa (banneri 880–979 px) tabletti-asettelu venyi ja
+   keskelle jäi iso tyhjä alue. Nyt desktop-asettelun kuva-alue joustaa:
+   kollaasi ja kasvoketju ankkuroituvat OIKEAAN reunaan ja vasen reuna
+   häivytetään, joten kapeampi desktop näyttää saman kuvan rajattuna.
    Fontti: variable-Archivo (wdth-akseli) kuten kuvavisat.css/viikkovisa.css —
    designin wdth 68 ei toimi staattisella Archivolla (KORTTISÄÄNTÖ).
    ============================================================ */
@@ -49,7 +54,7 @@
 }
 .tn20 .eb-rivi { display: block; }
 .tn20 .eb-mmeta { display: none; margin: 0; font-size: 12px; font-weight: 600; color: #8e8676; }
-.tn20 .eb-row { display: flex; align-items: center; gap: 14px; }
+.tn20 .eb-row { display: flex; align-items: center; flex-wrap: wrap; gap: 14px; }
 .tn20 .eb--ika .eb-row { gap: 16px; }
 .tn20 .eb-btn {
   height: 50px; display: inline-flex; align-items: center; justify-content: center; gap: 12px; padding: 0 26px;
@@ -84,17 +89,21 @@
 
 /* ── 12A kuvatodiste ──────────────────────────────────────────────────── */
 .tn20 .eb-strip { display: none; }
-.tn20 .eb-visual { flex: 0 0 560px; position: relative; height: 268px; }
+/* Joustava kuva-alue: 560 px designin mukaisesti ≥ 1080 px:n bannerissa,
+   kapeammalla tekstipalstalle jätetään 520 px — mitattu tarve 38 px sisennys
+   + 238 px nappi + 14 px väli + 204 px viikkovisamerkki = 494 px, jotta rivi ei
+   rivity kahdeksi (rivittyessään se työnsi tagit bannerin yläreunan yli). */
+.tn20 .eb-visual { flex: 0 0 clamp(320px, calc(100% - 520px), 560px); position: relative; height: 268px; overflow: hidden; }
 .tn20 .eb-visual-varjo { position: absolute; inset: 0; z-index: 2; pointer-events: none; background: linear-gradient(90deg, var(--eb-bg) 0%, rgba(23, 20, 12, 0) 26%); }
 .tn20 .eb-kortti {
   position: absolute; margin: 0; overflow: hidden; border-radius: 13px;
   border: 1px solid #2f2718; box-shadow: 0 26px 48px -24px rgba(0, 0, 0, 0.95);
 }
 .tn20 .eb-kortti img { width: 100%; height: 100%; object-fit: cover; display: block; }
-.tn20 .eb-kortti--rakennus { left: 16px; top: 26px; width: 200px; height: 216px; transform: rotate(-2.5deg); }
-.tn20 .eb-kortti--liput { left: 206px; top: 14px; width: 196px; height: 196px; transform: rotate(2deg); background: #f4efe4; display: flex; align-items: center; justify-content: center; padding: 18px; }
+.tn20 .eb-kortti--rakennus { right: 344px; top: 26px; width: 200px; height: 216px; transform: rotate(-2.5deg); }
+.tn20 .eb-kortti--liput { right: 158px; top: 14px; width: 196px; height: 196px; transform: rotate(2deg); background: #f4efe4; display: flex; align-items: center; justify-content: center; padding: 18px; }
 .tn20 .eb-kortti--liput img { width: auto; height: auto; max-width: 100%; max-height: 100%; object-fit: contain; }
-.tn20 .eb-kortti--maalaukset { left: 262px; top: 118px; width: 170px; height: 134px; transform: rotate(-1.4deg); }
+.tn20 .eb-kortti--maalaukset { right: 128px; top: 118px; width: 170px; height: 134px; transform: rotate(-1.4deg); }
 .tn20 .eb-kortti--elaimet { right: 22px; top: 34px; width: 214px; height: 200px; transform: rotate(1.8deg); border-color: rgba(34, 211, 238, 0.4); }
 .tn20 .eb-kortti-savy { position: absolute; inset: 0; background: linear-gradient(200deg, rgba(34, 211, 238, 0.22), rgba(11, 9, 4, 0.55)); }
 .tn20 .eb-setti { position: absolute; left: 0; right: 0; bottom: 0; padding: 12px 14px; display: flex; align-items: center; justify-content: space-between; }
@@ -105,11 +114,15 @@
 /* Design 580 px, mutta sen rivi (52 + 3 × 118 + 130 + 78 + 4 × 14 = 670 px) ei
    mahtunut siihen: "+6 kasvoa" leikkautui bannerin reunaan. 650 px + 12 px
    välit + 34 px sisennys = 644 px mahtuu kokonaan. */
-.tn20 .eb-ketju { flex: 0 0 650px; position: relative; height: 268px; display: flex; align-items: center; }
-.tn20 .eb-ketju-varjo { position: absolute; inset: 0; z-index: 3; pointer-events: none; background: linear-gradient(90deg, var(--eb-bg) 0%, rgba(23, 20, 12, 0) 22%); }
+.tn20 .eb-ketju { flex: 0 0 clamp(380px, calc(100% - 470px), 650px); position: relative; height: 268px; display: flex; align-items: center; overflow: hidden; }
+/* Häivytys: täysi peitto 8 %:iin asti, jotta kapeammassa desktopissa reunaan
+   leikkautuva kortti ei näy terävänä siivuna. */
+.tn20 .eb-ketju-varjo { position: absolute; inset: 0; z-index: 3; pointer-events: none; background: linear-gradient(90deg, var(--eb-bg) 0%, var(--eb-bg) 8%, rgba(23, 20, 12, 0) 30%); }
 .tn20 .eb-ketju-viiva { position: absolute; left: 34px; right: 24px; top: 50%; height: 1px; background: linear-gradient(90deg, rgba(199, 155, 255, 0), rgba(199, 155, 255, 0.5) 18%, rgba(199, 155, 255, 0.5) 82%, rgba(199, 155, 255, 0)); }
 .tn20 .eb-ketju-akseli { position: absolute; left: 34px; right: 24px; top: calc(50% + 86px); display: flex; justify-content: space-between; font-size: 10px; font-weight: 800; letter-spacing: 0.2em; text-transform: uppercase; color: var(--eb-violet-soft); }
-.tn20 .eb-ketju-rivi { position: relative; z-index: 2; display: flex; align-items: center; gap: 12px; padding-left: 34px; }
+/* Rivi ankkuroituu oikeaan: kapeammalla ketjulla vasemmanpuoleiset kasvot
+   jäävät häivytyksen alle eikä "+6 kasvoa" -laatta leikkaudu. */
+.tn20 .eb-ketju-rivi { position: relative; z-index: 2; width: 100%; display: flex; align-items: center; justify-content: flex-end; gap: 12px; padding: 0 6px 0 0; }
 .tn20 .eb-kasvo {
   position: relative; flex: 0 0 auto; margin: 0; width: 118px; height: 150px; overflow: hidden; border-radius: 12px;
   border: 1px solid rgba(199, 155, 255, 0.45); box-shadow: 0 22px 44px -22px rgba(0, 0, 0, 0.95); background: #231a33;
@@ -138,8 +151,8 @@
 /* Näkyvyysapurit (desktop-, kapea- ja mobiilisisältö samassa DOMissa) */
 .tn20 .eb-vain-kapea, .tn20 .eb-vain-mob, .tn20 .eb-sub--kapea { display: none; }
 
-/* ═══ Tabletti 600–979 px (design 760 × 230) ═══════════════════════════ */
-@container eb (max-width: 979px) {
+/* ═══ Tabletti 640–859 px (design 760 × 230) ═══════════════════════════ */
+@container eb (max-width: 859px) {
   .tn20 .eb-vain-desk { display: none !important; }
   .tn20 .eb-vain-kapea { display: inline; }
   .tn20 .eb-sub--desk { display: none; }
@@ -157,10 +170,13 @@
   .tn20 .eb-vv-nimi { font-size: 13px; letter-spacing: 0; }
   .tn20 .eb-vv-uusi { display: none; }
 
-  .tn20 .eb-visual { flex-basis: 300px; height: 230px; }
+  /* 300 px designin 760 px:n bannerissa; kapeammalla (640–700 px) jousta
+     240 px:iin asti, ettei napin ja viikkovisamerkin rivi rivity (mitattu
+     648 px:n bannerissa 18.9.2026). */
+  .tn20 .eb-visual { flex-basis: clamp(240px, calc(100% - 420px), 300px); height: 230px; overflow: hidden; }
   .tn20 .eb-visual-varjo { background: linear-gradient(90deg, var(--eb-bg) 0%, rgba(23, 20, 12, 0) 30%); }
   .tn20 .eb-kortti { border-radius: 11px; box-shadow: 0 22px 40px -22px rgba(0, 0, 0, 0.95); }
-  .tn20 .eb-kortti--rakennus { left: 6px; top: 26px; width: 150px; height: 172px; }
+  .tn20 .eb-kortti--rakennus { left: 6px; right: auto; top: 26px; width: 150px; height: 172px; }
   .tn20 .eb-kortti--liput { left: auto; right: 14px; top: 16px; width: 152px; height: 150px; padding: 14px; }
   .tn20 .eb-kortti--maalaukset { display: none; }
   .tn20 .eb-kortti--elaimet { top: auto; right: 26px; bottom: 14px; width: 136px; height: 104px; transform: rotate(-1.6deg); }
@@ -172,7 +188,7 @@
   .tn20 .eb-ketju-varjo { background: linear-gradient(90deg, var(--eb-bg) 0%, rgba(23, 20, 12, 0) 26%); }
   .tn20 .eb-ketju-viiva { left: 20px; right: 12px; }
   .tn20 .eb-ketju-akseli { display: none; }
-  .tn20 .eb-ketju-rivi { gap: 9px; padding-left: 20px; }
+  .tn20 .eb-ketju-rivi { justify-content: flex-start; gap: 9px; padding: 0 0 0 20px; }
   .tn20 .eb-kasvo { width: 86px; height: 118px; border-radius: 11px; }
   .tn20 .eb-kasvo--vain-desk { display: none; }
   .tn20 .eb-kasvo--raahaa { width: 98px; height: 134px; transform: translateY(-6px) rotate(-1.5deg); }
@@ -181,12 +197,12 @@
   .tn20 .eb-lisaa { width: 54px; height: 118px; border-radius: 11px; }
   .tn20 .eb-lisaa-n { font-size: 22px; }
 }
-@container eb (min-width: 600px) and (max-width: 979px) {
+@container eb (min-width: 640px) and (max-width: 859px) {
   .tn20 .eb-in { height: 230px; }
 }
 
-/* ═══ Mobiili < 600 px (design 380) ═════════════════════════════════════ */
-@container eb (max-width: 599px) {
+/* ═══ Mobiili < 640 px (design 380) ═════════════════════════════════════ */
+@container eb (max-width: 639px) {
   .tn20 .eb-vain-mob { display: inline; }
   .tn20 .eb-text { width: 100%; align-items: stretch; gap: 12px; padding: 2px 18px 18px; }
   .tn20 .eb-h { font-size: 34px; line-height: 0.9; letter-spacing: -0.02em; font-variation-settings: "wdth" 70; text-wrap: balance; }
@@ -203,7 +219,7 @@
   .tn20 .eb--kv .eb-in { background: var(--eb-bg); }
   .tn20 .eb--ika .eb-in { background: radial-gradient(120% 80% at 50% 0%, rgba(167, 110, 255, 0.2), rgba(19, 17, 9, 0) 60%), var(--eb-bg); }
 }
-@container eb (max-width: 599px) {
+@container eb (max-width: 639px) {
   /* 12A mobiili: kuvakaista ylhäällä, tagi sen päällä */
   .tn20 .eb--kv .eb-tags { display: none; }
   .tn20 .eb--kv .eb-mmeta { display: block; }
@@ -218,7 +234,7 @@
   .tn20 .eb--ika .eb-tags { align-self: flex-start; }
   .tn20 .eb-ketju { order: 1; flex: 0 0 auto; height: 138px; justify-content: center; padding-top: 6px; }
   .tn20 .eb-ketju-varjo, .tn20 .eb-ketju-viiva { display: none; }
-  .tn20 .eb-ketju-rivi { gap: 9px; padding-left: 0; }
+  .tn20 .eb-ketju-rivi { justify-content: center; gap: 9px; padding: 0; }
   .tn20 .eb-kasvo { width: 78px; height: 104px; box-shadow: none; }
   .tn20 .eb-kasvo--raahaa { width: 88px; height: 118px; transform: rotate(-1.5deg); box-shadow: 0 0 0 3px rgba(182, 255, 60, 0.16); }
   .tn20 .eb-kasvo-nro { left: 6px; top: 6px; width: 19px; height: 19px; border-radius: 5px; }
