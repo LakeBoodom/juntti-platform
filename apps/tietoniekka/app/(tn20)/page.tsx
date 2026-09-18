@@ -2,7 +2,8 @@
 // 28.8.2026 — korvasi 18.8. version kokonaan; Heikki: "uusi design korvaa nykyisen
 // 2.0 työhaaran"). Rakenne ylhäältä alas:
 //   ylätunniste (TopBar layoutista: tagline, nostot, Päivän putki) → kategoriarivi →
-//   lippuvisa-hero → Viikkovisa-promo (18.9.2026) → Suositut kokoelmat (6) → Laura ja Mikko (profiilit + 4 korttia)
+//   Kuvavisat-banneri (18.9.2026, korvasi lippuvisa-heron ja viikkovisapromon)
+//   → Suositut kokoelmat (6) → Kuka on vanhin? -banneri → Laura ja Mikko (profiilit + 4 korttia)
 //   → Päivän visa → Uusimmat visat -ticker → footer.
 // Poistuneet: Laura & Mikko -duohero, upotettu ensimmäinen kysymys, putkinauha,
 // viisi täysleveää nostoa, historia-aikajana.
@@ -21,13 +22,14 @@ import { jalkapalloQuizImg } from "@/lib/jalkapallo";
 import { jaakiekkoQuizImg } from "@/lib/jaakiekko";
 import { urheilulajitQuizImg } from "@/lib/urheilulajit";
 import PaivanVisaCard, { type PaivanVisaData } from "@/components/tn20/PaivanVisaCard";
-import { ViikkovisaPromo } from "@/components/tn20/ViikkovisaPromo";
+import { KuvavisatBanneri, IkajarjestysBanneri } from "@/components/tn20/EtusivunBannerit";
 import { getViikkovisa } from "@/lib/kuvavisat2026";
-import { viikkoInfo } from "@/lib/viikkovisa";
+import { getKuvavisaYhteenveto, getBanneriHenkilot } from "@/lib/etusivunBannerit";
 import {
-  CATEGORY_CHIPS, ETUSIVU_HERO, POPULAR_COLLECTIONS, HOSTS, HOSTS_INTRO,
+  CATEGORY_CHIPS, POPULAR_COLLECTIONS, HOSTS, HOSTS_INTRO,
 } from "@/lib/etusivu";
 import "./etusivu.css";
+import "./etusivun-bannerit.css";
 
 /* Kokoelman nimi Päivän visan merkkiin — sama sanasto kuin pelin loaderissa. */
 const COLLECTION_NAME: Record<string, string> = {
@@ -156,12 +158,13 @@ const fiBirth = (iso: string) => {
 };
 
 export default async function Etusivu20() {
-  const [data, vv] = await Promise.all([getData(), getViikkovisa()]);
+  const [data, vv, kvYhteenveto, henkilot] = await Promise.all([
+    getData(), getViikkovisa(), getKuvavisaYhteenveto(), getBanneriHenkilot(),
+  ]);
   if (!data) return <main style={{ padding: 32 }}>Ei tietokantayhteyttä.</main>;
-  /* VIIKKOVISA-PROMO (kierros 4, 18.9.2026): aluksi vain Kuvavisojen
-     viikkovisa, koska muilla kategorioilla ei vielä ole omaa. Viikkotiedot
-     palvelimella; null (ei aktiivisia kuvia) → promo jää pois. */
-  const viikko = vv ? { info: viikkoInfo(vv.vuosi, vv.viikko), kuvia: vv.kuvaIdt.length } : null;
+  /* Viikkovisa näkyy nyt Kuvavisat-bannerin merkkinä (kierros 12);
+     null (ei aktiivisia kuvia) → merkki jää pois. */
+  const viikko = vv ? { viikko: vv.viikko, kuvia: vv.kuvaIdt.length } : null;
   const { hero, sankariIsToday, dayPick, today, latest } = data;
 
   /* Päivän visan sisältö: adminin valinta (visa tai sankari) tai synttärisankari. */
@@ -215,18 +218,10 @@ export default async function Etusivu20() {
       </div>
 
       <div className="tn-es-main">
-        {/* ─── Lippuvisa-hero ─── */}
-        <a className="tn-es-hero" href={ETUSIVU_HERO.href}>
-          <span className="tn-es-hero-bg" aria-hidden style={{ backgroundImage: `url(${ETUSIVU_HERO.img})`, backgroundPosition: ETUSIVU_HERO.pos }} />
-          <span className="tn-es-hero-panel">
-            <h1 className="tn-es-h1">{ETUSIVU_HERO.title}</h1>
-            <p className="tn-es-hero-lede">{ETUSIVU_HERO.lede}</p>
-            <span className="tn-es-btn">{ETUSIVU_HERO.cta}</span>
-          </span>
-        </a>
-
-        {/* ─── Viikkovisa (10A Sinetti) ─── */}
-        {viikko && <ViikkovisaPromo data={viikko} sijainti="etusivu" />}
+        {/* ─── Kuvavisat-banneri (Design kierros 12A, 18.9.2026) ───
+            Korvasi lippuvisa-heron ja sen alla olleen viikkovisapromon.
+            Bannerin otsikko on etusivun h1. */}
+        <KuvavisatBanneri yhteenveto={kvYhteenveto} viikko={viikko} />
 
         {/* ─── Suositut kokoelmat ─── */}
         <section aria-labelledby="suositut">
@@ -248,6 +243,9 @@ export default async function Etusivu20() {
             ))}
           </div>
         </section>
+
+        {/* ─── Kuka on vanhin? -banneri (Design kierros 12B) — ennen juontajia ─── */}
+        <IkajarjestysBanneri henkilot={henkilot} />
 
         {/* ─── Laura ja Mikko ─── */}
         <section className="tn-es-hosts" aria-labelledby="juontajat">
