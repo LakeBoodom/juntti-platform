@@ -7,7 +7,8 @@
 
 import { getSupabase } from "@/lib/supabase";
 import { getKuvavisat, getKuvavisatByIds } from "@/lib/queries";
-import { TASOT, MAANOSAT, KATEGORIAT, variaationNimi, getViikkovisa, levynSavy, VIIKKOVISA_KUVIA } from "@/lib/kuvavisat2026";
+import { TASOT, MAANOSAT, KATEGORIAT, variaationNimi, getViikkovisa, getViikkoKollaasi, levynSavy, VIIKKOVISA_KUVIA } from "@/lib/kuvavisat2026";
+import { viikkoInfo, viikkoNimi, viikkoAvaimesta, VIIKKO_AKSENTTI } from "@/lib/viikkovisa";
 import { haeHaaste } from "@/lib/haaste";
 import { kulttuuriImg } from "@/lib/kulttuuri";
 import { luontoImg } from "@/lib/luonto";
@@ -55,8 +56,9 @@ export async function generateMetadata(
   });
   if (viikkovisa) {
     const vv = await getViikkovisa();
-    const t = vv ? `Viikkovisa ${vv.viikko}` : "Viikkovisa";
-    const d = `${VIIKKOVISA_KUVIA} kuvaa kaikista kortistoista: liput, vaakunat, linnut, eläimet, maalaukset, rakennukset, henkilöt sekä kasvit ja puut. Sama visa kaikille koko viikon.`;
+    /* Kierros 4: "Viikkovisa 38 · Kuvat" — sama nimi kuin sivulla ja jaossa. */
+    const t = vv ? viikkoNimi(vv.viikko) : "Viikkovisa";
+    const d = `${VIIKKOVISA_KUVIA} kuvaa, yksi yritys. Liput, vaakunat, linnut, eläimet, maalaukset, rakennukset, henkilöt sekä kasvit ja puut. Sama visa kaikille koko viikon.`;
     return {
       title: `${t} – tunnista kuvasta${suffix}`,
       description: d,
@@ -69,6 +71,7 @@ export async function generateMetadata(
     /* T4: variaatio näkyy otsikossa samalla nimellä kuin kokoelmasivun linkissä. */
     const taso = str("taso");
     const maanosa = str("maanosa");
+    /* Viikkovisan haaste: taso = viikkoavain → "Viikkovisa 38 · Kuvat" */
     const vari = variaationNimi(kuvavisa, taso, maanosa);
     const t = vari ?? KUVAVISA_TITLES[kuvavisa] ?? "Kuvavisa";
     const kuvaDesc = KUVAVISA_DESC[kuvavisa] ?? "Yksi kuva, neljä vaihtoehtoa. Pelaa ilmainen kuvavisa Tietoniekassa.";
@@ -129,7 +132,7 @@ const KUVAVISA_DESC: Record<string, string> = {
   henkilot: "Tunnista tunnetut henkilöt kuvasta. Ilmainen kuvavisa Tietoniekassa.",
   rakennukset: "Tunnista maailman rakennukset kuvasta. Ilmainen kuvavisa Tietoniekassa.",
   kaupungit: "Tunnista kaupungit yhdestä näkymästä. Ilmainen kuvavisa Tietoniekassa.",
-  viikko: "Viikkovisan kuvasarja kaikista kortistoista. Ilmainen kuvavisa Tietoniekassa — ei kirjautumista.",
+  viikko: "Kuvasarja kaikista kortistoista: liput, vaakunat, linnut, eläimet ja muut. Ilmainen kuvavisa Tietoniekassa — ei kirjautumista.",
 };
 
 const COLLECTION_ACCENT: Record<string, string> = {
@@ -245,29 +248,39 @@ export default async function Peli20({
   if (viikkovisa) {
     const vv = await getViikkovisa();
     if (!vv) notFound();
-    const rows = await getKuvavisatByIds(vv.kuvaIdt);
+    /* Kierros 4 (18.9.2026): viikkotiedot lasketaan TÄSSÄ, palvelimella —
+       viikkonumero ja lukituksen avain tulevat kannan funktiosta (Suomen aika),
+       päivämääräväli ja "N pv jäljellä" palvelimen kellosta. Selain vain
+       vertaa tallennettua avainta tähän, joten lukitus purkautuu maanantaina
+       ilman että selaimen kelloon nojataan. */
+    const info = viikkoInfo(vv.vuosi, vv.viikko);
+    const [rows, kollaasi] = await Promise.all([
+      getKuvavisatByIds(vv.kuvaIdt),
+      getViikkoKollaasi(vv.kuvaIdt, info.avain),
+    ]);
     if (rows.length === 0) notFound();
+    const nimi = viikkoNimi(info.viikko, info.kategoria);
 
     const game: GameQuiz = {
       id: "", // ei quizzes-riviä → pelikertaa ei tallenneta
-      title: `Viikkovisa ${vv.viikko}`,
+      title: nimi,
       teaser:
-        `${rows.length} kuvaa kaikista kortistoista: liput, vaakunat, linnut, eläimet, ` +
-        "maalaukset, rakennukset, henkilöt sekä kasvit ja puut. Sama visa kaikille " +
-        "koko viikon — uusi maanantaina.",
+        "Liput, vaakunat, linnut, eläimet, maalaukset, rakennukset, henkilöt sekä " +
+        "kasvit ja puut. Sama visa kaikille koko viikon.",
       collectionLabel: "Kuvavisat",
       genreLabel: null,
       hubHref: "/kokoelma/kuvavisat",
       bgImg: "", // K1: kuvavisoissa ei taustakuvaa
-      accent: "#B6FF3C",
+      /* Formaatin oma aksentti (10A Sinetti), ei putken ja pääpainikkeiden limeä. */
+      accent: VIIKKO_AKSENTTI,
       isSankari: false,
       kind: "kuva",
       /* Kuvat tulevat kaikista kortistoista, joten levyn sävy ratkaistaan
          kysymys kerrallaan eikä visan tasolla (ks. GameQuestion.plate). */
       plate: "tumma",
-      challengePath: `/peli?kuvavisa=viikko&ids=${rows.map((r) => r.id).join(",")}`,
-      /* Sarja on lukittu viikoksi → "Pelaa uudelleen" antaa saman visan, ei
-         uudelleenlatausta. */
+      challengePath: `/peli?kuvavisa=viikko&taso=${info.avain}&ids=${rows.map((r) => r.id).join(",")}`,
+      /* Yksi yritys viikossa: GameClient ei näytä "Pelaa uudelleen" -nappia
+         viikkovisalle lainkaan. */
       reloadOnRestart: false,
       autoStart: false,
       kuvaIdt: rows.map((r) => r.id),
@@ -275,8 +288,12 @@ export default async function Peli20({
          rows[0].type nimesi viikkovisasta jaetun haasteen sen ensimmäisen kuvan
          kortiston mukaan ("Vaakunavisa", 15 kuvaa). Kuvat tulevat silti id:istä. */
       kuvavisaSlug: "viikko",
-      taso: null,
+      /* Haasterivin taso = viikkoavain, jotta /h/<koodi> nimeää haasteen
+         "Viikkovisa 38 · Kuvat" vielä viikon vaihduttuakin. */
+      taso: info.avain,
       maanosa: null,
+      viikko: { ...info, kollaasi },
+      jakoNimi: nimi,
       spare: [],
       questions: rows.map((r) => ({
         question: r.question,
@@ -455,7 +472,10 @@ export default async function Peli20({
       maalaukset: { title: "Maalausvisa", teaser: "Taiteen klassikot yhdestä kuvasta. Tunnistatko tunnetut teokset — ja niiden tekijät?", motif: "naamio", color: "#E85D9E" },
       /* Viikkovisasta jaettu haaste tulee tähän (?kuvavisa=viikko&ids=...).
          Ei kokoelmasivun kortisto — kuvat tulevat aina id-listasta. */
-      viikko: { title: "Viikkovisa", teaser: "Viikkovisan kuvasarja kaikista kortistoista: liput, vaakunat, linnut, eläimet, maalaukset, rakennukset, henkilöt sekä kasvit ja puut.", motif: "kysymys", color: "#B6FF3C" },
+      /* Haastesivulla ei puhuta "tämän viikon visasta" eikä näytetä
+         viikkosinettiä (kierros 4, kohta 6.7): haaste on pelattavissa myös
+         viikon vaihduttua, jolloin viikkoviittaus olisi harhaanjohtava. */
+      viikko: { title: "Viikkovisa · Kuvat", teaser: "Kuvasarja kaikista kortistoista: liput, vaakunat, linnut, eläimet, maalaukset, rakennukset, henkilöt sekä kasvit ja puut.", motif: "kysymys", color: "#B6FF3C" },
     };
     const deck = DECKS[kuvavisa] ?? { title: "Kuvavisa", teaser: "Tunnista kuvasta.", motif: "kysymys", color: "#4C9AFF" };
 
@@ -477,7 +497,10 @@ export default async function Peli20({
     const haaste = hParam ? await haeHaaste(hParam) : null;
 
     const tasoParam = typeof params.taso === "string" ? params.taso : null;
-    const taso = TASOT.some((t) => t.key === tasoParam) ? tasoParam : null;
+    /* Viikkovisan haasteessa taso on viikkoavain ("2026-38"), ei vaikeustaso. */
+    const taso =
+      kuvavisa === "viikko" ? (viikkoAvaimesta(tasoParam) ? tasoParam : null)
+      : TASOT.some((t) => t.key === tasoParam) ? tasoParam : null;
     const maanosaParam = typeof params.maanosa === "string" ? params.maanosa : null;
     const maanosa = MAANOSAT.find((m) => m.key === maanosaParam) ?? null;
 
@@ -489,6 +512,8 @@ export default async function Peli20({
        Arvonta on palvelimella tarkoituksella: propseina tuleva valmis järjestys ei voi
        tuottaa hydraatioeroa, toisin kuin renderissä tehty Math.random. Haastelinkki
        (?ids=) ohittaa arvonnan kokonaan — siinä sarja on lukittu. */
+    /* "viikko" ei ole kortisto: ilman id-listaa ei ole mitään pelattavaa. */
+    if (kuvavisa === "viikko" && wantedIds.length === 0) notFound();
     const allRows =
       wantedIds.length > 0
         ? await getKuvavisatByIds(wantedIds)
@@ -564,6 +589,9 @@ export default async function Peli20({
       haaste: haaste
         ? { oikein: haaste.oikein, kysymyksia: haaste.kysymyksia, pisteet: haaste.pisteet }
         : undefined,
+      /* Viikkovisan haaste: jakoteksti "Viikkovisa 38 · Kuvat 12/15" kuten
+         alkuperäisessä viikkovisassa. */
+      jakoNimi: kuvavisa === "viikko" && variaatio ? variaatio : undefined,
       spare: spareRows.map(toQ),
       questions: rows.map(toQ),
       related,

@@ -14,6 +14,7 @@ import "@fontsource-variable/archivo/wdth.css";
 import "./tn20.css";
 import "./tietoketju.css";
 import "./kuvavisat.css";
+import "./viikkovisa.css";
 import TopBar from "@/components/tn20/TopBar";
 import SiteFooter from "@/components/tn20/SiteFooter";
 

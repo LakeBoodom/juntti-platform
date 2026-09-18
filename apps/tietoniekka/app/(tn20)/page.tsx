@@ -2,7 +2,7 @@
 // 28.8.2026 — korvasi 18.8. version kokonaan; Heikki: "uusi design korvaa nykyisen
 // 2.0 työhaaran"). Rakenne ylhäältä alas:
 //   ylätunniste (TopBar layoutista: tagline, nostot, Päivän putki) → kategoriarivi →
-//   lippuvisa-hero → Suositut kokoelmat (6) → Laura ja Mikko (profiilit + 4 korttia)
+//   lippuvisa-hero → Viikkovisa-promo (18.9.2026) → Suositut kokoelmat (6) → Laura ja Mikko (profiilit + 4 korttia)
 //   → Päivän visa → Uusimmat visat -ticker → footer.
 // Poistuneet: Laura & Mikko -duohero, upotettu ensimmäinen kysymys, putkinauha,
 // viisi täysleveää nostoa, historia-aikajana.
@@ -21,6 +21,9 @@ import { jalkapalloQuizImg } from "@/lib/jalkapallo";
 import { jaakiekkoQuizImg } from "@/lib/jaakiekko";
 import { urheilulajitQuizImg } from "@/lib/urheilulajit";
 import PaivanVisaCard, { type PaivanVisaData } from "@/components/tn20/PaivanVisaCard";
+import { ViikkovisaEtusivu } from "@/components/tn20/ViikkovisaPromo";
+import { getViikkovisa } from "@/lib/kuvavisat2026";
+import { viikkoInfo } from "@/lib/viikkovisa";
 import {
   CATEGORY_CHIPS, ETUSIVU_HERO, POPULAR_COLLECTIONS, HOSTS, HOSTS_INTRO,
 } from "@/lib/etusivu";
@@ -153,8 +156,12 @@ const fiBirth = (iso: string) => {
 };
 
 export default async function Etusivu20() {
-  const data = await getData();
+  const [data, vv] = await Promise.all([getData(), getViikkovisa()]);
   if (!data) return <main style={{ padding: 32 }}>Ei tietokantayhteyttä.</main>;
+  /* VIIKKOVISA-PROMO (kierros 4, 18.9.2026): aluksi vain Kuvavisojen
+     viikkovisa, koska muilla kategorioilla ei vielä ole omaa. Viikkotiedot
+     palvelimella; null (ei aktiivisia kuvia) → promo jää pois. */
+  const viikko = vv ? { info: viikkoInfo(vv.vuosi, vv.viikko), kuvia: vv.kuvaIdt.length } : null;
   const { hero, sankariIsToday, dayPick, today, latest } = data;
 
   /* Päivän visan sisältö: adminin valinta (visa tai sankari) tai synttärisankari. */
@@ -217,6 +224,9 @@ export default async function Etusivu20() {
             <span className="tn-es-btn">{ETUSIVU_HERO.cta}</span>
           </span>
         </a>
+
+        {/* ─── Viikkovisa (10A Sinetti) ─── */}
+        {viikko && <ViikkovisaEtusivu data={viikko} />}
 
         {/* ─── Suositut kokoelmat ─── */}
         <section aria-labelledby="suositut">

@@ -25,6 +25,9 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { getSupabase, SITE_SLUG } from "../../../lib/supabase";
 import { PAIVAN_VISA_KEY, localDateKey } from "../../../components/tn20/PaivanVisaCard";
+import { ViikkoSinetti, KuvatIkoni } from "../../../components/tn20/Viikkosinetti";
+import { lueViikkoTulos, tallennaViikkoTulos, type ViikkoInfo, type ViikkoTulos } from "../../../lib/viikkovisa";
+import type { KollaasiKuva } from "../../../lib/kuvavisat2026";
 import "../peli2026.css";
 
 const BASE_POINTS = 100;
@@ -80,6 +83,13 @@ export type GameQuiz = {
   maanosa?: string | null;
   /** K3: haastajan tulos, kun sivulle tultiin /h/<koodi>-linkistä. */
   haaste?: { oikein: number; kysymyksia: number; pisteet: number };
+  /** Viikkovisa (kierros 4, 18.9.2026): palvelimella lasketut viikkotiedot +
+      aloitusnäkymän kollaasi. Kun annettu, peli on yhden yrityksen viikkovisa:
+      oma aloitusnäkymä (10A Sinetti), tulos lukitaan selaimeen eikä "Pelaa
+      uudelleen" -nappia ole. Haastelinkki (/h/) EI saa tätä kenttää. */
+  viikko?: ViikkoInfo & { kollaasi: KollaasiKuva[] };
+  /** Jakoteksti nimen mukaan: "Viikkovisa 38 · Kuvat 12/15". */
+  jakoNimi?: string;
   /** Varakysymykset teknistä ohitusta varten (kuvavisat) */
   spare?: GameQuestion[];
   questions: GameQuestion[];
@@ -235,6 +245,11 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
      luotu tai luonti ei onnistunut → jaossa käytetään pitkää ?ids=-osoitetta,
      joten jakaminen ei koskaan hajoa kannan takia. */
   const [haasteKoodi, setHaasteKoodi] = useState<string | null>(null);
+  /* Viikkovisa: tämän viikon tulos selaimesta. null = ei pelattu.
+     viikkoTarkistettu estää Aloita-napin välähdyksen ennen tarkistusta. */
+  const vk = quiz.viikko ?? null;
+  const [viikkoTulos, setViikkoTulos] = useState<ViikkoTulos | null>(null);
+  const [viikkoTarkistettu, setViikkoTarkistettu] = useState(!vk);
 
   const rootRef = useRef<HTMLDivElement>(null);
   const pageRef = useRef<HTMLDivElement>(null);
@@ -280,6 +295,34 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
   useEffect(() => {
     try { setOrigin(window.location.origin); } catch { /* no-op */ }
     if (typeof navigator !== "undefined" && typeof navigator.share === "function") setHasShare(true);
+  }, []);
+
+  /* Viikkovisa, yksi yritys: jos tämän viikon tulos on jo selaimessa,
+     palautetaan vastaukset tarkastelua varten ja Aloita vaihtuu omaan
+     tulokseen. Avain tulee palvelimelta (vk.avain), joten maanantaina
+     tallennettu tulos ei enää täsmää ja lukitus purkautuu itsestään.
+     Valinnat on tallennettu TEKSTEINÄ: vaihtoehtojen järjestys arvotaan joka
+     latauksella, joten indeksi haetaan uudelleen tämän latauksen järjestyksestä. */
+  useEffect(() => {
+    if (!vk) return;
+    const t = lueViikkoTulos(vk.avain);
+    if (t) {
+      setViikkoTulos(t);
+      setRight(t.oikein);
+      setScore(t.pisteet);
+      setHist(quiz.questions.map((_, i) => (t.tila[i] ?? undefined) as Hist));
+      setPicks(quiz.questions.map((qq, i) => {
+        const v = t.valinnat[i];
+        const idx = v == null ? -1 : qq.options.indexOf(v);
+        return idx >= 0 ? idx : null;
+      }));
+      /* ?tarkastele=1 (promo ja kortti): avaa vastaukset suoraan. */
+      try {
+        if (new URLSearchParams(window.location.search).get("tarkastele") === "1") setReview(0);
+      } catch { /* no-op */ }
+    }
+    setViikkoTarkistettu(true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   /* SEO-aiheopas (SSR, pelin alla) piilotetaan pelin ajaksi ja tulosnäkymässä */
@@ -453,7 +496,7 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
     } catch { /* no-op */ }
   }
 
-  function finish(finalScore: number) {
+  function finish(finalScore: number, histNyt: Hist[] = hist, picksNyt: Array<number | null> = picks) {
     anchorTop.current = null;
     setPhase("end");
     setReview(null);
@@ -470,6 +513,21 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
     /* K3: haastetunnus tulosnäkymää varten. right ja finalScore ovat tässä
        ajan tasalla, koska finish kutsutaan vasta seuraavassa klikkauksessa. */
     void luoHaaste(right, finalScore);
+    /* Viikkovisa: lukitus syntyy vasta läpipelatusta visasta (kesken jäänyt
+       yritys alkaa alusta). Ensimmäinen valmis tulos jää voimaan viikon loppuun. */
+    if (vk && !viikkoTulos) {
+      const t: ViikkoTulos = {
+        avain: vk.avain,
+        oikein: right,
+        kysymyksia: total,
+        pisteet: finalScore,
+        tila: questions.map((_, i) => histNyt[i] ?? null),
+        valinnat: questions.map((qq, i) => { const pi = picksNyt[i]; return pi == null ? null : qq.options[pi] ?? null; }),
+      };
+      tallennaViikkoTulos(t);
+      setViikkoTulos(t);
+    }
+    /* Putki jatkuu millä tahansa pelillä — myös viikkovisalla (linjaus 4.5). */
     updateDailyStreak();
     if (quiz.isSankari) { try { window.localStorage.setItem(PAIVAN_VISA_KEY, localDateKey()); } catch { /* no-op */ } }
     if (quiz.citySlug) stampCity(quiz.citySlug);
@@ -529,11 +587,13 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
     const h = hist.slice(); h[qi] = "skipped";
     const p = picks.slice(); p[qi] = null;
     setHist(h); setPicks(p); setSel(null); setLocked(false); setRemoved([]);
-    if (qi >= total - 1) finish(score);
+    if (qi >= total - 1) finish(score, h, p);
     else { setQi(qi + 1); preloadNext(qi + 1); }
   }
   function retryImg() { setBust((b) => ({ ...b, [qi]: (b[qi] ?? 0) + 1 })); }
   function startGame() {
+    /* Viikkovisa pelattu tällä viikolla → ei uutta yritystä. */
+    if (vk && (viikkoTulos || !viikkoTarkistettu)) return;
     setPhase("play");
     preloadNext(-1);
     try { window.scrollTo(0, 0); } catch { /* no-op */ }
@@ -575,7 +635,9 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
     function onKey(e: KeyboardEvent) {
       const c = ctx();
       if (zoom) { if (e.key === "Escape") { e.preventDefault(); setZoom(false); } return; }
-      if (phase === "start") { if ((e.key === "Enter" || e.key === " ") && !c.control) { e.preventDefault(); startGame(); } return; }
+      /* Viikkovisan pelatussa aloitusnäkymässä tarkastelu avautuu start-vaiheessa,
+         joten dialogin näppäimet käsitellään ennen aloitusnäkymän Enteriä. */
+      if (phase === "start" && review == null) { if ((e.key === "Enter" || e.key === " ") && !c.control) { e.preventDefault(); startGame(); } return; }
       if (review != null) {
         if (e.key === "Escape") { e.preventDefault(); setReview(null); }
         else if (!c.typing && e.key === "ArrowRight") { e.preventDefault(); setReview(Math.min(total - 1, review + 1)); }
@@ -610,7 +672,9 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
   /* ── Haaste ja jaot (3a: linkki = visan oma osoite, aina valmis) ── */
   /* K3: /h/abc123 kun tunnus on luotu, muuten pitkä ?ids=-osoite. */
   const challengeUrl = haasteKoodi ? `${origin}/h/${haasteKoodi}` : `${origin}${quiz.challengePath}`;
-  const shareText = `Sain ${right}/${total} Tietoniekan ${quiz.title} -visassa. Pystytkö parempaan?`;
+  const shareText = quiz.jakoNimi
+    ? `${quiz.jakoNimi} ${right}/${total} Tietoniekassa. Pystytkö parempaan?`
+    : `Sain ${right}/${total} Tietoniekan ${quiz.title} -visassa. Pystytkö parempaan?`;
   const linkReady = !!quiz.challengePath;
   function clearCopyLater() { if (copyTimer.current) clearTimeout(copyTimer.current); copyTimer.current = setTimeout(() => setCopyState(null), 3000); }
   function copyLink() {
@@ -725,6 +789,12 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
               <span className="tng-cat">{category}</span>
             )}
           </div>
+          {vk && phase === "start" && (
+            <span className="vv-hud">
+              <span className="vv-hud-pitka">Viikko {vk.viikko} · voimassa {vk.voimassaAsti} asti</span>
+              <span className="vv-hud-lyhyt">{vk.voimassaAsti.replace(/^su/, "Su")} asti</span>
+            </span>
+          )}
           <div className="tng-progress" data-hide={phase === "start" ? "1" : "0"}>
             <div className="tng-pips" role="img" aria-label={`Kysymys ${Math.min(qi + 1, total)} / ${total}, ${right} oikein`}>
               {questions.map((_, i) => (
@@ -768,8 +838,68 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
         </header>
 
         <main ref={mainRef} className="tng-main" data-mode={mode}>
+          {/* ── Viikkovisan aloitusnäkymä (10A Sinetti, kierros 11 korjattuna) ── */}
+          {phase === "start" && vk && (
+            <section className="vv-start" aria-label="Viikkovisan aloitus">
+              <div className="vv-start-teksti">
+                <h1 className="vv-wordmark">
+                  <span className="vv-wordmark-viiva" aria-hidden />
+                  Viikkovisa
+                  <span className="tng-sr"> {vk.viikko} · {vk.kategoria}</span>
+                </h1>
+                <div className="vv-start-kat" aria-hidden="true">
+                  <span className="vv-start-katikoni"><KuvatIkoni /></span>
+                  <span className="vv-start-katnimi">{vk.kategoria}</span>
+                </div>
+                {/* Mobiilissa sinetti tekstipalstan sisällä (CSS valitsee kumman). */}
+                <ViikkoSinetti viikko={vk.viikko} vali={vk.vali} />
+                <div className="vv-start-meta">
+                  <span>
+                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#8E8676" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2.5" /><circle cx="8.6" cy="9.6" r="1.7" /><path d="M3.6 17.4 9 12.6l4.2 3.6 3.1-2.6 4.1 3.4" /></svg>
+                    {total} kuvaa, yksi yritys
+                  </span>
+                  <i aria-hidden />
+                  <span>
+                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#8E8676" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2.5" /><path d="M3 10h18M8 3v4M16 3v4" /></svg>
+                    uusi maanantaina
+                  </span>
+                </div>
+                {quiz.teaser && <p className="vv-start-p">{quiz.teaser}</p>}
+                {viikkoTulos ? (
+                  <>
+                    <div className="vv-start-tulos">
+                      <span className="vv-start-tulos-l">Sinun tuloksesi</span>
+                      <span className="vv-start-tulos-v">{viikkoTulos.oikein}<i>/</i>{viikkoTulos.kysymyksia}</span>
+                      <span className="vv-start-tulos-p">Yksi yritys viikossa. Uusi viikkovisa maanantaina.</span>
+                    </div>
+                    <div className="vv-start-row">
+                      <button type="button" className="vv-btn" onClick={(e) => openReview(0, e.currentTarget)}>Tarkastele vastauksia</button>
+                      <a className="vv-link" href={quiz.hubHref}>Takaisin kortistoihin <span aria-hidden>→</span></a>
+                    </div>
+                  </>
+                ) : (
+                  <div className="vv-start-row" data-odottaa={viikkoTarkistettu ? undefined : "1"}>
+                    <button type="button" className="vv-btn" onClick={startGame} disabled={!viikkoTarkistettu}>Aloita <span aria-hidden>→</span></button>
+                    <span className="vv-start-aika">noin {Math.max(1, Math.round((total * 16) / 60))} min · {vk.jaljellaTeksti}</span>
+                  </div>
+                )}
+              </div>
+              <ViikkoSinetti viikko={vk.viikko} vali={vk.vali} />
+              {vk.kollaasi.length > 0 && (
+                <div className="vv-kollaasi" aria-hidden="true">
+                  {vk.kollaasi.slice(0, 4).map((k, i) => (
+                    <figure key={`${k.src}-${i}`} className="vv-kollaasi-kuva" data-grafiikka={k.grafiikka ? "1" : undefined}>
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={k.src} alt="" loading="lazy" draggable={false} />
+                    </figure>
+                  ))}
+                </div>
+              )}
+            </section>
+          )}
+
           {/* ── Aloitusnäkymä ── */}
-          {phase === "start" && (
+          {phase === "start" && !vk && (
             <section className="tng-start" aria-label="Visan aloitus">
               <span className="tng-start-cat"><i aria-hidden />{category}</span>
               {/* T5: murupolku aloitusnäkymään — Etusivu / Kuvavisat / Lippuvisa. */}
@@ -955,7 +1085,6 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
                          vastaamisen hetkellä. */
                       <div className="tng-fbwait">
                         {oljenkorsiNappi}
-                        <span className="tng-fbwait-p">Palaute ja Tiesitkö-tieto ilmestyvät tähän.</span>
                       </div>
                     )}
                   </div>
@@ -1098,12 +1227,15 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
                 </div>
 
                 <div className="tng-resact">
-                  <button type="button" onClick={restart}>
-                    <svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M17 10a7 7 0 11-2.05-4.95M17 3v3.5h-3.5" /></svg>
-                    Pelaa uudelleen
-                  </button>
+                  {/* Viikkovisa: yksi yritys → ei uudelleenpeluuta (linjaus 4.6). */}
+                  {!vk && (
+                    <button type="button" onClick={restart}>
+                      <svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M17 10a7 7 0 11-2.05-4.95M17 3v3.5h-3.5" /></svg>
+                      Pelaa uudelleen
+                    </button>
+                  )}
                   {/* T5: vie kortiston kokoelmaan (esim. /kokoelma/kuvavisat), ei kaikkien kokoelmien listaan. */}
-                  <a href={quiz.hubHref || "/kokoelmat"}>Valitse uusi visa</a>
+                  <a href={quiz.hubHref || "/kokoelmat"}>{vk ? "Takaisin kortistoihin" : "Valitse uusi visa"}</a>
                 </div>
               </section>
 

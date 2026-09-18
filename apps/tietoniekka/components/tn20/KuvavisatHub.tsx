@@ -1,28 +1,29 @@
 // KUVAVISAT 2.0 (2026-09-17) — kokoelmasivun hub. Design: näkymät 1a (työpöytä)
 // ja 1b (mobiili). Server-komponentti: kategorian laajennus on natiivi
-// <details>/<summary>, joten koko sivu toimii ilman JavaScriptiä.
+// <details>/<summary>, joten koko sivu toimii ilman JavaScriptiä (viikkovisakortti
+// on oma pieni asiakaskomponenttinsa, koska oma tulos luetaan selaimesta).
 //
-// EROT DESIGNIIN — kolme tietoista poikkeamaa, kaikki Heikin päätöksiä 2026-09-17:
-//  1. Designin sininen (#2C6BE0 painikkeet, #0D1526 viikkovisapaneeli) jää pois.
-//     BRAND.md:n token-lohkossa ei ole sinistä, se sallii enintään kaksi
-//     taustaväriä per näkymä ja lime on ainoa toimintoväri. BRAND.md voittaa.
-//  2. Ylätunnisteen "Kirjaudu" ja "Putki 4 pv" jäävät pois — CLAUDE.md sääntö 7:
-//     v1 on täysin anonyymi. Nappi joka ei tee mitään on huonompi kuin ei nappia.
-//  3. Viikkovisapaneeli (design 1a) ja "Löydä oikea kuva" -esittely jäävät pois
-//     tästä PR:stä: kumpikaan ominaisuus ei ole vielä olemassa, eikä sivulla
-//     lueta lupauksia joita tuotanto ei lunasta. Tulevat omina PR:inään.
+// KIERROS 4 (18.9.2026, Heikin muutospyynnöt + viikkovisan 10A Sinetti):
+//  - Herokuva kuten muilla kokoelmasivuilla (vrt. /kokoelma/historia). Hero on
+//    leveä ja kuvallinen, ja se pitää limen: "Arvo satunnainen kuvavisa" on
+//    näkymän ainoa täytetty lime-nappi.
+//  - Viikkovisa on kapea, kuvaton kortti kategoriaruudukon vasemmassa laidassa,
+//    syaani ääriviivanappi — hero ja kortti eivät kilpaile samalla värillä.
+//  - Ei eksakteja kuvamääriä (hero, kortit, variaatiorivit) eikä variaatiolukua:
+//    tilalla kuvaava teksti (variaatioKuvaus).
+//  - Tyyppimerkki (GRAFIIKKA / VALOKUVA) pois kuvan päältä — kuvan päällä ei
+//    ole nyt mitään. Kuvatyyppi (KategoriaMeta.sovitus) ohjaa yhä layoutia.
+//  - FAQ-osio ("Kuvavisat pähkinänkuoressa") pois sivun alalaidasta.
 //
-// Designin esimerkkiluvut (2 900 kuvaa, 28 variaatiota) EIVÄT ole tuotannon
-// lukuja — kaikki näytettävät määrät tulevat kannasta.
+// Ylätunnisteen "Kirjaudu" ja "Putki 4 pv" jäävät yhä pois — CLAUDE.md sääntö 7:
+// v1 on täysin anonyymi.
 
-import { ryhmiteltyVariaatiot, type KategoriaData } from "@/lib/kuvavisat2026";
+import { ryhmiteltyVariaatiot, variaatioKuvaus, type KategoriaData } from "@/lib/kuvavisat2026";
+import { ViikkovisaKortti, type ViikkoPromoData } from "./ViikkovisaPromo";
+import Crumbs from "./Crumbs";
 
 /* Kuvalaatikko — Claude Designin korjaus (README "Kategorianäkymä, korjaus", 17.9.2026).
-   JUURISYY jota tämä korjaa: kuvalaatikolla ei ollut kiinteää korkeutta, joten kuva
-   kasvoi oman kuvasuhteensa mukaan ja pystykuvat (Mona Lisa, Napoleon, Eiffel) valuivat
-   otsikon ja napin päälle. Nyt laatikko on aina 16:10 ja teksti on sen ULKOPUOLELLA
-   omana sisaruksenaan — ei päällekkäisiä kerroksia. Ainoa kuvan päällä oleva elementti
-   on tyyppimerkki, jolla on oma tumma pohja. */
+   Laatikko on aina 16:10 ja teksti on sen ULKOPUOLELLA omana sisaruksenaan. */
 function KuvaLaatikko({ k }: { k: KategoriaData }) {
   const kuvat = k.esikatselut.slice(0, 2);
   if (kuvat.length === 0) return null;
@@ -42,21 +43,13 @@ function KuvaLaatikko({ k }: { k: KategoriaData }) {
           />
         ))}
       </div>
-      {/* Tyyppimerkki: kertoo kumpaa kuvatyyppiä kortisto käyttää. Sama tieto ohjaa
-          sovitusta myös pelinäkymässä (KategoriaMeta.sovitus). */}
-      <span className="kv-media-kind">{grafiikka ? "Grafiikka" : "Valokuva"}</span>
     </div>
   );
 }
 
 function KategoriaKortti({ k }: { k: KategoriaData }) {
   const ryhmat = ryhmiteltyVariaatiot(k.variaatiot);
-  const visoja = k.variaatiot.length;
-  /* Kaikki kortit kiinni oletuksena (Heikin QA 17.9.2026). Design 1a:ssa
-     ensimmäinen on <details open>, mutta tuotannossa se jätti työpöytärivin
-     muut kortit lyhyiksi ja viereen ison tyhjän alueen, ja mobiilissa pelaaja
-     joutui vierittämään kahdeksan variaatiolinkin ohi päästäkseen seuraavaan
-     kategoriaan. */
+  /* Kaikki kortit kiinni oletuksena (Heikin QA 17.9.2026). */
   return (
     <details
       className="kv-card"
@@ -67,13 +60,7 @@ function KategoriaKortti({ k }: { k: KategoriaData }) {
         <div className="kv-card-body">
           <h3 className="kv-card-title">{k.meta.otsikko}</h3>
           <p className="kv-card-desc">{k.meta.kuvaus}</p>
-          <div className="kv-card-meta">
-            <span className="kv-card-count">{k.meta.yksikko(k.kuvia)}</span>
-            <span aria-hidden="true">·</span>
-            <span>
-              {visoja} {visoja === 1 ? "visa" : "visaa"}
-            </span>
-          </div>
+          <div className="kv-card-meta">{variaatioKuvaus(k.variaatiot)}</div>
           {/* margin-top:auto pitää napit samalla linjalla vaikka otsikot ja
               kuvaukset ovat eri pituisia (Designin korjaus, kohta 3). */}
           <span className="kv-card-cta">
@@ -92,7 +79,7 @@ function KategoriaKortti({ k }: { k: KategoriaData }) {
             {r.items.map((v) => (
               <a key={v.key} className={`kv-var${v.kaikki ? " kv-var--kaikki" : ""}`} href={v.href}>
                 <span className="kv-var-label">{v.label}</span>
-                <span className="kv-var-count">{v.kuvia} kuvaa</span>
+                <span className="kv-var-arrow" aria-hidden="true">→</span>
               </a>
             ))}
           </div>
@@ -104,83 +91,56 @@ function KategoriaKortti({ k }: { k: KategoriaData }) {
 
 export function KuvavisatHub({
   kategoriat,
-  kuviaYhteensa,
-  variaatioitaYhteensa,
   satunnainenHref,
   viikkovisa,
-  article,
 }: {
   kategoriat: KategoriaData[];
-  kuviaYhteensa: number;
-  variaatioitaYhteensa: number;
   satunnainenHref: string | null;
-  /** Kuluvan viikon viikkovisa. null = ei vielä olemassa → paneeli jää pois. */
-  viikkovisa?: { viikko: number; kuvia: number } | null;
-  article?: React.ReactNode;
+  /** Kuluvan viikon viikkovisa. null = ei vielä olemassa → kortti jää pois. */
+  viikkovisa?: ViikkoPromoData | null;
 }) {
   return (
-    <div className="kv-page">
+    <>
+      <Crumbs items={[{ label: "Kokoelmat", href: "/kokoelmat" }, { label: "Kuvavisat" }]} />
       <header className="kv-hero">
-        <h1 className="kv-hero-title">Kuvavisat</h1>
-        <p className="kv-hero-lede">
-          Tunnista liput, vaakunat, linnut, eläimet, maalaukset, rakennukset ja kasvit. Valitse kategoria, sitten sinulle
-          sopiva vaikeustaso.
-        </p>
-        <div className="kv-hero-stats">
-          <span className="kv-stat-lead">{kuviaYhteensa} kuvaa</span>
-          <span aria-hidden="true">·</span>
-          <span>{kategoriat.length} kategoriaa</span>
-          <span aria-hidden="true">·</span>
-          <span>{variaatioitaYhteensa} visavariaatiota</span>
+        <div className="kv-hero-media" aria-hidden="true">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/20/kuvavisat/hero.webp" alt="" fetchPriority="high" />
         </div>
-        {satunnainenHref && (
-          <a className="kv-hero-random" href={satunnainenHref}>
-            Arvo satunnainen kuvavisa
-          </a>
-        )}
+        <div className="tn-shell kv-hero-shell">
+          <div className="kv-hero-in">
+            <h1 className="kv-hero-title">Kuvavisat</h1>
+            <p className="kv-hero-lede">
+              Tunnista liput, vaakunat, linnut, eläimet, maalaukset, rakennukset ja kasvit. Valitse kategoria, sitten
+              sinulle sopiva vaikeustaso.
+            </p>
+            {satunnainenHref && (
+              <a className="kv-hero-random" href={satunnainenHref}>
+                Arvo satunnainen kuvavisa <span aria-hidden="true">→</span>
+              </a>
+            )}
+          </div>
+        </div>
       </header>
 
-      {/* VIIKKOVISA (design 1a -paneeli). Design käyttää sinistä #2C6BE0 ja
-          tummansinistä pohjaa #0D1526, mutta BRAND.md:n token-lohkossa ei ole
-          sinistä ja lime on ainoa toimintoväri — sama linjaus kuin painikkeissa.
-          Paneeli näkyy vain kun kuluvan viikon sarja on kannassa: sivulla ei
-          lueta lupauksia joita tuotanto ei lunasta. */}
-      {viikkovisa && (
-        <section className="kv-viikko" aria-labelledby="kv-viikko-title">
-          <span className="kv-viikko-badge">Tämän viikon kuvavisa</span>
-          <h2 className="kv-viikko-title" id="kv-viikko-title">Viikkovisa</h2>
-          <p className="kv-viikko-lede">
-            {viikkovisa.kuvia} kuvaa kaikista kortistoista: liput, vaakunat, linnut, eläimet, maalaukset,
-            rakennukset, henkilöt sekä kasvit ja puut. Sama visa kaikille koko viikon — uusi maanantaina.
-          </p>
-          <div className="kv-viikko-row">
-            <a className="kv-viikko-cta" href="/peli?viikkovisa=1">
-              Aloita viikkovisa <span aria-hidden="true">→</span>
-            </a>
-            <span className="kv-viikko-meta">
-              Viikko {viikkovisa.viikko}
-              <span aria-hidden="true"> · </span>
-              {viikkovisa.kuvia} kuvaa
-              <span aria-hidden="true"> · </span>
-              kaikki kategoriat
-            </span>
-          </div>
-        </section>
-      )}
-
-      <section className="kv-section">
-        <div className="kv-section-head">
-          <h2 className="kv-section-title">Valitse kategoria</h2>
-          <span className="kv-section-note">Kategoria avaa visavariaatiot — peli ei käynnisty heti</span>
+      <div className="tn-shell">
+        <div className="kv-page">
+          <section className="kv-section">
+            <div className="kv-section-head">
+              <h2 className="kv-section-title">Valitse kategoria</h2>
+              <span className="kv-section-note">Kategoria avaa visavariaatiot — peli ei käynnisty heti</span>
+            </div>
+            <div className="kv-layout" data-viikko={viikkovisa ? "1" : undefined}>
+              {viikkovisa && <ViikkovisaKortti data={viikkovisa} />}
+              <div className="kv-grid">
+                {kategoriat.map((k) => (
+                  <KategoriaKortti key={k.meta.type} k={k} />
+                ))}
+              </div>
+            </div>
+          </section>
         </div>
-        <div className="kv-grid">
-          {kategoriat.map((k) => (
-            <KategoriaKortti key={k.meta.type} k={k} />
-          ))}
-        </div>
-      </section>
-
-      {article}
-    </div>
+      </div>
+    </>
   );
 }

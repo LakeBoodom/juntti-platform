@@ -11,6 +11,7 @@
 
 import { getSupabase } from "@/lib/supabase";
 import { getSiteId } from "@/lib/queries";
+import { viikkoAvaimesta, viikkoNimi } from "@/lib/viikkovisa";
 
 /** Pienin kuvamäärä jolla variaatio näytetään. Kierros on enintään 12 kuvaa
     (ks. /peli getKuvavisat(..., 12)), joten alle kymmenen kuvan variaatio
@@ -246,6 +247,13 @@ export async function getKuvavisatHub(): Promise<{ kategoriat: KategoriaData[]; 
  * kokonaan (silloin käytetään kortiston omaa nimeä).
  */
 export function variaationNimi(type: string, taso?: string | null, maanosaKey?: string | null): string | null {
+  /* Viikkovisasta jaettu haaste: taso-kenttä kantaa viikkoavaimen ("2026-38"),
+     jotta haastesivu ja sen og:title nimeävät visan "Viikkovisa 38 · Kuvat"
+     myös viikon vaihduttua (kierros 4, 18.9.2026). */
+  if (type === "viikko") {
+    const vk = viikkoAvaimesta(taso);
+    return vk ? viikkoNimi(vk.viikko) : null;
+  }
   const meta = KATEGORIAT.find((k) => k.type === type);
   if (!meta) return null;
   if (maanosaKey) {
@@ -257,6 +265,24 @@ export function variaationNimi(type: string, taso?: string | null, maanosaKey?: 
     if (t) return `${t.label} ${meta.monikko}`;
   }
   return null;
+}
+
+/**
+ * Heikin pyyntö 2 (18.9.2026): kortissa ei eksakteja kuvamääriä eikä
+ * variaatiolukua ("143 lippua · 8 visaa") — luku heittelee datan mukaan, koska
+ * alle MIN_VARIAATIO-kuvan variaatiot piilotetaan. Tilalle kuvaava teksti,
+ * joka johdetaan NÄKYVISTÄ variaatioista: kun kasvien, lintujen ja maalausten
+ * vaikeustasot tasapainotetaan kantaan, teksti päivittyy itsestään.
+ *   liput → "Vaikeustasot ja maanosat", 3 tasoa → "Kolme vaikeustasoa",
+ *   2 tasoa → "Kaksi vaikeustasoa", 0–1 tasoa → "Koko kortisto".
+ */
+export function variaatioKuvaus(v: Variaatio[]): string {
+  const tasoja = v.filter((x) => x.key.startsWith("taso-")).length;
+  const maanosia = v.filter((x) => x.key.startsWith("maanosa-")).length;
+  if (maanosia > 0) return tasoja > 0 ? "Vaikeustasot ja maanosat" : "Maanosat";
+  if (tasoja >= 3) return "Kolme vaikeustasoa";
+  if (tasoja === 2) return "Kaksi vaikeustasoa";
+  return "Koko kortisto";
 }
 
 /** Variaatioiden ryhmittely designin 1a-listaan: vaikeustasot ensin, sitten maanosat. */
@@ -320,4 +346,47 @@ export async function getViikkovisa(): Promise<Viikkovisa | null> {
     kaikista kortistoista, joten sävy ratkaistaan kysymys kerrallaan. */
 export function levynSavy(type: string): "vaalea" | "tumma" {
   return KATEGORIAT.find((k) => k.type === type)?.sovitus === "contain" ? "vaalea" : "tumma";
+}
+
+export type KollaasiKuva = { src: string; grafiikka: boolean };
+
+/**
+ * Viikkovisan aloitusnäkymän kuvakollaasi (kierros 11, korjattu 18.9.2026).
+ * Heikin korjaus 1: kollaasi EI saa paljastaa visan sisältöä — designin
+ * Eiffel-torni, Australian lippu ja maakuntavaakuna olisivat voineet olla
+ * saman viikon 15 kuvan joukossa. Siksi kuvat valitaan vain riveistä, jotka
+ * eivät ole kuluvan viikon sarjassa. Valinta on deterministinen viikon
+ * mukaan (sama kollaasi koko viikon), ja se vaihtuu viikon mukana.
+ * Järjestys: valokuva, grafiikka, grafiikka, valokuva — designin 2 × 2.
+ */
+export async function getViikkoKollaasi(viikonIdt: string[], siemen: string): Promise<KollaasiKuva[]> {
+  const sb = getSupabase();
+  if (!sb) return [];
+  const siteId = await getSiteId();
+  if (!siteId) return [];
+  const { data } = await sb
+    .from("kuvavisas")
+    .select("id, type, image_url")
+    .eq("site_id", siteId)
+    .eq("active", true);
+  const pois = new Set(viikonIdt);
+  const rivit = ((data ?? []) as Array<{ id: string; type: string; image_url: string }>)
+    .filter((r) => !pois.has(r.id) && r.image_url);
+
+  /* FNV-1a: kevyt ja deterministinen, ei riipu Math.randomista. */
+  const tiiviste = (x: string) => {
+    let h = 0x811c9dc5;
+    for (let i = 0; i < x.length; i++) { h ^= x.charCodeAt(i); h = Math.imul(h, 0x01000193); }
+    return h >>> 0;
+  };
+  const valitse = (tyyppi: string): KollaasiKuva | null => {
+    const ehdokkaat = rivit.filter((r) => r.type === tyyppi);
+    if (ehdokkaat.length === 0) return null;
+    const r = ehdokkaat.reduce((a, b) => (tiiviste(b.id + siemen) < tiiviste(a.id + siemen) ? b : a));
+    return { src: r.image_url, grafiikka: KATEGORIAT.find((k) => k.type === tyyppi)?.sovitus === "contain" };
+  };
+  /* Henkilöt ja maalaukset jätetään pois: kasvot ja tunnetut teokset ovat
+     kollaasissa helposti "vihje" eikä koriste. */
+  return [valitse("rakennukset"), valitse("liput"), valitse("vaakunat"), valitse("elaimet") ?? valitse("linnut")]
+    .filter((k): k is KollaasiKuva => k !== null);
 }

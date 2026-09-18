@@ -18,6 +18,7 @@ import { ShowMoreGrid } from "@/components/tn20/ShowMoreGrid";
 import Crumbs from "@/components/tn20/Crumbs";
 import { KuvavisatHub } from "@/components/tn20/KuvavisatHub";
 import { getKuvavisatHub, getViikkovisa } from "@/lib/kuvavisat2026";
+import { viikkoInfo } from "@/lib/viikkovisa";
 import { urheiluImg } from "@/lib/urheilu";
 import { getPageContent } from "@/lib/pageContent";
 import { notFound } from "next/navigation";
@@ -156,7 +157,7 @@ const HUBS: Record<string, HubMeta> = {
        kuvamäärää ei voi käyttää) ja chips/ctaTitle/ctaDesc ovat tälle hubille
        käyttämättömiä — tyyppi vaatii ne, muut hubit käyttävät. */
     lede: () => "Tunnista liput, vaakunat, linnut, eläimet, maalaukset, rakennukset ja kasvit. Valitse kategoria ja sinulle sopiva vaikeustaso.",
-    chips: (n) => [`${n} kuvaa`, "Kortistot kannasta"],
+    chips: () => ["Kuvavisat"],
     source: { kind: "kuvavisa" },
     modes: [],
     ctaTitle: () => "Ota satunnainen kortisto",
@@ -288,11 +289,12 @@ export default async function KokoelmaHub({
      Korvasi vanhan kortistoruudukon (SVG-motiivikortit, jotka käynnistivät pelin
      suoraan). Uusi malli: kategoriakortti esikatselukuvilla avaa listan
      visavariaatioita (vaikeustaso, lipuilla myös maanosa). Design:
-     Kuvavisat-2026-design.html näkymät 1a/1b. Oma kehys HubShellin sijaan, koska
-     design luopuu hero-taustakuvasta tekstiheron hyväksi — murupolku säilyy
-     sivuston yhteisenä (Crumbs). */
+     Kuvavisat-2026-design.html näkymät 1a/1b. Oma kehys HubShellin sijaan:
+     herokuva (kierros 4) on samaa linjaa kuin muilla kokoelmilla, mutta
+     suodatinrivit ja visakortit eivät sovi kortistomalliin. Murupolku on
+     sivuston yhteinen (Crumbs, KuvavisatHubin sisällä). */
   if (hub.source.kind === "kuvavisa") {
-    const [{ kategoriat, kuviaYhteensa, variaatioitaYhteensa }, vv] = await Promise.all([
+    const [{ kategoriat }, vv] = await Promise.all([
       getKuvavisatHub(),
       getViikkovisa(),
     ]);
@@ -303,19 +305,17 @@ export default async function KokoelmaHub({
     const kaikkiVariaatiot = kategoriat.flatMap((k) => k.variaatiot);
     const satunnainenHref = kaikkiVariaatiot[Math.floor(Math.random() * kaikkiVariaatiot.length)]?.href ?? null;
 
+    /* Kierros 4 (18.9.2026): FAQ-osio ("Kuvavisat pähkinänkuoressa") EI tule
+       tälle sivulle — Heikin pyyntö 1, vastaavat on poistettu muualtakin.
+       page_content-rivi jää kantaan (generateMetadata voi yhä lukea sitä).
+       Viikkotiedot lasketaan palvelimella (viikkoInfo), ei selaimen kellosta. */
     return (
       <main style={{ minHeight: "100dvh" }}>
-        <Crumbs items={[{ label: "Kokoelmat", href: "/kokoelmat" }, { label: hub.name }]} />
-        <div className="tn-shell">
-          <KuvavisatHub
-            kategoriat={kategoriat}
-            kuviaYhteensa={kuviaYhteensa}
-            variaatioitaYhteensa={variaatioitaYhteensa}
-            satunnainenHref={satunnainenHref}
-            viikkovisa={vv ? { viikko: vv.viikko, kuvia: vv.kuvaIdt.length } : null}
-            article={article}
-          />
-        </div>
+        <KuvavisatHub
+          kategoriat={kategoriat}
+          satunnainenHref={satunnainenHref}
+          viikkovisa={vv ? { info: viikkoInfo(vv.vuosi, vv.viikko), kuvia: vv.kuvaIdt.length } : null}
+        />
       </main>
     );
   }

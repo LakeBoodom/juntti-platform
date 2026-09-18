@@ -551,7 +551,13 @@
   justify-content: center;
 }
 .tn20 .tng[data-lock="1"] .tng-zoomhint { display: none; }
-.tn20 .tng[data-lock="1"] .tng-qimg { width: auto; height: auto; max-width: 100%; max-height: 100%; object-fit: contain; }
+/* B2 (18.9.2026): kuva täyttää levyn. Aiempi width/height: auto + max-* ei
+   skaalannut YLÖSPÄIN: Golden Gate (lähde 500 × 375) näkyi 1440 × 900:ssa
+   luonnollisessa koossaan keskellä 680 × 691 px levyä (40 % tilasta), mobiilissa
+   202 × 151. Nyt kuvan laatikko on koko napin kokoinen ja contain sovittaa
+   sisällön kumpaan tahansa suuntaan — pystykuva ei silti vuoda levyn yli,
+   koska laatikko ei ole levyä suurempi. */
+.tn20 .tng[data-lock="1"] .tng-qimg { width: 100%; height: 100%; min-width: 0; min-height: 0; max-width: none; max-height: none; object-fit: contain; }
 
 /* Lähdemerkintä ja "Suurenna kuva" levyn ALLE (9a–9c). Kuvan päällä nappi
    peitti pystykuvassa juuri sen alareunan, josta vaakuna tai rakennus
@@ -574,7 +580,9 @@
 .tn20 .tng-zoomrow:disabled { opacity: 0.4; cursor: default; }
 
 /* Varattu tila ennen vastaamista: Oljenkorsi asuu tässä, ei Seuraava-rivillä.
-   Sama korkeus, eri sisältö — siksi vastauslista ei liikahda vastaamisessa. */
+   Sama korkeus, eri sisältö — siksi vastauslista ei liikahda vastaamisessa.
+   Heikin pyyntö 5 (18.9.2026): placeholder-teksti "Palaute ja Tiesitkö-tieto
+   ilmestyvät tähän" poistettu — korkeus tulee flexistä, ei tekstistä. */
 .tn20 .tng-fbwait {
   display: flex; flex-direction: column;
   align-items: flex-start; justify-content: center;
@@ -582,7 +590,6 @@
   padding: clamp(14px, 1.45cqw, 22px) clamp(15px, 1.55cqw, 24px);
   border-radius: 16px; border: 1px dashed #2e2718; background: rgba(23, 19, 11, 0.45);
 }
-.tn20 .tng-fbwait-p { font-size: clamp(12px, 1.05cqw, 14px); font-weight: 600; color: #8e8676; }
 /* Tulos alapalkissa on vain mobiilin ratkaisu (9d) — muualla se on
    palautelohkon otsikossa. */
 .tn20 .tng-actres { display: none; }
@@ -713,6 +720,10 @@
 
   .tn20 .tng[data-lock="1"] .tng-main[data-mode="peli"] .tng-act {
     flex: 0 0 88px; align-items: center;
+    /* width: auto (18.9.2026): yhteisen lohkon width: 100% + negatiiviset
+       marginaalit siirsivät palkin vasemmalle, ja tausta jäi oikeasta reunasta
+       ~31 px vajaaksi 390 px:n ruudulla. */
+    width: auto; align-self: stretch;
     margin: 0 clamp(-18px, -4vw, -14px);
     padding: 0 clamp(14px, 4vw, 18px) env(safe-area-inset-bottom);
     border-top: 1px solid #2c2517; background: #17140d;
@@ -765,3 +776,10 @@
 .tn20 .tng-vs[data-vs="tasan"] .tng-vs-t { color: #f7ce7e; }
 /* P2: jakoruudukko on nyt yksi nappi — ei kolmen sarakkeen jäänne. */
 .tn20 .tng-sharegrid[data-cols="1"] { grid-template-columns: minmax(0, 1fr); }
+
+/* B3 (18.9.2026): "Vastaa myös näppäimillä A–D" on turha kosketuslaitteella ja
+   vei mobiilin kiinteän alapalkin parhaan paikan ennen vastaamista. Alle 768 px
+   palkki on tyhjä, kunnes Seuraava ilmestyy. */
+@media (max-width: 767px) {
+  .tn20 .tng-hint { display: none; }
+}
