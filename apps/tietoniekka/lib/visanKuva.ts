@@ -1,5 +1,11 @@
 // VISAN OMA KUVA — yksi dispatcher visakohtaiselle kuvalle.
 //
+// 19.9.2026 (Päivän visa -toteutus, luku 2.1): EI ENÄÄ KÄYTÖSSÄ AJOSSA.
+// quizzes.hero_image on visan kuvan ainoa totuus; tämä valitsin ajettiin
+// kertaalleen kantaan (scripts/hero-image-backfill.ts). Uutta visan kuvaa
+// lisättäessä kirjoitetaan hero_image kantaan — skripti täyttää sen, jos kuva
+// on lisätty myös kokoelman listaan, ja raportoi listan ja kannan erot.
+//
 // 19.9.2026: etusivun Päivän visa -kortilla ja pelisivun herolla oli kummallakin
 // oma, erilainen lista kokoelmista. Pelisivu kattoi vain kulttuurin, luonnon,
 // urheilun (osittain) ja maantiedon, joten TV-, musiikki-, elokuva-,

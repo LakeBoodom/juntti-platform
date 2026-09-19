@@ -16,7 +16,6 @@ import { urheiluImg } from "@/lib/urheilu";
 import { maantietoImg } from "@/lib/maantieto";
 import { KAUPUNGIT } from "@/lib/kaupungit";
 import { resolveCollection, COLLECTION_LABEL } from "@/lib/visanKokoelma";
-import { visanOmaKuva } from "@/lib/visanKuva";
 import { type Learn } from "@/components/tn20/LearnArticle";
 import GameClient, { type GameQuiz } from "./GameClient";
 import { notFound } from "next/navigation";
@@ -167,9 +166,10 @@ export default async function Peli20({
   const kuvavisa = typeof params.kuvavisa === "string" ? params.kuvavisa : null;
   const viikkovisa = params.viikkovisa === "1";
   const mega = typeof params.mega === "string" ? params.mega : null;
-  // Putki kertyy päivän nostosta: paivan_visa=1 (manuaalinen Päivän visa,
-  // Heikki 4.8.2026) tai paivan_sankari=1 (synttärisankari-fallback).
-  const isSankari = params.paivan_sankari === "1" || params.paivan_visa === "1";
+  // Etusivun Päivän visa -kortin "pelattu"-tila: vain ?paivan_visa=1.
+  // 19.9.2026 alkaen Päivän sankari (?paivan_sankari=1) on oma rivinsä, eikä
+  // sen pelaaminen saa merkitä Päivän visaa pelatuksi.
+  const isSankari = params.paivan_visa === "1";
 
   const sb = getSupabase();
   /* Virhetilat → tyylitelty 404 (QA-007, 29.8.2026) */
@@ -611,10 +611,10 @@ export default async function Peli20({
      Alkuperäistä tiedostoa ei käytetä (voi olla useita megatavuja). */
   const wikiThumb = (url: string | null, width: number): string | null =>
     url && /\/thumb\//.test(url) ? url.replace(/\/(\d+)px-/, `/${width}px-`) : url;
-  /* Visan oma kuva kaikista kokoelmista (lib/visanKuva.ts) — ei vain niistä
-     neljästä, jotka topicImg kattaa. */
-  const omaKuva = visanOmaKuva(collection, quiz.category, quiz.slug);
-  const heroImage = quiz.hero_image ?? (isPerson ? wikiThumb(celeb?.image_url ?? null, 1280) : omaKuva);
+  /* Visan oma kuva tulee kannasta (quizzes.hero_image; taustatäyttö
+     19.9.2026, scripts/hero-image-backfill.ts). Henkilövisan kuva on sankarin
+     celebrities.image_url. Koodissa ei enää johdeta polkua slugista. */
+  const heroImage = quiz.hero_image ?? (isPerson ? wikiThumb(celeb?.image_url ?? null, 1280) : null);
   const heroSrcSet = !quiz.hero_image && isPerson && celeb?.image_url
     ? [wikiThumb(celeb.image_url, 330), wikiThumb(celeb.image_url, 1280)]
         .filter(Boolean)

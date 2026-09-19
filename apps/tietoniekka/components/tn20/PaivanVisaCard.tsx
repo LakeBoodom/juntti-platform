@@ -1,35 +1,32 @@
 "use client";
-// TIETONIEKKA 2.0 — PÄIVÄN VISA -KORTTI (design_handoff_etusivu_2026_prod,
-// toteutettu 28.8.2026 — korvasi 18.8. DailyQuizCardin, jossa oli upotettu
-// ensimmäinen kysymys). Designin mukainen vaakakortti: kuva vasemmalla (26/74-
-// jako, pinoutuu kapealla) + merkki + otsikko + meta + kuvaus + pelinappi.
+// TIETONIEKKA 2.0 — PÄIVÄN VISA -KORTTI (Design v0.3 kierros 14, toteutusohje
+// 19.9.2026 luvut 5 ja 7). Korvasi 28.8. kortin, joka oletti päivänsankarin;
+// sankari on nyt oma rivinsä kortin alla (PaivanSankari.tsx).
 //
-// Heikin linjaus 19.9.2026: Päivän visa EI ole päivänsankarikortti. Kierrossa
-// voi olla synttäri-, kaupunki-, luonto- tai mikä tahansa visa, ja sen visan
-// oma kuva näytetään aina. Kortti ei oleta julkkista:
-//  - Merkki on visan kategoria (sama resolveri kuin pelisivun .tng-cat,
-//    lib/visanKokoelma.ts) ja linkki sen kokoelmasivulle. Aiemmin merkki oli
-//    `collection` ("Yleistieto" → 404) tai "Tänään juhlii".
-//  - Kuva ratkaistaan palvelimella (app/(tn20)/page.tsx, paivanVisanKuva):
-//    quizzes.image_url → julkkiksen kuva → visan teemakuva → kaupunkikuva →
-//    kokoelmakuva. Jos mitään ei ole, näytetään brändipinta ilman tekstiä —
-//    designin sisäinen "Kuva — päivänsankari" -työnimi ei näy koskaan.
-//  - Kuva on koristeellinen (otsikko kertoo aiheen vieressä), joten se on
-//    aria-hidden eikä role="img" + epämääräinen aria-label.
+// Kolme tilaa (luku 7):
+//   A  intro_headline + intro_text → koukkulaatta: päiväleima + koukkurivi +
+//      selittävä virke. Laatta KORVAA visan kuvailevan tekstin.
+//   B  ei introa → visan oma teaser, ei laattaa; päiväleima osion otsikossa.
+//   C  vain intro_text → laatta ilman koukkuriviä.
+// Kortin korkeus pysyy samana tilojen välillä (kuva määrää minimikorkeuden).
+// Intro on pelkkää tekstiä (React escapettaa; ei markdownia eikä HTML:ää).
+// Mobiilissa (kortti < 640 px) laatta on ennen kuvaa: päiväleima + koukkurivi
+// laatassa, selittävä virke otsikon alla teaserin paikalla (14b). Tilassa C
+// mobiililaatassa on päiväleima + teksti. Laatta renderöidään kahteen kohtaan
+// ja piilotetaan container-kyselyllä (display: none → ei ruudunlukijalle).
 //
-// Kaksi tilaa (design: fresh / played). Played-tila luetaan omasta
-// localStorage-avaimesta (PAIVAN_VISA_KEY = tämän päivän päiväys), jonka
-// GameClient kirjoittaa kun Päivän visa pelataan loppuun.
+// Pelattu tila luetaan localStoragesta (PAIVAN_VISA_KEY = tämän päivän
+// päiväys Suomen aikaan), jonka GameClient kirjoittaa kun Päivän visa
+// (?paivan_visa=1) pelataan loppuun. Päivän sankarin pelaaminen ei merkitse
+// Päivän visaa pelatuksi.
 
 import { useEffect, useState } from "react";
 import { helsinginPaiva } from "@/lib/aika";
+import { paivanVisaTila, type PaivanVisaData } from "@/lib/paivanVisa";
 
 export const PAIVAN_VISA_KEY = "tn_paivan_visa_pelattu";
 
-/** Tämän päivän avain Suomen aikaan ("2026-09-19"). 19.9.2026: aiemmin
-    selaimen oma aikavyöhyke — ulkomailla pelattu tila vaihtui eri hetkellä kuin
-    etusivun Päivän visa, joka lasketaan palvelimella Suomen aikaan
-    (lib/aika.ts). Muoto on sama, joten jo tallennetut merkinnät kelpaavat. */
+/** Tämän päivän avain Suomen aikaan ("2026-09-19"). */
 export function localDateKey(n: Date = new Date()) {
   return helsinginPaiva(n).iso;
 }
@@ -42,53 +39,64 @@ function isPlayedToday(): boolean {
   }
 }
 
-export type PaivanVisaData = {
-  /** Visan kategoria ja sen kokoelmasivu: "Suomen kaupungit" → /kokoelma/kaupungit */
-  badge: { label: string; href: string };
-  title: string; // "62 vuotta — Antti Reini" / visan nimi
-  meta: string | null; // "Tänään juhlii · Syntynyt 27.8.1964 · Näyttelijä" / "10 kysymystä"
-  lede: string | null;
-  /** Ratkaistu kuva; null → brändipinta */
-  imageUrl: string | null;
-  imagePos?: string;
-  playHref: string;
-  playedHref: string;
-  playedCta: string; // "Pelaa henkilövisoja →" / "Lisää visoja →"
-};
+export type { PaivanVisaData };
+
+/** Pisimmän sanan merkkimäärä — otsikon koko sovitetaan sen mukaan. */
+export function pisinSana(t: string): number {
+  return Math.max(1, ...t.split(/\s+/).map((w) => Array.from(w).length));
+}
 
 export default function PaivanVisaCard({ data }: { data: PaivanVisaData }) {
   const [played, setPlayed] = useState(false);
   useEffect(() => setPlayed(isPlayedToday()), []);
+  const tila = paivanVisaTila(data);
+  const headline = tila === "A" ? data.intro!.headline : null;
+  const text = tila === "B" ? null : data.intro!.text;
+
+  const laatta = (mobiili: boolean) => (
+    <div className={`tn-es-pv-hook ${mobiili ? "tn-es-v-mob" : "tn-es-v-desk"}`}>
+      <span className="tn-es-pv-stamp">{data.stamp}</span>
+      {headline && <p className="tn-es-pv-hook-h">{headline}</p>}
+      {/* Tila A mobiilissa: selittävä virke otsikon alla, ei laatassa. */}
+      {text && (!mobiili || tila === "C") && (
+        <p className={tila === "C" ? "tn-es-pv-hook-t tn-es-pv-hook-t--c" : "tn-es-pv-hook-t"}>{text}</p>
+      )}
+    </div>
+  );
 
   return (
-    <div className="tn-es-day" data-played={played ? "" : undefined}>
-      <div className="tn-es-day-media" data-kuva={data.imageUrl ? "1" : "0"} aria-hidden="true">
-        {data.imageUrl && (
-          <>
-            {/* Sama kuvio kuin etusivun muissa korteissa (.tn-es-card-bg). */}
-            <span
-              className="tn-es-card-bg"
-              style={{ backgroundImage: `url(${data.imageUrl})`, backgroundPosition: data.imagePos ?? "50% 40%" }}
-            />
-            <span className="tn-es-day-shade" />
-          </>
-        )}
-      </div>
-      <div className="tn-es-day-body">
-        {played ? (
-          <span className="tn-es-day-badge tn-es-day-badge--done">✓ Tämän päivän visa on pelattu</span>
-        ) : (
-          <a className="tn-es-day-badge" href={data.badge.href}>{data.badge.label}</a>
-        )}
-        <h3 className="tn-es-day-title">{data.title}</h3>
-        {data.meta && <div className="tn-es-day-meta">{data.meta}</div>}
-        {data.lede && <p className="tn-es-day-lede">{data.lede}</p>}
-        <div className="tn-es-day-actions">
-          {played ? (
-            <a className="tn-es-btn" href={data.playedHref}>{data.playedCta}</a>
-          ) : (
-            <a className="tn-es-btn" href={data.playHref}>Pelaa päivän visa →</a>
+    <div className="tn-es-pv-wrap">
+      <div className="tn-es-pv" data-tila={tila} data-played={played ? "" : undefined}>
+        {tila !== "B" && laatta(true)}
+        <div className="tn-es-pv-media" data-kuva={data.imageUrl ? "1" : "0"}>
+          {data.imageUrl && (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={data.imageUrl} alt={data.imageAlt} fetchPriority="high" style={{ objectPosition: data.imagePos }} />
           )}
+        </div>
+        <div className="tn-es-pv-body">
+          <div className="tn-es-pv-metarow">
+            {played ? (
+              <span className="tn-es-pv-badge tn-es-pv-badge--done">✓ Tämän päivän visa on pelattu</span>
+            ) : (
+              <a className="tn-es-pv-badge" href={data.badge.href}>{data.badge.label}</a>
+            )}
+            {data.meta && <span className="tn-es-pv-meta">{data.meta}</span>}
+          </div>
+          {/* Otsikon koko sovitetaan pisimpään sanaan (KORTTISÄÄNTÖ, etusivu.css). */}
+          <div className="tn-es-pv-titlebox" style={{ ["--tnpv-lw" as string]: pisinSana(data.title) }}>
+            <h3 className="tn-es-pv-title">{data.title}</h3>
+          </div>
+          {tila === "B" && data.lede && <p className="tn-es-pv-lede">{data.lede}</p>}
+          {tila === "A" && text && <p className="tn-es-pv-lede tn-es-v-mob">{text}</p>}
+          {tila !== "B" && laatta(false)}
+          <div className="tn-es-pv-actions">
+            {played ? (
+              <a className="tn-es-pv-btn" href={data.playedHref}>Lisää visoja <span aria-hidden>→</span></a>
+            ) : (
+              <a className="tn-es-pv-btn" href={data.playHref}>Pelaa päivän visa <span aria-hidden>→</span></a>
+            )}
+          </div>
         </div>
       </div>
     </div>
