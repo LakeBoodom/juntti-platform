@@ -22,11 +22,16 @@
 // GameClient kirjoittaa kun Päivän visa pelataan loppuun.
 
 import { useEffect, useState } from "react";
+import { helsinginPaiva } from "@/lib/aika";
 
 export const PAIVAN_VISA_KEY = "tn_paivan_visa_pelattu";
 
+/** Tämän päivän avain Suomen aikaan ("2026-09-19"). 19.9.2026: aiemmin
+    selaimen oma aikavyöhyke — ulkomailla pelattu tila vaihtui eri hetkellä kuin
+    etusivun Päivän visa, joka lasketaan palvelimella Suomen aikaan
+    (lib/aika.ts). Muoto on sama, joten jo tallennetut merkinnät kelpaavat. */
 export function localDateKey(n: Date = new Date()) {
-  return `${n.getFullYear()}-${String(n.getMonth() + 1).padStart(2, "0")}-${String(n.getDate()).padStart(2, "0")}`;
+  return helsinginPaiva(n).iso;
 }
 
 function isPlayedToday(): boolean {
