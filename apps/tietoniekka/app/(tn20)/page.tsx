@@ -12,18 +12,8 @@
 
 import { getSupabase, SITE_SLUG } from "@/lib/supabase";
 import { resolveCollection } from "@/lib/visanKokoelma";
-import { KAUPUNGIT, kaupunkiImg } from "@/lib/kaupungit";
+import { visanOmaKuva } from "@/lib/visanKuva";
 import { helsinginPaiva, pvmOsat } from "@/lib/aika";
-import { kulttuuriImg } from "@/lib/kulttuuri";
-import { luontoImg } from "@/lib/luonto";
-import { urheiluImg } from "@/lib/urheilu";
-import { maantietoImg } from "@/lib/maantieto";
-import { tvImg } from "@/lib/tv";
-import { musiikkiImg } from "@/lib/musiikki";
-import { elokuvatImg } from "@/lib/elokuvat";
-import { jalkapalloQuizImg } from "@/lib/jalkapallo";
-import { jaakiekkoQuizImg } from "@/lib/jaakiekko";
-import { urheilulajitQuizImg } from "@/lib/urheilulajit";
 import PaivanVisaCard, { type PaivanVisaData } from "@/components/tn20/PaivanVisaCard";
 import { KuvavisatBanneri, IkajarjestysBanneri } from "@/components/tn20/EtusivunBannerit";
 import { getViikkovisa } from "@/lib/kuvavisat2026";
@@ -33,17 +23,6 @@ import {
 } from "@/lib/etusivu";
 import "./etusivu.css";
 import "./etusivun-bannerit.css";
-
-/** Visan oma kuva (teemakokoelmien topicImg) — sama dispatcher kuin 25.–26.8. */
-const topicImgFor = (collection: string | null | undefined, slug: string | null | undefined): string | null =>
-  collection === "kulttuuri" ? kulttuuriImg(slug)
-  : collection === "luonto" ? luontoImg(slug)
-  : collection === "urheilu" ? urheiluImg(slug) ?? jalkapalloQuizImg(slug) ?? jaakiekkoQuizImg(slug) ?? urheilulajitQuizImg(slug)
-  : collection === "matkakohteet" ? maantietoImg(slug)
-  : collection === "tv" ? tvImg(slug)
-  : collection === "musiikki" ? musiikkiImg(slug)
-  : collection === "elokuvat" ? elokuvatImg(slug)
-  : null;
 
 /* ── Päivän visan kuva (bugi A, 19.9.2026) ─────────────────────────────
    Aiemmin kuva haettiin vain teemakokoelmien topicImg-dispatcherista, joten
@@ -67,13 +46,9 @@ function paivanVisanKuva(
 ): { src: string; pos: string } | null {
   if (quizImage) return { src: quizImage, pos: "50% 40%" };          // 1. quizzes.image_url
   if (celebImage) return { src: celebImage, pos: "50% 30%" };        // 2. synttäri-/henkilövisa
-  const topic = topicImgFor(q.collection, q.slug);                   // 3a. visan teemakuva
-  if (topic) return { src: topic, pos: "50% 46%" };
+  const oma = visanOmaKuva(q.collection, q.category, q.slug);       // 3. visan oma kuva (teema- tai kaupunkikuva)
+  if (oma) return { src: oma, pos: q.category === "kaupungit" ? "50% 50%" : "50% 46%" };
   const kokoelma = resolveCollection({ collection: q.collection ?? null, category: q.category ?? null, genre: q.genre ?? null });
-  if (kokoelma.key === "kaupungit") {                                // 3b. kaupungin oma kuva
-    const k = KAUPUNGIT.find((c) => c.quizSlug === q.slug);
-    if (k) return { src: kaupunkiImg(k.id), pos: "50% 50%" };
-  }
   const coll = KOKOELMAKUVA[kokoelma.key];                           // 3c. kokoelman kuva
   if (coll) return { src: coll, pos: "50% 50%" };
   if (kokoelma.bg && kokoelma.bg !== GENEERINEN_BG) return { src: kokoelma.bg, pos: "50% 40%" };

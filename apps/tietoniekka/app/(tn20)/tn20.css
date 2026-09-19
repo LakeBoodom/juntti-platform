@@ -1231,6 +1231,10 @@
 /* SSR-kopio artikkelista piilotetaan aina selaimessa (pelaaja näkee
    saman sisällön loppunäkymän kohdassa 5) — hakukoneille HTML:ssä */
 .tn-game-playing .tn20 .tn-learn-ssr { display: none; }
+/* Uusi hero: ristiinnostot näkyvät vaakarivinä heron alalaidassa, joten
+   SSR-lista + murupolku piilotetaan katsojalta. Ne jäävät HTML:ään, eli
+   sisäiset linkit säilyvät crawlattavina. (Heikki 19.9.2026) */
+.tn-hero-start .tn20 .tn-learn-ssr { display: none; }
 
 /* Murupolku + ristiinnostot (SSR, crawlattavat sisäiset linkit) — §13.6 */
 .tn20 .tn-seo-nav { border-top: 1px solid #241e13; background: var(--tn-bg); }
