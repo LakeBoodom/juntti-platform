@@ -13,10 +13,10 @@
 
 import { getSupabase, SITE_SLUG } from "@/lib/supabase";
 import { brand } from "@/config/brand";
-import { resolveCollection } from "@/lib/visanKokoelma";
 import { helsinginPaiva } from "@/lib/aika";
 import PaivanVisaCard from "@/components/tn20/PaivanVisaCard";
 import { paivanVisaTila, type PaivanVisaData } from "@/lib/paivanVisa";
+import { rakennaPaivanVisa } from "@/lib/paivanVisaData";
 import PaivanSankari from "@/components/tn20/PaivanSankari";
 import { muotoileSankari, type SankariRivi } from "@/lib/paivanSankari";
 import { KuvavisatBanneri, IkajarjestysBanneri } from "@/components/tn20/EtusivunBannerit";
@@ -44,14 +44,6 @@ type PaivanVisaRivi = {
   auto_filled: boolean; vaihdettu: boolean;
 };
 
-type PaivanVisaQuiz = {
-  id: string; slug: string | null; title: string; display_title: string | null;
-  teaser: string | null; description: string | null;
-  collection: string | null; category: string | null; genre: string | null;
-  hero_image: string | null; hero_focal_x: number | string | null;
-  hero_focal_y: number | string | null; hero_alt: string | null;
-};
-
 /* Esikatselu (vain preview/kehitys, ei tuotannossa): ?pv=A|B|C näyttää
    Päivän visan kyseisessä tilassa mallitekstillä ja ?sankari=YYYY-MM-DD
    päivän sankarin toiselta päivältä (esim. 2027-06-23 = muistopäivä). */
@@ -59,15 +51,6 @@ const ESIKATSELU = process.env.VERCEL_ENV !== "production";
 const MALLI_INTRO = {
   headline: "Kahdeksankymmentä merkkiä pitkä koukkuotsikko täyttää rivin aivan reunaan asti",
   text: "Kahdensadanneljänkymmenen merkin mittainen koukkuteksti vie laatasta kolme riviä työpöydällä ja näyttää tarkalleen kuinka korkeaksi laatta kasvaa silloin kun toimitus käyttää koko sallitun tilan viimeistä merkkiä myöten loppuun.",
-};
-
-/* Wikimedian thumb-osoitteessa leveys on polussa; 1280 on suurin toimiva porras. */
-const wikiThumb = (url: string, width: number) =>
-  /\/thumb\//.test(url) ? url.replace(/\/(\d+)px-/, `/${width}px-`) : url;
-
-const pos = (x: number | string | null, y: number | string | null, dx: number, dy: number) => {
-  const n = (v: number | string | null, d: number) => (v == null || v === "" || !Number.isFinite(Number(v)) ? d : Number(v));
-  return `${Math.round(n(x, dx) * 100)}% ${Math.round(n(y, dy) * 100)}%`;
 };
 
 async function getData(opts: { pvTila: string | null; sankariPaiva: string | null }) {
@@ -101,47 +84,18 @@ async function getData(opts: { pvTila: string | null; sankariPaiva: string | nul
 
   let daily: PaivanVisaData | null = null;
   if (pv?.quiz_id) {
-    const { data: q } = await sb
-      .from("quizzes")
-      .select("id, slug, title, display_title, teaser, description, collection, category, genre, hero_image, hero_focal_x, hero_focal_y, hero_alt" as never)
-      .eq("id", pv.quiz_id)
-      .maybeSingle();
-    const quiz = q as PaivanVisaQuiz | null;
-    if (quiz) {
-      const kokoelma = resolveCollection({ collection: quiz.collection, category: quiz.category, genre: quiz.genre });
-      const isPerson = quiz.collection === "tunnetut-henkilot";
-      /* Kuva kannasta: quizzes.hero_image. Henkilövisan kuva on sankarin
-         celebrities.image_url (henkilövisoille ei tallenneta hero_imagea). */
-      let imageUrl = quiz.hero_image;
-      if (!imageUrl && isPerson) {
-        const { data: c } = await sb.from("celebrities").select("image_url").eq("trivia_quiz_id", quiz.id).maybeSingle();
-        const u = (c as { image_url: string | null } | null)?.image_url;
-        imageUrl = u ? wikiThumb(u, 1280) : null;
-      }
-      const tila = ESIKATSELU ? opts.pvTila : null;
-      const intro =
-        tila === "A" ? MALLI_INTRO
-        : tila === "C" ? { headline: null, text: MALLI_INTRO.text }
-        : tila === "B" ? null
-        : pv.intro_headline || pv.intro_text ? { headline: pv.intro_headline, text: pv.intro_text }
-        : null;
-      daily = {
-        badge: { label: kokoelma.label, href: kokoelma.hub },
-        title: quiz.display_title ?? quiz.title,
-        meta: (() => {
-          const n = cards.find((c) => c.id === quiz.id)?.question_count;
-          return n ? `${n} kysymystä` : null;
-        })(),
-        lede: quiz.teaser?.trim() || quiz.description?.trim() || null,
-        intro,
-        stamp: `Tänään ${today.pv}.${today.kk}.`,
-        imageUrl,
-        imagePos: pos(quiz.hero_focal_x, quiz.hero_focal_y, 0.5, isPerson ? 0.15 : 0.4),
-        imageAlt: quiz.hero_alt ?? "",
-        playHref: `/peli?quiz_id=${quiz.id}&paivan_visa=1`,
-        playedHref: kokoelma.hub,
-      };
-    }
+    const tila = ESIKATSELU ? opts.pvTila : null;
+    const intro =
+      tila === "A" ? MALLI_INTRO
+      : tila === "C" ? { headline: null, text: MALLI_INTRO.text }
+      : tila === "B" ? null
+      : { headline: pv.intro_headline, text: pv.intro_text };
+    daily = await rakennaPaivanVisa(sb, {
+      quizId: pv.quiz_id,
+      paiva: today.iso,
+      intro,
+      questionCount: cards.find((c) => c.id === pv!.quiz_id)?.question_count ?? null,
+    });
   }
 
   /* Ticker: uusimmat visat julkaisujärjestyksessä. Henkilövisat pois

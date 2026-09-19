@@ -5,6 +5,8 @@ import { getSupabaseAdmin, supabaseFromCookies } from "@/lib/supabase-server";
 import { listSites } from "@/lib/sites";
 import { Nav } from "@/components/nav";
 import { MetaEditor } from "./meta-editor";
+import { HeroEditor } from "./hero-editor";
+import { TIETONIEKKA_URL } from "@/lib/paivan-visa-yhteiset";
 import { QuestionCard } from "./question-card";
 import { QuizActionsBar } from "./quiz-actions-bar";
 
@@ -95,6 +97,17 @@ export default async function QuizDetailPage({
           </div>
           <QuizActionsBar id={quiz.id} status={quiz.status} />
         </div>
+
+        <HeroEditor
+          id={quiz.id}
+          tietoniekkaUrl={TIETONIEKKA_URL}
+          initial={{
+            hero_image: (quiz as { hero_image?: string | null }).hero_image ?? null,
+            hero_alt: (quiz as { hero_alt?: string | null }).hero_alt ?? null,
+            hero_focal_x: (quiz as { hero_focal_x?: number | null }).hero_focal_x ?? null,
+            hero_focal_y: (quiz as { hero_focal_y?: number | null }).hero_focal_y ?? null,
+          }}
+        />
 
         <div className="space-y-3">
           <h2 className="text-lg font-semibold">

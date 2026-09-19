@@ -11,6 +11,19 @@ const nextConfig = {
   /* Julkaisu 31.8.2026: 2.0 siirtyi juureen ja 1.0-reitit poistuivat.
      Kaikki vanhat osoitteet ohjataan 301:llä uusiin (SEO_STRATEGIA §3.1).
      /visa/<slug> säilyy samana polkuna (uusi sivu vastaa siihen suoraan). */
+  /* Adminin esikatselu (19.9.2026): ei indeksoida, upotettavissa vain adminiin
+     (Vercel-osoitteet) ja paikalliseen kehitykseen. */
+  async headers() {
+    return [
+      {
+        source: "/esikatselu/:path*",
+        headers: [
+          { key: "X-Robots-Tag", value: "noindex, nofollow" },
+          { key: "Content-Security-Policy", value: "frame-ancestors 'self' https://*.vercel.app http://localhost:*" },
+        ],
+      },
+    ];
+  },
   async redirects() {
     return [
       /* Haaran esikatseluosoitteet → juuri */
