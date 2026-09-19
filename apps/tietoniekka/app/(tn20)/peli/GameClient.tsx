@@ -70,6 +70,8 @@ export type GameQuiz = {
     kind: "henkilo" | "kuva" | "ei-kuvaa";
     /** Wikimedia-kuville 330w + 1280w, jottei mobiili lataa 340 kt:n kuvaa */
     srcSet?: string | null;
+    /** Varaosoite jos iso thumb puuttuu — ettei hero jää ilman kuvaa */
+    srcSmall?: string | null;
     /** Henkilövisan ammatti kannasta (esim. "Jääkiekkoilija") */
     roleLabel?: string | null;
   } | null;
@@ -277,6 +279,16 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
     document.body.classList.toggle("tn-game-playing", phase !== "start");
     return () => document.body.classList.remove("tn-game-playing");
   }, [phase]);
+
+  /* Uusi hero näyttää ristiinnostot vaakarivinä heron alalaidassa (Heikki
+     19.9.2026: "se korvaa tämän vertikaalin listanäkymän"). Palvelimen
+     renderöimä murupolku + linkkilista JÄÄVÄT HTML:ään — ne ovat sivun
+     crawlattavat sisäiset linkit (SEO_STRATEGIA §13.6) — mutta piilotetaan
+     katsojalta, koska samat linkit näkyvät jo heron rivillä. */
+  useEffect(() => {
+    document.body.classList.toggle("tn-hero-start", quiz.hero != null);
+    return () => document.body.classList.remove("tn-hero-start");
+  }, [quiz.hero]);
 
   /* ── KORTTISÄÄNTÖ: otsikoiden sovitus ── */
   useLayoutEffect(() => {
@@ -602,6 +614,17 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
      kuva vaatii näkyvän merkinnän, AI-kuvitus ei vaadi mitään. */
   const heroCredit = hero?.alt && /kuva:/i.test(hero.alt) ? hero.alt.slice(hero.alt.search(/kuva:/i)).trim() : null;
 
+  /* Wikimedia ei generoi thumbia alkuperäistä leveämmäksi: jos 1280 px puuttuu,
+     hero jäisi tyhjäksi. Pudotaan silloin kerran kannan 330 px:n kuvaan. */
+  const heroImgError = (e: React.SyntheticEvent<HTMLImageElement>) => {
+    const el = e.currentTarget;
+    if (!hero?.srcSmall || el.dataset.fallback === "1") return;
+    el.dataset.fallback = "1";
+    el.removeAttribute("srcset");
+    el.removeAttribute("sizes");
+    el.src = hero.srcSmall;
+  };
+
   /* ── Tulosnäkymän arvot ── */
   const skipped = hist.filter((v) => v === "skipped").length;
   const scored = Math.max(1, total - skipped);
@@ -706,6 +729,7 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
                     alt={hero.alt ?? ""}
                     fetchPriority="high"
                     decoding="async"
+                    onError={heroImgError}
                     style={{ objectPosition: `${Math.round(hero.focalX * 100)}% ${Math.round(hero.focalY * 100)}%` }}
                   />
                 )}
@@ -740,6 +764,7 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
                       sizes="(min-aspect-ratio: 1/1) 44vw, 100vw"
                       alt=""
                       decoding="async"
+                      onError={heroImgError}
                     />
                   </div>
                 )}
