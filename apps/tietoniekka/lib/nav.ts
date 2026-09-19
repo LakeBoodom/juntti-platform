@@ -48,3 +48,10 @@ export const NAV_MODES: NavMode[] = [
 ];
 
 export const hubHref = (slug: string) => `/kokoelma/${slug}`;
+
+/* Pelikuoren reitit: niillä on oma header (tng-top), joten sivuston TopBar ja
+   alatunniste jäävät pois. /h/<koodi> on haastelinkki, joka renderöi saman
+   pelisivun — B1 (18.9.2026): se puuttui listalta, ja haasteen aloitus- ja
+   tulosnäkymässä näkyi kaksi yläpalkkia päällekkäin. */
+export const isGameRoute = (pathname: string) =>
+  pathname.startsWith("/peli") || pathname.startsWith("/visa") || pathname.startsWith("/h/");

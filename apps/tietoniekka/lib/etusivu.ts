@@ -32,15 +32,8 @@ export const CATEGORY_CHIPS = [
   { label: "Kaikki", href: "/kokoelmat" },
 ];
 
-/* Lippuvisa-hero: CTA vie suoraan lippukortistoon (kuvavisas.type = liput). */
-export const ETUSIVU_HERO = {
-  title: "Tunnistatko tämän maan lipun?",
-  lede: "Testaa, tiedätkö vastauksen.",
-  cta: "Aloita visa →",
-  href: "/peli?kuvavisa=liput",
-  img: "/20/etusivu/hero-lippu-namibia.webp",
-  pos: "55% 48%",
-};
+/* Lippuvisa-hero (ETUSIVU_HERO) poistettu 18.9.2026: etusivun yläosan korvasi
+   Kuvavisat-banneri (components/tn20/EtusivunBannerit.tsx, Design kierros 12A). */
 
 export type CollectionCard = { key: string; title: string; href: string; img: string; pos: string; desc?: string };
 

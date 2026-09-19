@@ -1,0 +1,259 @@
+/* ============================================================
+   ETUSIVUN PROMOBANNERIT — Claude Design kierros 12 (18.9.2026)
+   12A Kuvavisat + Viikkovisa, 12B Kuka on vanhin? (ikäjärjestys).
+   Mitat designista: desktop 1160 × 268, tabletti 760 × 230, mobiili 380.
+   Asettelu valitaan BANNERIN leveydestä (container "eb"), ei ikkunasta:
+     desktop ≥ 860 px · tabletti 640–859 px · mobiili < 640 px.
+   Korjaus 18.9.2026 (Heikin havainto tuotannossa): raja oli 980 px, jolloin
+   ~1000–1060 px:n ikkunassa (banneri 880–979 px) tabletti-asettelu venyi ja
+   keskelle jäi iso tyhjä alue. Nyt desktop-asettelun kuva-alue joustaa:
+   kollaasi ja kasvoketju ankkuroituvat OIKEAAN reunaan ja vasen reuna
+   häivytetään, joten kapeampi desktop näyttää saman kuvan rajattuna.
+   Fontti: variable-Archivo (wdth-akseli) kuten kuvavisat.css/viikkovisa.css —
+   designin wdth 68 ei toimi staattisella Archivolla (KORTTISÄÄNTÖ).
+   ============================================================ */
+
+.tn20 .eb {
+  --eb-display: "Archivo Variable", "Archivo", "Barlow Condensed", sans-serif;
+  --eb-bg: #17140c;
+  --eb-cyan: #22d3ee;
+  --eb-violet: #c79bff;
+  --eb-violet-ink: #180f26;
+  --eb-violet-soft: #a99fd6;
+  container: eb / inline-size;
+  overflow: hidden;
+  border: 1px solid #2c2517;
+  border-radius: 18px;
+  color: #f5f0e6;
+}
+/* .eb on kontti (sen leveys valitsee asettelun), .eb-in varsinainen flex-rivi —
+   container query ei voi muuttaa kontin omaa asettelua. */
+.tn20 .eb-in { position: relative; display: flex; align-items: center; height: 268px; }
+.tn20 .eb--kv .eb-in { background: radial-gradient(90% 160% at 78% 45%, rgba(34, 211, 238, 0.13), rgba(19, 17, 9, 0) 60%), var(--eb-bg); }
+.tn20 .eb--ika .eb-in { background: radial-gradient(85% 150% at 76% 50%, rgba(167, 110, 255, 0.18), rgba(19, 17, 9, 0) 62%), var(--eb-bg); }
+
+/* ── Tekstipalsta ─────────────────────────────────────────────────────── */
+.tn20 .eb-text { flex: 1 1 0%; min-width: 0; display: flex; flex-direction: column; align-items: flex-start; gap: 14px; padding: 0 0 0 38px; position: relative; z-index: 4; }
+.tn20 .eb-tags { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; }
+.tn20 .eb-tag {
+  height: 24px; display: inline-flex; align-items: center; padding: 0 10px; border-radius: 6px;
+  font-size: 11px; font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase; white-space: nowrap;
+}
+.tn20 .eb-tag--amber { background: #e8a320; color: #131109; }
+.tn20 .eb-tag--violet { background: var(--eb-violet); color: var(--eb-violet-ink); }
+.tn20 .eb-meta { font-size: 11px; font-weight: 800; letter-spacing: 0.16em; text-transform: uppercase; color: #8e8676; white-space: nowrap; }
+/* KORTTISÄÄNTÖ: pisin sana "TUNNISTATKO" 11 merkkiä. Design 56 px (wdth 68):
+   mitattu ≈ 0.49 em/merkki → 302 px, palsta ≥ 560 px desktopissa. Tabletti
+   40 px ≈ 216 px, mobiili 34 px yhdellä tai kahdella rivillä. */
+.tn20 .eb-h {
+  margin: 0;
+  font-family: var(--eb-display); font-weight: 900; font-variation-settings: "wdth" 68;
+  font-size: 56px; line-height: 0.88; letter-spacing: -0.025em;
+  text-transform: uppercase; color: #f5f0e6;
+  overflow-wrap: normal; word-break: keep-all; hyphens: none;
+}
+.tn20 .eb-rivi { display: block; }
+.tn20 .eb-mmeta { display: none; margin: 0; font-size: 12px; font-weight: 600; color: #8e8676; }
+.tn20 .eb-row { display: flex; align-items: center; flex-wrap: wrap; gap: 14px; }
+.tn20 .eb--ika .eb-row { gap: 16px; }
+.tn20 .eb-btn {
+  height: 50px; display: inline-flex; align-items: center; justify-content: center; gap: 12px; padding: 0 26px;
+  border-radius: 999px; background: #b6ff3c; color: #131109 !important;
+  font-family: var(--eb-display); font-weight: 900; font-variation-settings: "wdth" 86;
+  font-size: 16px; text-transform: uppercase; white-space: nowrap; text-decoration: none;
+  box-shadow: 0 12px 30px -14px rgba(182, 255, 60, 0.7);
+  transition: filter 150ms, transform 150ms;
+}
+.tn20 .eb-btn span { font-size: 19px; line-height: 1; }
+.tn20 .eb-btn:hover { filter: brightness(1.07); transform: translateY(-1px); }
+.tn20 .eb-btn:focus-visible, .tn20 .eb-vv:focus-visible { outline: 2px solid #f5f0e6; outline-offset: 3px; }
+.tn20 .eb-sub { margin: 0; font-size: 13px; font-weight: 600; line-height: 1.4; color: var(--eb-violet-soft); }
+.tn20 .eb-sub--kapea { display: none; font-size: 12px; }
+
+/* Viikkovisamerkki (pilleri). Ei vinoviivaa — Heikin päätös V3. */
+.tn20 .eb-vv {
+  height: 50px; display: inline-flex; align-items: center; gap: 11px; padding: 0 20px 0 14px;
+  border-radius: 999px; border: 1px solid rgba(34, 211, 238, 0.55); background: rgba(34, 211, 238, 0.08);
+  color: #f5f0e6; text-decoration: none; white-space: nowrap; transition: background 150ms;
+}
+.tn20 .eb-vv:hover { background: rgba(34, 211, 238, 0.16); }
+.tn20 .eb-vv-nro {
+  width: 30px; height: 30px; flex: 0 0 auto; border-radius: 7px; background: var(--eb-cyan); color: #0b0904;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--eb-display); font-weight: 900; font-variation-settings: "wdth" 78; font-size: 15px;
+}
+.tn20 .eb-vv-t { display: flex; flex-direction: column; gap: 1px; }
+.tn20 .eb-vv-nimi { font-family: var(--eb-display); font-weight: 900; font-variation-settings: "wdth" 80; font-size: 15px; letter-spacing: 0.02em; text-transform: uppercase; color: #f5f0e6; }
+.tn20 .eb-vv-uusi { font-size: 10px; font-weight: 700; letter-spacing: 0.13em; text-transform: uppercase; color: #7dd9ec; }
+.tn20 .eb-vv-pelaa { display: none; margin-left: auto; font-size: 11px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; color: #7dd9ec; }
+
+/* ── 12A kuvatodiste ──────────────────────────────────────────────────── */
+.tn20 .eb-strip { display: none; }
+/* Joustava kuva-alue: 560 px designin mukaisesti ≥ 1080 px:n bannerissa,
+   kapeammalla tekstipalstalle jätetään 520 px — mitattu tarve 38 px sisennys
+   + 238 px nappi + 14 px väli + 204 px viikkovisamerkki = 494 px, jotta rivi ei
+   rivity kahdeksi (rivittyessään se työnsi tagit bannerin yläreunan yli). */
+.tn20 .eb-visual { flex: 0 0 clamp(320px, calc(100% - 520px), 560px); position: relative; height: 268px; overflow: hidden; }
+.tn20 .eb-visual-varjo { position: absolute; inset: 0; z-index: 2; pointer-events: none; background: linear-gradient(90deg, var(--eb-bg) 0%, rgba(23, 20, 12, 0) 26%); }
+.tn20 .eb-kortti {
+  position: absolute; margin: 0; overflow: hidden; border-radius: 13px;
+  border: 1px solid #2f2718; box-shadow: 0 26px 48px -24px rgba(0, 0, 0, 0.95);
+}
+.tn20 .eb-kortti img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.tn20 .eb-kortti--rakennus { right: 344px; top: 26px; width: 200px; height: 216px; transform: rotate(-2.5deg); }
+.tn20 .eb-kortti--liput { right: 158px; top: 14px; width: 196px; height: 196px; transform: rotate(2deg); background: #f4efe4; display: flex; align-items: center; justify-content: center; padding: 18px; }
+.tn20 .eb-kortti--liput img { width: auto; height: auto; max-width: 100%; max-height: 100%; object-fit: contain; }
+.tn20 .eb-kortti--maalaukset { right: 128px; top: 118px; width: 170px; height: 134px; transform: rotate(-1.4deg); }
+.tn20 .eb-kortti--elaimet { right: 22px; top: 34px; width: 214px; height: 200px; transform: rotate(1.8deg); border-color: rgba(34, 211, 238, 0.4); }
+.tn20 .eb-kortti-savy { position: absolute; inset: 0; background: linear-gradient(200deg, rgba(34, 211, 238, 0.22), rgba(11, 9, 4, 0.55)); }
+.tn20 .eb-setti { position: absolute; left: 0; right: 0; bottom: 0; padding: 12px 14px; display: flex; align-items: center; justify-content: space-between; }
+.tn20 .eb-setti-l { font-size: 11px; font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase; color: #f5f0e6; }
+.tn20 .eb-setti-n { font-family: var(--eb-display); font-weight: 900; font-variation-settings: "wdth" 74; font-size: 28px; line-height: 1; color: var(--eb-cyan); }
+
+/* ── 12B ikäjärjestysketju ────────────────────────────────────────────── */
+/* Design 580 px, mutta sen rivi (52 + 3 × 118 + 130 + 78 + 4 × 14 = 670 px) ei
+   mahtunut siihen: "+6 kasvoa" leikkautui bannerin reunaan. 650 px + 12 px
+   välit + 34 px sisennys = 644 px mahtuu kokonaan. */
+.tn20 .eb-ketju { flex: 0 0 clamp(380px, calc(100% - 470px), 650px); position: relative; height: 268px; display: flex; align-items: center; overflow: hidden; }
+/* Häivytys: täysi peitto 8 %:iin asti, jotta kapeammassa desktopissa reunaan
+   leikkautuva kortti ei näy terävänä siivuna. */
+.tn20 .eb-ketju-varjo { position: absolute; inset: 0; z-index: 3; pointer-events: none; background: linear-gradient(90deg, var(--eb-bg) 0%, var(--eb-bg) 8%, rgba(23, 20, 12, 0) 30%); }
+.tn20 .eb-ketju-viiva { position: absolute; left: 34px; right: 24px; top: 50%; height: 1px; background: linear-gradient(90deg, rgba(199, 155, 255, 0), rgba(199, 155, 255, 0.5) 18%, rgba(199, 155, 255, 0.5) 82%, rgba(199, 155, 255, 0)); }
+.tn20 .eb-ketju-akseli { position: absolute; z-index: 4; left: 34px; right: 24px; top: calc(50% + 86px); display: flex; justify-content: space-between; font-size: 10px; font-weight: 800; letter-spacing: 0.2em; text-transform: uppercase; color: var(--eb-violet-soft); }
+/* Rivi ankkuroituu oikeaan: kapeammalla ketjulla vasemmanpuoleiset kasvot
+   jäävät häivytyksen alle eikä "+6 kasvoa" -laatta leikkaudu. */
+.tn20 .eb-ketju-rivi { position: relative; z-index: 2; width: 100%; display: flex; align-items: center; justify-content: flex-end; gap: 12px; padding: 0 6px 0 0; }
+.tn20 .eb-kasvo {
+  position: relative; flex: 0 0 auto; margin: 0; width: 118px; height: 150px; overflow: hidden; border-radius: 12px;
+  border: 1px solid rgba(199, 155, 255, 0.45); box-shadow: 0 22px 44px -22px rgba(0, 0, 0, 0.95); background: #231a33;
+}
+.tn20 .eb-kasvo img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 22%; display: block; filter: grayscale(1); }
+.tn20 .eb-kasvo-savy { position: absolute; inset: 0; background: linear-gradient(rgba(120, 60, 200, 0.42), rgba(24, 15, 38, 0.78)); }
+.tn20 .eb-kasvo--raahaa { width: 130px; height: 168px; border-color: #b6ff3c; box-shadow: 0 0 0 3px rgba(182, 255, 60, 0.16), 0 26px 50px -22px rgba(0, 0, 0, 0.95); transform: translateY(-8px) rotate(-1.5deg); }
+.tn20 .eb-kasvo--raahaa .eb-kasvo-savy { background: linear-gradient(rgba(120, 60, 200, 0.3), rgba(24, 15, 38, 0.72)); }
+.tn20 .eb-kasvo-nro {
+  position: absolute; left: 8px; top: 8px; width: 22px; height: 22px; border-radius: 6px;
+  background: var(--eb-violet); color: var(--eb-violet-ink);
+  display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 12px;
+}
+.tn20 .eb-kasvo-raahaa {
+  position: absolute; left: 8px; top: 8px; height: 22px; display: flex; align-items: center; padding: 0 8px; border-radius: 6px;
+  background: #b6ff3c; color: #131109; font-size: 10px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase;
+}
+.tn20 .eb-lisaa {
+  flex: 0 0 auto; width: 78px; height: 150px; border-radius: 12px;
+  border: 1px dashed rgba(199, 155, 255, 0.45); background: rgba(199, 155, 255, 0.06);
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
+}
+.tn20 .eb-lisaa-n { font-family: var(--eb-display); font-weight: 900; font-variation-settings: "wdth" 74; font-size: 28px; line-height: 1; color: var(--eb-violet); }
+.tn20 .eb-lisaa-l { font-size: 10px; font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase; color: var(--eb-violet-soft); }
+
+/* Näkyvyysapurit (desktop-, kapea- ja mobiilisisältö samassa DOMissa) */
+.tn20 .eb-vain-kapea, .tn20 .eb-vain-mob, .tn20 .eb-sub--kapea { display: none; }
+
+/* ═══ Tabletti 640–859 px (design 760 × 230) ═══════════════════════════ */
+@container eb (max-width: 859px) {
+  .tn20 .eb-vain-desk { display: none !important; }
+  .tn20 .eb-vain-kapea { display: inline; }
+  .tn20 .eb-sub--desk { display: none; }
+  .tn20 .eb-sub--kapea { display: block; }
+  .tn20 .eb-text { gap: 11px; padding-left: 28px; }
+  .tn20 .eb-tags { gap: 8px; }
+  .tn20 .eb-tag { height: 22px; padding: 0 9px; font-size: 10px; }
+  .tn20 .eb-meta { font-size: 10px; }
+  .tn20 .eb-h { font-size: 40px; }
+  .tn20 .eb-row { gap: 10px; }
+  .tn20 .eb-btn { height: 44px; padding: 0 20px; gap: 10px; font-size: 14px; box-shadow: none; }
+  .tn20 .eb-btn span { font-size: 17px; }
+  .tn20 .eb-vv { height: 44px; gap: 9px; padding: 0 15px 0 11px; }
+  .tn20 .eb-vv-nro { width: 26px; height: 26px; border-radius: 6px; font-size: 13px; }
+  .tn20 .eb-vv-nimi { font-size: 13px; letter-spacing: 0; }
+  .tn20 .eb-vv-uusi { display: none; }
+
+  /* 300 px designin 760 px:n bannerissa; kapeammalla (640–700 px) jousta
+     240 px:iin asti, ettei napin ja viikkovisamerkin rivi rivity (mitattu
+     648 px:n bannerissa 18.9.2026). */
+  .tn20 .eb-visual { flex-basis: clamp(240px, calc(100% - 420px), 300px); height: 230px; overflow: hidden; }
+  .tn20 .eb-visual-varjo { background: linear-gradient(90deg, var(--eb-bg) 0%, rgba(23, 20, 12, 0) 30%); }
+  .tn20 .eb-kortti { border-radius: 11px; box-shadow: 0 22px 40px -22px rgba(0, 0, 0, 0.95); }
+  .tn20 .eb-kortti--rakennus { left: 6px; right: auto; top: 26px; width: 150px; height: 172px; }
+  .tn20 .eb-kortti--liput { left: auto; right: 14px; top: 16px; width: 152px; height: 150px; padding: 14px; }
+  .tn20 .eb-kortti--maalaukset { display: none; }
+  .tn20 .eb-kortti--elaimet { top: auto; right: 26px; bottom: 14px; width: 136px; height: 104px; transform: rotate(-1.6deg); }
+  .tn20 .eb-setti { display: none; }
+
+  /* Design 322 px, rivi 26 + 2 × 86 + 98 + 54 + 3 × 10 = 380 px → "+7"
+     leikkautui. 380 px + 9 px välit + 20 px sisennys = 371 px. */
+  .tn20 .eb-ketju { flex-basis: 380px; height: 230px; }
+  .tn20 .eb-ketju-varjo { background: linear-gradient(90deg, var(--eb-bg) 0%, rgba(23, 20, 12, 0) 26%); }
+  .tn20 .eb-ketju-viiva { left: 20px; right: 12px; }
+  .tn20 .eb-ketju-akseli { display: none; }
+  .tn20 .eb-ketju-rivi { justify-content: flex-start; gap: 9px; padding: 0 0 0 20px; }
+  .tn20 .eb-kasvo { width: 86px; height: 118px; border-radius: 11px; }
+  .tn20 .eb-kasvo--vain-desk { display: none; }
+  .tn20 .eb-kasvo--raahaa { width: 98px; height: 134px; transform: translateY(-6px) rotate(-1.5deg); }
+  .tn20 .eb-kasvo-nro { left: 7px; top: 7px; width: 20px; height: 20px; font-size: 11px; }
+  .tn20 .eb-kasvo-raahaa { left: 7px; top: 7px; height: 20px; padding: 0 7px; font-size: 9px; }
+  .tn20 .eb-lisaa { width: 54px; height: 118px; border-radius: 11px; }
+  .tn20 .eb-lisaa-n { font-size: 22px; }
+}
+@container eb (min-width: 640px) and (max-width: 859px) {
+  .tn20 .eb-in { height: 230px; }
+}
+
+/* ═══ Mobiili < 640 px (design 380) ═════════════════════════════════════ */
+@container eb (max-width: 639px) {
+  .tn20 .eb-vain-mob { display: inline; }
+  .tn20 .eb-text { width: 100%; align-items: stretch; gap: 12px; padding: 2px 18px 18px; }
+  .tn20 .eb-h { font-size: 34px; line-height: 0.9; letter-spacing: -0.02em; font-variation-settings: "wdth" 70; text-wrap: balance; }
+  .tn20 .eb-rivi { display: inline; }
+  .tn20 .eb-row { flex-direction: column; align-items: stretch; gap: 10px; }
+  .tn20 .eb-btn { height: 48px; font-size: 15px; }
+  .tn20 .eb-btn span { font-size: 18px; }
+  .tn20 .eb-vv { height: 46px; gap: 10px; padding: 0 14px; border-radius: 12px; border-color: rgba(34, 211, 238, 0.5); }
+  .tn20 .eb-vv-nro { width: 28px; height: 28px; border-radius: 7px; font-size: 14px; }
+  .tn20 .eb-vv-nimi { font-size: 14px; }
+  .tn20 .eb-vv-pelaa { display: inline; }
+  .tn20 .eb-visual { display: none; }
+  .tn20 .eb-in { height: auto; flex-direction: column; align-items: stretch; }
+  .tn20 .eb--kv .eb-in { background: var(--eb-bg); }
+  .tn20 .eb--ika .eb-in { background: radial-gradient(120% 80% at 50% 0%, rgba(167, 110, 255, 0.2), rgba(19, 17, 9, 0) 60%), var(--eb-bg); }
+}
+@container eb (max-width: 639px) {
+  /* 12A mobiili: kuvakaista ylhäällä, tagi sen päällä */
+  .tn20 .eb--kv .eb-tags { display: none; }
+  .tn20 .eb--kv .eb-mmeta { display: block; }
+  .tn20 .eb-strip { display: block; position: relative; height: 132px; }
+  .tn20 .eb-strip-kuvat { position: absolute; inset: 0; display: flex; }
+  .tn20 .eb-strip-kuvat img { width: 33.4%; height: 100%; object-fit: cover; display: block; }
+  .tn20 .eb-strip-varjo { position: absolute; inset: 0; background: linear-gradient(to top, var(--eb-bg) 6%, rgba(23, 20, 12, 0.55) 48%, rgba(34, 211, 238, 0.12) 100%); }
+  .tn20 .eb-strip-tag { position: absolute; left: 16px; top: 14px; }
+
+  /* 12B mobiili: ketju ylhäällä, teksti alla */
+  .tn20 .eb--ika .eb-text { order: 2; padding-top: 6px; gap: 11px; }
+  .tn20 .eb--ika .eb-tags { align-self: flex-start; }
+  .tn20 .eb-ketju { order: 1; flex: 0 0 auto; height: 138px; justify-content: center; padding-top: 6px; }
+  .tn20 .eb-ketju-varjo, .tn20 .eb-ketju-viiva { display: none; }
+  .tn20 .eb-ketju-rivi { justify-content: center; gap: 9px; padding: 0; }
+  .tn20 .eb-kasvo { width: 78px; height: 104px; box-shadow: none; }
+  .tn20 .eb-kasvo--raahaa { width: 88px; height: 118px; transform: rotate(-1.5deg); box-shadow: 0 0 0 3px rgba(182, 255, 60, 0.16); }
+  .tn20 .eb-kasvo-nro { left: 6px; top: 6px; width: 19px; height: 19px; border-radius: 5px; }
+  .tn20 .eb-kasvo-raahaa { left: 6px; top: 6px; height: 19px; border-radius: 5px; }
+  .tn20 .eb-lisaa { width: 44px; height: 104px; }
+  .tn20 .eb-lisaa-n { font-size: 19px; }
+}
+
+/* Kapein mobiili (320 px): designin 380 px:n ketju (78 + 88 + 78 + 44 + 3 × 9
+   = 315 px) ei mahdu 288 px:n banneriin — reunimmaiset kortit leikkautuivat
+   (mitattu 18.9.2026). Pienennetty ketju = 66 + 76 + 66 + 38 + 3 × 7 = 267 px. */
+@container eb (max-width: 339px) {
+  .tn20 .eb-ketju-rivi { gap: 7px; }
+  .tn20 .eb-kasvo { width: 66px; height: 90px; }
+  .tn20 .eb-kasvo--raahaa { width: 76px; height: 104px; }
+  .tn20 .eb-lisaa { width: 38px; height: 90px; }
+  .tn20 .eb-lisaa-n { font-size: 17px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tn20 .eb-btn, .tn20 .eb-vv { transition: none; }
+}

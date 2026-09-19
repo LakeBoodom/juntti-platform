@@ -28,7 +28,7 @@
 import "./topbar.css";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
-import { NAV_COLLECTIONS, NAV_MODES, hubHref } from "@/lib/nav";
+import { NAV_COLLECTIONS, NAV_MODES, hubHref, isGameRoute } from "@/lib/nav";
 import { HEADER_PROMOS, SITE_TAGLINE } from "@/lib/etusivu";
 import StreakButton from "./StreakButton";
 
@@ -93,8 +93,9 @@ export default function TopBar() {
   }, [open, sheet, closeMenu]);
 
   /* Pelinäkymä on headeriton (pelikuoren logosäännöt, lukittu 1.8.2026).
-     /visa/<slug> on pelisivun kanoninen osoite (julkaisu 31.8.2026) → sama sääntö. */
-  if (pathname.startsWith("/peli") || pathname.startsWith("/visa")) return null;
+     /visa/<slug> on pelisivun kanoninen osoite (julkaisu 31.8.2026) → sama sääntö,
+     samoin haastelinkki /h/<koodi> (B1, 18.9.2026). */
+  if (isGameRoute(pathname)) return null;
 
   const home = pathname === "/";
   const isKuvavisat = pathname.startsWith("/kokoelma/kuvavisat");

@@ -258,14 +258,17 @@
   min-height: clamp(140px, 15cqw, 260px);
   overflow: hidden;
   border-radius: clamp(10px, 1.1cqw, 14px);
-  background: repeating-linear-gradient(135deg, #1a160d 0 11px, #221c10 11px 22px);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 12px;
+  /* Brändipinta (19.9.2026): näkyy vain jos visalle ei löydy mitään kuvaa.
+     Korvasi designin raidallisen paikkamerkin ja sen "Kuva — päivänsankari"
+     -työnimen, joka näkyi tuotannossa pelaajalle. */
+  background:
+    radial-gradient(120% 90% at 28% 18%, rgba(232, 163, 32, 0.22), rgba(232, 163, 32, 0) 62%),
+    radial-gradient(90% 80% at 85% 100%, rgba(182, 255, 60, 0.08), rgba(182, 255, 60, 0) 60%),
+    #1a160d;
 }
-.tn20 .tn-es-day-media img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
-.tn20 .tn-es-day-ph { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: clamp(9px, 0.95cqw, 12px); letter-spacing: 0.14em; text-transform: uppercase; color: #8e8676; text-align: center; }
+/* Kuva samalla .tn-es-card-bg-kuviolla kuin etusivun muut kortit; kevyt
+   tummennus alareunaan, ettei kirkas kuva kilpaile otsikon kanssa. */
+.tn20 .tn-es-day-shade { position: absolute; inset: 0; background: linear-gradient(to top, rgba(11, 10, 6, 0.35), rgba(11, 10, 6, 0) 55%); }
 .tn20 .tn-es-day-body {
   flex: 74 1 min(100%, 300px);
   min-width: 0;
@@ -286,6 +289,10 @@
   text-transform: uppercase;
   color: var(--tn-gold);
 }
+/* Merkki on linkki visan kokoelmasivulle (19.9.2026). */
+.tn20 a.tn-es-day-badge { text-decoration: none; transition: border-color 150ms, background 150ms; }
+.tn20 a.tn-es-day-badge:hover { border-color: var(--tn-gold); background: rgba(232, 163, 32, 0.2); color: var(--tn-gold); }
+.tn20 a.tn-es-day-badge:focus-visible { outline: 2px solid var(--tn-gold); outline-offset: 2px; }
 .tn20 .tn-es-day-badge--done { border-color: rgba(182, 255, 60, 0.5); background: rgba(182, 255, 60, 0.12); color: var(--tn-lime); }
 /* CD clamp(20px, 2.1cqw, 32px); nimi voi olla mikä tahansa (ei koskaan katkaista
    — 23.8. vaatimus) → rivitys sallittu sanojen välistä, kortti kasvaa. */

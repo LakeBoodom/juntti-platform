@@ -1,0 +1,470 @@
+/* ============================================================
+   KUVAVISAT 2.0 (2026-09-17) — kokoelmasivun tyylit.
+   Design: Kuvavisat-2026-design.html, näkymät 1a (työpöytä) ja 1b (mobiili).
+   Tokenit: BRAND.md §1.1. Kaikki skoopattu .tn20-luokan alle kuten tn20.css.
+
+   FONTTI — tämä on KORTTISÄÄNTÖ (CLAUDE.md) suoraan: design määrittää jokaiselle
+   otsikolle font-variation-settings:'wdth' 70–80, mutta tuotannon
+   @fontsource/archivo on STAATTINEN, jolloin wdth ei tee mitään ja glyyfit ovat
+   ~15–20 % designin mitoitusta leveämpiä. Siksi tämä sivu käyttää omaa
+   --kv-display-tokenia joka osoittaa @fontsource-variable/archivo -perheeseen
+   ('Archivo Variable', font-stretch 62%–125%). Muu sivusto jää staattiseen
+   Archivoon tarkoituksella: tn20.css, jaakiekko.css, jalkapallo.css,
+   kaupungit.css, megavisat.css ja urheilulajit.css sisältävät yhteensä 69
+   font-variation-settings-riviä jotka ovat nyt kuolleita — jos display-tokenin
+   vaihtaisi globaalisti, ne kaikki heräisivät kerralla ja muuttaisivat viiden
+   sivutyypin typografian ilman katselmointia ja ilman mittauksia. Sivuston
+   laajuinen siirtymä on oma työnsä.
+   ============================================================ */
+
+.tn20 .kv-page {
+  --kv-display: "Archivo Variable", "Archivo", "Barlow Condensed", sans-serif;
+  --kv-plate: #f4efe4; /* BRAND.md §5: grafiikan (lippu, vaakuna) vaalea levy */
+  --kv-plate-border: #cfc4ac;
+
+  display: flex;
+  flex-direction: column;
+  gap: clamp(38px, 5vw, 56px);
+  padding: clamp(26px, 3.4vw, 44px) 0 60px;
+}
+
+/* ---------- Hero (kierros 4, 18.9.2026: herokuva kuten muilla kokoelmilla) ----------
+   Kuva on kaikkien kortistojen kollaasi (lippu, vaakuna, linnut, kettu,
+   henkilö, maalaus, rakennukset), jonka vasen laita on valmiiksi tumma —
+   teksti istuu sen päällä. Hero pitää limen: "Arvo satunnainen kuvavisa" on
+   näkymän ainoa täytetty lime-nappi, viikkovisakortin nappi on syaani
+   ääriviiva (design 10A b). Heroon ei tule kuvamääriä (Heikin pyyntö 2). */
+.tn20 .kv-hero {
+  --kv-display: "Archivo Variable", "Archivo", "Barlow Condensed", sans-serif;
+  position: relative;
+  overflow: hidden;
+  min-height: clamp(300px, 32vw, 470px);
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid #241e13;
+}
+.tn20 .kv-hero-media { position: absolute; inset: 0; }
+.tn20 .kv-hero-media img { width: 100%; height: 100%; object-fit: cover; object-position: 100% 50%; display: block; }
+.tn20 .kv-hero-media::after {
+  content: ""; position: absolute; inset: 0;
+  background:
+    linear-gradient(90deg, var(--tn-bg, #131109) 12%, color-mix(in srgb, var(--tn-bg, #131109) 70%, transparent) 38%, transparent 62%),
+    linear-gradient(to top, var(--tn-bg, #131109) 0%, transparent 32%);
+}
+.tn20 .kv-hero-shell { position: relative; width: 100%; }
+.tn20 .kv-hero-in {
+  display: flex; flex-direction: column; align-items: flex-start; gap: 18px;
+  max-width: 560px;
+  padding: clamp(40px, 6vw, 88px) 0 clamp(32px, 4.4vw, 64px);
+}
+
+/* KORTTISÄÄNTÖ-mitoitus. Pisin sana "Kuvavisat" = 9 merkkiä.
+   Lähtöarvo 320px:llä: 0.95 × (320 − 40 kuilu) / (0.67 × 9) ≈ 44px — sama kuin
+   designin mobiiliarvo (1b: 44px). Desktopin katto on designin 78px (1a).
+   Mitattu Range-menetelmällä, ks. mittauskommentti tiedoston lopussa. */
+.tn20 .kv-hero-title {
+  margin: 0;
+  font-family: var(--kv-display);
+  font-weight: 900;
+  font-variation-settings: "wdth" 70;
+  font-size: clamp(40px, 5.4vw, 78px);
+  line-height: 0.9;
+  letter-spacing: -0.025em;
+  text-transform: uppercase;
+  color: var(--tn-text, #f5f0e6);
+  overflow-wrap: normal;
+  word-break: keep-all;
+  hyphens: none;
+  text-wrap: balance;
+}
+
+.tn20 .kv-hero-lede {
+  margin: 0;
+  max-width: 44ch;
+  font-size: clamp(15px, 1.3vw, 17px);
+  line-height: 1.6;
+  color: #cfc7b6;
+  text-wrap: pretty;
+}
+
+/* Heron pääpainike: lime täytetty (BRAND.md §4). Kosketuskohde 52px. */
+.tn20 .kv-hero-random {
+  min-height: 52px;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 26px;
+  border-radius: 999px;
+  background: var(--tn-lime, #b6ff3c);
+  color: #131109;
+  font-family: var(--kv-display);
+  font-weight: 900;
+  font-variation-settings: "wdth" 86;
+  font-size: 15px;
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  text-decoration: none;
+  transition: filter 150ms cubic-bezier(0.2, 0.8, 0.2, 1), transform 150ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.tn20 .kv-hero-random:hover { filter: brightness(1.07); transform: translateY(-1px); color: #131109; }
+.tn20 .kv-hero-random:focus-visible { outline: 2px solid #f5f0e6; outline-offset: 3px; }
+
+/* Mobiili: kollaasi näkyy oikealla, teksti alhaalla vahvemman varjon päällä. */
+@media (max-width: 760px) {
+  .tn20 .kv-hero { align-items: flex-end; min-height: 440px; }
+  .tn20 .kv-hero-media img { object-position: 72% 50%; }
+  .tn20 .kv-hero-media::after {
+    background: linear-gradient(to top, var(--tn-bg, #131109) 30%, color-mix(in srgb, var(--tn-bg, #131109) 60%, transparent) 58%, transparent 82%);
+  }
+  .tn20 .kv-hero-in { padding: 170px 0 28px; }
+}
+
+/* ---------- Osio ---------- */
+
+.tn20 .kv-section {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.tn20 .kv-section-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #241e13;
+}
+
+/* Pisin sana "kategoria" = 9 merkkiä — mahtuu reilusti kaikilla leveyksillä. */
+.tn20 .kv-section-title {
+  margin: 0;
+  font-family: var(--kv-display);
+  font-weight: 900;
+  font-variation-settings: "wdth" 74;
+  font-size: clamp(22px, 2.6vw, 34px);
+  line-height: 1;
+  text-transform: uppercase;
+  color: var(--tn-text, #f5f0e6);
+  overflow-wrap: normal;
+  word-break: keep-all;
+}
+
+.tn20 .kv-section-note {
+  flex: 0 1 auto;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: #8e8676;
+  text-align: right;
+}
+/* Mobiilissa huomautus siirtyy otsikon alle eikä purista otsikkoa kapeaksi. */
+@media (max-width: 760px) {
+  .tn20 .kv-section-head {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  .tn20 .kv-section-note {
+    text-align: left;
+  }
+}
+
+/* ---------- Kategoriaruudukko ---------- */
+
+/* Design 1a: 3 saraketta 1440px:llä, 1b: 1 sarake mobiilissa. auto-fit hoitaa
+   välileveydet ilman erillisiä breakpointeja. align-items: start — avattu
+   kortti kasvaa alaspäin eikä veny sisarustensa korkeuteen. */
+/* Designin ruudukko: auto-fill + minmax(310px) + gap 22.
+   POIKKEAMA DESIGNIIN: align-items on start, ei stretch. Designin kortit eivät
+   laajene — täällä ne ovat <details>-elementtejä, ja stretchillä yhden kortin
+   avaaminen venytti saman rivin suljetut kortit sen korkeuteen, jolloin niiden
+   "Valitse visa" -napit valuivat satojen pikselien tyhjän tilan pohjalle
+   (havaittu mittauskuvasta 17.9.2026). Napit osuvat silti samalle linjalle ilman
+   stretchiä, koska suljetun kortin korkeus on rakenteeltaan vakio: kuvalaatikko
+   on kiinteä 16:10, otsikolla on min-height 53px (2 riviä) ja kuvauksella 42px. */
+.tn20 .kv-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 310px), 1fr));
+  align-items: start;
+  gap: 22px;
+}
+
+.tn20 .kv-card {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid #2c2517;
+  border-radius: 22px;
+  overflow: hidden;
+  background: #17140d;
+  color: var(--tn-text, #f5f0e6);
+  transition: border-color 150ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.tn20 .kv-card:hover {
+  border-color: color-mix(in srgb, var(--kv-accent, #e8a320) 50%, transparent);
+}
+
+.tn20 .kv-card-summary {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  cursor: pointer;
+  list-style: none;
+}
+.tn20 .kv-card-summary::-webkit-details-marker {
+  display: none;
+}
+.tn20 .kv-card-summary::marker {
+  content: "";
+}
+.tn20 .kv-card-summary:focus-visible {
+  outline: 2px solid var(--tn-amber, #e8a320);
+  outline-offset: -2px;
+}
+
+/* ---------- Kuvalaatikko (Claude Designin korjaus 17.9.2026) ----------
+   Kiinteä 16:10 — kuvan oma kuvasuhde ei enää venytä korttia, joten pysty- ja
+   vaakakuva näyttävät samankokoisilta eikä mikään valu tekstin päälle.
+   Kaksi tyyppiä, ei koskaan sekaisin samassa kortissa:
+     Grafiikka (liput, vaakunat, maalaukset) = yksi yhtenäinen vaalea levy,
+       kuvat contain max-width 44% → mikään ei rajaudu.
+     Valokuva (linnut, eläimet, rakennukset, henkilöt, kasvit) = 2 saraketta,
+       1px hairline välissä, cover. */
+.tn20 .kv-media {
+  position: relative;
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  background: #0f0d07;
+  border-bottom: 1px solid #2c2517;
+}
+
+.tn20 .kv-media-plate {
+  position: absolute;
+  inset: 0;
+  background: var(--kv-plate);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  padding: 20px;
+}
+.tn20 .kv-media-plate img {
+  max-width: 44%;
+  max-height: 100%;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  display: block;
+}
+
+.tn20 .kv-media-photos {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  /* Rivi on nimenomaan 1fr, ei implisiittinen auto (Heikin QA 17.9.2026).
+     Auto-rivillä kuvan height:100% jää määrittelemättömäksi ja putoaa takaisin
+     kuvan omaan kuvasuhteeseen: mitattu 1440 px leveydellä kuva 189 × 283 px
+     vaikka laatikko on 189 × 235 px. Rivi kasvoi laatikkoa korkeammaksi,
+     overflow:hidden leikkasi ylimenevän osan ALAREUNASTA ja object-position
+     (henkilökuvien 50% 18%) menetti merkityksensä kokonaan. 1fr tekee rivistä
+     määräisen, jolloin height:100% ratkeaa ja object-fit: cover rajaa
+     keskeltä niin kuin on tarkoitus. */
+  grid-template-rows: 1fr;
+  gap: 1px;
+  background: #2c2517;
+}
+.tn20 .kv-media-photos img {
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  object-fit: cover;
+  display: block;
+}
+
+/* Tyyppimerkki (GRAFIIKKA / VALOKUVA) poistettu kuvan päältä 18.9.2026
+   (Heikin pyyntö 6) — kuvan päällä ei ole mitään. */
+
+.tn20 .kv-card-body {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  gap: 10px;
+  padding: 20px 22px 22px;
+}
+
+/* KORTTISÄÄNTÖ-mitoitus. Pisimmät sanat kategorianimissä ovat 11 merkkiä
+   ("Rakennukset", "Maalaukset"). Kapein kortti on 310px (kv-grid minmax),
+   josta tekstille jää 300 − 44 padding = 256px:
+   0.95 × 256 / (0.67 × 11) ≈ 33px. Designin arvot ovat 27px (1a) ja 19px (1b),
+   eli molemmat mahtuvat lähtöarvoon selvällä marginaalilla. */
+/* Designin arvot: 25px / wdth 78 / line-height 1.06 / min-height 53px = kaksi riviä.
+   min-height varaa toisen rivin tilan myös yksiriviselle otsikolle, jotta kuvaus ja
+   nappi ovat samalla linjalla kaikissa korteissa (Designin korjaus, kohta 3).
+   KORTTISÄÄNTÖ: pisin sana kategorianimissä on 11 merkkiä ("Vaakunoiden" jäi pois
+   päätöksellä 2, nyt pisin on "Rakennukset"/"Maalaukset"). Kapein kortti 310px −
+   44px padding = 266px tekstille → 0.95 × 266 / (0.67 × 11) ≈ 34px mahtuisi, eli
+   25px on reilusti turvallinen. Mitattu Range-menetelmällä, ks. tiedoston loppu. */
+.tn20 .kv-card-title {
+  margin: 0;
+  display: flex;
+  align-items: flex-start;
+  min-height: 53px;
+  font-family: var(--kv-display);
+  font-weight: 900;
+  font-variation-settings: "wdth" 78;
+  font-size: clamp(20px, 1.8vw, 25px);
+  line-height: 1.06;
+  letter-spacing: -0.015em;
+  text-transform: uppercase;
+  color: var(--tn-text, #f5f0e6);
+  overflow-wrap: normal;
+  word-break: keep-all;
+  text-wrap: balance;
+}
+
+.tn20 .kv-card-desc {
+  margin: 0;
+  min-height: 42px;
+  font-size: 14px;
+  line-height: 1.5;
+  color: #a79e8c;
+  text-wrap: pretty;
+}
+
+.tn20 .kv-card-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding-top: 6px;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: #8e8676;
+}
+/* Kategoriaväri vain merkkinä/korostuksena (BRAND.md §1.2: ei isoihin pintoihin) */
+.tn20 .kv-card-meta .kv-card-count {
+  color: var(--kv-accent, #e8a320);
+}
+
+.tn20 .kv-card-cta {
+  margin-top: auto;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 0 18px;
+  border: 1px solid #3a3120;
+  border-radius: 999px;
+  font-size: 15px;
+  font-weight: 600;
+  transition: border-color 150ms cubic-bezier(0.2, 0.8, 0.2, 1), color 150ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.tn20 .kv-card:hover .kv-card-cta {
+  border-color: var(--tn-amber, #e8a320);
+  color: var(--tn-amber, #e8a320);
+}
+.tn20 .kv-card-cta .kv-caret {
+  font-size: 10px;
+  opacity: 0.55;
+  transition: transform 220ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.tn20 .kv-card[open] .kv-card-cta .kv-caret {
+  transform: rotate(180deg);
+}
+
+/* ---------- Visavariaatiot (details-sisältö) ---------- */
+
+.tn20 .kv-varlist {
+  padding: 4px 16px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.tn20 .kv-vargroup {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+/* BRAND.md §2.3: eyebrow on brändielementti — 11px/800/.16em/uppercase, amber. */
+.tn20 .kv-vargroup-label {
+  padding: 12px 6px 8px;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--tn-amber, #e8a320);
+}
+.tn20 .kv-vargroup:first-child .kv-vargroup-label {
+  padding-top: 6px;
+}
+
+.tn20 .kv-var {
+  min-height: 46px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 14px;
+  border: 1px solid #241e13;
+  border-radius: 9px;
+  font-size: 14.5px;
+  font-weight: 700;
+  color: var(--tn-text, #f5f0e6);
+  text-decoration: none;
+  transition: border-color 150ms cubic-bezier(0.2, 0.8, 0.2, 1), background 150ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.tn20 .kv-var:hover {
+  border-color: #3a3122;
+  background: #1b1710;
+  color: var(--tn-text, #f5f0e6);
+}
+.tn20 .kv-var:focus-visible {
+  outline: 2px solid var(--tn-amber, #e8a320);
+  outline-offset: 2px;
+}
+
+/* Variaation nimi saa rivittyä sanaväleistä (se on leipätekstiä, ei otsikko),
+   mutta kuvamäärä ei koskaan katkea omalta rivinsä keskeltä. */
+.tn20 .kv-var-label {
+  min-width: 0;
+  overflow-wrap: normal;
+  word-break: keep-all;
+}
+/* Variaatiorivillä ei kuvamäärää (Heikin pyyntö 2) — nuoli kertoo että rivi
+   käynnistää pelin. */
+.tn20 .kv-var-arrow {
+  flex: 0 0 auto;
+  font-size: 15px;
+  font-weight: 800;
+  color: #8e8676;
+}
+
+/* "Kaikki liput" — listan viimeinen ja ainoa korostettu rivi. Lime on tässä
+   listassa toiminnon väri (BRAND.md §1.2), ja se on eri näkymäosio kuin
+   heron lime-pääpainike, ja rivi näkyy vasta kun kortti avataan. */
+.tn20 .kv-var--kaikki {
+  margin-top: 4px;
+  border-color: var(--tn-lime, #b6ff3c);
+  color: var(--tn-lime, #b6ff3c);
+  font-weight: 800;
+}
+.tn20 .kv-var--kaikki:hover {
+  border-color: var(--tn-lime, #b6ff3c);
+  background: color-mix(in srgb, var(--tn-lime, #b6ff3c) 10%, transparent);
+  color: var(--tn-lime, #b6ff3c);
+}
+.tn20 .kv-var--kaikki .kv-var-arrow {
+  color: inherit;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tn20 .kv-card,
+  .tn20 .kv-card-cta .kv-caret,
+  .tn20 .kv-hero-random,
+  .tn20 .kv-var {
+    transition: none;
+  }
+}

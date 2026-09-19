@@ -7,19 +7,31 @@
 
 import { getSupabase } from "@/lib/supabase";
 import { getKuvavisat, getKuvavisatByIds } from "@/lib/queries";
+import { TASOT, MAANOSAT, KATEGORIAT, variaationNimi, getViikkovisa, getViikkoKollaasi, levynSavy, VIIKKOVISA_KUVIA } from "@/lib/kuvavisat2026";
+import { viikkoInfo, viikkoNimi, viikkoAvaimesta, VIIKKO_AKSENTTI } from "@/lib/viikkovisa";
+import { haeHaaste } from "@/lib/haaste";
 import { kulttuuriImg } from "@/lib/kulttuuri";
 import { luontoImg } from "@/lib/luonto";
 import { urheiluImg } from "@/lib/urheilu";
 import { maantietoImg } from "@/lib/maantieto";
-import { KAUPUNGIT, KAUPUNGIT_HERO_IMG } from "@/lib/kaupungit";
-import { JK_HERO, JK_ACCENT } from "@/lib/jaakiekko";
-import { JP_HERO } from "@/lib/jalkapallo";
-import { LearnArticle, type Learn } from "@/components/tn20/LearnArticle";
+import { KAUPUNGIT } from "@/lib/kaupungit";
+import { resolveCollection, COLLECTION_LABEL } from "@/lib/visanKokoelma";
+import { type Learn } from "@/components/tn20/LearnArticle";
 import GameClient, { type GameQuiz } from "./GameClient";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 
 export const dynamic = "force-dynamic";
+
+/** Fisher–Yates. Palauttaa uuden taulukon — kutsutaan vain palvelimella (ks. K2). */
+function sekoita<T>(arr: T[]): T[] {
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
 
 /* ── Sivukohtainen title/description (QA-006, 29.8.2026): aiemmin kaikki
    371 pelisivua perivät layoutin "esikatselu"-otsikon. ── */
@@ -30,16 +42,54 @@ export async function generateMetadata(
   const sb = getSupabase();
   const str = (k: string) => (typeof p[k] === "string" ? (p[k] as string) : null);
   const kuvavisa = str("kuvavisa"), mega = str("mega"), slug = str("visa"), quizId = str("quiz_id");
+  const viikkovisa = str("viikkovisa") === "1";
   const suffix = " | Tietoniekka";
+  /* Heikin havainto 17.9.2026: juurilayoutin openGraph.title on kaikilla
+     sivuilla "Tietoniekka — testaa tietosi", ja koska tämä generateMetadata
+     asetti vain titlen ja descriptionin, JOKAINEN jaettu visalinkki näytti
+     WhatsAppissa ja Facebookissa saman otsikon. Jakaminen on kasvun pääkanava,
+     joten og ja twitter asetetaan nyt jokaisessa haarassa erikseen. */
+  const og = (title: string, description: string): Metadata => ({
+    openGraph: { type: "website", locale: "fi_FI", siteName: "Tietoniekka", title, description },
+    twitter: { card: "summary_large_image", title, description },
+  });
+  if (viikkovisa) {
+    const vv = await getViikkovisa();
+    /* Kierros 4: "Viikkovisa 38 · Kuvat" — sama nimi kuin sivulla ja jaossa. */
+    const t = vv ? viikkoNimi(vv.viikko) : "Viikkovisa";
+    const d = `${VIIKKOVISA_KUVIA} kuvaa, yksi yritys. Liput, vaakunat, linnut, eläimet, maalaukset, rakennukset, henkilöt sekä kasvit ja puut. Sama visa kaikille koko viikon.`;
+    return {
+      title: `${t} – tunnista kuvasta${suffix}`,
+      description: d,
+      ...og(t, d),
+      /* Sarja vaihtuu maanantaisin, joten kanoninen osoite on parametriton. */
+      alternates: { canonical: "/peli?viikkovisa=1" },
+    };
+  }
   if (kuvavisa) {
-    const t = KUVAVISA_TITLES[kuvavisa] ?? "Kuvavisa";
-    return { title: `${t} – tunnista kuvasta${suffix}`, description: "Yksi kuva, neljä vaihtoehtoa. Pelaa ilmainen kuvavisa Tietoniekassa." };
+    /* T4: variaatio näkyy otsikossa samalla nimellä kuin kokoelmasivun linkissä. */
+    const taso = str("taso");
+    const maanosa = str("maanosa");
+    /* Viikkovisan haaste: taso = viikkoavain → "Viikkovisa 38 · Kuvat" */
+    const vari = variaationNimi(kuvavisa, taso, maanosa);
+    const t = vari ?? KUVAVISA_TITLES[kuvavisa] ?? "Kuvavisa";
+    const kuvaDesc = KUVAVISA_DESC[kuvavisa] ?? "Yksi kuva, neljä vaihtoehtoa. Pelaa ilmainen kuvavisa Tietoniekassa.";
+    return {
+      title: `${t} – tunnista kuvasta${suffix}`,
+      description: kuvaDesc,
+      ...og(`${t} – tunnista kuvasta`, kuvaDesc),
+      /* T6: kanoninen osoite on kortiston perusvisa — variaatiot eivät kilpaile
+         samasta hakutuloksesta keskenään. */
+      alternates: { canonical: `/peli?kuvavisa=${encodeURIComponent(kuvavisa)}` },
+    };
   }
   if (!sb) return {};
   if (mega) {
     const { data } = await sb.from("quizzes").select("title, display_title, teaser").eq("slug", mega).maybeSingle<{ title: string; display_title: string | null; teaser: string | null }>();
     if (!data) return { title: `Visaa ei löytynyt${suffix}` };
-    return { title: `${data.display_title ?? data.title}${suffix}`, description: data.teaser ?? "Megavisa: yksi istunto ilman taukoja. Pelaa ilmaiseksi Tietoniekassa." };
+    const megaNimi = data.display_title ?? data.title;
+    const megaDesc = data.teaser ?? "Megavisa: yksi istunto ilman taukoja. Pelaa ilmaiseksi Tietoniekassa.";
+    return { title: `${megaNimi}${suffix}`, description: megaDesc, ...og(megaNimi, megaDesc) };
   }
   if (slug || quizId) {
     let q = sb.from("quizzes").select("title, display_title, teaser, description, slug").eq("status", "published");
@@ -54,83 +104,34 @@ export async function generateMetadata(
        description sen sijaan 97 %:lle (ks. claude/SEO_PIKATARKISTUS_2026_09_01.md
        kohta 2) — käytetään description-kenttää fallbackina ennen geneeristä
        lausetta, jotta hakutuloksen kuvaus on oikea lähes kaikilla visoilla. */
-    return { title: `${name}${suffix}`, description: data.teaser ?? data.description ?? `${name} – ilmainen tietovisa Tietoniekassa.`, ...canonical };
+    const visaDesc = data.teaser ?? data.description ?? `${name} – ilmainen tietovisa Tietoniekassa.`;
+    return { title: `${name}${suffix}`, description: visaDesc, ...og(name, visaDesc), ...canonical };
   }
   return { title: `Visaa ei löytynyt${suffix}` };
 }
 
+/* T6 (UX-korjaus 17.9.2026): henkilot ja rakennukset puuttuivat → metadata näytti
+   niille geneerisen "Kuvavisa – tunnista kuvasta". Kaupungit lisätty samalla. */
 const KUVAVISA_TITLES: Record<string, string> = {
   liput: "Lippuvisa", vaakunat: "Vaakunavisa", vaakuna: "Vaakunavisa", linnut: "Lintuvisa",
   elaimet: "Eläinvisa", kasvit: "Kasvivisa", maalaukset: "Maalausvisa",
+  henkilot: "Henkilövisa", rakennukset: "Rakennusvisa", kaupungit: "Kaupunkivisa",
+  viikko: "Viikkovisa",
 };
 
-const COLLECTION_ACCENT: Record<string, string> = {
-  tv: "#FF3D9E",
-  urheilu: "#B6FF3C",
-  elokuvat: "#FF5C3D",
-  musiikki: "#A855F7",
-  matkakohteet: "#46D6C8",
-  yleistieto: "#E8A320",
-  kulttuuri: "#E8A320",
-  historia: "#E8A320",
-  luonto: "#3FBF7F",
-  "tunnetut-henkilot": "#C9A96A",
-};
-const COLLECTION_HUB: Record<string, string> = {
-  tv: "/kokoelma/tv",
-  urheilu: "/kokoelma/urheilu",
-  elokuvat: "/kokoelma/elokuvat",
-  musiikki: "/kokoelma/musiikki",
-  matkakohteet: "/kokoelma/matkakohteet",
-  kulttuuri: "/kokoelma/kulttuuri",
-  historia: "/kokoelma/historia",
-  luonto: "/kokoelma/luonto",
-  "tunnetut-henkilot": "/kokoelma/tunnetut-henkilot",
-};
-/* ── Kokoelman tunnistus (QA-003/013 + Heikki 1, 2, 5 — 29.8.2026):
-   kaupunkivisat ovat kannassa collection=yleistieto/category=kaupungit,
-   jääkiekko ja jalkapallo collection=urheilu → tunnistetaan category/genre-
-   kentästä ja ohjataan omille teemasivuilleen. Yleistieto ei ole 2.0:ssa
-   omana kokoelmana (Heikki 3) → hub /kokoelmat. ── */
-type Resolved = { key: string; label: string; hub: string; bg: string; accent: string };
-function resolveCollection(q: { collection: string | null; category: string | null; genre: string | null }): Resolved {
-  const collection = q.collection ?? "yleistieto";
-  const cat = q.category ?? "", genre = q.genre ?? "";
-  if (cat === "kaupungit") return { key: "kaupungit", label: "Suomen kaupungit", hub: "/kokoelma/kaupungit", bg: KAUPUNGIT_HERO_IMG, accent: "#E8A320" };
-  if (cat === "jaakiekko" || genre === "jaakiekko") return { key: "jaakiekko", label: "Jääkiekko", hub: "/kokoelma/jaakiekko", bg: JK_HERO.img, accent: JK_ACCENT };
-  if (genre === "jalkapallo") return { key: "jalkapallo", label: "Jalkapallo", hub: "/kokoelma/jalkapallo", bg: JP_HERO.img, accent: "#B6FF3C" };
-  if (collection === "yleistieto") return { key: "yleistieto", label: "Yleistieto", hub: "/kokoelmat", bg: "/20/hero-mikko-laura.webp", accent: "#E8A320" };
-  return {
-    key: collection,
-    label: COLLECTION_LABEL[collection] ?? "Visa",
-    hub: COLLECTION_HUB[collection] ?? "/kokoelmat",
-    bg: COLLECTION_BG[collection] ?? "/20/hero-mikko-laura.webp",
-    accent: COLLECTION_ACCENT[collection] ?? "#E8A320",
-  };
-}
-
-const COLLECTION_BG: Record<string, string> = {
-  tv: "/20/hero-tv-laura.webp",
-  urheilu: "/20/hero-urheilu-mikko.webp",
-  elokuvat: "/20/teema-elokuvat.webp",
-  musiikki: "/20/teema-musiikki.webp",
-  matkakohteet: "/20/maantieto/hero-landing.webp",
-  kulttuuri: "/20/kulttuuri/hero-kollaasi.webp",
-  historia: "/20/historia/hero-aikajana.webp",
-  luonto: "/20/luonto/hero-landing.webp",
-  "tunnetut-henkilot": "/20/teema-tunnetut-henkilot.webp",
-};
-const COLLECTION_LABEL: Record<string, string> = {
-  tv: "TV & Suoratoisto",
-  urheilu: "Urheilu",
-  elokuvat: "Elokuvat",
-  musiikki: "Musiikki",
-  matkakohteet: "Maantieto",
-  yleistieto: "Yleistieto",
-  kulttuuri: "Kulttuuri",
-  historia: "Historia",
-  luonto: "Luonto",
-  "tunnetut-henkilot": "Tunnetut henkilöt",
+/* T6: kortistokohtainen meta description — aiemmin kaikilla kuvavisoilla oli sama
+   lause, joten hakutuloksissa kymmenen visaa näytti identtisiltä. */
+const KUVAVISA_DESC: Record<string, string> = {
+  liput: "Tunnista maailman valtioiden liput. Ilmainen kuvavisa Tietoniekassa — ei kirjautumista.",
+  vaakunat: "Tunnista maakuntien, kaupunkien ja kuntien vaakunat. Ilmainen kuvavisa Tietoniekassa.",
+  linnut: "Tunnista Suomen linnut kuvasta. Ilmainen kuvavisa Tietoniekassa — ei kirjautumista.",
+  elaimet: "Tunnista eläinlajit lähikuvasta. Ilmainen kuvavisa Tietoniekassa — ei kirjautumista.",
+  kasvit: "Tunnista Suomen kasvit ja puut kuvasta. Ilmainen kuvavisa Tietoniekassa.",
+  maalaukset: "Tunnista klassikkomaalaukset ja niiden tekijät. Ilmainen kuvavisa Tietoniekassa.",
+  henkilot: "Tunnista tunnetut henkilöt kuvasta. Ilmainen kuvavisa Tietoniekassa.",
+  rakennukset: "Tunnista maailman rakennukset kuvasta. Ilmainen kuvavisa Tietoniekassa.",
+  kaupungit: "Tunnista kaupungit yhdestä näkymästä. Ilmainen kuvavisa Tietoniekassa.",
+  viikko: "Kuvasarja kaikista kortistoista: liput, vaakunat, linnut, eläimet ja muut. Ilmainen kuvavisa Tietoniekassa — ei kirjautumista.",
 };
 
 /* Urheilussa peli perii joukkueen värin (CD: "urheilu joukkueväri") */
@@ -163,6 +164,7 @@ export default async function Peli20({
   const quizId = typeof params.quiz_id === "string" ? params.quiz_id : null;
   const slug = typeof params.visa === "string" ? params.visa : null;
   const kuvavisa = typeof params.kuvavisa === "string" ? params.kuvavisa : null;
+  const viikkovisa = params.viikkovisa === "1";
   const mega = typeof params.mega === "string" ? params.mega : null;
   // Putki kertyy päivän nostosta: paivan_visa=1 (manuaalinen Päivän visa,
   // Heikki 4.8.2026) tai paivan_sankari=1 (synttärisankari-fallback).
@@ -170,7 +172,77 @@ export default async function Peli20({
 
   const sb = getSupabase();
   /* Virhetilat → tyylitelty 404 (QA-007, 29.8.2026) */
-  if (!sb || (!quizId && !slug && !kuvavisa && !mega)) notFound();
+  if (!sb || (!quizId && !slug && !kuvavisa && !mega && !viikkovisa)) notFound();
+
+  /* ── VIIKKOVISA (17.9.2026) ──
+     15 kuvaa kaikista kahdeksasta kortistosta, sama visa kaikille koko viikon.
+     Sarja on lukittu kantaan (kuvavisa_viikot), joten tässä EI arvota mitään:
+     id:t haetaan sellaisenaan ja järjestys on kannan järjestys. Vaihtoehtojen
+     järjestys sekoitetaan kuten muissakin kuvavisoissa, koska se on
+     kysymyskohtainen eikä vaikuta siihen että visa on sama kaikille. */
+  if (viikkovisa) {
+    const vv = await getViikkovisa();
+    if (!vv) notFound();
+    /* Kierros 4 (18.9.2026): viikkotiedot lasketaan TÄSSÄ, palvelimella —
+       viikkonumero ja lukituksen avain tulevat kannan funktiosta (Suomen aika),
+       päivämääräväli ja "N pv jäljellä" palvelimen kellosta. Selain vain
+       vertaa tallennettua avainta tähän, joten lukitus purkautuu maanantaina
+       ilman että selaimen kelloon nojataan. */
+    const info = viikkoInfo(vv.vuosi, vv.viikko);
+    const [rows, kollaasi] = await Promise.all([
+      getKuvavisatByIds(vv.kuvaIdt),
+      getViikkoKollaasi(vv.kuvaIdt, info.avain),
+    ]);
+    if (rows.length === 0) notFound();
+    const nimi = viikkoNimi(info.viikko, info.kategoria);
+
+    const game: GameQuiz = {
+      id: "", // ei quizzes-riviä → pelikertaa ei tallenneta
+      title: nimi,
+      teaser:
+        "Liput, vaakunat, linnut, eläimet, maalaukset, rakennukset, henkilöt sekä " +
+        "kasvit ja puut. Sama visa kaikille koko viikon.",
+      collectionLabel: "Kuvavisat",
+      genreLabel: null,
+      hubHref: "/kokoelma/kuvavisat",
+      bgImg: "", // K1: kuvavisoissa ei taustakuvaa
+      /* Formaatin oma aksentti (10A Sinetti), ei putken ja pääpainikkeiden limeä. */
+      accent: VIIKKO_AKSENTTI,
+      isSankari: false,
+      kind: "kuva",
+      /* Kuvat tulevat kaikista kortistoista, joten levyn sävy ratkaistaan
+         kysymys kerrallaan eikä visan tasolla (ks. GameQuestion.plate). */
+      plate: "tumma",
+      challengePath: `/peli?kuvavisa=viikko&taso=${info.avain}&ids=${rows.map((r) => r.id).join(",")}`,
+      /* Yksi yritys viikossa: GameClient ei näytä "Pelaa uudelleen" -nappia
+         viikkovisalle lainkaan. */
+      reloadOnRestart: false,
+      autoStart: false,
+      kuvaIdt: rows.map((r) => r.id),
+      /* "viikko" eikä rows[0].type: haastelinkki tallentaa tämän arvon, ja
+         rows[0].type nimesi viikkovisasta jaetun haasteen sen ensimmäisen kuvan
+         kortiston mukaan ("Vaakunavisa", 15 kuvaa). Kuvat tulevat silti id:istä. */
+      kuvavisaSlug: "viikko",
+      /* Haasterivin taso = viikkoavain, jotta /h/<koodi> nimeää haasteen
+         "Viikkovisa 38 · Kuvat" vielä viikon vaihduttuakin. */
+      taso: info.avain,
+      maanosa: null,
+      viikko: { ...info, kollaasi },
+      jakoNimi: nimi,
+      spare: [],
+      questions: rows.map((r) => ({
+        question: r.question,
+        options: sekoita((r.options ?? []).slice(0, 4)),
+        correct: r.correct_option,
+        fact: r.fact ?? null,
+        image: r.image_url,
+        credit: r.source_credit ?? null,
+        plate: levynSavy(r.type),
+      })),
+      related: [],
+    };
+    return <GameClient quiz={game} />;
+  }
 
   /* ── MEGA (3.8.2026, MEGA_SPEC §1): viittauskooste mega_questions-taulusta.
      Mega-rivi voi olla draft (RLS "Mega preview readable") — tuotantosivun
@@ -319,17 +391,26 @@ export default async function Peli20({
      Data kuvavisas-taulusta adminin järjestyksessä; mekaniikka sama.
      Pelikertoja ei tallenneta (kuten tuotannossa — ei quizzes-riviä). */
   if (kuvavisa) {
+    /* T3 (17.9.2026): teaser = pelisivun aloitusnäkymän intro, Heikin hyväksymät
+       tekstit. Kategoriakortin lyhyt kuvaus (max 60 merkkiä) on eri teksti ja
+       asuu KATEGORIAT[].kuvaus:issa — näitä kahta ei saa yhdistää. */
     const DECKS: Record<string, { title: string; teaser: string; motif: string; color: string }> = {
-      liput: { title: "Lippuvisa", teaser: "Yksi lippu, neljä maata — kuinka tarkka silmäsi on?", motif: "lippu", color: "#4C9AFF" },
-      vaakuna: { title: "Vaakunavisa", teaser: "Tunnista suomalainen kunnanvaakuna kilvestä.", motif: "vaakuna", color: "#8FC0FF" },
-      vaakunat: { title: "Vaakunavisa", teaser: "Tunnista suomalainen kunnanvaakuna kilvestä.", motif: "vaakuna", color: "#8FC0FF" },
-      linnut: { title: "Lintuvisa", teaser: "Siivet, nokat ja höyhenpuvut — tunnista laji kuvasta.", motif: "lintu", color: "#7CEBC8" },
-      elaimet: { title: "Eläinvisa", teaser: "Tunnista eläinlaji lähikuvasta.", motif: "elain", color: "#2FD9A5" },
-      kasvit: { title: "Kasvivisa", teaser: "Lehti, kukka vai kaarna — tunnista kasvi.", motif: "kasvi", color: "#4ADE80" },
-      henkilot: { title: "Henkilövisa", teaser: "Tunnista henkilö kuvasta.", motif: "kasvot", color: "#F0A24B" },
-      rakennukset: { title: "Rakennusvisa", teaser: "Tunnista rakennus kuvasta.", motif: "torni", color: "#F2C230" },
+      liput: { title: "Lippuvisa", teaser: "Maailman valtioiden liput. Tunnistatko maan pelkän lipun perusteella — tutuimmista harvinaisempiin?", motif: "lippu", color: "#4C9AFF" },
+      vaakuna: { title: "Vaakunavisa", teaser: "Suomalaiset vaakunat: maakuntien, kaupunkien ja kuntien tunnukset. Harva tunnistaa edes oman kotiseutunsa — entä sinä?", motif: "vaakuna", color: "#8FC0FF" },
+      vaakunat: { title: "Vaakunavisa", teaser: "Suomalaiset vaakunat: maakuntien, kaupunkien ja kuntien tunnukset. Harva tunnistaa edes oman kotiseutunsa — entä sinä?", motif: "vaakuna", color: "#8FC0FF" },
+      linnut: { title: "Lintuvisa", teaser: "Nokasta, siivistä ja väreistä: tunnista lintu yhdestä kuvasta ennen kuin se lentää pois.", motif: "lintu", color: "#7CEBC8" },
+      elaimet: { title: "Eläinvisa", teaser: "Tunnista eläin yhdestä kuvasta. Tutut ja yllättävämmät lajit panevat lajintuntemuksen koetukselle.", motif: "elain", color: "#2FD9A5" },
+      kasvit: { title: "Kasvivisa", teaser: "Kukkia, puita ja muita kasveja lähikuvassa. Tunnistatko kasvin sen tuntomerkeistä ja löydätkö oikean nimen neljästä vaihtoehdosta?", motif: "kasvi", color: "#4ADE80" },
+      henkilot: { title: "Henkilövisa", teaser: "Tutut kasvot historiasta ja nykypäivästä. Riittääkö yksi kuva, että tunnistat henkilön?", motif: "kasvot", color: "#F0A24B" },
+      rakennukset: { title: "Rakennusvisa", teaser: "Torneista temppeleihin ja pyramideihin: tunnista rakennuksia ja rakennelmia yhdestä kuvasta. Kuinka monta kohdetta tunnistat?", motif: "torni", color: "#F2C230" },
       kaupungit: { title: "Kaupunkivisa", teaser: "Tunnista kaupunki yhdestä näkymästä.", motif: "kaupunki", color: "#F5C462" },
-      maalaukset: { title: "Maalausvisa", teaser: "Tunnista taideteos tai tekijä.", motif: "naamio", color: "#E85D9E" },
+      maalaukset: { title: "Maalausvisa", teaser: "Taiteen klassikot yhdestä kuvasta. Tunnistatko tunnetut teokset — ja niiden tekijät?", motif: "naamio", color: "#E85D9E" },
+      /* Viikkovisasta jaettu haaste tulee tähän (?kuvavisa=viikko&ids=...).
+         Ei kokoelmasivun kortisto — kuvat tulevat aina id-listasta. */
+      /* Haastesivulla ei puhuta "tämän viikon visasta" eikä näytetä
+         viikkosinettiä (kierros 4, kohta 6.7): haaste on pelattavissa myös
+         viikon vaihduttua, jolloin viikkoviittaus olisi harhaanjohtava. */
+      viikko: { title: "Viikkovisa · Kuvat", teaser: "Kuvasarja kaikista kortistoista: liput, vaakunat, linnut, eläimet, maalaukset, rakennukset, henkilöt sekä kasvit ja puut.", motif: "kysymys", color: "#B6FF3C" },
     };
     const deck = DECKS[kuvavisa] ?? { title: "Kuvavisa", teaser: "Tunnista kuvasta.", motif: "kysymys", color: "#4C9AFF" };
 
@@ -338,9 +419,43 @@ export default async function Peli20({
        ohitusta varten (README: rikkinäinen kysymys korvataan ensin). */
     const idsParam = typeof params.ids === "string" ? params.ids : null;
     const wantedIds = idsParam ? idsParam.split(",").map((x) => x.trim()).filter((x) => /^[0-9a-f-]{20,}$/i.test(x)).slice(0, 20) : [];
-    const allRows = wantedIds.length > 0 ? await getKuvavisatByIds(wantedIds) : await getKuvavisat(kuvavisa, 12);
-    const rows = wantedIds.length > 0 ? allRows : allRows.slice(0, 10);
-    const spareRows = wantedIds.length > 0 ? [] : allRows.slice(10);
+
+    /* KUVAVISAT 2.0 (2026-09-17): kokoelmasivun visavariaatiot tulevat tänne
+       parametreina — ?taso=helppo|keski|vaikea rajaa vaikeustasolla, ?maanosa=
+       rajaa lipun maanosalla. Tuntematon arvo ohitetaan (ei 404), jolloin
+       pelaaja saa koko kortiston eikä rikkinäistä linkkiä. Haastelinkki (?ids)
+       voittaa aina: siinä kortit on jo lukittu. */
+    /* K3 (17.9.2026): ?h=<koodi> tulee /h/<koodi>-reitiltä. Haastajan tulos
+       näytetään aloitusnäkymässä ja tulosvertailussa. Tuntematon tai vanhentunut
+       koodi ohitetaan hiljaa — peli toimii silti, se on vain tavallinen kierros. */
+    const hParam = typeof params.h === "string" ? params.h : null;
+    const haaste = hParam ? await haeHaaste(hParam) : null;
+
+    const tasoParam = typeof params.taso === "string" ? params.taso : null;
+    /* Viikkovisan haasteessa taso on viikkoavain ("2026-38"), ei vaikeustaso. */
+    const taso =
+      kuvavisa === "viikko" ? (viikkoAvaimesta(tasoParam) ? tasoParam : null)
+      : TASOT.some((t) => t.key === tasoParam) ? tasoParam : null;
+    const maanosaParam = typeof params.maanosa === "string" ? params.maanosa : null;
+    const maanosa = MAANOSAT.find((m) => m.key === maanosaParam) ?? null;
+
+    /* K2 (UX-korjaus 17.9.2026, päätös 3): jokainen peli arpoo 10 kuvaa kortistosta.
+       Aiemmin haku otti 12 ensimmäistä sort_order-järjestyksessä, joten Liput antoi
+       aina saman sarjan samassa järjestyksessä (Australia, Albania, Alankomaat…) niin
+       sivun latauksella kuin "Pelaa uudelleen" -napilla. Nyt koko (mahdollisesti
+       suodatettu) kortisto haetaan ja siitä arvotaan palvelimella 10 + 2 varakorttia.
+       Arvonta on palvelimella tarkoituksella: propseina tuleva valmis järjestys ei voi
+       tuottaa hydraatioeroa, toisin kuin renderissä tehty Math.random. Haastelinkki
+       (?ids=) ohittaa arvonnan kokonaan — siinä sarja on lukittu. */
+    /* "viikko" ei ole kortisto: ilman id-listaa ei ole mitään pelattavaa. */
+    if (kuvavisa === "viikko" && wantedIds.length === 0) notFound();
+    const allRows =
+      wantedIds.length > 0
+        ? await getKuvavisatByIds(wantedIds)
+        : await getKuvavisat(kuvavisa, 500, { taso, tagit: maanosa ? [...maanosa.tagit] : null });
+    const arvottu = wantedIds.length > 0 ? allRows : sekoita(allRows);
+    const rows = wantedIds.length > 0 ? arvottu : arvottu.slice(0, 10);
+    const spareRows = wantedIds.length > 0 ? [] : arvottu.slice(10, 12);
     if (rows.length === 0) notFound();
 
     /* Ristiinnostot: muut aktiiviset kortistot */
@@ -359,26 +474,59 @@ export default async function Peli20({
         href: `/peli?kuvavisa=${type}`,
       }));
 
+    /* Vaihtoehtojen järjestys sekoitetaan per kysymys: aiemmin oikea vastaus oli
+       joka pelissä samalla paikalla, koska options tuli kannasta vakiojärjestyksessä. */
     const toQ = (r: (typeof rows)[number]) => ({
       question: r.question,
-      options: (r.options ?? []).slice(0, 4),
+      options: sekoita((r.options ?? []).slice(0, 4)),
       correct: r.correct_option,
       fact: r.fact ?? null,
       image: r.image_url,
+      /* K6: lähdemerkintä kuvalevyn alle, kannasta. 94 riviä on ilman → rivi
+         jää niillä pois kokonaan. Kovakoodattua "Wikimedia Commons" ei tule. */
+      credit: r.source_credit ?? null,
+      /* Levyn sävy kysymyskohtaisesti: haastelinkki voi kantaa sekakortistoisen
+         sarjan (viikkovisan haaste), jolloin visan tason arvo olisi väärä
+         osalle kuvista. Yhden kortiston visassa tulos on sama kuin ennen. */
+      plate: levynSavy(r.type),
     });
+    /* K6: vaalea kuvalevy grafiikalle (liput, vaakunat, maalaukset), tumma
+       valokuville — sama laatikko ja sama object-fit: contain molemmissa.
+       Tyyppi luetaan riviltä eikä URL-slugista, koska slug ja kannan `type`
+       eroavat osassa kortistoja (esim. /peli?kuvavisa=vaakuna → "vaakunat"). */
+    const levy = KATEGORIAT.find((k) => k.type === rows[0]?.type)?.sovitus === "contain" ? "vaalea" : "tumma";
+    const variaatio = variaationNimi(kuvavisa, taso, maanosa?.key ?? null);
     const game: GameQuiz = {
       id: "", // ei quizzes-riviä → pelikertaa ei tallenneta
-      title: deck.title,
+      /* T4: "Afrikan liput" / "Vaikeat liput" — sama nimi kuin kokoelmasivun linkissä. */
+      title: variaatio ?? deck.title,
       teaser: deck.teaser,
       collectionLabel: "Kuvavisat",
       genreLabel: null,
       hubHref: "/kokoelma/kuvavisat",
-      bgImg: "/20/teema-liput.webp",
+      /* K1: ei taustakuvaa kuvavisoissa — tasainen brändipohja, ks. GameClient. */
+      bgImg: "",
       /* Kuvavisat = designin sininen (kuvavisa-README) */
       accent: "#3B82F6",
       isSankari: false,
       kind: "kuva",
+      plate: levy,
       challengePath: `/peli?kuvavisa=${encodeURIComponent(kuvavisa)}&ids=${rows.map((r) => r.id).join(",")}`,
+      /* Haastelinkillä sarja on lukittu → ei uudelleenlatausta "Pelaa uudelleen" -napista. */
+      reloadOnRestart: wantedIds.length === 0,
+      autoStart: params.aloita === "1",
+      /* K3: kuvasarja selaimeen, jotta tulosnäkymä voi luoda lyhyen
+         haastetunnuksen (RPC) ilman että id:t ovat osoiteriville asti. */
+      kuvaIdt: rows.map((r) => r.id),
+      kuvavisaSlug: kuvavisa,
+      taso: taso ?? null,
+      maanosa: maanosa?.key ?? null,
+      haaste: haaste
+        ? { oikein: haaste.oikein, kysymyksia: haaste.kysymyksia, pisteet: haaste.pisteet }
+        : undefined,
+      /* Viikkovisan haaste: jakoteksti "Viikkovisa 38 · Kuvat 12/15" kuten
+         alkuperäisessä viikkovisassa. */
+      jakoNimi: kuvavisa === "viikko" && variaatio ? variaatio : undefined,
       spare: spareRows.map(toQ),
       questions: rows.map(toQ),
       related,
@@ -557,13 +705,16 @@ export default async function Peli20({
   return (
     <>
       <GameClient quiz={game} />
-      {/* TIETOMEDIA kerros 4: SEO-kopio aiheoppaasta renderöidään
-          PALVELIMELTA — Google ei pelaa visaa, joten opas on HTML:ssä
-          alusta asti. Aloitusnäkymässä opas on myös kävijälle näkyvissä;
-          se piilotetaan vain pelin ajaksi ja loppunäkymässä, jossa sama
-          sisältö näkyy kohdassa 5. (SEO_STRATEGIA.md §13.2)
-          (Indeksointi aukeaa 2.0-julkaisussa slug-URLeilla; / on noindex.) */}
-      {learn && <LearnArticle learn={learn} fallbackTitle={quiz.title} accent={accent} ssr />}
+      {/* AIHEOPAS POISTETTU ALOITUSNÄKYMÄSTÄ (Heikki 2026-09-16).
+          Aiempi ssr-LearnArticle näytti koko aiheoppaan (Pikafaktat + UKK)
+          visan aloitussivulla ja SSR-HTML:ssä. Se vuoti Suomen marjat -visassa
+          kaikki 10/10 vastausta ja teki sivusta "SEO-kalastelijan" oloisen.
+          Poistettu tietoisesti — SEO-hyöty menetetään ja ansaitaan takaisin
+          muulla, laadukkaammalla tavalla. ÄLÄ palauta tätä renderöimään learnia
+          aloitussivulle. (learn-data säilyy kannassa ja käytetään yhä metassa,
+          rivi ~455.) Loppunäkymän oppimissisältö on GameClientin oma (päätös 4a).
+          Murupolku + ristiinnostot (alla) jäävät: laillista sisäistä linkitystä,
+          ei vastausvuotoa. */}
 
       {/* Crawlattavat sisäiset linkit: murupolku + ristiinnostot. Ennen näitä
           sivulla oli vain kaksi sisäistä linkkiä mutta neljä ulkoista
