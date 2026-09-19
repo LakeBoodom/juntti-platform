@@ -1,212 +1,114 @@
 "use client";
 
 import Link from "next/link";
-import { useState, useTransition } from "react";
-import { Calendar, Plus, Sparkles, X } from "lucide-react";
+import { useTransition } from "react";
+import { AlertTriangle, Bot, Cake, Flower2, Pencil, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { TableCell, TableRow } from "@/components/ui/table";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from "@/components/ui/dialog";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { setQuizForDate, clearQuizForDate } from "./actions";
+import { paivaTeksti, type Paiva } from "@/lib/paivan-visa-yhteiset";
+import { poistaPaiva } from "./actions";
 
-type QuizOption = { id: string; title: string; category: string; status: string };
+/** Tilamerkit: automaattivalinta, intro (A/C) tai ei introa, varoitukset. */
+export function Merkit({ paiva }: { paiva: Paiva }) {
+  const s = paiva.saanto;
+  return (
+    <div className="flex flex-wrap items-center gap-1.5 text-[11px]">
+      {s?.auto_filled && (
+        <span className="inline-flex items-center gap-1 rounded bg-slate-100 px-1.5 py-0.5 text-slate-700">
+          <Bot className="h-3 w-3" /> Automaattivalinta — ei toimitettu
+        </span>
+      )}
+      {s && (s.intro_text ? (
+        <span className="rounded bg-lime-100 px-1.5 py-0.5 text-lime-800">
+          Intro {s.intro_headline ? "A" : "C"}
+        </span>
+      ) : (
+        <span className="rounded border px-1.5 py-0.5 text-muted-foreground">Ei introa</span>
+      ))}
+      {paiva.varoitukset.length > 0 && (
+        <span className="inline-flex items-center gap-1 rounded bg-amber-100 px-1.5 py-0.5 text-amber-800">
+          <AlertTriangle className="h-3 w-3" /> {paiva.varoitukset.length}
+        </span>
+      )}
+    </div>
+  );
+}
 
-const WEEKDAYS = ["su", "ma", "ti", "ke", "to", "pe", "la"];
-
-export function DayRow({
-  date,
-  isoDate,
-  siteId,
-  currentQuiz,
-  quizOptions,
-  birthdays = [],
-}: {
-  date: Date;
-  isoDate: string;
-  siteId: string;
-  currentQuiz: { id: string; title: string; category: string } | null;
-  quizOptions: QuizOption[];
-  /** Synttärivihjeet: keillä julkkiksilla on tänä päivänä synttärit (+ oma visa jos on). */
-  birthdays?: Array<{ name: string; quizId: string | null }>;
-}) {
-  const [setOpen, setSetOpen] = useState(false);
-  const [selectedQuizId, setSelectedQuizId] = useState<string>(currentQuiz?.id ?? "");
-  const [error, setError] = useState<string | null>(null);
+export function DayRow({ paiva, siteId, tanaan }: { paiva: Paiva; siteId: string; tanaan: string }) {
   const [pending, startTransition] = useTransition();
+  const { lyhyt, vp } = paivaTeksti(paiva.iso);
+  const isToday = paiva.iso === tanaan;
 
-  function save() {
-    setError(null);
-    if (!selectedQuizId) {
-      setError("Valitse visa");
-      return;
-    }
+  function poista() {
+    if (!confirm(`Poistetaanko ${lyhyt} valinta? Automaatti valitsee päivälle uuden visan.`)) return;
     startTransition(async () => {
-      const res = await setQuizForDate(siteId, isoDate, selectedQuizId);
-      if (!res.ok) setError(res.error);
-      else setSetOpen(false);
+      await poistaPaiva(siteId, paiva.iso);
     });
   }
-
-  function doClear() {
-    startTransition(async () => {
-      await clearQuizForDate(siteId, isoDate);
-    });
-  }
-
-  /** Aseta synttärisankarin visa suoraan päivän visaksi. */
-  function applyBirthdayQuiz(quizId: string) {
-    setError(null);
-    startTransition(async () => {
-      const res = await setQuizForDate(siteId, isoDate, quizId);
-      if (!res.ok) setError(res.error);
-    });
-  }
-
-  const isToday = isoDate === new Date().toISOString().slice(0, 10);
-  const dayLabel = `${date.getDate()}.${date.getMonth() + 1}.`;
-  const weekday = WEEKDAYS[date.getDay()];
 
   return (
     <TableRow className={isToday ? "bg-amber-50/30 dark:bg-amber-950/20" : ""}>
-      <TableCell className="font-medium">
-        <div>{dayLabel}</div>
+      <TableCell className="align-top font-medium">
+        <div>{lyhyt}</div>
         <div className="text-xs text-muted-foreground">
-          {weekday}
+          {vp}
           {isToday && <span className="ml-1 text-amber-600">tänään</span>}
         </div>
       </TableCell>
-      <TableCell>
-        {currentQuiz ? (
-          <Link
-            href={`/quizzes/${currentQuiz.id}`}
-            className="font-medium hover:underline"
-          >
-            {currentQuiz.title}
+      <TableCell className="align-top">
+        {paiva.visa ? (
+          <Link href={`/paivan-visa/${paiva.iso}`} className="font-medium hover:underline">
+            {paiva.visa.title}
           </Link>
         ) : (
-          <span className="text-sm text-muted-foreground italic">— tyhjä —</span>
+          <span className="text-sm italic text-muted-foreground">— automaatti valitsee —</span>
         )}
-        {birthdays.length > 0 && (
-          <div className="mt-1 space-y-0.5">
-            {birthdays.map((b) => (
-              <div key={b.name} className="flex items-center gap-2 text-xs text-muted-foreground">
-                <span>
-                  🎂 {b.name}
-                  {!b.quizId && <span className="italic"> — ei visaa</span>}
-                </span>
-                {b.quizId && currentQuiz?.id !== b.quizId && (
-                  <button
-                    className="rounded border px-1.5 py-0.5 text-[11px] hover:bg-muted disabled:opacity-50"
-                    disabled={pending}
-                    onClick={() => applyBirthdayQuiz(b.quizId!)}
-                  >
-                    Käytä
-                  </button>
-                )}
-                {b.quizId && currentQuiz?.id === b.quizId && (
-                  <span className="text-[11px] text-green-600">✓ valittu</span>
-                )}
-              </div>
+        {paiva.saanto?.intro_headline && (
+          <div className="mt-0.5 text-xs text-muted-foreground">“{paiva.saanto.intro_headline}”</div>
+        )}
+        <div className="mt-1">
+          <Merkit paiva={paiva} />
+        </div>
+        {paiva.varoitukset.length > 0 && (
+          <ul className="mt-1 space-y-0.5">
+            {paiva.varoitukset.map((v, i) => (
+              <li key={i} className="flex gap-1 text-xs text-amber-800">
+                <AlertTriangle className="mt-0.5 h-3 w-3 shrink-0" /> {v.teksti}
+              </li>
             ))}
-            {error && <p className="text-xs text-destructive">{error}</p>}
-          </div>
+          </ul>
         )}
       </TableCell>
-      <TableCell className="text-sm text-muted-foreground">
-        {currentQuiz?.category ?? ""}
+      <TableCell className="align-top text-sm text-muted-foreground">{paiva.visa?.kokoelma ?? ""}</TableCell>
+      <TableCell className="align-top text-sm">
+        {paiva.sankari ? (
+          <span className="inline-flex items-center gap-1">
+            {paiva.sankari.death_date ? (
+              <Flower2 className="h-3.5 w-3.5 text-sky-700" aria-label="Muistopäivä" />
+            ) : (
+              <Cake className="h-3.5 w-3.5 text-lime-700" aria-label="Synttärit" />
+            )}
+            {paiva.sankari.name}
+            <span className="text-xs text-muted-foreground">{paiva.sankari.ika} v</span>
+          </span>
+        ) : (
+          <span className="text-xs text-muted-foreground">ei sankaria</span>
+        )}
       </TableCell>
-      <TableCell className="text-right">
+      <TableCell className="align-top text-right">
         <div className="inline-flex gap-1">
-          <Button
-            variant={currentQuiz ? "outline" : "default"}
-            size="sm"
-            onClick={() => setSetOpen(true)}
-          >
-            <Calendar className="h-3.5 w-3.5" />
-            {currentQuiz ? "Vaihda" : "Aseta visa"}
-          </Button>
-          <Link href={`/quizzes/new?scheduled_for=${isoDate}`}>
-            <Button variant="ghost" size="sm">
-              <Sparkles className="h-3.5 w-3.5" />
-              Luo AI:lla
+          <Link href={`/paivan-visa/${paiva.iso}`}>
+            <Button variant={paiva.saanto && !paiva.saanto.auto_filled ? "outline" : "default"} size="sm">
+              <Pencil className="h-3.5 w-3.5" />
+              {paiva.saanto && !paiva.saanto.auto_filled ? "Muokkaa" : "Toimita"}
             </Button>
           </Link>
-          {currentQuiz && (
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={doClear}
-              disabled={pending}
-              aria-label="Poista visa tältä päivältä"
-            >
+          {paiva.saanto && (
+            <Button variant="ghost" size="icon" onClick={poista} disabled={pending} aria-label="Poista päivän valinta">
               <X className="h-3.5 w-3.5" />
             </Button>
           )}
         </div>
-
-        <Dialog open={setOpen} onOpenChange={setSetOpen}>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Aseta visa: {dayLabel}</DialogTitle>
-              <DialogDescription>
-                Valitse olemassa oleva visa joka näytetään tällä päivällä.
-              </DialogDescription>
-            </DialogHeader>
-
-            <div className="space-y-3 py-2">
-              <Select value={selectedQuizId} onValueChange={setSelectedQuizId}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Valitse visa..." />
-                </SelectTrigger>
-                <SelectContent>
-                  {quizOptions.length === 0 ? (
-                    <SelectItem value="__empty" disabled>
-                      Ei visoja tällä sitellä
-                    </SelectItem>
-                  ) : (
-                    quizOptions.map((q) => (
-                      <SelectItem key={q.id} value={q.id}>
-                        [{q.status === "published" ? "✓" : "·"}] {q.title}{" "}
-                        {q.category && (
-                          <span className="text-muted-foreground">— {q.category}</span>
-                        )}
-                      </SelectItem>
-                    ))
-                  )}
-                </SelectContent>
-              </Select>
-              <p className="text-xs text-muted-foreground">
-                ✓ = julkaistu · · = draft. Voit valita myös draftin — julkaisu tehdään
-                erikseen visan muokkaussivulla.
-              </p>
-              {error && (
-                <p className="text-sm text-destructive">{error}</p>
-              )}
-            </div>
-
-            <DialogFooter>
-              <Button variant="outline" onClick={() => setSetOpen(false)}>
-                Peruuta
-              </Button>
-              <Button onClick={save} disabled={pending || !selectedQuizId}>
-                {pending ? "Tallennetaan…" : "Tallenna"}
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
       </TableCell>
     </TableRow>
   );

@@ -3,6 +3,10 @@
 // palvelinkomponentti voi kutsua paivanVisaTila()-funktiota.
 
 export type PaivanVisaData = {
+  /** Mittaus (luku 9) */
+  quizId: string;
+  /** Kokoelman avain mittaukseen: "tv", "urheilu" … */
+  kategoria: string | null;
   /** Visan kokoelma ja sen sivu: "TV-sarjat" → /kokoelma/tv */
   badge: { label: string; href: string };
   title: string;

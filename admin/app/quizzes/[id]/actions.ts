@@ -133,3 +133,38 @@ export async function reorderQuestion(
   revalidatePath(`/quizzes/${quizId}`);
   return { ok: true as const };
 }
+
+/**
+ * Visan oma kuva (quizzes.hero_image) — ainoa totuus pelisivun herolle ja
+ * etusivun Päivän visalle (Päivän visa -toteutus 19.9.2026, luku 2.1).
+ * Polku on joko sivuston oma ("/20/kokoelma/tiedosto.webp") tai https-osoite.
+ * Focal 0–1 (tyhjä = oletus 0.5 / 0.4).
+ */
+export async function updateQuizHero(
+  id: string,
+  input: { hero_image: string; hero_alt: string; hero_focal_x: string; hero_focal_y: string },
+) {
+  const kuva = input.hero_image.trim() || null;
+  if (kuva && !/^(\/[\w\-./]+\.(webp|jpe?g|png|avif)|https:\/\/\S+)$/i.test(kuva)) {
+    return { ok: false as const, error: "Kuvan polun pitää olla esim. /20/tv/visa.webp tai https://-osoite." };
+  }
+  const focal = (s: string) => {
+    const t = s.trim().replace(",", ".");
+    if (!t) return null;
+    const n = Number(t);
+    return Number.isFinite(n) && n >= 0 && n <= 1 ? n : NaN;
+  };
+  const fx = focal(input.hero_focal_x);
+  const fy = focal(input.hero_focal_y);
+  if (Number.isNaN(fx) || Number.isNaN(fy)) {
+    return { ok: false as const, error: "Rajauspisteen pitää olla luku väliltä 0–1 (esim. 0.5)." };
+  }
+  const sb = getSupabaseAdmin();
+  const { error } = await sb
+    .from("quizzes")
+    .update({ hero_image: kuva, hero_alt: input.hero_alt.trim() || null, hero_focal_x: fx, hero_focal_y: fy } as never)
+    .eq("id", id);
+  if (error) return { ok: false as const, error: error.message };
+  revalidatePath(`/quizzes/${id}`);
+  return { ok: true as const };
+}

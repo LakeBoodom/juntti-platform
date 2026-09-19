@@ -13,6 +13,7 @@
 import { useState } from "react";
 import type { PaivanSankariData } from "@/lib/paivanSankari";
 import { pisinSana } from "@/components/tn20/PaivanVisaCard";
+import { kirjaaNosto, useNayttoMittaus } from "@/lib/nostoMittaus";
 
 function nimikirjaimet(nimi: string) {
   return nimi
@@ -26,6 +27,9 @@ function nimikirjaimet(nimi: string) {
 
 export default function PaivanSankari({ data }: { data: PaivanSankariData }) {
   const [kuvaOk, setKuvaOk] = useState(Boolean(data.kuva));
+  /* Mittaus (luku 9): kategoriana sankarin tapaus (vakio / pyorea / muisto). */
+  const mitta = { slotti: "paivan_sankari" as const, quizId: data.quizId, kategoria: data.tapaus };
+  const nayttoRef = useNayttoMittaus<HTMLAnchorElement>(() => kirjaaNosto({ ...mitta, tapahtuma: "naytto" }));
   return (
     <section
       className="tn-es-sank"
@@ -37,7 +41,7 @@ export default function PaivanSankari({ data }: { data: PaivanSankariData }) {
         <h2 className="tn-es-sank-h" id="paivan-sankari-h">Päivän sankari</h2>
         <i aria-hidden />
       </div>
-      <a className="tn-es-sank-row" href={data.playHref}>
+      <a ref={nayttoRef} className="tn-es-sank-row" href={data.playHref} onClick={() => kirjaaNosto({ ...mitta, tapahtuma: "klikkaus" })}>
         <span className="tn-es-sank-img" aria-hidden>
           {kuvaOk && data.kuva ? (
             // eslint-disable-next-line @next/next/no-img-element

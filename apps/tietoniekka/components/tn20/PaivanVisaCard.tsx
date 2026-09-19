@@ -23,6 +23,7 @@
 import { useEffect, useState } from "react";
 import { helsinginPaiva } from "@/lib/aika";
 import { paivanVisaTila, type PaivanVisaData } from "@/lib/paivanVisa";
+import { kirjaaNosto, useNayttoMittaus } from "@/lib/nostoMittaus";
 
 export const PAIVAN_VISA_KEY = "tn_paivan_visa_pelattu";
 
@@ -46,10 +47,16 @@ export function pisinSana(t: string): number {
   return Math.max(1, ...t.split(/\s+/).map((w) => Array.from(w).length));
 }
 
-export default function PaivanVisaCard({ data }: { data: PaivanVisaData }) {
+export default function PaivanVisaCard({ data, esikatselu = false }: { data: PaivanVisaData; esikatselu?: boolean }) {
   const [played, setPlayed] = useState(false);
-  useEffect(() => setPlayed(isPlayedToday()), []);
+  /* Adminin esikatselussa ei lueta pelattu-tilaa (kortti aina pelaamaton). */
+  useEffect(() => { if (!esikatselu) setPlayed(isPlayedToday()); }, [esikatselu]);
   const tila = paivanVisaTila(data);
+  /* Mittaus (luku 9): näyttö + klikkaus, tieto introtilasta ja kokoelmasta.
+     Ei adminin esikatselussa. */
+  const mitta = { slotti: "paivan_visa" as const, quizId: data.quizId, intro: tila, kategoria: data.kategoria };
+  const nayttoRef = useNayttoMittaus<HTMLDivElement>(() => kirjaaNosto({ ...mitta, tapahtuma: "naytto" }), esikatselu);
+  const klikkaus = () => { if (!esikatselu) kirjaaNosto({ ...mitta, tapahtuma: "klikkaus" }); };
   const headline = tila === "A" ? data.intro!.headline : null;
   const text = tila === "B" ? null : data.intro!.text;
 
@@ -66,7 +73,7 @@ export default function PaivanVisaCard({ data }: { data: PaivanVisaData }) {
 
   return (
     <div className="tn-es-pv-wrap">
-      <div className="tn-es-pv" data-tila={tila} data-played={played ? "" : undefined}>
+      <div ref={nayttoRef} className="tn-es-pv" data-tila={tila} data-played={played ? "" : undefined}>
         {tila !== "B" && laatta(true)}
         <div className="tn-es-pv-media" data-kuva={data.imageUrl ? "1" : "0"}>
           {data.imageUrl && (
@@ -94,7 +101,7 @@ export default function PaivanVisaCard({ data }: { data: PaivanVisaData }) {
             {played ? (
               <a className="tn-es-pv-btn" href={data.playedHref}>Lisää visoja <span aria-hidden>→</span></a>
             ) : (
-              <a className="tn-es-pv-btn" href={data.playHref}>Pelaa päivän visa <span aria-hidden>→</span></a>
+              <a className="tn-es-pv-btn" href={data.playHref} onClick={klikkaus}>Pelaa päivän visa <span aria-hidden>→</span></a>
             )}
           </div>
         </div>
