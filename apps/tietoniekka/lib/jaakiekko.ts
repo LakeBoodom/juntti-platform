@@ -46,7 +46,7 @@ export const JK_COPY = {
   derbyTitle: "Derbyvisat",
   generalKicker: "Jatkoerä",
   generalTitle: "Liigan kohokohdat",
-  generalIntro: "Seurarajat ylittävät klassikot: maalivahdit, pistemiehet, penkin takana kiehuvat valmentajat.",
+  generalIntro: "Seurarajat ylittävät klassikot: maalivahdit, maalitykit, kovanaamat, tuomarit ja penkin takana kiehuvat valmentajat.",
   lionsTitle: "Leijonien kultavisat",
   lionsIntro: "Kaikki Leijonien kultamitalit: viisi MM-kultaa, olympiavoitto ja kolme nuorten maailmanmestaruutta.",
   nhlTitle: "Suomen NHL historia",
@@ -165,6 +165,11 @@ export const JK_GENERAL: JkCard[] = [
   { quizSlug: "sm-liiga-valmentajadraamat-tulisielut", tag: "Penkin takana", title: "Aidot tulisielut", img: IMG("jk-liiga-valmentajat"), accent: "#E2231A" },
   { quizSlug: "sm-liiga-ulkomaalaisvahvistukset", tag: "Tuontitavara", title: "Liigan ulkomaalaislegendat", img: IMG("jk-liiga-ulkomaalaiset"), accent: "#F26B21" },
   { quizSlug: "sm-liigan-legendaariset-pomot-visa", tag: "Seurapatruunat", title: "Sikarit, faksit ja seurapatruunat", img: IMG("jk-liiga-pomot"), accent: "#B6FF3C" },
+  // 19.9.2026: kolme 22.8. julkaistua visaa puuttui sivulta (ei korttia eikä
+  // kuvaa, pelattavissa vain suoralla linkillä). Kuvat Heikiltä 19.9.
+  { quizSlug: "sm-liiga-ikonisimmat-maalitykit", tag: "Maalintekijät", title: "Liigan maalitykit", img: IMG("jk-liiga-maalitykit"), accent: "#35D6A0" },
+  { quizSlug: "sm-liiga-jaahykuninkaat-kovanaamat", tag: "Jäähyaitio", title: "Liigan kovanaamat", img: IMG("jk-liiga-kovanaamat"), accent: "#F5F0E6" },
+  { quizSlug: "sm-liiga-tuomarilegendat", tag: "Erotuomarit", title: "Pillin legendat", img: IMG("jk-liiga-tuomarit"), accent: "#8FE4FB" },
 ];
 
 export const JK_LIONS: JkCard[] = [

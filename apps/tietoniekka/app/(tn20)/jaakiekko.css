@@ -312,7 +312,18 @@
    suoraan .tnj-grid[data-variant="general"]:lle, mikä ei koskaan lauennut —
    auto-fill jäi pysyvästi voimaan. */
 .tn20 .tnj-general-wrap { container: tnj-general / inline-size; }
-@container tnj-general (min-width: 620px) {
+/* 19.9.2026 (6 → 9 korttia): 3 saraketta vasta 780 px:stä. 620 px:n
+   kynnyksellä kortti jäi ~205–228 px:ksi ja "ULKOMAALAISLEGENDAT" ylitti
+   kortin 6–10 px (Range-mittaus 700/768 px). Sama sana vaatii ≥ ~236 px:n
+   kortin, joten 2 saraketta vasta 500 px:stä (auto-fill antoi 2 × 224 px
+   jo ~470 px:ssä, +21 px ylivuoto) ja sitä kapeammalla yksi sarake. */
+.tn20 .tnj-grid[data-variant="general"] { grid-template-columns: minmax(0, 1fr); }
+@container tnj-general (min-width: 500px) {
+  .tn20 .tnj-grid[data-variant="general"] {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@container tnj-general (min-width: 780px) {
   .tn20 .tnj-grid[data-variant="general"] {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
@@ -350,14 +361,32 @@
   text-transform: uppercase; white-space: nowrap; max-width: calc(100% - 20px);
   overflow: hidden; text-overflow: ellipsis;
 }
+/* OTSIKON SOVITUS KORTIN LEVEYTEEN (19.9.2026). Sivun cqw-pohjainen koko
+   ei tiedä kortin leveyttä: Leijonissa (5 × 223 px) "KOTIKAUKALOSSA" ylitti
+   24 px:n koolla tekstialueen 53 px ja NHL:ssä (4 × 281 px, 28 px)
+   "TILASTOTARINAT" 15 px (Range-mittaus 1280–2450 px). Nyt otsikko on
+   min(sivun koko, tekstialue / (ruudukon pisin sana × 0.76)); --tnj-lw
+   (pisimmän sanan merkkimäärä) tulee CardGridistä. 0.76 = mitattu leveimmän
+   sanan leveys/merkki/fonttikoko 0.733 + ~4 % marginaali.
+   Tekstialue on container, joten sen SISÄLLÄ cqw viittaisi siihen eikä
+   sivuun — siksi sivun mukaan lasketut koot (--tnj-tfs, --tnj-dfs) ovat
+   rekisteröityjä <length>-muuttujia, jotka lasketaan tekstialueella itsellään
+   (elementti ei koskaan kysy omaa containeriaan). */
+@property --tnj-tfs { syntax: "<length>"; inherits: true; initial-value: 20px; }
+@property --tnj-dfs { syntax: "<length>"; inherits: true; initial-value: 12px; }
 .tn20 .tnj-card-text {
   position: absolute; z-index: 1;
   left: clamp(10px,1.2cqw,15px); right: clamp(10px,1.2cqw,15px); bottom: clamp(10px,1.2cqw,15px);
+  container-type: inline-size;
+  --tnj-tfs: clamp(16px,1.85cqw,24px);
+  --tnj-dfs: clamp(10.5px,1.08cqw,13.5px);
 }
+.tn20 .tnj-grid[data-size="l"] .tnj-card-text { --tnj-tfs: clamp(19px,2.1cqw,28px); }
 .tn20 .tnj-card[data-bar] .tnj-card-text { bottom: calc(clamp(10px,1.2cqw,15px) + 5px); }
 .tn20 .tnj-card-title {
   margin: 0; font-family: var(--tn-font-display); font-weight: 900;
-  font-variation-settings: "wdth" 74; font-size: clamp(16px,1.85cqw,24px);
+  font-variation-settings: "wdth" 74;
+  font-size: min(var(--tnj-tfs), 100cqi / (var(--tnj-lw, 1) * .76));
   line-height: .98; letter-spacing: -.01em; text-transform: uppercase; color: #F5F0E6;
   text-wrap: balance;
   /* overflow-wrap: break-word — pitkät yhdyssanat (esim. "ulkomaalaislegendat"
@@ -365,7 +394,7 @@
   overflow-wrap: break-word;
 }
 .tn20 .tnj-grid[data-size="l"] .tnj-card-title {
-  font-variation-settings: "wdth" 72; font-size: clamp(19px,2.1cqw,28px); line-height: .94;
+  font-variation-settings: "wdth" 72; line-height: .94;
   /* l-koon korteissa jokainen sana mahtuu jo kokonaisena kortin leveyteen
      (mitattu) — mutta overflow-wrap: break-word (peritty yllä) sallii
      spekin mukaan katkaisun KESKELTÄ SANAA aina kun se auttaisi tasapainoa,
@@ -392,7 +421,7 @@
   word-break: keep-all;
 }
 .tn20 .tnj-card-desc {
-  margin: 6px 0 0; color: #CFC7B6; font-size: clamp(10.5px,1.08cqw,13.5px);
+  margin: 6px 0 0; color: #CFC7B6; font-size: var(--tnj-dfs);
   line-height: 1.42; font-weight: 500; text-wrap: pretty;
   display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
 }

@@ -58,6 +58,13 @@ function orderCards(cards: Array<JkCard & { playHref: string | null }>) {
   return [...cards.filter((c) => c.playHref), ...cards.filter((c) => !c.playHref)];
 }
 
+/** Ruudukon pisimmän sanan merkkimäärä — otsikon koko sovitetaan sen mukaan
+    (jaakiekko.css, OTSIKON SOVITUS). Yhteinen koko koko ruudukolle, jotta
+    saman rivin otsikot ovat keskenään samankokoisia. */
+function longestWord(titles: string[]): number {
+  return Math.max(1, ...titles.flatMap((t) => t.split(/\s+/).map((w) => Array.from(w).length)));
+}
+
 function CardGrid({
   cards,
   size,
@@ -71,7 +78,12 @@ function CardGrid({
   variant?: "general";
 }) {
   return (
-    <div className="tnj-grid" data-size={size} data-variant={variant}>
+    <div
+      className="tnj-grid"
+      data-size={size}
+      data-variant={variant}
+      style={{ ["--tnj-lw" as string]: longestWord(cards.map((c) => c.title)) }}
+    >
       {cards.map((c) => {
         const inner = (
           <>

@@ -24,7 +24,7 @@ export const JP_HERO = {
 
 /** Osiovalinta heron alareunassa (CD: Lohko A/B/C). */
 export const JP_PARTS = [
-  { kicker: "Lohko A", title: "Valioliiga", meta: "19 seuravisaa + yleisvisat", href: "#valioliiga", color: "#B6FF3C" },
+  { kicker: "Lohko A", title: "Valioliiga", meta: "20 seuravisaa + yleisvisat", href: "#valioliiga", color: "#B6FF3C" },
   { kicker: "Lohko B", title: "Suurseurat", meta: "Espanja, Italia, Saksa, Ranska", href: "#suurseurat", color: "#B6FF3C" },
   { kicker: "Lohko C", title: "Mestarien liiga", meta: "Historia, finaalit, suomalaiset", href: "#mestarienliiga", color: "#E8A320" },
 ] as const;
@@ -34,7 +34,7 @@ export type JpClub = {
   founded: number; stadium: string; color: string; tier: string; hook: string;
 };
 
-/** Lohko A — Valioliiga ja Englannin futis (19 seuraa, CD:n CLUBS-taulukko).
+/** Lohko A — Valioliiga ja Englannin futis (20 seuraa: CD:n CLUBS-taulukko + Everton 19.9.2026).
     quizSlug-mäppäys Supabasesta 25.8.2026 (kaikki julkaistuja). */
 export const JP_CLUBS: JpClub[] = [
   { id: "arsenal", quizSlug: "arsenal-fc-legendat", name: "Arsenal", short: "Arsenal", city: "Lontoo", founded: 1886, stadium: "Emirates Stadium", color: "#EF0107", tier: "Valioliiga", hook: "Highburyn marmorikäytäviltä Emiratesille — ja se kausi 2003–04, jolloin yhtäkään liigapeliä ei hävitty." },
@@ -44,6 +44,7 @@ export const JP_CLUBS: JpClub[] = [
   { id: "chelsea", quizSlug: "chelsea-fc-sinisten-syvin-arkisto-vaikea-visa", name: "Chelsea", short: "Chelsea", city: "Lontoo", founded: 1905, stadium: "Stamford Bridge", color: "#2C64C8", tier: "Valioliiga", hook: "Stamford Bridge, Münchenin 2012 rangaistuspotkut ja Euroopan vilkkain valmentajakaruselli." },
   { id: "tottenham", quizSlug: "tottenham-hotspur-uskaltaa-on-tehda-visa", name: "Tottenham", short: "Spurs", city: "Lontoo", founded: 1882, stadium: "Tottenham Hotspur Stadium", color: "#C9D2DC", tier: "Valioliiga", hook: "To Dare Is To Do: vuoden 1961 tupla, Wembleyn välivuodet ja Amsterdamin ihme 2019." },
   { id: "newcastle", quizSlug: "newcastle-united-legendat", name: "Newcastle", short: "Newcastle", city: "Newcastle", founded: 1892, stadium: "St James’ Park", color: "#DDDDDD", tier: "Valioliiga", hook: "St James’ Park kaupungin keskellä, Toon Army ja Keeganin hyökkäysfutis 90-luvulla." },
+  { id: "everton", quizSlug: "everton-fc-nil-satis-nisi-optimum-visa", name: "Everton", short: "Everton", city: "Liverpool", founded: 1878, stadium: "Hill Dickinson Stadium", color: "#274BB5", tier: "Valioliiga", hook: "Toffees, Goodison Parkin 133 vuotta ja Merseysiden derby — eikä kukaan ole pelannut Englannin pääsarjassa useampaa kautta." },
   { id: "astonvilla", quizSlug: "aston-villa-legendat", name: "Aston Villa", short: "Villa", city: "Birmingham", founded: 1874, stadium: "Villa Park", color: "#95BFE5", tier: "Valioliiga", hook: "Villa Park ja Rotterdamin yö 1982 — kerran Birminghamista tuli Euroopan mestari." },
   { id: "brighton", quizSlug: "brighton-hove-albion-lokkien-lento-visa", name: "Brighton", short: "Brighton", city: "Brighton", founded: 1901, stadium: "Amex Stadium", color: "#0057B8", tier: "Valioliiga", hook: "Lokit nousivat konkurssin partaalta liigan tyylitietoisimmaksi joukkueeksi." },
   { id: "bournemouth", quizSlug: "afc-bournemouth-kirsikoiden-visa", name: "Bournemouth", short: "Cherries", city: "Bournemouth", founded: 1899, stadium: "Vitality Stadium", color: "#DA291C", tier: "Valioliiga", hook: "Yksi liigan pienimmistä stadioneista ja yksi sen hurjimmista nousutarinoista." },
@@ -115,10 +116,13 @@ export const JP_CL: JpCard[] = [
   { quizSlug: "mestarien-liiga-comebackit-yllatykset", tag: "Comebackit", title: "Comebackit ja yllätykset", desc: "Illat, joina kolmen maalin tappioasema ei riittänyt lopettamaan mitään.", img: jpImg("cl-comebackit"), pos: "center 40%", color: "#35D6A0" },
 ];
 
-/** Suomalaiset eurokentillä (3, teksti kokonaan kuvan päällä). */
+/** Suomalaiset eurokentillä (4, teksti kokonaan kuvan päällä). */
 export const JP_FINNS: JpCard[] = [
   { quizSlug: "mestarien-liiga-suomalaiset", tag: "Mestarien liiga", title: "Sinivalkoiset Euroopan huipulla", desc: "Suomalaiset Mestarien liigassa: Litmanen, Hyypiä ja muut tunnelin läpi kulkeneet.", img: jpImg("cl-suomalaiset2"), pos: "center 40%", color: "#4FD1F5" },
   { quizSlug: "suomalaiset-euroopassa-historia", tag: "Seurat", title: "Suomalaisseurat eurokentillä", desc: "Karsintakierrosten sankarit ja ne illat, jolloin Suomi voitti Euroopassa.", img: jpImg("cl-eurokentat"), pos: "center 40%", color: "#B6FF3C" },
+  // 19.9.2026: julkaistu 23.8. mutta puuttui sivulta. Kuva on CD-paketin
+  // alkuperäinen cl-suomalaiset (käyttämättä jäänyt, Heikin valinta).
+  { quizSlug: "suomalaiset-euroopassa-champions-league", tag: "Pelaajat", title: "Tunnelista tähtihymniin", desc: "Suomalaispelaajat Mestarien liigassa — Ajaxista ja Liverpoolista TsSKA:han.", img: jpImg("cl-suomalaiset"), pos: "center 40%", color: "#F5C518" },
   { quizSlug: "suomalaiset-euroopassa-hjk", tag: "HJK", title: "HJK:n eurotarina", desc: "Kesä 1998 ja tie Mestarien liigan lohkovaiheeseen — Suomen ainoa.", img: jpImg("cl-hjk"), pos: "center 35%", color: "#3C6FF5" },
 ];
 

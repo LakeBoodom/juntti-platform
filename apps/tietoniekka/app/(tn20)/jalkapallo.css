@@ -333,6 +333,17 @@
   display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%,270px),1fr));
   gap: clamp(10px,1.4cqw,20px);
 }
+/* Suomalaiset eurokentillä (19.9.2026: 3 → 4 korttia). Oma grid, koska
+   eurogridin auto-fit (min 270px) jakoi neljä korttia yhdelle riville ja
+   16/10-kortti jäi ~270 × 170 px:n kokoiseksi: 3-rivinen otsikko nousi tagin
+   päälle ja "Suomalaisseurat" leikkautui (KORTTISÄÄNTÖ). 2 × 2 vasta kun
+   kortti on ≥ ~380 px leveä, muuten yksi sarake. Container vanhemmalla,
+   sama periaate kuin .tnj-general-wrap. */
+.tn20 .tnjp-finn-wrap { container: tnjp-finn / inline-size; }
+.tn20 .tnjp-finngrid { display: grid; grid-template-columns: minmax(0, 1fr); gap: clamp(10px,1.4cqw,20px); }
+@container tnjp-finn (min-width: 780px) {
+  .tn20 .tnjp-finngrid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
 .tn20 .tnjp-ecard { display: block; text-decoration: none; transition: transform 160ms ease-out; }
 .tn20 a.tnjp-ecard:hover, .tn20 a.tnjp-ecard:focus-visible { transform: translateY(-4px); }
 .tn20 .tnjp-ecard:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }
