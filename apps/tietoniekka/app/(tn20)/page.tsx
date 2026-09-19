@@ -13,6 +13,7 @@
 import { getSupabase, SITE_SLUG } from "@/lib/supabase";
 import { resolveCollection } from "@/lib/visanKokoelma";
 import { KAUPUNGIT, kaupunkiImg } from "@/lib/kaupungit";
+import { helsinginPaiva, pvmOsat } from "@/lib/aika";
 import { kulttuuriImg } from "@/lib/kulttuuri";
 import { luontoImg } from "@/lib/luonto";
 import { urheiluImg } from "@/lib/urheilu";
@@ -121,14 +122,16 @@ async function getData() {
   const celebs = (celebsRes.data ?? []) as Celeb[];
 
   // Päivän sankari: tämän päivän synttärit, muuten seuraava tuleva
-  const today = new Date();
+  /* Suomen aika (19.9.2026): aiemmin new Date() palvelimella = UTC, jolloin
+     Päivän visa ja päivänsankari vaihtuivat klo 3 (kesäaika) / 2 (talviaika). */
+  const today = helsinginPaiva();
   const key = (m: number, d: number) => m * 100 + d;
-  const todayKey = key(today.getMonth() + 1, today.getDate());
+  const todayKey = key(today.kk, today.pv);
   const sorted = celebs
     .filter((c) => c.trivia_quiz_id)
     .map((c) => {
-      const b = new Date(c.birth_date);
-      const k = key(b.getMonth() + 1, b.getDate());
+      const b = pvmOsat(c.birth_date);
+      const k = key(b.kk, b.pv);
       return { c, dist: k >= todayKey ? k - todayKey : k + 1300 - todayKey };
     })
     .sort((a, b) => a.dist - b.dist);
@@ -137,7 +140,7 @@ async function getData() {
   // Päivän visa: manuaalinen valinta administa (schedule_rules). Fallback = sankari.
   type DayPick = { kind: "celeb"; celeb: Celeb; isToday: boolean } | { kind: "quiz"; card: Card } | null;
   let dayPick: DayPick = null;
-  const todayIso = new Date().toISOString().slice(0, 10);
+  const todayIso = today.iso;
   const { data: siteRow } = await sb.from("sites").select("id").eq("slug", SITE_SLUG).maybeSingle();
   if (siteRow) {
     const { data: rule } = await sb
@@ -153,8 +156,8 @@ async function getData() {
     if (pickedId) {
       const celeb = celebs.find((c) => c.trivia_quiz_id === pickedId);
       if (celeb) {
-        const b = new Date(celeb.birth_date);
-        dayPick = { kind: "celeb", celeb, isToday: key(b.getMonth() + 1, b.getDate()) === todayKey };
+        const b = pvmOsat(celeb.birth_date);
+        dayPick = { kind: "celeb", celeb, isToday: key(b.kk, b.pv) === todayKey };
       } else {
         const card = cards.find((c) => c.id === pickedId);
         if (card) dayPick = { kind: "quiz", card };
@@ -184,17 +187,17 @@ async function getData() {
 }
 
 function age(birth: string, onNextBirthday: boolean) {
-  const b = new Date(birth);
-  const t = new Date();
-  let a = t.getFullYear() - b.getFullYear();
-  const m = t.getMonth() - b.getMonth();
-  if (m < 0 || (m === 0 && t.getDate() < b.getDate())) a--;
+  const b = pvmOsat(birth);
+  const t = helsinginPaiva();
+  let a = t.vuosi - b.vuosi;
+  const m = t.kk - b.kk;
+  if (m < 0 || (m === 0 && t.pv < b.pv)) a--;
   return onNextBirthday ? a : a + 1;
 }
 
 const fiBirth = (iso: string) => {
-  const b = new Date(iso);
-  return `${b.getDate()}.${b.getMonth() + 1}.${b.getFullYear()}`;
+  const b = pvmOsat(iso);
+  return `${b.pv}.${b.kk}.${b.vuosi}`;
 };
 
 export default async function Etusivu20() {
@@ -239,8 +242,8 @@ export default async function Etusivu20() {
       category: dayCard?.category ?? null,
       genre: dayCard?.genre ?? null,
     });
-    const b = new Date(celeb.birth_date);
-    const juhlii = celebToday ? "Tänään juhlii" : `Juhlii ${b.getDate()}.${b.getMonth() + 1}.`;
+    const b = pvmOsat(celeb.birth_date);
+    const juhlii = celebToday ? "Tänään juhlii" : `Juhlii ${b.pv}.${b.kk}.`;
     const kuva = dayCard
       ? paivanVisanKuva(dayCard, dayImageUrl, celeb.image_url)
       : dayImageUrl || celeb.image_url ? { src: (dayImageUrl ?? celeb.image_url)!, pos: "50% 30%" } : null;
@@ -339,7 +342,7 @@ export default async function Etusivu20() {
         <section id="paivan-visa" aria-labelledby="paivan-visa-h">
           <div className="tn-es-head tn-es-head--row">
             <h2 className="tn-es-h2 tn-es-h2--nowrap" id="paivan-visa-h">Päivän visa</h2>
-            <span className="tn-es-date">Tänään {today.getDate()}.{today.getMonth() + 1}.</span>
+            <span className="tn-es-date">Tänään {today.pv}.{today.kk}.</span>
           </div>
           {daily ? <PaivanVisaCard data={daily} /> : <div className="tn-es-day tn-es-day--empty">Päivän visa palaa huomenna.</div>}
         </section>

@@ -2,6 +2,7 @@
 // V1.0: ei kakkuksen, kaikki request-time. Voidaan lisätä Next-cache myöhemmin.
 
 import { getSupabase, SITE_SLUG } from "./supabase";
+import { helsinginPaiva } from "./aika";
 /* 1.0:n app/peli/questions.ts poistui julkaisussa 31.8.2026 — tyyppi siirretty tähän. */
 type RelatedQuiz = { id: string; title: string; slug: string | null };
 
@@ -322,7 +323,8 @@ export async function getSankariQuizPreview(quizId: string): Promise<CategoryPre
 export async function getTodaysQuiz(): Promise<CategoryPreview | null> {
   const siteId = await getSiteId();
   if (!siteId) return null;
-  const today = new Date().toISOString().slice(0, 10);
+  /* Suomen päivä, ei UTC (19.9.2026, ks. lib/aika.ts). */
+  const today = helsinginPaiva().iso;
   const sb = getSupabase();
   if (!sb) return null;
 
