@@ -2,9 +2,10 @@
 // 28.8.2026 — korvasi 18.8. version kokonaan; Heikki: "uusi design korvaa nykyisen
 // 2.0 työhaaran"). Rakenne ylhäältä alas:
 //   ylätunniste (TopBar layoutista: tagline, nostot, Päivän putki) → kategoriarivi →
-//   Kuvavisat-banneri (18.9.2026, korvasi lippuvisa-heron ja viikkovisapromon)
-//   → Suositut kokoelmat (6) → Kuka on vanhin? -banneri → Laura ja Mikko (profiilit + 4 korttia)
-//   → Päivän visa + Päivän sankari (19.9.2026) → Uusimmat visat -ticker → footer.
+//   Päivän visa (19.9.2026: sivun ensimmäinen osio) → Kuvavisat-banneri (18.9.2026,
+//   korvasi lippuvisa-heron ja viikkovisapromon) → Suositut kokoelmat (6) →
+//   Kuka on vanhin? -banneri → Päivän sankari → Laura ja Mikko (profiilit + 4
+//   korttia) → Uusimmat visat -ticker → footer.
 // Poistuneet: Laura & Mikko -duohero, upotettu ensimmäinen kysymys, putkinauha,
 // viisi täysleveää nostoa, historia-aikajana.
 // Kuori staattinen (lib/etusivu.ts), Päivän visa ja ticker dynaamisia kannasta.
@@ -205,6 +206,19 @@ export default async function Etusivu20({
       </div>
 
       <div className="tn-es-main">
+        {/* ─── Päivän visa — sivun ensimmäinen osio (Heikki 19.9.2026) ─── */}
+        <section id="paivan-visa" aria-labelledby="paivan-visa-h">
+          <div className="tn-es-head tn-es-head--row">
+            <h2 className="tn-es-h2 tn-es-h2--nowrap" id="paivan-visa-h">Päivän visa</h2>
+            {/* Tilassa B päiväleima on otsikkorivillä; A/C:ssä koukkulaatassa. */}
+            {(!daily || paivanVisaTila(daily) === "B") && (
+              <span className="tn-es-date">Tänään {today.pv}.{today.kk}.</span>
+            )}
+          </div>
+          {daily ? <PaivanVisaCard data={daily} /> : <div className="tn-es-pv tn-es-pv--empty">Päivän visa palaa huomenna.</div>}
+        </section>
+
+
         {/* ─── Kuvavisat-banneri (Design kierros 12A, 18.9.2026) ───
             Korvasi lippuvisa-heron ja sen alla olleen viikkovisapromon.
             Bannerin otsikko on etusivun h1. */}
@@ -233,6 +247,10 @@ export default async function Etusivu20({
 
         {/* ─── Kuka on vanhin? -banneri (Design kierros 12B) — ennen juontajia ─── */}
         <IkajarjestysBanneri henkilot={henkilot} />
+
+        {/* ─── Päivän sankari — Kuka on vanhin? -bannerin alla, ennen juontajia
+            (Heikki 19.9.2026). Ei sankaria → ei lohkoa eikä varattua tilaa. ─── */}
+        {sankari && <PaivanSankari data={sankari} />}
 
         {/* ─── Laura ja Mikko ─── */}
         <section className="tn-es-hosts" aria-labelledby="juontajat">
@@ -266,20 +284,6 @@ export default async function Etusivu20({
               </div>
             ))}
           </div>
-        </section>
-
-        {/* ─── Päivän visa ─── */}
-        <section id="paivan-visa" aria-labelledby="paivan-visa-h">
-          <div className="tn-es-head tn-es-head--row">
-            <h2 className="tn-es-h2 tn-es-h2--nowrap" id="paivan-visa-h">Päivän visa</h2>
-            {/* Tilassa B päiväleima on otsikkorivillä; A/C:ssä koukkulaatassa. */}
-            {(!daily || paivanVisaTila(daily) === "B") && (
-              <span className="tn-es-date">Tänään {today.pv}.{today.kk}.</span>
-            )}
-          </div>
-          {daily ? <PaivanVisaCard data={daily} /> : <div className="tn-es-pv tn-es-pv--empty">Päivän visa palaa huomenna.</div>}
-          {/* Päivän sankari: vakiopaikka Päivän visan alla; ei sankaria → ei lohkoa. */}
-          {sankari && <PaivanSankari data={sankari} />}
         </section>
 
         {/* ─── Uusimmat visat ─── */}

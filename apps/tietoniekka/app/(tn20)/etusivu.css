@@ -353,7 +353,9 @@
    Rivi, ei kortti — kevyempi kuin Päivän visa. Muistopäivä: viileä
    teräksensininen aksentti samalla kirkkaudella. Oma container (tnsank):
    mobiiliasettelu alle 560 px. */
-.tn20 .tn-es-sank { margin-top: clamp(20px, 2.2cqw, 26px); container: tnsank / inline-size; }
+/* Oma osionsa .tn-es-mainin flex-gapilla (19.9.2026: siirretty Kuka on vanhin?
+   -bannerin alle), ei omaa ylämarginaalia. */
+.tn20 .tn-es-sank { container: tnsank / inline-size; }
 .tn20 .tn-es-sank-head { display: flex; align-items: center; gap: 12px; padding-bottom: 12px; }
 .tn20 .tn-es-sank-head i { flex: 1; height: 1px; background: #221c12; }
 .tn20 .tn-es-sank-h {
