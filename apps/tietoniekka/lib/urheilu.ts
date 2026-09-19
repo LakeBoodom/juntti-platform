@@ -3,7 +3,7 @@
 // kuva public/20/urheilu/<slug>.webp näkyy hubin korteissa, etusivulla ja
 // pelinäkymässä. Visa ilman kuvaa toimii silti: urheiluImg palauttaa null →
 // kortti käyttää SVG-motiivia ja pelikuori kokoelman herokuvaa.
-// Huom: Evertonille ei ole vielä kuvaa (ei löytynyt design-kansiosta 13.8.).
+// Evertonin kuva lisätty 19.9.2026 (Heikin paitakuva, kehys rajattu pois).
 
 /** Visat joilla on oma kuva — tiedostonimi on visan slug. */
 const IMG_SLUGS = new Set([
@@ -15,6 +15,7 @@ const IMG_SLUGS = new Set([
   "chelsea-fc-sinisten-syvin-arkisto-vaikea-visa",
   "coventry-city-pusb-visa",
   "crystal-palace-etela-lontoon-ylpeys-visa",
+  "everton-fc-nil-satis-nisi-optimum-visa",
   "fulham-fc-mokin-mestarit-visa",
   "hull-city-meripihkan-ja-mustan-raidat-visa",
   "ipswich-town-suffolkin-sinipaidat-visa",

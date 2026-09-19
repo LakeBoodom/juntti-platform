@@ -42,7 +42,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const title = pc?.seo_title ?? "Jalkapallo — Valioliiga, suurseurat ja Mestarien liiga tietovisoina";
   const description =
     pc?.seo_description ??
-    "Kaikki jalkapallosta: 19 Valioliigan seuravisaa, Euroopan suurseurat ja Mestarien liigan ikuiset illat — sekä suomalaiset eurokentillä.";
+    "Kaikki jalkapallosta: 20 Valioliigan seuravisaa, Euroopan suurseurat ja Mestarien liigan ikuiset illat — sekä suomalaiset eurokentillä.";
   const canonical = `${SITE_URL}/kokoelma/jalkapallo`;
   return {
     title, description,
@@ -288,10 +288,12 @@ export default async function JalkapalloLanding({
           <h2 className="tnjp-h3">Suomalaiset eurokentillä</h2>
           <i aria-hidden />
         </div>
-        <div className="tnjp-eurogrid">
-          {JP_FINNS.map((c) => (
-            <ThemeCard key={c.quizSlug} c={c} playHref={hrefFor(bySlug.get(c.quizSlug))} variant="finn" />
-          ))}
+        <div className="tnjp-finn-wrap">
+          <div className="tnjp-finngrid">
+            {JP_FINNS.map((c) => (
+              <ThemeCard key={c.quizSlug} c={c} playHref={hrefFor(bySlug.get(c.quizSlug))} variant="finn" />
+            ))}
+          </div>
         </div>
       </section>
 

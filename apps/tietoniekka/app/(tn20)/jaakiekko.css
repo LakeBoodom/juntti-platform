@@ -312,7 +312,18 @@
    suoraan .tnj-grid[data-variant="general"]:lle, mikä ei koskaan lauennut —
    auto-fill jäi pysyvästi voimaan. */
 .tn20 .tnj-general-wrap { container: tnj-general / inline-size; }
-@container tnj-general (min-width: 620px) {
+/* 19.9.2026 (6 → 9 korttia): 3 saraketta vasta 780 px:stä. 620 px:n
+   kynnyksellä kortti jäi ~205–228 px:ksi ja "ULKOMAALAISLEGENDAT" ylitti
+   kortin 6–10 px (Range-mittaus 700/768 px). Sama sana vaatii ≥ ~236 px:n
+   kortin, joten 2 saraketta vasta 500 px:stä (auto-fill antoi 2 × 224 px
+   jo ~470 px:ssä, +21 px ylivuoto) ja sitä kapeammalla yksi sarake. */
+.tn20 .tnj-grid[data-variant="general"] { grid-template-columns: minmax(0, 1fr); }
+@container tnj-general (min-width: 500px) {
+  .tn20 .tnj-grid[data-variant="general"] {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@container tnj-general (min-width: 780px) {
   .tn20 .tnj-grid[data-variant="general"] {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
