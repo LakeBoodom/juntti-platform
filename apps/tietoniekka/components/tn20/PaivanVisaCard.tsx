@@ -4,16 +4,22 @@
 // ensimmäinen kysymys). Designin mukainen vaakakortti: kuva vasemmalla (26/74-
 // jako, pinoutuu kapealla) + merkki + otsikko + meta + kuvaus + pelinappi.
 //
-// Kaksi tilaa (design: fresh / played):
-//  - fresh:  "Tänään juhlii" (synttärisankari) tai kokoelman nimi (adminin valitsema
-//            visa) → "Pelaa päivän visa →"
-//  - played: "✓ Tämän päivän visa on pelattu" → "Pelaa henkilövisoja →" (sankari) /
-//            kokoelman hubiin (visa). Tila luetaan omasta localStorage-avaimesta
-//            (PAIVAN_VISA_KEY = tämän päivän päiväys), jonka GameClient kirjoittaa
-//            kun Päivän visa pelataan loppuun — EI putkiavaimesta, koska putki
-//            jatkuu 28.8.2026 alkaen mistä tahansa visasta.
-// Kuva: sankarin oma kuva (celebrities.image_url) tai visan teemakuva (topicImg);
-// designin "Kuva — päivänsankari" -paikkamerkki näytetään vain jos kuvaa ei ole.
+// Heikin linjaus 19.9.2026: Päivän visa EI ole päivänsankarikortti. Kierrossa
+// voi olla synttäri-, kaupunki-, luonto- tai mikä tahansa visa, ja sen visan
+// oma kuva näytetään aina. Kortti ei oleta julkkista:
+//  - Merkki on visan kategoria (sama resolveri kuin pelisivun .tng-cat,
+//    lib/visanKokoelma.ts) ja linkki sen kokoelmasivulle. Aiemmin merkki oli
+//    `collection` ("Yleistieto" → 404) tai "Tänään juhlii".
+//  - Kuva ratkaistaan palvelimella (app/(tn20)/page.tsx, paivanVisanKuva):
+//    quizzes.image_url → julkkiksen kuva → visan teemakuva → kaupunkikuva →
+//    kokoelmakuva. Jos mitään ei ole, näytetään brändipinta ilman tekstiä —
+//    designin sisäinen "Kuva — päivänsankari" -työnimi ei näy koskaan.
+//  - Kuva on koristeellinen (otsikko kertoo aiheen vieressä), joten se on
+//    aria-hidden eikä role="img" + epämääräinen aria-label.
+//
+// Kaksi tilaa (design: fresh / played). Played-tila luetaan omasta
+// localStorage-avaimesta (PAIVAN_VISA_KEY = tämän päivän päiväys), jonka
+// GameClient kirjoittaa kun Päivän visa pelataan loppuun.
 
 import { useEffect, useState } from "react";
 
@@ -32,13 +38,14 @@ function isPlayedToday(): boolean {
 }
 
 export type PaivanVisaData = {
-  badge: string; // "Tänään juhlii" / kokoelman nimi
+  /** Visan kategoria ja sen kokoelmasivu: "Suomen kaupungit" → /kokoelma/kaupungit */
+  badge: { label: string; href: string };
   title: string; // "62 vuotta — Antti Reini" / visan nimi
-  meta: string | null; // "Syntynyt 27.8.1964 · Näyttelijä" / "10 kysymystä"
+  meta: string | null; // "Tänään juhlii · Syntynyt 27.8.1964 · Näyttelijä" / "10 kysymystä"
   lede: string | null;
+  /** Ratkaistu kuva; null → brändipinta */
   imageUrl: string | null;
   imagePos?: string;
-  imageAlt: string;
   playHref: string;
   playedHref: string;
   playedCta: string; // "Pelaa henkilövisoja →" / "Lisää visoja →"
@@ -50,19 +57,23 @@ export default function PaivanVisaCard({ data }: { data: PaivanVisaData }) {
 
   return (
     <div className="tn-es-day" data-played={played ? "" : undefined}>
-      <div className="tn-es-day-media" role="img" aria-label={data.imageAlt}>
-        {data.imageUrl ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img src={data.imageUrl} alt="" loading="lazy" style={{ objectPosition: data.imagePos ?? "50% 40%" }} />
-        ) : (
-          <span className="tn-es-day-ph">Kuva — päivänsankari</span>
+      <div className="tn-es-day-media" data-kuva={data.imageUrl ? "1" : "0"} aria-hidden="true">
+        {data.imageUrl && (
+          <>
+            {/* Sama kuvio kuin etusivun muissa korteissa (.tn-es-card-bg). */}
+            <span
+              className="tn-es-card-bg"
+              style={{ backgroundImage: `url(${data.imageUrl})`, backgroundPosition: data.imagePos ?? "50% 40%" }}
+            />
+            <span className="tn-es-day-shade" />
+          </>
         )}
       </div>
       <div className="tn-es-day-body">
         {played ? (
           <span className="tn-es-day-badge tn-es-day-badge--done">✓ Tämän päivän visa on pelattu</span>
         ) : (
-          <span className="tn-es-day-badge">{data.badge}</span>
+          <a className="tn-es-day-badge" href={data.badge.href}>{data.badge.label}</a>
         )}
         <h3 className="tn-es-day-title">{data.title}</h3>
         {data.meta && <div className="tn-es-day-meta">{data.meta}</div>}
