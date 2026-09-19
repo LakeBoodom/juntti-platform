@@ -16,6 +16,7 @@ import { urheiluImg } from "@/lib/urheilu";
 import { maantietoImg } from "@/lib/maantieto";
 import { KAUPUNGIT } from "@/lib/kaupungit";
 import { resolveCollection, COLLECTION_LABEL } from "@/lib/visanKokoelma";
+import { visanOmaKuva } from "@/lib/visanKuva";
 import { type Learn } from "@/components/tn20/LearnArticle";
 import GameClient, { type GameQuiz } from "./GameClient";
 import { notFound } from "next/navigation";
@@ -610,7 +611,10 @@ export default async function Peli20({
      Alkuperäistä tiedostoa ei käytetä (voi olla useita megatavuja). */
   const wikiThumb = (url: string | null, width: number): string | null =>
     url && /\/thumb\//.test(url) ? url.replace(/\/(\d+)px-/, `/${width}px-`) : url;
-  const heroImage = quiz.hero_image ?? (isPerson ? wikiThumb(celeb?.image_url ?? null, 1280) : topicImg);
+  /* Visan oma kuva kaikista kokoelmista (lib/visanKuva.ts) — ei vain niistä
+     neljästä, jotka topicImg kattaa. */
+  const omaKuva = visanOmaKuva(collection, quiz.category, quiz.slug);
+  const heroImage = quiz.hero_image ?? (isPerson ? wikiThumb(celeb?.image_url ?? null, 1280) : omaKuva);
   const heroSrcSet = !quiz.hero_image && isPerson && celeb?.image_url
     ? [wikiThumb(celeb.image_url, 330), wikiThumb(celeb.image_url, 1280)]
         .filter(Boolean)
@@ -620,7 +624,11 @@ export default async function Peli20({
   /* Tunnetut henkilöt (246 julkaistua visaa) saa uuden heron ilman
      ?hero=uusi-parametria: jokaisella on celebrities-rivillä kuva, joten
      kokoelma on kokonaan valmis eikä jää puolitiehen. (Heikki 19.9.2026) */
-  const heroOn = quiz.hero_image != null || heroParam === "uusi" || (isPerson && heroImage != null);
+  /* Heikin linjaus 19.9.2026: hero aktivoituu AINA kun visalla on oma kuva
+     (hero_image, henkilön kuva tai kokoelman visakohtainen kuva). Kuvattomat
+     visat säilyttävät vanhan aloitusnäkymän; ?hero=uusi näyttää niille
+     kuvattoman heron testiksi. */
+  const heroOn = heroImage != null || heroParam === "uusi";
   const heroFocalX = quiz.hero_focal_x != null ? Number(quiz.hero_focal_x) : 0.5;
   /* Kasvokuvissa kiinnostava kohta on ylhäällä (CD: 0.12–0.18) */
   const heroFocalY = quiz.hero_focal_y != null ? Number(quiz.hero_focal_y) : isPerson ? 0.15 : 0.4;

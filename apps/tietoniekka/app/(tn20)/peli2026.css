@@ -365,7 +365,10 @@
 /* "Lisää X-visoja": mobiilissa pino heron JÄLKEEN (ei heti napin alle),
    vaakanäkymässä 3 sarakkeen ruudukko heron alalaidassa. */
 .tn20 .tng-heromore { position: relative; z-index: 2; display: flex; flex-direction: column; gap: clamp(10px, 1.4vh, 15px); padding: clamp(18px, 3vh, 26px) clamp(16px, 5vw, 28px) clamp(24px, 4vh, 32px); border-top: 1px solid rgba(255, 251, 242, 0.12); }
-.tn20 .tng-heromore-head { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; }
+/* flex-wrap (19.9.2026): pitkillä kokoelmanimillä ("Lisää tv & suoratoisto-visoja")
+   otsikko ja rivittymätön "Kaikki …-visat →" -linkki eivät mahtuneet 320 px:n
+   riville (ylivuoto 0,7–1,4 px) — linkki siirtyy tarvittaessa omalle rivilleen. */
+.tn20 .tng-heromore-head { display: flex; align-items: baseline; justify-content: space-between; flex-wrap: wrap; gap: 6px 16px; }
 .tn20 .tng-heromore-t { font-family: var(--tn-font-display); font-weight: 900; font-size: clamp(15px, 1.5cqw, 17px); letter-spacing: 0.02em; text-transform: uppercase; color: #fffbf2; }
 .tn20 .tng-heromore-all { font-size: clamp(12px, 1.15cqw, 13px); font-weight: 700; color: var(--tnAccText); white-space: nowrap; }
 .tn20 .tng-heromore-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: clamp(9px, 1cqw, 14px); }
