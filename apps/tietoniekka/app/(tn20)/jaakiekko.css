@@ -328,6 +328,14 @@
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
+/* Leijonat (Heikki 19.9.2026): neljän kortin rivit leveällä. Auto-fill antoi
+   5 × 223 px, jolloin otsikon sovitus pienensi "KOTIKAUKALOSSA"-ruudukon
+   18 px:iin; 4 × ~284 px:ssä koko on ~23–24 px. Kapeammalla auto-fill
+   (1–3 saraketta) kuten ennen. Container vanhemmalla (.tnj-lions-wrap). */
+.tn20 .tnj-lions-wrap { container: tnj-lions / inline-size; }
+@container tnj-lions (min-width: 780px) {
+  .tn20 .tnj-grid[data-variant="lions"] { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
 .tn20 .tnj-card {
   position: relative; display: block; aspect-ratio: 4 / 5; overflow: hidden;
   border-radius: clamp(12px,1.5cqw,18px); border: 1px solid #3A3122; background: #1C1810;

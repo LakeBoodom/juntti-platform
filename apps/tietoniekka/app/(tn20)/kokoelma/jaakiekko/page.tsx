@@ -75,7 +75,7 @@ function CardGrid({
   /** "general" = Liigan kohokohdat: 6 korttia jaetaan kahdelle riville
       desktopissa sen sijaan että auto-fill jättäisi 6. kortin yksin
       omalle, koko leveyteen venytetylle rivilleen (Heikin katselmus 24.8.). */
-  variant?: "general";
+  variant?: "general" | "lions";
 }) {
   return (
     <div
@@ -234,7 +234,10 @@ export default async function JaakiekkoLanding() {
             <h2 className="tnj-h2">{JK_COPY.lionsTitle}</h2>
             <p className="tnj-intro">{JK_COPY.lionsIntro}</p>
           </div>
-          <CardGrid cards={lions} size="s" />
+          {/* Heikki 19.9.2026: Leijonat neljän kortin riveinä (ennen 5 + 4) */}
+          <div className="tnj-lions-wrap">
+            <CardGrid cards={lions} size="s" variant="lions" />
+          </div>
         </section>
 
         {/* ─── 3. erä — NHL ─── */}
