@@ -469,7 +469,10 @@ export default async function Peli20({
         .map((u, i) => `${u} ${i === 0 ? 330 : 1280}w`)
         .join(", ")
     : null;
-  const heroOn = quiz.hero_image != null || heroParam === "uusi";
+  /* Tunnetut henkilöt (246 julkaistua visaa) saa uuden heron ilman
+     ?hero=uusi-parametria: jokaisella on celebrities-rivillä kuva, joten
+     kokoelma on kokonaan valmis eikä jää puolitiehen. (Heikki 19.9.2026) */
+  const heroOn = quiz.hero_image != null || heroParam === "uusi" || (isPerson && heroImage != null);
   const heroFocalX = quiz.hero_focal_x != null ? Number(quiz.hero_focal_x) : 0.5;
   /* Kasvokuvissa kiinnostava kohta on ylhäällä (CD: 0.12–0.18) */
   const heroFocalY = quiz.hero_focal_y != null ? Number(quiz.hero_focal_y) : isPerson ? 0.15 : 0.4;
@@ -487,6 +490,9 @@ export default async function Peli20({
         side: heroSide,
         alt: quiz.hero_alt ?? (isPerson && celeb ? `${celeb.name}. Kuva: Wikimedia Commons` : null),
         srcSet: heroSrcSet,
+        /* Varaosoite: jos 1280 px:n thumbia ei ole (alkuperäinen kapeampi),
+           selain jäisi ilman kuvaa. Silloin palataan kannan 330 px:n kuvaan. */
+        srcSmall: !quiz.hero_image && isPerson ? celeb?.image_url ?? null : null,
         /* Henkilövisan yläotsikko: ammatti suoraan kannasta (TEEMAKARTTA:
            kortti näyttää tarkan ammatin, ei geneeristä "urheilija"). */
         roleLabel: isPerson ? celeb?.role ?? null : null,
