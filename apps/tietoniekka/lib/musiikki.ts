@@ -59,6 +59,7 @@ const IMG_SLUGS = new Set([
   "kanye-west-visa-tunnetko-uudistajan",
   "kendrick-lamar-visa-tunnetko-rap-tahden",
   "lordi-hirviot-haltuun",
+  "nylon-beat-visa-vuosikymmenen-hitit",
   "pmmp-visa-rusketusraidat",
   "post-malone-visa-tunnetko-tahden",
   "rihanna-visa-tunnetko-tahden",
@@ -82,10 +83,12 @@ export const MUSIIKKI_FEATURED: Array<{ slug: string; rankColor: string; hook: s
     rankColor: "#A24BFF",
     hook: "Kausi kaudelta uudelleen keksitty poptähti. Kymmenen kysymystä sanoituksista, kiertueista ja kissoista.",
   },
+  /* Nylon Beat korvasi Eppu Normaalin nostona (Heikki 19.9.2026: ajankohtainen
+     seuraavan kuukauden). Eppu Normaali pysyy aihepiirissä 03. */
   {
-    slug: "eppu-normaali-tietovisa",
+    slug: "nylon-beat-visa-vuosikymmenen-hitit",
     rankColor: "#FF5C3D",
-    hook: "Suomirockin kestävin kokoonpano. Muistatko levyt, riffit ja Martin sanaparret?",
+    hook: "Kiitoradalta listojen kärkeen. Kuinka hyvin muistat Jonnan ja Erinin hitit Looserista Valehtelijaan?",
   },
   {
     slug: "jvg-visa-haista-ikuiseen-vappuun",
@@ -124,6 +127,7 @@ export const MUSIIKKI_SECTIONS: Array<{
       { slug: "haloo-helsinki-visa-beibi-fani", hook: "Beibi, tunnetko bändin tarinan?" },
       { slug: "pmmp-visa-rusketusraidat", hook: "Rusketusraidat ja muut klassikot" },
       { slug: "ultra-bra-tietovisa", hook: "Isot kuorot ja 90-luvun tunnelmat" },
+      { slug: "nylon-beat-visa-vuosikymmenen-hitit", hook: "Ysärin suomipopin kultainen duo" },
     ],
   },
   {
