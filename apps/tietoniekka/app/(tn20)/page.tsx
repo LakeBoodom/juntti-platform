@@ -11,6 +11,8 @@
 // Sivu käyttää container-kyselyitä (.tn20 on inline-size-container → cqw).
 
 import { getSupabase, SITE_SLUG } from "@/lib/supabase";
+import { resolveCollection } from "@/lib/visanKokoelma";
+import { KAUPUNGIT, kaupunkiImg } from "@/lib/kaupungit";
 import { kulttuuriImg } from "@/lib/kulttuuri";
 import { luontoImg } from "@/lib/luonto";
 import { urheiluImg } from "@/lib/urheilu";
@@ -31,13 +33,6 @@ import {
 import "./etusivu.css";
 import "./etusivun-bannerit.css";
 
-/* Kokoelman nimi Päivän visan merkkiin — sama sanasto kuin pelin loaderissa. */
-const COLLECTION_NAME: Record<string, string> = {
-  tv: "TV & Suoratoisto", urheilu: "Urheilu", elokuvat: "Elokuvat", musiikki: "Musiikki",
-  matkakohteet: "Maantieto", yleistieto: "Yleistieto", kulttuuri: "Kulttuuri",
-  historia: "Historia", luonto: "Luonto", "tunnetut-henkilot": "Tunnetut henkilöt",
-};
-
 /** Visan oma kuva (teemakokoelmien topicImg) — sama dispatcher kuin 25.–26.8. */
 const topicImgFor = (collection: string | null | undefined, slug: string | null | undefined): string | null =>
   collection === "kulttuuri" ? kulttuuriImg(slug)
@@ -48,6 +43,51 @@ const topicImgFor = (collection: string | null | undefined, slug: string | null 
   : collection === "musiikki" ? musiikkiImg(slug)
   : collection === "elokuvat" ? elokuvatImg(slug)
   : null;
+
+/* ── Päivän visan kuva (bugi A, 19.9.2026) ─────────────────────────────
+   Aiemmin kuva haettiin vain teemakokoelmien topicImg-dispatcherista, joten
+   kaupunki-, yleistieto- ja megavisoille kortti näytti designin paikkamerkin
+   "Kuva — päivänsankari". Nyt visan oma kuva aina ensin, visatyypistä
+   riippumatta; null → brändipinta ilman tekstiä. */
+const KOKOELMAKUVA: Record<string, string> = {
+  elokuvat: "/20/etusivu/coll-elokuvat.webp",
+  kaupungit: "/20/etusivu/coll-kaupungit.webp",
+  matkakohteet: "/20/etusivu/coll-maantieto.webp",
+  megavisat: "/20/etusivu/coll-megavisat.webp",
+};
+/* resolveCollection antaa kokoelmattomille (yleistieto) juontajakuvan — se ei
+   kerro visan aiheesta mitään, joten sitä ei käytetä Päivän visan kuvana. */
+const GENEERINEN_BG = "/20/hero-mikko-laura.webp";
+
+function paivanVisanKuva(
+  q: { id: string; slug: string | null; collection?: string | null; category?: string | null; genre?: string | null },
+  quizImage: string | null,
+  celebImage: string | null,
+): { src: string; pos: string } | null {
+  if (quizImage) return { src: quizImage, pos: "50% 40%" };          // 1. quizzes.image_url
+  if (celebImage) return { src: celebImage, pos: "50% 30%" };        // 2. synttäri-/henkilövisa
+  const topic = topicImgFor(q.collection, q.slug);                   // 3a. visan teemakuva
+  if (topic) return { src: topic, pos: "50% 46%" };
+  const kokoelma = resolveCollection({ collection: q.collection ?? null, category: q.category ?? null, genre: q.genre ?? null });
+  if (kokoelma.key === "kaupungit") {                                // 3b. kaupungin oma kuva
+    const k = KAUPUNGIT.find((c) => c.quizSlug === q.slug);
+    if (k) return { src: kaupunkiImg(k.id), pos: "50% 50%" };
+  }
+  const coll = KOKOELMAKUVA[kokoelma.key];                           // 3c. kokoelman kuva
+  if (coll) return { src: coll, pos: "50% 50%" };
+  if (kokoelma.bg && kokoelma.bg !== GENEERINEN_BG) return { src: kokoelma.bg, pos: "50% 40%" };
+  return null;                                                       // 4. brändipinta
+}
+
+/** quizzes.image_url (ei ole quiz_cards-näkymässä). Tyhjä useimmilla visoilla
+    19.9.2026 — kun kenttä täytetään, se voittaa kaikki päätellyt kuvat. */
+async function getQuizImageUrl(id: string): Promise<string | null> {
+  const sb = getSupabase();
+  if (!sb) return null;
+  const { data } = await sb.from("quizzes").select("image_url" as never).eq("id", id).maybeSingle();
+  const url = (data as { image_url?: string | null } | null)?.image_url ?? null;
+  return url && url.trim() ? url : null;
+}
 
 export const dynamic = "force-dynamic";
 
@@ -66,7 +106,7 @@ type Card = {
   id: string; slug: string; custom_slug: string | null; title: string;
   display_title: string | null; collection: string | null; play_count: number;
   published_at: string | null; game_mode?: string | null; teaser?: string | null;
-  question_count?: number | null; category?: string | null;
+  question_count?: number | null; category?: string | null; genre?: string | null;
 };
 
 async function getData() {
@@ -140,7 +180,7 @@ async function getData() {
       href: c.game_mode === "mega" && c.slug ? `/peli?mega=${c.slug}` : `/peli?quiz_id=${c.id}`,
     }));
 
-  return { hero, sankariIsToday: hero?.dist === 0, dayPick, today, latest };
+  return { hero, sankariIsToday: hero?.dist === 0, dayPick, today, latest, cards, celebs };
 }
 
 function age(birth: string, onNextBirthday: boolean) {
@@ -165,40 +205,54 @@ export default async function Etusivu20() {
   /* Viikkovisa näkyy nyt Kuvavisat-bannerin merkkinä (kierros 12);
      null (ei aktiivisia kuvia) → merkki jää pois. */
   const viikko = vv ? { viikko: vv.viikko, kuvia: vv.kuvaIdt.length } : null;
-  const { hero, sankariIsToday, dayPick, today, latest } = data;
+  const { hero, sankariIsToday, dayPick, today, latest, cards, celebs } = data;
 
-  /* Päivän visan sisältö: adminin valinta (visa tai sankari) tai synttärisankari. */
+  /* Päivän visan sisältö: adminin valinta (visa tai sankari) tai synttärisankari.
+     Heikin linjaus 19.9.2026: kortti ei oleta julkkista — merkki on aina visan
+     kategoria (sama resolveri kuin pelisivulla) ja kuva visan oma. */
   let daily: PaivanVisaData | null = null;
   const celeb = dayPick?.kind === "celeb" ? dayPick.celeb : !dayPick ? hero?.c ?? null : null;
   const celebToday = dayPick?.kind === "celeb" ? dayPick.isToday : sankariIsToday;
+  const dayQuizId = dayPick?.kind === "quiz" ? dayPick.card.id : celeb?.trivia_quiz_id ?? null;
+  const dayCard = dayPick?.kind === "quiz" ? dayPick.card : dayQuizId ? cards.find((c) => c.id === dayQuizId) ?? null : null;
+  const dayImageUrl = dayQuizId ? await getQuizImageUrl(dayQuizId) : null;
 
   if (dayPick?.kind === "quiz") {
     const c = dayPick.card;
-    const collection = c.collection ?? "yleistieto";
-    const img = topicImgFor(collection, c.slug);
+    const kokoelma = resolveCollection({ collection: c.collection ?? null, category: c.category ?? null, genre: c.genre ?? null });
+    const kuva = paivanVisanKuva(c, dayImageUrl, celebs.find((x) => x.trivia_quiz_id === c.id)?.image_url ?? null);
     daily = {
-      badge: COLLECTION_NAME[collection] ?? "Päivän visa",
+      badge: { label: kokoelma.label, href: kokoelma.hub },
       title: c.display_title ?? c.title,
       meta: c.question_count ? `${c.question_count} kysymystä` : null,
       lede: c.teaser ?? null,
-      imageUrl: img,
-      imagePos: "50% 46%",
-      imageAlt: "Päivän visan kuva",
+      imageUrl: kuva?.src ?? null,
+      imagePos: kuva?.pos,
       playHref: `/peli?quiz_id=${c.id}&paivan_visa=1`,
-      playedHref: `/kokoelma/${collection}`,
+      /* Aiemmin /kokoelma/${collection} → kaupunkivisoilla /kokoelma/yleistieto (404). */
+      playedHref: kokoelma.hub,
       playedCta: "Lisää visoja →",
     };
   } else if (celeb?.trivia_quiz_id) {
+    const kokoelma = resolveCollection({
+      collection: dayCard?.collection ?? "tunnetut-henkilot",
+      category: dayCard?.category ?? null,
+      genre: dayCard?.genre ?? null,
+    });
+    const b = new Date(celeb.birth_date);
+    const juhlii = celebToday ? "Tänään juhlii" : `Juhlii ${b.getDate()}.${b.getMonth() + 1}.`;
+    const kuva = dayCard
+      ? paivanVisanKuva(dayCard, dayImageUrl, celeb.image_url)
+      : dayImageUrl || celeb.image_url ? { src: (dayImageUrl ?? celeb.image_url)!, pos: "50% 30%" } : null;
     daily = {
-      badge: celebToday ? "Tänään juhlii" : "Seuraavaksi juhlii",
+      badge: { label: kokoelma.label, href: kokoelma.hub },
       title: celebToday ? `${age(celeb.birth_date, true)} vuotta — ${celeb.name}` : celeb.name,
-      meta: `Syntynyt ${fiBirth(celeb.birth_date)}${celeb.role ? ` · ${celeb.role}` : ""}`,
+      meta: `${juhlii} · Syntynyt ${fiBirth(celeb.birth_date)}${celeb.role ? ` · ${celeb.role}` : ""}`,
       lede: "Kuinka hyvin tunnet päivänsankarin uran ja tunnetuimmat saavutukset?",
-      imageUrl: celeb.image_url,
-      imagePos: "50% 30%",
-      imageAlt: "Päivänsankarin kuva",
+      imageUrl: kuva?.src ?? null,
+      imagePos: kuva?.pos,
       playHref: `/peli?quiz_id=${celeb.trivia_quiz_id}&${dayPick ? "paivan_visa" : "paivan_sankari"}=1`,
-      playedHref: "/kokoelma/tunnetut-henkilot",
+      playedHref: kokoelma.hub,
       playedCta: "Pelaa henkilövisoja →",
     };
   }
