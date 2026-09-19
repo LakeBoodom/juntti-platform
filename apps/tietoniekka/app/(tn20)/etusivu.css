@@ -18,8 +18,7 @@
 .tn20 .tn-es-h1,
 .tn20 .tn-es-h2,
 .tn20 .tn-es-card-title,
-.tn20 .tn-es-host-name,
-.tn20 .tn-es-day-title {
+.tn20 .tn-es-host-name {
   font-family: var(--tn-font-display);
   font-weight: 900;
   text-transform: uppercase;
@@ -239,68 +238,181 @@
 .tn20 .tn-es-hcard-text { min-width: 0; display: block; }
 .tn20 .tn-es-hcard-desc { display: block; margin-top: 6px; font-size: clamp(10.5px, 1cqw, 13px); font-weight: 600; color: #b9af9b; text-wrap: pretty; }
 
-/* ── Päivän visa ──────────────────────────────────────────────────────── */
-.tn20 .tn-es-day {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: stretch;
-  gap: clamp(12px, 1.3cqw, 20px);
-  padding: clamp(12px, 1.3cqw, 20px);
-  border: 1px solid var(--tn-line);
-  border-radius: clamp(14px, 1.5cqw, 20px);
-  background: #1c1810;
-  min-height: clamp(200px, calc(140px + 8cqw), 260px);
+/* ── Päivän visa (Design v0.3 kierros 14, 19.9.2026) ─────────────────────
+   Kortti on oma container (tnpv): työpöytä ≥ 640 px kortin leveydellä, alle
+   sen mobiilipino (14b). Mitat designin 1160 px:n kortista suhteutettuna
+   kortin leveyteen (cqi). Koukkulaatta renderöidään kahteen kohtaan
+   (.tn-es-v-desk / .tn-es-v-mob), joista vain toinen näkyy. */
+.tn20 .tn-es-pv-wrap { container: tnpv / inline-size; }
+.tn20 .tn-es-pv {
+  display: grid;
+  grid-template-columns: clamp(220px, 28.5cqi, 330px) minmax(0, 1fr);
+  gap: clamp(18px, 2.25cqi, 26px);
+  padding: clamp(16px, 1.9cqi, 22px);
+  border: 1px solid #2c2517;
+  border-radius: 18px;
+  background: #17140c;
 }
-.tn20 .tn-es-day--empty { align-items: center; justify-content: center; color: #8e8676; font-weight: 600; }
-.tn20 .tn-es-day-media {
+.tn20 .tn-es-pv--empty { display: flex; align-items: center; justify-content: center; min-height: 200px; color: #8e8676; font-weight: 600; }
+.tn20 .tn-es-pv-wrap .tn-es-v-mob { display: none; }
+.tn20 .tn-es-pv-media {
   position: relative;
-  flex: 26 1 min(100%, 210px);
-  min-height: clamp(140px, 15cqw, 260px);
+  /* Kuva määrää kortin minimikorkeuden → korkeus pysyy samana tiloissa A/B/C
+     (CD 296 px @ 1160). */
+  min-height: clamp(220px, 25.5cqi, 296px);
   overflow: hidden;
-  border-radius: clamp(10px, 1.1cqw, 14px);
-  /* Brändipinta (19.9.2026): näkyy vain jos visalle ei löydy mitään kuvaa.
-     Korvasi designin raidallisen paikkamerkin ja sen "Kuva — päivänsankari"
-     -työnimen, joka näkyi tuotannossa pelaajalle. */
+  border: 1px solid #2f2718;
+  border-radius: 13px;
+  /* Brändipinta: näkyy vain jos visalla ei ole kuvaa kannassa. */
   background:
     radial-gradient(120% 90% at 28% 18%, rgba(232, 163, 32, 0.22), rgba(232, 163, 32, 0) 62%),
     radial-gradient(90% 80% at 85% 100%, rgba(182, 255, 60, 0.08), rgba(182, 255, 60, 0) 60%),
     #1a160d;
 }
-/* Kuva samalla .tn-es-card-bg-kuviolla kuin etusivun muut kortit; kevyt
-   tummennus alareunaan, ettei kirkas kuva kilpaile otsikon kanssa. */
-.tn20 .tn-es-day-shade { position: absolute; inset: 0; background: linear-gradient(to top, rgba(11, 10, 6, 0.35), rgba(11, 10, 6, 0) 55%); }
-.tn20 .tn-es-day-body {
-  flex: 74 1 min(100%, 300px);
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: clamp(8px, 0.9cqw, 13px);
+.tn20 .tn-es-pv-media img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
+.tn20 .tn-es-pv-body { min-width: 0; display: flex; flex-direction: column; gap: 14px; }
+.tn20 .tn-es-pv-metarow { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+.tn20 .tn-es-pv-badge {
+  height: 28px; display: inline-flex; align-items: center; padding: 0 13px;
+  border-radius: 999px; border: 1px solid #6b4e13; color: var(--tn-gold);
+  font-size: 11px; font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase;
+  transition: border-color 150ms, background 150ms;
 }
-.tn20 .tn-es-day-badge {
-  align-self: flex-start;
-  padding: 5px 11px;
-  border-radius: 999px;
-  border: 1px solid rgba(232, 163, 32, 0.5);
-  background: rgba(232, 163, 32, 0.12);
-  font-size: clamp(9.5px, 0.9cqw, 11.5px);
-  font-weight: 800;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: var(--tn-gold);
+.tn20 a.tn-es-pv-badge:hover { border-color: var(--tn-gold); background: rgba(232, 163, 32, 0.12); }
+.tn20 a.tn-es-pv-badge:focus-visible { outline: 2px solid var(--tn-gold); outline-offset: 2px; }
+.tn20 .tn-es-pv-badge--done { border-color: rgba(182, 255, 60, 0.5); background: rgba(182, 255, 60, 0.12); color: var(--tn-lime); }
+.tn20 .tn-es-pv-meta { font-size: 12px; font-weight: 600; color: #8e8676; }
+/* Otsikko: CD 44px (wdth 70). KORTTISÄÄNTÖ: tuotannon Archivo on staattinen
+   ja leveämpi → peruskoko clamp(24px, 3.3cqi, 38px) kortin leveydestä, ja
+   lisäksi otsikko sovitetaan pisimpään sanaansa: min(peruskoko, palsta /
+   (pisin sana × 0.76)); --tnpv-lw tulee komponentista. Pisin sana
+   julkaistuissa 19.9.2026: "elektroniikkakaupungin" (22 merkkiä), joka ei
+   320 px:n mobiilissa mahtuisi 21 px:n minimikoolla. 0.76 = leveimmän sanan
+   mitattu leveys / merkki / fonttikoko 0.733 + ~4 %. Otsikkolaatikko on
+   container, joten peruskoko lasketaan rekisteröitynä <length>-muuttujana
+   laatikolla itsellään (sen cqi viittaa korttiin). */
+@property --tnpv-tfs { syntax: "<length>"; inherits: true; initial-value: 28px; }
+.tn20 .tn-es-pv-titlebox { container-type: inline-size; --tnpv-tfs: clamp(24px, 3.3cqi, 38px); }
+.tn20 .tn-es-pv-title {
+  margin: 0;
+  font-family: var(--tn-font-display); font-weight: 900; text-transform: uppercase;
+  font-size: min(var(--tnpv-tfs), 100cqi / (var(--tnpv-lw, 1) * 0.76)); line-height: 0.94; letter-spacing: -0.02em;
+  color: #f5f0e6; overflow-wrap: normal; word-break: keep-all; text-wrap: balance;
 }
-/* Merkki on linkki visan kokoelmasivulle (19.9.2026). */
-.tn20 a.tn-es-day-badge { text-decoration: none; transition: border-color 150ms, background 150ms; }
-.tn20 a.tn-es-day-badge:hover { border-color: var(--tn-gold); background: rgba(232, 163, 32, 0.2); color: var(--tn-gold); }
-.tn20 a.tn-es-day-badge:focus-visible { outline: 2px solid var(--tn-gold); outline-offset: 2px; }
-.tn20 .tn-es-day-badge--done { border-color: rgba(182, 255, 60, 0.5); background: rgba(182, 255, 60, 0.12); color: var(--tn-lime); }
-/* CD clamp(20px, 2.1cqw, 32px); nimi voi olla mikä tahansa (ei koskaan katkaista
-   — 23.8. vaatimus) → rivitys sallittu sanojen välistä, kortti kasvaa. */
-.tn20 .tn-es-day-title { margin: 0; font-size: clamp(20px, 2.1cqw, 32px); line-height: 0.98; letter-spacing: -0.02em; text-wrap: balance; }
-.tn20 .tn-es-day-meta { font-size: clamp(11px, 1.05cqw, 14px); font-weight: 700; color: #8e8676; }
-.tn20 .tn-es-day-lede { margin: 0; max-width: 60ch; font-size: clamp(12.5px, 1.2cqw, 16px); line-height: 1.45; color: #cfc7b6; text-wrap: pretty; }
-.tn20 .tn-es-day-actions { display: flex; flex-wrap: wrap; align-items: center; gap: clamp(10px, 1.2cqw, 20px); margin-top: clamp(2px, 0.4cqw, 6px); }
-.tn20 .tn-es-day-actions .tn-es-btn { font-size: clamp(13px, 1.3cqw, 17px); }
+.tn20 .tn-es-pv-lede { margin: 0; max-width: 60ch; font-size: 16px; line-height: 1.55; color: #cfc7b6; text-wrap: pretty; }
+/* Koukkulaatta: lime pystyviiva, päiväleima, koukkurivi, selittävä virke. */
+.tn20 .tn-es-pv-hook {
+  display: flex; flex-direction: column; gap: 8px;
+  padding: 12px 16px;
+  border-left: 3px solid var(--tn-lime);
+  border-radius: 0 10px 10px 0;
+  background: linear-gradient(90deg, rgba(182, 255, 60, 0.07), rgba(182, 255, 60, 0) 72%);
+}
+.tn20 .tn-es-pv-wrap .tn-es-pv-hook.tn-es-v-mob { display: none; }
+.tn20 .tn-es-pv-stamp {
+  align-self: flex-start; height: 20px; display: inline-flex; align-items: center; padding: 0 8px;
+  border-radius: 5px; background: var(--tn-lime); color: #131109;
+  font-size: 10px; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; white-space: nowrap;
+}
+.tn20 .tn-es-pv-hook-h { margin: 0; font-size: 19px; font-weight: 700; line-height: 1.25; color: #f5f0e6; text-wrap: pretty; overflow-wrap: break-word; }
+.tn20 .tn-es-pv-hook-t { margin: 0; font-size: 14px; line-height: 1.5; color: #cfc7b6; text-wrap: pretty; overflow-wrap: break-word; }
+.tn20 .tn-es-pv-hook-t--c { font-size: 16px; }
+.tn20 .tn-es-pv-actions { margin-top: auto; display: flex; }
+.tn20 .tn-es-pv-btn {
+  height: 52px; display: inline-flex; align-items: center; gap: 11px; padding: 0 26px;
+  border-radius: 999px; background: var(--tn-lime); color: #131109;
+  font-family: var(--tn-font-display); font-weight: 900; font-size: 16px; text-transform: uppercase; white-space: nowrap;
+}
+.tn20 .tn-es-pv-btn span { font-size: 19px; line-height: 1; }
+.tn20 .tn-es-pv-btn:hover { background: #c9ff6e; }
+.tn20 .tn-es-pv-btn:focus-visible { outline: 2px solid var(--tn-lime); outline-offset: 3px; }
+
+/* Mobiili (14b, 380 px): laatta ennen kuvaa, kuva 2:1, nappi täysleveä. */
+@container tnpv (max-width: 639px) {
+  .tn20 .tn-es-pv { display: flex; flex-direction: column; gap: 13px; padding: 16px; border-radius: 16px; }
+  .tn20 .tn-es-pv-wrap .tn-es-v-desk { display: none; }
+  .tn20 .tn-es-pv-wrap .tn-es-pv-lede.tn-es-v-mob { display: block; }
+  .tn20 .tn-es-pv-wrap .tn-es-pv-hook.tn-es-v-mob {
+    display: flex; gap: 7px; padding: 0 0 0 13px; border-radius: 0; background: none;
+  }
+  .tn20 .tn-es-pv-hook-h { font-size: 18px; }
+  .tn20 .tn-es-pv-hook-t--c { font-size: 15px; }
+  .tn20 .tn-es-pv-media { min-height: 0; aspect-ratio: 2 / 1; border-radius: 11px; }
+  .tn20 .tn-es-pv-body { display: contents; }
+  .tn20 .tn-es-pv-meta { display: none; }
+  .tn20 .tn-es-pv-badge { align-self: flex-start; height: 26px; padding: 0 12px; font-size: 10px; }
+  .tn20 .tn-es-pv-titlebox { --tnpv-tfs: clamp(21px, 7.4cqi, 28px); }
+  .tn20 .tn-es-pv-title { line-height: 0.95; }
+  .tn20 .tn-es-pv-lede { font-size: 14px; line-height: 1.5; }
+  .tn20 .tn-es-pv-actions { margin-top: 0; }
+  .tn20 .tn-es-pv-btn { width: 100%; height: 48px; justify-content: center; gap: 10px; font-size: 15px; padding: 0 16px; }
+  .tn20 .tn-es-pv-btn span { font-size: 18px; }
+}
+
+/* ── Päivän sankari (Design v0.3 14b/14c) ────────────────────────────────
+   Rivi, ei kortti — kevyempi kuin Päivän visa. Muistopäivä: viileä
+   teräksensininen aksentti samalla kirkkaudella. Oma container (tnsank):
+   mobiiliasettelu alle 560 px. */
+.tn20 .tn-es-sank { margin-top: clamp(20px, 2.2cqw, 26px); container: tnsank / inline-size; }
+.tn20 .tn-es-sank-head { display: flex; align-items: center; gap: 12px; padding-bottom: 12px; }
+.tn20 .tn-es-sank-head i { flex: 1; height: 1px; background: #221c12; }
+.tn20 .tn-es-sank-h {
+  margin: 0; font-family: var(--tn-font-display); font-weight: 900; text-transform: uppercase;
+  font-size: 24px; line-height: 1; color: #8e8676; white-space: nowrap;
+}
+.tn20 .tn-es-sank-row {
+  display: flex; align-items: center; gap: 22px; padding: 20px 4px;
+  border-top: 1px solid #221c12; border-bottom: 1px solid #221c12; color: inherit;
+}
+.tn20 .tn-es-sank-row:focus-visible { outline: 2px solid var(--tn-lime); outline-offset: 2px; }
+.tn20 .tn-es-sank-img {
+  flex: 0 0 96px; width: 96px; height: 96px; border-radius: 999px; overflow: hidden;
+  border: 1px solid #3a3120; background: #1c1810; display: flex; align-items: center; justify-content: center;
+}
+.tn20 .tn-es-sank-img img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.tn20 .tn-es-sank-initials { font-family: var(--tn-font-display); font-weight: 900; font-size: 30px; color: #8e8676; }
+/* Tekstipalsta on container: nimi sovitetaan pisimpään sanaansa
+   (--sank-lw, esim. "Grahn-Laasonen"), kuten Päivän visan otsikko. */
+.tn20 .tn-es-sank-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 7px; container-type: inline-size; }
+.tn20 .tn-es-sank-kicker { font-size: 10px; font-weight: 800; letter-spacing: 0.18em; text-transform: uppercase; color: #93a86b; }
+.tn20 .tn-es-sank-namerow { display: flex; align-items: baseline; flex-wrap: wrap; column-gap: 12px; row-gap: 4px; }
+.tn20 .tn-es-sank-name {
+  font-family: var(--tn-font-display); font-weight: 900; text-transform: uppercase;
+  font-size: min(30px, 100cqi / (var(--sank-lw, 1) * 0.76)); line-height: 1; letter-spacing: -0.01em; color: #f5f0e6;
+  overflow-wrap: normal; word-break: keep-all;
+}
+.tn20 .tn-es-sank-years { font-size: 15px; font-weight: 600; color: #9fc4de; }
+.tn20 .tn-es-sank-text { font-size: 14px; line-height: 1.5; color: #8e8676; max-width: 62ch; text-wrap: pretty; }
+.tn20 .tn-es-sank-cta {
+  display: flex; align-items: center; gap: 9px;
+  font-family: var(--tn-font-display); font-weight: 900; font-size: 14px; letter-spacing: 0.04em;
+  text-transform: uppercase; color: var(--tn-lime); white-space: nowrap;
+}
+.tn20 .tn-es-sank-cta span { font-size: 17px; line-height: 1; transition: transform 150ms; }
+.tn20 .tn-es-sank-row:hover .tn-es-sank-cta span { transform: translateX(3px); }
+.tn20 .tn-es-sank-cta--desk { flex: 0 0 auto; }
+.tn20 .tn-es-sank .tn-es-v-mob, .tn20 .tn-es-sank-cta--mob { display: none; }
+.tn20 .tn-es-sank[data-tapaus="muisto"] .tn-es-sank-img { border-color: #3f4e5a; }
+.tn20 .tn-es-sank[data-tapaus="muisto"] .tn-es-sank-kicker,
+.tn20 .tn-es-sank[data-tapaus="muisto"] .tn-es-sank-cta { color: #9fc4de; }
+.tn20 .tn-es-sank[data-tapaus="muisto"] .tn-es-sank-text { color: #cfc7b6; }
+.tn20 .tn-es-sank[data-tapaus="muisto"] .tn-es-sank-row:focus-visible { outline-color: #9fc4de; }
+
+@container tnsank (max-width: 559px) {
+  .tn20 .tn-es-sank-head { gap: 10px; padding-bottom: 10px; }
+  .tn20 .tn-es-sank-h { font-size: 19px; }
+  .tn20 .tn-es-sank-row { align-items: flex-start; gap: 15px; padding: 15px 2px; }
+  .tn20 .tn-es-sank-img { flex-basis: 66px; width: 66px; height: 66px; }
+  .tn20 .tn-es-sank-initials { font-size: 22px; }
+  .tn20 .tn-es-sank-body { gap: 6px; }
+  .tn20 .tn-es-sank-kicker { letter-spacing: 0.16em; }
+  .tn20 .tn-es-sank-name { font-size: min(22px, 100cqi / (var(--sank-lw, 1) * 0.76)); }
+  .tn20 .tn-es-sank-text { font-size: 13px; line-height: 1.45; }
+  .tn20 .tn-es-sank .tn-es-v-desk, .tn20 .tn-es-sank-cta--desk { display: none; }
+  .tn20 .tn-es-sank .tn-es-v-mob { display: inline; }
+  .tn20 .tn-es-sank-cta--mob { display: flex; gap: 8px; font-size: 13px; letter-spacing: 0; }
+  .tn20 .tn-es-sank-cta--mob span { font-size: 16px; }
+}
 
 /* ── Uusimmat visat -ticker ───────────────────────────────────────────── */
 .tn20 .tn-es-ticker {
