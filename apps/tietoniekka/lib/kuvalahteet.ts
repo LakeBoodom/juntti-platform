@@ -21,7 +21,7 @@ export type Kuvalahde = {
   /** Visan slug = kuvatiedoston nimi kansiossa public/20/<kokoelma>/ */
   slug: string;
   /** Kokoelma, jonka kansiossa kuva on. */
-  kokoelma: "musiikki" | "kaupungit";
+  kokoelma: "musiikki" | "kaupungit" | "tiede";
   /** Mitä kuvassa on — näytetään lähdesivulla. */
   kuvaus: string;
   /** Tiedoston nimi Wikimedia Commonsissa (ilman File:-etuliitettä). */
@@ -86,6 +86,27 @@ export const KUVALAHTEET: Kuvalahde[] = [
   { slug: "turku", kokoelma: "kaupungit", kuvaus: "Turun tuomiokirkko ja Aurajoki", tiedosto: "Kirjastosilta, Aurajoki ja Turun tuomiokirkko, kuvattuna Itäiseltä Rantakadulta, Turku, 8.12.2013.jpg", tekija: "Markus Rantala (Makele-90)", lisenssi: "CC BY-SA 3.0", lisenssiUrl: CC("by-sa/3.0"), vuosi: "2013" },
   { slug: "vaasa", kokoelma: "kaupungit", kuvaus: "Vaasan kirkko ja keskusta vesitornista", tiedosto: "Vaasa Church from water tower.jpg", tekija: "Roland Struwe", lisenssi: "CC BY-SA 3.0", lisenssiUrl: CC("by-sa/3.0"), vuosi: "2008" },
   { slug: "vantaa", kokoelma: "kaupungit", kuvaus: "Tiedekeskus Heureka, Vantaa", tiedosto: "Heureka.jpg", tekija: "Danila Talikov", lisenssi: "CC BY-SA 3.0", lisenssiUrl: CC("by-sa/3.0"), vuosi: "2013" },
+
+  // ─── Tiede ja teknologia (19.9.2026) ───
+  { slug: "matka-planeetoilta-kuun-kraattereihin", kokoelma: "tiede", kuvaus: "Saturnus ja sen renkaat, Cassini-luotain", tiedosto: "Saturn, its rings, and a few of its moons.jpg", tekija: "NASA/JPL/Space Science Institute", lisenssi: "Public domain", lisenssiUrl: "", vuosi: "2009" },
+  { slug: "laaketieteen-lapimurrot-visa", kokoelma: "tiede", kuvaus: "Wilhelm Röntgenin ensimmäinen lääketieteellinen röntgenkuva", tiedosto: "First medical X-ray by Wilhelm Röntgen of his wife Anna Bertha Ludwig's hand - 18951222.jpg", tekija: "Wilhelm Röntgen", lisenssi: "Public domain", lisenssiUrl: "", vuosi: "1895" },
+  { slug: "neroja-omenoita-ja-yllattavia-kaanteita", kokoelma: "tiede", kuvaus: "Isaac Newtonin muotokuva, Godfrey Kneller 1702", tiedosto: "Sir Isaac Newton by Sir Godfrey Kneller, Bt.jpg", tekija: "Godfrey Kneller", lisenssi: "Public domain", lisenssiUrl: "", vuosi: "1702" },
+  { slug: "elava-planeetta-liikkuu-jalkojesi-alla", kokoelma: "tiede", kuvaus: "Laavasuihkuja, Kapoho, Kilauea 1960", tiedosto: "Kapoho lava fountains (1).jpg", tekija: "Hawaii Volcanoes National Park (USGS)", lisenssi: "Public domain", lisenssiUrl: "", vuosi: "1960" },
+  { slug: "saa-ja-ilmakeha-taivaan-pikkuprintti", kokoelma: "tiede", kuvaus: "Wilson Bentleyn lumikidevalokuva", tiedosto: "Wilson A. Bentley snowflake, 1890.jpg", tekija: "Wilson Bentley", lisenssi: "Public domain", lisenssiUrl: "", vuosi: "1890" },
+  { slug: "evoluutio-ja-biodiversiteetti-visa", kokoelma: "tiede", kuvaus: "Charles Darwinin valokuva, n. 1854", tiedosto: "Charles Darwin seated crop.jpg", tekija: "Maull & Fox", lisenssi: "Public domain", lisenssiUrl: "", vuosi: "1854" },
+  { slug: "kasvit-ja-sienet-ansoja-kauppoja-jattilaisia", kokoelma: "tiede", kuvaus: "Kärpäsloukku, tuntokarvat näkyvissä", tiedosto: "Venus Flytrap showing trigger hairs.jpg", tekija: "Noah Elhardt", lisenssi: "CC BY-SA 2.5", lisenssiUrl: CC("by-sa/2.5"), vuosi: "2005" },
+  { slug: "elainten-supervoimat-aistit-ja-ennatykset", kokoelma: "tiede", kuvaus: "Gepardi jahdin jälkeen, Phinda-luonnonpuisto", tiedosto: "Cheetah (Acinonyx jubatus) female after chase.jpg", tekija: "Charles J. Sharp", lisenssi: "CC BY-SA 4.0", lisenssiUrl: CC("by-sa/4.0"), vuosi: "2014" },
+  { slug: "arkijarki-vastaan-matematiikka", kokoelma: "tiede", kuvaus: "Nautiluksen kuoren poikkileikkaus, Fibonacci-spiraali", tiedosto: "NautilusCutawayLogarithmicSpiral.jpg", tekija: "Chris 73", lisenssi: "CC BY-SA 3.0", lisenssiUrl: CC("by-sa/3.0"), vuosi: "2004" },
+  { slug: "kadonneen-ajan-jattilaiset", kokoelma: "tiede", kuvaus: "T. rex -luuranko SUE, Field Museum Chicago", tiedosto: "SUE Trex Real Bones.jpg", tekija: "Evolutionnumber9", lisenssi: "CC BY-SA 4.0", lisenssiUrl: CC("by-sa/4.0"), vuosi: "2020" },
+  { slug: "nerokkaita-oivalluksia-ja-onnekkaita-sattumia", kokoelma: "tiede", kuvaus: "Vanha hehkulamppu, orava-häkki-hehkulanka", tiedosto: "Vintage edison light bulb.jpg", tekija: "Filip Mishevski", lisenssi: "CC BY 2.0", lisenssiUrl: CC("by/2.0"), vuosi: "2013" },
+  { slug: "mikroskooppinen-maailma-nakymaton-elama", kokoelma: "tiede", kuvaus: "Vibrio vulnificus -bakteeri, värjätty SEM-kuva", tiedosto: "Flagellated Vibrio Vulnificus Bacterium - Colorized Scanning Electron Micrograph (SEM) - cdc.gov - 1576 x 1080.jpg", tekija: "CDC / Janice Haney Carr", lisenssi: "Public domain", lisenssiUrl: "", vuosi: "2005" },
+  { slug: "arjen-fysiikka-salamoista-sireeneihin", kokoelma: "tiede", kuvaus: "Ukkosmyrsky, Pritzerbe, Saksa", tiedosto: "Lightning Pritzerbe 01 (MK).jpg", tekija: "Mathias Krumbholz", lisenssi: "CC BY-SA 3.0", lisenssiUrl: CC("by-sa/3.0"), vuosi: "2010" },
+  { slug: "kemia-ja-alkuaineet-visa", kokoelma: "tiede", kuvaus: "Alkuaineiden liekkivärjäys", tiedosto: "MultiColor Flame.jpg", tekija: "Raquelaa54", lisenssi: "CC BY 4.0", lisenssiUrl: CC("by/4.0"), vuosi: "2017" },
+  { slug: "teknologian-ensimmaiset-hetket-visa", kokoelma: "tiede", kuvaus: "Western Electric -pöytäpuhelin (candlestick)", tiedosto: "Western Electric Bullnose Candlestick Telephone (53993129386).jpg", tekija: "Ethan Long", lisenssi: "CC BY-SA 2.0", lisenssiUrl: CC("by-sa/2.0"), vuosi: "2024" },
+  { slug: "mista-olet-tehty-oikeasti-genetiikka", kokoelma: "tiede", kuvaus: "DNA-kaksoiskierre, emäsparit", tiedosto: "Blausen 0321 DNA 1.png", tekija: "BruceBlaus / Blausen Medical", lisenssi: "CC BY 3.0", lisenssiUrl: CC("by/3.0"), vuosi: "2013" },
+  { slug: "meret-ja-merentutkimus-visa", kokoelma: "tiede", kuvaus: "Värikäs koralliriutta", tiedosto: "Colorful Corals.jpg", tekija: "Unitarywheat", lisenssi: "CC BY-SA 4.0", lisenssiUrl: CC("by-sa/4.0"), vuosi: "2025" },
+  { slug: "kehosi-katketyt-kummallisuudet", kokoelma: "tiede", kuvaus: "Ihmissydämen anatominen malli", tiedosto: "Human heart model.jpg", tekija: "Alaa Najjar", lisenssi: "CC BY-SA 3.0", lisenssiUrl: CC("by-sa/3.0"), vuosi: "2017" },
+  { slug: "paan-sisalla-tapahtuu-enemman-kuin-huomaat", kokoelma: "tiede", kuvaus: "Aivorunko ja pikkuaivot, preparoitu näyte", tiedosto: "Brain stem and cerebellum.jpg", tekija: "Dexteriov", lisenssi: "Public domain (CC0)", lisenssiUrl: "", vuosi: "2024" },
 ];
 
 /** Commons-tiedostosivun osoite — lisenssiehtojen vaatima linkki lähteeseen. */
