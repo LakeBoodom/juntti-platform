@@ -62,11 +62,11 @@ export function KuvavisatBanneri({
             </span>
           )}
         </div>
-        {/* Etusivun ainoa h1: banneri korvasi lippuvisa-heron, jonka otsikko
-            oli sivun h1. */}
-        <h1 className="eb-h" id="eb-kv-h">
+        {/* h2 (19.9.2026): Päivän visa on sivun ensimmäinen osio, ja etusivun
+            h1 on sivun alussa näkymättömänä (app/(tn20)/page.tsx). */}
+        <h2 className="eb-h" id="eb-kv-h">
           Tunnistatko <span className="eb-rivi">kuvasta?</span>
-        </h1>
+        </h2>
         {meta[0] && <p className="eb-mmeta">{meta.filter(Boolean).join(" · ")}</p>}
         <div className="eb-row">
           <a className="eb-btn" href="/kokoelma/kuvavisat">

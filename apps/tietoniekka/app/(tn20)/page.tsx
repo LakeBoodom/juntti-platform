@@ -12,6 +12,7 @@
 // Sivu käyttää container-kyselyitä (.tn20 on inline-size-container → cqw).
 
 import { getSupabase, SITE_SLUG } from "@/lib/supabase";
+import { brand } from "@/config/brand";
 import { resolveCollection } from "@/lib/visanKokoelma";
 import { helsinginPaiva } from "@/lib/aika";
 import PaivanVisaCard from "@/components/tn20/PaivanVisaCard";
@@ -206,6 +207,9 @@ export default async function Etusivu20({
       </div>
 
       <div className="tn-es-main">
+        {/* Etusivun h1 (19.9.2026): näkymätön, ruudunlukijoille ja hakukoneille.
+            Siirretty Kuvavisat-bannerista, kun Päivän visa nousi ensimmäiseksi. */}
+        <h1 className="tn-es-sr-only">{brand.name} – suomalainen tietovisasivusto</h1>
         {/* ─── Päivän visa — sivun ensimmäinen osio (Heikki 19.9.2026) ─── */}
         <section id="paivan-visa" aria-labelledby="paivan-visa-h">
           <div className="tn-es-head tn-es-head--row">
