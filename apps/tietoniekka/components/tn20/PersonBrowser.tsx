@@ -17,6 +17,8 @@ import { PersonSilhouette } from "./motifs";
 
 export type BrowserPerson = PersonCardData & {
   role: string | null;
+  /** celebrities.laji (tarkempi taso, esim. "jaakiekko") — ei vielä suodattimena */
+  laji: string | null;
   priority: number | null;
   created_at: string;
   href: string;

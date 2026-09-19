@@ -587,33 +587,14 @@ function HubShell({
 
 /* ─────────── Tunnetut henkilöt -hub (ennallaan) ─────────── */
 
-const ROLE_GROUPS: Record<string, string[]> = {
-  nayttelijat: ["näyttelijä"],
-  artistit: ["laulaja", "muusikko", "räppäri", "rap-artisti", "pop-artisti", "pianisti", "oopperalaulaja", "kapellimestari", "dj", "viihdetaiteilija"],
-  urheilijat: [
-    "jääkiekkoilija", "jalkapalloilija", "formulakuljettaja", "f1-kuljettaja", "hiihtäjä", "tennispelaaja",
-    "mäkihyppääjä", "taitoluistelija", "jalkapallovalmentaja", "lentopalloilija", "alppihiihtäjä",
-    "ralliautoilija", "rallikuljettaja", "painija", "golfaaja", "yleisurheilija", "seiväshyppääjä",
-    "koripalloilija", "uimari", "kiekkoilija", "valmentaja",
-  ],
-  poliitikot: ["poliitikko", "presidentti", "ministeri", "kansanedustaja", "kuninkaallinen"],
-};
-const GROUP_LABELS = [
-  { key: "kaikki", label: "Kaikki" },
-  { key: "nayttelijat", label: "Näyttelijät" },
-  { key: "artistit", label: "Artistit" },
-  { key: "urheilijat", label: "Urheilijat" },
-  { key: "poliitikot", label: "Poliitikot & merkkihenkilöt" },
-  { key: "muut", label: "Muut" },
-];
-function roleGroup(role: string | null): string {
-  const r = (role ?? "").toLowerCase();
-  for (const [key, roles] of Object.entries(ROLE_GROUPS)) if (roles.some((x) => r.includes(x) || x.includes(r))) return key;
-  return "muut";
-}
-
+/* Henkilöryhmä tulee kannasta (celebrities.ryhma, täytetty 19.9.2026):
+   nayttelijat | artistit | urheilijat | poliitikot | muut. Korvasi
+   kovakoodatun role → ryhmä -mappauksen, joka pudotti mm. autourheilijat
+   ryhmään "Muut" ja tyhjän roolin ryhmään "Näyttelijät". Tarkempi taso
+   celebrities.laji (esim. jaakiekko, moottoriurheilu) tulee mukaan valmiiksi. */
 type Celeb = {
   id: string; slug: string | null; name: string; role: string | null;
+  ryhma: string | null; laji: string | null;
   image_url: string | null; birth_date: string; trivia_quiz_id: string | null;
   priority: number | null; created_at: string;
 };
@@ -632,10 +613,10 @@ async function PersonHub({ hub, article }: { hub: HubMeta; article?: React.React
   if (!siteId) return <main style={{ padding: 32 }}>Ei tietokantayhteyttä.</main>;
   const { data } = await sb
     .from("celebrities")
-    .select("id, slug, name, role, image_url, birth_date, trivia_quiz_id, priority, created_at")
+    .select("id, slug, name, role, ryhma, laji, image_url, birth_date, trivia_quiz_id, priority, created_at")
     .eq("site_id", siteId)
     .order("name");
-  const celebs = (data ?? []) as Celeb[];
+  const celebs = (data ?? []) as unknown as Celeb[];
 
   const today = new Date();
   const key = (m: number, d: number) => m * 100 + d;
@@ -660,7 +641,8 @@ async function PersonHub({ hub, article }: { hub: HubMeta; article?: React.React
       name: c.name,
       role: c.role,
       image_url: c.image_url,
-      category: roleGroup(c.role),
+      category: c.ryhma ?? "muut",
+      laji: c.laji,
       priority: c.priority,
       created_at: c.created_at,
       href: playHref(c),
