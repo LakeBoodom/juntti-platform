@@ -14,13 +14,14 @@
 
 import { getSupabase } from "./supabase";
 import { getSiteId } from "./queries";
-import { roleGroup } from "./personCategories";
 import { ROUND_SIZE, shuffleChain, type ChainPerson } from "./ikajarjestysConstants";
 
 type CelebRow = {
   id: string;
   name: string;
   role: string;
+  /** celebrities.ryhma (kategoria kannasta, 19.9.2026) */
+  ryhma: string | null;
   image_url: string | null;
   birth_date: string;
 };
@@ -47,14 +48,14 @@ export async function getChainRound(
 
   const { data, error } = await sb
     .from("celebrities")
-    .select("id, name, role, image_url, birth_date")
+    .select("id, name, role, ryhma, image_url, birth_date")
     .eq("site_id", siteId)
     .not("birth_date", "is", null)
     .not("name", "is", null);
   if (error || !data) return [];
 
   const rows = data as unknown as CelebRow[];
-  let pool = category === "kaikki" ? rows : rows.filter((r) => roleGroup(r.role) === category);
+  let pool = category === "kaikki" ? rows : rows.filter((r) => (r.ryhma ?? "muut") === category);
 
   if (excludeIds.length > 0) {
     const withoutRecent = pool.filter((r) => !excludeIds.includes(r.id));
