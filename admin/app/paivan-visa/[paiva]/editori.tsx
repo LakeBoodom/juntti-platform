@@ -2,7 +2,7 @@
 
 import { useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { AlertTriangle, Bot, ExternalLink, Monitor, Save, Smartphone, Trash2 } from "lucide-react";
+import { AlertTriangle, Bot, Check, ExternalLink, Monitor, Save, Smartphone, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -137,20 +137,42 @@ export function PaivaEditori(props: {
         <div className="space-y-2">
           <Label htmlFor="pv-haku">Visa</Label>
           <Input id="pv-haku" placeholder="Hae nimellä tai kokoelmalla…" value={haku} onChange={(e) => setHaku(e.target.value)} />
-          <select
-            className="h-48 w-full rounded-md border bg-transparent p-1 text-sm"
-            size={8}
-            value={quizId}
-            onChange={(e) => setQuizId(e.target.value)}
-            aria-label="Valitse visa"
-          >
-            {suodatetut.map((v) => (
-              <option key={v.id} value={v.id}>
-                {v.status === "published" ? "" : "[luonnos] "}{v.title}{v.kokoelma ? ` — ${v.kokoelma}` : ""}{v.kuva ? "" : " (ei kuvaa)"}
-              </option>
-            ))}
-          </select>
-          {visa && <p className="text-xs text-muted-foreground">Valittu: <strong>{visa.title}</strong> · {visa.kokoelma ?? "—"}</p>}
+          {/* Klikattava lista natiivin monirivisen selectin sijaan (20.9.2026):
+              select näytti sinisen korostuksen rivillä, jota ei ollut valittu,
+              jolloin Tallenna jäi harmaaksi eikä syy näkynyt. */}
+          <div role="listbox" aria-label="Valitse visa" className="h-48 overflow-y-auto rounded-md border p-1">
+            {suodatetut.length === 0 && (
+              <p className="p-2 text-sm text-muted-foreground">Ei osumia haulla “{haku}”.</p>
+            )}
+            {suodatetut.map((v) => {
+              const valittu = v.id === quizId;
+              return (
+                <button
+                  key={v.id}
+                  type="button"
+                  role="option"
+                  aria-selected={valittu}
+                  onClick={() => setQuizId(v.id)}
+                  className={`flex w-full items-center gap-2 rounded px-2 py-1 text-left text-sm ${
+                    valittu ? "bg-foreground text-background" : "hover:bg-muted"
+                  }`}
+                >
+                  <Check className={`h-3.5 w-3.5 shrink-0 ${valittu ? "" : "opacity-0"}`} />
+                  <span className="truncate">
+                    {v.status === "published" ? "" : "[luonnos] "}{v.title}
+                    <span className={valittu ? "opacity-80" : "text-muted-foreground"}>
+                      {v.kokoelma ? ` — ${v.kokoelma}` : ""}{v.kuva ? "" : " (ei kuvaa)"}
+                    </span>
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+          {visa ? (
+            <p className="text-xs text-muted-foreground">Valittu: <strong>{visa.title}</strong> · {visa.kokoelma ?? "—"}</p>
+          ) : (
+            <p className="text-xs text-amber-700">Ei valittua visaa — napauta visaa listasta.</p>
+          )}
         </div>
 
         {varoitukset.length > 0 && (
@@ -218,6 +240,11 @@ export function PaivaEditori(props: {
             <Button variant="outline" onClick={poista} disabled={pending}>
               <Trash2 className="h-4 w-4" /> Poista valinta
             </Button>
+          )}
+          {/* Miksi tallennus ei ole käytettävissä */}
+          {!pending && !quizId && <span className="self-center text-sm text-muted-foreground">Valitse ensin visa listasta.</span>}
+          {!pending && quizId && !muutettu && !autoFilled && (
+            <span className="self-center text-sm text-muted-foreground">Ei tallentamattomia muutoksia.</span>
           )}
         </div>
       </div>
