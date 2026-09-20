@@ -77,66 +77,45 @@ export const TIEDE_NOSTO = {
   meta: "Tiedemyytit – totta vai tarua?",
 };
 
-/** Neljä aihepiiriä (design: 01–04). Nimi ja koukku ovat designin copya —
-    korteissa näytetään lyhyt nimi, ei visan koko otsikkoa. */
+/** Neljä aihepiiriä (design: 01–04) — vain otsikot ja kuvaukset.
+ *
+ *  Mikä visa kuuluu mihinkin aihepiiriin tulee kannasta:
+ *  `quizzes.subcollection` = `id` alla. Kortin lyhyt nimi on
+ *  `quizzes.display_title` ja koukku `quizzes.teaser`. Sama tapa kuin
+ *  Historialla, Luonnolla ja Kulttuurilla (migraatio 20.9.2026).
+ *  Uusi tiedevisa ilmestyy sivulle ilman koodimuutosta, kunhan sille
+ *  asetetaan kannassa category='tiede-teknologia' ja subcollection.
+ *
+ *  Järjestys aihepiirin sisällä: published_at nousevasti. */
 export const TIEDE_SECTIONS: Array<{
   number: string;
   title: string;
   id: string;
   intro: string;
-  quizzes: Array<{ slug: string; nimi: string; hook: string }>;
 }> = [
   {
     number: "01",
     title: "Elämä & ihminen",
     id: "elama-ja-ihminen",
     intro: "Soluista aivoihin ja evoluutiosta eläinten uskomattomiin kykyihin.",
-    quizzes: [
-      { slug: "kehosi-katketyt-kummallisuudet", nimi: "Ihmiskeho", hook: "Kätketyt kummallisuudet" },
-      { slug: "paan-sisalla-tapahtuu-enemman-kuin-huomaat", nimi: "Aivot ja mieli", hook: "Enemmän kuin huomaat" },
-      { slug: "mista-olet-tehty-oikeasti-genetiikka", nimi: "Genetiikka", hook: "Mistä olet tehty, oikeasti?" },
-      { slug: "evoluutio-ja-biodiversiteetti-visa", nimi: "Evoluutio", hook: "Kaikki muuttuu, mutta ei niin kuin luulet" },
-      { slug: "mikroskooppinen-maailma-nakymaton-elama", nimi: "Mikrobit", hook: "Näkymätön maailma silmiesi edessä" },
-      { slug: "laaketieteen-lapimurrot-visa", nimi: "Lääketiede", hook: "Läpimurtoja leikkaussalista laboratorioon" },
-      { slug: "kasvit-ja-sienet-ansoja-kauppoja-jattilaisia", nimi: "Kasvit ja sienet", hook: "Ansoja, kauppoja ja jättiläisiä" },
-      { slug: "elainten-supervoimat-aistit-ja-ennatykset", nimi: "Eläinten supervoimat", hook: "Aisteja ja ennätyksiä" },
-    ],
   },
   {
     number: "02",
     title: "Maa & avaruus",
     id: "maa-ja-avaruus",
     intro: "Miljardeja vuosia historiaa maan alla, meren syvyyksissä ja taivaalla.",
-    quizzes: [
-      { slug: "matka-planeetoilta-kuun-kraattereihin", nimi: "Aurinkokunta", hook: "Planeetoilta Kuun kraattereihin" },
-      { slug: "elava-planeetta-liikkuu-jalkojesi-alla", nimi: "Geologia", hook: "Elävä planeetta jalkojesi alla" },
-      { slug: "saa-ja-ilmakeha-taivaan-pikkuprintti", nimi: "Sää ja ilmakehä", hook: "Taivaan pikkuprintti" },
-      { slug: "meret-ja-merentutkimus-visa", nimi: "Meret ja syvyydet", hook: "Pimeys, paine ja salaisuudet" },
-      { slug: "kadonneen-ajan-jattilaiset", nimi: "Dinosaurukset", hook: "Kadonneen ajan jättiläiset" },
-    ],
   },
   {
     number: "03",
     title: "Fysiikka, kemia & matematiikka",
     id: "fysiikka-kemia-matematiikka",
     intro: "Miksi asiat putoavat, reagoivat ja käyttäytyvät aivan eri tavalla kuin intuitio väittää?",
-    quizzes: [
-      { slug: "arjen-fysiikka-salamoista-sireeneihin", nimi: "Arjen fysiikka", hook: "Salamoista sireeneihin" },
-      { slug: "kemia-ja-alkuaineet-visa", nimi: "Kemia", hook: "Kuplia, ruostetta ja tähtipölyä" },
-      { slug: "arkijarki-vastaan-matematiikka", nimi: "Arkijärki vastaan matematiikka", hook: "Kun intuitio on väärässä" },
-    ],
   },
   {
     number: "04",
     title: "Keksinnöt & tiedehistoria",
     id: "keksinnot-ja-tiedehistoria",
     intro: "Nerokkaita oivalluksia, vahinkoja, kilpailua ja ihmisiä, jotka muuttivat maailmaa.",
-    quizzes: [
-      { slug: "nerokkaita-oivalluksia-ja-onnekkaita-sattumia", nimi: "Keksinnöt", hook: "Nerokkaita oivalluksia ja onnekkaita sattumia" },
-      { slug: "teknologian-ensimmaiset-hetket-visa", nimi: "Teknologian ensiaskeleet", hook: "Ensimmäinen sana, kuva ja soitto" },
-      { slug: "neroja-omenoita-ja-yllattavia-kaanteita", nimi: "Tiedehistorian nerot", hook: "Omenoita ja yllättäviä käänteitä" },
-      { slug: "tiedemyyttien-tarkastus-visa", nimi: "Tiedemyytit", hook: "Totta vai tarua?" },
-    ],
   },
 ];
 

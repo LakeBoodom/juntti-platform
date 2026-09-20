@@ -6,8 +6,11 @@
 // Rakenne designin mukaan: hero → aihepiirichipit → "Aloita näistä" (6) →
 // aihepiirit 01 ja 02 → nostettu visa → aihepiirit 03 ja 04 → alaviite.
 // Poimitut TOISTUVAT aihepiireissä (sama sääntö kuin TV- ja Musiikki-sivuilla).
-// Kortin nimi ja koukku ovat designin copya (lib/tiede.ts), eivät visan omaa
-// otsikkoa — visan koko nimi näkyy pelisivulla.
+//
+// Aihepiirijako tulee kannasta (quizzes.subcollection, migraatio 20.9.2026);
+// aihepiirien otsikot ja kuvaukset ovat lib/tiede.ts:ssä. Aihepiirikortin
+// lyhyt nimi ja koukku luetaan visan otsikosta ("Nimi – koukku"), ja
+// "Aloita näistä" -poiminnoilla on oma copynsa designin mukaan.
 
 import type { Metadata } from "next";
 import { getSupabase } from "@/lib/supabase";
@@ -37,8 +40,25 @@ export const metadata: Metadata = {
 
 type Card = {
   id: string; slug: string | null; custom_slug: string | null;
-  title: string; display_title: string | null; question_count: number;
+  title: string; display_title: string | null;
+  subcollection: string | null; question_count: number;
 };
+
+/** Aihepiirikortissa näkyy lyhyt nimi ja sen alla koukku. Molemmat luetaan
+ *  visan omasta otsikosta, joka on tässä kokoelmassa muotoa "Nimi – koukku"
+ *  (migraatio 20.9.2026 varmistaa muodon). Näin uusi tiedevisa saa oikean
+ *  kortin ilman koodimuutosta, eikä hakutulosten kuvaus kutistu koukuksi.
+ *
+ *  Jos ajatusviivaa ei ole, koko otsikko on nimi ja koukku jää tyhjäksi —
+ *  kortti näyttää silloin siistiltä, vaikka copy puuttuisi. */
+function kortinTeksti(c: Card): { nimi: string; koukku: string } {
+  const koko = c.display_title ?? c.title;
+  const i = koko.indexOf("–");
+  if (i < 0) return { nimi: koko.trim(), koukku: "" };
+  const nimi = koko.slice(0, i).trim();
+  const loppu = koko.slice(i + 1).trim();
+  return { nimi, koukku: loppu ? loppu[0].toUpperCase() + loppu.slice(1) : "" };
+}
 
 const playHref = (c: Card) =>
   c.custom_slug || c.slug ? `/peli?visa=${c.custom_slug ?? c.slug}` : `/peli?quiz_id=${c.id}`;
@@ -73,22 +93,26 @@ export default async function TiedeLanding() {
 
   const { data } = await sb
     .from("quiz_cards" as never)
-    .select("id, slug, custom_slug, title, display_title, question_count")
-    .eq("category", TIEDE_KATEGORIA);
+    .select("id, slug, custom_slug, title, display_title, subcollection, question_count")
+    .eq("category", TIEDE_KATEGORIA)
+    .order("published_at", { ascending: true });
   const cards = (data ?? []) as unknown as Card[];
   const bySlug = new Map(cards.map((c) => [c.slug ?? "", c]));
-  const poimi = <T extends { slug: string }>(l: T[]) =>
-    l.map((q) => ({ ...q, card: bySlug.get(q.slug) })).filter((q): q is T & { card: Card } => Boolean(q.card));
 
-  const aloita = poimi(TIEDE_ALOITA);
-  const sections = TIEDE_SECTIONS.map((s) => ({ ...s, cards: poimi(s.quizzes) })).filter((s) => s.cards.length > 0);
+  /* Aihepiirit kannasta (quizzes.subcollection); otsikot ja kuvaukset koodista. */
+  const sections = TIEDE_SECTIONS
+    .map((s) => ({ ...s, cards: cards.filter((c) => c.subcollection === s.id) }))
+    .filter((s) => s.cards.length > 0);
+
+  /* "Aloita näistä" on kuratoitu poiminta omalla copyllaan (design v0.2). */
+  const aloita = TIEDE_ALOITA
+    .map((q) => ({ ...q, card: bySlug.get(q.slug) }))
+    .filter((q): q is (typeof TIEDE_ALOITA)[number] & { card: Card } => Boolean(q.card));
+
   const nosto = bySlug.get(TIEDE_NOSTO.slug) ?? null;
   /* Luvut kannasta, ei kovakoodattuina (design: "20 tietovisaa · satoja kysymyksiä"). */
-  const visoja = new Set(sections.flatMap((s) => s.cards.map((c) => c.card.id))).size;
-  const kysymyksia = sections
-    .flatMap((s) => s.cards.map((c) => c.card))
-    .filter((c, i, l) => l.findIndex((x) => x.id === c.id) === i)
-    .reduce((a, c) => a + (c.question_count ?? 0), 0);
+  const visoja = cards.length;
+  const kysymyksia = cards.reduce((a, c) => a + (c.question_count ?? 0), 0);
 
   return (
     <main className="tnt-page">
@@ -154,9 +178,10 @@ export default async function TiedeLanding() {
                   </span>
                 </div>
                 <div className="tnt-grid">
-                  {s.cards.map((q) => (
-                    <Kortti key={q.slug} card={q.card} nimi={q.nimi} hook={q.hook} />
-                  ))}
+                  {s.cards.map((c) => {
+                    const t = kortinTeksti(c);
+                    return <Kortti key={c.id} card={c} nimi={t.nimi} hook={t.koukku} />;
+                  })}
                 </div>
               </section>
 
