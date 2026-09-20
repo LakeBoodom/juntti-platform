@@ -21,13 +21,15 @@ export const HEADER_PROMOS: HeaderPromo[] = [
   { key: "suosittu", kicker: "Suosittu nyt", label: "Elokuvat", href: "/kokoelma/elokuvat" },
 ];
 
-/* Kategoriarivi (7 chippiä designin lopullisen HTML:n mukaan — README:n 9:n lista
-   hävisi HTML:lle, CD:n sääntö). */
+/* Kategoriarivi (designin lopullisen HTML:n mukaan — README:n 9:n lista hävisi
+   HTML:lle, CD:n sääntö). Tiede lisätty 20.9.2026 uuden kokoelman myötä;
+   rivi vierii vaakasuunnassa, joten pituus ei ole rajoite. */
 export const CATEGORY_CHIPS = [
   { label: "Urheilu", href: "/kokoelma/urheilu" },
   { label: "Historia", href: "/kokoelma/historia" },
   { label: "Luonto", href: "/kokoelma/luonto" },
   { label: "Maantieto", href: "/kokoelma/matkakohteet" },
+  { label: "Tiede", href: "/kokoelma/tiede" },
   { label: "Elokuvat", href: "/kokoelma/elokuvat" },
   { label: "Kuvavisat", href: "/kokoelma/kuvavisat" },
   { label: "Kaikki", href: "/kokoelmat" },
