@@ -4,6 +4,7 @@
 //   ylätunniste (TopBar layoutista: tagline, nostot, Päivän putki) → kategoriarivi →
 //   Päivän visa (19.9.2026: sivun ensimmäinen osio) → Kuvavisat-banneri (18.9.2026,
 //   korvasi lippuvisa-heron ja viikkovisapromon) → Suositut kokoelmat (6) →
+//   Tiede & teknologia -banneri → Suositut kokoelmat (6) →
 //   Kuka on vanhin? -banneri → Päivän sankari → Laura ja Mikko (profiilit + 4
 //   korttia) → Uusimmat visat -ticker → footer.
 // Poistuneet: Laura & Mikko -duohero, upotettu ensimmäinen kysymys, putkinauha,
@@ -20,6 +21,7 @@ import { rakennaPaivanVisa } from "@/lib/paivanVisaData";
 import PaivanSankari from "@/components/tn20/PaivanSankari";
 import { muotoileSankari, type SankariRivi } from "@/lib/paivanSankari";
 import { KuvavisatBanneri, IkajarjestysBanneri } from "@/components/tn20/EtusivunBannerit";
+import { TiedeBanneri } from "@/components/tn20/TiedeBanneri";
 import { getViikkovisa } from "@/lib/kuvavisat2026";
 import { getKuvavisaYhteenveto, getBanneriHenkilot } from "@/lib/etusivunBannerit";
 import {
@@ -27,6 +29,7 @@ import {
 } from "@/lib/etusivu";
 import "./etusivu.css";
 import "./etusivun-bannerit.css";
+import "./tiede.css";
 
 export const dynamic = "force-dynamic";
 
@@ -106,7 +109,7 @@ async function getData(opts: { pvTila: string | null; sankariPaiva: string | nul
      kaupunkivisat ja megat. */
   const latest = cards
     .filter((c) => c.collection && c.collection !== "tunnetut-henkilot" && c.published_at)
-    .filter((c) => c.collection !== "yleistieto" || c.category === "kaupungit" || c.game_mode === "mega")
+    .filter((c) => c.collection !== "yleistieto" || c.category === "kaupungit" || c.category === "tiede-teknologia" || c.game_mode === "mega")
     .sort((a, b) => (b.published_at! > a.published_at! ? 1 : -1))
     .slice(0, 12)
     .map((c) => ({
@@ -181,6 +184,10 @@ export default async function Etusivu20({
             Korvasi lippuvisa-heron ja sen alla olleen viikkovisapromon.
             Bannerin otsikko on etusivun h1. */}
         <KuvavisatBanneri yhteenveto={kvYhteenveto} viikko={viikko} />
+
+        {/* ─── Tiede & teknologia -mainosbanneri (Heikki 20.9.2026):
+            Kuvavisat-bannerin alla ennen Suosittuja kokoelmia ─── */}
+        <TiedeBanneri />
 
         {/* ─── Suositut kokoelmat ─── */}
         <section aria-labelledby="suositut">

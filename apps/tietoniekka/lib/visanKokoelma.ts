@@ -12,6 +12,7 @@
 // kentästä ja ohjataan omille teemasivuilleen. Yleistieto ei ole 2.0:ssa
 // omana kokoelmana (Heikki 3) → hub /kokoelmat.
 
+import { TIEDE_ACCENT, TIEDE_HERO } from "@/lib/tiede";
 import { KAUPUNGIT_HERO_IMG } from "@/lib/kaupungit";
 import { JK_HERO, JK_ACCENT } from "@/lib/jaakiekko";
 import { JP_HERO } from "@/lib/jalkapallo";
@@ -54,6 +55,9 @@ export function resolveCollection(q: { collection: string | null; category: stri
      ei muuta pelinäkymää. */
   if (cat === "mega") return { key: "megavisat", label: "Megavisat", hub: "/megavisat", bg: "/20/megavisa.webp", accent: "#E8A320" };
   if (cat === "kaupungit") return { key: "kaupungit", label: "Suomen kaupungit", hub: "/kokoelma/kaupungit", bg: KAUPUNGIT_HERO_IMG, accent: "#E8A320" };
+  /* Tiede & teknologia (20.9.2026): visat ovat kannassa yleistietoa, kokoelma
+     tunnistetaan kategoriasta — sama periaate kuin kaupunkivisoilla. */
+  if (cat === "tiede-teknologia") return { key: "tiede", label: "Tiede & teknologia", hub: "/kokoelma/tiede", bg: TIEDE_HERO.img, accent: TIEDE_ACCENT };
   if (cat === "jaakiekko" || genre === "jaakiekko") return { key: "jaakiekko", label: "Jääkiekko", hub: "/kokoelma/jaakiekko", bg: JK_HERO.img, accent: JK_ACCENT };
   if (genre === "jalkapallo") return { key: "jalkapallo", label: "Jalkapallo", hub: "/kokoelma/jalkapallo", bg: JP_HERO.img, accent: "#B6FF3C" };
   if (collection === "yleistieto") return { key: "yleistieto", label: "Yleistieto", hub: "/kokoelmat", bg: "/20/hero-mikko-laura.webp", accent: "#E8A320" };

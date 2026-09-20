@@ -31,6 +31,11 @@ export const NAV_COLLECTIONS: NavCollection[] = [
   { slug: "kulttuuri", label: "Kulttuuri", color: "#E8A320" },
   { slug: "historia", label: "Historia", color: "#E8A320" },
   { slug: "luonto", label: "Luonto", color: "#3FBF7F" },
+  /* Tiede & teknologia (Heikki 20.9.2026): oma teemakokoelma, jonka visat ovat
+     kannassa yleistieto-kokoelmaa category='tiede-teknologia' — sama
+     nosto-periaate kuin Suomen kaupungeilla. Visamäärä lasketaan kategoriasta
+     (ks. kokoelmat/page.tsx). */
+  { slug: "tiede", label: "Tiede & teknologia", color: "#5BE1FF" },
 ];
 
 export type NavMode = {

@@ -12,7 +12,7 @@ import { KAUPUNGIT } from "@/lib/kaupungit";
 
 export const metadata: Metadata = {
   title: "Kaikki kokoelmat – tietovisat aiheittain | Tietoniekka",
-  description: "Valitse aihe: TV & suoratoisto, urheilu, jääkiekko, jalkapallo, elokuvat, musiikki, maantieto, Suomen kaupungit, tunnetut henkilöt, kulttuuri, historia ja luonto.",
+  description: "Valitse aihe: TV & suoratoisto, urheilu, jääkiekko, jalkapallo, elokuvat, musiikki, maantieto, Suomen kaupungit, tunnetut henkilöt, kulttuuri, historia, luonto ja tiede & teknologia.",
 };
 
 export const dynamic = "force-dynamic";
@@ -37,13 +37,16 @@ async function getCounts(): Promise<Record<string, number>> {
   try {
     const sb = getSupabase();
     if (!sb) return {};
-    const { data } = await sb.from("quiz_cards" as never).select("collection, slug");
+    const { data } = await sb.from("quiz_cards" as never).select("collection, category, slug");
     const counts: Record<string, number> = {};
-    for (const r of (data ?? []) as Array<{ collection: string | null; slug: string | null }>) {
+    for (const r of (data ?? []) as Array<{ collection: string | null; category: string | null; slug: string | null }>) {
       if (r.collection) counts[r.collection] = (counts[r.collection] ?? 0) + 1;
       if (r.slug && JP_SLUGS.has(r.slug)) counts.jalkapallo = (counts.jalkapallo ?? 0) + 1;
       if (r.slug && JK_SLUGS.has(r.slug)) counts.jaakiekko = (counts.jaakiekko ?? 0) + 1;
       if (r.slug && KAUPUNGIT_SLUGS.has(r.slug)) counts.kaupungit = (counts.kaupungit ?? 0) + 1;
+      /* Tiede & teknologia (20.9.2026): visat ovat yleistietoa, kokoelma
+         tunnistetaan kategoriasta. */
+      if (r.category === "tiede-teknologia") counts.tiede = (counts.tiede ?? 0) + 1;
     }
     return counts;
   } catch {

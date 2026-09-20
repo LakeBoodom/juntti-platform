@@ -553,6 +553,7 @@ export default async function Peli20({
     .neq("game_mode" as never, "mega");
   relQ =
     resolved.key === "kaupungit" ? relQ.eq("category", "kaupungit") :
+    resolved.key === "tiede" ? relQ.eq("category", "tiede-teknologia") :
     resolved.key === "jaakiekko" ? relQ.or("category.eq.jaakiekko,genre.eq.jaakiekko") :
     resolved.key === "jalkapallo" ? relQ.eq("genre", "jalkapallo") :
     resolved.key === "yleistieto" ? relQ.eq("collection", "yleistieto").neq("category", "kaupungit").neq("category", "ruoka-juoma") :
