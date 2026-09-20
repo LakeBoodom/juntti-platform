@@ -36,10 +36,12 @@ const IMG_SLUGS = new Set([
   "how-i-met-your-mother-visa",
   "kauniit-ja-rohkeat-forresterien-maailma",
   "ketonen-ja-myllyrinne-visa",
+  "koko-suomi-leipoo-visa-uunit-kuumina",
   "kotikatu-visa-muistatko-kotimaisen-klassikon",
   "kummeli-visa",
   "luottomies-visa",
   "maajussille-morsian-sydan-maaseudulla-visa",
+  "masked-singer-suomi-visa-naamion-takana",
   "metsolat-ysarin-sukusaaga",
   "money-heist-suuri-keikka",
   "muumilaakson-tarinoita-visa",
@@ -57,6 +59,7 @@ const IMG_SLUGS = new Set([
   "succession-visa-tunnetko-valtataistelun",
   "syke-sairaalan-sankarit",
   "tankki-tayteen-huoltamoklassikko-visa",
+  "tanssii-tahtien-kanssa-visa-parketin-tahdet",
   "ted-lasso-tiedatko-sarjasta-kaiken",
   "temptation-island-suomi-viettelysten-saarella-visa",
   "big-bang-theory-visa",
@@ -86,10 +89,12 @@ export const TV_FEATURED: Array<{ slug: string; rankColor: string; hook: string 
     rankColor: "#B79BE8",
     hook: "Kotimaisen sairaalasarjan pisin päivystysvuoro. Muistatko kenen kanssa kukin oli ja milloin?",
   },
+  /* Masked Singer Suomi korvasi Successionin nostona (Heikki 20.9.2026).
+     Succession pysyy aihepiirissä 01. */
   {
-    slug: "succession-visa-tunnetko-valtataistelun",
+    slug: "masked-singer-suomi-visa-naamion-takana",
     rankColor: "#E8A320",
-    hook: "Perheyhtiö, jossa kukaan ei voita. Kuinka hyvin tunnet valtataistelun huipulla?",
+    hook: "Naamion takana voi olla kuka tahansa. Muistatko hahmot, etsivien arvaukset ja suurimmat paljastukset?",
   },
 ];
 
@@ -175,6 +180,9 @@ export const TV_SECTIONS: Array<{
       { slug: "diili-sa-saat-potkut-visa", hook: "Sä saat potkut!" },
       { slug: "erikoisjoukot-visa", hook: "Kuulutko sinäkin Erikoisjoukkoihin?" },
       { slug: "maajussille-morsian-sydan-maaseudulla-visa", hook: "Sydän maaseudulla" },
+      { slug: "masked-singer-suomi-visa-naamion-takana", hook: "Kuka on naamion takana?" },
+      { slug: "tanssii-tahtien-kanssa-visa-parketin-tahdet", hook: "Parketin tähdet ja tiukat tuomarit" },
+      { slug: "koko-suomi-leipoo-visa-uunit-kuumina", hook: "Uunit kuumina, kädet jauhoissa" },
     ],
   },
 ];
