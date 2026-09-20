@@ -27,15 +27,44 @@ export const TIEDE_HERO = {
 };
 
 /** "Aloita näistä" — kuusi poimintaa. Poimitut TOISTUVAT aihepiireissä
-    (sama sääntö kuin TV- ja Musiikki-sivuilla). */
+    (sama sääntö kuin TV- ja Musiikki-sivuilla). Designissa v0.2 poiminnoilla
+    on oma copynsa: koko nimi otsikkona ja pidempi kuvaus (ei sama koukku kuin
+    aihepiirikorteissa). */
 export const TIEDE_ALOITA: Array<{ slug: string; nimi: string; hook: string }> = [
-  { slug: "kehosi-katketyt-kummallisuudet", nimi: "Ihmiskeho", hook: "Kätketyt kummallisuudet" },
-  { slug: "matka-planeetoilta-kuun-kraattereihin", nimi: "Aurinkokunta", hook: "Planeetoilta Kuun kraattereihin" },
-  { slug: "tiedemyyttien-tarkastus-visa", nimi: "Tiedemyytit", hook: "Totta vai tarua?" },
-  { slug: "kadonneen-ajan-jattilaiset", nimi: "Dinosaurukset", hook: "Kadonneen ajan jättiläiset" },
-  { slug: "paan-sisalla-tapahtuu-enemman-kuin-huomaat", nimi: "Aivot ja mieli", hook: "Enemmän kuin huomaat" },
-  { slug: "nerokkaita-oivalluksia-ja-onnekkaita-sattumia", nimi: "Keksinnöt", hook: "Nerokkaita oivalluksia ja onnekkaita sattumia" },
+  {
+    slug: "kehosi-katketyt-kummallisuudet",
+    nimi: "Ihmiskeho – kätketyt kummallisuudet",
+    hook: "Luita, soluja ja reaktioita, joita kannat mukanasi joka päivä huomaamatta.",
+  },
+  {
+    slug: "matka-planeetoilta-kuun-kraattereihin",
+    nimi: "Aurinkokunta – planeetoilta Kuun kraattereihin",
+    hook: "Naapuruston kiertoradat, kuut ja ilmiöt, joita voi katsoa omalta pihalta.",
+  },
+  {
+    slug: "tiedemyyttien-tarkastus-visa",
+    nimi: "Tiedemyytit – totta vai tarua?",
+    hook: "Sitkeimmät koulussa opitut totuudet, jotka eivät kestä lähempää tarkastelua.",
+  },
+  {
+    slug: "kadonneen-ajan-jattilaiset",
+    nimi: "Dinosaurukset – kadonneen ajan jättiläiset",
+    hook: "Mitä fossiilit oikeasti kertovat maailman kuuluisimmista eläimistä.",
+  },
+  {
+    slug: "paan-sisalla-tapahtuu-enemman-kuin-huomaat",
+    nimi: "Aivot ja mieli – enemmän kuin huomaat",
+    hook: "Muisti, aistiharhat ja päätökset, jotka teet ennen kuin ehdit ajatella.",
+  },
+  {
+    slug: "nerokkaita-oivalluksia-ja-onnekkaita-sattumia",
+    nimi: "Keksinnöt – oivalluksia ja onnekkaita sattumia",
+    hook: "Arkiset esineet, joiden syntytarina on paljon outompi kuin uskoisi.",
+  },
 ];
+
+/** Poimintaruudukon ylänurkan pikkuotsikko (design v0.2). */
+export const TIEDE_ALOITA_KICKER = "Tietoniekka suosittelee";
 
 /** Nostettu visa aihepiirien 02 ja 03 välissä. */
 export const TIEDE_NOSTO = {

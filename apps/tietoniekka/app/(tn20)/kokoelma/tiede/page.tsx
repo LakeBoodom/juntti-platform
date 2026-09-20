@@ -13,7 +13,7 @@ import type { Metadata } from "next";
 import { getSupabase } from "@/lib/supabase";
 import Crumbs from "@/components/tn20/Crumbs";
 import {
-  TIEDE_ALOITA, TIEDE_BANNERI, TIEDE_FOOTNOTE, TIEDE_HERO, TIEDE_KATEGORIA,
+  TIEDE_ALOITA, TIEDE_ALOITA_KICKER, TIEDE_BANNERI, TIEDE_FOOTNOTE, TIEDE_HERO, TIEDE_KATEGORIA,
   TIEDE_NOSTO, TIEDE_SECTIONS, tiedeImg,
 } from "@/lib/tiede";
 import "../../tiede.css";
@@ -53,8 +53,10 @@ function Kortti({
         <img src={tiedeImg(card.slug ?? "")} alt="" loading="lazy" />
       </span>
       <span className="tnt-card-body">
-        <span className="tnt-card-name">{nimi}</span>
-        <span className="tnt-card-hook">{hook}</span>
+        <span className="tnt-card-text">
+          <span className="tnt-card-name">{nimi}</span>
+          <span className="tnt-card-hook">{hook}</span>
+        </span>
         {nuoli && (
           <span className="tnt-card-arrow" aria-hidden>
             <i>→</i>
@@ -130,7 +132,7 @@ export default async function TiedeLanding() {
             <section className="tnt-section tnt-section--start" aria-labelledby="tnt-aloita">
               <div className="tnt-starthead">
                 <h2 className="tnt-h2" id="tnt-aloita">Aloita näistä</h2>
-                <span>Suosituimmat tutkimuskohteet</span>
+                <span>{TIEDE_ALOITA_KICKER}</span>
               </div>
               <div className="tnt-grid tnt-grid--start">
                 {aloita.map((q) => (

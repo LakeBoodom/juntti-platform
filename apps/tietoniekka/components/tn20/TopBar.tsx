@@ -197,7 +197,7 @@ export default function TopBar() {
           </nav>
 
           <div className="tn-topbar-right">
-            {/* Nostot: Uusin kokoelma (≥1100 px) · Suosittu nyt (≥700 px) */}
+            {/* Nostot: Uusin kokoelma (≥1560 px) · Suosittu nyt (≥700 px) */}
             {HEADER_PROMOS.map((p) => (
               <a key={p.key} className="tn-promo" data-promo={p.key} href={p.href}>
                 <span className="tn-promo-dot" aria-hidden />

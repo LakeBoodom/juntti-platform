@@ -14,9 +14,10 @@ export const SITE_TAGLINE = "Suomalainen tietovisasivusto · 500+ visaa";
 
 export type HeaderPromo = { key: "uusin" | "suosittu"; kicker: string; label: string; href: string };
 
-/* Ylätunnisteen nostot: "Uusin kokoelma" näkyy ≥ 1100 px, "Suosittu nyt" ≥ 700 px. */
+/* Ylätunnisteen nostot: "Uusin kokoelma" näkyy ≥ 1560 px, "Suosittu nyt" ≥ 700 px
+   (mitattu raja, ks. topbar.css). */
 export const HEADER_PROMOS: HeaderPromo[] = [
-  { key: "uusin", kicker: "Uusin kokoelma", label: "Suomen historia", href: "/kokoelma/historia" },
+  { key: "uusin", kicker: "Uusin kokoelma", label: "Tiede & teknologia", href: "/kokoelma/tiede" },
   { key: "suosittu", kicker: "Suosittu nyt", label: "Elokuvat", href: "/kokoelma/elokuvat" },
 ];
 
