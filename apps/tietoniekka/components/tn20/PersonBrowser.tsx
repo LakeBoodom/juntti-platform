@@ -33,11 +33,14 @@ const GROUP_LABELS = [
   { key: "muut", label: "Muut" },
 ];
 
+/* "Suosituimmat" poistettu 21.9.2026 (Heikki): priority-kenttä ei erottele
+   henkilöitä, joten se antoi käytännössä saman listan etunimijärjestyksessä.
+   Oletus on A–Ö sukunimen mukaan. */
 const SORT_OPTIONS = [
-  { key: "suosituimmat", label: "Suosituimmat" },
   { key: "aakkoset", label: "A–Ö" },
   { key: "uusimmat", label: "Uusimmat" },
 ];
+const DEFAULT_SORT = "aakkoset";
 
 const INITIAL = 24;
 const STEP = 18;
@@ -101,7 +104,11 @@ function PersonBrowserInner({ people }: { people: BrowserPerson[] }) {
 
   const [q, setQ] = useState(() => searchParams.get("q") ?? "");
   const [cat, setCat] = useState(() => searchParams.get("cat") ?? "kaikki");
-  const [sort, setSort] = useState(() => searchParams.get("sort") ?? "suosituimmat");
+  // Vanha ?sort=suosituimmat -linkki (tai muu tuntematon arvo) → oletus.
+  const [sort, setSort] = useState(() => {
+    const s = searchParams.get("sort");
+    return SORT_OPTIONS.some((o) => o.key === s) ? (s as string) : DEFAULT_SORT;
+  });
   const [limit, setLimit] = useState(() => {
     const n = Number(searchParams.get("limit"));
     return Number.isFinite(n) && n > 0 ? n : INITIAL;
@@ -114,7 +121,7 @@ function PersonBrowserInner({ people }: { people: BrowserPerson[] }) {
     const params = new URLSearchParams();
     if (q) params.set("q", q);
     if (cat !== "kaikki") params.set("cat", cat);
-    if (sort !== "suosituimmat") params.set("sort", sort);
+    if (sort !== DEFAULT_SORT) params.set("sort", sort);
     if (limit !== INITIAL) params.set("limit", String(limit));
     const qs = params.toString();
     router.replace(qs ? `?${qs}` : "?", { scroll: false });
@@ -129,12 +136,10 @@ function PersonBrowserInner({ people }: { people: BrowserPerson[] }) {
       list = list.filter((p) => normalize(p.name).includes(nq) || (p.role && normalize(p.role).includes(nq)));
     }
     const sorted = [...list];
-    if (sort === "aakkoset") {
-      sorted.sort((a, b) => surname(a.name).localeCompare(surname(b.name), "fi") || a.name.localeCompare(b.name, "fi"));
-    } else if (sort === "uusimmat") {
+    if (sort === "uusimmat") {
       sorted.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
     } else {
-      sorted.sort((a, b) => (b.priority ?? 0) - (a.priority ?? 0) || a.name.localeCompare(b.name, "fi"));
+      sorted.sort((a, b) => surname(a.name).localeCompare(surname(b.name), "fi") || a.name.localeCompare(b.name, "fi"));
     }
     return sorted;
   }, [people, cat, q, sort]);

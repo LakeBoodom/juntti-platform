@@ -616,7 +616,25 @@ async function PersonHub({ hub, article }: { hub: HubMeta; article?: React.React
     .select("id, slug, name, role, ryhma, laji, image_url, birth_date, trivia_quiz_id, priority, created_at")
     .eq("site_id", siteId)
     .order("name");
-  const celebs = (data ?? []) as unknown as Celeb[];
+  const kaikki = (data ?? []) as unknown as Celeb[];
+
+  /* Vain henkilöt, joiden visa on JULKAISTU (21.9.2026). Aiemmin riitti että
+     trivia_quiz_id oli asetettu, joten luonnostilaiset visat (31 kpl) näkyivät
+     sivulla — ja klikkaus vei pelisivulle, joka ei näytä luonnoksia. quiz_cards
+     sisältää vain julkaistut visat. */
+  const visaIdt = [...new Set(kaikki.map((c) => c.trivia_quiz_id).filter(Boolean))] as string[];
+  // Erissä: ~290 uuid:tä yhdessä in()-listassa tekisi yli 10 kt:n URL:n.
+  const erat: string[][] = [];
+  for (let i = 0; i < visaIdt.length; i += 100) erat.push(visaIdt.slice(i, i + 100));
+  const tulokset = await Promise.all(
+    erat.map((era) => sb.from("quiz_cards" as never).select("id").in("id", era)),
+  );
+  const julkaistuIdt = new Set(
+    tulokset.flatMap((r) => ((r.data ?? []) as unknown as Array<{ id: string }>).map((x) => x.id)),
+  );
+  const celebs = kaikki.map((c) =>
+    c.trivia_quiz_id && !julkaistuIdt.has(c.trivia_quiz_id) ? { ...c, trivia_quiz_id: null } : c,
+  );
 
   const today = new Date();
   const key = (m: number, d: number) => m * 100 + d;
