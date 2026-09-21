@@ -4,23 +4,28 @@ import { getSupabaseAdmin, supabaseFromCookies } from "@/lib/supabase-server";
 import { getCurrentSite } from "@/lib/sites";
 import { Nav } from "@/components/nav";
 import { Button } from "@/components/ui/button";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { SortableHeader } from "@/components/sortable-header";
-import { FeaturedToggle } from "./featured-toggle";
+import { QuizList, type ListaVisa } from "./quiz-list";
 
 export const dynamic = "force-dynamic";
 
-export default async function QuizzesPage({ searchParams }: { searchParams: Promise<{ sort?: string; dir?: string }> }) {
-  const sp = await searchParams;
-  const sortKey = sp.sort ?? "created_at";
-  const sortDir = sp.dir === "asc" ? "asc" : "desc";
+// Visalista (uudistettu 21.9.2026): haku, tila- ja kokoelmasuodatus ja järjestys
+// tapahtuvat selaimessa (QuizList), joten tämä sivu vain hakee kaiken kerran.
+// Poistettu: Sävy (vain AI-generoinnin ohje, näkyy muokkaussivulla), Alusta (aina
+// tietoniekka) ja Nosto (featured_in_category — Tietoniekka 2.0 ei lue sitä).
+// Pelatut luki quizzes.play_count-kenttää, jota mikään ei päivitä; nyt pelikerrat
+// lasketaan quiz_plays-taulusta (admin_visa_tilastot).
+
+type Rivi = {
+  id: string; title: string; slug: string | null; custom_slug: string | null;
+  collection: string | null; category: string | null; difficulty: string | null;
+  status: string; created_at: string; updated_at: string | null; published_at: string | null;
+};
+
+type Tilasto = {
+  quiz_id: string; pelit: number; pelit_30pv: number; peukku_ylos: number; peukku_alas: number;
+};
+
+export default async function QuizzesPage() {
   const sb = await supabaseFromCookies();
   const {
     data: { user },
@@ -28,25 +33,46 @@ export default async function QuizzesPage({ searchParams }: { searchParams: Prom
 
   const site = await getCurrentSite();
   const admin = getSupabaseAdmin();
-  const [{ data, error }, { data: fbRows }] = await Promise.all([
-    admin
-      .from("quizzes")
-      .select(
-        "id, title, slug, category, difficulty, tone, platform, status, created_at, play_count, site_id, featured_in_category",
-      )
-      .eq("site_id", site.id)
-      .order(sortKey, { ascending: sortDir === "asc" }),
-    admin.from("quiz_plays").select("quiz_id, feedback").not("feedback", "is", null),
-  ]);
 
-  // Visapalaute: 👍/👎-summat per visa
-  const fb: Record<string, { up: number; down: number }> = {};
-  for (const r of fbRows ?? []) {
-    if (!r.quiz_id) continue;
-    const e = (fb[r.quiz_id] ??= { up: 0, down: 0 });
-    if (r.feedback === 1) e.up += 1;
-    else if (r.feedback === -1) e.down += 1;
+  /* PostgREST palauttaa enintään 1000 riviä kerralla — haetaan erissä, ettei
+     lista katkea hiljaa kun visoja on enemmän. */
+  const rivit: Rivi[] = [];
+  let virhe: string | null = null;
+  for (let alku = 0; ; alku += 1000) {
+    const { data, error } = await admin
+      .from("quizzes")
+      .select("id, title, slug, custom_slug, collection, category, difficulty, status, created_at, updated_at, published_at")
+      .eq("site_id", site.id)
+      .order("created_at", { ascending: false })
+      .range(alku, alku + 999);
+    if (error) { virhe = error.message; break; }
+    rivit.push(...((data ?? []) as unknown as Rivi[]));
+    if (!data || data.length < 1000) break;
   }
+
+  const { data: tilastot } = await admin.rpc("admin_visa_tilastot" as never, { p_site: site.id } as never);
+  const tilastoMap = new Map(
+    ((tilastot ?? []) as unknown as Tilasto[]).map((t) => [t.quiz_id, t]),
+  );
+
+  const visat: ListaVisa[] = rivit.map((r) => {
+    const t = tilastoMap.get(r.id);
+    return {
+      id: r.id,
+      title: r.title,
+      slug: r.custom_slug ?? r.slug,
+      collection: r.collection,
+      category: r.category,
+      difficulty: r.difficulty,
+      status: r.status,
+      created_at: r.created_at,
+      updated_at: r.updated_at ?? r.created_at,
+      pelit: Number(t?.pelit ?? 0),
+      pelit30: Number(t?.pelit_30pv ?? 0),
+      ylos: Number(t?.peukku_ylos ?? 0),
+      alas: Number(t?.peukku_alas ?? 0),
+    };
+  });
 
   return (
     <>
@@ -56,7 +82,7 @@ export default async function QuizzesPage({ searchParams }: { searchParams: Prom
           <div>
             <h1 className="text-2xl font-semibold">Visat</h1>
             <p className="text-sm text-muted-foreground">
-              Kaikki draftit ja julkaistut visat. Site: <strong>{site.name}</strong>. Luo uusi AI:lla.
+              Kaikki luonnokset ja julkaistut visat. Site: <strong>{site.name}</strong>.
             </p>
           </div>
           <Link href="/quizzes/new">
@@ -66,76 +92,16 @@ export default async function QuizzesPage({ searchParams }: { searchParams: Prom
           </Link>
         </div>
 
-        {error ? (
+        {virhe ? (
           <div className="rounded-md border border-destructive/40 bg-destructive/10 p-3 text-sm text-destructive">
-            Lataus epäonnistui: {error.message}
+            Lataus epäonnistui: {virhe}
           </div>
-        ) : !data?.length ? (
+        ) : visat.length === 0 ? (
           <div className="rounded-md border border-dashed p-8 text-center text-sm text-muted-foreground">
             Ei yhtään visaa. Generoi ensimmäinen yllä olevasta napista.
           </div>
         ) : (
-          <div className="rounded-md border">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <SortableHeader column="title">Otsikko</SortableHeader>
-                  <SortableHeader column="category">Kategoria</SortableHeader>
-                  <SortableHeader column="difficulty">Vaikeus</SortableHeader>
-                  <SortableHeader column="tone">Sävy</SortableHeader>
-                  <SortableHeader column="platform">Alusta</SortableHeader>
-                  <SortableHeader column="status">Status</SortableHeader>
-                  <TableHead>Nosto</TableHead>
-                  <TableHead>Palaute</TableHead>
-                  <TableHead className="text-right">Pelatut</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {data.map((q) => (
-                  <TableRow key={q.id}>
-                    <TableCell className="font-medium">
-                      <Link
-                        href={`/quizzes/${q.id}`}
-                        className="hover:underline"
-                      >
-                        {q.title}
-                      </Link>
-                    </TableCell>
-                    <TableCell className="text-muted-foreground">
-                      {q.category}
-                    </TableCell>
-                    <TableCell>{q.difficulty}</TableCell>
-                    <TableCell>{q.tone}</TableCell>
-                    <TableCell>{q.platform}</TableCell>
-                    <TableCell>
-                      <span
-                        className={
-                          q.status === "published"
-                            ? "inline-flex items-center rounded-full border border-green-600/30 bg-green-600/10 px-2 py-0.5 text-xs text-green-700"
-                            : q.status === "draft"
-                              ? "inline-flex items-center rounded-full border border-yellow-600/30 bg-yellow-600/10 px-2 py-0.5 text-xs text-yellow-700"
-                              : "inline-flex items-center rounded-full border border-muted-foreground/30 bg-muted px-2 py-0.5 text-xs text-muted-foreground"
-                        }
-                      >
-                        {q.status === "published"
-                          ? "Julkaistu"
-                          : q.status === "draft"
-                            ? "Draft"
-                            : "Arkistoitu"}
-                      </span>
-                    </TableCell>
-                    <TableCell>
-                      <FeaturedToggle quizId={q.id} featured={q.featured_in_category} />
-                    </TableCell>
-                    <TableCell className="whitespace-nowrap text-sm text-muted-foreground">
-                      {fb[q.id] ? `👍 ${fb[q.id].up} · 👎 ${fb[q.id].down}` : "—"}
-                    </TableCell>
-                    <TableCell className="text-right">{q.play_count}</TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </div>
+          <QuizList visat={visat} />
         )}
       </main>
     </>
