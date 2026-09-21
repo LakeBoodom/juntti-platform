@@ -185,7 +185,8 @@ function QuizListInner({ visat }: { visat: ListaVisa[] }) {
         <span className="sr-only">Hae visaa</span>
         <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
         <input
-          type="search"
+          type="text"
+          enterKeyHint="search"
           value={haku}
           onChange={(e) => kirjoitus(e.target.value)}
           placeholder="Hae otsikolla tai osoitteella…"
