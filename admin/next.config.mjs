@@ -2,6 +2,12 @@
 const nextConfig = {
   reactStrictMode: true,
   transpilePackages: ["@juntti/db", "@juntti/ai"],
+  // Instagram-kuvien fontit luetaan levyltä (lib/ig/fontit.ts) — varmistetaan,
+  // että ne tulevat mukaan Vercelin funktioon.
+  outputFileTracingIncludes: {
+    "/api/ig/**": ["./lib/ig/fontit/**"],
+    "/instagram/**": ["./lib/ig/fontit/**"],
+  },
   experimental: {
     serverActions: {
       // Kuvavisojen kuvien lataus kulkee Server Actionin kautta

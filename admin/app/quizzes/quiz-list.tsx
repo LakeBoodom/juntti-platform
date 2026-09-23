@@ -10,6 +10,7 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { ExternalLink, Search, X } from "lucide-react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { kokoelmaNimi } from "@/lib/kokoelmat";
 
 export type ListaVisa = {
   id: string;
@@ -28,31 +29,6 @@ export type ListaVisa = {
 };
 
 const SIVUSTO = "https://tietoniekka.fi";
-
-/* Kokoelman nimi samoin kuin sivustolla. Useimmat tulevat collection-kentästä;
-   osa kokoelmista tunnistetaan kategoriasta (vrt. tietoniekan lib/visanKokoelma.ts).
-   Jalkapallo on sivustolla oma kokoelmansa, mutta kannassa se on urheilun alla,
-   joten tässä se näkyy Urheiluna. */
-const KOKOELMAT: Record<string, string> = {
-  elokuvat: "Elokuvat",
-  historia: "Historia",
-  kulttuuri: "Kulttuuri",
-  luonto: "Luonto",
-  matkakohteet: "Maantieto",
-  musiikki: "Musiikki",
-  "tunnetut-henkilot": "Tunnetut henkilöt",
-  tv: "TV & suoratoisto",
-  urheilu: "Urheilu",
-  yleistieto: "Yleistieto",
-};
-
-function kokoelmaNimi(v: Pick<ListaVisa, "collection" | "category">): string {
-  if (v.category === "mega") return "Megavisat";
-  if (v.category === "tiede-teknologia") return "Tiede & teknologia";
-  if (v.category === "kaupungit") return "Suomen kaupungit";
-  if (v.category === "jaakiekko") return "Jääkiekko";
-  return (v.collection && KOKOELMAT[v.collection]) || "Muut";
-}
 
 const TILAT = [
   { key: "kaikki", label: "Kaikki" },

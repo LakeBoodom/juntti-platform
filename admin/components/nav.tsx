@@ -58,10 +58,10 @@ export function Nav({ email }: { email?: string | null }) {
             Kalenteri
           </Link>
           <Link
-            href="/somepostaukset"
+            href="/instagram"
             className="text-sm text-muted-foreground hover:text-foreground"
           >
-            Some
+            Instagram
           </Link>
           <Link
             href="/kaksintaistelut"
