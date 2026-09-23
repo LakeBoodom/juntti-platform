@@ -15,7 +15,11 @@ export const SYNT_POHJAT: Pohja[] = ["4h", "4r", "4i", "4j"];
 /** Kierrossa automaattisesti; muut valitaan käsin, koska ne vaativat toimituksellisen
     harkinnan (4d nostalgia: visan pitää oikeasti käsitellä vanhaa; 4j: henkilön
     tuotannosta oikea visa; 4i: henkilökuva ja kuvaajatieto). */
-export const AUTO_VISA: Pohja[] = ["4a", "4g", "4b", "4c", "4e", "4f", "4l", "4m", "4n", "4o", "4p", "4q"];
+// Heikin valinta 23.9.2026 ensimmäisten korttien perusteella: kierrossa vahvimmat —
+// oikea visakysymys, useampi kysymys, peitetty vastaus, juontajat eri mieltä ja
+// identiteettikuva. Muut (4b, 4c, 4e, 4g, 4n, 4p, 4q) valitaan käsin; 4c ja 4e
+// odottavat jatkokehitystä (aihe jää kortissa piiloon).
+export const AUTO_VISA: Pohja[] = ["4a", "4f", "4l", "4m", "4o"];
 export const AUTO_SYNT: Pohja[] = ["4h", "4r"];
 
 export const POHJA_NIMET: Record<string, string> = {
@@ -146,4 +150,4 @@ export const OLETUSTEKSTIT: Record<Pohja, { koukku?: string; palkinto?: string; 
 };
 
 /** Käsin valittavat (eivät ole kierrossa) — lomakkeen selite. */
-export const KASIN: Pohja[] = ["4d", "4i", "4j"];
+export const KASIN: Pohja[] = ["4b", "4c", "4d", "4e", "4g", "4i", "4j", "4n", "4p", "4q"];
