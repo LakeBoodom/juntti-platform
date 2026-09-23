@@ -17,7 +17,7 @@
 import type { ReactElement } from "react";
 import { ilmanTavutusta, leveys, sovita, type lataaFontit } from "./fontit";
 import { kelpaa, rajaa, type Kuva, type Kysymys, type SynttariData, type VisaData } from "./data";
-import { juontajaPng, valitseJuontaja, type Asento } from "./juontajat";
+import { juontajaPng, valitseJuontaja, type Asento, type Kuka } from "./juontajat";
 
 export const W = 1080;
 export const H = 1350;
@@ -69,7 +69,7 @@ export type Piirros = {
 /* ── Piirtokonteksti ─────────────────────────────────────────────────── */
 
 type Kuvaksi = (k: Kuva, w: number, h: number, o?: { seepia?: number }) => Promise<string>;
-type Juontaja = (asento: Asento, korkeus: number) => Promise<{ data: string; leveys: number; korkeus: number } | null>;
+type Juontaja = (asento: Asento, korkeus: number, kuka: Kuka[]) => Promise<{ data: string; leveys: number; korkeus: number; kuka: Kuka } | null>;
 
 type Ktx = { m: Mitat; kuvaksi: Kuvaksi; juontaja: Juontaja; siemen: string };
 
@@ -80,12 +80,15 @@ function konteksti(m: Mitat, siemen: string, piirra: boolean): Ktx {
     m,
     siemen,
     kuvaksi: piirra ? (k, w, h, o) => rajaa(k, w, h, o) : async () => TYHJA,
-    juontaja: async (asento, korkeus) => {
-      const k = await valitseJuontaja(asento, siemen);
+    juontaja: async (asento, korkeus, kuka) => {
+      const k = await valitseJuontaja(asento, siemen, kuka);
       if (!k) return null;
-      if (piirra) return juontajaPng(k, korkeus);
+      if (piirra) {
+        const png = await juontajaPng(k, korkeus);
+        return png ? { ...png, kuka: k.kuka } : null;
+      }
       const suhde = k.leveys && k.korkeus ? k.leveys / k.korkeus : 0.8;
-      return { data: TYHJA, leveys: Math.round(korkeus * suhde), korkeus };
+      return { data: TYHJA, leveys: Math.round(korkeus * suhde), korkeus, kuka: k.kuka };
     },
   };
 }
@@ -648,16 +651,17 @@ async function p4m(c: Ktx, v: VisaData, k: Kentat): Promise<Piirros> {
   };
 }
 
-/** Juontajakuva: asettelu designin mukaan (korkeus, oikea/vasen reuna tai keskitys). */
-async function juontajaKuva(c: Ktx, asento: Asento, korkeus: number, esteet: string[], sijainti: { right?: number; left?: number; keski?: boolean; bottom?: number }) {
-  const j = await c.juontaja(asento, korkeus);
+/** Juontajakuva: asettelu designin mukaan (korkeus, oikea/vasen reuna tai keskitys).
+    Palauttaa myös, kuka kuvassa on — kortin tekstit mukautuvat (Auta Mikkoa / Lauraa). */
+async function juontajaKuva(c: Ktx, asento: Asento, kuka: Kuka[], korkeus: number, esteet: string[], sijainti: { right?: number; left?: number; keski?: boolean; bottom?: number }) {
+  const j = await c.juontaja(asento, korkeus, kuka);
   if (!j) {
-    esteet.push(`Juontajakuvaa asennolle "${asento}" ei ole — lisää kuva Juontajakuvat-osiosta.`);
-    return null;
+    esteet.push(`Juontajakuvaa (${asento}, ${kuka.join(" tai ")}) ei ole — lisää kuva Juontajakuvat-osiosta.`);
+    return { el: null, kuka: kuka[0] };
   }
   const bottom = sijainti.bottom ?? 0;
   const vaaka = sijainti.keski ? { left: Math.round((W - j.leveys) / 2) } : sijainti.right !== undefined ? { right: sijainti.right } : { left: sijainti.left ?? 0 };
-  return <img src={j.data} width={j.leveys} height={j.korkeus} alt="" style={{ position: "absolute", bottom, width: j.leveys, height: j.korkeus, ...vaaka }} />;
+  return { el: <img src={j.data} width={j.leveys} height={j.korkeus} alt="" style={{ position: "absolute", bottom, width: j.leveys, height: j.korkeus, ...vaaka }} />, kuka: j.kuka };
 }
 
 /** 4n Mikko haastaa · identiteetti. */
@@ -666,7 +670,7 @@ async function p4n(c: Ktx, v: VisaData, k: Kentat): Promise<Piirros> {
   const koukku = vaadiKoukku(k, null, esteet);
   const ots = otsikko(c, koukku, { koot: [112, 100, 88, 76], leveys: 560, maxRivit: 5, valistys: -0.04 });
   tarkistaMahtuu(ots, "Koukku", esteet);
-  const kuva = await juontajaKuva(c, "haastaa", 1120, esteet, { right: -200 });
+  const { el: kuva } = await juontajaKuva(c, "haastaa", ["mikko"], 1120, esteet, { right: -200 });
   const cta = t(k.cta) || "Todista toisin";
   return {
     ruudut: [
@@ -718,7 +722,7 @@ async function p4o(c: Ktx, v: VisaData, k: Kentat): Promise<Piirros> {
   const lM = lappu(mikko);
   tarkistaMahtuu(lL, "Lauran vastaus", esteet);
   tarkistaMahtuu(lM, "Mikon vastaus", esteet);
-  const kuva = await juontajaKuva(c, "eri_mielta", 900, esteet, { keski: true });
+  const { el: kuva } = await juontajaKuva(c, "eri_mielta", ["molemmat"], 900, esteet, { keski: true });
   const cta = t(k.cta) || "Laura vai Mikko?";
   return {
     ruudut: [
@@ -761,11 +765,11 @@ async function p4p(c: Ktx, v: VisaData, k: Kentat): Promise<Piirros> {
   const esteet: string[] = [];
   const [q] = kortinKysymykset(v, k, "4p", c.siemen);
   kysymysEste(q, esteet, "4p");
-  const koukku = otsikko(c, vaadiKoukku(k, "Tämä yllätti Lauran.", esteet), { koot: [124, 108, 96, 84], leveys: 600, maxRivit: 3, valistys: -0.045 });
+  const { el: kuva, kuka } = await juontajaKuva(c, "yllattyy", ["laura", "molemmat"], 1040, esteet, { right: -170 });
+  const koukku = otsikko(c, vaadiKoukku(k, kuka === "molemmat" ? "Tämä yllätti juontajat." : "Tämä yllätti Lauran.", esteet), { koot: [124, 108, 96, 84], leveys: 600, maxRivit: 3, valistys: -0.045 });
   tarkistaMahtuu(koukku, "Koukku", esteet);
   const kys = otsikko(c, q?.teksti ?? "Kysymys puuttuu", { koot: [60, 52, 46, 40], leveys: 600 - 60, maxRivit: 4, valistys: -0.02 });
   tarkistaMahtuu(kys, "Kysymys", esteet);
-  const kuva = await juontajaKuva(c, "yllattyy", 1040, esteet, { right: -170 });
   const cta = t(k.cta) || "Pelaa ja selvitä";
   return {
     ruudut: [
@@ -810,14 +814,15 @@ async function p4q(c: Ktx, v: VisaData, k: Kentat): Promise<Piirros> {
   const lw = (520 - 12) / 2;
   const vaihtoehdot = (q?.vaihtoehdot ?? []).map((x) => leipa(c, x, { koot: [24, 22, 20], leveys: lw - 40 - 36 - 14, maxRivit: 2 }));
   vaihtoehdot.forEach((s) => tarkistaMahtuu(s, "Vaihtoehto", esteet));
-  const kuva = await juontajaKuva(c, "miettii", 1000, esteet, { left: -150 });
-  const cta = t(k.cta) || "Auta Mikkoa";
+  const { el: kuva, kuka } = await juontajaKuva(c, "miettii", ["mikko", "laura"], 1000, esteet, { left: -150 });
+  const nimi = kuka === "laura" ? "Laura" : "Mikko";
+  const cta = t(k.cta) || (kuka === "laura" ? "Auta Lauraa" : "Auta Mikkoa");
   return {
     ruudut: [
       <Absoluuttinen key="4q" bg="#241046">
         {kuva}
         <div style={{ position: "absolute", top: 72, left: 72, right: 72, display: "flex", flexDirection: "column", gap: 26 }}>
-          <Etiketti teksti="Mikko miettii vielä" vari="#C9A6FF" valistys={0.2} />
+          <Etiketti teksti={`${nimi} miettii vielä`} vari="#C9A6FF" valistys={0.2} />
           <Iso s={koukku} valistys={-0.045} vari="#FFFFFF" lh={0.84} />
         </div>
         <div style={{ position: "absolute", top: 440, right: 64, width: 520, display: "flex", flexDirection: "column", gap: 16 }}>
@@ -906,7 +911,7 @@ async function p4r(c: Ktx, s: SynttariData, k: Kentat): Promise<Piirros> {
   tarkistaMahtuu(ots, "Koukku", esteet);
   const label = leipa(c, isot(synttariLabel(s, true)), { koot: [32, 28, 24], leveys: SISA, maxRivit: 1, paino: 700 });
   tarkistaMahtuu(label, "Nimirivi", esteet);
-  const kuva = await juontajaKuva(c, "onnittelee", 860, esteet, { keski: true, bottom: -40 });
+  const { el: kuva } = await juontajaKuva(c, "onnittelee", ["molemmat"], 860, esteet, { keski: true, bottom: -40 });
   const cta = t(k.cta) || (eiVisaa ? "Kerro kommentissa" : "Näytä mitä osaat");
   const reitti = !eiVisaa && k.reitti !== false;
   return {

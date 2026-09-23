@@ -31,7 +31,7 @@ const t = (s?: string | null) => ilmanTavutusta((s ?? "").replace(/\s+/g, " ").t
 const KOMMENTTIKEHOTE: Partial<Record<Pohja, string>> = {
   "4f": "Vastaa kommenttiin! Koko visa löytyy biosta.",
   "4o": "Kumpi on oikeassa, Laura vai Mikko? Kerro kommentissa.",
-  "4q": "Auta Mikkoa kommenteissa. Koko visa löytyy biosta.",
+  "4q": "Tiedätkö vastauksen? Kerro kommentissa. Koko visa löytyy biosta.",
   "4i": "Kerro muistosi kommentissa.",
 };
 
