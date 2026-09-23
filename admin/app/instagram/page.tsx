@@ -2,7 +2,7 @@ import { supabaseFromCookies } from "@/lib/supabase-server";
 import { getCurrentSite } from "@/lib/sites";
 import { Nav } from "@/components/nav";
 import { lataaFontit } from "@/lib/ig/fontit";
-import { paivaTeksti } from "@/lib/ig/data";
+import { korvaaKuva, paivaTeksti, type Kuva, type SynttariData, type VisaData } from "@/lib/ig/data";
 import {
   POHJA_NIMET,
   SYNT_POHJAT,
@@ -12,9 +12,12 @@ import {
   type Pohja,
 } from "@/lib/ig/pohjat";
 import { synttariKuvateksti, visaKuvateksti } from "@/lib/ig/kuvateksti";
-import { varmistaSuunnitelma } from "@/lib/ig/suunnitelma";
+import { rivinSisalto } from "@/lib/ig/sisalto";
+import { haeAsetukset, varmistaSuunnitelma, type Julkaisu } from "@/lib/ig/suunnitelma";
+import { kokoelmaNimi } from "@/lib/kokoelmat";
 import { getSupabaseAdmin } from "@juntti/db";
 import { JulkaisuKortti, type KorttiData } from "./julkaisu-kortti";
+import { SlottiKytkin, UusiJulkaisu } from "./omat";
 
 export const dynamic = "force-dynamic";
 // Suunnitelma hakee 14 päivän datan ja kuvat — annetaan aikaa ensilataukselle.
@@ -24,57 +27,94 @@ export const maxDuration = 60;
 // Vaihe 1: suunnitelma, esikatselu, tekstit ja hyväksyntä. Julkaisu Instagramiin
 // tulee vaiheessa 2 — siihen asti hyväksytyn kuvan voi ladata ja julkaista käsin.
 
+type Mitat = Awaited<ReturnType<typeof lataaFontit>>["mitat"];
+
+function kuvanTiedot(k: Kuva | null, r: Julkaisu): KorttiData["kuva"] {
+  return {
+    url: k?.url ?? null,
+    leveys: k?.leveys ?? 0,
+    korkeus: k?.korkeus ?? 0,
+    fx: k?.fx ?? 50,
+    fy: k?.fy ?? 40,
+    korvattu: !!r.kentat?.kuva?.url,
+  };
+}
+
+async function visaKortti(m: Mitat, r: Julkaisu, v0: VisaData): Promise<KorttiData> {
+  const v = await korvaaKuva(v0, r.kentat?.kuva);
+  const esteet: Record<string, string[]> = {};
+  const huomiot: Record<string, string[]> = {};
+  for (const pohja of VISA_POHJAT) {
+    const t = await tarkistaVisa(m, pohja, v, r.kentat ?? {}, r.pohja_vari ?? "lime");
+    esteet[pohja] = t.esteet;
+    huomiot[pohja] = t.huomiot;
+  }
+  return {
+    rivi: r,
+    otsikko: v.nimi,
+    ala: [v.kokoelma, r.kentat?.tapahtuma ?? v.introOtsikko].filter(Boolean).join(" · "),
+    pohjat: VISA_POHJAT,
+    esteet,
+    huomiot,
+    oletusKuvateksti: visaKuvateksti(r.kentat?.tapahtuma ? { ...v, introOtsikko: r.kentat.tapahtuma } : v),
+    oletusTapahtuma: v0.introOtsikko,
+    kuva: kuvanTiedot(v.kuva, r),
+  };
+}
+
+async function synttariKortti(m: Mitat, r: Julkaisu, s0: SynttariData): Promise<KorttiData> {
+  const s = await korvaaKuva(s0, r.kentat?.kuva);
+  const esteet: Record<string, string[]> = {};
+  const huomiot: Record<string, string[]> = {};
+  for (const pohja of SYNT_POHJAT) {
+    const t = await tarkistaSynttarit(m, pohja, s, r.kentat ?? {});
+    esteet[pohja] = t.esteet;
+    huomiot[pohja] = t.huomiot;
+  }
+  return {
+    rivi: r,
+    otsikko: s.nimi,
+    ala: `${s.muisto ? "olisi täyttänyt" : "täyttää"} ${s.ika} · ${s.rooli ?? ""}`.trim(),
+    pohjat: SYNT_POHJAT,
+    esteet,
+    huomiot,
+    oletusKuvateksti: synttariKuvateksti(s, r.pohja, r.kentat ?? {}),
+    oletusTapahtuma: null,
+    kuva: kuvanTiedot(s.kuva, r),
+  };
+}
+
 export default async function InstagramPage() {
   const sb = await supabaseFromCookies();
   const {
     data: { user },
   } = await sb.auth.getUser();
   const site = await getCurrentSite();
-  const [paivat, { mitat }] = await Promise.all([varmistaSuunnitelma(site.id, 14), lataaFontit()]);
+  const [paivat, { mitat }, asetukset, { data: visat }] = await Promise.all([
+    varmistaSuunnitelma(site.id, 14),
+    lataaFontit(),
+    haeAsetukset(site.id),
+    getSupabaseAdmin().from("quizzes").select("collection, category").eq("site_id", site.id).eq("status", "published"),
+  ]);
 
-  const kortit: Array<{ paiva: string; visa: KorttiData | null; synt: KorttiData | null }> = [];
+  // Kampanjan kokoelmat: sivuston kokoelmanimet ja julkaistujen visojen määrä.
+  const kokoelmaLkm = new Map<string, number>();
+  for (const q of (visat ?? []) as unknown as Array<{ collection: string | null; category: string | null }>) {
+    const n = kokoelmaNimi(q);
+    kokoelmaLkm.set(n, (kokoelmaLkm.get(n) ?? 0) + 1);
+  }
+  const kokoelmat = [...kokoelmaLkm.entries()].sort((a, b) => a[0].localeCompare(b[0], "fi")).map(([nimi, lkm]) => ({ nimi, lkm }));
+
+  const kortit: Array<{ paiva: string; visa: KorttiData | null; synt: KorttiData | null; omat: KorttiData[] }> = [];
   for (const p of paivat) {
-    let visa: KorttiData | null = null;
-    if (p.visa && p.visaRivi) {
-      const r = p.visaRivi;
-      const esteet: Record<string, string[]> = {};
-      const huomiot: Record<string, string[]> = {};
-      for (const pohja of VISA_POHJAT) {
-        const t = await tarkistaVisa(mitat, pohja, p.visa, r.kentat, r.pohja_vari ?? "lime");
-        esteet[pohja] = t.esteet;
-        huomiot[pohja] = t.huomiot;
-      }
-      visa = {
-        rivi: r,
-        otsikko: p.visa.nimi,
-        ala: [p.visa.kokoelma, p.visa.introOtsikko].filter(Boolean).join(" · "),
-        pohjat: VISA_POHJAT,
-        esteet,
-        huomiot,
-        oletusKuvateksti: visaKuvateksti(p.visa),
-      };
+    const visa = p.visa && p.visaRivi ? await visaKortti(mitat, p.visaRivi, p.visa) : null;
+    const synt = p.synttarit && p.synttariRivi ? await synttariKortti(mitat, p.synttariRivi, p.synttarit) : null;
+    const omat: KorttiData[] = [];
+    for (const r of p.omat) {
+      const sis = await rivinSisalto({ site_id: site.id, paiva: r.paiva, slotti: "oma", quiz_id: r.quiz_id }, r.kentat ?? {});
+      if (sis?.tyyppi === "visa") omat.push(await visaKortti(mitat, r, sis.v));
     }
-    let synt: KorttiData | null = null;
-    if (p.synttarit && p.synttariRivi) {
-      const r = p.synttariRivi;
-      const esteet: Record<string, string[]> = {};
-      const huomiot: Record<string, string[]> = {};
-      for (const pohja of SYNT_POHJAT) {
-        const t = await tarkistaSynttarit(mitat, pohja, p.synttarit, r.kentat);
-        esteet[pohja] = t.esteet;
-        huomiot[pohja] = t.huomiot;
-      }
-      synt = {
-        rivi: r,
-        otsikko: p.synttarit.nimi,
-        ala: `${p.synttarit.muisto ? "olisi täyttänyt" : "täyttää"} ${p.synttarit.ika} · ${p.synttarit.rooli ?? ""}`.trim(),
-        pohjat: SYNT_POHJAT,
-        esteet,
-        huomiot,
-        oletusKuvateksti: synttariKuvateksti(p.synttarit, r.pohja, r.kentat),
-      };
-    }
-    kortit.push({ paiva: p.paiva, visa, synt });
+    kortit.push({ paiva: p.paiva, visa, synt, omat });
   }
 
   // Testin kertymä: montako kertaa kutakin pohjaa on suunniteltu tai julkaistu.
@@ -99,12 +139,25 @@ export default async function InstagramPage() {
         <div>
           <h1 className="text-2xl font-semibold">Instagram</h1>
           <p className="max-w-3xl text-sm text-muted-foreground">
-            Päivän visa ja Päivän synttärit seuraavalle 14 päivälle. Pohja valitaan automaattisesti
-            A/B-testin kierron mukaan (sama pohja ei toistu peräkkäin, kirkas V-D enintään kahdesti viikossa,
-            jokainen pohja saa sekä urheilu- että muita aiheita). Voit vaihtaa pohjan, muokata tekstit ja
-            hyväksyä julkaisun. Instagram-yhteys tulee seuraavaksi — siihen asti hyväksytyn kuvan voi ladata.
+            Päivän visa ja Päivän synttärit seuraavalle 14 päivälle sekä omat julkaisut ja kampanjat. Pohja valitaan
+            automaattisesti A/B-testin kierron mukaan (sama pohja ei toistu peräkkäin, kirkas V-D enintään kahdesti
+            viikossa, jokainen pohja saa sekä urheilu- että muita aiheita). Voit vaihtaa pohjan ja kuvan, muokata tekstit
+            ja hyväksyä julkaisun. Instagram-yhteys tulee seuraavaksi — siihen asti hyväksytyn kuvan voi ladata.
           </p>
         </div>
+
+        <section className="grid gap-4 lg:grid-cols-[1fr_2fr]">
+          <div className="space-y-3 rounded-md border p-4">
+            <h2 className="text-sm font-semibold">Päivittäiset julkaisut</h2>
+            <SlottiKytkin kentta="visa_paalla" paalla={asetukset.visa_paalla} nimi="Päivän visa" />
+            <SlottiKytkin kentta="synttarit_paalla" paalla={asetukset.synttarit_paalla} nimi="Päivän synttärit" />
+            <p className="text-xs text-muted-foreground">
+              Pois päältä: sarjaa ei suunnitella eikä julkaista. Yksittäisen päivän julkaisun saa pois kortin
+              Julkaistaan-kytkimellä.
+            </p>
+          </div>
+          <UusiJulkaisu kokoelmat={kokoelmat} />
+        </section>
 
         <section className="rounded-md border p-4">
           <h2 className="mb-2 text-sm font-semibold">Testin kertymä</h2>
@@ -123,7 +176,7 @@ export default async function InstagramPage() {
           </div>
           <p className="mt-2 text-xs text-muted-foreground">
             Tavoite designin mukaan noin 8–10 julkaisua per pohja ennen karsintaa. V-E (karuselli) ja S-A
-            (henkilökuva, vaatii kuvaajan) valitaan käsin.
+            (henkilökuva, vaatii kuvaajan) valitaan käsin. Omat julkaisut lasketaan mukaan.
           </p>
         </section>
 
@@ -134,14 +187,17 @@ export default async function InstagramPage() {
               <div className="grid gap-4 lg:grid-cols-2">
                 {k.visa ? (
                   <JulkaisuKortti data={k.visa} otsikko="Päivän visa" />
-                ) : (
+                ) : asetukset.visa_paalla && k.paiva <= paivat[13]?.paiva ? (
                   <div className="rounded-md border border-dashed p-6 text-sm text-muted-foreground">Ei Päivän visaa.</div>
-                )}
+                ) : null}
                 {k.synt ? (
                   <JulkaisuKortti data={k.synt} otsikko="Päivän synttärit" />
-                ) : (
+                ) : asetukset.synttarit_paalla && k.paiva <= paivat[13]?.paiva ? (
                   <div className="rounded-md border border-dashed p-6 text-sm text-muted-foreground">Ei synttärisankaria.</div>
-                )}
+                ) : null}
+                {k.omat.map((o) => (
+                  <JulkaisuKortti key={o.rivi.id} data={o} otsikko={o.rivi.kampanja ? `Kampanja · ${o.rivi.kampanja}` : "Oma julkaisu"} />
+                ))}
               </div>
             </section>
           ))}

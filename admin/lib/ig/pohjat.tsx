@@ -52,6 +52,13 @@ export type Kentat = {
   kysymys?: string;
   /** S-A: kuvaajan nimi ja lisenssi (kuvatekstiin) — ilman tätä S-A ei ole julkaistavissa */
   kuvaaja?: string;
+  /** Päivän tapahtuma (V-A:n iso otsikko, muilla pohjilla alarivi). Korvaa Päivän visan
+      intron otsikon — design: toimitus kirjoittaa lyhyen version, jos intro on pitkä. */
+  tapahtuma?: string;
+  /** Oma julkaisu: tunniste yläreunaan, esim. "Luontoviikko" (oletus "Visa") */
+  otsake?: string;
+  /** Korvaava kuva tai uusi rajaus: julkinen kuvaosoite tai Commonsin tiedostosivu */
+  kuva?: { url: string; fx: number; fy: number };
 };
 
 export type Piirros = {
@@ -226,6 +233,17 @@ function Alarivi(p: { m: Mitat; verbi: string; lyhyt: string; ak: Aksentti; logo
 }
 
 const VISA_CTA = { verbi: "Pelaa päivän visa", lyhyt: "Pelaa" };
+const OMA_CTA = { verbi: "Pelaa visa", lyhyt: "Pelaa" };
+const visaCta = (v: VisaData) => (v.oma ? OMA_CTA : VISA_CTA);
+/** V-A:n ja V-C:n tunnistelaatta: Päivän visalla "TÄNÄÄN", omalla julkaisulla otsake. */
+const laatta = (v: VisaData) => (v.oma ? v.tunniste : "TÄNÄÄN");
+
+/** Laatta + päivämäärä samalla rivillä: pitkä oma otsake ei saa työntää päivää yli reunan. */
+function tarkistaYlarivi(m: Mitat, v: VisaData, esteet: string[]) {
+  if (!v.oma) return;
+  const tarve = leveys(m, v.tunniste, "Instrument Sans", 700, 32, 0.2) + 40 + 20 + leveys(m, paivaTeksti(v.paiva), "Instrument Sans", 600, 32);
+  if (tarve > SISA) esteet.push("Otsake on liian pitkä yläriville — lyhennä (noin 20 merkkiä).");
+}
 const SYNT_CTA = { verbi: "Testaa tietosi", lyhyt: "Testaa" };
 
 function Kortti(p: { bg: string; children: React.ReactNode; padding?: string; column?: boolean; relative?: boolean }) {
@@ -256,11 +274,12 @@ async function vA(m: Mitat, v: VisaData, kuvaksi: Kuvaksi): Promise<Piirros> {
   const huomiot: string[] = [];
   const ak = aksentti(v.kokoelma);
   const tapahtuma = v.introOtsikko ?? "";
-  if (!tapahtuma) esteet.push("V-A vaatii päivän tapahtuman (intron otsikko).");
+  if (!tapahtuma) esteet.push("V-A vaatii tapahtuman (Päivän visan intron otsikko tai oma Tapahtuma-teksti).");
+  tarkistaYlarivi(m, v, esteet);
   if (tapahtuma.length > 60) esteet.push("Tapahtuma yli 60 merkkiä — design: toimitus kirjoittaa lyhyen version.");
 
   const kaistale = kelpaaKaistaleeksi(v.kuva);
-  if (v.kuva && !kaistale) huomiot.push(`Kansikuva on liian pieni kaistaleeksi (${v.kuva.leveys} px) — pohja piirtyy ilman kuvaa.`);
+  if (v.kuva && !kaistale) huomiot.push(`Kansikuva on liian pieni kaistaleeksi (${v.kuva.leveys} px, tarvitaan väh. 720) — pohja piirtyy ilman kuvaa.`);
 
   const otsikko = sovita(m, {
     teksti: tapahtuma || v.nimi, perhe: "Archivo", paino: 900, isot: true, valistysEm: -0.035,
@@ -277,17 +296,17 @@ async function vA(m: Mitat, v: VisaData, kuvaksi: Kuvaksi): Promise<Piirros> {
   const sisalto = (
     <div style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "space-between", padding: 64 }}>
       <div style={{ display: "flex", alignItems: "center", gap: 20 }}>
-        <div style={{ height: 56, display: "flex", alignItems: "center", padding: "0 20px", background: ak.bg, color: ak.ink, fontSize: 32, fontWeight: 700, letterSpacing: 6.4 }}>TÄNÄÄN</div>
+        <div style={{ height: 56, display: "flex", alignItems: "center", padding: "0 20px", background: ak.bg, color: ak.ink, fontSize: 32, fontWeight: 700, letterSpacing: 6.4 }}>{laatta(v)}</div>
         <div style={{ fontSize: 32, fontWeight: 600, color: "#8E8676" }}>{paivaTeksti(v.paiva)}</div>
       </div>
       <div style={{ display: "flex", flexDirection: "column", gap: 36 }}>
         <Rivit rivit={otsikko.rivit} koko={otsikko.koko} lh={0.88} style={{ fontFamily: "Archivo", fontWeight: 900, letterSpacing: -0.035 * otsikko.koko, color: "#FFFFFF" }} />
         <div style={{ display: "flex", flexDirection: "column", gap: 10, paddingLeft: 28, borderLeft: `6px solid ${ak.bg}` }}>
-          <div style={{ fontSize: 30, fontWeight: 600, letterSpacing: 4.8, color: "#8E8676" }}>PÄIVÄN VISA</div>
+          <div style={{ fontSize: 30, fontWeight: 600, letterSpacing: 4.8, color: "#8E8676" }}>{v.oma ? "VISA" : "PÄIVÄN VISA"}</div>
           <Rivit rivit={nimi.rivit} koko={nimi.koko} lh={1.05} style={{ fontFamily: "Archivo", fontWeight: 700, color: "#F5F0E6" }} />
         </div>
       </div>
-      <Alarivi m={m} {...VISA_CTA} ak={ak} />
+      <Alarivi m={m} {...visaCta(v)} ak={ak} />
     </div>
   );
   return {
@@ -346,7 +365,7 @@ async function vB(m: Mitat, v: VisaData, k: Kentat, kuvaksi: Kuvaksi): Promise<P
           {iso}
           {alaviite}
         </div>
-        <Alarivi m={m} {...VISA_CTA} ak={ak} />
+        <Alarivi m={m} {...visaCta(v)} ak={ak} />
       </div>
     </div>
   ) : (
@@ -358,7 +377,7 @@ async function vB(m: Mitat, v: VisaData, k: Kentat, kuvaksi: Kuvaksi): Promise<P
       </div>
       <div style={{ display: "flex", flexDirection: "column", gap: 26 }}>
         {alaviite}
-        <Alarivi m={m} {...VISA_CTA} ak={ak} />
+        <Alarivi m={m} {...visaCta(v)} ak={ak} />
       </div>
     </Kortti>
   );
@@ -370,8 +389,9 @@ async function vC(m: Mitat, v: VisaData, kuvaksi: Kuvaksi): Promise<Piirros> {
   const esteet: string[] = [];
   const huomiot: string[] = [];
   const ak = aksentti(v.kokoelma);
-  if (!v.kuva) esteet.push("V-C vaatii kansikuvan.");
-  else if (!kelpaaKokoPinnaksi(v.kuva)) esteet.push(`Kansikuva liian pieni koko pinnalle (${v.kuva.leveys}×${v.kuva.korkeus}, tarvitaan väh. 850 px korkea).`);
+  if (!v.kuva) esteet.push("V-C vaatii kuvan.");
+  else if (!kelpaaKokoPinnaksi(v.kuva)) esteet.push(`Kuva liian pieni koko pinnalle (${v.kuva.leveys}×${v.kuva.korkeus}, tarvitaan väh. 720×900) — vaihda kuva.`);
+  tarkistaYlarivi(m, v, esteet);
 
   // Tapahtuma aina yhdellä rivillä (design: max 44 merkkiä) — muuten pois.
   let tapahtuma = v.introOtsikko ?? "";
@@ -392,7 +412,7 @@ async function vC(m: Mitat, v: VisaData, kuvaksi: Kuvaksi): Promise<Piirros> {
         <div style={{ position: "absolute", top: 0, left: 0, width: W, height: H, display: "flex", backgroundImage: "linear-gradient(180deg, rgba(14,12,6,.55) 0%, rgba(14,12,6,0) 26%, rgba(14,12,6,0) 50%, rgba(14,12,6,.95) 86%)" }} />
         <div style={{ position: "absolute", top: 0, left: 0, width: W, height: H, display: "flex", flexDirection: "column", justifyContent: "space-between", padding: "56px 64px 60px" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 18 }}>
-            <div style={{ height: 52, display: "flex", alignItems: "center", padding: "0 18px", background: ak.bg, color: ak.ink, fontSize: 30, fontWeight: 700, letterSpacing: 5.4 }}>TÄNÄÄN</div>
+            <div style={{ height: 52, display: "flex", alignItems: "center", padding: "0 18px", background: ak.bg, color: ak.ink, fontSize: 30, fontWeight: 700, letterSpacing: 5.4 }}>{laatta(v)}</div>
             <div style={{ fontSize: 30, fontWeight: 600, color: "#E4DACA" }}>{paivaTeksti(v.paiva)}</div>
           </div>
           <div style={{ display: "flex", flexDirection: "column", gap: 22 }}>
@@ -400,7 +420,7 @@ async function vC(m: Mitat, v: VisaData, kuvaksi: Kuvaksi): Promise<Piirros> {
             <Rivit rivit={nimi.rivit} koko={nimi.koko} lh={0.95} style={{ fontFamily: "Archivo", fontWeight: 900, letterSpacing: -0.025 * nimi.koko, color: "#FFFFFF" }} />
             <div style={{ display: "flex", paddingTop: 10 }}>
               <div style={{ display: "flex", flex: 1, flexDirection: "column" }}>
-                <Alarivi m={m} {...VISA_CTA} ak={ak} />
+                <Alarivi m={m} {...visaCta(v)} ak={ak} />
               </div>
             </div>
           </div>
@@ -424,12 +444,13 @@ async function vD(m: Mitat, v: VisaData, vari: VdVari): Promise<Piirros> {
     koot: [178, 146, 112, 96, 84, 72, 64], leveys: SISA, maxRivit: 6,
   });
   if (!nimi.mahtuu) esteet.push("Visan nimi ei mahdu 64 px:llä — pisin sana on liian pitkä.");
+  tarkistaYlarivi(m, v, esteet);
   const ala = v.introOtsikko ?? v.kokoelma;
   return {
     ruudut: [
       <Kortti key="vd" bg={c.bg}>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-          <div style={{ fontSize: 32, fontWeight: 700, letterSpacing: 6.4, color: c.ink }}>PÄIVÄN VISA</div>
+          <div style={{ fontSize: 32, fontWeight: 700, letterSpacing: 6.4, color: c.ink }}>{v.tunniste}</div>
           <div style={{ fontSize: 32, fontWeight: 600, color: c.heikko }}>{paivaTeksti(v.paiva)}</div>
         </div>
         <div style={{ display: "flex", flexDirection: "column", gap: 34 }}>
@@ -439,7 +460,7 @@ async function vD(m: Mitat, v: VisaData, vari: VdVari): Promise<Piirros> {
         </div>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
           <div style={{ fontFamily: "Archivo", fontWeight: 900, fontSize: 32, letterSpacing: 1.9, color: c.ink }}>TIETONIEKKA</div>
-          <Cta m={m} {...VISA_CTA} bg={c.ink} ink={c.bg} maxLeveys={SISA - leveys(m, "TIETONIEKKA", "Archivo", 900, 32, 0.06) - 28} />
+          <Cta m={m} {...visaCta(v)} bg={c.ink} ink={c.bg} maxLeveys={SISA - leveys(m, "TIETONIEKKA", "Archivo", 900, 32, 0.06) - 28} />
         </div>
       </Kortti>,
     ],
@@ -479,7 +500,7 @@ async function vE(m: Mitat, v: VisaData, k: Kentat): Promise<Piirros> {
   const r1 = (
     <Kortti key="ve1" bg="#131109">
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-        <div style={{ height: 52, display: "flex", alignItems: "center", padding: "0 18px", borderRadius: 8, background: "#E8A320", color: "#131109", fontSize: 28, fontWeight: 700, letterSpacing: 4.5 }}>PÄIVÄN VISA</div>
+        <div style={{ height: 52, display: "flex", alignItems: "center", padding: "0 18px", borderRadius: 8, background: "#E8A320", color: "#131109", fontSize: 28, fontWeight: 700, letterSpacing: 4.5 }}>{v.tunniste}</div>
         <div style={{ fontSize: 30, fontWeight: 600, color: "#8E8676" }}>{paivaTeksti(v.paiva)}</div>
       </div>
       <div style={{ display: "flex", flexDirection: "column", gap: 32 }}>
@@ -511,7 +532,7 @@ async function vE(m: Mitat, v: VisaData, k: Kentat): Promise<Piirros> {
   );
   const r3 = (
     <Kortti key="ve3" bg="#E8A320">
-      <div style={{ fontSize: 32, fontWeight: 700, letterSpacing: 6.4, color: "#131109" }}>{`PÄIVÄN VISA · ${lyhytPaiva(v.paiva)}`}</div>
+      <div style={{ fontSize: 32, fontWeight: 700, letterSpacing: 6.4, color: "#131109" }}>{`${v.tunniste} · ${lyhytPaiva(v.paiva)}`}</div>
       <div style={{ display: "flex", flexDirection: "column", gap: 30 }}>
         <Rivit rivit={loppuOts.rivit} koko={loppuOts.koko} lh={0.88} style={{ fontFamily: "Archivo", fontWeight: 900, letterSpacing: -0.035 * loppuOts.koko, color: "#131109" }} />
         <div style={{ fontSize: 38, fontWeight: 600, lineHeight: "50px", color: "#3D2A05" }}>
@@ -519,7 +540,7 @@ async function vE(m: Mitat, v: VisaData, k: Kentat): Promise<Piirros> {
         </div>
       </div>
       <div style={{ display: "flex", flexDirection: "column", gap: 26 }}>
-        <Cta m={m} {...VISA_CTA} bg="#131109" ink="#E8A320" maxLeveys={SISA} korkeus={96} koot={[38, 34, 32]} tayslev />
+        <Cta m={m} {...visaCta(v)} bg="#131109" ink="#E8A320" maxLeveys={SISA} korkeus={96} koot={[38, 34, 32]} tayslev />
         <div style={{ fontFamily: "Archivo", fontWeight: 900, fontSize: 32, letterSpacing: 1.9, color: "#131109" }}>TIETONIEKKA</div>
       </div>
     </Kortti>
@@ -557,7 +578,7 @@ async function sA(m: Mitat, s: SynttariData, k: Kentat, kuvaksi: Kuvaksi): Promi
   const huomiot: string[] = [];
   const ak = s.muisto ? A.muisto : A.amber;
   if (!s.kuva) esteet.push("S-A vaatii henkilökuvan.");
-  else if (!kelpaaKokoPinnaksi(s.kuva)) esteet.push(`Henkilökuva liian pieni koko pinnalle (${s.kuva.leveys}×${s.kuva.korkeus}).`);
+  else if (!kelpaaKokoPinnaksi(s.kuva)) esteet.push(`Henkilökuva liian pieni koko pinnalle (${s.kuva.leveys}×${s.kuva.korkeus}, tarvitaan väh. 720×900) — vaihda kuva.`);
   if (!k.kuvaaja?.trim()) esteet.push("S-A vaatii kuvaajan nimen ja lisenssin (CC BY-SA edellyttää sitä kuvatekstiin).");
   const nimi = sovita(m, { teksti: s.nimi, perhe: "Archivo", paino: 900, isot: true, valistysEm: -0.025, koot: [92, 76, 62], leveys: SISA, maxRivit: 2 });
   if (!nimi.mahtuu) esteet.push("Nimi ei mahdu kahdelle riville.");
@@ -739,7 +760,8 @@ export function piirraSynttarit(m: Mitat, pohja: Pohja, s: SynttariData, k: Kent
   return valitseSynttarit(m, pohja, s, k, RAJAA);
 }
 
-async function valitseVisa(m: Mitat, pohja: Pohja, v: VisaData, k: Kentat, vari: VdVari, kuvaksi: Kuvaksi): Promise<Piirros> {
+async function valitseVisa(m: Mitat, pohja: Pohja, v0: VisaData, k: Kentat, vari: VdVari, kuvaksi: Kuvaksi): Promise<Piirros> {
+  const v = k.tapahtuma?.trim() ? { ...v0, introOtsikko: k.tapahtuma.trim() } : v0;
   switch (pohja) {
     case "V-A": return vA(m, v, kuvaksi);
     case "V-B": return vB(m, v, k, kuvaksi);

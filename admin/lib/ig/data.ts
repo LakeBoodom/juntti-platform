@@ -32,6 +32,10 @@ export type VisaData = {
   introOtsikko: string | null;
   introTeksti: string | null;
   kuva: Kuva | null;
+  /** Oma julkaisu (ad hoc / kampanja) — ei Päivän visa. Muuttaa tunnisteen ja CTA:n. */
+  oma: boolean;
+  /** Tunniste kuvan yläreunaan: "PÄIVÄN VISA" tai oman julkaisun otsake ("LUONTOVIIKKO") */
+  tunniste: string;
 };
 
 export type SynttariData = {
@@ -82,6 +86,14 @@ function ehdokkaat(abs: string): string[] {
   return [abs.replace(/\/\d+px-([^/]+)$/, "/1280px-$1"), `${m[1]}/${m[2]}`, abs];
 }
 
+/** Wikimedia Commonsin tiedostosivu (commons.wikimedia.org/wiki/File:X.jpg) → alkuperäinen kuva. */
+export function kuvaOsoite(url: string): string {
+  const u = url.trim();
+  const m = u.match(/^https?:\/\/commons\.(?:m\.)?wikimedia\.org\/wiki\/((?:File|Tiedosto):[^?#]+)/i);
+  if (m) return `https://commons.wikimedia.org/wiki/Special:FilePath/${m[1].replace(/^(File|Tiedosto):/i, "")}`;
+  return u;
+}
+
 /** Hakee kuvan ja mittaa sen. Muunnetaan JPEG:ksi (Satori ei tue WebP:tä
     luotettavasti) ja pitkä sivu rajataan 1600 px:iin. */
 export function lataaKuva(url: string | null, fx = 50, fy = 40): Promise<Kuva | null> {
@@ -122,8 +134,15 @@ export function lataaKuva(url: string | null, fx = 50, fy = 40): Promise<Kuva | 
   return p;
 }
 
+/** Suurin sallittu suurennos. Instagram näyttää 1080 px:n kuvan puhelimessa noin
+    1 170 laitepikselin levyisenä; 1,5× suurennettu valokuva tekstin ja liukuvärin
+    alla näyttää vielä terävältä, 1,7× (640 px → 1080 px) jo selvästi pehmeältä. */
+export const MAX_SUURENNOS = 1.5;
+
+const suurennos = (k: Kuva, w: number, h: number) => Math.max(w / k.leveys, h / k.korkeus);
+
 /** Rajaa kuvan täsmälleen w × h -kokoon kuten CSS:n object-fit: cover +
-    object-position fx% fy% ja palauttaa data-URL:n. */
+    object-position fx% fy% ja palauttaa data-URL:n. Suurennettaessa terävöitetään kevyesti. */
 export async function rajaa(k: Kuva, w: number, h: number): Promise<string> {
   const meta = await sharp(k.buf).metadata();
   const W = meta.width ?? w;
@@ -133,18 +152,23 @@ export async function rajaa(k: Kuva, w: number, h: number): Promise<string> {
   const rh = Math.max(h, Math.round(H * s));
   const left = Math.round((rw - w) * (k.fx / 100));
   const top = Math.round((rh - h) * (k.fy / 100));
-  const out = await sharp(k.buf)
-    .resize(rw, rh)
-    .extract({ left, top, width: w, height: h })
-    .jpeg({ quality: 88 })
-    .toBuffer();
+  let kuva = sharp(k.buf).resize(rw, rh, { kernel: "lanczos3" }).extract({ left, top, width: w, height: h });
+  if (s > 1.05) kuva = kuva.sharpen({ sigma: 0.7 });
+  const out = await kuva.jpeg({ quality: 90 }).toBuffer();
   return `data:image/jpeg;base64,${out.toString("base64")}`;
 }
 
-/** Kuvakaistale (1080 × 300–360) ei saa venyttää pientä kuvaa sumeaksi. */
-export const kelpaaKaistaleeksi = (k: Kuva | null) => !!k && k.leveys >= 900;
-/** Koko pinnan kuva (V-C, S-A: 1080 × 1350) vaatii korkean kuvan. */
-export const kelpaaKokoPinnaksi = (k: Kuva | null) => !!k && k.korkeus >= 850 && k.leveys >= 850;
+/** Kuvakaistale (1080 × 300–360): enintään 1,5× suurennos → väh. 720 px leveä. */
+export const kelpaaKaistaleeksi = (k: Kuva | null) => !!k && suurennos(k, 1080, 360) <= MAX_SUURENNOS;
+/** Koko pinnan kuva (V-C, S-A: 1080 × 1350): väh. 720 × 900 px. */
+export const kelpaaKokoPinnaksi = (k: Kuva | null) => !!k && suurennos(k, 1080, 1350) <= MAX_SUURENNOS;
+
+/** Toimituksen korvaava kuva tai uusi rajaus (ig_julkaisut.kentat.kuva). */
+export async function korvaaKuva<T extends { kuva: Kuva | null }>(d: T, korvaava?: { url: string; fx: number; fy: number } | null): Promise<T> {
+  if (!korvaava?.url) return d;
+  const k = await lataaKuva(kuvaOsoite(korvaava.url), korvaava.fx, korvaava.fy);
+  return k ? { ...d, kuva: k } : d;
+}
 
 /* ── Päivän visa ─────────────────────────────────────────────────────── */
 
@@ -161,8 +185,7 @@ type Visa = {
 };
 
 export async function haePaivanVisa(siteId: string, paiva: string, lataaKuvat = true): Promise<VisaData | null> {
-  const sb = getSupabaseAdmin();
-  const { data: s } = await sb
+  const { data: s } = await getSupabaseAdmin()
     .from("schedule_rules")
     .select("content_id, intro_headline, intro_text")
     .eq("site_id", siteId)
@@ -172,14 +195,27 @@ export async function haePaivanVisa(siteId: string, paiva: string, lataaKuvat = 
     .maybeSingle();
   const saanto = s as unknown as Saanto | null;
   if (!saanto?.content_id) return null;
+  return haeVisa(saanto.content_id, paiva, {
+    introOtsikko: saanto.intro_headline,
+    introTeksti: saanto.intro_text,
+    lataaKuvat,
+  });
+}
 
+/** Mikä tahansa visa annetulle päivälle — omat julkaisut ja kampanjat. */
+export async function haeVisa(
+  quizId: string,
+  paiva: string,
+  o: { introOtsikko?: string | null; introTeksti?: string | null; oma?: boolean; otsake?: string | null; lataaKuvat?: boolean } = {},
+): Promise<VisaData | null> {
+  const sb = getSupabaseAdmin();
   const [{ data: q }, { count }] = await Promise.all([
     sb
       .from("quizzes")
       .select("id, title, display_title, slug, custom_slug, category, collection, hero_image, image_url, hero_focal_x, hero_focal_y")
-      .eq("id", saanto.content_id)
+      .eq("id", quizId)
       .maybeSingle(),
-    sb.from("questions").select("id", { count: "exact", head: true }).eq("quiz_id", saanto.content_id),
+    sb.from("questions").select("id", { count: "exact", head: true }).eq("quiz_id", quizId),
   ]);
   const visa = q as unknown as Visa | null;
   if (!visa) return null;
@@ -187,6 +223,7 @@ export async function haePaivanVisa(siteId: string, paiva: string, lataaKuvat = 
   const fx = visa.hero_focal_x ?? 50;
   const fy = visa.hero_focal_y ?? 40;
   const kuvaUrl = visa.hero_image ?? visa.image_url;
+  const oma = !!o.oma;
   return {
     paiva,
     quizId: visa.id,
@@ -196,9 +233,11 @@ export async function haePaivanVisa(siteId: string, paiva: string, lataaKuvat = 
     urheilu: onUrheilu(visa),
     henkilovisa: visa.collection === "tunnetut-henkilot",
     kysymyksia: count ?? 10,
-    introOtsikko: saanto.intro_headline?.trim() || null,
-    introTeksti: saanto.intro_text?.trim() || null,
-    kuva: lataaKuvat ? await lataaKuva(kuvaUrl, fx, fy) : null,
+    introOtsikko: o.introOtsikko?.trim() || null,
+    introTeksti: o.introTeksti?.trim() || null,
+    kuva: o.lataaKuvat === false ? null : await lataaKuva(kuvaUrl, fx, fy),
+    oma,
+    tunniste: oma ? (o.otsake?.trim() || "Visa").toLocaleUpperCase("fi-FI") : "PÄIVÄN VISA",
   };
 }
 

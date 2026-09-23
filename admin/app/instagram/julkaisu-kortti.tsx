@@ -4,12 +4,24 @@
 // kuvateksti ja hyväksyntä. Esikatselukuva piirretään /api/ig/kuva-reitillä; kun
 // tekstiä muokataan, kuva päivittyy hetken viiveellä ennen tallennusta.
 
-import { useEffect, useMemo, useState, useTransition } from "react";
-import { AlertTriangle, Check, Download, RotateCcw, Sparkles, SkipForward } from "lucide-react";
+import { useEffect, useMemo, useRef, useState, useTransition } from "react";
+import { AlertTriangle, Check, Download, RotateCcw, Sparkles, Trash2, Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { Julkaisu } from "@/lib/ig/suunnitelma";
 import type { Kentat, Pohja, VdVari } from "@/lib/ig/pohjat";
-import { asetaTila, ehdotaHaaste, hyvaksyJulkaisu, palautaAutomaattinen, tallennaJulkaisu } from "./actions";
+import {
+  asetaTila,
+  ehdotaHaaste,
+  hyvaksyJulkaisu,
+  lataaIgKuva,
+  palautaAutomaattinen,
+  poistaOma,
+  tallennaJulkaisu,
+  tarkistaKuvaOsoite,
+  vaihdaOmanVisa,
+  type KuvanTiedot,
+} from "./actions";
+import { Kytkin, VisaValitsin } from "./omat";
 
 export type KorttiData = {
   rivi: Julkaisu;
@@ -19,7 +31,29 @@ export type KorttiData = {
   esteet: Record<string, string[]>;
   huomiot: Record<string, string[]>;
   oletusKuvateksti: string;
+  /** Päivän visan intron otsikko (Tapahtuma-kentän oletus) */
+  oletusTapahtuma: string | null;
+  /** Käytössä oleva kuva (visan/henkilön oma tai toimituksen korvaava) */
+  kuva: { url: string | null; leveys: number; korkeus: number; fx: number; fy: number; korvattu: boolean };
 };
+
+const syote = "h-8 w-full rounded-md border border-input bg-background px-2 text-sm";
+
+/** Selain pienentää ison kuvan ennen lähetystä (Vercelin pyyntöraja 4,5 MB). */
+async function pienenna(file: File): Promise<Blob> {
+  if (file.size <= 3.5 * 1024 * 1024) return file;
+  const bmp = await createImageBitmap(file);
+  const s = Math.min(1, 2400 / Math.max(bmp.width, bmp.height));
+  const c = document.createElement("canvas");
+  c.width = Math.round(bmp.width * s);
+  c.height = Math.round(bmp.height * s);
+  c.getContext("2d")!.drawImage(bmp, 0, 0, c.width, c.height);
+  return new Promise((ok, ei) => c.toBlob((b) => (b ? ok(b) : ei(new Error("pienennys"))), "image/jpeg", 0.9));
+}
+
+function koonKuvaus(t: { leveys: number; korkeus: number; kokoPinta: boolean; kaistale: boolean }) {
+  return `${t.leveys}×${t.korkeus} px — ${t.kokoPinta ? "riittää koko pinnalle (V-C, S-A)" : t.kaistale ? "riittää kaistaleeksi, ei koko pinnalle" : "liian pieni kuvapohjille"}`;
+}
 
 const NIMET: Record<Pohja, string> = {
   "V-A": "Tapahtuma edellä",
@@ -65,19 +99,34 @@ export function JulkaisuKortti({ data, otsikko }: { data: KorttiData; otsikko: s
 
   const ruutuja = pohja === "V-E" ? 3 : 1;
   const kuvat = useMemo(() => {
-    const p = new URLSearchParams({ paiva: r.paiva, slotti: r.slotti, pohja, vari });
+    const p = new URLSearchParams({ id: r.id, pohja, vari });
     p.set("kentat", JSON.stringify(esikKentat));
     return Array.from({ length: ruutuja }, (_, i) => {
       const q = new URLSearchParams(p);
       q.set("ruutu", String(i + 1));
       return `/api/ig/kuva?${q.toString()}`;
     });
-  }, [r.paiva, r.slotti, pohja, vari, esikKentat, ruutuja]);
+  }, [r.id, pohja, vari, esikKentat, ruutuja]);
 
   const esteet = data.esteet[pohja] ?? [];
   const huomiot = data.huomiot[pohja] ?? [];
   const tekstiMuuttui = JSON.stringify(kentat) !== JSON.stringify(r.kentat ?? {});
   const lukittu = r.tila === "julkaistu";
+  const visajulkaisu = r.slotti !== "synttarit";
+  const oma = r.slotti === "oma";
+
+  // Kuvan vaihto: liitetty osoite tai oma tiedosto, sekä rajauksen kohdistus.
+  const [kuvaUrl, setKuvaUrl] = useState("");
+  const [kuvaInfo, setKuvaInfo] = useState<string | null>(null);
+  const tiedosto = useRef<HTMLInputElement>(null);
+  const nykyKuva = kentat.kuva?.url ? kentat.kuva : data.kuva.url ? { url: data.kuva.url, fx: data.kuva.fx, fy: data.kuva.fy } : null;
+
+  function kaytaKuvaa(t: KuvanTiedot) {
+    if (!t.ok) { setKuvaInfo(t.virhe); return; }
+    aseta("kuva", { url: t.url, fx: 50, fy: 40 });
+    setKuvaInfo(`Uusi kuva: ${koonKuvaus(t)}. Muista tallentaa.`);
+    setKuvaUrl("");
+  }
 
   function aseta<K extends keyof Kentat>(k: K, v: Kentat[K]) {
     setKentat((e) => ({ ...e, [k]: v }));
@@ -141,8 +190,41 @@ export function JulkaisuKortti({ data, otsikko }: { data: KorttiData; otsikko: s
             <div className="truncate font-medium" title={data.otsikko}>{data.otsikko}</div>
             <div className="truncate text-xs text-muted-foreground" title={data.ala}>{data.ala}</div>
           </div>
-          <span className={`shrink-0 rounded-full border px-2 py-0.5 text-xs ${tila.luokka}`}>{tila.teksti}</span>
+          <div className="flex shrink-0 flex-col items-end gap-1">
+            <span className={`rounded-full border px-2 py-0.5 text-xs ${tila.luokka}`}>{tila.teksti}</span>
+            <label className="flex items-center gap-1.5 text-xs text-muted-foreground">
+              {r.tila === "ohitettu" ? "Ei julkaista" : "Julkaistaan"}
+              <Kytkin
+                nimi="Julkaistaan"
+                paalla={r.tila !== "ohitettu"}
+                disabled={pending || lukittu}
+                onChange={(v) => start(async () => { await asetaTila(r.id, v ? "luonnos" : "ohitettu"); })}
+              />
+            </label>
+          </div>
         </div>
+
+        {oma && (
+          <div className="flex items-center gap-2">
+            <span className="w-14 shrink-0 text-xs text-muted-foreground">Visa</span>
+            <VisaValitsin
+              valittu={null}
+              placeholder="Vaihda visa — hae nimellä…"
+              onValitse={(v) =>
+                start(async () => {
+                  const t = await vaihdaOmanVisa(r.id, v.id);
+                  setViesti(t.ok ? { ok: true, teksti: "Visa vaihdettu." } : { ok: false, teksti: t.virhe });
+                })
+              }
+            />
+          </div>
+        )}
+        {oma && (
+          <label className="flex items-center gap-2">
+            <span className="w-14 shrink-0 text-xs text-muted-foreground">Otsake</span>
+            <input value={kentat.otsake ?? ""} onChange={(e) => aseta("otsake", e.target.value)} maxLength={28} placeholder="VISA" className={syote} />
+          </label>
+        )}
 
         <label className="flex items-center gap-2">
           <span className="w-14 shrink-0 text-xs text-muted-foreground">Pohja</span>
@@ -176,6 +258,19 @@ export function JulkaisuKortti({ data, otsikko }: { data: KorttiData; otsikko: s
           <div className="text-xs text-muted-foreground">Pohja valittu käsin.</div>
         ) : (
           <div className="text-xs text-muted-foreground">Pohja valittu automaattisesti kierron mukaan.</div>
+        )}
+
+        {visajulkaisu && pohja !== "V-E" && (
+          <label className="flex items-center gap-2">
+            <span className="w-14 shrink-0 text-xs text-muted-foreground">Tapahtuma</span>
+            <input
+              value={kentat.tapahtuma ?? ""}
+              onChange={(e) => aseta("tapahtuma", e.target.value)}
+              maxLength={80}
+              placeholder={data.oletusTapahtuma ?? (pohja === "V-A" ? "V-A vaatii tapahtuman, esim. Revontulet näkyvät tänään" : "Valinnainen alarivi")}
+              className={syote}
+            />
+          </label>
         )}
 
         {/* Toimitetut tekstit pohjan mukaan */}
@@ -256,6 +351,71 @@ export function JulkaisuKortti({ data, otsikko }: { data: KorttiData; otsikko: s
           </ul>
         )}
 
+        <details className="text-xs" open={!data.kuva.url || (data.kuva.leveys > 0 && data.kuva.leveys < 720)}>
+          <summary className="cursor-pointer text-muted-foreground hover:text-foreground">
+            Kuva{" "}
+            {data.kuva.url
+              ? `· ${data.kuva.leveys}×${data.kuva.korkeus}${data.kuva.korvattu ? " (vaihdettu)" : ""}`
+              : "· ei kuvaa"}
+          </summary>
+          <div className="mt-1 space-y-2">
+            <div className="flex gap-1">
+              <input
+                value={kuvaUrl}
+                onChange={(e) => setKuvaUrl(e.target.value)}
+                placeholder="Liitä kuvan osoite tai Wikimedia Commonsin tiedostosivu"
+                disabled={lukittu}
+                className="h-8 min-w-0 flex-1 rounded-md border border-input bg-background px-2 text-xs"
+              />
+              <Button type="button" size="sm" variant="outline" disabled={pending || lukittu || !kuvaUrl.trim()} onClick={() => start(async () => kaytaKuvaa(await tarkistaKuvaOsoite(kuvaUrl)))}>
+                Käytä
+              </Button>
+              <Button type="button" size="sm" variant="outline" disabled={pending || lukittu} onClick={() => tiedosto.current?.click()} title="Lataa oma kuva">
+                <Upload className="h-3.5 w-3.5" />
+              </Button>
+              <input
+                ref={tiedosto}
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+                className="hidden"
+                onChange={(e) => {
+                  const f = e.target.files?.[0];
+                  e.target.value = "";
+                  if (!f) return;
+                  setKuvaInfo("Ladataan…");
+                  start(async () => {
+                    try {
+                      const fd = new FormData();
+                      fd.append("file", new File([await pienenna(f)], f.name.replace(/\.\w+$/, ".jpg"), { type: "image/jpeg" }));
+                      kaytaKuvaa(await lataaIgKuva(fd));
+                    } catch {
+                      setKuvaInfo("Kuvan lataus epäonnistui.");
+                    }
+                  });
+                }}
+              />
+            </div>
+            {nykyKuva && (
+              <div className="grid grid-cols-[4rem_1fr] items-center gap-x-2 gap-y-1">
+                <span className="text-muted-foreground">Vaaka</span>
+                <input type="range" min={0} max={100} value={nykyKuva.fx} disabled={lukittu} onChange={(e) => aseta("kuva", { ...nykyKuva, fx: Number(e.target.value) })} />
+                <span className="text-muted-foreground">Pysty</span>
+                <input type="range" min={0} max={100} value={nykyKuva.fy} disabled={lukittu} onChange={(e) => aseta("kuva", { ...nykyKuva, fy: Number(e.target.value) })} />
+              </div>
+            )}
+            {kentat.kuva?.url && (
+              <button type="button" disabled={lukittu} onClick={() => { aseta("kuva", undefined); setKuvaInfo(null); }} className="text-muted-foreground underline-offset-2 hover:text-foreground hover:underline">
+                Palauta alkuperäinen kuva ja rajaus
+              </button>
+            )}
+            {kuvaInfo && <div className="text-muted-foreground">{kuvaInfo}</div>}
+            <div className="text-[11px] text-muted-foreground">
+              Koko pinnan kuva (V-C, S-A) vaatii vähintään 720×900 px, kaistale (V-A, V-B) 720 px leveyttä. Vain kuvia,
+              joihin on käyttöoikeus — Commonsin kuvissa kuvaaja ja lisenssi kuvatekstiin.
+            </div>
+          </div>
+        </details>
+
         <details className="text-xs">
           <summary className="cursor-pointer text-muted-foreground hover:text-foreground">Kuvateksti</summary>
           <textarea
@@ -286,16 +446,18 @@ export function JulkaisuKortti({ data, otsikko }: { data: KorttiData; otsikko: s
               Peru hyväksyntä
             </Button>
           )}
-          {r.tila !== "ohitettu" ? (
-            <Button size="sm" variant="ghost" disabled={pending || lukittu} onClick={() => start(async () => { await asetaTila(r.id, "ohitettu"); })} title="Ei julkaista tänä päivänä">
-              <SkipForward className="h-3.5 w-3.5" /> Ohita
-            </Button>
-          ) : (
-            <Button size="sm" variant="ghost" disabled={pending} onClick={() => start(async () => { await asetaTila(r.id, "luonnos"); })}>
-              Palauta
+          {oma && !lukittu && (
+            <Button
+              size="sm"
+              variant="ghost"
+              disabled={pending}
+              onClick={() => { if (confirm("Poistetaanko tämä oma julkaisu?")) start(async () => { await poistaOma(r.id); }); }}
+              title="Poista oma julkaisu"
+            >
+              <Trash2 className="h-3.5 w-3.5" /> Poista
             </Button>
           )}
-          {r.tila === "luonnos" && r.pohja_valittu_kasin && (
+          {!oma && r.tila === "luonnos" && r.pohja_valittu_kasin && (
             <Button size="sm" variant="ghost" disabled={pending} onClick={() => start(async () => { await palautaAutomaattinen(r.id); })} title="Anna kierron valita pohja uudelleen">
               <RotateCcw className="h-3.5 w-3.5" /> Automaattinen
             </Button>

@@ -18,7 +18,18 @@
 
 import { getSupabaseAdmin } from "@juntti/db";
 import { lataaFontit } from "./fontit";
-import { haePaivanSynttarit, haePaivanVisa, onPyorea, type SynttariData, type VisaData } from "./data";
+import {
+  haePaivanSynttarit,
+  haePaivanVisa,
+  haeVisa,
+  kelpaaKaistaleeksi,
+  kelpaaKokoPinnaksi,
+  lataaKuva,
+  onPyorea,
+  type SynttariData,
+  type VisaData,
+} from "./data";
+import { kokoelmaNimi } from "@/lib/kokoelmat";
 import {
   tarkistaSynttarit,
   tarkistaVisa,
@@ -28,7 +39,7 @@ import {
 } from "./pohjat";
 import { luonnosteleHaaste } from "./kuvateksti";
 
-export type Slotti = "paivan_visa" | "synttarit";
+export type Slotti = "paivan_visa" | "synttarit" | "oma";
 export type Tila = "luonnos" | "hyvaksytty" | "julkaistu" | "epaonnistui" | "ohitettu";
 
 export type Julkaisu = {
@@ -47,10 +58,24 @@ export type Julkaisu = {
   kuvateksti: string | null;
   tila: Tila;
   julkaistu_at: string | null;
+  kampanja: string | null;
 };
 
 const SARAKKEET =
-  "id, paiva, slotti, pohja, pohja_vari, pohja_valittu_kasin, muoto, quiz_id, celebrity_id, kokoelma, on_kuva, kentat, kuvateksti, tila, julkaistu_at";
+  "id, paiva, slotti, pohja, pohja_vari, pohja_valittu_kasin, muoto, quiz_id, celebrity_id, kokoelma, on_kuva, kentat, kuvateksti, tila, julkaistu_at, kampanja";
+
+/* ── Asetukset ───────────────────────────────────────────────────────── */
+
+export type Asetukset = { visa_paalla: boolean; synttarit_paalla: boolean };
+
+export async function haeAsetukset(siteId: string): Promise<Asetukset> {
+  const { data } = await getSupabaseAdmin()
+    .from("ig_asetukset" as never)
+    .select("visa_paalla, synttarit_paalla")
+    .eq("site_id", siteId)
+    .maybeSingle();
+  return (data as unknown as Asetukset | null) ?? { visa_paalla: true, synttarit_paalla: true };
+}
 
 /* ── Päivämäärät (Helsingin aika) ────────────────────────────────────── */
 
@@ -77,6 +102,7 @@ function viikonAlku(iso: string): string {
 type Historia = Array<{ paiva: string; slotti: Slotti; pohja: Pohja; pohja_vari: VdVari | null; urheilu: boolean }>;
 
 const VISA_JARJESTYS: Pohja[] = ["V-A", "V-C", "V-B", "V-D"];
+const OMA_JARJESTYS: Pohja[] = ["V-C", "V-A", "V-D", "V-B"];
 const SYNT_JARJESTYS: Pohja[] = ["S-B", "S-D", "S-C"];
 const VD_VARIT: VdVari[] = ["lime", "valkoinen", "mintti"];
 
@@ -99,7 +125,7 @@ function valitse(
   });
   if (kelpaavat.length === 0) return null;
 
-  const jarjestys = slotti === "paivan_visa" ? VISA_JARJESTYS : SYNT_JARJESTYS;
+  const jarjestys = slotti === "paivan_visa" ? VISA_JARJESTYS : slotti === "oma" ? OMA_JARJESTYS : SYNT_JARJESTYS;
   const kaikki = (p: Pohja) => oma.filter((h) => h.pohja === p).length;
   const luokassa = (p: Pohja) => oma.filter((h) => h.pohja === p && h.urheilu === urheilu).length;
   return [...kelpaavat].sort(
@@ -123,6 +149,8 @@ export type PaivanSisalto = {
   synttarit: SynttariData | null;
   visaRivi: Julkaisu | null;
   synttariRivi: Julkaisu | null;
+  /** Omat julkaisut ja kampanjat tälle päivälle */
+  omat: Julkaisu[];
 };
 
 /**
@@ -132,16 +160,16 @@ export type PaivanSisalto = {
 export async function varmistaSuunnitelma(siteId: string, paivia = 14): Promise<PaivanSisalto[]> {
   const sb = getSupabaseAdmin();
   const alku = tanaanHelsinki();
-  const loppu = lisaaPaivia(alku, paivia - 1);
   const { mitat } = await lataaFontit();
+  const asetukset = await haeAsetukset(siteId);
 
   const [{ data: rivit }, sisallot] = await Promise.all([
     sb.from("ig_julkaisut" as never).select(SARAKKEET).eq("site_id", siteId).order("paiva"),
     Promise.all(
       Array.from({ length: paivia }, (_, i) => lisaaPaivia(alku, i)).map(async (paiva) => ({
         paiva,
-        visa: await haePaivanVisa(siteId, paiva),
-        synttarit: await haePaivanSynttarit(siteId, paiva),
+        visa: asetukset.visa_paalla ? await haePaivanVisa(siteId, paiva) : null,
+        synttarit: asetukset.synttarit_paalla ? await haePaivanSynttarit(siteId, paiva) : null,
       })),
     ),
   ]);
@@ -167,7 +195,15 @@ export async function varmistaSuunnitelma(siteId: string, paivia = 14): Promise<
       const h = { paiva: r.paiva, slotti: r.slotti, pohja: r.pohja, pohja_vari: r.pohja_vari, urheilu: urheiluKokoelma(r.kokoelma) };
       if (i >= 0) historia[i] = h; else historia.push(h);
     }
-    tulos.push({ paiva, visa, synttarit, visaRivi, synttariRivi });
+    const omat = kaikki.filter((r) => r.paiva === paiva && r.slotti === "oma");
+    tulos.push({ paiva, visa, synttarit, visaRivi: visa ? visaRivi : null, synttariRivi: synttarit ? synttariRivi : null, omat });
+  }
+
+  // Omat julkaisut suunnitelman jälkeisille päiville (kampanja voi alkaa myöhemmin).
+  const viimeinen = lisaaPaivia(alku, paivia - 1);
+  const myohemmat = [...new Set(kaikki.filter((r) => r.slotti === "oma" && r.paiva > viimeinen).map((r) => r.paiva))].sort();
+  for (const paiva of myohemmat) {
+    tulos.push({ paiva, visa: null, synttarit: null, visaRivi: null, synttariRivi: null, omat: kaikki.filter((r) => r.paiva === paiva && r.slotti === "oma") });
   }
   return tulos;
 }
@@ -252,12 +288,132 @@ async function suunnitteleSynttarit(siteId: string, s: SynttariData, rivi: Julka
 }
 
 async function lisaa(siteId: string, paiva: string, slotti: Slotti, arvot: Record<string, unknown>): Promise<Julkaisu | null> {
-  const { data } = await getSupabaseAdmin()
+  const sb = getSupabaseAdmin();
+  const { data, error } = await sb
     .from("ig_julkaisut" as never)
-    .upsert({ site_id: siteId, paiva, slotti, ...arvot } as never, { onConflict: "site_id,paiva,slotti", ignoreDuplicates: false })
+    .insert({ site_id: siteId, paiva, slotti, ...arvot } as never)
     .select(SARAKKEET)
     .single();
-  return (data as unknown as Julkaisu) ?? null;
+  if (!error) return (data as unknown as Julkaisu) ?? null;
+  // Rinnakkainen sivunlataus ehti luoda rivin (päivä + slotti on ainutlaatuinen
+  // Päivän visalle ja synttäreille) — käytetään sitä.
+  if (slotti === "oma") return null;
+  const { data: olemassa } = await sb
+    .from("ig_julkaisut" as never)
+    .select(SARAKKEET)
+    .eq("site_id", siteId)
+    .eq("paiva", paiva)
+    .eq("slotti", slotti)
+    .maybeSingle();
+  return (olemassa as unknown as Julkaisu) ?? null;
+}
+
+/* ── Omat julkaisut ja kampanjat ─────────────────────────────────────── */
+
+async function omaHistoria(siteId: string): Promise<Historia> {
+  const { data } = await getSupabaseAdmin()
+    .from("ig_julkaisut" as never)
+    .select("paiva, slotti, pohja, pohja_vari, kokoelma")
+    .eq("site_id", siteId)
+    .eq("slotti", "oma")
+    .neq("tila", "ohitettu");
+  return ((data ?? []) as unknown as Array<{ paiva: string; slotti: Slotti; pohja: Pohja; pohja_vari: VdVari | null; kokoelma: string | null }>).map(
+    (r) => ({ ...r, urheilu: urheiluKokoelma(r.kokoelma) }),
+  );
+}
+
+/** Luo yhden oman julkaisun. Pohja valitaan omien julkaisujen kierrosta niistä,
+    joilla ei ole esteitä (V-A vaatii tapahtuman ja V-B haasteen, joten
+    tyypillisesti V-C kuvalle kelpaavalla visalla, muuten V-D). */
+export async function luoOmaJulkaisu(
+  siteId: string,
+  o: { paiva: string; quizId: string; otsake: string | null; kampanja: string | null },
+  historia?: Historia,
+): Promise<Julkaisu | null> {
+  const { mitat } = await lataaFontit();
+  const kentat: Kentat = o.otsake ? { otsake: o.otsake } : {};
+  const v = await haeVisa(o.quizId, o.paiva, { oma: true, otsake: o.otsake });
+  if (!v) return null;
+  const h = historia ?? (await omaHistoria(siteId));
+  const ehdokkaat: Pohja[] = [];
+  for (const p of ["V-C", "V-A", "V-D"] as Pohja[]) {
+    const t = await tarkistaVisa(mitat, p, v, kentat);
+    if (t.esteet.length === 0) ehdokkaat.push(p);
+  }
+  const pohja = valitse(ehdokkaat, o.paiva, "oma", v.urheilu, h) ?? "V-D";
+  const vari = pohja === "V-D" ? valitseVdVari(o.paiva, h) : null;
+  const rivi = await lisaa(siteId, o.paiva, "oma", {
+    pohja,
+    pohja_vari: vari,
+    muoto: "kuva",
+    quiz_id: v.quizId,
+    kokoelma: v.kokoelma,
+    on_kuva: pohja === "V-D" ? false : !!v.kuva,
+    kentat,
+    kampanja: o.kampanja,
+  });
+  if (rivi) h.push({ paiva: rivi.paiva, slotti: "oma", pohja: rivi.pohja, pohja_vari: rivi.pohja_vari, urheilu: v.urheilu });
+  return rivi;
+}
+
+type VisaEhdokas = {
+  id: string; title: string; display_title: string | null; collection: string | null; category: string | null;
+  hero_image: string | null; image_url: string | null; hero_focal_x: number | null; hero_focal_y: number | null;
+};
+
+/** Kampanjan visat: kokoelman julkaistut visat, joita ei ole jo käytetty Instagramissa
+    eikä ajastettu Päivän visaksi kampanjan lähelle. Kuvalliset ensin — koko pinnalle
+    kelpaavat kuvat, sitten kaistaleeksi kelpaavat, sitten muut. */
+export async function valitseKampanjanVisat(siteId: string, kokoelma: string, alku: string, paivia: number): Promise<string[]> {
+  const sb = getSupabaseAdmin();
+  const [{ data: visat }, { data: kaytetyt }, { data: ajastetut }] = await Promise.all([
+    sb
+      .from("quizzes")
+      .select("id, title, display_title, collection, category, hero_image, image_url, hero_focal_x, hero_focal_y")
+      .eq("site_id", siteId)
+      .eq("status", "published")
+      .order("published_at", { ascending: false }),
+    sb.from("ig_julkaisut" as never).select("quiz_id").eq("site_id", siteId).not("quiz_id", "is", null),
+    sb
+      .from("schedule_rules")
+      .select("content_id")
+      .eq("site_id", siteId)
+      .eq("content_type", "quiz")
+      .gte("scheduled_date", lisaaPaivia(alku, -14))
+      .lte("scheduled_date", lisaaPaivia(alku, paivia + 14)),
+  ]);
+  const pois = new Set<string>([
+    ...((kaytetyt ?? []) as unknown as Array<{ quiz_id: string }>).map((r) => r.quiz_id),
+    ...((ajastetut ?? []) as unknown as Array<{ content_id: string }>).map((r) => r.content_id),
+  ]);
+  const ehdokkaat = ((visat ?? []) as unknown as VisaEhdokas[]).filter((q) => kokoelmaNimi(q) === kokoelma && !pois.has(q.id));
+
+  const kuvalliset = ehdokkaat.filter((q) => q.hero_image ?? q.image_url).slice(0, paivia * 3);
+  const mitatut = await Promise.all(
+    kuvalliset.map(async (q) => {
+      const k = await lataaKuva(q.hero_image ?? q.image_url, q.hero_focal_x ?? 50, q.hero_focal_y ?? 40);
+      return { id: q.id, taso: kelpaaKokoPinnaksi(k) ? 0 : kelpaaKaistaleeksi(k) ? 1 : 2 };
+    }),
+  );
+  const jarjestys = [
+    ...mitatut.sort((a, b) => a.taso - b.taso).map((m) => m.id),
+    ...ehdokkaat.filter((q) => !(q.hero_image ?? q.image_url)).map((q) => q.id),
+  ];
+  return jarjestys.slice(0, paivia);
+}
+
+export async function luoKampanja(
+  siteId: string,
+  o: { nimi: string; alku: string; paivia: number; kokoelma: string },
+): Promise<{ luotu: number; visoja: number }> {
+  const visat = await valitseKampanjanVisat(siteId, o.kokoelma, o.alku, o.paivia);
+  const historia = await omaHistoria(siteId);
+  let luotu = 0;
+  for (let i = 0; i < visat.length; i++) {
+    const r = await luoOmaJulkaisu(siteId, { paiva: lisaaPaivia(o.alku, i), quizId: visat[i], otsake: o.nimi, kampanja: o.nimi }, historia);
+    if (r) luotu++;
+  }
+  return { luotu, visoja: visat.length };
 }
 
 async function paivita(id: string, arvot: Record<string, unknown>): Promise<Julkaisu | null> {

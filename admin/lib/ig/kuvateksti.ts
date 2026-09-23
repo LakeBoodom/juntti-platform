@@ -32,11 +32,11 @@ export function visaKuvateksti(v: VisaData): string {
   const rivit: string[] = [];
   if (v.introOtsikko) rivit.push(piste(v.introOtsikko));
   if (v.introTeksti) rivit.push(v.introTeksti);
-  if (!v.introOtsikko && !v.introTeksti) rivit.push(`Päivän visa: ${v.nimi}.`);
+  if (!v.introOtsikko && !v.introTeksti) rivit.push(v.oma ? piste(v.nimi) : `Päivän visa: ${v.nimi}.`);
   rivit.push("");
-  rivit.push(`Pelaa päivän visa — linkki biossa. ${v.kysymyksia} kysymystä, ei kirjautumista.`);
+  rivit.push(`${v.oma ? "Pelaa visa" : "Pelaa päivän visa"} — linkki biossa. ${v.kysymyksia} kysymystä, ei kirjautumista.`);
   rivit.push("");
-  rivit.push([PERUSTAGIT, "#päivänvisa", KOKOELMA_TAGI[v.kokoelma]].filter(Boolean).join(" "));
+  rivit.push([PERUSTAGIT, v.oma ? null : "#päivänvisa", KOKOELMA_TAGI[v.kokoelma]].filter(Boolean).join(" "));
   return rivit.join("\n");
 }
 
@@ -79,6 +79,8 @@ Säännöt:
 - Enintään 60 merkkiä. Yksi lause, päättyy kysymys- tai huutomerkkiin tai pisteeseen.
 - Ei faktaväitteitä, lukuja tai nimiä, joita alla ei mainita. Ei vihjeitä vastauksiin.
 - Puhuttele lukijaa (sinä-muoto). Leikkisä mutta ei imelä. Ei emojeja eikä hashtageja.
+- Älä kysy yksittäistä tietokysymystä ("Tiedätkö, kuka…", "Muistatko, mikä…") — se on
+  visan kysymys, ei haaste. Haasta muistamaan, luettelemaan tai todistamaan osaamisensa.
 - Esimerkkejä tyylistä: "Montako suomalaista F1-kuljettajaa muistat ulkoa?",
   "Väitätkö tosifaniksi? Todista se."
 
