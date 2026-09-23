@@ -196,3 +196,45 @@ export async function julkaiseInstagramiin(y: Yhteys, kuvaUrlit: string[], kuvat
   } catch { /* linkki ei ole välttämätön */ }
   return { mediaId: media.id, permalink };
 }
+
+/* ── Luvut (insights) ────────────────────────────────────────────────── */
+
+export type Tilastot = Partial<Record<
+  "reach" | "views" | "likes" | "comments" | "saved" | "shares" | "total_interactions" | "follows" | "profile_visits",
+  number
+>>;
+
+/* Instagram hylkää koko pyynnön, jos yksikin mittari ei sovi mediatyypille tai
+   API-versiolle (esim. views tuli 2025, impressions poistui). Kokeillaan siksi
+   ensin laajaa joukkoa ja sitten suppeampia. */
+const MITTARIJOUKOT = [
+  ["reach", "views", "likes", "comments", "saved", "shares", "total_interactions", "follows", "profile_visits"],
+  ["reach", "views", "likes", "comments", "saved", "shares", "total_interactions"],
+  ["reach", "likes", "comments", "saved", "shares"],
+  ["reach", "likes", "comments", "saved"],
+];
+
+type InsightVastaus = { data?: Array<{ name: string; values?: Array<{ value: number }>; total_value?: { value: number } }> };
+
+export async function haeMediaTilastot(y: Yhteys, mediaId: string): Promise<Tilastot> {
+  let viimeisin: unknown = null;
+  for (const joukko of MITTARIJOUKOT) {
+    try {
+      const r = await get<InsightVastaus>(y, `${mediaId}/insights`, { metric: joukko.join(",") }, "Luvut");
+      const t: Tilastot = {};
+      for (const m of r.data ?? []) {
+        const v = m.total_value?.value ?? m.values?.[0]?.value;
+        if (typeof v === "number") t[m.name as keyof Tilastot] = v;
+      }
+      return t;
+    } catch (e) {
+      viimeisin = e;
+    }
+  }
+  throw viimeisin instanceof Error ? viimeisin : new Error("Lukujen haku epäonnistui.");
+}
+
+export async function haeTilinTiedot(y: Yhteys): Promise<{ seuraajia: number | null; julkaisuja: number | null }> {
+  const r = await get<{ followers_count?: number; media_count?: number }>(y, "me", { fields: "followers_count,media_count" }, "Tilin tiedot");
+  return { seuraajia: r.followers_count ?? null, julkaisuja: r.media_count ?? null };
+}

@@ -15,7 +15,7 @@ import { rivinSisalto } from "@/lib/ig/sisalto";
 import { lisaaPaivia, luoKampanja, luoOmaJulkaisu, tanaanHelsinki } from "@/lib/ig/suunnitelma";
 import { kokoelmaNimi } from "@/lib/kokoelmat";
 import { haeYhteys } from "@/lib/ig/instagram";
-import { julkaiseRivi } from "@/lib/ig/julkaisu";
+import { julkaiseRivi, paivitaTilastot } from "@/lib/ig/julkaisu";
 
 type Tulos = { ok: true } | { ok: false; virhe: string };
 
@@ -172,6 +172,18 @@ export async function julkaiseNyt(id: string): Promise<{ ok: true; permalink: st
   const t = await julkaiseRivi(id);
   revalidatePath("/instagram");
   return t;
+}
+
+/** Hakee Instagramin luvut heti kaikille viimeisen 30 päivän julkaisuille. */
+export async function paivitaLuvut(): Promise<{ ok: true; maara: number } | { ok: false; virhe: string }> {
+  const site = await getCurrentSite();
+  try {
+    const maara = await paivitaTilastot(site.id, { maxIka: 0, enintaan: 40 });
+    revalidatePath("/instagram");
+    return { ok: true, maara };
+  } catch (e) {
+    return { ok: false, virhe: e instanceof Error ? e.message : String(e) };
+  }
 }
 
 export async function katkaiseYhteys(): Promise<Tulos> {

@@ -23,6 +23,7 @@ export function YhteysPaneeli(p: {
   automaattinen: boolean;
   ajat: { visa_klo: string; synttarit_klo: string; omat_klo: string };
   ilmoitus: { ok: boolean; teksti: string } | null;
+  seuraajia: number | null;
 }) {
   const [ajat, setAjat] = useState({
     visa_klo: p.ajat.visa_klo.slice(0, 5),
@@ -43,6 +44,7 @@ export function YhteysPaneeli(p: {
         {p.yhteys ? (
           <span className="inline-flex items-center gap-1 text-sm text-green-800">
             <CheckCircle2 className="h-4 w-4" /> Yhdistetty{p.yhteys.kayttajanimi ? `: @${p.yhteys.kayttajanimi}` : ""}
+            {p.seuraajia !== null && <span className="text-xs text-muted-foreground">· {p.seuraajia} seuraajaa</span>}
             <span className="text-xs text-muted-foreground">· yhteys voimassa {pvm(p.yhteys.vanhenee)} asti, uusiutuu automaattisesti</span>
           </span>
         ) : (

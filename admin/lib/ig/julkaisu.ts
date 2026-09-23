@@ -7,7 +7,7 @@
 // samaa kuvaa kahdesti.
 
 import { getSupabaseAdmin } from "@juntti/db";
-import { haeYhteys, julkaiseInstagramiin, uusiTokenTarvittaessa } from "./instagram";
+import { haeMediaTilastot, haeYhteys, julkaiseInstagramiin, uusiTokenTarvittaessa } from "./instagram";
 import { jpegit, piirraRivi, type PiirrettavaRivi } from "./piirto";
 import { synttariKuvateksti, visaKuvateksti } from "./kuvateksti";
 import { haeAsetukset, tanaanHelsinki } from "./suunnitelma";
@@ -91,10 +91,17 @@ function nytHelsinki(): string {
     (ajo kymmenen minuutin välein riittää, ja funktio pysyy aikarajassa). */
 export async function ajastinKierros(siteId: string): Promise<string> {
   const a = await haeAsetukset(siteId);
-  const y = await haeYhteys(siteId);
+  let y = await haeYhteys(siteId);
   if (!y) return "ei yhteyttä";
-  try { await uusiTokenTarvittaessa(y); } catch (e) { console.error("IG-tokenin uusiminen", e); }
-  if (!a.automaattinen) return "automaattinen julkaisu pois";
+  try { y = await uusiTokenTarvittaessa(y); } catch (e) { console.error("IG-tokenin uusiminen", e); }
+  let luvut = "";
+  try {
+    const n = await paivitaTilastot(siteId, { maxIka: 3 * 3600 * 1000, enintaan: 5 });
+    if (n) luvut = ` · luvut päivitetty ${n}`;
+  } catch (e) {
+    console.error("IG-lukujen päivitys", e);
+  }
+  if (!a.automaattinen) return `automaattinen julkaisu pois${luvut}`;
 
   const tanaan = tanaanHelsinki();
   const nyt = nytHelsinki();
@@ -114,7 +121,43 @@ export async function ajastinKierros(siteId: string): Promise<string> {
     const s = erapaiva[r.slotti];
     return s?.paalla && nyt >= s.klo;
   });
-  if (erääntyneet.length === 0) return `ei erääntyneitä (${nyt})`;
+  if (erääntyneet.length === 0) return `ei erääntyneitä (${nyt})${luvut}`;
   const t = await julkaiseRivi(erääntyneet[0].id);
-  return t.ok ? `julkaistu ${erääntyneet[0].id}` : `epäonnistui ${erääntyneet[0].id}: ${t.virhe}`;
+  return t.ok ? `julkaistu ${erääntyneet[0].id}${luvut}` : `epäonnistui ${erääntyneet[0].id}: ${t.virhe}${luvut}`;
+}
+
+/** Päivittää Instagramin luvut viimeisen 30 päivän julkaisuille. Luvut kertyvät
+    postauksen ensimmäisten päivien aikana, joten ajastin päivittää enintään
+    kolmen tunnin välein ja muutaman kerrallaan; admin voi pakottaa päivityksen.
+    Palauttaa päivitettyjen määrän. */
+export async function paivitaTilastot(siteId: string, o: { maxIka: number; enintaan: number }): Promise<number> {
+  const sb = getSupabaseAdmin();
+  const y = await haeYhteys(siteId);
+  if (!y) return 0;
+  const raja = new Date(Date.now() - 30 * 24 * 3600 * 1000).toISOString();
+  const { data } = await sb
+    .from("ig_julkaisut" as never)
+    .select("id, ig_media_id, tilastot_at")
+    .eq("site_id", siteId)
+    .eq("tila", "julkaistu")
+    .not("ig_media_id", "is", null)
+    .gte("julkaistu_at", raja)
+    .order("tilastot_at", { ascending: true, nullsFirst: true });
+  const vanhat = ((data ?? []) as unknown as Array<{ id: string; ig_media_id: string; tilastot_at: string | null }>)
+    .filter((r) => !r.tilastot_at || Date.now() - new Date(r.tilastot_at).getTime() > o.maxIka)
+    .slice(0, o.enintaan);
+  let n = 0;
+  for (const r of vanhat) {
+    try {
+      const t = await haeMediaTilastot(y, r.ig_media_id);
+      await sb
+        .from("ig_julkaisut" as never)
+        .update({ ig_tilastot: t, tilastot_at: new Date().toISOString() } as never)
+        .eq("id", r.id);
+      n++;
+    } catch (e) {
+      console.error("IG-luvut", r.id, e);
+    }
+  }
+  return n;
 }

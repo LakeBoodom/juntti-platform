@@ -6,7 +6,7 @@
 import { useEffect, useState, useTransition } from "react";
 import { ImageIcon, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { tallennaAsetukset, haeVisoja, luoKampanjaToiminto, luoOma, type VisaHaku } from "./actions";
+import { tallennaAsetukset, haeVisoja, luoKampanjaToiminto, luoOma, paivitaLuvut, type VisaHaku } from "./actions";
 
 const kentta = "h-8 rounded-md border border-input bg-background px-2 text-sm";
 
@@ -52,6 +52,29 @@ export function SlottiKytkin(p: { kentta: "visa_paalla" | "synttarit_paalla"; pa
       <span className="text-xs text-muted-foreground">{p.paalla ? "päällä" : "pois päältä"}</span>
       {virhe && <span className="text-xs text-red-700">{virhe}</span>}
     </div>
+  );
+}
+
+export function PaivitaLuvut() {
+  const [pending, start] = useTransition();
+  const [viesti, setViesti] = useState<string | null>(null);
+  return (
+    <span className="inline-flex items-center gap-2">
+      <Button
+        size="sm"
+        variant="outline"
+        disabled={pending}
+        onClick={() =>
+          start(async () => {
+            const t = await paivitaLuvut();
+            setViesti(t.ok ? `Päivitetty ${t.maara} julkaisun luvut.` : t.virhe);
+          })
+        }
+      >
+        {pending ? "Haetaan…" : "Päivitä luvut nyt"}
+      </Button>
+      {viesti && <span className="text-xs text-muted-foreground">{viesti}</span>}
+    </span>
   );
 }
 

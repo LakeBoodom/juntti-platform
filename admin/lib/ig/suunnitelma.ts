@@ -38,6 +38,7 @@ import {
   type VdVari,
 } from "./pohjat";
 import { luonnosteleHaaste } from "./kuvateksti";
+import type { Tilastot } from "./instagram";
 
 export type Slotti = "paivan_visa" | "synttarit" | "oma";
 export type Tila = "luonnos" | "hyvaksytty" | "julkaistaan" | "julkaistu" | "epaonnistui" | "ohitettu";
@@ -61,10 +62,12 @@ export type Julkaisu = {
   kampanja: string | null;
   virhe: string | null;
   ig_permalink: string | null;
+  ig_tilastot: Tilastot | null;
+  tilastot_at: string | null;
 };
 
 const SARAKKEET =
-  "id, paiva, slotti, pohja, pohja_vari, pohja_valittu_kasin, muoto, quiz_id, celebrity_id, kokoelma, on_kuva, kentat, kuvateksti, tila, julkaistu_at, kampanja, virhe, ig_permalink";
+  "id, paiva, slotti, pohja, pohja_vari, pohja_valittu_kasin, muoto, quiz_id, celebrity_id, kokoelma, on_kuva, kentat, kuvateksti, tila, julkaistu_at, kampanja, virhe, ig_permalink, ig_tilastot, tilastot_at";
 
 /* ── Asetukset ───────────────────────────────────────────────────────── */
 

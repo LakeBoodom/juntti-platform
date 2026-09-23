@@ -17,9 +17,9 @@ import { haeAsetukset, varmistaSuunnitelma, type Julkaisu } from "@/lib/ig/suunn
 import { kokoelmaNimi } from "@/lib/kokoelmat";
 import { getSupabaseAdmin } from "@juntti/db";
 import { JulkaisuKortti, type KorttiData, type Mittaus } from "./julkaisu-kortti";
-import { SlottiKytkin, UusiJulkaisu } from "./omat";
+import { PaivitaLuvut, SlottiKytkin, UusiJulkaisu } from "./omat";
 import { YhteysPaneeli } from "./yhteys";
-import { haeYhteys, salaisuusAsetettu } from "@/lib/ig/instagram";
+import { haeTilinTiedot, haeYhteys, salaisuusAsetettu, type Tilastot } from "@/lib/ig/instagram";
 
 export const dynamic = "force-dynamic";
 // Suunnitelma hakee 14 päivän datan ja kuvat — annetaan aikaa ensilataukselle.
@@ -100,6 +100,10 @@ export default async function InstagramPage({ searchParams }: { searchParams: Pr
     getSupabaseAdmin().from("quizzes").select("collection, category").eq("site_id", site.id).eq("status", "published"),
     haeYhteys(site.id),
   ]);
+  let tili: { seuraajia: number | null; julkaisuja: number | null } | null = null;
+  if (yhteys) {
+    try { tili = await haeTilinTiedot(yhteys); } catch { /* näytetään ilman lukuja */ }
+  }
   const ilmoitus =
     q.ig === "yhdistetty"
       ? { ok: true, teksti: `Instagram yhdistetty${q.tili ? `: @${q.tili}` : ""}. Kytke automaattinen julkaisu päälle, kun olet valmis.` }
@@ -132,7 +136,7 @@ export default async function InstagramPage({ searchParams }: { searchParams: Pr
   const [{ data: kaikki }, { data: mittausRivit }] = await Promise.all([
     getSupabaseAdmin()
       .from("ig_julkaisut" as never)
-      .select("id, pohja, tila, kokoelma")
+      .select("id, pohja, tila, kokoelma, ig_tilastot")
       .eq("site_id", site.id)
       .neq("tila", "ohitettu"),
     getSupabaseAdmin().from("ig_mittaus" as never).select("julkaisu, tapahtuma, maara"),
@@ -144,8 +148,23 @@ export default async function InstagramPage({ searchParams }: { searchParams: Pr
     const e = (mittaus[m.julkaisu] ??= { klikkaus: 0, avaus: 0, valmis: 0 });
     if (m.tapahtuma === "klikkaus" || m.tapahtuma === "avaus" || m.tapahtuma === "valmis") e[m.tapahtuma] += m.maara;
   }
+  type Tulos = { n: number; lukuja: number; reach: number; sitoutuminen: number; avaus: number; valmis: number };
+  const tulokset = new Map<string, Tulos>();
   const kertyma = new Map<string, { yht: number; urheilu: number; julkaistu: number; avaus: number; valmis: number }>();
-  for (const r of (kaikki ?? []) as unknown as Array<{ id: string; pohja: Pohja; tila: string; kokoelma: string | null }>) {
+  for (const r of (kaikki ?? []) as unknown as Array<{ id: string; pohja: Pohja; tila: string; kokoelma: string | null; ig_tilastot: Tilastot | null }>) {
+    if (r.tila === "julkaistu") {
+      const t = tulokset.get(r.pohja) ?? { n: 0, lukuja: 0, reach: 0, sitoutuminen: 0, avaus: 0, valmis: 0 };
+      t.n++;
+      const i = r.ig_tilastot;
+      if (i && typeof i.reach === "number") {
+        t.lukuja++;
+        t.reach += i.reach;
+        t.sitoutuminen += (i.likes ?? 0) + (i.comments ?? 0) + (i.saved ?? 0) + (i.shares ?? 0);
+      }
+      t.avaus += mittaus[r.id]?.avaus ?? 0;
+      t.valmis += mittaus[r.id]?.valmis ?? 0;
+      tulokset.set(r.pohja, t);
+    }
     const e = kertyma.get(r.pohja) ?? { yht: 0, urheilu: 0, julkaistu: 0, avaus: 0, valmis: 0 };
     e.yht++;
     if (r.kokoelma === "Urheilu" || r.kokoelma === "Jääkiekko") e.urheilu++;
@@ -175,6 +194,7 @@ export default async function InstagramPage({ searchParams }: { searchParams: Pr
           automaattinen={asetukset.automaattinen}
           ajat={{ visa_klo: asetukset.visa_klo, synttarit_klo: asetukset.synttarit_klo, omat_klo: asetukset.omat_klo }}
           ilmoitus={ilmoitus}
+          seuraajia={tili?.seuraajia ?? null}
         />
 
         <section className="grid gap-4 lg:grid-cols-[1fr_2fr]">
@@ -189,6 +209,8 @@ export default async function InstagramPage({ searchParams }: { searchParams: Pr
           </div>
           <UusiJulkaisu kokoelmat={kokoelmat} />
         </section>
+
+        <Tulostaulukko tulokset={tulokset} />
 
         <section className="rounded-md border p-4">
           <h2 className="mb-2 text-sm font-semibold">Testin kertymä</h2>
@@ -237,5 +259,55 @@ export default async function InstagramPage({ searchParams }: { searchParams: Pr
         </div>
       </main>
     </>
+  );
+}
+
+/** Designin mittaussuunnitelma: tavoittavuus, sitoutumisaste ja Instagramista
+    aloitetut visat erikseen, pohjittain. Sitoutuminen = (tykkäykset + kommentit
+    + tallennukset + jaot) / tavoittavuus niistä julkaisuista, joille luvut on haettu. */
+function Tulostaulukko({ tulokset }: { tulokset: Map<string, { n: number; lukuja: number; reach: number; sitoutuminen: number; avaus: number; valmis: number }> }) {
+  const rivit = [...VISA_POHJAT, ...SYNT_POHJAT].filter((p) => tulokset.get(p)?.n);
+  if (rivit.length === 0) return null;
+  const luku = (n: number) => new Intl.NumberFormat("fi-FI", { maximumFractionDigits: 1 }).format(n);
+  return (
+    <section className="rounded-md border p-4">
+      <div className="mb-2 flex flex-wrap items-center gap-3">
+        <h2 className="text-sm font-semibold">Tulokset pohjittain</h2>
+        <PaivitaLuvut />
+      </div>
+      <div className="overflow-x-auto">
+        <table className="w-full min-w-[560px] text-xs">
+          <thead className="text-left text-muted-foreground">
+            <tr>
+              <th className="py-1 pr-3 font-medium">Pohja</th>
+              <th className="py-1 pr-3 text-right font-medium">Julkaistu</th>
+              <th className="py-1 pr-3 text-right font-medium">Tavoitti / julkaisu</th>
+              <th className="py-1 pr-3 text-right font-medium">Sitoutuminen</th>
+              <th className="py-1 pr-3 text-right font-medium">Aloituksia IG:stä / julkaisu</th>
+              <th className="py-1 text-right font-medium">Pelattu loppuun</th>
+            </tr>
+          </thead>
+          <tbody>
+            {rivit.map((p) => {
+              const t = tulokset.get(p)!;
+              return (
+                <tr key={p} className="border-t">
+                  <td className="py-1.5 pr-3"><span className="font-semibold">{p}</span> {POHJA_NIMET[p]}</td>
+                  <td className="py-1.5 pr-3 text-right tabular-nums">{t.n}</td>
+                  <td className="py-1.5 pr-3 text-right tabular-nums">{t.lukuja ? luku(t.reach / t.lukuja) : "–"}</td>
+                  <td className="py-1.5 pr-3 text-right tabular-nums">{t.reach ? `${luku((100 * t.sitoutuminen) / t.reach)} %` : "–"}</td>
+                  <td className="py-1.5 pr-3 text-right tabular-nums">{luku(t.avaus / t.n)}</td>
+                  <td className="py-1.5 text-right tabular-nums">{t.valmis}</td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+      <p className="mt-2 text-xs text-muted-foreground">
+        Luvut päivittyvät automaattisesti muutaman tunnin välein 30 päivän ajan julkaisusta. Vertaa pohjia vasta, kun
+        kullakin on useampi julkaisu — yksittäinen postaus riippuu paljon aiheesta ja päivästä.
+      </p>
+    </section>
   );
 }

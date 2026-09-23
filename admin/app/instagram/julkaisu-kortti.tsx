@@ -490,6 +490,15 @@ export function JulkaisuKortti({ data, otsikko, yhdistetty, mittaus }: { data: K
               <Send className="h-3.5 w-3.5" /> {r.tila === "epaonnistui" ? "Yritä uudelleen" : "Julkaise nyt"}
             </Button>
           )}
+          {r.tila === "julkaistu" && r.ig_tilastot && (
+            <span className="text-xs text-muted-foreground" title={r.tilastot_at ? `Instagramin luvut, päivitetty ${new Date(r.tilastot_at).toLocaleString("fi-FI")}` : undefined}>
+              Instagram: tavoitti {r.ig_tilastot.reach ?? "–"}
+              {r.ig_tilastot.views !== undefined ? ` · näytöt ${r.ig_tilastot.views}` : ""} · tykkäykset {r.ig_tilastot.likes ?? 0} · kommentit{" "}
+              {r.ig_tilastot.comments ?? 0} · tallennukset {r.ig_tilastot.saved ?? 0} · jaot {r.ig_tilastot.shares ?? 0}
+              {r.ig_tilastot.profile_visits !== undefined ? ` · profiilikäynnit ${r.ig_tilastot.profile_visits}` : ""}
+              {r.ig_tilastot.follows !== undefined ? ` · uudet seuraajat ${r.ig_tilastot.follows}` : ""}
+            </span>
+          )}
           {r.tila === "julkaistu" && (
             <span className="text-xs text-muted-foreground" title="Bio-sivun (tietoniekka.fi/ig) mittaus">
               Bio: {mittaus?.klikkaus ?? 0} klikkausta · {mittaus?.avaus ?? 0} aloitusta · {mittaus?.valmis ?? 0} loppuun
