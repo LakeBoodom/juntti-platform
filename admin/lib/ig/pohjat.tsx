@@ -907,7 +907,10 @@ async function p4r(c: Ktx, s: SynttariData, k: Kentat): Promise<Piirros> {
   // Ilman visaa kortti ohjaa kommentteihin (design 4i:n periaate).
   const eiVisaa = !s.quizId;
   const koukku = vaadiKoukku(k, eiVisaa ? "Mikä on ensimmäinen muistosi hänestä?" : "Kuinka hyvin tunnet hänet?", esteet);
-  const ots = otsikko(c, koukku, { koot: [118, 104, 92, 80], leveys: SISA, maxRivit: 3, valistys: -0.04 });
+  // Kolme riviä designin koossa; pitkälle koukulle neljäs rivi pienempänä
+  // (juontajien pää alkaa noin 530 px:n korkeudelta, neljä riviä 88 px:llä päättyy ~480).
+  const kolme = otsikko(c, koukku, { koot: [118, 104, 92, 80], leveys: SISA, maxRivit: 3, valistys: -0.04 });
+  const ots = kolme.mahtuu ? kolme : otsikko(c, koukku, { koot: [88, 80], leveys: SISA, maxRivit: 4, valistys: -0.04 });
   tarkistaMahtuu(ots, "Koukku", esteet);
   const label = leipa(c, isot(synttariLabel(s, true)), { koot: [32, 28, 24], leveys: SISA, maxRivit: 1, paino: 700 });
   tarkistaMahtuu(label, "Nimirivi", esteet);
