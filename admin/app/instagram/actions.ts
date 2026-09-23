@@ -9,28 +9,26 @@ import { getSupabaseAdmin } from "@juntti/db";
 import { getCurrentSite } from "@/lib/sites";
 import { lataaFontit } from "@/lib/ig/fontit";
 import { kelpaaKaistaleeksi, kelpaaKokoPinnaksi, kuvaOsoite, lataaKuva } from "@/lib/ig/data";
-import { tarkistaSynttarit, tarkistaVisa, type Kentat, type Pohja, type VdVari } from "@/lib/ig/pohjat";
-import { luonnosteleHaaste } from "@/lib/ig/kuvateksti";
+import { onSynttaripohja, onVisapohja, tarkistaSynttarit, tarkistaVisa, type Kentat, type Pohja } from "@/lib/ig/pohjat";
+import { fanitasotKelpaavat, luoFanitasot, luonnosteleTekstit, type Luonnos } from "@/lib/ig/tekstit";
 import { rivinSisalto } from "@/lib/ig/sisalto";
 import { lisaaPaivia, luoKampanja, luoOmaJulkaisu, tanaanHelsinki } from "@/lib/ig/suunnitelma";
 import { kokoelmaNimi } from "@/lib/kokoelmat";
 import { haeYhteys } from "@/lib/ig/instagram";
 import { julkaiseRivi, paivitaTilastot } from "@/lib/ig/julkaisu";
+import { haeJuontajakuvat, type Asento, type Kuka } from "@/lib/ig/juontajat";
 
 type Tulos = { ok: true } | { ok: false; virhe: string };
 
-const VISA: Pohja[] = ["V-A", "V-B", "V-C", "V-D", "V-E"];
-const SYNT: Pohja[] = ["S-A", "S-B", "S-C", "S-D"];
-
 type Rivi = {
   id: string; site_id: string; paiva: string; slotti: "paivan_visa" | "synttarit" | "oma";
-  quiz_id: string | null; pohja: Pohja; pohja_vari: VdVari | null; kentat: Kentat;
+  quiz_id: string | null; pohja: Pohja; kentat: Kentat;
 };
 
 async function haeRivi(id: string): Promise<Rivi | null> {
   const { data } = await getSupabaseAdmin()
     .from("ig_julkaisut" as never)
-    .select("id, site_id, paiva, slotti, quiz_id, pohja, pohja_vari, kentat")
+    .select("id, site_id, paiva, slotti, quiz_id, pohja, kentat")
     .eq("id", id)
     .maybeSingle();
   return (data as unknown as Rivi) ?? null;
@@ -40,20 +38,17 @@ const rajaaProsentti = (n: unknown) => Math.min(100, Math.max(0, Math.round(Numb
 
 function siivoaKentat(k: Kentat): Kentat {
   const t = (s?: string) => (s ?? "").replace(/\s+/g, " ").trim() || undefined;
-  const sisalto = (k.sisalto ?? [])
-    .map((s) => ({ otsikko: t(s.otsikko) ?? "", teksti: t(s.teksti) ?? "" }))
-    .filter((s) => s.otsikko || s.teksti)
-    .slice(0, 3);
+  const kysymykset = (k.kysymykset ?? []).filter((x) => typeof x === "string" && /^[0-9a-f-]{36}$/i.test(x)).slice(0, 3);
   const puhdas: Kentat = {
-    haaste: t(k.haaste),
-    haasteAla: t(k.haasteAla),
+    aihe: t(k.aihe)?.toLocaleUpperCase("fi-FI"),
     koukku: t(k.koukku),
-    koukkuAla: t(k.koukkuAla),
-    kysymys: t(k.kysymys),
-    kuvaaja: t(k.kuvaaja),
+    palkinto: t(k.palkinto),
+    cta: t(k.cta),
     tapahtuma: t(k.tapahtuma),
-    otsake: t(k.otsake),
-    ...(sisalto.length ? { sisalto } : {}),
+    kuvaaja: t(k.kuvaaja),
+    luonnosPohjalle: t(k.luonnosPohjalle),
+    ...(typeof k.reitti === "boolean" ? { reitti: k.reitti } : {}),
+    ...(kysymykset.length ? { kysymykset } : {}),
     ...(k.kuva?.url?.trim()
       ? { kuva: { url: k.kuva.url.trim(), fx: rajaaProsentti(k.kuva.fx), fy: rajaaProsentti(k.kuva.fy) } }
       : {}),
@@ -61,14 +56,15 @@ function siivoaKentat(k: Kentat): Kentat {
   return Object.fromEntries(Object.entries(puhdas).filter(([, v]) => v !== undefined)) as Kentat;
 }
 
+const sopiiRiviin = (slotti: Rivi["slotti"], pohja: string) => (slotti === "synttarit" ? onSynttaripohja(pohja) : onVisapohja(pohja));
+
 export async function tallennaJulkaisu(
   id: string,
-  muutos: { pohja: Pohja; pohja_vari: VdVari | null; kentat: Kentat; kuvateksti: string | null },
+  muutos: { pohja: Pohja; kentat: Kentat; kuvateksti: string | null },
 ): Promise<Tulos> {
   const rivi = await haeRivi(id);
   if (!rivi) return { ok: false, virhe: "Julkaisua ei löytynyt." };
-  const sallitut = rivi.slotti === "synttarit" ? SYNT : VISA;
-  if (!sallitut.includes(muutos.pohja)) return { ok: false, virhe: "Pohja ei sovi tähän julkaisuun." };
+  if (!sopiiRiviin(rivi.slotti, muutos.pohja)) return { ok: false, virhe: "Pohja ei sovi tähän julkaisuun." };
 
   const kuvateksti = (muutos.kuvateksti ?? "").trim();
   if (kuvateksti.length > 2200) return { ok: false, virhe: "Instagramin kuvateksti on enintään 2 200 merkkiä." };
@@ -77,9 +73,9 @@ export async function tallennaJulkaisu(
     .from("ig_julkaisut" as never)
     .update({
       pohja: muutos.pohja,
-      pohja_vari: muutos.pohja === "V-D" ? (muutos.pohja_vari ?? "lime") : null,
-      pohja_valittu_kasin: muutos.pohja !== rivi.pohja ? true : undefined,
-      muoto: muutos.pohja === "V-E" ? "karuselli" : "kuva",
+      // Toimituksen muokkaama julkaisu on käsin valittu: suunnittelija ei enää luonnostele sitä uudelleen.
+      pohja_valittu_kasin: true,
+      muoto: "kuva",
       kentat: siivoaKentat(muutos.kentat),
       kuvateksti: kuvateksti || null,
       updated_at: new Date().toISOString(),
@@ -95,13 +91,15 @@ export async function tallennaJulkaisu(
 export async function hyvaksyJulkaisu(id: string): Promise<Tulos> {
   const rivi = await haeRivi(id);
   if (!rivi) return { ok: false, virhe: "Julkaisua ei löytynyt." };
+  if (!sopiiRiviin(rivi.slotti, rivi.pohja)) return { ok: false, virhe: "Valitse kierroksen 4 pohja." };
   const { mitat } = await lataaFontit();
   const sisalto = await rivinSisalto(rivi, rivi.kentat ?? {});
   if (!sisalto) return { ok: false, virhe: rivi.slotti === "synttarit" ? "Päivälle ei ole synttärisankaria." : "Visaa ei löytynyt." };
+  const o = { m: mitat, siemen: rivi.paiva };
   const esteet =
     sisalto.tyyppi === "visa"
-      ? (await tarkistaVisa(mitat, rivi.pohja, sisalto.v, rivi.kentat ?? {}, rivi.pohja_vari ?? "lime")).esteet
-      : (await tarkistaSynttarit(mitat, rivi.pohja, sisalto.s, rivi.kentat ?? {})).esteet;
+      ? (await tarkistaVisa(o, rivi.pohja, sisalto.v, rivi.kentat ?? {})).esteet
+      : (await tarkistaSynttarit(o, rivi.pohja, sisalto.s, rivi.kentat ?? {})).esteet;
   if (esteet.length) return { ok: false, virhe: `Ei voi hyväksyä: ${esteet.join(" ")}` };
   return asetaTila(id, "hyvaksytty");
 }
@@ -117,25 +115,93 @@ export async function asetaTila(id: string, tila: "luonnos" | "hyvaksytty" | "oh
   return { ok: true };
 }
 
-/** Poistaa rivin, jolloin suunnittelija valitsee pohjan uudelleen seuraavalla latauksella. */
+/** Poistaa rivin, jolloin suunnittelija valitsee pohjan ja tekstit uudelleen seuraavalla latauksella. */
 export async function palautaAutomaattinen(id: string): Promise<Tulos> {
   const { error } = await getSupabaseAdmin()
     .from("ig_julkaisut" as never)
     .delete()
     .eq("id", id)
-    .in("tila", ["luonnos", "ohitettu"]);
+    .neq("slotti", "oma")
+    .in("tila", ["luonnos", "ohitettu", "hyvaksytty", "epaonnistui"]);
   if (error) return { ok: false, virhe: error.message };
   revalidatePath("/instagram");
   return { ok: true };
 }
 
-export async function ehdotaHaaste(id: string): Promise<{ ok: true; haaste: string } | { ok: false; virhe: string }> {
+/** Tekoälyn ehdotus kortin teksteiksi valitulle pohjalle (ei tallenna). */
+export async function ehdotaTekstit(id: string, pohja: Pohja): Promise<{ ok: true; luonnos: Luonnos } | { ok: false; virhe: string }> {
   const rivi = await haeRivi(id);
-  if (!rivi || rivi.slotti === "synttarit") return { ok: false, virhe: "Haaste vain visajulkaisuille." };
+  if (!rivi) return { ok: false, virhe: "Julkaisua ei löytynyt." };
   const sisalto = await rivinSisalto(rivi, rivi.kentat ?? {}, false);
-  if (!sisalto || sisalto.tyyppi !== "visa") return { ok: false, virhe: "Visaa ei löytynyt." };
-  const haaste = await luonnosteleHaaste(sisalto.v);
-  return haaste ? { ok: true, haaste } : { ok: false, virhe: "Tekoäly ei vastannut — kirjoita haaste itse." };
+  if (!sisalto) return { ok: false, virhe: "Sisältöä ei löytynyt." };
+  const l = await luonnosteleTekstit(pohja, sisalto.tyyppi === "visa" ? { visa: sisalto.v } : { synttarit: sisalto.s });
+  return l ? { ok: true, luonnos: l } : { ok: false, virhe: "Tekoäly ei vastannut — kirjoita tekstit itse." };
+}
+
+/* ── Fanitasot (sivuston tulosruutu) ─────────────────────────────────── */
+
+export async function tallennaFanitasot(quizId: string, tasot: string[]): Promise<Tulos> {
+  const siistit = tasot.map((x) => x.replace(/\s+/g, " ").trim());
+  if (!fanitasotKelpaavat(siistit)) {
+    return { ok: false, virhe: "Viisi eri tasoa, kukin 3–28 merkkiä, yksikään sana yli 14 merkkiä (tulosruudun otsikko)." };
+  }
+  const { error } = await getSupabaseAdmin().from("quizzes").update({ fanitasot: siistit } as never).eq("id", quizId);
+  if (error) return { ok: false, virhe: error.message };
+  revalidatePath("/instagram");
+  return { ok: true };
+}
+
+export async function luoFanitasotNyt(quizId: string): Promise<{ ok: true; tasot: string[] } | { ok: false; virhe: string }> {
+  const tasot = await luoFanitasot(quizId);
+  if (!tasot) return { ok: false, virhe: "Tekoäly ei tuottanut kelpaavia tasoja — kirjoita ne itse." };
+  revalidatePath("/instagram");
+  return { ok: true, tasot };
+}
+
+/* ── Juontajakuvat ───────────────────────────────────────────────────── */
+
+const ASENNOT: Asento[] = ["haastaa", "yllattyy", "miettii", "eri_mielta", "onnittelee", "innostunut", "neutraali"];
+
+/** Uusi juontajakuva: läpinäkyvätaustainen PNG/WebP (rajattu hahmo) tai
+    taustallinen ympäristökuva. Tallennetaan WebP:nä alfakanava säilyttäen. */
+export async function lataaJuontajakuva(formData: FormData): Promise<Tulos> {
+  const file = formData.get("file") as File | null;
+  const kuka = String(formData.get("kuka") ?? "") as Kuka;
+  const asento = String(formData.get("asento") ?? "") as Asento;
+  const tausta = formData.get("tausta") === "ymparisto" ? "ymparisto" : "rajattu";
+  const kuvaus = String(formData.get("kuvaus") ?? "").trim() || null;
+  if (!file || !file.size) return { ok: false, virhe: "Tiedosto puuttuu." };
+  if (!["laura", "mikko", "molemmat"].includes(kuka)) return { ok: false, virhe: "Valitse kuka kuvassa on." };
+  if (!ASENNOT.includes(asento)) return { ok: false, virhe: "Valitse asento." };
+  let kuva: { data: Buffer; info: sharp.OutputInfo };
+  try {
+    kuva = await sharp(Buffer.from(await file.arrayBuffer()))
+      .rotate()
+      .resize({ width: 2400, height: 3000, fit: "inside", withoutEnlargement: true })
+      .webp({ quality: 92, alphaQuality: 100 })
+      .toBuffer({ resolveWithObject: true });
+  } catch {
+    return { ok: false, virhe: "Tiedosto ei ole kuva." };
+  }
+  if (kuva.info.height < 1100) return { ok: false, virhe: `Kuva on liian pieni (${kuva.info.width}×${kuva.info.height}) — tarvitaan vähintään 1 100 px korkea.` };
+  const polku = `juontajat/${kuka}-${asento}-${Date.now()}.webp`;
+  const sb = getSupabaseAdmin();
+  const { error } = await sb.storage.from("ig-kuvat").upload(polku, kuva.data, { contentType: "image/webp", upsert: false });
+  if (error) return { ok: false, virhe: error.message };
+  const url = sb.storage.from("ig-kuvat").getPublicUrl(polku).data.publicUrl;
+  const { error: e2 } = await sb.from("ig_juontajakuvat" as never).insert({ url, kuka, asento, tausta, kuvaus, leveys: kuva.info.width, korkeus: kuva.info.height } as never);
+  if (e2) return { ok: false, virhe: e2.message };
+  await haeJuontajakuvat(true);
+  revalidatePath("/instagram");
+  return { ok: true };
+}
+
+export async function asetaJuontajakuvaAktiivinen(id: string, aktiivinen: boolean): Promise<Tulos> {
+  const { error } = await getSupabaseAdmin().from("ig_juontajakuvat" as never).update({ aktiivinen } as never).eq("id", id);
+  if (error) return { ok: false, virhe: error.message };
+  await haeJuontajakuvat(true);
+  revalidatePath("/instagram");
+  return { ok: true };
 }
 
 /* ── Päälle / pois ───────────────────────────────────────────────────── */

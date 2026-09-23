@@ -11,10 +11,11 @@ import { haeMediaTilastot, haeYhteys, julkaiseInstagramiin, uusiTokenTarvittaess
 import { jpegit, piirraRivi, type PiirrettavaRivi } from "./piirto";
 import { synttariKuvateksti, visaKuvateksti } from "./kuvateksti";
 import { haeAsetukset, tanaanHelsinki } from "./suunnitelma";
+import { taytaFanitasoja } from "./tekstit";
 
 type Rivi = PiirrettavaRivi & { id: string; tila: string; kuvateksti: string | null };
 
-const SARAKKEET = "id, site_id, paiva, slotti, quiz_id, pohja, pohja_vari, kentat, tila, kuvateksti";
+const SARAKKEET = "id, site_id, paiva, slotti, quiz_id, pohja, kentat, tila, kuvateksti";
 
 export async function julkaiseRivi(id: string): Promise<{ ok: true; permalink: string | null } | { ok: false; virhe: string }> {
   const sb = getSupabaseAdmin();
@@ -55,7 +56,7 @@ export async function julkaiseRivi(id: string): Promise<{ ok: true; permalink: s
     const kuvateksti =
       rivi.kuvateksti?.trim() ||
       (p.sisalto.tyyppi === "visa"
-        ? visaKuvateksti(rivi.kentat?.tapahtuma ? { ...p.sisalto.v, introOtsikko: rivi.kentat.tapahtuma } : p.sisalto.v)
+        ? visaKuvateksti(p.sisalto.v, rivi.pohja, rivi.kentat ?? {})
         : synttariKuvateksti(p.sisalto.s, rivi.pohja, rivi.kentat ?? {}));
 
     const t = await julkaiseInstagramiin(yhteys, urlit, kuvateksti);
@@ -90,14 +91,23 @@ function nytHelsinki(): string {
 /** Ajastimen kierros: julkaisee enintään yhden erääntyneen julkaisun per ajo
     (ajo kymmenen minuutin välein riittää, ja funktio pysyy aikarajassa). */
 export async function ajastinKierros(siteId: string): Promise<string> {
+  // Fanitasot sivuston tulosruutuun: täytetään puuttuvia vähitellen (3 visaa per ajo).
+  let tasot = "";
+  try {
+    const n = await taytaFanitasoja(siteId, 3);
+    if (n) tasot = ` · fanitasot ${n}`;
+  } catch (e) {
+    console.error("Fanitasot", e);
+  }
   const a = await haeAsetukset(siteId);
   let y = await haeYhteys(siteId);
-  if (!y) return "ei yhteyttä";
+  if (!y) return `ei yhteyttä${tasot}`;
   try { y = await uusiTokenTarvittaessa(y); } catch (e) { console.error("IG-tokenin uusiminen", e); }
   let luvut = "";
   try {
     const n = await paivitaTilastot(siteId, { maxIka: 3 * 3600 * 1000, enintaan: 5 });
     if (n) luvut = ` · luvut päivitetty ${n}`;
+    luvut += tasot;
   } catch (e) {
     console.error("IG-lukujen päivitys", e);
   }

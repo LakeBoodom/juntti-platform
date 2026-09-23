@@ -1,13 +1,12 @@
-// Instagram-kuvatekstit (oletus; toimitus voi muokata adminissa) ja V-B:n haasteluonnos.
+// Instagram-kuvatekstit (oletus; toimitus voi muokata adminissa).
 //
-// Kuvatekstissä linkit eivät ole klikattavia, joten ohjataan bioon. Ei emojeja
-// eikä hashtag-tulvaa: muutama tunniste riittää ja pysyy samana, jotta A/B-testin
-// ainoa muuttuja on kuva.
+// Kierros 4: kuvassa ei ole metatietoja, joten tausta kulkee kuvatekstissä —
+// päivän tapahtuma (event_context), visan nimi ja reittiohje. Linkit eivät ole
+// klikattavia, joten ohjataan bioon (tietoniekka.fi/ig). Ei emojeja eikä
+// hashtag-tulvaa: muutama tunniste, jotta testin ainoa muuttuja on kortti.
 
-import { getAnthropic, MODEL } from "@juntti/ai";
-import { getSupabaseAdmin } from "@juntti/db";
 import type { SynttariData, VisaData } from "./data";
-import type { Kentat, Pohja } from "./pohjat";
+import { ilmanTavutusta, KOMMENTTIPOHJAT, type Kentat, type Pohja } from "./pohjat";
 
 const KOKOELMA_TAGI: Record<string, string> = {
   Urheilu: "#urheilu",
@@ -27,14 +26,28 @@ const KOKOELMA_TAGI: Record<string, string> = {
 const PERUSTAGIT = "#tietoniekka #tietovisa";
 
 const piste = (s: string) => (/[.!?…]$/.test(s) ? s : `${s}.`);
+const t = (s?: string | null) => ilmanTavutusta((s ?? "").replace(/\s+/g, " ").trim());
 
-export function visaKuvateksti(v: VisaData): string {
+const KOMMENTTIKEHOTE: Partial<Record<Pohja, string>> = {
+  "4f": "Vastaa kommenttiin! Koko visa löytyy biosta.",
+  "4o": "Kumpi on oikeassa, Laura vai Mikko? Kerro kommentissa.",
+  "4q": "Auta Mikkoa kommenteissa. Koko visa löytyy biosta.",
+  "4i": "Kerro muistosi kommentissa.",
+};
+
+export function visaKuvateksti(v: VisaData, pohja: Pohja, k: Kentat): string {
   const rivit: string[] = [];
-  if (v.introOtsikko) rivit.push(piste(v.introOtsikko));
-  if (v.introTeksti) rivit.push(v.introTeksti);
-  if (!v.introOtsikko && !v.introTeksti) rivit.push(v.oma ? piste(v.nimi) : `Päivän visa: ${v.nimi}.`);
+  const koukku = t(k.koukku);
+  if (koukku) rivit.push(koukku);
+  const palkinto = t(k.palkinto);
+  if (palkinto) rivit.push(palkinto);
+  const tapahtuma = t(k.tapahtuma) || t(v.introOtsikko);
+  if (tapahtuma) rivit.push(piste(tapahtuma));
+  if (!rivit.length) rivit.push(piste(v.nimi));
   rivit.push("");
-  rivit.push(`${v.oma ? "Pelaa visa" : "Pelaa päivän visa"} — linkki biossa. ${v.kysymyksia} kysymystä, ei kirjautumista.`);
+  const kommentti = KOMMENTTIPOHJAT.includes(pohja) && k.reitti !== true;
+  if (kommentti) rivit.push(KOMMENTTIKEHOTE[pohja] ?? "Vastaa kommenttiin!");
+  else rivit.push(`${v.nimi}: ${v.kysymyksia} kysymystä, ei kirjautumista. Pelaa — linkki biossa.`);
   rivit.push("");
   rivit.push([PERUSTAGIT, v.oma ? null : "#päivänvisa", KOKOELMA_TAGI[v.kokoelma]].filter(Boolean).join(" "));
   return rivit.join("\n");
@@ -48,63 +61,19 @@ export function synttariKuvateksti(s: SynttariData, pohja: Pohja, k: Kentat): st
   } else {
     rivit.push(`${s.nimi} täyttää tänään ${s.ika} vuotta. Onnea!`);
   }
+  const koukku = t(k.koukku);
+  if (koukku) rivit.push(koukku);
+  const palkinto = t(k.palkinto);
+  if (palkinto) rivit.push(palkinto);
   rivit.push("");
-  rivit.push("Kuinka hyvin tunnet hänet? Testaa tietosi — linkki biossa.");
+  if (pohja === "4i" || !s.quizId) rivit.push(KOMMENTTIKEHOTE["4i"]!);
+  else rivit.push(`${s.visaNimi ? `${s.visaNimi}: ` : ""}testaa tietosi — linkki biossa.`);
   // CC BY-SA -kuvat vaativat kuvaajan ja lisenssin: vain kun kuvassa on henkilökuva.
-  if (pohja === "S-A" && k.kuvaaja?.trim()) {
+  if (pohja === "4i" && t(k.kuvaaja)) {
     rivit.push("");
-    rivit.push(`Kuva: ${k.kuvaaja.trim()}`);
+    rivit.push(`Kuva: ${t(k.kuvaaja)}`);
   }
   rivit.push("");
   rivit.push(`${PERUSTAGIT} #päivänsynttärit`);
   return rivit.join("\n");
-}
-
-/**
- * V-B:n haaste tekoälyllä. Designin sääntö: faktaväitteetön haaste — ei väitettä,
- * jota aineistossa ei ole, eikä vihjettä vastauksiin. Toimitus hyväksyy aina.
- */
-export async function luonnosteleHaaste(v: VisaData): Promise<string | null> {
-  const { data } = await getSupabaseAdmin()
-    .from("questions")
-    .select("question_text")
-    .eq("quiz_id", v.quizId)
-    .limit(4);
-  const kysymykset = ((data ?? []) as unknown as Array<{ question_text: string }>).map((q) => `- ${q.question_text}`).join("\n");
-
-  const ohje = `Kirjoitat Tietoniekka.fi:n Instagram-julkaisuun yhden lyhyen HAASTEEN suomeksi.
-Haaste kutsuu lukijan vastaamaan kommentteihin ennen kuin hän pelaa visan.
-
-Säännöt:
-- Enintään 60 merkkiä. Yksi lause, päättyy kysymys- tai huutomerkkiin tai pisteeseen.
-- Ei faktaväitteitä, lukuja tai nimiä, joita alla ei mainita. Ei vihjeitä vastauksiin.
-- Puhuttele lukijaa (sinä-muoto). Leikkisä mutta ei imelä. Ei emojeja eikä hashtageja.
-- Älä kysy yksittäistä tietokysymystä ("Tiedätkö, kuka…", "Muistatko, mikä…") — se on
-  visan kysymys, ei haaste. Haasta muistamaan, luettelemaan tai todistamaan osaamisensa.
-- Esimerkkejä tyylistä: "Montako suomalaista F1-kuljettajaa muistat ulkoa?",
-  "Väitätkö tosifaniksi? Todista se."
-
-Visa: ${v.nimi} (${v.kokoelma})
-${v.introOtsikko ? `Päivän tapahtuma: ${v.introOtsikko}` : ""}
-Esimerkkikysymyksiä visasta (älä paljasta näiden vastauksia):
-${kysymykset || "- (ei saatavilla)"}
-
-Vastaa pelkällä haasteella, ilman lainausmerkkejä.`;
-
-  try {
-    const r = await getAnthropic().messages.create({
-      model: MODEL,
-      max_tokens: 120,
-      messages: [{ role: "user", content: ohje }],
-    });
-    const teksti = r.content
-      .filter((c) => c.type === "text")
-      .map((c) => (c as { text: string }).text)
-      .join("")
-      .trim()
-      .replace(/^["“”']+|["“”']+$/g, "");
-    return teksti && teksti.length <= 80 ? teksti : null;
-  } catch {
-    return null;
-  }
 }

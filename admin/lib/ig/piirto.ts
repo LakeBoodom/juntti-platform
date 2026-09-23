@@ -5,22 +5,27 @@ import sharp from "sharp";
 import { ImageResponse } from "next/og";
 import { lataaFontit } from "./fontit";
 import { rivinSisalto, type RivinLahde, type Sisalto } from "./sisalto";
-import { H, W, piirraSynttarit, piirraVisa, type Kentat, type Piirros, type Pohja, type VdVari } from "./pohjat";
+import { H, W, onSynttaripohja, onVisapohja, piirraSynttarit, piirraVisa, type Kentat, type Piirros, type Pohja } from "./pohjat";
 
-export type PiirrettavaRivi = RivinLahde & { pohja: Pohja; pohja_vari: VdVari | null; kentat: Kentat };
+export type PiirrettavaRivi = RivinLahde & { pohja: Pohja; kentat: Kentat };
 
 export async function piirraRivi(
   rivi: PiirrettavaRivi,
-  o: { pohja?: Pohja; vari?: VdVari; kentat?: Kentat } = {},
+  o: { pohja?: Pohja; kentat?: Kentat } = {},
 ): Promise<{ piirros: Piirros; sisalto: Sisalto; fontit: Awaited<ReturnType<typeof lataaFontit>> } | null> {
   const kentat = o.kentat ?? rivi.kentat ?? {};
   const pohja = o.pohja ?? rivi.pohja;
   const [fontit, sisalto] = await Promise.all([lataaFontit(), rivinSisalto(rivi, kentat)]);
   if (!sisalto) return null;
-  const piirros =
-    sisalto.tyyppi === "visa"
-      ? await piirraVisa(fontit.mitat, pohja, sisalto.v, kentat, o.vari ?? rivi.pohja_vari ?? "lime")
-      : await piirraSynttarit(fontit.mitat, pohja, sisalto.s, kentat);
+  const mitattava = { m: fontit.mitat, siemen: rivi.paiva };
+  let piirros: Piirros;
+  if (sisalto.tyyppi === "visa") {
+    if (!onVisapohja(pohja)) return null;
+    piirros = await piirraVisa(mitattava, pohja, sisalto.v, kentat);
+  } else {
+    if (!onSynttaripohja(pohja)) return null;
+    piirros = await piirraSynttarit(mitattava, pohja, sisalto.s, kentat);
+  }
   return { piirros, sisalto, fontit };
 }
 

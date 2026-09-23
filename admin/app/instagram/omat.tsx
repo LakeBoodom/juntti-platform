@@ -181,12 +181,12 @@ export function UusiJulkaisu({ kokoelmat }: { kokoelmat: Array<{ nimi: string; l
           </label>
         )}
         <label className="flex min-w-[220px] flex-1 items-center gap-1">
-          <span className="text-xs text-muted-foreground">Otsake</span>
+          <span className="text-xs text-muted-foreground">{tapa === "kampanja" ? "Nimi" : "Aihe"}</span>
           <input
             value={otsake}
             onChange={(e) => setOtsake(e.target.value)}
             maxLength={28}
-            placeholder={tapa === "kampanja" ? "esim. Luontoviikko" : "esim. Viikon visa (valinnainen)"}
+            placeholder={tapa === "kampanja" ? "Kampanjan nimi, esim. Luontoviikko" : "Aihe-etiketti, esim. JOKERIT (valinnainen)"}
             className={`${kentta} min-w-0 flex-1`}
           />
         </label>
@@ -214,8 +214,8 @@ export function UusiJulkaisu({ kokoelmat }: { kokoelmat: Array<{ nimi: string; l
 
       <p className="text-xs text-muted-foreground">
         {tapa === "kampanja"
-          ? "Kampanja luo joka päivälle yhden julkaisun kokoelman visoista: ensin ne, joiden kuva riittää koko pinnalle, eikä visoja, jotka on jo julkaistu Instagramissa tai ajastettu Päivän visaksi lähipäiville. Otsake näkyy kuvan yläreunassa. Voit vaihtaa kunkin päivän visan, pohjan ja kuvan kortista."
-          : "Otsake näkyy kuvan yläreunassa (oletus VISA). Painikkeessa lukee Pelaa visa."}
+          ? "Kampanja luo joka päivälle yhden julkaisun kokoelman visoista (kuvalliset ensin, ei jo Instagramissa julkaistuja eikä lähipäivien Päivän visoja). Pohja kiertää motiivista toiseen ja tekoäly luonnostelee tekstit. Kampanjan nimi näkyy adminissa; kortin aihe-etiketti tehdään visan aiheesta. Voit vaihtaa kunkin päivän visan, pohjan ja tekstit kortista."
+          : "Otsake on kortin aihe-etiketti (esim. JOKERIT) — jätä tyhjäksi, niin tekoäly ehdottaa."}
       </p>
       {viesti && <div className={`text-xs ${viesti.ok ? "text-green-700" : "text-red-700"}`}>{viesti.teksti}</div>}
     </div>

@@ -81,13 +81,49 @@ export function leveys(
 
 export type Sovitus = { koko: number; rivit: string[] };
 
+/** Tavutuskohta: toimitus merkitsee pitkän yhdyssanan rajan pystyviivalla
+    ("Jokeri|fani") tai pehmeällä tavuviivalla (U+00AD, kuten designissa). */
+export const TAVU = "\u00AD";
+export const tavutus = (s: string) => s.replace(/\|/g, TAVU);
+/** Teksti ilman tavutusmerkkejä (kuvateksti, esikatselun tekstit). */
+export const ilmanTavutusta = (s: string) => s.replace(/[|\u00AD]/g, "");
+
+/**
+ * Rivittää sanat ahneesti. KORTTISÄÄNTÖ (CLAUDE.md): sana ei katkea keskeltä —
+ * paitsi merkitystä tavutuskohdasta, ja silloinkin vain, jos sana ei mahdu
+ * tyhjällekään riville (kuten designin "OLETKO OIKEA JOKERI-/FANI?").
+ * Palauttaa null, jos jokin sana tai tavu ei mahdu millään.
+ */
+function rivita(sanat: string[], w: (s: string) => number, raja: number): string[] | null {
+  const rivit: string[] = [];
+  let rivi = "";
+  for (const sana of sanat) {
+    const kokonainen = sana.split(TAVU).join("");
+    const koe = rivi ? `${rivi} ${kokonainen}` : kokonainen;
+    if (w(koe) <= raja) { rivi = koe; continue; }
+    if (rivi && w(kokonainen) <= raja) { rivit.push(rivi); rivi = kokonainen; continue; }
+    // Sana ei mahdu tyhjällekään riville: tavutetaan merkityistä kohdista.
+    let osat = sana.split(TAVU);
+    if (osat.length === 1) return null;
+    if (rivi) { rivit.push(rivi); rivi = ""; }
+    while (osat.length) {
+      const loput = osat.join("");
+      if (w(loput) <= raja) { rivi = loput; break; }
+      let k = osat.length - 1;
+      while (k >= 1 && w(`${osat.slice(0, k).join("")}-`) > raja) k--;
+      if (k < 1) return null;
+      rivit.push(`${osat.slice(0, k).join("")}-`);
+      osat = osat.slice(k);
+    }
+  }
+  if (rivi) rivit.push(rivi);
+  return rivit;
+}
+
 /**
  * Valitsee portaista suurimman koon, jolla teksti mahtuu leveyteen ja rivimäärään.
- *
- * KORTTISÄÄNTÖ (CLAUDE.md): suomen sanat eivät saa katketa, joten jokaisen sanan
- * on mahduttava riville kokonaan. Rivitys on ahne sanarivitys kuten selaimessa.
  * Jos mikään porras ei riitä, palautetaan pienin porras — kutsuja päättää
- * (esim. pudottaa rivin pois tai käyttää toista pohjaa).
+ * (esim. estää julkaisun tai käyttää toista pohjaa).
  */
 export function sovita(
   mitat: Ladattu["mitat"],
@@ -104,7 +140,8 @@ export function sovita(
     varaPx?: number;
   },
 ): Sovitus & { mahtuu: boolean } {
-  const teksti = o.isot ? o.teksti.toLocaleUpperCase("fi-FI") : o.teksti;
+  const perus = tavutus(o.teksti);
+  const teksti = o.isot ? perus.toLocaleUpperCase("fi-FI") : perus;
   // Ajatusviiva ei saa aloittaa riviä ("– HALLITSIJAT"): liimataan se edelliseen
   // sanaan sitovalla välilyönnillä. Rivitys katkaisee vain tavallisesta välilyönnistä.
   const sanat = teksti
@@ -113,27 +150,29 @@ export function sovita(
     .filter(Boolean);
   const vara = o.varaPx ?? 6;
   const raja = o.leveys - vara;
-  for (const koko of o.koot) {
-    const ls = o.valistysEm ?? 0;
-    const w = (s: string) => leveys(mitat, s, o.perhe, o.paino, koko, ls);
-    if (sanat.some((s) => w(s) > raja)) continue;
-    const rivit: string[] = [];
-    let rivi = "";
-    for (const s of sanat) {
-      const koe = rivi ? `${rivi} ${s}` : s;
-      if (w(koe) <= raja) rivi = koe;
-      else { rivit.push(rivi); rivi = s; }
+  const ls = o.valistysEm ?? 0;
+  // Kaksi kierrosta: ilman tavutusta ja tavutuksen kanssa. Tavutettu versio valitaan
+  // vain, jos se on selvästi (≥ 20 %) isompi — muuten sana pysyy ehjänä.
+  const koeta = (tavuta: boolean) => {
+    const osat = tavuta ? sanat : sanat.map((x) => x.split(TAVU).join(""));
+    for (const koko of o.koot) {
+      const w = (s: string) => leveys(mitat, s, o.perhe, o.paino, koko, ls);
+      const rivit = rivita(osat, w, raja);
+      if (rivit && rivit.length <= o.maxRivit) return { koko, rivit, mahtuu: true };
     }
-    if (rivi) rivit.push(rivi);
-    if (rivit.length <= o.maxRivit) return { koko, rivit, mahtuu: true };
-  }
-  // Ei mahdu: palautetaan pienin koko rivitettynä, jotta esikatselu näyttää
-  // ongelman (julkaisu estetään kutsujassa mahtuu=false:n perusteella).
+    return null;
+  };
+  const ehja = koeta(false);
+  const tavutettu = sanat.some((x) => x.includes(TAVU)) ? koeta(true) : null;
+  if (tavutettu && (!ehja || tavutettu.koko >= ehja.koko * 1.2)) return tavutettu;
+  if (ehja) return ehja;
+  // Ei mahdu: palautetaan pienin koko rivitettynä (ylipitkä sana omalle rivilleen),
+  // jotta esikatselu näyttää ongelman; julkaisu estetään mahtuu=false:n perusteella.
   const pienin = o.koot[o.koot.length - 1];
-  const w = (s: string) => leveys(mitat, s, o.perhe, o.paino, pienin, o.valistysEm ?? 0);
+  const w = (s: string) => leveys(mitat, s, o.perhe, o.paino, pienin, ls);
   const rivit: string[] = [];
   let rivi = "";
-  for (const s of sanat) {
+  for (const s of sanat.map((x) => x.split(TAVU).join(""))) {
     const koe = rivi ? `${rivi} ${s}` : s;
     if (w(koe) <= raja || !rivi) rivi = koe;
     else { rivit.push(rivi); rivi = s; }

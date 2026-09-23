@@ -7,6 +7,9 @@ import {
   POHJA_NIMET,
   SYNT_POHJAT,
   VISA_POHJAT,
+  onSynttaripohja,
+  onVisapohja,
+  sopiiKysymykseksi,
   tarkistaSynttarit,
   tarkistaVisa,
   type Pohja,
@@ -18,6 +21,8 @@ import { kokoelmaNimi } from "@/lib/kokoelmat";
 import { getSupabaseAdmin } from "@juntti/db";
 import { JulkaisuKortti, type KorttiData, type Mittaus } from "./julkaisu-kortti";
 import { PaivitaLuvut, SlottiKytkin, UusiJulkaisu } from "./omat";
+import { Juontajakuvat } from "./juontajakuvat";
+import { haeJuontajakuvat } from "@/lib/ig/juontajat";
 import { YhteysPaneeli } from "./yhteys";
 import { haeTilinTiedot, haeYhteys, salaisuusAsetettu, type Tilastot } from "@/lib/ig/instagram";
 
@@ -25,9 +30,8 @@ export const dynamic = "force-dynamic";
 // Suunnitelma hakee 14 päivän datan ja kuvat — annetaan aikaa ensilataukselle.
 export const maxDuration = 60;
 
-// Instagram-julkaisut (Claude Design kierros 2, A/B-testisarja).
-// Vaihe 1: suunnitelma, esikatselu, tekstit ja hyväksyntä. Julkaisu Instagramiin
-// tulee vaiheessa 2 — siihen asti hyväksytyn kuvan voi ladata ja julkaista käsin.
+// Instagram-julkaisut (Claude Design kierros 4: motiivipohjat, kysymyskortit,
+// juontajat). Suunnitelma, esikatselu, tekstit, hyväksyntä ja julkaisu Instagramiin.
 
 type Mitat = Awaited<ReturnType<typeof lataaFontit>>["mitat"];
 
@@ -46,21 +50,27 @@ async function visaKortti(m: Mitat, r: Julkaisu, v0: VisaData): Promise<KorttiDa
   const v = await korvaaKuva(v0, r.kentat?.kuva);
   const esteet: Record<string, string[]> = {};
   const huomiot: Record<string, string[]> = {};
-  for (const pohja of VISA_POHJAT) {
-    const t = await tarkistaVisa(m, pohja, v, r.kentat ?? {}, r.pohja_vari ?? "lime");
-    esteet[pohja] = t.esteet;
-    huomiot[pohja] = t.huomiot;
+  const vanha = !onVisapohja(r.pohja);
+  if (!vanha) {
+    for (const pohja of VISA_POHJAT) {
+      const t = await tarkistaVisa({ m, siemen: r.paiva }, pohja, v, r.kentat ?? {});
+      esteet[pohja] = t.esteet;
+      huomiot[pohja] = t.huomiot;
+    }
   }
   return {
     rivi: r,
     otsikko: v.nimi,
-    ala: [v.kokoelma, r.kentat?.tapahtuma ?? v.introOtsikko].filter(Boolean).join(" · "),
-    pohjat: VISA_POHJAT,
+    ala: [v.kokoelma, `${v.kysymyksia} kysymystä`, v.fanitasot ? null : "ei fanitasoja"].filter(Boolean).join(" · "),
+    pohjat: vanha ? [r.pohja] : VISA_POHJAT,
     esteet,
     huomiot,
-    oletusKuvateksti: visaKuvateksti(r.kentat?.tapahtuma ? { ...v, introOtsikko: r.kentat.tapahtuma } : v),
+    oletusKuvateksti: vanha ? "" : visaKuvateksti(v, r.pohja, r.kentat ?? {}),
     oletusTapahtuma: v0.introOtsikko,
     kuva: kuvanTiedot(v.kuva, r),
+    kysymykset: v.kysymykset.map((q) => ({ id: q.id, teksti: q.teksti, sopii: VISA_POHJAT.filter((p) => sopiiKysymykseksi(q, p)) })),
+    fanitasot: { quizId: v.quizId, tasot: v.fanitasot },
+    vanha,
   };
 }
 
@@ -68,21 +78,27 @@ async function synttariKortti(m: Mitat, r: Julkaisu, s0: SynttariData): Promise<
   const s = await korvaaKuva(s0, r.kentat?.kuva);
   const esteet: Record<string, string[]> = {};
   const huomiot: Record<string, string[]> = {};
-  for (const pohja of SYNT_POHJAT) {
-    const t = await tarkistaSynttarit(m, pohja, s, r.kentat ?? {});
-    esteet[pohja] = t.esteet;
-    huomiot[pohja] = t.huomiot;
+  const vanha = !onSynttaripohja(r.pohja);
+  if (!vanha) {
+    for (const pohja of SYNT_POHJAT) {
+      const t = await tarkistaSynttarit({ m, siemen: r.paiva }, pohja, s, r.kentat ?? {});
+      esteet[pohja] = t.esteet;
+      huomiot[pohja] = t.huomiot;
+    }
   }
   return {
     rivi: r,
     otsikko: s.nimi,
-    ala: `${s.muisto ? "olisi täyttänyt" : "täyttää"} ${s.ika} · ${s.rooli ?? ""}`.trim(),
-    pohjat: SYNT_POHJAT,
+    ala: `${s.muisto ? "olisi täyttänyt" : "täyttää"} ${s.ika} · ${s.rooli ?? ""}${s.visaNimi ? ` · visa: ${s.visaNimi}` : " · ei visaa"}`.trim(),
+    pohjat: vanha ? [r.pohja] : SYNT_POHJAT,
     esteet,
     huomiot,
-    oletusKuvateksti: synttariKuvateksti(s, r.pohja, r.kentat ?? {}),
+    oletusKuvateksti: vanha ? "" : synttariKuvateksti(s, r.pohja, r.kentat ?? {}),
     oletusTapahtuma: null,
     kuva: kuvanTiedot(s.kuva, r),
+    kysymykset: [],
+    fanitasot: null,
+    vanha,
   };
 }
 
@@ -181,10 +197,10 @@ export default async function InstagramPage({ searchParams }: { searchParams: Pr
         <div>
           <h1 className="text-2xl font-semibold">Instagram</h1>
           <p className="max-w-3xl text-sm text-muted-foreground">
-            Päivän visa ja Päivän synttärit seuraavalle 14 päivälle sekä omat julkaisut ja kampanjat. Pohja valitaan
-            automaattisesti A/B-testin kierron mukaan (sama pohja ei toistu peräkkäin, kirkas V-D enintään kahdesti
-            viikossa, jokainen pohja saa sekä urheilu- että muita aiheita). Voit vaihtaa pohjan ja kuvan, muokata tekstit
-            ja hyväksyä julkaisun. Hyväksytyt julkaistaan automaattisesti, kun automaattinen julkaisu on päällä.
+            Päivän visa ja Päivän synttärit seuraavalle 14 päivälle sekä omat julkaisut ja kampanjat (Claude Design
+            kierros 4). Kortti puhuu katsojalle: koukku, palkinto ja CTA — visan nimi, päivämäärä ja tapahtuma kulkevat
+            kuvatekstissä. Pohja valitaan kierron mukaan (sama pohja tai perhe ei toistu peräkkäin, jokainen pohja saa
+            sekä urheilu- että muita aiheita) ja tekoäly luonnostelee tekstit. Tarkista, muokkaa ja hyväksy.
           </p>
         </div>
 
@@ -212,10 +228,12 @@ export default async function InstagramPage({ searchParams }: { searchParams: Pr
 
         <Tulostaulukko tulokset={tulokset} />
 
+        <Juontajakuvat kuvat={await haeJuontajakuvat(true)} />
+
         <section className="rounded-md border p-4">
           <h2 className="mb-2 text-sm font-semibold">Testin kertymä</h2>
           <div className="flex flex-wrap gap-2 text-xs">
-            {[...VISA_POHJAT, ...SYNT_POHJAT].map((p) => {
+            {[...VISA_POHJAT, ...SYNT_POHJAT, ...[...kertyma.keys()].filter((p) => !onVisapohja(p) && !onSynttaripohja(p))].map((p) => {
               const e = kertyma.get(p) ?? { yht: 0, urheilu: 0, julkaistu: 0, avaus: 0, valmis: 0 };
               return (
                 <div key={p} className="rounded border px-2 py-1" title={POHJA_NIMET[p]}>
@@ -229,8 +247,8 @@ export default async function InstagramPage({ searchParams }: { searchParams: Pr
             })}
           </div>
           <p className="mt-2 text-xs text-muted-foreground">
-            Tavoite designin mukaan noin 8–10 julkaisua per pohja ennen karsintaa. V-E (karuselli) ja S-A
-            (henkilökuva, vaatii kuvaajan) valitaan käsin. Omat julkaisut lasketaan mukaan. Aloitukset = visa
+            Tavoite designin mukaan noin 8–10 julkaisua per pohja ennen karsintaa. 4d (nostalgia), 4i (muisto,
+            vaatii kuvaajan) ja 4j (tuotanto) valitaan käsin. Omat julkaisut lasketaan mukaan. Aloitukset = visa
             avattu Instagramin bio-sivulta (tietoniekka.fi/ig); bio-sivua avattu yhteensä {bioNaytot} kertaa.
           </p>
         </section>
@@ -266,7 +284,7 @@ export default async function InstagramPage({ searchParams }: { searchParams: Pr
     aloitetut visat erikseen, pohjittain. Sitoutuminen = (tykkäykset + kommentit
     + tallennukset + jaot) / tavoittavuus niistä julkaisuista, joille luvut on haettu. */
 function Tulostaulukko({ tulokset }: { tulokset: Map<string, { n: number; lukuja: number; reach: number; sitoutuminen: number; avaus: number; valmis: number }> }) {
-  const rivit = [...VISA_POHJAT, ...SYNT_POHJAT].filter((p) => tulokset.get(p)?.n);
+  const rivit = [...VISA_POHJAT, ...SYNT_POHJAT, ...[...tulokset.keys()].filter((p) => !onVisapohja(p) && !onSynttaripohja(p))].filter((p) => tulokset.get(p)?.n);
   if (rivit.length === 0) return null;
   const luku = (n: number) => new Intl.NumberFormat("fi-FI", { maximumFractionDigits: 1 }).format(n);
   return (

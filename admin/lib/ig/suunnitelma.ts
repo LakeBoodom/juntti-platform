@@ -1,20 +1,17 @@
-// Instagram-julkaisujen suunnitelma ja pohjakierto (Claude Design, kierros 2 — kohdat 2h–2j).
+// Instagram-julkaisujen suunnitelma ja pohjakierto — Claude Design kierros 4.
 //
-// Kiertosäännöt designista:
-//  - Sama pohja ei toistu kahtena päivänä peräkkäin.
-//  - V-D (kirkas typografia) enintään kaksi kertaa viikossa, ei peräkkäin.
-//  - V-E (karuselli) enintään kaksi kertaa viikossa — valitaan vain käsin,
-//    koska se vaatii toimitetut sisältökentät.
-//  - V-C vain kuvalle, joka kestää koko pinnan; V-A vain terävälle tapahtumalle.
-//  - Tasapaino: jokainen pohja saa sekä urheilu- että muita aiheita. Valitaan
-//    vähiten käytetty kelpaava pohja, ensin kokonaismäärän, sitten saman
-//    aiheluokan (urheilu / muu) käyttömäärän mukaan.
-//  - S-C (ikä edellä) aina kun vuodet ovat pyöreät, koska tilaisuuksia on vähän.
-//  - S-A vaatii kuvaajatiedon, joten sekin valitaan vain käsin.
+// Kiertosäännöt:
+//  - Sama pohja ei toistu kahtena päivänä peräkkäin, eikä saman perheen kortti
+//    (kuva / teksti / kysymys / juontaja), jos muitakin on tarjolla — testissä
+//    eroa tekee motiivi, ei se, että sama kortti toistuu.
+//  - Vähiten käytetty kelpaava pohja ensin, sitten saman aiheluokan (urheilu/muu)
+//    käyttömäärän mukaan — jokainen pohja saa sekä urheilu- että muita aiheita.
+//  - Käsin valittavat pohjat (4d nostalgia, 4i muisto, 4j tuotanto) eivät ole kierrossa.
 //
-// Rivi ig_julkaisut-taulussa luodaan kerran. Jos päivän visa tai sankari vaihtuu,
-// rivi päivitetään, ja pohja valitaan uudelleen, ellei sitä ole valittu käsin
-// tai julkaisua jo hyväksytty.
+// Rivi luodaan kahdessa vaiheessa: (1) pohjat päätetään päivä kerrallaan ilman
+// tekoälyä, jotta kierto näkee edellisen päivän valinnan; (2) tekstit luonnostellaan
+// rinnakkain. Jos tekoäly ei vastaa pohjalle, joka tarvitsee koukun, pohja vaihtuu
+// kiinteän koukun korttiin.
 
 import { getSupabaseAdmin } from "@juntti/db";
 import { lataaFontit } from "./fontit";
@@ -25,19 +22,25 @@ import {
   kelpaaKaistaleeksi,
   kelpaaKokoPinnaksi,
   lataaKuva,
-  onPyorea,
   type SynttariData,
   type VisaData,
 } from "./data";
 import { kokoelmaNimi } from "@/lib/kokoelmat";
 import {
+  AUTO_SYNT,
+  AUTO_VISA,
+  LUPAA_TASON,
+  PERHE,
+  TEKOALY_KOUKKU,
+  TEKOALY_PALKINTO,
+  kortinKysymykset,
+  kysymyksiaPohjalle,
   tarkistaSynttarit,
   tarkistaVisa,
   type Kentat,
   type Pohja,
-  type VdVari,
 } from "./pohjat";
-import { luonnosteleHaaste } from "./kuvateksti";
+import { luoFanitasot, luonnosteleTekstit } from "./tekstit";
 import type { Tilastot } from "./instagram";
 
 export type Slotti = "paivan_visa" | "synttarit" | "oma";
@@ -47,8 +50,8 @@ export type Julkaisu = {
   id: string;
   paiva: string;
   slotti: Slotti;
+  /** Kierroksen 4 pohja; julkaistuissa voi olla myös kierroksen 2 tunnus (V-A …) */
   pohja: Pohja;
-  pohja_vari: VdVari | null;
   pohja_valittu_kasin: boolean;
   muoto: "kuva" | "karuselli";
   quiz_id: string | null;
@@ -64,10 +67,12 @@ export type Julkaisu = {
   ig_permalink: string | null;
   ig_tilastot: Tilastot | null;
   tilastot_at: string | null;
+  /** Julkaistut kuvat (julkaistun kortin esikatselu, myös kierroksen 2 pohjille) */
+  kuva_urls: string[] | null;
 };
 
 const SARAKKEET =
-  "id, paiva, slotti, pohja, pohja_vari, pohja_valittu_kasin, muoto, quiz_id, celebrity_id, kokoelma, on_kuva, kentat, kuvateksti, tila, julkaistu_at, kampanja, virhe, ig_permalink, ig_tilastot, tilastot_at";
+  "id, paiva, slotti, pohja, pohja_valittu_kasin, muoto, quiz_id, celebrity_id, kokoelma, on_kuva, kentat, kuvateksti, tila, julkaistu_at, kampanja, virhe, ig_permalink, ig_tilastot, tilastot_at, kuva_urls";
 
 /* ── Asetukset ───────────────────────────────────────────────────────── */
 
@@ -112,56 +117,48 @@ export function lisaaPaivia(iso: string, n: number): string {
   return t.toISOString().slice(0, 10);
 }
 
-/** ISO-viikon maanantai */
-function viikonAlku(iso: string): string {
-  const [y, m, d] = iso.split("-").map(Number);
-  const t = new Date(Date.UTC(y, m - 1, d));
-  const vp = (t.getUTCDay() + 6) % 7;
-  return lisaaPaivia(iso, -vp);
-}
-
 /* ── Kierto ──────────────────────────────────────────────────────────── */
 
-type Historia = Array<{ paiva: string; slotti: Slotti; pohja: Pohja; pohja_vari: VdVari | null; urheilu: boolean }>;
+type Historia = Array<{ paiva: string; slotti: Slotti; pohja: string; urheilu: boolean }>;
 
-const VISA_JARJESTYS: Pohja[] = ["V-A", "V-C", "V-B", "V-D"];
-const OMA_JARJESTYS: Pohja[] = ["V-C", "V-A", "V-D", "V-B"];
-const SYNT_JARJESTYS: Pohja[] = ["S-B", "S-D", "S-C"];
-const VD_VARIT: VdVari[] = ["lime", "valkoinen", "mintti"];
+/** Tarkistukseen: koukkua vaativat pohjat arvioidaan paikkamerkkikoukulla, koska
+    tekstit luonnostellaan vasta pohjan valinnan jälkeen. */
+const KOEKENTAT: Kentat = { koukku: "Oletko oikea fani?", palkinto: "" };
 
-function valitse(
-  ehdokkaat: Pohja[],
-  paiva: string,
-  slotti: Slotti,
-  urheilu: boolean,
-  historia: Historia,
-): Pohja | null {
+function valitse(ehdokkaat: Pohja[], paiva: string, slotti: Slotti, urheilu: boolean, historia: Historia, jarjestys: Pohja[]): Pohja | null {
   const oma = historia.filter((h) => h.slotti === slotti && h.paiva !== paiva);
-  const edellinen = oma.find((h) => h.paiva === lisaaPaivia(paiva, -1))?.pohja;
-  const vk = viikonAlku(paiva);
-  const viikolla = (p: Pohja) => oma.filter((h) => h.pohja === p && viikonAlku(h.paiva) === vk).length;
-
-  const kelpaavat = ehdokkaat.filter((p) => {
-    if (p === edellinen) return false;
-    if ((p === "V-D" || p === "V-E") && viikolla(p) >= 2) return false;
-    return true;
-  });
+  const eilen = oma.filter((h) => h.paiva === lisaaPaivia(paiva, -1)).map((h) => h.pohja);
+  const eilenPerheet = new Set(eilen.map((p) => PERHE[p as Pohja]).filter(Boolean));
+  let kelpaavat = ehdokkaat.filter((p) => !eilen.includes(p));
+  const perheittain = kelpaavat.filter((p) => !eilenPerheet.has(PERHE[p]));
+  if (perheittain.length) kelpaavat = perheittain;
   if (kelpaavat.length === 0) return null;
-
-  const jarjestys = slotti === "paivan_visa" ? VISA_JARJESTYS : slotti === "oma" ? OMA_JARJESTYS : SYNT_JARJESTYS;
   const kaikki = (p: Pohja) => oma.filter((h) => h.pohja === p).length;
   const luokassa = (p: Pohja) => oma.filter((h) => h.pohja === p && h.urheilu === urheilu).length;
-  return [...kelpaavat].sort(
-    (a, b) => kaikki(a) - kaikki(b) || luokassa(a) - luokassa(b) || jarjestys.indexOf(a) - jarjestys.indexOf(b),
-  )[0];
+  return [...kelpaavat].sort((a, b) => kaikki(a) - kaikki(b) || luokassa(a) - luokassa(b) || jarjestys.indexOf(a) - jarjestys.indexOf(b))[0];
 }
 
-function valitseVdVari(paiva: string, historia: Historia): VdVari {
-  const edellinen = [...historia]
-    .filter((h) => h.pohja === "V-D" && h.paiva < paiva && h.pohja_vari)
-    .sort((a, b) => b.paiva.localeCompare(a.paiva))[0]?.pohja_vari;
-  const i = edellinen ? VD_VARIT.indexOf(edellinen) : -1;
-  return VD_VARIT[(i + 1) % VD_VARIT.length];
+function urheiluKokoelma(k: string | null) {
+  return k === "Urheilu" || k === "Jääkiekko";
+}
+
+type Mitat = Awaited<ReturnType<typeof lataaFontit>>["mitat"];
+
+/** Kierrossa kelpaavat visapohjat tälle visalle (ei esteitä paikkamerkkikoukulla). */
+async function kelpaavatVisapohjat(m: Mitat, v: VisaData, siemen: string, vainKiinteat = false): Promise<Pohja[]> {
+  const tulos: Pohja[] = [];
+  for (const p of AUTO_VISA) {
+    if (vainKiinteat && TEKOALY_KOUKKU.includes(p)) continue;
+    const t = await tarkistaVisa({ m, siemen }, p, v, KOEKENTAT);
+    if (t.esteet.length === 0) tulos.push(p);
+  }
+  return tulos;
+}
+
+/** Kysymyspohjille valitut kysymykset talteen, jotta toimitus näkee ja voi vaihtaa ne. */
+function kysymysKentat(v: VisaData, pohja: Pohja, siemen: string): Kentat {
+  if (!kysymyksiaPohjalle(pohja)) return {};
+  return { kysymykset: kortinKysymykset(v, {}, pohja, siemen).map((q) => q.id) };
 }
 
 /* ── Suunnitelman ylläpito ───────────────────────────────────────────── */
@@ -201,25 +198,40 @@ export async function varmistaSuunnitelma(siteId: string, paivia = 14): Promise<
   // Historia pohjien laskentaan: kaikki muut kuin ohitetut, myös tulevat suunnitellut.
   const historia: Historia = kaikki
     .filter((r) => r.tila !== "ohitettu")
-    .map((r) => ({ paiva: r.paiva, slotti: r.slotti, pohja: r.pohja, pohja_vari: r.pohja_vari, urheilu: urheiluKokoelma(r.kokoelma) }));
+    .map((r) => ({ paiva: r.paiva, slotti: r.slotti, pohja: r.pohja, urheilu: urheiluKokoelma(r.kokoelma) }));
+  const paivitaHistoria = (r: Julkaisu | null) => {
+    if (!r) return;
+    const i = historia.findIndex((h) => h.paiva === r.paiva && h.slotti === r.slotti);
+    const h = { paiva: r.paiva, slotti: r.slotti, pohja: r.pohja, urheilu: urheiluKokoelma(r.kokoelma) };
+    if (i >= 0) historia[i] = h; else historia.push(h);
+  };
 
+  // Vaihe 1: pohjat päivä kerrallaan.
   const tulos: PaivanSisalto[] = [];
-  // Päivät järjestyksessä, jotta "edellinen päivä" -sääntö näkee juuri tehdyn valinnan.
+  const luonnosteltavat: Array<{ rivi: Julkaisu; visa?: VisaData; synttarit?: SynttariData }> = [];
   for (const { paiva, visa, synttarit } of sisallot) {
     let visaRivi = kaikki.find((r) => r.paiva === paiva && r.slotti === "paivan_visa") ?? null;
     let synttariRivi = kaikki.find((r) => r.paiva === paiva && r.slotti === "synttarit") ?? null;
 
-    if (visa) visaRivi = await suunnitteleVisa(siteId, visa, visaRivi, historia, mitat);
-    if (synttarit) synttariRivi = await suunnitteleSynttarit(siteId, synttarit, synttariRivi, historia, mitat);
-
-    for (const r of [visaRivi, synttariRivi]) {
-      if (!r) continue;
-      const i = historia.findIndex((h) => h.paiva === r.paiva && h.slotti === r.slotti);
-      const h = { paiva: r.paiva, slotti: r.slotti, pohja: r.pohja, pohja_vari: r.pohja_vari, urheilu: urheiluKokoelma(r.kokoelma) };
-      if (i >= 0) historia[i] = h; else historia.push(h);
+    if (visa) {
+      visaRivi = await suunnitteleVisa(siteId, visa, visaRivi, historia, mitat);
+      if (visaRivi && tarvitseeLuonnoksen(visaRivi)) luonnosteltavat.push({ rivi: visaRivi, visa });
     }
+    if (synttarit) {
+      synttariRivi = await suunnitteleSynttarit(siteId, synttarit, synttariRivi, historia, mitat);
+      if (synttariRivi && tarvitseeLuonnoksen(synttariRivi)) luonnosteltavat.push({ rivi: synttariRivi, synttarit });
+    }
+    paivitaHistoria(visaRivi);
+    paivitaHistoria(synttariRivi);
     const omat = kaikki.filter((r) => r.paiva === paiva && r.slotti === "oma");
     tulos.push({ paiva, visa, synttarit, visaRivi: visa ? visaRivi : null, synttariRivi: synttarit ? synttariRivi : null, omat });
+  }
+
+  // Vaihe 2: tekstit rinnakkain.
+  const valmiit = await luonnosteleRivit(luonnosteltavat, mitat, historia);
+  for (const p of tulos) {
+    if (p.visaRivi && valmiit.has(p.visaRivi.id)) p.visaRivi = valmiit.get(p.visaRivi.id)!;
+    if (p.synttariRivi && valmiit.has(p.synttariRivi.id)) p.synttariRivi = valmiit.get(p.synttariRivi.id)!;
   }
 
   // Omat julkaisut suunnitelman jälkeisille päiville (kampanja voi alkaa myöhemmin).
@@ -231,83 +243,103 @@ export async function varmistaSuunnitelma(siteId: string, paivia = 14): Promise<
   return tulos;
 }
 
-function urheiluKokoelma(k: string | null) {
-  return k === "Urheilu" || k === "Jääkiekko";
+/** Luonnos puuttuu: tekstit tehty toiselle pohjalle (tai ei lainkaan) eikä toimitus ole koskenut. */
+function tarvitseeLuonnoksen(r: Julkaisu) {
+  return r.tila === "luonnos" && !r.pohja_valittu_kasin && r.kentat?.luonnosPohjalle !== r.pohja;
 }
 
-type Mitat = Awaited<ReturnType<typeof lataaFontit>>["mitat"];
-
-async function suunnitteleVisa(siteId: string, v: VisaData, rivi: Julkaisu | null, historia: Historia, mitat: Mitat): Promise<Julkaisu | null> {
-  const lukittu = rivi && (rivi.pohja_valittu_kasin || rivi.tila !== "luonnos");
+async function suunnitteleVisa(siteId: string, v: VisaData, rivi: Julkaisu | null, historia: Historia, m: Mitat): Promise<Julkaisu | null> {
   const vaihtui = rivi && rivi.quiz_id !== v.quizId;
   if (rivi && !vaihtui) return rivi;
-  if (rivi && lukittu && vaihtui) {
-    // Visa vaihtui hyväksytyn/käsin valitun jälkeen: päivitetään lähde, pohja pysyy.
-    return paivita(rivi.id, { quiz_id: v.quizId, kokoelma: v.kokoelma, on_kuva: !!v.kuva });
+  if (rivi && rivi.tila === "julkaistu") return rivi;
+  if (rivi && vaihtui && rivi.pohja_valittu_kasin) {
+    // Visa vaihtui käsin valitun pohjan jälkeen: pohja pysyy, tekstit ja kysymykset
+    // luonnostellaan uudelleen ja julkaisu palaa luonnokseksi tarkistettavaksi.
+    return paivita(rivi.id, { quiz_id: v.quizId, kokoelma: v.kokoelma, on_kuva: !!v.kuva, kentat: kysymysKentat(v, rivi.pohja, v.paiva), tila: "luonnos", pohja_valittu_kasin: false });
   }
-
-  // Ehdokkaat: pohjat, joilla ei ole esteitä. V-B:n haaste luonnostellaan vasta valinnan jälkeen.
-  const ehdokkaat: Pohja[] = [];
-  for (const p of ["V-A", "V-C", "V-D"] as Pohja[]) {
-    const t = await tarkistaVisa(mitat, p, v, {});
-    if (t.esteet.length === 0) ehdokkaat.push(p);
-  }
-  ehdokkaat.push("V-B");
-  let pohja = valitse(ehdokkaat, v.paiva, "paivan_visa", v.urheilu, historia) ?? "V-D";
-
-  const kentat: Kentat = { ...(rivi?.kentat ?? {}) };
-  if (pohja === "V-B" && !kentat.haaste) {
-    const haaste = await luonnosteleHaaste(v);
-    if (haaste) kentat.haaste = haaste;
-    else pohja = valitse(ehdokkaat.filter((p) => p !== "V-B"), v.paiva, "paivan_visa", v.urheilu, historia) ?? "V-D";
-  }
-  const vari = pohja === "V-D" ? valitseVdVari(v.paiva, historia) : null;
-
+  const ehdokkaat = await kelpaavatVisapohjat(m, v, v.paiva);
+  const pohja = valitse(ehdokkaat, v.paiva, "paivan_visa", v.urheilu, historia, AUTO_VISA) ?? "4b";
   const arvot = {
     pohja,
-    pohja_vari: vari,
     muoto: "kuva",
     quiz_id: v.quizId,
     celebrity_id: null,
     kokoelma: v.kokoelma,
-    on_kuva: pohja === "V-D" ? false : !!v.kuva,
-    kentat,
+    on_kuva: !!v.kuva,
+    kentat: kysymysKentat(v, pohja, v.paiva),
+    tila: "luonnos",
+    pohja_valittu_kasin: false,
   };
   return rivi ? paivita(rivi.id, arvot) : lisaa(siteId, v.paiva, "paivan_visa", arvot);
 }
 
-async function suunnitteleSynttarit(siteId: string, s: SynttariData, rivi: Julkaisu | null, historia: Historia, mitat: Mitat): Promise<Julkaisu | null> {
-  const lukittu = rivi && (rivi.pohja_valittu_kasin || rivi.tila !== "luonnos");
+async function suunnitteleSynttarit(siteId: string, s: SynttariData, rivi: Julkaisu | null, historia: Historia, m: Mitat): Promise<Julkaisu | null> {
   const vaihtui = rivi && rivi.celebrity_id !== s.celebrityId;
   if (rivi && !vaihtui) return rivi;
-  if (rivi && lukittu && vaihtui) {
-    return paivita(rivi.id, { celebrity_id: s.celebrityId, quiz_id: s.quizId });
-  }
-
+  if (rivi && rivi.tila === "julkaistu") return rivi;
   const ehdokkaat: Pohja[] = [];
-  for (const p of ["S-B", "S-C", "S-D"] as Pohja[]) {
-    const t = await tarkistaSynttarit(mitat, p, s, {});
+  for (const p of AUTO_SYNT) {
+    const t = await tarkistaSynttarit({ m, siemen: s.paiva }, p, s, KOEKENTAT);
     if (t.esteet.length === 0) ehdokkaat.push(p);
   }
-  // Pyöreät vuodet ovat harvinaisia — S-C aina kun mahdollista (paitsi jos eilen oli S-C).
-  let pohja: Pohja | null = null;
-  if (ehdokkaat.includes("S-C") && onPyorea(s.ika)) {
-    const eilen = historia.find((h) => h.slotti === "synttarit" && h.paiva === lisaaPaivia(s.paiva, -1));
-    if (eilen?.pohja !== "S-C") pohja = "S-C";
-  }
-  pohja ??= valitse(ehdokkaat.filter((p) => p !== "S-C"), s.paiva, "synttarit", false, historia) ?? "S-B";
-
+  const pohja = valitse(ehdokkaat, s.paiva, "synttarit", false, historia, AUTO_SYNT) ?? (s.muisto ? "4h" : "4r");
   const arvot = {
     pohja,
-    pohja_vari: null,
     muoto: "kuva",
     quiz_id: s.quizId,
     celebrity_id: s.celebrityId,
     kokoelma: "Tunnetut henkilöt",
     on_kuva: false,
-    kentat: rivi?.kentat ?? {},
+    kentat: {},
+    tila: "luonnos",
+    pohja_valittu_kasin: false,
   };
   return rivi ? paivita(rivi.id, arvot) : lisaa(siteId, s.paiva, "synttarit", arvot);
+}
+
+/** Tekstit pohjalle: tekoälyltä ne kentät, jotka pohja siltä ottaa; kiinteät oletukset
+    jäävät pohjaan. Identiteettikortille varmistetaan fanitasot. */
+async function luonnostele(rivi: Julkaisu, pohja: Pohja, o: { visa?: VisaData; synttarit?: SynttariData }): Promise<Kentat | null> {
+  const eiVisaa = !!o.synttarit && !o.synttarit.quizId;
+  const tarvitsee = TEKOALY_KOUKKU.includes(pohja) && !eiVisaa;
+  const [l] = await Promise.all([
+    luonnosteleTekstit(pohja, o),
+    o.visa && LUPAA_TASON.includes(pohja) && !o.visa.fanitasot ? luoFanitasot(o.visa.quizId) : null,
+  ]);
+  if (!l) return tarvitsee ? null : { ...rivi.kentat, luonnosPohjalle: pohja };
+  const k: Kentat = { ...rivi.kentat, luonnosPohjalle: pohja };
+  if (l.aihe) k.aihe = l.aihe;
+  if (TEKOALY_KOUKKU.includes(pohja) && !eiVisaa) k.koukku = l.koukku;
+  if (TEKOALY_PALKINTO.includes(pohja) && l.palkinto) k.palkinto = l.palkinto;
+  return k;
+}
+
+/** Vaihe 2: luonnokset rinnakkain (kuusi kerrallaan). Epäonnistunut koukkupohja
+    vaihtuu kiinteän koukun korttiin, jotta suunnitelmassa ei ole tyhjiä kortteja. */
+async function luonnosteleRivit(
+  jono: Array<{ rivi: Julkaisu; visa?: VisaData; synttarit?: SynttariData }>,
+  m: Mitat,
+  historia: Historia,
+): Promise<Map<string, Julkaisu>> {
+  const valmiit = new Map<string, Julkaisu>();
+  let i = 0;
+  const tyontekija = async () => {
+    while (i < jono.length) {
+      const tyo = jono[i++];
+      let pohja = tyo.rivi.pohja;
+      let k = await luonnostele(tyo.rivi, pohja, tyo);
+      if (!k && tyo.visa) {
+        const kiinteat = await kelpaavatVisapohjat(m, tyo.visa, tyo.rivi.paiva, true);
+        pohja = valitse(kiinteat, tyo.rivi.paiva, tyo.rivi.slotti, tyo.visa.urheilu, historia, AUTO_VISA) ?? "4c";
+        k = { ...kysymysKentat(tyo.visa, pohja, tyo.rivi.paiva), luonnosPohjalle: pohja };
+      }
+      if (!k) continue; // synttäri ilman luonnosta: oletuskoukku riittää, yritetään seuraavalla latauksella
+      const uusi = await paivita(tyo.rivi.id, { pohja, kentat: k });
+      if (uusi) valmiit.set(uusi.id, uusi);
+    }
+  };
+  await Promise.all(Array.from({ length: Math.min(6, jono.length) }, tyontekija));
+  return valmiit;
 }
 
 async function lisaa(siteId: string, paiva: string, slotti: Slotti, arvot: Record<string, unknown>): Promise<Julkaisu | null> {
@@ -331,52 +363,68 @@ async function lisaa(siteId: string, paiva: string, slotti: Slotti, arvot: Recor
   return (olemassa as unknown as Julkaisu) ?? null;
 }
 
+async function paivita(id: string, arvot: Record<string, unknown>): Promise<Julkaisu | null> {
+  const { data } = await getSupabaseAdmin()
+    .from("ig_julkaisut" as never)
+    .update({ ...arvot, updated_at: new Date().toISOString() } as never)
+    .eq("id", id)
+    .select(SARAKKEET)
+    .single();
+  return (data as unknown as Julkaisu) ?? null;
+}
+
 /* ── Omat julkaisut ja kampanjat ─────────────────────────────────────── */
 
 async function omaHistoria(siteId: string): Promise<Historia> {
   const { data } = await getSupabaseAdmin()
     .from("ig_julkaisut" as never)
-    .select("paiva, slotti, pohja, pohja_vari, kokoelma")
+    .select("paiva, slotti, pohja, kokoelma")
     .eq("site_id", siteId)
     .eq("slotti", "oma")
     .neq("tila", "ohitettu");
-  return ((data ?? []) as unknown as Array<{ paiva: string; slotti: Slotti; pohja: Pohja; pohja_vari: VdVari | null; kokoelma: string | null }>).map(
-    (r) => ({ ...r, urheilu: urheiluKokoelma(r.kokoelma) }),
-  );
+  return ((data ?? []) as unknown as Array<{ paiva: string; slotti: Slotti; pohja: string; kokoelma: string | null }>).map((r) => ({
+    ...r,
+    urheilu: urheiluKokoelma(r.kokoelma),
+  }));
 }
 
-/** Luo yhden oman julkaisun. Pohja valitaan omien julkaisujen kierrosta niistä,
-    joilla ei ole esteitä (V-A vaatii tapahtuman ja V-B haasteen, joten
-    tyypillisesti V-C kuvalle kelpaavalla visalla, muuten V-D). */
-export async function luoOmaJulkaisu(
+/** Luo oman julkaisun pohjan (ilman tekstejä). Kampanja ja yksittäinen julkaisu
+    luonnostelevat tekstit tämän jälkeen rinnakkain. */
+async function luoOmaPohja(
   siteId: string,
   o: { paiva: string; quizId: string; otsake: string | null; kampanja: string | null },
-  historia?: Historia,
-): Promise<Julkaisu | null> {
-  const { mitat } = await lataaFontit();
-  const kentat: Kentat = o.otsake ? { otsake: o.otsake } : {};
+  historia: Historia,
+  m: Mitat,
+): Promise<{ rivi: Julkaisu; visa: VisaData } | null> {
   const v = await haeVisa(o.quizId, o.paiva, { oma: true, otsake: o.otsake });
   if (!v) return null;
-  const h = historia ?? (await omaHistoria(siteId));
-  const ehdokkaat: Pohja[] = [];
-  for (const p of ["V-C", "V-A", "V-D"] as Pohja[]) {
-    const t = await tarkistaVisa(mitat, p, v, kentat);
-    if (t.esteet.length === 0) ehdokkaat.push(p);
-  }
-  const pohja = valitse(ehdokkaat, o.paiva, "oma", v.urheilu, h) ?? "V-D";
-  const vari = pohja === "V-D" ? valitseVdVari(o.paiva, h) : null;
+  const ehdokkaat = await kelpaavatVisapohjat(m, v, o.paiva);
+  const pohja = valitse(ehdokkaat, o.paiva, "oma", v.urheilu, historia, AUTO_VISA) ?? "4b";
   const rivi = await lisaa(siteId, o.paiva, "oma", {
     pohja,
-    pohja_vari: vari,
     muoto: "kuva",
     quiz_id: v.quizId,
     kokoelma: v.kokoelma,
-    on_kuva: pohja === "V-D" ? false : !!v.kuva,
-    kentat,
+    on_kuva: !!v.kuva,
+    kentat: { ...kysymysKentat(v, pohja, o.paiva), ...(o.otsake ? { aihe: o.otsake.toLocaleUpperCase("fi-FI") } : {}) },
     kampanja: o.kampanja,
   });
-  if (rivi) h.push({ paiva: rivi.paiva, slotti: "oma", pohja: rivi.pohja, pohja_vari: rivi.pohja_vari, urheilu: v.urheilu });
-  return rivi;
+  if (!rivi) return null;
+  historia.push({ paiva: rivi.paiva, slotti: "oma", pohja: rivi.pohja, urheilu: v.urheilu });
+  return { rivi, visa: v };
+}
+
+/** Yksittäinen oma julkaisu. Otsake (jos annettu) on kortin aihe-etiketti. */
+export async function luoOmaJulkaisu(
+  siteId: string,
+  o: { paiva: string; quizId: string; otsake: string | null; kampanja: string | null },
+): Promise<Julkaisu | null> {
+  const { mitat } = await lataaFontit();
+  const historia = await omaHistoria(siteId);
+  const tulos = await luoOmaPohja(siteId, o, historia, mitat);
+  if (!tulos) return null;
+  const valmiit = await luonnosteleRivit([tulos], mitat, historia);
+  return valmiit.get(tulos.rivi.id) ?? tulos.rivi;
 }
 
 type VisaEhdokas = {
@@ -419,7 +467,7 @@ export async function valitseKampanjanVisat(siteId: string, kokoelma: string, al
     }),
   );
   const jarjestys = [
-    ...mitatut.sort((a, b) => a.taso - b.taso).map((m) => m.id),
+    ...mitatut.sort((a, b) => a.taso - b.taso).map((x) => x.id),
     ...ehdokkaat.filter((q) => !(q.hero_image ?? q.image_url)).map((q) => q.id),
   ];
   return jarjestys.slice(0, paivia);
@@ -429,22 +477,14 @@ export async function luoKampanja(
   siteId: string,
   o: { nimi: string; alku: string; paivia: number; kokoelma: string },
 ): Promise<{ luotu: number; visoja: number }> {
+  const { mitat } = await lataaFontit();
   const visat = await valitseKampanjanVisat(siteId, o.kokoelma, o.alku, o.paivia);
   const historia = await omaHistoria(siteId);
-  let luotu = 0;
+  const luodut: Array<{ rivi: Julkaisu; visa: VisaData }> = [];
   for (let i = 0; i < visat.length; i++) {
-    const r = await luoOmaJulkaisu(siteId, { paiva: lisaaPaivia(o.alku, i), quizId: visat[i], otsake: o.nimi, kampanja: o.nimi }, historia);
-    if (r) luotu++;
+    const r = await luoOmaPohja(siteId, { paiva: lisaaPaivia(o.alku, i), quizId: visat[i], otsake: null, kampanja: o.nimi }, historia, mitat);
+    if (r) luodut.push(r);
   }
-  return { luotu, visoja: visat.length };
-}
-
-async function paivita(id: string, arvot: Record<string, unknown>): Promise<Julkaisu | null> {
-  const { data } = await getSupabaseAdmin()
-    .from("ig_julkaisut" as never)
-    .update({ ...arvot, updated_at: new Date().toISOString() } as never)
-    .eq("id", id)
-    .select(SARAKKEET)
-    .single();
-  return (data as unknown as Julkaisu) ?? null;
+  await luonnosteleRivit(luodut, mitat, historia);
+  return { luotu: luodut.length, visoja: visat.length };
 }

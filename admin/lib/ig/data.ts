@@ -20,6 +20,17 @@ export type Kuva = {
   buf: Buffer;
 };
 
+/** Visan kysymys korttia varten (4f, 4l, 4m, 4o, 4p, 4q): teksti ja vaihtoehdot
+    sellaisenaan visasta — designin sääntö: kortissa ei muokata. */
+export type Kysymys = {
+  id: string;
+  teksti: string;
+  vaihtoehdot: string[];
+  oikea: string;
+  /** Kuvakysymys ei toimi kortilla ilman kuvaa */
+  kuva: boolean;
+};
+
 export type VisaData = {
   paiva: string;
   quizId: string;
@@ -36,6 +47,9 @@ export type VisaData = {
   oma: boolean;
   /** Tunniste kuvan yläreunaan: "PÄIVÄN VISA" tai oman julkaisun otsake ("LUONTOVIIKKO") */
   tunniste: string;
+  kysymykset: Kysymys[];
+  /** Aihekohtaiset tulostasot (quizzes.fanitasot) tai null */
+  fanitasot: string[] | null;
 };
 
 export type SynttariData = {
@@ -142,8 +156,10 @@ export const MAX_SUURENNOS = 1.5;
 const suurennos = (k: Kuva, w: number, h: number) => Math.max(w / k.leveys, h / k.korkeus);
 
 /** Rajaa kuvan täsmälleen w × h -kokoon kuten CSS:n object-fit: cover +
-    object-position fx% fy% ja palauttaa data-URL:n. Suurennettaessa terävöitetään kevyesti. */
-export async function rajaa(k: Kuva, w: number, h: number): Promise<string> {
+    object-position fx% fy% ja palauttaa data-URL:n. Suurennettaessa terävöitetään kevyesti.
+    seepia 0–1: designin 4d "lämmin kuva" (CSS sepia(.25) saturate(.9)) — Satori ei tue
+    CSS-suodattimia, joten sävy tehdään kuvaan valmiiksi. */
+export async function rajaa(k: Kuva, w: number, h: number, o: { seepia?: number } = {}): Promise<string> {
   const meta = await sharp(k.buf).metadata();
   const W = meta.width ?? w;
   const H = meta.height ?? h;
@@ -154,9 +170,19 @@ export async function rajaa(k: Kuva, w: number, h: number): Promise<string> {
   const top = Math.round((rh - h) * (k.fy / 100));
   let kuva = sharp(k.buf).resize(rw, rh, { kernel: "lanczos3" }).extract({ left, top, width: w, height: h });
   if (s > 1.05) kuva = kuva.sharpen({ sigma: 0.7 });
+  if (o.seepia) {
+    const a = o.seepia;
+    // CSS sepia(a): lineaarinen sekoitus identiteetin ja seepiamatriisin välillä
+    const S = [[0.393, 0.769, 0.189], [0.349, 0.686, 0.168], [0.272, 0.534, 0.131]];
+    const m = S.map((r, i) => r.map((v, j) => (1 - a) * (i === j ? 1 : 0) + a * v)) as [[number, number, number], [number, number, number], [number, number, number]];
+    kuva = sharp(await kuva.toBuffer()).recomb(m).modulate({ saturation: 0.9 });
+  }
   const out = await kuva.jpeg({ quality: 90 }).toBuffer();
   return `data:image/jpeg;base64,${out.toString("base64")}`;
 }
+
+/** Kelpaako kuva w × h -alueelle (enintään 1,5× suurennos). */
+export const kelpaa = (k: Kuva | null, w: number, h: number) => !!k && suurennos(k, w, h) <= MAX_SUURENNOS;
 
 /** Kuvakaistale (1080 × 300–360): enintään 1,5× suurennos → väh. 720 px leveä. */
 export const kelpaaKaistaleeksi = (k: Kuva | null) => !!k && suurennos(k, 1080, 360) <= MAX_SUURENNOS;
@@ -209,16 +235,27 @@ export async function haeVisa(
   o: { introOtsikko?: string | null; introTeksti?: string | null; oma?: boolean; otsake?: string | null; lataaKuvat?: boolean } = {},
 ): Promise<VisaData | null> {
   const sb = getSupabaseAdmin();
-  const [{ data: q }, { count }] = await Promise.all([
+  const [{ data: q }, { data: kys }] = await Promise.all([
     sb
       .from("quizzes")
-      .select("id, title, display_title, slug, custom_slug, category, collection, hero_image, image_url, hero_focal_x, hero_focal_y")
+      .select("id, title, display_title, slug, custom_slug, category, collection, hero_image, image_url, hero_focal_x, hero_focal_y, fanitasot")
       .eq("id", quizId)
       .maybeSingle(),
-    sb.from("questions").select("id", { count: "exact", head: true }).eq("quiz_id", quizId),
+    sb.from("questions").select("id, question_text, answers, image_url, sort_order").eq("quiz_id", quizId).order("sort_order"),
   ]);
-  const visa = q as unknown as Visa | null;
+  const visa = q as unknown as (Visa & { fanitasot: unknown }) | null;
   if (!visa) return null;
+  const kysymykset: Kysymys[] = ((kys ?? []) as unknown as Array<{ id: string; question_text: string; answers: Array<{ text: string; is_correct: boolean }> | null; image_url: string | null }>).map((r) => {
+    const vastaukset = (r.answers ?? []).filter((a) => a?.text?.trim());
+    return {
+      id: r.id,
+      teksti: r.question_text.trim(),
+      vaihtoehdot: vastaukset.slice(0, 4).map((a) => a.text.trim()),
+      oikea: (vastaukset.find((a) => a.is_correct)?.text ?? "").trim(),
+      kuva: !!r.image_url,
+    };
+  });
+  const count = kysymykset.length;
 
   const fx = visa.hero_focal_x ?? 50;
   const fy = visa.hero_focal_y ?? 40;
@@ -232,12 +269,14 @@ export async function haeVisa(
     kokoelma: kokoelmaNimi(visa),
     urheilu: onUrheilu(visa),
     henkilovisa: visa.collection === "tunnetut-henkilot",
-    kysymyksia: count ?? 10,
+    kysymyksia: count || 10,
     introOtsikko: o.introOtsikko?.trim() || null,
     introTeksti: o.introTeksti?.trim() || null,
     kuva: o.lataaKuvat === false ? null : await lataaKuva(kuvaUrl, fx, fy),
     oma,
     tunniste: oma ? (o.otsake?.trim() || "Visa").toLocaleUpperCase("fi-FI") : "PÄIVÄN VISA",
+    kysymykset,
+    fanitasot: Array.isArray(visa.fanitasot) && visa.fanitasot.length === 5 ? (visa.fanitasot as string[]) : null,
   };
 }
 

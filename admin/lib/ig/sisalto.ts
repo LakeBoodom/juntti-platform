@@ -23,7 +23,7 @@ export async function rivinSisalto(r: RivinLahde, k: Kentat, lataaKuvat = true):
   const v =
     r.slotti === "oma"
       ? r.quiz_id
-        ? await haeVisa(r.quiz_id, r.paiva, { oma: true, otsake: k.otsake, lataaKuvat })
+        ? await haeVisa(r.quiz_id, r.paiva, { oma: true, otsake: k.aihe, lataaKuvat })
         : null
       : await haePaivanVisa(r.site_id, r.paiva, lataaKuvat);
   if (!v) return null;

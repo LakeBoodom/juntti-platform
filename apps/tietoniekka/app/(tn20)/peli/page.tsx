@@ -153,6 +153,8 @@ type QuizRow = {
      golfvisassa näkyi tennisvisan kuva. */
   hero_image: string | null; hero_focal_x: number | null; hero_focal_y: number | null;
   hero_side: string | null; hero_alt: string | null;
+  /* Aihekohtaiset tulostasot (migraatio 20260928, Instagram-kierros 4) */
+  fanitasot?: unknown;
 };
 
 export default async function Peli20({
@@ -537,7 +539,7 @@ export default async function Peli20({
 
   let q = sb
     .from("quizzes")
-    .select("id, slug, title, display_title, teaser, description, category, collection, genre, learn, hero_image, hero_focal_x, hero_focal_y, hero_side, hero_alt")
+    .select("id, slug, title, display_title, teaser, description, category, collection, genre, learn, hero_image, hero_focal_x, hero_focal_y, hero_side, hero_alt, fanitasot")
     .eq("status", "published");
   q = quizId ? q.eq("id", quizId) : q.eq("slug", slug!);
   const { data: quiz } = await q.maybeSingle<QuizRow>();
@@ -688,6 +690,10 @@ export default async function Peli20({
        kaupunkivisasta, GameClient kirjoittaa leiman localStorageen pelin
        päättyessä (ks. lib/kaupungit.ts, KaupunkiPelilauta.tsx). */
     citySlug: KAUPUNGIT.find((c) => c.quizSlug === quiz.slug)?.id ?? null,
+    fanitasot:
+      Array.isArray(quiz.fanitasot) && quiz.fanitasot.length === 5 && quiz.fanitasot.every((t) => typeof t === "string" && t.trim())
+        ? (quiz.fanitasot as string[]).map((t) => t.trim())
+        : null,
     questions: (qs ?? []).map((row) => {
       const answers = (row.answers as Array<{ text: string; is_correct: boolean }>) ?? [];
       const correct = answers.find((a) => a.is_correct)?.text ?? answers[0]?.text ?? "";

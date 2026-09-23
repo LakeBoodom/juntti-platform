@@ -72,6 +72,9 @@ export type GameQuiz = {
   plate?: "vaalea" | "tumma";
   /** Haastelinkin polku (origin lisätään selaimessa). */
   challengePath: string;
+  /** Aihekohtaiset tulostasot heikoimmasta parhaaseen, rajat 0/40/60/80/100 %
+      (quizzes.fanitasot). Instagram-kierros 4: "Visa kertoo, mille tasolle yllät". */
+  fanitasot?: string[] | null;
   /** Uusi aloitusnäkymä (CD kierros 4–5). null = vanha .tng-start-näkymä. */
   hero?: {
     image: string | null;
@@ -832,6 +835,11 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
   const pct = Math.round((right / scored) * 100);
   const tasot = vk ? TIERS_VIIKKO : TIERS;
   const tier = tasot.find((t) => pct >= t.min) ?? tasot[tasot.length - 1];
+  /* Fanitaso: aihekohtainen tason nimi otsikoksi, yleinen taso leipätekstin alkuun.
+     Nimet on rajattu admin-puolella (sana enintään 14 merkkiä), joten ne mahtuvat
+     samaan .tng-restitle-mitoitukseen kuin "Harjoiteltavaa jäi". */
+  const faniIndeksi = [0, 40, 60, 80, 100].indexOf(tier.min);
+  const fanitaso = !vk && quiz.fanitasot && faniIndeksi >= 0 ? quiz.fanitasot[faniIndeksi] : null;
   const today = new Date();
   const playedDate = `${today.getDate()}.${today.getMonth() + 1}.${today.getFullYear()}`;
   const liveStatus =
@@ -1353,8 +1361,10 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
                     </div>
                   </div>
                   <span className="tng-sr">{right} oikein {total}:sta, osumatarkkuus {pct} prosenttia, {score} pistettä.</span>
-                  <h1 className="tng-restitle">{tier.title}</h1>
-                  <p className="tng-resbody">{tier.body}</p>
+                  <h1 className="tng-restitle">{fanitaso ?? tier.title}</h1>
+                  <p className="tng-resbody">
+                    {fanitaso ? `${/[.!?]$/.test(tier.title) ? tier.title : `${tier.title}.`} ${tier.body}` : tier.body}
+                  </p>
                   {/* Viikkovisassa nimi on jo yläotsikossa — ei toisteta. */}
                   {!vk && <p className="tng-resname">{quiz.title}</p>}
                   {/* K3: vertailu haastajaan. Tasapeli on oma tapaus — "voitit"
