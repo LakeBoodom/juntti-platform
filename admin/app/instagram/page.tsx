@@ -18,6 +18,8 @@ import { kokoelmaNimi } from "@/lib/kokoelmat";
 import { getSupabaseAdmin } from "@juntti/db";
 import { JulkaisuKortti, type KorttiData } from "./julkaisu-kortti";
 import { SlottiKytkin, UusiJulkaisu } from "./omat";
+import { YhteysPaneeli } from "./yhteys";
+import { haeYhteys, salaisuusAsetettu } from "@/lib/ig/instagram";
 
 export const dynamic = "force-dynamic";
 // Suunnitelma hakee 14 päivän datan ja kuvat — annetaan aikaa ensilataukselle.
@@ -84,18 +86,26 @@ async function synttariKortti(m: Mitat, r: Julkaisu, s0: SynttariData): Promise<
   };
 }
 
-export default async function InstagramPage() {
+export default async function InstagramPage({ searchParams }: { searchParams: Promise<Record<string, string | undefined>> }) {
+  const q = await searchParams;
   const sb = await supabaseFromCookies();
   const {
     data: { user },
   } = await sb.auth.getUser();
   const site = await getCurrentSite();
-  const [paivat, { mitat }, asetukset, { data: visat }] = await Promise.all([
+  const [paivat, { mitat }, asetukset, { data: visat }, yhteys] = await Promise.all([
     varmistaSuunnitelma(site.id, 14),
     lataaFontit(),
     haeAsetukset(site.id),
     getSupabaseAdmin().from("quizzes").select("collection, category").eq("site_id", site.id).eq("status", "published"),
+    haeYhteys(site.id),
   ]);
+  const ilmoitus =
+    q.ig === "yhdistetty"
+      ? { ok: true, teksti: `Instagram yhdistetty${q.tili ? `: @${q.tili}` : ""}. Kytke automaattinen julkaisu päälle, kun olet valmis.` }
+      : q.ig === "virhe"
+        ? { ok: false, teksti: `Yhdistäminen epäonnistui: ${q.syy ?? "tuntematon virhe"}` }
+        : null;
 
   // Kampanjan kokoelmat: sivuston kokoelmanimet ja julkaistujen visojen määrä.
   const kokoelmaLkm = new Map<string, number>();
@@ -142,9 +152,17 @@ export default async function InstagramPage() {
             Päivän visa ja Päivän synttärit seuraavalle 14 päivälle sekä omat julkaisut ja kampanjat. Pohja valitaan
             automaattisesti A/B-testin kierron mukaan (sama pohja ei toistu peräkkäin, kirkas V-D enintään kahdesti
             viikossa, jokainen pohja saa sekä urheilu- että muita aiheita). Voit vaihtaa pohjan ja kuvan, muokata tekstit
-            ja hyväksyä julkaisun. Instagram-yhteys tulee seuraavaksi — siihen asti hyväksytyn kuvan voi ladata.
+            ja hyväksyä julkaisun. Hyväksytyt julkaistaan automaattisesti, kun automaattinen julkaisu on päällä.
           </p>
         </div>
+
+        <YhteysPaneeli
+          yhteys={yhteys ? { kayttajanimi: yhteys.kayttajanimi, vanhenee: yhteys.token_vanhenee } : null}
+          salaisuusOk={salaisuusAsetettu()}
+          automaattinen={asetukset.automaattinen}
+          ajat={{ visa_klo: asetukset.visa_klo, synttarit_klo: asetukset.synttarit_klo, omat_klo: asetukset.omat_klo }}
+          ilmoitus={ilmoitus}
+        />
 
         <section className="grid gap-4 lg:grid-cols-[1fr_2fr]">
           <div className="space-y-3 rounded-md border p-4">
@@ -186,17 +204,17 @@ export default async function InstagramPage() {
               <h2 className="text-lg font-semibold">{paivaTeksti(k.paiva)}</h2>
               <div className="grid gap-4 lg:grid-cols-2">
                 {k.visa ? (
-                  <JulkaisuKortti data={k.visa} otsikko="Päivän visa" />
+                  <JulkaisuKortti data={k.visa} otsikko="Päivän visa" yhdistetty={!!yhteys} />
                 ) : asetukset.visa_paalla && k.paiva <= paivat[13]?.paiva ? (
                   <div className="rounded-md border border-dashed p-6 text-sm text-muted-foreground">Ei Päivän visaa.</div>
                 ) : null}
                 {k.synt ? (
-                  <JulkaisuKortti data={k.synt} otsikko="Päivän synttärit" />
+                  <JulkaisuKortti data={k.synt} otsikko="Päivän synttärit" yhdistetty={!!yhteys} />
                 ) : asetukset.synttarit_paalla && k.paiva <= paivat[13]?.paiva ? (
                   <div className="rounded-md border border-dashed p-6 text-sm text-muted-foreground">Ei synttärisankaria.</div>
                 ) : null}
                 {k.omat.map((o) => (
-                  <JulkaisuKortti key={o.rivi.id} data={o} otsikko={o.rivi.kampanja ? `Kampanja · ${o.rivi.kampanja}` : "Oma julkaisu"} />
+                  <JulkaisuKortti key={o.rivi.id} yhdistetty={!!yhteys} data={o} otsikko={o.rivi.kampanja ? `Kampanja · ${o.rivi.kampanja}` : "Oma julkaisu"} />
                 ))}
               </div>
             </section>

@@ -14,6 +14,8 @@ import { luonnosteleHaaste } from "@/lib/ig/kuvateksti";
 import { rivinSisalto } from "@/lib/ig/sisalto";
 import { lisaaPaivia, luoKampanja, luoOmaJulkaisu, tanaanHelsinki } from "@/lib/ig/suunnitelma";
 import { kokoelmaNimi } from "@/lib/kokoelmat";
+import { haeYhteys } from "@/lib/ig/instagram";
+import { julkaiseRivi } from "@/lib/ig/julkaisu";
 
 type Tulos = { ok: true } | { ok: false; virhe: string };
 
@@ -82,7 +84,8 @@ export async function tallennaJulkaisu(
       kuvateksti: kuvateksti || null,
       updated_at: new Date().toISOString(),
     } as never)
-    .eq("id", id);
+    .eq("id", id)
+    .not("tila", "in", "(julkaistu,julkaistaan)");
   if (error) return { ok: false, virhe: error.message };
   revalidatePath("/instagram");
   return { ok: true };
@@ -108,7 +111,7 @@ export async function asetaTila(id: string, tila: "luonnos" | "hyvaksytty" | "oh
     .from("ig_julkaisut" as never)
     .update({ tila, updated_at: new Date().toISOString() } as never)
     .eq("id", id)
-    .neq("tila", "julkaistu");
+    .not("tila", "in", "(julkaistu,julkaistaan)");
   if (error) return { ok: false, virhe: error.message };
   revalidatePath("/instagram");
   return { ok: true };
@@ -137,14 +140,45 @@ export async function ehdotaHaaste(id: string): Promise<{ ok: true; haaste: stri
 
 /* ── Päälle / pois ───────────────────────────────────────────────────── */
 
-export async function asetaSlotti(slotti: "visa_paalla" | "synttarit_paalla", paalla: boolean): Promise<Tulos> {
+const KLO = /^([01]\d|2[0-3]):[0-5]\d$/;
+
+export async function tallennaAsetukset(muutos: {
+  visa_paalla?: boolean;
+  synttarit_paalla?: boolean;
+  automaattinen?: boolean;
+  visa_klo?: string;
+  synttarit_klo?: string;
+  omat_klo?: string;
+}): Promise<Tulos> {
+  for (const k of ["visa_klo", "synttarit_klo", "omat_klo"] as const) {
+    const v = muutos[k];
+    if (v !== undefined && !KLO.test(v)) return { ok: false, virhe: "Kellonaika muodossa 07:30." };
+  }
+  if (muutos.automaattinen && !(await haeYhteys((await getCurrentSite()).id))) {
+    return { ok: false, virhe: "Yhdistä Instagram-tili ensin." };
+  }
+  const site = await getCurrentSite();
+  const { error } = await getSupabaseAdmin()
+    .from("ig_asetukset" as never)
+    .upsert({ site_id: site.id, ...muutos, updated_at: new Date().toISOString() } as never, { onConflict: "site_id" });
+  if (error) return { ok: false, virhe: error.message };
+  revalidatePath("/instagram");
+  return { ok: true };
+}
+
+/* ── Instagram-yhteys ja julkaisu ────────────────────────────────────── */
+
+export async function julkaiseNyt(id: string): Promise<{ ok: true; permalink: string | null } | { ok: false; virhe: string }> {
+  const t = await julkaiseRivi(id);
+  revalidatePath("/instagram");
+  return t;
+}
+
+export async function katkaiseYhteys(): Promise<Tulos> {
   const site = await getCurrentSite();
   const sb = getSupabaseAdmin();
-  const { data } = await sb.from("ig_asetukset" as never).select("visa_paalla, synttarit_paalla").eq("site_id", site.id).maybeSingle();
-  const nyt = (data as unknown as { visa_paalla: boolean; synttarit_paalla: boolean } | null) ?? { visa_paalla: true, synttarit_paalla: true };
-  const { error } = await sb
-    .from("ig_asetukset" as never)
-    .upsert({ site_id: site.id, ...nyt, [slotti]: paalla, updated_at: new Date().toISOString() } as never, { onConflict: "site_id" });
+  await sb.from("ig_asetukset" as never).update({ automaattinen: false } as never).eq("site_id", site.id);
+  const { error } = await sb.from("ig_yhteys" as never).delete().eq("site_id", site.id);
   if (error) return { ok: false, virhe: error.message };
   revalidatePath("/instagram");
   return { ok: true };
@@ -209,7 +243,7 @@ export async function vaihdaOmanVisa(id: string, quizId: string): Promise<Tulos>
     .from("ig_julkaisut" as never)
     .update({ quiz_id: quizId, kokoelma: kokoelmaNimi(q as unknown as { collection: string | null; category: string | null }), tila: "luonnos", updated_at: new Date().toISOString() } as never)
     .eq("id", id)
-    .neq("tila", "julkaistu");
+    .not("tila", "in", "(julkaistu,julkaistaan)");
   if (error) return { ok: false, virhe: error.message };
   revalidatePath("/instagram");
   return { ok: true };
@@ -221,7 +255,7 @@ export async function poistaOma(id: string): Promise<Tulos> {
     .delete()
     .eq("id", id)
     .eq("slotti", "oma")
-    .neq("tila", "julkaistu");
+    .not("tila", "in", "(julkaistu,julkaistaan)");
   if (error) return { ok: false, virhe: error.message };
   revalidatePath("/instagram");
   return { ok: true };

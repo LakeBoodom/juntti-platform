@@ -30,6 +30,9 @@ export async function middleware(req: NextRequest) {
   const isAuthRoute =
     pathname.startsWith("/login") || pathname.startsWith("/auth");
 
+  // Instagram-ajastin (pg_cron) tunnistautuu omalla avaimellaan reitin sisällä.
+  if (pathname === "/api/ig/ajastin") return res;
+
   if (!user && !isAuthRoute) {
     const url = req.nextUrl.clone();
     url.pathname = "/login";

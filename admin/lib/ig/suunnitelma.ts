@@ -40,7 +40,7 @@ import {
 import { luonnosteleHaaste } from "./kuvateksti";
 
 export type Slotti = "paivan_visa" | "synttarit" | "oma";
-export type Tila = "luonnos" | "hyvaksytty" | "julkaistu" | "epaonnistui" | "ohitettu";
+export type Tila = "luonnos" | "hyvaksytty" | "julkaistaan" | "julkaistu" | "epaonnistui" | "ohitettu";
 
 export type Julkaisu = {
   id: string;
@@ -59,22 +59,42 @@ export type Julkaisu = {
   tila: Tila;
   julkaistu_at: string | null;
   kampanja: string | null;
+  virhe: string | null;
+  ig_permalink: string | null;
 };
 
 const SARAKKEET =
-  "id, paiva, slotti, pohja, pohja_vari, pohja_valittu_kasin, muoto, quiz_id, celebrity_id, kokoelma, on_kuva, kentat, kuvateksti, tila, julkaistu_at, kampanja";
+  "id, paiva, slotti, pohja, pohja_vari, pohja_valittu_kasin, muoto, quiz_id, celebrity_id, kokoelma, on_kuva, kentat, kuvateksti, tila, julkaistu_at, kampanja, virhe, ig_permalink";
 
 /* ── Asetukset ───────────────────────────────────────────────────────── */
 
-export type Asetukset = { visa_paalla: boolean; synttarit_paalla: boolean };
+export type Asetukset = {
+  visa_paalla: boolean;
+  synttarit_paalla: boolean;
+  /** Ajastin julkaisee hyväksytyt julkaisut automaattisesti (oletus pois) */
+  automaattinen: boolean;
+  /** Julkaisuajat Helsingin aikaa, "07:30:00" */
+  visa_klo: string;
+  synttarit_klo: string;
+  omat_klo: string;
+};
+
+export const OLETUSASETUKSET: Asetukset = {
+  visa_paalla: true,
+  synttarit_paalla: true,
+  automaattinen: false,
+  visa_klo: "07:30:00",
+  synttarit_klo: "11:00:00",
+  omat_klo: "17:00:00",
+};
 
 export async function haeAsetukset(siteId: string): Promise<Asetukset> {
   const { data } = await getSupabaseAdmin()
     .from("ig_asetukset" as never)
-    .select("visa_paalla, synttarit_paalla")
+    .select("visa_paalla, synttarit_paalla, automaattinen, visa_klo, synttarit_klo, omat_klo")
     .eq("site_id", siteId)
     .maybeSingle();
-  return (data as unknown as Asetukset | null) ?? { visa_paalla: true, synttarit_paalla: true };
+  return (data as unknown as Asetukset | null) ?? OLETUSASETUKSET;
 }
 
 /* ── Päivämäärät (Helsingin aika) ────────────────────────────────────── */

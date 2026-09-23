@@ -6,7 +6,7 @@
 import { useEffect, useState, useTransition } from "react";
 import { ImageIcon, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { asetaSlotti, haeVisoja, luoKampanjaToiminto, luoOma, type VisaHaku } from "./actions";
+import { tallennaAsetukset, haeVisoja, luoKampanjaToiminto, luoOma, type VisaHaku } from "./actions";
 
 const kentta = "h-8 rounded-md border border-input bg-background px-2 text-sm";
 
@@ -43,7 +43,7 @@ export function SlottiKytkin(p: { kentta: "visa_paalla" | "synttarit_paalla"; pa
         nimi={p.nimi}
         onChange={(v) =>
           start(async () => {
-            const t = await asetaSlotti(p.kentta, v);
+            const t = await tallennaAsetukset({ [p.kentta]: v });
             setVirhe(t.ok ? null : t.virhe);
           })
         }

@@ -5,11 +5,9 @@
 // Suojattu adminin kirjautumisella (middleware) — julkaisuvaiheessa kuva tallennetaan
 // Supabase Storageen, josta Instagram sen hakee.
 
-import { ImageResponse } from "next/og";
 import { getSupabaseAdmin } from "@juntti/db";
-import { lataaFontit } from "@/lib/ig/fontit";
-import { rivinSisalto, type RivinLahde } from "@/lib/ig/sisalto";
-import { H, W, piirraSynttarit, piirraVisa, type Kentat, type Pohja, type VdVari } from "@/lib/ig/pohjat";
+import { piirraRivi, pngVastaus, type PiirrettavaRivi } from "@/lib/ig/piirto";
+import type { Kentat, Pohja, VdVari } from "@/lib/ig/pohjat";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -22,7 +20,7 @@ function virhe(teksti: string, status = 400) {
   return new Response(teksti, { status, headers: { "Content-Type": "text/plain; charset=utf-8" } });
 }
 
-type Rivi = RivinLahde & { pohja: Pohja; pohja_vari: VdVari | null; kentat: Kentat };
+type Rivi = PiirrettavaRivi;
 
 export async function GET(req: Request) {
   const u = new URL(req.url);
@@ -47,23 +45,15 @@ export async function GET(req: Request) {
     try { kentat = JSON.parse(kp) as Kentat; } catch { return virhe("kentat ei ole JSON"); }
   }
 
-  const [fontit, sisalto] = await Promise.all([lataaFontit(), rivinSisalto(rivi, kentat)]);
-  if (!sisalto) return virhe(rivi.slotti === "synttarit" ? "Päivälle ei ole synttärisankaria" : "Visaa ei löytynyt", 404);
-  const piirros =
-    sisalto.tyyppi === "visa"
-      ? await piirraVisa(fontit.mitat, pohja, sisalto.v, kentat, vari)
-      : await piirraSynttarit(fontit.mitat, pohja, sisalto.s, kentat);
+  const p = await piirraRivi(rivi, { pohja, vari, kentat });
+  if (!p) return virhe(rivi.slotti === "synttarit" ? "Päivälle ei ole synttärisankaria" : "Visaa ei löytynyt", 404);
+  const { piirros, fontit } = p;
   const el = piirros.ruudut[Math.min(ruutu, piirros.ruudut.length - 1)];
 
   const lataa = u.searchParams.get("lataa") === "1";
   const tiedosto = `tietoniekka-${rivi.paiva}-${pohja}${piirros.ruudut.length > 1 ? `-${ruutu + 1}` : ""}.png`;
-  return new ImageResponse(el, {
-    width: W,
-    height: H,
-    fonts: fontit.satori,
-    headers: {
-      "Cache-Control": "no-store",
-      ...(lataa ? { "Content-Disposition": `attachment; filename="${tiedosto}"` } : {}),
-    },
+  return pngVastaus(el, fontit, {
+    "Cache-Control": "no-store",
+    ...(lataa ? { "Content-Disposition": `attachment; filename="${tiedosto}"` } : {}),
   });
 }

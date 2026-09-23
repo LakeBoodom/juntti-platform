@@ -5,7 +5,7 @@
 // tekstiä muokataan, kuva päivittyy hetken viiveellä ennen tallennusta.
 
 import { useEffect, useMemo, useRef, useState, useTransition } from "react";
-import { AlertTriangle, Check, Download, RotateCcw, Sparkles, Trash2, Upload } from "lucide-react";
+import { AlertTriangle, Check, Download, ExternalLink, RotateCcw, Send, Sparkles, Trash2, Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { Julkaisu } from "@/lib/ig/suunnitelma";
 import type { Kentat, Pohja, VdVari } from "@/lib/ig/pohjat";
@@ -13,6 +13,7 @@ import {
   asetaTila,
   ehdotaHaaste,
   hyvaksyJulkaisu,
+  julkaiseNyt,
   lataaIgKuva,
   palautaAutomaattinen,
   poistaOma,
@@ -70,12 +71,13 @@ const NIMET: Record<Pohja, string> = {
 const TILA_TEKSTI: Record<string, { teksti: string; luokka: string }> = {
   luonnos: { teksti: "Luonnos", luokka: "border-yellow-600/30 bg-yellow-600/10 text-yellow-800" },
   hyvaksytty: { teksti: "Hyväksytty", luokka: "border-green-600/30 bg-green-600/10 text-green-800" },
+  julkaistaan: { teksti: "Julkaistaan…", luokka: "border-blue-600/30 bg-blue-600/10 text-blue-800" },
   julkaistu: { teksti: "Julkaistu", luokka: "border-blue-600/30 bg-blue-600/10 text-blue-800" },
   epaonnistui: { teksti: "Epäonnistui", luokka: "border-red-600/30 bg-red-600/10 text-red-800" },
   ohitettu: { teksti: "Ohitettu", luokka: "border-muted-foreground/30 bg-muted text-muted-foreground" },
 };
 
-export function JulkaisuKortti({ data, otsikko }: { data: KorttiData; otsikko: string }) {
+export function JulkaisuKortti({ data, otsikko, yhdistetty }: { data: KorttiData; otsikko: string; yhdistetty: boolean }) {
   const r = data.rivi;
   const [pohja, setPohja] = useState<Pohja>(r.pohja);
   const [vari, setVari] = useState<VdVari>(r.pohja_vari ?? "lime");
@@ -111,7 +113,7 @@ export function JulkaisuKortti({ data, otsikko }: { data: KorttiData; otsikko: s
   const esteet = data.esteet[pohja] ?? [];
   const huomiot = data.huomiot[pohja] ?? [];
   const tekstiMuuttui = JSON.stringify(kentat) !== JSON.stringify(r.kentat ?? {});
-  const lukittu = r.tila === "julkaistu";
+  const lukittu = r.tila === "julkaistu" || r.tila === "julkaistaan";
   const visajulkaisu = r.slotti !== "synttarit";
   const oma = r.slotti === "oma";
 
@@ -332,6 +334,12 @@ export function JulkaisuKortti({ data, otsikko }: { data: KorttiData; otsikko: s
           <input value={kentat.kuvaaja ?? ""} onChange={(e) => aseta("kuvaaja", e.target.value)} placeholder="Kuvaaja ja lisenssi, esim. Matti Meikäläinen / CC BY-SA 4.0 (Wikimedia Commons)" className="h-8 w-full rounded-md border border-input bg-background px-2 text-sm" />
         )}
 
+        {r.tila === "epaonnistui" && r.virhe && (
+          <div className="flex gap-1 rounded border border-red-600/30 bg-red-600/5 p-2 text-xs text-red-800">
+            <AlertTriangle className="mt-0.5 h-3 w-3 shrink-0" /> Julkaisu epäonnistui: {r.virhe}
+          </div>
+        )}
+
         {/* Esteet ja huomiot (palvelimen tarkistus tallennetuilla teksteillä) */}
         {esteet.length > 0 && (
           <ul className="space-y-0.5">
@@ -461,6 +469,29 @@ export function JulkaisuKortti({ data, otsikko }: { data: KorttiData; otsikko: s
             <Button size="sm" variant="ghost" disabled={pending} onClick={() => start(async () => { await palautaAutomaattinen(r.id); })} title="Anna kierron valita pohja uudelleen">
               <RotateCcw className="h-3.5 w-3.5" /> Automaattinen
             </Button>
+          )}
+          {yhdistetty && (r.tila === "hyvaksytty" || r.tila === "epaonnistui") && !muokattu && (
+            <Button
+              size="sm"
+              variant="outline"
+              disabled={pending}
+              onClick={() => {
+                if (!confirm("Julkaistaanko tämä Instagramiin nyt?")) return;
+                setViesti({ ok: true, teksti: "Julkaistaan…" });
+                start(async () => {
+                  const t = await julkaiseNyt(r.id);
+                  setViesti(t.ok ? { ok: true, teksti: "Julkaistu Instagramiin." } : { ok: false, teksti: t.virhe });
+                });
+              }}
+              title="Julkaise heti Instagramiin"
+            >
+              <Send className="h-3.5 w-3.5" /> {r.tila === "epaonnistui" ? "Yritä uudelleen" : "Julkaise nyt"}
+            </Button>
+          )}
+          {r.tila === "julkaistu" && r.ig_permalink && (
+            <a href={r.ig_permalink} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 text-xs underline-offset-2 hover:underline">
+              <ExternalLink className="h-3 w-3" /> Avaa Instagramissa
+            </a>
           )}
           {viesti && <span className={`text-xs ${viesti.ok ? "text-green-700" : "text-red-700"}`}>{viesti.teksti}</span>}
         </div>
