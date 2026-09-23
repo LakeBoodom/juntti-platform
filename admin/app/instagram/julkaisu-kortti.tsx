@@ -38,6 +38,8 @@ export type KorttiData = {
   kuva: { url: string | null; leveys: number; korkeus: number; fx: number; fy: number; korvattu: boolean };
 };
 
+export type Mittaus = { klikkaus: number; avaus: number; valmis: number };
+
 const syote = "h-8 w-full rounded-md border border-input bg-background px-2 text-sm";
 
 /** Selain pienentää ison kuvan ennen lähetystä (Vercelin pyyntöraja 4,5 MB). */
@@ -77,7 +79,7 @@ const TILA_TEKSTI: Record<string, { teksti: string; luokka: string }> = {
   ohitettu: { teksti: "Ohitettu", luokka: "border-muted-foreground/30 bg-muted text-muted-foreground" },
 };
 
-export function JulkaisuKortti({ data, otsikko, yhdistetty }: { data: KorttiData; otsikko: string; yhdistetty: boolean }) {
+export function JulkaisuKortti({ data, otsikko, yhdistetty, mittaus }: { data: KorttiData; otsikko: string; yhdistetty: boolean; mittaus?: Mittaus }) {
   const r = data.rivi;
   const [pohja, setPohja] = useState<Pohja>(r.pohja);
   const [vari, setVari] = useState<VdVari>(r.pohja_vari ?? "lime");
@@ -487,6 +489,11 @@ export function JulkaisuKortti({ data, otsikko, yhdistetty }: { data: KorttiData
             >
               <Send className="h-3.5 w-3.5" /> {r.tila === "epaonnistui" ? "Yritä uudelleen" : "Julkaise nyt"}
             </Button>
+          )}
+          {r.tila === "julkaistu" && (
+            <span className="text-xs text-muted-foreground" title="Bio-sivun (tietoniekka.fi/ig) mittaus">
+              Bio: {mittaus?.klikkaus ?? 0} klikkausta · {mittaus?.avaus ?? 0} aloitusta · {mittaus?.valmis ?? 0} loppuun
+            </span>
           )}
           {r.tila === "julkaistu" && r.ig_permalink && (
             <a href={r.ig_permalink} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 text-xs underline-offset-2 hover:underline">

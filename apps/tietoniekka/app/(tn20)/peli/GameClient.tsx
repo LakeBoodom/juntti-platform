@@ -28,6 +28,7 @@ import { PAIVAN_VISA_KEY, localDateKey } from "../../../components/tn20/PaivanVi
 import { ViikkoSinetti, KuvatIkoni } from "../../../components/tn20/Viikkosinetti";
 import { lueViikkoTulos, tallennaViikkoTulos, type ViikkoInfo, type ViikkoTulos } from "../../../lib/viikkovisa";
 import type { KollaasiKuva } from "../../../lib/kuvavisat2026";
+import { igAvaus, igValmis } from "../../../lib/igMittaus";
 import "../peli2026.css";
 
 const BASE_POINTS = 100;
@@ -359,6 +360,8 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
   useEffect(() => {
     try { setOrigin(window.location.origin); } catch { /* no-op */ }
     if (typeof navigator !== "undefined" && typeof navigator.share === "function") setHasShare(true);
+    igAvaus(quiz.id); // Instagram-mittaus (?lahde=ig), lib/igMittaus.ts
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   /* Viikkovisa, yksi yritys: jos tämän viikon tulos on jo selaimessa,
@@ -555,6 +558,7 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
   async function recordPlay(finalScore: number) {
     if (recorded.current || !quiz.id) return; // kuvavisat: ei quizzes-riviä → ei tallennusta
     recorded.current = true;
+    igValmis(quiz.id);
     try {
       const sb = getSupabase();
       if (!sb) return;

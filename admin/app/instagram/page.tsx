@@ -16,7 +16,7 @@ import { rivinSisalto } from "@/lib/ig/sisalto";
 import { haeAsetukset, varmistaSuunnitelma, type Julkaisu } from "@/lib/ig/suunnitelma";
 import { kokoelmaNimi } from "@/lib/kokoelmat";
 import { getSupabaseAdmin } from "@juntti/db";
-import { JulkaisuKortti, type KorttiData } from "./julkaisu-kortti";
+import { JulkaisuKortti, type KorttiData, type Mittaus } from "./julkaisu-kortti";
 import { SlottiKytkin, UusiJulkaisu } from "./omat";
 import { YhteysPaneeli } from "./yhteys";
 import { haeYhteys, salaisuusAsetettu } from "@/lib/ig/instagram";
@@ -127,18 +127,31 @@ export default async function InstagramPage({ searchParams }: { searchParams: Pr
     kortit.push({ paiva: p.paiva, visa, synt, omat });
   }
 
-  // Testin kertymä: montako kertaa kutakin pohjaa on suunniteltu tai julkaistu.
-  const { data: kaikki } = await getSupabaseAdmin()
-    .from("ig_julkaisut" as never)
-    .select("pohja, tila, kokoelma")
-    .eq("site_id", site.id)
-    .neq("tila", "ohitettu");
-  const kertyma = new Map<string, { yht: number; urheilu: number; julkaistu: number }>();
-  for (const r of (kaikki ?? []) as unknown as Array<{ pohja: Pohja; tila: string; kokoelma: string | null }>) {
-    const e = kertyma.get(r.pohja) ?? { yht: 0, urheilu: 0, julkaistu: 0 };
+  // Testin kertymä: montako kertaa kutakin pohjaa on suunniteltu tai julkaistu,
+  // ja montako visaa Instagramista on avattu / pelattu loppuun (bio-sivun mittaus).
+  const [{ data: kaikki }, { data: mittausRivit }] = await Promise.all([
+    getSupabaseAdmin()
+      .from("ig_julkaisut" as never)
+      .select("id, pohja, tila, kokoelma")
+      .eq("site_id", site.id)
+      .neq("tila", "ohitettu"),
+    getSupabaseAdmin().from("ig_mittaus" as never).select("julkaisu, tapahtuma, maara"),
+  ]);
+  const mittaus: Record<string, Mittaus> = {};
+  let bioNaytot = 0;
+  for (const m of (mittausRivit ?? []) as unknown as Array<{ julkaisu: string; tapahtuma: string; maara: number }>) {
+    if (m.tapahtuma === "bio_naytto") { bioNaytot += m.maara; continue; }
+    const e = (mittaus[m.julkaisu] ??= { klikkaus: 0, avaus: 0, valmis: 0 });
+    if (m.tapahtuma === "klikkaus" || m.tapahtuma === "avaus" || m.tapahtuma === "valmis") e[m.tapahtuma] += m.maara;
+  }
+  const kertyma = new Map<string, { yht: number; urheilu: number; julkaistu: number; avaus: number; valmis: number }>();
+  for (const r of (kaikki ?? []) as unknown as Array<{ id: string; pohja: Pohja; tila: string; kokoelma: string | null }>) {
+    const e = kertyma.get(r.pohja) ?? { yht: 0, urheilu: 0, julkaistu: 0, avaus: 0, valmis: 0 };
     e.yht++;
     if (r.kokoelma === "Urheilu" || r.kokoelma === "Jääkiekko") e.urheilu++;
     if (r.tila === "julkaistu") e.julkaistu++;
+    e.avaus += mittaus[r.id]?.avaus ?? 0;
+    e.valmis += mittaus[r.id]?.valmis ?? 0;
     kertyma.set(r.pohja, e);
   }
 
@@ -181,20 +194,22 @@ export default async function InstagramPage({ searchParams }: { searchParams: Pr
           <h2 className="mb-2 text-sm font-semibold">Testin kertymä</h2>
           <div className="flex flex-wrap gap-2 text-xs">
             {[...VISA_POHJAT, ...SYNT_POHJAT].map((p) => {
-              const e = kertyma.get(p) ?? { yht: 0, urheilu: 0, julkaistu: 0 };
+              const e = kertyma.get(p) ?? { yht: 0, urheilu: 0, julkaistu: 0, avaus: 0, valmis: 0 };
               return (
                 <div key={p} className="rounded border px-2 py-1" title={POHJA_NIMET[p]}>
                   <span className="font-semibold">{p}</span> {POHJA_NIMET[p]}:{" "}
                   <span className="tabular-nums">{e.yht}</span> suunn. ·{" "}
                   <span className="tabular-nums">{e.urheilu}</span> urheilua ·{" "}
-                  <span className="tabular-nums">{e.julkaistu}</span> julk.
+                  <span className="tabular-nums">{e.julkaistu}</span> julk. ·{" "}
+                  <span className="tabular-nums">{e.avaus}</span> aloitusta IG:stä
                 </div>
               );
             })}
           </div>
           <p className="mt-2 text-xs text-muted-foreground">
             Tavoite designin mukaan noin 8–10 julkaisua per pohja ennen karsintaa. V-E (karuselli) ja S-A
-            (henkilökuva, vaatii kuvaajan) valitaan käsin. Omat julkaisut lasketaan mukaan.
+            (henkilökuva, vaatii kuvaajan) valitaan käsin. Omat julkaisut lasketaan mukaan. Aloitukset = visa
+            avattu Instagramin bio-sivulta (tietoniekka.fi/ig); bio-sivua avattu yhteensä {bioNaytot} kertaa.
           </p>
         </section>
 
@@ -204,17 +219,17 @@ export default async function InstagramPage({ searchParams }: { searchParams: Pr
               <h2 className="text-lg font-semibold">{paivaTeksti(k.paiva)}</h2>
               <div className="grid gap-4 lg:grid-cols-2">
                 {k.visa ? (
-                  <JulkaisuKortti data={k.visa} otsikko="Päivän visa" yhdistetty={!!yhteys} />
+                  <JulkaisuKortti data={k.visa} otsikko="Päivän visa" yhdistetty={!!yhteys} mittaus={mittaus[k.visa.rivi.id]} />
                 ) : asetukset.visa_paalla && k.paiva <= paivat[13]?.paiva ? (
                   <div className="rounded-md border border-dashed p-6 text-sm text-muted-foreground">Ei Päivän visaa.</div>
                 ) : null}
                 {k.synt ? (
-                  <JulkaisuKortti data={k.synt} otsikko="Päivän synttärit" yhdistetty={!!yhteys} />
+                  <JulkaisuKortti data={k.synt} otsikko="Päivän synttärit" yhdistetty={!!yhteys} mittaus={mittaus[k.synt.rivi.id]} />
                 ) : asetukset.synttarit_paalla && k.paiva <= paivat[13]?.paiva ? (
                   <div className="rounded-md border border-dashed p-6 text-sm text-muted-foreground">Ei synttärisankaria.</div>
                 ) : null}
                 {k.omat.map((o) => (
-                  <JulkaisuKortti key={o.rivi.id} yhdistetty={!!yhteys} data={o} otsikko={o.rivi.kampanja ? `Kampanja · ${o.rivi.kampanja}` : "Oma julkaisu"} />
+                  <JulkaisuKortti key={o.rivi.id} yhdistetty={!!yhteys} mittaus={mittaus[o.rivi.id]} data={o} otsikko={o.rivi.kampanja ? `Kampanja · ${o.rivi.kampanja}` : "Oma julkaisu"} />
                 ))}
               </div>
             </section>
