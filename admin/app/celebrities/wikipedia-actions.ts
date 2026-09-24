@@ -3,6 +3,20 @@
 import { revalidatePath } from "next/cache";
 import { getSupabaseAdmin } from "@juntti/db";
 
+// The REST API now returns thumbnails as thumb.wikimedia.org/…?utm_… — the
+// public sites expect the canonical upload.wikimedia.org form (same path).
+function normalizeWikimediaImage(u: string | null | undefined): string | null {
+  if (!u) return null;
+  try {
+    const url = new URL(u);
+    if (url.hostname === "thumb.wikimedia.org") url.hostname = "upload.wikimedia.org";
+    if (url.hostname.endsWith("wikimedia.org")) url.search = "";
+    return url.toString();
+  } catch {
+    return u;
+  }
+}
+
 function parseWikipediaUrl(
   rawUrl: string,
 ): { lang: string; slug: string } | null {
@@ -85,8 +99,9 @@ export async function fetchFromWikipedia(rawUrl: string): Promise<
       ok: true,
       name: typeof data.title === "string" ? data.title : "",
       bio_short: trimmed,
-      image_url:
-        data.thumbnail?.source ?? data.originalimage?.source ?? null,
+      image_url: normalizeWikimediaImage(
+        data.thumbnail?.source ?? data.originalimage?.source,
+      ),
     };
   } catch (err: any) {
     return {
@@ -149,7 +164,7 @@ export async function backfillCelebrityImages(): Promise<
         continue;
       }
       const d: any = await r.json();
-      const img: string | null = d.thumbnail?.source ?? d.originalimage?.source ?? null;
+      const img = normalizeWikimediaImage(d.thumbnail?.source ?? d.originalimage?.source);
       if (!img) {
         result.missing.push({ name: row.name, reason: "sivulla ei pääkuvaa" });
         continue;
