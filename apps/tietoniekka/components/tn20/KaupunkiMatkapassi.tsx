@@ -7,6 +7,7 @@
 import { useEffect, useState } from "react";
 import { KAUPUNGIT, KAUPUNKI_REITTI } from "@/lib/kaupungit";
 import { KAUPUNKILEIMAT_KEY } from "./KaupunkiPelilauta";
+import { MobiiliEdistyminen } from "./MobiiliSankari";
 
 function readStampCount(): number {
   try {
@@ -32,6 +33,36 @@ export function KaupunkiMatkapassiBadge() {
     <span className="tnk2-ctabox-badge">
       Matkapassisi {visitedN ?? 0}/{KAUPUNGIT.length}
     </span>
+  );
+}
+
+/** Mobiilin sankarimoduuli (CD 24.9.): sama mittari kuin Historiassa. */
+export function KaupunkiEdistyminen() {
+  const [tila, setTila] = useState<{ n: number; next: string } | null>(null);
+  useEffect(() => {
+    const read = () => {
+      let visited: Set<string>;
+      try {
+        const raw = window.localStorage.getItem(KAUPUNKILEIMAT_KEY);
+        const arr = raw ? (JSON.parse(raw) as string[]) : [];
+        visited = new Set(Array.isArray(arr) ? arr : []);
+      } catch {
+        visited = new Set();
+      }
+      setTila({ n: readStampCount(), next: nextCityName(visited) });
+    };
+    read();
+    window.addEventListener("focus", read);
+    return () => window.removeEventListener("focus", read);
+  }, []);
+  const total = KAUPUNGIT.length;
+  const n = tila?.n ?? 0;
+  return (
+    <MobiiliEdistyminen
+      label="Matkapassi"
+      pct={total > 0 ? (n / total) * 100 : 0}
+      lines={[`${n}/${total} leimattu · ${tila ? (n >= total ? "koko Suomi kierretty!" : `seuraava: ${tila.next}`) : "seuraava: …"}`]}
+    />
   );
 }
 

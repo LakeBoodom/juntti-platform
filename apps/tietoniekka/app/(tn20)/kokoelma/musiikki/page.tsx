@@ -16,6 +16,7 @@ import type { Metadata } from "next";
 import { getSupabase } from "@/lib/supabase";
 import { getPageContent } from "@/lib/pageContent";
 import Crumbs from "@/components/tn20/Crumbs";
+import { MobiiliSankari } from "@/components/tn20/MobiiliSankari";
 import {
   MUSIIKKI_HERO, MUSIIKKI_HERO_POSITION, musiikkiIntro, MUSIIKKI_BADGE,
   MUSIIKKI_FEATURED, MUSIIKKI_SECTIONS, musiikkiImg,
@@ -88,9 +89,17 @@ export default async function MusiikkiLanding() {
     <main className="tnk tne-mus" style={{ minHeight: "100dvh", paddingBottom: 60 }}>
       {/* Murupolkurivi palkin alla (nav-speksi 17.8.2026) */}
       <Crumbs items={[{ label: "Kokoelmat", href: "/kokoelmat" }, { label: "Musiikki" }]} />
+      <MobiiliSankari
+        accent="#C68BFF"
+        eyebrow="Teemakokoelma"
+        title={["Musiikki ja", "Artistit"]}
+        lead={musiikkiIntro(count)}
+        stats={[{ n: count, label: "visaa" }, { n: sectionCount, label: "lajityyppiä" }]}
+        image={{ src: MUSIIKKI_HERO, position: MUSIIKKI_HERO_POSITION }}
+      />
       <div className="tn-shell" style={{ paddingTop: "clamp(14px,2vw,26px)" }}>
         {/* ─── Hero ─── */}
-        <section className="tne-hero">
+        <section className="tne-hero tnms-desk">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             className="tne-hero-img"

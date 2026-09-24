@@ -30,6 +30,7 @@ import type { Metadata } from "next";
 import { getSupabase } from "@/lib/supabase";
 import { getPageContent } from "@/lib/pageContent";
 import Crumbs from "@/components/tn20/Crumbs";
+import { MobiiliLista, MobiiliSankari } from "@/components/tn20/MobiiliSankari";
 import {
   UL_HERO, UL_LOHKOT, UL_GATES, ulKicker, ulDark, ulKickerColor,
   type UlLohko, type UlVisa,
@@ -166,9 +167,26 @@ export default async function UrheiluLanding() {
   return (
     <main className="tnk" style={{ minHeight: "100dvh" }}>
       <Crumbs items={[{ label: "Kokoelmat", href: "/kokoelmat" }, { label: "Urheilu" }]} />
+      {/* Mobiili (CD 24.9.): teksti kuvan päällä varjostuksella + lohkot listana */}
+      <MobiiliSankari
+        variant="overlay"
+        accent="#B6FF3C"
+        eyebrow="Teemakokoelma"
+        title={UL_HERO.titleLines}
+        lead={UL_HERO.introLines.join(" ")}
+        stats={[{ n: blocks.reduce((s, b) => s + b.count, 0), label: "visaa" }, { n: blocks.length, label: "lohkoa" }]}
+        image={{ src: UL_HERO.img }}
+      />
+      <MobiiliLista
+        accent="#B6FF3C"
+        eyebrow="Lohkot"
+        count={`${blocks.length} lohkoa`}
+        title="Valitse laji"
+        rows={blocks.map(({ l, count }, i) => ({ kicker: ulKicker(i), name: l.navTitle, meta: `${count} visaa`, href: `#${l.slug}`, color: ulKickerColor(i, blocks.length) }))}
+      />
 
       {/* ─── Hero + lohkovalinta-nauha (generoidaan lohkolistasta) ─── */}
-      <section className="tnu-herowrap">
+      <section className="tnu-herowrap tnms-desk">
         <div className="tnu-hero-bg">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={UL_HERO.img} alt="" fetchPriority="high" />

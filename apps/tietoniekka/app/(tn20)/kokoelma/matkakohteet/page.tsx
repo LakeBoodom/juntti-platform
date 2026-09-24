@@ -14,6 +14,7 @@ import { getSupabase } from "@/lib/supabase";
 import { getPageContent } from "@/lib/pageContent";
 import { LearnArticle } from "@/components/tn20/LearnArticle";
 import Crumbs from "@/components/tn20/Crumbs";
+import { MobiiliSankari } from "@/components/tn20/MobiiliSankari";
 import {
   MAANTIETO_HERO, MAANTIETO_LM, MAANTIETO_DESC, MAANTIETO_CURATED,
   MAANTIETO_GRID_ORDER, maantietoImg,
@@ -86,7 +87,16 @@ export default async function MaantietoLanding() {
       {/* Murupolkurivi palkin alla (nav-speksi 17.8.2026) — korvasi heron inline-navin */}
       <Crumbs items={[{ label: "Kokoelmat", href: "/kokoelmat" }, { label: "Maantieto" }]} />
       {/* ─── Hero: petrooli + teal, kuva oikealla (CD) ─── */}
-      <section className="tnt-hero">
+      <MobiiliSankari
+        accent="#35D6C0"
+        tint="#082830"
+        eyebrow="Teemakokoelma"
+        title={["Maailman ääriltä", "kotia kohti"]}
+        lead="Tietovisoja vuorista, meristä, joista, saarista ja kaupungeista — myös niistä, jotka luulet tuntevasi."
+        stats={[{ n: count, label: "visaa" }, { n: questions, label: "kysymystä" }]}
+        image={{ src: MAANTIETO_HERO }}
+      />
+      <section className="tnt-hero tnms-desk">
         <div className="tnt-hero-text">
           <span className="tnt-eyebrow">Teemakokoelma</span>
           <h1 className="tnt-title">

@@ -1,0 +1,154 @@
+/* KOKOELMASIVUJEN MOBIILIRUNKO — CD "TN Kokoelmasivut – mobiili" (24.9.2026).
+   Vain ulkoasu ≤ 768 px: yksi sankari (components/tn20/MobiiliSankari.tsx),
+   yksi tekstilinja (--page-x), yksi osion aloitus, yksipalstaiset alakokoelmat.
+   Sivun oma sankari (.tnms-desk) jää työpöydälle ennalleen. */
+
+.tn20 .tnms,
+.tn20 .tnms-first { display: none; }
+
+@media (max-width: 768px) {
+  .tn20 { --page-x: 20px; }
+  .tn20 .tnms-desk { display: none !important; }
+
+  /* Yksi tekstilinja: murupolku, sankari, osiot ja kortit samasta reunasta. */
+  .tn20 .tn-shell,
+  .tn20 .tnl-shell,
+  .tn20 .tnt-shell { padding-left: var(--page-x); padding-right: var(--page-x); }
+
+  /* ── Sankari ── */
+  .tn20 .tnms {
+    display: block; position: relative; overflow: hidden;
+    --tnms-tint: color-mix(in srgb, var(--tnms-acc) 10%, #0d0c08);
+    background: var(--tnms-tint);
+    border-bottom: 1px solid #2A2720;
+    margin: 0 0 32px;
+  }
+  /* 16:10-nauha, matalampi kapeimmilla (360 px → 187 px), jotta sankari päättyy ennen 640 px:ää. */
+  .tn20 .tnms-media { position: relative; height: clamp(180px, 52vw, 230px); overflow: hidden; }
+  .tn20 .tnms[data-module] .tnms-media { height: 170px; }
+  .tn20 .tnms-media img { display: block; width: 100%; height: 100%; object-fit: cover; }
+  .tn20 .tnms-body {
+    position: relative; z-index: 1;
+    max-width: calc(520px + 2 * var(--page-x)); margin: 0 auto;
+    padding: 24px var(--page-x) 24px;
+  }
+
+  /* Teksti kuvan päällä: vain lippulaivoilla, varjostus 0 → 88 % mustaa. */
+  .tn20 .tnms[data-variant="overlay"] .tnms-media { height: 330px; }
+  .tn20 .tnms[data-variant="overlay"] .tnms-media::after {
+    content: ""; position: absolute; inset: 0;
+    background: linear-gradient(180deg, rgba(8, 7, 4, 0) 30%, rgba(8, 7, 4, 0.55) 62%, rgba(8, 7, 4, 0.88) 100%);
+  }
+  .tn20 .tnms[data-variant="overlay"] .tnms-body { margin-top: -118px; padding-top: 0; }
+  .tn20 .tnms[data-variant="overlay"] .tnms-lead { margin-top: 20px; }
+
+  /* Kuvaton: sävypohja + kuviotekstuuri. */
+  .tn20 .tnms[data-variant="plain"] .tnms-body { padding-top: 28px; }
+  .tn20 .tnms[data-pattern]::before { content: ""; position: absolute; inset: 0; pointer-events: none; }
+  .tn20 .tnms[data-pattern="stripes"]::before {
+    background: repeating-linear-gradient(132deg, rgba(245, 240, 230, 0.045) 0 1px, transparent 1px 22px);
+  }
+  .tn20 .tnms[data-pattern="rays"]::before {
+    background: repeating-conic-gradient(from 0deg at 88% 0%, color-mix(in srgb, var(--tnms-acc) 16%, transparent) 0deg 1.4deg, transparent 1.4deg 7deg);
+    -webkit-mask-image: linear-gradient(180deg, #000 0%, rgba(0, 0, 0, 0.35) 100%);
+            mask-image: linear-gradient(180deg, #000 0%, rgba(0, 0, 0, 0.35) 100%);
+  }
+
+  .tn20 .tnms-eyebrow {
+    font-family: var(--tn-font-body); font-size: 12px; font-weight: 800; line-height: 1.2;
+    letter-spacing: 0.16em; text-transform: uppercase; color: var(--tnms-acc); margin: 0 0 12px;
+  }
+  .tn20 .tnms-title {
+    font-family: var(--tn-font-display); font-weight: 900; font-size: var(--tnms-title-size, 34px);
+    /* POIKKEAMA: CD 0,92 → 0,98 — Ä:n ja Ö:n pisteet osuvat muuten ylempään riviin
+       ("MAAILMAN / ÄÄRILTÄ"; sama havainto Instagram-korteissa). */
+    line-height: 0.98; letter-spacing: -0.01em; text-transform: uppercase; color: #F5F0E6;
+    margin: 0 0 16px; overflow-wrap: normal; word-break: keep-all; hyphens: manual; text-wrap: balance;
+  }
+  .tn20 .tnms-title-l { display: block; }
+  .tn20 .tnms-title-acc { color: var(--tnms-acc); }
+  .tn20 .tnms-lead {
+    font-family: var(--tn-font-body); font-size: 17px; line-height: 1.5; font-weight: 400;
+    color: #C9C3B6; margin: 0 0 20px; text-wrap: pretty;
+  }
+  .tn20 .tnms-stats { font-family: var(--tn-font-body); font-size: 15px; font-weight: 600; color: #C9C3B6; margin: 0; }
+  .tn20 .tnms-stats b { color: #F5F0E6; font-weight: 800; }
+  .tn20 .tnms-dot { color: #6E6757; }
+
+  /* ── Edistymismittari (Historia, Suomen kaupungit) ── */
+  .tn20 .tnms-progress {
+    margin-top: 20px; padding: 14px 16px 16px; border: 1px solid #2A2720; border-radius: 14px;
+    background: rgba(0, 0, 0, 0.28);
+  }
+  .tn20 .tnms-progress-row { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+  .tn20 .tnms-progress-label { font-size: 12px; font-weight: 800; letter-spacing: 0.16em; text-transform: uppercase; color: #A39B8A; }
+  .tn20 .tnms-progress-pct { font-size: 15px; font-weight: 800; color: var(--tnms-acc); }
+  .tn20 .tnms-progress-bar { height: 6px; margin: 10px 0 12px; border-radius: 99px; background: rgba(245, 240, 230, 0.08); overflow: hidden; }
+  .tn20 .tnms-progress-bar i { display: block; height: 100%; border-radius: inherit; background: var(--tnms-acc); }
+  .tn20 .tnms-progress-note { margin: 0; font-size: 14px; line-height: 1.45; color: #C9C3B6; }
+
+  /* ── Ensimmäinen osio: alakokoelmat listana ── */
+  .tn20 .tnms-first {
+    display: block; max-width: calc(520px + 2 * var(--page-x)); margin: 0 auto 32px;
+    padding: 0 var(--page-x);
+  }
+  .tn20 .tnms-sechead { margin: 0 0 8px; }
+  .tn20 .tnms-sechead-row { display: flex; align-items: center; gap: 12px; }
+  .tn20 .tnms-sechead-eyebrow { font-size: 12px; font-weight: 800; letter-spacing: 0.16em; text-transform: uppercase; color: var(--tnms-acc); white-space: nowrap; }
+  .tn20 .tnms-sechead-row i { flex: 1; height: 1px; background: #2A2720; }
+  .tn20 .tnms-sechead-count { font-size: 13px; font-weight: 600; color: #8E8676; white-space: nowrap; }
+  .tn20 .tnms-sechead-title {
+    font-family: var(--tn-font-display); font-size: 26px; font-weight: 900; line-height: 1;
+    text-transform: uppercase; color: #F5F0E6; margin: 12px 0 0;
+  }
+  .tn20 .tnms-sechead-note { margin: 8px 0 0; font-size: 15px; line-height: 1.45; color: #C9C3B6; }
+  .tn20 .tnms-list { list-style: none; margin: 12px 0 0; padding: 0; border-top: 1px solid #2A2720; }
+  .tn20 .tnms-list li { border-bottom: 1px solid #2A2720; }
+  .tn20 .tnms-list a {
+    display: flex; align-items: center; justify-content: space-between; gap: 16px;
+    min-height: 64px; padding: 10px 0; text-decoration: none; color: inherit;
+  }
+  .tn20 .tnms-list-main { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+  .tn20 .tnms-list-kicker { font-size: 11px; font-weight: 800; letter-spacing: 0.16em; text-transform: uppercase; color: var(--tnms-acc); }
+  .tn20 .tnms-list-name { font-family: var(--tn-font-display); font-size: 19px; font-weight: 800; line-height: 1.1; color: #F5F0E6; }
+  .tn20 .tnms-list-meta { flex: 0 1 45%; text-align: right; font-size: 13px; line-height: 1.35; color: #A39B8A; }
+  .tn20 .tnms-list a:active .tnms-list-name { color: var(--tnms-acc); }
+}
+
+@media (max-width: 768px) and (min-width: 414px) {
+  .tn20 { --page-x: 24px; }
+}
+
+@media (max-width: 768px) {
+  /* Kuvavisat: satunnaisnosto tekstilinkkinä sankarin alla (ei painiketta sankarissa). */
+  .tn20 .tnms-first--link { margin-top: -12px; margin-bottom: 8px; }
+  .tn20 .tnms-textlink {
+    display: inline-flex; align-items: center; gap: 8px; min-height: 44px;
+    font-size: 15px; font-weight: 700; color: #B6FF3C; text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+}
+
+@media (max-width: 768px) {
+  /* Aiheopas (LearnArticle) samaan tekstilinjaan kuin sivun muu sisältö. */
+  .tn20 .tn-learn-in { padding-left: var(--page-x); padding-right: var(--page-x); }
+}
+@media (max-width: 420px) {
+  /* KORTTISÄÄNTÖ: "PÄHKINÄNKUORESSA" (16 merkkiä) mahtuu 360 px:llä vasta ~22 px:n
+     koossa — mitattu 331 px / 28 px, tila 320 px. Koko skaalautuu leveyden mukaan. */
+  .tn20 .tn-learn-title { font-size: clamp(20px, 6.2vw, 28px); }
+  /* Kahden palstan visakortti 360 px:llä: nimen tila 131 px, "LEIJONAKUNINGAS"
+     14 px / wdth 74 = 151 px → kapeampi leikkaus (wdth 62 ≈ −16 %) = 127 px. */
+  .tn20 .tne-card-name { font-family: "Archivo Variable", var(--tn-font-display); font-variation-settings: "wdth" 62; }
+}
+
+@media (max-width: 768px) {
+  /* Sankarin ja ensimmäisen osion väli on aina 32 px (sankarin alareuna + hiusviiva):
+     sivujen omat yläreunukset oli mitoitettu vanhan sankarin perään. */
+  .tn20 .tnms + .tn-shell { padding-top: 0 !important; }
+  .tn20 .tnms + .tn-shell > .tnms-desk + .tne-section { margin-top: 0; }
+  .tn20 .tnms + .tnt-hero + .tn-shell > .tnt-section:first-child { padding-top: 0; }
+  .tn20 .tnk2-herowrap.tnms-desk + .tn-shell { padding-top: 0; }
+  .tn20 .tnms + .tn-hero + .tn-shell > .tn-section:first-child { padding-top: 0 !important; }
+  .tn20 .tnms + .tn-shell > .tnh-eranav { padding-top: 0; }
+}

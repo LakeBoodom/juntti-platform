@@ -15,6 +15,7 @@
 import type { Metadata } from "next";
 import { getSupabase } from "@/lib/supabase";
 import Crumbs from "@/components/tn20/Crumbs";
+import { MobiiliLista, MobiiliSankari } from "@/components/tn20/MobiiliSankari";
 import {
   TIEDE_ALOITA, TIEDE_ALOITA_KICKER, TIEDE_BANNERI, TIEDE_FOOTNOTE, TIEDE_HERO, TIEDE_KATEGORIA,
   TIEDE_NOSTO, TIEDE_SECTIONS, tiedeImg,
@@ -117,10 +118,27 @@ export default async function TiedeLanding() {
   return (
     <main className="tnt-page">
       <Crumbs items={[{ label: "Kokoelmat", href: "/kokoelmat" }, { label: "Tiede & teknologia" }]} />
+      {/* Mobiili (CD 24.9.): iskulause ingressin ensimmäiseksi virkkeeksi, aihepiirit listana */}
+      <MobiiliSankari
+        accent="#4FD1FF"
+        tint="#0B1830"
+        eyebrow={TIEDE_HERO.kicker}
+        title={TIEDE_HERO.titleLines}
+        lead={`${TIEDE_HERO.lead} ${TIEDE_HERO.intro}`}
+        stats={[{ n: visoja, label: "visaa" }, { n: kysymyksia, label: "kysymystä" }]}
+        image={{ src: TIEDE_HERO.img, position: TIEDE_HERO.pos }}
+      />
+      <MobiiliLista
+        accent="#4FD1FF"
+        eyebrow="Kategoriat"
+        count={`${sections.length} ryhmää`}
+        title="Valitse ala"
+        rows={sections.map((s) => ({ name: s.title, meta: `${s.cards.length} visaa`, href: `#${s.id}` }))}
+      />
       <div className="tnt-shell">
         <div className="tnt-wrap">
           {/* ─── Hero ─── */}
-          <section className="tnt-hero">
+          <section className="tnt-hero tnms-desk">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={TIEDE_HERO.img} alt="" fetchPriority="high" style={{ objectPosition: TIEDE_HERO.pos }} />
             <span className="tnt-hero-line" aria-hidden />
@@ -143,7 +161,7 @@ export default async function TiedeLanding() {
           </section>
 
           {/* ─── Aihepiirichipit ─── */}
-          <nav className="tnt-chips" aria-label="Aihepiirit">
+          <nav className="tnt-chips tnms-desk" aria-label="Aihepiirit">
             {sections.map((s) => (
               <a key={s.id} className="tnt-chip" href={`#${s.id}`}>
                 {s.title}<b>{s.cards.length}</b>

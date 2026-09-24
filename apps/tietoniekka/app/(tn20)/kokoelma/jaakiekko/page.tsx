@@ -23,6 +23,7 @@ import type { Metadata } from "next";
 import { getSupabase } from "@/lib/supabase";
 import { getPageContent } from "@/lib/pageContent";
 import Crumbs from "@/components/tn20/Crumbs";
+import { MobiiliLista, MobiiliSankari } from "@/components/tn20/MobiiliSankari";
 import KiekkoKartta, { type KarttaTeam } from "@/components/tn20/KiekkoKartta";
 import {
   JK_KAUSI, JK_HERO, JK_PERIODS, JK_COPY, JK_TEAMS,
@@ -150,9 +151,25 @@ export default async function JaakiekkoLanding() {
           { label: "Jääkiekko" },
         ]}
       />
+      {/* Mobiili (CD 24.9.): kuva yllä, teksti alla + erät listana */}
+      <MobiiliSankari
+        accent="#4FD1F5"
+        eyebrow={JK_KAUSI.statusPill}
+        title={JK_HERO.titleLines}
+        lead={JK_HERO.intro}
+        stats={[{ n: bySlug.size, label: "visaa" }, { n: JK_PERIODS.length, label: "erää" }]}
+        image={{ src: JK_HERO.img }}
+      />
+      <MobiiliLista
+        accent="#4FD1F5"
+        eyebrow="Erät"
+        count={`${JK_PERIODS.length} erää`}
+        title="Valitse erä"
+        rows={JK_PERIODS.map((p) => ({ kicker: p.kicker, name: p.title, meta: p.meta, href: p.href }))}
+      />
       <div className="tn-shell" style={{ paddingTop: "clamp(14px,2vw,26px)" }}>
         {/* ─── Hero + scoreboard ─── */}
-        <section className="tnj-hero">
+        <section className="tnj-hero tnms-desk">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img className="tnj-hero-img" src={JK_HERO.img} alt="" />
           <div className="tnj-hero-body">
@@ -167,7 +184,7 @@ export default async function JaakiekkoLanding() {
             <p className="tnj-lede">{JK_HERO.intro}</p>
           </div>
         </section>
-        <nav className="tnj-score" aria-label="Sivun osiot">
+        <nav className="tnj-score tnms-desk" aria-label="Sivun osiot">
           {JK_PERIODS.map((p) => (
             <a key={p.href} href={p.href}>
               <span className="tnj-score-kicker">{p.kicker}</span>

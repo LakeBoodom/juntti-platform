@@ -16,6 +16,7 @@ import { getSupabase } from "@/lib/supabase";
 import { getPageContent } from "@/lib/pageContent";
 import { LearnArticle } from "@/components/tn20/LearnArticle";
 import Crumbs from "@/components/tn20/Crumbs";
+import { MobiiliSankari } from "@/components/tn20/MobiiliSankari";
 import {
   TV_HERO, TV_HERO_POSITION, TV_INTRO, TV_BADGE, TV_FEATURED, TV_SECTIONS, tvImg,
 } from "@/lib/tv";
@@ -89,9 +90,17 @@ export default async function TvLanding() {
     <main className="tnk tne-tv" style={{ minHeight: "100dvh", paddingBottom: 60 }}>
       {/* Murupolkurivi palkin alla (nav-speksi 17.8.2026) */}
       <Crumbs items={[{ label: "Kokoelmat", href: "/kokoelmat" }, { label: "TV & Suoratoisto" }]} />
+      <MobiiliSankari
+        accent="#FF4FA8"
+        eyebrow="Teemakokoelma"
+        title={["TV ja", "Suoratoisto"]}
+        lead={TV_INTRO}
+        stats={[{ n: count, label: "visaa" }, { n: sectionCount, label: "genreä" }]}
+        image={{ src: TV_HERO, position: TV_HERO_POSITION }}
+      />
       <div className="tn-shell" style={{ paddingTop: "clamp(14px,2vw,26px)" }}>
         {/* ─── Hero ─── */}
-        <section className="tne-hero">
+        <section className="tne-hero tnms-desk">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             className="tne-hero-img"

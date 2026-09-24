@@ -14,6 +14,7 @@ import { getSupabase } from "@/lib/supabase";
 import { getPageContent } from "@/lib/pageContent";
 import { LearnArticle } from "@/components/tn20/LearnArticle";
 import Crumbs from "@/components/tn20/Crumbs";
+import { MobiiliSankari } from "@/components/tn20/MobiiliSankari";
 import {
   ELOKUVAT_HERO, ELOKUVAT_FEATURED, ELOKUVAT_SECTIONS, elokuvatImg,
 } from "@/lib/elokuvat";
@@ -77,9 +78,17 @@ export default async function ElokuvatLanding() {
     <main className="tnk" style={{ minHeight: "100dvh", paddingBottom: 60 }}>
       {/* Murupolkurivi palkin alla (nav-speksi 17.8.2026) — korvasi heron inline-navin */}
       <Crumbs items={[{ label: "Kokoelmat", href: "/kokoelmat" }, { label: "Elokuvat" }]} />
+      <MobiiliSankari
+        accent="#FF6A4D"
+        eyebrow="Teemakokoelma"
+        title={["Elokuvat"]}
+        lead="Tietovisat valkokankaalta: blockbusterit, kotimaiset klassikot ja ne joita ei myönnetä katsotuiksi."
+        stats={[{ n: count, label: "visaa" }, { n: sectionCount, label: "aihepiiriä" }, { label: "uusia joka viikko" }]}
+        image={{ src: ELOKUVAT_HERO }}
+      />
       <div className="tn-shell" style={{ paddingTop: "clamp(14px,2vw,26px)" }}>
         {/* ─── Hero ─── */}
-        <section className="tne-hero">
+        <section className="tne-hero tnms-desk">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img className="tne-hero-img" src={ELOKUVAT_HERO} alt="" />
           <div className="tne-hero-body">

@@ -17,6 +17,7 @@ import { getSupabase } from "@/lib/supabase";
 import { getPageContent } from "@/lib/pageContent";
 import { LearnArticle } from "@/components/tn20/LearnArticle";
 import Crumbs from "@/components/tn20/Crumbs";
+import { MobiiliSankari } from "@/components/tn20/MobiiliSankari";
 import {
   LUONTO_HERO, LUONTO_SUBS, LUONTO_CURATED, luontoImg,
 } from "@/lib/luonto";
@@ -99,7 +100,16 @@ export default async function LuontoLanding({
       {/* Murupolkurivi palkin alla (nav-speksi 17.8.2026) — korvasi heron inline-navin */}
       <Crumbs items={[{ label: "Kokoelmat", href: "/kokoelmat" }, { label: "Luonto" }]} />
       {/* ─── Hero: teksti 44 % + kuva 56 % desktopilla, kuva ylhäällä kapealla ─── */}
-      <section className="tnl-herowrap">
+      <MobiiliSankari
+        accent="#4ED592"
+        tint="#0F2319"
+        eyebrow="Teemakokoelma"
+        title={["Suomen luonto", "lähimetsästä tunturiin"]}
+        lead={`${count} visaa eläimistä, kasveista, maastoista ja luonnon ilmiöistä. Tunnetko oikeasti lähimetsäsi?`}
+        stats={[{ n: count, label: "visaa" }, { n: questions, label: "kysymystä" }]}
+        image={{ src: LUONTO_HERO }}
+      />
+      <section className="tnl-herowrap tnms-desk">
         <div className="tnl-shell">
         <div className="tnl-hero">
         <div className="tnl-hero-text">

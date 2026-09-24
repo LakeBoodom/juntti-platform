@@ -26,6 +26,7 @@ import type { Metadata } from "next";
 import { getSupabase } from "@/lib/supabase";
 import { getPageContent } from "@/lib/pageContent";
 import Crumbs from "@/components/tn20/Crumbs";
+import { MobiiliLista, MobiiliSankari } from "@/components/tn20/MobiiliSankari";
 import JpPaitaseina, { type JpWallClub } from "@/components/tn20/JpPaitaseina";
 import JpSuurseurat, { type JpEuroCard } from "@/components/tn20/JpSuurseurat";
 import {
@@ -153,8 +154,25 @@ export default async function JalkapalloLanding({
         ]}
       />
 
+      {/* Mobiili (CD 24.9.): kuva yllä, teksti alla + lohkot listana */}
+      <MobiiliSankari
+        accent="#B6FF3C"
+        eyebrow={JP_KAUSI.badge}
+        title={JP_HERO.titleLines}
+        lead={JP_HERO.introLines.join(" ")}
+        stats={[{ n: bySlug.size, label: "visaa" }, { n: JP_PARTS.length, label: "lohkoa" }]}
+        image={{ src: JP_HERO.img }}
+      />
+      <MobiiliLista
+        accent="#B6FF3C"
+        eyebrow="Lohkot"
+        count={`${JP_PARTS.length} lohkoa`}
+        title="Valitse sarja"
+        rows={JP_PARTS.map((p) => ({ kicker: p.kicker, name: p.title, meta: p.meta, href: p.href, color: p.color }))}
+      />
+
       {/* ─── Hero + osiovalinta ─── */}
-      <section className="tnjp-herowrap">
+      <section className="tnjp-herowrap tnms-desk">
         <div className="tnjp-hero-bg">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={JP_HERO.img} alt="" fetchPriority="high" />

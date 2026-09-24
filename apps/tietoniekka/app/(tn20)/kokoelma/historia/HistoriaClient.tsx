@@ -5,6 +5,7 @@
 // Ei vaikeustasoja (lukittu 6.8.2026). Ei kirjautumista.
 
 import { useEffect, useMemo, useState } from "react";
+import { MobiiliEdistyminen, MobiiliSankari } from "@/components/tn20/MobiiliSankari";
 
 export type HistoriaCard = { id: string; title: string; questions: number; href: string; tag?: string };
 export type HistoriaEra = { key: string; years: string; short: string; title: string; desc: string; quizzes: HistoriaCard[] };
@@ -39,9 +40,26 @@ export default function HistoriaClient({ data }: { data: HistoriaData }) {
 
   return (
     <main className="tnh" style={{ minHeight: "100dvh", paddingBottom: 60 }}>
+      {/* Mobiili (CD 24.9.): kuvaton malli (sävypohja + tekstuuri), oma edistyminen aina näkyvissä */}
+      <MobiiliSankari
+        variant="plain"
+        pattern="stripes"
+        accent="#E8A320"
+        eyebrow="Teemakokoelma"
+        title={["Suomen", "historia"]}
+        lead="Kivikaudesta nykypäivään. Jokainen aikakausi on oma visansa — pelaa järjestyksessä tai poimi jakso, joka kiinnostaa juuri nyt."
+        stats={[{ n: totalQuizzes, label: "visaa" }, { n: data.eras.length, label: "aikakautta" }]}
+        module={
+          <MobiiliEdistyminen
+            label="Oma edistyminen"
+            pct={pct}
+            lines={[`${playedEra}/${eraQuizzes.length} aikakausivisaa pelattu`, nextUp ? `Seuraava: ${nextUp.title}` : "Kaikki aikakaudet pelattu!"]}
+          />
+        }
+      />
       {/* ─── Hero: typografinen (CD) ─── */}
       <div className="tn-shell">
-        <section className="tnh-hero">
+        <section className="tnh-hero tnms-desk">
           {/* Inline-murupolku poistettu — Crumbs-rivi tulee page.tsx:stä (17.8.2026) */}
           <h1 className="tn-display tnh-title">
             Suomen<br /><span>historia</span>
@@ -74,7 +92,7 @@ export default function HistoriaClient({ data }: { data: HistoriaData }) {
         </section>
 
         {/* ─── Herokuva: aikajanapanoraama kivikaudesta nykypäivään (Heikki 6.8.) ─── */}
-        <div className="tnh-heroimg">
+        <div className="tnh-heroimg tnms-desk">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/20/historia/hero-aikajana.webp" alt="Suomen historia kivikaudesta nykypäivään" />
         </div>

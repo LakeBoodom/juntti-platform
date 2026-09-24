@@ -11,6 +11,7 @@ import { getSupabase } from "@/lib/supabase";
 import { getPageContent } from "@/lib/pageContent";
 import { LearnArticle } from "@/components/tn20/LearnArticle";
 import Crumbs from "@/components/tn20/Crumbs";
+import { MobiiliSankari } from "@/components/tn20/MobiiliSankari";
 import {
   KULTTUURI_HERO, KULTTUURI_SUBS, KULTTUURI_CURATED, kulttuuriImg,
 } from "@/lib/kulttuuri";
@@ -92,7 +93,16 @@ export default async function KulttuuriLanding({
       {/* Murupolkurivi palkin alla (nav-speksi 17.8.2026) — korvasi heron inline-navin */}
       <Crumbs items={[{ label: "Kokoelmat", href: "/kokoelmat" }, { label: "Kulttuuri" }]} />
       {/* ─── Hero: kollaasi + kaksivärinen otsikko (CD) ─── */}
-      <section className="tnk-herowrap">
+      <MobiiliSankari
+        accent="#F2B634"
+        tint="#10173A"
+        eyebrow="Teemakokoelma"
+        title={["Suomen tarinat,", "tekijät ja klassikot"]}
+        lead={`${count} visaa taiteesta, musiikista, kirjallisuudesta, designista ja suomalaisista ilmiöistä.`}
+        stats={[{ n: count, label: "visaa" }, { n: questions, label: "kysymystä" }]}
+        image={{ src: KULTTUURI_HERO }}
+      />
+      <section className="tnk-herowrap tnms-desk">
         <div className="tn-shell">
         <div className="tnk-hero">
         <div className="tnk-hero-text">

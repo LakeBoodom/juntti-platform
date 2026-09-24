@@ -23,7 +23,8 @@ import { getSupabase } from "@/lib/supabase";
 import { getPageContent } from "@/lib/pageContent";
 import Crumbs from "@/components/tn20/Crumbs";
 import KaupunkiPelilauta from "@/components/tn20/KaupunkiPelilauta";
-import KaupunkiMatkapassi, { KaupunkiMatkapassiBadge } from "@/components/tn20/KaupunkiMatkapassi";
+import KaupunkiMatkapassi, { KaupunkiEdistyminen, KaupunkiMatkapassiBadge } from "@/components/tn20/KaupunkiMatkapassi";
+import { MobiiliSankari } from "@/components/tn20/MobiiliSankari";
 import { KAUPUNGIT, KAUPUNGIT_HERO_IMG, SUOMI_MEGA_SLUG, kaupunkiImg } from "@/lib/kaupungit";
 
 export const dynamic = "force-dynamic";
@@ -75,8 +76,19 @@ export default async function KaupungitLanding() {
         ]}
       />
 
+      {/* Mobiili (CD 24.9.): kuva yllä, teksti alla, matkapassi yhteisenä edistymismittarina */}
+      <MobiiliSankari
+        accent="#35D6A0"
+        eyebrow="Kaupunkivisat"
+        title={["Matkusta", "halki Suomen"]}
+        lead="Jokaisella kaupungilla on oma visansa. Pelaa, kerää leimoja matkapassiisi ja katso, kuinka pitkälle matkasi kantaa."
+        stats={[{ n: KAUPUNGIT.length, label: "kaupunkia" }, { n: Object.values(questionCounts).reduce((a, b) => a + b, 0), label: "kysymystä" }]}
+        image={{ src: KAUPUNGIT_HERO_IMG }}
+        module={<KaupunkiEdistyminen />}
+      />
+
       {/* ─── Hero + matkapassi ─── */}
-      <section className="tnk2-herowrap">
+      <section className="tnk2-herowrap tnms-desk">
         <div className="tnk2-hero-bg">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={KAUPUNGIT_HERO_IMG} alt="" fetchPriority="high" />

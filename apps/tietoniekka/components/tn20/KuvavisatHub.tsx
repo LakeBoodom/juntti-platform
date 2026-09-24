@@ -21,6 +21,7 @@
 import { ryhmiteltyVariaatiot, variaatioKuvaus, type KategoriaData } from "@/lib/kuvavisat2026";
 import { ViikkovisaPromo, type ViikkoPromoData } from "./ViikkovisaPromo";
 import Crumbs from "./Crumbs";
+import { MobiiliSankari } from "./MobiiliSankari";
 
 /* Kuvalaatikko — Claude Designin korjaus (README "Kategorianäkymä, korjaus", 17.9.2026).
    Laatikko on aina 16:10 ja teksti on sen ULKOPUOLELLA omana sisaruksenaan. */
@@ -102,7 +103,23 @@ export function KuvavisatHub({
   return (
     <>
       <Crumbs items={[{ label: "Kokoelmat", href: "/kokoelmat" }, { label: "Kuvavisat" }]} />
-      <header className="kv-hero">
+      {/* Mobiili (CD 24.9.): teksti kuvan päällä varjostuksella, ei painiketta sankarissa —
+          satunnaisnosto tekstilinkkinä heti sankarin alla. */}
+      <MobiiliSankari
+        variant="overlay"
+        accent="#B6FF3C"
+        eyebrow="Teemakokoelma"
+        title={["Kuvavisat"]}
+        lead="Tunnista liput, vaakunat, linnut, eläimet, maalaukset, rakennukset ja kasvit. Valitse kategoria, sitten sinulle sopiva vaikeustaso."
+        stats={[{ n: kategoriat.length, label: "kategoriaa" }, { label: "uusi viikkovisa maanantaisin" }]}
+        image={{ src: "/20/kuvavisat/hero.webp" }}
+      />
+      {satunnainenHref && (
+        <div className="tnms-first tnms-first--link">
+          <a className="tnms-textlink" href={satunnainenHref}>Arvo satunnainen kuvavisa <span aria-hidden="true">→</span></a>
+        </div>
+      )}
+      <header className="kv-hero tnms-desk">
         <div className="kv-hero-media" aria-hidden="true">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/20/kuvavisat/hero.webp" alt="" fetchPriority="high" />

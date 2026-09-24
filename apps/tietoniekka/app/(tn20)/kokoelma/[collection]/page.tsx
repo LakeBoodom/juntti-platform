@@ -16,6 +16,7 @@ import { MOTIF_PATHS, motifPathFor } from "@/components/tn20/motif-paths";
 import { LearnArticle } from "@/components/tn20/LearnArticle";
 import { ShowMoreGrid } from "@/components/tn20/ShowMoreGrid";
 import Crumbs from "@/components/tn20/Crumbs";
+import { MobiiliSankari } from "@/components/tn20/MobiiliSankari";
 import { KuvavisatHub } from "@/components/tn20/KuvavisatHub";
 import { getKuvavisatHub, getViikkovisa } from "@/lib/kuvavisat2026";
 import { viikkoInfo } from "@/lib/viikkovisa";
@@ -678,7 +679,15 @@ async function PersonHub({ hub, article }: { hub: HubMeta; article?: React.React
     <main style={{ minHeight: "100dvh", paddingBottom: 80 }}>
       {/* Murupolkurivi palkin alla (nav-speksi 17.8.2026) — korvasi heron inline-navin */}
       <Crumbs items={[{ label: "Kokoelmat", href: "/kokoelmat" }, { label: "Tunnetut henkilöt" }]} />
-      <section className="tn-hero" style={{ minHeight: "clamp(300px, 34vw, 460px)", display: "flex", alignItems: "flex-end" }}>
+      <MobiiliSankari
+        accent={hub.accentLight}
+        eyebrow="Teemakokoelma"
+        title={[hub.titleTop, hub.titleAccent]}
+        lead={hub.lede(0)}
+        stats={[{ n: browserPeople.length, label: "henkilöä" }, { label: "synttärisankarit joka päivä" }]}
+        image={{ src: hub.img }}
+      />
+      <section className="tn-hero tnms-desk" style={{ minHeight: "clamp(300px, 34vw, 460px)", display: "flex", alignItems: "flex-end" }}>
         <div className="tn-hero-media">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={hub.img} alt="" />

@@ -19,6 +19,7 @@ import "../megavisat.css";
 import type { Metadata } from "next";
 import { getSupabase } from "@/lib/supabase";
 import Crumbs from "@/components/tn20/Crumbs";
+import { MobiiliSankari } from "@/components/tn20/MobiiliSankari";
 import { MEGA_FEATURED, MEGA_GRID, MEGA_WORD_MARK, megaDuration } from "@/lib/megavisat";
 
 export const dynamic = "force-dynamic";
@@ -81,8 +82,19 @@ export default async function MegavisatLanding() {
     <main className="tnm2" style={{ minHeight: "100dvh" }}>
       <Crumbs items={[{ label: "Megavisat" }]} />
 
+      {/* Mobiili (CD 24.9.): kuvaton malli, säteilevä kuvio brändielementtinä */}
+      <MobiiliSankari
+        variant="plain"
+        pattern="rays"
+        accent="#E8A320"
+        eyebrow="Megavisat"
+        title={["Pitkä", "peli"]}
+        lead="Megavisa on yksi istunto ilman taukoja: valitse aihe ja pelaa loppuun asti. Ei selityksiä — vain pisteet ja putki."
+        stats={totalMegas > 0 ? [{ n: totalMegas, label: "megavisaa" }, { n: "20–50", label: "kysymystä per mega" }] : []}
+      />
+
       {/* ─── Hero: "Pitkä peli" ─── */}
-      <section className="tnm2-herowrap">
+      <section className="tnm2-herowrap tnms-desk">
         <div className="tn-shell tnm2-hero">
           <div className="tnm2-hero-left">
             <span className="tnm2-pill">Megavisat</span>
