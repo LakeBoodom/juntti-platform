@@ -1,5 +1,8 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
+import { getSupabaseAdmin } from "@juntti/db";
+
 function parseWikipediaUrl(
   rawUrl: string,
 ): { lang: string; slug: string } | null {
@@ -91,4 +94,80 @@ export async function fetchFromWikipedia(rawUrl: string): Promise<
       error: err?.message ?? "URL:n käsittely epäonnistui",
     };
   }
+}
+
+export type BackfillImagesResult = {
+  updated: { name: string; image_url: string }[];
+  missing: { name: string; reason: string }[];
+  remaining: number; // rows left unprocessed because the time budget ran out
+};
+
+// Fills celebrities.image_url from each person's own Wikipedia page for rows
+// that have a wikipedia_url but no image. Touches ONLY image_url — never the
+// name, bio, quizzes or any other field. Sequential with a short pause so we
+// stay polite towards the Wikimedia REST API.
+export async function backfillCelebrityImages(): Promise<
+  { ok: true; result: BackfillImagesResult } | { ok: false; error: string }
+> {
+  const admin = getSupabaseAdmin();
+  const { data, error } = await admin
+    .from("celebrities")
+    .select("id, name, wikipedia_url, image_url")
+    .not("wikipedia_url", "is", null)
+    .or("image_url.is.null,image_url.eq.")
+    .order("birth_date", { ascending: true });
+  if (error) return { ok: false, error: error.message };
+
+  const rows = (data ?? []).filter((r) => r.wikipedia_url?.trim());
+  const result: BackfillImagesResult = { updated: [], missing: [], remaining: 0 };
+  // Server actions share the page's maxDuration (60 s) — stop well before it.
+  const deadline = Date.now() + 45_000;
+
+  for (let i = 0; i < rows.length; i++) {
+    if (Date.now() > deadline) {
+      result.remaining = rows.length - i;
+      break;
+    }
+    const row = rows[i];
+    if (i > 0) await new Promise((res) => setTimeout(res, 200));
+
+    const parsed = parseWikipediaUrl(row.wikipedia_url!);
+    if (!parsed) {
+      result.missing.push({ name: row.name, reason: "Wikipedia-URL ei kelpaa" });
+      continue;
+    }
+    try {
+      const r = await fetch(
+        `https://${parsed.lang}.wikipedia.org/api/rest_v1/page/summary/${parsed.slug}`,
+        { headers: { "User-Agent": "juntti-platform-admin/0.1 (+https://juntti.com)" } },
+      );
+      if (!r.ok) {
+        result.missing.push({
+          name: row.name,
+          reason: r.status === 404 ? "sivua ei löydy (404)" : `Wikipedia-haku epäonnistui: ${r.status}`,
+        });
+        continue;
+      }
+      const d: any = await r.json();
+      const img: string | null = d.thumbnail?.source ?? d.originalimage?.source ?? null;
+      if (!img) {
+        result.missing.push({ name: row.name, reason: "sivulla ei pääkuvaa" });
+        continue;
+      }
+      const { error: upErr } = await admin
+        .from("celebrities")
+        .update({ image_url: img })
+        .eq("id", row.id);
+      if (upErr) {
+        result.missing.push({ name: row.name, reason: `tallennus epäonnistui: ${upErr.message}` });
+        continue;
+      }
+      result.updated.push({ name: row.name, image_url: img });
+    } catch (err: any) {
+      result.missing.push({ name: row.name, reason: err?.message ?? "haku epäonnistui" });
+    }
+  }
+
+  revalidatePath("/celebrities");
+  return { ok: true, result };
 }

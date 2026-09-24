@@ -81,8 +81,10 @@ export function CelebrityForm({
         setWikiError(res.error);
         return;
       }
-      if (res.name) setName(res.name);
-      if (res.bio_short) setBio(res.bio_short);
+      // Nimi ja bio täytetään vain tyhjiin kenttiin, jotta toimitetut
+      // tekstit eivät katoa. Kuva saa päivittyä aina.
+      if (res.name && !name.trim()) setName(res.name);
+      if (res.bio_short && !bio.trim()) setBio(res.bio_short);
       if (res.image_url) setImageUrl(res.image_url);
     });
   }
@@ -139,7 +141,7 @@ export function CelebrityForm({
           <p className="text-xs text-destructive">{wikiError}</p>
         )}
         <p className="text-xs text-muted-foreground">
-          Täyttää nimen, lyhyen bion ja kuva-URL:n automaattisesti. URL
+          Täyttää kuva-URL:n sekä nimen ja lyhyen bion, jos ne ovat tyhjiä. URL
           tallentuu myös talteen — AI-visan generointi käyttää koko artikkelin
           lähteenä, mikä parantaa faktatarkkuutta.
         </p>
