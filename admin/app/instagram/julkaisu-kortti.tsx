@@ -74,7 +74,7 @@ async function pienenna(file: File): Promise<Blob> {
 }
 
 function koonKuvaus(t: { leveys: number; korkeus: number; kokoPinta: boolean; kaistale: boolean }) {
-  return `${t.leveys}×${t.korkeus} px — ${t.kokoPinta ? "riittää koko pinnalle (4a, 4e)" : t.kaistale ? "riittää kehykseen, ei koko pinnalle" : "liian pieni kuvapohjille"}`;
+  return `${t.leveys}×${t.korkeus} px — ${t.kokoPinta ? "riittää koko pinnalle (4a, 5a, 5f)" : t.kaistale ? "riittää kehykseen, ei koko pinnalle" : "liian pieni kuvapohjille"}`;
 }
 
 const TILA_TEKSTI: Record<string, { teksti: string; luokka: string }> = {
@@ -86,7 +86,7 @@ const TILA_TEKSTI: Record<string, { teksti: string; luokka: string }> = {
   ohitettu: { teksti: "Ohitettu", luokka: "border-muted-foreground/30 bg-muted text-muted-foreground" },
 };
 
-const KENTTA_NIMI = { aihe: "Aihe", koukku: "Koukku", palkinto: "Palkinto" } as const;
+const KENTTA_NIMI = { aihe: "Aihe", koukku: "Koukku", palkinto: "Palkinto", syy: "Syyrivi" } as const;
 
 export function JulkaisuKortti({ data, otsikko, yhdistetty, mittaus }: { data: KorttiData; otsikko: string; yhdistetty: boolean; mittaus?: Mittaus }) {
   const r = data.rivi;
@@ -263,13 +263,15 @@ export function JulkaisuKortti({ data, otsikko, yhdistetty, mittaus }: { data: K
                   value={kentat[k] ?? ""}
                   onChange={(e) => aseta(k, e.target.value)}
                   disabled={lukittu}
-                  maxLength={k === "aihe" ? 24 : 90}
+                  maxLength={k === "aihe" ? 24 : k === "syy" ? 32 : 90}
                   placeholder={
                     k === "aihe"
                       ? "esim. JOKERIT (valinnainen)"
-                      : k === "koukku"
-                        ? oletus.koukku ?? "Pakollinen — kysymys tai haaste katsojalle"
-                        : oletus.palkinto ?? "Valinnainen — pois, jos koukku jo lupaa palkinnon"
+                      : k === "syy"
+                        ? "Valinnainen, esim. Euroviisut 2027 — korvaa automaattisen rivin"
+                        : k === "koukku"
+                          ? oletus.koukku ?? "Pakollinen — kysymys tai haaste katsojalle"
+                          : oletus.palkinto ?? "Valinnainen — pois, jos koukku jo lupaa palkinnon"
                   }
                   className={syote}
                 />

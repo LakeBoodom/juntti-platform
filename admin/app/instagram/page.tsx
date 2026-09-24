@@ -7,6 +7,7 @@ import {
   POHJA_NIMET,
   SYNT_POHJAT,
   VISA_POHJAT,
+  onHenkilopohja,
   onSynttaripohja,
   onVisapohja,
   sopiiKysymykseksi,
@@ -67,7 +68,8 @@ async function visaKortti(m: Mitat, r: Julkaisu, v0: VisaData): Promise<KorttiDa
     huomiot,
     oletusKuvateksti: vanha ? "" : visaKuvateksti(v, r.pohja, r.kentat ?? {}),
     oletusTapahtuma: v0.introOtsikko,
-    kuva: kuvanTiedot(v.kuva, r),
+    // Henkilökortissa kuva on henkilön oma (ellei toimitus ole vaihtanut sitä).
+    kuva: kuvanTiedot(onHenkilopohja(r.pohja) && v.henkilo && !r.kentat?.kuva?.url ? v.henkilo.kuva : v.kuva, r),
     kysymykset: v.kysymykset.map((q) => ({ id: q.id, teksti: q.teksti, sopii: VISA_POHJAT.filter((p) => sopiiKysymykseksi(q, p)) })),
     fanitasot: { quizId: v.quizId, tasot: v.fanitasot },
     vanha,

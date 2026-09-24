@@ -13,10 +13,15 @@
 // Piirto: next/og (Satori) — vain flexbox, kiinteät pikselit. Isot tekstit
 // sovitetaan mittaamalla (fontit.ts: sovita) ja piirretään valmiiksi rivitettyinä
 // (KORTTISÄÄNTÖ). Tavutuskohta "Jokeri|fani" katkeaa vain, jos sana ei muuten mahdu.
+//
+// Kierros 5 (TN Instagram-pohjat v0.4): "Aihe on osa koukkua. Kasvot ovat kuva."
+// Koukun [hakasulkeissa] oleva aihe piirretään korostelaatikkoon (5a, 5b, 5d), ja
+// henkilökorteissa (5f, 5h, 5i, 5m) henkilön kasvot ovat kortin kuva. POIKKEAMA
+// designista: kuvaajarivi ei piirry kuvaan (Heikki 24.9.) — se kulkee kuvatekstissä.
 
 import type { ReactElement } from "react";
 import { ilmanTavutusta, leveys, sovita, type lataaFontit } from "./fontit";
-import { kelpaa, rajaa, type Kuva, type Kysymys, type SynttariData, type VisaData } from "./data";
+import { kelpaa, lataaKuva, rajaa, type Kuva, type Kysymys, type SynttariData, type VisaData } from "./data";
 import { juontajaPng, valitseJuontaja, type Asento, type Kuka } from "./juontajat";
 
 export const W = 1080;
@@ -25,6 +30,7 @@ export const H = 1350;
 type Mitat = Awaited<ReturnType<typeof lataaFontit>>["mitat"];
 
 import {
+  AIHELAATIKKO,
   KOMMENTTIPOHJAT,
   SYNT_POHJAT,
   VISA_POHJAT,
@@ -53,8 +59,11 @@ export type Kentat = {
   tapahtuma?: string;
   /** Korvaava kuva tai uusi rajaus */
   kuva?: { url: string; fx: number; fy: number };
-  /** Henkilökuvan kuvaaja ja lisenssi (4i, CC BY-SA → kuvatekstiin) */
+  /** Henkilökuvan kuvaaja ja lisenssi (CC BY-SA → kuvatekstiin). Tyhjä → haetaan Wikimediasta. */
   kuvaaja?: string;
+  /** occasion_line: henkilökortin syyrivi ("Euroviisut 2027"), enintään 32 merkkiä.
+      Toimitus vastaa faktasta; korvaa automaattisen "täyttää tänään 46" -rivin. */
+  syy?: string;
   /** Pohja, jolle tekstit on luonnosteltu (pohjan vaihto → uusi luonnos) */
   luonnosPohjalle?: string;
 };
@@ -68,10 +77,13 @@ export type Piirros = {
 
 /* ── Piirtokonteksti ─────────────────────────────────────────────────── */
 
-type Kuvaksi = (k: Kuva, w: number, h: number, o?: { seepia?: number }) => Promise<string>;
+type Kuvaksi = (k: Kuva, w: number, h: number, o?: { seepia?: number; harmaa?: boolean }) => Promise<string>;
 type Juontaja = (asento: Asento, korkeus: number, kuka: Kuka[]) => Promise<{ data: string; leveys: number; korkeus: number; kuka: Kuka } | null>;
 
-type Ktx = { m: Mitat; kuvaksi: Kuvaksi; juontaja: Juontaja; siemen: string };
+/** Juontajat ympäristössä (5n): koko pinnan kuva rajattuna 1080 × 1350, tai null. */
+type Ymparisto = (asento: Asento) => Promise<string | null>;
+
+type Ktx = { m: Mitat; kuvaksi: Kuvaksi; juontaja: Juontaja; ymparisto: Ymparisto; siemen: string };
 
 const TYHJA = "data:image/gif;base64,R0lGODlhAQABAAAAACw=";
 
@@ -89,6 +101,13 @@ function konteksti(m: Mitat, siemen: string, piirra: boolean): Ktx {
       }
       const suhde = k.leveys && k.korkeus ? k.leveys / k.korkeus : 0.8;
       return { data: TYHJA, leveys: Math.round(korkeus * suhde), korkeus, kuka: k.kuka };
+    },
+    ymparisto: async (asento) => {
+      const k = await valitseJuontaja(asento, siemen, ["molemmat"], "ymparisto");
+      if (!k) return null;
+      if (!piirra) return TYHJA;
+      const kuva = await lataaKuva(k.url, 50, 40);
+      return kuva ? rajaa(kuva, W, H) : null;
     },
   };
 }
@@ -145,8 +164,8 @@ function Nuoli({ koko, vari }: { koko: number; vari: string }) {
   );
 }
 
-function Merkki({ vari, koko = 26 }: { vari: string; koko?: number }) {
-  return <div style={{ display: "flex", fontFamily: "Archivo", fontWeight: 900, fontSize: koko, letterSpacing: koko * 0.08, color: vari }}>TIETONIEKKA</div>;
+function Merkki({ vari, koko = 26, paino = 900 }: { vari: string; koko?: number; paino?: 700 | 900 }) {
+  return <div style={{ display: "flex", fontFamily: "Archivo", fontWeight: paino, fontSize: koko, letterSpacing: koko * 0.08, color: vari }}>TIETONIEKKA</div>;
 }
 const merkinLeveys = (c: Ktx) => leveys(c.m, "TIETONIEKKA", "Archivo", 900, 26, 0.08);
 
@@ -240,7 +259,7 @@ const VIITTAA_VAIHTOEHTOIHIN = /seuraavista|alla olevista|näistä|oheisista|mik
 /** Sopiiko kysymys pohjaan: kuvakysymykset pois, pituusrajat pohjan tilan mukaan. */
 export function sopiiKysymykseksi(q: Kysymys, pohja: Pohja): boolean {
   if (q.kuva || !q.teksti) return false;
-  const vaihtoehdoilla = pohja === "4f" || pohja === "4q" || pohja === "4o";
+  const vaihtoehdoilla = pohja === "4f" || pohja === "4q" || pohja === "4o" || pohja === "5n";
   if (vaihtoehdoilla) {
     if (q.vaihtoehdot.length < 2 || !q.oikea) return false;
     const maxV = pohja === "4q" ? 24 : 34;
@@ -249,7 +268,7 @@ export function sopiiKysymykseksi(q: Kysymys, pohja: Pohja): boolean {
     if (VIITTAA_VAIHTOEHTOIHIN.test(q.teksti)) return false;
     if ((pohja === "4m" || pohja === "4p") && !q.oikea) return false;
   }
-  const max: Partial<Record<Pohja, number>> = { "4f": 100, "4q": 80, "4o": 90, "4m": 110, "4p": 90, "4l": 90 };
+  const max: Partial<Record<Pohja, number>> = { "4f": 100, "4q": 80, "4o": 90, "5n": 90, "4m": 110, "4p": 90, "4l": 90 };
   return q.teksti.length <= (max[pohja] ?? 100);
 }
 
@@ -383,48 +402,6 @@ async function p4b(c: Ktx, v: VisaData, k: Kentat): Promise<Piirros> {
   };
 }
 
-/** 4c Pistemäärähaaste: kysymysmäärä kortin suurin luku. */
-async function p4c(c: Ktx, v: VisaData, k: Kentat): Promise<Piirros> {
-  const esteet: string[] = [];
-  const huomiot: string[] = [];
-  const n = v.kysymykset.length;
-  // Design: ilman question_countia jättiluku poistuu, pohja ei koskaan arvaa asteikkoa.
-  if (!n) huomiot.push("Kysymysmäärä puuttuu — jättiluku jätetty pois.");
-  const koukku = vaadiKoukku(k, "Saatko täydet?", esteet);
-  const ots = otsikko(c, koukku, { koot: [120, 104, 92, 80], leveys: SISA, maxRivit: 2, valistys: -0.04 });
-  tarkistaMahtuu(ots, "Koukku", esteet);
-  const luku = `${n}/${n}`;
-  let lukuKoko = 300;
-  while (lukuKoko > 180 && leveys(c.m, luku, "Archivo", 900, lukuKoko, -0.06) > SISA - 40) lukuKoko -= 20;
-  const pal = leipa(c, t(k.palkinto) || "Montako saat oikein ilman apua?", { koot: [40, 36], leveys: 600, maxRivit: 2 });
-  tarkistaMahtuu(pal, "Palkintorivi", esteet);
-  const cta = t(k.cta) || "Tavoittele täysiä";
-  const aihe = t(k.aihe);
-  return {
-    ruudut: [
-      <Kortti key="4c" bg="#F2B634" vari="#1A1200">
-        {aihe ? <Etiketti teksti={aihe} vari="#1A1200" /> : <div style={{ display: "flex", height: 36 }} />}
-        <div style={{ display: "flex", flexDirection: "column", gap: 30 }}>
-          <Iso s={ots} valistys={-0.04} vari="#1A1200" />
-          {n > 0 && (
-            <div style={{ display: "flex", fontFamily: "Archivo", fontWeight: 900, fontSize: lukuKoko, lineHeight: `${Math.round(lukuKoko * 0.86)}px`, letterSpacing: -0.06 * lukuKoko, paddingLeft: 30 }}>{luku}</div>
-          )}
-          <Leipa s={pal} vari="#1A1200" />
-        </div>
-        <Alarivi
-          cta={<CtaNappi c={c} teksti={cta} bg="#1A1200" ink="#F2B634" maxLeveys={SISA - merkinLeveys(c) - 40} esteet={esteet} />}
-          reitti={reittiNakyy(k, "4c") ? REITTI : null}
-          reittiVari="#6B4E00"
-          merkki="#1A1200"
-        />
-      </Kortti>,
-    ],
-    esteet,
-    huomiot,
-    onKuva: false,
-  };
-}
-
 /** 4d Nostalgia · lämmin kuva ylhäällä + paperipohja. */
 async function p4d(c: Ktx, v: VisaData, k: Kentat): Promise<Piirros> {
   const esteet: string[] = [];
@@ -457,55 +434,10 @@ async function p4d(c: Ktx, v: VisaData, k: Kentat): Promise<Piirros> {
   };
 }
 
-/** 4e Sosiaalinen kilpailu · kuva taustalla, tarra ohjaa merkitsemään kaverin. */
-async function p4e(c: Ktx, v: VisaData, k: Kentat): Promise<Piirros> {
-  const esteet: string[] = [];
-  const huomiot: string[] = [];
-  const kuvaOk = !!v.kuva && kelpaa(v.kuva, W, H);
-  // POIKKEAMA: toimii myös ilman kuvaa (tumma pohja) — sosiaalinen koukku ei
-  // riipu kuvasta, ja isoja kuvia on vähän.
-  if (v.kuva && !kuvaOk) huomiot.push("Kuva liian pieni koko pinnalle — kortti piirtyy ilman kuvaa.");
-  const koukku = vaadiKoukku(k, "Kumpi teistä tietää enemmän?", esteet);
-  const ots = otsikko(c, koukku, { koot: [128, 112, 96, 84], leveys: SISA, maxRivit: 4, valistys: -0.04 });
-  tarkistaMahtuu(ots, "Koukku", esteet);
-  const aihe = t(k.aihe);
-  const tarra = otsikko(c, t(k.palkinto) || "Merkitse se kaveri.", { koot: [56, 50, 44], leveys: SISA - 68 - 40, maxRivit: 2, valistys: 0 });
-  tarkistaMahtuu(tarra, "Tarran teksti", esteet);
-  const kuva = kuvaOk && v.kuva ? await c.kuvaksi(v.kuva, W, H) : null;
-  const cta = t(k.cta) || "Haasta kaveri";
-  return {
-    ruudut: [
-      <Absoluuttinen key="4e" bg="#081226">
-        {kuva && <img src={kuva} width={W} height={H} alt="" style={{ position: "absolute", top: 0, left: 0, width: W, height: H }} />}
-        <div style={{ position: "absolute", top: 0, left: 0, width: W, height: H, display: "flex", backgroundImage: "linear-gradient(180deg, #081226 0%, rgba(8,18,38,.55) 30%, rgba(8,18,38,0) 50%, rgba(8,18,38,.4) 72%, #081226 96%)" }} />
-        <div style={{ position: "absolute", top: 72, left: 72, right: 72, display: "flex" }}>
-          <Iso s={ots} valistys={-0.04} vari="#FFFFFF" />
-        </div>
-        <div style={{ position: "absolute", left: 72, right: 72, bottom: 72, display: "flex", flexDirection: "column", gap: 40 }}>
-          <div style={{ alignSelf: "flex-start", display: "flex", flexDirection: "column", gap: 14, padding: "26px 34px", background: "#FFFFFF", color: "#081226", transform: "rotate(-3deg)" }}>
-            {aihe ? <div style={{ display: "flex", fontSize: 26, fontWeight: 700, letterSpacing: 26 * 0.2, color: "#2A5BD7" }}>{isot(aihe)}</div> : null}
-            <Iso s={tarra} valistys={0} vari="#081226" lh={1.05} />
-          </div>
-          <Alarivi
-            cta={<CtaViiva c={c} teksti={cta} vari="#FFFFFF" viiva="#7FB8FF" koko={52} paksuus={6} maxLeveys={SISA - merkinLeveys(c) - 24} esteet={esteet} />}
-            reitti={reittiNakyy(k, "4e") ? REITTI : null}
-            reittiVari="#8FA0B8"
-            merkki="#FFFFFF"
-            gap={10}
-          />
-        </div>
-      </Absoluuttinen>,
-    ],
-    esteet,
-    huomiot,
-    onKuva: !!kuva,
-  };
-}
-
 const KIRJAIMET = ["A", "B", "C", "D"];
 
 function kysymysEste(q: Kysymys | undefined, esteet: string[], pohja: Pohja) {
-  if (!q) esteet.push(`${pohja} vaatii visasta sopivan kysymyksen (ei kuvakysymys, riittävän lyhyt${pohja === "4f" || pohja === "4q" || pohja === "4o" ? ", lyhyet vaihtoehdot" : ""}) — valitse kysymys tai toinen pohja.`);
+  if (!q) esteet.push(`${pohja} vaatii visasta sopivan kysymyksen (ei kuvakysymys, riittävän lyhyt${pohja === "4f" || pohja === "4q" || pohja === "4o" || pohja === "5n" ? ", lyhyet vaihtoehdot" : ""}) — valitse kysymys tai toinen pohja.`);
 }
 
 /** 4f Oikea visakysymys vaihtoehtoineen · paperipohja. Vastaus kommentteihin. */
@@ -700,19 +632,23 @@ async function p4n(c: Ktx, v: VisaData, k: Kentat): Promise<Piirros> {
   };
 }
 
+/** Juontajien vastaukset visan vaihtoehdoista: toinen oikein, toinen väärin (4o, 5n). */
+function juontajienVastaukset(c: Ktx, q: Kysymys | undefined, pohja: Pohja, esteet: string[]) {
+  const vaarat = (q?.vaihtoehdot ?? []).filter((x) => x !== q?.oikea);
+  if (q && vaarat.length === 0) esteet.push(`${pohja} vaatii kysymyksen, jossa on myös väärä vaihtoehto.`);
+  const h = hajautus(c.siemen + (q?.id ?? ""));
+  const vaara = vaarat[h % Math.max(1, vaarat.length)] ?? "";
+  const lauraOikein = h % 2 === 0;
+  return { laura: lauraOikein ? (q?.oikea ?? "") : vaara, mikko: lauraOikein ? vaara : (q?.oikea ?? "") };
+}
+
 /** 4o Juontajat eri mieltä · kumpi on oikeassa? Vastaukset visan vaihtoehdoista,
     enintään yksi oikein (design). Kortti ohjaa kommentteihin. */
 async function p4o(c: Ktx, v: VisaData, k: Kentat): Promise<Piirros> {
   const esteet: string[] = [];
   const [q] = kortinKysymykset(v, k, "4o", c.siemen);
   kysymysEste(q, esteet, "4o");
-  const vaarat = (q?.vaihtoehdot ?? []).filter((x) => x !== q?.oikea);
-  if (q && vaarat.length === 0) esteet.push("4o vaatii kysymyksen, jossa on myös väärä vaihtoehto.");
-  const h = hajautus(c.siemen + (q?.id ?? ""));
-  const vaara = vaarat[h % Math.max(1, vaarat.length)] ?? "";
-  const lauraOikein = h % 2 === 0;
-  const laura = lauraOikein ? (q?.oikea ?? "") : vaara;
-  const mikko = lauraOikein ? vaara : (q?.oikea ?? "");
+  const { laura, mikko } = juontajienVastaukset(c, q, "4o", esteet);
   const kys = otsikko(c, q?.teksti ?? "Kysymys puuttuu", { koot: [60, 52, 46, 40], leveys: W - 128 - 60, maxRivit: 3, valistys: -0.02 });
   tarkistaMahtuu(kys, "Kysymys", esteet);
   const koukku = otsikko(c, vaadiKoukku(k, "Kumpi on oikeassa?", esteet), { koot: [112, 96, 84], leveys: W - 128, maxRivit: 2, valistys: -0.04 });
@@ -950,7 +886,7 @@ async function p4i(c: Ktx, s: SynttariData, k: Kentat): Promise<Piirros> {
   const kh = 640;
   if (!s.kuva) esteet.push("4i vaatii henkilökuvan.");
   else if (!kelpaa(s.kuva, kw, kh)) esteet.push(`Henkilökuva liian pieni (${s.kuva.leveys}×${s.kuva.korkeus}, tarvitaan väh. ${Math.ceil(kw / 1.5)}×${Math.ceil(kh / 1.5)}) — vaihda kuva.`);
-  if (!t(k.kuvaaja)) esteet.push("4i vaatii kuvaajan nimen ja lisenssin (CC BY-SA edellyttää sitä kuvatekstiin).");
+  if (!t(k.kuvaaja) && !s.kuvaaja) esteet.push("4i vaatii kuvaajan nimen ja lisenssin (CC BY-SA edellyttää sitä kuvatekstiin).");
   const koukku = vaadiKoukku(k, "Mikä on ensimmäinen muistosi hänestä?", esteet);
   const ots = otsikko(c, koukku, { koot: [104, 92, 80, 72], leveys: W - 144, maxRivit: 3, valistys: -0.035 });
   tarkistaMahtuu(ots, "Koukku", esteet);
@@ -1015,6 +951,575 @@ async function p4j(c: Ktx, s: SynttariData, k: Kentat): Promise<Piirros> {
   };
 }
 
+/* ── Kierros 5: aihe näkyviin ────────────────────────────────────────── */
+
+type Osa = { teksti: string; laatikko: boolean };
+
+/** Koukku osiin: [hakasulkeissa] oleva aihe on korostelaatikko. Ilman hakasulkeita
+    aihe-kenttä (perusmuoto, "SALKKARIT") nousee laatikkoon koukun edelle, kuten
+    designin 5c:n ohje "aihe yksinään". Pelkkä välimerkki laatikon perässä kuuluu
+    laatikkoon ("[Formula 1:stä]?" → FORMULA 1:STÄ?). */
+function koukunOsat(koukku: string, aihe: string): Osa[] {
+  const m = koukku.match(/^([\s\S]*?)\[([^\]]+)\]([\s\S]*)$/);
+  if (m) {
+    const perassa = m[3].trim();
+    const valimerkki = /^[?!.…]+$/.test(perassa);
+    return [
+      { teksti: m[1].trim(), laatikko: false },
+      { teksti: m[2].trim() + (valimerkki ? perassa : ""), laatikko: true },
+      { teksti: valimerkki ? "" : perassa, laatikko: false },
+    ].filter((o) => o.teksti);
+  }
+  const x = koukku.replace(/[[\]]/g, "").trim();
+  return aihe ? [{ teksti: aihe, laatikko: true }, { teksti: x, laatikko: false }] : [{ teksti: x, laatikko: false }];
+}
+
+type Korostus = { koko: number; osat: Array<{ rivit: string[]; laatikko: boolean }>; mahtuu: boolean };
+
+/** Sovittaa koukun osat samaan kokoon: laatikon sisältö on 48 px kapeampi (padding 24 + 24). */
+function korosta(c: Ktx, osat: Osa[], o: { koot: number[]; leveys: number; maxRivit: number }): Korostus {
+  const koeta = (koko: number) => {
+    const tulos = osat.map((x) => ({ ...otsikko(c, x.teksti, { koot: [koko], leveys: x.laatikko ? o.leveys - 48 : o.leveys, maxRivit: 9, valistys: -0.03 }), laatikko: x.laatikko }));
+    const rivit = tulos.reduce((n, x) => n + x.rivit.length, 0);
+    return { koko, osat: tulos.map((x) => ({ rivit: x.rivit, laatikko: x.laatikko })), mahtuu: tulos.every((x) => x.mahtuu) && rivit <= o.maxRivit };
+  };
+  for (const koko of o.koot) {
+    const t = koeta(koko);
+    if (t.mahtuu) return t;
+  }
+  return koeta(o.koot[o.koot.length - 1]);
+}
+
+function Korostettu(p: { s: Korostus; vari: string; laatikko: string; laatikkoMuste: string }) {
+  const lh = Math.round(p.s.koko * ISOT_LH);
+  const tyyli = { fontFamily: "Archivo", fontWeight: 900, fontSize: p.s.koko, letterSpacing: -0.03 * p.s.koko, whiteSpace: "nowrap" as const };
+  return (
+    <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 12 }}>
+      {p.s.osat.map((o, i) =>
+        o.laatikko ? (
+          <div key={i} style={{ display: "flex", flexDirection: "column", padding: "10px 24px 4px", background: p.laatikko }}>
+            {o.rivit.map((r, j) => <div key={j} style={{ display: "flex", lineHeight: `${lh}px`, color: p.laatikkoMuste, ...tyyli }}>{r}</div>)}
+          </div>
+        ) : (
+          <div key={i} style={{ display: "flex", flexDirection: "column" }}>
+            {o.rivit.map((r, j) => <div key={j} style={{ display: "flex", lineHeight: `${lh}px`, color: p.vari, ...tyyli }}>{r}</div>)}
+          </div>
+        ),
+      )}
+    </div>
+  );
+}
+
+/** Leima "10/10" vain, kun kysymysmäärä on luettu datasta (design 5o: question_count). */
+function Leima(p: { c: Ktx; n: number; halkaisija: number; koko: number; bg?: string; muste: string; reunus?: string; kierto: number; style?: Record<string, unknown> }) {
+  const luku = `${p.n}/${p.n}`;
+  let koko = p.koko;
+  while (koko > 40 && leveys(p.c.m, luku, "Archivo", 900, koko, -0.04) > p.halkaisija * 0.8) koko -= 4;
+  return (
+    <div style={{ width: p.halkaisija, height: p.halkaisija, borderRadius: 999, display: "flex", alignItems: "center", justifyContent: "center", background: p.bg ?? "transparent", color: p.muste, transform: `rotate(${p.kierto}deg)`, ...(p.reunus ? { border: `10px solid ${p.reunus}` } : {}), ...p.style }}>
+      <div style={{ display: "flex", fontFamily: "Archivo", fontWeight: 900, fontSize: koko, lineHeight: 1, letterSpacing: -0.04 * koko }}>{luku}</div>
+    </div>
+  );
+}
+
+/** Aihekortin koukku: pakollinen, hakasulkeet tai aihe-kenttä nostaa aiheen laatikkoon. */
+function aiheKoukku(k: Kentat, pohja: Pohja, oletus: string, esteet: string[], huomiot: string[]) {
+  const koukku = vaadiKoukku(k, oletus, esteet);
+  const osat = koukunOsat(koukku, t(k.aihe));
+  if (AIHELAATIKKO.includes(pohja) && !osat.some((o) => o.laatikko)) huomiot.push("Aihe ei näy kortissa — merkitse se koukkuun hakasulkein, esim. Saatko [Salkkareista] täydet?");
+  return osat;
+}
+
+/** 5a Pistemäärähaaste · koko pinnan kuva. Korvaa 4c:n. */
+async function p5a(c: Ktx, v: VisaData, k: Kentat): Promise<Piirros> {
+  const esteet: string[] = [];
+  const huomiot: string[] = [];
+  if (!v.kuva) esteet.push("5a vaatii kuvan — ilman kuvaa käytä 5b:tä.");
+  else if (!kelpaa(v.kuva, W, H)) esteet.push(`Kuva liian pieni koko pinnalle (${v.kuva.leveys}×${v.kuva.korkeus}, tarvitaan väh. 720×900) — käytä 5b:tä (kuva kehyksessä).`);
+  const osat = aiheKoukku(k, "5a", "Saatko täydet?", esteet, huomiot);
+  // Design 116 px; staattinen Archivo on leveämpi, joten portaat 72 px:iin asti (5o).
+  const ots = korosta(c, osat, { koot: [116, 104, 92, 84, 76, 72], leveys: W - 144, maxRivit: 4 });
+  tarkistaMahtuu(ots, "Koukku", esteet);
+  const n = v.kysymykset.length;
+  const kuva = v.kuva ? await c.kuvaksi(v.kuva, W, H) : null;
+  const cta = t(k.cta) || "Tavoittele täysiä";
+  return {
+    ruudut: [
+      <Absoluuttinen key="5a" bg="#0E0C06">
+        {kuva && <img src={kuva} width={W} height={H} alt="" style={{ position: "absolute", top: 0, left: 0, width: W, height: H }} />}
+        <div style={{ position: "absolute", top: 0, left: 0, width: W, height: H, display: "flex", backgroundImage: "linear-gradient(180deg, rgba(14,12,6,0) 30%, rgba(14,12,6,.8) 56%, #0E0C06 78%)" }} />
+        {n > 0 && <Leima c={c} n={n} halkaisija={270} koko={80} bg="#F2B634" muste="#1A1200" kierto={8} style={{ position: "absolute", top: 64, right: 64 }} />}
+        <div style={{ position: "absolute", left: 72, right: 72, bottom: 72, display: "flex", flexDirection: "column", gap: 48 }}>
+          <Korostettu s={ots} vari="#FFFFFF" laatikko="#F2B634" laatikkoMuste="#1A1200" />
+          <Alarivi
+            cta={<CtaViiva c={c} teksti={cta} vari="#FFFFFF" viiva="#F2B634" koko={52} paksuus={6} maxLeveys={SISA - merkinLeveys(c) - 24} esteet={esteet} />}
+            reitti={reittiNakyy(k, "5a") ? REITTI : null}
+            reittiVari="#A99F8B"
+            merkki="#FFFFFF"
+            gap={10}
+          />
+        </div>
+      </Absoluuttinen>,
+    ],
+    esteet,
+    huomiot,
+    onKuva: !!kuva,
+  };
+}
+
+/** 5b Pistemäärähaaste · kuva kehyksessä (640 × 360 riittää). Ilman kuvaa leima
+    kasvaa ja toimii kuvana (designin kuvaton sisarpohja 5c). */
+async function p5b(c: Ktx, v: VisaData, k: Kentat): Promise<Piirros> {
+  const esteet: string[] = [];
+  const huomiot: string[] = [];
+  // Kehys 720 × 405, 10 px reunus → kuva 700 × 385 (640 px:n kuva suurenee 1,1-kertaiseksi).
+  const kuvaOk = !!v.kuva && kelpaa(v.kuva, 700, 385);
+  if (v.kuva && !kuvaOk) huomiot.push(`Kuva liian pieni kehykseenkin (${v.kuva.leveys}×${v.kuva.korkeus}) — kortti piirtyy ilman kuvaa.`);
+  const osat = aiheKoukku(k, "5b", "Saatko täydet?", esteet, huomiot);
+  const ots = korosta(c, osat, { koot: [100, 92, 84, 76, 72], leveys: SISA, maxRivit: 4 });
+  tarkistaMahtuu(ots, "Koukku", esteet);
+  const n = v.kysymykset.length;
+  const kuva = kuvaOk && v.kuva ? await c.kuvaksi(v.kuva, 700, 385) : null;
+  const cta = t(k.cta) || "Tavoittele täysiä";
+  return {
+    ruudut: [
+      <div key="5b" style={{ position: "relative", width: W, height: H, display: "flex", flexDirection: "column", justifyContent: "space-between", padding: 72, background: "#F2B634", color: "#1A1200", fontFamily: "Instrument Sans" }}>
+        {kuva ? (
+          <div style={{ display: "flex", width: 720, height: 405, border: "10px solid #1A1200", transform: "rotate(-2deg)" }}>
+            <img src={kuva} width={700} height={385} alt="" style={{ width: 700, height: 385 }} />
+          </div>
+        ) : n > 0 ? (
+          <Leima c={c} n={n} halkaisija={380} koko={116} muste="#1A1200" reunus="#1A1200" kierto={-6} />
+        ) : (
+          <div style={{ display: "flex", height: 36 }} />
+        )}
+        {kuva && n > 0 && <Leima c={c} n={n} halkaisija={250} koko={76} bg="#1A1200" muste="#F2B634" kierto={8} style={{ position: "absolute", top: 150, right: 84 }} />}
+        <Korostettu s={ots} vari="#1A1200" laatikko="#1A1200" laatikkoMuste="#F2B634" />
+        <Alarivi
+          cta={<CtaNappi c={c} teksti={cta} bg="#1A1200" ink="#F2B634" maxLeveys={SISA - merkinLeveys(c) - 40} esteet={esteet} />}
+          reitti={reittiNakyy(k, "5b") ? REITTI : null}
+          reittiVari="#5C4300"
+          merkki="#1A1200"
+        />
+      </div>,
+    ],
+    esteet,
+    huomiot,
+    onKuva: !!kuva,
+  };
+}
+
+/** Tarra "Merkitse se kaveri." (5d). */
+function Tarra(p: { s: ReturnType<typeof sovita>; style?: Record<string, unknown> }) {
+  return (
+    <div style={{ display: "flex", padding: "24px 32px", background: "#FFFFFF", transform: "rotate(-3deg)", ...p.style }}>
+      <Rivit rivit={p.s.rivit} koko={p.s.koko} lh={1} style={{ fontFamily: "Archivo", fontWeight: 900, color: "#081226" }} />
+    </div>
+  );
+}
+
+/** 5d Haasta kaveri · vaakakuva kaistana ylhäällä. Korvaa 4e:n. Kapea kuva menee
+    kehykseen (kuten 5b), ilman kuvaa koukku kasvaa (designin 5e). */
+async function p5d(c: Ktx, v: VisaData, k: Kentat): Promise<Piirros> {
+  const esteet: string[] = [];
+  const huomiot: string[] = [];
+  const kaista = !!v.kuva && kelpaa(v.kuva, W, 700);
+  const kehys = !kaista && !!v.kuva && kelpaa(v.kuva, 700, 385);
+  if (v.kuva && !kaista && !kehys) huomiot.push(`Kuva liian pieni (${v.kuva.leveys}×${v.kuva.korkeus}) — kortti piirtyy ilman kuvaa.`);
+  const osat = aiheKoukku(k, "5d", "Kumpi teistä tietää enemmän?", esteet, huomiot);
+  const tarra = otsikko(c, t(k.palkinto) || "Merkitse se kaveri.", { koot: [52, 46, 40], leveys: SISA - 64 - 40, maxRivit: 2, valistys: 0 });
+  tarkistaMahtuu(tarra, "Tarran teksti", esteet);
+  const cta = t(k.cta) || "Haasta kaveri";
+  const ctaEl = (merkki: boolean) => <CtaViiva c={c} teksti={cta} vari="#FFFFFF" viiva="#7FB8FF" koko={52} paksuus={6} maxLeveys={merkki ? SISA - merkinLeveys(c) - 24 : SISA} esteet={esteet} />;
+  const reitti = reittiNakyy(k, "5d") ? REITTI : null;
+
+  if (!kaista && !kehys) {
+    const ots = korosta(c, osat, { koot: [112, 100, 88, 80, 72], leveys: SISA, maxRivit: 5 });
+    tarkistaMahtuu(ots, "Koukku", esteet);
+    return {
+      ruudut: [
+        <Kortti key="5d" bg="#081226">
+          <Merkki vari="#FFFFFF" />
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 56 }}>
+            <Korostettu s={ots} vari="#FFFFFF" laatikko="#7FB8FF" laatikkoMuste="#061022" />
+            <Tarra s={tarra} />
+          </div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+            {ctaEl(false)}
+            {reitti ? <Reitti teksti={reitti} vari="#8FA0B8" /> : null}
+          </div>
+        </Kortti>,
+      ],
+      esteet,
+      huomiot,
+      onKuva: false,
+    };
+  }
+
+  // Kaista 700 px; kehys vie yläosasta 560 px. Koukun tila: 1350 − yläosa − padding − alarivi.
+  const ylaosa = kaista ? 700 : 560;
+  const kolme = korosta(c, osat, { koot: [88, 80, 72], leveys: SISA, maxRivit: 3 });
+  const ots = kolme.mahtuu ? kolme : korosta(c, osat, { koot: [68, 62], leveys: SISA, maxRivit: 4 });
+  tarkistaMahtuu(ots, "Koukku", esteet);
+  const kuva = v.kuva ? await c.kuvaksi(v.kuva, kaista ? W : 700, kaista ? 700 : 385) : null;
+  return {
+    ruudut: [
+      <div key="5d" style={{ position: "relative", width: W, height: H, display: "flex", flexDirection: "column", background: "#081226", fontFamily: "Instrument Sans" }}>
+        {kaista ? (
+          <img src={kuva ?? TYHJA} width={W} height={700} alt="" style={{ width: W, height: 700 }} />
+        ) : (
+          <div style={{ display: "flex", height: ylaosa, padding: "72px 72px 0" }}>
+            <div style={{ display: "flex", width: 720, height: 405, border: "10px solid #FFFFFF", transform: "rotate(-2deg)" }}>
+              <img src={kuva ?? TYHJA} width={700} height={385} alt="" style={{ width: 700, height: 385 }} />
+            </div>
+          </div>
+        )}
+        <Tarra s={tarra} style={{ position: "absolute", top: ylaosa - 90, right: 64 }} />
+        <div style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "space-between", padding: `${kaista ? 110 : 100}px 72px 72px` }}>
+          <Korostettu s={ots} vari="#FFFFFF" laatikko="#7FB8FF" laatikkoMuste="#061022" />
+          <Alarivi cta={ctaEl(true)} reitti={reitti} reittiVari="#8FA0B8" merkki="#FFFFFF" gap={10} />
+        </div>
+      </div>,
+    ],
+    esteet,
+    huomiot,
+    onKuva: !!kuva,
+  };
+}
+
+/** 5n Juontajat ympäristössä · eri mieltä (4o:n hengessä). Kuva ympäristöineen koko
+    pinnalla; tekstit ylimmässä 40 %:ssa, vastaustarrat olkapäiden korkeudella. */
+async function p5n(c: Ktx, v: VisaData, k: Kentat): Promise<Piirros> {
+  const esteet: string[] = [];
+  const [q] = kortinKysymykset(v, k, "5n", c.siemen);
+  kysymysEste(q, esteet, "5n");
+  const { laura, mikko } = juontajienVastaukset(c, q, "5n", esteet);
+  const tausta = await c.ymparisto("eri_mielta");
+  if (!tausta) esteet.push("5n odottaa ympäristökuvaa (Laura ja Mikko eri mieltä, tausta mukana) — lataa se Juontajakuvat-osiosta.");
+  const kys = otsikko(c, q?.teksti ?? "Kysymys puuttuu", { koot: [60, 52, 46, 40], leveys: W - 128 - 60, maxRivit: 3, valistys: -0.02 });
+  tarkistaMahtuu(kys, "Kysymys", esteet);
+  const koukku = otsikko(c, vaadiKoukku(k, "Kumpi on oikeassa?", esteet), { koot: [112, 96, 84], leveys: W - 128, maxRivit: 2, valistys: -0.03 });
+  tarkistaMahtuu(koukku, "Koukku", esteet);
+  const lappu = (x: string) => sovita(c.m, { teksti: x, perhe: "Archivo", paino: 900, koot: [44, 38, 32], leveys: 380, maxRivit: 2 });
+  const lL = lappu(laura);
+  const lM = lappu(mikko);
+  tarkistaMahtuu(lL, "Lauran vastaus", esteet);
+  tarkistaMahtuu(lM, "Mikon vastaus", esteet);
+  const cta = t(k.cta) || "Laura vai Mikko?";
+  const Lappu = (p: { nimi: string; s: typeof lL; bg: string; style: Record<string, unknown> }) => (
+    <div style={{ position: "absolute", display: "flex", flexDirection: "column", gap: 4, padding: "20px 26px", background: p.bg, color: "#FFFFFF", ...p.style }}>
+      <div style={{ display: "flex", fontSize: 22, fontWeight: 700, letterSpacing: 22 * 0.16 }}>{p.nimi}</div>
+      <Rivit rivit={p.s.rivit} koko={p.s.koko} lh={1} style={{ fontFamily: "Archivo", fontWeight: 900, color: "#FFFFFF" }} />
+    </div>
+  );
+  return {
+    ruudut: [
+      <Absoluuttinen key="5n" bg="#1A2330">
+        {tausta && <img src={tausta} width={W} height={H} alt="" style={{ position: "absolute", top: 0, left: 0, width: W, height: H }} />}
+        <div style={{ position: "absolute", top: 0, left: 0, width: W, height: H, display: "flex", backgroundImage: "linear-gradient(180deg, rgba(10,14,20,.7) 0%, rgba(10,14,20,0) 42%, rgba(10,14,20,0) 78%, rgba(10,14,20,.85) 100%)" }} />
+        <div style={{ position: "absolute", top: 64, left: 64, right: 64, display: "flex", flexDirection: "column", gap: 26 }}>
+          <div style={{ display: "flex", padding: "26px 30px", borderRadius: 18, background: "rgba(10,14,20,.6)" }}>
+            <Iso s={kys} valistys={-0.02} vari="#E6EDF7" lh={0.95} />
+          </div>
+          <Iso s={koukku} valistys={-0.03} vari="#FFFFFF" />
+        </div>
+        <Lappu nimi="LAURA" s={lL} bg="#1F3FD1" style={{ left: 64, top: 760, transform: "rotate(-3deg)" }} />
+        <Lappu nimi="MIKKO" s={lM} bg="#C8231A" style={{ right: 64, top: 730, transform: "rotate(3deg)" }} />
+        <div style={{ position: "absolute", left: 64, right: 64, bottom: 56, display: "flex", flexDirection: "column" }}>
+          <Alarivi
+            cta={<CtaNappi c={c} teksti={cta} bg="#FFFFFF" ink="#131109" maxLeveys={W - 128 - merkinLeveys(c) - 40} esteet={esteet} />}
+            reitti={reittiNakyy(k, "5n") ? REITTI : "Vastaa kommenttiin"}
+            reittiVari="#E6EDF7"
+            reittiPaino={700}
+            merkki="#FFFFFF"
+          />
+        </div>
+      </Absoluuttinen>,
+    ],
+    esteet,
+    huomiot: [],
+    onKuva: !!tausta,
+  };
+}
+
+/* ── Kierros 5: henkilökortit ────────────────────────────────────────── */
+
+/** Henkilökortin sisältö synttäreistä tai henkilövisasta (design C ja D). */
+type Henkilo = {
+  nimi: string;
+  kuva: Kuva | null;
+  kuollut: boolean;
+  /** Syntymä- tai muistopäivä tänään (synttärijulkaisu) */
+  synttari: boolean;
+  ika: number | null;
+  vuodet: string | null;
+  /** Henkilöllä on visa → CTA sivustolle; muuten kommentteihin */
+  visa: boolean;
+};
+
+const vuosivali = (a: number | null, b: number | null) => (a && b ? `${a}–${b}` : null);
+
+function henkiloSynttareista(s: SynttariData): Henkilo {
+  return { nimi: s.nimi, kuva: s.kuva, kuollut: s.muisto, synttari: true, ika: s.ika, vuodet: vuosivali(s.syntymavuosi, s.kuolinvuosi), visa: !!s.quizId };
+}
+
+/** Henkilövisa minä päivänä tahansa: kuva on henkilön oma, ellei toimitus ole vaihtanut sitä. */
+function henkiloVisasta(v: VisaData, k: Kentat): Henkilo | null {
+  const h = v.henkilo;
+  if (!h) return null;
+  return {
+    nimi: h.nimi,
+    kuva: k.kuva?.url ? v.kuva : h.kuva,
+    kuollut: !!h.kuolinvuosi,
+    synttari: false,
+    ika: null,
+    vuodet: vuosivali(h.syntymavuosi, h.kuolinvuosi),
+    visa: true,
+  };
+}
+
+/** Pohja henkilön kuvan mukaan (design 5o: person_image). Koko pinta, jos kuva riittää
+    (enintään 1,5× suurennos → väh. 720 × 900); muuten kehys; ilman kuvaa juontajakortti
+    (synttärit) tai ei henkilökorttia (null). */
+export function henkilonPohja(h: { kuva: Kuva | null; kuollut: boolean; synttari: boolean }): Pohja | null {
+  if (h.kuva && kelpaa(h.kuva, W, H)) return h.kuollut ? "5h" : "5f";
+  if (h.kuva) return h.kuollut || !h.synttari ? "5m" : "5i";
+  if (!h.synttari) return null;
+  return h.kuollut ? "4h" : "4r";
+}
+export const synttareidenPohja = (s: SynttariData) => henkilonPohja(henkiloSynttareista(s))!;
+export const henkilovisanPohja = (v: VisaData) => {
+  const h = henkiloVisasta(v, {});
+  return h ? henkilonPohja(h) : null;
+};
+
+/** Syyrivi: toimituksen occasion_line korvaa automaattisen. */
+function autoSyy(h: Henkilo): string | null {
+  if (!h.synttari || h.ika == null) return null;
+  return h.kuollut ? `Olisi täyttänyt tänään ${h.ika}` : `Täyttää tänään ${h.ika}`;
+}
+
+function henkiloKoukku(h: Henkilo, k: Kentat, esteet: string[]) {
+  return vaadiKoukku(k, h.visa ? "Kuinka hyvin tunnet hänet?" : "Mikä on ensimmäinen muistosi hänestä?", esteet);
+}
+const henkiloCta = (h: Henkilo, k: Kentat) => t(k.cta) || (h.visa ? "Testaa tietosi" : "Kerro kommentissa");
+const henkiloReitti = (h: Henkilo, k: Kentat) => h.visa && k.reitti !== false;
+
+function Piste({ vari }: { vari: string }) {
+  return <div style={{ display: "flex", width: 14, height: 14, borderRadius: 999, background: vari }} />;
+}
+
+/** Syyrivi isoilla kirjaimilla (30 → 24 px, yksi rivi). Ei mahdu → "46 v. tänään" (design 5g). */
+function syyrivi(c: Ktx, teksti: string, leveysPx: number, lyhyempi: string | null, esteet: string[]) {
+  const koe = (x: string) => sovita(c.m, { teksti: isot(x), perhe: "Instrument Sans", paino: 700, koot: [30, 27, 24], leveys: leveysPx, maxRivit: 1, valistysEm: 0.14 });
+  let s = koe(teksti);
+  if (!s.mahtuu && lyhyempi) s = koe(lyhyempi);
+  tarkistaMahtuu(s, "Syyrivi", esteet);
+  return s;
+}
+
+function Syyrivi(p: { s: ReturnType<typeof sovita>; vari: string; piste?: boolean }) {
+  return (
+    <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+      {p.piste !== false && <Piste vari={p.vari} />}
+      <div style={{ display: "flex", fontSize: p.s.koko, fontWeight: 700, letterSpacing: 0.14 * p.s.koko, color: p.vari, whiteSpace: "nowrap" }}>{p.s.rivit[0]}</div>
+    </div>
+  );
+}
+
+/** Kehyskuvan koko: enintään laatikon kokoinen, eikä kuvaa koskaan suurenneta (design 5i). */
+function kehyksenKoko(kuva: Kuva, w: number, h: number) {
+  const s = Math.max(w / kuva.leveys, h / kuva.korkeus);
+  return s > 1 ? { w: Math.round(w / s), h: Math.round(h / s) } : { w, h };
+}
+
+/** Valokuvamainen kehys: kuva + nimi kuvatekstinä (5i, 5m). */
+async function Valokuva(c: Ktx, h: Henkilo, o: { w: number; h: number; kierto: number; reunus?: string; nimiVari: string }) {
+  if (!h.kuva) return null;
+  const koko = kehyksenKoko(h.kuva, o.w, o.h);
+  const kuva = await c.kuvaksi(h.kuva, koko.w, koko.h);
+  const nimi = sovita(c.m, { teksti: h.nimi, perhe: "Instrument Sans", paino: 700, koot: [28, 25, 22], leveys: Math.max(koko.w, 240), maxRivit: 2 });
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 14, padding: "16px 16px 20px", background: "#FFFFFF", transform: `rotate(${o.kierto}deg)`, ...(o.reunus ? { border: `1px solid ${o.reunus}` } : {}) }}>
+      <img src={kuva} width={koko.w} height={koko.h} alt="" style={{ width: koko.w, height: koko.h }} />
+      <Rivit rivit={nimi.rivit} koko={nimi.koko} lh={1.15} style={{ fontWeight: 700, color: o.nimiVari, maxWidth: Math.max(koko.w, 240) }} />
+    </div>
+  );
+}
+
+/** 5f Henkilökortti · koko pinnan kuva. Kasvot yläosassa, nimi aina syyrivin alussa. */
+async function p5f(c: Ktx, h: Henkilo, k: Kentat): Promise<Piirros> {
+  const esteet: string[] = [];
+  if (h.kuollut) esteet.push("5f on elävälle henkilölle — muistopäivään käytä 5h:ta (iso kuva) tai 5m:ää.");
+  if (!h.kuva) esteet.push("5f vaatii henkilökuvan — ilman kuvaa käytä 4r:ää.");
+  else if (!kelpaa(h.kuva, W, H)) esteet.push(`Kuva liian pieni koko pinnalle (${h.kuva.leveys}×${h.kuva.korkeus}, tarvitaan väh. 720×900) — käytä 5i:tä tai 5m:ää.`);
+  const syy = t(k.syy) || autoSyy(h);
+  const rivi = syyrivi(c, syy ? `${h.nimi} · ${syy}` : h.nimi, SISA - 28, h.synttari && !t(k.syy) && h.ika != null ? `${h.nimi} · ${h.ika} v. tänään` : null, esteet);
+  const kolme = otsikko(c, henkiloKoukku(h, k, esteet), { koot: [112, 100, 92, 84], leveys: SISA, maxRivit: 3, valistys: -0.03 });
+  const ots = kolme.mahtuu ? kolme : otsikko(c, henkiloKoukku(h, k, []), { koot: [84, 76, 72], leveys: SISA, maxRivit: 4, valistys: -0.03 });
+  tarkistaMahtuu(ots, "Koukku", esteet);
+  const kuva = h.kuva ? await c.kuvaksi(h.kuva, W, H) : null;
+  return {
+    ruudut: [
+      <Absoluuttinen key="5f" bg="#0B1420">
+        {kuva && <img src={kuva} width={W} height={H} alt="" style={{ position: "absolute", top: 0, left: 0, width: W, height: H }} />}
+        <div style={{ position: "absolute", top: 0, left: 0, width: W, height: H, display: "flex", backgroundImage: "linear-gradient(180deg, rgba(11,20,32,.55) 0%, rgba(11,20,32,0) 12%, rgba(11,20,32,0) 44%, rgba(11,20,32,.85) 64%, #0B1420 82%)" }} />
+        <div style={{ position: "absolute", left: 72, right: 72, bottom: 72, display: "flex", flexDirection: "column", gap: 40 }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: 22 }}>
+            <Syyrivi s={rivi} vari="#FFD84A" />
+            <Iso s={ots} valistys={-0.03} vari="#FFFFFF" lh={0.95} />
+          </div>
+          <Alarivi
+            cta={<CtaViiva c={c} teksti={henkiloCta(h, k)} vari="#FFFFFF" viiva="#FFD84A" koko={52} paksuus={6} maxLeveys={SISA - merkinLeveys(c) - 24} esteet={esteet} />}
+            reitti={henkiloReitti(h, k) ? REITTI : null}
+            reittiVari="#8FA0B8"
+            merkki="#FFFFFF"
+            gap={10}
+          />
+        </div>
+      </Absoluuttinen>,
+    ],
+    esteet,
+    huomiot: [],
+    onKuva: !!kuva,
+  };
+}
+
+/** 5h Muistopäivä · hillitty. Ei korostusväriä, pistettä eikä nuolta; Archivo 700;
+    harmaasävy tehdään kuvaan etukäteen. */
+async function p5h(c: Ktx, h: Henkilo, k: Kentat): Promise<Piirros> {
+  const esteet: string[] = [];
+  if (!h.kuollut) esteet.push("5h on muistopäivän kortti — elävälle henkilölle käytä 5f:ää.");
+  if (!h.kuva) esteet.push("5h vaatii henkilökuvan — ilman kuvaa käytä 4h:ta.");
+  else if (!kelpaa(h.kuva, W, H)) esteet.push(`Kuva liian pieni koko pinnalle (${h.kuva.leveys}×${h.kuva.korkeus}, tarvitaan väh. 720×900) — käytä 5m:ää.`);
+  const nimirivi = sovita(c.m, { teksti: isot(h.vuodet ? `${h.nimi} · ${h.vuodet}` : h.nimi), perhe: "Instrument Sans", paino: 700, koot: [30, 27, 24], leveys: SISA, maxRivit: 1, valistysEm: 0.14 });
+  tarkistaMahtuu(nimirivi, "Nimirivi", esteet);
+  const lause = t(k.syy) || (autoSyy(h) ? `${autoSyy(h)}.` : "");
+  const lauseS = lause ? leipa(c, lause, { koot: [34, 30], leveys: SISA, maxRivit: 1 }) : null;
+  if (lauseS) tarkistaMahtuu(lauseS, "Syyrivi", esteet);
+  const koukku = henkiloKoukku(h, k, esteet);
+  const sov = (koot: number[], maxRivit: number) => sovita(c.m, { teksti: koukku, perhe: "Archivo", paino: 700, isot: true, valistysEm: -0.02, koot, leveys: SISA, maxRivit });
+  const kolme = sov([104, 96, 88, 80], 3);
+  const ots = kolme.mahtuu ? kolme : sov([80, 72], 4);
+  tarkistaMahtuu(ots, "Koukku", esteet);
+  const cta = henkiloCta(h, k);
+  const ctaK = ctaKoko(c, cta, [44, 40, 36], SISA - merkinLeveys(c) - 24, () => 0, esteet);
+  const kuva = h.kuva ? await c.kuvaksi(h.kuva, W, H, { harmaa: true }) : null;
+  return {
+    ruudut: [
+      <Absoluuttinen key="5h" bg="#141414">
+        {kuva && <img src={kuva} width={W} height={H} alt="" style={{ position: "absolute", top: 0, left: 0, width: W, height: H }} />}
+        <div style={{ position: "absolute", top: 0, left: 0, width: W, height: H, display: "flex", backgroundImage: "linear-gradient(180deg, rgba(20,20,20,.5) 0%, rgba(20,20,20,0) 12%, rgba(20,20,20,0) 40%, rgba(20,20,20,.88) 62%, #141414 80%)" }} />
+        <div style={{ position: "absolute", left: 72, right: 72, bottom: 72, display: "flex", flexDirection: "column", gap: 40 }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: 22 }}>
+            <Rivit rivit={nimirivi.rivit} koko={nimirivi.koko} lh={1.2} style={{ fontWeight: 700, letterSpacing: 0.14 * nimirivi.koko, color: "#A8A196" }} />
+            {lauseS && <Leipa s={lauseS} vari="#CFCAC2" lh={1.2} />}
+            <Rivit rivit={ots.rivit} koko={ots.koko} lh={0.95} style={{ fontFamily: "Archivo", fontWeight: 700, letterSpacing: -0.02 * ots.koko, color: "#EDE8DF" }} />
+          </div>
+          <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", gap: 24 }}>
+            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+              <div style={{ display: "flex", alignSelf: "flex-start", fontFamily: "Archivo", fontWeight: 700, fontSize: ctaK, lineHeight: 1, color: "#EDE8DF", borderBottom: "3px solid #6E6A63", paddingBottom: 8 }}>{isot(cta)}</div>
+              {henkiloReitti(h, k) ? <Reitti teksti={REITTI} vari="#8C877F" /> : null}
+            </div>
+            <Merkki vari="#A8A196" paino={700} />
+          </div>
+        </div>
+      </Absoluuttinen>,
+    ],
+    esteet,
+    huomiot: [],
+    onKuva: !!kuva,
+  };
+}
+
+/** 5i Heikko kuva · valokuvakehys keltaisella. Kuvaa ei koskaan suurenneta. */
+async function p5i(c: Ktx, h: Henkilo, k: Kentat): Promise<Piirros> {
+  const esteet: string[] = [];
+  if (h.kuollut) esteet.push("5i on elävälle henkilölle — muistopäivään käytä 5m:ää.");
+  if (!h.kuva) esteet.push("5i vaatii henkilökuvan — ilman kuvaa käytä 4r:ää.");
+  const syy = t(k.syy) || autoSyy(h);
+  const rivi = syy ? syyrivi(c, syy, SISA - 28, null, esteet) : null;
+  const ots = otsikko(c, henkiloKoukku(h, k, esteet), { koot: [112, 100, 92, 84, 76], leveys: SISA, maxRivit: 4, valistys: -0.03 });
+  tarkistaMahtuu(ots, "Koukku", esteet);
+  const kuva = await Valokuva(c, h, { w: 340, h: 430, kierto: -3, nimiVari: "#1A1400" });
+  return {
+    ruudut: [
+      <Kortti key="5i" bg="#FFD84A" vari="#1A1400">
+        <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 24 }}>
+          {kuva ?? <div style={{ display: "flex" }} />}
+          <Merkki vari="#1A1400" />
+        </div>
+        <div style={{ display: "flex", flexDirection: "column", gap: 22 }}>
+          {rivi && <Syyrivi s={rivi} vari="#8A2A12" />}
+          <Iso s={ots} valistys={-0.03} vari="#1A1400" lh={0.95} />
+        </div>
+        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+          <CtaNappi c={c} teksti={henkiloCta(h, k)} bg="#1A1400" ink="#FFD84A" maxLeveys={SISA} esteet={esteet} />
+          {henkiloReitti(h, k) ? <Reitti teksti={REITTI} vari="#6B5200" /> : null}
+        </div>
+      </Kortti>,
+    ],
+    esteet,
+    huomiot: [],
+    onKuva: !!kuva,
+  };
+}
+
+/** 5m Paperi · neutraali sävy eläville ja kuolleille, heikkokin kuva 1:1. Designissa ei
+    syyriviä; POIKKEAMA: muistopäivänä vuodet ja "olisi täyttänyt" hiljaisena rivinä,
+    koska 5m on heikon kuvan muistopäivän kortti (5h vaatii ison kuvan). */
+async function p5m(c: Ktx, h: Henkilo, k: Kentat): Promise<Piirros> {
+  const esteet: string[] = [];
+  if (!h.kuva) esteet.push("5m vaatii henkilökuvan (heikkokin käy).");
+  const auto = autoSyy(h);
+  const syy = t(k.syy) || [h.kuollut ? h.vuodet : null, auto].filter(Boolean).join(" · ");
+  const rivi = syy ? leipa(c, syy, { koot: [30, 27, 24], leveys: SISA, maxRivit: 1 }) : null;
+  if (rivi) tarkistaMahtuu(rivi, "Syyrivi", esteet);
+  const nelja = otsikko(c, henkiloKoukku(h, k, esteet), { koot: [120, 108, 96, 88], leveys: SISA, maxRivit: 4, valistys: -0.03 });
+  const ots = nelja.mahtuu ? nelja : otsikko(c, henkiloKoukku(h, k, []), { koot: [84, 76], leveys: SISA, maxRivit: 5, valistys: -0.03 });
+  tarkistaMahtuu(ots, "Koukku", esteet);
+  const kuva = await Valokuva(c, h, { w: 300, h: 396, kierto: 3, reunus: "#DDD3C0", nimiVari: "#131109" });
+  return {
+    ruudut: [
+      <Kortti key="5m" bg="#F5F0E6" vari="#131109">
+        <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 24 }}>
+          <Merkki vari="#131109" />
+          {kuva ?? <div style={{ display: "flex" }} />}
+        </div>
+        <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+          {rivi && <Leipa s={rivi} vari="#6E6757" lh={1.2} />}
+          <Iso s={ots} valistys={-0.03} vari="#131109" lh={0.95} />
+        </div>
+        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+          <CtaNappi c={c} teksti={henkiloCta(h, k)} bg="#131109" ink="#F5F0E6" pyorea maxLeveys={SISA} esteet={esteet} />
+          {henkiloReitti(h, k) ? <Reitti teksti={REITTI} vari="#6E6757" sisennys={8} /> : null}
+        </div>
+      </Kortti>,
+    ],
+    esteet,
+    huomiot: [],
+    onKuva: !!kuva,
+  };
+}
+
+async function valitseHenkilo(c: Ktx, pohja: Pohja, h: Henkilo, k: Kentat): Promise<Piirros> {
+  switch (pohja) {
+    case "5f": return p5f(c, h, k);
+    case "5h": return p5h(c, h, k);
+    case "5i": return p5i(c, h, k);
+    case "5m": return p5m(c, h, k);
+    default: throw new Error(`Ei henkilöpohja: ${pohja}`);
+  }
+}
+
+/** Henkilökortti visajulkaisuun: vain henkilövisalle, jonka henkilö on tiedossa. */
+async function henkiloVisaan(c: Ktx, pohja: Pohja, v: VisaData, k: Kentat): Promise<Piirros> {
+  const h = henkiloVisasta(v, k);
+  if (h) return valitseHenkilo(c, pohja, h, k);
+  const p = await valitseHenkilo(c, pohja, { nimi: v.nimi, kuva: null, kuollut: false, synttari: false, ika: null, vuodet: null, visa: true }, k);
+  return { ...p, esteet: [`${pohja} on henkilökortti — käy vain Tunnetut henkilöt -visalle, jonka henkilö on kannassa.`, ...p.esteet] };
+}
+
 /* ── Julkinen rajapinta ──────────────────────────────────────────────── */
 
 type Mitattava = { m: Mitat; siemen: string };
@@ -1024,9 +1529,7 @@ async function valitseVisa(c: Ktx, pohja: Pohja, v: VisaData, k: Kentat): Promis
     case "4a": return p4a(c, v, k);
     case "4g": return p4g(c, v, k);
     case "4b": return p4b(c, v, k);
-    case "4c": return p4c(c, v, k);
     case "4d": return p4d(c, v, k);
-    case "4e": return p4e(c, v, k);
     case "4f": return p4f(c, v, k);
     case "4l": return p4l(c, v, k);
     case "4m": return p4m(c, v, k);
@@ -1034,6 +1537,11 @@ async function valitseVisa(c: Ktx, pohja: Pohja, v: VisaData, k: Kentat): Promis
     case "4o": return p4o(c, v, k);
     case "4p": return p4p(c, v, k);
     case "4q": return p4q(c, v, k);
+    case "5a": return p5a(c, v, k);
+    case "5b": return p5b(c, v, k);
+    case "5d": return p5d(c, v, k);
+    case "5n": return p5n(c, v, k);
+    case "5f": case "5h": case "5i": case "5m": return henkiloVisaan(c, pohja, v, k);
     default: throw new Error(`Ei visapohja: ${pohja}`);
   }
 }
@@ -1044,6 +1552,7 @@ async function valitseSynttarit(c: Ktx, pohja: Pohja, s: SynttariData, k: Kentat
     case "4r": return p4r(c, s, k);
     case "4i": return p4i(c, s, k);
     case "4j": return p4j(c, s, k);
+    case "5f": case "5h": case "5i": case "5m": return valitseHenkilo(c, pohja, henkiloSynttareista(s), k);
     default: throw new Error(`Ei synttäripohja: ${pohja}`);
   }
 }

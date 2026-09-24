@@ -57,11 +57,12 @@ function hajautus(s: string): number {
   return h;
 }
 
-/** Aktiivinen rajattu kuva asentoon ja henkilöille; siemen (esim. päivä) vaihtelee
+/** Aktiivinen kuva asentoon ja henkilöille (oletuksena rajattu hahmo; 5n käyttää
+    ympäristökuvaa); siemen (esim. päivä) vaihtelee
     useamman välillä. Pohja kertoo, kuka kuvassa saa olla (4n Mikko, 4o/4r molemmat …). */
-export async function valitseJuontaja(asento: Asento, siemen: string, kuka?: Kuka[]): Promise<Juontajakuva | null> {
+export async function valitseJuontaja(asento: Asento, siemen: string, kuka?: Kuka[], tausta: Juontajakuva["tausta"] = "rajattu"): Promise<Juontajakuva | null> {
   const ehdokkaat = (await haeJuontajakuvat()).filter(
-    (k) => k.aktiivinen && k.tausta === "rajattu" && k.asento === asento && (!kuka || kuka.includes(k.kuka)),
+    (k) => k.aktiivinen && k.tausta === tausta && k.asento === asento && (!kuka || kuka.includes(k.kuka)),
   );
   if (ehdokkaat.length === 0) return null;
   return ehdokkaat[hajautus(siemen) % ehdokkaat.length];

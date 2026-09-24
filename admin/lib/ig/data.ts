@@ -50,6 +50,19 @@ export type VisaData = {
   kysymykset: Kysymys[];
   /** Aihekohtaiset tulostasot (quizzes.fanitasot) tai null */
   fanitasot: string[] | null;
+  /** Kuvan tekijä ja lisenssi Wikimediasta ("Werner100359 / CC BY-SA 3.0") */
+  kuvaaja: string | null;
+  /** Henkilövisan henkilö (celebrities.trivia_quiz_id) — henkilökortit 5f–5m */
+  henkilo: VisanHenkilo | null;
+};
+
+export type VisanHenkilo = {
+  celebrityId: string;
+  nimi: string;
+  kuva: Kuva | null;
+  kuvaaja: string | null;
+  syntymavuosi: number | null;
+  kuolinvuosi: number | null;
 };
 
 export type SynttariData = {
@@ -63,6 +76,8 @@ export type SynttariData = {
   syntymavuosi: number | null;
   kuolinvuosi: number | null;
   kuva: Kuva | null;
+  /** Kuvan tekijä ja lisenssi Wikimediasta — kuvatekstiin (CC BY-SA) */
+  kuvaaja: string | null;
   /** Henkilön visan kokoelma ja nimi (S-D:n visayhteys) */
   visaNimi: string | null;
 };
@@ -155,11 +170,64 @@ export const MAX_SUURENNOS = 1.5;
 
 const suurennos = (k: Kuva, w: number, h: number) => Math.max(w / k.leveys, h / k.korkeus);
 
+/* ── Kuvaaja ja lisenssi (Wikimedia) ─────────────────────────────────── */
+
+const kuvaajaVälimuisti = new Map<string, Promise<string | null>>();
+
+/** Wikimedia-kuvan osoitteesta tiedoston nimi ja wikin API. Muut osoitteet → null. */
+function wikiTiedosto(url: string): { api: string; nimi: string } | null {
+  const u = url.trim();
+  let m = u.match(/^https:\/\/upload\.wikimedia\.org\/wikipedia\/([a-z-]+)\/(?:thumb\/)?[0-9a-f]\/[0-9a-f]{2}\/([^/?#]+)/);
+  if (m) return { api: m[1] === "commons" ? "https://commons.wikimedia.org" : `https://${m[1]}.wikipedia.org`, nimi: m[2] };
+  m = u.match(/^https?:\/\/commons\.(?:m\.)?wikimedia\.org\/wiki\/(?:Special:FilePath\/|(?:File|Tiedosto):)([^?#]+)/i);
+  if (m) return { api: "https://commons.wikimedia.org", nimi: m[1] };
+  return null;
+}
+
+const ilmanHtml = (s: string) =>
+  s.replace(/<[^>]*>/g, " ").replace(/&amp;/g, "&").replace(/&quot;/g, '"').replace(/&#0?39;/g, "'").replace(/&nbsp;/g, " ").replace(/\s+/g, " ").trim();
+
+/** Kuvan tekijä ja lisenssi Wikimedian tiedostotiedoista kuvatekstiin:
+    "Werner100359 / CC BY-SA 3.0". Pitkä tekijätieto (esim. usean rivin kuvaus)
+    lyhennetään ensimmäiseen osaan. null, jos kuva ei ole Wikimediasta tai tieto puuttuu. */
+export function haeKuvaaja(url: string | null | undefined): Promise<string | null> {
+  const t = url ? wikiTiedosto(url) : null;
+  if (!t) return Promise.resolve(null);
+  const avain = `${t.api}|${t.nimi}`;
+  let p = kuvaajaVälimuisti.get(avain);
+  if (!p) {
+    p = (async () => {
+      try {
+        const nimi = decodeURIComponent(t.nimi).replace(/_/g, " ");
+        const q = new URLSearchParams({ action: "query", titles: `File:${nimi}`, prop: "imageinfo", iiprop: "extmetadata", format: "json", formatversion: "2" });
+        const r = await fetch(`${t.api}/w/api.php?${q}`, {
+          headers: { "User-Agent": "TietoniekkaAdmin/1.0 (https://tietoniekka.fi)" },
+          signal: AbortSignal.timeout(8000),
+        });
+        if (!r.ok) return null;
+        const j = (await r.json()) as { query?: { pages?: Array<{ imageinfo?: Array<{ extmetadata?: Record<string, { value?: string }> }> }> } };
+        const meta = j.query?.pages?.[0]?.imageinfo?.[0]?.extmetadata ?? {};
+        let tekija = ilmanHtml(meta.Artist?.value ?? "").split(/[;\n]| - /)[0].trim();
+        if (tekija.length > 60) tekija = `${tekija.slice(0, 57).replace(/\s+\S*$/, "")}…`;
+        const lisenssi = ilmanHtml(meta.LicenseShortName?.value ?? "");
+        const pd = /^public domain$/i.test(lisenssi) ? "PD" : lisenssi;
+        if (!tekija && !pd) return null;
+        return [tekija || "Wikimedia Commons", pd].filter(Boolean).join(" / ");
+      } catch {
+        return null;
+      }
+    })();
+    kuvaajaVälimuisti.set(avain, p);
+    setTimeout(() => kuvaajaVälimuisti.delete(avain), 60 * 60 * 1000).unref?.();
+  }
+  return p;
+}
+
 /** Rajaa kuvan täsmälleen w × h -kokoon kuten CSS:n object-fit: cover +
     object-position fx% fy% ja palauttaa data-URL:n. Suurennettaessa terävöitetään kevyesti.
     seepia 0–1: designin 4d "lämmin kuva" (CSS sepia(.25) saturate(.9)) — Satori ei tue
     CSS-suodattimia, joten sävy tehdään kuvaan valmiiksi. */
-export async function rajaa(k: Kuva, w: number, h: number, o: { seepia?: number } = {}): Promise<string> {
+export async function rajaa(k: Kuva, w: number, h: number, o: { seepia?: number; harmaa?: boolean } = {}): Promise<string> {
   const meta = await sharp(k.buf).metadata();
   const W = meta.width ?? w;
   const H = meta.height ?? h;
@@ -177,6 +245,8 @@ export async function rajaa(k: Kuva, w: number, h: number, o: { seepia?: number 
     const m = S.map((r, i) => r.map((v, j) => (1 - a) * (i === j ? 1 : 0) + a * v)) as [[number, number, number], [number, number, number], [number, number, number]];
     kuva = sharp(await kuva.toBuffer()).recomb(m).modulate({ saturation: 0.9 });
   }
+  // Muistopäivän kortti (5h): harmaasävy etukäteen, koska Satori ei tue suodattimia.
+  if (o.harmaa) kuva = sharp(await kuva.toBuffer()).grayscale();
   const out = await kuva.jpeg({ quality: 90 }).toBuffer();
   return `data:image/jpeg;base64,${out.toString("base64")}`;
 }
@@ -190,10 +260,11 @@ export const kelpaaKaistaleeksi = (k: Kuva | null) => !!k && suurennos(k, 1080, 
 export const kelpaaKokoPinnaksi = (k: Kuva | null) => !!k && suurennos(k, 1080, 1350) <= MAX_SUURENNOS;
 
 /** Toimituksen korvaava kuva tai uusi rajaus (ig_julkaisut.kentat.kuva). */
-export async function korvaaKuva<T extends { kuva: Kuva | null }>(d: T, korvaava?: { url: string; fx: number; fy: number } | null): Promise<T> {
+export async function korvaaKuva<T extends { kuva: Kuva | null; kuvaaja: string | null }>(d: T, korvaava?: { url: string; fx: number; fy: number } | null): Promise<T> {
   if (!korvaava?.url) return d;
-  const k = await lataaKuva(kuvaOsoite(korvaava.url), korvaava.fx, korvaava.fy);
-  return k ? { ...d, kuva: k } : d;
+  const osoite = kuvaOsoite(korvaava.url);
+  const [k, kuvaaja] = await Promise.all([lataaKuva(osoite, korvaava.fx, korvaava.fy), haeKuvaaja(osoite)]);
+  return k ? { ...d, kuva: k, kuvaaja } : d;
 }
 
 /* ── Päivän visa ─────────────────────────────────────────────────────── */
@@ -235,13 +306,19 @@ export async function haeVisa(
   o: { introOtsikko?: string | null; introTeksti?: string | null; oma?: boolean; otsake?: string | null; lataaKuvat?: boolean } = {},
 ): Promise<VisaData | null> {
   const sb = getSupabaseAdmin();
-  const [{ data: q }, { data: kys }] = await Promise.all([
+  const [{ data: q }, { data: kys }, { data: hlo }] = await Promise.all([
     sb
       .from("quizzes")
       .select("id, title, display_title, slug, custom_slug, category, collection, hero_image, image_url, hero_focal_x, hero_focal_y, fanitasot")
       .eq("id", quizId)
       .maybeSingle(),
     sb.from("questions").select("id, question_text, answers, image_url, sort_order").eq("quiz_id", quizId).order("sort_order"),
+    sb
+      .from("celebrities")
+      .select("id, name, birth_date, death_date, image_url, image_focal_x, image_focal_y")
+      .eq("trivia_quiz_id", quizId)
+      .limit(1)
+      .maybeSingle(),
   ]);
   const visa = q as unknown as (Visa & { fanitasot: unknown }) | null;
   if (!visa) return null;
@@ -261,6 +338,17 @@ export async function haeVisa(
   const fy = visa.hero_focal_y ?? 40;
   const kuvaUrl = visa.hero_image ?? visa.image_url;
   const oma = !!o.oma;
+  const lataa = o.lataaKuvat !== false;
+  const c = hlo as unknown as {
+    id: string; name: string; birth_date: string | null; death_date: string | null;
+    image_url: string | null; image_focal_x: number | null; image_focal_y: number | null;
+  } | null;
+  const [kuva, kuvaaja, hKuva, hKuvaaja] = await Promise.all([
+    lataa ? lataaKuva(kuvaUrl, fx, fy) : null,
+    lataa ? haeKuvaaja(kuvaUrl) : null,
+    lataa && c ? lataaKuva(c.image_url, c.image_focal_x ?? 50, c.image_focal_y ?? 25) : null,
+    lataa && c ? haeKuvaaja(c.image_url) : null,
+  ]);
   return {
     paiva,
     quizId: visa.id,
@@ -272,7 +360,18 @@ export async function haeVisa(
     kysymyksia: count || 10,
     introOtsikko: o.introOtsikko?.trim() || null,
     introTeksti: o.introTeksti?.trim() || null,
-    kuva: o.lataaKuvat === false ? null : await lataaKuva(kuvaUrl, fx, fy),
+    kuva,
+    kuvaaja,
+    henkilo: c
+      ? {
+          celebrityId: c.id,
+          nimi: c.name.trim(),
+          kuva: hKuva,
+          kuvaaja: hKuvaaja,
+          syntymavuosi: c.birth_date ? Number(c.birth_date.slice(0, 4)) : null,
+          kuolinvuosi: c.death_date ? Number(c.death_date.slice(0, 4)) : null,
+        }
+      : null,
     oma,
     tunniste: oma ? (o.otsake?.trim() || "Visa").toLocaleUpperCase("fi-FI") : "PÄIVÄN VISA",
     kysymykset,
@@ -314,6 +413,7 @@ export async function haePaivanSynttarit(siteId: string, paiva: string, lataaKuv
     syntymavuosi: rivi.birth_date ? Number(rivi.birth_date.slice(0, 4)) : null,
     kuolinvuosi: rivi.death_date ? Number(rivi.death_date.slice(0, 4)) : null,
     kuva: lataaKuvat ? await lataaKuva(rivi.image_url, fx, fy) : null,
+    kuvaaja: lataaKuvat ? await haeKuvaaja(rivi.image_url) : null,
     visaNimi,
   };
 }

@@ -11,7 +11,7 @@
 import { getAnthropic, MODEL } from "@juntti/ai";
 import { getSupabaseAdmin } from "@juntti/db";
 import type { SynttariData, VisaData } from "./data";
-import { MOTIIVI, type Pohja } from "./pohjat";
+import { AIHELAATIKKO, MOTIIVI, onHenkilopohja, type Pohja } from "./pohjat";
 
 export type Luonnos = { aihe: string; koukku: string; palkinto: string };
 
@@ -30,7 +30,13 @@ const MOTIIVIOHJE: Record<string, string> = {
   synttari:
     'Syntymäpäivä on syy, visa on aihe. Koukku siltaa henkilöstä visaan, esim. "Tunnetko Suomen F1-kuljettajat?" tai "Kuinka hyvin tunnet hänet?". Palkinto lyhyt, esim. "Häkkinen on vasta alku." Ei ikää eikä päivämäärää koukkuun.',
   muisto: 'Muisto kommenttiin: kortti pyytää lukijan oman muiston. Koukku esim. "Mikä on ensimmäinen muistosi hänestä?". Ei palkintoa.',
+  henkilo:
+    'Henkilökortti: henkilön kasvot ovat kuvassa ja nimi näkyy kortissa. Pääasia on henkilövisa, ei syntymäpäivä. Koukku oletuksena "Kuinka hyvin tunnet Petri Pasasen?" — henkilön koko nimi oikein taivutettuna (akkusatiivi: Pasasen, Nousiaisen, Janssonin, Canthin). Voit myös kysyä hänen tuotannostaan tai urastaan, esim. "Muistatko Pasasen Ajax-vuodet?", jos se on varmasti totta. Ei ikää, päivämäärää eikä onnittelua koukkuun. Palkintoa ei tarvita.',
 };
+
+/** Aihelaatikko (kierros 5): koukun aihe hakasulkeissa oikeassa sijamuodossa. */
+const AIHELAATIKKO_OHJE =
+  '- Merkitse koukkuun visan aihe hakasulkein siinä sijamuodossa kuin lause vaatii, esim. "Saatko [Salkkareista] täydet?", "Saatko [Satakunnan derbystä] täydet?", "Kumpi teistä tietää enemmän [Formula 1:stä]?". Aihe on lyhyt ja tunnistettava (enintään 30 merkkiä), mieluiten puhekielinen nimi (Salkkarit, ei Salatut elämät -sarja). Täsmälleen yksi hakasulkupari.';
 
 function lueJson(teksti: string): Record<string, unknown> | null {
   const m = teksti.match(/\{[\s\S]*\}/);
@@ -58,10 +64,11 @@ export async function luonnosteleTekstit(pohja: Pohja, o: { visa?: VisaData | nu
   const v = o.visa;
   const s = o.synttarit;
   const kysymykset = (v?.kysymykset ?? []).slice(0, 5).map((q) => `- ${q.teksti}`).join("\n");
+  const henkilo = !s && v?.henkilo ? `\nVisan henkilö: ${v.henkilo.nimi}${v.henkilo.kuolinvuosi ? ` (${v.henkilo.syntymavuosi ?? "?"}–${v.henkilo.kuolinvuosi})` : ""}` : "";
   const aineisto = s
     ? `Henkilö: ${s.nimi}${s.rooli ? ` (${s.rooli})` : ""}, ${s.muisto ? `olisi täyttänyt tänään ${s.ika} (kuollut)` : `täyttää tänään ${s.ika}`}.
 Henkilön visa: ${s.visaNimi ?? "(ei visaa — kortti ohjaa kommentteihin)"}`
-    : `Visa: ${v?.nimi ?? ""} (kokoelma ${v?.kokoelma ?? ""}, ${v?.kysymyksia ?? 10} kysymystä)
+    : `Visa: ${v?.nimi ?? ""} (kokoelma ${v?.kokoelma ?? ""}, ${v?.kysymyksia ?? 10} kysymystä)${henkilo}
 ${v?.introOtsikko ? `Päivän tapahtuma (vain taustaksi, EI koukkuun): ${v.introOtsikko}` : ""}
 Esimerkkikysymyksiä visasta (älä paljasta vastauksia, älä kopioi kysymyksiä koukuksi):
 ${kysymykset || "- (ei saatavilla)"}`;
@@ -72,11 +79,12 @@ Motiivi: ${MOTIIVIOHJE[motiivi] ?? motiivi}
 ${pohja === "4n" ? 'Juontaja Mikko haastaa katsojan provokaatiolla, esim. "Sinä et ole oikea Jokeri|fani." — persoonan heitto, ei faktaväite.' : ""}
 
 Säännöt:
-- koukku: enintään 45 merkkiä, sinä-muoto, kysymys tai haaste. Ei faktaväitteitä, lukuja tai nimiä, joita alla ei mainita. Ei vihjeitä vastauksiin. Älä kysy yksittäistä visan tietokysymystä.
+- koukku: enintään ${AIHELAATIKKO.includes(pohja) || onHenkilopohja(pohja) ? 55 : 45} merkkiä, sinä-muoto, kysymys tai haaste. Ei faktaväitteitä, lukuja tai nimiä, joita alla ei mainita. Ei vihjeitä vastauksiin. Älä kysy yksittäistä visan tietokysymystä.
 - palkinto: enintään 60 merkkiä tai tyhjä, jos koukku jo lupaa palkinnon. Ei väitteitä muiden pelaajien tuloksista.
 - aihe: 1–2 sanaa isoilla kirjaimilla, toimituksellinen lyhenne aiheesta (esim. JOKERIT, SALKKARIT, REVONTULET, PORI). Ei katkaistu visan nimi.
 - Merkitse yli 11-kirjaimisten YHDYSSANOJEN osien raja pystyviivalla, esim. Jokeri|fani, revontuli|ekspertti. Vain yhdyssanan osien väliin — ei koskaan tavun keskelle (EI "kuljet|tajat").
 - Ei emojeja, ei hashtageja, ei lainausmerkkejä.
+${AIHELAATIKKO.includes(pohja) ? AIHELAATIKKO_OHJE : "- Ei hakasulkeita."}
 
 ${aineisto}
 
@@ -85,7 +93,9 @@ Vastaa pelkkänä JSON-oliona: {"aihe": "...", "koukku": "...", "palkinto": "...
   const vastaus = await kysy(ohje);
   const j = vastaus ? lueJson(vastaus) : null;
   if (!j) return null;
-  const koukku = siisti(j.koukku, 60);
+  let koukku = siisti(j.koukku, 70);
+  // Hakasulkeet vain aihelaatikkopohjille, ja niissäkin täsmälleen yksi pari.
+  if (!AIHELAATIKKO.includes(pohja) || (koukku.match(/\[/g) ?? []).length !== 1 || !/\[[^\]]+\]/.test(koukku)) koukku = koukku.replace(/[[\]]/g, "");
   if (!koukku) return null;
   return { aihe: siisti(j.aihe, 24).toLocaleUpperCase("fi-FI"), koukku, palkinto: siisti(j.palkinto, 80) };
 }

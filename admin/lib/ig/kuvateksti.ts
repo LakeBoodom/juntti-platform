@@ -6,7 +6,7 @@
 // hashtag-tulvaa: muutama tunniste, jotta testin ainoa muuttuja on kortti.
 
 import type { SynttariData, VisaData } from "./data";
-import { ilmanTavutusta, KOMMENTTIPOHJAT, type Kentat, type Pohja } from "./pohjat";
+import { ilmanTavutusta, KOMMENTTIPOHJAT, onHenkilopohja, type Kentat, type Pohja } from "./pohjat";
 
 const KOKOELMA_TAGI: Record<string, string> = {
   Urheilu: "#urheilu",
@@ -26,13 +26,18 @@ const KOKOELMA_TAGI: Record<string, string> = {
 const PERUSTAGIT = "#tietoniekka #tietovisa";
 
 const piste = (s: string) => (/[.!?…]$/.test(s) ? s : `${s}.`);
-const t = (s?: string | null) => ilmanTavutusta((s ?? "").replace(/\s+/g, " ").trim());
+// Hakasulkeet merkitsevät kortin aihelaatikon (kierros 5) — kuvatekstissä ne jäävät pois.
+const t = (s?: string | null) => ilmanTavutusta((s ?? "").replace(/[[\]]/g, "").replace(/\s+/g, " ").trim());
+
+/** Kortit, joissa visan kansikuva näkyy — Wikimedia-kuvan tekijä kuvatekstiin. */
+const KANSIKUVAPOHJAT: Pohja[] = ["4a", "4g", "4d", "5a", "5b", "5d"];
 
 const KOMMENTTIKEHOTE: Partial<Record<Pohja, string>> = {
   "4f": "Vastaa kommenttiin! Koko visa löytyy biosta.",
   "4o": "Kumpi on oikeassa, Laura vai Mikko? Kerro kommentissa.",
   "4q": "Tiedätkö vastauksen? Kerro kommentissa. Koko visa löytyy biosta.",
   "4i": "Kerro muistosi kommentissa.",
+  "5n": "Kumpi on oikeassa, Laura vai Mikko? Kerro kommentissa.",
 };
 
 export function visaKuvateksti(v: VisaData, pohja: Pohja, k: Kentat): string {
@@ -48,6 +53,13 @@ export function visaKuvateksti(v: VisaData, pohja: Pohja, k: Kentat): string {
   const kommentti = KOMMENTTIPOHJAT.includes(pohja) && k.reitti !== true;
   if (kommentti) rivit.push(KOMMENTTIKEHOTE[pohja] ?? "Vastaa kommenttiin!");
   else rivit.push(`${v.nimi}: ${v.kysymyksia} kysymystä, ei kirjautumista. Pelaa — linkki biossa.`);
+  // CC BY-SA vaatii tekijän ja lisenssin. Toimituksen kirjoittama kuvaaja voittaa haetun.
+  const henkilo = onHenkilopohja(pohja) && v.henkilo;
+  const kuvaaja = t(k.kuvaaja) || (henkilo ? (k.kuva?.url ? v.kuvaaja : v.henkilo?.kuvaaja) : KANSIKUVAPOHJAT.includes(pohja) ? v.kuvaaja : null);
+  if (kuvaaja) {
+    rivit.push("");
+    rivit.push(`Kuva: ${kuvaaja}`);
+  }
   rivit.push("");
   rivit.push([PERUSTAGIT, v.oma ? null : "#päivänvisa", KOKOELMA_TAGI[v.kokoelma]].filter(Boolean).join(" "));
   return rivit.join("\n");
@@ -69,9 +81,10 @@ export function synttariKuvateksti(s: SynttariData, pohja: Pohja, k: Kentat): st
   if (pohja === "4i" || !s.quizId) rivit.push(KOMMENTTIKEHOTE["4i"]!);
   else rivit.push(`${s.visaNimi ? `${s.visaNimi}: ` : ""}testaa tietosi — linkki biossa.`);
   // CC BY-SA -kuvat vaativat kuvaajan ja lisenssin: vain kun kuvassa on henkilökuva.
-  if (pohja === "4i" && t(k.kuvaaja)) {
+  const kuvaaja = t(k.kuvaaja) || s.kuvaaja;
+  if ((pohja === "4i" || onHenkilopohja(pohja)) && kuvaaja) {
     rivit.push("");
-    rivit.push(`Kuva: ${t(k.kuvaaja)}`);
+    rivit.push(`Kuva: ${kuvaaja}`);
   }
   rivit.push("");
   rivit.push(`${PERUSTAGIT} #päivänsynttärit`);

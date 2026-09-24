@@ -27,15 +27,15 @@ import {
 } from "./data";
 import { kokoelmaNimi } from "@/lib/kokoelmat";
 import {
-  AUTO_SYNT,
   AUTO_VISA,
   LUPAA_TASON,
   PERHE,
   TEKOALY_KOUKKU,
   TEKOALY_PALKINTO,
   kortinKysymykset,
+  henkilovisanPohja,
   kysymyksiaPohjalle,
-  tarkistaSynttarit,
+  synttareidenPohja,
   tarkistaVisa,
   type Kentat,
   type Pohja,
@@ -152,7 +152,8 @@ async function kelpaavatVisapohjat(m: Mitat, v: VisaData, siemen: string, vainKi
     const t = await tarkistaVisa({ m, siemen }, p, v, KOEKENTAT);
     if (t.esteet.length === 0) tulos.push(p);
   }
-  return tulos;
+  // Kehyskortti 5b on pienen kuvan pohja: iso kuva kuuluu koko pinnalle (5a).
+  return tulos.includes("5a") ? tulos.filter((p) => p !== "5b") : tulos;
 }
 
 /** Kysymyspohjille valitut kysymykset talteen, jotta toimitus näkee ja voi vaihtaa ne. */
@@ -218,7 +219,7 @@ export async function varmistaSuunnitelma(siteId: string, paivia = 14): Promise<
       if (visaRivi && tarvitseeLuonnoksen(visaRivi)) luonnosteltavat.push({ rivi: visaRivi, visa });
     }
     if (synttarit) {
-      synttariRivi = await suunnitteleSynttarit(siteId, synttarit, synttariRivi, historia, mitat);
+      synttariRivi = await suunnitteleSynttarit(siteId, synttarit, synttariRivi);
       if (synttariRivi && tarvitseeLuonnoksen(synttariRivi)) luonnosteltavat.push({ rivi: synttariRivi, synttarit });
     }
     paivitaHistoria(visaRivi);
@@ -273,23 +274,20 @@ async function suunnitteleVisa(siteId: string, v: VisaData, rivi: Julkaisu | nul
   return rivi ? paivita(rivi.id, arvot) : lisaa(siteId, v.paiva, "paivan_visa", arvot);
 }
 
-async function suunnitteleSynttarit(siteId: string, s: SynttariData, rivi: Julkaisu | null, historia: Historia, m: Mitat): Promise<Julkaisu | null> {
+/** Synttäreiden pohja ei kierrä: henkilön kuva ratkaisee (kierros 5). Iso kuva →
+    5f (muistopäivänä 5h), heikko kuva → 5i (5m), ei kuvaa → juontajat 4r (4h). */
+async function suunnitteleSynttarit(siteId: string, s: SynttariData, rivi: Julkaisu | null): Promise<Julkaisu | null> {
   const vaihtui = rivi && rivi.celebrity_id !== s.celebrityId;
   if (rivi && !vaihtui) return rivi;
   if (rivi && rivi.tila === "julkaistu") return rivi;
-  const ehdokkaat: Pohja[] = [];
-  for (const p of AUTO_SYNT) {
-    const t = await tarkistaSynttarit({ m, siemen: s.paiva }, p, s, KOEKENTAT);
-    if (t.esteet.length === 0) ehdokkaat.push(p);
-  }
-  const pohja = valitse(ehdokkaat, s.paiva, "synttarit", false, historia, AUTO_SYNT) ?? (s.muisto ? "4h" : "4r");
+  const pohja = synttareidenPohja(s);
   const arvot = {
     pohja,
     muoto: "kuva",
     quiz_id: s.quizId,
     celebrity_id: s.celebrityId,
     kokoelma: "Tunnetut henkilöt",
-    on_kuva: false,
+    on_kuva: !!s.kuva,
     kentat: {},
     tila: "luonnos",
     pohja_valittu_kasin: false,
@@ -330,7 +328,7 @@ async function luonnosteleRivit(
       let k = await luonnostele(tyo.rivi, pohja, tyo);
       if (!k && tyo.visa) {
         const kiinteat = await kelpaavatVisapohjat(m, tyo.visa, tyo.rivi.paiva, true);
-        pohja = valitse(kiinteat, tyo.rivi.paiva, tyo.rivi.slotti, tyo.visa.urheilu, historia, AUTO_VISA) ?? "4c";
+        pohja = valitse(kiinteat, tyo.rivi.paiva, tyo.rivi.slotti, tyo.visa.urheilu, historia, AUTO_VISA) ?? "4f";
         k = { ...kysymysKentat(tyo.visa, pohja, tyo.rivi.paiva), luonnosPohjalle: pohja };
       }
       if (!k) continue; // synttäri ilman luonnosta: oletuskoukku riittää, yritetään seuraavalla latauksella
@@ -398,8 +396,9 @@ async function luoOmaPohja(
 ): Promise<{ rivi: Julkaisu; visa: VisaData } | null> {
   const v = await haeVisa(o.quizId, o.paiva, { oma: true, otsake: o.otsake });
   if (!v) return null;
-  const ehdokkaat = await kelpaavatVisapohjat(m, v, o.paiva);
-  const pohja = valitse(ehdokkaat, o.paiva, "oma", v.urheilu, historia, AUTO_VISA) ?? "4b";
+  // Henkilövisa minä päivänä tahansa (design D): henkilökortti, jos henkilöllä on kuva.
+  const henkilolle = henkilovisanPohja(v);
+  const pohja = henkilolle ?? valitse(await kelpaavatVisapohjat(m, v, o.paiva), o.paiva, "oma", v.urheilu, historia, AUTO_VISA) ?? "4b";
   const rivi = await lisaa(siteId, o.paiva, "oma", {
     pohja,
     muoto: "kuva",
