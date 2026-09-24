@@ -92,9 +92,9 @@ export async function generateMetadata(
     return { title: `${megaNimi}${suffix}`, description: megaDesc, ...og(megaNimi, megaDesc) };
   }
   if (slug || quizId) {
-    let q = sb.from("quizzes").select("title, display_title, teaser, description, slug").eq("status", "published");
+    let q = sb.from("quizzes").select("title, display_title, teaser, description, slug, seo_title, seo_description, collection").eq("status", "published");
     q = quizId ? q.eq("id", quizId) : q.eq("slug", slug!);
-    const { data } = await q.maybeSingle<{ title: string; display_title: string | null; teaser: string | null; description: string | null; slug: string | null }>();
+    const { data } = await q.maybeSingle<{ title: string; display_title: string | null; teaser: string | null; description: string | null; slug: string | null; seo_title: string | null; seo_description: string | null; collection: string | null }>();
     if (!data) return { title: `Visaa ei löytynyt${suffix}` };
     const name = data.display_title ?? data.title;
     /* Kanoninen osoite on /visa/<slug> (julkaisu 31.8.2026) — myös silloin kun
@@ -104,8 +104,22 @@ export async function generateMetadata(
        description sen sijaan 97 %:lle (ks. claude/SEO_PIKATARKISTUS_2026_09_01.md
        kohta 2) — käytetään description-kenttää fallbackina ennen geneeristä
        lausetta, jotta hakutuloksen kuvaus on oikea lähes kaikilla visoilla. */
-    const visaDesc = data.teaser ?? data.description ?? `${name} – ilmainen tietovisa Tietoniekassa.`;
-    return { title: `${name}${suffix}`, description: visaDesc, ...og(name, visaDesc), ...canonical };
+    const visaDesc = data.seo_description ?? data.teaser ?? data.description ?? `${name} – ilmainen tietovisa Tietoniekassa.`;
+    /* Hakuotsikko (Trends-/Search Console -analyysi 23.9.2026, claude/TRENDS_KYSYNTAKARTTA.md):
+       henkilöhaut tuovat paljon näyttökertoja mutta tuskin klikkauksia, koska
+       pelkkä "Nimi – näyttelijä" ei kerro hakijalle, että kyseessä on visa.
+       Klikkaukset tulevat "aihe + visa" -hauista. Siksi:
+       1) quizzes.seo_title voittaa aina (suffiksi lisätään, jos se puuttuu),
+       2) henkilövisoille sääntöpohjainen "Nimi – tietovisa: kuinka hyvin tunnet?".
+       Sivun näkyvä otsikko ja jakokortin og-otsikko pysyvät ennallaan. */
+    let hakuOtsikko = `${name}${suffix}`;
+    if (data.seo_title) {
+      hakuOtsikko = /tietoniekka/i.test(data.seo_title) ? data.seo_title : `${data.seo_title}${suffix}`;
+    } else if (data.collection === "tunnetut-henkilot") {
+      const henkilo = name.split(/\s[–—-]\s/)[0].trim();
+      hakuOtsikko = `${henkilo} – tietovisa: kuinka hyvin tunnet?${suffix}`;
+    }
+    return { title: hakuOtsikko, description: visaDesc, ...og(name, visaDesc), ...canonical };
   }
   return { title: `Visaa ei löytynyt${suffix}` };
 }
