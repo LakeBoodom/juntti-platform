@@ -12,7 +12,9 @@
 //  2. Jokaisesta CC BY- ja CC BY-SA -kuvasta on näytettävä tekijä, lisenssi ja
 //     linkki lähteeseen. Se tehdään sivulla /kuvien-lahteet, johon viitataan
 //     kokoelmasivun kuvakrediitistä ja alatunnisteesta.
-//  3. Kuvia on rajattu 640x360-kokoon ja skaalattu. Rajaus on muokkaus, joten
+//  3. Kuvia on rajattu 640x360-kokoon ja skaalattu (musiikin 24.9. lisätyillä
+//     visoilla myös pelinäkymän hero public/20/musiikki/hero/<slug>.webp: koko
+//     kuva + saman kuvan sumennettu jatke sivuilla). Rajaus on muokkaus, joten
 //     BY-SA-kuvien osalta sivu ilmoittaa muokatun kuvan olevan saatavilla
 //     samalla lisenssillä (share-alike).
 //  4. Uusi kuva ei mene tuotantoon ilman riviä tässä tiedostossa.
