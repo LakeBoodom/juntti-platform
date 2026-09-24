@@ -474,7 +474,7 @@ export async function valitseKampanjanVisat(siteId: string, kokoelma: string, al
   const kuvalliset = ehdokkaat.filter((q) => q.hero_image ?? q.image_url).slice(0, paivia * 3);
   const mitatut = await Promise.all(
     kuvalliset.map(async (q) => {
-      const k = await lataaKuva(q.hero_image ?? q.image_url, q.hero_focal_x ?? 50, q.hero_focal_y ?? 40);
+      const k = await lataaKuva(q.hero_image ?? q.image_url, (q.hero_focal_x ?? 0.5) * (Number(q.hero_focal_x ?? 0.5) <= 1 ? 100 : 1), (q.hero_focal_y ?? 0.4) * (Number(q.hero_focal_y ?? 0.4) <= 1 ? 100 : 1));
       return { id: q.id, taso: kelpaaKokoPinnaksi(k) ? 0 : kelpaaKaistaleeksi(k) ? 1 : 2 };
     }),
   );

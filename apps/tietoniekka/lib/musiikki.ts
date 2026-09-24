@@ -15,8 +15,10 @@
 // 3 poimintakuvausta EI ole hyväksytetty → tarkistetaan copy/SEO-passissa.
 // Artistinimien kirjoitusasu on osa dataa (SANNI, Haloo Helsinki!, Juice
 // WRLD, The Weeknd, J Balvin, BTS) — uppercase tehdään CSS:llä.
-// Jokaisella 36 visalla on kuva public/20/musiikki/<slug>.webp (Heikin
-// alkuperäisistä PNG:istä; AI-lavakuvituksia, ei oikeita artistikuvia).
+// Jokaisella visalla on kuva public/20/musiikki/<slug>.webp — Wikimedia
+// Commonsin artistikuvia 640 × 360 -rajauksena (tekijät lib/kuvalahteet.ts).
+// 24.9.2026: kahdeksan uutta visaa (suomipop, iskelmä, suomirock); Kaija Koo
+// korvasi Taylor Swiftin nostona (Heikki). Taylor Swift pysyy aihepiirissä 04.
 
 export const MUSIIKKI_HERO = "/20/musiikki/hero.webp";
 /** README §Hero: fokus Lauran ja Mikon kasvoissa (oikea kolmannes) — älä keskitä. */
@@ -51,6 +53,14 @@ const IMG_SLUGS = new Set([
   "eppu-normaali-tietovisa",
   "future-visa-tunnetko-trapin-tahden",
   "haloo-helsinki-visa-beibi-fani",
+  "jenni-vartiainen-visa-hittien-takana",
+  "juha-tapio-visa-laulujen-tarinat",
+  "kaija-koo-visa-hitit-ja-ura",
+  "kari-tapio-visa-iskelmalegenda",
+  "katri-helena-visa-iskelmalegenda",
+  "nightwish-visa-sinfoninen-metalli",
+  "popeda-visa-manserock",
+  "suvi-terasniska-visa-iskelmatahti",
   "visa-mo5e4rgk",
   "j-balvin-visa-tunnetko-reggaetontahden",
   "juice-wrld-visa-tunnetko-tahden",
@@ -78,10 +88,11 @@ export function musiikkiImg(slug: string | null | undefined): string | null {
 /** "Tietoniekka suosittelee" — täsmälleen 3 (README: 1 = #A24BFF,
     2 = #FF5C3D, 3 = #E8A320). Poiminnan koukku pidempi kuin ruudukon. */
 export const MUSIIKKI_FEATURED: Array<{ slug: string; rankColor: string; hook: string }> = [
+  /* Kaija Koo korvasi Taylor Swiftin nostona (Heikki 24.9.2026). */
   {
-    slug: "taylor-swift-visa-tunnetko-supertahden",
+    slug: "kaija-koo-visa-hitit-ja-ura",
     rankColor: "#A24BFF",
-    hook: "Kausi kaudelta uudelleen keksitty poptähti. Kymmenen kysymystä sanoituksista, kiertueista ja kissoista.",
+    hook: "Tinakenkätytöstä Vain elämään. Kuinka hyvin tunnet neljä vuosikymmentä Kaija Koon hittejä?",
   },
   /* Nylon Beat korvasi Eppu Normaalin nostona (Heikki 19.9.2026: ajankohtainen
      seuraavan kuukauden). Eppu Normaali pysyy aihepiirissä 03. */
@@ -128,6 +139,10 @@ export const MUSIIKKI_SECTIONS: Array<{
       { slug: "pmmp-visa-rusketusraidat", hook: "Rusketusraidat ja muut klassikot" },
       { slug: "ultra-bra-tietovisa", hook: "Isot kuorot ja 90-luvun tunnelmat" },
       { slug: "nylon-beat-visa-vuosikymmenen-hitit", hook: "Ysärin suomipopin kultainen duo" },
+      { slug: "kaija-koo-visa-hitit-ja-ura", hook: "Neljä vuosikymmentä hittejä" },
+      { slug: "jenni-vartiainen-visa-hittien-takana", hook: "Mitä hittien takana on?" },
+      { slug: "juha-tapio-visa-laulujen-tarinat", hook: "Tarinoita laulujen takaa" },
+      { slug: "suvi-terasniska-visa-iskelmatahti", hook: "Tanssilavoilta joululevyihin" },
     ],
   },
   {
@@ -139,6 +154,10 @@ export const MUSIIKKI_SECTIONS: Array<{
       { slug: "eppu-normaali-tietovisa", hook: "Suomirockin pitkäikäisin bändi puntarissa" },
       { slug: "apulanta-bandi-tietovisa", hook: "Kolme jätkää ja kolme vuosikymmentä" },
       { slug: "visa-mo5e4rgk", hook: "Glamin kotimaiset kapinalliset" },
+      { slug: "popeda-visa-manserock", hook: "Manserockin jyrät vuodesta 1977" },
+      { slug: "nightwish-visa-sinfoninen-metalli", hook: "Sinfonista metallia maailmalle" },
+      { slug: "katri-helena-visa-iskelmalegenda", hook: "Iskelmälegendan kuusi vuosikymmentä" },
+      { slug: "kari-tapio-visa-iskelmalegenda", hook: "Suomalaisen iskelmän ääni" },
     ],
   },
   {

@@ -65,6 +65,15 @@ export const KUVALAHTEET: Kuvalahde[] = [
   { slug: "sanni-visa-prinsessoja-astronautteja", kokoelma: "musiikki", kuvaus: "SANNI, Ilosaarirock 2016", tiedosto: "Sanni - Ilosaarirock 2016 - 06.jpg", tekija: "Tuomas Vitikainen", lisenssi: "CC BY-SA 4.0", lisenssiUrl: CC("by-sa/4.0"), vuosi: "2016" },
   { slug: "taylor-swift-visa-tunnetko-supertahden", kokoelma: "musiikki", kuvaus: "Taylor Swift lavalla 2016", tiedosto: "Taylor Swift Performance (31592454132).jpg", tekija: "el_ave (Flickr)", lisenssi: "CC BY 2.0", lisenssiUrl: CC("by/2.0"), vuosi: "2016" },
   { slug: "ultra-bra-tietovisa", kokoelma: "musiikki", kuvaus: "Ultra Bra lavalla 1997", tiedosto: "Ultra Bra 1997.tif", tekija: "Tuomas Jääskeläinen", lisenssi: "CC BY 4.0", lisenssiUrl: CC("by/4.0"), vuosi: "1997" },
+  // Suomipop, iskelmä ja suomirock (24.9.2026) — lisenssit tarkistettu Commonsin API:sta.
+  { slug: "suvi-terasniska-visa-iskelmatahti", kokoelma: "musiikki", kuvaus: "Suvi Teräsniska 2010", tiedosto: "Suviterasniska.jpg", tekija: "Motopark", lisenssi: "CC BY-SA 3.0", lisenssiUrl: CC("by-sa/3.0"), vuosi: "2010" },
+  { slug: "katri-helena-visa-iskelmalegenda", kokoelma: "musiikki", kuvaus: "Katri Helena 1993", tiedosto: "Katri-Helena-1993.jpg", tekija: "Seppo Konstig / Eeva", lisenssi: "CC BY 4.0", lisenssiUrl: CC("by/4.0"), vuosi: "1993" },
+  { slug: "kari-tapio-visa-iskelmalegenda", kokoelma: "musiikki", kuvaus: "Kari Tapio, Helsingin musiikkimessut 2009", tiedosto: "Kari Tapio.jpg", tekija: "Soppakanuuna", lisenssi: "CC BY-SA 3.0", lisenssiUrl: CC("by-sa/3.0"), vuosi: "2009" },
+  { slug: "kaija-koo-visa-hitit-ja-ura", kokoelma: "musiikki", kuvaus: "Kaija Koo, Rakuunarock 2013", tiedosto: "Kaija Koo - Rakuunarock 2013.jpg", tekija: "Tuomas Vitikainen", lisenssi: "CC BY-SA 3.0", lisenssiUrl: CC("by-sa/3.0"), vuosi: "2013" },
+  { slug: "juha-tapio-visa-laulujen-tarinat", kokoelma: "musiikki", kuvaus: "Juha Tapio, Kuopio 2013", tiedosto: "Juha T.JPG", tekija: "Muumimuikkunen", lisenssi: "Public domain", lisenssiUrl: "", vuosi: "2013" },
+  { slug: "nightwish-visa-sinfoninen-metalli", kokoelma: "musiikki", kuvaus: "Floor Jansen ja Nightwish, Florida 2012", tiedosto: "Floor Jansen - Nightwish.jpg", tekija: "Luis Blanco", lisenssi: "CC BY 2.0", lisenssiUrl: CC("by/2.0"), vuosi: "2012" },
+  { slug: "jenni-vartiainen-visa-hittien-takana", kokoelma: "musiikki", kuvaus: "Jenni Vartiainen, Ilosaarirock 2014", tiedosto: "Jenni Vartiainen, 2014 (cropped).jpg", tekija: "Tuomas Vitikainen", lisenssi: "CC BY-SA 4.0", lisenssiUrl: CC("by-sa/4.0"), vuosi: "2014" },
+  { slug: "popeda-visa-manserock", kokoelma: "musiikki", kuvaus: "Popeda, Provinssirock 2013", tiedosto: "Provinssirock 20130615 - Popeda - 05.jpg", tekija: "Cecil", lisenssi: "CC BY-SA 3.0", lisenssiUrl: CC("by-sa/3.0"), vuosi: "2013" },
 
   // ─── Kaupungit (12.9.2026) ───
   { slug: "espoo", kokoelma: "kaupungit", kuvaus: "Hanasaari ja Espoon saaristo ilmasta", tiedosto: "Hanasaari, Espoo 2019-10-05.jpg", tekija: "Joneikifi", lisenssi: "CC BY-SA 4.0", lisenssiUrl: CC("by-sa/4.0"), vuosi: "2019" },

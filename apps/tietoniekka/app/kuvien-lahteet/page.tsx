@@ -9,7 +9,7 @@ export const metadata: Metadata = {
   robots: { index: true, follow: true },
 };
 
-const PAIVITETTY = "12.9.2026";
+const PAIVITETTY = "24.9.2026";
 
 export default function KuvienLahteetPage() {
   const musiikki = KUVALAHTEET.filter((k) => k.kokoelma === "musiikki");

@@ -81,7 +81,7 @@ export default async function MusiikkiLanding() {
       .filter((x): x is { card: Card; hook: string } => Boolean(x)),
   })).filter((s) => s.cards.length > 0);
   const sectionCount = sections.length;
-  // Sivun visamäärä = kuratoitujen osioiden uniikit visat (36) — EI koko
+  // Sivun visamäärä = kuratoitujen osioiden uniikit visat (44, 24.9.2026) — EI koko
   // kokoelman rivimäärä, koska festarivisat eivät ole sivulla (Heikki 19.8.).
   const count = new Set(sections.flatMap((s) => s.cards.map(({ card }) => card.id))).size;
 

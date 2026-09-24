@@ -354,8 +354,10 @@ export async function haeVisa(
   const kysymykset = kys;
   const count = kysymykset.length;
 
-  const fx = visa.hero_focal_x ?? 50;
-  const fy = visa.hero_focal_y ?? 40;
+  // quizzes.hero_focal_* on sivuston asteikolla 0–1 (admin: "0.5"); kuvaputki käyttää prosentteja.
+  const prosentti = (v: number | null, oletus: number) => (v == null ? oletus : Number(v) <= 1 ? Number(v) * 100 : Number(v));
+  const fx = prosentti(visa.hero_focal_x, 50);
+  const fy = prosentti(visa.hero_focal_y, 40);
   const kuvaUrl = visa.hero_image ?? visa.image_url;
   const oma = !!o.oma;
   const lataa = o.lataaKuvat !== false;
