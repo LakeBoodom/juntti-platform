@@ -15,7 +15,6 @@
 import type { Metadata } from "next";
 import { getSupabase } from "@/lib/supabase";
 import { getPageContent } from "@/lib/pageContent";
-import { LearnArticle } from "@/components/tn20/LearnArticle";
 import Crumbs from "@/components/tn20/Crumbs";
 import {
   MUSIIKKI_HERO, MUSIIKKI_HERO_POSITION, musiikkiIntro, MUSIIKKI_BADGE,
@@ -84,10 +83,6 @@ export default async function MusiikkiLanding() {
   // Sivun visamäärä = kuratoitujen osioiden uniikit visat (44, 24.9.2026) — EI koko
   // kokoelman rivimäärä, koska festarivisat eivät ole sivulla (Heikki 19.8.).
   const count = new Set(sections.flatMap((s) => s.cards.map(({ card }) => card.id))).size;
-
-  const article = pc?.learn ? (
-    <LearnArticle learn={pc.learn} fallbackTitle="Musiikki" accent="#A24BFF" />
-  ) : null;
 
   return (
     <main className="tnk tne-mus" style={{ minHeight: "100dvh", paddingBottom: 60 }}>
@@ -181,7 +176,8 @@ export default async function MusiikkiLanding() {
           </section>
         ))}
 
-        {article}
+        {/* "Musiikkivisat pähkinänkuoressa" -artikkeli (page_content.learn) poistettu
+            sivulta Heikin pyynnöstä 24.9.2026 — sisältö jää kantaan talteen. */}
 
         {/* Kuvakrediitti — CC BY / CC BY-SA vaativat tekijämaininnan.
             Tekijät ja lisenssit listattu sivulla /kuvien-lahteet (12.9.2026). */}
