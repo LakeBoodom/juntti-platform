@@ -259,7 +259,7 @@ const VIITTAA_VAIHTOEHTOIHIN = /seuraavista|alla olevista|näistä|oheisista|mik
 /** Sopiiko kysymys pohjaan: kuvakysymykset pois, pituusrajat pohjan tilan mukaan. */
 export function sopiiKysymykseksi(q: Kysymys, pohja: Pohja): boolean {
   if (q.kuva || !q.teksti) return false;
-  const vaihtoehdoilla = pohja === "4f" || pohja === "4q" || pohja === "4o" || pohja === "5n";
+  const vaihtoehdoilla = pohja === "4f" || pohja === "4q" || pohja === "4o" || pohja === "5n" || pohja === "5p";
   if (vaihtoehdoilla) {
     if (q.vaihtoehdot.length < 2 || !q.oikea) return false;
     const maxV = pohja === "4q" ? 24 : 34;
@@ -268,13 +268,13 @@ export function sopiiKysymykseksi(q: Kysymys, pohja: Pohja): boolean {
     if (VIITTAA_VAIHTOEHTOIHIN.test(q.teksti)) return false;
     if ((pohja === "4m" || pohja === "4p") && !q.oikea) return false;
   }
-  const max: Partial<Record<Pohja, number>> = { "4f": 100, "4q": 80, "4o": 90, "5n": 90, "4m": 110, "4p": 90, "4l": 90 };
+  const max: Partial<Record<Pohja, number>> = { "4f": 100, "4q": 80, "4o": 90, "5n": 90, "5p": 90, "5q": 90, "4m": 110, "4p": 90, "4l": 90 };
   return q.teksti.length <= (max[pohja] ?? 100);
 }
 
 
 /** Kortin kysymykset: toimituksen valitsemat, tai automaattisesti sopivista siemenen mukaan. */
-export function kortinKysymykset(v: VisaData, k: Kentat, pohja: Pohja, siemen: string): Kysymys[] {
+export function kortinKysymykset(v: { kysymykset: Kysymys[] }, k: Kentat, pohja: Pohja, siemen: string): Kysymys[] {
   const n = kysymyksiaPohjalle(pohja);
   if (n === 0) return [];
   const valitut = (k.kysymykset ?? []).map((id) => v.kysymykset.find((q) => q.id === id)).filter((q): q is Kysymys => !!q);
@@ -437,7 +437,7 @@ async function p4d(c: Ktx, v: VisaData, k: Kentat): Promise<Piirros> {
 const KIRJAIMET = ["A", "B", "C", "D"];
 
 function kysymysEste(q: Kysymys | undefined, esteet: string[], pohja: Pohja) {
-  if (!q) esteet.push(`${pohja} vaatii visasta sopivan kysymyksen (ei kuvakysymys, riittävän lyhyt${pohja === "4f" || pohja === "4q" || pohja === "4o" || pohja === "5n" ? ", lyhyet vaihtoehdot" : ""}) — valitse kysymys tai toinen pohja.`);
+  if (!q) esteet.push(`${pohja} vaatii visasta sopivan kysymyksen (ei kuvakysymys, riittävän lyhyt${pohja === "4f" || pohja === "4q" || pohja === "4o" || pohja === "5n" || pohja === "5p" ? ", lyhyet vaihtoehdot" : ""}) — valitse kysymys tai toinen pohja.`);
 }
 
 /** 4f Oikea visakysymys vaihtoehtoineen · paperipohja. Vastaus kommentteihin. */
@@ -1255,12 +1255,14 @@ type Henkilo = {
   vuodet: string | null;
   /** Henkilöllä on visa → CTA sivustolle; muuten kommentteihin */
   visa: boolean;
+  /** Henkilön visan kysymykset (5p, 5q) */
+  kysymykset: Kysymys[];
 };
 
 const vuosivali = (a: number | null, b: number | null) => (a && b ? `${a}–${b}` : null);
 
 function henkiloSynttareista(s: SynttariData): Henkilo {
-  return { nimi: s.nimi, kuva: s.kuva, kuollut: s.muisto, synttari: true, ika: s.ika, vuodet: vuosivali(s.syntymavuosi, s.kuolinvuosi), visa: !!s.quizId };
+  return { nimi: s.nimi, kuva: s.kuva, kuollut: s.muisto, synttari: true, ika: s.ika, vuodet: vuosivali(s.syntymavuosi, s.kuolinvuosi), visa: !!s.quizId, kysymykset: s.kysymykset };
 }
 
 /** Henkilövisa minä päivänä tahansa: kuva on henkilön oma, ellei toimitus ole vaihtanut sitä. */
@@ -1275,6 +1277,7 @@ function henkiloVisasta(v: VisaData, k: Kentat): Henkilo | null {
     ika: null,
     vuodet: vuosivali(h.syntymavuosi, h.kuolinvuosi),
     visa: true,
+    kysymykset: v.kysymykset,
   };
 }
 
@@ -1502,12 +1505,155 @@ async function p5m(c: Ktx, h: Henkilo, k: Kentat): Promise<Piirros> {
   };
 }
 
+/* ── Henkilö + kysymys (5p, 5q) ─────────────────────────────────────── */
+
+/** Värit: syntymäpäivä navy + keltainen (5f), muistopäivä hillitty harmaa (5h). */
+const henkiloVarit = (h: Henkilo) =>
+  h.kuollut
+    ? { bg: "#141414", bgRgb: "20,20,20", ink: "#EDE8DF", ak: "#A8A196", heikko: "#8C877F", reuna: "#3A3834", laatikko: "rgba(20,20,20,.82)" }
+    : { bg: "#0B1420", bgRgb: "11,20,32", ink: "#FFFFFF", ak: "#FFD84A", heikko: "#8FA0B8", reuna: "#23385A", laatikko: "rgba(11,20,32,.82)" };
+
+/** Kasvot kortin yläosaan: kaista koko leveydeltä, jos kuva riittää (enintään 1,5×),
+    muuten valokuvakehys vasemmalle ja merkki oikealle. Muistopäivänä harmaasävy. */
+async function Kasvot(c: Ktx, h: Henkilo, korkeus: number, esteet: string[], tummaAlkaa = 0.55) {
+  const v = henkiloVarit(h);
+  // Teksti alkaa 5p:ssä jo kuvan päältä: kuva tummuu täysin ennen syyriviä.
+  const liukuvari = `linear-gradient(180deg, rgba(${v.bgRgb},.5) 0%, rgba(${v.bgRgb},0) 14%, rgba(${v.bgRgb},0) ${Math.round(tummaAlkaa * 100)}%, rgba(${v.bgRgb},.9) ${Math.round((tummaAlkaa + 1) * 50)}%, ${v.bg} 100%)`;
+  if (!h.kuva) {
+    esteet.push("Henkilökuva puuttuu — ilman kuvaa käytä 4r:ää tai 4h:ta.");
+    return <div style={{ display: "flex", width: W, height: korkeus }} />;
+  }
+  if (kelpaa(h.kuva, W, korkeus)) {
+    const kuva = await c.kuvaksi(h.kuva, W, korkeus, { harmaa: h.kuollut });
+    return (
+      <div style={{ position: "relative", display: "flex", width: W, height: korkeus }}>
+        <img src={kuva} width={W} height={korkeus} alt="" style={{ width: W, height: korkeus }} />
+        <div style={{ position: "absolute", top: 0, left: 0, width: W, height: korkeus, display: "flex", backgroundImage: liukuvari }} />
+        <div style={{ position: "absolute", top: 56, right: 72, display: "flex" }}>
+          <Merkki vari={v.ink} paino={h.kuollut ? 700 : 900} />
+        </div>
+      </div>
+    );
+  }
+  const kehys = await Valokuva(c, h, { w: 240, h: 300, kierto: -3, nimiVari: "#131109" });
+  return (
+    <div style={{ display: "flex", width: W, height: korkeus, alignItems: "flex-start", justifyContent: "space-between", padding: "64px 72px 0" }}>
+      {kehys}
+      <Merkki vari={v.ink} paino={h.kuollut ? 700 : 900} />
+    </div>
+  );
+}
+
+/** Syyrivi henkilö + kysymys -korttiin: nimi aina näkyvissä. */
+function henkilonRivi(c: Ktx, h: Henkilo, k: Kentat, esteet: string[]) {
+  const syy = t(k.syy) || autoSyy(h);
+  return syyrivi(c, syy ? `${h.nimi} · ${syy}` : h.nimi, SISA - 28, h.synttari && !t(k.syy) && h.ika != null && !h.kuollut ? `${h.nimi} · ${h.ika} v. tänään` : null, esteet);
+}
+
+/** 5p Henkilö + kysymys: kasvot ylhäällä, henkilön visan kysymys vaihtoehtoineen
+    (4f:n periaate), vastaus kommentteihin. */
+async function p5p(c: Ktx, h: Henkilo, k: Kentat): Promise<Piirros> {
+  const esteet: string[] = [];
+  const v = henkiloVarit(h);
+  const [q] = kortinKysymykset(h, k, "5p", c.siemen);
+  kysymysEste(q, esteet, "5p");
+  const rivi = henkilonRivi(c, h, k, esteet);
+  const kys = otsikko(c, q?.teksti ?? "Kysymys puuttuu", { koot: [60, 54, 48, 42], leveys: SISA - 60, maxRivit: 4, valistys: -0.02 });
+  tarkistaMahtuu(kys, "Kysymys", esteet);
+  const lw = (SISA - 16) / 2;
+  const vaihtoehdot = (q?.vaihtoehdot ?? []).map((x) => leipa(c, x, { koot: [28, 25, 22], leveys: lw - 40 - 36 - 16, maxRivit: 2 }));
+  vaihtoehdot.forEach((s) => tarkistaMahtuu(s, "Vaihtoehto", esteet));
+  const koukku = leipa(c, t(k.koukku) || "Tiedätkö ilman apua?", { koot: [36, 32], leveys: SISA, maxRivit: 1, paino: 700 });
+  tarkistaMahtuu(koukku, "Koukku", esteet);
+  const cta = t(k.cta) || "Vastaa kommenttiin";
+  const kasvot = await Kasvot(c, h, 760, esteet, 0.36);
+  return {
+    ruudut: [
+      <Absoluuttinen key="5p" bg={v.bg}>
+        <div style={{ position: "absolute", top: 0, left: 0, display: "flex" }}>{kasvot}</div>
+        <div style={{ position: "absolute", left: 72, right: 72, bottom: 72, display: "flex", flexDirection: "column", gap: 26 }}>
+          <Syyrivi s={rivi} vari={v.ak} piste={!h.kuollut} />
+          <div style={{ display: "flex", padding: "26px 30px", borderRadius: 18, background: v.laatikko, border: `3px solid ${v.reuna}` }}>
+            <Iso s={kys} valistys={-0.02} vari={v.ink} lh={0.95} />
+          </div>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 16 }}>
+            {vaihtoehdot.map((s, i) => (
+              <div key={i} style={{ width: lw, height: 96, display: "flex", alignItems: "center", gap: 16, padding: "0 20px", border: `3px solid ${v.ak}`, borderRadius: 14, background: v.bg }}>
+                <div style={{ display: "flex", fontFamily: "Archivo", fontWeight: 900, fontSize: 36, color: v.ak }}>{KIRJAIMET[i]}</div>
+                <Leipa s={s} vari={v.ink} lh={1.1} />
+              </div>
+            ))}
+          </div>
+          <Leipa s={koukku} vari={v.ink} paino={700} />
+          <Alarivi
+            cta={<CtaNappi c={c} teksti={cta} bg={v.ak} ink={v.bg} maxLeveys={SISA - merkinLeveys(c) - 40} esteet={esteet} />}
+            reitti={reittiNakyy(k, "5p") ? `Lisää visoja: ${REITTI}` : null}
+            reittiVari={v.heikko}
+            merkki={null}
+          />
+        </div>
+      </Absoluuttinen>,
+    ],
+    esteet,
+    huomiot: [],
+    onKuva: !!h.kuva,
+  };
+}
+
+/** 5q Henkilö + useampi kysymys: kasvot kaistana, kolme kysymystä hänen visastaan (4l:n periaate). */
+async function p5q(c: Ktx, h: Henkilo, k: Kentat): Promise<Piirros> {
+  const esteet: string[] = [];
+  const v = henkiloVarit(h);
+  const qs = kortinKysymykset(h, k, "5q", c.siemen);
+  if (qs.length < 3) esteet.push("5q vaatii henkilön visasta kolme sopivaa kysymystä (ei kuvakysymyksiä, enintään 90 merkkiä, ei viittausta vaihtoehtoihin).");
+  const rivi = henkilonRivi(c, h, k, esteet);
+  const ots = otsikko(c, vaadiKoukku(k, qs.length === 1 ? "Tiedätkö tämän?" : "Montako näistä tiedät?", esteet), { koot: [84, 76, 68], leveys: SISA, maxRivit: 2, valistys: -0.04 });
+  tarkistaMahtuu(ots, "Koukku", esteet);
+  const rivit = qs.map((q) => leipa(c, q.teksti, { koot: [34, 31, 28], leveys: SISA - 52 - 22 - 52, maxRivit: 3, paino: 700 }));
+  rivit.forEach((s) => tarkistaMahtuu(s, "Kysymys", esteet));
+  const cta = t(k.cta) || "Pelaa koko visa";
+  const kasvot = await Kasvot(c, h, 440, esteet);
+  return {
+    ruudut: [
+      <div key="5q" style={{ width: W, height: H, display: "flex", flexDirection: "column", background: v.bg, fontFamily: "Instrument Sans" }}>
+        {kasvot}
+        <div style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "space-between", padding: "8px 72px 72px" }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+            <Syyrivi s={rivi} vari={v.ak} piste={!h.kuollut} />
+            <Iso s={ots} valistys={-0.04} vari={v.ink} />
+          </div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+            {rivit.map((s, i) => (
+              <div key={i} style={{ display: "flex", gap: 22, alignItems: "flex-start", padding: "20px 26px", border: `3px solid ${v.reuna}`, borderRadius: 18 }}>
+                <div style={{ display: "flex", width: 52, fontFamily: "Archivo", fontWeight: 900, fontSize: 56, lineHeight: "50px", color: v.ak }}>{String(i + 1)}</div>
+                <Leipa s={s} vari={v.ink} paino={700} lh={1.2} />
+              </div>
+            ))}
+          </div>
+          <Alarivi
+            cta={<CtaViiva c={c} teksti={cta} vari={v.ink} viiva={v.ak} nuoli={!h.kuollut} nuoliVari={v.ak} koko={48} paksuus={6} maxLeveys={SISA - merkinLeveys(c) - 24} esteet={esteet} />}
+            reitti={reittiNakyy(k, "5q") ? REITTI : null}
+            reittiVari={v.heikko}
+            merkki={null}
+            gap={10}
+          />
+        </div>
+      </div>,
+    ],
+    esteet,
+    huomiot: [],
+    onKuva: !!h.kuva,
+  };
+}
+
 async function valitseHenkilo(c: Ktx, pohja: Pohja, h: Henkilo, k: Kentat): Promise<Piirros> {
   switch (pohja) {
     case "5f": return p5f(c, h, k);
     case "5h": return p5h(c, h, k);
     case "5i": return p5i(c, h, k);
     case "5m": return p5m(c, h, k);
+    case "5p": return p5p(c, h, k);
+    case "5q": return p5q(c, h, k);
     default: throw new Error(`Ei henkilöpohja: ${pohja}`);
   }
 }
@@ -1516,7 +1662,7 @@ async function valitseHenkilo(c: Ktx, pohja: Pohja, h: Henkilo, k: Kentat): Prom
 async function henkiloVisaan(c: Ktx, pohja: Pohja, v: VisaData, k: Kentat): Promise<Piirros> {
   const h = henkiloVisasta(v, k);
   if (h) return valitseHenkilo(c, pohja, h, k);
-  const p = await valitseHenkilo(c, pohja, { nimi: v.nimi, kuva: null, kuollut: false, synttari: false, ika: null, vuodet: null, visa: true }, k);
+  const p = await valitseHenkilo(c, pohja, { nimi: v.nimi, kuva: null, kuollut: false, synttari: false, ika: null, vuodet: null, visa: true, kysymykset: v.kysymykset }, k);
   return { ...p, esteet: [`${pohja} on henkilökortti — käy vain Tunnetut henkilöt -visalle, jonka henkilö on kannassa.`, ...p.esteet] };
 }
 
@@ -1541,7 +1687,7 @@ async function valitseVisa(c: Ktx, pohja: Pohja, v: VisaData, k: Kentat): Promis
     case "5b": return p5b(c, v, k);
     case "5d": return p5d(c, v, k);
     case "5n": return p5n(c, v, k);
-    case "5f": case "5h": case "5i": case "5m": return henkiloVisaan(c, pohja, v, k);
+    case "5f": case "5h": case "5i": case "5m": case "5p": case "5q": return henkiloVisaan(c, pohja, v, k);
     default: throw new Error(`Ei visapohja: ${pohja}`);
   }
 }
@@ -1552,7 +1698,7 @@ async function valitseSynttarit(c: Ktx, pohja: Pohja, s: SynttariData, k: Kentat
     case "4r": return p4r(c, s, k);
     case "4i": return p4i(c, s, k);
     case "4j": return p4j(c, s, k);
-    case "5f": case "5h": case "5i": case "5m": return valitseHenkilo(c, pohja, henkiloSynttareista(s), k);
+    case "5f": case "5h": case "5i": case "5m": case "5p": case "5q": return valitseHenkilo(c, pohja, henkiloSynttareista(s), k);
     default: throw new Error(`Ei synttäripohja: ${pohja}`);
   }
 }

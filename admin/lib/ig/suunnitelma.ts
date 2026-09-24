@@ -35,7 +35,9 @@ import {
   kortinKysymykset,
   henkilovisanPohja,
   kysymyksiaPohjalle,
+  onHenkilopohja,
   synttareidenPohja,
+  tarkistaSynttarit,
   tarkistaVisa,
   type Kentat,
   type Pohja,
@@ -157,7 +159,7 @@ async function kelpaavatVisapohjat(m: Mitat, v: VisaData, siemen: string, vainKi
 }
 
 /** Kysymyspohjille valitut kysymykset talteen, jotta toimitus näkee ja voi vaihtaa ne. */
-function kysymysKentat(v: VisaData, pohja: Pohja, siemen: string): Kentat {
+function kysymysKentat(v: { kysymykset: VisaData["kysymykset"] }, pohja: Pohja, siemen: string): Kentat {
   if (!kysymyksiaPohjalle(pohja)) return {};
   return { kysymykset: kortinKysymykset(v, {}, pohja, siemen).map((q) => q.id) };
 }
@@ -219,7 +221,7 @@ export async function varmistaSuunnitelma(siteId: string, paivia = 14): Promise<
       if (visaRivi && tarvitseeLuonnoksen(visaRivi)) luonnosteltavat.push({ rivi: visaRivi, visa });
     }
     if (synttarit) {
-      synttariRivi = await suunnitteleSynttarit(siteId, synttarit, synttariRivi);
+      synttariRivi = await suunnitteleSynttarit(siteId, synttarit, synttariRivi, historia, mitat);
       if (synttariRivi && tarvitseeLuonnoksen(synttariRivi)) luonnosteltavat.push({ rivi: synttariRivi, synttarit });
     }
     paivitaHistoria(visaRivi);
@@ -274,13 +276,24 @@ async function suunnitteleVisa(siteId: string, v: VisaData, rivi: Julkaisu | nul
   return rivi ? paivita(rivi.id, arvot) : lisaa(siteId, v.paiva, "paivan_visa", arvot);
 }
 
-/** Synttäreiden pohja ei kierrä: henkilön kuva ratkaisee (kierros 5). Iso kuva →
-    5f (muistopäivänä 5h), heikko kuva → 5i (5m), ei kuvaa → juontajat 4r (4h). */
-async function suunnitteleSynttarit(siteId: string, s: SynttariData, rivi: Julkaisu | null): Promise<Julkaisu | null> {
+/** Synttäreiden pohja: henkilön kuva ratkaisee kasvokortin (kierros 5) — iso kuva 5f
+    (muistopäivänä 5h), heikko kuva 5i (5m), ei kuvaa juontajat 4r (4h). Kuvallisilla
+    henkilöillä kasvokortti kiertää henkilö + kysymys -korttien (5p, 5q) kanssa, jos
+    visassa on sopivat kysymykset — testissä nähdään, haastaako kysymys paremmin. */
+async function suunnitteleSynttarit(siteId: string, s: SynttariData, rivi: Julkaisu | null, historia: Historia, m: Mitat): Promise<Julkaisu | null> {
   const vaihtui = rivi && rivi.celebrity_id !== s.celebrityId;
   if (rivi && !vaihtui) return rivi;
   if (rivi && rivi.tila === "julkaistu") return rivi;
-  const pohja = synttareidenPohja(s);
+  const perus = synttareidenPohja(s);
+  let pohja = perus;
+  if (onHenkilopohja(perus)) {
+    const ehdokkaat: Pohja[] = [perus];
+    for (const p of ["5p", "5q"] as Pohja[]) {
+      const t = await tarkistaSynttarit({ m, siemen: s.paiva }, p, s, KOEKENTAT);
+      if (t.esteet.length === 0) ehdokkaat.push(p);
+    }
+    pohja = valitse(ehdokkaat, s.paiva, "synttarit", false, historia, ehdokkaat) ?? perus;
+  }
   const arvot = {
     pohja,
     muoto: "kuva",
@@ -288,7 +301,7 @@ async function suunnitteleSynttarit(siteId: string, s: SynttariData, rivi: Julka
     celebrity_id: s.celebrityId,
     kokoelma: "Tunnetut henkilöt",
     on_kuva: !!s.kuva,
-    kentat: {},
+    kentat: kysymysKentat(s, pohja, s.paiva),
     tila: "luonnos",
     pohja_valittu_kasin: false,
   };

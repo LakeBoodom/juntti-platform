@@ -98,7 +98,7 @@ async function synttariKortti(m: Mitat, r: Julkaisu, s0: SynttariData): Promise<
     oletusKuvateksti: vanha ? "" : synttariKuvateksti(s, r.pohja, r.kentat ?? {}),
     oletusTapahtuma: null,
     kuva: kuvanTiedot(s.kuva, r),
-    kysymykset: [],
+    kysymykset: s.kysymykset.map((q) => ({ id: q.id, teksti: q.teksti, sopii: SYNT_POHJAT.filter((p) => sopiiKysymykseksi(q, p)) })),
     fanitasot: null,
     vanha,
   };

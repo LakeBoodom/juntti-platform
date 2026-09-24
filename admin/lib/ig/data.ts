@@ -78,6 +78,8 @@ export type SynttariData = {
   kuva: Kuva | null;
   /** Kuvan tekijä ja lisenssi Wikimediasta — kuvatekstiin (CC BY-SA) */
   kuvaaja: string | null;
+  /** Henkilön visan kysymykset (henkilö + kysymys -kortit 5p, 5q) */
+  kysymykset: Kysymys[];
   /** Henkilön visan kokoelma ja nimi (S-D:n visayhteys) */
   visaNimi: string | null;
 };
@@ -299,30 +301,10 @@ export async function haePaivanVisa(siteId: string, paiva: string, lataaKuvat = 
   });
 }
 
-/** Mikä tahansa visa annetulle päivälle — omat julkaisut ja kampanjat. */
-export async function haeVisa(
-  quizId: string,
-  paiva: string,
-  o: { introOtsikko?: string | null; introTeksti?: string | null; oma?: boolean; otsake?: string | null; lataaKuvat?: boolean } = {},
-): Promise<VisaData | null> {
-  const sb = getSupabaseAdmin();
-  const [{ data: q }, { data: kys }, { data: hlo }] = await Promise.all([
-    sb
-      .from("quizzes")
-      .select("id, title, display_title, slug, custom_slug, category, collection, hero_image, image_url, hero_focal_x, hero_focal_y, fanitasot")
-      .eq("id", quizId)
-      .maybeSingle(),
-    sb.from("questions").select("id, question_text, answers, image_url, sort_order").eq("quiz_id", quizId).order("sort_order"),
-    sb
-      .from("celebrities")
-      .select("id, name, birth_date, death_date, image_url, image_focal_x, image_focal_y")
-      .eq("trivia_quiz_id", quizId)
-      .limit(1)
-      .maybeSingle(),
-  ]);
-  const visa = q as unknown as (Visa & { fanitasot: unknown }) | null;
-  if (!visa) return null;
-  const kysymykset: Kysymys[] = ((kys ?? []) as unknown as Array<{ id: string; question_text: string; answers: Array<{ text: string; is_correct: boolean }> | null; image_url: string | null }>).map((r) => {
+/** Visan kysymykset korttia varten, teksti ja vaihtoehdot sellaisinaan. */
+export async function haeKysymykset(quizId: string): Promise<Kysymys[]> {
+  const { data } = await getSupabaseAdmin().from("questions").select("id, question_text, answers, image_url, sort_order").eq("quiz_id", quizId).order("sort_order");
+  return ((data ?? []) as unknown as Array<{ id: string; question_text: string; answers: Array<{ text: string; is_correct: boolean }> | null; image_url: string | null }>).map((r) => {
     const vastaukset = (r.answers ?? []).filter((a) => a?.text?.trim());
     return {
       id: r.id,
@@ -332,6 +314,32 @@ export async function haeVisa(
       kuva: !!r.image_url,
     };
   });
+}
+
+/** Mikä tahansa visa annetulle päivälle — omat julkaisut ja kampanjat. */
+export async function haeVisa(
+  quizId: string,
+  paiva: string,
+  o: { introOtsikko?: string | null; introTeksti?: string | null; oma?: boolean; otsake?: string | null; lataaKuvat?: boolean } = {},
+): Promise<VisaData | null> {
+  const sb = getSupabaseAdmin();
+  const [{ data: q }, kys, { data: hlo }] = await Promise.all([
+    sb
+      .from("quizzes")
+      .select("id, title, display_title, slug, custom_slug, category, collection, hero_image, image_url, hero_focal_x, hero_focal_y, fanitasot")
+      .eq("id", quizId)
+      .maybeSingle(),
+    haeKysymykset(quizId),
+    sb
+      .from("celebrities")
+      .select("id, name, birth_date, death_date, image_url, image_focal_x, image_focal_y")
+      .eq("trivia_quiz_id", quizId)
+      .limit(1)
+      .maybeSingle(),
+  ]);
+  const visa = q as unknown as (Visa & { fanitasot: unknown }) | null;
+  if (!visa) return null;
+  const kysymykset = kys;
   const count = kysymykset.length;
 
   const fx = visa.hero_focal_x ?? 50;
@@ -394,6 +402,7 @@ export async function haePaivanSynttarit(siteId: string, paiva: string, lataaKuv
   if (!rivi) return null;
 
   let visaNimi: string | null = null;
+  const kysymykset = rivi.quiz_id ? await haeKysymykset(rivi.quiz_id) : [];
   if (rivi.quiz_id) {
     const { data: q } = await sb.from("quizzes").select("title, display_title").eq("id", rivi.quiz_id).maybeSingle();
     const v = q as unknown as { title: string; display_title: string | null } | null;
@@ -414,6 +423,7 @@ export async function haePaivanSynttarit(siteId: string, paiva: string, lataaKuv
     kuolinvuosi: rivi.death_date ? Number(rivi.death_date.slice(0, 4)) : null,
     kuva: lataaKuvat ? await lataaKuva(rivi.image_url, fx, fy) : null,
     kuvaaja: lataaKuvat ? await haeKuvaaja(rivi.image_url) : null,
+    kysymykset,
     visaNimi,
   };
 }
