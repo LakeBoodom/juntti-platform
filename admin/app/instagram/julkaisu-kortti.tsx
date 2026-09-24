@@ -10,6 +10,8 @@ import { AlertTriangle, Check, Download, ExternalLink, RotateCcw, Send, Sparkles
 import { Button } from "@/components/ui/button";
 import type { Julkaisu } from "@/lib/ig/suunnitelma";
 import type { Kentat } from "@/lib/ig/pohjat";
+import type { Tagit } from "@/lib/ig/data";
+import { jasennaTilit, tilitTekstina } from "@/lib/ig/maininnat";
 import {
   CTA_EHDOTUKSET,
   KASIN,
@@ -27,6 +29,7 @@ import {
   julkaiseNyt,
   lataaIgKuva,
   luoFanitasotNyt,
+  muistaTilit,
   palautaAutomaattinen,
   poistaOma,
   tallennaFanitasot,
@@ -53,6 +56,8 @@ export type KorttiData = {
   kysymykset: Array<{ id: string; teksti: string; sopii: Pohja[] }>;
   /** Tulosruudun fanitasot (visajulkaisut) */
   fanitasot: { quizId: string; tasot: string[] | null } | null;
+  /** Instagram-maininnat: visan/henkilön tallennetut tilit ja kohde, jolle uusi tili muistetaan */
+  tagit: Tagit;
   /** Kierroksen 2 julkaistu kortti: esikatselu julkaistusta kuvasta */
   vanha: boolean;
 };
@@ -94,6 +99,14 @@ export function JulkaisuKortti({ data, otsikko, yhdistetty, mittaus }: { data: K
   const [kentat, setKentat] = useState<Kentat>(r.kentat ?? {});
   const [kuvateksti, setKuvateksti] = useState(r.kuvateksti ?? data.oletusKuvateksti);
   const [viesti, setViesti] = useState<{ ok: boolean; teksti: string } | null>(null);
+  // Tägäys: kenttä näyttää julkaisun maininnat (toimituksen valinta tai tallennettu ehdotus).
+  const [tagiTeksti, setTagiTeksti] = useState(tilitTekstina(r.kentat?.maininnat ?? data.tagit.ehdotus));
+  const tagit = jasennaTilit(tagiTeksti);
+  const kohde = data.tagit.kohde;
+  const tilitMuuttuivat = !!kohde && tilitTekstina(tagit.tilit) !== tilitTekstina(kohde.tilit);
+  // Uusi tili muistetaan oletuksena; tyhjennys koskee vain tätä julkaisua, ellei toimitus valitse toisin.
+  const [muistaValinta, setMuista] = useState<boolean | null>(null);
+  const muista = muistaValinta ?? tagit.tilit.length > 0;
   const [pending, start] = useTransition();
 
   // Esikatselun kentät päivittyvät viiveellä, ettei jokainen näppäily piirrä kuvaa.
@@ -104,7 +117,20 @@ export function JulkaisuKortti({ data, otsikko, yhdistetty, mittaus }: { data: K
   }, [kentat]);
 
   const muokattu =
-    pohja !== r.pohja || JSON.stringify(kentat) !== JSON.stringify(r.kentat ?? {}) || kuvateksti !== (r.kuvateksti ?? data.oletusKuvateksti);
+    pohja !== r.pohja ||
+    JSON.stringify(kentat) !== JSON.stringify(r.kentat ?? {}) ||
+    kuvateksti !== (r.kuvateksti ?? data.oletusKuvateksti) ||
+    (muista && tilitMuuttuivat);
+
+  function asetaTagit(teksti: string) {
+    setTagiTeksti(teksti);
+    const t = jasennaTilit(teksti).tilit;
+    // Sama kuin tallennettu ehdotus → ei julkaisukohtaista valintaa (ehdotus päivittyy jatkossakin).
+    setKentat((e) => {
+      const { maininnat: _pois, ...muut } = e;
+      return tilitTekstina(t) === tilitTekstina(data.tagit.ehdotus) ? muut : { ...muut, maininnat: t };
+    });
+  }
 
   const esikatselu = useMemo(() => {
     if (data.vanha) return r.kuva_urls?.[0] ?? null;
@@ -165,8 +191,13 @@ export function JulkaisuKortti({ data, otsikko, yhdistetty, mittaus }: { data: K
   function tallenna(jalkeen?: () => Promise<{ ok: boolean; virhe?: string }>) {
     setViesti(null);
     start(async () => {
+      if (tagit.virheelliset.length) { setViesti({ ok: false, teksti: `Tarkista Instagram-tunnus: ${tagit.virheelliset.join(", ")}` }); return; }
       const t = await tallennaJulkaisu(r.id, { pohja, kentat, kuvateksti: kuvateksti === data.oletusKuvateksti ? null : kuvateksti });
       if (!t.ok) { setViesti({ ok: false, teksti: t.virhe }); return; }
+      if (kohde && muista && tilitMuuttuivat) {
+        const m = await muistaTilit(kohde.tyyppi, kohde.id, tagit.tilit);
+        if (!m.ok) { setViesti({ ok: false, teksti: `Tilin muistaminen: ${m.virhe}` }); return; }
+      }
       if (jalkeen) {
         const j = await jalkeen();
         setViesti(j.ok ? { ok: true, teksti: "Hyväksytty." } : { ok: false, teksti: j.virhe ?? "Virhe" });
@@ -292,6 +323,34 @@ export function JulkaisuKortti({ data, otsikko, yhdistetty, mittaus }: { data: K
                 {CTA_EHDOTUKSET[pohja].map((c) => <option key={c} value={c} />)}
               </datalist>
             </label>
+            <label className="flex items-center gap-2">
+              <span className="w-16 shrink-0 text-xs text-muted-foreground">Tägää</span>
+              <input
+                value={tagiTeksti}
+                onChange={(e) => asetaTagit(e.target.value)}
+                disabled={lukittu}
+                maxLength={160}
+                placeholder="@tili — valinnainen, esim. bändin tai henkilön virallinen tili"
+                className={syote}
+              />
+            </label>
+            {(tagit.tilit.length > 0 || tagit.virheelliset.length > 0 || tilitMuuttuivat) && (
+              <div className="ml-[72px] flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
+                {tagit.tilit.map((t) => (
+                  <a key={t} href={`https://www.instagram.com/${t}/`} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 underline-offset-2 hover:text-foreground hover:underline">
+                    <ExternalLink className="h-3 w-3" /> Tarkista @{t}
+                  </a>
+                ))}
+                {tagit.virheelliset.length > 0 && <span className="text-red-700">Ei kelpaa: {tagit.virheelliset.join(", ")}</span>}
+                {tilitMuuttuivat && kohde && (
+                  <label className="flex items-center gap-1.5">
+                    <input type="checkbox" checked={muista} disabled={lukittu} onChange={(e) => setMuista(e.target.checked)} />
+                    Muista jatkossa: {kohde.nimi}
+                  </label>
+                )}
+                {tagit.tilit.length > 0 && <span>Maininta lisätään kuvatekstiin hashtagien edelle.</span>}
+              </div>
+            )}
             <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground">
               <label className="flex items-center gap-1.5">
                 <input
@@ -422,7 +481,7 @@ export function JulkaisuKortti({ data, otsikko, yhdistetty, mittaus }: { data: K
               )}
               {kuvaInfo && <div className="text-muted-foreground">{kuvaInfo}</div>}
               <div className="text-[11px] text-muted-foreground">
-                Kuva tarvitaan pohjiin 4a, 4g, 4d ja 4i (4e toimii ilman). Koko pinnalle väh. 720×900 px. Vain kuvia, joihin on
+                Kuva tarvitaan kuvapohjiin (4a, 4g, 4d, 5a, 5f, 5h; 5b ja 5d toimivat ilman). Koko pinnalle väh. 720×900 px. Vain kuvia, joihin on
                 käyttöoikeus — Commonsin kuvissa kuvaaja ja lisenssi kuvatekstiin.
               </div>
             </div>

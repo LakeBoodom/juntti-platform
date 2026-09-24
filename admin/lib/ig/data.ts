@@ -8,6 +8,16 @@ import { kokoelmaNimi, onUrheilu } from "@/lib/kokoelmat";
 
 const SIVUSTO = "https://tietoniekka.fi";
 
+/** Instagram-maininnat: tallennetut tilit ehdotukseksi ja kohde, jolle uusi tili muistetaan
+    (henkilö, jos julkaisu koskee henkilöä; muuten visa). */
+export type Tagit = {
+  ehdotus: string[];
+  kohde: { tyyppi: "quiz" | "celebrity"; id: string; nimi: string; tilit: string[] } | null;
+};
+
+const tilitListaksi = (x: unknown): string[] => (Array.isArray(x) ? x.filter((t): t is string => typeof t === "string" && !!t) : []);
+const yhdista = (...l: string[][]) => [...new Set(l.flat())];
+
 export type Kuva = {
   url: string;
   /** Alkuperäisen kuvan mitat (ratkaisevat, kelpaako kuva isoksi) */
@@ -54,6 +64,7 @@ export type VisaData = {
   kuvaaja: string | null;
   /** Henkilövisan henkilö (celebrities.trivia_quiz_id) — henkilökortit 5f–5m */
   henkilo: VisanHenkilo | null;
+  tagit: Tagit;
 };
 
 export type VisanHenkilo = {
@@ -80,6 +91,7 @@ export type SynttariData = {
   kuvaaja: string | null;
   /** Henkilön visan kysymykset (henkilö + kysymys -kortit 5p, 5q) */
   kysymykset: Kysymys[];
+  tagit: Tagit;
   /** Henkilön visan kokoelma ja nimi (S-D:n visayhteys) */
   visaNimi: string | null;
 };
@@ -326,18 +338,18 @@ export async function haeVisa(
   const [{ data: q }, kys, { data: hlo }] = await Promise.all([
     sb
       .from("quizzes")
-      .select("id, title, display_title, slug, custom_slug, category, collection, hero_image, image_url, hero_focal_x, hero_focal_y, fanitasot")
+      .select("id, title, display_title, slug, custom_slug, category, collection, hero_image, image_url, hero_focal_x, hero_focal_y, fanitasot, ig_tilit")
       .eq("id", quizId)
       .maybeSingle(),
     haeKysymykset(quizId),
     sb
       .from("celebrities")
-      .select("id, name, birth_date, death_date, image_url, image_focal_x, image_focal_y")
+      .select("id, name, birth_date, death_date, image_url, image_focal_x, image_focal_y, ig_tilit")
       .eq("trivia_quiz_id", quizId)
       .limit(1)
       .maybeSingle(),
   ]);
-  const visa = q as unknown as (Visa & { fanitasot: unknown }) | null;
+  const visa = q as unknown as (Visa & { fanitasot: unknown; ig_tilit: unknown }) | null;
   if (!visa) return null;
   const kysymykset = kys;
   const count = kysymykset.length;
@@ -349,8 +361,10 @@ export async function haeVisa(
   const lataa = o.lataaKuvat !== false;
   const c = hlo as unknown as {
     id: string; name: string; birth_date: string | null; death_date: string | null;
-    image_url: string | null; image_focal_x: number | null; image_focal_y: number | null;
+    image_url: string | null; image_focal_x: number | null; image_focal_y: number | null; ig_tilit: unknown;
   } | null;
+  const visanTilit = tilitListaksi(visa.ig_tilit);
+  const henkilonTilit = c ? tilitListaksi(c.ig_tilit) : [];
   const [kuva, kuvaaja, hKuva, hKuvaaja] = await Promise.all([
     lataa ? lataaKuva(kuvaUrl, fx, fy) : null,
     lataa ? haeKuvaaja(kuvaUrl) : null,
@@ -380,6 +394,12 @@ export async function haeVisa(
           kuolinvuosi: c.death_date ? Number(c.death_date.slice(0, 4)) : null,
         }
       : null,
+    tagit: {
+      ehdotus: yhdista(henkilonTilit, visanTilit),
+      kohde: c
+        ? { tyyppi: "celebrity", id: c.id, nimi: c.name.trim(), tilit: henkilonTilit }
+        : { tyyppi: "quiz", id: visa.id, nimi: (visa.display_title ?? visa.title).trim(), tilit: visanTilit },
+    },
     oma,
     tunniste: oma ? (o.otsake?.trim() || "Visa").toLocaleUpperCase("fi-FI") : "PÄIVÄN VISA",
     kysymykset,
@@ -402,11 +422,17 @@ export async function haePaivanSynttarit(siteId: string, paiva: string, lataaKuv
   if (!rivi) return null;
 
   let visaNimi: string | null = null;
-  const kysymykset = rivi.quiz_id ? await haeKysymykset(rivi.quiz_id) : [];
+  let visanTilit: string[] = [];
+  const [kysymykset, { data: hlo }] = await Promise.all([
+    rivi.quiz_id ? haeKysymykset(rivi.quiz_id) : Promise.resolve([]),
+    sb.from("celebrities").select("ig_tilit").eq("id", rivi.celebrity_id).maybeSingle(),
+  ]);
+  const henkilonTilit = tilitListaksi((hlo as unknown as { ig_tilit: unknown } | null)?.ig_tilit);
   if (rivi.quiz_id) {
-    const { data: q } = await sb.from("quizzes").select("title, display_title").eq("id", rivi.quiz_id).maybeSingle();
-    const v = q as unknown as { title: string; display_title: string | null } | null;
+    const { data: q } = await sb.from("quizzes").select("title, display_title, ig_tilit").eq("id", rivi.quiz_id).maybeSingle();
+    const v = q as unknown as { title: string; display_title: string | null; ig_tilit: unknown } | null;
     visaNimi = v ? (v.display_title ?? v.title) : rivi.quiz_title;
+    visanTilit = tilitListaksi(v?.ig_tilit);
   }
 
   const fx = rivi.image_focal_x ?? 50;
@@ -424,6 +450,10 @@ export async function haePaivanSynttarit(siteId: string, paiva: string, lataaKuv
     kuva: lataaKuvat ? await lataaKuva(rivi.image_url, fx, fy) : null,
     kuvaaja: lataaKuvat ? await haeKuvaaja(rivi.image_url) : null,
     kysymykset,
+    tagit: {
+      ehdotus: yhdista(henkilonTilit, visanTilit),
+      kohde: { tyyppi: "celebrity", id: rivi.celebrity_id, nimi: rivi.name.trim(), tilit: henkilonTilit },
+    },
     visaNimi,
   };
 }

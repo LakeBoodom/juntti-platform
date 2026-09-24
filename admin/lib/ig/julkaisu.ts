@@ -10,6 +10,7 @@ import { getSupabaseAdmin } from "@juntti/db";
 import { haeMediaTilastot, haeYhteys, julkaiseInstagramiin, uusiTokenTarvittaessa } from "./instagram";
 import { jpegit, piirraRivi, type PiirrettavaRivi } from "./piirto";
 import { synttariKuvateksti, visaKuvateksti } from "./kuvateksti";
+import { julkaisunMaininnat, lisaaMaininnat } from "./maininnat";
 import { haeAsetukset, tanaanHelsinki } from "./suunnitelma";
 import { taytaFanitasoja } from "./tekstit";
 
@@ -53,11 +54,14 @@ export async function julkaiseRivi(id: string): Promise<{ ok: true; permalink: s
       urlit.push(sb.storage.from("ig-kuvat").getPublicUrl(polku).data.publicUrl);
     }
 
-    const kuvateksti =
+    const perus =
       rivi.kuvateksti?.trim() ||
       (p.sisalto.tyyppi === "visa"
         ? visaKuvateksti(p.sisalto.v, rivi.pohja, rivi.kentat ?? {})
         : synttariKuvateksti(p.sisalto.s, rivi.pohja, rivi.kentat ?? {}));
+    // Tägäys: @-maininnat omalle rivilleen hashtagien edelle (myös muokattuun kuvatekstiin).
+    const ehdotus = p.sisalto.tyyppi === "visa" ? p.sisalto.v.tagit.ehdotus : p.sisalto.s.tagit.ehdotus;
+    const kuvateksti = lisaaMaininnat(perus, julkaisunMaininnat(rivi.kentat?.maininnat, ehdotus));
 
     const t = await julkaiseInstagramiin(yhteys, urlit, kuvateksti);
     await sb

@@ -12,6 +12,7 @@ import { kelpaaKaistaleeksi, kelpaaKokoPinnaksi, kuvaOsoite, lataaKuva } from "@
 import { onSynttaripohja, onVisapohja, tarkistaSynttarit, tarkistaVisa, type Kentat, type Pohja } from "@/lib/ig/pohjat";
 import { fanitasotKelpaavat, luoFanitasot, luonnosteleTekstit, type Luonnos } from "@/lib/ig/tekstit";
 import { rivinSisalto } from "@/lib/ig/sisalto";
+import { jasennaTilit } from "@/lib/ig/maininnat";
 import { lisaaPaivia, luoKampanja, luoOmaJulkaisu, tanaanHelsinki } from "@/lib/ig/suunnitelma";
 import { kokoelmaNimi } from "@/lib/kokoelmat";
 import { haeYhteys } from "@/lib/ig/instagram";
@@ -36,6 +37,18 @@ async function haeRivi(id: string): Promise<Rivi | null> {
 
 const rajaaProsentti = (n: unknown) => Math.min(100, Math.max(0, Math.round(Number(n) || 0)));
 
+/** Visan tai henkilön Instagram-tilit ehdotukseksi tuleviin julkaisuihin. */
+export async function muistaTilit(tyyppi: "quiz" | "celebrity", id: string, tilit: string[]): Promise<Tulos> {
+  const puhtaat = jasennaTilit(tilit.join(" ")).tilit;
+  const { error } = await getSupabaseAdmin()
+    .from(tyyppi === "quiz" ? "quizzes" : "celebrities")
+    .update({ ig_tilit: puhtaat } as never)
+    .eq("id", id);
+  if (error) return { ok: false, virhe: error.message };
+  revalidatePath("/instagram");
+  return { ok: true };
+}
+
 function siivoaKentat(k: Kentat): Kentat {
   const t = (s?: string) => (s ?? "").replace(/\s+/g, " ").trim() || undefined;
   const kysymykset = (k.kysymykset ?? []).filter((x) => typeof x === "string" && /^[0-9a-f-]{36}$/i.test(x)).slice(0, 3);
@@ -46,9 +59,11 @@ function siivoaKentat(k: Kentat): Kentat {
     cta: t(k.cta),
     tapahtuma: t(k.tapahtuma),
     kuvaaja: t(k.kuvaaja),
+    syy: t(k.syy)?.slice(0, 32),
     luonnosPohjalle: t(k.luonnosPohjalle),
     ...(typeof k.reitti === "boolean" ? { reitti: k.reitti } : {}),
     ...(kysymykset.length ? { kysymykset } : {}),
+    ...(Array.isArray(k.maininnat) ? { maininnat: jasennaTilit(k.maininnat.join(" ")).tilit } : {}),
     ...(k.kuva?.url?.trim()
       ? { kuva: { url: k.kuva.url.trim(), fx: rajaaProsentti(k.kuva.fx), fy: rajaaProsentti(k.kuva.fy) } }
       : {}),

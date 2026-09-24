@@ -64,6 +64,8 @@ export type Kentat = {
   /** occasion_line: henkilökortin syyrivi ("Euroviisut 2027"), enintään 32 merkkiä.
       Toimitus vastaa faktasta; korvaa automaattisen "täyttää tänään 46" -rivin. */
   syy?: string;
+  /** Instagram-maininnat (tunnukset ilman @). Puuttuu → visan/henkilön tallennetut tilit. */
+  maininnat?: string[];
   /** Pohja, jolle tekstit on luonnosteltu (pohjan vaihto → uusi luonnos) */
   luonnosPohjalle?: string;
 };

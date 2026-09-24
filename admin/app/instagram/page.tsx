@@ -72,6 +72,7 @@ async function visaKortti(m: Mitat, r: Julkaisu, v0: VisaData): Promise<KorttiDa
     kuva: kuvanTiedot(onHenkilopohja(r.pohja) && v.henkilo && !r.kentat?.kuva?.url ? v.henkilo.kuva : v.kuva, r),
     kysymykset: v.kysymykset.map((q) => ({ id: q.id, teksti: q.teksti, sopii: VISA_POHJAT.filter((p) => sopiiKysymykseksi(q, p)) })),
     fanitasot: { quizId: v.quizId, tasot: v.fanitasot },
+    tagit: v.tagit,
     vanha,
   };
 }
@@ -100,6 +101,7 @@ async function synttariKortti(m: Mitat, r: Julkaisu, s0: SynttariData): Promise<
     kuva: kuvanTiedot(s.kuva, r),
     kysymykset: s.kysymykset.map((q) => ({ id: q.id, teksti: q.teksti, sopii: SYNT_POHJAT.filter((p) => sopiiKysymykseksi(q, p)) })),
     fanitasot: null,
+    tagit: s.tagit,
     vanha,
   };
 }
