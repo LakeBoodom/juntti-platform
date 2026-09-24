@@ -11,6 +11,7 @@ import {
 import { SortableHeader } from "@/components/sortable-header";
 import { CelebrityRow } from "./celebrity-row";
 import { NewCelebrityButton } from "./new-button";
+import { BackfillImagesButton } from "./backfill-images-button";
 
 /** Päivää seuraavaan synttäriin tästä päivästä (0 = tänään, 365 = eilen) */
 function daysUntilNextBirthday(birthDate: string): number {
@@ -23,6 +24,8 @@ function daysUntilNextBirthday(birthDate: string): number {
 }
 
 export const dynamic = "force-dynamic";
+// Kuvien massahaku (server action) ajetaan tämän sivun kautta.
+export const maxDuration = 60;
 
 export default async function CelebritiesPage({ searchParams }: { searchParams: Promise<{ sort?: string; dir?: string }> }) {
   const sp = await searchParams;
@@ -43,6 +46,14 @@ export default async function CelebritiesPage({ searchParams }: { searchParams: 
     )
     .eq("site_id", site.id)
     .order("name", { ascending: true });
+
+  // Puuttuvat kuvat kaikilta siteiltä — sama rajaus kuin backfillCelebrityImages
+  const { count: missingImages } = await admin
+    .from("celebrities")
+    .select("id", { count: "exact", head: true })
+    .not("wikipedia_url", "is", null)
+    .neq("wikipedia_url", "")
+    .or("image_url.is.null,image_url.eq.");
 
   // Järjestä valitun sarakkeen mukaan
   const data = rawData
@@ -77,6 +88,8 @@ export default async function CelebritiesPage({ searchParams }: { searchParams: 
           </div>
           <NewCelebrityButton sites={sites} defaultSiteId={site.id} />
         </div>
+
+        <BackfillImagesButton missingCount={missingImages ?? 0} />
 
         {error ? (
           <div className="rounded-md border border-destructive/40 bg-destructive/10 p-3 text-sm text-destructive">
