@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { getSupabaseAdmin } from "@juntti/db";
+import { jasennaTilit } from "@/lib/ig/maininnat";
 
 export type CelebrityInput = {
   name: string;
@@ -13,7 +14,14 @@ export type CelebrityInput = {
   platform: "juntti" | "tietoniekka" | "both" | "synttarit";
   wikipedia_url: string | null;
   site_id: string;
+  /** Instagram-tilit (tägäys, ilman @). Puuttuu → ei muuteta. */
+  ig_tilit?: string[];
 };
+
+/** Instagram-tilit tallennettavaksi: vain kelvolliset tunnukset. */
+function igTilit(input: CelebrityInput) {
+  return input.ig_tilit ? { ig_tilit: jasennaTilit(input.ig_tilit.join(" ")).tilit } : {};
+}
 
 function validate(input: CelebrityInput): string | null {
   if (!input.name.trim()) return "Nimi puuttuu";
@@ -24,6 +32,8 @@ function validate(input: CelebrityInput): string | null {
     return "Kuolinpäivä muodossa YYYY-MM-DD tai tyhjä";
   if (!input.role.trim()) return "Rooli puuttuu";
   if (!input.site_id) return "Site puuttuu";
+  const tilit = jasennaTilit((input.ig_tilit ?? []).join(" "));
+  if (tilit.virheelliset.length) return `Instagram-tunnus ei kelpaa: ${tilit.virheelliset.join(", ")}`;
   return null;
 }
 
@@ -41,7 +51,8 @@ export async function createCelebrity(input: CelebrityInput) {
     platform: input.platform,
     wikipedia_url: input.wikipedia_url?.trim() || null,
     site_id: input.site_id,
-  });
+    ...igTilit(input),
+  } as never);
   if (error) return { ok: false as const, error: error.message };
   revalidatePath("/celebrities");
   return { ok: true as const };
@@ -63,7 +74,8 @@ export async function updateCelebrity(id: string, input: CelebrityInput) {
       platform: input.platform,
       wikipedia_url: input.wikipedia_url?.trim() || null,
       site_id: input.site_id,
-    })
+      ...igTilit(input),
+    } as never)
     .eq("id", id);
   if (error) return { ok: false as const, error: error.message };
   revalidatePath("/celebrities");

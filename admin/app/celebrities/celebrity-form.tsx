@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { Download } from "lucide-react";
+import { Download, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -19,6 +19,7 @@ import {
   type CelebrityInput,
 } from "./actions";
 import { fetchFromWikipedia } from "./wikipedia-actions";
+import { jasennaTilit, tilitTekstina } from "@/lib/ig/maininnat";
 
 export type CelebrityFormValue = Omit<CelebrityInput, "site_id"> & { id?: string; site_id?: string | null };
 
@@ -70,6 +71,9 @@ export function CelebrityForm({
     initial?.platform ?? "both",
   );
   const [siteId, setSiteId] = useState<string>(initial?.site_id ?? defaultSiteId);
+  // Tägäys: Instagram-tili mainitaan synttäri- ja henkilövisajulkaisujen kuvatekstissä.
+  const [igTeksti, setIgTeksti] = useState(tilitTekstina(initial?.ig_tilit ?? []));
+  const ig = jasennaTilit(igTeksti);
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
 
@@ -103,7 +107,12 @@ export function CelebrityForm({
       platform,
       wikipedia_url: wikiUrl || null,
       site_id: siteId,
+      ig_tilit: ig.tilit,
     };
+    if (ig.virheelliset.length) {
+      setError(`Instagram-tunnus ei kelpaa: ${ig.virheelliset.join(", ")}`);
+      return;
+    }
     startTransition(async () => {
       const res = initial?.id
         ? await updateCelebrity(initial.id, payload)
@@ -251,6 +260,30 @@ export function CelebrityForm({
           onChange={(e) => setImageUrl(e.target.value)}
           placeholder="https://…"
         />
+      </div>
+
+      <div className="space-y-1.5">
+        <Label htmlFor="ig">Instagram-tili (tägäys)</Label>
+        <Input
+          id="ig"
+          value={igTeksti}
+          onChange={(e) => setIgTeksti(e.target.value)}
+          placeholder="@tili — virallinen tili, useampi välilyönnillä"
+          maxLength={160}
+        />
+        {(ig.tilit.length > 0 || ig.virheelliset.length > 0) && (
+          <div className="flex flex-wrap gap-x-3 gap-y-1 text-xs text-muted-foreground">
+            {ig.tilit.map((t) => (
+              <a key={t} href={`https://www.instagram.com/${t}/`} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 underline-offset-2 hover:text-foreground hover:underline">
+                <ExternalLink className="h-3 w-3" /> Tarkista @{t}
+              </a>
+            ))}
+            {ig.virheelliset.length > 0 && <span className="text-destructive">Ei kelpaa: {ig.virheelliset.join(", ")}</span>}
+          </div>
+        )}
+        <p className="text-xs text-muted-foreground">
+          Mainitaan Instagram-julkaisun kuvatekstissä (synttärit ja henkilön visa). Tarkista tili linkistä ennen tallennusta.
+        </p>
       </div>
 
       <div className="space-y-1.5">

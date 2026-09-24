@@ -27,6 +27,12 @@ export const dynamic = "force-dynamic";
 // Kuvien massahaku (server action) ajetaan tämän sivun kautta.
 export const maxDuration = 60;
 
+type CelebrityRivi = {
+  id: string; name: string; birth_date: string; death_date: string | null; role: string; bio_short: string | null;
+  image_url: string | null; platform: "juntti" | "tietoniekka" | "both" | "synttarit"; trivia_quiz_id: string | null;
+  site_id: string | null; wikipedia_url: string | null; ig_tilit: string[] | null;
+};
+
 export default async function CelebritiesPage({ searchParams }: { searchParams: Promise<{ sort?: string; dir?: string }> }) {
   const sp = await searchParams;
   const sortKey = sp.sort ?? "birthday";
@@ -39,13 +45,16 @@ export default async function CelebritiesPage({ searchParams }: { searchParams: 
   const site = await getCurrentSite();
   const sites = await listSites();
   const admin = getSupabaseAdmin();
-  const { data: rawData, error } = await admin
-    .from("celebrities")
+  const { data: rawRows, error } = await admin
+    .from("celebrities" as never)
     .select(
-      "id, name, birth_date, death_date, role, bio_short, image_url, platform, trivia_quiz_id, site_id",
+      // wikipedia_url ja ig_tilit: muokkauslomake tallentaa ne — ilman niitä tallennus tyhjentäisi kentät.
+      "id, name, birth_date, death_date, role, bio_short, image_url, platform, trivia_quiz_id, site_id, wikipedia_url, ig_tilit",
     )
     .eq("site_id", site.id)
     .order("name", { ascending: true });
+  // ig_tilit puuttuu generoiduista tyypeistä (packages/db/types.ts) — rivit tyypitetään tässä.
+  const rawData = rawRows as unknown as CelebrityRivi[] | null;
 
   // Puuttuvat kuvat kaikilta siteiltä — sama rajaus kuin backfillCelebrityImages
   const { count: missingImages } = await admin
