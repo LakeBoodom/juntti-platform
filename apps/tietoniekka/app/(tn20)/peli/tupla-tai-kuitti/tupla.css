@@ -1,0 +1,150 @@
+/* TUPLA TAI KUITTI — pelinäkymä (esikatselu 25.9.2026). Mobiili ensin (390 px),
+   sisältö enintään 560 px. Teeman väri tulee muuttujasta --ttk-acc.
+   Väliaikainen ilme: lopullinen brändäys ja animaatiot Claude Designilta.
+
+   KORTTISÄÄNTÖ: kysymys ja sanamerkki eivät saa katketa sanan keskeltä eivätkä
+   leikkautua. Sanamerkin koko: pisin sana "KUITTI"/"TUPLA" (6 merkkiä) →
+   0,95 × (350 / (0,67 × 6)) ≈ 83 px 390 px:n näytöllä; käytössä clamp(48px, 15vw, 88px),
+   jotta Aloita-nappi näkyy 390 × 844 -näytöllä ilman vieritystä.
+   Kysymys (Instrument Sans 700, ei versaalia) rivittyy vapaasti: pisimmät sanat
+   ("F1-maailmanmestaruudet", 22 merkkiä) ≈ 0,55 em/merkki → 22 px:llä 266 px < 318 px. */
+
+.tn20 .ttk {
+  --ttk-bg: #07111a;
+  --ttk-surface: #0e1c28;
+  --ttk-line: #1f3345;
+  --ttk-ok: #4ade80;
+  --ttk-fail: #ff5c3d;
+  --ttk-gold: #e8a320;
+  min-height: 100svh;
+  background:
+    radial-gradient(120% 60% at 50% -10%, color-mix(in srgb, var(--ttk-acc) 18%, transparent), transparent 60%),
+    var(--ttk-bg);
+  color: #f2f7fb;
+  font-family: var(--tn-font-body);
+  padding: 16px 20px 56px;
+}
+.tn20 .ttk > * { max-width: 560px; margin-left: auto; margin-right: auto; }
+
+.tn20 .ttk-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 20px; }
+.tn20 .ttk-home { font-family: var(--tn-font-display); font-weight: 900; font-size: 18px; letter-spacing: .02em; text-decoration: none; color: #f2f7fb; }
+.tn20 .ttk-home b { color: var(--tn-gold); font-weight: 900; }
+.tn20 .ttk-top-name { font-size: 13px; font-weight: 600; color: #9fb3c4; text-align: right; white-space: nowrap; }
+@media (max-width: 359px) { .tn20 .ttk-top-name { font-size: 12px; } .tn20 .ttk-home { font-size: 16px; } }
+
+/* ── Aloitus ─────────────────────────────────────────── */
+.tn20 .ttk-intro { display: flex; flex-direction: column; gap: 18px; padding-top: 8px; }
+.tn20 .ttk-eyebrow { font-size: 14px; font-weight: 700; letter-spacing: .18em; text-transform: uppercase; color: var(--ttk-acc); }
+.tn20 .ttk-wordmark {
+  margin: 0; display: flex; flex-direction: column; line-height: .95;
+  font-family: var(--tn-font-display); font-weight: 900; text-transform: uppercase;
+  font-size: clamp(48px, 15vw, 88px); letter-spacing: -.02em;
+  overflow-wrap: normal; word-break: keep-all;
+}
+.tn20 .ttk-wordmark-tai { font-size: .38em; letter-spacing: .12em; color: var(--ttk-acc); margin: 4px 0 2px; }
+.tn20 .ttk-lead { margin: 0; font-size: 17px; line-height: 1.45; color: #c7d4df; }
+.tn20 .ttk-rules { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 10px; counter-reset: s; }
+.tn20 .ttk-rules li {
+  counter-increment: s; position: relative; padding: 12px 14px 12px 50px; border: 1px solid var(--ttk-line);
+  border-radius: 14px; background: var(--ttk-surface); font-size: 15px; line-height: 1.4; color: #c7d4df;
+}
+.tn20 .ttk-rules li::before {
+  content: counter(s); position: absolute; left: 14px; top: 11px; width: 24px; height: 24px; border-radius: 999px;
+  display: grid; place-items: center; background: var(--ttk-acc); color: #04121c; font-weight: 800; font-size: 13px;
+}
+.tn20 .ttk-rules b { color: #f2f7fb; }
+.tn20 .ttk-ladder-note { margin: -8px 0 0; font-size: 13px; color: #9fb3c4; display: flex; align-items: center; gap: 6px; }
+.tn20 .ttk-seed { margin: 0; font-size: 14px; color: #9fb3c4; text-align: center; }
+.tn20 .ttk-link { background: none; border: 0; padding: 0; color: var(--ttk-acc); font: inherit; font-weight: 700; text-decoration: underline; cursor: pointer; }
+
+/* ── Tikapuut ────────────────────────────────────────── */
+.tn20 .ttk-ladder { list-style: none; margin: 0 auto 14px; padding: 0; display: grid; grid-template-columns: repeat(10, 1fr); gap: 4px; }
+.tn20 .ttk-step {
+  position: relative; height: 34px; border-radius: 8px; display: grid; place-items: center;
+  background: var(--ttk-surface); border: 1px solid var(--ttk-line); color: #6f8699;
+  font-size: 12px; font-weight: 700; font-variant-numeric: tabular-nums;
+}
+.tn20 .ttk-step.turva { border-color: color-mix(in srgb, var(--ttk-gold) 70%, transparent); }
+.tn20 .ttk-step.turva::after, .tn20 .ttk-lock {
+  content: ""; width: 9px; height: 7px; border-radius: 2px; background: var(--ttk-gold); display: inline-block;
+  box-shadow: 0 -4px 0 -1.5px transparent;
+}
+.tn20 .ttk-step.turva::after { position: absolute; top: -5px; right: -3px; }
+.tn20 .ttk-step.ok { background: color-mix(in srgb, var(--ttk-acc) 22%, var(--ttk-surface)); color: #f2f7fb; border-color: var(--ttk-acc); }
+.tn20 .ttk-step.nyt { background: var(--ttk-acc); color: #04121c; border-color: var(--ttk-acc); transform: translateY(-2px); box-shadow: 0 6px 18px color-mix(in srgb, var(--ttk-acc) 40%, transparent); }
+
+/* ── HUD ─────────────────────────────────────────────── */
+.tn20 .ttk-hud { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; margin-bottom: 14px; }
+.tn20 .ttk-pot { display: flex; flex-direction: column; gap: 2px; }
+.tn20 .ttk-pot-label { font-size: 12px; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; color: #9fb3c4; }
+.tn20 .ttk-pot-value {
+  display: flex; align-items: center; gap: 10px; font-family: var(--tn-font-display); font-weight: 900; font-size: 40px; line-height: 1;
+  font-variant-numeric: tabular-nums; animation: ttk-pop .45s cubic-bezier(.2, 1.6, .4, 1);
+}
+.tn20 .ttk-meta { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; font-size: 13px; font-weight: 600; color: #9fb3c4; }
+.tn20 .ttk-dots { display: flex; gap: 4px; }
+.tn20 .ttk-dots i { width: 8px; height: 8px; border-radius: 999px; background: var(--ttk-line); }
+.tn20 .ttk-dots i.on { background: var(--ttk-acc); }
+
+/* ── Kysymys ─────────────────────────────────────────── */
+.tn20 .ttk-card { border: 1px solid var(--ttk-line); border-radius: 18px; background: var(--ttk-surface); padding: 20px 18px; }
+.tn20 .ttk-source { font-size: 12px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--ttk-acc); margin-bottom: 10px; }
+.tn20 .ttk-q { margin: 0 0 18px; font-size: clamp(20px, 5.6vw, 26px); line-height: 1.25; font-weight: 700; overflow-wrap: normal; word-break: keep-all; hyphens: manual; }
+.tn20 .ttk-options { display: grid; gap: 10px; }
+.tn20 .ttk-opt {
+  display: flex; align-items: center; gap: 14px; width: 100%; min-height: 56px; padding: 12px 16px; text-align: left;
+  border-radius: 14px; border: 2px solid var(--ttk-line); background: var(--ttk-bg); color: #f2f7fb;
+  font: inherit; font-size: 17px; font-weight: 600; cursor: pointer; transition: border-color .15s, background .15s, opacity .2s;
+}
+.tn20 .ttk-opt b { font-family: var(--tn-font-display); font-weight: 900; color: var(--ttk-acc); font-size: 18px; width: 16px; flex: none; }
+.tn20 .ttk-opt:not(:disabled):hover { border-color: var(--ttk-acc); }
+.tn20 .ttk-opt:disabled { cursor: default; }
+.tn20 .ttk-opt.oikea { border-color: var(--ttk-ok); background: color-mix(in srgb, var(--ttk-ok) 16%, var(--ttk-bg)); }
+.tn20 .ttk-opt.oikea b { color: var(--ttk-ok); }
+.tn20 .ttk-opt.vaara { border-color: var(--ttk-fail); background: color-mix(in srgb, var(--ttk-fail) 16%, var(--ttk-bg)); animation: ttk-shake .35s; }
+.tn20 .ttk-opt.vaara b { color: var(--ttk-fail); }
+.tn20 .ttk-opt.himmea { opacity: .45; }
+
+/* ── Päätös ──────────────────────────────────────────── */
+.tn20 .ttk-decision { margin-top: 16px; padding: 18px; border-radius: 18px; border: 2px solid; display: flex; flex-direction: column; gap: 12px; animation: ttk-in .3s ease-out; }
+.tn20 .ttk-decision.ok { border-color: var(--ttk-ok); background: color-mix(in srgb, var(--ttk-ok) 8%, var(--ttk-bg)); }
+.tn20 .ttk-decision.fail { border-color: var(--ttk-fail); background: color-mix(in srgb, var(--ttk-fail) 8%, var(--ttk-bg)); }
+.tn20 .ttk-verdict { font-family: var(--tn-font-display); font-weight: 900; font-size: 32px; text-transform: uppercase; line-height: 1; }
+.tn20 .ttk-decision.ok .ttk-verdict { color: var(--ttk-ok); }
+.tn20 .ttk-decision.fail .ttk-verdict { color: var(--ttk-fail); }
+.tn20 .ttk-fact { margin: 0; font-size: 15px; line-height: 1.45; color: #c7d4df; }
+.tn20 .ttk-choice-note { margin: 0; font-size: 14px; font-weight: 600; color: #f2f7fb; }
+.tn20 .ttk-choice { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+/* ── Napit ───────────────────────────────────────────── */
+.tn20 .ttk-btn {
+  display: inline-flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; min-height: 56px; padding: 10px 16px;
+  border-radius: 14px; border: 2px solid var(--ttk-line); background: transparent; color: #f2f7fb;
+  font: inherit; font-size: 16px; font-weight: 800; text-align: center; text-decoration: none; cursor: pointer;
+}
+.tn20 .ttk-btn small { font-size: 12px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; opacity: .8; }
+.tn20 .ttk-btn--primary { background: var(--ttk-acc); border-color: var(--ttk-acc); color: #04121c; }
+.tn20 .ttk-btn--kuitti { border-color: var(--ttk-gold); color: var(--ttk-gold); }
+.tn20 .ttk-btn--tupla { animation: ttk-pulse 1.6s ease-in-out infinite; }
+.tn20 .ttk-btn--wide { width: 100%; }
+
+/* ── Tulos ───────────────────────────────────────────── */
+.tn20 .ttk-end { display: flex; flex-direction: column; align-items: center; gap: 12px; text-align: center; padding-top: 12px; }
+.tn20 .ttk-end-kicker { font-family: var(--tn-font-display); font-weight: 900; font-size: 34px; text-transform: uppercase; }
+.tn20 .ttk-end-kicker--jaahy { color: var(--ttk-fail); }
+.tn20 .ttk-end-kicker--kuittasi { color: var(--ttk-gold); }
+.tn20 .ttk-end-kicker--taydet { color: var(--ttk-ok); }
+.tn20 .ttk-end-score { display: flex; align-items: center; gap: 16px; animation: ttk-pop .6s cubic-bezier(.2, 1.6, .4, 1); }
+.tn20 .ttk-count { font-family: var(--tn-font-display); font-weight: 900; font-size: clamp(72px, 24vw, 120px); line-height: 1; font-variant-numeric: tabular-nums; }
+.tn20 .ttk-end-unit { font-size: 15px; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; color: #9fb3c4; margin-top: -8px; }
+.tn20 .ttk-end .ttk-ladder { width: 100%; margin-top: 6px; }
+.tn20 .ttk-actions { display: grid; gap: 10px; width: 100%; margin-top: 6px; }
+.tn20 .ttk-back { margin-top: 8px; color: #9fb3c4; font-size: 15px; font-weight: 600; }
+
+@keyframes ttk-pop { 0% { transform: scale(.6); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+@keyframes ttk-in { from { transform: translateY(8px); opacity: 0; } to { transform: none; opacity: 1; } }
+@keyframes ttk-shake { 0%, 100% { transform: none; } 25% { transform: translateX(-6px); } 75% { transform: translateX(6px); } }
+@keyframes ttk-pulse { 0%, 100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--ttk-acc) 50%, transparent); } 50% { box-shadow: 0 0 0 8px transparent; } }
+@media (prefers-reduced-motion: reduce) {
+  .tn20 .ttk * { animation: none !important; }
+}
