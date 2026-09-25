@@ -7,13 +7,14 @@ export type Pohja =
   | "4a" | "4b" | "4d" | "4f" | "4g" | "4l" | "4m" | "4n" | "4o" | "4p" | "4q"
   | "4h" | "4i" | "4j" | "4r"
   | "5a" | "5b" | "5d" | "5n"
-  | "5f" | "5h" | "5i" | "5m" | "5p" | "5q";
+  | "5f" | "5h" | "5i" | "5m" | "5p" | "5q" | "5r";
 
 /** Kierroksen 5 henkilökortit: kasvot ovat kortin kuva. Käyvät sekä synttäreihin
     että henkilövisan omaan julkaisuun minä päivänä tahansa (design D). */
 // 5p ja 5q (Heikin idea 24.9.): henkilön kasvot + kysymys hänen visastaan — kysymys on
-// kovempi haaste kuin pelkkä "tunnetko hänet".
-export const HENKILOPOHJAT: Pohja[] = ["5f", "5h", "5i", "5m", "5p", "5q"];
+// kovempi haaste kuin pelkkä "tunnetko hänet". 5r (Heikki 25.9.): 5i:n keltainen
+// valokuvakehys + kysymys — pieni kuva ei rajaa kasvoja.
+export const HENKILOPOHJAT: Pohja[] = ["5f", "5h", "5i", "5m", "5p", "5q", "5r"];
 export const onHenkilopohja = (p: string) => (HENKILOPOHJAT as string[]).includes(p);
 
 /** Visajulkaisun pohjat (Päivän visa, omat ja kampanjat) */
@@ -59,6 +60,7 @@ export const POHJA_NIMET: Record<string, string> = {
   "5m": "Henkilökortti · paperi, ei syyriviä",
   "5p": "Henkilö + kysymys",
   "5q": "Henkilö + useampi kysymys",
+  "5r": "Henkilö + kysymys · valokuvakehys",
   // Kierroksen 2 pohjat — vain julkaistujen historiaa varten
   "V-A": "Tapahtuma edellä (kierros 2)",
   "V-B": "Haaste edellä (kierros 2)",
@@ -79,7 +81,7 @@ export const PERHE: Record<Pohja, "kuva" | "teksti" | "kysymys" | "juontaja" | "
   "4n": "juontaja", "4o": "juontaja", "4p": "juontaja", "4q": "juontaja",
   "4h": "synttari", "4r": "synttari", "4i": "synttari", "4j": "synttari",
   "5a": "kuva", "5b": "kuva", "5d": "kuva", "5n": "juontaja",
-  "5f": "synttari", "5h": "synttari", "5i": "synttari", "5m": "synttari", "5p": "synttari", "5q": "synttari",
+  "5f": "synttari", "5h": "synttari", "5i": "synttari", "5m": "synttari", "5p": "synttari", "5q": "synttari", "5r": "synttari",
 };
 
 /** Designin motiivi (kierros 3–4) — tekoälyluonnoksen ohje ja adminin selite. */
@@ -90,14 +92,14 @@ export const MOTIIVI: Record<Pohja, string> = {
   "4f": "osallistuminen", "4l": "osallistuminen", "4o": "osallistuminen", "4q": "osallistuminen",
   "4h": "synttari", "4r": "synttari", "4i": "muisto", "4j": "synttari",
   "5a": "tulos", "5b": "tulos", "5d": "sosiaalinen", "5n": "osallistuminen",
-  "5f": "henkilo", "5h": "henkilo", "5i": "henkilo", "5m": "henkilo", "5p": "osallistuminen", "5q": "osallistuminen",
+  "5f": "henkilo", "5h": "henkilo", "5i": "henkilo", "5m": "henkilo", "5p": "osallistuminen", "5q": "osallistuminen", "5r": "osallistuminen",
 };
 
 /** Koukun [hakasulkeissa] oleva aihe piirretään korostelaatikkoon (kierros 5). */
 export const AIHELAATIKKO: Pohja[] = ["5a", "5b", "5d"];
 
 /** Kortit, jotka ohjaavat kommentteihin eivätkä sivustolle. */
-export const KOMMENTTIPOHJAT: Pohja[] = ["4f", "4o", "4q", "4i", "5n", "5p"];
+export const KOMMENTTIPOHJAT: Pohja[] = ["4f", "4o", "4q", "4i", "5n", "5p", "5r"];
 
 /** CTA-vaihtoehdot motiivin mukaan (design 4k: "valitaan motiivin listasta"). */
 export const CTA_EHDOTUKSET: Record<Pohja, string[]> = {
@@ -126,6 +128,7 @@ export const CTA_EHDOTUKSET: Record<Pohja, string[]> = {
   "5m": ["Testaa tietosi", "Näytä mitä osaat"],
   "5p": ["Vastaa kommenttiin", "Kerro vastauksesi"],
   "5q": ["Pelaa koko visa", "Testaa loput", "Pelaa kaikki"],
+  "5r": ["Vastaa kommenttiin", "Kerro vastauksesi"],
 };
 
 /** Kentät, joita pohja käyttää — adminin lomake näyttää vain nämä. */
@@ -156,9 +159,10 @@ export const POHJAN_KENTAT: Record<Pohja, Kentta[]> = {
   "5m": ["koukku", "syy"],
   "5p": ["koukku", "syy"],
   "5q": ["koukku", "syy"],
+  "5r": ["koukku", "syy"],
 };
 
-export const KYSYMYSPOHJAT: Pohja[] = ["4f", "4l", "4m", "4o", "4p", "4q", "5n", "5p", "5q"];
+export const KYSYMYSPOHJAT: Pohja[] = ["4f", "4l", "4m", "4o", "4p", "4q", "5n", "5p", "5q", "5r"];
 export const kysymyksiaPohjalle = (p: Pohja) => (p === "4l" || p === "5q" ? 3 : KYSYMYSPOHJAT.includes(p) ? 1 : 0);
 
 /** Pohjat, joiden koukku luonnostellaan tekoälyllä. Muissa koukku on kiinteä oletus
@@ -198,6 +202,7 @@ export const OLETUSTEKSTIT: Record<Pohja, { koukku?: string; palkinto?: string; 
   "5m": { koukku: "Kuinka hyvin tunnet hänet?", cta: "Testaa tietosi" },
   "5p": { koukku: "Tiedätkö ilman apua?", cta: "Vastaa kommenttiin" },
   "5q": { koukku: "Montako näistä tiedät?", cta: "Pelaa koko visa" },
+  "5r": { koukku: "Tiedätkö ilman apua?", cta: "Vastaa kommenttiin" },
 };
 
 /** Käsin valittavat (eivät ole kierrossa) — lomakkeen selite. */

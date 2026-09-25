@@ -241,10 +241,11 @@ export function haeKuvaaja(url: string | null | undefined): Promise<string | nul
     object-position fx% fy% ja palauttaa data-URL:n. Suurennettaessa terävöitetään kevyesti.
     seepia 0–1: designin 4d "lämmin kuva" (CSS sepia(.25) saturate(.9)) — Satori ei tue
     CSS-suodattimia, joten sävy tehdään kuvaan valmiiksi. */
-export async function rajaa(k: Kuva, w: number, h: number, o: { seepia?: number; harmaa?: boolean } = {}): Promise<string> {
+export async function rajaa(k: Kuva, w: number, h: number, o: { seepia?: number; harmaa?: boolean; kokonaan?: boolean } = {}): Promise<string> {
   const meta = await sharp(k.buf).metadata();
   const W = meta.width ?? w;
   const H = meta.height ?? h;
+  if (o.kokonaan) return kokonaisena(k, W, H, w, h, o.harmaa);
   const s = Math.max(w / W, h / H);
   const rw = Math.max(w, Math.round(W * s));
   const rh = Math.max(h, Math.round(H * s));
@@ -261,6 +262,42 @@ export async function rajaa(k: Kuva, w: number, h: number, o: { seepia?: number;
   }
   // Muistopäivän kortti (5h): harmaasävy etukäteen, koska Satori ei tue suodattimia.
   if (o.harmaa) kuva = sharp(await kuva.toBuffer()).grayscale();
+  const out = await kuva.jpeg({ quality: 90 }).toBuffer();
+  return `data:image/jpeg;base64,${out.toString("base64")}`;
+}
+
+/** Pystykuva leveään kaistaan ilman kasvojen leikkausta (Heikki 25.9.: Häkkisen lähikuvasta
+    näkyi vain otsa ja silmät). Kuva rajataan enintään 4:5-pystyyn kohdistuspisteen mukaan ja
+    sovitetaan kaistan korkeuteen keskelle; sivuille sama kuva sumeana ja tummennettuna kuten
+    musiikkivisojen herokuvissa. Satori ei osaa sumentaa, joten koostetaan valmiiksi. */
+async function kokonaisena(k: Kuva, W: number, H: number, w: number, h: number, harmaa?: boolean): Promise<string> {
+  const suhde = Math.min(Math.max(W / H, 0.7), 0.8);
+  let cw = W;
+  let ch = H;
+  if (W / H > suhde) cw = Math.round(H * suhde);
+  else ch = Math.round(W / suhde);
+  const left = Math.round((W - cw) * (k.fx / 100));
+  const top = Math.round((H - ch) * (k.fy / 100));
+  const fh = h;
+  const fw = Math.round(fh * (cw / ch));
+  const etu = await sharp(k.buf).extract({ left, top, width: cw, height: ch }).resize(fw, fh, { kernel: "lanczos3" }).toBuffer();
+  const s = Math.max(w / W, h / H);
+  const rw = Math.max(w, Math.round(W * s));
+  const rh = Math.max(h, Math.round(H * s));
+  const tausta = await sharp(k.buf)
+    .resize(rw, rh)
+    .extract({ left: Math.round((rw - w) / 2), top: Math.round((rh - h) * (k.fy / 100)), width: w, height: h })
+    .blur(28)
+    .modulate({ brightness: 0.45, saturation: 0.8 })
+    .toBuffer();
+  // Pehmeä reuna: etukuvan sivut häivytetään taustaan 80 px matkalla.
+  const reuna = 80;
+  const maski = Buffer.from(
+    `<svg width="${fw}" height="${fh}"><defs><linearGradient id="g" x1="0" x2="1"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset="${reuna / fw}" stop-color="#fff"/><stop offset="${1 - reuna / fw}" stop-color="#fff"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient></defs><rect width="100%" height="100%" fill="url(#g)"/></svg>`,
+  );
+  const pehmea = await sharp(etu).ensureAlpha().composite([{ input: maski, blend: "dest-in" }]).png().toBuffer();
+  let kuva = sharp(tausta).composite([{ input: pehmea, left: Math.round((w - fw) / 2), top: 0 }]);
+  if (harmaa) kuva = sharp(await kuva.jpeg().toBuffer()).grayscale();
   const out = await kuva.jpeg({ quality: 90 }).toBuffer();
   return `data:image/jpeg;base64,${out.toString("base64")}`;
 }

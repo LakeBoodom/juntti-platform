@@ -21,7 +21,7 @@
 
 import type { ReactElement } from "react";
 import { ilmanTavutusta, leveys, sovita, type lataaFontit } from "./fontit";
-import { kelpaa, lataaKuva, rajaa, type Kuva, type Kysymys, type SynttariData, type VisaData } from "./data";
+import { MAX_SUURENNOS, kelpaa, lataaKuva, rajaa, type Kuva, type Kysymys, type SynttariData, type VisaData } from "./data";
 import { juontajaPng, valitseJuontaja, type Asento, type Kuka } from "./juontajat";
 
 export const W = 1080;
@@ -79,7 +79,7 @@ export type Piirros = {
 
 /* ── Piirtokonteksti ─────────────────────────────────────────────────── */
 
-type Kuvaksi = (k: Kuva, w: number, h: number, o?: { seepia?: number; harmaa?: boolean }) => Promise<string>;
+type Kuvaksi = (k: Kuva, w: number, h: number, o?: { seepia?: number; harmaa?: boolean; kokonaan?: boolean }) => Promise<string>;
 type Juontaja = (asento: Asento, korkeus: number, kuka: Kuka[]) => Promise<{ data: string; leveys: number; korkeus: number; kuka: Kuka } | null>;
 
 /** Juontajat ympäristössä (5n): koko pinnan kuva rajattuna 1080 × 1350, tai null. */
@@ -242,7 +242,10 @@ function vaadiKoukku(k: Kentat, oletus: string | null, esteet: string[]) {
 }
 
 function tarkistaMahtuu(s: { mahtuu: boolean }, mika: string, esteet: string[]) {
-  if (!s.mahtuu) esteet.push(`${mika} ei mahdu — lyhennä tai merkitse tavutuskohta (esim. Jokeri|fani).`);
+  if (s.mahtuu) return;
+  // Visan kysymystä ja vaihtoehtoja ei muokata kortissa — neuvotaan valitsemaan toinen.
+  if (mika === "Kysymys" || mika === "Vaihtoehto") esteet.push(`${mika} on liian pitkä tähän korttiin — valitse lyhyempi kysymys tai toinen pohja.`);
+  else esteet.push(`${mika} ei mahdu — lyhennä tai merkitse tavutuskohta (esim. Jokeri|fani).`);
 }
 
 const reittiNakyy = (k: Kentat, pohja: Pohja) => (k.reitti ?? !KOMMENTTIPOHJAT.includes(pohja)) !== false;
@@ -259,9 +262,12 @@ function hajautus(s: string): number {
 const VIITTAA_VAIHTOEHTOIHIN = /seuraavista|alla olevista|näistä|oheisista|mikä seuraava|kuka seuraava/i;
 
 /** Sopiiko kysymys pohjaan: kuvakysymykset pois, pituusrajat pohjan tilan mukaan. */
+/** Kortit, joissa kysymys näkyy vaihtoehtoineen. */
+const VAIHTOEHTOPOHJAT: Pohja[] = ["4f", "4q", "4o", "5n", "5p", "5r"];
+
 export function sopiiKysymykseksi(q: Kysymys, pohja: Pohja): boolean {
   if (q.kuva || !q.teksti) return false;
-  const vaihtoehdoilla = pohja === "4f" || pohja === "4q" || pohja === "4o" || pohja === "5n" || pohja === "5p";
+  const vaihtoehdoilla = VAIHTOEHTOPOHJAT.includes(pohja);
   if (vaihtoehdoilla) {
     if (q.vaihtoehdot.length < 2 || !q.oikea) return false;
     const maxV = pohja === "4q" ? 24 : 34;
@@ -270,7 +276,7 @@ export function sopiiKysymykseksi(q: Kysymys, pohja: Pohja): boolean {
     if (VIITTAA_VAIHTOEHTOIHIN.test(q.teksti)) return false;
     if ((pohja === "4m" || pohja === "4p") && !q.oikea) return false;
   }
-  const max: Partial<Record<Pohja, number>> = { "4f": 100, "4q": 80, "4o": 90, "5n": 90, "5p": 90, "5q": 90, "4m": 110, "4p": 90, "4l": 90 };
+  const max: Partial<Record<Pohja, number>> = { "4f": 100, "4q": 80, "4o": 110, "5n": 90, "5p": 90, "5q": 90, "5r": 90, "4m": 110, "4p": 90, "4l": 90 };
   return q.teksti.length <= (max[pohja] ?? 100);
 }
 
@@ -439,7 +445,7 @@ async function p4d(c: Ktx, v: VisaData, k: Kentat): Promise<Piirros> {
 const KIRJAIMET = ["A", "B", "C", "D"];
 
 function kysymysEste(q: Kysymys | undefined, esteet: string[], pohja: Pohja) {
-  if (!q) esteet.push(`${pohja} vaatii visasta sopivan kysymyksen (ei kuvakysymys, riittävän lyhyt${pohja === "4f" || pohja === "4q" || pohja === "4o" || pohja === "5n" || pohja === "5p" ? ", lyhyet vaihtoehdot" : ""}) — valitse kysymys tai toinen pohja.`);
+  if (!q) esteet.push(`${pohja} vaatii visasta sopivan kysymyksen (ei kuvakysymys, riittävän lyhyt${VAIHTOEHTOPOHJAT.includes(pohja) ? ", lyhyet vaihtoehdot" : ""}) — valitse kysymys tai toinen pohja.`);
 }
 
 /** 4f Oikea visakysymys vaihtoehtoineen · paperipohja. Vastaus kommentteihin. */
@@ -651,7 +657,9 @@ async function p4o(c: Ktx, v: VisaData, k: Kentat): Promise<Piirros> {
   const [q] = kortinKysymykset(v, k, "4o", c.siemen);
   kysymysEste(q, esteet, "4o");
   const { laura, mikko } = juontajienVastaukset(c, q, "4o", esteet);
-  const kys = otsikko(c, q?.teksti ?? "Kysymys puuttuu", { koot: [60, 52, 46, 40], leveys: W - 128 - 60, maxRivit: 3, valistys: -0.02 });
+  // Neljäs rivi sallittu (Heikki 25.9.: 98 merkin ravintolakysymys ei mahtunut kolmelle);
+  // koukun ja juontajien väliin jää silti tilaa.
+  const kys = otsikko(c, q?.teksti ?? "Kysymys puuttuu", { koot: [60, 52, 46, 40], leveys: W - 128 - 60, maxRivit: 4, valistys: -0.02 });
   tarkistaMahtuu(kys, "Kysymys", esteet);
   const koukku = otsikko(c, vaadiKoukku(k, "Kumpi on oikeassa?", esteet), { koot: [112, 96, 84], leveys: W - 128, maxRivit: 2, valistys: -0.04 });
   tarkistaMahtuu(koukku, "Koukku", esteet);
@@ -1516,7 +1524,9 @@ const henkiloVarit = (h: Henkilo) =>
     : { bg: "#0B1420", bgRgb: "11,20,32", ink: "#FFFFFF", ak: "#FFD84A", heikko: "#8FA0B8", reuna: "#23385A", laatikko: "rgba(11,20,32,.82)" };
 
 /** Kasvot kortin yläosaan: kaista koko leveydeltä, jos kuva riittää (enintään 1,5×),
-    muuten valokuvakehys vasemmalle ja merkki oikealle. Muistopäivänä harmaasävy. */
+    muuten valokuvakehys vasemmalle ja merkki oikealle. Muistopäivänä harmaasävy.
+    Pystykuva, josta leveä kaista jättäisi alle 60 % korkeudesta (lähikuvasta vain otsa ja
+    silmät), sovitetaan kaistaan kokonaisena sumean taustan päälle (Heikki 25.9., Häkkinen). */
 async function Kasvot(c: Ktx, h: Henkilo, korkeus: number, esteet: string[], tummaAlkaa = 0.55) {
   const v = henkiloVarit(h);
   // Teksti alkaa 5p:ssä jo kuvan päältä: kuva tummuu täysin ennen syyriviä.
@@ -1525,8 +1535,10 @@ async function Kasvot(c: Ktx, h: Henkilo, korkeus: number, esteet: string[], tum
     esteet.push("Henkilökuva puuttuu — ilman kuvaa käytä 4r:ää tai 4h:ta.");
     return <div style={{ display: "flex", width: W, height: korkeus }} />;
   }
-  if (kelpaa(h.kuva, W, korkeus)) {
-    const kuva = await c.kuvaksi(h.kuva, W, korkeus, { harmaa: h.kuollut });
+  const kokonaan = ((h.kuva.leveys / h.kuva.korkeus) * korkeus) / W < 0.6;
+  const riittaa = kokonaan ? Math.min(h.kuva.korkeus, h.kuva.leveys / 0.7) * MAX_SUURENNOS >= korkeus : kelpaa(h.kuva, W, korkeus);
+  if (riittaa) {
+    const kuva = await c.kuvaksi(h.kuva, W, korkeus, { harmaa: h.kuollut, kokonaan });
     return (
       <div style={{ position: "relative", display: "flex", width: W, height: korkeus }}>
         <img src={kuva} width={W} height={korkeus} alt="" style={{ width: W, height: korkeus }} />
@@ -1568,7 +1580,7 @@ async function p5p(c: Ktx, h: Henkilo, k: Kentat): Promise<Piirros> {
   const koukku = leipa(c, t(k.koukku) || "Tiedätkö ilman apua?", { koot: [36, 32], leveys: SISA, maxRivit: 1, paino: 700 });
   tarkistaMahtuu(koukku, "Koukku", esteet);
   const cta = t(k.cta) || "Vastaa kommenttiin";
-  const kasvot = await Kasvot(c, h, 760, esteet, 0.36);
+  const kasvot = await Kasvot(c, h, 600, esteet, 0.5);
   return {
     ruudut: [
       <Absoluuttinen key="5p" bg={v.bg}>
@@ -1648,6 +1660,66 @@ async function p5q(c: Ktx, h: Henkilo, k: Kentat): Promise<Piirros> {
   };
 }
 
+/** 5r Henkilö + kysymys · valokuvakehys (Heikki 25.9.): 5i:n keltainen pohja ja kehys,
+    5p:n kysymys vaihtoehtoineen. Kuvaa ei suurenneta eikä kasvoja rajata, joten sopii
+    myös lähikuvalle ja heikolle kuvalle. Vastaus kommentteihin. */
+async function p5r(c: Ktx, h: Henkilo, k: Kentat): Promise<Piirros> {
+  const esteet: string[] = [];
+  if (h.kuollut) esteet.push("5r on elävälle henkilölle — muistopäivään käytä 5p:tä.");
+  if (!h.kuva) esteet.push("5r vaatii henkilökuvan — ilman kuvaa käytä 4r:ää.");
+  const [q] = kortinKysymykset(h, k, "5r", c.siemen);
+  kysymysEste(q, esteet, "5r");
+  const KW = 300;
+  const oikea = SISA - (KW + 32) - 48;
+  const syy = t(k.syy) || autoSyy(h);
+  const rivi = syy ? syyrivi(c, syy, oikea - 28, null, esteet) : null;
+  const koukku = otsikko(c, t(k.koukku) || "Tiedätkö ilman apua?", { koot: [80, 72, 64, 56], leveys: oikea, maxRivit: 4, valistys: -0.03 });
+  tarkistaMahtuu(koukku, "Koukku", esteet);
+  const kys = otsikko(c, q?.teksti ?? "Kysymys puuttuu", { koot: [56, 50, 45, 40], leveys: SISA, maxRivit: 4, valistys: -0.02 });
+  tarkistaMahtuu(kys, "Kysymys", esteet);
+  const lw = (SISA - 16) / 2;
+  const vaihtoehdot = (q?.vaihtoehdot ?? []).map((x) => leipa(c, x, { koot: [28, 25, 22], leveys: lw - 40 - 36 - 16, maxRivit: 2 }));
+  vaihtoehdot.forEach((s) => tarkistaMahtuu(s, "Vaihtoehto", esteet));
+  const cta = t(k.cta) || "Vastaa kommenttiin";
+  const kuva = await Valokuva(c, h, { w: KW, h: 376, kierto: -3, nimiVari: "#1A1400" });
+  return {
+    ruudut: [
+      <Kortti key="5r" bg="#FFD84A" vari="#1A1400">
+        <div style={{ display: "flex", alignItems: "stretch", justifyContent: "space-between", gap: 48 }}>
+          {kuva ?? <div style={{ display: "flex", width: KW }} />}
+          <div style={{ display: "flex", flexDirection: "column", justifyContent: "space-between", width: oikea, gap: 32 }}>
+            <div style={{ display: "flex", justifyContent: "flex-end" }}>
+              <Merkki vari="#1A1400" />
+            </div>
+            <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
+              {rivi && <Syyrivi s={rivi} vari="#8A2A12" />}
+              <Iso s={koukku} valistys={-0.03} vari="#1A1400" lh={0.95} />
+            </div>
+          </div>
+        </div>
+        <div style={{ display: "flex", flexDirection: "column", gap: 28 }}>
+          <Iso s={kys} valistys={-0.02} vari="#1A1400" lh={0.98} />
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 16 }}>
+            {vaihtoehdot.map((s, i) => (
+              <div key={i} style={{ width: lw, height: 96, display: "flex", alignItems: "center", gap: 16, padding: "0 20px", border: "3px solid #1A1400", borderRadius: 14, background: "#FFE68A" }}>
+                <div style={{ display: "flex", fontFamily: "Archivo", fontWeight: 900, fontSize: 36, color: "#8A2A12" }}>{KIRJAIMET[i]}</div>
+                <Leipa s={s} vari="#1A1400" lh={1.1} />
+              </div>
+            ))}
+          </div>
+        </div>
+        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+          <CtaNappi c={c} teksti={cta} bg="#1A1400" ink="#FFD84A" maxLeveys={SISA} esteet={esteet} />
+          {reittiNakyy(k, "5r") ? <Reitti teksti={`Lisää visoja: ${REITTI}`} vari="#6B5200" /> : null}
+        </div>
+      </Kortti>,
+    ],
+    esteet,
+    huomiot: [],
+    onKuva: !!kuva,
+  };
+}
+
 async function valitseHenkilo(c: Ktx, pohja: Pohja, h: Henkilo, k: Kentat): Promise<Piirros> {
   switch (pohja) {
     case "5f": return p5f(c, h, k);
@@ -1656,6 +1728,7 @@ async function valitseHenkilo(c: Ktx, pohja: Pohja, h: Henkilo, k: Kentat): Prom
     case "5m": return p5m(c, h, k);
     case "5p": return p5p(c, h, k);
     case "5q": return p5q(c, h, k);
+    case "5r": return p5r(c, h, k);
     default: throw new Error(`Ei henkilöpohja: ${pohja}`);
   }
 }
@@ -1689,7 +1762,7 @@ async function valitseVisa(c: Ktx, pohja: Pohja, v: VisaData, k: Kentat): Promis
     case "5b": return p5b(c, v, k);
     case "5d": return p5d(c, v, k);
     case "5n": return p5n(c, v, k);
-    case "5f": case "5h": case "5i": case "5m": case "5p": case "5q": return henkiloVisaan(c, pohja, v, k);
+    case "5f": case "5h": case "5i": case "5m": case "5p": case "5q": case "5r": return henkiloVisaan(c, pohja, v, k);
     default: throw new Error(`Ei visapohja: ${pohja}`);
   }
 }
@@ -1700,7 +1773,7 @@ async function valitseSynttarit(c: Ktx, pohja: Pohja, s: SynttariData, k: Kentat
     case "4r": return p4r(c, s, k);
     case "4i": return p4i(c, s, k);
     case "4j": return p4j(c, s, k);
-    case "5f": case "5h": case "5i": case "5m": case "5p": case "5q": return valitseHenkilo(c, pohja, henkiloSynttareista(s), k);
+    case "5f": case "5h": case "5i": case "5m": case "5p": case "5q": case "5r": return valitseHenkilo(c, pohja, henkiloSynttareista(s), k);
     default: throw new Error(`Ei synttäripohja: ${pohja}`);
   }
 }

@@ -278,7 +278,7 @@ async function suunnitteleVisa(siteId: string, v: VisaData, rivi: Julkaisu | nul
 
 /** Synttäreiden pohja: henkilön kuva ratkaisee kasvokortin (kierros 5) — iso kuva 5f
     (muistopäivänä 5h), heikko kuva 5i (5m), ei kuvaa juontajat 4r (4h). Kuvallisilla
-    henkilöillä kasvokortti kiertää henkilö + kysymys -korttien (5p, 5q) kanssa, jos
+    henkilöillä kasvokortti kiertää henkilö + kysymys -korttien (5p, 5q, 5r) kanssa, jos
     visassa on sopivat kysymykset — testissä nähdään, haastaako kysymys paremmin. */
 async function suunnitteleSynttarit(siteId: string, s: SynttariData, rivi: Julkaisu | null, historia: Historia, m: Mitat): Promise<Julkaisu | null> {
   const vaihtui = rivi && rivi.celebrity_id !== s.celebrityId;
@@ -288,7 +288,7 @@ async function suunnitteleSynttarit(siteId: string, s: SynttariData, rivi: Julka
   let pohja = perus;
   if (onHenkilopohja(perus)) {
     const ehdokkaat: Pohja[] = [perus];
-    for (const p of ["5p", "5q"] as Pohja[]) {
+    for (const p of ["5p", "5q", "5r"] as Pohja[]) {
       const t = await tarkistaSynttarit({ m, siemen: s.paiva }, p, s, KOEKENTAT);
       if (t.esteet.length === 0) ehdokkaat.push(p);
     }

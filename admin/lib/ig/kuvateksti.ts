@@ -39,6 +39,7 @@ const KOMMENTTIKEHOTE: Partial<Record<Pohja, string>> = {
   "4i": "Kerro muistosi kommentissa.",
   "5n": "Kumpi on oikeassa, Laura vai Mikko? Kerro kommentissa.",
   "5p": "Tiedätkö vastauksen? Kerro kommentissa. Koko visa löytyy biosta.",
+  "5r": "Tiedätkö vastauksen? Kerro kommentissa. Koko visa löytyy biosta.",
 };
 
 export function visaKuvateksti(v: VisaData, pohja: Pohja, k: Kentat): string {
@@ -80,7 +81,7 @@ export function synttariKuvateksti(s: SynttariData, pohja: Pohja, k: Kentat): st
   if (palkinto) rivit.push(palkinto);
   rivit.push("");
   if (pohja === "4i" || !s.quizId) rivit.push(KOMMENTTIKEHOTE["4i"]!);
-  else if (pohja === "5p" && k.reitti !== true) rivit.push(`Tiedätkö vastauksen? Kerro kommentissa. ${s.visaNimi ? `${s.visaNimi}: koko visa` : "Koko visa"} löytyy biosta.`);
+  else if ((pohja === "5p" || pohja === "5r") && k.reitti !== true) rivit.push(`Tiedätkö vastauksen? Kerro kommentissa. ${s.visaNimi ? `${s.visaNimi}: koko visa` : "Koko visa"} löytyy biosta.`);
   else rivit.push(`${s.visaNimi ? `${s.visaNimi}: ` : ""}testaa tietosi — linkki biossa.`);
   // CC BY-SA -kuvat vaativat kuvaajan ja lisenssin: vain kun kuvassa on henkilökuva.
   const kuvaaja = t(k.kuvaaja) || s.kuvaaja;
