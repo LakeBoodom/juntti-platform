@@ -15,30 +15,55 @@
 
 import { JK_ACCENT } from "./jaakiekko";
 
+/** Palkintoikonit (CD "TN Tupla tai kuitti" 1C): yksi SVG-symboli per palkinto,
+    kasa rakennetaan toistamalla samaa symbolia. */
+export type PalkintoIkoni = "kiekko" | "kolikko" | "pallo" | "karkki" | "lahja";
+
 export type Palkinto = {
   /** "kiekko" */
   yksi: string;
   /** partitiivi: "kiekkoa" */
   monta: string;
+  /** yksikön genetiivi: "kiekon" (otit kiekon talteen) */
+  yhden: string;
   /** monikon nominatiivi: "kiekot" (otatko kiekot talteen) */
   kaikki: string;
   /** monikon elatiivi: "kiekoista" (osa kiekoista on turvassa) */
   osa: string;
-  ikoni: "kiekko" | "kolikko";
+  ikoni: PalkintoIkoni;
 };
+
+/** Tuloksen toinen rivi — antaa pienellekin saaliille arvon (CD-ehdotus 5: teemakohtainen
+    taulukko, rivi arvotaan). {n} = oikein-määrä sanana, {turva} = turvattu määrä. */
+export type Lauseet = { pieni: string[]; kuitattu: string[]; turva: string[]; nolla: string[]; taydet: string[] };
 
 export type TuplaTeema = {
   slug: string;
-  /** Näkyy nimen jälkeen: "Tupla tai kuitti – SM-liiga" */
+  /** Näkyy sanamerkin alla: "Tupla tai kuitti – SM-liiga" */
   nimi: string;
   kuvaus: string;
+  /** Teeman korostusväri = TUPLA-väri. Vähintään 30° päässä kullasta, vihreästä ja punaisesta. */
   accent: string;
+  /** Yläosan kuvio (CSS background), esim. kaukalon aloitusympyrä */
+  kuvio: string;
   palkinto: Palkinto;
-  /** Väärän vastauksen huudahdus */
+  /** Väärän vastauksen huudahdus: yksi sana + huutomerkki, enintään 10 merkkiä */
   virhe: string;
+  lauseet: Lauseet;
+  /** Kausipainos (X VAI Y): X = talteen otettava (kulta), Y = häviö (punainen) */
+  painos?: { x: string; y: string; nimi: string; tag: string };
   /** Mistä kysymykset arvotaan (quizzes.slug) */
   visat: string[];
   paluu: { href: string; teksti: string };
+};
+
+/** Oletuslauseet teemoille, joilla ei ole omia. */
+export const LAUSEET_OLETUS: Lauseet = {
+  pieni: ["Varma on varma. Ensi kierroksella rohkeammin?", "Pieni potti, mutta kokonaan sinun."],
+  kuitattu: ["Kylmä pää palkittiin. {N} oikein putkeen.", "Tiesit, milloin lopettaa. {N} oikein putkeen."],
+  turva: ["Turva piti. {N} oikein ja {turva} mukaan.", "Turvataso pelasti. {turva} jää sinulle."],
+  nolla: ["Hups! Uusi sarja odottaa.", "Tällä kertaa ei. Seuraava sarja on jo arvottavissa."],
+  taydet: ["Täydellinen kierros. Tästä puhutaan vielä pitkään."],
 };
 
 /** Potti oikeiden vastausten jälkeen: 1 oikein = 1, 2 = 2, … 10 = 512. */
@@ -76,12 +101,21 @@ export const TEEMAT: TuplaTeema[] = [
   {
     slug: "sm-liiga",
     nimi: "SM-liiga",
-    kuvaus: "Seurat, legendat, finaalit ja jäähyaitio. Kymmenen kysymystä, jokainen edellistä vaikeampi.",
+    kuvaus: "Kymmenen kysymystä SM-liigasta, jokainen edellistä vaikeampi. Jokainen oikea vastaus tuplaa potin. Sinä päätät, milloin lopetat.",
     accent: JK_ACCENT,
-    palkinto: { yksi: "kiekko", monta: "kiekkoa", kaikki: "kiekot", osa: "kiekoista", ikoni: "kiekko" },
+    kuvio:
+      "radial-gradient(circle at 50% -40px, transparent 0 130px, rgba(79,209,245,.26) 131px 133px, transparent 134px), linear-gradient(180deg, transparent 0 190px, rgba(79,209,245,.18) 190px 193px, transparent 193px), radial-gradient(120% 80% at 50% 0, rgba(79,209,245,.10), transparent 70%)",
+    palkinto: { yksi: "kiekko", monta: "kiekkoa", yhden: "kiekon", kaikki: "kiekot", osa: "kiekoista", ikoni: "kiekko" },
     virhe: "Jäähy!",
+    lauseet: {
+      pieni: ["Varma maali on maali. Ensi kierroksella rohkeammin?", "Pieni saalis, mutta ei yhtään jäähyminuuttia."],
+      kuitattu: ["Kylmä pää palkittiin. {N} oikein putkeen.", "Oikea vaihto oikeaan aikaan. {N} oikein putkeen."],
+      turva: ["Turva piti. {N} oikein ja {turva} mukaan.", "Maalivahti pelasti: {turva} jää sinulle."],
+      nolla: ["Kaksi minuuttia jäähyä, sitten uusi vaihto.", "Kiekko karkasi. Uusi vaihto odottaa jo."],
+      taydet: ["Tästä puhutaan pukukopissa vielä pitkään."],
+    },
     visat: SM_LIIGA_VISAT,
-    paluu: { href: "/kokoelma/jaakiekko", teksti: "Jääkiekkovisat" },
+    paluu: { href: "/kokoelma/jaakiekko", teksti: "Jääkiekko-kokoelmaan" },
   },
 ];
 
