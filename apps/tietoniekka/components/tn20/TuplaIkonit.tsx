@@ -73,6 +73,19 @@ export function TuplaSprite() {
           <path d="M18.5 13.5a8 8 0 0 1 4-3.5" fill="none" stroke="#F6DDBA" strokeWidth="1.8" strokeLinecap="round" />
         </g>
       </symbol>
+      <symbol id="ttk-lippu" viewBox="0 0 48 48">
+        <path d="M2 24v3l30 7 14-9v-3l-14 9z" fill="#9D2E6B" />
+        <path d="M2 24l14-9 30 7-14 9z" fill="#F472B6" />
+        <path d="M25 17.1l-14 9" fill="none" stroke="#FFD1E8" strokeWidth="1.6" strokeDasharray="2 2" />
+        <circle cx="31" cy="23" r="2.6" fill="#FFD1E8" />
+        <path d="M2 24l14-9 30 7v3l-14 9-30-7z" fill="none" stroke="#FFD1E8" strokeWidth="1.8" strokeLinejoin="round" />
+      </symbol>
+      <symbol id="ttk-popcorn" viewBox="0 0 48 48">
+        <g fill="#FFE7A8" stroke="#FFF7DE" strokeWidth="1.4"><circle cx="17" cy="16.5" r="5" /><circle cx="31" cy="16.5" r="5" /><circle cx="24" cy="12" r="5.5" /><circle cx="20.5" cy="19.5" r="4.5" /><circle cx="27.5" cy="19.5" r="4.5" /></g>
+        <path d="M12 20h24l-3 23H15z" fill="#F5F0E6" />
+        <path d="M17 20l1.4 23h4l-.4-23zM26 20l-.4 23h4l1.4-23z" fill="#FF3D9E" />
+        <path d="M12 20h24l-3 23H15z" fill="none" stroke="#FFFFFF" strokeWidth="1.8" strokeLinejoin="round" />
+      </symbol>
       <symbol id="ttk-lukko" viewBox="0 0 16 18">
         <path d="M4.5 8.5V5.5a3.5 3.5 0 0 1 7 0v3" fill="none" stroke="currentColor" strokeWidth="2.2" />
         <rect x="2" y="8" width="12" height="9.2" rx="2.4" fill="currentColor" />
@@ -95,9 +108,9 @@ export function Symboli({ id, koko, style, className }: { id: string; koko: numb
 }
 
 /** Symbolin tyhjä reunus ylhäältä ja alhaalta (osuus koosta) — kasa pakataan tiiviiksi. */
-const PAD: Record<PalkintoIkoni, number> = { kiekko: 0.23, kolikko: 0.27, pallo: 0.125, karkki: 0.3, lahja: 0.17, vinyyli: 0.31, kapy: 0.1 };
+const PAD: Record<PalkintoIkoni, number> = { kiekko: 0.23, kolikko: 0.27, pallo: 0.125, karkki: 0.3, lahja: 0.17, vinyyli: 0.31, kapy: 0.1, lippu: 0.29, popcorn: 0.1 };
 /** Litteät palkinnot pinoutuvat torniksi (kerrosväli), muut kasautuvat pyramidiksi (CD v0.2). */
-const TORNI: Partial<Record<PalkintoIkoni, number>> = { kiekko: 0.21, kolikko: 0.15, vinyyli: 0.12 };
+const TORNI: Partial<Record<PalkintoIkoni, number>> = { kiekko: 0.21, kolikko: 0.15, vinyyli: 0.12, lippu: 0.11 };
 const RIVIVALI: Partial<Record<PalkintoIkoni, number>> = { karkki: 0.4, kapy: 0.5, lahja: 0.6 };
 const HEILUNTA = [0, 1.5, -1, 2, -2, 1, -1.5, 2, 0, -1];
 

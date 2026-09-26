@@ -18,7 +18,7 @@ import { KAUPUNGIT } from "./kaupungit";
 
 /** Palkintoikonit (CD "TN Tupla tai kuitti" 1C): yksi SVG-symboli per palkinto,
     kasa rakennetaan toistamalla samaa symbolia. */
-export type PalkintoIkoni = "kiekko" | "kolikko" | "pallo" | "karkki" | "lahja" | "vinyyli" | "kapy";
+export type PalkintoIkoni = "kiekko" | "kolikko" | "pallo" | "karkki" | "lahja" | "vinyyli" | "kapy" | "lippu" | "popcorn";
 
 export type Palkinto = {
   /** "kiekko" */
@@ -191,6 +191,47 @@ TEEMAT.push(
     kuva: "/20/tupla/ikoni-vinyyli.webp",
     nosto: "Artistit, hitit ja levyt kotimaasta maailmalle.",
     visat: { kokoelma: "musiikki" },
+    paluu: { href: "/peli/tupla-tai-kuitti", teksti: "Kaikki Tupla tai kuitti -aiheet" },
+  },
+  // Heikki 26.9.2026: Kulttuuri (pääsylippu) ja TV ja suoratoisto (popcorn)
+  {
+    slug: "kulttuuri",
+    nimi: "Kulttuuri",
+    kuvaus: "Kymmenen kysymystä suomalaisesta kulttuurista, jokainen edellistä vaikeampi. Jokainen oikea vastaus tuplaa potin.",
+    accent: "#F472B6",
+    kuvio: "repeating-linear-gradient(90deg, rgba(244,114,182,.14) 0 3px, transparent 3px 26px)",
+    palkinto: { yksi: "lippu", monta: "lippua", yhden: "lipun", kaikki: "liput", osa: "lipuista", ikoni: "lippu" },
+    virhe: "Esirippu!",
+    lauseet: {
+      pieni: ["Yksikin lippu vie katsomoon. Ensi kerralla eturiviin?", "Pieni saalis, mutta paikka salissa on varma."],
+      kuitattu: ["Aplodit! {N} oikein putkeen.", "Oikea poistuminen oikeaan aikaan. {N} oikein putkeen."],
+      turva: ["Esirippu laski, mutta {turva} jää sinulle.", "Turva piti. {N} oikein ja {turva} mukaan."],
+      nolla: ["Esirippu laski. Seuraava näytös alkaa pian.", "Tällä kertaa ei aplodeja. Uusi sarja odottaa."],
+      taydet: ["Täydet liput. Seisovat aplodit!"],
+    },
+    kuva: "/20/tupla/ikoni-lippu.webp",
+    nosto: "Suomalainen taide, design, kirjallisuus ja perinteet.",
+    visat: { kokoelma: "kulttuuri" },
+    paluu: { href: "/peli/tupla-tai-kuitti", teksti: "Kaikki Tupla tai kuitti -aiheet" },
+  },
+  {
+    slug: "tv-ja-suoratoisto",
+    nimi: "TV ja suoratoisto",
+    kuvaus: "Kymmenen kysymystä tv-sarjoista ja -ohjelmista kotimaasta maailmalle, jokainen edellistä vaikeampi. Jokainen oikea vastaus tuplaa potin.",
+    accent: "#FF3D9E",
+    kuvio: "repeating-linear-gradient(180deg, rgba(255,61,158,.10) 0 2px, transparent 2px 6px)",
+    palkinto: { yksi: "popcorn", monta: "popcornia", yhden: "popcornin", kaikki: "popcornit", osa: "popcorneista", ikoni: "popcorn" },
+    virhe: "Katkos!",
+    lauseet: {
+      pieni: ["Pienikin kulhollinen on parempi kuin tyhjä sohva.", "Varma popcorn. Ensi jaksossa rohkeammin?"],
+      kuitattu: ["Lopetit kuin kauden finaaliin. {N} oikein putkeen.", "Hyvä ajoitus. {N} oikein putkeen."],
+      turva: ["Katkos tuli, mutta {turva} jää sinulle.", "Turva piti. {N} oikein ja {turva} mukaan."],
+      nolla: ["Katkos! Jatkuu seuraavassa jaksossa.", "Lähetys katkesi. Uusi sarja odottaa."],
+      taydet: ["Täydet popcornit. Ahmimisen mestari."],
+    },
+    kuva: "/20/tupla/ikoni-popcorn.webp",
+    nosto: "Sarjat, hahmot ja ohjelmat kotisohvalta.",
+    visat: { kokoelma: "tv" },
     paluu: { href: "/peli/tupla-tai-kuitti", teksti: "Kaikki Tupla tai kuitti -aiheet" },
   },
 );

@@ -87,6 +87,8 @@
   position: absolute; inset: 0; background: var(--kuvio); opacity: .8; pointer-events: none;
   -webkit-mask-image: linear-gradient(200deg, #000, transparent 70%); mask-image: linear-gradient(200deg, #000, transparent 70%);
 }
+/* Pariton määrä: viimeinen kortti koko leveydelle, ei orpoa solua (mobiili) */
+.tn20 .tks-aiheet li:last-child:nth-child(odd) { grid-column: 1 / -1; }
 .tn20 .tks-aiheet img { position: relative; align-self: flex-end; width: 80px; height: 80px; object-fit: contain; filter: drop-shadow(0 10px 14px rgba(0, 0, 0, .5)); }
 .tn20 .tks-kortti-nimi { position: relative; font-family: var(--tn-font-display); font-weight: 900; font-size: 16px; line-height: 1.02; text-transform: uppercase; text-wrap: balance; }
 .tn20 .tks-arvo { display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 20px 0 4px; margin-top: 16px; border-top: 1px solid var(--line); font-size: 14px; color: var(--soft); }
@@ -110,7 +112,9 @@
   .tn20 .tks-nosto-nimi { font-size: 38px; }
   .tn20 .tks-nosto-ikoni { width: 128px; height: 128px; }
   .tn20 .tks-rules { justify-content: center; }
-  .tn20 .tks-aiheet ul { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; }
+  /* Kaikki aiheet yhdelle riville niin pitkälle kuin mahtuu (5 × ~200 px 1072 px:ssä) */
+  .tn20 .tks-aiheet ul { grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; }
+  .tn20 .tks-aiheet li:last-child:nth-child(odd) { grid-column: auto; }
   .tn20 .tks-aiheet img { width: 104px; height: 104px; }
 }
 @media (prefers-reduced-motion: reduce) {
