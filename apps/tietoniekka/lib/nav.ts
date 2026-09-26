@@ -59,4 +59,6 @@ export const hubHref = (slug: string) => `/kokoelma/${slug}`;
    pelisivun — B1 (18.9.2026): se puuttui listalta, ja haasteen aloitus- ja
    tulosnäkymässä näkyi kaksi yläpalkkia päällekkäin. */
 export const isGameRoute = (pathname: string) =>
-  pathname.startsWith("/peli") || pathname.startsWith("/visa") || pathname.startsWith("/h/");
+  // Tupla tai kuitti -aihesivu on kokoelmasivu (sivuston navigaatio), sen pelit eivät
+  pathname !== "/peli/tupla-tai-kuitti" &&
+  (pathname.startsWith("/peli") || pathname.startsWith("/visa") || pathname.startsWith("/h/"));

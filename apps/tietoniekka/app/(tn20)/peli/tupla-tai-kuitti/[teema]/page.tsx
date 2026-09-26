@@ -53,5 +53,6 @@ export default async function TuplaSivu({ params, searchParams }: Props) {
   const sarja = arvoSarja((data ?? []) as unknown as KysymysRivi[], nimet, siemen);
   if (sarja.length < 10) notFound();
 
-  return <TuplaClient teema={t} sarja={sarja} siemen={siemen} paivanSarja={!pyydetty} />;
+  const [, kk, pv] = paiva.split("-").map(Number);
+  return <TuplaClient teema={t} sarja={sarja} siemen={siemen} paivanSarja={!pyydetty} paivays={`${pv}.${kk}.`} />;
 }

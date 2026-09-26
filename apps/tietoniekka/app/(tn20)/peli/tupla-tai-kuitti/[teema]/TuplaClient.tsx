@@ -137,19 +137,19 @@ function Sanamerkki({ t }: { t: TuplaTeema }) {
       </div>
     );
   }
+  // Virallinen logo (CD v0.2, 26.9.2026) korvaa tekstisanamerkin; teemarivi pysyy.
   return (
     <div className="ttk-lockup">
-      <h1 className="ttk-wm" aria-label={`Tupla tai kuitti – ${t.nimi}`}>
-        <span className="ttk-wm-tupla">Tupla</span>
-        <span className="ttk-wm-sep"><span>tai</span><i /></span>
-        <span className="ttk-wm-kuitti">Kuitti</span>
+      <h1 className="ttk-logo-h">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src="/20/tupla/logo.webp" alt={`Tupla tai kuitti – ${t.nimi}`} width={640} height={374} fetchPriority="high" />
       </h1>
       <span className="ttk-theme"><i />{t.nimi}</span>
     </div>
   );
 }
 
-export default function TuplaClient({ teema: t, sarja, siemen, paivanSarja }: { teema: TuplaTeema; sarja: TuplaKysymys[]; siemen: string; paivanSarja: boolean }) {
+export default function TuplaClient({ teema: t, sarja, siemen, paivanSarja, paivays }: { teema: TuplaTeema; sarja: TuplaKysymys[]; siemen: string; paivanSarja: boolean; /** "26.9." */ paivays: string }) {
   const [vaihe, setVaihe] = useState<Vaihe>("alku");
   const [i, setI] = useState(0);
   const [valinta, setValinta] = useState<string | null>(null);
@@ -278,7 +278,7 @@ export default function TuplaClient({ teema: t, sarja, siemen, paivanSarja }: { 
             <button className="ttk-cta" onClick={alusta}>ALOITA</button>
             <p className="ttk-seed">
               <span>
-                <b>{paivanSarja ? "Päivän sarja" : "Oma sarja"}</b> · {paivanSarja ? "sama kaikille tänään" : "sama kuin haastajallasi"}
+                <b>{paivanSarja ? `Päivän sarja ${paivays}` : "Oma sarja"}</b> · {paivanSarja ? "sama kaikille tänään" : "sama kuin haastajallasi"}
               </span>
               <button type="button" className="ttk-link" onClick={arvoUusi}>Arvo uusi sarja</button>
             </p>

@@ -52,10 +52,16 @@ export type TuplaTeema = {
   lauseet: Lauseet;
   /** Kausipainos (X VAI Y): X = talteen otettava (kulta), Y = häviö (punainen) */
   painos?: { x: string; y: string; nimi: string; tag: string };
+  /** Aihesivun kortti (CD 3A): 3D-palkintoikoni ja yhden rivin kuvaus */
+  kuva: string;
+  nosto: string;
   /** Mistä kysymykset arvotaan (quizzes.slug) */
   visat: string[];
   paluu: { href: string; teksti: string };
 };
+
+/** Pelimuodon oma sivu — kaikki teemat samassa paikassa (Heikki 26.9.2026). */
+export const TUPLA_SIVU = "/peli/tupla-tai-kuitti";
 
 /** Oletuslauseet teemoille, joilla ei ole omia. */
 export const LAUSEET_OLETUS: Lauseet = {
@@ -70,8 +76,9 @@ export const LAUSEET_OLETUS: Lauseet = {
 export const POTTI = [1, 2, 4, 8, 16, 32, 64, 128, 256, 512] as const;
 /** Kysymysten vaikeustasot askelittain (questions.taso). */
 export const ASKELEET = [1, 1, 2, 2, 3, 3, 4, 4, 5, 5] as const;
-/** Turvataso: montako oikein → potti on varmasti pelaajan (Heikki: 3 ja 5 oikein). */
-export const TURVAT = [3, 5] as const;
+/** Turvataso: montako oikein → potti on varmasti pelaajan. Heikki 26.9. (CD-ehdotus 1):
+    siirretty 3 ja 5 oikein (4 ja 16) → 4 ja 6 oikein (8 ja 32). */
+export const TURVAT = [4, 6] as const;
 
 /** Turvassa oleva määrä, kun `oikein` vastausta on takana. */
 export function turvassa(oikein: number): number {
@@ -114,8 +121,10 @@ export const TEEMAT: TuplaTeema[] = [
       nolla: ["Kaksi minuuttia jäähyä, sitten uusi vaihto.", "Kiekko karkasi. Uusi vaihto odottaa jo."],
       taydet: ["Tästä puhutaan pukukopissa vielä pitkään."],
     },
+    kuva: "/20/tupla/ikoni-kiekko.webp",
+    nosto: "Liigan pelaajat, kaudet ja pudotuspelien muistot.",
     visat: SM_LIIGA_VISAT,
-    paluu: { href: "/kokoelma/jaakiekko", teksti: "Jääkiekko-kokoelmaan" },
+    paluu: { href: "/peli/tupla-tai-kuitti", teksti: "Kaikki Tupla tai kuitti -aiheet" },
   },
 ];
 

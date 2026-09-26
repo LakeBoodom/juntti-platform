@@ -1,0 +1,118 @@
+/* TUPLA TAI KUITTI — pelimuodon oma sivu (CD v0.2, 3A virallinen design, 26.9.2026).
+   Mobiili 390 px: studiokuva reunasta reunaan, sisältö 20 px reunoin. Desktop ≥ 900 px:
+   sisältö 1120 px, esittely kolmena palstana, nosto 440 px + Näin pelaat vierekkäin.
+
+   KORTTISÄÄNTÖ: otsikon pisin sana "tietovisaklassikosta" (20 merkkiä, Archivo 800
+   ≈ 0,62 em/merkki) → koko enintään (100vw − 40 px) / 12,6: 320 px:llä 22 px,
+   390 px:llä 28 px (CD:n arvo). Desktop 44 px (CD). */
+
+.tn20 .tks {
+  --line: #2c2517;
+  --line2: #3a3120;
+  --ink: #f5f0e6;
+  --soft: #cfc7b6;
+  --muted: #8e8676;
+  --gold: #e8a320;
+  --lime: #b6ff3c;
+  max-width: 1120px;
+  margin: 0 auto;
+  padding-bottom: 56px;
+  color: var(--ink);
+}
+.tn20 .tks-hero { position: relative; }
+.tn20 .tks-hero img { display: block; width: 100%; height: auto; aspect-ratio: 1672 / 941; object-fit: cover; }
+.tn20 .tks-in { padding: 26px 20px 0; display: flex; flex-direction: column; gap: 22px; }
+
+.tn20 .tks-h1 {
+  margin: 0; font-family: var(--tn-font-display); font-weight: 800; line-height: 1.08; letter-spacing: -.015em;
+  font-size: min(28px, calc((100vw - 40px) / 12.6));
+  text-wrap: balance; overflow-wrap: normal; word-break: keep-all;
+}
+.tn20 .tks-h1 span { color: var(--gold); }
+
+.tn20 .tks-intro { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.tn20 .tks-intro li { display: grid; grid-template-columns: 34px minmax(0, 1fr); gap: 10px; padding: 14px 0; border-top: 1px solid var(--line); }
+.tn20 .tks-intro li:last-child { border-bottom: 1px solid var(--line); }
+.tn20 .tks-num { font-family: var(--tn-font-display); font-weight: 900; font-size: 15px; color: var(--gold); }
+.tn20 .tks-intro div { display: flex; flex-direction: column; gap: 4px; }
+.tn20 .tks-intro b { font-size: 16px; color: var(--ink); }
+.tn20 .tks-intro div > span { font-size: 15px; line-height: 1.5; color: var(--soft); text-wrap: pretty; }
+
+.tn20 .tks-feat { display: flex; flex-direction: column; gap: 20px; }
+.tn20 .tks-nosto {
+  position: relative; overflow: hidden; border-radius: 18px; border: 1px solid color-mix(in srgb, var(--acc) 35%, transparent);
+  background: #10151b; padding: 20px 16px 16px; display: flex; flex-direction: column; gap: 14px; justify-content: space-between;
+  color: var(--ink); text-decoration: none;
+}
+.tn20 .tks-nosto::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 3px; background: var(--acc); }
+.tn20 .tks-nosto-kuvio {
+  position: absolute; inset: 0; pointer-events: none;
+  background:
+    radial-gradient(circle at 100% 0, transparent 0 110px, color-mix(in srgb, var(--acc) 22%, transparent) 111px 113px, transparent 114px),
+    linear-gradient(90deg, transparent 0 62%, color-mix(in srgb, var(--acc) 14%, transparent) 62% calc(62% + 3px), transparent 0);
+}
+.tn20 .tks-nosto-top { position: relative; display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+.tn20 .tks-nosto-merkki { display: flex; flex-direction: column; gap: 10px; }
+.tn20 .tks-nosto-merkki img { display: block; width: 170px; height: auto; }
+.tn20 .tks-nosto-nimi { font-family: var(--tn-font-display); font-weight: 900; font-size: 30px; line-height: .9; text-transform: uppercase; letter-spacing: -.02em; color: var(--acc); }
+.tn20 .tks-nosto-ikoni { width: 96px; height: 96px; flex-shrink: 0; object-fit: contain; filter: drop-shadow(0 10px 14px rgba(0, 0, 0, .55)); transition: transform .2s; }
+.tn20 .tks-nosto:hover .tks-nosto-ikoni { transform: translateY(-3px) rotate(-4deg); }
+.tn20 .tks-nosto-s { position: relative; font-size: 15px; line-height: 1.45; color: var(--soft); text-wrap: pretty; }
+.tn20 .tks-cta {
+  position: relative; align-self: flex-start; height: 52px; padding: 0 28px; border-radius: 999px; background: var(--lime); color: #131109;
+  display: flex; align-items: center; font-family: var(--tn-font-display); font-weight: 900; font-size: 16px; white-space: nowrap;
+}
+
+.tn20 .tks-rules { display: flex; flex-direction: column; gap: 10px; }
+.tn20 .tks-eyebrow { font-size: 11px; font-weight: 800; letter-spacing: .16em; text-transform: uppercase; color: var(--muted); }
+.tn20 .tks-rules ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.tn20 .tks-rules li { display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-radius: 14px; border: 1px solid var(--line); background: #0f0d07; }
+.tn20 .tks-rule-k {
+  width: 36px; height: 36px; flex-shrink: 0; border-radius: 999px; border: 1.5px solid; display: grid; place-items: center;
+  font-family: var(--tn-font-display); font-weight: 900; font-size: 13px; white-space: nowrap; letter-spacing: -.02em;
+}
+.tn20 .tks-rule-t { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.tn20 .tks-rule-t b { font-family: var(--tn-font-display); font-weight: 900; font-size: 15px; text-transform: uppercase; color: var(--ink); }
+.tn20 .tks-rule-t span { font-size: 13px; line-height: 1.4; color: var(--soft); }
+
+.tn20 .tks-aiheet { display: flex; flex-direction: column; gap: 12px; padding-top: 8px; }
+.tn20 .tks-aiheet h2 { margin: 0; font-family: var(--tn-font-display); font-weight: 900; font-size: 20px; text-transform: uppercase; letter-spacing: -.01em; }
+.tn20 .tks-aiheet ul { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.tn20 .tks-aiheet a {
+  position: relative; overflow: hidden; border-radius: 16px; border: 1px solid var(--line); background: #17140d; padding: 12px; min-height: 150px;
+  display: flex; flex-direction: column; justify-content: space-between; gap: 10px; color: var(--ink); text-decoration: none;
+}
+.tn20 .tks-aiheet a::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 3px; background: var(--acc); }
+.tn20 .tks-kortti-kuvio {
+  position: absolute; inset: 0; background: var(--kuvio); opacity: .8; pointer-events: none;
+  -webkit-mask-image: linear-gradient(200deg, #000, transparent 70%); mask-image: linear-gradient(200deg, #000, transparent 70%);
+}
+.tn20 .tks-aiheet img { position: relative; align-self: flex-end; width: 80px; height: 80px; object-fit: contain; filter: drop-shadow(0 10px 14px rgba(0, 0, 0, .5)); }
+.tn20 .tks-kortti-nimi { position: relative; font-family: var(--tn-font-display); font-weight: 900; font-size: 16px; line-height: 1.02; text-transform: uppercase; text-wrap: balance; }
+.tn20 .tks-arvo { display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 20px 0 4px; margin-top: 16px; border-top: 1px solid var(--line); font-size: 14px; color: var(--soft); }
+.tn20 .tks-arvo button { height: 52px; padding: 0 24px; border-radius: 999px; border: 1px solid var(--line2); background: transparent; color: var(--ink); font: inherit; font-size: 15px; font-weight: 700; cursor: pointer; }
+
+@media (min-width: 900px) {
+  .tn20 .tks { padding: 24px 24px 72px; }
+  .tn20 .tks-hero { border-radius: 24px 24px 0 0; overflow: hidden; }
+  .tn20 .tks-hero img { aspect-ratio: 1672 / 780; object-position: 50% 30%; }
+  .tn20 .tks-hero::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 120px; background: linear-gradient(180deg, transparent, #131109); pointer-events: none; }
+  .tn20 .tks-in { padding: 8px 48px 0; gap: 36px; }
+  .tn20 .tks-h1 { max-width: 880px; font-size: 44px; line-height: 1.04; letter-spacing: -.02em; }
+  .tn20 .tks-intro { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 32px; }
+  .tn20 .tks-intro li, .tn20 .tks-intro li:last-child { display: flex; flex-direction: column; gap: 8px; padding: 16px 0 0; border: 0; border-top: 2px solid var(--gold); }
+  .tn20 .tks-num { font-size: 14px; }
+  .tn20 .tks-intro b { font-size: 18px; line-height: 1.25; }
+  .tn20 .tks-intro div > span { line-height: 1.55; }
+  .tn20 .tks-feat { display: grid; grid-template-columns: 440px minmax(0, 1fr); gap: 28px; align-items: stretch; }
+  .tn20 .tks-nosto { border-radius: 22px; padding: 26px 26px 24px; gap: 18px; }
+  .tn20 .tks-nosto-merkki img { width: 210px; }
+  .tn20 .tks-nosto-nimi { font-size: 38px; }
+  .tn20 .tks-nosto-ikoni { width: 128px; height: 128px; }
+  .tn20 .tks-rules { justify-content: center; }
+  .tn20 .tks-aiheet ul { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; }
+  .tn20 .tks-aiheet img { width: 104px; height: 104px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .tn20 .tks-nosto-ikoni { transition: none; }
+}

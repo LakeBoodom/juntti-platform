@@ -57,6 +57,9 @@
 /* ── Sanamerkki ──────────────────────────────────────── */
 /* Kalibrointi: CD 24cqi (60–96 px) — tarkistetaan mittaamalla 320/390/430 px:llä. */
 .tn20 .ttk-lockup { display: flex; flex-direction: column; gap: 12px; }
+/* Virallinen logo (CD v0.2): 1042 × 609 -suhde, leveys säiliön mukaan */
+.tn20 .ttk-logo-h { margin: 0; line-height: 0; }
+.tn20 .ttk-logo-h img { display: block; width: clamp(200px, 64cqi, 300px); height: auto; }
 .tn20 .ttk-wm {
   margin: 0; display: flex; flex-direction: column; gap: 4px; line-height: .86;
   font-family: var(--tn-font-display); font-weight: 900; text-transform: uppercase; letter-spacing: -.02em;
