@@ -22,6 +22,7 @@ import PaivanSankari from "@/components/tn20/PaivanSankari";
 import { muotoileSankari, type SankariRivi } from "@/lib/paivanSankari";
 import { KuvavisatBanneri, IkajarjestysBanneri } from "@/components/tn20/EtusivunBannerit";
 import { TiedeBanneri } from "@/components/tn20/TiedeBanneri";
+import { TuplaBanneri } from "@/components/tn20/TuplaBanneri";
 import { getViikkovisa } from "@/lib/kuvavisat2026";
 import { getKuvavisaYhteenveto, getBanneriHenkilot } from "@/lib/etusivunBannerit";
 import {
@@ -30,6 +31,7 @@ import {
 import "./etusivu.css";
 import "./etusivun-bannerit.css";
 import "./tiede.css";
+import "./tupla-banneri.css";
 
 export const dynamic = "force-dynamic";
 
@@ -178,6 +180,9 @@ export default async function Etusivu20({
           </div>
           {daily ? <PaivanVisaCard data={daily} /> : <div className="tn-es-pv tn-es-pv--empty">Päivän visa palaa huomenna.</div>}
         </section>
+
+        {/* ─── Tupla tai kuitti -banneri (CD v0.2 3B): heti Päivän visan alla (Heikki 26.9.2026) ─── */}
+        <TuplaBanneri />
 
 
         {/* ─── Kuvavisat-banneri (Design kierros 12A, 18.9.2026) ───

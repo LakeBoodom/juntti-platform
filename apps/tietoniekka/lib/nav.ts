@@ -48,6 +48,8 @@ export type NavMode = {
 /* Klassista ei nosteta navigaatioon (CD:n sääntö: se on visojen oletusmuoto).
    Rakenne kestää uudet rivit sellaisenaan → Kumpi? ja Järjestä lisätään 2.5:ssä. */
 export const NAV_MODES: NavMode[] = [
+  // Tupla tai kuitti (Heikki 26.9.2026): uusi pelimuoto ensimmäisenä
+  { href: "/peli/tupla-tai-kuitti", label: "Tupla tai kuitti", desc: "Tuplaa potti tai kuittaa ajoissa", color: "#E8A320" },
   { href: "/megavisat", label: "Megavisat", desc: "20–50 kysymystä — pitkä peli", color: "#E8A320" },
   { href: "/kokoelma/kuvavisat", label: "Kuvavisat", desc: "Tunnista kuvasta — liput, vaakunat, linnut", color: "#4C9AFF" },
 ];

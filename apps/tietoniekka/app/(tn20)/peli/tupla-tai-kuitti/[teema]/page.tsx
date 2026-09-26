@@ -24,7 +24,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title: t ? `Tupla tai kuitti – ${t.nimi} | Tietoniekka` : "Tupla tai kuitti | Tietoniekka",
     description: t?.kuvaus,
-    robots: { index: false, follow: false },
+    // Sarjaparametrit (?sarja=) ovat saman sivun muunnelmia
+    alternates: t ? { canonical: `/peli/tupla-tai-kuitti/${t.slug}` } : undefined,
   };
 }
 
@@ -40,7 +41,8 @@ export default async function TuplaSivu({ params, searchParams }: Props) {
 
   const sb = getSupabase();
   if (!sb) notFound();
-  const { data: visat } = await sb.from("quizzes").select("id, title, display_title").in("slug", t.visat).eq("status", "published");
+  const haku = sb.from("quizzes").select("id, title, display_title").eq("status", "published");
+  const { data: visat } = await (Array.isArray(t.visat) ? haku.in("slug", t.visat) : haku.filter("collection", "eq", t.visat.kokoelma) /* collection puuttuu generoiduista tyypeistä */);
   // display_title puuttuu generoiduista tyypeistä (packages/db/types.ts) → paikallinen tyyppi.
   const rivit = (visat ?? []) as unknown as Array<{ id: string; title: string; display_title: string | null }>;
   const nimet = new Map(rivit.map((v) => [v.id, (v.display_title || v.title).trim()]));

@@ -14,10 +14,11 @@
 // antaa satunnaisen siemenen, ja haastelinkki kuljettaa siemenen kaverille.
 
 import { JK_ACCENT } from "./jaakiekko";
+import { KAUPUNGIT } from "./kaupungit";
 
 /** Palkintoikonit (CD "TN Tupla tai kuitti" 1C): yksi SVG-symboli per palkinto,
     kasa rakennetaan toistamalla samaa symbolia. */
-export type PalkintoIkoni = "kiekko" | "kolikko" | "pallo" | "karkki" | "lahja";
+export type PalkintoIkoni = "kiekko" | "kolikko" | "pallo" | "karkki" | "lahja" | "vinyyli" | "kapy";
 
 export type Palkinto = {
   /** "kiekko" */
@@ -34,7 +35,8 @@ export type Palkinto = {
 };
 
 /** Tuloksen toinen rivi — antaa pienellekin saaliille arvon (CD-ehdotus 5: teemakohtainen
-    taulukko, rivi arvotaan). {n} = oikein-määrä sanana, {turva} = turvattu määrä. */
+    taulukko, rivi arvotaan). {N} = oikein-määrä sanana lauseen alussa ("Neljä"),
+    {n} = lauseen keskellä ("neljä"), {turva} = turvattu määrä. */
 export type Lauseet = { pieni: string[]; kuitattu: string[]; turva: string[]; nolla: string[]; taydet: string[] };
 
 export type TuplaTeema = {
@@ -55,8 +57,8 @@ export type TuplaTeema = {
   /** Aihesivun kortti (CD 3A): 3D-palkintoikoni ja yhden rivin kuvaus */
   kuva: string;
   nosto: string;
-  /** Mistä kysymykset arvotaan (quizzes.slug) */
-  visat: string[];
+  /** Mistä kysymykset arvotaan: visojen slugit tai koko kokoelma (quizzes.collection) */
+  visat: string[] | { kokoelma: string };
   paluu: { href: string; teksti: string };
 };
 
@@ -128,6 +130,71 @@ export const TEEMAT: TuplaTeema[] = [
   },
 ];
 
+/* Aihekokoelmien teemat (Heikki 26.9.2026: järjestyksessä Suomen kaupungit, Luonto,
+   Musiikki). Värit, palkinnot ja huudahdukset CD v0.2:n teemasäännöstä (1B, 2A). */
+TEEMAT.push(
+  {
+    slug: "suomen-kaupungit",
+    nimi: "Suomen kaupungit",
+    kuvaus: "Kymmenen kysymystä Suomen kaupungeista, jokainen edellistä vaikeampi. Jokainen oikea vastaus tuplaa potin.",
+    accent: "#7FB2FF",
+    kuvio: "repeating-radial-gradient(circle at 88% -40px, transparent 0 16px, rgba(127,178,255,.16) 16px 17px)",
+    palkinto: { yksi: "kolikko", monta: "kolikkoa", yhden: "kolikon", kaikki: "kolikot", osa: "kolikoista", ikoni: "kolikko" },
+    virhe: "Hups!",
+    lauseet: {
+      pieni: ["Pienikin matkakassa on matkakassa. Ensi kierroksella pidemmälle?", "Varma kolikko taskussa."],
+      kuitattu: ["Hyvin suunnistettu. {N} oikein putkeen.", "Kaupunkikierros kannatti. {N} oikein putkeen."],
+      turva: ["Turva piti. {N} oikein ja {turva} mukaan.", "Väärä liittymä, mutta {turva} jää sinulle."],
+      nolla: ["Hups! Väärä liittymä, mutta uusi reitti odottaa.", "Tällä kertaa eksyit. Uusi kierros odottaa."],
+      taydet: ["Täydellinen kaupunkikierros. Tunnet Suomen kuin omat taskusi."],
+    },
+    kuva: "/20/tupla/ikoni-kaupunki.webp",
+    nosto: "Kaupunkien historia, maamerkit ja paikalliset erikoisuudet.",
+    visat: KAUPUNGIT.map((k) => k.quizSlug),
+    paluu: { href: "/peli/tupla-tai-kuitti", teksti: "Kaikki Tupla tai kuitti -aiheet" },
+  },
+  {
+    slug: "luonto",
+    nimi: "Luonto",
+    kuvaus: "Kymmenen kysymystä eläimistä, kasveista ja luonnon ilmiöistä, jokainen edellistä vaikeampi. Jokainen oikea vastaus tuplaa potin.",
+    accent: "#2DD4BF",
+    kuvio: "repeating-radial-gradient(ellipse at 15% 0, transparent 0 14px, rgba(45,212,191,.16) 14px 15px)",
+    palkinto: { yksi: "käpy", monta: "käpyä", yhden: "kävyn", kaikki: "kävyt", osa: "kävyistä", ikoni: "kapy" },
+    virhe: "Pusikkoon!",
+    lauseet: {
+      pieni: ["Käpy kourassa on parempi kuin kaksi puussa.", "Pieni saalis, mutta metsä odottaa."],
+      kuitattu: ["Kävyt korissa ennen pusikkoa. {N} oikein putkeen.", "Hyvä vainu. {N} oikein putkeen."],
+      turva: ["Turva piti. {N} oikein ja {turva} mukaan.", "Pusikkoon meni, mutta {turva} jää sinulle."],
+      nolla: ["Pusikkoon meni. Metsä ei karkaa, uusi retki odottaa.", "Polku katosi. Uusi sarja odottaa."],
+      taydet: ["Täydet kävyt. Luonto on sinulle avoin kirja."],
+    },
+    kuva: "/20/tupla/ikoni-kapy.webp",
+    nosto: "Eläimet, kasvit ja luonnon ihmeet.",
+    visat: { kokoelma: "luonto" },
+    paluu: { href: "/peli/tupla-tai-kuitti", teksti: "Kaikki Tupla tai kuitti -aiheet" },
+  },
+  {
+    slug: "musiikki",
+    nimi: "Musiikki",
+    kuvaus: "Kymmenen kysymystä musiikista kotimaasta maailmalle, jokainen edellistä vaikeampi. Jokainen oikea vastaus tuplaa potin.",
+    accent: "#A855F7",
+    kuvio: "repeating-radial-gradient(circle at 100% 0, rgba(168,85,247,.16) 0 1px, transparent 1px 8px)",
+    palkinto: { yksi: "levy", monta: "levyä", yhden: "levyn", kaikki: "levyt", osa: "levyistä", ikoni: "vinyyli" },
+    virhe: "Falski!",
+    lauseet: {
+      pieni: ["Yksikin levy on kokoelman alku.", "Varma single. Ensi kerralla albumi?"],
+      kuitattu: ["Oikea lopetus oikeaan aikaan. {N} oikein putkeen.", "Encore jäi väliin, mutta {n} oikein putkeen."],
+      turva: ["Falski nuotti, mutta {turva} jää sinulle.", "Turva piti. {N} oikein ja {turva} mukaan."],
+      nolla: ["Falski! Seuraava kappale on jo soimassa.", "Levy hyppäsi. Uusi sarja odottaa."],
+      taydet: ["Täydet levyt. Tästä tehdään kultalevy."],
+    },
+    kuva: "/20/tupla/ikoni-vinyyli.webp",
+    nosto: "Artistit, hitit ja levyt kotimaasta maailmalle.",
+    visat: { kokoelma: "musiikki" },
+    paluu: { href: "/peli/tupla-tai-kuitti", teksti: "Kaikki Tupla tai kuitti -aiheet" },
+  },
+);
+
 export const teema = (slug: string) => TEEMAT.find((t) => t.slug === slug) ?? null;
 
 /* ── Sarjan arvonta ──────────────────────────────────────────────────── */
@@ -179,9 +246,10 @@ function sekoita<T>(a: T[], r: () => number): T[] {
   return b;
 }
 
-/** Kymmenen kysymyksen sarja siemenestä. Sama visa ei toistu, eikä kahdella
-    kysymyksellä ole samaa oikeaa vastausta (vähentää ristiinpaljastusta). Jos tasolta
-    loppuvat ehdokkaat, otetaan lähin taso. */
+/** Kymmenen kysymyksen sarja siemenestä. Sama visa ei toistu, kahdella kysymyksellä ei
+    ole samaa oikeaa vastausta, eikä kysymyksen oikea vastaus saa esiintyä toisen
+    kysymyksen tekstissä (esim. Joensuu-kysymys mainitsee Stenbäckin, joka on Mikkeli-
+    kysymyksen vastaus). Jos tasolta loppuvat ehdokkaat, otetaan lähin taso. */
 export function arvoSarja(rivit: KysymysRivi[], visaNimet: Map<string, string>, siemen: string): TuplaKysymys[] {
   const r = satunnainen(siemen);
   const kelvot = rivit.filter((x) => {
@@ -192,6 +260,9 @@ export function arvoSarja(rivit: KysymysRivi[], visaNimet: Map<string, string>, 
   for (const t of [1, 2, 3, 4, 5]) tasoittain.set(t, sekoita(kelvot.filter((x) => x.taso === t), r));
   const visat = new Set<string>();
   const vastaukset = new Set<string>();
+  const tekstit: string[] = [];
+  // Lyhyet vastaukset (esim. "1", "JYP") osuisivat sattumalta tekstiin → vain ≥ 4 merkkiä
+  const paljastaa = (vastaus: string, teksti: string) => vastaus.length >= 4 && teksti.includes(vastaus);
   const valitut: TuplaKysymys[] = [];
   for (const taso of ASKELEET) {
     const jarjestys = [taso, taso + 1, taso - 1, taso + 2, taso - 2].filter((t) => t >= 1 && t <= 5);
@@ -200,7 +271,9 @@ export function arvoSarja(rivit: KysymysRivi[], visaNimet: Map<string, string>, 
       for (const t of jarjestys) {
         osuma = tasoittain.get(t)!.find((x) => {
           const oikea = x.answers!.find((a) => a.is_correct)!.text.trim().toLowerCase();
-          return !valitut.some((v) => v.id === x.id) && (sallitaanSamaVisa || !visat.has(x.quiz_id)) && !vastaukset.has(oikea);
+          const teksti = x.question_text.toLowerCase();
+          const ristiin = tekstit.some((tx) => paljastaa(oikea, tx)) || [...vastaukset].some((v) => paljastaa(v, teksti));
+          return !valitut.some((v) => v.id === x.id) && (sallitaanSamaVisa || !visat.has(x.quiz_id)) && !vastaukset.has(oikea) && !ristiin;
         });
         if (osuma) break;
       }
@@ -211,6 +284,7 @@ export function arvoSarja(rivit: KysymysRivi[], visaNimet: Map<string, string>, 
     const oikea = v.find((a) => a.is_correct)!.text.trim();
     visat.add(osuma.quiz_id);
     vastaukset.add(oikea.toLowerCase());
+    tekstit.push(osuma.question_text.toLowerCase());
     valitut.push({
       id: osuma.id,
       kysymys: osuma.question_text.trim(),

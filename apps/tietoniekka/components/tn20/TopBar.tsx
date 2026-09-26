@@ -101,7 +101,7 @@ export default function TopBar() {
   const isKuvavisat = pathname.startsWith("/kokoelma/kuvavisat");
   const activeKokoelmat =
     (pathname.startsWith("/kokoelma") && !isKuvavisat) || pathname.startsWith("/kokoelmat");
-  const activePelimuodot = pathname.startsWith("/megavisat") || isKuvavisat;
+  const activePelimuodot = pathname.startsWith("/megavisat") || isKuvavisat || pathname.startsWith("/peli/tupla-tai-kuitti");
 
   /* Nuolinäppäimet valikon riveillä — eivät vieritä sivua */
   const onMenuKeyDown = (e: React.KeyboardEvent) => {

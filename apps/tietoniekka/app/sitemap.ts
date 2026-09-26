@@ -3,6 +3,7 @@
 // next.config.mjs:ssä) eivätkä kuulu enää sitemapiin. Visasivujen kanoninen
 // osoite on /visa/<slug> (SEO_STRATEGIA §3.1).
 import type { MetadataRoute } from "next";
+import { TEEMAT, TUPLA_SIVU } from "@/lib/tuplaTaiKuitti";
 import { getPublishedQuizSlugs } from "@/lib/queries";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://tietoniekka.fi";
@@ -35,6 +36,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${SITE_URL}/`, lastModified: now, changeFrequency: "daily", priority: 1.0 },
     { url: `${SITE_URL}/kokoelmat`, lastModified: now, changeFrequency: "weekly", priority: 0.9 },
     { url: `${SITE_URL}/megavisat`, lastModified: now, changeFrequency: "weekly", priority: 0.8 },
+    { url: `${SITE_URL}${TUPLA_SIVU}`, lastModified: now, changeFrequency: "weekly", priority: 0.8 },
+    ...TEEMAT.map((t) => ({ url: `${SITE_URL}${TUPLA_SIVU}/${t.slug}`, lastModified: now, changeFrequency: "daily" as const, priority: 0.6 })),
     { url: `${SITE_URL}/tietosuoja`, lastModified: now, changeFrequency: "yearly", priority: 0.2 },
   ];
 

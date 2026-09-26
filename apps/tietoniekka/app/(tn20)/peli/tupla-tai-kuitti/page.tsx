@@ -17,8 +17,8 @@ export const metadata: Metadata = {
   title: "Tupla tai kuitti – Tietoniekan versio tietovisaklassikosta | Tietoniekka",
   description:
     "Valitse aihe ja vastaa kymmeneen yhä vaikeampaan kysymykseen. Jokainen oikea vastaus tuplaa potin – kuittaa ajoissa tai pelaa kaikesta.",
-  // Esikatselu: ei indeksoida ennen julkaisupäätöstä
-  robots: { index: false, follow: false },
+  // Julkaistu 26.9.2026: Pelimuodot-valikossa ja etusivun bannerissa
+  alternates: { canonical: "/peli/tupla-tai-kuitti" },
 };
 
 const ESITTELY = [

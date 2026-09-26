@@ -17,6 +17,7 @@ import {
   type TuplaTeema,
 } from "@/lib/tuplaTaiKuitti";
 import { Kasa, Symboli, TuplaSprite } from "@/components/tn20/TuplaIkonit";
+import { getSupabase } from "@/lib/supabase";
 
 type Vaihe = "alku" | "kysymys" | "palaute" | "loppu";
 type Syy = "kuittasi" | "jaahy" | "taydet";
@@ -52,6 +53,34 @@ function tallennaParas(avain: string, n: number): boolean {
     // selaimen tallennus estetty — paras tulos vain jää muistamatta
   }
   return false;
+}
+
+/** Sama selaimen satunnaistunniste kuin visapelin quiz_plays-tallennuksessa. */
+function istunto(): string {
+  try {
+    let id = localStorage.getItem("tn_session_id");
+    if (!id) {
+      id = crypto.randomUUID();
+      localStorage.setItem("tn_session_id", id);
+    }
+    return id;
+  } catch {
+    return "anonymous";
+  }
+}
+
+/** Pelikerta tilastoihin (tupla_pelit). Best-effort: epäonnistuminen ei näy pelaajalle. */
+async function tallennaPeli(r: { teema: string; siemen: string; paivanSarja: boolean; syy: string; saalis: number; oikein: number; kysymykset: string[] }) {
+  try {
+    const sb = getSupabase();
+    if (!sb) return;
+    await sb.from("tupla_pelit" as never).insert({
+      teema: r.teema, siemen: r.siemen, paivan_sarja: r.paivanSarja, syy: r.syy, saalis: r.saalis, oikein: r.oikein,
+      kysymykset: r.kysymykset, session_id: istunto(),
+    } as never);
+  } catch {
+    // tilasto jää saamatta — peli jatkuu normaalisti
+  }
 }
 
 /** Luku laskee kohti kohdetta (tuplaus, jäähy, tulos). Vähennetty liike → suoraan lopulliseen. */
@@ -176,8 +205,11 @@ export default function TuplaClient({ teema: t, sarja, siemen, paivanSarja, paiv
 
   function lopeta(syy: Syy, saalis: number, oik: number) {
     const lista = syy === "taydet" ? L.taydet : syy === "jaahy" ? (saalis > 0 ? L.turva : L.nolla) : saalis <= 4 ? L.pieni : L.kuitattu;
-    const l2 = (lista[Math.floor(Math.random() * lista.length)] ?? "").replace("{N}", NOM[oik]).replace("{turva}", maara(saalis, p));
+    const l2 = (lista[Math.floor(Math.random() * lista.length)] ?? "").replace("{N}", NOM[oik]).replace("{n}", NOM[oik].toLowerCase()).replace("{turva}", maara(saalis, p));
     const uusiEnnatys = tallennaParas(avain, saalis);
+    // Pelatut kysymykset: oikein menneet + jäähyllä se, joka meni väärin
+    const pelatut = sarja.slice(0, syy === "jaahy" ? oik + 1 : oik).map((x) => x.id);
+    void tallennaPeli({ teema: t.slug, siemen, paivanSarja, syy, saalis, oikein: oik, kysymykset: pelatut });
     setParas(lueParas(avain));
     setLoppu({ syy, saalis, oikein: oik, l2, uusiEnnatys });
     setVaihe("loppu");
@@ -308,7 +340,8 @@ export default function TuplaClient({ teema: t, sarja, siemen, paivanSarja, paiv
   if (vapaa) riski = `Seuraava kysymys on vaikeampi, mutta turvassa on jo ${maara(turva, p)}. Väärä vastaus ei vie mitään.`;
   else if (turva > 0) riski = `Seuraava kysymys on vaikeampi. Väärällä vastauksella saat turvaan ${maara(turva, p)}.`;
   if (lukittuu) riski += ` Oikealla vastauksella ${seuraava} lukittuu turvaan.`;
-  const kasaS = p.ikoni === "karkki" || p.ikoni === "pallo" ? 14 : 22;
+  // Pyramidipalkinnot (pallo, karkki, käpy) levenevät, tornit kasvavat ylöspäin
+  const kasaS = p.ikoni === "karkki" || p.ikoni === "pallo" || p.ikoni === "kapy" ? 14 : 22;
   const turvaHud = turvassa(oikeat);
 
   return (
