@@ -20,7 +20,7 @@ import type { Metadata } from "next";
 import { getSupabase } from "@/lib/supabase";
 import Crumbs from "@/components/tn20/Crumbs";
 import { MobiiliSankari } from "@/components/tn20/MobiiliSankari";
-import { MEGA_FEATURED, MEGA_GRID, MEGA_WORD_MARK, megaDuration } from "@/lib/megavisat";
+import { MEGA_FEATURED, MEGA_GRID, megaDuration } from "@/lib/megavisat";
 
 export const dynamic = "force-dynamic";
 
@@ -82,10 +82,11 @@ export default async function MegavisatLanding() {
     <main className="tnm2" style={{ minHeight: "100dvh" }}>
       <Crumbs items={[{ label: "Megavisat" }]} />
 
-      {/* Mobiili (CD 24.9.): kuvaton malli, säteilevä kuvio brändielementtinä */}
+      {/* Mobiili: Mikko Megavisa-studiossa (Heikki 26.9.2026), teksti kuvan päällä */}
       <MobiiliSankari
-        variant="plain"
-        pattern="rays"
+        variant="overlay"
+        tint="#0D0B05"
+        image={{ src: "/20/megavisat/mikko-hero-mob.webp", position: "center 4%", alt: "Mikko Megavisa-studiossa" }}
         accent="#E8A320"
         eyebrow="Megavisat"
         title={["Pitkä", "peli"]}
@@ -94,7 +95,19 @@ export default async function MegavisatLanding() {
       />
 
       {/* ─── Hero: "Pitkä peli" ─── */}
-      <section className="tnm2-herowrap tnms-desk">
+      <section className="tnm2-herowrap tnm2-herowrap--kuva tnms-desk">
+        {/* Herokuva: Mikko Megavisa-studiossa (Heikki 26.9.2026), korvaa MEGA-kuvamerkin */}
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          className="tnm2-herokuva"
+          src="/20/megavisat/mikko-hero.webp"
+          srcSet="/20/megavisat/mikko-hero-900.webp 900w, /20/megavisat/mikko-hero.webp 1672w"
+          sizes="100vw"
+          alt="Mikko Megavisa-studiossa"
+          width={1672}
+          height={941}
+          fetchPriority="high"
+        />
         <div className="tn-shell tnm2-hero">
           <div className="tnm2-hero-left">
             <span className="tnm2-pill">Megavisat</span>
@@ -119,10 +132,6 @@ export default async function MegavisatLanding() {
                 </div>
               </div>
             )}
-          </div>
-          <div className="tnm2-hero-right">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img className="tnm2-wordmark" src={MEGA_WORD_MARK} alt="" aria-hidden fetchPriority="high" />
           </div>
         </div>
       </section>

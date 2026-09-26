@@ -48,6 +48,18 @@
   mix-blend-mode: screen;
 }
 
+/* Kuvahero (Heikki 26.9.2026): Mikko Megavisa-studiossa koko heron taustana,
+   teksti vasemmalla luettavuusverhon päällä. Säteet ja kulta-hehku pois. */
+.tn20 .tnm2-herowrap--kuva::before, .tn20 .tnm2-herowrap--kuva::after { content: none; }
+.tn20 .tnm2-herokuva {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  object-fit: cover; object-position: 72% 0%;
+}
+.tn20 .tnm2-herowrap--kuva .tnm2-hero { z-index: 1; min-height: clamp(380px, 38vw, 620px); }
+.tn20 .tnm2-herowrap--kuva .tnm2-hero-left::before {
+  background: linear-gradient(100deg, rgba(13,11,5,.96) 0%, rgba(13,11,5,.86) 60%, transparent 100%);
+}
+
 .tn20 .tnm2-pill {
   display: inline-block; padding: clamp(6px,.75cqw,10px) clamp(12px,1.4cqw,18px);
   border-radius: 999px; border: 1px solid #E8A320; color: #E8A320;
