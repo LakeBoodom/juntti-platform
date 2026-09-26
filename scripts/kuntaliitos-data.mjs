@@ -142,7 +142,7 @@ const kunnat = geo.features
     return {
       k,
       n: db.name_fi,
-      m: db.maakunta.replace(/ maakunta$/, ""),
+      m: db.maakunta === "Ahvenanmaan maakunta" ? "Ahvenanmaa" : db.maakunta,
       v: db.vaakuna_url ?? VAAKUNA_LISA[k] ?? null,
       p: keskus(suurin),
       b: [Math.min(...xs), Math.min(...ys), Math.max(...xs), Math.max(...ys)],

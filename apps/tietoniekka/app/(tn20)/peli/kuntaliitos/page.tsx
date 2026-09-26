@@ -2,11 +2,12 @@
 // Julkaistu 26.9.2026 Pelimuodot-valikkoon (Heikki: "Mene suosituksillasi").
 //   /peli/kuntaliitos               päivän reitti (sama kaikille tänään)
 //   /peli/kuntaliitos?reitti=x7k2   tietty reitti (Arvo uusi reitti, haastelinkki)
+//   /peli/kuntaliitos?maakunta=uusimaa   reitti alkaa Uudeltamaalta (oma päivän reitti per maakunta)
 // Reitti ja sen alueen kartta arvotaan palvelimella (lib/kuntaliitos/reitti.ts).
 
 import type { Metadata } from "next";
 import { helsinginPaiva } from "@/lib/aika";
-import { arvoReitti, KL_LAHDE } from "@/lib/kuntaliitos/reitti";
+import { arvoReitti, KL_LAHDE, KL_MAAKUNNAT, maakuntaTunnuksella } from "@/lib/kuntaliitos/reitti";
 import KuntaliitosClient from "./KuntaliitosClient";
 import "./kuntaliitos.css";
 
@@ -29,9 +30,12 @@ export default async function KuntaliitosSivu({ searchParams }: Props) {
   const pyydetty = typeof sp.reitti === "string" && SIEMEN.test(sp.reitti) ? sp.reitti : null;
   const paiva = helsinginPaiva();
   const siemen = pyydetty ?? paiva.iso;
+  const maakunta = maakuntaTunnuksella(typeof sp.maakunta === "string" ? sp.maakunta : null);
   return (
     <KuntaliitosClient
-      reitti={arvoReitti(siemen)}
+      reitti={arvoReitti(siemen, maakunta?.nimi ?? null)}
+      maakunnat={KL_MAAKUNNAT}
+      maakuntaTunnus={maakunta?.tunnus ?? null}
       siemen={siemen}
       paivanReitti={!pyydetty}
       paivays={`${paiva.pv}.${paiva.kk}.`}

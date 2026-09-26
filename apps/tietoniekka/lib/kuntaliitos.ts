@@ -19,10 +19,13 @@ export const KL_PISTEET = 10;
 export type KlKunta = { k: string; n: string; m: string; v: string | null; x: number; y: number };
 
 /** Kartan tausta: reitin alueen kunnat valmiina SVG-polkuina (viewBox-koordinaatit). */
-export type KlKartta = { viewBox: string; alueet: Array<{ k: string; d: string; s: number }> };
+/** u = kunta valitun maakunnan ulkopuolella (himmennetään). */
+export type KlKartta = { viewBox: string; alueet: Array<{ k: string; d: string; s: number; u?: boolean }> };
 
 export type KlReitti = {
   siemen: string;
+  /** Valittu aloitusmaakunta (null = koko Suomi). */
+  maakunta: string | null;
   /** Oikea järjestys (yksi ratkaisu; reitti arvotaan niin, että ratkaisuja on tasan yksi). */
   ratkaisu: KlKunta[];
   /** Pelaajan lähtöjärjestys: päätepisteet paikallaan, välikunnat sekoitettuina. */

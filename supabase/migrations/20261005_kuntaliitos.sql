@@ -44,3 +44,6 @@ set vaakuna_url = 'https://tietoniekka.fi/20/kuntaliitos/humppila.png',
     vaakuna_source = 'Wikipedia / Wikimedia Commons',
     vaakuna_license = 'Public domain'
 where code = '103' and vaakuna_url is null;
+
+-- 4) Maakuntavalinta (Heikki 26.9.2026): reitin aloitusmaakunta tilastoihin (null = koko Suomi).
+alter table kuntaliitos_pelit add column if not exists maakunta text check (length(maakunta) <= 40);

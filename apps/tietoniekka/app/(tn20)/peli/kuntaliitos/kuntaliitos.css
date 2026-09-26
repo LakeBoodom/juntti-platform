@@ -79,6 +79,17 @@
   .tn20 .kl-mkartta { display: none; }
 }
 
+/* ── Maakuntavalinta (Heikki 26.9.2026) ─────────────────── */
+.tn20 .kl-valinta { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin-bottom: 14px; font-size: 13px; font-weight: 700; color: var(--kl-heikko); }
+.tn20 .kl-valinta-kentta { position: relative; display: inline-flex; align-items: center; }
+.tn20 .kl-valinta select {
+  appearance: none; -webkit-appearance: none; min-height: 44px; padding: 0 40px 0 16px; border: 1px solid #c7d4dd; border-radius: 12px;
+  background: #fff; box-shadow: 0 3px 0 #e3daca; color: var(--kl-navy); font: inherit; font-family: var(--kl-display); font-weight: 900;
+  font-variation-settings: "wdth" 82; font-size: 16px; cursor: pointer;
+}
+.tn20 .kl-valinta select:focus-visible { outline: 3px solid var(--kl-navy); outline-offset: 3px; }
+.tn20 .kl-valinta-kentta svg { position: absolute; right: 14px; width: 16px; height: 16px; color: var(--kl-navy); pointer-events: none; }
+
 /* ── Vaakunakilpi (leveys × 1,2) ───────────────────────── */
 .tn20 .kl-kilpi { position: relative; display: block; flex: none; width: 54px; aspect-ratio: 5 / 6; }
 .tn20 .kl-kilpi::before, .tn20 .kl-kilpi-pohja { clip-path: polygon(0 0, 100% 0, 100% 60%, 50% 100%, 0 60%); }
@@ -191,6 +202,9 @@
 .tn20 .kl-savy3 { fill: #0f525a; }
 .tn20 .kl-savy4 { fill: #28537a; }
 .tn20 .kl-alue--reitti { fill: #7dc2bd; }
+/* Valitun maakunnan ulkopuoliset kunnat himmeämpinä: oma maakunta erottuu kartalta */
+.tn20 .kl-alue--ulko { fill-opacity: .55; }
+.tn20 .kl-alue--ulko.kl-alue--reitti { fill-opacity: 1; }
 .tn20 .kl-viiva, .tn20 .kl-viiva-alla, .tn20 .kl-haamu { vector-effect: non-scaling-stroke; stroke-linecap: round; fill: none; }
 .tn20 .kl-viiva-alla { stroke: #fbf8f1; stroke-width: 7px; animation: kl-hiipuu .35s ease-out both; }
 .tn20 .kl-viiva { stroke-width: 3.5px; animation: kl-hiipuu .35s ease-out both; }

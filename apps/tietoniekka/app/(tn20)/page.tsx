@@ -23,6 +23,7 @@ import { muotoileSankari, type SankariRivi } from "@/lib/paivanSankari";
 import { KuvavisatBanneri, IkajarjestysBanneri } from "@/components/tn20/EtusivunBannerit";
 import { TiedeBanneri } from "@/components/tn20/TiedeBanneri";
 import { TuplaBanneri } from "@/components/tn20/TuplaBanneri";
+import { KuntaliitosBanneri } from "@/components/tn20/KuntaliitosBanneri";
 import { getViikkovisa } from "@/lib/kuvavisat2026";
 import { getKuvavisaYhteenveto, getBanneriHenkilot } from "@/lib/etusivunBannerit";
 import {
@@ -32,6 +33,7 @@ import "./etusivu.css";
 import "./etusivun-bannerit.css";
 import "./tiede.css";
 import "./tupla-banneri.css";
+import "./kuntaliitos-banneri.css";
 
 export const dynamic = "force-dynamic";
 
@@ -183,6 +185,8 @@ export default async function Etusivu20({
 
         {/* ─── Tupla tai kuitti -banneri (CD v0.2 3B): heti Päivän visan alla (Heikki 26.9.2026) ─── */}
         <TuplaBanneri />
+        {/* Kuntaliitos (Heikki 26.9.2026): Tuplan alla, CD 13a */}
+        <KuntaliitosBanneri />
 
 
         {/* ─── Kuvavisat-banneri (Design kierros 12A, 18.9.2026) ───

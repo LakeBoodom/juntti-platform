@@ -65,17 +65,34 @@ function ratkaisuja(reitti: string[]): number {
   return n;
 }
 
+/** Maakunnat valikkoon: nimi ja osoitteen tunnus (?maakunta=uusimaa). */
+const tunnus = (m: string) => m.toLowerCase().replace(/ä/g, "a").replace(/ö/g, "o").replace(/å/g, "a").replace(/[^a-z]+/g, "-");
+// Ahvenanmaa ei ole valikossa: sieltä ei pääse maateitse mantereelle, eikä saarten sisällä
+// ole kahdeksan kunnan maarajareittiä (testattu 26.9.2026: 0 / 200 arvontaa).
+export const KL_MAAKUNNAT = [...new Set(KUNNAT.map((k) => k.m))]
+  .filter((m) => m !== "Ahvenanmaa")
+  .sort((a, b) => a.localeCompare(b, "fi"))
+  .map((nimi) => ({ nimi, tunnus: tunnus(nimi) }));
+export const maakuntaTunnuksella = (t: string | null | undefined) => KL_MAAKUNNAT.find((m) => m.tunnus === t) ?? null;
+
 /** Itseään välttävä kävely selviä maarajoja pitkin. Uusi kunta ei saa rajautua aiempiin
-    kuin edelliseen → reitin kunnista muodostuu "käärme", jolla on tasan yksi oikea järjestys. */
-function kavele(r: () => number): string[] | null {
-  const reitti = [ALOITUS[Math.floor(r() * ALOITUS.length)]];
+    kuin edelliseen → reitin kunnista muodostuu "käärme", jolla on tasan yksi oikea järjestys.
+    Maakunta valittuna (Heikki 26.9.2026): reitti alkaa siitä maakunnasta ja suosii sen kuntia,
+    mutta saa jatkua rajan yli (pienissä maakunnissa, kuten Kymenlaaksossa, on vain muutama kunta). */
+function kavele(r: () => number, maakunta: string | null): string[] | null {
+  const lahdot = maakunta ? ALOITUS.filter((k) => PER.get(k)!.m === maakunta) : ALOITUS;
+  if (!lahdot.length) return null;
+  const reitti = [lahdot[Math.floor(r() * lahdot.length)]];
   while (reitti.length < KL_KUNTIA) {
     const nyk = reitti.at(-1)!;
     const ehdokkaat = (arvonta.get(nyk) ?? []).filter(
       (x) => !reitti.includes(x) && !reitti.slice(0, -1).some((y) => rajaa(x, y)),
     );
     if (!ehdokkaat.length) return null;
-    reitti.push(ehdokkaat[Math.floor(r() * ehdokkaat.length)]);
+    const paino = (x: string) => (maakunta && PER.get(x)!.m === maakunta ? 6 : 1);
+    let arpa = r() * ehdokkaat.reduce((s, x) => s + paino(x), 0);
+    const valinta = ehdokkaat.find((x) => (arpa -= paino(x)) < 0) ?? ehdokkaat.at(-1)!;
+    reitti.push(valinta);
   }
   return reitti;
 }
@@ -83,7 +100,7 @@ function kavele(r: () => number): string[] | null {
 /** Kartan kuvasuhde (leveys / korkeus) — sama kuin .kl-kartta-alue CSS:ssä. */
 export const KL_KARTTA_SUHDE = 4 / 5;
 
-function kartta(reitti: Kunta[]): { viewBox: [number, number, number, number]; alueet: KlReitti["kartta"]["alueet"] } {
+function kartta(reitti: Kunta[], maakunta: string | null): { viewBox: [number, number, number, number]; alueet: KlReitti["kartta"]["alueet"] } {
   const xs = reitti.map((k) => k.p[0]), ys = reitti.map((k) => k.p[1]);
   let [x0, y0, x1, y1] = [Math.min(...xs), Math.min(...ys), Math.max(...xs), Math.max(...ys)];
   // Reunoille tilaa nastoille (vaakuna + nimilappu), vähintään 12 km
@@ -97,7 +114,7 @@ function kartta(reitti: Kunta[]): { viewBox: [number, number, number, number]; a
   // Iso alue (Lappi) karkeistetaan näytön tarkkuuteen: ~700 ruutua kartan korkeudella.
   const ruutu = Math.max(2, Math.round(vb[3] / 700));
   const alueet = KUNNAT.filter((k) => k.b[2] >= vb[0] && k.b[0] <= vb[0] + vb[2] && k.b[3] >= vb[1] && k.b[1] <= vb[1] + vb[3]).map(
-    (k) => ({ k: k.k, d: ruutu > 2 ? karkeista(k.d, ruutu) : k.d, s: SAVY.get(k.m) ?? 0 }),
+    (k) => ({ k: k.k, d: ruutu > 2 ? karkeista(k.d, ruutu) : k.d, s: SAVY.get(k.m) ?? 0, ...(maakunta && k.m !== maakunta ? { u: true } : {}) }),
   );
   return { viewBox: vb, alueet };
 }
@@ -125,12 +142,19 @@ function karkeista(d: string, g: number): string {
   return osat.join("");
 }
 
-export function arvoReitti(siemen: string): KlReitti | null {
-  const r = satunnainen(`kuntaliitos:${siemen}`);
+export function arvoReitti(siemen: string, maakunta: string | null = null): KlReitti | null {
+  const r = satunnainen(`kuntaliitos:${maakunta ?? ""}:${siemen}`);
+  // Maakunnan kanssa otetaan 40 kelvollisesta ehdokkaasta se, jossa on eniten maakunnan
+  // omia kuntia (tutuimmat); ilman maakuntaa ensimmäinen kelvollinen.
+  const tavoite = maakunta ? 40 : 1;
+  const omia = (x: string[]) => x.filter((k) => PER.get(k)!.m === maakunta).length;
   let reitti: string[] | null = null;
-  for (let i = 0; i < 400 && !reitti; i++) {
-    const ehdokas = kavele(r);
-    if (ehdokas && ratkaisuja(ehdokas) === 1) reitti = ehdokas;
+  let loydetty = 0;
+  for (let i = 0; i < 2000 && loydetty < tavoite; i++) {
+    const ehdokas = kavele(r, maakunta);
+    if (!ehdokas || ratkaisuja(ehdokas) !== 1) continue;
+    loydetty++;
+    if (!reitti || omia(ehdokas) > omia(reitti)) reitti = ehdokas;
   }
   if (!reitti) return null;
   const kunnat = reitti.map((k) => PER.get(k)!);
@@ -148,14 +172,14 @@ export function arvoReitti(siemen: string): KlReitti | null {
   const rajat: string[] = [];
   for (const a of reitti) for (const b of reitti) if (a < b && rajaa(a, b)) rajat.push(pariAvain(a, b));
 
-  const { viewBox, alueet } = kartta(kunnat);
+  const { viewBox, alueet } = kartta(kunnat, maakunta);
   const [vx, vy, vw, vh] = viewBox;
   const ratkaisu: KlKunta[] = kunnat.map((k) => ({
     k: k.k, n: k.n, m: k.m, v: k.v,
     x: Math.round(((k.p[0] - vx) / vw) * 1000) / 10,
     y: Math.round(((k.p[1] - vy) / vh) * 1000) / 10,
   }));
-  return { siemen, ratkaisu, alku, rajat, kartta: { viewBox: viewBox.join(" "), alueet } };
+  return { siemen, maakunta, ratkaisu, alku, rajat, kartta: { viewBox: viewBox.join(" "), alueet } };
 }
 
 export const KL_LAHDE = data.lahde as string;

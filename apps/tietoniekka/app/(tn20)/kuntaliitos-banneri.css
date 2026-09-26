@@ -1,0 +1,132 @@
+/* KUNTALIITOS-BANNERI (CD "Etusivun bannerit" 13a, 26.9.2026). Vaalea pöytä erottuu tummalta
+   etusivulta. Mobiili (< 600 px, CD 380): ketjukuva ylhäällä 176 px, teksti ja täysleveä CTA alla.
+   Tabletti (600–1199, CD 760 × 230): teksti vasemmalla, ketju 360 px oikealla.
+   Desktop (≥ 1200, CD 1160 × 268; 600–1199 tablettiasettelu): ketju 640 px, "Yhteinen raja" -pilleri ja reittiviiva.
+   Otsikko "KUNTALIITOS" (11 merkkiä, Archivo Variable wdth 70): 60 px ≈ 360 px, palstaa ~480 px. */
+
+.tn20 .klb {
+  --klb-display: "Archivo Variable", "Archivo", sans-serif;
+  --klb-navy: #0e3a5c;
+  --klb-teal: #2aa5a5;
+  position: relative; display: flex; flex-direction: column; overflow: hidden; margin: 0 0 40px;
+  border-radius: 16px; border: 1px solid #e0d8c6; background: #f4efe4; color: var(--klb-navy); text-decoration: none;
+}
+.tn20 .klb:focus-visible { outline: 3px solid #2aa5a5; outline-offset: 3px; }
+
+/* ── Ketju ja kartta ── */
+.tn20 .klb-ketju {
+  position: relative; height: 176px; overflow: hidden;
+  background: radial-gradient(80% 90% at 60% 50%, rgba(42, 165, 165, .16), rgba(244, 239, 228, 0) 70%);
+}
+.tn20 .klb-kartta {
+  position: absolute; right: 14px; top: -70px; height: 330px; width: auto; max-width: none;
+  mix-blend-mode: multiply; opacity: .5; transform: rotate(-6deg); pointer-events: none;
+}
+.tn20 .klb-polku { display: none; }
+.tn20 .klb-rivi { position: absolute; left: 0; right: 0; bottom: 14px; padding: 0 10px; display: flex; align-items: center; justify-content: center; }
+.tn20 .klb-laatta {
+  display: flex; flex-direction: column; align-items: center; gap: 6px; width: 88px; padding: 10px 6px 8px;
+  border: 1px solid #e0d8c6; border-radius: 13px; background: #fff; box-shadow: 0 3px 0 #e3daca, 0 14px 22px -12px rgba(14, 58, 92, .35);
+}
+.tn20 .klb-l1 { transform: rotate(-2deg) translateY(4px); }
+.tn20 .klb-l2 { transform: rotate(1.5deg) translateY(-4px); }
+.tn20 .klb-kilpi { position: relative; display: block; width: 42px; aspect-ratio: 5 / 6; }
+.tn20 .klb-kilpi::before, .tn20 .klb-kilpi-pohja { clip-path: polygon(0 0, 100% 0, 100% 60%, 50% 100%, 0 60%); }
+.tn20 .klb-kilpi::before { content: ""; position: absolute; inset: 0; background: var(--klb-navy); }
+.tn20 .klb-kilpi-pohja { position: absolute; inset: 2px; background: #fffdf7; overflow: hidden; }
+.tn20 .klb-kilpi img { display: block; width: 100%; height: 100%; object-fit: contain; object-position: top center; }
+.tn20 .klb-nimi { font-family: var(--klb-display); font-weight: 900; font-variation-settings: "wdth" 80; font-size: 14px; line-height: 1; white-space: nowrap; }
+.tn20 .klb-liitos { flex: none; width: 22px; display: flex; flex-direction: column; align-items: center; gap: 6px; }
+.tn20 .klb-liitos i { width: 100%; height: 4px; border-radius: 3px; background: var(--klb-teal); }
+.tn20 .klb-pill { display: none; }
+.tn20 .klb-katko { flex: none; width: 16px; height: 4px; background: repeating-linear-gradient(90deg, #9fb8c4 0 5px, transparent 5px 9px); }
+.tn20 .klb-kysymys {
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; width: 66px; height: 96px;
+  border: 2px dashed var(--klb-navy); border-radius: 13px; background: rgba(255, 253, 247, .82); transform: rotate(-1.5deg) translateY(2px);
+}
+.tn20 .klb-kysymys b { font-family: var(--klb-display); font-weight: 900; font-variation-settings: "wdth" 74; font-size: 48px; line-height: .9; color: var(--klb-teal); }
+.tn20 .klb-kysymys small { display: none; font-size: 10px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; text-align: center; }
+.tn20 .klb-tag {
+  height: 22px; display: inline-flex; align-items: center; padding: 0 9px; border-radius: 6px; background: var(--klb-navy); color: #fff;
+  font-size: 10px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; white-space: nowrap;
+}
+.tn20 .klb-tag--m { position: absolute; left: 16px; top: 14px; }
+
+/* ── Teksti ── */
+.tn20 .klb-teksti { display: flex; flex-direction: column; gap: 10px; padding: 14px 18px 18px; }
+.tn20 .klb-tagit { display: none; align-items: center; gap: 10px; }
+.tn20 .klb-meta { font-size: 11px; font-weight: 800; letter-spacing: .16em; text-transform: uppercase; color: #0a6e70; white-space: nowrap; }
+.tn20 .klb-h {
+  font-family: var(--klb-display); font-weight: 900; font-variation-settings: "wdth" 70; font-size: 32px; line-height: .9;
+  letter-spacing: -.02em; text-transform: uppercase; overflow-wrap: normal; word-break: keep-all;
+}
+.tn20 .klb-s { font-size: 14px; font-weight: 600; line-height: 1.4; color: #4e5c64; text-wrap: pretty; }
+.tn20 .klb-cta {
+  margin-top: 4px; height: 50px; display: flex; align-items: center; justify-content: center; gap: 10px; padding: 0 22px;
+  border-radius: 14px; background: var(--klb-navy); box-shadow: 0 5px 0 #07253c; color: #fff;
+  font-family: var(--klb-display); font-weight: 900; font-variation-settings: "wdth" 86; font-size: 15px; text-transform: uppercase; letter-spacing: .03em; white-space: nowrap;
+}
+.tn20 .klb-cta span { font-size: 18px; line-height: 1; transition: transform .15s; }
+.tn20 .klb:hover .klb-cta span { transform: translateX(3px); }
+
+/* ── Tabletti ── */
+@media (min-width: 600px) {
+  .tn20 .klb {
+    display: grid; grid-template-columns: minmax(0, 1fr) 360px; height: 230px;
+    background: radial-gradient(70% 140% at 76% 50%, rgba(42, 165, 165, .14), rgba(244, 239, 228, 0) 62%), #f4efe4;
+  }
+  .tn20 .klb-ketju { grid-column: 2; grid-row: 1; height: auto; overflow: visible; background: none; }
+  .tn20 .klb-kartta { right: 24px; top: -60px; height: 380px; opacity: .55; }
+  .tn20 .klb-rivi { top: 0; bottom: 0; justify-content: flex-start; padding-right: 18px; }
+  .tn20 .klb-laatta { width: 104px; padding: 12px 8px 10px; gap: 7px; }
+  .tn20 .klb-l1 { transform: rotate(-2deg) translateY(8px); }
+  .tn20 .klb-l2 { transform: rotate(1.5deg) translateY(-6px); }
+  .tn20 .klb-kilpi { width: 50px; }
+  .tn20 .klb-nimi { font-size: 16px; }
+  .tn20 .klb-liitos { width: 40px; }
+  .tn20 .klb-katko { width: 24px; }
+  .tn20 .klb-kysymys { width: 78px; height: 118px; }
+  .tn20 .klb-kysymys b { font-size: 60px; }
+  .tn20 .klb-tag--m { display: none; }
+  .tn20 .klb-teksti { grid-column: 1; grid-row: 1; position: relative; justify-content: center; gap: 11px; padding: 0 0 0 28px; }
+  .tn20 .klb-tagit { display: flex; }
+  .tn20 .klb-meta { display: none; }
+  .tn20 .klb-h { font-size: 44px; line-height: .86; }
+  .tn20 .klb-s { font-size: 13px; max-width: 30ch; }
+  .tn20 .klb-cta { align-self: flex-start; height: 44px; padding: 0 20px; font-size: 14px; box-shadow: 0 4px 0 #07253c; }
+}
+
+/* ── Desktop ── (1200 px: kapeammalla 640 px:n ketju peittäisi otsikon, mitattu 1024 px:llä) */
+@media (min-width: 1200px) {
+  .tn20 .klb { grid-template-columns: minmax(0, 1fr) 640px; height: 268px; border-radius: 18px; }
+  .tn20 .klb-kartta { right: 150px; top: -78px; height: 440px; opacity: .62; }
+  .tn20 .klb-polku { display: block; position: absolute; left: 356px; top: 14px; width: 160px; height: 240px; overflow: visible; pointer-events: none; }
+  .tn20 .klb-polku path { fill: none; stroke: var(--klb-teal); stroke-width: 4; stroke-dasharray: 2 9; stroke-linecap: round; }
+  .tn20 .klb-polku circle { fill: var(--klb-navy); stroke: #fffdf7; stroke-width: 3; }
+  .tn20 .klb-rivi { padding-left: 6px; padding-right: 0; }
+  .tn20 .klb-laatta { width: 128px; padding: 14px 10px 12px; gap: 9px; border-radius: 16px; box-shadow: 0 3px 0 #e3daca, 0 18px 30px -16px rgba(14, 58, 92, .35); }
+  .tn20 .klb-l1 { transform: rotate(-2deg) translateY(10px); }
+  .tn20 .klb-l2 { transform: rotate(1.5deg) translateY(-8px); }
+  .tn20 .klb-kilpi { width: 62px; }
+  .tn20 .klb-nimi { font-size: 19px; }
+  .tn20 .klb-liitos { width: 114px; } /* "Yhteinen raja" on pidempi kuin CD:n "Maaraja" */
+  .tn20 .klb-pill {
+    display: inline-flex; align-items: center; gap: 5px; padding: 4px 9px 4px 7px; border-radius: 999px; background: #fff; border: 1px solid var(--klb-teal);
+    color: #0a6e70; font-size: 9px; font-weight: 800; letter-spacing: .09em; text-transform: uppercase; white-space: nowrap;
+  }
+  .tn20 .klb-pill svg { width: 11px; height: 11px; }
+  .tn20 .klb-pill path { fill: none; stroke: #0a6e70; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+  .tn20 .klb-katko { width: 44px; height: 4px; background: repeating-linear-gradient(90deg, #9fb8c4 0 8px, transparent 8px 14px); }
+  .tn20 .klb-kysymys { width: 128px; height: 150px; border-radius: 16px; transform: rotate(-1.5deg) translateY(6px); }
+  .tn20 .klb-kysymys b { font-size: 78px; }
+  .tn20 .klb-kysymys small { display: block; color: var(--klb-navy); font-size: 9px; letter-spacing: .1em; }
+  .tn20 .klb-teksti { gap: 14px; padding-left: 38px; }
+  .tn20 .klb-meta { display: inline; }
+  .tn20 .klb-tag { height: 24px; padding: 0 10px; font-size: 11px; }
+  .tn20 .klb-h { font-size: 60px; line-height: .86; letter-spacing: -.025em; }
+  .tn20 .klb-s { font-size: 15px; max-width: 34ch; }
+  .tn20 .klb-cta { height: 50px; padding: 0 26px; font-size: 16px; box-shadow: 0 5px 0 #07253c; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .tn20 .klb-cta span { transition: none; }
+}
