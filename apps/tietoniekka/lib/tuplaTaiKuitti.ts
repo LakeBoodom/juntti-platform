@@ -18,7 +18,7 @@ import { KAUPUNGIT } from "./kaupungit";
 
 /** Palkintoikonit (CD "TN Tupla tai kuitti" 1C): yksi SVG-symboli per palkinto,
     kasa rakennetaan toistamalla samaa symbolia. */
-export type PalkintoIkoni = "kiekko" | "kolikko" | "pallo" | "karkki" | "lahja" | "vinyyli" | "kapy" | "lippu" | "popcorn";
+export type PalkintoIkoni = "kiekko" | "kolikko" | "pallo" | "karkki" | "lahja" | "vinyyli" | "kapy" | "lippu" | "popcorn" | "kompassi";
 
 export type Palkinto = {
   /** "kiekko" */
@@ -232,6 +232,48 @@ TEEMAT.push(
     kuva: "/20/tupla/ikoni-popcorn.webp",
     nosto: "Sarjat, hahmot ja ohjelmat kotisohvalta.",
     visat: { kokoelma: "tv" },
+    paluu: { href: "/peli/tupla-tai-kuitti", teksti: "Kaikki Tupla tai kuitti -aiheet" },
+  },
+  // Heikki 26.9.2026: Historia (yleinen kolikko aarteena, CD 2A) ja Maantieto (kompassi)
+  {
+    slug: "historia",
+    nimi: "Historia",
+    kuvaus: "Kymmenen kysymystä Suomen historiasta, jokainen edellistä vaikeampi. Jokainen oikea vastaus tuplaa potin.",
+    accent: "#C4B5FD",
+    kuvio: "repeating-linear-gradient(45deg, rgba(196,181,253,.12) 0 1px, transparent 1px 12px)",
+    palkinto: { yksi: "kolikko", monta: "kolikkoa", yhden: "kolikon", kaikki: "kolikot", osa: "kolikoista", ikoni: "kolikko" },
+    virhe: "Hups!",
+    lauseet: {
+      pieni: ["Pienikin aarre on aarre. Ensi kerralla syvemmälle?", "Varma kolikko kirstuun."],
+      kuitattu: ["Aarre talteen ajoissa. {N} oikein putkeen.", "Viisas päätös, historia muistaa sen. {N} oikein putkeen."],
+      turva: ["Turva piti. {N} oikein ja {turva} mukaan.", "Hups, mutta {turva} jää aarrekirstuun."],
+      nolla: ["Hups! Aarre jäi löytymättä, uusi sarja odottaa.", "Historia ei toistanut itseään tällä kertaa. Uusi sarja odottaa."],
+      taydet: ["Täydet kolikot. Tästä kirjoitetaan historiankirjoihin."],
+    },
+    kuva: "/20/tupla/ikoni-kolikko.webp",
+    nosto: "Kuninkaat, sodat, presidentit ja arki ennen vanhaan.",
+    visat: { kokoelma: "historia" },
+    paluu: { href: "/peli/tupla-tai-kuitti", teksti: "Kaikki Tupla tai kuitti -aiheet" },
+  },
+  {
+    slug: "maantieto",
+    nimi: "Maantieto",
+    kuvaus: "Kymmenen kysymystä maailman ääripäistä, kaupungeista ja matkakohteista, jokainen edellistä vaikeampi. Jokainen oikea vastaus tuplaa potin.",
+    accent: "#60A5FA",
+    kuvio: "linear-gradient(90deg, rgba(96,165,250,.14) 1px, transparent 1px) 0 0/34px 34px, linear-gradient(0deg, rgba(96,165,250,.14) 1px, transparent 1px) 0 0/34px 34px",
+    palkinto: { yksi: "kompassi", monta: "kompassia", yhden: "kompassin", kaikki: "kompassit", osa: "kompasseista", ikoni: "kompassi" },
+    virhe: "Eksyit!",
+    lauseet: {
+      pieni: ["Oikea suunta, lyhyt matka. Ensi kerralla pidemmälle?", "Varma kompassi taskussa."],
+      kuitattu: ["Hyvä suuntavaisto. {N} oikein putkeen.", "Palasit ajoissa leiriin. {N} oikein putkeen."],
+      turva: ["Eksyit, mutta {turva} jää sinulle.", "Turva piti. {N} oikein ja {turva} mukaan."],
+      nolla: ["Eksyit! Kartta käteen ja uusi reitti.", "Suunta hukassa. Uusi sarja odottaa."],
+      taydet: ["Täydet kompassit. Maailma on sinun karttasi."],
+    },
+    kuva: "/20/tupla/ikoni-kompassi.webp",
+    nosto: "Vuoret, joet, saaret ja maailman ääripäät.",
+    // Maantieto-kokoelma on kannassa "matkakohteet" (nav.ts)
+    visat: { kokoelma: "matkakohteet" },
     paluu: { href: "/peli/tupla-tai-kuitti", teksti: "Kaikki Tupla tai kuitti -aiheet" },
   },
 );

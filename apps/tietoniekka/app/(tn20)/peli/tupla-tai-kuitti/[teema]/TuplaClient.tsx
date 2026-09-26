@@ -16,7 +16,7 @@ import {
   type TuplaKysymys,
   type TuplaTeema,
 } from "@/lib/tuplaTaiKuitti";
-import { Kasa, Symboli, TuplaSprite } from "@/components/tn20/TuplaIkonit";
+import { Kasa, Symboli, TuplaSprite, onTorni } from "@/components/tn20/TuplaIkonit";
 import { getSupabase } from "@/lib/supabase";
 
 type Vaihe = "alku" | "kysymys" | "palaute" | "loppu";
@@ -341,7 +341,7 @@ export default function TuplaClient({ teema: t, sarja, siemen, paivanSarja, paiv
   else if (turva > 0) riski = `Seuraava kysymys on vaikeampi. Väärällä vastauksella saat turvaan ${maara(turva, p)}.`;
   if (lukittuu) riski += ` Oikealla vastauksella ${seuraava} lukittuu turvaan.`;
   // Pyramidipalkinnot (pallo, karkki, käpy) levenevät, tornit kasvavat ylöspäin
-  const kasaS = p.ikoni === "karkki" || p.ikoni === "pallo" || p.ikoni === "kapy" || p.ikoni === "popcorn" ? 14 : 22;
+  const kasaS = onTorni(p.ikoni) ? 22 : 14;
   const turvaHud = turvassa(oikeat);
 
   return (

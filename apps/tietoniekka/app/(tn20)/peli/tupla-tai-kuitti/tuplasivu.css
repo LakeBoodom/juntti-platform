@@ -112,8 +112,8 @@
   .tn20 .tks-nosto-nimi { font-size: 38px; }
   .tn20 .tks-nosto-ikoni { width: 128px; height: 128px; }
   .tn20 .tks-rules { justify-content: center; }
-  /* Kaikki aiheet yhdelle riville niin pitkälle kuin mahtuu (5 × ~200 px 1072 px:ssä) */
-  .tn20 .tks-aiheet ul { grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; }
+  /* Neljä saraketta (CD 3A); 7 aihetta → 4 + 3 */
+  .tn20 .tks-aiheet ul { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; }
   .tn20 .tks-aiheet li:last-child:nth-child(odd) { grid-column: auto; }
   .tn20 .tks-aiheet img { width: 104px; height: 104px; }
 }

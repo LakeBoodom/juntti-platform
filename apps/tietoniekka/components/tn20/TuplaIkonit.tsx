@@ -86,6 +86,15 @@ export function TuplaSprite() {
         <path d="M17 20l1.4 23h4l-.4-23zM26 20l-.4 23h4l1.4-23z" fill="#FF3D9E" />
         <path d="M12 20h24l-3 23H15z" fill="none" stroke="#FFFFFF" strokeWidth="1.8" strokeLinejoin="round" />
       </symbol>
+      <symbol id="ttk-kompassi" viewBox="0 0 48 48">
+        <circle cx="24" cy="24" r="18" fill="#1B2433" />
+        <circle cx="24" cy="24" r="13.5" fill="none" stroke="#3B4A63" strokeWidth="1.4" />
+        <path d="M24 11l4.2 13h-8.4z" fill="#FF7A5C" />
+        <path d="M24 37l-4.2-13h8.4z" fill="#E6EDF7" />
+        <circle cx="24" cy="24" r="2" fill="#1B2433" stroke="#E6EDF7" strokeWidth="1.4" />
+        <circle cx="24" cy="24" r="18" fill="none" stroke="#D6E6FF" strokeWidth="1.8" />
+        <path d="M11.5 17a14 14 0 0 1 6.5-7" fill="none" stroke="#FFFFFF" strokeWidth="1.8" strokeLinecap="round" />
+      </symbol>
       <symbol id="ttk-lukko" viewBox="0 0 16 18">
         <path d="M4.5 8.5V5.5a3.5 3.5 0 0 1 7 0v3" fill="none" stroke="currentColor" strokeWidth="2.2" />
         <rect x="2" y="8" width="12" height="9.2" rx="2.4" fill="currentColor" />
@@ -108,9 +117,11 @@ export function Symboli({ id, koko, style, className }: { id: string; koko: numb
 }
 
 /** Symbolin tyhjä reunus ylhäältä ja alhaalta (osuus koosta) — kasa pakataan tiiviiksi. */
-const PAD: Record<PalkintoIkoni, number> = { kiekko: 0.23, kolikko: 0.27, pallo: 0.125, karkki: 0.3, lahja: 0.17, vinyyli: 0.31, kapy: 0.1, lippu: 0.29, popcorn: 0.1 };
+const PAD: Record<PalkintoIkoni, number> = { kiekko: 0.23, kolikko: 0.27, pallo: 0.125, karkki: 0.3, lahja: 0.17, vinyyli: 0.31, kapy: 0.1, lippu: 0.29, popcorn: 0.1, kompassi: 0.125 };
 /** Litteät palkinnot pinoutuvat torniksi (kerrosväli), muut kasautuvat pyramidiksi (CD v0.2). */
 const TORNI: Partial<Record<PalkintoIkoni, number>> = { kiekko: 0.21, kolikko: 0.15, vinyyli: 0.12, lippu: 0.11 };
+/** Torni kasvaa ylöspäin, pyramidi levenee — päätöskortissa pyramidi piirretään pienempänä. */
+export const onTorni = (p: PalkintoIkoni) => TORNI[p] != null;
 const RIVIVALI: Partial<Record<PalkintoIkoni, number>> = { karkki: 0.4, kapy: 0.5, lahja: 0.6 };
 const HEILUNTA = [0, 1.5, -1, 2, -2, 1, -1.5, 2, 0, -1];
 
