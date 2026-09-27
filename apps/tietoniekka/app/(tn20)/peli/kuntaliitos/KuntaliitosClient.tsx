@@ -1,6 +1,6 @@
 "use client";
 // KUNTALIITOS — pelinäkymä (CD "Kuntaliitos v0.2", kierros 5: 5a pelitilanne, 5b vaiheittainen
-// paljastus, 5c epäonnistunut kierros ja jatko, 5d täydellinen onnistuminen, 1d virhetila).
+// paljastus, 5c epäonnistunut kierros ja jatko (CD:n "Korjaa katkos" → "Yritä uudelleen", Heikki 27.9.2026), 5d täydellinen onnistuminen, 1d virhetila).
 //
 // Poikkeamat designista (Heikin hyväksymät suositukset 26.9.2026):
 //   - "Maaraja" → "Yhteinen raja": kuntarajat jatkuvat merelle (Naantali–Turku).
@@ -470,7 +470,7 @@ export default function KuntaliitosClient({
       ? "Reitti rakentuu pari kerrallaan – kartta näyttää, mihin se katkeaa."
       : taydet
         ? "Koko reitti kulki yhteisiä rajoja pitkin päätepisteestä päätepisteeseen."
-        : "Katkokset on merkitty korttien väliin ja kartalle. Korjaa katkos ja rakenna reitti uudelleen.";
+        : "Katkokset on merkitty korttien väliin ja kartalle. Yritä uudelleen – järjestys säilyy, joten voit siirtää vain katkosten kohdalla olevia kuntia.";
 
   return (
     <div className="kl" ref={juuri}>
@@ -594,7 +594,7 @@ export default function KuntaliitosClient({
             {vaihe === "tarkistus" && <div className="kl-rakentuu">Reittiä rakennetaan · {oikein}/{KL_YHTEYKSIA}</div>}
             {vaihe === "tulos" && (taydet
               ? <button type="button" className="kl-nappi kl-nappi--teal" onClick={arvoUusi}>Arvo uusi reitti</button>
-              : <button type="button" className="kl-nappi" onClick={korjaa}>Korjaa katkos</button>)}
+              : <button type="button" className="kl-nappi" onClick={korjaa}>Yritä uudelleen</button>)}
           </div>
           {vaihe === "tulos" && (
             <div className="kl-lisat">
@@ -639,7 +639,7 @@ export default function KuntaliitosClient({
         <ol>
           <li><b>Reitin päät ovat kiinni.</b> Ensimmäinen ja viimeinen kunta pysyvät paikallaan.</li>
           <li><b>Järjestä välikunnat.</b> Raahaa tai napauta kahta korttia vaihtaaksesi niiden paikat. Jokaisella vierekkäisellä parilla pitää olla yhteinen raja.</li>
-          <li><b>Rakenna reitti.</b> Kartta piirtää reitin pari kerrallaan. Jokainen oikea yhteys on {KL_PISTEET} pistettä – katkoksen voi korjata ja yrittää uudelleen.</li>
+          <li><b>Rakenna reitti.</b> Kartta piirtää reitin pari kerrallaan. Jokainen oikea yhteys on {KL_PISTEET} pistettä – jos reitti katkeaa, voit yrittää uudelleen samalla järjestyksellä.</li>
         </ol>
         <p>Uusi päivän reitti joka päivä – koko Suomelle ja jokaiselle maakunnalle omansa. Valitse maakunta, niin reitti alkaa sieltä ja kulkee mahdollisimman paljon sen kuntien kautta. Yhteinen raja voi kulkea myös vesialueella, esimerkiksi Naantalin ja Turun välillä.</p>
         <p className="kl-lahde">{lahde}</p>
