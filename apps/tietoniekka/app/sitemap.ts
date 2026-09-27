@@ -5,6 +5,7 @@
 import type { MetadataRoute } from "next";
 import { TEEMAT, TUPLA_SIVU } from "@/lib/tuplaTaiKuitti";
 import { KL_SIVU } from "@/lib/kuntaliitos";
+import { RN_SIVU } from "@/lib/rajanaapurit";
 import { getPublishedQuizSlugs } from "@/lib/queries";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://tietoniekka.fi";
@@ -40,6 +41,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${SITE_URL}${TUPLA_SIVU}`, lastModified: now, changeFrequency: "weekly", priority: 0.8 },
     ...TEEMAT.map((t) => ({ url: `${SITE_URL}${TUPLA_SIVU}/${t.slug}`, lastModified: now, changeFrequency: "daily" as const, priority: 0.6 })),
     { url: `${SITE_URL}${KL_SIVU}`, lastModified: now, changeFrequency: "daily", priority: 0.7 },
+    { url: `${SITE_URL}${RN_SIVU}`, lastModified: now, changeFrequency: "daily", priority: 0.7 },
     { url: `${SITE_URL}/tietosuoja`, lastModified: now, changeFrequency: "yearly", priority: 0.2 },
   ];
 

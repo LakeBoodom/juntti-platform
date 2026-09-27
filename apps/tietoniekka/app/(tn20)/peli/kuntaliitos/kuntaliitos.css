@@ -97,15 +97,6 @@
 .tn20 .kl-kilpi-pohja { position: absolute; inset: 2px; background: #fffdf7; overflow: hidden; display: flex; align-items: flex-start; justify-content: center; }
 .tn20 .kl-kilpi img { width: 100%; height: 100%; object-fit: contain; object-position: top center; -webkit-user-drag: none; }
 .tn20 .kl-kilpi-kirjain { margin-top: 14%; font-family: var(--kl-display); font-weight: 900; font-size: 1.1em; color: var(--kl-navy); }
-/* Rajanaapurit: lippu 4:3-kehyksessä (väliaikainen, kunnes CD:n lippulaatta valmistuu). Kehys
-   näkyy myös vaaleiden lippujen (Puola) ympärillä. */
-.tn20 .kl-kilpi--lippu { aspect-ratio: 4 / 3; }
-.tn20 .kl-kilpi--lippu::before, .tn20 .kl-kilpi--lippu .kl-kilpi-pohja { clip-path: none; border-radius: 4px; }
-.tn20 .kl-kilpi--lippu::before { background: var(--kl-reuna, rgba(14, 58, 92, .35)); }
-.tn20 .kl-kilpi--lippu .kl-kilpi-pohja { inset: 1px; border-radius: 3px; align-items: center; background: #f4f1ea; }
-.tn20 .kl-kilpi--lippu img { object-fit: cover; object-position: center; }
-.tn20 .kl-nasta .kl-kilpi--lippu::before { inset: -1px; background: var(--kl-reuna, var(--kl-navy)); }
-.tn20 .kl-nasta .kl-kilpi--lippu .kl-kilpi-pohja { inset: 1.5px; }
 .tn20 .kl-kilpi--pari { width: 26px; }
 .tn20 .kl-kilpi--pieni { width: 34px; }
 
@@ -153,7 +144,7 @@
    Archivo 900 wdth 80 ≈ 0,58 em / merkki (mitattu). Lyhyillä nimillä yläraja --kl-nimi-max. */
 .tn20 .kl-nimi {
   font-family: var(--kl-display); font-weight: 900; font-variation-settings: "wdth" 80; line-height: 1.02; color: var(--kl-navy);
-  font-size: min(var(--kl-nimi-max), calc((88cqi - var(--kl-vw) - 84px) / (var(--kl-len) * .52)));
+  font-size: min(var(--kl-nimi-max), calc((100cqi - var(--kl-porras-max, 12cqi) - var(--kl-vw) - 84px) / (var(--kl-len) * .52)));
   overflow-wrap: normal; word-break: keep-all; white-space: nowrap;
 }
 /* Monisanaiset valtioiden nimet rivittyvät sanojen välistä; koko pisimmän sanan mukaan */
@@ -224,6 +215,7 @@
 .tn20 .kl-viiva--ok { stroke: var(--kl-teal); }
 .tn20 .kl-viiva--bad { stroke: var(--kl-puna); }
 .tn20 .kl-haamu { stroke: #fbf8f1; stroke-width: 2.2px; stroke-dasharray: 3 5; opacity: .95; }
+.tn20 .kl-haamu-alla { display: none; }
 .tn20 .kl-risti {
   position: absolute; transform: translate(-50%, -50%); width: 18px; height: 18px; border-radius: 999px; background: #fff; border: 2px solid var(--kl-puna);
   display: flex; align-items: center; justify-content: center; color: #b0301a; animation: kl-pomppu .3s ease-out both;
@@ -317,6 +309,134 @@
 .tn20 .kl-info ol { margin: 0 0 14px; padding-left: 20px; display: flex; flex-direction: column; gap: 8px; max-width: 68ch; font-size: 15px; line-height: 1.5; color: #2f3d45; }
 .tn20 .kl-info p { margin: 0 0 8px; max-width: 68ch; font-size: 14px; line-height: 1.5; color: var(--kl-heikko); }
 .tn20 .kl-info .kl-lahde { font-size: 12px; color: var(--kl-ruskea); }
+
+/* ══════════ RAJANAAPURIT (CD "Rajanaapurit v0.2", 27.9.2026) ══════════
+   Sama rakenne kuin Kuntaliitoksessa; peliperheen aksentti on kulta (turkoosi reitti hukkuisi
+   maailmankartan syvänsiniseen ja turkoosiin maahan). Kullan roolit: #F2B233 reittiviiva ja nastan
+   rengas, #D39A17 kisko ja mittari, #C8900F valitun kortin reunus, #8A5A00 teksti vaalealla. */
+.tn20 .kl--rajanaapurit {
+  --kl-kulta: #f2b233;
+  --kl-kulta-2: #d39a17;
+  --kl-kulta-3: #c8900f;
+  --kl-kulta-t: #8a5a00;
+}
+.tn20 .kl--rajanaapurit .kl-bar-nimi h1 { box-shadow: inset 0 -3px 0 var(--kl-kulta); padding-bottom: 3px; }
+.tn20 .kl--rajanaapurit .kl-seg--ok { background: var(--kl-kulta-2); }
+.tn20 .kl--rajanaapurit .kl-tilanne-rivi b.kl-teal { color: var(--kl-kulta-t); }
+@container kl (min-width: 900px) {
+  .tn20 .kl--rajanaapurit .kl-main { grid-template-columns: minmax(0, 1.4fr) minmax(340px, 460px); }
+}
+
+/* Maanosavalinta: segmentit (3d) */
+.tn20 .kl-segvalinta { display: flex; flex-direction: column; gap: 8px; margin-bottom: 14px; }
+.tn20 .kl-segvalinta-yla { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
+.tn20 .kl-segvalinta-reitti { font-size: 11px; font-weight: 700; color: var(--kl-heikko); white-space: nowrap; }
+.tn20 .kl-segmentit {
+  display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 3px; padding: 3px;
+  border: 1px solid var(--kl-viiva); border-radius: 15px; background: #fff; box-shadow: 0 3px 0 #e3daca;
+}
+.tn20 .kl-segmentit button {
+  min-width: 0; min-height: 52px; padding: 0 2px; border: 0; border-radius: 12px; background: transparent; color: var(--kl-navy);
+  font-family: var(--kl-display); font-weight: 800; font-variation-settings: "wdth" 76; font-size: 12px; letter-spacing: .02em;
+  text-transform: uppercase; white-space: nowrap; overflow: hidden; cursor: pointer; transition: background .15s ease;
+}
+.tn20 .kl-segmentit button[aria-pressed="true"] { background: var(--kl-navy); color: #fff; }
+.tn20 .kl-segmentit button[aria-pressed="false"]:hover { background: #f5f1e8; }
+.tn20 .kl-segmentit button:focus-visible { outline: 3px solid var(--kl-navy); outline-offset: 2px; }
+@container kl (max-width: 340px) {
+  .tn20 .kl-segmentit button { font-size: 11px; font-variation-settings: "wdth" 70; }
+}
+
+/* Lippulaatta (3a): kiinteä 4:3, cover, pyöristys 5 px, hiusviivareuna kaikissa lipuissa */
+.tn20 .kl-lippu { position: relative; display: block; flex: none; width: 56px; aspect-ratio: 4 / 3; border-radius: 5px; background: #f4f1ea; }
+.tn20 .kl-lippu img { display: block; width: 100%; height: 100%; object-fit: cover; border-radius: inherit; -webkit-user-drag: none; }
+.tn20 .kl-lippu::after { content: ""; position: absolute; inset: 0; border-radius: inherit; box-shadow: inset 0 0 0 1px rgba(10, 44, 71, .24); pointer-events: none; }
+.tn20 .kl-lippu .kl-kilpi-kirjain { display: flex; height: 100%; margin: 0; align-items: center; justify-content: center; }
+.tn20 .kl-kortti .kl-lippu { width: var(--kl-vw); }
+.tn20 .kl-lippu.kl-kilpi--pari { width: 32px; border-radius: 3px; }
+.tn20 .kl-lippu.kl-kilpi--pieni { width: 36px; border-radius: 3px; }
+.tn20 .kl--rajanaapurit .kl-kortti {
+  --kl-vw: 56px; --kl-nimi-max: 17px; --kl-porras-max: 8cqi;
+  min-height: 60px; padding: 9px 14px 9px 12px;
+}
+.tn20 .kl--rajanaapurit .kl-kortti-num { top: -8px; left: -9px; box-shadow: 0 0 0 2px #fff; }
+.tn20 .kl--rajanaapurit .kl-nimi { font-variation-settings: "wdth" 78; hyphens: manual; }
+.tn20 .kl--rajanaapurit .kl-maakunta { background: #e6edf2; color: var(--kl-navy); }
+.tn20 .kl--rajanaapurit .kl-kortti[data-tila="valittu"] { border: 2px solid var(--kl-kulta-3); animation: kl-syke-kulta 1.6s ease-in-out infinite; }
+.tn20 .kl--rajanaapurit .kl-kortti[data-tila="siirtyva"] { border-color: var(--kl-kulta-3); box-shadow: 0 14px 26px rgba(10, 44, 71, .28), 0 4px 0 #9a6a06; }
+.tn20 .kl--rajanaapurit .kl-kortti[data-tila="lukittu"] { border-style: dashed; }
+.tn20 .kl--rajanaapurit .kl-kahva--lukko { background: #e3dccb; }
+@container (max-width: 400px) {
+  .tn20 .kl--rajanaapurit .kl-kortti { --kl-vw: 48px; --kl-nimi-max: 16px; }
+}
+@container (max-width: 316px) {
+  /* CD: alle 340 px:n näytöllä (lista ~316 px) lippu 44 px, nimi 15 px, wdth 72 */
+  .tn20 .kl--rajanaapurit .kl-kortti { --kl-vw: 44px; --kl-nimi-max: 15px; padding-right: 10px; gap: 9px; }
+  .tn20 .kl--rajanaapurit .kl-nimi { font-variation-settings: "wdth" 72; }
+}
+@container kl (min-width: 900px) {
+  .tn20 .kl--rajanaapurit .kl-kortti { --kl-vw: 68px; --kl-nimi-max: 24px; min-width: min(100%, 380px); padding-right: clamp(18px, 2cqi, 28px); }
+}
+@container kl (min-width: 1400px) {
+  .tn20 .kl--rajanaapurit .kl-kortti { --kl-vw: 76px; --kl-nimi-max: 28px; min-width: min(100%, 460px); }
+}
+.tn20 .kl--rajanaapurit .kl-liitos { padding-left: calc(var(--kl-porras) + 26px); }
+.tn20 .kl--rajanaapurit .kl-liitos[data-tila="ok"] .kl-kisko { background: var(--kl-kulta-2); }
+.tn20 .kl--rajanaapurit .kl-liitos[data-tila="ok"] .kl-pilleri { border-color: var(--kl-kulta-3); background: #fbf1da; color: #7a5200; }
+
+/* Maailmankartta (3c): meri harmaansininen, valittu maanosa 5 syvää sävyä, muut himmennettyinä,
+   pelin ulkopuoliset paperinvaaleina. Kartta on vaakamuotoinen (5:4 = moottorin suhde). */
+.tn20 .kl--rajanaapurit .kl-kartta-alue { aspect-ratio: 5 / 4; background: #d5e1e0; }
+.tn20 .kl--rajanaapurit .kl-mkartta .kl-kartta-alue { width: 100%; }
+.tn20 .kl--rajanaapurit .kl-kartta--akt { border-color: var(--kl-kulta-3); }
+.tn20 .kl--rajanaapurit .kl-alue { stroke: #efe9dc; stroke-width: .8px; fill-opacity: 1; }
+.tn20 .kl--rajanaapurit .kl-savy0 { fill: #0e3a5c; }
+.tn20 .kl--rajanaapurit .kl-savy1 { fill: #1a5b80; }
+.tn20 .kl--rajanaapurit .kl-savy2 { fill: #0f6a74; }
+.tn20 .kl--rajanaapurit .kl-savy3 { fill: #1c8487; }
+.tn20 .kl--rajanaapurit .kl-savy4 { fill: #2f6e96; }
+.tn20 .kl--rajanaapurit .kl-alue--ulko { stroke: #e6ecec; }
+.tn20 .kl--rajanaapurit .kl-alue--ulko.kl-savy0 { fill: #9db2bd; }
+.tn20 .kl--rajanaapurit .kl-alue--ulko.kl-savy1 { fill: #aec0c7; }
+.tn20 .kl--rajanaapurit .kl-alue--ulko.kl-savy2 { fill: #a3bab8; }
+.tn20 .kl--rajanaapurit .kl-alue--ulko.kl-savy3 { fill: #b7c6cb; }
+.tn20 .kl--rajanaapurit .kl-alue--ulko.kl-savy4 { fill: #a6b6c3; }
+.tn20 .kl--rajanaapurit .kl-alue.kl-alue--tausta { fill: #eae4d6; stroke: #cfc4ac; stroke-width: .6px; }
+.tn20 .kl-selite-ulko { width: 11px !important; height: 11px !important; border-radius: 3px !important; background: #eae4d6; border: 1px solid #cfc4ac; }
+.tn20 .kl--rajanaapurit .kl-selite-ok { background: var(--kl-kulta); box-shadow: 0 0 0 1px #0a2c47; }
+.tn20 .kl--rajanaapurit .kl-viiva-alla { stroke: #0a2c47; stroke-width: 6.5px; opacity: .85; }
+.tn20 .kl--rajanaapurit .kl-viiva--ok { stroke: var(--kl-kulta); }
+.tn20 .kl--rajanaapurit .kl-haamu-alla { display: inline; stroke: #0a2c47; stroke-width: 5px; opacity: .55; vector-effect: non-scaling-stroke; stroke-linecap: round; }
+.tn20 .kl--rajanaapurit .kl-haamu { stroke: #fffdf7; stroke-width: 2.2px; stroke-dasharray: 2 5; opacity: 1; }
+.tn20 .kl-rengas { position: absolute; width: 13px; height: 13px; border-radius: 50%; border: 1.4px dashed #0e3a5c; transform: translate(-50%, -50%); pointer-events: none; }
+.tn20 .kl-rengas--u { border-color: #6e858f; }
+.tn20 .kl--rajanaapurit .kl-pari { border-color: #ebcb86; background: #fbf1da; }
+.tn20 .kl--rajanaapurit .kl-pari-t span { color: #7a5200; }
+.tn20 .kl--rajanaapurit .kl-pari--bad { border-color: #f0cfc5; background: #fbe7e1; }
+.tn20 .kl--rajanaapurit .kl-pari--bad .kl-pari-t span { color: var(--kl-puna-t); }
+
+/* Lippunasta (3b): lippu valkoisessa 2 px passepartoutissa, 2 px tilarengas + tumma varjo.
+   Päätepiste 32 px, välinasta 24 px (kartta alle 560 px leveä). */
+.tn20 .kl--rajanaapurit .kl-nasta { --kl-pw: 24px; transform: translate(-50%, -50%); gap: 4px; }
+.tn20 .kl--rajanaapurit .kl-nasta--paate { --kl-pw: 32px; z-index: 1; }
+.tn20 .kl--rajanaapurit .kl-nasta--oik { transform: translate(calc(-100% + var(--kl-pw) / 2), -50%); }
+.tn20 .kl--rajanaapurit .kl-nasta--vas { transform: translate(calc(var(--kl-pw) / -2), -50%); }
+.tn20 .kl--rajanaapurit .kl-nasta-kilpi { filter: none; }
+.tn20 .kl-nasta .kl-lippu {
+  width: var(--kl-pw); padding: 2px; border-radius: 4px; background: #fff;
+  box-shadow: 0 0 0 2px var(--kl-reuna, #f2b233), 0 4px 10px rgba(7, 24, 38, .5);
+}
+.tn20 .kl-nasta .kl-lippu img { border-radius: 2px; }
+.tn20 .kl-nasta .kl-lippu::after { display: none; }
+.tn20 .kl--rajanaapurit .kl-nasta-num { top: -9px; right: -10px; min-width: 17px; height: 17px; line-height: 17px; padding: 0 4px; box-shadow: 0 0 0 1.5px #fff; }
+.tn20 .kl--rajanaapurit .kl-nasta-lappu { box-shadow: 0 0 0 1.5px #fff; }
+
+/* Tulos ja paljastus kullalla (päätoiminto pysyy navyna: valkoinen kullalla ei täytä kontrastia) */
+.tn20 .kl--rajanaapurit .kl-tulos--ok { border-color: var(--kl-kulta-3); background: linear-gradient(180deg, #fbf1da, #fff); box-shadow: 0 4px 0 #ebcb86; }
+.tn20 .kl--rajanaapurit .kl-tulos--ok .kl-tulos-ik { background: var(--kl-kulta-t); }
+.tn20 .kl--rajanaapurit .kl-tulos--ok .kl-tulos-t b { color: #7a5200; }
+.tn20 .kl--rajanaapurit .kl-rakentuu { border-color: #ebcb86; background: #fbf1da; color: #7a5200; }
+@keyframes kl-syke-kulta { 0%, 100% { box-shadow: 0 3px 0 #9a6a06, 0 0 0 0 rgba(200, 144, 15, 0); } 50% { box-shadow: 0 3px 0 #9a6a06, 0 0 0 8px rgba(200, 144, 15, .2); } }
 
 @keyframes kl-nousu { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
 @keyframes kl-syke { 0%, 100% { box-shadow: 0 3px 0 #0a7e86, 0 0 0 0 rgba(21, 154, 156, 0); } 50% { box-shadow: 0 3px 0 #0a7e86, 0 0 0 9px rgba(21, 154, 156, .18); } }

@@ -1,0 +1,68 @@
+/* RAJANAAPURIT-BANNERI (CD "Rajanaapurit v0.2" 3f, 27.9.2026). Rakentuu Kuntaliitoksen bannerin
+   (.klb, kuntaliitos-banneri.css) päälle: kulta turkoosin tilalla, liput kilpien tilalla, taustalla
+   himmeä Keski-Euroopan kartta ja ketjun 8 s:n silmukka-animaatio (desktop ja mobiili; tabletti
+   staattinen). Otsikko "RAJANAAPURIT" (12 merkkiä, Archivo Variable wdth 70): 60 px ≈ 400 px,
+   palstaa ≥ 480 px (1200 px:stä), tabletilla 44 px ≈ 290 px / 590 px, mobiilissa 32 px ≈ 210 px / 290 px. */
+
+.tn20 .klb--rn {
+  --klb-kulta: #d39a17;
+  background: #f4efe4;
+}
+.tn20 .klb--rn .klb-ketju { background: radial-gradient(80% 90% at 60% 50%, rgba(242, 178, 51, .18), rgba(244, 239, 228, 0) 70%); }
+.tn20 .klb-kartta--rn {
+  right: 0; left: 0; top: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 45%;
+  transform: none; opacity: .36; mix-blend-mode: multiply;
+  /* Kartan reuna häivytetään, ettei rajattu maa näy pystysuorana leikkauksena */
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 22%); mask-image: linear-gradient(90deg, transparent, #000 22%);
+}
+.tn20 .klb-lippu { position: relative; display: block; width: 50px; aspect-ratio: 4 / 3; border-radius: 4px; }
+.tn20 .klb-lippu img { display: block; width: 100%; height: 100%; object-fit: cover; border-radius: inherit; }
+.tn20 .klb-lippu::after { content: ""; position: absolute; inset: 0; border-radius: inherit; box-shadow: inset 0 0 0 1px rgba(10, 44, 71, .24); }
+.tn20 .klb--rn .klb-liitos i { background: var(--klb-kulta); }
+.tn20 .klb--rn .klb-katko { background: repeating-linear-gradient(90deg, #b9a77e 0 5px, transparent 5px 9px); }
+.tn20 .klb--rn .klb-kysymys { width: 64px; height: 90px; background: rgba(255, 253, 247, .86); transform: none; }
+.tn20 .klb--rn .klb-kysymys b { color: #c8900f; }
+.tn20 .klb--rn .klb-meta { color: #7a5200; }
+
+/* Animaatio (8 s): Itävalta → kisko → Unkari → kisko → "?"; ketju näkyvissä suurimman osan ajasta.
+   Käyttää erillisiä translate/scale-ominaisuuksia, jotta laattojen oma kallistus (transform) säilyy. */
+.tn20 .klb--rn .klb-anim { animation: 8s cubic-bezier(.2, .8, .2, 1) infinite both; }
+.tn20 .klb--rn .klb-anim--1 { animation-name: klb-rn-in1; }
+.tn20 .klb--rn .klb-anim--kisko1 { animation-name: klb-rn-kisko1; transform-origin: left center; }
+.tn20 .klb--rn .klb-anim--2 { animation-name: klb-rn-in2; }
+.tn20 .klb--rn .klb-anim--kisko2 { animation-name: klb-rn-kisko2; transform-origin: left center; }
+.tn20 .klb--rn .klb-anim--q { animation-name: klb-rn-q; }
+@keyframes klb-rn-in1 { 0% { opacity: 0; translate: 0 16px; } 7%, 90% { opacity: 1; translate: 0 0; } 97%, 100% { opacity: 0; translate: 0 0; } }
+@keyframes klb-rn-kisko1 { 0%, 11% { opacity: 0; scale: 0 1; } 18%, 90% { opacity: 1; scale: 1 1; } 97%, 100% { opacity: 0; scale: 1 1; } }
+@keyframes klb-rn-in2 { 0%, 17% { opacity: 0; translate: 0 16px; } 25%, 90% { opacity: 1; translate: 0 0; } 97%, 100% { opacity: 0; translate: 0 0; } }
+@keyframes klb-rn-kisko2 { 0%, 29% { opacity: 0; scale: 0 1; } 35%, 90% { opacity: 1; scale: 1 1; } 97%, 100% { opacity: 0; scale: 1 1; } }
+@keyframes klb-rn-q { 0%, 35% { opacity: 0; scale: .7; } 42% { opacity: 1; scale: 1.07; } 46%, 60% { opacity: 1; scale: 1; } 64% { scale: 1.05; } 68%, 90% { opacity: 1; scale: 1; } 97%, 100% { opacity: 0; scale: 1; } }
+
+/* ── Tabletti (staattinen) ── */
+@media (min-width: 600px) {
+  .tn20 .klb--rn { background: radial-gradient(70% 140% at 76% 50%, rgba(242, 178, 51, .16), rgba(244, 239, 228, 0) 62%), #f4efe4; }
+  .tn20 .klb--rn .klb-ketju { background: none; }
+  .tn20 .klb-kartta--rn { left: auto; right: 0; width: 440px; opacity: .38; }
+  .tn20 .klb-lippu { width: 60px; }
+  .tn20 .klb--rn .klb-laatta { padding: 13px 8px 11px; gap: 8px; }
+  .tn20 .klb--rn .klb-kysymys { width: 78px; height: 108px; transform: rotate(-1.5deg); }
+}
+@media (min-width: 600px) and (max-width: 1199px) {
+  .tn20 .klb--rn .klb-anim { animation: none; }
+}
+
+/* ── Desktop ── */
+@media (min-width: 1200px) {
+  .tn20 .klb-kartta--rn { width: 760px; opacity: .4; }
+  .tn20 .klb-lippu { width: 76px; border-radius: 5px; }
+  .tn20 .klb--rn .klb-laatta { width: 132px; padding: 16px 10px 13px; gap: 10px; }
+  .tn20 .klb--rn .klb-pill { border-color: #c8900f; background: #fbf1da; color: #7a5200; }
+  .tn20 .klb--rn .klb-pill path { stroke: #7a5200; }
+  .tn20 .klb--rn .klb-liitos { width: 92px; }
+  .tn20 .klb--rn .klb-katko { width: 60px; background: repeating-linear-gradient(90deg, #b9a77e 0 8px, transparent 8px 14px); }
+  .tn20 .klb--rn .klb-kysymys { width: 132px; height: 140px; transform: rotate(-1.5deg) translateY(6px); }
+  .tn20 .klb--rn .klb-polku { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .tn20 .klb--rn .klb-anim { animation: none; }
+}

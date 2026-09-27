@@ -20,7 +20,12 @@ export type KlKunta = { k: string; n: string; m: string; v: string | null; x: nu
 
 /** Kartan tausta: reitin alueen kunnat valmiina SVG-polkuina (viewBox-koordinaatit). */
 /** u = alue valitun ryhmän (maakunta, maanosa) ulkopuolella (himmennetään), t = pelin ulkopuolinen taustan alue. */
-export type KlKartta = { viewBox: string; alueet: Array<{ k: string; d: string; s: number; u?: boolean; t?: boolean }> };
+export type KlKartta = {
+  viewBox: string;
+  alueet: Array<{ k: string; d: string; s: number; u?: boolean; t?: boolean }>;
+  /** Pikkualueiden katkoviivarenkaat (x/y prosentteina), u = valitun ryhmän ulkopuolella. */
+  renkaat?: Array<{ x: number; y: number; u?: boolean }>;
+};
 
 export type KlReitti = {
   siemen: string;

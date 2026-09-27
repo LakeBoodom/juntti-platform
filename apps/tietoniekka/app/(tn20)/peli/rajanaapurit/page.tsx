@@ -1,6 +1,6 @@
 // RAJANAAPURIT — reittipeli valtioilla ja lipuilla (27.9.2026). Kuntaliitoksen sisarpeli:
-// sama moottori ja näkymä, CD:n lippulaatta, maailmankartan tyyli ja banneri tulossa
-// (brief: Documents/Tietoniekka.com/Rajanaapurit). Esikatselu: ei linkitetä eikä indeksoida.
+// sama moottori ja näkymä. Design: CD "Rajanaapurit v0.2" (Documents/Tietoniekka.com/
+// Kartta- ja liitoskokoelma). Julkaistu 27.9.2026 Pelimuodot-valikkoon ja etusivun banneriin.
 //   /peli/rajanaapurit                  päivän reitti (koko maailma)
 //   /peli/rajanaapurit?maanosa=eurooppa päivän reitti Euroopasta
 //   /peli/rajanaapurit?reitti=x7k2      tietty reitti (Arvo uusi reitti, haastelinkki)
@@ -18,8 +18,6 @@ export const metadata: Metadata = {
   description:
     "Järjestä kahdeksan valtiota reitiksi niin, että jokaisella vierekkäisellä parilla on yhteinen maaraja. Uusi päivän reitti joka päivä.",
   alternates: { canonical: "/peli/rajanaapurit" },
-  // Esikatselu, kunnes CD:n lippulaatta ja maailmankartan tyyli ovat valmiit
-  robots: { index: false, follow: false },
 };
 
 const SIEMEN = /^[a-z0-9-]{3,40}$/;

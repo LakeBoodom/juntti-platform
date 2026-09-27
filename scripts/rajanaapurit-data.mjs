@@ -1,6 +1,6 @@
 // RAJANAAPURIT — pelin valtioaineiston generointi (27.9.2026).
 //
-// Tuottaa apps/tietoniekka/lib/rajanaapurit/maat.json samassa muodossa kuin Kuntaliitoksen
+// Projektio Mercator (CD v0.2, 27.9.2026). Tuottaa apps/tietoniekka/lib/rajanaapurit/maat.json samassa muodossa kuin Kuntaliitoksen
 // kunnat.json, joten sama reittimoottori (lib/reittipeli.ts) toimii molemmille:
 //   alueet: pelin valtiot (nimi, maanosa, lippu, karttapolku, nastan paikka)
 //   rajat:  maarajaparit [a, b, pituus m, "maa"] — kannan maiden_rajat (accepted), pituus kartasta
@@ -33,6 +33,8 @@ const MAANOSA = {
   karibia: ["Karibia", "Amerikka"], oseania: ["Oseania", "Oseania"],
 };
 const RUUTU = 3; // km — alle pikselin Euroopan mittakaavassa
+/** Mannertenväliset maat korostuvat kummassakin maanosassa (CD v0.2 3c). */
+const MANTEREET = { RUS: ["Eurooppa", "Aasia"], TUR: ["Eurooppa", "Aasia"], KAZ: ["Eurooppa", "Aasia"], GEO: ["Eurooppa", "Aasia"], AZE: ["Eurooppa", "Aasia"], ARM: ["Eurooppa", "Aasia"], EGY: ["Afrikka", "Aasia"] };
 
 async function sb(polku) {
   const r = await fetch(`${SB}/rest/v1/${polku}`, { headers: { apikey: KEY, Authorization: `Bearer ${KEY}` } });
@@ -44,14 +46,10 @@ const maat = await sb("maat?select=code,name_fi,continent&limit=1000");
 const dbRajat = await sb("maiden_rajat?select=country_a,country_b,border_type,accepted&limit=5000");
 const pelissa = new Map(maat.filter((m) => !POIS.has(m.code)).map((m) => [m.code, m]));
 
-// ── Equal Earth -projektio (km) ──
-const [A1, A2, A3, A4, M] = [1.340264, -0.081106, 0.000893, 0.003796, Math.sqrt(3) / 2];
+// ── Mercator-projektio (km päiväntasaajalla) — CD v0.2 3c: alueet näyttävät tutuilta ──
 function projisoi([lon, lat]) {
-  const l = (lon * Math.PI) / 180, t = Math.asin(M * Math.sin((lat * Math.PI) / 180));
-  const t2 = t * t, t6 = t2 * t2 * t2;
-  const x = (6371 * 2 * Math.sqrt(3) * l * Math.cos(t)) / (3 * (9 * A4 * t6 * t2 + 7 * A3 * t6 + 3 * A2 * t2 + A1));
-  const y = 6371 * t * (A1 + A2 * t2 + A3 * t6 + A4 * t6 * t2);
-  return [x, -y];
+  const l = Math.max(-85, Math.min(85, lat)) * Math.PI / 180;
+  return [6371 * lon * Math.PI / 180, -6371 * Math.log(Math.tan(Math.PI / 4 + l / 2))];
 }
 
 // ── Valtiot ja niiden osat ──
@@ -194,7 +192,10 @@ for (const [k, polyt] of osat) {
     n: m.name_fi.replace(/\s*\(.*\)$/, ""),
     m: maanosa,
     r: ryhma,
+    ...(MANTEREET[k] ? { rr: MANTEREET[k] } : {}),
     v: `/20/rajanaapurit/liput/${k.toLowerCase()}.webp`,
+    // Pinta-ala (yksikkö²): pikkuvaltiot saavat kartalla katkoviivarenkaan (CD v0.2 3c)
+    a: Math.round(paa.flat().reduce((s, r) => s + Math.abs(ala(r)), 0)),
     p: NASTA[k] ? projisoi(NASTA[k]).map(Math.round) : keskus(suurin),
     b: laatikko(paa.flat()),
     d: polku(paa.flat()),

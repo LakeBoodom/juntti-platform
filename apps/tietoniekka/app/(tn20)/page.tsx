@@ -23,7 +23,7 @@ import { muotoileSankari, type SankariRivi } from "@/lib/paivanSankari";
 import { KuvavisatBanneri, IkajarjestysBanneri } from "@/components/tn20/EtusivunBannerit";
 import { TiedeBanneri } from "@/components/tn20/TiedeBanneri";
 import { TuplaBanneri } from "@/components/tn20/TuplaBanneri";
-import { KuntaliitosBanneri } from "@/components/tn20/KuntaliitosBanneri";
+import { RajanaapuritBanneri } from "@/components/tn20/RajanaapuritBanneri";
 import { getViikkovisa } from "@/lib/kuvavisat2026";
 import { getKuvavisaYhteenveto, getBanneriHenkilot } from "@/lib/etusivunBannerit";
 import {
@@ -34,6 +34,7 @@ import "./etusivun-bannerit.css";
 import "./tiede.css";
 import "./tupla-banneri.css";
 import "./kuntaliitos-banneri.css";
+import "./rajanaapurit-banneri.css";
 
 export const dynamic = "force-dynamic";
 
@@ -185,8 +186,10 @@ export default async function Etusivu20({
 
         {/* ─── Tupla tai kuitti -banneri (CD v0.2 3B): heti Päivän visan alla (Heikki 26.9.2026) ─── */}
         <TuplaBanneri />
-        {/* Kuntaliitos (Heikki 26.9.2026): Tuplan alla, CD 13a */}
-        <KuntaliitosBanneri />
+        {/* Karttapelit Tuplan alla. Rajanaapurit (CD v0.2 3f-b, 27.9.2026): julkaisuviikkoina oma banneri
+            Kuntaliitoksen paikalla — kaksi vaaleaa karttabanneria peräkkäin toistaisi itseään.
+            Myöhemmin yhteinen Karttapelit-nosto; Kuntaliitoksen banneri: components/tn20/KuntaliitosBanneri. */}
+        <RajanaapuritBanneri />
 
 
         {/* ─── Kuvavisat-banneri (Design kierros 12A, 18.9.2026) ───
