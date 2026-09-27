@@ -24,6 +24,7 @@ import { KuvavisatBanneri, IkajarjestysBanneri } from "@/components/tn20/Etusivu
 import { TiedeBanneri } from "@/components/tn20/TiedeBanneri";
 import { TuplaBanneri } from "@/components/tn20/TuplaBanneri";
 import { RajanaapuritBanneri } from "@/components/tn20/RajanaapuritBanneri";
+import { KuntaliitosBanneri } from "@/components/tn20/KuntaliitosBanneri";
 import { getViikkovisa } from "@/lib/kuvavisat2026";
 import { getKuvavisaYhteenveto, getBanneriHenkilot } from "@/lib/etusivunBannerit";
 import {
@@ -186,9 +187,8 @@ export default async function Etusivu20({
 
         {/* ─── Tupla tai kuitti -banneri (CD v0.2 3B): heti Päivän visan alla (Heikki 26.9.2026) ─── */}
         <TuplaBanneri />
-        {/* Karttapelit Tuplan alla. Rajanaapurit (CD v0.2 3f-b, 27.9.2026): julkaisuviikkoina oma banneri
-            Kuntaliitoksen paikalla — kaksi vaaleaa karttabanneria peräkkäin toistaisi itseään.
-            Myöhemmin yhteinen Karttapelit-nosto; Kuntaliitoksen banneri: components/tn20/KuntaliitosBanneri. */}
+        {/* Rajanaapurit Tuplan alla (CD v0.2 3f, 27.9.2026). Kuntaliitoksen banneri on erillään
+            Päivän sankarin alla, jotta kaksi vaaleaa karttabanneria ei ole peräkkäin (CD 3f-b). */}
         <RajanaapuritBanneri />
 
 
@@ -228,6 +228,9 @@ export default async function Etusivu20({
         {/* ─── Päivän sankari — Kuka on vanhin? -bannerin alla, ennen juontajia
             (Heikki 19.9.2026). Ei sankaria → ei lohkoa eikä varattua tilaa. ─── */}
         {sankari && <PaivanSankari data={sankari} />}
+
+        {/* ─── Kuntaliitos-banneri (CD 13a): Päivän sankarin alla (Heikki 27.9.2026) ─── */}
+        <KuntaliitosBanneri />
 
         {/* ─── Laura ja Mikko ─── */}
         <section className="tn-es-hosts" aria-labelledby="juontajat">
