@@ -97,6 +97,15 @@
 .tn20 .kl-kilpi-pohja { position: absolute; inset: 2px; background: #fffdf7; overflow: hidden; display: flex; align-items: flex-start; justify-content: center; }
 .tn20 .kl-kilpi img { width: 100%; height: 100%; object-fit: contain; object-position: top center; -webkit-user-drag: none; }
 .tn20 .kl-kilpi-kirjain { margin-top: 14%; font-family: var(--kl-display); font-weight: 900; font-size: 1.1em; color: var(--kl-navy); }
+/* Rajanaapurit: lippu 4:3-kehyksessä (väliaikainen, kunnes CD:n lippulaatta valmistuu). Kehys
+   näkyy myös vaaleiden lippujen (Puola) ympärillä. */
+.tn20 .kl-kilpi--lippu { aspect-ratio: 4 / 3; }
+.tn20 .kl-kilpi--lippu::before, .tn20 .kl-kilpi--lippu .kl-kilpi-pohja { clip-path: none; border-radius: 4px; }
+.tn20 .kl-kilpi--lippu::before { background: var(--kl-reuna, rgba(14, 58, 92, .35)); }
+.tn20 .kl-kilpi--lippu .kl-kilpi-pohja { inset: 1px; border-radius: 3px; align-items: center; background: #f4f1ea; }
+.tn20 .kl-kilpi--lippu img { object-fit: cover; object-position: center; }
+.tn20 .kl-nasta .kl-kilpi--lippu::before { inset: -1px; background: var(--kl-reuna, var(--kl-navy)); }
+.tn20 .kl-nasta .kl-kilpi--lippu .kl-kilpi-pohja { inset: 1.5px; }
 .tn20 .kl-kilpi--pari { width: 26px; }
 .tn20 .kl-kilpi--pieni { width: 34px; }
 
@@ -147,6 +156,8 @@
   font-size: min(var(--kl-nimi-max), calc((88cqi - var(--kl-vw) - 84px) / (var(--kl-len) * .52)));
   overflow-wrap: normal; word-break: keep-all; white-space: nowrap;
 }
+/* Monisanaiset valtioiden nimet rivittyvät sanojen välistä; koko pisimmän sanan mukaan */
+.tn20 .kl-nimi--rivittyva { white-space: normal; text-wrap: balance; line-height: 1.05; }
 .tn20 .kl-maakunta { padding: 2px 8px; border-radius: 999px; background: #e9f3f2; color: var(--kl-teal-t); font-size: 10px; font-weight: 800; letter-spacing: .09em; text-transform: uppercase; white-space: nowrap; }
 .tn20 .kl-kahva {
   flex: none; width: 28px; height: 28px; border-radius: 999px; background: #f5f1e8; border: 1px solid var(--kl-viiva);
@@ -204,6 +215,8 @@
 .tn20 .kl-alue--reitti { fill: #7dc2bd; }
 /* Valitun maakunnan ulkopuoliset kunnat himmeämpinä: oma maakunta erottuu kartalta */
 .tn20 .kl-alue--ulko { fill-opacity: .55; }
+/* Pelin ulkopuoliset alueet (saarivaltiot, kiistanalaiset) hillitysti */
+.tn20 .kl-alue--tausta { fill: #8e9da3; fill-opacity: .45; }
 .tn20 .kl-alue--ulko.kl-alue--reitti { fill-opacity: 1; }
 .tn20 .kl-viiva, .tn20 .kl-viiva-alla, .tn20 .kl-haamu { vector-effect: non-scaling-stroke; stroke-linecap: round; fill: none; }
 .tn20 .kl-viiva-alla { stroke: #fbf8f1; stroke-width: 7px; animation: kl-hiipuu .35s ease-out both; }
@@ -218,14 +231,18 @@
 .tn20 .kl-risti svg { width: 10px; height: 10px; }
 .tn20 .kl-nasta { position: absolute; transform: translate(-50%, -62%); display: flex; flex-direction: column; align-items: center; gap: 2px; pointer-events: none; animation: kl-pomppu .34s cubic-bezier(.34, 1.4, .5, 1) both; }
 .tn20 .kl-nasta-kilpi { position: relative; filter: drop-shadow(0 3px 6px rgba(10, 44, 71, .45)); }
-.tn20 .kl-nasta .kl-kilpi { width: clamp(20px, 7cqi, 30px); }
-.tn20 .kl-nasta--paate .kl-kilpi { width: clamp(26px, 9cqi, 36px); }
+.tn20 .kl-nasta { --kl-pw: clamp(20px, 7cqi, 30px); }
+.tn20 .kl-nasta--paate { --kl-pw: clamp(26px, 9cqi, 36px); }
+.tn20 .kl-nasta .kl-kilpi { width: var(--kl-pw); }
 .tn20 .kl-nasta-num {
   position: absolute; top: -6px; right: -7px; min-width: 16px; height: 16px; padding: 0 3px; border-radius: 999px; color: #fff;
   font-family: var(--kl-display); font-weight: 900; font-variation-settings: "wdth" 82; font-size: 10px; line-height: 16px; text-align: center;
 }
 .tn20 .kl-nasta-lappu { padding: 1px 7px; border-radius: 999px; color: #fff; font-family: var(--kl-display); font-weight: 900; font-variation-settings: "wdth" 82; font-size: 10px; letter-spacing: .04em; white-space: nowrap; }
 .tn20 .kl-nasta-nimi { padding: 0 5px; border-radius: 4px; background: rgba(251, 248, 241, .92); color: var(--kl-navy); font-size: 10px; font-weight: 700; line-height: 1.5; white-space: nowrap; }
+/* Reunan lähellä nimilappu kartan sisäpuolelle, ettei se leikkaudu (Bosnia ja Hertsegovina) */
+.tn20 .kl-nasta--oik { align-items: flex-end; transform: translate(calc(-100% + var(--kl-pw) / 2), -62%); }
+.tn20 .kl-nasta--vas { align-items: flex-start; transform: translate(calc(var(--kl-pw) / -2), -62%); }
 .tn20 .kl-kartta-huomio { margin: 10px 0 0; font-size: 11px; line-height: 1.4; color: var(--kl-ruskea); text-align: center; }
 
 /* ── Tulos, ratkaisu, toiminnot ────────────────────────── */

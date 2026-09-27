@@ -8,7 +8,7 @@
 import type { Metadata } from "next";
 import { helsinginPaiva } from "@/lib/aika";
 import { arvoReitti, KL_LAHDE, KL_MAAKUNNAT, maakuntaTunnuksella } from "@/lib/kuntaliitos/reitti";
-import KuntaliitosClient from "./KuntaliitosClient";
+import ReittipeliClient from "@/components/tn20/reittipeli/ReittipeliClient";
 import "./kuntaliitos.css";
 
 export const dynamic = "force-dynamic";
@@ -32,7 +32,8 @@ export default async function KuntaliitosSivu({ searchParams }: Props) {
   const siemen = pyydetty ?? paiva.iso;
   const maakunta = maakuntaTunnuksella(typeof sp.maakunta === "string" ? sp.maakunta : null);
   return (
-    <KuntaliitosClient
+    <ReittipeliClient
+      peli="kuntaliitos"
       reitti={arvoReitti(siemen, maakunta?.nimi ?? null)}
       maakunnat={KL_MAAKUNNAT}
       maakuntaTunnus={maakunta?.tunnus ?? null}

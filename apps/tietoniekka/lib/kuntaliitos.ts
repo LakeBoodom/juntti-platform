@@ -19,8 +19,8 @@ export const KL_PISTEET = 10;
 export type KlKunta = { k: string; n: string; m: string; v: string | null; x: number; y: number };
 
 /** Kartan tausta: reitin alueen kunnat valmiina SVG-polkuina (viewBox-koordinaatit). */
-/** u = kunta valitun maakunnan ulkopuolella (himmennetään). */
-export type KlKartta = { viewBox: string; alueet: Array<{ k: string; d: string; s: number; u?: boolean }> };
+/** u = alue valitun ryhmän (maakunta, maanosa) ulkopuolella (himmennetään), t = pelin ulkopuolinen taustan alue. */
+export type KlKartta = { viewBox: string; alueet: Array<{ k: string; d: string; s: number; u?: boolean; t?: boolean }> };
 
 export type KlReitti = {
   siemen: string;
