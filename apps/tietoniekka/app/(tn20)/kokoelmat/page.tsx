@@ -12,7 +12,7 @@ import { KAUPUNGIT } from "@/lib/kaupungit";
 
 export const metadata: Metadata = {
   title: "Kaikki kokoelmat – tietovisat aiheittain | Tietoniekka",
-  description: "Valitse aihe: TV & suoratoisto, urheilu, jääkiekko, jalkapallo, elokuvat, musiikki, maantieto, Suomen kaupungit, tunnetut henkilöt, kulttuuri, historia, luonto ja tiede & teknologia.",
+  description: "Valitse aihe: TV & suoratoisto, urheilu, jääkiekko, jalkapallo, elokuvat, musiikki, maantieto, Suomen kaupungit, tunnetut henkilöt, kulttuuri, historia, luonto, tiede & teknologia ja juhlat.",
 };
 
 export const dynamic = "force-dynamic";

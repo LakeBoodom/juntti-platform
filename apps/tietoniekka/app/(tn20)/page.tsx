@@ -25,6 +25,8 @@ import { TiedeBanneri } from "@/components/tn20/TiedeBanneri";
 import { TuplaBanneri } from "@/components/tn20/TuplaBanneri";
 import { RajanaapuritBanneri } from "@/components/tn20/RajanaapuritBanneri";
 import { KuntaliitosBanneri } from "@/components/tn20/KuntaliitosBanneri";
+import { JuhlatBanneri, juhlaBanneriNosto } from "@/components/tn20/JuhlatBanneri";
+import { JUHLAT_KOKOELMA, pvm } from "@/lib/juhlat";
 import { getViikkovisa } from "@/lib/kuvavisat2026";
 import { getKuvavisaYhteenveto, getBanneriHenkilot } from "@/lib/etusivunBannerit";
 import {
@@ -36,6 +38,7 @@ import "./tiede.css";
 import "./tupla-banneri.css";
 import "./kuntaliitos-banneri.css";
 import "./rajanaapurit-banneri.css";
+import "./juhlat-banneri.css";
 
 export const dynamic = "force-dynamic";
 
@@ -62,7 +65,7 @@ const MALLI_INTRO = {
   text: "Kahdensadanneljänkymmenen merkin mittainen koukkuteksti vie laatasta kolme riviä työpöydällä ja näyttää tarkalleen kuinka korkeaksi laatta kasvaa silloin kun toimitus käyttää koko sallitun tilan viimeistä merkkiä myöten loppuun.",
 };
 
-async function getData(opts: { pvTila: string | null; sankariPaiva: string | null }) {
+async function getData(opts: { pvTila: string | null; sankariPaiva: string | null; juhlaPaiva: string | null }) {
   const sb = getSupabase();
   if (!sb) return null;
 
@@ -115,6 +118,8 @@ async function getData(opts: { pvTila: string | null; sankariPaiva: string | nul
      kaupunkivisat ja megat. */
   const latest = cards
     .filter((c) => c.collection && c.collection !== "tunnetut-henkilot" && c.published_at)
+    /* Juhlavisat (28.9.2026) eivät tickeriin: niillä on oma banneri, eikä joulua nosteta syyskuussa. */
+    .filter((c) => c.collection !== JUHLAT_KOKOELMA)
     .filter((c) => c.collection !== "yleistieto" || c.category === "kaupungit" || c.category === "tiede-teknologia" || c.game_mode === "mega")
     .sort((a, b) => (b.published_at! > a.published_at! ? 1 : -1))
     .slice(0, 12)
@@ -125,8 +130,14 @@ async function getData(opts: { pvTila: string | null; sankariPaiva: string | nul
       href: c.game_mode === "mega" && c.slug ? `/peli?mega=${c.slug}` : `/peli?quiz_id=${c.id}`,
     }));
 
+  /* Juhlat-banneri: lähin iso juhla, jolla on julkaistu visa (lib/juhlat.ts). */
+  const jp = opts.juhlaPaiva?.split("-").map(Number);
+  const tanaanPv = jp ? pvm(jp[0], jp[1], jp[2]) : pvm(today.vuosi, today.kk, today.pv);
+  const juhla = juhlaBanneriNosto(tanaanPv, new Set(cards.filter((c) => c.collection === JUHLAT_KOKOELMA).map((c) => c.slug)));
+
   return {
     daily,
+    juhla: juhla ? { nosto: juhla, tanaan: tanaanPv } : null,
     sankari: sankari ? muotoileSankari(sankari) : null,
     today,
     latest,
@@ -145,6 +156,8 @@ export default async function Etusivu20({
     getData({
       pvTila: one("pv"),
       sankariPaiva: sankariParam && /^\d{4}-\d{2}-\d{2}$/.test(sankariParam) ? sankariParam : null,
+      /* ?juhlapvm=YYYY-MM-DD: Juhlat-banneri toisena päivänä (vain esikatselu) */
+      juhlaPaiva: ESIKATSELU && /^\d{4}-\d{2}-\d{2}$/.test(one("juhlapvm") ?? "") ? one("juhlapvm") : null,
     }),
     getViikkovisa(), getKuvavisaYhteenveto(), getBanneriHenkilot(),
   ]);
@@ -152,7 +165,7 @@ export default async function Etusivu20({
   /* Viikkovisa näkyy nyt Kuvavisat-bannerin merkkinä (kierros 12);
      null (ei aktiivisia kuvia) → merkki jää pois. */
   const viikko = vv ? { viikko: vv.viikko, kuvia: vv.kuvaIdt.length } : null;
-  const { daily, sankari, today, latest } = data;
+  const { daily, juhla, sankari, today, latest } = data;
 
 
   /* Ticker duplikoidaan kertaalleen saumattomaan looppiin (design). */
@@ -173,6 +186,8 @@ export default async function Etusivu20({
         {/* Etusivun h1 (19.9.2026): näkymätön, ruudunlukijoille ja hakukoneille.
             Siirretty Kuvavisat-bannerista, kun Päivän visa nousi ensimmäiseksi. */}
         <h1 className="tn-es-sr-only">{brand.name} – suomalainen tietovisasivusto</h1>
+        {/* ─── Juhlat-banneri (CD v0.2 4a): ykkösnosto ennen Päivän visaa (Heikki 28.9.2026) ─── */}
+        {juhla && <JuhlatBanneri nosto={juhla.nosto} tanaan={juhla.tanaan} />}
         {/* ─── Päivän visa — sivun ensimmäinen osio (Heikki 19.9.2026) ─── */}
         <section id="paivan-visa" aria-labelledby="paivan-visa-h">
           <div className="tn-es-head tn-es-head--row">

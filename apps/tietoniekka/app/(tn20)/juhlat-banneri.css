@@ -1,0 +1,141 @@
+/* JUHLAT-BANNERI (CD "Juhlat-banneri v0.2" 4a, 28.9.2026). Etusivun ensimmäinen nosto.
+   Mobiili (CD 380): kuva 170 px ylhäällä, meta kuvan päällä, laskuri kuvan oikeassa alakulmassa,
+   koukku ja täysleveä nappi alla. Tabletti 600–1199 px (CD 760 × 240) ja desktop ≥ 1200 px
+   (CD 1160 × 268): teksti vasemmalla, laskuri oikealla, kuva oikeassa reunassa häivytettynä.
+   Koukun koko (Archivo Variable wdth 70): pisin sana "Halloween-lyhdyt" 16 merkkiä ≈ 0,5 em/merkki
+   → mobiilissa 30 px ≈ 240 px (320 px:n näytöllä tilaa 320 − 32 − 36 = 252 px). */
+
+.tn20 .jub {
+  --jub-display: "Archivo Variable", "Archivo", "Barlow Condensed", sans-serif;
+  position: relative; display: flex; flex-direction: column; overflow: hidden; isolation: isolate;
+  border-radius: 16px; border: 1px solid #2c2517; background: #0f0d07; color: #f5f0e6; text-decoration: none;
+}
+.tn20 .jub:hover { color: #f5f0e6; border-color: #3a3120; }
+.tn20 .jub:focus-visible { outline: 3px solid #b6ff3c; outline-offset: 3px; }
+
+.tn20 .jub-kuva { position: relative; display: block; height: 170px; overflow: hidden; }
+.tn20 .jub-kuva img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 60% 40%; }
+.tn20 .jub-kuva::after {
+  content: ""; position: absolute; inset: 0;
+  background: linear-gradient(to top, #0f0d07 0%, rgba(15, 13, 7, .35) 45%, transparent 75%);
+}
+/* Lyhdyn lepatus kuvan päällä (juhlan värin hehku) */
+.tn20 .jub-lyhty {
+  position: absolute; right: 20px; top: -30px; width: 300px; height: 240px; pointer-events: none; mix-blend-mode: screen;
+  background: radial-gradient(closest-side, var(--jub-lyhty), transparent 70%);
+  animation: jub-lepatus 3.6s steps(1, end) infinite;
+}
+
+.tn20 .jub-meta {
+  position: absolute; left: 16px; right: 16px; top: 14px; z-index: 2; display: flex; align-items: center; gap: 8px; white-space: nowrap;
+  font-size: 12px; font-weight: 700; text-shadow: 0 1px 6px rgba(0, 0, 0, .6);
+}
+.tn20 .jub-tag {
+  height: 22px; display: flex; align-items: center; padding: 0 9px; border-radius: 6px; background: #e8a320; color: #131109;
+  font-size: 10px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; text-shadow: none;
+}
+.tn20 .jub-pvm::before { content: "·"; margin-right: .4em; }
+
+.tn20 .jub-h {
+  position: relative; z-index: 1; display: block; padding: 8px 18px 0; margin: 0;
+  font-family: var(--jub-display); font-weight: 900; font-variation-settings: "wdth" 70; font-size: 30px; line-height: 1;
+  letter-spacing: -.02em; text-wrap: balance;
+}
+.tn20 .jub-sana {
+  display: inline-block; white-space: nowrap; vertical-align: baseline; margin-right: .24em;
+  animation: jub-sana 520ms cubic-bezier(.2, .7, .2, 1) var(--d) both;
+}
+.tn20 .jub-sana--loppu { margin-right: 0; }
+.tn20 .jub-hl {
+  color: #131109; padding: 0 .12em; margin: 0 -.04em; border-radius: .12em;
+  background-image: linear-gradient(var(--jub-a), var(--jub-a)); background-repeat: no-repeat; background-position: 0 55%; background-size: 100% 100%;
+  animation: jub-hl 480ms cubic-bezier(.6, 0, .2, 1) var(--jub-hl) both;
+}
+.tn20 .jub-q {
+  display: inline-block; color: var(--jub-a); margin-left: .04em; transform-origin: 50% 80%;
+  animation: jub-q 4200ms ease-in-out var(--jub-q) infinite;
+}
+
+.tn20 .jub-ala {
+  position: relative; z-index: 1; display: flex; flex-direction: column; align-items: stretch; gap: 12px; padding: 12px 18px 18px;
+  animation: jub-nousu 500ms cubic-bezier(.2, .7, .2, 1) var(--jub-ala) both;
+}
+.tn20 .jub-s { font-size: 15px; font-weight: 600; color: #e6dfd0; }
+.tn20 .jub-cta {
+  height: 48px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 0 22px; border-radius: 999px;
+  background: #b6ff3c; color: #131109; font-family: var(--jub-display); font-weight: 900; font-variation-settings: "wdth" 86;
+  font-size: 15px; text-transform: uppercase; white-space: nowrap;
+}
+.tn20 .jub:hover .jub-cta { background: #cbff6e; }
+
+.tn20 .jub-cd {
+  position: absolute; right: 14px; top: 158px; transform: translateY(-100%); z-index: 2;
+  display: flex; flex-direction: column; gap: 6px; min-width: 67px; padding: 10px 14px 9px; border-radius: 13px;
+  border: 1px solid rgba(245, 240, 230, .16); background: rgba(15, 13, 7, .72);
+  backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+  animation: jub-nousu-cd 500ms cubic-bezier(.2, .7, .2, 1) 900ms both;
+}
+.tn20 .jub-cd-n {
+  font-family: var(--jub-display); font-weight: 900; font-variation-settings: "wdth" 76; font-size: 42px; line-height: .86;
+  font-variant-numeric: tabular-nums; color: var(--jub-a);
+}
+.tn20 .jub-cd-u { max-width: 170px; font-size: 9px; font-weight: 800; line-height: 1.3; letter-spacing: .14em; text-transform: uppercase; }
+
+/* ── Tabletti ja desktop: teksti vasemmalla, laskuri oikealla ── */
+@media (min-width: 600px) {
+  .tn20 .jub {
+    display: grid; grid-template-columns: minmax(0, 470px) 1fr auto; grid-template-areas: "meta . cd" "h . cd" "ala . cd";
+    align-content: center; row-gap: 9px; column-gap: 18px; height: 240px; padding: 0 26px;
+  }
+  /* Juhlan värin hehku vasemmassa yläkulmassa */
+  .tn20 .jub::before {
+    content: ""; position: absolute; left: -140px; top: -180px; width: 600px; height: 460px; z-index: 0; pointer-events: none;
+    background: radial-gradient(closest-side, var(--jub-glow), transparent 72%);
+  }
+  .tn20 .jub-kuva { position: absolute; right: 0; top: 0; width: 400px; height: 100%; z-index: 0; }
+  .tn20 .jub-kuva::after { background: linear-gradient(90deg, #0f0d07 0%, rgba(15, 13, 7, .6) 34%, rgba(15, 13, 7, 0) 70%); }
+  .tn20 .jub-lyhty { right: 10px; top: -20px; width: 320px; height: 280px; }
+  .tn20 .jub-meta { grid-area: meta; position: relative; left: auto; right: auto; top: auto; gap: 9px; text-shadow: none; }
+  .tn20 .jub-pvm { font-weight: 600; color: #a79e8c; }
+  .tn20 .jub-pvm::before { content: none; }
+  .tn20 .jub-tag { height: 22px; }
+  .tn20 .jub-h { grid-area: h; padding: 0; font-size: 26px; font-variation-settings: "wdth" 68; }
+  .tn20 .jub-ala { grid-area: ala; flex-direction: column; align-items: flex-start; gap: 10px; padding: 0; }
+  .tn20 .jub-s { font-size: 14px; white-space: nowrap; }
+  .tn20 .jub-cta { height: 36px; font-size: 12px; }
+  .tn20 .jub-cd {
+    grid-area: cd; align-self: center; position: relative; right: auto; top: auto; transform: none;
+    min-width: 86px; padding: 12px 16px 11px; border-radius: 14px;
+  }
+  .tn20 .jub-cd-n { font-size: 54px; }
+  .tn20 .jub-cd-u { font-size: 10px; }
+}
+@media (min-width: 1200px) {
+  .tn20 .jub {
+    grid-template-columns: minmax(0, 680px) 1fr auto; row-gap: 12px; column-gap: 28px;
+    height: 268px; padding: 0 38px; border-radius: 18px;
+  }
+  .tn20 .jub-kuva { width: 600px; }
+  .tn20 .jub-kuva::after { background: linear-gradient(90deg, #0f0d07 0%, rgba(15, 13, 7, .6) 28%, rgba(15, 13, 7, 0) 62%); }
+  .tn20 .jub-lyhty { right: 40px; top: -20px; width: 420px; height: 320px; }
+  .tn20 .jub-meta { gap: 10px; font-size: 13px; }
+  .tn20 .jub-tag { height: 24px; padding: 0 10px; font-size: 11px; }
+  .tn20 .jub-h { font-size: 36px; font-variation-settings: "wdth" 70; line-height: .98; }
+  .tn20 .jub-s { font-size: 16px; }
+  .tn20 .jub-cta { height: 42px; font-size: 14px; }
+  .tn20 .jub-cd { min-width: 122px; padding: 16px 22px 14px; border-radius: 16px; }
+  .tn20 .jub-cd-n { font-size: 76px; }
+  .tn20 .jub-cd-u { font-size: 11px; }
+}
+
+@keyframes jub-sana { from { opacity: 0; transform: translateY(14px); filter: blur(6px); } to { opacity: 1; transform: none; filter: none; } }
+@keyframes jub-nousu { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+@keyframes jub-nousu-cd { from { opacity: 0; translate: 0 8px; } to { opacity: 1; translate: 0 0; } }
+@keyframes jub-q { 0%, 86%, 100% { transform: scale(1); } 91% { transform: scale(1.22) rotate(-6deg); } 95% { transform: scale(.96); } }
+@keyframes jub-lepatus { 0%, 100% { opacity: .85; } 8% { opacity: .55; } 12% { opacity: .95; } 30% { opacity: .7; } 34% { opacity: 1; } 55% { opacity: .78; } 61% { opacity: .62; } 64% { opacity: .92; } 82% { opacity: .74; } }
+@keyframes jub-hl { from { background-size: 0% 100%; } to { background-size: 100% 100%; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .tn20 .jub-sana, .tn20 .jub-hl, .tn20 .jub-q, .tn20 .jub-ala, .tn20 .jub-cd { animation: none; }
+  .tn20 .jub-lyhty { animation: none; opacity: .8; }
+}

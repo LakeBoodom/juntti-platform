@@ -1,0 +1,229 @@
+/* JUHLAT — kokoelmasivu (CD "Juhlat-kokoelma", 28.9.2026). Designin inline-tyylit
+   luokiksi; mitat cqi-yksiköissä (.ju on inline-size-container kuten designin juuri).
+   Otsikot Archivo Variablella (wdth toimii, kuten Kuvavisoissa). Mobiilille ei ollut
+   omaa designia: ruudukot ovat auto-fit-ruudukkoja ja nosto pinoaa laskurin tekstin alle. */
+
+.tn20 .ju {
+  --ju-display: "Archivo Variable", "Archivo", "Barlow Condensed", sans-serif;
+  --ju-line: #2c2517;
+  --ju-card: #17140d;
+  --ju-deep: #0f0d07;
+  --ju-muted: #8e8676;
+  --ju-soft: #cfc7b6;
+  --ju-pad: clamp(18px, 4cqi, 72px);
+  container-type: inline-size;
+  min-height: 100dvh;
+  background: #131109;
+  color: #f5f0e6;
+  padding-bottom: clamp(40px, 5cqi, 80px);
+}
+.tn20 .ju-wrap { max-width: 1600px; margin-inline: auto; }
+.tn20 .ju a { text-decoration: none; }
+
+/* ── Otsikko ── */
+.tn20 .ju-head {
+  display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 18px;
+  padding: clamp(18px, 3cqi, 48px) var(--ju-pad) clamp(20px, 2.6cqi, 36px);
+}
+.tn20 .ju-head-teksti { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+.tn20 .ju-h1 {
+  margin: 0; font-family: var(--ju-display); font-weight: 900; font-variation-settings: "wdth" 70;
+  font-size: clamp(46px, 7cqi, 88px); line-height: .86; letter-spacing: -.02em; text-transform: uppercase;
+}
+.tn20 .ju-lead { margin: 0; font-size: clamp(15px, 1.4cqi, 18px); line-height: 1.5; color: var(--ju-soft); max-width: 44ch; text-wrap: pretty; }
+.tn20 .ju-tanaan { font-size: 13px; font-weight: 600; color: var(--ju-muted); }
+
+/* ── Nosto ── */
+.tn20 .ju-nosto { padding: 0 var(--ju-pad); display: flex; flex-direction: column; gap: clamp(16px, 1.8cqi, 24px); }
+.tn20 .ju-hero {
+  position: relative; display: flex; flex-direction: column; justify-content: flex-end;
+  min-height: clamp(460px, 48cqi, 660px); border-radius: 24px; border: 1px solid var(--ju-line); background: var(--ju-deep); overflow: hidden;
+}
+.tn20 .ju-hero > img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 60% 45%; }
+.tn20 .ju-hero-glow { position: absolute; inset: 0; background: radial-gradient(circle at 70% 30%, var(--ju-glow), transparent 65%); }
+.tn20 .ju-hero-varjo {
+  position: absolute; inset: 0; pointer-events: none;
+  background:
+    linear-gradient(to top, rgba(15, 13, 7, .94) 0%, rgba(15, 13, 7, .5) 30%, transparent 58%),
+    linear-gradient(90deg, rgba(15, 13, 7, .9) 0%, rgba(15, 13, 7, .62) 34%, transparent 64%);
+}
+.tn20 .ju-hero-body {
+  position: relative; display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between;
+  gap: clamp(22px, 3cqi, 40px); padding: clamp(22px, 3.4cqi, 52px);
+}
+.tn20 .ju-hero-teksti { display: flex; flex-direction: column; gap: clamp(14px, 1.8cqi, 24px); min-width: 0; }
+.tn20 .ju-hero-pvm { font-size: 14px; font-weight: 600; white-space: nowrap; }
+/* Nostun nimi: CD clamp(52px, 8cqw, 120px). Pisin rivi "ITSENÄISYYS-" (12 merkkiä, wdth 70):
+   mitattu 0,56 em/merkki → 320 px:n näytöllä tilaa 320 − 36 − 44 = 240 px → 36 px.
+   Alaraja siksi 36 px, kasvu 8cqi kuten designissa. */
+.tn20 .ju-h2 {
+  margin: 0; display: flex; flex-direction: column; font-family: var(--ju-display); font-weight: 900; font-variation-settings: "wdth" 70;
+  font-size: clamp(36px, 8cqi, 120px); line-height: .84; letter-spacing: -.02em; text-transform: uppercase;
+  overflow-wrap: normal; word-break: keep-all;
+}
+.tn20 .ju-hero-toiminnot { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 18px; }
+.tn20 .ju-btn {
+  flex: none; white-space: nowrap; display: inline-flex; align-items: center; height: 56px; padding: 0 30px; border-radius: 999px;
+  background: #b6ff3c; color: #131109; font-family: var(--ju-display); font-weight: 900; font-variation-settings: "wdth" 86;
+  font-size: 17px; text-transform: uppercase; letter-spacing: .01em;
+}
+.tn20 .ju-btn:hover { background: #cbff6e; color: #131109; }
+.tn20 .ju-hero-visa { font-size: 14px; font-weight: 600; color: var(--ju-soft); max-width: 32ch; text-wrap: pretty; }
+
+.tn20 .ju-cd { display: flex; flex-direction: column; gap: 10px; }
+.tn20 .ju-cd-label { font-size: 12px; font-weight: 800; letter-spacing: .18em; text-transform: uppercase; }
+.tn20 .ju-cd-osat { display: flex; gap: clamp(8px, 1cqi, 12px); }
+.tn20 .ju-cd-osa {
+  min-width: clamp(76px, 8.4cqi, 116px); padding: 14px 16px 12px; border-radius: 16px; border: 1px solid rgba(245, 240, 230, .16);
+  background: rgba(15, 13, 7, .72); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); display: flex; flex-direction: column; gap: 6px;
+}
+.tn20 .ju-cd-n {
+  font-family: var(--ju-display); font-weight: 900; font-variation-settings: "wdth" 76; font-size: clamp(36px, 4.2cqi, 60px);
+  line-height: .9; font-variant-numeric: tabular-nums;
+}
+.tn20 .ju-cd-u { font-size: 11px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; color: var(--ju-soft); }
+
+.tn20 .ju-osa { display: flex; flex-direction: column; gap: 14px; }
+.tn20 .ju-osa + .ju-osa { padding-top: clamp(8px, 1.2cqi, 18px); }
+.tn20 .ju-kicker { font-size: 12px; font-weight: 800; letter-spacing: .18em; text-transform: uppercase; color: var(--ju-muted); }
+
+.tn20 .ju-faktat { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr)); gap: clamp(12px, 1.4cqi, 18px); }
+.tn20 .ju-fakta {
+  position: relative; display: flex; flex-direction: column; gap: 12px; padding: clamp(22px, 2.2cqi, 30px);
+  border-radius: 22px; border: 1px solid var(--ju-line); background: var(--ju-card); overflow: hidden;
+}
+.tn20 .ju-fakta::before {
+  content: ""; position: absolute; right: -30%; top: -50%; width: 90%; height: 120%; pointer-events: none;
+  background: radial-gradient(closest-side, var(--ju-glow), transparent 70%);
+}
+.tn20 .ju-fakta > * { position: relative; }
+.tn20 .ju-fakta-label { font-size: 11px; font-weight: 800; letter-spacing: .16em; text-transform: uppercase; color: var(--ju-a); }
+/* CD clamp(34px, 3.4cqw, 48px). Pisin arvo "SAMA PÄIVÄ" / "100+ MAATA" rivittyy välilyönnistä;
+   pisin sana "Nuutinpäivä"-kokoluokkaa ei käytetä tässä kentässä. */
+.tn20 .ju-fakta-k {
+  font-family: var(--ju-display); font-weight: 900; font-variation-settings: "wdth" 72; font-size: clamp(34px, 3.4cqi, 48px);
+  line-height: .9; letter-spacing: -.02em; text-transform: uppercase; overflow-wrap: normal; word-break: keep-all;
+}
+.tn20 .ju-fakta p { margin: 0; font-size: 15px; line-height: 1.5; color: var(--ju-soft); text-wrap: pretty; }
+
+.tn20 .ju-visat { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr)); gap: clamp(12px, 1.4cqi, 18px); }
+.tn20 .ju-visa {
+  display: flex; flex-direction: column; border-radius: 22px; border: 1px solid var(--ju-line); background: var(--ju-card);
+  overflow: hidden; color: #f5f0e6; transition: transform 150ms cubic-bezier(.2, .8, .2, 1), border-color 150ms;
+}
+.tn20 .ju-visa:hover { transform: translateY(-2px); border-color: #3a3120; color: #f5f0e6; }
+.tn20 .ju-visa-kuva { position: relative; aspect-ratio: 16 / 9; background: var(--ju-deep); }
+.tn20 .ju-visa-kuva img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.tn20 .ju-visa-body { display: flex; flex-direction: column; gap: 8px; padding: 16px 18px 20px; }
+.tn20 .ju-visa-juhla { font-size: 11px; font-weight: 800; letter-spacing: .16em; text-transform: uppercase; }
+.tn20 .ju-visa-nimi {
+  font-family: var(--ju-display); font-weight: 900; font-variation-settings: "wdth" 78; font-size: clamp(20px, 1.9cqi, 26px);
+  line-height: .98; letter-spacing: -.015em; text-transform: uppercase; text-wrap: balance; overflow-wrap: normal; word-break: keep-all;
+}
+.tn20 .ju-visa-teaser { font-size: 14px; line-height: 1.45; color: var(--ju-soft); }
+.tn20 .ju-tyhja { padding: clamp(20px, 2.4cqi, 32px); border-radius: 22px; border: 1px solid var(--ju-line); background: var(--ju-card); font-size: 15px; color: var(--ju-soft); }
+
+/* ── Vuosikello ── */
+.tn20 .ju-kello,
+.tn20 .ju-kaikki { padding: clamp(44px, 5.4cqi, 80px) var(--ju-pad) 0; display: flex; flex-direction: column; gap: clamp(22px, 2.6cqi, 36px); }
+.tn20 .ju-sechead { display: flex; flex-direction: column; gap: 6px; }
+.tn20 .ju-h2s {
+  margin: 0; font-family: var(--ju-display); font-weight: 900; font-variation-settings: "wdth" 72;
+  font-size: clamp(30px, 3.4cqi, 40px); line-height: 1; letter-spacing: -.02em; text-transform: uppercase;
+}
+.tn20 .ju-secsub { font-size: 14px; font-weight: 600; color: var(--ju-muted); }
+
+.tn20 .ju-aika { position: relative; height: 82px; }
+.tn20 .ju-aika-viiva { position: absolute; left: 0; right: 0; top: 50%; height: 1px; background: #3a3120; }
+.tn20 .ju-aika-kk {
+  position: absolute; top: 0; bottom: 0; padding-left: 6px; border-left: 1px solid var(--ju-line);
+  font-size: 11px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; color: #7c7462;
+}
+.tn20 .ju-aika-pisteet { position: absolute; left: 0; right: 0; top: 50%; }
+.tn20 .ju-aika-piste { position: absolute; top: 0; transform: translate(-50%, -50%); border-radius: 50%; box-shadow: 0 0 0 3px #131109; }
+.tn20 .ju-aika-nyt { position: absolute; left: 0; top: 0; width: 3px; height: 30px; transform: translateY(-50%); background: #f5f0e6; border-radius: 2px; }
+/* Kapealla kuukausien nimet eivät mahdu 1/12-väliin: näytetään joka toinen */
+@container (max-width: 700px) {
+  .tn20 .ju-aika-kk--2 { font-size: 0; }
+}
+
+.tn20 .ju-t1 { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap: clamp(14px, 1.6cqi, 22px); }
+.tn20 .ju-t1-kortti {
+  position: relative; display: flex; flex-direction: column; justify-content: flex-end; min-height: clamp(300px, 30cqi, 420px);
+  border-radius: 22px; border: 1px solid var(--ju-line); background: var(--ju-deep); overflow: hidden; color: #f5f0e6;
+  transition: transform 150ms cubic-bezier(.2, .8, .2, 1);
+}
+.tn20 a.ju-t1-kortti:hover { transform: translateY(-2px); color: #f5f0e6; }
+.tn20 .ju-t1-kortti > img, .tn20 .ju-t1-glow { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.tn20 .ju-t1-varjo { position: absolute; inset: 0; background: linear-gradient(to top, rgba(15, 13, 7, .96) 8%, rgba(15, 13, 7, .7) 38%, transparent 70%); }
+.tn20 .ju-t1-body { position: relative; display: flex; flex-direction: column; gap: 12px; padding: clamp(20px, 2cqi, 28px); }
+.tn20 .ju-t1-pvm { display: flex; align-items: center; gap: 8px; white-space: nowrap; font-size: 12px; font-weight: 800; letter-spacing: .16em; text-transform: uppercase; }
+.tn20 .ju-t1-pvm i, .tn20 .ju-ryhma-nimi i { flex: none; width: 9px; height: 9px; border-radius: 50%; }
+/* CD clamp(36px, 3.8cqw, 52px) + overflow-wrap:anywhere. Pitkät nimet riveitetään (Itsenäisyys-/päivä),
+   joten pisin sana on 12 merkkiä ("YSTÄVÄNPÄIVÄ"). Koko skaalataan kortin omasta leveydestä:
+   11cqi → 300 px:n kortissa 33 px, 440 px:ssä 48 px (mitattu, ks. raportti 28.9.2026). */
+.tn20 .ju-t1-kortti { container-type: inline-size; }
+.tn20 .ju-t1-nimi {
+  display: flex; flex-direction: column;
+  font-family: var(--ju-display); font-weight: 900; font-variation-settings: "wdth" 70; font-size: clamp(28px, 11cqi, 52px);
+  line-height: .88; letter-spacing: -.02em; text-transform: uppercase; overflow-wrap: normal; word-break: keep-all;
+}
+.tn20 .ju-t1-ala {
+  display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 8px;
+  padding-top: 12px; border-top: 1px solid rgba(245, 240, 230, .18); font-size: 13px; font-weight: 700; color: var(--ju-soft);
+}
+.tn20 .ju-t1-ala b { font-family: var(--ju-display); font-weight: 900; font-variation-settings: "wdth" 76; font-size: 30px; line-height: 1; color: #f5f0e6; font-variant-numeric: tabular-nums; }
+.tn20 .ju-t1-tila { color: var(--ju-muted); }
+
+.tn20 .ju-t2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr)); gap: clamp(10px, 1.2cqi, 16px); }
+.tn20 .ju-t2-kortti {
+  display: grid; grid-template-columns: 64px minmax(0, 1fr); align-items: center; gap: 14px; padding: 12px;
+  border-radius: 18px; border: 1px solid var(--ju-line); background: var(--ju-card); color: #f5f0e6;
+}
+.tn20 a.ju-t2-kortti:hover { border-color: #3a3120; color: #f5f0e6; }
+.tn20 .ju-t2-pv { width: 64px; height: 64px; border-radius: 13px; border: 1px solid; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; }
+.tn20 .ju-t2-pv b { font-family: var(--ju-display); font-weight: 900; font-variation-settings: "wdth" 76; font-size: 24px; line-height: 1; }
+.tn20 .ju-t2-pv small { font-size: 10px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; }
+.tn20 .ju-t2-teksti { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+/* CD 21 px + ellipsis. "ITSENÄISYYSPÄIVÄ" ei saa leikkautua: koko pienenee laatan leveyden mukaan
+   (tekstille jää 100cqi − 102 px; 16 merkkiä ≈ 9,8 em wdth 78). 284 px:n laatassa 18,5 px. */
+.tn20 .ju-t2-kortti { container-type: inline-size; }
+.tn20 .ju-t2-nimi {
+  font-family: var(--ju-display); font-weight: 900; font-variation-settings: "wdth" 78; font-size: min(21px, calc((100cqi - 102px) / 9.8)); line-height: 1;
+  text-transform: uppercase; white-space: nowrap;
+}
+.tn20 .ju-t2-meta { font-size: 13px; font-weight: 600; color: var(--ju-muted); }
+
+.tn20 .ju-t3 { display: flex; flex-direction: column; gap: 12px; padding-top: clamp(6px, 1cqi, 14px); }
+.tn20 .ju-t3-otsikko, .tn20 .ju-t3-label { font-size: 12px; font-weight: 800; letter-spacing: .18em; text-transform: uppercase; color: #7c7462; }
+.tn20 .ju-t3-label { font-size: 11px; letter-spacing: .14em; }
+.tn20 .ju-t3-kuut { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 190px), 1fr)); gap: 14px clamp(14px, 2cqi, 28px); }
+.tn20 .ju-t3-kk { display: flex; flex-direction: column; gap: 6px; padding-top: 10px; border-top: 1px solid var(--ju-line); }
+.tn20 .ju-t3-rivi { display: flex; align-items: baseline; gap: 8px; font-size: 14px; font-weight: 500; color: #a79e8c; }
+.tn20 a.ju-t3-rivi:hover { color: #f5f0e6; }
+.tn20 .ju-t3-pvm { min-width: 40px; color: #7c7462; font-variant-numeric: tabular-nums; }
+
+/* ── Kaikki juhlavisat ── */
+.tn20 .ju-ryhmat { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr)); gap: clamp(12px, 1.4cqi, 18px); align-items: start; }
+.tn20 .ju-ryhma { display: flex; flex-direction: column; gap: 4px; padding: 18px 18px 12px; border-radius: 18px; border: 1px solid var(--ju-line); background: var(--ju-card); scroll-margin-top: 90px; }
+.tn20 .ju-ryhma:target { border-color: #e8a320; }
+.tn20 .ju-ryhma-head { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; padding-bottom: 8px; }
+.tn20 .ju-ryhma-nimi { display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 800; letter-spacing: .16em; text-transform: uppercase; }
+.tn20 .ju-ryhma-pvm { font-size: 13px; font-weight: 600; color: var(--ju-muted); font-variant-numeric: tabular-nums; }
+.tn20 .ju-ryhma-rivi {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 44px; padding: 8px 0;
+  border-top: 1px solid var(--ju-line); font-size: 15px; font-weight: 600; line-height: 1.3; color: #f5f0e6;
+}
+.tn20 .ju-ryhma-rivi span:first-child { text-wrap: pretty; }
+.tn20 .ju-ryhma-rivi:hover { color: #b6ff3c; }
+.tn20 .ju-ryhma-pelaa { flex: none; font-size: 13px; font-weight: 700; color: #b6ff3c; }
+
+/* Mobiili: laskurin laatat jakavat rivin tasan */
+@container (max-width: 520px) {
+  .tn20 .ju-cd, .tn20 .ju-cd-osat { width: 100%; }
+  .tn20 .ju-cd-osa { flex: 1 1 0; min-width: 0; padding: 12px 12px 10px; }
+  .tn20 .ju-hero { min-height: 520px; }
+  .tn20 .ju-hero > img { object-position: 62% 30%; }
+  /* Mobiilissa nimi kasvaa näytön mukaan: 11cqi → 390 px:llä 43 px, "ITSENÄISYYS-" ≈ 290 px / tilaa 310 px */
+  .tn20 .ju-h2 { font-size: clamp(34px, 11cqi, 56px); }
+}

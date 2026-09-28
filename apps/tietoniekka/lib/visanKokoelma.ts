@@ -28,6 +28,7 @@ export const COLLECTION_ACCENT: Record<string, string> = {
   historia: "#E8A320",
   luonto: "#3FBF7F",
   "tunnetut-henkilot": "#C9A96A",
+  juhlat: "#E8A320",
 };
 export const COLLECTION_HUB: Record<string, string> = {
   tv: "/kokoelma/tv",
@@ -39,6 +40,7 @@ export const COLLECTION_HUB: Record<string, string> = {
   historia: "/kokoelma/historia",
   luonto: "/kokoelma/luonto",
   "tunnetut-henkilot": "/kokoelma/tunnetut-henkilot",
+  juhlat: "/kokoelma/juhlat",
 };
 /* ── Kokoelman tunnistus (QA-003/013 + Heikki 1, 2, 5 — 29.8.2026):
    kaupunkivisat ovat kannassa collection=yleistieto/category=kaupungit,
@@ -80,6 +82,7 @@ export const COLLECTION_BG: Record<string, string> = {
   historia: "/20/historia/hero-aikajana.webp",
   luonto: "/20/luonto/hero-landing.webp",
   "tunnetut-henkilot": "/20/teema-tunnetut-henkilot.webp",
+  juhlat: "/20/juhlat/halloween.webp",
 };
 export const COLLECTION_LABEL: Record<string, string> = {
   tv: "TV & Suoratoisto",
@@ -92,5 +95,6 @@ export const COLLECTION_LABEL: Record<string, string> = {
   historia: "Historia",
   luonto: "Luonto",
   "tunnetut-henkilot": "Tunnetut henkilöt",
+  juhlat: "Juhlat",
 };
 

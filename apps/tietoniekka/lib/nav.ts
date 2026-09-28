@@ -36,6 +36,8 @@ export const NAV_COLLECTIONS: NavCollection[] = [
      nosto-periaate kuin Suomen kaupungeilla. Visamäärä lasketaan kategoriasta
      (ks. kokoelmat/page.tsx). */
   { slug: "tiede", label: "Tiede & teknologia", color: "#5BE1FF" },
+  /* Juhlat (Heikki 28.9.2026): vuoden juhlat ja perinteet, kannassa collection='juhlat'. */
+  { slug: "juhlat", label: "Juhlat", color: "#E8A320" },
 ];
 
 export type NavMode = {
