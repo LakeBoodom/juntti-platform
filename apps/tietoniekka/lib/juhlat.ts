@@ -170,34 +170,59 @@ export const JUHLAT: Juhla[] = [
     },
   },
   {
-    slug: "loppiainen", nimi: "Loppiainen", iso: true, accent: "#9FC7E8", korttikuva: I + "loppiainen-800.webp",
+    slug: "loppiainen", nimi: "Loppiainen", iso: true, accent: "#9FC7E8", kuva: I + "loppiainen.webp",
     paiva: (y) => pvm(y, 1, 6), laskuri: "Loppiaiseen", ill: "loppiaiseen",
     visat: ["loppiainen-ja-nuutinpaiva-visa"],
     faktat: [{ label: "Nuutinpäivä", k: "13.1.", t: "Nuutinpäivänä joulu on perinteisesti ajettu ulos talosta." }],
+    koukku: {
+      visa: "loppiainen-ja-nuutinpaiva-visa",
+      kysymys: "Kuka tuo italialaisille lapsille lahjat loppiaisena?", korostus: "loppiaisena?",
+      ala: "Tietäjistä tiernapoikiin ja nuuttipukkeihin.", cta: "Selvitä vastaus",
+    },
   },
   {
-    slug: "laskiainen", nimi: "Laskiainen", iso: true, accent: "#BFE3FF",
+    slug: "laskiainen", nimi: "Laskiainen", iso: true, accent: "#BFE3FF", kuva: I + "laskiainen.webp",
     paiva: (y) => lisaa(paasiainen(y), -47), laskuri: "Laskiaiseen", ill: "laskiaiseen",
     visat: ["laskiainen-perinteet-ja-herkut-visa"],
+    koukku: {
+      visa: "laskiainen-perinteet-ja-herkut-visa",
+      kysymys: "Mitä pitkän mäenlaskun uskottiin ennustavan?", korostus: "mäenlaskun",
+      ala: "Pulkkamäestä pullapöytään.", cta: "Selvitä vastaus",
+    },
   },
   {
-    slug: "ystavanpaiva", nimi: "Ystävänpäivä", iso: true, accent: "#FF5C8A",
+    slug: "ystavanpaiva", nimi: "Ystävänpäivä", iso: true, accent: "#FF5C8A", kuva: I + "ystavanpaiva.webp",
     paiva: (y) => pvm(y, 2, 14), laskuri: "Ystävänpäivään", ill: "ystävänpäivään",
     visat: ["ystavanpaiva-suomessa-ja-maailmalla-visa"],
+    koukku: {
+      visa: "ystavanpaiva-suomessa-ja-maailmalla-visa",
+      kysymys: "Mitä japanilaiset naiset antavat miehille ystävänpäivänä?", korostus: "japanilaiset",
+      ala: "Sydänten juhla Suomessa ja maailmalla.", cta: "Pelaa visa",
+    },
   },
   {
     slug: "kalevalanpaiva", nimi: "Kalevalan päivä", iso: false, accent: "#6FA8FF",
     paiva: (y) => pvm(y, 2, 28), ill: "Kalevalan päivään", visat: [],
   },
   {
-    slug: "paasiainen", nimi: "Pääsiäinen", iso: true, accent: "#F2D64B",
+    slug: "paasiainen", nimi: "Pääsiäinen", iso: true, accent: "#F2D64B", kuva: I + "paasiainen.webp",
     paiva: paasiainen, laskuri: "Pääsiäiseen", ill: "pääsiäiseen",
     visat: ["paasiainen-perinteet-ja-herkut-visa"],
+    koukku: {
+      visa: "paasiainen-perinteet-ja-herkut-visa",
+      kysymys: "Mikä Fazerin herkku valmistetaan aitoon munankuoreen?", korostus: "munankuoreen?",
+      ala: "Virpomisesta mämmiin.", cta: "Selvitä vastaus",
+    },
   },
   {
-    slug: "vappu", nimi: "Vappu", iso: true, accent: "#FFD23F",
+    slug: "vappu", nimi: "Vappu", iso: true, accent: "#FFD23F", kuva: I + "vappu.webp",
     paiva: (y) => pvm(y, 5, 1), laskuri: "Vappuun", ill: "vappuun",
     visat: ["vappu-perinteet-historia-suomi"],
+    koukku: {
+      visa: "vappu-perinteet-historia-suomi",
+      kysymys: "Minne noitien uskottiin lentävän vapunaattona?", korostus: "noitien",
+      ala: "Simasta ylioppilaslakkeihin.", cta: "Selvitä vastaus",
+    },
   },
   {
     slug: "aitienpaiva", nimi: "Äitienpäivä", iso: true, accent: "#F28BB0", kuva: I + "aitienpaiva.webp",
