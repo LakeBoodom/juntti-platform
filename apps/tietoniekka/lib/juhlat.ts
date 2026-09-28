@@ -147,18 +147,18 @@ export const JUHLAT: Juhla[] = [
     slug: "joulu", nimi: "Joulu", iso: true, accent: "#E8453C", kuva: I + "joulupoyta.webp",
     paiva: (y) => pvm(y, 12, 24), loppu: 2, laskuri: "Jouluaattoon", ill: "jouluaattoon",
     visat: [
-      "adventista-jouluaattoon-visa", "joulupukki-visa", "joulupoydan-antimet-visa", "joulu-maailmalla-visa",
+      "adventista-jouluaattoon-visa", "joulun-oudoimmat-tarinat-visa", "joulupukki-visa", "joulupoydan-antimet-visa", "joulu-maailmalla-visa",
       "joulun-historia-ja-perinteet-visa", "suomalaisen-joulun-hiljaiset-tavat", "joulun-kulttuuri-ikonit-visa",
     ],
     faktat: [
       { label: "Rovaniemi", k: "100+ maata", t: "Joulupukin Pääposti saa kirjeitä yli sadasta maasta." },
     ],
-    /* Heikki 28.9.2026: joulu tarvitsee vahvan oman koukun → joulupukki (vastaus: urosvuohi). */
+    /* Heikki 28.9.2026: joulun koukku "Joulun yllättävimmät tarinat" -visasta (vastaus: tutti). */
     koukku: {
-      visa: "joulupukki-visa",
-      kysymys: "Mitä sana pukki joulupukin nimessä alun perin tarkoittaa?", korostus: "pukki",
-      ala: "Piispasta Korvatunturille – tunnetko joulupukin?", cta: "Selvitä vastaus",
-      kuva: I + "joulupukki.webp",
+      visa: "joulun-oudoimmat-tarinat-visa",
+      kysymys: "Mitä pienet lapset lähettävät joulupukille kirjeidensä mukana?", korostus: "kirjeidensä",
+      ala: "Joulun yllättävimmät tarinat – tunnetko ne?", cta: "Selvitä vastaus",
+      kuva: I + "joulun-tarinat.webp",
     },
   },
   {
