@@ -29,6 +29,7 @@ export function JuhlatBanneri({ nosto, tanaan }: { nosto: Esiintyma; tanaan: num
   const korostus = k?.korostus ?? kysymys.split(" ").pop()!;
   const ala = k?.ala ?? "Testaa tietosi!";
   const cta = k?.cta ?? "Pelaa visa";
+  const kuva = k?.kuva ?? nosto.kuva;
   const kaynnissa = tanaan >= nosto.alku;
   const paivia = kaynnissa ? 0 : paiviaValissa(nosto.alku + (nosto.kohde ?? 0) * 864e5, tanaan);
   const yksikko = kaynnissa ? "Juhla on tänään" : `${paivia === 1 ? "päivä" : "päivää"} ${nosto.ill}`;
@@ -45,11 +46,11 @@ export function JuhlatBanneri({ nosto, tanaan }: { nosto: Esiintyma; tanaan: num
       } as React.CSSProperties}
     >
       <span className="jub-kuva" aria-hidden>
-        {nosto.kuva && (
+        {kuva && (
           /* eslint-disable-next-line @next/next/no-img-element */
           <img
-            src={nosto.kuva.replace(/\.webp$/, "-800.webp")}
-            srcSet={`${nosto.kuva.replace(/\.webp$/, "-800.webp")} 800w, ${nosto.kuva} 1600w`}
+            src={kuva.replace(/\.webp$/, "-800.webp")}
+            srcSet={`${kuva.replace(/\.webp$/, "-800.webp")} 800w, ${kuva} 1600w`}
             sizes="(min-width: 1200px) 600px, (min-width: 600px) 400px, 100vw"
             alt=""
           />

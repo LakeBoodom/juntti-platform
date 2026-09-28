@@ -20,7 +20,11 @@ const I = "/20/juhlat/";
 export type Fakta = { label: string; k: string; t: string };
 
 /** Etusivun bannerin koukku: kysymys visasta (ei saa paljastaa vastausta). */
-export type Koukku = { visa: string; kysymys: string; korostus: string; ala: string; cta: string };
+export type Koukku = {
+  visa: string; kysymys: string; korostus: string; ala: string; cta: string;
+  /** Bannerin kuva, jos koukun visa kaipaa eri kuvaa kuin juhlan pääkuva */
+  kuva?: string;
+};
 
 export type Juhla = {
   slug: string;
@@ -149,10 +153,12 @@ export const JUHLAT: Juhla[] = [
     faktat: [
       { label: "Rovaniemi", k: "100+ maata", t: "Joulupukin Pääposti saa kirjeitä yli sadasta maasta." },
     ],
+    /* Heikki 28.9.2026: joulu tarvitsee vahvan oman koukun → joulupukki (vastaus: urosvuohi). */
     koukku: {
-      visa: "joulupoydan-antimet-visa",
-      kysymys: "Mihin graavilohen nimi alun perin viittaa?", korostus: "graavilohen",
-      ala: "Joulupöydän herkuilla on yllättäviä tarinoita.", cta: "Selvitä vastaus",
+      visa: "joulupukki-visa",
+      kysymys: "Mitä sana pukki joulupukin nimessä alun perin tarkoittaa?", korostus: "pukki",
+      ala: "Piispasta Korvatunturille – tunnetko joulupukin?", cta: "Selvitä vastaus",
+      kuva: I + "joulupukki.webp",
     },
   },
   {
