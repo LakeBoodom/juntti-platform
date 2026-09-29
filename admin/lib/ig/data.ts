@@ -139,6 +139,12 @@ export function kuvaOsoite(url: string): string {
 
 /** Hakee kuvan ja mittaa sen. Muunnetaan JPEG:ksi (Satori ei tue WebP:tä
     luotettavasti) ja pitkä sivu rajataan 1600 px:iin. */
+/** Polttopiste kuvaputken prosenteiksi. Kannan quizzes.hero_focal_* ja
+    celebrities.image_focal_* ovat sivuston asteikolla 0–1 (29.9.2026 yhtenäistetty);
+    yli 1 olevat tulkitaan jo prosenteiksi. */
+export const prosentti = (v: number | string | null | undefined, oletus: number) =>
+  v == null || v === "" ? oletus : Number(v) <= 1 ? Number(v) * 100 : Number(v);
+
 export function lataaKuva(url: string | null, fx = 50, fy = 40): Promise<Kuva | null> {
   if (!url) return Promise.resolve(null);
   const abs = absoluuttinen(url);
@@ -392,7 +398,6 @@ export async function haeVisa(
   const count = kysymykset.length;
 
   // quizzes.hero_focal_* on sivuston asteikolla 0–1 (admin: "0.5"); kuvaputki käyttää prosentteja.
-  const prosentti = (v: number | null, oletus: number) => (v == null ? oletus : Number(v) <= 1 ? Number(v) * 100 : Number(v));
   const fx = prosentti(visa.hero_focal_x, 50);
   const fy = prosentti(visa.hero_focal_y, 40);
   const kuvaUrl = visa.hero_image ?? visa.image_url;
@@ -407,7 +412,7 @@ export async function haeVisa(
   const [kuva, kuvaaja, hKuva, hKuvaaja] = await Promise.all([
     lataa ? lataaKuva(kuvaUrl, fx, fy) : null,
     lataa ? haeKuvaaja(kuvaUrl) : null,
-    lataa && c ? lataaKuva(c.image_url, c.image_focal_x ?? 50, c.image_focal_y ?? 25) : null,
+    lataa && c ? lataaKuva(c.image_url, prosentti(c.image_focal_x, 50), prosentti(c.image_focal_y, 25)) : null,
     lataa && c ? haeKuvaaja(c.image_url) : null,
   ]);
   return {
@@ -474,8 +479,8 @@ export async function haePaivanSynttarit(siteId: string, paiva: string, lataaKuv
     visanTilit = tilitListaksi(v?.ig_tilit);
   }
 
-  const fx = rivi.image_focal_x ?? 50;
-  const fy = rivi.image_focal_y ?? 25;
+  const fx = prosentti(rivi.image_focal_x, 50);
+  const fy = prosentti(rivi.image_focal_y, 25);
   return {
     paiva,
     celebrityId: rivi.celebrity_id,
