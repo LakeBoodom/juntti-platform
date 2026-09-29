@@ -654,6 +654,24 @@
   .tn20 .tng-main[data-mode="peli"] .tng-fbslot { grid-column: 1; grid-row: 2; width: 100%; max-width: 900px; min-height: 0; align-self: stretch; overflow-y: auto; overscroll-behavior: contain; }
   .tn20 .tng-main[data-mode="peli"] .tng-act { grid-column: 2; grid-row: 2; align-self: end; width: 100%; max-width: 900px; position: sticky; bottom: 0; margin: 0; padding: 10px 0; background: linear-gradient(180deg, rgba(15, 13, 7, 0), rgba(15, 13, 7, 0.92) 55%); backdrop-filter: none; -webkit-backdrop-filter: none; border-top: 0; }
 
+  /* Keskitys (Heikki 29.9.2026): GameClient laskee siirron --tngOff (kysymys +
+     vastaukset hieman keskilinjan yläpuolelle, selitykselle varattu tila) ja
+     vastauslistan korkeuden --tngAH. Nappirivi on absoluuttisesti heti listan alla
+     (ruudukkoalue rivi 1 / palsta 2 on sen sijaintikehys), joten se ei kasvata
+     rivejä eikä siirrä palautetta. Kuvavisan lukittu asettelu on omillaan. */
+  .tn20 .tng:not([data-lock="1"]) .tng-main[data-mode="peli"] {
+    position: relative;
+    padding-top: calc(clamp(24px, 3.4cqw, 64px) + var(--tngOff, 0px));
+  }
+  .tn20 .tng:not([data-lock="1"]) .tng-main[data-mode="peli"] .tng-act {
+    position: absolute; grid-column: 2; grid-row: 1; align-self: start;
+    top: calc(var(--tngAH, 0px) + clamp(16px, 1.6cqw, 24px)); left: 0; bottom: auto;
+    /* Viimeisen palstan sijaintikehys ulottuu ruudukon pehmusteen reunaan asti →
+       oikea reuna rajataan samaan kohtaan kuin vastauslistan (pehmusteen verran). */
+    right: clamp(16px, 2.6cqw, 48px); width: auto;
+    padding: 0; background: none;
+  }
+
   /* Lukittu kysymys kevenee (CD: 58 → 34 px), jotta palaute mahtuu sen alle
      ilman vieritystä. JS-auto-fit (KORTTISÄÄNTÖ) ajetaan uudelleen lukituksessa,
      joten pisin sana mahtuu myös kevennetyssä koossa. */

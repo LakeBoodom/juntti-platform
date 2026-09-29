@@ -458,6 +458,46 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
     m.style.removeProperty("align-content");
   }, [locked, qi, phase]);
 
+  /* ── Tekstivisan sijoittelu keskelle (Heikki 29.9.2026) ──
+     Työpöydällä ja tabletilla (≥ 880 px, kaksi palstaa) kysymys ja vastaukset
+     nostetaan pystysuunnassa hieman keskilinjan yläpuolelle (40 % vapaasta
+     tilasta yläpuolelle). Korkeus lasketaan uuden kysymyksen alussa niin, että
+     selitykselle on varattu tila kysymyksen alla, ja siirto lukitaan — vastaaminen
+     ei liikuta mitään. Nappirivi (oljenkorsi / Seuraava) sijoittuu heti
+     vastauslistan alle (--tngAH, ks. peli2026.css). Kuvavisoihin (lukittu
+     asettelu) ja yksipalstaiseen mobiiliin tämä ei vaikuta. */
+  const keskitaRef = useRef<() => void>(() => {});
+  keskitaRef.current = () => {
+    const m = mainRef.current, g = groupRef.current;
+    if (!m) return;
+    const kaksiPalstaa = phase === "play" && !lukittu && g != null
+      && getComputedStyle(m).gridTemplateColumns.trim().split(/\s+/).length === 2;
+    if (!kaksiPalstaa) { m.style.removeProperty("--tngOff"); m.style.removeProperty("--tngAH"); return; }
+    const ah = g.getBoundingClientRect().height;
+    m.style.setProperty("--tngAH", `${Math.round(ah)}px`);
+    if (locked) return; // siirto lukitaan kysymyksen alussa
+    const qc = m.querySelector<HTMLElement>(".tng-qcol");
+    const act = m.querySelector<HTMLElement>(".tng-act");
+    const cs = getComputedStyle(m);
+    const nyk = parseFloat(m.style.getPropertyValue("--tngOff")) || 0;
+    const vapaa = m.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom) + nyk;
+    const lapset = qc ? Array.from(qc.children) as HTMLElement[] : [];
+    const qh = lapset.length ? lapset[lapset.length - 1].getBoundingClientRect().bottom - lapset[0].getBoundingClientRect().top : 0;
+    const rowGap = parseFloat(cs.rowGap) || 0;
+    /* Selitykselle varattu tila kysymyksen alla (palautelohko ≈ 170–230 px). */
+    const varaus = Math.min(260, Math.max(190, vapaa * 0.26));
+    const vasen = qh + rowGap + varaus;
+    const oikea = ah + rowGap + (act?.getBoundingClientRect().height ?? 0);
+    const siirto = Math.max(0, Math.round((vapaa - Math.max(vasen, oikea)) * 0.4));
+    m.style.setProperty("--tngOff", `${siirto}px`);
+  };
+  useLayoutEffect(() => { keskitaRef.current(); }, [phase, qi, questions, locked, lukittu]);
+  useEffect(() => {
+    const onR = () => keskitaRef.current();
+    window.addEventListener("resize", onR);
+    return () => window.removeEventListener("resize", onR);
+  }, []);
+
   /* ── Fokus lukituksen jälkeen (CD kierros 5, arvo 6) ──
      Fokus siirtyy "Seuraava"-nappiin 120 ms viiveellä (palautteen tuloanimaation
      alku ehtii ohi), joten koko peli toimii näppäimistöllä ilman hiirtä. */
