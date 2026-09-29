@@ -645,7 +645,11 @@
      työnnä koko sivua — teksti pysyy kokonaan luettavana (KORTTISÄÄNTÖ). */
   .tn20 .tng-main[data-mode="peli"] .tng-qcol { grid-column: 1; grid-row: 1; align-self: stretch; min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: 0; }
   .tn20 .tng-main[data-mode="peli"] .tng-acol { display: contents; }
-  .tn20 .tng-main[data-mode="peli"] .tng-agroup { grid-column: 2; grid-row: 1 / span 2; width: 100%; max-width: 900px; align-self: center; }
+  /* Heikki 29.9.2026: vastaukset samalle tasolle kysymyksen kanssa (yläreunat linjassa).
+     Aiempi align-self: center pudotti listan näkymän keskelle, joten korkealla ruudulla
+     (tabletti pystyssä) kysymys ja vastaukset olivat eri tasoilla. Lista ei liiku
+     lukituksessakaan, koska se on ankkuroitu ruudukon yläreunaan. */
+  .tn20 .tng-main[data-mode="peli"] .tng-agroup { grid-column: 2; grid-row: 1 / span 2; width: 100%; max-width: 900px; align-self: start; }
   .tn20 .tng-main[data-mode="peli"] .tng-wait { grid-column: 2; grid-row: 1; width: 100%; max-width: 900px; }
   .tn20 .tng-main[data-mode="peli"] .tng-fbslot { grid-column: 1; grid-row: 2; width: 100%; max-width: 900px; min-height: 0; align-self: stretch; overflow-y: auto; overscroll-behavior: contain; }
   .tn20 .tng-main[data-mode="peli"] .tng-act { grid-column: 2; grid-row: 2; align-self: end; width: 100%; max-width: 900px; position: sticky; bottom: 0; margin: 0; padding: 10px 0; background: linear-gradient(180deg, rgba(15, 13, 7, 0), rgba(15, 13, 7, 0.92) 55%); backdrop-filter: none; -webkit-backdrop-filter: none; border-top: 0; }
