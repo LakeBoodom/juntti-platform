@@ -122,7 +122,7 @@ export function SynttaritCelebrityForm({
           />
           <Input
             type="number"
-            min={1900}
+            min={1000}
             max={2020}
             value={birthYear}
             onChange={(e) => setBirthYear(e.target.value)}

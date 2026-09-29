@@ -190,7 +190,7 @@ export function CelebrityForm({
           />
           <Input
             type="number"
-            min={1900}
+            min={1000}
             max={2030}
             value={birthYear}
             onChange={(e) => setBirthYear(e.target.value)}
@@ -221,7 +221,7 @@ export function CelebrityForm({
           />
           <Input
             type="number"
-            min={1900}
+            min={1000}
             max={2030}
             value={deathYear}
             onChange={(e) => setDeathYear(e.target.value)}
