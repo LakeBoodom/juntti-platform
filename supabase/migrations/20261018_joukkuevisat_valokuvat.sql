@@ -1,4 +1,4 @@
--- 1.10.2026: joukkuevisoille oikeat valokuvat AI-kuvien tilalle (Heikki hyväksyi; KooKoo odottaa).
+-- 1.10.2026: joukkuevisoille oikeat valokuvat AI-kuvien tilalle (Heikki hyväksyi; KooKoo erikseen 20261019).
 -- Sama kuva on Jääkiekko-kokoelman seurakortissa. Lähteet lib/kuvalahteet.ts:ssä.
 update quizzes set hero_image = '/20/jaakiekko/jk-tappara-kuva.webp', hero_focal_x = 0.7, hero_focal_y = 0.5, hero_alt = 'Tapparan pelaajat Nokia Arenan avausottelussa 3.12.2021. Kuva: kallerna / Wikimedia Commons, CC BY-SA 4.0' where slug = 'tappara-tampere-kirvesrinnat-tietovisa';
 update quizzes set hero_image = '/20/jaakiekko/jk-ilves-kuva.webp', hero_focal_x = 0.36, hero_focal_y = 0.5, hero_alt = 'Raimo Helminen Ilveksen vuoden 1985 retropaidassa viimeisen runkosarjaottelunsa jälkeen 2008. Kuva: Saruwine / Wikimedia Commons, CC BY-SA 3.0' where slug = 'ilves-tampere-keltamustat-tietovisa';

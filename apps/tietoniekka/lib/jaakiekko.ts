@@ -196,7 +196,7 @@ export const JK_NHL: JkCard[] = [
     Muilla on vielä AI-kuva jk-<id>.webp. Sama kuva on seuran visan pelinäkymän herona. */
 const JK_TEAM_KUVAT = new Set([
   "tappara", "ilves", "tps", "karpat", "hifk", "jokerit", "assat", "hpk", "lukko",
-  "jyp", "kalpa", "pelicans", "saipa", "sport", "jukurit", "kiekko-espoo",
+  "jyp", "kalpa", "pelicans", "saipa", "kookoo", "sport", "jukurit", "kiekko-espoo",
 ]);
 
 export function jkTeamImg(id: string): string {
