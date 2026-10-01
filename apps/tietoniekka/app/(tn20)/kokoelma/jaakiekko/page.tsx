@@ -269,6 +269,12 @@ export default async function JaakiekkoLanding() {
           </div>
           <CardGrid cards={nhl} size="l" />
         </section>
+        {/* Kuvakrediitti — derbykorttien valokuvat ovat CC BY-SA / public domain (1.10.2026).
+            Tekijät ja lisenssit listattu sivulla /kuvien-lahteet. Erillinen rivi, ei kuvan päällä. */}
+        <p className="tne-kuvakrediitti">
+          Derbyjen valokuvat: Wikimedia Commons, CC BY-SA / public domain ·{" "}
+          <a href="/kuvien-lahteet">tekijät ja lisenssit</a>
+        </p>
       </div>
 
       {/* Alatunniste tulee layoutista (SiteFooter, QA-005 29.8.2026) */}

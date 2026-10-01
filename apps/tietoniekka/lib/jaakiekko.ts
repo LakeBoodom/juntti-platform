@@ -144,16 +144,18 @@ export type JkCard = {
 
 const IMG = (n: string) => `/20/jaakiekko/${n}.webp`;
 
+// Derbykortit (1.10.2026): oikeat valokuvat AI-kuvien tilalle, samat kuin visojen pelinäkymässä.
+// Tekijät lib/kuvalahteet.ts → /kuvien-lahteet (krediittirivi kokoelmasivun lopussa).
 export const JK_DERBIES: JkCard[] = [
   { quizSlug: "sm-liiga-stadin-derby-hifk-jokerit", tag: "Stadin derby", title: "HIFK vs. Jokerit",
     desc: "Kausi 2026-27 tuo stadin derbyt takaisin. Uutta historiaa luodaan, vanha on täynnä uskomattomia tapahtumia.",
-    img: IMG("jk-derby-stadi"), accent: "#E2231A" },
+    img: IMG("jk-derby-stadi-1971"), accent: "#E2231A" },
   { quizSlug: "sm-liiga-tampereen-derby-ilves-tappara", tag: "Tampereen paikallishegemonia", title: "Ilves vs. Tappara",
     desc: "Tampereella sinulta kysytään - Ilves vai Tappara?",
-    img: IMG("jk-derby-manse"), accent: "#25A244" },
+    img: IMG("jk-derby-manse-2021"), accent: "#25A244" },
   { quizSlug: "sm-liiga-satakunnan-derby-assat-lukko", tag: "Satakunta", title: "Ässät vs. Lukko",
     desc: "Kahden länsirannikon teollisuuskaupungin vanhin riita jäällä.",
-    img: IMG("jk-derby-satakunta"), accent: "#F5C518" },
+    img: IMG("jk-derby-satakunta-2019c"), accent: "#F5C518" },
 ];
 
 /** Liigan yleisvisat — README:n poisjättö: kysymysmääriä EI näytetä korteissa
