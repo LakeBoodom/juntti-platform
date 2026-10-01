@@ -96,7 +96,7 @@ export const KUVALAHTEET: Kuvalahde[] = [
   { slug: "rovaniemi", kokoelma: "kaupungit", kuvaus: "Jätkänkynttiläsilta, Rovaniemi", tiedosto: "Rovaniemi Lumberjack’s Candle Bridge.jpg", tekija: "themadpenguin", lisenssi: "CC BY 2.0", lisenssiUrl: CC("by/2.0"), vuosi: "2012" },
   /* Jääkiekko (1.10.2026): Satakunnan derbyn visakuva on yhdistetty kahdesta saman ottelun
      (Lukko–Ässät, Äijänsuo 30.11.2019) kuvasta: vasemmalla Ässät, oikealla Lukon kannattajat.
-     public/20/jaakiekko/jk-derby-satakunta-2019.webp, saatavilla samalla CC BY-SA 4.0 -lisenssillä. */
+     public/20/jaakiekko/jk-derby-satakunta-2019b.webp, saatavilla samalla CC BY-SA 4.0 -lisenssillä. */
   { slug: "sm-liiga-satakunnan-derby-assat-lukko", kokoelma: "jaakiekko", kuvaus: "Satakunnan derby: Ässät kiittää yleisöä, Lukko–Ässät Äijänsuolla 30.11.2019", tiedosto: "Lukko-Ässät 30-11-19 23.jpg", tekija: "kallerna", lisenssi: "CC BY-SA 4.0", lisenssiUrl: CC("by-sa/4.0"), vuosi: "2019", muokkaus: "rajattu ja yhdistetty toiseen kuvaan" },
   { slug: "sm-liiga-satakunnan-derby-assat-lukko", kokoelma: "jaakiekko", kuvaus: "Satakunnan derby: Lukon kannattajat, Lukko–Ässät Äijänsuolla 30.11.2019", tiedosto: "Lukko-Ässät 30-11-19 12.jpg", tekija: "kallerna", lisenssi: "CC BY-SA 4.0", lisenssiUrl: CC("by-sa/4.0"), vuosi: "2019", muokkaus: "rajattu ja yhdistetty toiseen kuvaan" },
   { slug: "salo", kokoelma: "kaupungit", kuvaus: "Salon kaupungintalo", tiedosto: "Salon kaupungintalo.jpg", tekija: "Motopark", lisenssi: "CC BY-SA 3.0", lisenssiUrl: CC("by-sa/3.0"), vuosi: "2011" },
