@@ -9,11 +9,12 @@ export const metadata: Metadata = {
   robots: { index: true, follow: true },
 };
 
-const PAIVITETTY = "24.9.2026";
+const PAIVITETTY = "1.10.2026";
 
 export default function KuvienLahteetPage() {
   const musiikki = KUVALAHTEET.filter((k) => k.kokoelma === "musiikki");
   const kaupungit = KUVALAHTEET.filter((k) => k.kokoelma === "kaupungit");
+  const jaakiekko = KUVALAHTEET.filter((k) => k.kokoelma === "jaakiekko");
 
   return (
     <main
@@ -64,8 +65,9 @@ export default function KuvienLahteetPage() {
             Wikimedia Commonsista
           </a>
           . Jokaisen kuvan lisenssi on tarkistettu kuvan omalta Commons-sivulta. Kuvia on rajattu
-          korttimittaan (640×360) ja skaalattu; muuta muokkausta ei ole tehty. CC BY-SA -lisensoitujen
-          kuvien rajatut versiot ovat saatavilla samalla lisenssillä kuin alkuperäiset.
+          korttimittaan (640×360) ja skaalattu; muu muokkaus, kuten kahden kuvan yhdistäminen, on
+          merkitty kuvan kohdalle. CC BY-SA -lisensoitujen kuvien muokatut versiot ovat saatavilla
+          samalla lisenssillä kuin alkuperäiset.
         </p>
 
         <p style={{ color: "rgba(255,255,255,0.55)", fontSize: 14, margin: "0 0 28px" }}>
@@ -77,6 +79,9 @@ export default function KuvienLahteetPage() {
 
         <h2 style={{ fontSize: 22, margin: "34px 0 14px" }}>Kaupungit-kokoelma</h2>
         <Lista rivit={kaupungit} />
+
+        <h2 style={{ fontSize: 22, margin: "34px 0 14px" }}>Jääkiekko-kokoelma</h2>
+        <Lista rivit={jaakiekko} />
 
         <p style={{ color: "rgba(255,255,255,0.55)", fontSize: 14, marginTop: 28 }}>
           Huomasitko virheen kuvan tekijä- tai lisenssitiedossa? Kerro siitä, niin korjaamme tai
@@ -92,7 +97,7 @@ function Lista({ rivit }: { rivit: Kuvalahde[] }) {
     <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "grid", gap: 14 }}>
       {rivit.map((k) => (
         <li
-          key={k.kokoelma + "-" + k.slug}
+          key={k.kokoelma + "-" + k.slug + "-" + k.tiedosto}
           style={{
             background: "rgba(255,255,255,0.04)",
             border: "1px solid rgba(255,255,255,0.08)",
@@ -114,7 +119,7 @@ function Lista({ rivit }: { rivit: Kuvalahde[] }) {
             ) : (
               k.lisenssi
             )}
-            {k.vuosi ? ` · ${k.vuosi}` : ""} · rajattu
+            {k.vuosi ? ` · ${k.vuosi}` : ""} · {k.muokkaus ?? "rajattu"}
           </div>
         </li>
       ))}
