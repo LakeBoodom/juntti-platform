@@ -97,6 +97,12 @@ export const KUVALAHTEET: Kuvalahde[] = [
   /* Jääkiekko (1.10.2026): Satakunnan derbyn visakuva, rajattu (public/20/jaakiekko/jk-derby-satakunta-2019c.webp).
      Kuvassa näkyvät molemmat joukkueet: Ässät kiittää yleisöä, Lukon pelaajat taustalla. */
   { slug: "sm-liiga-satakunnan-derby-assat-lukko", kokoelma: "jaakiekko", kuvaus: "Satakunnan derby: Ässät kiittää yleisöä, Lukko–Ässät Äijänsuolla 30.11.2019", tiedosto: "Lukko-Ässät 30-11-19 23.jpg", tekija: "kallerna", lisenssi: "CC BY-SA 4.0", lisenssiUrl: CC("by-sa/4.0"), vuosi: "2019" },
+  /* Tampereen derbyn visakuva (1.10.2026): Nokia Arenan avausottelu Tappara–Ilves 3.12.2021, rajattu
+     (public/20/jaakiekko/jk-derby-manse-2021.webp). */
+  { slug: "sm-liiga-tampereen-derby-ilves-tappara", kokoelma: "jaakiekko", kuvaus: "Tampereen derby: aloitus Nokia Arenan avausottelussa Tappara–Ilves 3.12.2021", tiedosto: "Nokia Arenan avajaiset 15.jpg", tekija: "kallerna", lisenssi: "CC BY-SA 4.0", lisenssiUrl: CC("by-sa/4.0"), vuosi: "2021" },
+  /* Stadin derbyn visakuva (1.10.2026): Jokerit–HIFK 1971, public domain (suomalainen valokuva,
+     suoja-aika 50 v päättynyt). Rajattu ja skaalattu (public/20/jaakiekko/jk-derby-stadi-1971.webp). */
+  { slug: "sm-liiga-stadin-derby-hifk-jokerit", kokoelma: "jaakiekko", kuvaus: "Stadin derby: Timo Sutinen (Jokerit) HIFK:ta vastaan 1971", tiedosto: "Timo Sutinen Jokerit 1971.jpg", tekija: "Heikki Wegelius", lisenssi: "Public domain", lisenssiUrl: "", vuosi: "1971" },
   { slug: "salo", kokoelma: "kaupungit", kuvaus: "Salon kaupungintalo", tiedosto: "Salon kaupungintalo.jpg", tekija: "Motopark", lisenssi: "CC BY-SA 3.0", lisenssiUrl: CC("by-sa/3.0"), vuosi: "2011" },
   { slug: "seinajoki", kokoelma: "kaupungit", kuvaus: "Aalto-keskus ja Lakeuden Ristin kellotorni, Seinäjoki", tiedosto: "Seinäjoki 2023.jpg", tekija: "Zache", lisenssi: "CC BY 4.0", lisenssiUrl: CC("by/4.0"), vuosi: "2023" },
   { slug: "tampere", kokoelma: "kaupungit", kuvaus: "Tampereen keskusta Näsinneulasta", tiedosto: "Tampere center from Näsinneula.jpg", tekija: "Leo-setä", lisenssi: "CC BY 2.0", lisenssiUrl: CC("by/2.0"), vuosi: "2011" },
