@@ -192,8 +192,15 @@ export const JK_NHL: JkCard[] = [
   { quizSlug: "suomalaiset-nhl-kuriositeetit", tag: "Tilastotarinat", title: "Kuriositeetit ja tilastotarinat", desc: "Oudot luvut ja unohdetut suomalaissaavutukset NHL-historiassa.", img: IMG("jk-nhl-kuriositeetit"), accent: "#D5DCE2", bar: true },
 ];
 
+/** Seurat, joilla on oikea valokuva (1.10.2026, Wikimedia Commons, tekijät lib/kuvalahteet.ts).
+    Muilla on vielä AI-kuva jk-<id>.webp. Sama kuva on seuran visan pelinäkymän herona. */
+const JK_TEAM_KUVAT = new Set([
+  "tappara", "ilves", "tps", "karpat", "hifk", "jokerit", "assat", "hpk", "lukko",
+  "jyp", "kalpa", "pelicans", "saipa", "sport", "jukurit", "kiekko-espoo",
+]);
+
 export function jkTeamImg(id: string): string {
-  return `/20/jaakiekko/jk-${id}.webp`;
+  return JK_TEAM_KUVAT.has(id) ? `/20/jaakiekko/jk-${id}-kuva.webp` : `/20/jaakiekko/jk-${id}.webp`;
 }
 
 /** Päivän visa -kortin kuvahaku (etusivu, 25.8.2026): jääkiekkovisan

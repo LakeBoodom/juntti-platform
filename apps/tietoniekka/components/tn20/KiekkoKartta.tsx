@@ -17,7 +17,7 @@
 // Tyylit: app/jaakiekko.css (.tnj-*).
 
 import { useMemo, useRef, useState } from "react";
-import { JK_MAP_IMG, type JkTeam } from "@/lib/jaakiekko";
+import { JK_MAP_IMG, jkTeamImg, type JkTeam } from "@/lib/jaakiekko";
 
 export type KarttaTeam = JkTeam & {
   /** Pelilinkki kun julkaistu visa on olemassa, muuten null → "Visa tulossa" */
@@ -145,7 +145,7 @@ export default function KiekkoKartta({
         <article className="tnj-team" style={{ ["--tnj-team" as string]: team.color }}>
           <div className="tnj-team-media">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={`/20/jaakiekko/jk-${team.id}.webp`} alt={team.name} />
+            <img src={jkTeamImg(team.id)} alt={team.name} />
             <div className="tnj-team-pills">
               <span className="tnj-pill">{team.city}</span>
               <span className="tnj-pill">{team.badge}</span>
@@ -180,7 +180,7 @@ export default function KiekkoKartta({
                 onClick={() => setSel(i)}
               >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={`/20/jaakiekko/jk-${t.id}.webp`} alt="" loading="lazy" />
+                <img src={jkTeamImg(t.id)} alt="" loading="lazy" />
                 <span className="tnj-wall-short">{t.short}</span>
               </button>
             ))}
