@@ -65,9 +65,8 @@ export default function KuvienLahteetPage() {
             Wikimedia Commonsista
           </a>
           . Jokaisen kuvan lisenssi on tarkistettu kuvan omalta Commons-sivulta. Kuvia on rajattu
-          korttimittaan (640×360) ja skaalattu; muu muokkaus, kuten kahden kuvan yhdistäminen, on
-          merkitty kuvan kohdalle. CC BY-SA -lisensoitujen kuvien muokatut versiot ovat saatavilla
-          samalla lisenssillä kuin alkuperäiset.
+          korttimittaan (640×360) ja skaalattu; muu muokkaus on merkitty kuvan kohdalle. CC BY-SA -lisensoitujen
+          kuvien muokatut versiot ovat saatavilla samalla lisenssillä kuin alkuperäiset.
         </p>
 
         <p style={{ color: "rgba(255,255,255,0.55)", fontSize: 14, margin: "0 0 28px" }}>

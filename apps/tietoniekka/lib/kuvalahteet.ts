@@ -94,11 +94,9 @@ export const KUVALAHTEET: Kuvalahde[] = [
   { slug: "pori", kokoelma: "kaupungit", kuvaus: "Keski-Porin kirkko", tiedosto: "Keski Porin kirkko.jpg", tekija: "Silenzio", lisenssi: "Public domain", lisenssiUrl: "", vuosi: "2006" },
   { slug: "porvoo", kokoelma: "kaupungit", kuvaus: "Porvoon vanhat rantamakasiinit", tiedosto: "Old Porvoo riverside.jpg", tekija: "kallerna", lisenssi: "CC BY-SA 3.0", lisenssiUrl: CC("by-sa/3.0"), vuosi: "2010" },
   { slug: "rovaniemi", kokoelma: "kaupungit", kuvaus: "Jätkänkynttiläsilta, Rovaniemi", tiedosto: "Rovaniemi Lumberjack’s Candle Bridge.jpg", tekija: "themadpenguin", lisenssi: "CC BY 2.0", lisenssiUrl: CC("by/2.0"), vuosi: "2012" },
-  /* Jääkiekko (1.10.2026): Satakunnan derbyn visakuva on yhdistetty kahdesta saman ottelun
-     (Lukko–Ässät, Äijänsuo 30.11.2019) kuvasta: vasemmalla Ässät, oikealla Lukon kannattajat.
-     public/20/jaakiekko/jk-derby-satakunta-2019b.webp, saatavilla samalla CC BY-SA 4.0 -lisenssillä. */
-  { slug: "sm-liiga-satakunnan-derby-assat-lukko", kokoelma: "jaakiekko", kuvaus: "Satakunnan derby: Ässät kiittää yleisöä, Lukko–Ässät Äijänsuolla 30.11.2019", tiedosto: "Lukko-Ässät 30-11-19 23.jpg", tekija: "kallerna", lisenssi: "CC BY-SA 4.0", lisenssiUrl: CC("by-sa/4.0"), vuosi: "2019", muokkaus: "rajattu ja yhdistetty toiseen kuvaan" },
-  { slug: "sm-liiga-satakunnan-derby-assat-lukko", kokoelma: "jaakiekko", kuvaus: "Satakunnan derby: Lukon kannattajat, Lukko–Ässät Äijänsuolla 30.11.2019", tiedosto: "Lukko-Ässät 30-11-19 12.jpg", tekija: "kallerna", lisenssi: "CC BY-SA 4.0", lisenssiUrl: CC("by-sa/4.0"), vuosi: "2019", muokkaus: "rajattu ja yhdistetty toiseen kuvaan" },
+  /* Jääkiekko (1.10.2026): Satakunnan derbyn visakuva, rajattu (public/20/jaakiekko/jk-derby-satakunta-2019c.webp).
+     Kuvassa näkyvät molemmat joukkueet: Ässät kiittää yleisöä, Lukon pelaajat taustalla. */
+  { slug: "sm-liiga-satakunnan-derby-assat-lukko", kokoelma: "jaakiekko", kuvaus: "Satakunnan derby: Ässät kiittää yleisöä, Lukko–Ässät Äijänsuolla 30.11.2019", tiedosto: "Lukko-Ässät 30-11-19 23.jpg", tekija: "kallerna", lisenssi: "CC BY-SA 4.0", lisenssiUrl: CC("by-sa/4.0"), vuosi: "2019" },
   { slug: "salo", kokoelma: "kaupungit", kuvaus: "Salon kaupungintalo", tiedosto: "Salon kaupungintalo.jpg", tekija: "Motopark", lisenssi: "CC BY-SA 3.0", lisenssiUrl: CC("by-sa/3.0"), vuosi: "2011" },
   { slug: "seinajoki", kokoelma: "kaupungit", kuvaus: "Aalto-keskus ja Lakeuden Ristin kellotorni, Seinäjoki", tiedosto: "Seinäjoki 2023.jpg", tekija: "Zache", lisenssi: "CC BY 4.0", lisenssiUrl: CC("by/4.0"), vuosi: "2023" },
   { slug: "tampere", kokoelma: "kaupungit", kuvaus: "Tampereen keskusta Näsinneulasta", tiedosto: "Tampere center from Näsinneula.jpg", tekija: "Leo-setä", lisenssi: "CC BY 2.0", lisenssiUrl: CC("by/2.0"), vuosi: "2011" },
