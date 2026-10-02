@@ -16,12 +16,15 @@ import { brand } from "@/config/brand";
 import "./globals.css";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://tietoniekka.fi";
+/* Preview-julkaisuissa jakokuvat ja og:url osoittavat previewiin itseensä, jotta WhatsApp-/FB-
+   esikatselua voi testata ennen tuotantoa (preview on noindex). Tuotannossa SITE_URL. */
+const META_BASE = process.env.VERCEL_ENV === "preview" && process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : SITE_URL;
 const PLAUSIBLE_DOMAIN = process.env.NEXT_PUBLIC_PLAUSIBLE_DOMAIN;
 
 /* SEO-erä A8 (2.10.2026): visamäärä kannasta (lib/siteStats.ts). */
 function rakennaMetadata(Yli: string, yli: string): Metadata {
   return {
-  metadataBase: new URL(SITE_URL),
+  metadataBase: new URL(META_BASE),
   title: {
     default: `${brand.name} — testaa tietosi`,
     template: `%s | ${brand.name}`,

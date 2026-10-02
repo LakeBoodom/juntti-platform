@@ -10,8 +10,8 @@
 // README:n kielletyt paluut (ÄLÄ LISÄÄ): teemakarusellit, pelitapa-/alakokoelma-
 // suodattimet, heron oma "Tänään juhlii" -CTA, iso Wikipedia-kapseli kuvan päällä.
 
-import { Suspense, useEffect, useMemo, useRef, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import { PersonCard, type PersonCardData } from "./cards";
 import { PersonSilhouette } from "./motifs";
 
@@ -71,53 +71,41 @@ function surname(name: string): string {
   return parts[parts.length - 1] ?? name;
 }
 
-/* useSearchParams() vaatii Suspense-rajan server-renderöidyssä puussa
-   (Next 15 App Router) — [collection]/page.tsx on server component eikä
-   tarjoa sitä, joten ulompi export kääräisee sisäisen komponentin. */
+/* SEO-erä A4 (2.10.2026): hub on nyt ISR-sivu. useSearchParams() pakotti tämän komponentin
+   pois palvelinrenderöinnistä (CSR-bailout Suspense-rajalle) → 48 henkilökorttia ja niiden
+   visalinkit puuttuivat HTML:stä. Nyt oletustila renderöidään palvelimella ja URL-parametrit
+   (?q, ?cat, ?sort, ?limit) luetaan selaimessa mountin jälkeen. */
 export function PersonBrowser(props: { people: BrowserPerson[] }) {
-  return (
-    <Suspense fallback={<PersonBrowserFallback count={props.people.length} />}>
-      <PersonBrowserInner {...props} />
-    </Suspense>
-  );
-}
-
-function PersonBrowserFallback({ count }: { count: number }) {
-  return (
-    <div className="tn-personbrowser">
-      <div className="tn-personbrowser-head">
-        <h2 className="tn-section-title">Selaa kaikkia</h2>
-        <span className="tn-personbrowser-count">{count} henkilöä</span>
-      </div>
-      <div className="tn-card-grid tn-personbrowser-grid">
-        {Array.from({ length: 8 }).map((_, i) => (
-          <div key={i} className="tn-skeleton" />
-        ))}
-      </div>
-    </div>
-  );
+  return <PersonBrowserInner {...props} />;
 }
 
 function PersonBrowserInner({ people }: { people: BrowserPerson[] }) {
   const router = useRouter();
-  const searchParams = useSearchParams();
 
-  const [q, setQ] = useState(() => searchParams.get("q") ?? "");
-  const [cat, setCat] = useState(() => searchParams.get("cat") ?? "kaikki");
-  // Vanha ?sort=suosituimmat -linkki (tai muu tuntematon arvo) → oletus.
-  const [sort, setSort] = useState(() => {
-    const s = searchParams.get("sort");
-    return SORT_OPTIONS.some((o) => o.key === s) ? (s as string) : DEFAULT_SORT;
-  });
-  const [limit, setLimit] = useState(() => {
-    const n = Number(searchParams.get("limit"));
-    return Number.isFinite(n) && n > 0 ? n : INITIAL;
-  });
+  const [q, setQ] = useState("");
+  const [cat, setCat] = useState("kaikki");
+  const [sort, setSort] = useState<string>(DEFAULT_SORT);
+  const [limit, setLimit] = useState(INITIAL);
+  /* true kun URL-parametrit on luettu — sitä ennen tilaa ei kirjoiteta URL:iin */
+  const [valmis, setValmis] = useState(false);
+
+  useEffect(() => {
+    const sp = new URLSearchParams(window.location.search);
+    setQ(sp.get("q") ?? "");
+    setCat(sp.get("cat") ?? "kaikki");
+    // Vanha ?sort=suosituimmat -linkki (tai muu tuntematon arvo) → oletus.
+    const s = sp.get("sort");
+    setSort(SORT_OPTIONS.some((o) => o.key === s) ? (s as string) : DEFAULT_SORT);
+    const n = Number(sp.get("limit"));
+    setLimit(Number.isFinite(n) && n > 0 ? n : INITIAL);
+    setValmis(true);
+  }, []);
   const [loadingMore, setLoadingMore] = useState(false);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // q/cat/sort/limit URLiin (history.replaceState-tyylinen, ei uutta historiamerkintää)
   useEffect(() => {
+    if (!valmis) return;
     const params = new URLSearchParams();
     if (q) params.set("q", q);
     if (cat !== "kaikki") params.set("cat", cat);
@@ -126,7 +114,7 @@ function PersonBrowserInner({ people }: { people: BrowserPerson[] }) {
     const qs = params.toString();
     router.replace(qs ? `?${qs}` : "?", { scroll: false });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [q, cat, sort, limit]);
+  }, [q, cat, sort, limit, valmis]);
 
   const filtered = useMemo(() => {
     let list = people;
