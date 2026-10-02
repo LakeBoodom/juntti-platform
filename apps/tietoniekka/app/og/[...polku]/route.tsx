@@ -153,8 +153,8 @@ async function piirra(k: Kortti, cache: string) {
           </div>
           {k.tulos && (
             <div style={{ display: "flex", alignItems: "baseline", marginBottom: 10 }}>
-              <div style={{ fontSize: 180, fontWeight: 900, lineHeight: 1, color: KULTA }}>{k.tulos.score}</div>
-              <div style={{ fontSize: 90, fontWeight: 900, lineHeight: 1, color: "rgba(255,251,242,0.55)", marginLeft: 8 }}>{`/${k.tulos.total}`}</div>
+              <div style={{ display: "flex", fontSize: 180, fontWeight: 900, lineHeight: 1, color: KULTA }}>{String(k.tulos.score)}</div>
+              <div style={{ display: "flex", fontSize: 90, fontWeight: 900, lineHeight: 1, color: "rgba(255,251,242,0.55)", marginLeft: 8 }}>{`/${k.tulos.total}`}</div>
             </div>
           )}
           <div style={{ display: "flex", fontSize: koko, fontWeight: 900, lineHeight: 0.98, textTransform: "uppercase", letterSpacing: -1 }}>
