@@ -5,6 +5,7 @@
 //   /peli/rajanaapurit?maanosa=eurooppa päivän reitti Euroopasta
 //   /peli/rajanaapurit?reitti=x7k2      tietty reitti (Arvo uusi reitti, haastelinkki)
 
+import { jakoMeta } from "@/lib/jakoMeta";
 import type { Metadata } from "next";
 import { helsinginPaiva } from "@/lib/aika";
 import { arvoReitti, RN_LAHDE, RN_MAANOSAT, maanosaTunnuksella } from "@/lib/rajanaapurit/reitti";
@@ -18,6 +19,12 @@ export const metadata: Metadata = {
   description:
     "Järjestä kahdeksan valtiota reitiksi niin, että jokaisella vierekkäisellä parilla on yhteinen maaraja. Uusi päivän reitti joka päivä.",
   alternates: { canonical: "/peli/rajanaapurit" },
+  ...jakoMeta({
+    title: "Rajanaapurit – rakenna reitti naapurivaltioiden kautta",
+    description: "Järjestä kahdeksan valtiota reitiksi niin, että jokaisella vierekkäisellä parilla on yhteinen maaraja. Uusi päivän reitti joka päivä.",
+    url: "/peli/rajanaapurit",
+    kuva: "/og/sivu/rajanaapurit",
+  }),
 };
 
 const SIEMEN = /^[a-z0-9-]{3,40}$/;

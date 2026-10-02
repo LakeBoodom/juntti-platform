@@ -3,25 +3,23 @@
 // /peli?visa=<slug>, mutta siisti polku hakukoneille ja jaettaville linkeille.
 // 1.0:n /visa/<slug>-sivut (staattinen intro + "Aloita"-nappi) korvautuivat
 // tällä — vanhat osoitteet toimivat sellaisenaan, koska slugit ovat samat.
+//
+// SEO-erä A4 (2.10.2026): ISR 3600. Sivu EI lue searchParamsia (se tekisi siitä dynaamisen);
+// parametrilliset pyynnöt (?tulos=, ?paivan_visa=1, ?hero=) ohjataan middlewaressa sisäisesti
+// dynaamiseen /peli?visa=<slug>&…-reittiin. Ks. middleware.ts.
 import PeliPage, { generateMetadata as peliMetadata } from "../../peli/page";
 import type { Metadata } from "next";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 3600;
 
-type Props = {
-  params: Promise<{ slug: string }>;
-  /* Hero-testiparametri (?hero=uusi) välitetään myös kanoniselle polulle, jotta
-     uutta aloitusnäkymää voi katsoa /visa/<slug>-osoitteessa. */
-  searchParams?: Promise<Record<string, string | string[] | undefined>>;
-};
+type Props = { params: Promise<{ slug: string }> };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
-  return peliMetadata({ searchParams: Promise.resolve({ visa: slug }) });
+  return peliMetadata({ searchParams: Promise.resolve({ visa: decodeURIComponent(slug) }) });
 }
 
-export default async function VisaPage({ params, searchParams }: Props) {
+export default async function VisaPage({ params }: Props) {
   const { slug } = await params;
-  const sp = (await searchParams) ?? {};
-  return PeliPage({ searchParams: Promise.resolve({ ...sp, visa: slug }) });
+  return PeliPage({ searchParams: Promise.resolve({ visa: decodeURIComponent(slug) }) });
 }

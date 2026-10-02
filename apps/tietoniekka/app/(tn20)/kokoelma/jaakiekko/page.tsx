@@ -18,6 +18,7 @@
 // Kaikki korttien faktaväittämät ovat CD:n designcopya — tarkistetaan
 // copy/SEO-passissa (README luku 4); kausisidonnaiset tekstit lib-configissa.
 
+import { jakoMeta } from "@/lib/jakoMeta";
 import { visaHref } from "@/lib/visaHref";
 import "../../jaakiekko.css";
 import type { Metadata } from "next";
@@ -45,7 +46,7 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     title, description,
     alternates: { canonical },
-    openGraph: { type: "website", locale: "fi_FI", siteName: "Tietoniekka", url: canonical, title, description },
+    ...jakoMeta({ title, description, url: canonical, kuva: "/og/kokoelma/jaakiekko" }),
   };
 }
 

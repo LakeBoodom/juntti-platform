@@ -4,6 +4,7 @@
 //   /peli/tupla-tai-kuitti/sm-liiga?sarja=x7k2 tietty sarja (uusi arvonta, haastelinkki)
 // Esikatseluvaiheessa ei linkitetä mistään eikä indeksoida.
 
+import { jakoMeta } from "@/lib/jakoMeta";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getSupabase } from "@/lib/supabase";
@@ -26,6 +27,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     description: t?.kuvaus,
     // Sarjaparametrit (?sarja=) ovat saman sivun muunnelmia
     alternates: t ? { canonical: `/peli/tupla-tai-kuitti/${t.slug}` } : undefined,
+    ...jakoMeta({
+      title: t ? `Tupla tai kuitti – ${t.nimi}` : "Tupla tai kuitti",
+      description: t?.kuvaus,
+      url: t ? `/peli/tupla-tai-kuitti/${t.slug}` : "/peli/tupla-tai-kuitti",
+      kuva: "/og/sivu/tupla-tai-kuitti",
+    }),
   };
 }
 

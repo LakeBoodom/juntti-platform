@@ -5,6 +5,7 @@
 // localStoragesta (tn_played_quizzes) — ei kirjautumista, kuten Putkikin.
 // Staattinen segmentti ohittaa dynaamisen [collection]-reitin.
 
+import { jakoMeta } from "@/lib/jakoMeta";
 import { visaHref } from "@/lib/visaHref";
 import type { Metadata } from "next";
 import { getSupabase } from "@/lib/supabase";
@@ -27,7 +28,7 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     title, description,
     alternates: { canonical },
-    openGraph: { type: "website", locale: "fi_FI", siteName: "Tietoniekka", url: canonical, title, description },
+    ...jakoMeta({ title, description, url: canonical, kuva: "/og/kokoelma/historia" }),
   };
 }
 

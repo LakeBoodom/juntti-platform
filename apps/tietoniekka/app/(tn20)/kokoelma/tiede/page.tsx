@@ -12,6 +12,7 @@
 // lyhyt nimi ja koukku luetaan visan otsikosta ("Nimi – koukku"), ja
 // "Aloita näistä" -poiminnoilla on oma copynsa designin mukaan.
 
+import { jakoMeta } from "@/lib/jakoMeta";
 import { visaHref } from "@/lib/visaHref";
 import type { Metadata } from "next";
 import { getSupabase } from "@/lib/supabase";
@@ -32,12 +33,12 @@ export const metadata: Metadata = {
   description:
     "20 tietovisaa kehosta avaruuteen: aivot, genetiikka, aurinkokunta, dinosaurukset, keksinnöt ja tiedemyytit. Ilmaisia visoja ilman kirjautumista.",
   alternates: { canonical: `${SITE_URL}/kokoelma/tiede` },
-  openGraph: {
-    type: "website", locale: "fi_FI", siteName: "Tietoniekka",
+  ...jakoMeta({
     url: `${SITE_URL}/kokoelma/tiede`,
     title: "Tiede ja teknologia — tietovisat",
-    description: "Maailma on kummallisempi kuin luulet. 20 visaa kehosta avaruuteen.",
-  },
+    description: "Maailma on kummallisempi kuin luulet. Visat kehosta avaruuteen.",
+    kuva: "/og/kokoelma/tiede",
+  }),
 };
 
 type Card = {

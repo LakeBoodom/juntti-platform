@@ -15,6 +15,7 @@
 // linjaus kuin muissa teemasivuissa (Jääkiekko/Jalkapallo/Maantieto):
 // sivuston globaali yläpalkki + Crumbs-murupolku hoitavat navigaation.
 
+import { jakoMeta } from "@/lib/jakoMeta";
 import "../megavisat.css";
 import type { Metadata } from "next";
 import { getSupabase } from "@/lib/supabase";
@@ -34,7 +35,7 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     title, description,
     alternates: { canonical },
-    openGraph: { type: "website", locale: "fi_FI", siteName: "Tietoniekka", url: canonical, title, description },
+    ...jakoMeta({ title, description, url: canonical, kuva: "/og/sivu/megavisat" }),
   };
 }
 

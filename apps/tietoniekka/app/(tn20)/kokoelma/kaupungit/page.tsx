@@ -17,6 +17,7 @@
 // Suomen kaupungit -megavisaan ?mega=-osoitteella (QA-001, 29.8.2026; aiemmin
 // ?visa=kaikki-suomesta-mega, joka antoi tyhjän sivun).
 
+import { jakoMeta } from "@/lib/jakoMeta";
 import "../../kaupungit.css";
 import type { Metadata } from "next";
 import { getSupabase } from "@/lib/supabase";
@@ -41,7 +42,7 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     title, description,
     alternates: { canonical },
-    openGraph: { type: "website", locale: "fi_FI", siteName: "Tietoniekka", url: canonical, title, description },
+    ...jakoMeta({ title, description, url: canonical, kuva: "/og/kokoelma/kaupungit" }),
   };
 }
 

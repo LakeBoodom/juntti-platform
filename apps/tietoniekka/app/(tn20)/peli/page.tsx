@@ -50,10 +50,18 @@ export async function generateMetadata(
      asetti vain titlen ja descriptionin, JOKAINEN jaettu visalinkki näytti
      WhatsAppissa ja Facebookissa saman otsikon. Jakaminen on kasvun pääkanava,
      joten og ja twitter asetetaan nyt jokaisessa haarassa erikseen. */
-  const og = (title: string, description: string): Metadata => ({
-    openGraph: { type: "website", locale: "fi_FI", siteName: "Tietoniekka", title, description },
-    twitter: { card: "summary_large_image", title, description },
+  /* SEO-erä A2 (2.10.2026): jakokuva (/og/…) ja og:url jokaisessa haarassa — ilman niitä
+     lapsen openGraph korvasi juuren kuvan ja jaetuista linkeistä puuttui kuva kokonaan. */
+  const og = (title: string, description: string, image: string, url: string): Metadata => ({
+    openGraph: {
+      type: "website", locale: "fi_FI", siteName: "Tietoniekka", title, description, url,
+      images: [{ url: image, width: 1200, height: 630, alt: title }],
+    },
+    twitter: { card: "summary_large_image", title, description, images: [image] },
   });
+  /* Tulosvariantti (?tulos=8-10, jaettu tulos): jakokuvaan iso pistemäärä. */
+  const tulosRaw = str("tulos");
+  const tulos = tulosRaw && /^\d{1,2}-\d{1,2}$/.test(tulosRaw) ? tulosRaw : null;
   if (viikkovisa) {
     const vv = await getViikkovisa();
     /* Kierros 4: "Viikkovisa 38 · Kuvat" — sama nimi kuin sivulla ja jaossa. */
@@ -62,9 +70,9 @@ export async function generateMetadata(
     return {
       title: `${t} – tunnista kuvasta${suffix}`,
       description: d,
-      ...og(t, d),
-      /* Sarja vaihtuu maanantaisin, joten kanoninen osoite on parametriton. */
-      alternates: { canonical: "/peli?viikkovisa=1" },
+      ...og(t, d, "/og/kuvavisa/viikko", "/kuvavisa/viikko"),
+      /* Sarja vaihtuu maanantaisin, joten kanoninen osoite on parametriton (A6: /kuvavisa/viikko). */
+      alternates: { canonical: "/kuvavisa/viikko" },
     };
   }
   if (kuvavisa) {
@@ -78,10 +86,10 @@ export async function generateMetadata(
     return {
       title: `${t} – tunnista kuvasta${suffix}`,
       description: kuvaDesc,
-      ...og(`${t} – tunnista kuvasta`, kuvaDesc),
+      ...og(`${t} – tunnista kuvasta`, kuvaDesc, `/og/kuvavisa/${encodeURIComponent(kuvavisa)}`, `/kuvavisa/${encodeURIComponent(kuvavisa)}`),
       /* T6: kanoninen osoite on kortiston perusvisa — variaatiot eivät kilpaile
-         samasta hakutuloksesta keskenään. */
-      alternates: { canonical: `/peli?kuvavisa=${encodeURIComponent(kuvavisa)}` },
+         samasta hakutuloksesta keskenään. SEO-erä A6: polkumuoto /kuvavisa/<kortisto>. */
+      alternates: { canonical: `/kuvavisa/${encodeURIComponent(kuvavisa)}` },
     };
   }
   if (!sb) return {};
@@ -90,7 +98,12 @@ export async function generateMetadata(
     if (!data) return { title: `Visaa ei löytynyt${suffix}` };
     const megaNimi = data.display_title ?? data.title;
     const megaDesc = data.teaser ?? "Megavisa: yksi istunto ilman taukoja. Pelaa ilmaiseksi Tietoniekassa.";
-    return { title: `${megaNimi}${suffix}`, description: megaDesc, ...og(megaNimi, megaDesc) };
+    const megaUrl = `/peli?mega=${encodeURIComponent(mega)}`;
+    return {
+      title: `${megaNimi}${suffix}`, description: megaDesc,
+      ...og(megaNimi, megaDesc, `/og/mega/${encodeURIComponent(mega)}`, megaUrl),
+      alternates: { canonical: megaUrl },
+    };
   }
   if (slug || quizId) {
     let q = sb.from("quizzes").select("title, display_title, teaser, description, slug, seo_title, seo_description, collection").eq("status", "published");
@@ -120,7 +133,9 @@ export async function generateMetadata(
       const henkilo = name.split(/\s[–—-]\s/)[0].trim();
       hakuOtsikko = `${henkilo} – tietovisa: kuinka hyvin tunnet?${suffix}`;
     }
-    return { title: hakuOtsikko, description: visaDesc, ...og(name, visaDesc), ...canonical };
+    const visaPolku = data.slug ? `/visa/${data.slug}` : `/peli?quiz_id=${quizId}`;
+    const ogKuva = data.slug ? `/og/visa/${encodeURIComponent(data.slug)}${tulos ? `?tulos=${tulos}` : ""}` : "/og-image.png";
+    return { title: hakuOtsikko, description: visaDesc, ...og(name, visaDesc, ogKuva, visaPolku), ...canonical };
   }
   return { title: `Visaa ei löytynyt${suffix}` };
 }

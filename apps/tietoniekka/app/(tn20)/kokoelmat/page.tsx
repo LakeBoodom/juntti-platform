@@ -1,3 +1,4 @@
+import { jakoMeta } from "@/lib/jakoMeta";
 import type { Metadata } from "next";
 // TIETONIEKKA 2.0 — KAIKKI KOKOELMAT -indeksi (navigaation "Kaikki kokoelmat →" -kohde).
 // CD:n navigaatiosääntö (lukittu 17.8.2026): kaikki valikkolinkit vievät todellisille
@@ -13,6 +14,13 @@ import { KAUPUNGIT } from "@/lib/kaupungit";
 export const metadata: Metadata = {
   title: "Kaikki kokoelmat – tietovisat aiheittain | Tietoniekka",
   description: "Valitse aihe: TV & suoratoisto, urheilu, jääkiekko, jalkapallo, elokuvat, musiikki, maantieto, Suomen kaupungit, tunnetut henkilöt, kulttuuri, historia, luonto, tiede & teknologia ja juhlat.",
+  alternates: { canonical: "/kokoelmat" },
+  ...jakoMeta({
+    title: "Kaikki kokoelmat – tietovisat aiheittain",
+    description: "Valitse aihe ja pelaa: urheilu, elokuvat, musiikki, historia, luonto, tunnetut henkilöt ja paljon muuta.",
+    url: "/kokoelmat",
+    kuva: "/og/sivu/kokoelmat",
+  }),
 };
 
 export const dynamic = "force-dynamic";

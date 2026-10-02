@@ -9,6 +9,7 @@
 // → footer. Designin header/Putki-pilleri jätetty pois — landingit ovat
 // headerittömiä kuten Kulttuuri ja Luonto (murupolku hoitaa paluun).
 
+import { jakoMeta } from "@/lib/jakoMeta";
 import { visaHref } from "@/lib/visaHref";
 import type { Metadata } from "next";
 import { getSupabase } from "@/lib/supabase";
@@ -35,7 +36,7 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     title, description,
     alternates: { canonical },
-    openGraph: { type: "website", locale: "fi_FI", siteName: "Tietoniekka", url: canonical, title, description },
+    ...jakoMeta({ title, description, url: canonical, kuva: "/og/kokoelma/matkakohteet" }),
   };
 }
 

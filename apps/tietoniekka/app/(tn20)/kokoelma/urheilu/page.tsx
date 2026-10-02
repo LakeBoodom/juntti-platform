@@ -25,6 +25,7 @@
 // (README §Tyhjät tilat). Visamäärät ovat julkaistujen määriä — ei koskaan
 // kovakoodattuja. 26.8.2026 kaikki 16 visaa ovat julkaistuja.
 
+import { jakoMeta } from "@/lib/jakoMeta";
 import { visaHref } from "@/lib/visaHref";
 import "../../urheilulajit.css";
 import type { Metadata } from "next";
@@ -51,7 +52,7 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     title, description,
     alternates: { canonical },
-    openGraph: { type: "website", locale: "fi_FI", siteName: "Tietoniekka", url: canonical, title, description },
+    ...jakoMeta({ title, description, url: canonical, kuva: "/og/kokoelma/urheilu" }),
   };
 }
 

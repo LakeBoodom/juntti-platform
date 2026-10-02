@@ -5,6 +5,7 @@
 //   /peli/kuntaliitos?maakunta=uusimaa   reitti alkaa Uudeltamaalta (oma päivän reitti per maakunta)
 // Reitti ja sen alueen kartta arvotaan palvelimella (lib/kuntaliitos/reitti.ts).
 
+import { jakoMeta } from "@/lib/jakoMeta";
 import type { Metadata } from "next";
 import { helsinginPaiva } from "@/lib/aika";
 import { arvoReitti, KL_LAHDE, KL_MAAKUNNAT, maakuntaTunnuksella } from "@/lib/kuntaliitos/reitti";
@@ -19,6 +20,12 @@ export const metadata: Metadata = {
     "Järjestä kahdeksan kuntaa reitiksi niin, että jokaisella vierekkäisellä parilla on yhteinen raja. Uusi päivän reitti joka päivä – tunnetko Suomen kuntakartan?",
   // Reittiparametrit (?reitti=) ovat saman sivun muunnelmia
   alternates: { canonical: "/peli/kuntaliitos" },
+  ...jakoMeta({
+    title: "Kuntaliitos – rakenna reitti naapurikuntien kautta",
+    description: "Järjestä kahdeksan kuntaa reitiksi niin, että jokaisella vierekkäisellä parilla on yhteinen raja. Uusi päivän reitti joka päivä.",
+    url: "/peli/kuntaliitos",
+    kuva: "/og/sivu/kuntaliitos",
+  }),
 };
 
 const SIEMEN = /^[a-z0-9-]{3,40}$/;

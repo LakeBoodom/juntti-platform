@@ -2,6 +2,11 @@
 const nextConfig = {
   reactStrictMode: true,
   transpilePackages: ["@juntti/db"],
+  /* SEO-erä A2 (2.10.2026): jakokuvareitti lukee kuvat ja fontit tiedostojärjestelmästä
+     (Satori ei osaa WebP:tä → sharp muuntaa). Ilman tätä Vercelin funktiopaketista puuttuisivat. */
+  outputFileTracingIncludes: {
+    "/og/[...polku]": ["./public/20/**/*", "./public/og-image.png", "./assets/og/**/*"],
+  },
   images: {
     remotePatterns: [
       { protocol: "https", hostname: "upload.wikimedia.org" },

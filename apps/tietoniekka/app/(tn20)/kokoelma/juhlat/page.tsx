@@ -13,6 +13,7 @@
 // Juhlat, päivämäärät, faktat ja kuvat: lib/juhlat.ts. Visat kannasta (collection='juhlat',
 // vain julkaistut), kuva quizzes.hero_image.
 
+import { jakoMeta } from "@/lib/jakoMeta";
 import type { Metadata } from "next";
 import { getSupabase } from "@/lib/supabase";
 import { helsinginPaiva } from "@/lib/aika";
@@ -33,11 +34,12 @@ export const metadata: Metadata = {
   description:
     "Tietovisat halloweenista jouluun ja vappuun: juhlien historia, perinteet ja herkut. Ajankohtainen juhla on aina ylimpänä. Ilmaisia visoja ilman kirjautumista.",
   alternates: { canonical: `${SITE_URL}${JUHLAT_SIVU}` },
-  openGraph: {
-    type: "website", locale: "fi_FI", siteName: "Tietoniekka", url: `${SITE_URL}${JUHLAT_SIVU}`,
+  ...jakoMeta({
+    url: `${SITE_URL}${JUHLAT_SIVU}`,
     title: "Juhlat — tietovisat vuoden juhliin",
     description: "Visat vuoden juhliin ja perinteisiin. Ajankohtainen juhla on aina ylimpänä.",
-  },
+    kuva: "/og/kokoelma/juhlat",
+  }),
 };
 
 type Visa = { slug: string; title: string; display_title: string | null; teaser: string | null; hero_image: string | null };
