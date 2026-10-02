@@ -34,7 +34,7 @@ import StreakButton from "./StreakButton";
 
 type MenuId = "kokoelmat" | "pelimuodot";
 
-export default function TopBar() {
+export default function TopBar({ tagline }: { tagline?: string } = {}) {
   const pathname = usePathname() ?? "";
   const [open, setOpen] = useState<MenuId | null>(null);
   const [sheet, setSheet] = useState(false);
@@ -124,7 +124,7 @@ export default function TopBar() {
               <b>TIETO</b>
               <span>NIEKKA</span>
             </a>
-            <span className="tn-tagline">{SITE_TAGLINE}</span>
+            <span className="tn-tagline">{tagline ?? SITE_TAGLINE}</span>
           </div>
 
           {/* Työpöytävalikot */}
