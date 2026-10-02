@@ -17,6 +17,7 @@
 // Suomen kaupungit -megavisaan ?mega=-osoitteella (QA-001, 29.8.2026; aiemmin
 // ?visa=kaikki-suomesta-mega, joka antoi tyhjän sivun).
 
+import { KokoelmaLd } from "@/components/tn20/KokoelmaLd";
 import { jakoMeta } from "@/lib/jakoMeta";
 import "../../kaupungit.css";
 import type { Metadata } from "next";
@@ -69,6 +70,7 @@ export default async function KaupungitLanding() {
 
   return (
     <main className="tnk tnk2" style={{ minHeight: "100dvh" }}>
+      <KokoelmaLd avain="kaupungit" nimi="Suomen kaupungit" polku="/kokoelma/kaupungit" />
       <Crumbs
         items={[
           { label: "Kokoelmat", href: "/kokoelmat" },

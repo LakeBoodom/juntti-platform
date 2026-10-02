@@ -3,6 +3,8 @@
 // 13 px — ei kilpaile sivun otsikon kanssa. Vierii sisällön mukana pois (palkki jää).
 // Linkit vievät todellisille sivuille (Kokoelmat → /kokoelmat). Korvaa flagshipien
 // herojen sisäiset murupolut (tnt/tne/tnm-crumb + hub-templaten inline-nav).
+import { JsonLd, breadcrumbLd } from "@/lib/jsonLd";
+
 export type CrumbItem = { label: string; href?: string };
 
 export default function Crumbs({ items }: { items: CrumbItem[] }) {
@@ -19,6 +21,8 @@ export default function Crumbs({ items }: { items: CrumbItem[] }) {
           </span>
         ))}
       </div>
+      {/* SEO-erä A9: sama polku BreadcrumbList-muodossa */}
+      <JsonLd data={breadcrumbLd([{ name: "Etusivu", url: "/" }, ...items.map((c) => ({ name: c.label, url: c.href }))])} />
     </nav>
   );
 }

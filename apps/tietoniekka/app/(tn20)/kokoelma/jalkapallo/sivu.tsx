@@ -21,6 +21,7 @@
 // serveri lukee sen alkuvalinnaksi, klikkaus päivittää history.replaceState.
 // Kaikki korttitekstit ovat CD:n designcopya — tarkistetaan copy/SEO-passissa.
 
+import { KokoelmaLd } from "@/components/tn20/KokoelmaLd";
 import { jakoMeta } from "@/lib/jakoMeta";
 import { visaHref } from "@/lib/visaHref";
 import "../../jalkapallo.css";
@@ -149,6 +150,7 @@ export default async function JalkapalloLanding({
 
   return (
     <main className="tnk" style={{ minHeight: "100dvh" }}>
+      <KokoelmaLd avain="jalkapallo" nimi="Jalkapallo" polku="/kokoelma/jalkapallo" />
       <Crumbs
         items={[
           { label: "Kokoelmat", href: "/kokoelmat" },

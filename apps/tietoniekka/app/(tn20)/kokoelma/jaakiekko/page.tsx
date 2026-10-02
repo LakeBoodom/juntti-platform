@@ -18,6 +18,7 @@
 // Kaikki korttien faktaväittämät ovat CD:n designcopya — tarkistetaan
 // copy/SEO-passissa (README luku 4); kausisidonnaiset tekstit lib-configissa.
 
+import { KokoelmaLd } from "@/components/tn20/KokoelmaLd";
 import { jakoMeta } from "@/lib/jakoMeta";
 import { visaHref } from "@/lib/visaHref";
 import "../../jaakiekko.css";
@@ -146,6 +147,7 @@ export default async function JaakiekkoLanding() {
   return (
     <main className="tnk" style={{ minHeight: "100dvh", paddingBottom: 60 }}>
       {/* Sivuston vakiomurupolku (README avoin kohta 2: Etusivu-taso mukaan) */}
+      <KokoelmaLd avain="jaakiekko" nimi="Jääkiekko" polku="/kokoelma/jaakiekko" />
       <Crumbs
         items={[
           { label: "Kokoelmat", href: "/kokoelmat" },

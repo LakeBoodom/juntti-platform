@@ -12,6 +12,7 @@
 // vaikuttavan Aloita näistä -nostoihin, jotka näkyvät aina), mobiilissa
 // ruudukko avataan ShowAllCards-napilla 8 kortin jälkeen.
 
+import { KokoelmaLd } from "@/components/tn20/KokoelmaLd";
 import { jakoMeta } from "@/lib/jakoMeta";
 import { visaHref } from "@/lib/visaHref";
 import type { Metadata } from "next";
@@ -101,6 +102,7 @@ export default async function LuontoLanding({
   return (
     <main className="tnl" style={{ minHeight: "100dvh", paddingBottom: 60 }}>
       {/* Murupolkurivi palkin alla (nav-speksi 17.8.2026) — korvasi heron inline-navin */}
+      <KokoelmaLd avain="luonto" nimi="Luonto" polku="/kokoelma/luonto" />
       <Crumbs items={[{ label: "Kokoelmat", href: "/kokoelmat" }, { label: "Luonto" }]} />
       {/* ─── Hero: teksti 44 % + kuva 56 % desktopilla, kuva ylhäällä kapealla ─── */}
       <MobiiliSankari

@@ -5,6 +5,7 @@
 //   /peli/kuntaliitos?maakunta=uusimaa   reitti alkaa Uudeltamaalta (oma päivän reitti per maakunta)
 // Reitti ja sen alueen kartta arvotaan palvelimella (lib/kuntaliitos/reitti.ts).
 
+import { JsonLd, peliLd } from "@/lib/jsonLd";
 import { jakoMeta } from "@/lib/jakoMeta";
 import type { Metadata } from "next";
 import { helsinginPaiva } from "@/lib/aika";
@@ -39,15 +40,18 @@ export default async function KuntaliitosSivu({ searchParams }: Props) {
   const siemen = pyydetty ?? paiva.iso;
   const maakunta = maakuntaTunnuksella(typeof sp.maakunta === "string" ? sp.maakunta : null);
   return (
-    <ReittipeliClient
-      peli="kuntaliitos"
-      reitti={arvoReitti(siemen, maakunta?.nimi ?? null)}
-      maakunnat={KL_MAAKUNNAT}
-      maakuntaTunnus={maakunta?.tunnus ?? null}
-      siemen={siemen}
-      paivanReitti={!pyydetty}
-      paivays={`${paiva.pv}.${paiva.kk}.`}
-      lahde={KL_LAHDE}
-    />
+    <>
+      <JsonLd data={peliLd({ name: "Kuntaliitos", url: "/peli/kuntaliitos", description: "Järjestä kahdeksan kuntaa reitiksi niin, että jokaisella vierekkäisellä parilla on yhteinen raja. Uusi päivän reitti joka päivä." })} />
+      <ReittipeliClient
+        peli="kuntaliitos"
+        reitti={arvoReitti(siemen, maakunta?.nimi ?? null)}
+        maakunnat={KL_MAAKUNNAT}
+        maakuntaTunnus={maakunta?.tunnus ?? null}
+        siemen={siemen}
+        paivanReitti={!pyydetty}
+        paivays={`${paiva.pv}.${paiva.kk}.`}
+        lahde={KL_LAHDE}
+      />
+    </>
   );
 }

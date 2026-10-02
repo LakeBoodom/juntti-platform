@@ -9,6 +9,7 @@
 // → footer. Designin header/Putki-pilleri jätetty pois — landingit ovat
 // headerittömiä kuten Kulttuuri ja Luonto (murupolku hoitaa paluun).
 
+import { KokoelmaLd } from "@/components/tn20/KokoelmaLd";
 import { jakoMeta } from "@/lib/jakoMeta";
 import { visaHref } from "@/lib/visaHref";
 import type { Metadata } from "next";
@@ -87,6 +88,7 @@ export default async function MaantietoLanding() {
   return (
     <main className="tnt" style={{ minHeight: "100dvh" }}>
       {/* Murupolkurivi palkin alla (nav-speksi 17.8.2026) — korvasi heron inline-navin */}
+      <KokoelmaLd avain="matkakohteet" nimi="Maantieto" polku="/kokoelma/matkakohteet" />
       <Crumbs items={[{ label: "Kokoelmat", href: "/kokoelmat" }, { label: "Maantieto" }]} />
       {/* ─── Hero: petrooli + teal, kuva oikealla (CD) ─── */}
       <MobiiliSankari

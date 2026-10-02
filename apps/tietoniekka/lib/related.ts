@@ -55,7 +55,7 @@ function pohja(sb: Sb, ohita: string[]): Kysely {
 }
 
 /** Kokoelman oma joukko (sama logiikka kuin aiemmin pelisivulla). */
-function kokoelmanJoukko(q: Kysely, r: Pick<Resolved, "key">, collection: string | null): Kysely {
+export function kokoelmanJoukko(q: Kysely, r: Pick<Resolved, "key">, collection: string | null): Kysely {
   return r.key === "kaupungit" ? q.eq("category", "kaupungit")
     : r.key === "tiede" ? q.eq("category", "tiede-teknologia")
     : r.key === "jaakiekko" ? q.or("category.eq.jaakiekko,genre.eq.jaakiekko")

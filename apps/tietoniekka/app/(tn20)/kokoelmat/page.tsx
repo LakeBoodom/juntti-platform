@@ -1,3 +1,4 @@
+import { KokoelmaLd } from "@/components/tn20/KokoelmaLd";
 import { jakoMeta } from "@/lib/jakoMeta";
 import type { Metadata } from "next";
 // TIETONIEKKA 2.0 — KAIKKI KOKOELMAT -indeksi (navigaation "Kaikki kokoelmat →" -kohde).
@@ -67,6 +68,7 @@ export default async function KokoelmatPage() {
 
   return (
     <main style={{ minHeight: "100dvh" }}>
+      <KokoelmaLd avain="kokoelmat" nimi="Kaikki kokoelmat" polku="/kokoelmat" />
       <Crumbs items={[{ label: "Kokoelmat" }]} />
       <div className="tn-shell">
       <header className="tn-colx-head">

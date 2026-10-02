@@ -25,6 +25,7 @@
 // (README §Tyhjät tilat). Visamäärät ovat julkaistujen määriä — ei koskaan
 // kovakoodattuja. 26.8.2026 kaikki 16 visaa ovat julkaistuja.
 
+import { KokoelmaLd } from "@/components/tn20/KokoelmaLd";
 import { jakoMeta } from "@/lib/jakoMeta";
 import { visaHref } from "@/lib/visaHref";
 import "../../urheilulajit.css";
@@ -168,6 +169,7 @@ export default async function UrheiluLanding() {
 
   return (
     <main className="tnk" style={{ minHeight: "100dvh" }}>
+      <KokoelmaLd avain="urheilu" nimi="Urheilu" polku="/kokoelma/urheilu" />
       <Crumbs items={[{ label: "Kokoelmat", href: "/kokoelmat" }, { label: "Urheilu" }]} />
       {/* Mobiili (CD 24.9.): teksti kuvan päällä varjostuksella + lohkot listana */}
       <MobiiliSankari

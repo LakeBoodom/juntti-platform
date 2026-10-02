@@ -9,6 +9,7 @@
 // pelimuotoja, putkea, "suosituin"/"trendaa"-merkintöjä, ei mega-visoja —
 // älä lisää niitä takaisin.
 
+import { KokoelmaLd } from "@/components/tn20/KokoelmaLd";
 import { jakoMeta } from "@/lib/jakoMeta";
 import { visaHref } from "@/lib/visaHref";
 import type { Metadata } from "next";
@@ -79,6 +80,7 @@ export default async function ElokuvatLanding() {
   return (
     <main className="tnk" style={{ minHeight: "100dvh", paddingBottom: 60 }}>
       {/* Murupolkurivi palkin alla (nav-speksi 17.8.2026) — korvasi heron inline-navin */}
+      <KokoelmaLd avain="elokuvat" nimi="Elokuvat" polku="/kokoelma/elokuvat" />
       <Crumbs items={[{ label: "Kokoelmat", href: "/kokoelmat" }, { label: "Elokuvat" }]} />
       <MobiiliSankari
         accent="#FF6A4D"

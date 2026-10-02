@@ -12,6 +12,7 @@
 // Tietoisia poisjättöjä: ei vaikeustasoja, putkea, kysymysmääriä,
 // genremerkintöjä korteissa, ei suosituin/trendaa, ei poimintaselitettä.
 
+import { KokoelmaLd } from "@/components/tn20/KokoelmaLd";
 import { jakoMeta } from "@/lib/jakoMeta";
 import { visaHref } from "@/lib/visaHref";
 import type { Metadata } from "next";
@@ -90,6 +91,7 @@ export default async function MusiikkiLanding() {
   return (
     <main className="tnk tne-mus" style={{ minHeight: "100dvh", paddingBottom: 60 }}>
       {/* Murupolkurivi palkin alla (nav-speksi 17.8.2026) */}
+      <KokoelmaLd avain="musiikki" nimi="Musiikki" polku="/kokoelma/musiikki" />
       <Crumbs items={[{ label: "Kokoelmat", href: "/kokoelmat" }, { label: "Musiikki" }]} />
       <MobiiliSankari
         accent="#C68BFF"

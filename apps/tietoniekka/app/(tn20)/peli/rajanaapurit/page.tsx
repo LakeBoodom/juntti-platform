@@ -5,6 +5,7 @@
 //   /peli/rajanaapurit?maanosa=eurooppa päivän reitti Euroopasta
 //   /peli/rajanaapurit?reitti=x7k2      tietty reitti (Arvo uusi reitti, haastelinkki)
 
+import { JsonLd, peliLd } from "@/lib/jsonLd";
 import { jakoMeta } from "@/lib/jakoMeta";
 import type { Metadata } from "next";
 import { helsinginPaiva } from "@/lib/aika";
@@ -38,15 +39,18 @@ export default async function RajanaapuritSivu({ searchParams }: Props) {
   const siemen = pyydetty ?? paiva.iso;
   const maanosa = maanosaTunnuksella(typeof sp.maanosa === "string" ? sp.maanosa : null);
   return (
-    <ReittipeliClient
-      peli="rajanaapurit"
-      reitti={arvoReitti(siemen, maanosa?.nimi ?? null)}
-      maakunnat={RN_MAANOSAT}
-      maakuntaTunnus={maanosa?.tunnus ?? null}
-      siemen={siemen}
-      paivanReitti={!pyydetty}
-      paivays={`${paiva.pv}.${paiva.kk}.`}
-      lahde={RN_LAHDE}
-    />
+    <>
+      <JsonLd data={peliLd({ name: "Rajanaapurit", url: "/peli/rajanaapurit", description: "Järjestä kahdeksan valtiota reitiksi niin, että jokaisella vierekkäisellä parilla on yhteinen maaraja. Uusi päivän reitti joka päivä." })} />
+      <ReittipeliClient
+        peli="rajanaapurit"
+        reitti={arvoReitti(siemen, maanosa?.nimi ?? null)}
+        maakunnat={RN_MAANOSAT}
+        maakuntaTunnus={maanosa?.tunnus ?? null}
+        siemen={siemen}
+        paivanReitti={!pyydetty}
+        paivays={`${paiva.pv}.${paiva.kk}.`}
+        lahde={RN_LAHDE}
+      />
+    </>
   );
 }

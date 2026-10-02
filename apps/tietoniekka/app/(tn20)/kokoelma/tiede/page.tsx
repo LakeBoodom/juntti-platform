@@ -12,6 +12,7 @@
 // lyhyt nimi ja koukku luetaan visan otsikosta ("Nimi – koukku"), ja
 // "Aloita näistä" -poiminnoilla on oma copynsa designin mukaan.
 
+import { KokoelmaLd } from "@/components/tn20/KokoelmaLd";
 import { jakoMeta } from "@/lib/jakoMeta";
 import { visaHref } from "@/lib/visaHref";
 import type { Metadata } from "next";
@@ -119,6 +120,7 @@ export default async function TiedeLanding() {
 
   return (
     <main className="tnt-page">
+      <KokoelmaLd avain="tiede" nimi="Tiede & teknologia" polku="/kokoelma/tiede" />
       <Crumbs items={[{ label: "Kokoelmat", href: "/kokoelmat" }, { label: "Tiede & teknologia" }]} />
       {/* Mobiili (CD 24.9.): iskulause ingressin ensimmäiseksi virkkeeksi, aihepiirit listana */}
       <MobiiliSankari

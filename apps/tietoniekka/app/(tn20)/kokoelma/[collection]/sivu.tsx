@@ -5,6 +5,7 @@
 // Kuvavisat: oma hub (KUVAVISAT 2.0, 17.9.2026) — kategoriat avaavat visavariaatiot.
 // Tunnetut henkilöt: oma hub (ennallaan, Heikin ohje 2026-07-31).
 
+import { KokoelmaLd } from "@/components/tn20/KokoelmaLd";
 import { jakoMeta } from "@/lib/jakoMeta";
 import { visaHref } from "@/lib/visaHref";
 import type { Metadata } from "next";
@@ -678,6 +679,7 @@ async function PersonHub({ hub, article }: { hub: HubMeta; article?: React.React
   return (
     <main style={{ minHeight: "100dvh", paddingBottom: 80 }}>
       {/* Murupolkurivi palkin alla (nav-speksi 17.8.2026) — korvasi heron inline-navin */}
+      <KokoelmaLd avain="tunnetut-henkilot" nimi="Tunnetut henkilöt" polku="/kokoelma/tunnetut-henkilot" />
       <Crumbs items={[{ label: "Kokoelmat", href: "/kokoelmat" }, { label: "Tunnetut henkilöt" }]} />
       <MobiiliSankari
         accent={hub.accentLight}

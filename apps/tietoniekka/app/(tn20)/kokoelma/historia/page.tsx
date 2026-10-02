@@ -5,6 +5,7 @@
 // localStoragesta (tn_played_quizzes) — ei kirjautumista, kuten Putkikin.
 // Staattinen segmentti ohittaa dynaamisen [collection]-reitin.
 
+import { KokoelmaLd } from "@/components/tn20/KokoelmaLd";
 import { jakoMeta } from "@/lib/jakoMeta";
 import { visaHref } from "@/lib/visaHref";
 import type { Metadata } from "next";
@@ -97,6 +98,7 @@ export default async function HistoriaPage() {
     <>
       {/* Murupolkurivi palkin alla (nav-speksi 17.8.2026) — HistoriaClientin
           heron inline-nav poistettu samassa yhteydessä */}
+      <KokoelmaLd avain="historia" nimi="Historia" polku="/kokoelma/historia" />
       <Crumbs items={[{ label: "Kokoelmat", href: "/kokoelmat" }, { label: "Historia" }]} />
       <HistoriaClient data={data} />
       {article}

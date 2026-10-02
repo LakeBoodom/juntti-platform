@@ -3,6 +3,7 @@
 // kierros arvotaan jo palvelimella (ei tyhjää välähdystä ennen peliä).
 // Ilman autostartia sivu avaa CategoryPicker-aloitusnäkymän clientillä.
 
+import { JsonLd, peliLd } from "@/lib/jsonLd";
 import { jakoMeta } from "@/lib/jakoMeta";
 import type { Metadata } from "next";
 import { getChainRound } from "@/lib/ikajarjestys";
@@ -35,5 +36,10 @@ export default async function IkajarjestysPage({
 
   const initialRound = autostart ? await getChainRound(category) : null;
 
-  return <IkajarjestysClient initialCategory={category} initialRound={initialRound} />;
+  return (
+    <>
+      <JsonLd data={peliLd({ name: "Tietoketju: Ikäjärjestys", url: "/peli/ikajarjestys", description: "Aseta kymmenen tunnettua suomalaista syntymävuoden mukaiseen järjestykseen." })} />
+      <IkajarjestysClient initialCategory={category} initialRound={initialRound} />
+    </>
+  );
 }

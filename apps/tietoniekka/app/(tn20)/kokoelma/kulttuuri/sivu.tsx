@@ -6,6 +6,7 @@
 // lime vain toiminnoissa. Header/footer perusmustalla → sama tuote kuin muut.
 // Staattinen segmentti ohittaa dynaamisen [collection]-reitin Next.js:ssä.
 
+import { KokoelmaLd } from "@/components/tn20/KokoelmaLd";
 import { jakoMeta } from "@/lib/jakoMeta";
 import { visaHref } from "@/lib/visaHref";
 import type { Metadata } from "next";
@@ -94,6 +95,7 @@ export default async function KulttuuriLanding({
   return (
     <main className="tnk" style={{ minHeight: "100dvh", paddingBottom: 60 }}>
       {/* Murupolkurivi palkin alla (nav-speksi 17.8.2026) — korvasi heron inline-navin */}
+      <KokoelmaLd avain="kulttuuri" nimi="Kulttuuri" polku="/kokoelma/kulttuuri" />
       <Crumbs items={[{ label: "Kokoelmat", href: "/kokoelmat" }, { label: "Kulttuuri" }]} />
       {/* ─── Hero: kollaasi + kaksivärinen otsikko (CD) ─── */}
       <MobiiliSankari

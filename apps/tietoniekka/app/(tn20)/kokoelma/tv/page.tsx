@@ -11,6 +11,7 @@
 // Tietoisia poisjättöjä: ei vaikeustasoja, putkea, kysymysmääriä korteissa,
 // ei suosituin/trendaa-merkintöjä, ei poimintojen selitekappaletta.
 
+import { KokoelmaLd } from "@/components/tn20/KokoelmaLd";
 import { jakoMeta } from "@/lib/jakoMeta";
 import { visaHref } from "@/lib/visaHref";
 import type { Metadata } from "next";
@@ -91,6 +92,7 @@ export default async function TvLanding() {
   return (
     <main className="tnk tne-tv" style={{ minHeight: "100dvh", paddingBottom: 60 }}>
       {/* Murupolkurivi palkin alla (nav-speksi 17.8.2026) */}
+      <KokoelmaLd avain="tv" nimi="TV & Suoratoisto" polku="/kokoelma/tv" />
       <Crumbs items={[{ label: "Kokoelmat", href: "/kokoelmat" }, { label: "TV & Suoratoisto" }]} />
       <MobiiliSankari
         accent="#FF4FA8"

@@ -13,6 +13,7 @@
 // Juhlat, päivämäärät, faktat ja kuvat: lib/juhlat.ts. Visat kannasta (collection='juhlat',
 // vain julkaistut), kuva quizzes.hero_image.
 
+import { KokoelmaLd } from "@/components/tn20/KokoelmaLd";
 import { jakoMeta } from "@/lib/jakoMeta";
 import type { Metadata } from "next";
 import { getSupabase } from "@/lib/supabase";
@@ -133,6 +134,7 @@ export default async function JuhlatSivu({ searchParams }: { searchParams: Promi
 
   return (
     <main className="ju">
+      <KokoelmaLd avain="juhlat" nimi="Juhlat" polku="/kokoelma/juhlat" />
       <Crumbs items={[{ label: "Kokoelmat", href: "/kokoelmat" }, { label: "Juhlat" }]} />
       <div className="ju-wrap">
         <header className="ju-head">

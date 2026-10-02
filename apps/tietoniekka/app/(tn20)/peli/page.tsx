@@ -5,6 +5,7 @@
 // polku; kuvavisoissa pelattu kuvasarja kulkee ?ids=-parametrissa, jotta
 // kaveri saa täsmälleen saman sarjan.
 
+import { JsonLd, breadcrumbLd, abs } from "@/lib/jsonLd";
 import { haeRistiinnostot, type RelatedRow } from "@/lib/related";
 import { visaHref } from "@/lib/visaHref";
 import { getSupabase } from "@/lib/supabase";
@@ -184,6 +185,8 @@ type QuizRow = {
      golfvisassa näkyi tennisvisan kuva. */
   hero_image: string | null; hero_focal_x: number | null; hero_focal_y: number | null;
   hero_side: string | null; hero_alt: string | null;
+  /** SEO-erä A9: Quiz.dateModified */
+  updated_at?: string | null;
   /* Aihekohtaiset tulostasot (migraatio 20260928, Instagram-kierros 4) */
   fanitasot?: unknown;
 };
@@ -570,7 +573,7 @@ export default async function Peli20({
 
   let q = sb
     .from("quizzes")
-    .select("id, slug, title, display_title, teaser, description, category, collection, genre, learn, hero_image, hero_focal_x, hero_focal_y, hero_side, hero_alt, fanitasot")
+    .select("id, slug, title, display_title, teaser, description, category, collection, genre, learn, hero_image, hero_focal_x, hero_focal_y, hero_side, hero_alt, fanitasot, updated_at")
     .eq("status", "published");
   q = quizId ? q.eq("id", quizId) : q.eq("slug", slug!);
   const { data: quiz } = await q.maybeSingle<QuizRow>();
@@ -591,7 +594,7 @@ export default async function Peli20({
     /* Henkilövisan kuva tulee celebrities-riviltä (Wikipedia/Wikimedia), ei
        kokoelmakartasta — henkilövisoja on 243 eikä niille ole omia kuvia. */
     quiz.collection === "tunnetut-henkilot"
-      ? sb.from("celebrities").select("name, role, image_url").eq("trivia_quiz_id", quiz.id).maybeSingle()
+      ? sb.from("celebrities").select("name, role, image_url, wikipedia_url").eq("trivia_quiz_id", quiz.id).maybeSingle()
       : Promise.resolve({ data: null }),
   ]);
 
@@ -624,7 +627,7 @@ export default async function Peli20({
      se on juuri se virhe, jossa golfvisa sai tennisvisan kuvan. */
   const heroParam = typeof params.hero === "string" ? params.hero : null;
   const isPerson = collection === "tunnetut-henkilot";
-  const celeb = (celebRes.data ?? null) as { name: string; role: string | null; image_url: string | null } | null;
+  const celeb = (celebRes.data ?? null) as { name: string; role: string | null; image_url: string | null; wikipedia_url?: string | null } | null;
   /* Wikimedian thumb-osoitteessa leveys on polussa (".../330px-Tiedosto.jpg").
      Kannassa olevat kuvat ovat 330 px leveitä — liian pieniä 3:4-kortille — ja
      Wikimedia hyväksyy vain tietyt kokoportaat, joista 1280 on suurin toimiva.
@@ -755,6 +758,25 @@ export default async function Peli20({
           <span aria-current="page">{quiz.display_title ?? quiz.title}</span>
         </div>
       </nav>
+      {/* SEO-erä A9: BreadcrumbList + Quiz (henkilövisalle about: Person + sameAs Wikipedia) */}
+      <JsonLd data={breadcrumbLd([{ name: "Etusivu", url: "/" }, { name: collectionLabel, url: hubHref }, { name: quiz.display_title ?? quiz.title }])} />
+      <JsonLd
+        data={{
+          "@context": "https://schema.org",
+          "@type": "Quiz",
+          name: quiz.display_title ?? quiz.title,
+          url: abs(visaHref(quiz)),
+          description: quiz.teaser ?? quiz.description ?? undefined,
+          inLanguage: "fi",
+          isAccessibleForFree: true,
+          numberOfQuestions: game.questions.length,
+          ...(quiz.updated_at ? { dateModified: quiz.updated_at } : {}),
+          about: celeb
+            ? { "@type": "Person", name: celeb.name, ...(celeb.wikipedia_url ? { sameAs: celeb.wikipedia_url } : {}) }
+            : { "@type": "Thing", name: collectionLabel },
+          publisher: { "@type": "Organization", name: "Tietoniekka", url: abs("/") },
+        }}
+      />
 
       {relatedRows.length > 0 && (
         <section className="tn-seo-related tn-learn-ssr">

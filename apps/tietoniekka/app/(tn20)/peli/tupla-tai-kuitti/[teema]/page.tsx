@@ -4,6 +4,7 @@
 //   /peli/tupla-tai-kuitti/sm-liiga?sarja=x7k2 tietty sarja (uusi arvonta, haastelinkki)
 // Esikatseluvaiheessa ei linkitetä mistään eikä indeksoida.
 
+import { JsonLd, peliLd } from "@/lib/jsonLd";
 import { jakoMeta } from "@/lib/jakoMeta";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
@@ -63,5 +64,10 @@ export default async function TuplaSivu({ params, searchParams }: Props) {
   if (sarja.length < 10) notFound();
 
   const [, kk, pv] = paiva.split("-").map(Number);
-  return <TuplaClient teema={t} sarja={sarja} siemen={siemen} paivanSarja={!pyydetty} paivays={`${pv}.${kk}.`} />;
+  return (
+    <>
+      <JsonLd data={peliLd({ name: `Tupla tai kuitti – ${t.nimi}`, url: `/peli/tupla-tai-kuitti/${t.slug}`, description: t.kuvaus ?? "Tupla tai kuitti -pelimuoto Tietoniekassa." })} />
+      <TuplaClient teema={t} sarja={sarja} siemen={siemen} paivanSarja={!pyydetty} paivays={`${pv}.${kk}.`} />
+    </>
+  );
 }

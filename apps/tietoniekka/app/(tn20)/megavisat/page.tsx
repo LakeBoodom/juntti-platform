@@ -15,6 +15,7 @@
 // linjaus kuin muissa teemasivuissa (Jääkiekko/Jalkapallo/Maantieto):
 // sivuston globaali yläpalkki + Crumbs-murupolku hoitavat navigaation.
 
+import { KokoelmaLd } from "@/components/tn20/KokoelmaLd";
 import { jakoMeta } from "@/lib/jakoMeta";
 import "../megavisat.css";
 import type { Metadata } from "next";
@@ -81,6 +82,7 @@ export default async function MegavisatLanding() {
 
   return (
     <main className="tnm2" style={{ minHeight: "100dvh" }}>
+      <KokoelmaLd avain="megavisat" nimi="Megavisat" polku="/megavisat" />
       <Crumbs items={[{ label: "Megavisat" }]} />
 
       {/* Mobiili: Mikko Megavisa-studiossa (Heikki 26.9.2026), teksti kuvan päällä */}
