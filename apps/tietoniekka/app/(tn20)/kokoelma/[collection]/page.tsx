@@ -4,6 +4,10 @@ import Sivu, { generateMetadata } from "./sivu";
 
 export { generateMetadata };
 export const revalidate = 300;
+/* [collection] palvelee nykyään vain nämä kaksi hubia (staattiset kansiot varjostavat muut). */
+export function generateStaticParams() {
+  return [{ collection: "kuvavisat" }, { collection: "tunnetut-henkilot" }];
+}
 
 export default function Page({ params }: { params: Promise<{ collection: string }> }) {
   return Sivu({ params, searchParams: Promise.resolve({}) });

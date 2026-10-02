@@ -11,6 +11,11 @@ import PeliPage, { generateMetadata as peliMetadata } from "../../peli/page";
 import type { Metadata } from "next";
 
 export const revalidate = 3600;
+/* Ilman generateStaticParamsia dynaaminen segmentti renderöidään joka pyynnöllä (ei ISR:ää).
+   Tyhjä lista = sivut generoidaan ensimmäisellä käynnillä ja välimuistitetaan. */
+export function generateStaticParams() {
+  return [];
+}
 
 type Props = { params: Promise<{ slug: string }> };
 
