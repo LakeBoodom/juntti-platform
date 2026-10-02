@@ -5,6 +5,7 @@
 // polku; kuvavisoissa pelattu kuvasarja kulkee ?ids=-parametrissa, jotta
 // kaveri saa täsmälleen saman sarjan.
 
+import { haeRistiinnostot, type RelatedRow } from "@/lib/related";
 import { visaHref } from "@/lib/visaHref";
 import { getSupabase } from "@/lib/supabase";
 import { getKuvavisat, getKuvavisatByIds } from "@/lib/queries";
@@ -576,21 +577,7 @@ export default async function Peli20({
   if (!quiz) notFound();
 
   const resolved = resolveCollection(quiz);
-  /* Ristiinnostot samasta teemasta: kaupungit/jääkiekko/jalkapallo omista
-     joukoistaan, muut kokoelmasta. Megat pois (question_count 0, oma landing). */
-  let relQ = sb
-    .from("quiz_cards" as never)
-    .select("id, slug, custom_slug, display_title, title, teaser, collection, genre, question_count")
-    .neq("id", quiz.id)
-    .neq("game_mode" as never, "mega");
-  relQ =
-    resolved.key === "kaupungit" ? relQ.eq("category", "kaupungit") :
-    resolved.key === "tiede" ? relQ.eq("category", "tiede-teknologia") :
-    resolved.key === "jaakiekko" ? relQ.or("category.eq.jaakiekko,genre.eq.jaakiekko") :
-    resolved.key === "jalkapallo" ? relQ.eq("genre", "jalkapallo") :
-    resolved.key === "yleistieto" ? relQ.eq("collection", "yleistieto").neq("category", "kaupungit").neq("category", "ruoka-juoma") :
-    relQ.eq("collection", quiz.collection ?? "yleistieto");
-
+  /* Ristiinnostot (SEO-erä A3): portaittainen, satunnaistettu haku — ks. lib/related.ts. */
   const [{ data: qs }, genreRes, relatedRes, celebRes] = await Promise.all([
     sb
       .from("questions")
@@ -600,7 +587,7 @@ export default async function Peli20({
     quiz.genre
       ? sb.from("genres" as never).select("label").eq("collection", quiz.collection ?? "").eq("genre_key", quiz.genre).maybeSingle()
       : Promise.resolve({ data: null }),
-    relQ.order("published_at", { ascending: false }).limit(6),
+    haeRistiinnostot(sb, quiz, resolved).then((data) => ({ data })),
     /* Henkilövisan kuva tulee celebrities-riviltä (Wikipedia/Wikimedia), ei
        kokoelmakartasta — henkilövisoja on 243 eikä niille ole omia kuvia. */
     quiz.collection === "tunnetut-henkilot"
@@ -689,11 +676,6 @@ export default async function Peli20({
       }
     : null;
 
-  type RelatedRow = {
-    id: string; slug: string | null; custom_slug: string | null;
-    display_title: string | null; title: string; teaser: string | null;
-    collection: string | null; genre: string | null; question_count: number;
-  };
   const relatedRows = (relatedRes.data ?? []) as RelatedRow[];
   const relHref = (r: RelatedRow) =>
     visaHref(r);
