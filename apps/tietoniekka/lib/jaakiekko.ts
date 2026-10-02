@@ -162,8 +162,8 @@ export const JK_DERBIES: JkCard[] = [
 
 /** Liigan yleisvisat — README:n poisjättö: kysymysmääriä EI näytetä korteissa
     (referenssin "20 kysymystä" -metat jätetty pois, avoin kohta 5). */
-// Liigan yleisvisat (2.10.2026): oikeat valokuvat 8 visaan (Heikin valinnat: Riksman, Jalonen, Ruutu, Moberg).
-// Maalitykit vielä AI-kuva (ehdotetun Esa Peltonen -kuvan lisenssi epävarma).
+// Liigan yleisvisat (2.10.2026): oikeat valokuvat kaikkiin 9 visaan (Heikin valinnat: Riksman, Jalonen,
+// Ruutu, Moberg, Viitakoski). Esa Peltonen -kuva hylättiin: lisenssi epävarma ("own work" -lehtikuva).
 export const JK_GENERAL: JkCard[] = [
   { quizSlug: "sm-liiga-maalivahtilegendat", tag: "Maalivahdit", title: "Muurit ja mestariotteet", img: IMG("jk-liiga-maalivahdit-kuva"), pos: "16% top", accent: "#FFD100" },
   { quizSlug: "sm-liiga-kaikkien-aikojen-pistekuninkaat", tag: "Pistepörssi", title: "Maalitehtaat ja syöttökoneet", img: IMG("jk-liiga-pistekuninkaat-kuva"), pos: "22% top", accent: "#4FD1F5" },
@@ -173,7 +173,7 @@ export const JK_GENERAL: JkCard[] = [
   { quizSlug: "sm-liigan-legendaariset-pomot-visa", tag: "Seurapatruunat", title: "Sikarit, faksit ja seurapatruunat", img: IMG("jk-liiga-pomot-kuva"), pos: "16% top", accent: "#B6FF3C" },
   // 19.9.2026: kolme 22.8. julkaistua visaa puuttui sivulta (ei korttia eikä
   // kuvaa, pelattavissa vain suoralla linkillä). Kuvat Heikiltä 19.9.
-  { quizSlug: "sm-liiga-ikonisimmat-maalitykit", tag: "Maalintekijät", title: "Liigan maalitykit", img: IMG("jk-liiga-maalitykit"), accent: "#35D6A0" },
+  { quizSlug: "sm-liiga-ikonisimmat-maalitykit", tag: "Maalintekijät", title: "Liigan maalitykit", img: IMG("jk-liiga-maalitykit-kuva"), pos: "16% top", accent: "#35D6A0" },
   { quizSlug: "sm-liiga-jaahykuninkaat-kovanaamat", tag: "Jäähyaitio", title: "Liigan kovanaamat", img: IMG("jk-liiga-kovanaamat-kuva"), pos: "16% top", accent: "#F5F0E6" },
   { quizSlug: "sm-liiga-tuomarilegendat", tag: "Erotuomarit", title: "Pillin legendat", img: IMG("jk-liiga-tuomarit-kuva"), pos: "16% top", accent: "#8FE4FB" },
 ];
