@@ -853,6 +853,9 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
      ≤18 → 78 px · 19–32 → 72 px · 33–44 → 56 px · 45+ → 46 px. */
   const nameLen = quiz.title.length;
   const heroLen = nameLen <= 18 ? "xs" : nameLen <= 32 ? "s" : nameLen <= 44 ? "m" : "l";
+  /* Pisimmän sanan merkkimäärä → CSS:n --tng-lw, jolla otsikon koko rajataan niin, että pisinkin sana
+     mahtuu palstaan (KORTTISÄÄNTÖ, peli2026.css). */
+  const heroLw = Math.max(...quiz.title.split(/[\s\u2013\u2014-]+/).map((w) => w.length), 1);
   /* hero_alt sisältää saavutettavuustekstin JA mahdollisen kuvalähteen. Näkyviin
      tulee vain lähdeosuus ("Kuva: …"), ei koko alt-tekstiä: vapaasti lisensoitu
      kuva vaatii näkyvän merkinnän, AI-kuvitus ei vaadi mitään. */
@@ -1049,7 +1052,7 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
                     <span aria-current="page">{quiz.title}</span>
                   </nav>
                   <span className="tng-herocat"><i aria-hidden />{hero.roleLabel ? `${category} · ${hero.roleLabel}` : quiz.genreLabel ? `${category} · ${quiz.genreLabel}` : category}</span>
-                  <h1 ref={startH1Ref} className="tng-heroh1" data-len={heroLen}>{quiz.title}</h1>
+                  <h1 ref={startH1Ref} className="tng-heroh1" data-len={heroLen} style={{ ["--tng-lw" as string]: heroLw }}>{quiz.title}</h1>
                   {quiz.teaser && <p className="tng-herop">{quiz.teaser}</p>}
                   <div className="tng-herorow">
                     <button type="button" className="tng-herobtn" onClick={startGame}>Aloita visa <span aria-hidden>→</span></button>

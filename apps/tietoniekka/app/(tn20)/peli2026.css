@@ -328,21 +328,21 @@
   /* Pystynäkymän portaat nimen pituuden mukaan (CD kierros 5, arvo 2):
      ≤18 → 38 px · 19–32 → 34 px · 33–44 → 28 px · 45+ → 24 px, enintään 4 riviä.
      Alle 700 px korkealla jokainen porras laskee 4 px. */
-  font-size: clamp(30px, 8.6vw, 38px); max-width: 12ch;
+  --tng-h1: clamp(30px, 8.6vw, 38px); max-width: 12ch;
   display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 4; overflow: hidden;
   line-height: 0.96; letter-spacing: -0.025em;
   text-transform: uppercase; color: #fffbf2; text-wrap: balance;
   hyphens: none; -webkit-hyphens: none; overflow-wrap: normal; word-break: keep-all;
   text-shadow: 0 4px 40px rgba(0, 0, 0, 0.7);
 }
-.tn20 .tng-heroh1[data-len="s"] { font-size: clamp(28px, 7.8vw, 34px); max-width: 15ch; }
-.tn20 .tng-heroh1[data-len="m"] { font-size: clamp(24px, 6.4vw, 28px); max-width: 18ch; line-height: 1; }
-.tn20 .tng-heroh1[data-len="l"] { font-size: clamp(21px, 5.6vw, 24px); max-width: 20ch; line-height: 1.02; }
+.tn20 .tng-heroh1[data-len="s"] { --tng-h1: clamp(28px, 7.8vw, 34px); max-width: 15ch; }
+.tn20 .tng-heroh1[data-len="m"] { --tng-h1: clamp(24px, 6.4vw, 28px); max-width: 18ch; line-height: 1; }
+.tn20 .tng-heroh1[data-len="l"] { --tng-h1: clamp(21px, 5.6vw, 24px); max-width: 20ch; line-height: 1.02; }
 @media (max-height: 700px) and (max-aspect-ratio: 1/1) {
-  .tn20 .tng-heroh1 { font-size: clamp(26px, 8vw, 34px); }
-  .tn20 .tng-heroh1[data-len="s"] { font-size: clamp(24px, 7.2vw, 30px); }
-  .tn20 .tng-heroh1[data-len="m"] { font-size: clamp(21px, 6vw, 24px); }
-  .tn20 .tng-heroh1[data-len="l"] { font-size: clamp(19px, 5.2vw, 20px); }
+  .tn20 .tng-heroh1 { --tng-h1: clamp(26px, 8vw, 34px); }
+  .tn20 .tng-heroh1[data-len="s"] { --tng-h1: clamp(24px, 7.2vw, 30px); }
+  .tn20 .tng-heroh1[data-len="m"] { --tng-h1: clamp(21px, 6vw, 24px); }
+  .tn20 .tng-heroh1[data-len="l"] { --tng-h1: clamp(19px, 5.2vw, 20px); }
 }
 .tn20 .tng-herop { margin: 0; max-width: 44ch; font-size: clamp(14.5px, 1.4cqw, 18px); line-height: 1.5; color: #ded5c2; text-wrap: pretty; }
 .tn20 .tng-herorow { display: flex; align-items: center; gap: clamp(12px, 1.6cqw, 20px); flex-wrap: wrap; }
@@ -407,10 +407,10 @@
   .tn20 .tng-hero[data-kind="ei-kuvaa"] .tng-herobody { max-width: none; }
   .tn20 .tng-hero[data-kind="ei-kuvaa"] .tng-herop { max-width: 60ch; }
   /* Otsikkoportaat nimen pituuden mukaan (CD kierros 4; kova katto 78 px) */
-  .tn20 .tng-heroh1 { font-size: clamp(34px, 4.6cqw, 78px); max-width: 12ch; line-height: 0.92; }
-  .tn20 .tng-heroh1[data-len="s"] { font-size: clamp(34px, 4.4cqw, 72px); max-width: 14ch; }
-  .tn20 .tng-heroh1[data-len="m"] { font-size: clamp(30px, 3.6cqw, 56px); max-width: 18ch; line-height: 0.96; }
-  .tn20 .tng-heroh1[data-len="l"] { font-size: clamp(26px, 3cqw, 46px); max-width: 22ch; line-height: 0.98; }
+  .tn20 .tng-heroh1 { --tng-h1: clamp(34px, 4.6cqw, 78px); max-width: 12ch; line-height: 0.92; }
+  .tn20 .tng-heroh1[data-len="s"] { --tng-h1: clamp(34px, 4.4cqw, 72px); max-width: 14ch; }
+  .tn20 .tng-heroh1[data-len="m"] { --tng-h1: clamp(30px, 3.6cqw, 56px); max-width: 18ch; line-height: 0.96; }
+  .tn20 .tng-heroh1[data-len="l"] { --tng-h1: clamp(26px, 3cqw, 46px); max-width: 22ch; line-height: 0.98; }
   /* Vaakanäkymässä lisävisat asettuvat heron alalaitaan kuvan päälle; pystyssä
      ne jäävät heron jälkeen, jolloin ne löytyvät vierittämällä (CD kierros 5, P4). */
   .tn20 .tng-heromore { position: absolute; left: 0; right: 0; bottom: 0; border-top: 0; padding: clamp(18px, 2.2cqw, 26px) clamp(28px, 3.4cqw, 48px) clamp(22px, 2.6cqw, 30px); background: linear-gradient(0deg, rgba(15, 13, 7, 0.97) 0%, rgba(15, 13, 7, 0.93) 55%, rgba(15, 13, 7, 0.72) 85%, rgba(15, 13, 7, 0.34) 100%); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); }
@@ -439,7 +439,7 @@
 }
 /* Pystytabletti: sama 2b kuin mobiilissa, vain typografia kasvaa */
 @media (max-aspect-ratio: 1/1) and (min-width: 700px) {
-  .tn20 .tng-heroh1 { font-size: clamp(40px, 5.2vw, 56px); }
+  .tn20 .tng-heroh1 { --tng-h1: clamp(40px, 5.2vw, 56px); }
   .tn20 .tng-herobody { padding: 0 32px 32px; }
   .tn20 .tng-heromore { padding-left: 32px; padding-right: 32px; }
   .tn20 .tng-heromore-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -449,8 +449,8 @@
    alalaidan lisävisojen päälle. CD:n linjaus: pitkän nimen tylsä koko on merkki
    siitä että nimi pitää uusia, ei asettelun ongelma. */
 @media (max-height: 800px) and (min-aspect-ratio: 1/1) {
-  .tn20 .tng-heroh1[data-len="m"] { font-size: clamp(26px, 2.8cqw, 42px); max-width: 24ch; }
-  .tn20 .tng-heroh1[data-len="l"] { font-size: clamp(22px, 2.2cqw, 32px); max-width: 34ch; line-height: 1.04; }
+  .tn20 .tng-heroh1[data-len="m"] { --tng-h1: clamp(26px, 2.8cqw, 42px); max-width: 24ch; }
+  .tn20 .tng-heroh1[data-len="l"] { --tng-h1: clamp(22px, 2.2cqw, 32px); max-width: 34ch; line-height: 1.04; }
 }
 
 /* ── Tulosnäkymä ──────────────────────────────────────────────────────── */
@@ -1059,3 +1059,20 @@
 @media (max-width: 767px) {
   .tn20 .tng-hint { display: none; }
 }
+
+/* KORTTISÄÄNTÖ (2.10.2026): heron otsikko ei saa leikkautua. Koko = min(portaan koko, tekstipalstan
+   leveys / (pisin sana × 0,76)). --tng-lw = otsikon pisimmän sanan merkkimäärä (GameClient), 0,76 =
+   Archivo 900 versaalin mitattu keskileveys / em (sama kerroin kuin jaakiekko.css --tnj-lw).
+   Laukaisija: "Leijonien olympiakulta 2022" leikkautui 2000 px leveydellä (72 px, palsta 564 px).
+   Mitattu Range-menetelmällä 320–2450 px. */
+.tn20 .tng-heroh1 { --tng-h1cap: calc((100cqw - 2 * clamp(16px, 5vw, 28px)) / (var(--tng-lw, 1) * 0.76)); }
+@media (max-aspect-ratio: 1/1) and (min-width: 700px) {
+  .tn20 .tng-heroh1 { --tng-h1cap: calc((100cqw - 64px) / (var(--tng-lw, 1) * 0.76)); }
+}
+@media (min-aspect-ratio: 1/1) and (min-width: 768px) {
+  .tn20 .tng-heroh1 { --tng-h1cap: calc((min(660px, 52cqw) - 2 * clamp(28px, 3.4cqw, 48px)) / (var(--tng-lw, 1) * 0.76)); }
+  .tn20 .tng-hero[data-kind="ei-kuvaa"] .tng-heroh1 { --tng-h1cap: calc((100cqw - 2 * clamp(28px, 3.4cqw, 48px)) / (var(--tng-lw, 1) * 0.76)); }
+}
+/* max-width on annettu ch-yksiköissä (≈0,6 em), joten 12+ kirjaimen sana ei mahtuisi edes oikeassa
+   koossa: min-width (voittaa max-widthin) pitää laatikon vähintään pisimmän sanan levyisenä. */
+.tn20 .tng .tng-heroh1 { font-size: min(var(--tng-h1), var(--tng-h1cap)); min-width: min(100%, calc(var(--tng-lw, 1) * 0.78em)); }
