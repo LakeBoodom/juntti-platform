@@ -140,6 +140,8 @@ export type JkCard = {
   accent: string;
   /** 5 px currentColor-alapalkki (vain 2. ja 3. erässä, README) */
   bar?: boolean;
+  /** Kortin kuvan object-position (4:5-kortti rajaa 16:10-kuvasta keskikaistan), esim. "40% top" */
+  pos?: string;
 };
 
 const IMG = (n: string) => `/20/jaakiekko/${n}.webp`;
@@ -174,12 +176,14 @@ export const JK_GENERAL: JkCard[] = [
   { quizSlug: "sm-liiga-tuomarilegendat", tag: "Erotuomarit", title: "Pillin legendat", img: IMG("jk-liiga-tuomarit"), accent: "#8FE4FB" },
 ];
 
+// Leijonat/NHL (2.10.2026): oikeat valokuvat 5 MM-kultaan ja 3 NHL-visaan (-kuva.webp, tekijät
+// lib/kuvalahteet.ts). Olympiakulta 2022 ja nuorten kullat vielä AI-kuvia (Heikki: heikot odottavat).
 export const JK_LIONS: JkCard[] = [
-  { quizSlug: "leijonat-mm-1995-kulta", tag: "MM 1995", title: "Ensimmäinen kulta", desc: "Tukholma, Ville Peltosen hattutemppu ja koko kansan yö.", img: IMG("jk-leijonat-mm1995"), accent: "#4FD1F5", bar: true },
-  { quizSlug: "leijonat-mm-2011-kulta", tag: "MM 2011", title: "Bratislavan yö", desc: "Jalonen, Jokinen ja 6–1. Suomen selkein MM-finaali.", img: IMG("jk-leijonat-mm2011"), accent: "#E8A320", bar: true },
-  { quizSlug: "leijonat-mm-2019-kulta", tag: "MM 2019", title: "Ei ketään tähteä", desc: "Kokoonpano, jota kukaan ei uskonut. Ja Marko Anttila.", img: IMG("jk-leijonat-mm2019"), accent: "#B6FF3C", bar: true },
-  { quizSlug: "leijonat-mm-2022-kulta", tag: "MM 2022", title: "Kulta kotikisoista", desc: "Tampere, jatkoaika ja Sakari Mannisen ratkaisuosuma.", img: IMG("jk-leijonat-mm2022"), accent: "#4FD1F5", bar: true },
-  { quizSlug: "leijonat-mm-2026-kulta", tag: "MM 2026", title: "Tuorein kulta", desc: "Uusi sukupolvi, uusi mestaruus. Muistatko jo kokoonpanon?", img: IMG("jk-leijonat-mm2026"), accent: "#F5F0E6", bar: true },
+  { quizSlug: "leijonat-mm-1995-kulta", tag: "MM 1995", title: "Ensimmäinen kulta", desc: "Tukholma, Ville Peltosen hattutemppu ja koko kansan yö.", img: IMG("jk-leijonat-mm1995-kuva"), pos: "42% top", accent: "#4FD1F5", bar: true },
+  { quizSlug: "leijonat-mm-2011-kulta", tag: "MM 2011", title: "Bratislavan yö", desc: "Jalonen, Jokinen ja 6–1. Suomen selkein MM-finaali.", img: IMG("jk-leijonat-mm2011-kuva"), pos: "68% top", accent: "#E8A320", bar: true },
+  { quizSlug: "leijonat-mm-2019-kulta", tag: "MM 2019", title: "Ei ketään tähteä", desc: "Kokoonpano, jota kukaan ei uskonut. Ja Marko Anttila.", img: IMG("jk-leijonat-mm2019-kuva"), pos: "center top", accent: "#B6FF3C", bar: true },
+  { quizSlug: "leijonat-mm-2022-kulta", tag: "MM 2022", title: "Kulta kotikisoista", desc: "Tampere, jatkoaika ja Sakari Mannisen ratkaisuosuma.", img: IMG("jk-leijonat-mm2022-kuva"), pos: "40% top", accent: "#4FD1F5", bar: true },
+  { quizSlug: "leijonat-mm-2026-kulta", tag: "MM 2026", title: "Tuorein kulta", desc: "Uusi sukupolvi, uusi mestaruus. Muistatko jo kokoonpanon?", img: IMG("jk-leijonat-mm2026-kuva"), pos: "62% top", accent: "#F5F0E6", bar: true },
   { quizSlug: "leijonat-olympiakulta-2022", tag: "Peking 2022", title: "Olympiakulta", desc: "Hannes Björninen ja lopulta se ainoa puuttuva mitali.", img: IMG("jk-leijonat-olympia2022"), accent: "#E8A320", bar: true },
   { quizSlug: "nuoret-leijonat-mm-2014-kulta", tag: "Nuorten MM 2014", title: "Malmön kulta", desc: "Rasmus Ristolainen ja jatkoajan ratkaisu Ruotsista.", img: IMG("jk-leijonat-nuoret2014"), accent: "#35D6A0", bar: true },
   { quizSlug: "nuoret-leijonat-mm-2016-kulta", tag: "Nuorten MM 2016", title: "Kulta kotikaukalossa", desc: "Laine, Puljujärvi, Aho — ja Kapasen jatkoaikamaali.", img: IMG("jk-leijonat-nuoret2016"), accent: "#4FD1F5", bar: true },
@@ -187,9 +191,9 @@ export const JK_LIONS: JkCard[] = [
 ];
 
 export const JK_NHL: JkCard[] = [
-  { quizSlug: "suomalaiset-nhl-pioneerit", tag: "Pioneerit", title: "Suomalaiset pioneerit", desc: "Pentti Lund, Matti Hagman ja ne, jotka avasivat oven muille.", img: IMG("jk-nhl-pioneerit"), accent: "#4FD1F5", bar: true },
-  { quizSlug: "suomalaiset-nhl-ennatykset", tag: "Ennätykset", title: "Ennätykset ja saavutukset", desc: "Selänteen tulokaskausi, Stanley Cupit ja pisterajat.", img: IMG("jk-nhl-ennatykset"), accent: "#E8A320", bar: true },
-  { quizSlug: "suomalaiset-nhl-kuriositeetit", tag: "Tilastotarinat", title: "Kuriositeetit ja tilastotarinat", desc: "Oudot luvut ja unohdetut suomalaissaavutukset NHL-historiassa.", img: IMG("jk-nhl-kuriositeetit"), accent: "#D5DCE2", bar: true },
+  { quizSlug: "suomalaiset-nhl-pioneerit", tag: "Pioneerit", title: "Suomalaiset pioneerit", desc: "Pentti Lund, Matti Hagman ja ne, jotka avasivat oven muille.", img: IMG("jk-nhl-pioneerit-kuva"), pos: "center top", accent: "#4FD1F5", bar: true },
+  { quizSlug: "suomalaiset-nhl-ennatykset", tag: "Ennätykset", title: "Ennätykset ja saavutukset", desc: "Selänteen tulokaskausi, Stanley Cupit ja pisterajat.", img: IMG("jk-nhl-ennatykset-kuva"), pos: "34% top", accent: "#E8A320", bar: true },
+  { quizSlug: "suomalaiset-nhl-kuriositeetit", tag: "Tilastotarinat", title: "Kuriositeetit ja tilastotarinat", desc: "Oudot luvut ja unohdetut suomalaissaavutukset NHL-historiassa.", img: IMG("jk-nhl-kuriositeetit-kuva"), pos: "30% top", accent: "#D5DCE2", bar: true },
 ];
 
 /** Seurat, joilla on oikea valokuva (1.10.2026, Wikimedia Commons, tekijät lib/kuvalahteet.ts).

@@ -89,7 +89,7 @@ function CardGrid({
         const inner = (
           <>
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={c.img} alt={c.title} loading="lazy" />
+            <img src={c.img} alt={c.title} loading="lazy" style={c.pos ? { objectPosition: c.pos } : undefined} />
             <span className="tnj-card-tag">{c.playHref ? c.tag : "Tulossa"}</span>
             <span className="tnj-card-text">
               <span className="tnj-card-title">{c.title}</span>
