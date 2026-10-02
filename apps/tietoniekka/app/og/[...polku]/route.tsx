@@ -154,7 +154,7 @@ async function piirra(k: Kortti, cache: string) {
           {k.tulos && (
             <div style={{ display: "flex", alignItems: "baseline", marginBottom: 10 }}>
               <div style={{ fontSize: 180, fontWeight: 900, lineHeight: 1, color: KULTA }}>{k.tulos.score}</div>
-              <div style={{ fontSize: 90, fontWeight: 900, lineHeight: 1, color: "rgba(255,251,242,0.55)", marginLeft: 8 }}>/{k.tulos.total}</div>
+              <div style={{ fontSize: 90, fontWeight: 900, lineHeight: 1, color: "rgba(255,251,242,0.55)", marginLeft: 8 }}>{`/${k.tulos.total}`}</div>
             </div>
           )}
           <div style={{ display: "flex", fontSize: koko, fontWeight: 900, lineHeight: 0.98, textTransform: "uppercase", letterSpacing: -1 }}>
@@ -173,8 +173,10 @@ async function piirra(k: Kortti, cache: string) {
     ),
     { width: W, height: H, fonts: await haeFontit() },
   );
-  img.headers.set("Cache-Control", cache);
-  return img;
+  /* PNG → JPEG: ImageResponse tuottaa PNG:n (~800 kt valokuvalla); WhatsApp jättää usein
+     yli ~300 kt:n esikatselukuvan näyttämättä. */
+  const jpg = await sharp(Buffer.from(await img.arrayBuffer())).jpeg({ quality: 80, mozjpeg: true }).toBuffer();
+  return new Response(new Uint8Array(jpg), { headers: { "Content-Type": "image/jpeg", "Cache-Control": cache } });
 }
 
 /* ── Sisältö ───────────────────────────────────────────────────────────── */
