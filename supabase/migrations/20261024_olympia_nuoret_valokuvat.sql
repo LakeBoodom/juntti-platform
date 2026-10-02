@@ -1,0 +1,5 @@
+-- 2.10.2026: olympiakulta 2022 ja nuorten kullat 2014/2016 Heikin valitsemilla kuvilla (Lehtonen, Kivi, Puljujärvi).
+-- Nuoret 2019 jää AI-kuvaksi (ehdotettu joukkuekuva on IIHF/Hockey Canadan lehtikuva ilman vapaata lisenssiä).
+update quizzes set hero_image = '/20/jaakiekko/jk-leijonat-olympia2022-kuva.webp', hero_focal_x = 0.4, hero_focal_y = 0.08, hero_alt = 'Olympiavoittaja Mikko Lehtonen Suomen paidassa Channel One Cupissa 2017. Kuva: Voltmetro (Oleg Bkhambri) / Wikimedia Commons, CC BY-SA 3.0' where slug = 'leijonat-olympiakulta-2022';
+update quizzes set hero_image = '/20/jaakiekko/jk-leijonat-nuoret2014-kuva.webp', hero_focal_x = 0.4, hero_focal_y = 0.08, hero_alt = 'Nuorten MM-kultajoukkueen 2014 päävalmentaja Karri Kivi 2019. Kuva: Sampo Anttila / Wikimedia Commons, CC BY 3.0' where slug = 'nuoret-leijonat-mm-2014-kulta';
+update quizzes set hero_image = '/20/jaakiekko/jk-leijonat-nuoret2016-kuva.webp', hero_focal_x = 0.4, hero_focal_y = 0.08, hero_alt = 'Jesse Puljujärvi haastateltavana nuorten MM-kisoissa 2016. Kuva: Oonanur / Wikimedia Commons, CC BY-SA 4.0' where slug = 'nuoret-leijonat-mm-2016-kulta';

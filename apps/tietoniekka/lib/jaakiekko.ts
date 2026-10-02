@@ -178,17 +178,18 @@ export const JK_GENERAL: JkCard[] = [
   { quizSlug: "sm-liiga-tuomarilegendat", tag: "Erotuomarit", title: "Pillin legendat", img: IMG("jk-liiga-tuomarit-kuva"), pos: "16% top", accent: "#8FE4FB" },
 ];
 
-// Leijonat/NHL (2.10.2026): oikeat valokuvat 5 MM-kultaan ja 3 NHL-visaan (-kuva.webp, tekijät
-// lib/kuvalahteet.ts). Olympiakulta 2022 ja nuorten kullat vielä AI-kuvia (Heikki: heikot odottavat).
+// Leijonat/NHL (2.10.2026): oikeat valokuvat (-kuva.webp, tekijät lib/kuvalahteet.ts). Olympiakulta,
+// nuoret 2014 ja 2016 Heikin valinnoilla (Lehtonen, Kivi, Puljujärvi). Nuoret 2019 vielä AI-kuva: Heikin
+// ehdottama joukkuekuva on IIHF/Hockey Canadan lehtikuva ilman vapaata lisenssiä.
 export const JK_LIONS: JkCard[] = [
   { quizSlug: "leijonat-mm-1995-kulta", tag: "MM 1995", title: "Ensimmäinen kulta", desc: "Tukholma, Ville Peltosen hattutemppu ja koko kansan yö.", img: IMG("jk-leijonat-mm1995-kuva"), pos: "42% top", accent: "#4FD1F5", bar: true },
   { quizSlug: "leijonat-mm-2011-kulta", tag: "MM 2011", title: "Bratislavan yö", desc: "Jalonen, Jokinen ja 6–1. Suomen selkein MM-finaali.", img: IMG("jk-leijonat-mm2011-kuva"), pos: "68% top", accent: "#E8A320", bar: true },
   { quizSlug: "leijonat-mm-2019-kulta", tag: "MM 2019", title: "Ei ketään tähteä", desc: "Kokoonpano, jota kukaan ei uskonut. Ja Marko Anttila.", img: IMG("jk-leijonat-mm2019-kuva"), pos: "center top", accent: "#B6FF3C", bar: true },
   { quizSlug: "leijonat-mm-2022-kulta", tag: "MM 2022", title: "Kulta kotikisoista", desc: "Tampere, jatkoaika ja Sakari Mannisen ratkaisuosuma.", img: IMG("jk-leijonat-mm2022-kuva"), pos: "40% top", accent: "#4FD1F5", bar: true },
   { quizSlug: "leijonat-mm-2026-kulta", tag: "MM 2026", title: "Tuorein kulta", desc: "Uusi sukupolvi, uusi mestaruus. Muistatko jo kokoonpanon?", img: IMG("jk-leijonat-mm2026-kuva"), pos: "62% top", accent: "#F5F0E6", bar: true },
-  { quizSlug: "leijonat-olympiakulta-2022", tag: "Peking 2022", title: "Olympiakulta", desc: "Hannes Björninen ja lopulta se ainoa puuttuva mitali.", img: IMG("jk-leijonat-olympia2022"), accent: "#E8A320", bar: true },
-  { quizSlug: "nuoret-leijonat-mm-2014-kulta", tag: "Nuorten MM 2014", title: "Malmön kulta", desc: "Rasmus Ristolainen ja jatkoajan ratkaisu Ruotsista.", img: IMG("jk-leijonat-nuoret2014"), accent: "#35D6A0", bar: true },
-  { quizSlug: "nuoret-leijonat-mm-2016-kulta", tag: "Nuorten MM 2016", title: "Kulta kotikaukalossa", desc: "Laine, Puljujärvi, Aho — ja Kapasen jatkoaikamaali.", img: IMG("jk-leijonat-nuoret2016"), accent: "#4FD1F5", bar: true },
+  { quizSlug: "leijonat-olympiakulta-2022", tag: "Peking 2022", title: "Olympiakulta", desc: "Hannes Björninen ja lopulta se ainoa puuttuva mitali.", img: IMG("jk-leijonat-olympia2022-kuva"), pos: "16% top", accent: "#E8A320", bar: true },
+  { quizSlug: "nuoret-leijonat-mm-2014-kulta", tag: "Nuorten MM 2014", title: "Malmön kulta", desc: "Rasmus Ristolainen ja jatkoajan ratkaisu Ruotsista.", img: IMG("jk-leijonat-nuoret2014-kuva"), pos: "18% top", accent: "#35D6A0", bar: true },
+  { quizSlug: "nuoret-leijonat-mm-2016-kulta", tag: "Nuorten MM 2016", title: "Kulta kotikaukalossa", desc: "Laine, Puljujärvi, Aho — ja Kapasen jatkoaikamaali.", img: IMG("jk-leijonat-nuoret2016-kuva"), pos: "26% top", accent: "#4FD1F5", bar: true },
   { quizSlug: "nuoret-leijonat-mm-2019-kulta", tag: "Nuorten MM 2019", title: "Victorian voitto", desc: "Kaapo Kakko ja käänne finaalin loppuminuuteilla.", img: IMG("jk-leijonat-nuoret2019"), accent: "#E8A320", bar: true },
 ];
 
