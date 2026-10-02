@@ -25,8 +25,8 @@ import { ViikkoMerkkirivi } from "./Viikkosinetti";
 
 export type ViikkoPromoData = { info: ViikkoInfo; kuvia: number };
 
-const PELI = "/peli?viikkovisa=1";
-const TARKASTELE = "/peli?viikkovisa=1&tarkastele=1";
+const PELI = "/kuvavisa/viikko";
+const TARKASTELE = "/kuvavisa/viikko?tarkastele=1";
 const KORTISTOT = "/kokoelma/kuvavisat";
 
 function useViikkoTulos(avain: string): ViikkoTulos | null {

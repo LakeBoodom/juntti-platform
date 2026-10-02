@@ -247,7 +247,7 @@ export default async function Peli20({
       /* Kuvat tulevat kaikista kortistoista, joten levyn sävy ratkaistaan
          kysymys kerrallaan eikä visan tasolla (ks. GameQuestion.plate). */
       plate: "tumma",
-      challengePath: `/peli?kuvavisa=viikko&taso=${info.avain}&ids=${rows.map((r) => r.id).join(",")}`,
+      challengePath: `/kuvavisa/viikko?taso=${info.avain}&ids=${rows.map((r) => r.id).join(",")}`,
       /* Yksi yritys viikossa: GameClient ei näytä "Pelaa uudelleen" -nappia
          viikkovisalle lainkaan. */
       reloadOnRestart: false,
@@ -505,7 +505,7 @@ export default async function Peli20({
         id: `kv-${type}`,
         title: DECKS[type].title,
         meta: `${Math.min(n, 10)} kuvaa`,
-        href: `/peli?kuvavisa=${type}`,
+        href: `/kuvavisa/${type}`,
       }));
 
     /* Vaihtoehtojen järjestys sekoitetaan per kysymys: aiemmin oikea vastaus oli
@@ -545,7 +545,7 @@ export default async function Peli20({
       isSankari: false,
       kind: "kuva",
       plate: levy,
-      challengePath: `/peli?kuvavisa=${encodeURIComponent(kuvavisa)}&ids=${rows.map((r) => r.id).join(",")}`,
+      challengePath: `/kuvavisa/${encodeURIComponent(kuvavisa)}?ids=${rows.map((r) => r.id).join(",")}`,
       /* Haastelinkillä sarja on lukittu → ei uudelleenlatausta "Pelaa uudelleen" -napista. */
       reloadOnRestart: wantedIds.length === 0,
       autoStart: params.aloita === "1",
