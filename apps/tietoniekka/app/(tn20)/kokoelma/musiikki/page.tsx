@@ -112,7 +112,7 @@ export default async function MusiikkiLanding() {
           <div className="tne-hero-body">
             {/* Kaksirivinen otsikko on typografinen ratkaisu (README §Hero) */}
             <h1 className="tne-title">
-              Musiikki ja<b>Artistit</b>
+              Musiikki ja{" "}<b>Artistit</b>
             </h1>
             <p className="tne-lede">{musiikkiIntro(count)}</p>
             <div className="tne-pills">

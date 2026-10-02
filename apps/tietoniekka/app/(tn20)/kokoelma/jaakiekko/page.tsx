@@ -180,7 +180,7 @@ export default async function JaakiekkoLanding() {
               {JK_KAUSI.statusPill}
             </span>
             <h1 className="tnj-title">
-              {JK_HERO.titleLines[0]}
+              {JK_HERO.titleLines[0]}{" "}
               <b>{JK_HERO.titleLines[1]}</b>
             </h1>
             <p className="tnj-lede">{JK_HERO.intro}</p>

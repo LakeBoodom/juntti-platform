@@ -183,7 +183,7 @@ export default async function JalkapalloLanding({
         <div className="tn-shell tnjp-hero">
           <span className="tnjp-badge"><i aria-hidden />{JP_KAUSI.badge}</span>
           <h1 className="tnjp-h1">
-            {JP_HERO.titleLines[0]}
+            {JP_HERO.titleLines[0]}{" "}
             <br />
             {JP_HERO.titleLines[1]}
           </h1>

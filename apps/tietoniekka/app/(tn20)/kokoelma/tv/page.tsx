@@ -113,7 +113,7 @@ export default async function TvLanding() {
           <div className="tne-hero-body">
             {/* Kaksirivinen otsikko on typografinen ratkaisu (README §Hero) */}
             <h1 className="tne-title">
-              TV ja<b>Suoratoisto</b>
+              TV ja{" "}<b>Suoratoisto</b>
             </h1>
             <p className="tne-lede">{TV_INTRO}</p>
             <div className="tne-pills">

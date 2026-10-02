@@ -21,6 +21,7 @@ export function CategoryPicker({
   direction = "vanhin-nuorin",
   title = "Tietoketju: Ikäjärjestys",
   description = "Aseta 10 henkilöä syntymävuoden mukaiseen järjestykseen. Valitse ensin aihe.",
+  otsikkotaso = "h2",
 }: {
   open: boolean;
   variant?: "sheet" | "inline";
@@ -31,6 +32,8 @@ export function CategoryPicker({
   direction?: ChainDirection;
   title?: string;
   description?: string;
+  /** SEO-erä A7: pelisivun aloitusnäkymässä otsikko on sivun H1 (muualla h2). */
+  otsikkotaso?: "h1" | "h2";
 }) {
   if (!open) return null;
 
@@ -42,7 +45,7 @@ export function CategoryPicker({
         </button>
       )}
       <div className="tk-picker-handle" aria-hidden="true" />
-      <h2 className="tk-picker-title">{title}</h2>
+      {otsikkotaso === "h1" ? <h1 className="tk-picker-title">{title}</h1> : <h2 className="tk-picker-title">{title}</h2>}
       <p className="tk-picker-desc">{description}</p>
       <SuuntaindikaattoriBadge direction={direction} className="tk-picker-direction" />
       <div className="tk-chiprow" role="group" aria-label="Kategoria">

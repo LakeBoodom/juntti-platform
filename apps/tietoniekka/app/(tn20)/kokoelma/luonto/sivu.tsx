@@ -118,7 +118,7 @@ export default async function LuontoLanding({
         <div className="tnl-hero-text">
           <span className="tnl-eyebrow">— Teemakokoelma</span>
           <h1 className="tn-display tnl-title">
-            <span>Suomen luonto</span>
+            <span>Suomen luonto</span>{" "}
             <i className="tnl-title-l2">lähimetsästä tunturiin</i>
           </h1>
           <p className="tnl-lede">
