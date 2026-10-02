@@ -5,6 +5,7 @@
 // Kuvavisat: oma hub (KUVAVISAT 2.0, 17.9.2026) — kategoriat avaavat visavariaatiot.
 // Tunnetut henkilöt: oma hub (ennallaan, Heikin ohje 2026-07-31).
 
+import { visaHref } from "@/lib/visaHref";
 import type { Metadata } from "next";
 import { getSupabase } from "@/lib/supabase";
 import { getSiteId } from "@/lib/queries";
@@ -243,7 +244,7 @@ function toWide(hub: HubMeta, q: Card, genreLabel: Map<string, string>) {
     (q.genre && (genreLabel.get(q.genre) ?? q.genre)) ||
     (q.subcollection ? subLabel(q.subcollection) : null);
   return {
-    href: `/peli?quiz_id=${q.id}`,
+    href: visaHref(q),
     color: cardColor(hub, q),
     motifPath: motifPathFor(q.collection, q.genre, q.title),
     genreChip: chip ?? undefined,
@@ -598,12 +599,14 @@ type Celeb = {
   ryhma: string | null; laji: string | null;
   image_url: string | null; birth_date: string; trivia_quiz_id: string | null;
   priority: number | null; created_at: string;
+  /** visan slug (quiz_cards), täytetään PersonHubissa — SEO-erä A1 */
+  quizSlug?: string | null;
 };
 function playHref(c: Celeb): string {
   /* 1.0:n /sankari/-sivut poistuivat julkaisussa 31.8.2026 — hubiin paasevat
      vain pelattavat henkilot (trivia_quiz_id suodatetaan ylempana), joten
      fallback ei koskaan osu; "#" varmistaa ettei synny ohjaussilmukkaa. */
-  if (c.trivia_quiz_id) return `/peli?quiz_id=${c.trivia_quiz_id}`;
+  if (c.trivia_quiz_id) return visaHref({ slug: c.quizSlug, id: c.trivia_quiz_id });
   return "#";
 }
 
@@ -628,13 +631,15 @@ async function PersonHub({ hub, article }: { hub: HubMeta; article?: React.React
   const erat: string[][] = [];
   for (let i = 0; i < visaIdt.length; i += 100) erat.push(visaIdt.slice(i, i + 100));
   const tulokset = await Promise.all(
-    erat.map((era) => sb.from("quiz_cards" as never).select("id").in("id", era)),
+    erat.map((era) => sb.from("quiz_cards" as never).select("id, slug").in("id", era)),
   );
-  const julkaistuIdt = new Set(
-    tulokset.flatMap((r) => ((r.data ?? []) as unknown as Array<{ id: string }>).map((x) => x.id)),
+  const julkaistut = new Map(
+    tulokset.flatMap((r) => ((r.data ?? []) as unknown as Array<{ id: string; slug: string | null }>).map((x) => [x.id, x.slug] as const)),
   );
   const celebs = kaikki.map((c) =>
-    c.trivia_quiz_id && !julkaistuIdt.has(c.trivia_quiz_id) ? { ...c, trivia_quiz_id: null } : c,
+    c.trivia_quiz_id && !julkaistut.has(c.trivia_quiz_id)
+      ? { ...c, trivia_quiz_id: null }
+      : { ...c, quizSlug: c.trivia_quiz_id ? julkaistut.get(c.trivia_quiz_id) ?? null : null },
   );
 
   const today = new Date();

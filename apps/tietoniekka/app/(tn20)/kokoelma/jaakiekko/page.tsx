@@ -18,6 +18,7 @@
 // Kaikki korttien faktaväittämät ovat CD:n designcopya — tarkistetaan
 // copy/SEO-passissa (README luku 4); kausisidonnaiset tekstit lib-configissa.
 
+import { visaHref } from "@/lib/visaHref";
 import "../../jaakiekko.css";
 import type { Metadata } from "next";
 import { getSupabase } from "@/lib/supabase";
@@ -51,7 +52,7 @@ export async function generateMetadata(): Promise<Metadata> {
 type Row = { slug: string; custom_slug: string | null; published_at: string | null };
 
 const hrefFor = (r: Row | undefined) =>
-  r ? `/peli?visa=${r.custom_slug ?? r.slug}` : null;
+  r ? visaHref(r) : null;
 
 /** Ruudukon kortti: julkaistut ensin, Tulossa perään — kummankin sisällä
     README:n listausjärjestys (README luku 3: älä sekoita keskenään). */

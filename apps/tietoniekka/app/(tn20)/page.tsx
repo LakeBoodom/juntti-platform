@@ -12,6 +12,7 @@
 // Kuori staattinen (lib/etusivu.ts), Päivän visa ja ticker dynaamisia kannasta.
 // Sivu käyttää container-kyselyitä (.tn20 on inline-size-container → cqw).
 
+import { visaHref } from "@/lib/visaHref";
 import { getSupabase, SITE_SLUG } from "@/lib/supabase";
 import { brand } from "@/config/brand";
 import { helsinginPaiva } from "@/lib/aika";
@@ -127,7 +128,7 @@ async function getData(opts: { pvTila: string | null; sankariPaiva: string | nul
       id: c.id,
       name: (c.display_title ?? c.title) as string,
       mode: c.game_mode === "mega" ? "Megavisa" : undefined,
-      href: c.game_mode === "mega" && c.slug ? `/peli?mega=${c.slug}` : `/peli?quiz_id=${c.id}`,
+      href: visaHref(c),
     }));
 
   /* Juhlat-banneri: lähin iso juhla, jolla on julkaistu visa (lib/juhlat.ts). */

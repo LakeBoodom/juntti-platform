@@ -25,6 +25,7 @@
 // (README §Tyhjät tilat). Visamäärät ovat julkaistujen määriä — ei koskaan
 // kovakoodattuja. 26.8.2026 kaikki 16 visaa ovat julkaistuja.
 
+import { visaHref } from "@/lib/visaHref";
 import "../../urheilulajit.css";
 import type { Metadata } from "next";
 import { getSupabase } from "@/lib/supabase";
@@ -57,7 +58,7 @@ export async function generateMetadata(): Promise<Metadata> {
 type Row = { slug: string; custom_slug: string | null; published_at: string | null };
 
 const hrefFor = (r: Row | undefined) =>
-  r ? `/peli?visa=${r.custom_slug ?? r.slug}` : null;
+  r ? visaHref(r) : null;
 
 /* Overlay-kortti: kaikki teksti kuvan päällä (21/9 lead, 4/5, 16/9).
    Split-kortti: kuva + tekstiosa (16/10). Anatomia on kuvasuhteen funktio —

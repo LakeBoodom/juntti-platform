@@ -2,6 +2,7 @@
 // esikatselusivulle (/esikatselu/paivan-visa), jotta esikatselu on täsmälleen
 // sama kortti kuin etusivulla (toteutusohje 19.9.2026, luku 8).
 
+import { visaHref } from "@/lib/visaHref";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { resolveCollection } from "@/lib/visanKokoelma";
 import { pvmOsat } from "@/lib/aika";
@@ -75,7 +76,7 @@ export async function rakennaPaivanVisa(
     imageUrl,
     imagePos: pos(quiz.hero_focal_x, quiz.hero_focal_y, 0.5, isPerson ? 0.15 : 0.4),
     imageAlt: quiz.hero_alt ?? "",
-    playHref: `/peli?quiz_id=${quiz.id}&paivan_visa=1`,
+    playHref: `${visaHref(quiz)}${quiz.slug ? "?" : "&"}paivan_visa=1`,
     playedHref: kokoelma.hub,
   };
 }

@@ -5,6 +5,7 @@
 // polku; kuvavisoissa pelattu kuvasarja kulkee ?ids=-parametrissa, jotta
 // kaveri saa täsmälleen saman sarjan.
 
+import { visaHref } from "@/lib/visaHref";
 import { getSupabase } from "@/lib/supabase";
 import { getKuvavisat, getKuvavisatByIds } from "@/lib/queries";
 import { TASOT, MAANOSAT, KATEGORIAT, variaationNimi, getViikkovisa, getViikkoKollaasi, levynSavy, VIIKKOVISA_KUVIA } from "@/lib/kuvavisat2026";
@@ -680,7 +681,7 @@ export default async function Peli20({
   };
   const relatedRows = (relatedRes.data ?? []) as RelatedRow[];
   const relHref = (r: RelatedRow) =>
-    r.custom_slug || r.slug ? `/peli?visa=${r.custom_slug ?? r.slug}` : `/peli?quiz_id=${r.id}`;
+    visaHref(r);
 
   const game: GameQuiz = {
     id: quiz.id,
@@ -699,7 +700,7 @@ export default async function Peli20({
     accent,
     isSankari,
     kind: "teksti",
-    challengePath: quiz.slug ? `/visa/${encodeURIComponent(quiz.slug)}` : `/peli?quiz_id=${quiz.id}`,
+    challengePath: visaHref(quiz),
     /* SUOMEN KAUPUNGIT -matkapassi (28.8.2026): kun visa on yksi 20:sta
        kaupunkivisasta, GameClient kirjoittaa leiman localStorageen pelin
        päättyessä (ks. lib/kaupungit.ts, KaupunkiPelilauta.tsx). */

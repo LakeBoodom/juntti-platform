@@ -6,6 +6,7 @@
 // lime vain toiminnoissa. Header/footer perusmustalla → sama tuote kuin muut.
 // Staattinen segmentti ohittaa dynaamisen [collection]-reitin Next.js:ssä.
 
+import { visaHref } from "@/lib/visaHref";
 import type { Metadata } from "next";
 import { getSupabase } from "@/lib/supabase";
 import { getPageContent } from "@/lib/pageContent";
@@ -42,7 +43,7 @@ type Card = {
 };
 
 const playHref = (c: Card) =>
-  c.custom_slug || c.slug ? `/peli?visa=${c.custom_slug ?? c.slug}` : `/peli?quiz_id=${c.id}`;
+  visaHref(c);
 
 function CardMeta({ c }: { c: Card }) {
   return (

@@ -21,6 +21,7 @@
 // serveri lukee sen alkuvalinnaksi, klikkaus päivittää history.replaceState.
 // Kaikki korttitekstit ovat CD:n designcopya — tarkistetaan copy/SEO-passissa.
 
+import { visaHref } from "@/lib/visaHref";
 import "../../jalkapallo.css";
 import type { Metadata } from "next";
 import { getSupabase } from "@/lib/supabase";
@@ -55,7 +56,7 @@ export async function generateMetadata(): Promise<Metadata> {
 type Row = { slug: string; custom_slug: string | null; question_count: number | null; published_at: string | null };
 
 const hrefFor = (r: Row | undefined) =>
-  r ? `/peli?visa=${r.custom_slug ?? r.slug}` : null;
+  r ? visaHref(r) : null;
 
 function ThemeCard({ c, playHref, variant }: { c: JpCard; playHref: string | null; variant: "pl" | "cl" | "finn" }) {
   const tag = playHref ? c.tag : "Tulossa";

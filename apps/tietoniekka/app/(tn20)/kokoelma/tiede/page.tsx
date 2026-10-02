@@ -12,6 +12,7 @@
 // lyhyt nimi ja koukku luetaan visan otsikosta ("Nimi – koukku"), ja
 // "Aloita näistä" -poiminnoilla on oma copynsa designin mukaan.
 
+import { visaHref } from "@/lib/visaHref";
 import type { Metadata } from "next";
 import { getSupabase } from "@/lib/supabase";
 import Crumbs from "@/components/tn20/Crumbs";
@@ -62,7 +63,7 @@ function kortinTeksti(c: Card): { nimi: string; koukku: string } {
 }
 
 const playHref = (c: Card) =>
-  c.custom_slug || c.slug ? `/peli?visa=${c.custom_slug ?? c.slug}` : `/peli?quiz_id=${c.id}`;
+  visaHref(c);
 
 function Kortti({
   card, nimi, hook, nuoli = false,

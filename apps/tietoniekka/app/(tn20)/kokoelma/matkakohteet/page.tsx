@@ -9,6 +9,7 @@
 // → footer. Designin header/Putki-pilleri jätetty pois — landingit ovat
 // headerittömiä kuten Kulttuuri ja Luonto (murupolku hoitaa paluun).
 
+import { visaHref } from "@/lib/visaHref";
 import type { Metadata } from "next";
 import { getSupabase } from "@/lib/supabase";
 import { getPageContent } from "@/lib/pageContent";
@@ -45,7 +46,7 @@ type Card = {
 };
 
 const playHref = (c: Card) =>
-  c.custom_slug || c.slug ? `/peli?visa=${c.custom_slug ?? c.slug}` : `/peli?quiz_id=${c.id}`;
+  visaHref(c);
 
 const descFor = (c: Card) => MAANTIETO_DESC[c.slug ?? ""] ?? c.teaser ?? "";
 

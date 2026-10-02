@@ -12,6 +12,7 @@
 // Tietoisia poisjättöjä: ei vaikeustasoja, putkea, kysymysmääriä,
 // genremerkintöjä korteissa, ei suosituin/trendaa, ei poimintaselitettä.
 
+import { visaHref } from "@/lib/visaHref";
 import type { Metadata } from "next";
 import { getSupabase } from "@/lib/supabase";
 import { getPageContent } from "@/lib/pageContent";
@@ -47,7 +48,7 @@ type Card = {
 };
 
 const playHref = (c: Card) =>
-  c.custom_slug || c.slug ? `/peli?visa=${c.custom_slug ?? c.slug}` : `/peli?quiz_id=${c.id}`;
+  visaHref(c);
 
 const cardName = (c: Card) => c.display_title ?? c.title;
 

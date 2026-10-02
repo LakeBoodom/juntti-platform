@@ -5,6 +5,7 @@
 // localStoragesta (tn_played_quizzes) — ei kirjautumista, kuten Putkikin.
 // Staattinen segmentti ohittaa dynaamisen [collection]-reitin.
 
+import { visaHref } from "@/lib/visaHref";
 import type { Metadata } from "next";
 import { getSupabase } from "@/lib/supabase";
 import { getPageContent } from "@/lib/pageContent";
@@ -74,7 +75,7 @@ export default async function HistoriaPage() {
     id: r.id,
     title: r.display_title ?? r.title,
     questions: r.question_count,
-    href: r.custom_slug || r.slug ? `/peli?visa=${r.custom_slug ?? r.slug}` : `/peli?quiz_id=${r.id}`,
+    href: visaHref(r),
     tag: r.slug ? THEME_TAG[r.slug] : undefined,
   });
 
