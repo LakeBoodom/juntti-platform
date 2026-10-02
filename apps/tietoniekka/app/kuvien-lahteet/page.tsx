@@ -9,7 +9,7 @@ export const metadata: Metadata = {
   robots: { index: true, follow: true },
 };
 
-const PAIVITETTY = "1.10.2026";
+const PAIVITETTY = "2.10.2026";
 
 export default function KuvienLahteetPage() {
   const musiikki = KUVALAHTEET.filter((k) => k.kokoelma === "musiikki");
@@ -63,8 +63,12 @@ export default function KuvienLahteetPage() {
             style={linkki}
           >
             Wikimedia Commonsista
+          </a>{" "}
+          (yksittäisiä kuvia myös{" "}
+          <a href="https://www.finna.fi" target="_blank" rel="noopener noreferrer" style={linkki}>
+            Finnasta
           </a>
-          . Jokaisen kuvan lisenssi on tarkistettu kuvan omalta Commons-sivulta. Kuvia on rajattu
+          ). Jokaisen kuvan lisenssi on tarkistettu kuvan omalta lähdesivulta. Kuvia on rajattu
           korttimittaan (640×360) ja skaalattu; muu muokkaus on merkitty kuvan kohdalle. CC BY-SA -lisensoitujen
           kuvien muokatut versiot ovat saatavilla samalla lisenssillä kuin alkuperäiset.
         </p>
@@ -107,7 +111,7 @@ function Lista({ rivit }: { rivit: Kuvalahde[] }) {
           <div style={{ fontWeight: 600, marginBottom: 4 }}>{k.kuvaus}</div>
           <div style={{ fontSize: 14, color: "rgba(255,255,255,0.72)" }}>
             Kuva:{" "}
-            <a href={commonsUrl(k.tiedosto)} target="_blank" rel="noopener noreferrer" style={linkki}>
+            <a href={k.lahdeUrl ?? commonsUrl(k.tiedosto)} target="_blank" rel="noopener noreferrer" style={linkki}>
               {k.tiedosto.replace(/\.[a-z]+$/i, "")}
             </a>{" "}
             · {k.tekija} ·{" "}

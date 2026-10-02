@@ -36,6 +36,8 @@ export type Kuvalahde = {
   vuosi?: string;
   /** Tehty muokkaus, jos muu kuin pelkkä rajaus (näytetään lähdesivulla). */
   muokkaus?: string;
+  /** Lähdesivu, jos kuva ei ole Wikimedia Commonsista (esim. Finna); muuten linkki muodostetaan tiedostonimestä. */
+  lahdeUrl?: string;
 };
 
 const CC = (t: string) => `https://creativecommons.org/licenses/${t}/`;
@@ -131,6 +133,15 @@ export const KUVALAHTEET: Kuvalahde[] = [
   { slug: "suomalaiset-nhl-pioneerit", kokoelma: "jaakiekko", kuvaus: "Suomen maajoukkueen pelaajia 1969", tiedosto: "Finland-icehockey-team-1969.jpg", tekija: "Tuntematon / Helsingin Sanomat", lisenssi: "Public domain", lisenssiUrl: "", vuosi: "1969" },
   { slug: "suomalaiset-nhl-ennatykset", kokoelma: "jaakiekko", kuvaus: "Teemu Selänne, Vancouverin olympialaiset 2010", tiedosto: "TeemuSelanne2010WinterOlympics.jpg", tekija: "s.yume", lisenssi: "CC BY 2.0", lisenssiUrl: CC("by/2.0"), vuosi: "2010", muokkaus: "rajattu, sivuille sumennettu jatke samasta kuvasta" },
   { slug: "suomalaiset-nhl-kuriositeetit", kokoelma: "jaakiekko", kuvaus: "NHL-kauden avausottelu Helsingissä 2010", tiedosto: "NHL 2010 Face Off Hurricanes @ Wild in Helsinki.jpg", tekija: "Saruwine", lisenssi: "CC BY-SA 3.0", lisenssiUrl: CC("by-sa/3.0"), vuosi: "2010" },
+  /* Liigan yleisvisat + kokoelman kortit (2.10.2026), public/20/jaakiekko/jk-liiga-*-kuva.webp. Moberg-kuva Finnasta. */
+  { slug: "sm-liiga-maalivahtilegendat", kokoelma: "jaakiekko", kuvaus: "Juuso Riksman, HIFK 2011", tiedosto: "Juuso Riksman 2011.jpg", tekija: "JimmyK", lisenssi: "CC BY-SA 3.0", lisenssiUrl: CC("by-sa/3.0"), vuosi: "2011", muokkaus: "pienennetty, ympärillä sumennettu jatke samasta kuvasta" },
+  { slug: "sm-liiga-kaikkien-aikojen-pistekuninkaat", kokoelma: "jaakiekko", kuvaus: "Raimo Helminen (Ilves) ja Eetu Holma (SaiPa) 2007", tiedosto: "Helminen Raimo (Ilves) + Holma Eetu (SaiPa).jpg", tekija: "Saruwine", lisenssi: "CC BY-SA 4.0", lisenssiUrl: CC("by-sa/4.0"), vuosi: "2007", muokkaus: "pienennetty, ympärillä sumennettu jatke samasta kuvasta" },
+  { slug: "sm-liiga-finaalidraamat", kokoelma: "jaakiekko", kuvaus: "Kanada-malja, Liigan mestaruuspokaali", tiedosto: "Kanada-malja (Liiga) 2023.jpg", tekija: "Lasse Keskinen", lisenssi: "CC BY-SA 4.0", lisenssiUrl: CC("by-sa/4.0"), vuosi: "2023", muokkaus: "pienennetty, ympärillä sumennettu jatke samasta kuvasta" },
+  { slug: "sm-liiga-valmentajadraamat-tulisielut", kokoelma: "jaakiekko", kuvaus: "Kari Jalonen 2012", tiedosto: "Kari Jalonen.JPG", tekija: "Artem Korzhimanov", lisenssi: "CC BY-SA 3.0", lisenssiUrl: CC("by-sa/3.0"), vuosi: "2012", muokkaus: "pienennetty, ympärillä sumennettu jatke samasta kuvasta" },
+  { slug: "sm-liiga-ulkomaalaisvahvistukset", kokoelma: "jaakiekko", kuvaus: "Dale McTavish, SaiPa 2010", tiedosto: "Dale McTavish 2.jpg", tekija: "Tuomas Vitikainen", lisenssi: "CC BY-SA 3.0", lisenssiUrl: CC("by-sa/3.0"), vuosi: "2010", muokkaus: "pienennetty, ympärillä sumennettu jatke samasta kuvasta" },
+  { slug: "sm-liigan-legendaariset-pomot-visa", kokoelma: "jaakiekko", kuvaus: "Timo Haapaniemi, Aimo Mäkinen, Göran Stubb ja Frank Moberg 1973", tiedosto: "Timo Haapaniemi, Aimo Mäkinen, Göran Stubb ja Frank Moberg", tekija: "Tuntematon kuvaaja / Museovirasto, JOKA (HBL)", lisenssi: "CC BY 4.0", lisenssiUrl: CC("by/4.0"), vuosi: "1973", muokkaus: "pienennetty, ympärillä sumennettu jatke samasta kuvasta", lahdeUrl: "https://www.finna.fi/Record/museovirasto.97c0abc2-b001-434b-b389-827da3c5613b" },
+  { slug: "sm-liiga-jaahykuninkaat-kovanaamat", kokoelma: "jaakiekko", kuvaus: "Jarkko Ruutu, Jokerit 2013", tiedosto: "Jarkko Ruutu 2013 1.jpg", tekija: "Tuomas Vitikainen", lisenssi: "CC BY-SA 3.0", lisenssiUrl: CC("by-sa/3.0"), vuosi: "2013", muokkaus: "pienennetty, ympärillä sumennettu jatke samasta kuvasta" },
+  { slug: "sm-liiga-tuomarilegendat", kokoelma: "jaakiekko", kuvaus: "Tom Laaksonen ja Jussi Terho 2007", tiedosto: "Laaksonen Tom & Terho Jussi.jpg", tekija: "Saruwine", lisenssi: "CC BY-SA 4.0", lisenssiUrl: CC("by-sa/4.0"), vuosi: "2007", muokkaus: "pienennetty, ympärillä sumennettu jatke samasta kuvasta" },
   { slug: "salo", kokoelma: "kaupungit", kuvaus: "Salon kaupungintalo", tiedosto: "Salon kaupungintalo.jpg", tekija: "Motopark", lisenssi: "CC BY-SA 3.0", lisenssiUrl: CC("by-sa/3.0"), vuosi: "2011" },
   { slug: "seinajoki", kokoelma: "kaupungit", kuvaus: "Aalto-keskus ja Lakeuden Ristin kellotorni, Seinäjoki", tiedosto: "Seinäjoki 2023.jpg", tekija: "Zache", lisenssi: "CC BY 4.0", lisenssiUrl: CC("by/4.0"), vuosi: "2023" },
   { slug: "tampere", kokoelma: "kaupungit", kuvaus: "Tampereen keskusta Näsinneulasta", tiedosto: "Tampere center from Näsinneula.jpg", tekija: "Leo-setä", lisenssi: "CC BY 2.0", lisenssiUrl: CC("by/2.0"), vuosi: "2011" },
