@@ -25,7 +25,8 @@ import {
 } from "@/lib/juhlat";
 import "../../juhlat.css";
 
-export const dynamic = "force-dynamic";
+/* SEO-erä A4: ISR 5 min (esikatselun ?pvm= luetaan vain previewissä). */
+export const revalidate = 300;
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://tietoniekka.fi";
 
@@ -60,7 +61,7 @@ const juhlaHref = (o: Esiintyma) =>
 const ESIKATSELU = process.env.VERCEL_ENV !== "production";
 
 export default async function JuhlatSivu({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
-  const sp = await searchParams;
+  const sp = ESIKATSELU ? await searchParams : {};
   const simPvm = ESIKATSELU && typeof sp.pvm === "string" && /^\d{4}-\d{2}-\d{2}$/.test(sp.pvm) ? sp.pvm : null;
   const sb = getSupabase();
   if (!sb) return <main style={{ padding: 32 }}>Ei tietokantayhteyttä.</main>;

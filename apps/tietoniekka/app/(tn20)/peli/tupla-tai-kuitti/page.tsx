@@ -14,6 +14,8 @@ import { POTTI, TEEMAT, TURVAT, TUPLA_SIVU } from "@/lib/tuplaTaiKuitti";
 import ArvoTeema from "./ArvoTeema";
 import "./tuplasivu.css";
 
+export const revalidate = 300; // SEO-erä A4
+
 export const metadata: Metadata = {
   title: "Tupla tai kuitti – Tietoniekan versio tietovisaklassikosta | Tietoniekka",
   description:

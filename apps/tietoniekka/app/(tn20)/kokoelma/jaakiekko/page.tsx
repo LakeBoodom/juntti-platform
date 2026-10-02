@@ -32,7 +32,7 @@ import {
   JK_DERBIES, JK_GENERAL, JK_LIONS, JK_NHL, type JkCard,
 } from "@/lib/jaakiekko";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 300; // SEO-erä A4 (2.10.2026): ISR 5 min
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://tietoniekka.fi";
 

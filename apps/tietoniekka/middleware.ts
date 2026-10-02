@@ -4,6 +4,7 @@
 //   • /visa/<slug>?tulos=… / ?paivan_visa=1 / ?hero=… → kirjoitetaan sisäisesti /peli?visa=<slug>&…
 //     (dynaaminen; esim. tulosvariantin jakokuva og:image tarvitsee ?tulos=)
 //   • /peli?visa=<slug> (ei muita parametreja) → kirjoitetaan sisäisesti /visa/<slug> (ISR)
+//   • /kokoelma/<luonto|kulttuuri|jalkapallo|kuvavisat|tunnetut-henkilot>?suodata=… → /suodatettu/…
 // Osoite selaimessa ei muutu missään tapauksessa. Seurantaparametrit (fbclid, utm_*) eivät
 // tee sivusta dynaamista — Facebook lisää fbclid:n jokaiseen jaettuun linkkiin.
 import { NextResponse, type NextRequest } from "next/server";
@@ -24,6 +25,15 @@ export function middleware(req: NextRequest) {
     return NextResponse.rewrite(r);
   }
 
+  /* Suodatinparametrilliset hubit → dynaaminen /suodatettu/kokoelma/<x> (ISR-hub ei lue parametreja). */
+  const hub = url.pathname.match(/^\/kokoelma\/(luonto|kulttuuri|jalkapallo|kuvavisat|tunnetut-henkilot)\/?$/);
+  if (hub) {
+    if (avaimet.length === 0) return NextResponse.next();
+    const r = url.clone();
+    r.pathname = `/suodatettu/kokoelma/${hub[1]}`;
+    return NextResponse.rewrite(r);
+  }
+
   if (url.pathname === "/peli" && avaimet.length === 1 && avaimet[0] === "visa") {
     const slug = url.searchParams.get("visa");
     if (!slug) return NextResponse.next();
@@ -35,4 +45,4 @@ export function middleware(req: NextRequest) {
   return NextResponse.next();
 }
 
-export const config = { matcher: ["/visa/:path*", "/peli"] };
+export const config = { matcher: ["/visa/:path*", "/peli", "/kokoelma/:path*"] };

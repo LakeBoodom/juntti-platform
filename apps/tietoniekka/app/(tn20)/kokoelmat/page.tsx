@@ -23,7 +23,7 @@ export const metadata: Metadata = {
   }),
 };
 
-export const dynamic = "force-dynamic";
+export const revalidate = 300; // SEO-erä A4 (2.10.2026): ISR 5 min
 
 /* Jääkiekko ja Jalkapallo eivät ole kannassa omia kokoelmia (visat ovat
    urheilua) — niiden visamäärät lasketaan teemasivujen visalistoista
