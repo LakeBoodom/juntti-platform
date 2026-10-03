@@ -13,7 +13,7 @@
   --hs-line-2: #3a3122;
   padding-bottom: 80px;
 }
-.tn20 .hs-shell { padding-top: 8px; }
+.tn20 .hs .tn-shell.hs-shell { padding-top: 8px; max-width: 1440px; }
 
 /* ── Yläosa: mobiili (3c) ─────────────────────────────────────────── */
 .tn20 .hs-top {
@@ -24,7 +24,7 @@
   align-items: end;
 }
 .tn20 .hs-otsikko { grid-area: otsikko; display: flex; flex-direction: column; gap: 8px; min-width: 0; container-type: inline-size; padding-bottom: 2px; }
-.tn20 .hs-eyebrow-desk { display: none; }
+.tn20 .hub-eyebrow.hs-eyebrow-desk { display: none; }
 .tn20 .hs-h1 {
   margin: 0;
   font-family: var(--tn-font-display); font-weight: 900; text-transform: uppercase;
@@ -47,17 +47,17 @@
 .tn20 .hs-esittely { margin: 20px 0 0; font-size: 16px; line-height: 1.6; color: var(--hs-text-2); text-wrap: pretty; }
 
 /* ── Yläosa: desktop (3a / 2a) ────────────────────────────────────── */
-@media (min-width: 960px) {
+@media (min-width: 1100px) {
   .tn20 .hs-top {
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) clamp(300px, 32vw, 500px);
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) clamp(320px, 30vw, 460px);
     grid-template-areas: "otsikko otsikko kuva" "vasen oikea kuva";
     column-gap: 48px; align-items: start;
     background: #131109; border: 1px solid var(--hs-line); border-radius: 20px; overflow: hidden;
     padding-left: clamp(28px, 3.6vw, 56px);
   }
   .tn20 .hs-otsikko { padding: 40px 0 0; gap: 12px; }
-  .tn20 .hs-eyebrow-desk { display: block; }
-  .tn20 .hs-eyebrow-mob { display: none; }
+  .tn20 .hub-eyebrow.hs-eyebrow-desk { display: block; }
+  .tn20 .hub-eyebrow.hs-eyebrow-mob { display: none; }
   .tn20 .hs-h1 { padding-top: 16px; font-size: min(104px, calc(100cqw / (var(--hs-lw, 8) * 0.82))); }
   .tn20 .hs-rooli { font-size: 19px; }
   .tn20 .hs-kuva {
@@ -80,7 +80,7 @@
   display: grid; grid-template-columns: auto minmax(0, 1fr); column-gap: 18px; align-items: center;
   border-top: 3px double var(--hs-gold, #c9a96a); border-bottom: 1px solid var(--hs-line-2, #3a3122); padding: 16px 0;
 }
-@media (min-width: 960px) {
+@media (min-width: 1100px) {
   .tn20 .hub-fakta { border: 0; padding: 0; column-gap: 20px; }
 }
 .tn20 .hub-fakta-suuri { display: flex; flex-direction: column; gap: 8px; padding-right: 18px; border-right: 1px solid var(--hs-line-2, #3a3122); }
@@ -89,7 +89,7 @@
   font-size: clamp(60px, 15vw, 72px); white-space: nowrap;
 }
 .tn20 .hub-fakta-luku--vali { font-size: clamp(40px, 11vw, 52px); letter-spacing: -0.03em; }
-@media (min-width: 960px) {
+@media (min-width: 1100px) {
   .tn20 .hub-fakta-luku { font-size: clamp(72px, 6.6vw, 96px); }
   .tn20 .hub-fakta-luku--vali { font-size: clamp(48px, 4.4vw, 64px); }
 }
@@ -98,7 +98,7 @@
 .tn20 .hub-fakta-rivit { display: flex; flex-direction: column; gap: 7px; font-size: 15px; line-height: 1.35; color: var(--hs-text-2, #dcd4c4); min-width: 0; }
 .tn20 .hub-fakta-rivit strong { color: var(--tn-text); }
 .tn20 .hub-fakta-tayttaa { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
-@media (min-width: 960px) { .tn20 .hub-fakta-rivit { font-size: 16px; gap: 8px; } }
+@media (min-width: 1100px) { .tn20 .hub-fakta-rivit { font-size: 16px; gap: 8px; } }
 
 .tn20 .hub-chip { align-self: flex-start; display: inline-block; padding: 3px 9px; border-radius: 999px; font-size: 13px; line-height: 1.3; }
 .tn20 .hub-chip--kulta { background: rgba(201, 169, 106, 0.16); border: 1px solid rgba(201, 169, 106, 0.5); font-weight: 800; color: var(--hs-gold-2, #e4c98e); }
@@ -116,7 +116,7 @@
 }
 .tn20 .hub-lyhyesti dt { font-size: 12px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: var(--hs-gold, #c9a96a); padding-top: 2px; overflow-wrap: normal; word-break: keep-all; }
 .tn20 .hub-lyhyesti dd { margin: 0; font-weight: 600; color: var(--tn-text); }
-@media (min-width: 960px) {
+@media (min-width: 1100px) {
   .tn20 .hub-lyhyesti-rivi { grid-template-columns: 150px minmax(0, 1fr); font-size: 16px; }
 }
 
@@ -126,7 +126,7 @@
   font-size: clamp(20px, 5vw, 22px); line-height: 1.05; color: var(--tn-text);
   overflow-wrap: normal; word-break: keep-all;
 }
-.tn20 .hub-hylly { display: flex; flex-direction: column; gap: 12px; }
+.tn20 .hub-hylly { display: flex; flex-direction: column; gap: 12px; container-type: inline-size; }
 .tn20 .hub-hylly-otsikko { margin-bottom: 4px; }
 .tn20 .hub-eyebrow { display: block; font-size: 11px; font-weight: 800; letter-spacing: 0.16em; text-transform: uppercase; color: var(--hs-gold, #c9a96a); }
 .tn20 .hub-eyebrow--himmea { color: #b0a794; }
@@ -150,7 +150,8 @@
   font-family: var(--tn-font-display); font-weight: 900; font-size: 16px; letter-spacing: 0.05em; text-transform: uppercase; white-space: nowrap;
 }
 .tn20 .hub-btn--ghost { background: transparent; border: 1px solid rgba(201, 169, 106, 0.6); color: var(--hs-gold-2, #e4c98e); font-size: 15px; }
-@media (min-width: 560px) {
+/* Rivi vasta kun KORTILLA on tilaa (ei näkymän leveys): kapeassa sarakkeessa nimi + nappi pinoutuvat. */
+@container (min-width: 440px) {
   .tn20 .hub-visa { flex-direction: row; align-items: center; justify-content: space-between; gap: 20px; padding: 20px 22px; }
   .tn20 .hub-btn { flex: none; min-height: 52px; }
 }
@@ -187,7 +188,7 @@
 .tn20 .hub-laatta-nimi { font-size: 14px; font-weight: 700; line-height: 1.2; overflow-wrap: normal; word-break: keep-all; }
 .tn20 .hub-laatta-ala { font-size: 13px; color: #a79e8c; }
 .tn20 .hub-duotone { position: absolute; inset: 0; pointer-events: none; mix-blend-mode: color; background: #7a5af8; }
-@media (min-width: 960px) {
+@media (min-width: 1100px) {
   .tn20 .hub-laatat-lista { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 14px; margin: 0; padding: 0; overflow: visible; }
   .tn20 .hub-laatat-lista li { width: auto; }
 }
@@ -195,7 +196,7 @@
 /* ── Alaosa ───────────────────────────────────────────────────────── */
 .tn20 .hs-ala { display: flex; flex-direction: column; gap: 34px; margin-top: 34px; }
 .tn20 .hs-ala-vasen, .tn20 .hs-ala-oikea { display: flex; flex-direction: column; gap: 34px; min-width: 0; }
-@media (min-width: 960px) {
+@media (min-width: 1100px) {
   .tn20 .hs-ala { display: grid; grid-template-columns: minmax(0, 1fr) 360px; gap: 56px; margin-top: 40px; }
   .tn20 .hs-ala-oikea { gap: 16px; }
 }
