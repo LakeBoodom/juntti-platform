@@ -288,4 +288,5 @@ export function helsinginKeskiyo(t: number): number {
   return tunti === 0 ? arvio : arvio - tunti * 36e5;
 }
 
-export const visaHref = (slug: string) => `/peli?visa=${slug}`;
+/** SEO-erä A1: kanoninen /visa/<slug> (ks. lib/visaHref.ts). */
+export const visaHref = (slug: string) => `/visa/${encodeURIComponent(slug)}`;

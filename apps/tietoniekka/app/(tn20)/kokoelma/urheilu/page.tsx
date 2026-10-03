@@ -25,6 +25,9 @@
 // (README §Tyhjät tilat). Visamäärät ovat julkaistujen määriä — ei koskaan
 // kovakoodattuja. 26.8.2026 kaikki 16 visaa ovat julkaistuja.
 
+import { KokoelmaLd } from "@/components/tn20/KokoelmaLd";
+import { jakoMeta } from "@/lib/jakoMeta";
+import { visaHref } from "@/lib/visaHref";
 import "../../urheilulajit.css";
 import type { Metadata } from "next";
 import { getSupabase } from "@/lib/supabase";
@@ -36,7 +39,7 @@ import {
   type UlLohko, type UlVisa,
 } from "@/lib/urheilulajit";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 300; // SEO-erä A4 (2.10.2026): ISR 5 min
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://tietoniekka.fi";
 
@@ -50,14 +53,14 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     title, description,
     alternates: { canonical },
-    openGraph: { type: "website", locale: "fi_FI", siteName: "Tietoniekka", url: canonical, title, description },
+    ...jakoMeta({ title, description, url: canonical, kuva: "/og/kokoelma/urheilu" }),
   };
 }
 
 type Row = { slug: string; custom_slug: string | null; published_at: string | null };
 
 const hrefFor = (r: Row | undefined) =>
-  r ? `/peli?visa=${r.custom_slug ?? r.slug}` : null;
+  r ? visaHref(r) : null;
 
 /* Overlay-kortti: kaikki teksti kuvan päällä (21/9 lead, 4/5, 16/9).
    Split-kortti: kuva + tekstiosa (16/10). Anatomia on kuvasuhteen funktio —
@@ -166,6 +169,7 @@ export default async function UrheiluLanding() {
 
   return (
     <main className="tnk" style={{ minHeight: "100dvh" }}>
+      <KokoelmaLd avain="urheilu" nimi="Urheilu" polku="/kokoelma/urheilu" />
       <Crumbs items={[{ label: "Kokoelmat", href: "/kokoelmat" }, { label: "Urheilu" }]} />
       {/* Mobiili (CD 24.9.): teksti kuvan päällä varjostuksella + lohkot listana */}
       <MobiiliSankari

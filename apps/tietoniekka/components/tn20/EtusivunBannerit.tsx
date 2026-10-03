@@ -73,7 +73,7 @@ export function KuvavisatBanneri({
             Selaa kuvavisoja <span aria-hidden="true">→</span>
           </a>
           {viikko && (
-            <a className="eb-vv" href="/peli?viikkovisa=1" aria-label={`Viikkovisa ${viikko.viikko}, uusi maanantaina — pelaa`}>
+            <a className="eb-vv" href="/kuvavisa/viikko" aria-label={`Viikkovisa ${viikko.viikko}, uusi maanantaina — pelaa`}>
               <span className="eb-vv-nro">{viikko.viikko}</span>
               <span className="eb-vv-t">
                 <span className="eb-vv-nimi">Viikkovisa</span>

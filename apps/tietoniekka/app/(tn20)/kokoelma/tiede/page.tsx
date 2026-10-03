@@ -12,6 +12,9 @@
 // lyhyt nimi ja koukku luetaan visan otsikosta ("Nimi – koukku"), ja
 // "Aloita näistä" -poiminnoilla on oma copynsa designin mukaan.
 
+import { KokoelmaLd } from "@/components/tn20/KokoelmaLd";
+import { jakoMeta } from "@/lib/jakoMeta";
+import { visaHref } from "@/lib/visaHref";
 import type { Metadata } from "next";
 import { getSupabase } from "@/lib/supabase";
 import Crumbs from "@/components/tn20/Crumbs";
@@ -22,7 +25,7 @@ import {
 } from "@/lib/tiede";
 import "../../tiede.css";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 300; // SEO-erä A4 (2.10.2026): ISR 5 min
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://tietoniekka.fi";
 
@@ -31,12 +34,12 @@ export const metadata: Metadata = {
   description:
     "20 tietovisaa kehosta avaruuteen: aivot, genetiikka, aurinkokunta, dinosaurukset, keksinnöt ja tiedemyytit. Ilmaisia visoja ilman kirjautumista.",
   alternates: { canonical: `${SITE_URL}/kokoelma/tiede` },
-  openGraph: {
-    type: "website", locale: "fi_FI", siteName: "Tietoniekka",
+  ...jakoMeta({
     url: `${SITE_URL}/kokoelma/tiede`,
     title: "Tiede ja teknologia — tietovisat",
-    description: "Maailma on kummallisempi kuin luulet. 20 visaa kehosta avaruuteen.",
-  },
+    description: "Maailma on kummallisempi kuin luulet. Visat kehosta avaruuteen.",
+    kuva: "/og/kokoelma/tiede",
+  }),
 };
 
 type Card = {
@@ -62,7 +65,7 @@ function kortinTeksti(c: Card): { nimi: string; koukku: string } {
 }
 
 const playHref = (c: Card) =>
-  c.custom_slug || c.slug ? `/peli?visa=${c.custom_slug ?? c.slug}` : `/peli?quiz_id=${c.id}`;
+  visaHref(c);
 
 function Kortti({
   card, nimi, hook, nuoli = false,
@@ -117,6 +120,7 @@ export default async function TiedeLanding() {
 
   return (
     <main className="tnt-page">
+      <KokoelmaLd avain="tiede" nimi="Tiede & teknologia" polku="/kokoelma/tiede" />
       <Crumbs items={[{ label: "Kokoelmat", href: "/kokoelmat" }, { label: "Tiede & teknologia" }]} />
       {/* Mobiili (CD 24.9.): iskulause ingressin ensimmäiseksi virkkeeksi, aihepiirit listana */}
       <MobiiliSankari

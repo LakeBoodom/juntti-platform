@@ -3,6 +3,8 @@
 // kierros arvotaan jo palvelimella (ei tyhjää välähdystä ennen peliä).
 // Ilman autostartia sivu avaa CategoryPicker-aloitusnäkymän clientillä.
 
+import { JsonLd, peliLd } from "@/lib/jsonLd";
+import { jakoMeta } from "@/lib/jakoMeta";
 import type { Metadata } from "next";
 import { getChainRound } from "@/lib/ikajarjestys";
 import IkajarjestysClient from "./IkajarjestysClient";
@@ -13,6 +15,14 @@ export const metadata: Metadata = {
   title: "Tietoketju: Ikäjärjestys – aseta henkilöt syntymävuoden mukaan | Tietoniekka",
   description:
     "Aseta kymmenen tunnettua suomalaista syntymävuoden mukaiseen järjestykseen. Nopeatempoinen uusi tietopeli Tietoniekassa — ei kirjautumista.",
+  /* SEO-erä A2/A7: canonical (?category= ja ?autostart= ovat saman sivun muunnelmia) + jakokuva. */
+  alternates: { canonical: "/peli/ikajarjestys" },
+  ...jakoMeta({
+    title: "Tietoketju: Ikäjärjestys",
+    description: "Aseta kymmenen tunnettua suomalaista syntymävuoden mukaiseen järjestykseen.",
+    url: "/peli/ikajarjestys",
+    kuva: "/og/sivu/ikajarjestys",
+  }),
 };
 
 export default async function IkajarjestysPage({
@@ -26,5 +36,10 @@ export default async function IkajarjestysPage({
 
   const initialRound = autostart ? await getChainRound(category) : null;
 
-  return <IkajarjestysClient initialCategory={category} initialRound={initialRound} />;
+  return (
+    <>
+      <JsonLd data={peliLd({ name: "Tietoketju: Ikäjärjestys", url: "/peli/ikajarjestys", description: "Aseta kymmenen tunnettua suomalaista syntymävuoden mukaiseen järjestykseen." })} />
+      <IkajarjestysClient initialCategory={category} initialRound={initialRound} />
+    </>
+  );
 }

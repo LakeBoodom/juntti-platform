@@ -5,6 +5,9 @@
 // polku; kuvavisoissa pelattu kuvasarja kulkee ?ids=-parametrissa, jotta
 // kaveri saa täsmälleen saman sarjan.
 
+import { JsonLd, breadcrumbLd, abs } from "@/lib/jsonLd";
+import { haeRistiinnostot, type RelatedRow } from "@/lib/related";
+import { visaHref } from "@/lib/visaHref";
 import { getSupabase } from "@/lib/supabase";
 import { getKuvavisat, getKuvavisatByIds } from "@/lib/queries";
 import { TASOT, MAANOSAT, KATEGORIAT, variaationNimi, getViikkovisa, getViikkoKollaasi, levynSavy, VIIKKOVISA_KUVIA } from "@/lib/kuvavisat2026";
@@ -49,10 +52,18 @@ export async function generateMetadata(
      asetti vain titlen ja descriptionin, JOKAINEN jaettu visalinkki näytti
      WhatsAppissa ja Facebookissa saman otsikon. Jakaminen on kasvun pääkanava,
      joten og ja twitter asetetaan nyt jokaisessa haarassa erikseen. */
-  const og = (title: string, description: string): Metadata => ({
-    openGraph: { type: "website", locale: "fi_FI", siteName: "Tietoniekka", title, description },
-    twitter: { card: "summary_large_image", title, description },
+  /* SEO-erä A2 (2.10.2026): jakokuva (/og/…) ja og:url jokaisessa haarassa — ilman niitä
+     lapsen openGraph korvasi juuren kuvan ja jaetuista linkeistä puuttui kuva kokonaan. */
+  const og = (title: string, description: string, image: string, url: string): Metadata => ({
+    openGraph: {
+      type: "website", locale: "fi_FI", siteName: "Tietoniekka", title, description, url,
+      images: [{ url: image, width: 1200, height: 630, alt: title }],
+    },
+    twitter: { card: "summary_large_image", title, description, images: [image] },
   });
+  /* Tulosvariantti (?tulos=8-10, jaettu tulos): jakokuvaan iso pistemäärä. */
+  const tulosRaw = str("tulos");
+  const tulos = tulosRaw && /^\d{1,2}-\d{1,2}$/.test(tulosRaw) ? tulosRaw : null;
   if (viikkovisa) {
     const vv = await getViikkovisa();
     /* Kierros 4: "Viikkovisa 38 · Kuvat" — sama nimi kuin sivulla ja jaossa. */
@@ -61,9 +72,9 @@ export async function generateMetadata(
     return {
       title: `${t} – tunnista kuvasta${suffix}`,
       description: d,
-      ...og(t, d),
-      /* Sarja vaihtuu maanantaisin, joten kanoninen osoite on parametriton. */
-      alternates: { canonical: "/peli?viikkovisa=1" },
+      ...og(t, d, "/og/kuvavisa/viikko", "/kuvavisa/viikko"),
+      /* Sarja vaihtuu maanantaisin, joten kanoninen osoite on parametriton (A6: /kuvavisa/viikko). */
+      alternates: { canonical: "/kuvavisa/viikko" },
     };
   }
   if (kuvavisa) {
@@ -77,10 +88,10 @@ export async function generateMetadata(
     return {
       title: `${t} – tunnista kuvasta${suffix}`,
       description: kuvaDesc,
-      ...og(`${t} – tunnista kuvasta`, kuvaDesc),
+      ...og(`${t} – tunnista kuvasta`, kuvaDesc, `/og/kuvavisa/${encodeURIComponent(kuvavisa)}`, `/kuvavisa/${encodeURIComponent(kuvavisa)}`),
       /* T6: kanoninen osoite on kortiston perusvisa — variaatiot eivät kilpaile
-         samasta hakutuloksesta keskenään. */
-      alternates: { canonical: `/peli?kuvavisa=${encodeURIComponent(kuvavisa)}` },
+         samasta hakutuloksesta keskenään. SEO-erä A6: polkumuoto /kuvavisa/<kortisto>. */
+      alternates: { canonical: `/kuvavisa/${encodeURIComponent(kuvavisa)}` },
     };
   }
   if (!sb) return {};
@@ -89,7 +100,12 @@ export async function generateMetadata(
     if (!data) return { title: `Visaa ei löytynyt${suffix}` };
     const megaNimi = data.display_title ?? data.title;
     const megaDesc = data.teaser ?? "Megavisa: yksi istunto ilman taukoja. Pelaa ilmaiseksi Tietoniekassa.";
-    return { title: `${megaNimi}${suffix}`, description: megaDesc, ...og(megaNimi, megaDesc) };
+    const megaUrl = `/peli?mega=${encodeURIComponent(mega)}`;
+    return {
+      title: `${megaNimi}${suffix}`, description: megaDesc,
+      ...og(megaNimi, megaDesc, `/og/mega/${encodeURIComponent(mega)}`, megaUrl),
+      alternates: { canonical: megaUrl },
+    };
   }
   if (slug || quizId) {
     let q = sb.from("quizzes").select("title, display_title, teaser, description, slug, seo_title, seo_description, collection").eq("status", "published");
@@ -119,7 +135,9 @@ export async function generateMetadata(
       const henkilo = name.split(/\s[–—-]\s/)[0].trim();
       hakuOtsikko = `${henkilo} – tietovisa: kuinka hyvin tunnet?${suffix}`;
     }
-    return { title: hakuOtsikko, description: visaDesc, ...og(name, visaDesc), ...canonical };
+    const visaPolku = data.slug ? `/visa/${data.slug}` : `/peli?quiz_id=${quizId}`;
+    const ogKuva = data.slug ? `/og/visa/${encodeURIComponent(data.slug)}${tulos ? `?tulos=${tulos}` : ""}` : "/og-image.png";
+    return { title: hakuOtsikko, description: visaDesc, ...og(name, visaDesc, ogKuva, visaPolku), ...canonical };
   }
   return { title: `Visaa ei löytynyt${suffix}` };
 }
@@ -167,6 +185,8 @@ type QuizRow = {
      golfvisassa näkyi tennisvisan kuva. */
   hero_image: string | null; hero_focal_x: number | null; hero_focal_y: number | null;
   hero_side: string | null; hero_alt: string | null;
+  /** SEO-erä A9: Quiz.dateModified */
+  updated_at?: string | null;
   /* Aihekohtaiset tulostasot (migraatio 20260928, Instagram-kierros 4) */
   fanitasot?: unknown;
 };
@@ -230,7 +250,7 @@ export default async function Peli20({
       /* Kuvat tulevat kaikista kortistoista, joten levyn sävy ratkaistaan
          kysymys kerrallaan eikä visan tasolla (ks. GameQuestion.plate). */
       plate: "tumma",
-      challengePath: `/peli?kuvavisa=viikko&taso=${info.avain}&ids=${rows.map((r) => r.id).join(",")}`,
+      challengePath: `/kuvavisa/viikko?taso=${info.avain}&ids=${rows.map((r) => r.id).join(",")}`,
       /* Yksi yritys viikossa: GameClient ei näytä "Pelaa uudelleen" -nappia
          viikkovisalle lainkaan. */
       reloadOnRestart: false,
@@ -488,7 +508,7 @@ export default async function Peli20({
         id: `kv-${type}`,
         title: DECKS[type].title,
         meta: `${Math.min(n, 10)} kuvaa`,
-        href: `/peli?kuvavisa=${type}`,
+        href: `/kuvavisa/${type}`,
       }));
 
     /* Vaihtoehtojen järjestys sekoitetaan per kysymys: aiemmin oikea vastaus oli
@@ -528,7 +548,7 @@ export default async function Peli20({
       isSankari: false,
       kind: "kuva",
       plate: levy,
-      challengePath: `/peli?kuvavisa=${encodeURIComponent(kuvavisa)}&ids=${rows.map((r) => r.id).join(",")}`,
+      challengePath: `/kuvavisa/${encodeURIComponent(kuvavisa)}?ids=${rows.map((r) => r.id).join(",")}`,
       /* Haastelinkillä sarja on lukittu → ei uudelleenlatausta "Pelaa uudelleen" -napista. */
       reloadOnRestart: wantedIds.length === 0,
       autoStart: params.aloita === "1",
@@ -553,28 +573,14 @@ export default async function Peli20({
 
   let q = sb
     .from("quizzes")
-    .select("id, slug, title, display_title, teaser, description, category, collection, genre, learn, hero_image, hero_focal_x, hero_focal_y, hero_side, hero_alt, fanitasot")
+    .select("id, slug, title, display_title, teaser, description, category, collection, genre, learn, hero_image, hero_focal_x, hero_focal_y, hero_side, hero_alt, fanitasot, updated_at")
     .eq("status", "published");
   q = quizId ? q.eq("id", quizId) : q.eq("slug", slug!);
   const { data: quiz } = await q.maybeSingle<QuizRow>();
   if (!quiz) notFound();
 
   const resolved = resolveCollection(quiz);
-  /* Ristiinnostot samasta teemasta: kaupungit/jääkiekko/jalkapallo omista
-     joukoistaan, muut kokoelmasta. Megat pois (question_count 0, oma landing). */
-  let relQ = sb
-    .from("quiz_cards" as never)
-    .select("id, slug, custom_slug, display_title, title, teaser, collection, genre, question_count")
-    .neq("id", quiz.id)
-    .neq("game_mode" as never, "mega");
-  relQ =
-    resolved.key === "kaupungit" ? relQ.eq("category", "kaupungit") :
-    resolved.key === "tiede" ? relQ.eq("category", "tiede-teknologia") :
-    resolved.key === "jaakiekko" ? relQ.or("category.eq.jaakiekko,genre.eq.jaakiekko") :
-    resolved.key === "jalkapallo" ? relQ.eq("genre", "jalkapallo") :
-    resolved.key === "yleistieto" ? relQ.eq("collection", "yleistieto").neq("category", "kaupungit").neq("category", "ruoka-juoma") :
-    relQ.eq("collection", quiz.collection ?? "yleistieto");
-
+  /* Ristiinnostot (SEO-erä A3): portaittainen, satunnaistettu haku — ks. lib/related.ts. */
   const [{ data: qs }, genreRes, relatedRes, celebRes] = await Promise.all([
     sb
       .from("questions")
@@ -584,11 +590,11 @@ export default async function Peli20({
     quiz.genre
       ? sb.from("genres" as never).select("label").eq("collection", quiz.collection ?? "").eq("genre_key", quiz.genre).maybeSingle()
       : Promise.resolve({ data: null }),
-    relQ.order("published_at", { ascending: false }).limit(6),
+    haeRistiinnostot(sb, quiz, resolved).then((data) => ({ data })),
     /* Henkilövisan kuva tulee celebrities-riviltä (Wikipedia/Wikimedia), ei
        kokoelmakartasta — henkilövisoja on 243 eikä niille ole omia kuvia. */
     quiz.collection === "tunnetut-henkilot"
-      ? sb.from("celebrities").select("name, role, image_url").eq("trivia_quiz_id", quiz.id).maybeSingle()
+      ? sb.from("celebrities").select("name, role, image_url, wikipedia_url").eq("trivia_quiz_id", quiz.id).maybeSingle()
       : Promise.resolve({ data: null }),
   ]);
 
@@ -621,7 +627,7 @@ export default async function Peli20({
      se on juuri se virhe, jossa golfvisa sai tennisvisan kuvan. */
   const heroParam = typeof params.hero === "string" ? params.hero : null;
   const isPerson = collection === "tunnetut-henkilot";
-  const celeb = (celebRes.data ?? null) as { name: string; role: string | null; image_url: string | null } | null;
+  const celeb = (celebRes.data ?? null) as { name: string; role: string | null; image_url: string | null; wikipedia_url?: string | null } | null;
   /* Wikimedian thumb-osoitteessa leveys on polussa (".../330px-Tiedosto.jpg").
      Kannassa olevat kuvat ovat 330 px leveitä — liian pieniä 3:4-kortille — ja
      Wikimedia hyväksyy vain tietyt kokoportaat, joista 1280 on suurin toimiva.
@@ -673,14 +679,9 @@ export default async function Peli20({
       }
     : null;
 
-  type RelatedRow = {
-    id: string; slug: string | null; custom_slug: string | null;
-    display_title: string | null; title: string; teaser: string | null;
-    collection: string | null; genre: string | null; question_count: number;
-  };
   const relatedRows = (relatedRes.data ?? []) as RelatedRow[];
   const relHref = (r: RelatedRow) =>
-    r.custom_slug || r.slug ? `/peli?visa=${r.custom_slug ?? r.slug}` : `/peli?quiz_id=${r.id}`;
+    visaHref(r);
 
   const game: GameQuiz = {
     id: quiz.id,
@@ -699,7 +700,7 @@ export default async function Peli20({
     accent,
     isSankari,
     kind: "teksti",
-    challengePath: quiz.slug ? `/visa/${encodeURIComponent(quiz.slug)}` : `/peli?quiz_id=${quiz.id}`,
+    challengePath: visaHref(quiz),
     /* SUOMEN KAUPUNGIT -matkapassi (28.8.2026): kun visa on yksi 20:sta
        kaupunkivisasta, GameClient kirjoittaa leiman localStorageen pelin
        päättyessä (ks. lib/kaupungit.ts, KaupunkiPelilauta.tsx). */
@@ -757,6 +758,25 @@ export default async function Peli20({
           <span aria-current="page">{quiz.display_title ?? quiz.title}</span>
         </div>
       </nav>
+      {/* SEO-erä A9: BreadcrumbList + Quiz (henkilövisalle about: Person + sameAs Wikipedia) */}
+      <JsonLd data={breadcrumbLd([{ name: "Etusivu", url: "/" }, { name: collectionLabel, url: hubHref }, { name: quiz.display_title ?? quiz.title }])} />
+      <JsonLd
+        data={{
+          "@context": "https://schema.org",
+          "@type": "Quiz",
+          name: quiz.display_title ?? quiz.title,
+          url: abs(visaHref(quiz)),
+          description: quiz.teaser ?? quiz.description ?? undefined,
+          inLanguage: "fi",
+          isAccessibleForFree: true,
+          numberOfQuestions: game.questions.length,
+          ...(quiz.updated_at ? { dateModified: quiz.updated_at } : {}),
+          about: celeb
+            ? { "@type": "Person", name: celeb.name, ...(celeb.wikipedia_url ? { sameAs: celeb.wikipedia_url } : {}) }
+            : { "@type": "Thing", name: collectionLabel },
+          publisher: { "@type": "Organization", name: "Tietoniekka", url: abs("/") },
+        }}
+      />
 
       {relatedRows.length > 0 && (
         <section className="tn-seo-related tn-learn-ssr">

@@ -7,11 +7,15 @@
 // tulosta, tilaa eikä "uusi"-merkintöjä. Navigaatio tulee sivustolta (lib/nav.ts).
 // Aiheet ja Arvo teema näkyvät vasta, kun pelattavia teemoja on useampi kuin nosto.
 
+import { JsonLd, peliLd } from "@/lib/jsonLd";
+import { jakoMeta } from "@/lib/jakoMeta";
 import type { CSSProperties } from "react";
 import type { Metadata } from "next";
 import { POTTI, TEEMAT, TURVAT, TUPLA_SIVU } from "@/lib/tuplaTaiKuitti";
 import ArvoTeema from "./ArvoTeema";
 import "./tuplasivu.css";
+
+export const revalidate = 300; // SEO-erä A4
 
 export const metadata: Metadata = {
   title: "Tupla tai kuitti – Tietoniekan versio tietovisaklassikosta | Tietoniekka",
@@ -19,6 +23,12 @@ export const metadata: Metadata = {
     "Valitse aihe ja vastaa kymmeneen yhä vaikeampaan kysymykseen. Jokainen oikea vastaus tuplaa potin – kuittaa ajoissa tai pelaa kaikesta.",
   // Julkaistu 26.9.2026: Pelimuodot-valikossa ja etusivun bannerissa
   alternates: { canonical: "/peli/tupla-tai-kuitti" },
+  ...jakoMeta({
+    title: "Tupla tai kuitti – Tietoniekan versio tietovisaklassikosta",
+    description: "Kymmenen yhä vaikeampaa kysymystä. Jokainen oikea vastaus tuplaa potin – kuittaa ajoissa tai pelaa kaikesta.",
+    url: "/peli/tupla-tai-kuitti",
+    kuva: "/og/sivu/tupla-tai-kuitti",
+  }),
 };
 
 const ESITTELY = [
@@ -51,6 +61,7 @@ export default function TuplaTaiKuittiSivu() {
   const [nosto, ...muut] = TEEMAT;
   return (
     <main className="tks">
+      <JsonLd data={peliLd({ name: "Tupla tai kuitti", url: "/peli/tupla-tai-kuitti", description: "Kymmenen yhä vaikeampaa kysymystä; jokainen oikea vastaus tuplaa potin – kuittaa ajoissa tai pelaa kaikesta." })} />
       <div className="tks-hero">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img

@@ -98,3 +98,24 @@ export const COLLECTION_LABEL: Record<string, string> = {
   juhlat: "Juhlat",
 };
 
+
+/* SEO-erä A3 (2.10.2026): kokoelman naapurit ristiinnostojen viimeiselle portaalle
+   (lib/related.ts). Avaimena resolveCollection().key. Juhlat eivät ole kenenkään naapuri
+   (sesonkisidonnaisia), mutta juhlavisalle tarjotaan kulttuuria ja historiaa. */
+export const COLLECTION_NEIGHBORS: Record<string, string[]> = {
+  tv: ["elokuvat", "musiikki", "tunnetut-henkilot"],
+  elokuvat: ["tv", "musiikki", "kulttuuri"],
+  musiikki: ["tv", "elokuvat", "tunnetut-henkilot"],
+  urheilu: ["tunnetut-henkilot", "historia"],
+  jaakiekko: ["urheilu"],
+  jalkapallo: ["urheilu"],
+  historia: ["kulttuuri", "matkakohteet", "tunnetut-henkilot"],
+  kulttuuri: ["historia", "musiikki", "elokuvat"],
+  luonto: ["matkakohteet", "yleistieto"],
+  matkakohteet: ["luonto", "historia"],
+  kaupungit: ["matkakohteet", "historia"],
+  tiede: ["luonto", "historia"],
+  "tunnetut-henkilot": ["tv", "musiikki", "urheilu"],
+  juhlat: ["kulttuuri", "historia"],
+  yleistieto: ["historia", "matkakohteet", "luonto"],
+};

@@ -200,7 +200,7 @@ export async function getKuvavisatHub(): Promise<{ kategoriat: KategoriaData[]; 
         key: `taso-${taso.key}`,
         label: `${taso.label} ${meta.monikko}`,
         kuvia: n,
-        href: `/peli?kuvavisa=${meta.type}&taso=${taso.key}`,
+        href: `/kuvavisa/${meta.type}?taso=${taso.key}`,
       });
     }
 
@@ -212,7 +212,7 @@ export async function getKuvavisatHub(): Promise<{ kategoriat: KategoriaData[]; 
           key: `maanosa-${m.key}`,
           label: `${m.label} ${meta.monikko}`,
           kuvia: n,
-          href: `/peli?kuvavisa=${meta.type}&maanosa=${m.key}`,
+          href: `/kuvavisa/${meta.type}?maanosa=${m.key}`,
         });
       }
     }
@@ -221,7 +221,7 @@ export async function getKuvavisatHub(): Promise<{ kategoriat: KategoriaData[]; 
       key: "kaikki",
       label: `Kaikki ${meta.monikko}`,
       kuvia: omat.length,
-      href: `/peli?kuvavisa=${meta.type}`,
+      href: `/kuvavisa/${meta.type}`,
       kaikki: true,
     });
 

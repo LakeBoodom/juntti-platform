@@ -18,6 +18,9 @@
 // Kaikki korttien faktaväittämät ovat CD:n designcopya — tarkistetaan
 // copy/SEO-passissa (README luku 4); kausisidonnaiset tekstit lib-configissa.
 
+import { KokoelmaLd } from "@/components/tn20/KokoelmaLd";
+import { jakoMeta } from "@/lib/jakoMeta";
+import { visaHref } from "@/lib/visaHref";
 import "../../jaakiekko.css";
 import type { Metadata } from "next";
 import { getSupabase } from "@/lib/supabase";
@@ -30,7 +33,7 @@ import {
   JK_DERBIES, JK_GENERAL, JK_LIONS, JK_NHL, type JkCard,
 } from "@/lib/jaakiekko";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 300; // SEO-erä A4 (2.10.2026): ISR 5 min
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://tietoniekka.fi";
 
@@ -44,14 +47,14 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     title, description,
     alternates: { canonical },
-    openGraph: { type: "website", locale: "fi_FI", siteName: "Tietoniekka", url: canonical, title, description },
+    ...jakoMeta({ title, description, url: canonical, kuva: "/og/kokoelma/jaakiekko" }),
   };
 }
 
 type Row = { slug: string; custom_slug: string | null; published_at: string | null };
 
 const hrefFor = (r: Row | undefined) =>
-  r ? `/peli?visa=${r.custom_slug ?? r.slug}` : null;
+  r ? visaHref(r) : null;
 
 /** Ruudukon kortti: julkaistut ensin, Tulossa perään — kummankin sisällä
     README:n listausjärjestys (README luku 3: älä sekoita keskenään). */
@@ -144,6 +147,7 @@ export default async function JaakiekkoLanding() {
   return (
     <main className="tnk" style={{ minHeight: "100dvh", paddingBottom: 60 }}>
       {/* Sivuston vakiomurupolku (README avoin kohta 2: Etusivu-taso mukaan) */}
+      <KokoelmaLd avain="jaakiekko" nimi="Jääkiekko" polku="/kokoelma/jaakiekko" />
       <Crumbs
         items={[
           { label: "Kokoelmat", href: "/kokoelmat" },
@@ -178,7 +182,7 @@ export default async function JaakiekkoLanding() {
               {JK_KAUSI.statusPill}
             </span>
             <h1 className="tnj-title">
-              {JK_HERO.titleLines[0]}
+              {JK_HERO.titleLines[0]}{" "}
               <b>{JK_HERO.titleLines[1]}</b>
             </h1>
             <p className="tnj-lede">{JK_HERO.intro}</p>

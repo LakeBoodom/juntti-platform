@@ -18,6 +18,7 @@
 // Ylätunnisteen "Kirjaudu" ja "Putki 4 pv" jäävät yhä pois — CLAUDE.md sääntö 7:
 // v1 on täysin anonyymi.
 
+import { KokoelmaLd } from "@/components/tn20/KokoelmaLd";
 import { ryhmiteltyVariaatiot, variaatioKuvaus, type KategoriaData } from "@/lib/kuvavisat2026";
 import { ViikkovisaPromo, type ViikkoPromoData } from "./ViikkovisaPromo";
 import Crumbs from "./Crumbs";
@@ -102,6 +103,7 @@ export function KuvavisatHub({
 }) {
   return (
     <>
+      <KokoelmaLd avain="kuvavisat" nimi="Kuvavisat" polku="/kokoelma/kuvavisat" />
       <Crumbs items={[{ label: "Kokoelmat", href: "/kokoelmat" }, { label: "Kuvavisat" }]} />
       {/* Mobiili (CD 24.9.): teksti kuvan päällä varjostuksella, ei painiketta sankarissa —
           satunnaisnosto tekstilinkkinä heti sankarin alla. */}

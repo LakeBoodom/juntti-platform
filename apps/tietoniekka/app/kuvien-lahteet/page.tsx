@@ -1,3 +1,4 @@
+import { jakoMeta } from "@/lib/jakoMeta";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { KUVALAHTEET, commonsUrl, type Kuvalahde } from "@/lib/kuvalahteet";
@@ -7,6 +8,13 @@ export const metadata: Metadata = {
   description:
     "Tietoniekassa käytettyjen vapaasti lisensoitujen valokuvien tekijät, lisenssit ja lähteet.",
   robots: { index: true, follow: true },
+  alternates: { canonical: "/kuvien-lahteet" },
+  ...jakoMeta({
+    title: "Kuvien lähteet",
+    description: "Tietoniekassa käytettyjen vapaasti lisensoitujen valokuvien tekijät, lisenssit ja lähteet.",
+    url: "/kuvien-lahteet",
+    kuva: "/og/sivu/kuvien-lahteet",
+  }),
 };
 
 const PAIVITETTY = "2.10.2026";

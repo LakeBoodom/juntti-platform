@@ -12,6 +12,7 @@
 // Metadata on tarkoituksella OMA: juurilayoutin openGraph.title on kaikilla
 // sivuilla sama, ja juuri tämä osoite on se jonka kaveri saa WhatsAppissa.
 
+import { jakoMeta } from "@/lib/jakoMeta";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import Peli20 from "../../peli/page";
@@ -38,12 +39,12 @@ export async function generateMetadata(
   return {
     title: `${title} | Tietoniekka`,
     description,
-    openGraph: { type: "website", locale: "fi_FI", siteName: "Tietoniekka", title, description },
-    twitter: { card: "summary_large_image", title, description },
+    /* SEO-erä A2: jakokuva kortiston mukaan. */
+    ...jakoMeta({ title, description, url: `/h/${koodi}`, kuva: `/og/kuvavisa/${encodeURIComponent(h.kuvavisa)}` }),
     /* Haastelinkkejä on yksi per peli — ne eivät kuulu hakukoneisiin, ja
-       kanoninen osoite on kortiston perusvisa. */
+       kanoninen osoite on kortiston perusvisa (SEO-erä A6: /kuvavisa/<kortisto>). */
     robots: { index: false, follow: true },
-    alternates: { canonical: `/peli?kuvavisa=${encodeURIComponent(h.kuvavisa)}` },
+    alternates: { canonical: `/kuvavisa/${encodeURIComponent(h.kuvavisa)}` },
   };
 }
 

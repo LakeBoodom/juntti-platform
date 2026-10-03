@@ -5,6 +5,9 @@
 // localStoragesta (tn_played_quizzes) — ei kirjautumista, kuten Putkikin.
 // Staattinen segmentti ohittaa dynaamisen [collection]-reitin.
 
+import { KokoelmaLd } from "@/components/tn20/KokoelmaLd";
+import { jakoMeta } from "@/lib/jakoMeta";
+import { visaHref } from "@/lib/visaHref";
 import type { Metadata } from "next";
 import { getSupabase } from "@/lib/supabase";
 import { getPageContent } from "@/lib/pageContent";
@@ -12,7 +15,7 @@ import { LearnArticle } from "@/components/tn20/LearnArticle";
 import Crumbs from "@/components/tn20/Crumbs";
 import HistoriaClient, { type HistoriaData, type HistoriaCard } from "./HistoriaClient";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 300; // SEO-erä A4 (2.10.2026): ISR 5 min
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://tietoniekka.fi";
 
@@ -26,7 +29,7 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     title, description,
     alternates: { canonical },
-    openGraph: { type: "website", locale: "fi_FI", siteName: "Tietoniekka", url: canonical, title, description },
+    ...jakoMeta({ title, description, url: canonical, kuva: "/og/kokoelma/historia" }),
   };
 }
 
@@ -74,7 +77,7 @@ export default async function HistoriaPage() {
     id: r.id,
     title: r.display_title ?? r.title,
     questions: r.question_count,
-    href: r.custom_slug || r.slug ? `/peli?visa=${r.custom_slug ?? r.slug}` : `/peli?quiz_id=${r.id}`,
+    href: visaHref(r),
     tag: r.slug ? THEME_TAG[r.slug] : undefined,
   });
 
@@ -95,6 +98,7 @@ export default async function HistoriaPage() {
     <>
       {/* Murupolkurivi palkin alla (nav-speksi 17.8.2026) — HistoriaClientin
           heron inline-nav poistettu samassa yhteydessä */}
+      <KokoelmaLd avain="historia" nimi="Historia" polku="/kokoelma/historia" />
       <Crumbs items={[{ label: "Kokoelmat", href: "/kokoelmat" }, { label: "Historia" }]} />
       <HistoriaClient data={data} />
       {article}

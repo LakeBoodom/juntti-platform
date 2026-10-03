@@ -12,6 +12,9 @@
 // Tietoisia poisjättöjä: ei vaikeustasoja, putkea, kysymysmääriä,
 // genremerkintöjä korteissa, ei suosituin/trendaa, ei poimintaselitettä.
 
+import { KokoelmaLd } from "@/components/tn20/KokoelmaLd";
+import { jakoMeta } from "@/lib/jakoMeta";
+import { visaHref } from "@/lib/visaHref";
 import type { Metadata } from "next";
 import { getSupabase } from "@/lib/supabase";
 import { getPageContent } from "@/lib/pageContent";
@@ -22,7 +25,7 @@ import {
   MUSIIKKI_FEATURED, MUSIIKKI_SECTIONS, musiikkiImg,
 } from "@/lib/musiikki";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 300; // SEO-erä A4 (2.10.2026): ISR 5 min
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://tietoniekka.fi";
 
@@ -36,7 +39,7 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     title, description,
     alternates: { canonical },
-    openGraph: { type: "website", locale: "fi_FI", siteName: "Tietoniekka", url: canonical, title, description },
+    ...jakoMeta({ title, description, url: canonical, kuva: "/og/kokoelma/musiikki" }),
   };
 }
 
@@ -47,7 +50,7 @@ type Card = {
 };
 
 const playHref = (c: Card) =>
-  c.custom_slug || c.slug ? `/peli?visa=${c.custom_slug ?? c.slug}` : `/peli?quiz_id=${c.id}`;
+  visaHref(c);
 
 const cardName = (c: Card) => c.display_title ?? c.title;
 
@@ -88,6 +91,7 @@ export default async function MusiikkiLanding() {
   return (
     <main className="tnk tne-mus" style={{ minHeight: "100dvh", paddingBottom: 60 }}>
       {/* Murupolkurivi palkin alla (nav-speksi 17.8.2026) */}
+      <KokoelmaLd avain="musiikki" nimi="Musiikki" polku="/kokoelma/musiikki" />
       <Crumbs items={[{ label: "Kokoelmat", href: "/kokoelmat" }, { label: "Musiikki" }]} />
       <MobiiliSankari
         accent="#C68BFF"
@@ -110,7 +114,7 @@ export default async function MusiikkiLanding() {
           <div className="tne-hero-body">
             {/* Kaksirivinen otsikko on typografinen ratkaisu (README §Hero) */}
             <h1 className="tne-title">
-              Musiikki ja<b>Artistit</b>
+              Musiikki ja{" "}<b>Artistit</b>
             </h1>
             <p className="tne-lede">{musiikkiIntro(count)}</p>
             <div className="tne-pills">

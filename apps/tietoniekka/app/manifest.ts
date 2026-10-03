@@ -1,12 +1,14 @@
+import { getSiteStats, yliVisaa } from "@/lib/siteStats";
 import type { MetadataRoute } from "next";
 
 /** PWA-manifest (brief osio 2) — pohja tulevalle Capacitor/appivaiheelle. */
-export default function manifest(): MetadataRoute.Manifest {
+export default async function manifest(): Promise<MetadataRoute.Manifest> {
+  const yli = yliVisaa(await getSiteStats());
   return {
     name: "Tietoniekka",
     short_name: "Tietoniekka",
     description:
-      "Tietoniekka — suomalainen tietovisasivusto. Yli 500 visaa, aina ilmainen.",
+      `Tietoniekka — suomalainen tietovisasivusto. ${yli}, aina ilmainen.`,
     start_url: "/",
     display: "standalone",
     background_color: "#0f1520",

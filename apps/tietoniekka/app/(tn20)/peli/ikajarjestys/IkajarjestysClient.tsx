@@ -144,7 +144,20 @@ export default function IkajarjestysClient({
           selectedCategory={pickerCategory}
           onSelectCategory={setPickerCategory}
           onStart={() => startRound(pickerCategory)}
+          otsikkotaso="h1"
         />
+        {/* SEO-erä A7 (2.10.2026): lyhyt "Näin pelaat" Kuntaliitoksen malliin + linkki henkilöhubiin. */}
+        <section className="tk-info" aria-labelledby="tk-info-h">
+          <h2 id="tk-info-h">Näin pelaat</h2>
+          <ol>
+            <li><b>Valitse aihe</b> yllä olevista vaihtoehdoista – tai pelaa kaikilla henkilöillä.</li>
+            <li><b>Järjestä kymmenen henkilöä</b> syntymävuoden mukaan vanhimmasta nuorimpaan – raahaa tai napauta kahta korttia vaihtaaksesi niiden paikat.</li>
+            <li><b>Tarkista järjestys.</b> Oikeat paikat paljastuvat yksi kerrallaan, ja näet jokaisen syntymävuoden.</li>
+          </ol>
+          <p>
+            Henkilöt ovat Tietoniekan <a href="/kokoelma/tunnetut-henkilot">tunnettujen henkilöiden</a> joukosta – jokaisesta on myös oma tietovisansa.
+          </p>
+        </section>
         {phase === "loading" && (
           <p className="tk-loading" role="status">
             Arvotaan kierrosta…

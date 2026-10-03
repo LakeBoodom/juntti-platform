@@ -17,6 +17,8 @@
 // Suomen kaupungit -megavisaan ?mega=-osoitteella (QA-001, 29.8.2026; aiemmin
 // ?visa=kaikki-suomesta-mega, joka antoi tyhjän sivun).
 
+import { KokoelmaLd } from "@/components/tn20/KokoelmaLd";
+import { jakoMeta } from "@/lib/jakoMeta";
 import "../../kaupungit.css";
 import type { Metadata } from "next";
 import { getSupabase } from "@/lib/supabase";
@@ -27,7 +29,7 @@ import KaupunkiMatkapassi, { KaupunkiEdistyminen, KaupunkiMatkapassiBadge } from
 import { MobiiliSankari } from "@/components/tn20/MobiiliSankari";
 import { KAUPUNGIT, KAUPUNGIT_HERO_IMG, SUOMI_MEGA_SLUG, kaupunkiImg } from "@/lib/kaupungit";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 300; // SEO-erä A4 (2.10.2026): ISR 5 min
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://tietoniekka.fi";
 
@@ -41,7 +43,7 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     title, description,
     alternates: { canonical },
-    openGraph: { type: "website", locale: "fi_FI", siteName: "Tietoniekka", url: canonical, title, description },
+    ...jakoMeta({ title, description, url: canonical, kuva: "/og/kokoelma/kaupungit" }),
   };
 }
 
@@ -68,6 +70,7 @@ export default async function KaupungitLanding() {
 
   return (
     <main className="tnk tnk2" style={{ minHeight: "100dvh" }}>
+      <KokoelmaLd avain="kaupungit" nimi="Suomen kaupungit" polku="/kokoelma/kaupungit" />
       <Crumbs
         items={[
           { label: "Kokoelmat", href: "/kokoelmat" },

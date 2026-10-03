@@ -13,6 +13,8 @@
 // Juhlat, päivämäärät, faktat ja kuvat: lib/juhlat.ts. Visat kannasta (collection='juhlat',
 // vain julkaistut), kuva quizzes.hero_image.
 
+import { KokoelmaLd } from "@/components/tn20/KokoelmaLd";
+import { jakoMeta } from "@/lib/jakoMeta";
 import type { Metadata } from "next";
 import { getSupabase } from "@/lib/supabase";
 import { helsinginPaiva } from "@/lib/aika";
@@ -24,7 +26,8 @@ import {
 } from "@/lib/juhlat";
 import "../../juhlat.css";
 
-export const dynamic = "force-dynamic";
+/* SEO-erä A4: ISR 5 min (esikatselun ?pvm= luetaan vain previewissä). */
+export const revalidate = 300;
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://tietoniekka.fi";
 
@@ -33,11 +36,12 @@ export const metadata: Metadata = {
   description:
     "Tietovisat halloweenista jouluun ja vappuun: juhlien historia, perinteet ja herkut. Ajankohtainen juhla on aina ylimpänä. Ilmaisia visoja ilman kirjautumista.",
   alternates: { canonical: `${SITE_URL}${JUHLAT_SIVU}` },
-  openGraph: {
-    type: "website", locale: "fi_FI", siteName: "Tietoniekka", url: `${SITE_URL}${JUHLAT_SIVU}`,
+  ...jakoMeta({
+    url: `${SITE_URL}${JUHLAT_SIVU}`,
     title: "Juhlat — tietovisat vuoden juhliin",
     description: "Visat vuoden juhliin ja perinteisiin. Ajankohtainen juhla on aina ylimpänä.",
-  },
+    kuva: "/og/kokoelma/juhlat",
+  }),
 };
 
 type Visa = { slug: string; title: string; display_title: string | null; teaser: string | null; hero_image: string | null };
@@ -58,7 +62,7 @@ const juhlaHref = (o: Esiintyma) =>
 const ESIKATSELU = process.env.VERCEL_ENV !== "production";
 
 export default async function JuhlatSivu({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
-  const sp = await searchParams;
+  const sp = ESIKATSELU ? await searchParams : {};
   const simPvm = ESIKATSELU && typeof sp.pvm === "string" && /^\d{4}-\d{2}-\d{2}$/.test(sp.pvm) ? sp.pvm : null;
   const sb = getSupabase();
   if (!sb) return <main style={{ padding: 32 }}>Ei tietokantayhteyttä.</main>;
@@ -130,6 +134,7 @@ export default async function JuhlatSivu({ searchParams }: { searchParams: Promi
 
   return (
     <main className="ju">
+      <KokoelmaLd avain="juhlat" nimi="Juhlat" polku="/kokoelma/juhlat" />
       <Crumbs items={[{ label: "Kokoelmat", href: "/kokoelmat" }, { label: "Juhlat" }]} />
       <div className="ju-wrap">
         <header className="ju-head">

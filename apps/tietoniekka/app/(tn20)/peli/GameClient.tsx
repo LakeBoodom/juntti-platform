@@ -825,10 +825,15 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
 
   /* ── Haaste ja jaot (3a: linkki = visan oma osoite, aina valmis) ── */
   /* K3: /h/abc123 kun tunnus on luotu, muuten pitkä ?ids=-osoite. */
-  const challengeUrl = haasteKoodi ? `${origin}/h/${haasteKoodi}` : `${origin}${quiz.challengePath}`;
+  /* SEO-erä A2: jaettu tulos → /visa/<slug>?tulos=8-10, jolloin jakokuvassa näkyy pistemäärä ja
+     "Voitatko kaverisi?". Canonical pysyy /visa/<slug>:nä. */
+  const tulosParam = quiz.challengePath.startsWith("/visa/") && total > 0 ? `?tulos=${right}-${total}` : "";
+  const challengeUrl = haasteKoodi ? `${origin}/h/${haasteKoodi}` : `${origin}${quiz.challengePath}${tulosParam}`;
   const shareText = quiz.jakoNimi
     ? `${quiz.jakoNimi} ${right}/${total} Tietoniekassa. Pystytkö parempaan?`
-    : `Sain ${right}/${total} Tietoniekan ${quiz.title} -visassa. Pystytkö parempaan?`;
+    /* Heikki 3.10.2026: visan nimessä on usein ajatusviiva ("Kimi Räikkönen – F1:n Jäämies"),
+       joten "… -visassa"-taivutus kuulosti kömpelöltä → nimi lauseen loppuun. */
+    : `Sain ${right}/${total} Tietoniekan visassa ${quiz.title}. Pystytkö parempaan?`;
   const linkReady = !!quiz.challengePath;
   function clearCopyLater() { if (copyTimer.current) clearTimeout(copyTimer.current); copyTimer.current = setTimeout(() => setCopyState(null), 3000); }
   function copyLink() {

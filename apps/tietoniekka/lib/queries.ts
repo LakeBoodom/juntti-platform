@@ -167,16 +167,21 @@ export async function getRelatedQuizzes(
   return data ?? [];
 }
 
-/** Kaikkien julkaistujen visojen slugit + päivitysaika sitemapia varten. */
-export async function getPublishedQuizSlugs(): Promise<{ slug: string; updated_at: string | null }[]> {
+/** Kaikkien julkaistujen visojen slugit + päivitysaika sitemapia varten.
+    SEO-erä A5 (2.10.2026): vain tämän sivuston visat (site_id) ja game_mode mukaan, jotta megat
+    saavat oman osoitteensa (/peli?mega=) eivätkä päädy sitemapiin 404:ää antavina /visa/-osoitteina. */
+export async function getPublishedQuizSlugs(): Promise<{ slug: string; updated_at: string | null; game_mode: string | null }[]> {
   const sb = getSupabase();
   if (!sb) return [];
-  const { data } = await sb
+  const siteId = await getSiteId();
+  let q = sb
     .from("quizzes")
-    .select("slug, updated_at")
+    .select("slug, updated_at, game_mode" as never)
     .eq("status", "published")
     .not("slug", "is", null);
-  return (data ?? []) as { slug: string; updated_at: string | null }[];
+  if (siteId) q = q.eq("site_id", siteId);
+  const { data } = await q;
+  return (data ?? []) as unknown as { slug: string; updated_at: string | null; game_mode: string | null }[];
 }
 
 /** Hae random julkaistu visa kategoriasta. */

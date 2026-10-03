@@ -1,3 +1,4 @@
+import { getSiteStats, yliVisaa, visaMaara } from "@/lib/siteStats";
 import type { Metadata, Viewport } from "next";
 import Script from "next/script";
 
@@ -15,15 +16,20 @@ import { brand } from "@/config/brand";
 import "./globals.css";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://tietoniekka.fi";
+/* Preview-julkaisuissa jakokuvat ja og:url osoittavat previewiin itseensä, jotta WhatsApp-/FB-
+   esikatselua voi testata ennen tuotantoa (preview on noindex). Tuotannossa SITE_URL. */
+const META_BASE = process.env.VERCEL_ENV === "preview" && process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : SITE_URL;
 const PLAUSIBLE_DOMAIN = process.env.NEXT_PUBLIC_PLAUSIBLE_DOMAIN;
 
-export const metadata: Metadata = {
-  metadataBase: new URL(SITE_URL),
+/* SEO-erä A8 (2.10.2026): visamäärä kannasta (lib/siteStats.ts). */
+function rakennaMetadata(Yli: string, yli: string): Metadata {
+  return {
+  metadataBase: new URL(META_BASE),
   title: {
     default: `${brand.name} — testaa tietosi`,
     template: `%s | ${brand.name}`,
   },
-  description: `${brand.name} — suomalainen tietovisasivusto. Yli 500 visaa, Päivän visa, megavisat ja kuvavisat. Aina ilmainen.`,
+  description: `${brand.name} — suomalainen tietovisasivusto. ${Yli}, Päivän visa, megavisat ja kuvavisat. Aina ilmainen.`,
   applicationName: brand.name,
   keywords: [
     "visa",
@@ -40,7 +46,7 @@ export const metadata: Metadata = {
     url: SITE_URL,
     siteName: brand.name,
     title: `${brand.name} — testaa tietosi`,
-    description: `Suomalainen tietovisasivusto — yli 500 visaa, Päivän visa, megavisat ja kuvavisat. Aina ilmainen.`,
+    description: `Suomalainen tietovisasivusto — ${yli}, Päivän visa, megavisat ja kuvavisat. Aina ilmainen.`,
     images: [
       {
         url: "/og-image.png",
@@ -53,7 +59,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: `${brand.name} — testaa tietosi`,
-    description: `Suomalainen tietovisasivusto — yli 500 visaa, aina ilmainen.`,
+    description: `Suomalainen tietovisasivusto — ${yli}, aina ilmainen.`,
     images: ["/og-image.png"],
   },
   robots: {
@@ -69,17 +75,24 @@ export const metadata: Metadata = {
   formatDetection: {
     telephone: false,
   },
-};
+  };
+}
+
+export async function generateMetadata(): Promise<Metadata> {
+  const y = yliVisaa(await getSiteStats());
+  return rakennaMetadata(y, y.charAt(0).toLowerCase() + y.slice(1));
+}
 
 export const viewport: Viewport = {
   themeColor: "#0f1520",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const stats = await getSiteStats();
   return (
     <html lang="fi">
       <body>
@@ -95,8 +108,9 @@ export default function RootLayout({
             name: brand.name,
             url: SITE_URL,
             logo: `${SITE_URL}/og-image.png`,
-            description: `${brand.name} — suomalainen tietovisasivusto. Yli 500 visaa: Päivän visa, kokoelmat, megavisat ja kuvavisat. Aina ilmainen, ei rekisteröitymistä.`,
-            sameAs: [],
+            description: `${brand.name} — suomalainen tietovisasivusto. ${yliVisaa(stats)}: Päivän visa, kokoelmat, megavisat ja kuvavisat. Aina ilmainen, ei rekisteröitymistä.`,
+            /* SEO-erä A9: Instagram-tili */
+            sameAs: ["https://www.instagram.com/tietoniekka/"],
           })}
         </Script>
         <Script

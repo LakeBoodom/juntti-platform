@@ -53,12 +53,16 @@ export function MobiiliSankari(p: {
       )}
       <div className="tnms-body">
         {p.eyebrow && <div className="tnms-eyebrow">{p.eyebrow}</div>}
-        <h1 className="tnms-title" lang="fi">
+        {/* SEO-erä A7 (2.10.2026): sivulla on jo desktop-H1 (piilotettu mobiilissa CSS:llä), joten
+            tämä ei ole <h1>-elementti — HTML:ssä yksi H1 per hub. role="heading" pitää otsikon
+            ruudunlukijalle mobiilissa (piilotettu desktop-H1 ei näy saavutettavuuspuussa).
+            Välilyönnit rivien väliin, ettei teksti lue "Kaikkijääkiekosta". */}
+        <div className="tnms-title" lang="fi" role="heading" aria-level={1}>
           {alku.map((r) => (
-            <span key={r} className="tnms-title-l">{r}</span>
+            <span key={r} className="tnms-title-l">{r}{" "}</span>
           ))}
           <span className="tnms-title-l tnms-title-acc">{loppu}</span>
-        </h1>
+        </div>
         <p className="tnms-lead">{p.lead}</p>
         {p.stats && p.stats.length > 0 && (
           <p className="tnms-stats">

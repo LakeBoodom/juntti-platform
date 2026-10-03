@@ -9,6 +9,9 @@
 // → footer. Designin header/Putki-pilleri jätetty pois — landingit ovat
 // headerittömiä kuten Kulttuuri ja Luonto (murupolku hoitaa paluun).
 
+import { KokoelmaLd } from "@/components/tn20/KokoelmaLd";
+import { jakoMeta } from "@/lib/jakoMeta";
+import { visaHref } from "@/lib/visaHref";
 import type { Metadata } from "next";
 import { getSupabase } from "@/lib/supabase";
 import { getPageContent } from "@/lib/pageContent";
@@ -20,7 +23,7 @@ import {
   MAANTIETO_GRID_ORDER, maantietoImg,
 } from "@/lib/maantieto";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 300; // SEO-erä A4 (2.10.2026): ISR 5 min
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://tietoniekka.fi";
 
@@ -34,7 +37,7 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     title, description,
     alternates: { canonical },
-    openGraph: { type: "website", locale: "fi_FI", siteName: "Tietoniekka", url: canonical, title, description },
+    ...jakoMeta({ title, description, url: canonical, kuva: "/og/kokoelma/matkakohteet" }),
   };
 }
 
@@ -45,7 +48,7 @@ type Card = {
 };
 
 const playHref = (c: Card) =>
-  c.custom_slug || c.slug ? `/peli?visa=${c.custom_slug ?? c.slug}` : `/peli?quiz_id=${c.id}`;
+  visaHref(c);
 
 const descFor = (c: Card) => MAANTIETO_DESC[c.slug ?? ""] ?? c.teaser ?? "";
 
@@ -85,6 +88,7 @@ export default async function MaantietoLanding() {
   return (
     <main className="tnt" style={{ minHeight: "100dvh" }}>
       {/* Murupolkurivi palkin alla (nav-speksi 17.8.2026) — korvasi heron inline-navin */}
+      <KokoelmaLd avain="matkakohteet" nimi="Maantieto" polku="/kokoelma/matkakohteet" />
       <Crumbs items={[{ label: "Kokoelmat", href: "/kokoelmat" }, { label: "Maantieto" }]} />
       {/* ─── Hero: petrooli + teal, kuva oikealla (CD) ─── */}
       <MobiiliSankari

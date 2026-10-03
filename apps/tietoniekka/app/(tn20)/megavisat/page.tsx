@@ -15,6 +15,8 @@
 // linjaus kuin muissa teemasivuissa (Jääkiekko/Jalkapallo/Maantieto):
 // sivuston globaali yläpalkki + Crumbs-murupolku hoitavat navigaation.
 
+import { KokoelmaLd } from "@/components/tn20/KokoelmaLd";
+import { jakoMeta } from "@/lib/jakoMeta";
 import "../megavisat.css";
 import type { Metadata } from "next";
 import { getSupabase } from "@/lib/supabase";
@@ -22,7 +24,7 @@ import Crumbs from "@/components/tn20/Crumbs";
 import { MobiiliSankari } from "@/components/tn20/MobiiliSankari";
 import { MEGA_FEATURED, MEGA_GRID, megaDuration } from "@/lib/megavisat";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 300; // SEO-erä A4 (2.10.2026): ISR 5 min
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://tietoniekka.fi";
 
@@ -34,7 +36,7 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     title, description,
     alternates: { canonical },
-    openGraph: { type: "website", locale: "fi_FI", siteName: "Tietoniekka", url: canonical, title, description },
+    ...jakoMeta({ title, description, url: canonical, kuva: "/og/sivu/megavisat" }),
   };
 }
 
@@ -80,6 +82,7 @@ export default async function MegavisatLanding() {
 
   return (
     <main className="tnm2" style={{ minHeight: "100dvh" }}>
+      <KokoelmaLd avain="megavisat" nimi="Megavisat" polku="/megavisat" />
       <Crumbs items={[{ label: "Megavisat" }]} />
 
       {/* Mobiili: Mikko Megavisa-studiossa (Heikki 26.9.2026), teksti kuvan päällä */}

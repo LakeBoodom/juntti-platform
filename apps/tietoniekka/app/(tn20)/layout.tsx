@@ -1,5 +1,6 @@
 // TIETONIEKKA 2.0 — oma layout (Neon Night). Skoopattu .tn20-luokkaan,
 // jotta nykyinen sivusto ei muutu. Fontit: Archivo (display) + Instrument Sans (body).
+import { getSiteStats, visaMaara } from "@/lib/siteStats";
 import type { Metadata } from "next";
 import "@fontsource/archivo/500.css";
 import "@fontsource/archivo/700.css";
@@ -22,21 +23,26 @@ import SiteFooter from "@/components/tn20/SiteFooter";
 /* QA-006 (29.8.2026): oletusotsikko ja -kuvaus etusivulle; alasivut
    (kokoelmat, pelisivut) antavat omansa. noindex poistettu julkaisussa
    31.8.2026 — 2.0 on nyt tuotanto juuressa ja indeksoitavissa. */
-export const metadata: Metadata = {
+export async function generateMetadata(): Promise<Metadata> {
+  const maara = visaMaara(await getSiteStats());
+  return {
   /* absolute: juurilayoutin template ("%s | Tietoniekka") tuplaisi muuten
-     brändin etusivun otsikkoon (havaittu julkaisu-QA:ssa 31.8.2026). */
-  title: { absolute: "Tietoniekka – suomalainen tietovisasivusto · 500+ visaa" },
+     brändin etusivun otsikkoon (havaittu julkaisu-QA:ssa 31.8.2026).
+     SEO-erä A8: visamäärä kannasta (lib/siteStats.ts). */
+  title: { absolute: `Tietoniekka – suomalainen tietovisasivusto · ${maara}` },
   description:
     "Ilmaisia tietovisoja jääkiekosta, jalkapallosta, elokuvista, musiikista, historiasta ja luonnosta. Päivän visa, megavisat ja kuvavisat – pelaa ilman kirjautumista.",
-};
+  };
+}
 
 /* Heikin katselmus 17.8.: visamäärät poistettiin navigaatiosta kokonaan →
    layoutin ei tarvitse hakea lukuja kannasta (/kokoelmat hakee omansa). */
-export default function Tn20Layout({ children }: { children: React.ReactNode }) {
+export default async function Tn20Layout({ children }: { children: React.ReactNode }) {
+  const tagline = `Suomalainen tietovisasivusto · ${visaMaara(await getSiteStats())}`;
   return (
     <div className="tn20">
       {/* Navigaatiojärjestelmä (lukittu 17.8.2026) — piiloutuu itse pelinäkymässä */}
-      <TopBar />
+      <TopBar tagline={tagline} />
       {children}
       {/* Yhteinen alatunniste kaikille sivuille (QA-005, 29.8.2026) */}
       <SiteFooter />

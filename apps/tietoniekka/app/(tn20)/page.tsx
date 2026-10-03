@@ -12,6 +12,8 @@
 // Kuori staattinen (lib/etusivu.ts), Päivän visa ja ticker dynaamisia kannasta.
 // Sivu käyttää container-kyselyitä (.tn20 on inline-size-container → cqw).
 
+import { PaivaVahti } from "@/components/tn20/PaivaVahti";
+import { visaHref } from "@/lib/visaHref";
 import { getSupabase, SITE_SLUG } from "@/lib/supabase";
 import { brand } from "@/config/brand";
 import { helsinginPaiva } from "@/lib/aika";
@@ -40,7 +42,9 @@ import "./kuntaliitos-banneri.css";
 import "./rajanaapurit-banneri.css";
 import "./juhlat-banneri.css";
 
-export const dynamic = "force-dynamic";
+/* SEO-erä A4 (2.10.2026): ISR 5 min. Esikatseluparametreja (?pv, ?sankari, ?juhlapvm) ei lueta
+   tuotannossa, jotta sivu voidaan välimuistittaa; keskiyön vaihto: PaivaVahti. */
+export const revalidate = 300;
 
 type Card = {
   id: string; slug: string; custom_slug: string | null; title: string;
@@ -127,7 +131,7 @@ async function getData(opts: { pvTila: string | null; sankariPaiva: string | nul
       id: c.id,
       name: (c.display_title ?? c.title) as string,
       mode: c.game_mode === "mega" ? "Megavisa" : undefined,
-      href: c.game_mode === "mega" && c.slug ? `/peli?mega=${c.slug}` : `/peli?quiz_id=${c.id}`,
+      href: visaHref(c),
     }));
 
   /* Juhlat-banneri: lähin iso juhla, jolla on julkaistu visa (lib/juhlat.ts). */
@@ -149,7 +153,7 @@ export default async function Etusivu20({
 }: {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
-  const sp = await searchParams;
+  const sp = ESIKATSELU ? await searchParams : {};
   const one = (k: string) => (typeof sp[k] === "string" ? (sp[k] as string) : null);
   const sankariParam = ESIKATSELU ? one("sankari") : null;
   const [data, vv, kvYhteenveto, henkilot] = await Promise.all([
@@ -196,6 +200,7 @@ export default async function Etusivu20({
             {(!daily || paivanVisaTila(daily) === "B") && (
               <span className="tn-es-date">Tänään {today.pv}.{today.kk}.</span>
             )}
+            <PaivaVahti pvm={today.iso} />
           </div>
           {daily ? <PaivanVisaCard data={daily} /> : <div className="tn-es-pv tn-es-pv--empty">Päivän visa palaa huomenna.</div>}
         </section>

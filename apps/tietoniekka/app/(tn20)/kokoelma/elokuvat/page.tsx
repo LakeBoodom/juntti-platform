@@ -9,6 +9,9 @@
 // pelimuotoja, putkea, "suosituin"/"trendaa"-merkintöjä, ei mega-visoja —
 // älä lisää niitä takaisin.
 
+import { KokoelmaLd } from "@/components/tn20/KokoelmaLd";
+import { jakoMeta } from "@/lib/jakoMeta";
+import { visaHref } from "@/lib/visaHref";
 import type { Metadata } from "next";
 import { getSupabase } from "@/lib/supabase";
 import { getPageContent } from "@/lib/pageContent";
@@ -19,7 +22,7 @@ import {
   ELOKUVAT_HERO, ELOKUVAT_FEATURED, ELOKUVAT_SECTIONS, elokuvatImg,
 } from "@/lib/elokuvat";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 300; // SEO-erä A4 (2.10.2026): ISR 5 min
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://tietoniekka.fi";
 
@@ -33,7 +36,7 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     title, description,
     alternates: { canonical },
-    openGraph: { type: "website", locale: "fi_FI", siteName: "Tietoniekka", url: canonical, title, description },
+    ...jakoMeta({ title, description, url: canonical, kuva: "/og/kokoelma/elokuvat" }),
   };
 }
 
@@ -44,7 +47,7 @@ type Card = {
 };
 
 const playHref = (c: Card) =>
-  c.custom_slug || c.slug ? `/peli?visa=${c.custom_slug ?? c.slug}` : `/peli?quiz_id=${c.id}`;
+  visaHref(c);
 
 const cardName = (c: Card) => c.display_title ?? c.title;
 
@@ -77,6 +80,7 @@ export default async function ElokuvatLanding() {
   return (
     <main className="tnk" style={{ minHeight: "100dvh", paddingBottom: 60 }}>
       {/* Murupolkurivi palkin alla (nav-speksi 17.8.2026) — korvasi heron inline-navin */}
+      <KokoelmaLd avain="elokuvat" nimi="Elokuvat" polku="/kokoelma/elokuvat" />
       <Crumbs items={[{ label: "Kokoelmat", href: "/kokoelmat" }, { label: "Elokuvat" }]} />
       <MobiiliSankari
         accent="#FF6A4D"

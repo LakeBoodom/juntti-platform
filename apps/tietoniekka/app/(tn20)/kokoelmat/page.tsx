@@ -1,3 +1,5 @@
+import { KokoelmaLd } from "@/components/tn20/KokoelmaLd";
+import { jakoMeta } from "@/lib/jakoMeta";
 import type { Metadata } from "next";
 // TIETONIEKKA 2.0 — KAIKKI KOKOELMAT -indeksi (navigaation "Kaikki kokoelmat →" -kohde).
 // CD:n navigaatiosääntö (lukittu 17.8.2026): kaikki valikkolinkit vievät todellisille
@@ -13,9 +15,16 @@ import { KAUPUNGIT } from "@/lib/kaupungit";
 export const metadata: Metadata = {
   title: "Kaikki kokoelmat – tietovisat aiheittain | Tietoniekka",
   description: "Valitse aihe: TV & suoratoisto, urheilu, jääkiekko, jalkapallo, elokuvat, musiikki, maantieto, Suomen kaupungit, tunnetut henkilöt, kulttuuri, historia, luonto, tiede & teknologia ja juhlat.",
+  alternates: { canonical: "/kokoelmat" },
+  ...jakoMeta({
+    title: "Kaikki kokoelmat – tietovisat aiheittain",
+    description: "Valitse aihe ja pelaa: urheilu, elokuvat, musiikki, historia, luonto, tunnetut henkilöt ja paljon muuta.",
+    url: "/kokoelmat",
+    kuva: "/og/sivu/kokoelmat",
+  }),
 };
 
-export const dynamic = "force-dynamic";
+export const revalidate = 300; // SEO-erä A4 (2.10.2026): ISR 5 min
 
 /* Jääkiekko ja Jalkapallo eivät ole kannassa omia kokoelmia (visat ovat
    urheilua) — niiden visamäärät lasketaan teemasivujen visalistoista
@@ -59,6 +68,7 @@ export default async function KokoelmatPage() {
 
   return (
     <main style={{ minHeight: "100dvh" }}>
+      <KokoelmaLd avain="kokoelmat" nimi="Kaikki kokoelmat" polku="/kokoelmat" />
       <Crumbs items={[{ label: "Kokoelmat" }]} />
       <div className="tn-shell">
       <header className="tn-colx-head">
