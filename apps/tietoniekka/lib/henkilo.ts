@@ -7,6 +7,7 @@ import { getSiteId } from "./queries";
 import { lajiMonikko, ryhma, ryhmaOf, type RyhmaKey } from "./henkiloRyhmat";
 import { lueFaktat, type Fakta } from "./henkiloKaava";
 import { visaHref } from "./visaHref";
+import { henkiloSlug } from "./henkiloSlug";
 
 /* ── Päivämäärät (Europe/Helsinki) ─────────────────────────────────────── */
 
@@ -114,7 +115,7 @@ function sekoita<T>(a: T[]): T[] {
 }
 
 const laatta = (c: Rivi, nyt: Pvm): Laatta => ({
-  slug: c.slug!,
+  slug: henkiloSlug(c.name),
   name: c.name,
   image_url: c.image_url,
   ala: ikaRivi(c.birth_date, c.death_date, nyt),
@@ -123,10 +124,21 @@ const laatta = (c: Rivi, nyt: Pvm): Laatta => ({
 /** Kuvalliset ensin, sitten prioriteetti. */
 const jarjesta = (a: Rivi, b: Rivi) => (b.image_url ? 1 : 0) - (a.image_url ? 1 : 0) || (b.priority ?? 0) - (a.priority ?? 0);
 
-export async function haeHenkiloSivu(slug: string): Promise<HenkiloSivu | null> {
+/** Osoite → henkilö. Ensisijaisesti nimestä johdettu slug; kannan vanha slug palauttaa ohjauksen. */
+export async function haeHenkiloSivu(slug: string): Promise<HenkiloSivu | { ohjaa: string } | null> {
   const sb = getSupabase();
   const siteId = await getSiteId();
   if (!sb || !siteId) return null;
+
+  // Kaikki henkilöt kevyesti (≈ 380 riviä, ISR-välimuistissa): osoitteen ratkaisu, muut-laatat ja
+  // samana päivänä syntyneet. DATE-sarakkeeseen ei voi käyttää like-hakua (CLAUDE.md) → suodatus JS:ssä.
+  const { data: kaikkiData } = await sb.from("celebrities").select(KEVYT).eq("site_id", siteId).limit(2000);
+  const kaikkiRivit = (kaikkiData ?? []) as unknown as Rivi[];
+  const osuma = kaikkiRivit.find((x) => henkiloSlug(x.name) === slug);
+  if (!osuma) {
+    const vanha = kaikkiRivit.find((x) => x.slug === slug);
+    return vanha ? { ohjaa: henkiloSlug(vanha.name) } : null;
+  }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { data: c } = await (sb as any)
@@ -134,8 +146,7 @@ export async function haeHenkiloSivu(slug: string): Promise<HenkiloSivu | null> 
     .select(
       "id, slug, name, role, ryhma, laji, image_url, image_focal_x, image_focal_y, birth_date, death_date, bio_short, intro_text, wikipedia_url, trivia_quiz_id, birth_place, death_place, nickname, facts, facts_reviewed_at",
     )
-    .eq("site_id", siteId)
-    .eq("slug", slug)
+    .eq("id", osuma.id)
     .maybeSingle();
   if (!c) return null;
 
@@ -143,10 +154,7 @@ export async function haeHenkiloSivu(slug: string): Promise<HenkiloSivu | null> 
   const r = ryhmaOf(c.ryhma, c.laji);
   const hyvaksytty = !!c.facts_reviewed_at;
 
-  // Kaikki henkilöt kevyesti (≈ 380 riviä, ISR-välimuistissa): muut-laatat ja samana päivänä syntyneet.
-  // DATE-sarakkeeseen ei voi käyttää like-hakua (CLAUDE.md) → suodatus JS:ssä.
-  const [{ data: kaikkiData }, visaRes] = await Promise.all([
-    sb.from("celebrities").select(KEVYT).eq("site_id", siteId).not("slug", "is", null).limit(2000),
+  const [visaRes] = await Promise.all([
     c.trivia_quiz_id
       ? // eslint-disable-next-line @typescript-eslint/no-explicit-any
         (sb as any)
@@ -157,7 +165,7 @@ export async function haeHenkiloSivu(slug: string): Promise<HenkiloSivu | null> 
           .maybeSingle()
       : Promise.resolve({ data: null }),
   ]);
-  const kaikki = ((kaikkiData ?? []) as unknown as Rivi[]).filter((x) => x.id !== c.id && x.slug);
+  const kaikki = kaikkiRivit.filter((x) => x.id !== c.id);
 
   // Muut <laji>: vähintään 3 samasta lajista, muuten ryhmä.
   const samaLaji = c.laji ? kaikki.filter((x) => x.laji === c.laji) : [];
@@ -224,7 +232,7 @@ export async function haeHenkiloSivu(slug: string): Promise<HenkiloSivu | null> 
 
   return {
     id: c.id,
-    slug: c.slug,
+    slug: henkiloSlug(c.name),
     name: c.name,
     role: c.role,
     nickname: c.nickname,

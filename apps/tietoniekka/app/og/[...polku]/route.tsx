@@ -19,6 +19,7 @@ import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 import sharp from "sharp";
 import { getSupabase } from "@/lib/supabase";
+import { henkiloSlug } from "@/lib/henkiloSlug";
 import { getSiteId } from "@/lib/queries";
 import { resolveCollection, COLLECTION_ACCENT, COLLECTION_BG, COLLECTION_LABEL } from "@/lib/visanKokoelma";
 import { KATEGORIAT } from "@/lib/kuvavisat2026";
@@ -315,8 +316,9 @@ export async function GET(req: Request, ctx: { params: Promise<{ polku: string[]
     kortti = await kokoelmaKortti(avain);
   } else if (tyyppi === "henkilo" && avain) {
     const sb = getSupabase();
-    const { data } = sb ? await sb.from("celebrities").select("name, role, image_url").eq("slug", avain).maybeSingle() : { data: null };
-    const c = data as { name: string; role: string | null; image_url: string | null } | null;
+    // Henkilösivun osoite johdetaan nimestä (lib/henkiloSlug.ts), ei celebrities.slug-kentästä.
+    const { data } = sb ? await sb.from("celebrities").select("name, role, image_url").limit(2000) : { data: null };
+    const c = ((data ?? []) as Array<{ name: string; role: string | null; image_url: string | null }>).find((x) => henkiloSlug(x.name) === avain) ?? null;
     if (c)
       kortti = {
         eyebrow: "Tunnetut henkilöt",

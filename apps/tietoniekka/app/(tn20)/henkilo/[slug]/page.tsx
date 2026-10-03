@@ -4,7 +4,7 @@
 // vanha. Esittely ja Lyhyesti näkyvät vain Heikin hyväksymille (facts_reviewed_at), muille bio_short.
 import "../../henkilo.css";
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
+import { notFound, permanentRedirect } from "next/navigation";
 import Crumbs from "@/components/tn20/Crumbs";
 import FaktaRivi, { Chip } from "@/components/tn20/hub/FaktaRivi";
 import Lyhyesti from "@/components/tn20/hub/Lyhyesti";
@@ -38,7 +38,7 @@ function kuvaus(h: HenkiloSivu): string {
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const slug = decodeURIComponent((await params).slug);
   const h = await haeHenkiloSivu(slug);
-  if (!h) return {};
+  if (!h || "ohjaa" in h) return {};
   const url = henkiloHref(h.slug);
   const title = h.death ? `${h.name} – elämä, syntymäpäivä ja tietovisa` : `${h.name} – ikä, syntymäpäivä ja tietovisa`;
   return {
@@ -53,6 +53,7 @@ export default async function HenkiloPage({ params }: { params: Promise<{ slug: 
   const slug = decodeURIComponent((await params).slug);
   const h = await haeHenkiloSivu(slug);
   if (!h) notFound();
+  if ("ohjaa" in h) permanentRedirect(henkiloHref(h.ohjaa));
 
   const nyt = tanaan();
   const R = ryhma(h.ryhma);
