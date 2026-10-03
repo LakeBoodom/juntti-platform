@@ -19,7 +19,7 @@ export default function Lista({
     <main className="hs hk-sivu">
       <Crumbs items={murut} />
       <div className="tn-shell hk-shell">
-        <header className="hk-head">
+        <header className="hk-head" style={{ ["--hk-lw" as string]: Math.max(...otsikko.split(/\s+/).map((w) => w.length), 8) }}>
           <h1 className="hk-h1">{otsikko}</h1>
           <p className="hk-lead">{lead}</p>
         </header>

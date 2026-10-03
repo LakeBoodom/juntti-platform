@@ -21,7 +21,11 @@ export default function SukulaisLaatat({
 }) {
   if (!laatat.length) return null;
   return (
-    <section className="hub-laatat" aria-label={otsikko}>
+    <section
+      className="hub-laatat"
+      aria-label={otsikko}
+      style={{ ["--hub-lw" as string]: Math.max(...otsikko.split(/\s+/).map((w) => w.length), 8) }}
+    >
       <div className="hub-laatat-head">
         <h2 className="hub-h3">{otsikko}</h2>
         {kaikki &&

@@ -54,7 +54,7 @@ export default async function HenkilotPage() {
     <main className="hs hk-sivu">
       <Crumbs items={[{ label: "Tunnetut henkilöt", href: "/kokoelma/tunnetut-henkilot" }, { label: "A–Ö" }]} />
       <div className="tn-shell hk-shell">
-        <header className="hk-head">
+        <header className="hk-head" style={{ ["--hk-lw" as string]: 10 }}>
           <h1 className="hk-h1">Tunnetut henkilöt A–Ö</h1>
           <p className="hk-lead">{kaikki.length} henkilöä, ikä ja syntymäpäivä jokaisesta.</p>
         </header>
