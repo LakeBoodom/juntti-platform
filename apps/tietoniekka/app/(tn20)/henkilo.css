@@ -136,8 +136,9 @@
 }
 .tn20 .hub-visa--pelattu { background: #171208; border-color: #33291a; }
 .tn20 .hub-visa-teksti { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+/* KORTTISÄÄNTÖ: pisin sana (--hub-lw, PeliHylly laskee) mahtuu kortin sisään (padding 2 × 18–22 px). */
 .tn20 .hub-visa-nimi {
-  font-family: var(--tn-font-display); font-weight: 900; font-size: 21px; line-height: 1.05; text-transform: uppercase; color: var(--tn-text);
+  font-family: var(--tn-font-display); font-weight: 900; font-size: min(21px, calc((100cqw - 48px) / (var(--hub-lw, 10) * 0.82))); line-height: 1.05; text-transform: uppercase; color: var(--tn-text);
   overflow-wrap: normal; word-break: keep-all;
 }
 .tn20 .hub-visa-tulos { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-top: 6px; font-size: 14px; font-weight: 700; color: var(--hs-gold-2, #e4c98e); }
@@ -171,7 +172,8 @@
 .tn20 .hub-laatat-kaikki { flex: none; font-size: 14px; font-weight: 700; color: var(--hs-gold, #c9a96a); text-decoration: none; }
 .tn20 .hub-laatat-n { flex: none; font-size: 13px; font-weight: 700; color: var(--hs-muted, #8e8676); }
 .tn20 .hub-laatat-lista {
-  list-style: none; margin: 0 calc(-1 * clamp(16px, 4vw, 48px)); padding: 0 clamp(16px, 4vw, 48px) 4px;
+  /* Ei reunan yli -vuotoa: vw sisältää vierityspalkin → 768 px:ssä syntyi vaakavieritys (mitattu 3.10.). */
+  list-style: none; margin: 0; padding: 0 0 4px;
   display: flex; gap: 12px; overflow-x: auto; scrollbar-width: none;
 }
 .tn20 .hub-laatat-lista li { flex: none; width: 104px; }

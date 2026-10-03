@@ -37,7 +37,11 @@ export default function PeliHylly({ otsikko, visa, pelit }: { otsikko?: string; 
   }
 
   return (
-    <section className="hub-hylly" aria-label={otsikko ?? "Pelit"}>
+    <section
+      className="hub-hylly"
+      aria-label={otsikko ?? "Pelit"}
+      style={visa ? ({ "--hub-lw": Math.max(...visa.otsikko.split(/\s+/).map((w) => w.length), 8) } as React.CSSProperties) : undefined}
+    >
       {otsikko && <h2 className="hub-h3 hub-hylly-otsikko">{otsikko}</h2>}
       {visa && (
         <div className={tulos ? "hub-visa hub-visa--pelattu" : "hub-visa"}>
