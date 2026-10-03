@@ -46,7 +46,7 @@
   .tn20 .hs-grid {
     /* Hylly saa aina vähintään 340 px (3.10. Heikki: 1100–1300 px:n leveydellä hylly kapeni ja laatat
        kasvoivat 2 × 2 -ruudukossa liian suuriksi). Vasen sarake enintään 520 px. */
-    display: grid; grid-template-columns: minmax(0, 520px) minmax(340px, 640px); justify-content: space-between;
+    display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(340px, 1fr);
     gap: clamp(32px, 4vw, 64px); align-items: start;
     padding: 28px clamp(28px, 3.6vw, 56px) 56px;
   }
