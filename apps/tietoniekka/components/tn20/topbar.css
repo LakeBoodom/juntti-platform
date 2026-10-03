@@ -293,6 +293,11 @@
   color: var(--tn-text-dim);
 }
 .tn20 .tn-crumbrow-in { display: flex; align-items: center; gap: 8px; width: 100%; }
+/* 3.10.2026: pitkä polku (Etusivu / Tunnetut henkilöt / Urheilijat / Kamppailulajit) ylitti 320 px:n
+   näkymän → vaakavieritys koko sivulle. Rivi vierii nyt itse; 44 px:n yksirivinen muoto säilyy. */
+.tn20 .tn-crumbrow-in { overflow-x: auto; scrollbar-width: none; white-space: nowrap; }
+.tn20 .tn-crumbrow-in::-webkit-scrollbar { display: none; }
+.tn20 .tn-crumbrow-seg { flex: none; }
 .tn20 .tn-crumbrow a { color: var(--tn-text-dim); text-decoration: none; }
 .tn20 .tn-crumbrow a:hover { color: var(--tn-text-soft); }
 .tn20 .tn-crumbrow a:focus-visible { outline: 2px solid var(--tn-lime); outline-offset: 2px; }
