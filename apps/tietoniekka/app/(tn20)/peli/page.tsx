@@ -7,6 +7,7 @@
 
 import { JsonLd, breadcrumbLd, abs } from "@/lib/jsonLd";
 import { haeRistiinnostot, type RelatedRow } from "@/lib/related";
+import { henkiloHref } from "@/lib/henkiloSlug";
 import { visaHref } from "@/lib/visaHref";
 import { getSupabase } from "@/lib/supabase";
 import { getKuvavisat, getKuvavisatByIds } from "@/lib/queries";
@@ -594,7 +595,7 @@ export default async function Peli20({
     /* Henkilövisan kuva tulee celebrities-riviltä (Wikipedia/Wikimedia), ei
        kokoelmakartasta — henkilövisoja on 243 eikä niille ole omia kuvia. */
     quiz.collection === "tunnetut-henkilot"
-      ? sb.from("celebrities").select("name, role, image_url, wikipedia_url").eq("trivia_quiz_id", quiz.id).maybeSingle()
+      ? sb.from("celebrities").select("name, role, image_url, wikipedia_url, nimi_elatiivi" as never).eq("trivia_quiz_id", quiz.id).maybeSingle()
       : Promise.resolve({ data: null }),
   ]);
 
@@ -627,7 +628,7 @@ export default async function Peli20({
      se on juuri se virhe, jossa golfvisa sai tennisvisan kuvan. */
   const heroParam = typeof params.hero === "string" ? params.hero : null;
   const isPerson = collection === "tunnetut-henkilot";
-  const celeb = (celebRes.data ?? null) as { name: string; role: string | null; image_url: string | null; wikipedia_url?: string | null } | null;
+  const celeb = (celebRes.data ?? null) as unknown as { name: string; role: string | null; image_url: string | null; wikipedia_url?: string | null; nimi_elatiivi?: string | null } | null;
   /* Wikimedian thumb-osoitteessa leveys on polussa (".../330px-Tiedosto.jpg").
      Kannassa olevat kuvat ovat 330 px leveitä — liian pieniä 3:4-kortille — ja
      Wikimedia hyväksyy vain tietyt kokoportaat, joista 1280 on suurin toimiva.
@@ -704,6 +705,11 @@ export default async function Peli20({
     /* SUOMEN KAUPUNGIT -matkapassi (28.8.2026): kun visa on yksi 20:sta
        kaupunkivisasta, GameClient kirjoittaa leiman localStorageen pelin
        päättyessä (ks. lib/kaupungit.ts, KaupunkiPelilauta.tsx). */
+    /* Erä B6: henkilösivu. Elatiivi kannasta (Cowork), muuten koko nimi — ei generoitua taivutusta. */
+    henkilo:
+      isPerson && celeb
+        ? { href: henkiloHref(celeb.name), linkki: celeb.nimi_elatiivi?.trim() ? `Lue lisää ${celeb.nimi_elatiivi.trim()}` : `Lue lisää: ${celeb.name}` }
+        : null,
     citySlug: KAUPUNGIT.find((c) => c.quizSlug === quiz.slug)?.id ?? null,
     fanitasot:
       Array.isArray(quiz.fanitasot) && quiz.fanitasot.length === 5 && quiz.fanitasot.every((t) => typeof t === "string" && t.trim())

@@ -5,7 +5,9 @@
 // Kuvavisat: oma hub (KUVAVISAT 2.0, 17.9.2026) — kategoriat avaavat visavariaatiot.
 // Tunnetut henkilöt: oma hub (ennallaan, Heikin ohje 2026-07-31).
 
-import { ryhmaOf } from "@/lib/henkiloRyhmat";
+import { RYHMAT, ryhmaOf } from "@/lib/henkiloRyhmat";
+import { henkiloHref } from "@/lib/henkiloSlug";
+import "../../henkilo.css";
 import { KokoelmaLd } from "@/components/tn20/KokoelmaLd";
 import { jakoMeta } from "@/lib/jakoMeta";
 import { visaHref } from "@/lib/visaHref";
@@ -13,7 +15,7 @@ import type { Metadata } from "next";
 import { getSupabase } from "@/lib/supabase";
 import { getSiteId } from "@/lib/queries";
 import { PersonCard, type QuizCardData } from "@/components/tn20/cards";
-import { PersonBrowser, type BrowserPerson } from "@/components/tn20/PersonBrowser";
+import type { BrowserPerson } from "@/components/tn20/PersonBrowser";
 import { CollectionPageGamePromo } from "@/components/tn20/CollectionPageGamePromo";
 import { WideCard } from "@/components/tn20/WideCard";
 import { MOTIF_PATHS, motifPathFor } from "@/components/tn20/motif-paths";
@@ -728,7 +730,7 @@ async function PersonHub({ hub, article }: { hub: HubMeta; article?: React.React
               const m = today.getMonth() - b.getMonth();
               if (m < 0 || (m === 0 && today.getDate() < b.getDate())) a--;
               return (
-                <PersonCard key={c.id} person={c} dateChip={chip} ageLabel={`${dist === 0 ? a : a + 1} vuotta`} href={playHref(c)} />
+                <PersonCard key={c.id} person={c} dateChip={chip} ageLabel={`${dist === 0 ? a : a + 1} vuotta`} href={henkiloHref(c.name)} />
               );
             })}
           </div>
@@ -740,8 +742,26 @@ async function PersonHub({ hub, article }: { hub: HubMeta; article?: React.React
           <CollectionPageGamePromo peekPeople={peekPeople} />
         </section>
 
-        <section className="tn-section" style={{ paddingTop: 0 }}>
-          <PersonBrowser people={browserPeople} />
+        {/* Erä B6 (3.10.2026): "Selaa kaikkia" → hakemisto + 7 ryhmäkorttia. Aiempi selain listasi
+            vain osan henkilöistä visalinkkeinä; nyt jokainen henkilö on omalla sivullaan. */}
+        <section className="tn-section hs-hubryhmat" style={{ paddingTop: 0 }} aria-labelledby="selaa-h">
+          <div className="hs-hubryhmat-head">
+            <h2 id="selaa-h" className="tn-display">Selaa kaikkia</h2>
+            <a className="tn-morelink" href="/henkilot">
+              Kaikki {celebs.length} A–Ö →
+            </a>
+          </div>
+          <div className="hs-hubryhmat-grid">
+            {RYHMAT.map((g) => {
+              const n = celebs.filter((c) => ryhmaOf(c.ryhma, c.laji) === g.key).length;
+              return n ? (
+                <a key={g.key} className="hs-hubryhma" href={`/henkilot/${g.key}`}>
+                  <span className="hs-hubryhma-nimi">{g.nimi}</span>
+                  <span className="hs-hubryhma-n">{n} henkilöä →</span>
+                </a>
+              ) : null;
+            })}
+          </div>
         </section>
       </div>
       {article}

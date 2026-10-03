@@ -41,7 +41,7 @@ export default function PaivanSankari({ data }: { data: PaivanSankariData }) {
         <h2 className="tn-es-sank-h" id="paivan-sankari-h">Päivän sankari</h2>
         <i aria-hidden />
       </div>
-      <a ref={nayttoRef} className="tn-es-sank-row" href={data.playHref} onClick={() => kirjaaNosto({ ...mitta, tapahtuma: "klikkaus" })}>
+      <a ref={nayttoRef} className="tn-es-sank-row" href={data.henkiloHref} onClick={() => kirjaaNosto({ ...mitta, tapahtuma: "klikkaus" })}>
         <span className="tn-es-sank-img" aria-hidden>
           {kuvaOk && data.kuva ? (
             // eslint-disable-next-line @next/next/no-img-element

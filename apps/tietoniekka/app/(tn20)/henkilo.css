@@ -335,3 +335,15 @@
 .tn20 .hk-tanaan { display: flex; flex-direction: column; gap: 4px; padding: 18px 0 8px; }
 .tn20 .hk-kuukaudet { display: flex; flex-direction: column; }
 .tn20 .hk-kuukausi { min-height: 56px; border-bottom: 1px solid var(--hs-line, #241e13); font-size: 16px; font-weight: 700; }
+
+/* ── Henkilöhubin "Selaa kaikkia" (erä B6): 7 ryhmäkorttia + hakemistolinkki ── */
+.tn20 .hs-hubryhmat-head { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; margin-bottom: 14px; }
+.tn20 .hs-hubryhmat-head h2 { margin: 0; font-size: clamp(22px, 5vw, 30px); text-transform: uppercase; overflow-wrap: normal; word-break: keep-all; }
+.tn20 .hs-hubryhmat-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 240px), 1fr)); gap: 10px; }
+.tn20 .hs-hubryhma {
+  display: flex; flex-direction: column; justify-content: space-between; gap: 10px; min-height: 92px; padding: 16px 18px; border-radius: 14px;
+  background: #1c1810; border: 1px solid #3a3122; color: var(--tn-text); text-decoration: none;
+}
+.tn20 .hs-hubryhma:hover { border-color: rgba(201, 169, 106, 0.6); }
+.tn20 .hs-hubryhma-nimi { font-size: 17px; font-weight: 700; line-height: 1.25; overflow-wrap: normal; word-break: keep-all; }
+.tn20 .hs-hubryhma-n { font-size: 13.5px; font-weight: 700; color: #c9a96a; }
