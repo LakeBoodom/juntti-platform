@@ -44,6 +44,8 @@ export type EntityValue = {
   lon: number | null;
   name_partitive: string | null;
   fact_attributes?: AttrValue[];
+  /** Rajatut arvot (scope ≠ ''), vain näytettäväksi. */
+  rajatut?: AttrValue[];
 };
 
 const epochToDate = (n: number) => new Date(n * 1000).toISOString().slice(0, 10);

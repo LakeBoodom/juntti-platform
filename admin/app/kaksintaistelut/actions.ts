@@ -6,8 +6,11 @@ import { getSupabaseAdmin } from "@juntti/db";
 /** Attribuutit joiden num_value on epoch-sekunteina (lomake näyttää päivämäärän) */
 export const DATE_ATTRS = ["birth"];
 
+/** Lomake käsittelee vain koko uran arvoja (scope ''). Rajatut arvot (esim. seurakohtaiset
+ *  Liiga-luvut, scope 'Tappara') näytetään listassa mutta niitä ei muokata lomakkeella. */
 export type AttrValue = {
   attr_key: string;
+  scope?: string;
   num_value: number | null;
   display_value: string | null;
   source: string | null;
@@ -58,6 +61,7 @@ async function writeAttributes(entityId: string, attributes: AttrValue[]) {
       .from("fact_attributes")
       .delete()
       .eq("entity_id", entityId)
+      .eq("scope", "")
       .in("attr_key", drop.map((a) => a.attr_key));
   }
   if (keep.length) {
@@ -65,12 +69,13 @@ async function writeAttributes(entityId: string, attributes: AttrValue[]) {
       keep.map((a) => ({
         entity_id: entityId,
         attr_key: a.attr_key,
+        scope: "",
         num_value: a.num_value as number,
         display_value: a.display_value,
         source: a.source,
         verified_at: a.verified_at,
       })),
-      { onConflict: "entity_id,attr_key" },
+      { onConflict: "entity_id,attr_key,scope" },
     );
   }
 }

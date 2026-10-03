@@ -37,14 +37,20 @@ export default async function KaksintaistelutPage() {
     admin
       .from("fact_entities")
       .select(
-        "id, name, kind, role_label, show_role, image_url, image_credit, wiki_url, status, lat, lon, name_partitive, fact_attributes(attr_key, num_value, display_value, source, verified_at)",
+        "id, name, kind, role_label, show_role, image_url, image_credit, wiki_url, status, lat, lon, name_partitive, fact_attributes(attr_key, scope, num_value, display_value, source, verified_at)",
       )
       .order("kind")
       .order("name"),
   ]);
 
   const defList = defs ?? [];
-  const rows = (entities ?? []) as any[];
+  // Lomake, esikatselu ja parimäärät käyttävät vain koko uran arvoja (scope '');
+  // rajatut (seurakohtaiset) näytetään rivillä erikseen.
+  const rows = ((entities ?? []) as any[]).map((e) => ({
+    ...e,
+    fact_attributes: (e.fact_attributes ?? []).filter((a: any) => !a.scope),
+    rajatut: (e.fact_attributes ?? []).filter((a: any) => a.scope),
+  }));
 
   // --- Parimäärät per attribuutti ---
   const counts = new Map<string, number>();
