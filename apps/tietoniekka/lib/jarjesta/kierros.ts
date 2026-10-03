@@ -88,9 +88,26 @@ export async function haeJarjestysKierros(slug: string, excludeIds: string[] = [
     return [];
   }
 
+  // Syntymävuosirajaus: haetaan saman kindin birth-arvot (epoch-sekunnit) erikseen.
+  const syntyneet = new Map<string, number>();
+  const minVuosi = p.pool?.syntynytVahintaan;
+  if (minVuosi) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data: b } = await (sb as any)
+      .from("fact_attributes")
+      .select("entity_id, num_value, fact_entities!inner(kind)")
+      .eq("attr_key", "birth")
+      .eq("scope", "")
+      .eq("fact_entities.kind", p.kind);
+    for (const r of (b ?? []) as { entity_id: string; num_value: number | string }[])
+      syntyneet.set(r.entity_id, new Date(Number(r.num_value) * 1000).getUTCFullYear());
+  }
+  const vuosiOk = (id: string) => !minVuosi || (syntyneet.get(id) ?? minVuosi) >= minVuosi;
+
   const maxProm = p.pool?.maxProminence;
   const pool: JarjestysKohde[] = (data as Rivi[])
     .filter((r) => r.fact_entities && (!maxProm || (r.fact_entities.prominence ?? 1) <= maxProm))
+    .filter((r) => vuosiOk(r.fact_entities!.id))
     .map((r) => {
       const e = r.fact_entities!;
       const value = Number(r.num_value);

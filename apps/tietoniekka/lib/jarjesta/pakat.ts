@@ -31,7 +31,12 @@ export type Pakka = {
   /** Lisätään pelkän luvun perään ("101" → "101 maaottelua"). */
   yksikko: string;
   pick: number;
-  pool?: { maxProminence?: 1 | 2 | 3 };
+  pool?: {
+    maxProminence?: 1 | 2 | 3;
+    /** Vain tänä vuonna tai myöhemmin syntyneet (attr `birth`). Heikki 3.10.: Leijonat ja Tappara 1960+
+     *  ≈ ura 1980-luvulta. Kohde, jolta syntymäaika puuttuu, pidetään mukana (ei pudoteta datan aukon takia). */
+    syntynytVahintaan?: number;
+  };
   /** Kohteilla ei ole kuvia → kortti ilman kuvapaikkaa (henkilöillä siluetti riittää). */
   piilotaKuva?: boolean;
   /** Näytä kortilla rooli ilman lajia ("kansallispuisto · Lappi" → "Lappi"). Muuten ei roolia. */
@@ -66,7 +71,7 @@ export const PAKAT: Pakka[] = [
     otsikko: "Leijonien maaotteluennätykset",
     seoTitle: "Laita järjestykseen: eniten maaotteluita pelanneet Leijonat",
     kuvaus: "Järjestä kymmenen Leijonien pelaajaa maaotteluiden määrän mukaan – eniten pelannut ylimmäksi.",
-    rajaus: "Suomen jääkiekkomaajoukkueen kaikkien aikojen tilasto 1928–2025, pelaajat joilla yli 100 maaottelua.",
+    rajaus: "Leijonien kaikkien aikojen pistepörssin kärki, 1960 tai myöhemmin syntyneet pelaajat.",
     suunta: "Eniten otteluita ensin",
     kind: "player",
     attrKey: "nt_games",
@@ -75,6 +80,7 @@ export const PAKAT: Pakka[] = [
     vali: { tapa: "suhteellinen", min: 0.04 },
     yksikko: "maaottelua",
     pick: 10,
+    pool: { syntynytVahintaan: 1960 },
     collection: { slug: "jaakiekko", nimi: "Jääkiekko" },
     kuva: "/20/jaakiekko/jk-leijonat-mm2019-kuva.webp",
   },
@@ -83,7 +89,7 @@ export const PAKAT: Pakka[] = [
     otsikko: "Tapparan pistepörssi",
     seoTitle: "Laita järjestykseen: Tapparan kaikkien aikojen pistepörssi",
     kuvaus: "Järjestä kymmenen Tapparan pelaajaa SM-liigapisteiden mukaan – eniten pisteitä kerännyt ylimmäksi.",
-    rajaus: "SM-liigan runkosarja 1975–, pisteet Tapparan paidassa.",
+    rajaus: "SM-liigan runkosarja 1975–, pisteet Tapparan paidassa. 1960 tai myöhemmin syntyneet pelaajat.",
     suunta: "Eniten pisteitä ensin",
     kind: "player",
     attrKey: "liiga_points",
@@ -92,6 +98,7 @@ export const PAKAT: Pakka[] = [
     vali: { tapa: "suhteellinen", min: 0.04 },
     yksikko: "pistettä",
     pick: 10,
+    pool: { syntynytVahintaan: 1960 },
     collection: { slug: "jaakiekko", nimi: "Jääkiekko" },
     kuva: "/20/jaakiekko/jk-tappara-kuva.webp",
   },
