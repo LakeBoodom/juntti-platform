@@ -87,3 +87,29 @@ export async function getChainRound(
     birthDate: r.birth_date,
   }));
 }
+
+/**
+ * Henkilösivun henkilökohtainen kierros (design v0.3, 4a): täsmälleen nämä henkilöt (2–10 id:tä),
+ * jotka henkilösivu on valinnut (sama henkilö + päivä → samat vastustajat, vuotolista huomioitu).
+ * Järjestys sekoitetaan; vain saman sivuston henkilöt kelpaavat.
+ */
+export async function getChainRoundByIds(ids: string[]): Promise<ChainPerson[]> {
+  const siteId = await getSiteId();
+  const sb = getSupabase();
+  const puhtaat = [...new Set(ids)].filter((x) => /^[0-9a-f-]{36}$/i.test(x)).slice(0, ROUND_SIZE);
+  if (!siteId || !sb || puhtaat.length < 2) return [];
+  const { data, error } = await sb
+    .from("celebrities")
+    .select("id, name, role, ryhma, image_url, birth_date")
+    .eq("site_id", siteId)
+    .in("id", puhtaat)
+    .not("birth_date", "is", null);
+  if (error || !data) return [];
+  return shuffleChain(data as unknown as CelebRow[]).map((r) => ({
+    id: r.id,
+    name: r.name,
+    role: r.role,
+    image_url: r.image_url,
+    birthDate: r.birth_date,
+  }));
+}

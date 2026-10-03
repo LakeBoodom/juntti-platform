@@ -8,7 +8,7 @@ import { notFound, permanentRedirect } from "next/navigation";
 import Crumbs from "@/components/tn20/Crumbs";
 import FaktaRivi, { Chip } from "@/components/tn20/hub/FaktaRivi";
 import Lyhyesti from "@/components/tn20/hub/Lyhyesti";
-import PeliHylly from "@/components/tn20/hub/PeliHylly";
+import PeliHylly, { type HyllyPeli } from "@/components/tn20/hub/PeliHylly";
 import SukulaisLaatat from "@/components/tn20/hub/SukulaisLaatat";
 import LahdeRivi from "@/components/tn20/hub/LahdeRivi";
 import { JsonLd, abs } from "@/lib/jsonLd";
@@ -118,6 +118,15 @@ export default async function HenkiloPage({ params }: { params: Promise<{ slug: 
     ...(h.visa ? { subjectOf: { "@type": "Quiz", name: h.visa.otsikko, url: abs(h.visa.href) } } : {}),
   };
 
+  const hyllyPelit: HyllyPeli[] = [];
+  if (h.ikaKierros) hyllyPelit.push({ tyyppi: "ikajarjestys", ...h.ikaKierros });
+  if (h.visa) hyllyPelit.push({ tyyppi: "visa", id: h.visa.id, otsikko: h.visa.otsikko, href: h.visa.href, fanitasot: h.visa.fanitasot });
+  const ini = h.name
+    .split(/\s+/)
+    .map((w) => w[0])
+    .join("")
+    .slice(0, 2);
+
   return (
     <main className="hs" style={{ ["--hs-lw" as string]: lw }}>
       <JsonLd data={personLd} />
@@ -129,45 +138,45 @@ export default async function HenkiloPage({ params }: { params: Promise<{ slug: 
         ]}
       />
       <div className="tn-shell hs-shell">
-        <article className="hs-top">
-          <header className="hs-otsikko">
-            <span className="hub-eyebrow hs-eyebrow-desk">Tunnetut henkilöt · {R.lyhyt}</span>
-            <span className="hub-eyebrow hs-eyebrow-mob">{R.nimi}</span>
-            <h1 className="hs-h1">{h.name}</h1>
-            {rooli && <p className="hs-rooli">{rooli}</p>}
-          </header>
-          <div className="hs-kuva">
-            {h.image_url ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img src={h.image_url} alt={h.name} style={{ objectPosition: `${h.focal.x * 100}% ${h.focal.y * 100}%` }} />
-            ) : (
-              <span className="hub-laatta-ini" aria-hidden="true">
-                {h.name
-                  .split(/\s+/)
-                  .map((w) => w[0])
-                  .join("")
-                  .slice(0, 2)}
-              </span>
-            )}
-            <span className="hub-duotone" aria-hidden="true" />
-            <span className="hs-kuva-fade" aria-hidden="true" />
-            {h.image_url && <span className="hs-kuva-credit">Kuva: Wikimedia Commons</span>}
+        <article className="hs-kortti">
+          <div className="hs-grid">
+            <div className="hs-vasen">
+              <div className="hs-paa">
+                <figure className="hs-muotokuva">
+                  <div className="hs-passe">
+                    <div className="hs-kuva">
+                      {h.image_url ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img src={h.image_url} alt={h.name} style={{ objectPosition: `${h.focal.x * 100}% ${h.focal.y * 100}%` }} />
+                      ) : (
+                        <span className="hub-laatta-ini" aria-hidden="true">
+                          {ini}
+                        </span>
+                      )}
+                      <span className="hub-duotone" aria-hidden="true" />
+                    </div>
+                  </div>
+                  {h.image_url && <figcaption>Kuva: Wikimedia Commons</figcaption>}
+                </figure>
+                <header className="hs-otsikko">
+                  <span className="hub-eyebrow">{R.lyhyt}</span>
+                  <h1 className="hs-h1">{h.name}</h1>
+                  {rooli && <p className="hs-rooli">{rooli}</p>}
+                </header>
+              </div>
+              {fakta}
+              {h.esittely && <p className="hs-esittely">{h.esittely}</p>}
+              <Lyhyesti rivit={h.faktat} />
+            </div>
+            <div className="hs-oikea">
+              <PeliHylly
+                otsikko={h.elatiivi ? `Pelaa ${h.elatiivi}` : `Pelaa: ${h.name}`}
+                pelit={hyllyPelit}
+                muista={h.aiheet.map((a) => ({ otsikko: a.otsikko, href: a.href, meta: a.meta }))}
+              />
+            </div>
           </div>
-          <div className="hs-vasen">
-            {fakta}
-            {h.esittely && <p className="hs-esittely">{h.esittely}</p>}
-          </div>
-          <div className="hs-oikea">
-            <Lyhyesti rivit={h.faktat} />
-            <PeliHylly
-              visa={h.visa ? { id: h.visa.id, eyebrow: "Henkilövisa", otsikko: h.visa.otsikko, href: h.visa.href, fanitasot: h.visa.fanitasot } : null}
-              pelit={[]}
-            />
-          </div>
-        </article>
-
-        <div className="hs-ala">
-          <div className="hs-ala-vasen">
+          <div className="hs-ala">
             <SukulaisLaatat
               otsikko={h.muut.otsikko}
               laatat={h.muut.laatat.map((l) => ({ ...l, href: henkiloHref(l.slug) }))}
@@ -179,12 +188,9 @@ export default async function HenkiloPage({ params }: { params: Promise<{ slug: 
                 laatat={h.samanaPaivana.map((l) => ({ ...l, href: henkiloHref(l.slug) }))}
               />
             )}
+            <LahdeRivi wikipedia={h.wikipedia_url} />
           </div>
-          <div className="hs-ala-oikea">
-            <PeliHylly otsikko="Lisää pelattavaa" visa={null} pelit={h.pelit} />
-            <LahdeRivi kuva={h.image_url ? "Wikimedia Commons" : null} wikipedia={h.wikipedia_url} />
-          </div>
-        </div>
+        </article>
       </div>
     </main>
   );

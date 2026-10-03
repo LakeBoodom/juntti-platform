@@ -6193,6 +6193,7 @@ export type Database = {
           laji: string | null
           name: string
           nickname: string | null
+          nimi_elatiivi: string | null
           platform: string | null
           priority: number | null
           role: string
@@ -6221,6 +6222,7 @@ export type Database = {
           laji?: string | null
           name: string
           nickname?: string | null
+          nimi_elatiivi?: string | null
           platform?: string | null
           priority?: number | null
           role: string
@@ -6249,6 +6251,7 @@ export type Database = {
           laji?: string | null
           name?: string
           nickname?: string | null
+          nimi_elatiivi?: string | null
           platform?: string | null
           priority?: number | null
           role?: string
@@ -9966,6 +9969,7 @@ export type Database = {
           laji: string | null
           name: string
           nickname: string | null
+          nimi_elatiivi: string | null
           platform: string | null
           priority: number | null
           role: string

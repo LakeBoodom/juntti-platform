@@ -8,6 +8,7 @@ import { lajiMonikko, ryhma, ryhmaOf, type RyhmaKey } from "./henkiloRyhmat";
 import { lueFaktat, type Fakta } from "./henkiloKaava";
 import { visaHref } from "./visaHref";
 import { henkiloSlug } from "./henkiloSlug";
+import { nimiVuotaa, rakennaVuotolista, type VisanKysymys } from "./vuotolista";
 
 /* ── Päivämäärät (Europe/Helsinki) ─────────────────────────────────────── */
 
@@ -59,12 +60,22 @@ export type Laatta = { slug: string; name: string; image_url: string | null; ala
 
 export type PeliLinkki = { eyebrow: string; otsikko: string; href: string; meta?: string };
 
+/** Henkilökohtainen Ikäjärjestys (design v0.3, 4a): henkilö + 3 saman lajin vastustajaa. */
+export type IkaKierros = {
+  otsikko: string;
+  kuvaus: string;
+  href: string;
+  laatat: Array<{ name: string; image_url: string | null; oma: boolean }>;
+};
+
 export type HenkiloSivu = {
   id: string;
   slug: string;
   name: string;
   role: string | null;
   nickname: string | null;
+  /** "Kimistä" (Cowork täyttää); tyhjä → sivu käyttää koko nimeä, ei koskaan generoitua muotoa. */
+  elatiivi: string | null;
   ryhma: RyhmaKey;
   laji: string | null;
   image_url: string | null;
@@ -79,7 +90,9 @@ export type HenkiloSivu = {
   faktat: Fakta[];
   wikipedia_url: string | null;
   visa: { id: string; href: string; otsikko: string; fanitasot: string[] | null } | null;
-  pelit: PeliLinkki[];
+  ikaKierros: IkaKierros | null;
+  /** "Muista kokoelmista": 0–3 aihevisaa. */
+  aiheet: PeliLinkki[];
   muut: { otsikko: string; laatat: Laatta[]; kaikki: number; kaikkiHref: string | null };
   samanaPaivana: Laatta[];
 };
@@ -109,6 +122,28 @@ function sekoita<T>(a: T[]): T[] {
   const b = a.slice();
   for (let i = b.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
+    [b[i], b[j]] = [b[j], b[i]];
+  }
+  return b;
+}
+
+/* Päivän siemen: sama henkilö + sama päivä → samat vastustajat kortilla ja pelissä (Cowork 3.10.). */
+function siemen(s: string): () => number {
+  let h = 1779033703 ^ s.length;
+  for (let i = 0; i < s.length; i++) h = Math.imul(h ^ s.charCodeAt(i), 3432918353), (h = (h << 13) | (h >>> 19));
+  let a = h >>> 0;
+  return () => {
+    a = (a + 0x6d2b79f5) | 0;
+    let t = Math.imul(a ^ (a >>> 15), 1 | a);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+function sekoitaSiemenella<T>(a: T[], rnd: () => number): T[] {
+  const b = a.slice();
+  for (let i = b.length - 1; i > 0; i--) {
+    const j = Math.floor(rnd() * (i + 1));
     [b[i], b[j]] = [b[j], b[i]];
   }
   return b;
@@ -144,7 +179,7 @@ export async function haeHenkiloSivu(slug: string): Promise<HenkiloSivu | { ohja
   const { data: c } = await (sb as any)
     .from("celebrities")
     .select(
-      "id, slug, name, role, ryhma, laji, image_url, image_focal_x, image_focal_y, birth_date, death_date, bio_short, intro_text, wikipedia_url, trivia_quiz_id, birth_place, death_place, nickname, facts, facts_reviewed_at",
+      "id, slug, name, role, ryhma, laji, image_url, image_focal_x, image_focal_y, birth_date, death_date, intro_text, wikipedia_url, trivia_quiz_id, birth_place, death_place, nickname, nimi_elatiivi, facts, facts_reviewed_at",
     )
     .eq("id", osuma.id)
     .maybeSingle();
@@ -154,7 +189,7 @@ export async function haeHenkiloSivu(slug: string): Promise<HenkiloSivu | { ohja
   const r = ryhmaOf(c.ryhma, c.laji);
   const hyvaksytty = !!c.facts_reviewed_at;
 
-  const [visaRes] = await Promise.all([
+  const [visaRes, kysRes] = await Promise.all([
     c.trivia_quiz_id
       ? // eslint-disable-next-line @typescript-eslint/no-explicit-any
         (sb as any)
@@ -164,6 +199,9 @@ export async function haeHenkiloSivu(slug: string): Promise<HenkiloSivu | { ohja
           .eq("status", "published")
           .maybeSingle()
       : Promise.resolve({ data: null }),
+    c.trivia_quiz_id
+      ? sb.from("questions").select("question_text, answers").eq("quiz_id", c.trivia_quiz_id)
+      : Promise.resolve({ data: [] }),
   ]);
   const kaikki = kaikkiRivit.filter((x) => x.id !== c.id);
 
@@ -175,7 +213,7 @@ export async function haeHenkiloSivu(slug: string): Promise<HenkiloSivu | { ohja
   const lajiNimi = lajiMonikko(c.laji);
   const muut = {
     otsikko: lajiRiittaa && lajiNimi ? `Muut ${lajiNimi}` : `Muut: ${ryhma(r).nimi.toLowerCase()}`,
-    laatat: joukko.slice(0, 6).map((x) => laatta(x, nyt)),
+    laatat: joukko.slice(0, 8).map((x) => laatta(x, nyt)),
     kaikki: joukko.length + 1,
     kaikkiHref: null as string | null, // /henkilot/<ryhma>/<laji> tulee hakemiston mukana
   };
@@ -207,15 +245,40 @@ export async function haeHenkiloSivu(slug: string): Promise<HenkiloSivu | { ohja
       }
     : null;
 
-  // Pelihylly: Ikäjärjestys omalla ryhmällä/lajilla + 0–3 aihevisaa.
-  const pelit: PeliLinkki[] = [];
-  const ikaParams = new URLSearchParams({ category: r, autostart: "1" });
-  if (c.laji && lajiRiittaa) ikaParams.set("laji", c.laji);
-  pelit.push({
-    eyebrow: "Ikäjärjestys",
-    otsikko: lajiRiittaa && lajiNimi ? lajiNimi.charAt(0).toUpperCase() + lajiNimi.slice(1) : ryhma(r).nimi,
-    href: `/peli/ikajarjestys?${ikaParams}`,
-  });
+  // Henkilökohtainen Ikäjärjestys: henkilö + 3 saman lajin (tai ryhmän) henkilöä, joilla eri syntymäpäivä.
+  // Vastustajaksi ei kelpaa henkilö, jonka nimi on oman visan vastaus tai kysymyksen erisnimi.
+  let ikaKierros: IkaKierros | null = null;
+  if (s) {
+    const lista = rakennaVuotolista(((kysRes?.data ?? []) as unknown as VisanKysymys[]), c.name);
+    const rnd = siemen(`${c.id}|${nyt.y}-${nyt.m}-${nyt.d}`);
+    const ehdokkaat = sekoitaSiemenella(
+      (lajiRiittaa ? samaLaji : samaRyhma).filter((x) => x.birth_date && !nimiVuotaa(x.name, lista)),
+      rnd,
+    ).sort((a, b) => (b.image_url ? 1 : 0) - (a.image_url ? 1 : 0)); // kuvalliset ensin (laatat näyttävät kasvot)
+    const valitut: Rivi[] = [];
+    const paivat = new Set([c.birth_date]);
+    for (const x of ehdokkaat) {
+      if (valitut.length >= 3) break;
+      if (paivat.has(x.birth_date)) continue;
+      paivat.add(x.birth_date);
+      valitut.push(x);
+    }
+    if (valitut.length === 3) {
+      const laatat = sekoitaSiemenella(
+        [{ name: c.name, image_url: c.image_url, oma: true, id: c.id }, ...valitut.map((x) => ({ name: x.name, image_url: x.image_url, oma: false, id: x.id }))],
+        rnd,
+      );
+      ikaKierros = {
+        otsikko: `${c.name} ja ${lajiRiittaa && lajiNimi ? lajiNimi : ryhma(r).nimi.toLowerCase()}`,
+        kuvaus: `Järjestä ${c.name} ja kolme muuta syntymäpäivän mukaan.`,
+        // category: "Arvo 10 uutta" jatkaa saman ryhmän kierroksilla.
+        href: `/peli/ikajarjestys?henkilot=${laatat.map((l) => l.id).join(",")}&category=${r}`,
+        laatat: laatat.map(({ name, image_url, oma }) => ({ name, image_url, oma })),
+      };
+    }
+  }
+
+  const aiheet: PeliLinkki[] = [];
   const f = aiheSuodatin(r, c.laji);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let aq = (sb as any)
@@ -225,9 +288,9 @@ export async function haeHenkiloSivu(slug: string): Promise<HenkiloSivu | { ohja
     .neq("game_mode", "mega")
     .limit(60);
   if (f.genre) aq = aq.eq("genre", f.genre);
-  const { data: aiheet } = await aq;
-  for (const a of sekoita((aiheet ?? []) as Array<{ id: string; slug: string | null; custom_slug: string | null; title: string; display_title: string | null; collection: string; game_mode: string | null }>).slice(0, 3)) {
-    pelit.push({ eyebrow: "Visa", otsikko: a.display_title ?? a.title, href: visaHref(a), meta: KOKOELMA_NIMI[a.collection] ?? undefined });
+  const { data: aiheRivit } = await aq;
+  for (const a of sekoita((aiheRivit ?? []) as Array<{ id: string; slug: string | null; custom_slug: string | null; title: string; display_title: string | null; collection: string; game_mode: string | null }>).slice(0, 3)) {
+    aiheet.push({ eyebrow: "Visa", otsikko: a.display_title ?? a.title, href: visaHref(a), meta: KOKOELMA_NIMI[a.collection] ?? undefined });
   }
 
   return {
@@ -235,7 +298,9 @@ export async function haeHenkiloSivu(slug: string): Promise<HenkiloSivu | { ohja
     slug: henkiloSlug(c.name),
     name: c.name,
     role: c.role,
-    nickname: c.nickname,
+    // Lempinimi voi olla visan vastaus → näkyy vasta vuototarkistetun erän hyväksynnän jälkeen.
+    nickname: hyvaksytty ? c.nickname : null,
+    elatiivi: c.nimi_elatiivi?.trim() || null,
     ryhma: r,
     laji: c.laji,
     image_url: c.image_url,
@@ -246,12 +311,13 @@ export async function haeHenkiloSivu(slug: string): Promise<HenkiloSivu | { ohja
     deathIso: c.death_date,
     birth_place: c.birth_place,
     death_place: c.death_place,
-    // Vuotosääntö (brief B2): intro_text ja facts näkyvät vasta Heikin hyväksynnän jälkeen.
-    esittely: (hyvaksytty && c.intro_text) || c.bio_short || null,
+    // Vuotosääntö (brief B2, Cowork 3.10. vaihtoehto b): ennen hyväksyntää vain faktarivi, ei bio_shortia.
+    esittely: hyvaksytty ? c.intro_text || null : null,
     faktat: hyvaksytty ? lueFaktat(c.facts) : [],
     wikipedia_url: c.wikipedia_url,
     visa,
-    pelit,
+    ikaKierros,
+    aiheet,
     muut,
     samanaPaivana,
   };

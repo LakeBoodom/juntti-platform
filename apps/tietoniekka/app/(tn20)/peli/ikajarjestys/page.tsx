@@ -6,7 +6,7 @@
 import { JsonLd, peliLd } from "@/lib/jsonLd";
 import { jakoMeta } from "@/lib/jakoMeta";
 import type { Metadata } from "next";
-import { getChainRound } from "@/lib/ikajarjestys";
+import { getChainRound, getChainRoundByIds } from "@/lib/ikajarjestys";
 import IkajarjestysClient from "./IkajarjestysClient";
 
 export const dynamic = "force-dynamic";
@@ -34,7 +34,9 @@ export default async function IkajarjestysPage({
   const category = typeof sp.category === "string" ? sp.category : "kaikki";
   const autostart = sp.autostart === "1";
 
-  const initialRound = autostart ? await getChainRound(category) : null;
+  // Henkilösivun nosto: ?henkilot=id,id,id,id → täsmälleen nämä (design v0.3, 4a).
+  const henkilot = typeof sp.henkilot === "string" ? sp.henkilot.split(",") : null;
+  const initialRound = henkilot ? await getChainRoundByIds(henkilot) : autostart ? await getChainRound(category) : null;
 
   return (
     <>
