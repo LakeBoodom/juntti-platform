@@ -14,6 +14,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { PersonCard, type PersonCardData } from "./cards";
 import { PersonSilhouette } from "./motifs";
+import { RYHMAT } from "@/lib/henkiloRyhmat";
 
 export type BrowserPerson = PersonCardData & {
   role: string | null;
@@ -24,14 +25,8 @@ export type BrowserPerson = PersonCardData & {
   href: string;
 };
 
-const GROUP_LABELS = [
-  { key: "kaikki", label: "Kaikki" },
-  { key: "nayttelijat", label: "Näyttelijät" },
-  { key: "artistit", label: "Muusikot ja artistit" },
-  { key: "urheilijat", label: "Urheilijat" },
-  { key: "poliitikot", label: "Poliitikot ja merkkihenkilöt" },
-  { key: "muut", label: "Muut" },
-];
+/* 3.10.2026: ryhmät 4 → 7 (Cowork päivitti celebrities.ryhma-arvot). Lyhyet nimet chippeihin. */
+const GROUP_LABELS = [{ key: "kaikki", label: "Kaikki" }, ...RYHMAT.map((r) => ({ key: r.key as string, label: r.lyhyt }))];
 
 /* "Suosituimmat" poistettu 21.9.2026 (Heikki): priority-kenttä ei erottele
    henkilöitä, joten se antoi käytännössä saman listan etunimijärjestyksessä.

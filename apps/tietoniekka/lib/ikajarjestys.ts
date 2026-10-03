@@ -14,6 +14,7 @@
 
 import { getSupabase } from "./supabase";
 import { getSiteId } from "./queries";
+import { ryhmaOf } from "./henkiloRyhmat";
 import { ROUND_SIZE, shuffleChain, type ChainPerson } from "./ikajarjestysConstants";
 
 type CelebRow = {
@@ -55,7 +56,9 @@ export async function getChainRound(
   if (error || !data) return [];
 
   const rows = data as unknown as CelebRow[];
-  let pool = category === "kaikki" ? rows : rows.filter((r) => (r.ryhma ?? "muut") === category);
+  // Vanhat avaimet (artistit, muut) promo- ja kirjanmerkkilinkeistä → uudet ryhmät (3.10.2026).
+  const kat = category === "artistit" ? "muusikot" : category;
+  let pool = kat === "kaikki" || kat === "muut" ? rows : rows.filter((r) => ryhmaOf(r.ryhma, null) === kat);
 
   if (excludeIds.length > 0) {
     const withoutRecent = pool.filter((r) => !excludeIds.includes(r.id));

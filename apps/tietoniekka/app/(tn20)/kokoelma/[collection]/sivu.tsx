@@ -5,6 +5,7 @@
 // Kuvavisat: oma hub (KUVAVISAT 2.0, 17.9.2026) — kategoriat avaavat visavariaatiot.
 // Tunnetut henkilöt: oma hub (ennallaan, Heikin ohje 2026-07-31).
 
+import { ryhmaOf } from "@/lib/henkiloRyhmat";
 import { KokoelmaLd } from "@/components/tn20/KokoelmaLd";
 import { jakoMeta } from "@/lib/jakoMeta";
 import { visaHref } from "@/lib/visaHref";
@@ -661,7 +662,7 @@ async function PersonHub({ hub, article }: { hub: HubMeta; article?: React.React
       name: c.name,
       role: c.role,
       image_url: c.image_url,
-      category: c.ryhma ?? "muut",
+      category: ryhmaOf(c.ryhma, c.laji),
       laji: c.laji,
       priority: c.priority,
       created_at: c.created_at,
