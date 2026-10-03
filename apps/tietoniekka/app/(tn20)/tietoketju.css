@@ -446,11 +446,12 @@
 /* ─── LAITA JÄRJESTYKSEEN (3.10.2026) ───────────────────────────────────────
    Pakan otsikko on uppercase ja sanat eivät katkea (keep-all), joten koko rajataan
    pisimmän sanan mukaan: --tk-lw (merkkiä) asetetaan clientissä, 100cqw = otsikon
-   sarakkeen leveys. Kerroin 0.78 em/merkki (Archivo 900 uppercase, mitattu leveimmillä
-   ÄÖ-sanoilla) + pieni marginaali. Yläraja = Ikäjärjestyksen alkuperäiset koot. */
+   sarakkeen leveys. Kerroin 0.82 em/merkki (Archivo 900 uppercase; mitattu 3.10. Range-menetelmällä
+   320–2450 px: 0.78 antoi MAAOTTELUENNÄTYKSET-sanalle 99 % leveydestä → 0.82 ≈ 6 % marginaali).
+   Yläraja = Ikäjärjestyksen alkuperäiset koot. */
 .tn20 .tk-jarj-cq { container-type: inline-size; }
-.tn20 .tk-picker .tk-jarj-title { font-size: min(clamp(22px, 5vw, 30px), calc(100cqw / (var(--tk-lw, 10) * 0.78))); line-height: 1.08; }
-.tn20 .tk-order-head .tk-jarj-title { font-size: min(clamp(26px, 6vw, 40px), calc(100cqw / (var(--tk-lw, 10) * 0.78))); }
+.tn20 .tk-picker .tk-jarj-title { font-size: min(clamp(22px, 5vw, 30px), calc(100cqw / (var(--tk-lw, 10) * 0.82))); line-height: 1.08; }
+.tn20 .tk-order-head .tk-jarj-title { font-size: min(clamp(26px, 6vw, 40px), calc(100cqw / (var(--tk-lw, 10) * 0.82))); }
 .tn20 .tk-jarj-eyebrow {
   display: block; margin-bottom: 6px;
   font-size: 12px; font-weight: 800; letter-spacing: 0.12em; color: var(--tk-amber);
