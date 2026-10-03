@@ -44,11 +44,11 @@ export type Pakka = {
 export const PAKAT: Pakka[] = [
   {
     slug: "kansallispuistot-pinta-ala",
-    otsikko: "kansallispuistot suurimmasta pienimpään",
+    otsikko: "kansallispuistot pinta-alan mukaan",
     seoTitle: "Laita järjestykseen: Suomen kansallispuistot pinta-alan mukaan",
     kuvaus: "Järjestä kymmenen Suomen kansallispuistoa pinta-alan mukaan suurimmasta pienimpään.",
-    rajaus: "Kaikki Suomen 41 kansallispuistoa.",
-    suunta: "Suurimmasta pienimpään",
+    rajaus: "Kaikki Suomen 41 kansallispuistoa, pinta-ala neliökilometreinä (km²).",
+    suunta: "Suurin pinta-ala ensin",
     kind: "park",
     attrKey: "park_area_km2",
     scope: "",
