@@ -25,6 +25,7 @@ export function EntityRow({ row, defs }: { row: EntityValue & { id: string }; de
   const [pending, startTransition] = useTransition();
   const router = useRouter();
   const attrs = row.fact_attributes ?? [];
+  const rajatut = row.rajatut ?? [];
 
   function remove() {
     if (!confirm(`Poistetaanko ${row.name}? Tämä poistaa myös sen attribuutit.`)) return;
@@ -67,6 +68,15 @@ export function EntityRow({ row, defs }: { row: EntityValue & { id: string }; de
           ) : (
             <span className="text-destructive">ei attribuutteja</span>
           )}
+          {rajatut.map((a) => (
+            <span
+              key={`${a.attr_key}:${a.scope}`}
+              className="mr-2 inline-block rounded border px-1.5 py-0.5 text-xs text-muted-foreground"
+              title="Rajattu arvo (esim. seurakohtainen) — ei käytössä Kumpi?-pelissä"
+            >
+              {a.attr_key} [{a.scope}]: {a.display_value ?? a.num_value}
+            </span>
+          ))}
         </TableCell>
         <TableCell className="text-muted-foreground">{STATUS[row.status] ?? row.status}</TableCell>
         <TableCell className="text-right">

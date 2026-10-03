@@ -352,7 +352,7 @@ export async function getDuelData(): Promise<DuelData | null> {
     (sb as any)
       .from("fact_entities")
       .select(
-        "id, name, kind, role_label, show_role, domain, image_url, lat, lon, name_partitive, fact_attributes(attr_key, num_value, display_value)",
+        "id, name, kind, role_label, show_role, domain, image_url, lat, lon, name_partitive, fact_attributes(attr_key, scope, num_value, display_value)",
       )
       .eq("status", "published")
       .limit(2000),
@@ -373,6 +373,9 @@ export async function getDuelData(): Promise<DuelData | null> {
     const d: Record<string, string> = {};
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     for (const a of x.fact_attributes ?? []) {
+      // Vain koko uran / oletusarvo. Seurakohtaiset rivit (scope 'Tappara' jne.) ovat
+      // järjestyspeliä varten ja ylikirjoittaisivat muuten uran arvon satunnaisesti.
+      if (a.scope) continue;
       v[a.attr_key] = Number(a.num_value);
       if (a.display_value) d[a.attr_key] = a.display_value;
     }
