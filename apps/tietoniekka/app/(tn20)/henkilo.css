@@ -188,7 +188,8 @@
 .tn20 .hub-rivi--visa .hub-rivi-eyebrow { color: var(--hub-amber-2, #f2c874); }
 .tn20 .hub-rivi-nimi {
   font-family: var(--tn-font-display); font-weight: 900; text-transform: uppercase; line-height: 1;
-  font-size: min(26px, calc((100cqw - 220px) / (var(--hub-lw, 10) * 0.82))); overflow-wrap: normal; word-break: keep-all;
+  /* Varattu: ikoni 48 + välit 32 + CTA ~150 + padding 40 (mitattu 3.10.: 220 jätti 2 px ylivuodon). */
+  font-size: min(26px, calc((100cqw - 270px) / (var(--hub-lw, 10) * 0.84))); overflow-wrap: normal; word-break: keep-all;
 }
 .tn20 .hub-rivi-cta {
   flex: none; display: inline-flex; align-items: center; height: 44px; padding: 0 18px; border-radius: 999px;
@@ -197,6 +198,11 @@
 }
 /* Kapeassa hyllyssä (mobiili) rivi pinoutuu: nimi + tulos ylös, CTA alle täysleveänä. */
 @container (max-width: 479px) {
+  /* KORTTISÄÄNTÖ (mitattu 3.10.): neljä laattaa rinnakkain jättää 320–390 px:ssä ~52–70 px laatan,
+     johon "Schumacher" tai "Luusuaniemi" ei mahdu → kapeassa hyllyssä 2 × 2. */
+  .tn20 .hub-ika-laatat { grid-template-columns: repeat(2, minmax(0, 1fr)); row-gap: 16px; }
+  .tn20 .hub-ika-viiva { display: none; }
+  .tn20 .hub-ika-kuva { aspect-ratio: 1 / 1; }
   .tn20 .hub-rivi { flex-wrap: wrap; }
   .tn20 .hub-rivi-nimi { font-size: min(22px, calc((100cqw - 110px) / (var(--hub-lw, 10) * 0.82))); }
   .tn20 .hub-rivi-cta { width: 100%; justify-content: center; }
