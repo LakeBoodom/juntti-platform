@@ -133,7 +133,7 @@ export default async function HenkiloPage({ params }: { params: Promise<{ slug: 
       <Crumbs
         items={[
           { label: "Tunnetut henkilöt", href: "/kokoelma/tunnetut-henkilot" },
-          { label: R.lyhyt },
+          { label: R.lyhyt, href: `/henkilot/${h.ryhma}` },
           { label: h.name },
         ]}
       />

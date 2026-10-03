@@ -215,7 +215,7 @@ export async function haeHenkiloSivu(slug: string): Promise<HenkiloSivu | { ohja
     otsikko: lajiRiittaa && lajiNimi ? `Muut ${lajiNimi}` : `Muut: ${ryhma(r).nimi.toLowerCase()}`,
     laatat: joukko.slice(0, 8).map((x) => laatta(x, nyt)),
     kaikki: joukko.length + 1,
-    kaikkiHref: null as string | null, // /henkilot/<ryhma>/<laji> tulee hakemiston mukana
+    kaikkiHref: lajiRiittaa && c.laji ? `/henkilot/${r}/${c.laji}` : `/henkilot/${r}`,
   };
 
   const s = parsePvm(c.birth_date);
