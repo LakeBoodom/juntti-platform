@@ -67,6 +67,7 @@ async function kuvaUri(
   w: number,
   h: number,
   focal: { x?: number | null; y?: number | null } = {},
+  sumea = false,
 ): Promise<string | null> {
   if (!lahde) return null;
   const raw = lahde.startsWith("http") ? await etakuva(lahde) : await paikallinen(lahde);
@@ -80,7 +81,9 @@ async function kuvaUri(
     const fx = Math.min(1, Math.max(0, Number(focal.x ?? 0.5)));
     const fy = Math.min(1, Math.max(0, Number(focal.y ?? 0.4)));
     const left = Math.round((rw - w) * fx), top = Math.round((rh - h) * fy);
-    const out = await sharp(raw).resize(rw, rh).extract({ left, top, width: w, height: h }).jpeg({ quality: 82 }).toBuffer();
+    let kuva = sharp(raw).resize(rw, rh).extract({ left, top, width: w, height: h });
+    if (sumea) kuva = kuva.blur(28).modulate({ brightness: 0.6 });
+    const out = await kuva.jpeg({ quality: 82 }).toBuffer();
     return `data:image/jpeg;base64,${out.toString("base64")}`;
   } catch {
     return null;
@@ -121,10 +124,42 @@ function otsikkoKoko(t: string, leveys: number): number {
   return Math.floor(Math.min(sanaRaja, pituusRaja));
 }
 
+/* Turva-alue (Heikki 3.10.2026): WhatsApp näyttää linkin esikatselun neliönä, joka rajataan kuvan
+   keskeltä (x 285–915). Kaikki olennainen — pisteet, nimi, henkilökuva, logo — on tällä alueella;
+   reunoilla on vain taustakuva (henkilövisoissa saman kuvan sumennettu versio), jolloin leveä
+   esikatselu (Facebook, X, lähetetty WhatsApp-viesti) näyttää silti täydeltä. */
+const TURVA_X = (W - H) / 2; // 285
+const TURVA_PAD = 26;
+const SISA = H - 2 * TURVA_PAD; // 578
+
 async function piirra(k: Kortti, cache: string) {
-  const tekstiLeveys = k.henkilo ? 640 : 760;
+  const henkilo = !!k.henkilo;
+  const tekstiLeveys = henkilo ? 300 : SISA;
   const otsikko = k.otsikko.length > 80 ? k.otsikko.slice(0, 77) + "…" : k.otsikko;
-  const koko = k.tulos ? Math.min(otsikkoKoko(otsikko, tekstiLeveys), 52) : otsikkoKoko(otsikko, tekstiLeveys);
+  const raja = henkilo ? 46 : k.tulos ? 50 : 72;
+  const koko = Math.min(otsikkoKoko(otsikko, tekstiLeveys), raja);
+  const pisteKoko = henkilo ? 130 : 150;
+
+  const tekstit = (
+    <div style={{ display: "flex", flexDirection: "column", width: tekstiLeveys }}>
+      <div style={{ display: "flex", alignItems: "center", fontSize: 20, fontWeight: 700, letterSpacing: 3, textTransform: "uppercase", color: k.accent, marginBottom: 16 }}>
+        <div style={{ width: 10, height: 10, borderRadius: 5, background: k.accent, marginRight: 12 }} />
+        {k.eyebrow}
+      </div>
+      {k.tulos && (
+        <div style={{ display: "flex", alignItems: "baseline", marginBottom: 8 }}>
+          <div style={{ display: "flex", fontSize: pisteKoko, fontWeight: 900, lineHeight: 1, color: KULTA }}>{String(k.tulos.score)}</div>
+          <div style={{ display: "flex", fontSize: pisteKoko / 2, fontWeight: 900, lineHeight: 1, color: "rgba(255,251,242,0.6)", marginLeft: 6 }}>{`/${k.tulos.total}`}</div>
+        </div>
+      )}
+      <div style={{ display: "flex", fontSize: koko, fontWeight: 900, lineHeight: 0.98, textTransform: "uppercase", letterSpacing: -1 }}>
+        {otsikko}
+      </div>
+      {k.tulos && (
+        <div style={{ display: "flex", fontSize: 32, fontWeight: 700, marginTop: 20, color: "#fffbf2" }}>Voitatko kaverisi?</div>
+      )}
+    </div>
+  );
 
   const img = new ImageResponse(
     (
@@ -137,37 +172,22 @@ async function piirra(k: Kortti, cache: string) {
           style={{
             position: "absolute", left: 0, top: 0, width: W, height: H, display: "flex",
             background: k.tausta
-              ? "linear-gradient(90deg, rgba(15,13,7,0.96) 0%, rgba(15,13,7,0.9) 45%, rgba(15,13,7,0.45) 75%, rgba(15,13,7,0.15) 100%)"
-              : `radial-gradient(120% 90% at 85% 15%, ${k.accent}33, rgba(15,13,7,0) 60%)`,
+              ? "radial-gradient(60% 95% at 50% 50%, rgba(15,13,7,0.9) 0%, rgba(15,13,7,0.8) 55%, rgba(15,13,7,0.35) 100%)"
+              : `radial-gradient(120% 90% at 50% 20%, ${k.accent}33, rgba(15,13,7,0) 60%)`,
           }}
         />
-        {k.henkilo && (
-          /* eslint-disable-next-line @next/next/no-img-element */
-          <img src={k.henkilo} width={360} height={480} alt=""
-            style={{ position: "absolute", right: 70, top: 75, width: 360, height: 480, borderRadius: 22, border: "2px solid rgba(255,251,242,0.18)" }} />
-        )}
-        <div style={{ position: "relative", display: "flex", flexDirection: "column", justifyContent: "center", padding: "0 70px", width: tekstiLeveys + 140, height: H }}>
-          <div style={{ display: "flex", alignItems: "center", fontSize: 24, fontWeight: 700, letterSpacing: 4, textTransform: "uppercase", color: k.accent, marginBottom: 22 }}>
-            <div style={{ width: 12, height: 12, borderRadius: 6, background: k.accent, marginRight: 14 }} />
-            {k.eyebrow}
-          </div>
-          {k.tulos && (
-            <div style={{ display: "flex", alignItems: "baseline", marginBottom: 10 }}>
-              <div style={{ display: "flex", fontSize: 180, fontWeight: 900, lineHeight: 1, color: KULTA }}>{String(k.tulos.score)}</div>
-              <div style={{ display: "flex", fontSize: 90, fontWeight: 900, lineHeight: 1, color: "rgba(255,251,242,0.55)", marginLeft: 8 }}>{`/${k.tulos.total}`}</div>
-            </div>
-          )}
-          <div style={{ display: "flex", fontSize: koko, fontWeight: 900, lineHeight: 0.98, textTransform: "uppercase", letterSpacing: -1 }}>
-            {otsikko}
-          </div>
-          {k.tulos && (
-            <div style={{ display: "flex", fontSize: 40, fontWeight: 700, marginTop: 26, color: "#fffbf2" }}>Voitatko kaverisi?</div>
+        <div style={{ position: "absolute", left: TURVA_X + TURVA_PAD, top: TURVA_PAD, width: SISA, height: SISA, display: "flex", alignItems: "center", justifyContent: henkilo ? "space-between" : "flex-start" }}>
+          {tekstit}
+          {k.henkilo && (
+            /* eslint-disable-next-line @next/next/no-img-element */
+            <img src={k.henkilo} width={252} height={336} alt=""
+              style={{ width: 252, height: 336, borderRadius: 18, border: "2px solid rgba(255,251,242,0.2)" }} />
           )}
         </div>
-        <div style={{ position: "absolute", left: 70, bottom: 44, display: "flex", fontSize: 28, fontWeight: 900, letterSpacing: 1 }}>
+        <div style={{ position: "absolute", left: TURVA_X + TURVA_PAD, bottom: 34, display: "flex", fontSize: 24, fontWeight: 900, letterSpacing: 1 }}>
           <span style={{ color: KULTA }}>TIETO</span>
           <span>NIEKKA</span>
-          {k.alarivi && <span style={{ marginLeft: 22, fontSize: 22, fontWeight: 700, color: "rgba(255,251,242,0.6)", alignSelf: "center" }}>{k.alarivi}</span>}
+          {k.alarivi && <span style={{ marginLeft: 18, fontSize: 19, fontWeight: 700, color: "rgba(255,251,242,0.6)", alignSelf: "center" }}>{k.alarivi}</span>}
         </div>
       </div>
     ),
@@ -215,7 +235,8 @@ async function visaKortti(slug: string, tulos: ReturnType<typeof parseTulos>): P
       eyebrow: r.label,
       otsikko: cel?.name ?? otsikko,
       accent: r.accent,
-      henkilo: await kuvaUri(cel?.image_url, 360, 480, { x: 0.5, y: 0.2 }),
+      henkilo: await kuvaUri(cel?.image_url, 252, 336, { x: 0.5, y: 0.2 }),
+      tausta: await kuvaUri(cel?.image_url, W, H, { x: 0.5, y: 0.3 }, true),
       tulos,
       alarivi: tulos ? undefined : "Tietovisa",
     };
