@@ -3779,6 +3779,42 @@ export type Database = {
         }
         Relationships: []
       }
+      _kh_juntti_q_backup_20261003: {
+        Row: {
+          answers: Json | null
+          created_at: string | null
+          explanation: string | null
+          id: string | null
+          image_url: string | null
+          question_text: string | null
+          quiz_id: string | null
+          sort_order: number | null
+          taso: number | null
+        }
+        Insert: {
+          answers?: Json | null
+          created_at?: string | null
+          explanation?: string | null
+          id?: string | null
+          image_url?: string | null
+          question_text?: string | null
+          quiz_id?: string | null
+          sort_order?: number | null
+          taso?: number | null
+        }
+        Update: {
+          answers?: Json | null
+          created_at?: string | null
+          explanation?: string | null
+          id?: string | null
+          image_url?: string | null
+          question_text?: string | null
+          quiz_id?: string | null
+          sort_order?: number | null
+          taso?: number | null
+        }
+        Relationships: []
+      }
       _kh_kaupungit_q_backup_20260929: {
         Row: {
           answers: Json | null
@@ -6141,8 +6177,12 @@ export type Database = {
         Row: {
           bio_short: string | null
           birth_date: string
+          birth_place: string | null
           created_at: string | null
           death_date: string | null
+          death_place: string | null
+          facts: Json | null
+          facts_reviewed_at: string | null
           id: string
           ig_tilit: string[]
           image_focal_x: number | null
@@ -6152,6 +6192,7 @@ export type Database = {
           is_hero: boolean | null
           laji: string | null
           name: string
+          nickname: string | null
           platform: string | null
           priority: number | null
           role: string
@@ -6164,8 +6205,12 @@ export type Database = {
         Insert: {
           bio_short?: string | null
           birth_date: string
+          birth_place?: string | null
           created_at?: string | null
           death_date?: string | null
+          death_place?: string | null
+          facts?: Json | null
+          facts_reviewed_at?: string | null
           id?: string
           ig_tilit?: string[]
           image_focal_x?: number | null
@@ -6175,6 +6220,7 @@ export type Database = {
           is_hero?: boolean | null
           laji?: string | null
           name: string
+          nickname?: string | null
           platform?: string | null
           priority?: number | null
           role: string
@@ -6187,8 +6233,12 @@ export type Database = {
         Update: {
           bio_short?: string | null
           birth_date?: string
+          birth_place?: string | null
           created_at?: string | null
           death_date?: string | null
+          death_place?: string | null
+          facts?: Json | null
+          facts_reviewed_at?: string | null
           id?: string
           ig_tilit?: string[]
           image_focal_x?: number | null
@@ -6198,6 +6248,7 @@ export type Database = {
           is_hero?: boolean | null
           laji?: string | null
           name?: string
+          nickname?: string | null
           platform?: string | null
           priority?: number | null
           role?: string
@@ -9899,8 +9950,12 @@ export type Database = {
         Returns: {
           bio_short: string | null
           birth_date: string
+          birth_place: string | null
           created_at: string | null
           death_date: string | null
+          death_place: string | null
+          facts: Json | null
+          facts_reviewed_at: string | null
           id: string
           ig_tilit: string[]
           image_focal_x: number | null
@@ -9910,6 +9965,7 @@ export type Database = {
           is_hero: boolean | null
           laji: string | null
           name: string
+          nickname: string | null
           platform: string | null
           priority: number | null
           role: string

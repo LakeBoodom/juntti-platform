@@ -1,0 +1,203 @@
+/* Erä B3–B4 (3.10.2026): henkilösivu ja aihesivujen yhteiset lohkot (hub-*).
+   Lähde: Henkilosivu_design_v0.2.html — 3a (desktop, = 2a) ja 3c (mobiili, = 1a), pelihylly 3f.
+   KORTTISÄÄNTÖ: tuotannon Archivo on staattinen (CD käytti wdth 66–76), joten isot otsikot on
+   rajattu pisimmän sanan mukaan (--hs-lw, 0.82 em/merkki kuten järjestyspelissä) ja mitattu
+   Range-menetelmällä 320–2450 px. */
+
+.tn20 .hs {
+  --hs-gold: var(--tn-amber, #c9a96a);
+  --hs-gold-2: #e4c98e;
+  --hs-text-2: #dcd4c4;
+  --hs-muted: #8e8676;
+  --hs-line: #241e13;
+  --hs-line-2: #3a3122;
+  padding-bottom: 80px;
+}
+.tn20 .hs-shell { padding-top: 8px; }
+
+/* ── Yläosa: mobiili (3c) ─────────────────────────────────────────── */
+.tn20 .hs-top {
+  display: grid;
+  grid-template-columns: 112px minmax(0, 1fr);
+  grid-template-areas: "kuva otsikko" "vasen vasen" "oikea oikea";
+  column-gap: 16px;
+  align-items: end;
+}
+.tn20 .hs-otsikko { grid-area: otsikko; display: flex; flex-direction: column; gap: 8px; min-width: 0; container-type: inline-size; padding-bottom: 2px; }
+.tn20 .hs-eyebrow-desk { display: none; }
+.tn20 .hs-h1 {
+  margin: 0;
+  font-family: var(--tn-font-display); font-weight: 900; text-transform: uppercase;
+  line-height: 0.9; letter-spacing: -0.02em; color: var(--tn-text);
+  font-size: min(44px, calc(100cqw / (var(--hs-lw, 8) * 0.82)));
+  overflow-wrap: normal; word-break: keep-all;
+}
+.tn20 .hs-rooli { margin: 0; font-size: 15px; font-weight: 600; color: var(--hs-text-2); }
+
+.tn20 .hs-kuva {
+  grid-area: kuva; position: relative; align-self: end;
+  width: 112px; aspect-ratio: 3 / 4; border-radius: 12px; overflow: hidden;
+  border: 1px solid #33291a; background: linear-gradient(160deg, #9a86f5, #4b37a8);
+}
+.tn20 .hs-kuva img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.tn20 .hs-kuva-fade, .tn20 .hs-kuva-credit { display: none; }
+
+.tn20 .hs-vasen { grid-area: vasen; margin-top: 22px; }
+.tn20 .hs-oikea { grid-area: oikea; display: flex; flex-direction: column; gap: 28px; margin-top: 24px; }
+.tn20 .hs-esittely { margin: 20px 0 0; font-size: 16px; line-height: 1.6; color: var(--hs-text-2); text-wrap: pretty; }
+
+/* ── Yläosa: desktop (3a / 2a) ────────────────────────────────────── */
+@media (min-width: 960px) {
+  .tn20 .hs-top {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) clamp(300px, 32vw, 500px);
+    grid-template-areas: "otsikko otsikko kuva" "vasen oikea kuva";
+    column-gap: 48px; align-items: start;
+    background: #131109; border: 1px solid var(--hs-line); border-radius: 20px; overflow: hidden;
+    padding-left: clamp(28px, 3.6vw, 56px);
+  }
+  .tn20 .hs-otsikko { padding: 40px 0 0; gap: 12px; }
+  .tn20 .hs-eyebrow-desk { display: block; }
+  .tn20 .hs-eyebrow-mob { display: none; }
+  .tn20 .hs-h1 { padding-top: 16px; font-size: min(104px, calc(100cqw / (var(--hs-lw, 8) * 0.82))); }
+  .tn20 .hs-rooli { font-size: 19px; }
+  .tn20 .hs-kuva {
+    grid-row: 1 / span 2; align-self: stretch;
+    width: auto; aspect-ratio: auto; min-height: 560px;
+    border: 0; border-radius: 0; margin-left: 8px;
+  }
+  .tn20 .hs-kuva-fade { display: block; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(90deg, #131109 0%, rgba(19, 17, 9, 0) 28%); }
+  .tn20 .hs-kuva-credit { display: block; position: absolute; right: 16px; bottom: 14px; font-size: 11px; font-weight: 600; color: rgba(245, 240, 230, 0.75); }
+  .tn20 .hs-vasen, .tn20 .hs-oikea {
+    margin-top: 12px; padding: 24px 0 48px;
+    border-top: 3px double var(--hs-gold);
+  }
+  .tn20 .hs-oikea { gap: 24px; }
+  .tn20 .hs-esittely { font-size: 17px; margin-top: 22px; }
+}
+
+/* ── Faktalohko (hub) ─────────────────────────────────────────────── */
+.tn20 .hub-fakta {
+  display: grid; grid-template-columns: auto minmax(0, 1fr); column-gap: 18px; align-items: center;
+  border-top: 3px double var(--hs-gold, #c9a96a); border-bottom: 1px solid var(--hs-line-2, #3a3122); padding: 16px 0;
+}
+@media (min-width: 960px) {
+  .tn20 .hub-fakta { border: 0; padding: 0; column-gap: 20px; }
+}
+.tn20 .hub-fakta-suuri { display: flex; flex-direction: column; gap: 8px; padding-right: 18px; border-right: 1px solid var(--hs-line-2, #3a3122); }
+.tn20 .hub-fakta-luku {
+  font-family: var(--tn-font-display); font-weight: 900; line-height: 0.8; letter-spacing: -0.04em; color: var(--tn-text);
+  font-size: clamp(60px, 15vw, 72px); white-space: nowrap;
+}
+.tn20 .hub-fakta-luku--vali { font-size: clamp(40px, 11vw, 52px); letter-spacing: -0.03em; }
+@media (min-width: 960px) {
+  .tn20 .hub-fakta-luku { font-size: clamp(72px, 6.6vw, 96px); }
+  .tn20 .hub-fakta-luku--vali { font-size: clamp(48px, 4.4vw, 64px); }
+}
+.tn20 .hub-fakta-yks { font-size: 0.36em; letter-spacing: 0; color: var(--hs-gold, #c9a96a); }
+.tn20 .hub-fakta-ala { font-size: 13px; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; color: var(--hs-gold, #c9a96a); }
+.tn20 .hub-fakta-rivit { display: flex; flex-direction: column; gap: 7px; font-size: 15px; line-height: 1.35; color: var(--hs-text-2, #dcd4c4); min-width: 0; }
+.tn20 .hub-fakta-rivit strong { color: var(--tn-text); }
+.tn20 .hub-fakta-tayttaa { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+@media (min-width: 960px) { .tn20 .hub-fakta-rivit { font-size: 16px; gap: 8px; } }
+
+.tn20 .hub-chip { align-self: flex-start; display: inline-block; padding: 3px 9px; border-radius: 999px; font-size: 13px; line-height: 1.3; }
+.tn20 .hub-chip--kulta { background: rgba(201, 169, 106, 0.16); border: 1px solid rgba(201, 169, 106, 0.5); font-weight: 800; color: var(--hs-gold-2, #e4c98e); }
+.tn20 .hub-chip--neutraali { border: 1px solid #4a3f2c; font-weight: 700; color: #c8bfae; }
+
+/* ── Lyhyesti (hub) ───────────────────────────────────────────────── */
+.tn20 .hub-lyhyesti-otsikko {
+  font-size: 11px; font-weight: 800; letter-spacing: 0.18em; text-transform: uppercase; color: var(--hs-muted, #8e8676);
+  padding-bottom: 8px; border-bottom: 1px solid var(--hs-line-2, #3a3122);
+}
+.tn20 .hub-lyhyesti dl { margin: 0; }
+.tn20 .hub-lyhyesti-rivi {
+  display: grid; grid-template-columns: 110px minmax(0, 1fr); gap: 12px; padding: 12px 0;
+  border-bottom: 1px solid var(--hs-line, #241e13); font-size: 15px;
+}
+.tn20 .hub-lyhyesti dt { font-size: 12px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: var(--hs-gold, #c9a96a); padding-top: 2px; overflow-wrap: normal; word-break: keep-all; }
+.tn20 .hub-lyhyesti dd { margin: 0; font-weight: 600; color: var(--tn-text); }
+@media (min-width: 960px) {
+  .tn20 .hub-lyhyesti-rivi { grid-template-columns: 150px minmax(0, 1fr); font-size: 16px; }
+}
+
+/* ── Pelihylly (hub, design 3f) ───────────────────────────────────── */
+.tn20 .hub-h3 {
+  margin: 0; font-family: var(--tn-font-display); font-weight: 900; text-transform: uppercase;
+  font-size: clamp(20px, 5vw, 22px); line-height: 1.05; color: var(--tn-text);
+  overflow-wrap: normal; word-break: keep-all;
+}
+.tn20 .hub-hylly { display: flex; flex-direction: column; gap: 12px; }
+.tn20 .hub-hylly-otsikko { margin-bottom: 4px; }
+.tn20 .hub-eyebrow { display: block; font-size: 11px; font-weight: 800; letter-spacing: 0.16em; text-transform: uppercase; color: var(--hs-gold, #c9a96a); }
+.tn20 .hub-eyebrow--himmea { color: #b0a794; }
+.tn20 .hub-visa {
+  display: flex; flex-direction: column; gap: 14px; padding: 18px; border-radius: 16px;
+  background: linear-gradient(160deg, #2a2214, #171208 70%); border: 1px solid rgba(201, 169, 106, 0.45);
+}
+.tn20 .hub-visa--pelattu { background: #171208; border-color: #33291a; }
+.tn20 .hub-visa-teksti { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.tn20 .hub-visa-nimi {
+  font-family: var(--tn-font-display); font-weight: 900; font-size: 21px; line-height: 1.05; text-transform: uppercase; color: var(--tn-text);
+  overflow-wrap: normal; word-break: keep-all;
+}
+.tn20 .hub-visa-tulos { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-top: 6px; font-size: 14px; font-weight: 700; color: var(--hs-gold-2, #e4c98e); }
+.tn20 .hub-visa-palkit { display: flex; gap: 4px; }
+.tn20 .hub-visa-palkit span { width: 18px; height: 6px; border-radius: 3px; background: #3a3122; }
+.tn20 .hub-visa-palkit span.on { background: var(--hs-gold, #c9a96a); }
+.tn20 .hub-btn {
+  display: flex; align-items: center; justify-content: center; min-height: 48px; padding: 0 22px; border-radius: 12px;
+  background: var(--hs-gold, #c9a96a); color: #161005; text-decoration: none;
+  font-family: var(--tn-font-display); font-weight: 900; font-size: 16px; letter-spacing: 0.05em; text-transform: uppercase; white-space: nowrap;
+}
+.tn20 .hub-btn--ghost { background: transparent; border: 1px solid rgba(201, 169, 106, 0.6); color: var(--hs-gold-2, #e4c98e); font-size: 15px; }
+@media (min-width: 560px) {
+  .tn20 .hub-visa { flex-direction: row; align-items: center; justify-content: space-between; gap: 20px; padding: 20px 22px; }
+  .tn20 .hub-btn { flex: none; min-height: 52px; }
+}
+.tn20 .hub-pelit { list-style: none; margin: 0; padding: 0; border-bottom: 1px solid var(--hs-line, #241e13); }
+.tn20 .hub-peli {
+  display: flex; justify-content: space-between; align-items: center; gap: 12px; min-height: 56px; padding: 8px 0;
+  border-top: 1px solid var(--hs-line, #241e13); color: var(--tn-text); text-decoration: none;
+}
+.tn20 .hub-peli:hover .hub-peli-nimi { color: var(--hs-gold-2, #e4c98e); }
+.tn20 .hub-peli-teksti { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.tn20 .hub-peli-nimi { font-size: 16px; font-weight: 600; overflow-wrap: normal; word-break: keep-all; }
+.tn20 .hub-peli-meta { flex: none; font-size: 13px; color: var(--hs-muted, #8e8676); }
+
+/* ── Muut-laatat (hub) ────────────────────────────────────────────── */
+.tn20 .hub-laatat { display: flex; flex-direction: column; gap: 12px; }
+.tn20 .hub-laatat-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+.tn20 .hub-laatat-kaikki { flex: none; font-size: 14px; font-weight: 700; color: var(--hs-gold, #c9a96a); text-decoration: none; }
+.tn20 .hub-laatat-n { flex: none; font-size: 13px; font-weight: 700; color: var(--hs-muted, #8e8676); }
+.tn20 .hub-laatat-lista {
+  list-style: none; margin: 0 calc(-1 * clamp(16px, 4vw, 48px)); padding: 0 clamp(16px, 4vw, 48px) 4px;
+  display: flex; gap: 12px; overflow-x: auto; scrollbar-width: none;
+}
+.tn20 .hub-laatat-lista li { flex: none; width: 104px; }
+.tn20 .hub-laatta { display: flex; flex-direction: column; gap: 6px; color: var(--tn-text); text-decoration: none; }
+.tn20 .hub-laatta-kuva {
+  position: relative; display: block; aspect-ratio: 4 / 5; border-radius: 12px; overflow: hidden;
+  border: 1px solid #33291a; background: linear-gradient(160deg, #8c76f0, #3e2e8c);
+}
+.tn20 .hub-laatta-kuva img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.tn20 .hub-laatta-ini, .tn20 .hs-kuva .hub-laatta-ini {
+  position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+  font-family: var(--tn-font-display); font-weight: 900; font-size: 28px; color: rgba(245, 240, 230, 0.6);
+}
+.tn20 .hub-laatta-nimi { font-size: 14px; font-weight: 700; line-height: 1.2; overflow-wrap: normal; word-break: keep-all; }
+.tn20 .hub-laatta-ala { font-size: 13px; color: #a79e8c; }
+.tn20 .hub-duotone { position: absolute; inset: 0; pointer-events: none; mix-blend-mode: color; background: #7a5af8; }
+@media (min-width: 960px) {
+  .tn20 .hub-laatat-lista { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 14px; margin: 0; padding: 0; overflow: visible; }
+  .tn20 .hub-laatat-lista li { width: auto; }
+}
+
+/* ── Alaosa ───────────────────────────────────────────────────────── */
+.tn20 .hs-ala { display: flex; flex-direction: column; gap: 34px; margin-top: 34px; }
+.tn20 .hs-ala-vasen, .tn20 .hs-ala-oikea { display: flex; flex-direction: column; gap: 34px; min-width: 0; }
+@media (min-width: 960px) {
+  .tn20 .hs-ala { display: grid; grid-template-columns: minmax(0, 1fr) 360px; gap: 56px; margin-top: 40px; }
+  .tn20 .hs-ala-oikea { gap: 16px; }
+}
+.tn20 .hub-lahde { display: flex; gap: 16px; flex-wrap: wrap; margin: 0; font-size: 12px; color: var(--hs-muted, #8e8676); }
+.tn20 .hub-lahde a { color: inherit; }

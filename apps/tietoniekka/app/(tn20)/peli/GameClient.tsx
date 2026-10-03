@@ -666,6 +666,11 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
         const KEY = "tn_played_quizzes";
         const arr = JSON.parse(window.localStorage.getItem(KEY) ?? "[]") as string[];
         if (!arr.includes(quiz.id)) { arr.push(quiz.id); window.localStorage.setItem(KEY, JSON.stringify(arr)); }
+        /* Erä B4: henkilösivun pelihylly näyttää viimeisimmän tuloksen ("Sait 4/5 · <fanitaso>"). */
+        const TK = "tn_quiz_results";
+        const tulokset = JSON.parse(window.localStorage.getItem(TK) ?? "{}") as Record<string, { right: number; total: number }>;
+        tulokset[quiz.id] = { right, total };
+        window.localStorage.setItem(TK, JSON.stringify(tulokset));
       }
     } catch { /* no-op */ }
     void recordPlay(finalScore);
