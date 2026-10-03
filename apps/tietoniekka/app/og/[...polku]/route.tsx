@@ -172,7 +172,7 @@ async function piirra(k: Kortti, cache: string) {
           style={{
             position: "absolute", left: 0, top: 0, width: W, height: H, display: "flex",
             background: k.tausta
-              ? "radial-gradient(60% 95% at 50% 50%, rgba(15,13,7,0.9) 0%, rgba(15,13,7,0.8) 55%, rgba(15,13,7,0.35) 100%)"
+              ? "radial-gradient(50% 100% at 50% 50%, rgba(15,13,7,0.88) 0%, rgba(15,13,7,0.74) 55%, rgba(15,13,7,0.12) 100%)"
               : `radial-gradient(120% 90% at 50% 20%, ${k.accent}33, rgba(15,13,7,0) 60%)`,
           }}
         />
