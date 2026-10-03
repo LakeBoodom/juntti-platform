@@ -97,7 +97,7 @@ export async function haeJarjestysKierros(slug: string, excludeIds: string[] = [
       return {
         id: e.id,
         name: e.name,
-        role: e.show_role === false ? "" : e.role_label ?? "",
+        role: p.naytaRooli ? (e.role_label ?? "").replace(/^[^·]*·\s*/, "") : "",
         image_url: e.image_url,
         hideThumb: p.piilotaKuva || undefined,
         value,

@@ -34,6 +34,8 @@ export type Pakka = {
   pool?: { maxProminence?: 1 | 2 | 3 };
   /** Kohteilla ei ole kuvia → kortti ilman kuvapaikkaa (henkilöillä siluetti riittää). */
   piilotaKuva?: boolean;
+  /** Näytä kortilla rooli ilman lajia ("kansallispuisto · Lappi" → "Lappi"). Muuten ei roolia. */
+  naytaRooli?: boolean;
   collection: { slug: string; nimi: string };
   /** Jakokuvan taustakuva (public/). */
   kuva: string;
@@ -55,6 +57,7 @@ export const PAKAT: Pakka[] = [
     yksikko: "km²",
     pick: 10,
     piilotaKuva: true,
+    naytaRooli: true,
     collection: { slug: "luonto", nimi: "Luonto" },
     kuva: "/20/teema-luonto.webp",
   },
