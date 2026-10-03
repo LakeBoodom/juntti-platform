@@ -31,6 +31,17 @@ const kanta = (w: string) => (w.length <= 5 ? w : w.slice(0, Math.max(4, w.lengt
 
 const YLEISET = new Set(["kuka", "mika", "missa", "mista", "milla", "minka", "kenen", "kuinka", "milloin", "monta", "mita", "mihin", "minne"]);
 
+/* Erisnimet, jotka ovat lähes jokaisessa kysymyksessä ja esittelyssä eivätkä paljasta vastausta
+   (maat kansallisuuksina, sarjat, kilpailut). Mitattu 3.10.: ilman tätä 440 osumasta valtaosa oli näitä. */
+const YLEISNIMET = new Set([
+  "suomi", "suomen", "suomessa", "suomeen", "ruotsi", "ruotsin", "norja", "norjan", "tanska", "tanskan", "englanti", "englannin",
+  "yhdysvallat", "yhdysvaltain", "yhdysvaltojen", "saksa", "saksan", "ranska", "ranskan", "italia", "italian", "espanja", "espanjan",
+  "venaja", "venajan", "euroopan", "eurooppa", "helsinki", "helsingin", "grand", "slam", "formula", "stanley", "cup",
+  "olympia", "olympialaiset", "olympialaisissa", "nhl", "nba", "wrc", "uefa", "fifa", "liiga", "sm-liiga", "valioliiga", "valioliigan",
+]);
+/** MM-, EM-, F1-, SM-, NHL- jne. alkuiset yhdyssanat ovat kilpailuja, eivät vastauksia. */
+const SARJA_ETULIITE = /^(mm|em|sm|f1|nhl|nba|wrc|gp|vm)-/;
+
 function erisnimet(teksti: string): string[] {
   const out: string[] = [];
   // Virkkeen ensimmäinen sana ohitetaan (se on isolla joka tapauksessa).
@@ -44,8 +55,13 @@ function erisnimet(teksti: string): string[] {
   return out;
 }
 
+/** Henkilön oma nimi taivutettuna ("Shearerin", "Niemen", "Latvalasta") ei ole vuoto. */
+function omaNimiOsuu(w: string, oma: string[]): boolean {
+  return oma.some((o) => o.length >= 4 && w.slice(0, 4) === o.slice(0, 4) && Math.abs(w.length - o.length) <= 4);
+}
+
 export function rakennaVuotolista(kysymykset: VisanKysymys[], omaNimi: string): Vuotolista {
-  const oma = new Set(sanat(omaNimi).map(kanta));
+  const oma = sanat(omaNimi);
   const vastaukset: string[] = [];
   const vuodetV = new Set<string>();
   const vuodetK = new Set<string>();
@@ -59,7 +75,8 @@ export function rakennaVuotolista(kysymykset: VisanKysymys[], omaNimi: string): 
     for (const y of k.question_text.match(/\b(1[5-9]\d\d|20\d\d)\b/g) ?? []) vuodetK.add(y);
     for (const n of erisnimet(k.question_text)) {
       const ws = sanat(n);
-      if (ws.length && ws.every((w) => !oma.has(kanta(w)) && !YLEISET.has(w))) nimet.add(n);
+      if (ws.length && ws.every((w) => !omaNimiOsuu(w, oma) && !YLEISET.has(w) && !YLEISNIMET.has(w)) && !SARJA_ETULIITE.test(norm(n)))
+        nimet.add(n);
     }
   }
   return { vastaukset, vuodetVastauksissa: [...vuodetV], vuodetKysymyksissa: [...vuodetK], nimet: [...nimet] };
