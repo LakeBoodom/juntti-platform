@@ -106,6 +106,8 @@ export async function haeJarjestysKierros(slug: string, excludeIds: string[] = [
       };
     })
     .filter((k) => Number.isFinite(k.value));
+  // Ei yhtään kuvaa koko pakassa → ei kuvapaikkaa (pelkät siluetit vievät tilaa turhaan).
+  if (!pool.some((k) => k.image_url)) for (const k of pool) k.hideThumb = true;
 
   // Edellisen kierroksen kohteet pois, jos täysi kierros syntyy silti; muuten ilman rajausta.
   if (excludeIds.length) {
