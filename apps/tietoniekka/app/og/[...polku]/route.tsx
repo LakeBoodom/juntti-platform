@@ -8,6 +8,7 @@
 //   /og/kuvavisa/<kortisto>        kuvavisa (liput, vaakunat, linnut …, viikko)
 //   /og/kokoelma/<avain>           kokoelmahub
 //   /og/sivu/<avain>               pelimuodot ja muut sivut (tupla-tai-kuitti, kuntaliitos …)
+//   /og/jarjesta/<pakka>           Laita järjestykseen -pakka (lib/jarjesta/pakat.ts)
 //
 // Satori (ImageResponse) ei osaa WebP:tä, joten kuvat muunnetaan sharpilla JPEG:ksi. Kuvat luetaan
 // tiedostojärjestelmästä (next.config.mjs: outputFileTracingIncludes), jolloin myös preview-
@@ -18,6 +19,7 @@ import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 import sharp from "sharp";
 import { getSupabase } from "@/lib/supabase";
+import { haePakka } from "@/lib/jarjesta/pakat";
 import { getSiteId } from "@/lib/queries";
 import { resolveCollection, COLLECTION_ACCENT, COLLECTION_BG, COLLECTION_LABEL } from "@/lib/visanKokoelma";
 import { KATEGORIAT } from "@/lib/kuvavisat2026";
@@ -312,6 +314,10 @@ export async function GET(req: Request, ctx: { params: Promise<{ polku: string[]
     if (otsikko) kortti = { eyebrow: "Kuvavisa", otsikko, accent: kat?.accent ?? "#22D3EE", tausta: await kuvaUri(KUVAVISA_KUVA[avain], W, H), alarivi: "Tunnista kuvasta" };
   } else if (tyyppi === "kokoelma" && avain) {
     kortti = await kokoelmaKortti(avain);
+  } else if (tyyppi === "jarjesta" && haePakka(avain)) {
+    const p = haePakka(avain)!;
+    const otsikko = p.otsikko.charAt(0).toUpperCase() + p.otsikko.slice(1);
+    kortti = { eyebrow: "Laita järjestykseen", otsikko, accent: "#E8A320", tausta: await kuvaUri(p.kuva, W, H) };
   } else if (tyyppi === "sivu" && SIVUT[avain]) {
     const s = SIVUT[avain];
     kortti = { eyebrow: s.eyebrow, otsikko: s.otsikko, accent: s.accent, tausta: await kuvaUri(s.kuva, W, H) };
