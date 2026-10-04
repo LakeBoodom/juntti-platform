@@ -6175,6 +6175,7 @@ export type Database = {
       }
       celebrities: {
         Row: {
+          bio_intro: string | null
           bio_short: string | null
           birth_date: string
           birth_place: string | null
@@ -6204,6 +6205,7 @@ export type Database = {
           wikipedia_url: string | null
         }
         Insert: {
+          bio_intro?: string | null
           bio_short?: string | null
           birth_date: string
           birth_place?: string | null
@@ -6233,6 +6235,7 @@ export type Database = {
           wikipedia_url?: string | null
         }
         Update: {
+          bio_intro?: string | null
           bio_short?: string | null
           birth_date?: string
           birth_place?: string | null
@@ -9951,6 +9954,7 @@ export type Database = {
       todays_celebrities: {
         Args: { p_site_id: string }
         Returns: {
+          bio_intro: string | null
           bio_short: string | null
           birth_date: string
           birth_place: string | null

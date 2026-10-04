@@ -179,7 +179,7 @@ export async function haeHenkiloSivu(slug: string): Promise<HenkiloSivu | { ohja
   const { data: c } = await (sb as any)
     .from("celebrities")
     .select(
-      "id, slug, name, role, ryhma, laji, image_url, image_focal_x, image_focal_y, birth_date, death_date, intro_text, wikipedia_url, trivia_quiz_id, birth_place, death_place, nickname, nimi_elatiivi, facts, facts_reviewed_at",
+      "id, slug, name, role, ryhma, laji, image_url, image_focal_x, image_focal_y, birth_date, death_date, bio_intro, wikipedia_url, trivia_quiz_id, birth_place, death_place, nickname, nimi_elatiivi, facts, facts_reviewed_at",
     )
     .eq("id", osuma.id)
     .maybeSingle();
@@ -309,10 +309,13 @@ export async function haeHenkiloSivu(slug: string): Promise<HenkiloSivu | { ohja
     death: parsePvm(c.death_date),
     birthIso: c.birth_date,
     deathIso: c.death_date,
-    birth_place: c.birth_place,
-    death_place: c.death_place,
+    // Syntymä-/kuolinpaikka tulee Coworkin erissä ja voi olla visan vastaus (erä 1: Jonne Aaron
+    // "Tampereella", Zlatan "Malmössä") → näkyy vasta hyväksynnän jälkeen kuten esittely ja Lyhyesti.
+    birth_place: hyvaksytty ? c.birth_place : null,
+    death_place: hyvaksytty ? c.death_place : null,
     // Vuotosääntö (brief B2, Cowork 3.10. vaihtoehto b): ennen hyväksyntää vain faktarivi, ei bio_shortia.
-    esittely: hyvaksytty ? c.intro_text || null : null,
+    // Esittely = bio_intro (max 600). intro_text on Päivän sankari -rivin poikkeusteksti (max 240), ei tämä.
+    esittely: hyvaksytty ? c.bio_intro || null : null,
     faktat: hyvaksytty ? lueFaktat(c.facts) : [],
     wikipedia_url: c.wikipedia_url,
     visa,

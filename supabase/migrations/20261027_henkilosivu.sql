@@ -9,5 +9,5 @@ alter table celebrities add column if not exists facts jsonb;
 alter table celebrities add column if not exists facts_reviewed_at timestamptz;
 
 comment on column celebrities.facts is 'Lyhyesti-rivit [{label, value}], 0–3 kpl, ryhmäkaavan mukaan (lib/henkiloKaava.ts). Näytetään vain kun facts_reviewed_at ei ole null.';
-comment on column celebrities.facts_reviewed_at is 'Heikin hyväksyntä: intro_text ja facts näkyvät sivulla vasta kun tämä on asetettu.';
+comment on column celebrities.facts_reviewed_at is 'Heikin hyväksyntä: bio_intro ja facts näkyvät sivulla vasta kun tämä on asetettu.';
 comment on column celebrities.nickname is 'Lempinimi ilman lainausmerkkejä (esim. Iceman); näytetään roolin perässä.';

@@ -2,7 +2,7 @@
 //
 // Vertaa jokaisen henkilön sivulle tulevia tekstejä hänen OMAN visansa kysymyksiin ja raportoi osumat
 // ryhmittäin, jotta Cowork voi korjata ne ennen Heikin hyväksyntää (facts_reviewed_at).
-//   Kentät: intro_text, facts (label + value), nickname, bio_short (+ birth_place tiedoksi)
+//   Kentät: bio_intro (henkilösivun esittely), facts (label + value), nickname, bio_short (+ birth_place tiedoksi)
 //   Vertailu (lib/vuotolista.ts, sama lista kuin henkilösivun Ikäjärjestys-vastustajilla):
 //     - oikeat vastaukset (karkea taivutusvertailu: "Ferrarilla" osuu "Ferrari")
 //     - vuosiluvut oikeissa vastauksissa → kielletty kaikissa kentissä
@@ -10,7 +10,7 @@
 //     - erisnimet kysymyksissä (ilman henkilön omaa nimeä)
 //
 // Ajo (apps/tietoniekka):
-//   node scripts/run-ts.cjs scripts/henkilot-vuototarkistus.ts [raportti.md] [--vain-tarkistamattomat]
+//   node scripts/run-ts.cjs scripts/henkilot-vuototarkistus.ts [raportti.md] [--vain-tarkistamattomat] [--vain-erat]
 // Oletuksena raportti kirjoitetaan tiedostoon HENKILOSIVU_VUOTORAPORTTI.md nykyiseen kansioon.
 // Ympäristö: NEXT_PUBLIC_SUPABASE_URL + NEXT_PUBLIC_SUPABASE_ANON_KEY (prosessista tai .env.local).
 // Vain luku — skripti ei kirjoita kantaan mitään.
@@ -39,7 +39,7 @@ function lueEnv(): Record<string, string> {
 
 type Henkilo = {
   name: string; ryhma: string | null; laji: string | null; trivia_quiz_id: string | null;
-  intro_text: string | null; facts: unknown; nickname: string | null; bio_short: string | null;
+  bio_intro: string | null; facts: unknown; nickname: string | null; bio_short: string | null;
   birth_place: string | null; facts_reviewed_at: string | null;
 };
 
@@ -51,13 +51,15 @@ const md = (s: string) => s.replace(/\|/g, "\\|").replace(/\n/g, " ");
 async function main() {
   const args = process.argv.slice(3);
   const vainTarkistamattomat = args.includes("--vain-tarkistamattomat");
+  /** Vain henkilöt, joille Cowork on jo kirjoittanut bio_intro- tai facts-tiedot (erät). */
+  const vainUudet = args.includes("--vain-erat");
   const ulos = args.find((a) => !a.startsWith("--")) ?? "HENKILOSIVU_VUOTORAPORTTI.md";
   const env = lueEnv();
   const sb = createClient(env.NEXT_PUBLIC_SUPABASE_URL, env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
 
   const { data: hData, error } = await sb
     .from("celebrities")
-    .select("name, ryhma, laji, trivia_quiz_id, intro_text, facts, nickname, bio_short, birth_place, facts_reviewed_at" as never)
+    .select("name, ryhma, laji, trivia_quiz_id, bio_intro, facts, nickname, bio_short, birth_place, facts_reviewed_at" as never)
     .eq("site_id", SITE_ID)
     .limit(2000);
   if (error) throw error;
@@ -80,7 +82,8 @@ async function main() {
   for (const h of henkilot) {
     if (vainTarkistamattomat && h.facts_reviewed_at) continue;
     const kentat: Array<{ kentta: string; teksti: string; fakta: boolean }> = [];
-    if (h.intro_text) kentat.push({ kentta: "intro_text", teksti: h.intro_text, fakta: false });
+    if (vainUudet && !h.bio_intro && !Array.isArray(h.facts)) continue;
+    if (h.bio_intro) kentat.push({ kentta: "bio_intro", teksti: h.bio_intro, fakta: false });
     if (h.bio_short) kentat.push({ kentta: "bio_short", teksti: h.bio_short, fakta: false });
     if (h.nickname) kentat.push({ kentta: "nickname", teksti: h.nickname, fakta: false });
     if (Array.isArray(h.facts))
@@ -114,7 +117,7 @@ async function main() {
   const out: string[] = [
     "# Henkilösivun vuotoraportti",
     "",
-    `> Ajettu ${pvm}${vainTarkistamattomat ? " · vain tarkistamattomat (facts_reviewed_at tyhjä)" : ""}. Skripti: apps/tietoniekka/scripts/henkilot-vuototarkistus.ts.`,
+    `> Ajettu ${pvm}${vainTarkistamattomat ? " · vain tarkistamattomat (facts_reviewed_at tyhjä)" : ""}${vainUudet ? " · vain henkilöt, joilla bio_intro tai facts" : ""}. Skripti: apps/tietoniekka/scripts/henkilot-vuototarkistus.ts.`,
     "> Osuma = sivun teksti sisältää oman visan oikean vastauksen, vuosiluvun tai kysymyksen erisnimen. Vertailu on karkea: tarkista jokainen osuma ja korjaa teksti, jos se paljastaa vastauksen.",
     "> Vuosiluvut: kysymysten vuosiluvut ovat sallittuja facts-riveillä, oikeiden vastausten vuosiluvut eivät missään.",
     "",
