@@ -738,7 +738,7 @@ async function PersonHub({ hub }: { hub: HubMeta }) {
             vain osan henkilöistä visalinkkeinä; nyt jokainen henkilö on omalla sivullaan. */}
         <section className="tn-section hs-hubryhmat" style={{ paddingTop: 0 }} aria-labelledby="selaa-h">
           <div className="hs-hubryhmat-head">
-            <h2 id="selaa-h" className="tn-display">Selaa kaikkia</h2>
+            <h2 id="selaa-h" className="tn-display">Ryhmät</h2>
             <a className="tn-morelink" href="/henkilot">
               Kaikki {browserPeople.length} A–Ö →
             </a>
