@@ -109,3 +109,15 @@ export function nimiVuotaa(nimi: string, lista: Vuotolista): boolean {
   const osuu = (lahde: string) => sisaltaa(lahde, nimi) || (!!suku && suku.length >= 4 && sanat(lahde).some((w) => w.startsWith(kanta(suku))));
   return lista.vastaukset.some(osuu) || lista.nimet.some(osuu);
 }
+
+/** Laadulliset pakat (4.10.): luvut oikeissa vastauksissa ("21", "1 457"). Jos henkilön oma arvo on
+ *  jonkin visakysymyksen vastaus, pakka paljastaisi sen → pakka jätetään pois. */
+export function vastaustenLuvut(kysymykset: VisanKysymys[]): Set<number> {
+  const out = new Set<number>();
+  for (const k of kysymykset)
+    for (const a of k.answers ?? []) {
+      if (!a.is_correct) continue;
+      for (const m of a.text.replace(/(\d)[\s ](?=\d{3}\b)/g, "$1").match(/\d+(?:[.,]\d+)?/g) ?? []) out.add(Number(m.replace(",", ".")));
+    }
+  return out;
+}

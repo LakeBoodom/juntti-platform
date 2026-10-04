@@ -25,6 +25,7 @@ import { ReorderableChainList } from "@/components/tn20/ReorderableChainList";
 import { SuuntaindikaattoriBadge } from "@/components/tn20/SuuntaindikaattoriBadge";
 import { RevealSequencer, type RevealItem } from "@/components/tn20/RevealSequencer";
 import { calculateChainScore } from "@/components/tn20/ChainResultSummary";
+import { TkGameNav } from "@/components/tn20/TkGameNav";
 
 const LAST_SEEN_KEY = "tk-ikajarjestys-viimeksi-nahdyt";
 
@@ -47,24 +48,6 @@ function writeLastSeen(ids: string[]) {
 }
 
 type Phase = "start" | "loading" | "ordering" | "revealing";
-
-// NAVIGAATIOKORJAUS (2026-09-17, Heikin live-QA-löydös): pelisivulta puuttui
-// kokonaan tie takaisin muualle sivustoon — TopBar piiloutuu /peli-poluilla
-// (pelikuoren omat logosäännöt, ks. TopBar-kommentti), ja tavallinen visa
-// (GameClient.tsx) korvaa sen omalla tng-top-HUD:llaan, mutta Ikäjärjestys
-// jäi ilman kumpaakaan. Kevyt oma paluulinkki kaikkiin kolmeen vaiheeseen
-// (aloitus, järjestäminen, paljastus+tulos) — ei täyttä HUD:ia, koska
-// Ikäjärjestyksellä ei ole tavallisen visan kysymyslaskuria/putkea.
-function TkGameNav() {
-  return (
-    <nav className="tk-gamenav" aria-label="Sivuston navigaatio">
-      <a className="tk-gamenav-home" href="/" aria-label="Tietoniekka etusivu">
-        <b>TIETO</b>
-        <span>NIEKKA</span>
-      </a>
-    </nav>
-  );
-}
 
 export default function IkajarjestysClient({
   initialCategory,

@@ -8,7 +8,8 @@ import { lajiMonikko, ryhma, ryhmaOf, type RyhmaKey } from "./henkiloRyhmat";
 import { lueFaktat, type Fakta } from "./henkiloKaava";
 import { visaHref } from "./visaHref";
 import { henkiloSlug } from "./henkiloSlug";
-import { nimiVuotaa, rakennaVuotolista, type VisanKysymys } from "./vuotolista";
+import { nimiVuotaa, rakennaVuotolista, vastaustenLuvut, type VisanKysymys } from "./vuotolista";
+import { haeLaatuArvot, haeLaatuDefit, lukuSana, valitseLaatuPakka, type LaatuArvo, type PoolHenkilo } from "./laadullinen";
 
 /* ── Päivämäärät (Europe/Helsinki) ─────────────────────────────────────── */
 
@@ -60,12 +61,19 @@ export type Laatta = { slug: string; name: string; image_url: string | null; ala
 
 export type PeliLinkki = { eyebrow: string; otsikko: string; href: string; meta?: string };
 
-/** Henkilökohtainen Ikäjärjestys (design v0.3, 4a): henkilö + 3 saman lajin vastustajaa. */
-export type IkaKierros = {
+/** Pelihyllyn nosto (design v0.3 4a): laadullinen järjestyspakka (brief 4.10.) tai varalla Ikäjärjestys.
+ *  Pooli 8 henkilöä; kortissa näytetään henkilö + 3 laattaa ja "+N". */
+export type JarjestysNosto = {
+  merkki: string;
+  kysymys: string;
   otsikko: string;
   kuvaus: string;
   href: string;
   laatat: Array<{ name: string; image_url: string | null; oma: boolean }>;
+  lisaa: number;
+  akseli: [string, string];
+  /** "Tilastot: 4.10.2026" (laadulliset pakat). */
+  tilastot: string | null;
 };
 
 export type HenkiloSivu = {
@@ -90,7 +98,7 @@ export type HenkiloSivu = {
   faktat: Fakta[];
   wikipedia_url: string | null;
   visa: { id: string; href: string; otsikko: string; fanitasot: string[] | null } | null;
-  ikaKierros: IkaKierros | null;
+  nosto: JarjestysNosto | null;
   /** "Muista kokoelmista": 0–3 aihevisaa. */
   aiheet: PeliLinkki[];
   muut: { otsikko: string; laatat: Laatta[]; kaikki: number; kaikkiHref: string | null };
@@ -245,35 +253,80 @@ export async function haeHenkiloSivu(slug: string): Promise<HenkiloSivu | { ohja
       }
     : null;
 
-  // Henkilökohtainen Ikäjärjestys: henkilö + 3 saman lajin (tai ryhmän) henkilöä, joilla eri syntymäpäivä.
-  // Vastustajaksi ei kelpaa henkilö, jonka nimi on oman visan vastaus tai kysymyksen erisnimi.
-  let ikaKierros: IkaKierros | null = null;
-  if (s) {
-    const lista = rakennaVuotolista(((kysRes?.data ?? []) as unknown as VisanKysymys[]), c.name);
-    const rnd = siemen(`${c.id}|${nyt.y}-${nyt.m}-${nyt.d}`);
-    const ehdokkaat = sekoitaSiemenella(
-      (lajiRiittaa ? samaLaji : samaRyhma).filter((x) => x.birth_date && !nimiVuotaa(x.name, lista)),
+  // Pelihyllyn nosto: 1) laadullinen järjestyspakka (brief 4.10.), 2) varalla Ikäjärjestys. Molemmissa
+  // pooli 8 = henkilö + 7 (sama laji → sama ryhmä → muut), siemen henkilö + päivä (sivu on cacheable),
+  // vastustajaksi ei henkilöä, jonka nimi on oman visan vastaus tai kysymyksen erisnimi.
+  const kysymykset = (kysRes?.data ?? []) as unknown as VisanKysymys[];
+  const lista = rakennaVuotolista(kysymykset, c.name);
+  const rnd = siemen(`${henkiloSlug(c.name)}|${nyt.y}-${nyt.m}-${nyt.d}`);
+  const pool = (x: Rivi): PoolHenkilo => ({ id: x.id, name: x.name, laji: x.laji, ryhma: ryhmaOf(x.ryhma, x.laji), image_url: x.image_url });
+  const itse: PoolHenkilo = { id: c.id, name: c.name, laji: c.laji, ryhma: r, image_url: c.image_url };
+  const nostoLaatat = (jasenet: PoolHenkilo[]) => {
+    const nakyvat = sekoitaSiemenella(jasenet.slice(0, 4), rnd);
+    return nakyvat.map((x) => ({ name: x.name, image_url: x.image_url, oma: x.id === c.id }));
+  };
+  let nosto: JarjestysNosto | null = null;
+
+  const defit = await haeLaatuDefit(sb);
+  if (defit.size) {
+    // Henkilön omat mittarit → kaikkien niiden arvot (pieni joukko: kymmeniä rivejä per mittari).
+    const omat = await haeLaatuArvot(sb, [...defit.keys()], [c.id]);
+    const arvot = omat.size ? await haeLaatuArvot(sb, [...omat.keys()]) : new Map();
+    const pakka = valitseLaatuPakka({
+      henkilo: itse,
+      kaikki: kaikkiRivit.map(pool),
+      defit,
+      arvot,
+      lista,
+      vastausLuvut: vastaustenLuvut(kysymykset),
       rnd,
-    ).sort((a, b) => (b.image_url ? 1 : 0) - (a.image_url ? 1 : 0)); // kuvalliset ensin (laatat näyttävät kasvot)
+      sekoita: sekoitaSiemenella,
+    });
+    if (pakka) {
+      const asOf = (arvot.get(pakka.def.attr_key) ?? []).map((a: LaatuArvo) => a.asOf).filter(Boolean).sort().pop() ?? null;
+      const p = parsePvm(asOf);
+      const muita = pakka.jasenet.length - 1;
+      nosto = {
+        merkki: "Laita järjestykseen",
+        kysymys: pakka.def.winner === "high" ? "Kuka on kärjessä?" : "Kuka on ensimmäinen?",
+        otsikko: pakka.def.otsikko.charAt(0).toUpperCase() + pakka.def.otsikko.slice(1),
+        kuvaus: `Järjestä ${c.name} ja ${lukuSana(muita)} muuta – ${pakka.def.otsikko} ylimmäksi.`,
+        href: `/peli/jarjesta/oma?a=${pakka.def.attr_key}&h=${pakka.jasenet.map((x) => x.id).join(",")}&p=${henkiloSlug(c.name)}`,
+        laatat: nostoLaatat(pakka.jasenet),
+        lisaa: Math.max(0, pakka.jasenet.length - 4),
+        akseli: pakka.def.winner === "high" ? ["Eniten", "Vähiten"] : ["Vähiten", "Eniten"],
+        tilastot: p ? `Tilastot: ${fiPvm(p)}` : null,
+      };
+    }
+  }
+
+  if (!nosto && s) {
+    const taso = (x: Rivi) => (c.laji && x.laji === c.laji ? 0 : ryhmaOf(x.ryhma, x.laji) === r ? 1 : 2);
+    const ehdokkaat = kaikki.filter((x) => x.birth_date && !nimiVuotaa(x.name, lista));
+    const jarjestetty = [0, 1, 2].flatMap((t) =>
+      sekoitaSiemenella(ehdokkaat.filter((x) => taso(x) === t), rnd).sort((a, b) => (b.image_url ? 1 : 0) - (a.image_url ? 1 : 0)),
+    );
     const valitut: Rivi[] = [];
     const paivat = new Set([c.birth_date]);
-    for (const x of ehdokkaat) {
-      if (valitut.length >= 3) break;
+    for (const x of jarjestetty) {
+      if (valitut.length >= 7) break;
       if (paivat.has(x.birth_date)) continue;
       paivat.add(x.birth_date);
       valitut.push(x);
     }
-    if (valitut.length === 3) {
-      const laatat = sekoitaSiemenella(
-        [{ name: c.name, image_url: c.image_url, oma: true, id: c.id }, ...valitut.map((x) => ({ name: x.name, image_url: x.image_url, oma: false, id: x.id }))],
-        rnd,
-      );
-      ikaKierros = {
+    if (valitut.length >= 4) {
+      const jasenet = [itse, ...valitut.map(pool)];
+      nosto = {
+        merkki: "Ikäjärjestys",
+        kysymys: "Kuka on vanhin?",
         otsikko: `${c.name} ja ${lajiRiittaa && lajiNimi ? lajiNimi : ryhma(r).nimi.toLowerCase()}`,
-        kuvaus: `Järjestä ${c.name} ja kolme muuta syntymäpäivän mukaan.`,
+        kuvaus: `Järjestä ${c.name} ja ${lukuSana(valitut.length)} muuta syntymäpäivän mukaan.`,
         // category: "Arvo 10 uutta" jatkaa saman ryhmän kierroksilla.
-        href: `/peli/ikajarjestys?henkilot=${laatat.map((l) => l.id).join(",")}&category=${r}`,
-        laatat: laatat.map(({ name, image_url, oma }) => ({ name, image_url, oma })),
+        href: `/peli/ikajarjestys?henkilot=${jasenet.map((x) => x.id).join(",")}&category=${r}`,
+        laatat: nostoLaatat(jasenet),
+        lisaa: Math.max(0, jasenet.length - 4),
+        akseli: ["Vanhin", "Nuorin"],
+        tilastot: null,
       };
     }
   }
@@ -319,7 +372,7 @@ export async function haeHenkiloSivu(slug: string): Promise<HenkiloSivu | { ohja
     faktat: hyvaksytty ? lueFaktat(c.facts) : [],
     wikipedia_url: c.wikipedia_url,
     visa,
-    ikaKierros,
+    nosto,
     aiheet,
     muut,
     samanaPaivana,

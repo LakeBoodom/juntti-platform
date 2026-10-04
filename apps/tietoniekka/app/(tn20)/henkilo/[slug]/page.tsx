@@ -119,7 +119,7 @@ export default async function HenkiloPage({ params }: { params: Promise<{ slug: 
   };
 
   const hyllyPelit: HyllyPeli[] = [];
-  if (h.ikaKierros) hyllyPelit.push({ tyyppi: "ikajarjestys", ...h.ikaKierros });
+  if (h.nosto) hyllyPelit.push({ tyyppi: "jarjestys", ...h.nosto });
   if (h.visa) hyllyPelit.push({ tyyppi: "visa", id: h.visa.id, otsikko: h.visa.otsikko, href: h.visa.href, fanitasot: h.visa.fanitasot });
   const ini = h.name
     .split(/\s+/)

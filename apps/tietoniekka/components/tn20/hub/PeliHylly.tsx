@@ -10,7 +10,19 @@ import { useEffect, useState } from "react";
 export type HyllyLaatta = { name: string; image_url: string | null; oma: boolean };
 
 export type HyllyPeli =
-  | { tyyppi: "ikajarjestys"; otsikko: string; kuvaus: string; href: string; laatat: HyllyLaatta[] }
+  | {
+      /** Laadullinen järjestyspakka tai Ikäjärjestys (lib/henkilo.ts JarjestysNosto). */
+      tyyppi: "jarjestys";
+      merkki: string;
+      kysymys: string;
+      otsikko: string;
+      kuvaus: string;
+      href: string;
+      laatat: HyllyLaatta[];
+      lisaa: number;
+      akseli: [string, string];
+      tilastot: string | null;
+    }
   | { tyyppi: "visa"; id: string; otsikko: string; href: string; fanitasot?: string[] | null }
   | { tyyppi: "muu"; eyebrow: string; otsikko: string; href: string; aksentti: string };
 
@@ -60,12 +72,12 @@ function TulosRivi({ tulos, taso }: { tulos: Tulos; taso: string | null }) {
 
 /** Nosto: Ikäjärjestys (violetti, laatat + akseli) tai henkilövisa. */
 function Nosto({ peli }: { peli: HyllyPeli }) {
-  if (peli.tyyppi === "ikajarjestys") {
+  if (peli.tyyppi === "jarjestys") {
     return (
       <a className="hub-nosto hub-nosto--ika" href={peli.href} style={lw(peli.otsikko)}>
         <span className="hub-nosto-merkit">
-          <span className="hub-tyyppi hub-tyyppi--ika">Ikäjärjestys</span>
-          <span className="hub-nosto-kysymys">Kuka on vanhin?</span>
+          <span className="hub-tyyppi hub-tyyppi--ika">{peli.merkki}</span>
+          <span className="hub-nosto-kysymys">{peli.kysymys}</span>
         </span>
         <span className="hub-nosto-otsikko">{peli.otsikko}</span>
         <span className="hub-nosto-kuvaus">{peli.kuvaus}</span>
@@ -94,14 +106,22 @@ function Nosto({ peli }: { peli: HyllyPeli }) {
               <span className="hub-ika-nimi">{l.name}</span>
             </span>
           ))}
+          {peli.lisaa > 0 && (
+            <span className="hub-ika-lisaa" aria-label={`ja ${peli.lisaa} muuta`}>
+              +{peli.lisaa}
+            </span>
+          )}
         </span>
         <span className="hub-ika-akseli" aria-hidden="true">
-          <span>Vanhin</span>
+          <span>{peli.akseli[0]}</span>
           <span className="hub-ika-akseli-viiva" />
-          <span>Nuorin</span>
+          <span>{peli.akseli[1]}</span>
         </span>
-        <span className="hub-cta-lime">
-          Pelaa <span aria-hidden="true">→</span>
+        <span className="hub-nosto-ala">
+          <span className="hub-cta-lime">
+            Pelaa <span aria-hidden="true">→</span>
+          </span>
+          {peli.tilastot && <span className="hub-nosto-tilastot">{peli.tilastot}</span>}
         </span>
       </a>
     );
@@ -156,8 +176,8 @@ function Rivi({ peli, kortti }: { peli: HyllyPeli; kortti: boolean }) {
       </VisaTila>
     );
   }
-  const eyebrow = peli.tyyppi === "ikajarjestys" ? "Ikäjärjestys" : peli.eyebrow;
-  const acc = peli.tyyppi === "ikajarjestys" ? "#C79BFF" : peli.aksentti;
+  const eyebrow = peli.tyyppi === "jarjestys" ? peli.merkki : peli.eyebrow;
+  const acc = peli.tyyppi === "jarjestys" ? "#C79BFF" : peli.aksentti;
   return (
     <a
       className={kortti ? "hub-rivi hub-rivi--kortti" : "hub-rivi"}

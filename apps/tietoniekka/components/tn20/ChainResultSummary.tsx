@@ -4,8 +4,6 @@
 // "Vaihda aihetta". Ei toista paljastuksen yksittäisiä oikea/väärä-merkintöjä
 // (tehtävänanto) — tämä näkymä näyttää vain koosteen, ei henkilölistaa.
 
-import type { ChainPerson } from "@/lib/ikajarjestysConstants";
-
 export type ChainScoreResult = {
   score: number;
   correctCount: number;
@@ -22,7 +20,7 @@ export type ChainScoreResult = {
  * halutessaan korvata tämän myöhemmin toisella kaavalla ilman että UI-komponentti muuttuu
  * (ChainResultSummary ottaa vastaan jo valmiiksi lasketun ChainScoreResultin).
  */
-export function calculateChainScore(placedOrder: ChainPerson[], correctOrder: ChainPerson[]): ChainScoreResult {
+export function calculateChainScore(placedOrder: { id: string }[], correctOrder: { id: string }[]): ChainScoreResult {
   const correctIndexById = new Map(correctOrder.map((p, i) => [p.id, i]));
   let score = 0;
   let correctCount = 0;
@@ -51,15 +49,26 @@ export function calculateChainScore(placedOrder: ChainPerson[], correctOrder: Ch
   return { score, correctCount, totalCount: placedOrder.length, longestCorrectChain };
 }
 
+export type ChainResultSummaryProps = {
+  result: ChainScoreResult;
+  onNewRound: () => void;
+  /** Puuttuu = ei "Vaihda aihetta" -nappia (Laita järjestykseen -pakoilla ei ole aiheita). */
+  onChangeCategory?: () => void;
+  newRoundLabel?: string;
+  changeCategoryLabel?: string;
+  collectionHref?: string;
+  collectionLabel?: string;
+};
+
 export function ChainResultSummary({
   result,
   onNewRound,
   onChangeCategory,
-}: {
-  result: ChainScoreResult;
-  onNewRound: () => void;
-  onChangeCategory: () => void;
-}) {
+  newRoundLabel = "Arvo 10 uutta",
+  changeCategoryLabel = "Vaihda aihetta",
+  collectionHref = "/kokoelma/tunnetut-henkilot",
+  collectionLabel = "Tunnetut henkilöt -kokoelmaan →",
+}: ChainResultSummaryProps) {
   return (
     <div className="tk-result">
       <div className="tk-result-score">{result.score}</div>
@@ -79,16 +88,18 @@ export function ChainResultSummary({
       </div>
 
       <button type="button" className="tk-btn-primary tk-result-cta" onClick={onNewRound}>
-        Arvo 10 uutta
+        {newRoundLabel}
       </button>
-      <button type="button" className="tk-btn-secondary" onClick={onChangeCategory}>
-        Vaihda aihetta
-      </button>
+      {onChangeCategory && (
+        <button type="button" className="tk-btn-secondary" onClick={onChangeCategory}>
+          {changeCategoryLabel}
+        </button>
+      )}
       {/* NAVIGAATIOKORJAUS (2026-09-17, Heikin pyyntö): tulosnäkymästä pitää
           päästä myös Tunnetut henkilöt -kokoelman pääsivulle, ei vain uuteen
           kierrokseen tai aiheen vaihtoon tämän pelin sisällä. */}
-      <a className="tk-result-collection-link" href="/kokoelma/tunnetut-henkilot">
-        Tunnetut henkilöt -kokoelmaan →
+      <a className="tk-result-collection-link" href={collectionHref}>
+        {collectionLabel}
       </a>
     </div>
   );

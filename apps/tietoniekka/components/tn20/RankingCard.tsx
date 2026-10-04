@@ -18,6 +18,8 @@ export type RankingCardPerson = {
   name: string;
   role: string;
   image_url: string | null;
+  /** Laita järjestykseen -pakat, joiden kohteilla ei ole kuvia (kansallispuistot): ei kuvapaikkaa. */
+  hideThumb?: boolean;
 };
 
 export type RankingCardState = "idle" | "selected" | "target" | "dragging" | "correct" | "wrong";
@@ -29,6 +31,8 @@ export interface RankingCardProps {
   state?: RankingCardState;
   /** Muotoiltu syntymäaika ("12.4.1985") — annetaan vain paljastusvaiheessa. */
   revealedDate?: string | null;
+  /** Laita järjestykseen: paljastettu arvo ("2 858 km²") omalla rivillään. */
+  revealedValue?: string | null;
   /** Ei kahvaa, ei interaktiota (peek-esikatselu promo-korteissa, aave-kortti raahauksessa, paljastuskortti). */
   readOnly?: boolean;
   /** Koristeellinen peek-esikatselu (CollectionPageGamePromo): piilottaa nimi/ammatti-tekstin
@@ -71,7 +75,7 @@ const RESULT_ICON: Record<string, React.ReactElement | null> = {
 };
 
 export const RankingCard = forwardRef<HTMLDivElement, RankingCardProps>(function RankingCard(
-  { person, position, state = "idle", revealedDate, readOnly, peek, handleProps, dragProps, onActivate, grabbed, className, style, ariaLabel },
+  { person, position, state = "idle", revealedDate, revealedValue, readOnly, peek, handleProps, dragProps, onActivate, grabbed, className, style, ariaLabel },
   ref,
 ) {
   const resultIcon = state === "correct" || state === "wrong" ? RESULT_ICON[state] : null;
@@ -102,6 +106,7 @@ export const RankingCard = forwardRef<HTMLDivElement, RankingCardProps>(function
     >
       {typeof position === "number" && <div className="tk-rcard-pos" aria-hidden="true">{position}</div>}
 
+      {!person.hideThumb && (
       <div className="tk-rcard-thumb">
         {person.image_url ? (
           // draggable={false}: ilman tätä hiiriraahaus kortin kuvasta käynnistäisi
@@ -115,14 +120,18 @@ export const RankingCard = forwardRef<HTMLDivElement, RankingCardProps>(function
         )}
         <div className="tk-rcard-duotone" aria-hidden="true" />
       </div>
+      )}
 
       {!peek && (
         <div className="tk-rcard-body">
           <div className="tk-rcard-name">{person.name}</div>
-          <div className="tk-rcard-role">
-            {person.role}
-            {revealedDate && <span className="tk-rcard-date"> · s. {revealedDate}</span>}
-          </div>
+          {(person.role || revealedDate) && (
+            <div className="tk-rcard-role">
+              {person.role}
+              {revealedDate && <span className="tk-rcard-date"> · s. {revealedDate}</span>}
+            </div>
+          )}
+          {revealedValue && <div className="tk-rcard-value">{revealedValue}</div>}
         </div>
       )}
 

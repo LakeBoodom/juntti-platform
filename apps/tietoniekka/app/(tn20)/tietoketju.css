@@ -442,3 +442,12 @@
 .tn20 .tk-info ol { margin: 0 0 12px; padding-left: 20px; display: flex; flex-direction: column; gap: 8px; font-size: 15px; line-height: 1.5; }
 .tn20 .tk-info p { margin: 0; font-size: 14px; line-height: 1.5; }
 .tn20 .tk-info a { color: var(--tk-amber, #E8A320); text-decoration: underline; text-underline-offset: 2px; }
+
+/* Laita järjestykseen / laadulliset pakat (4.10.2026): paljastettu arvo omalla rivillään. */
+.tn20 .tk-rcard-value {
+  margin-top: 3px;
+  font-family: var(--tn-font-display); font-weight: 800; font-size: 14px; line-height: 1.25;
+  color: var(--tk-text-secondary);
+  overflow-wrap: normal; word-break: keep-all; white-space: normal;
+}
+.tn20 .tk-jarj-lahde { max-width: 560px; margin: 0 auto 40px; padding: 0 20px; font-size: 12.5px; color: var(--tk-text-muted); text-align: center; }
