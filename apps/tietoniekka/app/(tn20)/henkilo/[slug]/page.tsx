@@ -120,7 +120,9 @@ export default async function HenkiloPage({ params }: { params: Promise<{ slug: 
 
   const hyllyPelit: HyllyPeli[] = [];
   if (h.nosto) hyllyPelit.push({ tyyppi: "jarjestys", ...h.nosto });
-  if (h.visa) hyllyPelit.push({ tyyppi: "visa", id: h.visa.id, otsikko: h.visa.otsikko, href: h.visa.href, fanitasot: h.visa.fanitasot });
+  // "Aloita visa" vie suoraan 1. kysymykseen (Heikki 4.10.): henkilösivu on jo visan esittely.
+  const aloitaHref = h.visa ? `${h.visa.href}${h.visa.href.includes("?") ? "&" : "?"}aloita=1` : "";
+  if (h.visa) hyllyPelit.push({ tyyppi: "visa", id: h.visa.id, otsikko: h.visa.otsikko, href: aloitaHref, fanitasot: h.visa.fanitasot });
   const ini = h.name
     .split(/\s+/)
     .map((w) => w[0])

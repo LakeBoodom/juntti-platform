@@ -700,6 +700,8 @@ export default async function Peli20({
     hero,
     accent,
     isSankari,
+    /* Henkilösivun "Aloita visa" (Heikki 4.10.): ?aloita=1 → suoraan 1. kysymykseen, ei aloitusnäkymää. */
+    autoStart: params.aloita === "1",
     kind: "teksti",
     challengePath: visaHref(quiz),
     /* SUOMEN KAUPUNGIT -matkapassi (28.8.2026): kun visa on yksi 20:sta
