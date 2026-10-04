@@ -74,8 +74,19 @@ export async function haeLaatuArvot(sb: Sb, keys: string[], celebIdt?: string[])
   return out;
 }
 
-export const arvoTeksti = (d: LaatuDef, a: LaatuArvo) =>
-  /^[\d\s .,]+$/.test(a.display) && d.unit_label ? `${a.display} ${d.unit_label}` : a.display;
+/* Yksikkö on kannassa partitiivina ("voittoa"), joka on oikein luvuilla 0 ja 2+. Luvulla 1 tarvitaan
+   nominatiivi ("1 voitto") — kielioppia, ei mittaridataa, joten pieni taulukko koodissa riittää.
+   Tuntematon yksikkö jää partitiiviin mieluummin kuin keksitty muoto. */
+const YKSIKKO: Record<string, string> = {
+  voittoa: "voitto", maalia: "maali", pistettä: "piste", ottelua: "ottelu", maaottelua: "maaottelu",
+  lähtöä: "lähtö", paalupaikkaa: "paalupaikka", mestaruutta: "mestaruus", syöttöä: "syöttö", mitalia: "mitali",
+};
+
+export const arvoTeksti = (d: LaatuDef, a: LaatuArvo) => {
+  if (!/^[\d\s\u00a0.,]+$/.test(a.display) || !d.unit_label) return a.display;
+  const yks = a.value === 1 ? YKSIKKO[d.unit_label] ?? d.unit_label : d.unit_label;
+  return `${a.display} ${yks}`;
+};
 
 const LUKU = ["nolla", "yksi", "kaksi", "kolme", "neljä", "viisi", "kuusi", "seitsemän", "kahdeksan", "yhdeksän"];
 export const lukuSana = (n: number) => LUKU[n] ?? String(n);
