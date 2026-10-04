@@ -15,7 +15,7 @@ import type { Metadata } from "next";
 import { getSupabase } from "@/lib/supabase";
 import { getSiteId } from "@/lib/queries";
 import { PersonCard, type QuizCardData } from "@/components/tn20/cards";
-import type { BrowserPerson } from "@/components/tn20/PersonBrowser";
+import { PersonBrowser, type BrowserPerson } from "@/components/tn20/PersonBrowser";
 import { CollectionPageGamePromo } from "@/components/tn20/CollectionPageGamePromo";
 import { WideCard } from "@/components/tn20/WideCard";
 import { MOTIF_PATHS, motifPathFor } from "@/components/tn20/motif-paths";
@@ -283,7 +283,7 @@ export default async function KokoelmaHub({
 
   /* ── Tunnetut henkilöt (ennallaan) ── */
   if (hub.source.kind === "person") {
-    return <PersonHub hub={hub} article={article} />;
+    return <PersonHub hub={hub} />;
   }
 
   /* ── Kuvavisat 2.0 (17.9.2026): kategoriat → visavariaatiot ──
@@ -601,15 +601,8 @@ type Celeb = {
   /** visan slug (quiz_cards), täytetään PersonHubissa — SEO-erä A1 */
   quizSlug?: string | null;
 };
-function playHref(c: Celeb): string {
-  /* 1.0:n /sankari/-sivut poistuivat julkaisussa 31.8.2026 — hubiin paasevat
-     vain pelattavat henkilot (trivia_quiz_id suodatetaan ylempana), joten
-     fallback ei koskaan osu; "#" varmistaa ettei synny ohjaussilmukkaa. */
-  if (c.trivia_quiz_id) return visaHref({ slug: c.quizSlug, id: c.trivia_quiz_id });
-  return "#";
-}
 
-async function PersonHub({ hub, article }: { hub: HubMeta; article?: React.ReactNode }) {
+async function PersonHub({ hub }: { hub: HubMeta }) {
   const sb = getSupabase();
   if (!sb) return <main style={{ padding: 32 }}>Ei tietokantayhteyttä.</main>;
   const siteId = await getSiteId();
@@ -654,10 +647,9 @@ async function PersonHub({ hub, article }: { hub: HubMeta; article?: React.React
     .sort((a, b) => a.dist - b.dist)
     .slice(0, 12);
 
-  // Vain pelattavat henkilöt "Selaa kaikkia" -selaimeen (README:n Person-malli
-  // olettaa quizId:n aina — ilman visaa henkilö ei kuulu hakemistoon vielä).
+  // Henkilöselain (palautettu 4.10.2026, Heikki): kaikki henkilöt, kortti vie henkilösivulle — siellä on
+  // henkilön kaikki pelit (visa, järjestyspakka), ei vain yksi visa.
   const browserPeople: BrowserPerson[] = celebs
-    .filter((c) => c.trivia_quiz_id)
     .map((c) => ({
       id: c.id,
       slug: c.slug,
@@ -668,7 +660,7 @@ async function PersonHub({ hub, article }: { hub: HubMeta; article?: React.React
       laji: c.laji,
       priority: c.priority,
       created_at: c.created_at,
-      href: playHref(c),
+      href: henkiloHref(c.name),
     }));
 
   // Tietoketju: Ikäjärjestys -pelinoston peek-esikatselu (koristeellinen, aria-hidden) —
@@ -746,9 +738,9 @@ async function PersonHub({ hub, article }: { hub: HubMeta; article?: React.React
             vain osan henkilöistä visalinkkeinä; nyt jokainen henkilö on omalla sivullaan. */}
         <section className="tn-section hs-hubryhmat" style={{ paddingTop: 0 }} aria-labelledby="selaa-h">
           <div className="hs-hubryhmat-head">
-            <h2 id="selaa-h" className="tn-display">Selaa kaikkia</h2>
+            <h2 id="selaa-h" className="tn-display">Ryhmät</h2>
             <a className="tn-morelink" href="/henkilot">
-              Kaikki {celebs.length} A–Ö →
+              Kaikki {browserPeople.length} A–Ö →
             </a>
           </div>
           <div className="hs-hubryhmat-grid">
@@ -763,8 +755,13 @@ async function PersonHub({ hub, article }: { hub: HubMeta; article?: React.React
             })}
           </div>
         </section>
+
+        <section className="tn-section" style={{ paddingTop: 0 }}>
+          <PersonBrowser people={browserPeople} />
+        </section>
       </div>
-      {article}
+      {/* "Henkilövisat pähkinänkuoressa" -teksti poistettu 4.10.2026 (Heikki): ei pitänyt paikkaansa
+          eikä tuonut lisäarvoa. Muut kokoelmat näyttävät oman tekstinsä edelleen. */}
     </main>
   );
 }
