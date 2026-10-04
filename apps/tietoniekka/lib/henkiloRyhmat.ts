@@ -83,3 +83,45 @@ const LAJI_MONIKKO: Record<string, string> = {
 };
 
 export const lajiMonikko = (laji: string | null | undefined) => (laji && LAJI_MONIKKO[laji]) || null;
+
+/** Lajin nimi chippeihin ja otsikoihin ("Moottoriurheilu"). */
+const LAJI_NIMI: Record<string, string> = {
+  jaakiekko: "Jääkiekko",
+  jalkapallo: "Jalkapallo",
+  moottoriurheilu: "Moottoriurheilu",
+  talviurheilu: "Talviurheilu",
+  koripallo: "Koripallo",
+  yleisurheilu: "Yleisurheilu",
+  tennis: "Tennis",
+  golf: "Golf",
+  kamppailulajit: "Kamppailulajit",
+  "muu-urheilu": "Muu urheilu",
+  musiikki: "Musiikki",
+  klassinen: "Klassinen musiikki",
+  hiphop: "Hiphop",
+  tanssi: "Tanssi",
+  nayttelija: "Näyttelijät",
+  komedia: "Komedia",
+  politiikka: "Politiikka",
+  kuninkaalliset: "Kuninkaalliset",
+  maanpuolustus: "Maanpuolustus",
+  media: "Media",
+  elokuva: "Elokuva",
+  kirjallisuus: "Kirjallisuus",
+  kuvataide: "Kuvataide",
+  muotoilu: "Muotoilu",
+  tiede: "Tiede",
+  talous: "Talous",
+  muoti: "Muoti",
+  ruoka: "Ruoka",
+};
+
+export const lajiNimi = (laji: string) => LAJI_NIMI[laji] ?? laji.charAt(0).toUpperCase() + laji.slice(1);
+
+export const KUUKAUDET = [
+  "tammikuu", "helmikuu", "maaliskuu", "huhtikuu", "toukokuu", "kesäkuu",
+  "heinäkuu", "elokuu", "syyskuu", "lokakuu", "marraskuu", "joulukuu",
+] as const;
+
+/** Kuukauden osoiteosa (ilman ääkkösiä): "kesakuu", "heinakuu". */
+export const kuukausiSlug = (i: number) => KUUKAUDET[i].replace(/ä/g, "a");

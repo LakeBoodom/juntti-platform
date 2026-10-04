@@ -8,6 +8,7 @@
 //   /og/kuvavisa/<kortisto>        kuvavisa (liput, vaakunat, linnut …, viikko)
 //   /og/kokoelma/<avain>           kokoelmahub
 //   /og/sivu/<avain>               pelimuodot ja muut sivut (tupla-tai-kuitti, kuntaliitos …)
+//   /og/henkilo/<slug>             henkilösivu (erä B3): nimi + rooli, henkilökuva 3:4-korttina
 //
 // Satori (ImageResponse) ei osaa WebP:tä, joten kuvat muunnetaan sharpilla JPEG:ksi. Kuvat luetaan
 // tiedostojärjestelmästä (next.config.mjs: outputFileTracingIncludes), jolloin myös preview-
@@ -18,6 +19,7 @@ import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 import sharp from "sharp";
 import { getSupabase } from "@/lib/supabase";
+import { henkiloSlug } from "@/lib/henkiloSlug";
 import { getSiteId } from "@/lib/queries";
 import { resolveCollection, COLLECTION_ACCENT, COLLECTION_BG, COLLECTION_LABEL } from "@/lib/visanKokoelma";
 import { KATEGORIAT } from "@/lib/kuvavisat2026";
@@ -312,6 +314,20 @@ export async function GET(req: Request, ctx: { params: Promise<{ polku: string[]
     if (otsikko) kortti = { eyebrow: "Kuvavisa", otsikko, accent: kat?.accent ?? "#22D3EE", tausta: await kuvaUri(KUVAVISA_KUVA[avain], W, H), alarivi: "Tunnista kuvasta" };
   } else if (tyyppi === "kokoelma" && avain) {
     kortti = await kokoelmaKortti(avain);
+  } else if (tyyppi === "henkilo" && avain) {
+    const sb = getSupabase();
+    // Henkilösivun osoite johdetaan nimestä (lib/henkiloSlug.ts), ei celebrities.slug-kentästä.
+    const { data } = sb ? await sb.from("celebrities").select("name, role, image_url").limit(2000) : { data: null };
+    const c = ((data ?? []) as Array<{ name: string; role: string | null; image_url: string | null }>).find((x) => henkiloSlug(x.name) === avain) ?? null;
+    if (c)
+      kortti = {
+        eyebrow: "Tunnetut henkilöt",
+        otsikko: c.name,
+        accent: "#C9A96A",
+        henkilo: await kuvaUri(c.image_url, 252, 336, { x: 0.5, y: 0.2 }),
+        tausta: await kuvaUri(c.image_url, W, H, { x: 0.5, y: 0.3 }, true),
+        alarivi: c.role ?? undefined,
+      };
   } else if (tyyppi === "sivu" && SIVUT[avain]) {
     const s = SIVUT[avain];
     kortti = { eyebrow: s.eyebrow, otsikko: s.otsikko, accent: s.accent, tausta: await kuvaUri(s.kuva, W, H) };

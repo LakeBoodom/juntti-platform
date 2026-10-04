@@ -31,7 +31,7 @@
 
 import { useEffect, useState } from "react";
 import { RankingCard, type RankingCardState } from "./RankingCard";
-import { ChainResultSummary, type ChainScoreResult } from "./ChainResultSummary";
+import { ChainResultSummary, type ChainResultSummaryProps, type ChainScoreResult } from "./ChainResultSummary";
 import { usePrefersReducedMotion } from "@/lib/usePrefersReducedMotion";
 
 export type RevealItem = {
@@ -39,11 +39,15 @@ export type RevealItem = {
   name: string;
   role: string;
   image_url: string | null;
+  hideThumb?: boolean;
   /** Pelaajan asettama paikka (1-pohjainen) — tässä järjestyksessä kortit pysyvät koko paljastuksen ajan. */
   placedPosition: number;
   /** Oikea kronologinen paikka (1-pohjainen) — verrataan placedPositioniin. */
   correctPosition: number;
-  birthDateLabel: string;
+  /** Ikäjärjestys: syntymäaika ("s. 12.4.1985"). */
+  birthDateLabel?: string;
+  /** Laita järjestykseen: arvo ("2 858 km²") — käytetään syntymäajan sijaan. */
+  valueLabel?: string;
 };
 
 const STAGGER_MS = 90;
@@ -54,12 +58,15 @@ export function RevealSequencer({
   result,
   onNewRound,
   onChangeCategory,
+  summaryProps,
 }: {
   items: RevealItem[];
   /** Valmiiksi laskettu pistetulos — näytetään korttilistan alla heti kun kaikki on paljastettu. */
   result: ChainScoreResult;
   onNewRound: () => void;
-  onChangeCategory: () => void;
+  onChangeCategory?: () => void;
+  /** Laita järjestykseen: tulosnäkymän tekstit ja linkit (oletukset = Ikäjärjestys). */
+  summaryProps?: Pick<ChainResultSummaryProps, "newRoundLabel" | "changeCategoryLabel" | "collectionHref" | "collectionLabel">;
 }) {
   const ordered = [...items].sort((a, b) => a.placedPosition - b.placedPosition);
   const reducedMotion = usePrefersReducedMotion();
@@ -110,7 +117,8 @@ export function RevealSequencer({
                 person={item}
                 position={item.placedPosition}
                 state={state}
-                revealedDate={isRevealed ? item.birthDateLabel : null}
+                revealedDate={isRevealed ? item.birthDateLabel ?? null : null}
+                revealedValue={isRevealed ? item.valueLabel ?? null : null}
                 readOnly
               />
             </div>
@@ -119,7 +127,7 @@ export function RevealSequencer({
       </div>
 
       {allRevealed ? (
-        <ChainResultSummary result={result} onNewRound={onNewRound} onChangeCategory={onChangeCategory} />
+        <ChainResultSummary result={result} onNewRound={onNewRound} onChangeCategory={onChangeCategory} {...summaryProps} />
       ) : (
         <button type="button" className="tk-reveal-skip" onClick={revealAllNow}>
           Näytä heti →

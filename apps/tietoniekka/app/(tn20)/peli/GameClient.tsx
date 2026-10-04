@@ -90,6 +90,8 @@ export type GameQuiz = {
     /** Henkilövisan ammatti kannasta (esim. "Jääkiekkoilija") */
     roleLabel?: string | null;
   } | null;
+  /** Erä B6: henkilövisan henkilösivu — aloitusnäkymän yläotsikko ja tulosnäkymän "Lue lisää …" -linkki. */
+  henkilo?: { href: string; linkki: string } | null;
   /** K2: "Pelaa uudelleen" lataa sivun uudelleen uuden arvonnan vuoksi (kuvavisat). */
   reloadOnRestart?: boolean;
   /** K2: ohita aloitusnäkymä (?aloita=1 uudelleenlatauksen jälkeen). */
@@ -666,6 +668,11 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
         const KEY = "tn_played_quizzes";
         const arr = JSON.parse(window.localStorage.getItem(KEY) ?? "[]") as string[];
         if (!arr.includes(quiz.id)) { arr.push(quiz.id); window.localStorage.setItem(KEY, JSON.stringify(arr)); }
+        /* Erä B4: henkilösivun pelihylly näyttää viimeisimmän tuloksen ("Sait 4/5 · <fanitaso>"). */
+        const TK = "tn_quiz_results";
+        const tulokset = JSON.parse(window.localStorage.getItem(TK) ?? "{}") as Record<string, { right: number; total: number }>;
+        tulokset[quiz.id] = { right, total };
+        window.localStorage.setItem(TK, JSON.stringify(tulokset));
       }
     } catch { /* no-op */ }
     void recordPlay(finalScore);
@@ -1056,7 +1063,11 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
                     <span aria-hidden>/</span>
                     <span aria-current="page">{quiz.title}</span>
                   </nav>
-                  <span className="tng-herocat"><i aria-hidden />{hero.roleLabel ? `${category} · ${hero.roleLabel}` : quiz.genreLabel ? `${category} · ${quiz.genreLabel}` : category}</span>
+                  {quiz.henkilo ? (
+                    <a className="tng-herocat" href={quiz.henkilo.href}><i aria-hidden />{hero.roleLabel ? `${category} · ${hero.roleLabel}` : category}</a>
+                  ) : (
+                    <span className="tng-herocat"><i aria-hidden />{hero.roleLabel ? `${category} · ${hero.roleLabel}` : quiz.genreLabel ? `${category} · ${quiz.genreLabel}` : category}</span>
+                  )}
                   <h1 ref={startH1Ref} className="tng-heroh1" data-len={heroLen} style={{ ["--tng-lw" as string]: heroLw }}>{quiz.title}</h1>
                   {quiz.teaser && <p className="tng-herop">{quiz.teaser}</p>}
                   <div className="tng-herorow">
@@ -1415,6 +1426,11 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
                   </p>
                   {/* Viikkovisassa nimi on jo yläotsikossa — ei toisteta. */}
                   {!vk && <p className="tng-resname">{quiz.title}</p>}
+                  {quiz.henkilo && (
+                    <a className="tng-reshenkilo" href={quiz.henkilo.href}>
+                      {quiz.henkilo.linkki} <span aria-hidden>→</span>
+                    </a>
+                  )}
                   {/* K3: vertailu haastajaan. Tasapeli on oma tapaus — "voitit"
                       olisi väärin ja "häviisit" loukkaava kun tulos on sama. */}
                   {quiz.haaste && (

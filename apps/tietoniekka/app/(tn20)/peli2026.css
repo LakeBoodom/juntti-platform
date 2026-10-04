@@ -1076,3 +1076,9 @@
 /* max-width on annettu ch-yksiköissä (≈0,6 em), joten 12+ kirjaimen sana ei mahtuisi edes oikeassa
    koossa: min-width (voittaa max-widthin) pitää laatikon vähintään pisimmän sanan levyisenä. */
 .tn20 .tng .tng-heroh1 { font-size: min(var(--tng-h1), var(--tng-h1cap)); min-width: min(100%, calc(var(--tng-lw, 1) * 0.78em)); }
+
+/* Erä B6 (3.10.2026): henkilövisasta henkilösivulle. */
+.tn20 a.tng-herocat { text-decoration: none; }
+.tn20 a.tng-herocat:hover { text-decoration: underline; text-underline-offset: 3px; }
+.tn20 .tng-reshenkilo { align-self: flex-start; margin-top: 2px; font-size: clamp(13px, 1.2cqw, 15px); font-weight: 800; color: var(--tnAccText, #e4c98e); text-decoration: none; }
+.tn20 .tng-reshenkilo:hover { text-decoration: underline; text-underline-offset: 3px; }

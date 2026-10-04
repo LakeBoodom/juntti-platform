@@ -1,0 +1,364 @@
+/* Erä B3–B4 (3.10.2026): henkilösivu ja aihesivujen yhteiset lohkot (hub-*).
+   Lähde: Tietoniekka Henkilosivuv0.3 — 4a (desktop: kehystetty muotokuva + pelihylly ylätasolla),
+   4b (hyllyn sääntö), mobiili 3c/1a (hylly Lyhyesti-lohkon jälkeen).
+   KORTTISÄÄNTÖ: tuotannon Archivo on staattinen (CD käytti wdth 66–76), joten isot otsikot on
+   rajattu pisimmän sanan mukaan (--hs-lw / --hub-lw, 0.82 em/merkki kuten järjestyspelissä) ja
+   mitattu Range-menetelmällä 320–2450 px. */
+
+.tn20 .hs {
+  --hs-gold: var(--tn-amber, #c9a96a);
+  --hs-gold-2: #e4c98e;
+  --hs-text-2: #dcd4c4;
+  --hs-muted: #8e8676;
+  --hs-line: #241e13;
+  --hs-line-2: #3a3122;
+  --hub-violet: #c79bff;
+  --hub-violet-2: #a99fd6;
+  --hub-amber: #f0a24b;
+  --hub-amber-2: #f2c874;
+  padding-bottom: 80px;
+}
+.tn20 .hs .tn-shell.hs-shell { padding-top: 8px; max-width: 1440px; }
+
+/* ── Yläosa: mobiili ──────────────────────────────────────────────── */
+.tn20 .hs-grid, .tn20 .hs-vasen { display: flex; flex-direction: column; gap: 22px; min-width: 0; }
+.tn20 .hs-oikea { min-width: 0; margin-top: 12px; }
+.tn20 .hs-paa { display: grid; grid-template-columns: 112px minmax(0, 1fr); gap: 16px; align-items: end; }
+.tn20 .hs-muotokuva { margin: 0; display: flex; flex-direction: column; gap: 6px; }
+.tn20 .hs-passe { padding: 4px; border: 1px solid rgba(201, 169, 106, 0.55); border-radius: 4px; background: #1a160d; box-shadow: 0 18px 40px rgba(0, 0, 0, 0.45); }
+.tn20 .hs-kuva { position: relative; aspect-ratio: 3 / 4; overflow: hidden; border: 1px solid #33291a; background: linear-gradient(160deg, #9a86f5, #4b37a8); }
+.tn20 .hs-kuva img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.tn20 .hs-muotokuva figcaption { font-size: 10.5px; font-weight: 600; color: var(--hs-muted); }
+.tn20 .hs-otsikko { display: flex; flex-direction: column; gap: 8px; min-width: 0; container-type: inline-size; padding-bottom: 20px; }
+.tn20 .hs-h1 {
+  margin: 0;
+  font-family: var(--tn-font-display); font-weight: 900; text-transform: uppercase;
+  line-height: 0.92; letter-spacing: -0.02em; color: var(--tn-text);
+  font-size: min(44px, calc(100cqw / (var(--hs-lw, 8) * 0.82)));
+  overflow-wrap: normal; word-break: keep-all;
+}
+.tn20 .hs-rooli { margin: 0; font-size: 15px; font-weight: 600; color: var(--hs-text-2); }
+.tn20 .hs-esittely { margin: 0; font-size: 16px; line-height: 1.6; color: var(--hs-text-2); text-wrap: pretty; }
+
+/* ── Yläosa: desktop (4a) ─────────────────────────────────────────── */
+@media (min-width: 1100px) {
+  .tn20 .hs-kortti { background: #131109; border: 1px solid var(--hs-line); border-radius: 20px; overflow: hidden; }
+  .tn20 .hs-grid {
+    /* Hylly saa aina vähintään 340 px (3.10. Heikki: 1100–1300 px:n leveydellä hylly kapeni ja laatat
+       kasvoivat 2 × 2 -ruudukossa liian suuriksi). Vasen sarake enintään 520 px. */
+    display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(340px, 1fr);
+    gap: clamp(32px, 4vw, 64px); align-items: start;
+    padding: 28px clamp(28px, 3.6vw, 56px) 56px;
+  }
+  .tn20 .hs-vasen { gap: 26px; }
+  .tn20 .hs-oikea { margin-top: 0; }
+  .tn20 .hs-paa { grid-template-columns: 200px minmax(0, 1fr); gap: 28px; }
+  .tn20 .hs-passe { padding: 7px; }
+  .tn20 .hs-otsikko { gap: 12px; padding-bottom: 26px; }
+  .tn20 .hs-h1 { font-size: min(48px, calc(100cqw / (var(--hs-lw, 8) * 0.82))); }
+  .tn20 .hs-rooli { font-size: 17px; }
+}
+
+/* ── Faktalohko (hub) ─────────────────────────────────────────────── */
+.tn20 .hub-fakta {
+  display: grid; grid-template-columns: auto minmax(0, 1fr); column-gap: 18px; align-items: center;
+  border-top: 3px double var(--hs-gold, #c9a96a); border-bottom: 1px solid var(--hs-line-2, #3a3122); padding: 16px 0;
+}
+.tn20 .hub-fakta-suuri { display: flex; flex-direction: column; gap: 8px; padding-right: 18px; border-right: 1px solid var(--hs-line-2, #3a3122); }
+.tn20 .hub-fakta-luku {
+  font-family: var(--tn-font-display); font-weight: 900; line-height: 0.8; letter-spacing: -0.04em; color: var(--tn-text);
+  font-size: clamp(60px, 15vw, 72px); white-space: nowrap;
+}
+.tn20 .hub-fakta-luku--vali { font-size: clamp(40px, 11vw, 52px); letter-spacing: -0.03em; }
+.tn20 .hub-fakta-yks { font-size: 0.36em; letter-spacing: 0; color: var(--hs-gold, #c9a96a); }
+.tn20 .hub-fakta-ala { font-size: 13px; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; color: var(--hs-gold, #c9a96a); }
+.tn20 .hub-fakta-rivit { display: flex; flex-direction: column; gap: 7px; font-size: 15px; line-height: 1.35; color: var(--hs-text-2, #dcd4c4); min-width: 0; }
+.tn20 .hub-fakta-rivit strong { color: var(--tn-text); }
+.tn20 .hub-fakta-tayttaa { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+@media (min-width: 1100px) { .tn20 .hub-fakta-rivit { font-size: 16px; gap: 8px; } }
+
+.tn20 .hub-chip { align-self: flex-start; display: inline-block; padding: 3px 9px; border-radius: 999px; font-size: 13px; line-height: 1.3; }
+.tn20 .hub-chip--kulta { background: rgba(201, 169, 106, 0.16); border: 1px solid rgba(201, 169, 106, 0.5); font-weight: 800; color: var(--hs-gold-2, #e4c98e); }
+.tn20 .hub-chip--neutraali { border: 1px solid #4a3f2c; font-weight: 700; color: #c8bfae; }
+
+/* ── Lyhyesti (hub) ───────────────────────────────────────────────── */
+.tn20 .hub-lyhyesti-otsikko {
+  font-size: 11px; font-weight: 800; letter-spacing: 0.18em; text-transform: uppercase; color: var(--hs-muted, #8e8676);
+  padding-bottom: 8px; border-bottom: 1px solid var(--hs-line-2, #3a3122);
+}
+.tn20 .hub-lyhyesti dl { margin: 0; }
+.tn20 .hub-lyhyesti-rivi {
+  display: grid; grid-template-columns: 110px minmax(0, 1fr); gap: 12px; padding: 12px 0;
+  border-bottom: 1px solid var(--hs-line, #241e13); font-size: 15px;
+}
+.tn20 .hub-lyhyesti dt { font-size: 12px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: var(--hs-gold, #c9a96a); padding-top: 2px; overflow-wrap: normal; word-break: keep-all; }
+.tn20 .hub-lyhyesti dd { margin: 0; font-weight: 600; color: var(--tn-text); }
+@media (min-width: 1100px) {
+  .tn20 .hub-lyhyesti-rivi { grid-template-columns: 150px minmax(0, 1fr); font-size: 16px; }
+}
+
+@media (min-width: 1100px) {
+  .tn20 .hub-fakta { padding: 18px 0; column-gap: 20px; }
+  .tn20 .hub-fakta-luku { font-size: 76px; }
+  .tn20 .hub-fakta-luku--vali { font-size: 56px; }
+}
+
+/* ── Pelihylly (hub, design 4a/4b) ────────────────────────────────── */
+.tn20 .hub-hylly { display: flex; flex-direction: column; gap: 18px; container-type: inline-size; }
+.tn20 .hub-hylly-head { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; padding-bottom: 12px; border-bottom: 1px solid var(--hs-line-2, #3a3122); }
+.tn20 .hub-hylly-otsikko {
+  margin: 0; font-family: var(--tn-font-display); font-weight: 900; text-transform: uppercase; letter-spacing: -0.01em;
+  font-size: clamp(22px, 6vw, 28px); line-height: 1.05; color: var(--tn-text); overflow-wrap: normal; word-break: keep-all; min-width: 0;
+}
+.tn20 .hub-hylly-n { flex: none; font-size: 12px; font-weight: 800; letter-spacing: 0.16em; text-transform: uppercase; color: var(--hs-muted, #8e8676); }
+.tn20 .hub-eyebrow { display: block; font-size: 12px; font-weight: 800; letter-spacing: 0.2em; text-transform: uppercase; color: var(--hs-gold, #c9a96a); }
+.tn20 .hub-tyyppi {
+  align-self: flex-start; height: 24px; display: inline-flex; align-items: center; padding: 0 10px; border-radius: 6px;
+  font-size: 11px; font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase; white-space: nowrap; color: #180f26;
+}
+.tn20 .hub-tyyppi--ika { background: var(--hub-violet, #c79bff); }
+.tn20 .hub-tyyppi--visa { background: var(--hub-amber, #f0a24b); color: #131109; }
+
+/* Nosto */
+.tn20 .hub-nosto {
+  position: relative; display: flex; flex-direction: column; gap: 14px; padding: 20px 22px; border-radius: 20px; overflow: hidden;
+  color: var(--tn-text); text-decoration: none;
+  border: 1px solid color-mix(in srgb, var(--hub-acc, #c79bff) 45%, transparent);
+  background: radial-gradient(90% 130% at 78% 62%, color-mix(in srgb, var(--hub-acc, #a76eff) 24%, transparent), rgba(19, 17, 9, 0) 64%), #17140c;
+}
+.tn20 .hub-nosto--ika {
+  border-color: rgba(199, 155, 255, 0.45);
+  background: radial-gradient(90% 130% at 78% 62%, rgba(167, 110, 255, 0.24), rgba(19, 17, 9, 0) 64%), #17140c;
+  box-shadow: 0 30px 70px -36px rgba(140, 80, 230, 0.65);
+}
+.tn20 .hub-nosto--visa {
+  border-color: rgba(240, 162, 75, 0.5);
+  background: radial-gradient(70% 160% at 0% 50%, rgba(240, 162, 75, 0.2), rgba(19, 17, 9, 0) 70%), #17140c;
+}
+.tn20 .hub-nosto-merkit { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.tn20 .hub-nosto-kysymys { font-size: 11px; font-weight: 800; letter-spacing: 0.16em; text-transform: uppercase; color: var(--hub-violet-2, #a99fd6); }
+.tn20 .hub-nosto-otsikko {
+  font-family: var(--tn-font-display); font-weight: 900; text-transform: uppercase; line-height: 0.92; letter-spacing: -0.02em;
+  /* CD 4b: 30 px (4a:n 44 px teki nostosta liian suuren vasempaan sarakkeeseen nähden, Heikki 3.10.). */
+  font-size: min(30px, calc((100cqw - 44px) / (var(--hub-lw, 10) * 0.82)));
+  overflow-wrap: normal; word-break: keep-all;
+}
+.tn20 .hub-nosto-kuvaus { font-size: 15px; font-weight: 600; line-height: 1.45; color: var(--hub-violet-2, #a99fd6); text-wrap: pretty; }
+/* Laatat kiinteän kokoisina (CD 4b: 52 × 66 px; nimellinen versio enintään 88 px leveä), ei koskaan
+   sarakkeen levyisiä — muuten nosto paisuu (Heikki 3.10.). */
+.tn20 .hub-ika-laatat { position: relative; display: grid; grid-template-columns: repeat(4, minmax(0, 88px)); justify-content: start; gap: 12px; padding-top: 8px; }
+.tn20 .hub-ika-viiva { position: absolute; left: 0; right: 0; top: 42%; height: 1px; background: linear-gradient(90deg, rgba(199, 155, 255, 0), rgba(199, 155, 255, 0.55) 14%, rgba(199, 155, 255, 0.55) 86%, rgba(199, 155, 255, 0)); }
+.tn20 .hub-ika-laatta { position: relative; display: flex; flex-direction: column; gap: 7px; min-width: 0; }
+.tn20 .hub-ika-kuva {
+  position: relative; display: block; aspect-ratio: 4 / 5; border-radius: 12px; overflow: hidden;
+  border: 1px solid rgba(199, 155, 255, 0.45); background: #2a1d45; box-shadow: 0 22px 44px -22px rgba(0, 0, 0, 0.95);
+}
+.tn20 .hub-ika-kuva img { width: 100%; height: 100%; object-fit: cover; display: block; filter: grayscale(1); }
+.tn20 .hub-ika-savy { position: absolute; inset: 0; pointer-events: none; background: linear-gradient(180deg, rgba(120, 60, 200, 0.42), rgba(24, 15, 38, 0.78)); }
+.tn20 .hub-ika-laatta--oma .hub-ika-kuva { border-color: var(--tn-lime, #b6ff3c); box-shadow: 0 0 0 3px rgba(182, 255, 60, 0.16), 0 18px 36px -18px rgba(0, 0, 0, 0.95); transform: translateY(-4px) rotate(-1.5deg); }
+.tn20 .hub-ika-laatta--oma .hub-ika-savy { background: linear-gradient(180deg, rgba(120, 60, 200, 0.3), rgba(24, 15, 38, 0.72)); }
+.tn20 .hub-ika-merkki {
+  position: absolute; left: 5px; top: 5px; min-width: 18px; height: 18px; display: flex; align-items: center; justify-content: center; padding: 0 6px;
+  border-radius: 5px; background: var(--hub-violet, #c79bff); color: #180f26; font-family: var(--tn-font-display); font-weight: 900; font-size: 11px;
+}
+.tn20 .hub-ika-merkki--oma { background: var(--tn-lime, #b6ff3c); color: #131109; font-family: var(--tn-font-body); font-size: 9px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; padding: 0 4px; }
+.tn20 .hub-ika-nimi { font-size: 11.5px; font-weight: 700; line-height: 1.2; color: #cfc7b6; overflow-wrap: normal; word-break: keep-all; }
+.tn20 .hub-ika-laatta--oma .hub-ika-nimi { color: var(--tn-text); font-weight: 800; }
+/* "+4" (pooli 8, kortissa 4) laattarivin perässä. */
+.tn20 .hub-ika-laatat { grid-template-columns: repeat(4, minmax(0, 88px)) auto; }
+.tn20 .hub-ika-lisaa {
+  align-self: center; justify-self: start; margin-top: -18px; min-width: 40px; height: 32px; padding: 0 10px; border-radius: 999px;
+  display: inline-flex; align-items: center; justify-content: center;
+  border: 1px solid rgba(199, 155, 255, 0.45); color: var(--hub-violet-2, #a99fd6); font-family: var(--tn-font-display); font-weight: 900; font-size: 13px;
+}
+.tn20 .hub-nosto-ala { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+.tn20 .hub-nosto-tilastot { font-size: 11.5px; color: var(--hs-muted, #8e8676); }
+.tn20 .hub-ika-akseli { max-width: calc(4 * 88px + 3 * 12px); display: flex; align-items: center; gap: 12px; font-size: 10.5px; font-weight: 800; letter-spacing: 0.2em; text-transform: uppercase; color: var(--hub-violet-2, #a99fd6); }
+.tn20 .hub-ika-akseli-viiva { flex: 1; height: 1px; background: rgba(199, 155, 255, 0.3); }
+.tn20 .hub-cta-lime {
+  align-self: flex-start; height: 52px; display: inline-flex; align-items: center; gap: 12px; padding: 0 28px; border-radius: 999px;
+  background: var(--tn-lime, #b6ff3c); color: #131109; font-family: var(--tn-font-display); font-weight: 900; font-size: 16px; text-transform: uppercase;
+  box-shadow: 0 12px 30px -14px rgba(182, 255, 60, 0.7); white-space: nowrap;
+}
+@container (min-width: 480px) {
+  .tn20 .hub-nosto { padding: 24px; gap: 16px; }
+}
+
+/* Nostoa seuraavat: rivi (1) tai kortit (2–3) */
+.tn20 .hub-rivi {
+  display: flex; align-items: center; gap: 16px; padding: 16px 18px; border-radius: 18px; color: var(--tn-text); text-decoration: none;
+  border: 1px solid color-mix(in srgb, var(--hub-acc, #f0a24b) 50%, transparent);
+  background: radial-gradient(70% 160% at 0% 50%, color-mix(in srgb, var(--hub-acc, #f0a24b) 20%, transparent), rgba(19, 17, 9, 0) 70%), #17140c;
+}
+.tn20 .hub-rivi--visa { --hub-acc: #f0a24b; }
+.tn20 .hub-rivi-ikoni {
+  flex: none; width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; border-radius: 14px;
+  background: var(--hub-amber, #f0a24b); color: #131109; font-family: var(--tn-font-display); font-weight: 900; font-size: 28px; line-height: 1;
+}
+.tn20 .hub-rivi-teksti { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 5px; }
+.tn20 .hub-rivi-eyebrow { font-size: 11px; font-weight: 800; letter-spacing: 0.16em; text-transform: uppercase; color: color-mix(in srgb, var(--hub-acc, #f0a24b) 70%, #fff); }
+.tn20 .hub-rivi--visa .hub-rivi-eyebrow { color: var(--hub-amber-2, #f2c874); }
+.tn20 .hub-rivi-nimi {
+  font-family: var(--tn-font-display); font-weight: 900; text-transform: uppercase; line-height: 1;
+  /* Varattu: ikoni 48 + välit 32 + CTA ~150 + padding 40 (mitattu 3.10.: 220 jätti 2 px ylivuodon). */
+  font-size: min(26px, calc((100cqw - 270px) / (var(--hub-lw, 10) * 0.84))); overflow-wrap: normal; word-break: keep-all;
+}
+.tn20 .hub-rivi-cta {
+  flex: none; display: inline-flex; align-items: center; height: 44px; padding: 0 18px; border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--hub-acc, #f0a24b) 70%, transparent); color: var(--hub-amber-2, #f2c874);
+  font-family: var(--tn-font-display); font-weight: 900; font-size: 14px; text-transform: uppercase; white-space: nowrap;
+}
+/* Kapeassa hyllyssä (mobiili) rivi pinoutuu: nimi + tulos ylös, CTA alle täysleveänä. */
+@container (max-width: 479px) {
+  /* Kapea hylly (mobiili): CD 4b:n tiivis rivi — 4 pientä laattaa ilman nimiä (nimet ruudunlukijalle),
+     koska "Schumacher" ei mahdu ~60 px:n laattaan (KORTTISÄÄNTÖ, mitattu 3.10.). */
+  .tn20 .hub-ika-laatat { grid-template-columns: repeat(4, minmax(0, 60px)) auto; gap: 10px; }
+  .tn20 .hub-ika-lisaa { margin-top: 0; }
+  .tn20 .hub-ika-nimi { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; }
+  .tn20 .hub-ika-akseli { max-width: calc(4 * 60px + 3 * 10px); }
+  .tn20 .hub-rivi { flex-wrap: wrap; }
+  .tn20 .hub-rivi-nimi { font-size: min(22px, calc((100cqw - 110px) / (var(--hub-lw, 10) * 0.82))); }
+  .tn20 .hub-rivi-cta { width: 100%; justify-content: center; }
+}
+.tn20 .hub-rivit { display: grid; gap: 12px; }
+.tn20 .hub-rivit--2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.tn20 .hub-rivit--3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+@container (max-width: 479px) { .tn20 .hub-rivit--3 { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.tn20 .hub-rivi--kortti { position: relative; flex-direction: column; align-items: stretch; justify-content: space-between; gap: 14px; padding: 18px; overflow: hidden; }
+.tn20 .hub-rivi--kortti::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 3px; background: var(--hub-acc, #f0a24b); }
+.tn20 .hub-rivi--kortti .hub-rivi-nimi { font-family: var(--tn-font-body); text-transform: none; font-size: 17px; font-weight: 700; line-height: 1.25; }
+.tn20 .hub-rivi--kortti .hub-rivi-cta { border: 0; padding: 0; height: auto; font-family: var(--tn-font-body); font-size: 14px; font-weight: 800; text-transform: none; color: var(--hub-acc, #f0a24b); }
+.tn20 .hub-hylly-kaikki { align-self: flex-start; font-size: 14px; font-weight: 700; color: var(--hs-gold, #c9a96a); text-decoration: none; }
+
+/* Henkilövisan tulos (localStorage) */
+.tn20 .hub-visa-tulos { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; font-size: 14px; font-weight: 700; color: var(--hs-gold-2, #e4c98e); }
+.tn20 .hub-visa-palkit { display: flex; gap: 4px; }
+.tn20 .hub-visa-palkit span { width: 14px; height: 6px; border-radius: 3px; background: #3a3122; }
+.tn20 .hub-visa-palkit span.on { background: var(--hs-gold, #c9a96a); }
+
+/* Muista kokoelmista */
+.tn20 .hub-muista { display: flex; flex-direction: column; margin-top: 8px; }
+.tn20 .hub-muista-otsikko { font-size: 11px; font-weight: 800; letter-spacing: 0.18em; text-transform: uppercase; color: var(--hs-muted, #8e8676); padding-bottom: 6px; }
+.tn20 .hub-muista ul { list-style: none; margin: 0; padding: 0; border-bottom: 1px solid var(--hs-line, #241e13); }
+.tn20 .hub-muista a {
+  display: flex; justify-content: space-between; align-items: center; gap: 12px; min-height: 52px; padding: 6px 0;
+  border-top: 1px solid var(--hs-line, #241e13); font-size: 15px; font-weight: 600; color: var(--tn-text); text-decoration: none;
+}
+.tn20 .hub-muista a:hover { color: var(--hs-gold-2, #e4c98e); }
+.tn20 .hub-muista-meta { flex: none; font-size: 13px; color: var(--hs-muted, #8e8676); }
+
+.tn20 .hub-h3 {
+  margin: 0; font-family: var(--tn-font-display); font-weight: 900; text-transform: uppercase;
+  font-size: clamp(20px, 5vw, 22px); line-height: 1.05; color: var(--tn-text);
+  overflow-wrap: normal; word-break: keep-all;
+}
+
+/* ── Muut-laatat (hub) ────────────────────────────────────────────── */
+.tn20 .hub-laatat { display: flex; flex-direction: column; gap: 12px; container-type: inline-size; }
+/* Mitattu 3.10.: "MUUT MOOTTORIURHEILIJAT" + "Kaikki 16 →" ei mahdu riville 320 px:ssä → rivitys. */
+.tn20 .hub-laatat-head { display: flex; align-items: baseline; justify-content: space-between; gap: 6px 12px; flex-wrap: wrap; }
+.tn20 .hub-laatat-head .hub-h3 { min-width: 0; font-size: min(22px, calc(100cqw / (var(--hub-lw, 10) * 0.82))); }
+.tn20 .hub-laatat-kaikki { flex: none; font-size: 14px; font-weight: 700; color: var(--hs-gold, #c9a96a); text-decoration: none; }
+.tn20 .hub-laatat-n { flex: none; font-size: 13px; font-weight: 700; color: var(--hs-muted, #8e8676); }
+.tn20 .hub-laatat-lista {
+  /* Ei reunan yli -vuotoa: vw sisältää vierityspalkin → 768 px:ssä syntyi vaakavieritys (mitattu 3.10.). */
+  list-style: none; margin: 0; padding: 0 0 4px;
+  display: flex; gap: 12px; overflow-x: auto; scrollbar-width: none;
+}
+.tn20 .hub-laatat-lista li { flex: none; width: 104px; }
+.tn20 .hub-laatta { display: flex; flex-direction: column; gap: 6px; color: var(--tn-text); text-decoration: none; }
+.tn20 .hub-laatta-kuva {
+  position: relative; display: block; aspect-ratio: 4 / 5; border-radius: 12px; overflow: hidden;
+  border: 1px solid #33291a; background: linear-gradient(160deg, #8c76f0, #3e2e8c);
+}
+.tn20 .hub-laatta-kuva img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.tn20 .hub-laatta-ini, .tn20 .hs-kuva .hub-laatta-ini {
+  position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+  font-family: var(--tn-font-display); font-weight: 900; font-size: 28px; color: rgba(245, 240, 230, 0.6);
+}
+.tn20 .hub-laatta-nimi { font-size: 14px; font-weight: 700; line-height: 1.2; overflow-wrap: normal; word-break: keep-all; }
+.tn20 .hub-laatta-ala { font-size: 13px; color: #a79e8c; }
+.tn20 .hub-duotone { position: absolute; inset: 0; pointer-events: none; mix-blend-mode: color; background: #7a5af8; }
+@media (min-width: 1100px) {
+  .tn20 .hub-laatat-lista { display: grid; grid-template-columns: repeat(8, minmax(0, 1fr)); gap: 14px; margin: 0; padding: 0; overflow: visible; }
+  .tn20 .hub-laatat-lista li { width: auto; }
+}
+
+/* ── Alaosa: muut henkilöt (8), samana päivänä, lähteet ─────────── */
+.tn20 .hs-ala { display: flex; flex-direction: column; gap: 34px; margin-top: 40px; }
+@media (min-width: 1100px) {
+  .tn20 .hs-ala { margin-top: 0; padding: 40px clamp(28px, 3.6vw, 56px) 48px; border-top: 1px solid var(--hs-line); }
+}
+.tn20 .hub-lahde { display: flex; gap: 16px; flex-wrap: wrap; margin: 0; font-size: 12px; color: var(--hs-muted, #8e8676); }
+.tn20 .hub-lahde a { color: inherit; }
+
+/* ── Hakemisto /henkilot (design 3d/3e) ───────────────────────────── */
+.tn20 .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+.tn20 .hk-shell { max-width: 760px; padding-top: 8px; }
+.tn20 .hk-head { display: flex; flex-direction: column; gap: 6px; container-type: inline-size; }
+.tn20 .hk-h1 {
+  margin: 0; font-family: var(--tn-font-display); font-weight: 900; text-transform: uppercase; line-height: 0.9; letter-spacing: -0.02em;
+  font-size: min(clamp(32px, 9vw, 56px), calc(100cqw / (var(--hk-lw, 10) * 0.82))); color: var(--tn-text); overflow-wrap: normal; word-break: keep-all;
+}
+.tn20 .hk-lead { margin: 0; font-size: 15px; color: #b0a794; }
+.tn20 .hk { display: flex; flex-direction: column; margin-top: 18px; }
+.tn20 .hk-haku input {
+  width: 100%; min-height: 48px; padding: 0 16px; border-radius: 12px; background: #1c1810; border: 1px solid var(--hs-line-2, #3a3122);
+  color: var(--tn-text); font: inherit; font-size: 15px;
+}
+.tn20 .hk-tabs { margin-top: 16px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); border-bottom: 1px solid var(--hs-line-2, #3a3122); }
+.tn20 .hk-tabs button {
+  min-height: 44px; background: none; border: 0; border-bottom: 2px solid transparent; color: var(--hs-muted, #8e8676);
+  font: inherit; font-size: 14px; font-weight: 700; cursor: pointer;
+}
+.tn20 .hk-tabs button.on { color: var(--tn-text); font-weight: 800; border-bottom-color: var(--hs-gold, #c9a96a); }
+.tn20 .hk-az { display: grid; grid-template-columns: minmax(0, 1fr) 24px; gap: 4px; }
+.tn20 .hk-az[hidden], .tn20 .hk-ryhmat[hidden], .tn20 .hk-synttarit[hidden] { display: none; }
+.tn20 .hk-kirjain { display: flex; flex-direction: column; scroll-margin-top: 80px; }
+.tn20 .hk-kirjain-otsikko {
+  margin: 0; padding: 18px 0 6px; font-family: var(--tn-font-display); font-weight: 900; font-size: 22px; color: var(--hs-gold, #c9a96a);
+  border-bottom: 1px solid var(--hs-line-2, #3a3122);
+}
+.tn20 .hk-indeksi { position: sticky; top: 80px; align-self: start; display: flex; flex-direction: column; align-items: center; gap: 2px; padding-top: 22px; }
+.tn20 .hk-indeksi a { font-size: 10.5px; font-weight: 800; color: var(--hs-muted, #8e8676); text-decoration: none; line-height: 1.5; }
+.tn20 .hk-tyhja { color: var(--hs-muted, #8e8676); padding: 20px 0; }
+.tn20 .hk-rivi {
+  display: grid; grid-template-columns: 44px minmax(0, 1fr) auto; gap: 12px; align-items: center; min-height: 64px;
+  border-bottom: 1px solid var(--hs-line, #241e13); color: var(--tn-text); text-decoration: none;
+}
+.tn20 .hk-rivi:hover .hk-rivi-nimi { color: var(--hs-gold-2, #e4c98e); }
+.tn20 .hk-rivi-kuva { position: relative; width: 44px; height: 44px; border-radius: 10px; overflow: hidden; background: linear-gradient(160deg, #8c76f0, #3e2e8c); }
+.tn20 .hk-rivi-kuva img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.tn20 .hk-rivi-kuva .hub-laatta-ini { font-size: 15px; }
+.tn20 .hk-rivi-teksti { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.tn20 .hk-rivi-nimi { font-size: 16px; font-weight: 700; overflow-wrap: normal; word-break: keep-all; }
+.tn20 .hk-rivi-meta { font-size: 13px; color: #a79e8c; }
+.tn20 .hk-rivi-nuoli { color: var(--hs-gold, #c9a96a); font-size: 16px; padding-right: 4px; }
+.tn20 .hk-ryhma { display: flex; flex-direction: column; gap: 12px; padding: 16px 0; border-bottom: 1px solid var(--hs-line, #241e13); }
+.tn20 .hk-ryhma-head, .tn20 .hk-kuukausi { display: flex; justify-content: space-between; align-items: center; gap: 12px; color: var(--tn-text); text-decoration: none; }
+.tn20 .hk-ryhma-nimi { font-size: 17px; font-weight: 700; }
+.tn20 .hk-ryhma-n { flex: none; display: flex; gap: 10px; align-items: center; font-size: 14px; font-weight: 700; color: var(--hs-muted, #8e8676); }
+.tn20 .hk-ryhma-n span { color: var(--hs-gold, #c9a96a); }
+.tn20 .hk-chipit { display: flex; flex-wrap: wrap; gap: 6px; }
+.tn20 .hk-chipit--sivu { margin: 18px 0 4px; }
+.tn20 .hk-chip {
+  display: inline-flex; align-items: center; gap: 6px; min-height: 34px; padding: 0 12px; border-radius: 999px;
+  border: 1px solid var(--hs-line-2, #3a3122); background: #1c1810; color: var(--tn-text); font-size: 13.5px; font-weight: 600; text-decoration: none;
+}
+.tn20 .hk-chip span { color: var(--hs-muted, #8e8676); font-weight: 700; }
+.tn20 .hk-chip.on { border-color: var(--hs-gold, #c9a96a); color: var(--hs-gold-2, #e4c98e); }
+.tn20 .hk-tanaan { display: flex; flex-direction: column; gap: 4px; padding: 18px 0 8px; }
+.tn20 .hk-kuukaudet { display: flex; flex-direction: column; }
+.tn20 .hk-kuukausi { min-height: 56px; border-bottom: 1px solid var(--hs-line, #241e13); font-size: 16px; font-weight: 700; }
+
+/* ── Henkilöhubin "Selaa kaikkia" (erä B6): 7 ryhmäkorttia + hakemistolinkki ── */
+.tn20 .hs-hubryhmat-head { display: flex; align-items: baseline; justify-content: space-between; gap: 6px 16px; flex-wrap: wrap; margin-bottom: 14px; }
+.tn20 .hs-hubryhmat-head h2 { margin: 0; font-size: clamp(22px, 5vw, 30px); text-transform: uppercase; overflow-wrap: normal; word-break: keep-all; }
+.tn20 .hs-hubryhmat-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 240px), 1fr)); gap: 10px; }
+.tn20 .hs-hubryhma {
+  display: flex; flex-direction: column; justify-content: space-between; gap: 10px; min-height: 92px; padding: 16px 18px; border-radius: 14px;
+  background: #1c1810; border: 1px solid #3a3122; color: var(--tn-text); text-decoration: none;
+}
+.tn20 .hs-hubryhma:hover { border-color: rgba(201, 169, 106, 0.6); }
+.tn20 .hs-hubryhma-nimi { font-size: 17px; font-weight: 700; line-height: 1.25; overflow-wrap: normal; word-break: keep-all; }
+.tn20 .hs-hubryhma-n { font-size: 13.5px; font-weight: 700; color: #c9a96a; }

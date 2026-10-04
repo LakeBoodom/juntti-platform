@@ -7,6 +7,7 @@
 // Mobiiliteksti on mallipohjan oma variantti, ei katkaisu: nimi jätetään pois
 // virkkeen alusta, koska se on jo otsikkorivillä.
 
+import { henkiloHref } from "./henkiloSlug";
 import { visaHref } from "@/lib/visaHref";
 import { pvmOsat } from "@/lib/aika";
 
@@ -45,6 +46,8 @@ export type PaivanSankariData = {
   /** CSS object-position pyöreään kehykseen */
   kuvaPos: string;
   playHref: string;
+  /** Erä B6: rivi vie henkilösivulle (visa on sivun pelihyllyssä). */
+  henkiloHref: string;
 };
 
 /** Pyöreät vuodet: 40, 50, … 100 (Heikki 19.9.2026: "jo 40 vuotta alkaen";
@@ -106,6 +109,7 @@ export function muotoileSankari(s: SankariRivi): PaivanSankariData {
     teksti: oma ? { desktop: oma, mobile: oma } : { desktop, mobile },
     kuva: s.image_url || null,
     kuvaPos: `${pct(s.image_focal_x, 0.5)} ${pct(s.image_focal_y, 0.3)}`,
+    henkiloHref: henkiloHref(s.name),
     playHref: `${visaHref({ slug: s.quiz_slug, custom_slug: s.custom_slug, id: s.quiz_id })}${s.quiz_slug || s.custom_slug ? "?" : "&"}paivan_sankari=1`,
   };
 }
