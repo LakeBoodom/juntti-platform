@@ -73,8 +73,13 @@ export async function haeVaalitHub(): Promise<VaalitHub> {
   }));
 
   const kaikki = (celebs.data ?? []) as Celeb[];
-  const poliitikot = [...kaikki]
-    .sort((a, b) => (b.image_url ? 1 : 0) - (a.image_url ? 1 : 0) || (b.priority ?? 0) - (a.priority ?? 0) || a.name.localeCompare(b.name, "fi"))
+  // 12 kuvallista poliitikkoa, järjestys vaihtuu päivittäin (aakkosjärjestys toi joka päivä samat
+  // A-alkuiset, ensimmäisenä Abraham Lincolnin). Siemen = päivä → ISR-sivu pysyy samana koko päivän.
+  const t = new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Helsinki" }).format(new Date());
+  let siemen = [...t].reduce((h, c) => (h * 31 + c.charCodeAt(0)) >>> 0, 7);
+  const rnd = () => ((siemen = (siemen * 1664525 + 1013904223) >>> 0) / 4294967296);
+  const kuvalliset = kaikki.filter((c) => c.image_url).map((c) => ({ c, r: rnd() })).sort((a, b) => a.r - b.r).map((x) => x.c);
+  const poliitikot = [...kuvalliset, ...kaikki.filter((c) => !c.image_url)]
     .slice(0, 12)
     .map((c) => ({ href: henkiloHref(c.name), name: c.name, role: c.role, image_url: c.image_url }));
 

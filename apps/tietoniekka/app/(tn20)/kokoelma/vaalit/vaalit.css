@@ -100,6 +100,13 @@
 .tn20 .vl-rivi > * { scroll-snap-align: start; }
 @media (min-width: 760px) {
   .tn20 .vl-rivi--ruudukko { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); overflow: visible; }
+  /* Leveässä ruudukossa 16:10 jättäisi ~190 px tyhjää motiivialuetta → matalampi. */
+  .tn20 .vl-rivi--ruudukko .vl-kortti-kuva { aspect-ratio: 16 / 7; }
+  /* Poliitikot: desktopilla 2 riviä × 6 (katselmus §2.3: ei leikkautuvaa vaakariviä ilman vihjettä). */
+  .tn20 .vl-rivi--henkilot { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); overflow: visible; }
+}
+@media (min-width: 1100px) {
+  .tn20 .vl-rivi--henkilot { grid-template-columns: repeat(6, minmax(0, 1fr)); }
 }
 .tn20 .vl-kortti {
   flex: 0 0 clamp(212px, 22cqw, 240px); display: flex; flex-direction: column; overflow: hidden;
