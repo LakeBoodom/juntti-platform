@@ -2,6 +2,8 @@
 // Kumpi?) ja niiden mode-chipit renderöidään VAIN tämän rekisterin perusteella: kun peli julkaistaan,
 // se lisätään tänne ja rivi ilmestyy hubiin ilman hubin koodimuutosta. Tyhjä lista = ei riviä, ei
 // "Tulossa"-paikkoja (Cowork 5.10.: ei tyhjiä paikkoja).
+import { JULKAISTUT, pakkaHref } from "./jarjesta/pakat";
+
 export type PeliTyyppi = "paivan-peli" | "jarjesta" | "kumpi";
 
 export type KokoelmaPeli = {
@@ -16,7 +18,17 @@ export type KokoelmaPeli = {
   korosta?: number;
 };
 
-export const PELIT: KokoelmaPeli[] = [];
+// Laita järjestykseen -pakat tulevat suoraan pakkakonfiguraatiosta (julkaistu: true).
+export const PELIT: KokoelmaPeli[] = [
+  ...JULKAISTUT.map((p) => ({
+    kokoelma: p.collection.slug,
+    tyyppi: "jarjesta" as const,
+    slug: p.slug,
+    otsikko: p.kortti.otsikko,
+    meta: p.kortti.meta,
+    href: pakkaHref(p),
+  })),
+];
 
 export const kokoelmanPelit = (kokoelma: string, tyyppi?: PeliTyyppi) =>
   PELIT.filter((p) => p.kokoelma === kokoelma && (!tyyppi || p.tyyppi === tyyppi));
