@@ -11,6 +11,7 @@ import Crumbs from "@/components/tn20/Crumbs";
 import { KokoelmaLd } from "@/components/tn20/KokoelmaLd";
 import { jakoMeta } from "@/lib/jakoMeta";
 import { tanaan } from "@/lib/henkilo";
+import { helsinginPaiva } from "@/lib/aika";
 import { kokoelmanPelit, type KokoelmaPeli } from "@/lib/pelirekisteri";
 import { haeVaalitHub, pisteetPolkuna, puolikaari, VAALIEN_VAIHEET, VAALIPAIVA, type VaalitVisa } from "@/lib/vaalit/data";
 import VaalipiiriKartta from "./VaalipiiriKartta";
@@ -231,7 +232,7 @@ export default async function VaalitHub() {
             </div>
             {paivanPelit.map((p) => (
               <a key={p.href} className="vl-paivan-kortti" href={p.href}>
-                <span className="vl-tagi vl-tagi--vahva">Päivän peli</span>
+                <span className="vl-tagi vl-tagi--vahva">Päivän peli{p.numero ? ` · #${p.numero(helsinginPaiva().iso)}` : ""}</span>
                 <span className="vl-paivan-otsikko">{p.otsikko}</span>
                 <span className="vl-kortti-meta">{p.meta}</span>
                 <span className="vl-cta">Pelaa</span>

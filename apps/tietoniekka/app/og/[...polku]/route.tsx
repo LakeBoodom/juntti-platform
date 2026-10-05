@@ -271,6 +271,7 @@ const KUVAVISA_KUVA: Record<string, string> = {
 const SIVUT: Record<string, { eyebrow: string; otsikko: string; kuva: string; accent: string }> = {
   "tupla-tai-kuitti": { eyebrow: "Pelimuoto", otsikko: "Tupla tai kuitti", kuva: "/20/tupla/banneri-desk.webp", accent: "#B6FF3C" },
   kuntaliitos: { eyebrow: "Pelimuoto", otsikko: "Kuntaliitos", kuva: "/20/kuntaliitos/palapeli.webp", accent: "#E8A320" },
+  vaalipiiriketju: { eyebrow: "Päivän peli", otsikko: "Vaalipiiriketju", kuva: "/20/vaalit/hero.webp", accent: "#B4A5FF" },
   rajanaapurit: { eyebrow: "Pelimuoto", otsikko: "Rajanaapurit", kuva: "/20/rajanaapurit/banneri-kartta.webp", accent: "#4FD1F5" },
   ikajarjestys: { eyebrow: "Tietoketju", otsikko: "Ikäjärjestys", kuva: "/20/teema-tunnetut-henkilot.webp", accent: "#C9A96A" },
   megavisat: { eyebrow: "Pitkät visat", otsikko: "Megavisat", kuva: "/20/megavisa.webp", accent: KULTA },
