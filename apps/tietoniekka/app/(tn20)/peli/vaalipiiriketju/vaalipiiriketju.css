@@ -98,6 +98,9 @@
 /* Laatta (mobiili, 171 px @ 390) */
 .tn20 .vpk-kortti--laatta { display: flex; flex-direction: column; gap: 8px; min-height: 92px; height: 100%; padding: 11px 12px 10px; }
 .tn20 .vpk-kortti--laatta[data-tila="ok"], .tn20 .vpk-kortti--laatta[data-tila="bad"] { min-height: 112px; }
+/* Numeromerkin (28 px, top 8) tila varataan nimelle aina: oikea reuna + korkeus, jolloin puolue alkaa
+   merkin alapuolelta eikä kortti hyppää napautettaessa (mitattu 5.10.: 320–340 px merkki peitti puolueen). */
+.tn20 .vpk-kortti--laatta .vpk-kortti-nimi { padding-right: 30px; min-height: 26px; }
 /* 320 px: laatta 140 px → pisin puolue (Kristillisdemokraatit) vaatii 11 px ja kapeamman reunan (mitattu 5.10., CD 12 px). */
 @media (max-width: 359.98px) {
   .tn20 .vpk-kortti--laatta { padding: 11px 10px 10px; }
