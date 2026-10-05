@@ -31,7 +31,10 @@ import {
 
 const TOISTOVALI = 14;
 
-type Ehdokas = VpkEdustaja & { paino: number };
+/** Tunnettu (Heikki 5.10.2026): henkilösivu (celebrity_id), mp_years ≥ 15 tai nykyinen ministeri (mp_minister). */
+type Ehdokas = VpkEdustaja & { paino: number; tunnettu: boolean };
+/** Kuudesta järjestettävästä kortista vähintään näin moni on tunnettu (kova sääntö). */
+const TUNNETTUJA_VAHINTAAN = 3;
 export type VpkData = { vaalipiirit: VpkVaalipiiri[]; linkit: Record<string, VpkLinkki>; edustajat: Ehdokas[] };
 
 async function attr(sb: NonNullable<ReturnType<typeof getSupabase>>, key: string) {
@@ -53,13 +56,14 @@ async function attr(sb: NonNullable<ReturnType<typeof getSupabase>>, key: string
 export async function lataa(): Promise<VpkData | null> {
   const sb = getSupabase();
   if (!sb) return null;
-  const [vp, rajat, istuu, piiri, puolue, vuodet] = await Promise.all([
+  const [vp, rajat, istuu, piiri, puolue, vuodet, ministeri] = await Promise.all([
     sb.from("vaalipiirit" as never).select("id, name, short_name"),
     sb.from("vaalipiirien_rajat" as never).select("vaalipiiri_a, vaalipiiri_b, border_type").eq("accepted" as never, true as never),
     attr(sb, "mp_sitting"),
     attr(sb, "mp_district"),
     attr(sb, "mp_party"),
     attr(sb, "mp_years"),
+    attr(sb, "mp_minister"),
   ]);
   const geomK = new Map(VAALIPIIRI_GEOM.map((g) => [g.nimi, g.k]));
   const vpRivit = (vp.data ?? []) as Array<{ id: string; name: string; short_name: string }>;
@@ -77,6 +81,7 @@ export async function lataa(): Promise<VpkData | null> {
   const piiriOf = new Map(piiri.map((r) => [r.fact_entities.id, nimesta.get(r.text_value ?? "") ?? null]));
   const puolueOf = new Map(puolue.map((r) => [r.fact_entities.id, r.text_value]));
   const vuodetOf = new Map(vuodet.map((r) => [r.fact_entities.id, Number(r.num_value)]));
+  const salkkuOf = new Map(ministeri.filter((r) => r.text_value).map((r) => [r.fact_entities.id, r.text_value!]));
 
   // Henkilövisa-linkki vain julkaistulle visalle (katselmus §4): celebrity → trivia_quiz_id → published.
   const celebIdt = [...new Set(istuu.map((r) => r.fact_entities.celebrity_id).filter((x): x is string => !!x))];
@@ -101,13 +106,17 @@ export async function lataa(): Promise<VpkData | null> {
     const vpId = piiriOf.get(e.id);
     if (!istuvat.has(e.id) || !vpId) continue;
     const v = vuodetOf.get(e.id) ?? 0;
+    const salkku = salkkuOf.get(e.id) ?? null;
+    const tunnettu = !!e.celebrity_id || v >= 15 || !!salkku;
     edustajat.push({
       id: e.id,
       nimi: e.name,
       puolue: puolueNimi(puolueOf.get(e.id)) ?? "",
       vp: vpId,
       visa: e.celebrity_id ? visat.get(e.celebrity_id) ?? null : null,
-      paino: e.celebrity_id ? 4 : v >= 15 ? 2 : 1,
+      salkku,
+      tunnettu,
+      paino: e.celebrity_id ? 4 : tunnettu ? 2 : 1,
     });
   }
   // Vakaa järjestys → arvonta ei riipu kannan palautusjärjestyksestä.
@@ -116,7 +125,7 @@ export async function lataa(): Promise<VpkData | null> {
   return { vaalipiirit, linkit, edustajat };
 }
 
-const haeData = unstable_cache(lataa, ["vaalipiiriketju-data-v1"], { revalidate: 3600 });
+const haeData = unstable_cache(lataa, ["vaalipiiriketju-data-v2"], { revalidate: 3600 });
 
 // ── Arvonta ──────────────────────────────────────────────
 function satunnainen(siemen: string): () => number {
@@ -204,18 +213,33 @@ function painotettu(ehdokkaat: Ehdokas[], r: () => number): Ehdokas {
 /** viimeksi: edustaja → päivän järjestysnumero, jolloin hän oli viimeksi kierroksessa (tyhjä = harjoitus). */
 function valinta(d: VpkData, siemen: string, nyt: number, viimeksi: Map<string, number>) {
   const r = satunnainen(siemen);
-  const p = polku(d, r);
-  if (!p) return null;
-  const valitut = p.map((vp) => {
-    const kaikki = d.edustajat.filter((e) => e.vp === vp);
-    if (!kaikki.length) return null;
-    const tuoreet = kaikki.filter((e) => nyt - (viimeksi.get(e.id) ?? -Infinity) > TOISTOVALI);
+  const tuore = (e: Ehdokas) => nyt - (viimeksi.get(e.id) ?? -Infinity) > TOISTOVALI;
+  /** Toistokielto kun mahdollista: tuoreista painotetusti, muuten pisimpään tauolla ollut. */
+  const poimi = (ehdokkaat: Ehdokas[]) => {
+    const tuoreet = ehdokkaat.filter(tuore);
     if (tuoreet.length) return painotettu(tuoreet, r);
-    // Pieni vaalipiiri (Ahvenanmaa 1, Lappi 6): kaikki nähty 14 päivän sisällä → pisimpään tauolla ollut.
-    const vanhin = Math.min(...kaikki.map((e) => viimeksi.get(e.id) ?? -Infinity));
-    return painotettu(kaikki.filter((e) => (viimeksi.get(e.id) ?? -Infinity) === vanhin), r);
-  });
-  return valitut.every(Boolean) ? (valitut as Ehdokas[]) : null;
+    const vanhin = Math.min(...ehdokkaat.map((e) => viimeksi.get(e.id) ?? -Infinity));
+    return painotettu(ehdokkaat.filter((e) => (viimeksi.get(e.id) ?? -Infinity) === vanhin), r);
+  };
+  // Kova sääntö: kuudesta järjestettävästä vähintään 3 tunnettua. Reitti, jonka keskellä ei ole
+  // kolmea vaalipiiriä tunnetuin edustajin, hylätään ja arvotaan uusi (päät saavat olla kenet tahansa).
+  for (let yritys = 0; yritys < 60; yritys++) {
+    const p = polku(d, r);
+    if (!p) return null;
+    const ehdokkaat = p.map((vp) => d.edustajat.filter((e) => e.vp === vp));
+    if (ehdokkaat.some((x) => !x.length)) continue;
+    const keski = [1, 2, 3, 4, 5, 6].filter((i) => ehdokkaat[i].some((e) => e.tunnettu));
+    if (keski.length < TUNNETTUJA_VAHINTAAN) continue;
+    // Pakotetaan tunnettu kolmeen satunnaiseen pysäkkiin; ensin ne, joissa on tunnettu, jota ei ole
+    // nähty 14 päivään → pienten vaalipiirien (Keski-Suomi, Satakunta, Lappi: 2 tunnettua) samoja
+    // nimiä ei valita joka kerta, kun vaalipiiri tulee vastaan.
+    const jarjestys = sekoita(keski, r).sort(
+      (a, b) => Number(ehdokkaat[b].some((e) => e.tunnettu && tuore(e))) - Number(ehdokkaat[a].some((e) => e.tunnettu && tuore(e))),
+    );
+    const pakotetut = new Set(jarjestys.slice(0, TUNNETTUJA_VAHINTAAN));
+    return p.map((_, i) => poimi(pakotetut.has(i) ? ehdokkaat[i].filter((e) => e.tunnettu) : ehdokkaat[i]));
+  }
+  return null;
 }
 
 /** Päivän kierros. Toistoesto: edelliset 14 päivää julkaisupäivästä alkaen samalla arvonnalla. */
@@ -261,7 +285,7 @@ function kierros(d: VpkData, iso: string, valitut: Ehdokas[], harjoitus: string 
     harjoitus,
     paivays: paivaysTeksti(iso),
     huomenna: `#${vpkNumero(huomenna)} · ${paivaysTeksti(huomenna, true)}`,
-    reitti: valitut.map(({ paino: _p, ...e }) => e),
+    reitti: valitut.map(({ paino: _p, tunnettu: _t, ...e }) => e),
     pino,
     vaalipiirit: d.vaalipiirit,
     linkit: d.linkit,

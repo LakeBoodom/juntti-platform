@@ -89,7 +89,9 @@ const KAHVA = "M9 6h.01M15 6h.01M9 12h.01M15 12h.01M9 18h.01M15 18h.01";
 const LUKKO = "M7 10V7.5a5 5 0 0 1 10 0V10M5.5 10h13v10h-13z";
 
 /** TN-Edustajakortti (CD 2i): laatta (mobiili) tai rivi (pino, ketju, tulos). Lukittu = ketjun pää. */
-function Kortti({ e, muoto, tila, num, vp, visa, kahva }: { e: VpkEdustaja; muoto: "laatta" | "rivi"; tila: KorttiTila; num?: number; vp?: string; visa?: boolean; kahva?: boolean }) {
+function Kortti({ e, muoto, tila, num, vp, visa, kahva, salkku }: { e: VpkEdustaja; muoto: "laatta" | "rivi"; tila: KorttiTila; num?: number; vp?: string; visa?: boolean; kahva?: boolean; salkku?: boolean }) {
+  // Ministerin salkku vasta tarkistuksen jälkeen (Heikki 5.10.: paljastaisi muuten liikaa).
+  const puolue = salkku && e.salkku ? `${e.puolue} · ${e.salkku}` : e.puolue;
   const paljastettu = tila === "ok" || tila === "bad";
   const lukittu = tila === "lukittu";
   const merkki = paljastettu && (
@@ -132,7 +134,7 @@ function Kortti({ e, muoto, tila, num, vp, visa, kahva }: { e: VpkEdustaja; muot
       <span className="vpk-kortti-t">
         <span className="vpk-kortti-nimi" lang="fi">{e.nimi}</span>
         <span className="vpk-rivi-ala">
-          <span className="vpk-kortti-puolue">{e.puolue}</span>
+          <span className="vpk-kortti-puolue">{puolue}</span>
           {piiri}
         </span>
       </span>
@@ -671,7 +673,7 @@ function Tulos(p: {
                       </span>
                     </div>
                   )}
-                  <Kortti e={edustajat.get(id)!} muoto="rivi" tila={tila} num={i + 1} vp={p.vpNimi(vp[i])} visa={valmis} />
+                  <Kortti e={edustajat.get(id)!} muoto="rivi" tila={tila} num={i + 1} vp={p.vpNimi(vp[i])} visa={valmis} salkku={valmis} />
                 </li>
               );
             })}

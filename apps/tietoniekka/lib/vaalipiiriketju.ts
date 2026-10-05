@@ -19,7 +19,7 @@ export const VPK_KORTTEJA = 8;
 export const VPK_JARJESTETTAVIA = VPK_KORTTEJA - 2;
 /** #1 = julkaisupäivä (katselmus §6). Hubin kortti ja pelinäkymä käyttävät samaa laskuria (vpkNumero).
  *  Asetetaan tuotantoonvientipäiväksi mergessä. */
-export const VPK_JULKAISU = "2026-10-06";
+export const VPK_JULKAISU = "2026-10-05";
 
 export type VpkLinkki = "maa" | "lautta";
 
@@ -27,7 +27,15 @@ export type VpkLinkki = "maa" | "lautta";
 export type VpkVaalipiiri = { id: string; nimi: string; k: string };
 
 /** Kortti: nimi ja puolue näkyvät, vaalipiiri paljastuu vasta tarkistuksessa. */
-export type VpkEdustaja = { id: string; nimi: string; puolue: string; vp: string; visa: string | null };
+export type VpkEdustaja = {
+  id: string;
+  nimi: string;
+  puolue: string;
+  vp: string;
+  visa: string | null;
+  /** Nykyisen ministerin salkku (mp_minister), näytetään vasta tarkistuksen jälkeen. */
+  salkku: string | null;
+};
 
 export type VpkKierros = {
   iso: string;
