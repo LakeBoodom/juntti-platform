@@ -144,13 +144,13 @@ export default async function VaalitHub() {
               Vaalit ja <span>politiikka</span>
             </h1>
             <p className="vl-lead">
-              Tunnetko eduskunnan? {d.kansanedustajia} kansanedustajaa, {vaalipiireja} vaalipiiriä ja Suomen politiikan pitkä linja
+              Tunnetko eduskunnan? {d.kansanedustajia || 200} kansanedustajaa, {vaalipiireja || 13} vaalipiiriä ja Suomen politiikan pitkä linja
               {peleja ? " — peleinä ja visoina." : " — visoina ja kartalla."}
             </p>
             <ul className="vl-chipit">
-              <li>{d.kansanedustajia} kansanedustajaa</li>
-              <li>{vaalipiireja} vaalipiiriä</li>
-              <li>{d.poliitikkoja} henkilövisaa</li>
+              {d.kansanedustajia > 0 && <li>{d.kansanedustajia} kansanedustajaa</li>}
+              {vaalipiireja > 0 && <li>{vaalipiireja} vaalipiiriä</li>}
+              {d.poliitikkoja > 0 && <li>{d.poliitikkoja} henkilövisaa</li>}
               {peleja > 0 && <li>{peleja} {peleja === 1 ? "peli" : "peliä"}</li>}
             </ul>
           </div>
