@@ -30,6 +30,9 @@ export const NAV_COLLECTIONS: NavCollection[] = [
   { slug: "tunnetut-henkilot", label: "Tunnetut henkilöt", color: "#C9A96A" },
   { slug: "kulttuuri", label: "Kulttuuri", color: "#E8A320" },
   { slug: "historia", label: "Historia", color: "#E8A320" },
+  /* Vaalit ja politiikka (Heikki 5.10.2026): eduskunta, vaalipiirit, poliitikot. Omat visat category=
+     'politiikka', lisäksi ristiinlistatut historiavisat (lib/vaalit/data.ts). */
+  { slug: "vaalit", label: "Vaalit ja politiikka", color: "#B4A5FF" },
   { slug: "luonto", label: "Luonto", color: "#3FBF7F" },
   /* Tiede & teknologia (Heikki 20.9.2026): oma teemakokoelma, jonka visat ovat
      kannassa yleistieto-kokoelmaa category='tiede-teknologia' — sama

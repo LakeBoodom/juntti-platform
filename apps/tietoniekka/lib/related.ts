@@ -60,6 +60,7 @@ export function kokoelmanJoukko(q: Kysely, r: Pick<Resolved, "key">, collection:
     : r.key === "tiede" ? q.eq("category", "tiede-teknologia")
     : r.key === "jaakiekko" ? q.or("category.eq.jaakiekko,genre.eq.jaakiekko")
     : r.key === "jalkapallo" ? q.eq("genre", "jalkapallo")
+    : r.key === "vaalit" ? q.eq("category", "politiikka")
     : r.key === "yleistieto" ? q.eq("collection", "yleistieto").neq("category", "kaupungit").neq("category", "ruoka-juoma")
     : q.eq("collection", collection ?? r.key);
 }

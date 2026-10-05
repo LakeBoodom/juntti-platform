@@ -17,12 +17,13 @@ export const metadata: Metadata = {
   }),
 };
 
-const PAIVITETTY = "2.10.2026";
+const PAIVITETTY = "5.10.2026";
 
 export default function KuvienLahteetPage() {
   const musiikki = KUVALAHTEET.filter((k) => k.kokoelma === "musiikki");
   const kaupungit = KUVALAHTEET.filter((k) => k.kokoelma === "kaupungit");
   const jaakiekko = KUVALAHTEET.filter((k) => k.kokoelma === "jaakiekko");
+  const vaalit = KUVALAHTEET.filter((k) => k.kokoelma === "vaalit");
 
   return (
     <main
@@ -93,6 +94,12 @@ export default function KuvienLahteetPage() {
 
         <h2 style={{ fontSize: 22, margin: "34px 0 14px" }}>Jääkiekko-kokoelma</h2>
         <Lista rivit={jaakiekko} />
+
+        <h2 style={{ fontSize: 22, margin: "34px 0 14px" }}>Vaalit ja politiikka -kokoelma</h2>
+        <Lista rivit={vaalit} />
+        <p style={{ color: "rgba(255,255,255,0.6)", fontSize: 14, margin: "10px 0 0" }}>
+          Vaalipiirikartan rajat: Tilastokeskus, vaalipiirit 1:4,5 milj., CC BY 4.0 (yksinkertaistettu).
+        </p>
 
         <p style={{ color: "rgba(255,255,255,0.55)", fontSize: 14, marginTop: 28 }}>
           Huomasitko virheen kuvan tekijä- tai lisenssitiedossa? Kerro siitä, niin korjaamme tai
