@@ -31,7 +31,7 @@ import {
   type VpkKierros,
   type VpkTallenne,
 } from "@/lib/vaalipiiriketju";
-import VpkKartta, { type VpkJakso, type VpkSolmu } from "./VpkKartta";
+import VaalipiiriKartta, { type VpkJakso, type VpkSolmu } from "@/components/tn20/vaalipiirit/VaalipiiriKartta";
 
 type Vaihe = "peli" | "tulos";
 type KorttiTila = "lepo" | "valittu" | "veto" | "ok" | "bad" | "lukittu";
@@ -491,7 +491,7 @@ export default function VpkClient({
             <div className="vpk-mkartta vpk-vain-kapea">
               <span className="vpk-pikku">Ketjun päät</span>
               <div className="vpk-kartta-kehys vpk-kartta-kehys--tulos">
-                <VpkKartta solmut={paat} nimi={nimi} />
+                <VaalipiiriKartta mode="reitti" solmut={paat} nimi={nimi} />
               </div>
             </div>
           </div>
@@ -499,7 +499,7 @@ export default function VpkClient({
           <aside className="vpk-sivukartta vpk-vain-levea">
             <span className="vpk-pikku">Kartta</span>
             <div className="vpk-kartta-kehys">
-              <VpkKartta solmut={paat} nimi={nimi} />
+              <VaalipiiriKartta mode="reitti" solmut={paat} nimi={nimi} />
             </div>
             <p>Ketjun alku ja loppu näkyvät kartalla. Reitti piirtyy, kun tarkistat ketjun.</p>
           </aside>
@@ -696,7 +696,7 @@ function Tulos(p: {
               )}
             </div>
             <div className="vpk-kartta-kehys vpk-kartta-kehys--tulos">
-              <VpkKartta solmut={kartta.solmut} jaksot={kartta.jaksot} nimi={p.nimi} />
+              <VaalipiiriKartta mode="reitti" solmut={kartta.solmut} jaksot={kartta.jaksot} nimi={p.nimi} />
             </div>
             <div className="vpk-selite">
               <span><i className="vpk-selite-ok" />Raja</span>

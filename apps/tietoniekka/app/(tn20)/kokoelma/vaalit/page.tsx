@@ -14,7 +14,7 @@ import { tanaan } from "@/lib/henkilo";
 import { helsinginPaiva } from "@/lib/aika";
 import { kokoelmanPelit, type KokoelmaPeli } from "@/lib/pelirekisteri";
 import { haeVaalitHub, pisteetPolkuna, puolikaari, VAALIEN_VAIHEET, VAALIPAIVA, type VaalitVisa } from "@/lib/vaalit/data";
-import VaalipiiriKartta from "./VaalipiiriKartta";
+import VaalipiiriKartta from "@/components/tn20/vaalipiirit/VaalipiiriKartta";
 import VpkHubKortti from "@/components/tn20/vaalipiiriketju/VpkHubKortti";
 
 export const revalidate = 3600;
@@ -258,7 +258,7 @@ export default async function VaalitHub() {
                   <h3>{vaalipiireja} vaalipiiriä</h3>
                   <span>Eduskunnan 200 paikkaa jaetaan vaalipiirien kesken Suomen kansalaisten määrän mukaan. Ahvenanmaa valitsee aina yhden edustajan.</span>
                 </div>
-                <VaalipiiriKartta rivit={d.vaalipiirit} />
+                <VaalipiiriKartta mode="selaa" rivit={d.vaalipiirit} />
               </div>
             )}
           </section>

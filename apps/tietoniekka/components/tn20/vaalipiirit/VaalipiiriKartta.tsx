@@ -1,10 +1,163 @@
-// VAALIPIIRIKETJU — reittikartta (CD 2j "TN-Vaalipiiriketju-kartta"): 13 vaalipiiriä, reitti
-// solmuina ja viivoina, Ahvenanmaan lautta syaanina katkoviivana, Helsinki zoom-laatassa.
-// Katselmus §2: viiva ei saa kulkea toisen solmun läpi → kaari, jos suora osuisi solmuun.
-// Puhdas esityskomponentti (ei tilaa), toimii palvelimella ja selaimessa.
-import { VAALIPIIRI_GEOM } from "@/lib/vaalit/geometria";
+"use client";
+// VAALIPIIRIKARTTA — jaettu karttakomponentti (toteutusbrief 5.10.2026 §4). Sama SVG-pohja
+// (Tilastokeskus vaalipiiri4500k, CC BY 4.0, lib/vaalit/geometria.ts) kahdessa tilassa:
+//   mode="selaa"   Vaalit-hub (CD 5.10.): täyttö paikkamäärän mukaan, hover/napautus → tooltip ja
+//                  listarivin korostus; Ahvenanmaa ja Helsinki erillisinä laattoina; alarivi vain, kun
+//                  se eroaa nimestä (katselmus §2.4). Kartta ja lista ovat palvelimen HTML:ssä.
+//   mode="reitti"  Vaalipiiriketju (CD 2j): solmut ja jaksot, lautta syaanina katkoviivana, Helsinki
+//                  zoom-laatassa; viiva kaartuu muiden solmujen ohi (katselmus §2). Ei omaa tilaa.
+import { useState, type DOMAttributes } from "react";
+import type { VpRivi } from "@/lib/vaalit/data";
+import { VAALIPIIRI_GEOM, VP_H, VP_W } from "@/lib/vaalit/geometria";
 import type { VpkLinkki } from "@/lib/vaalipiiriketju";
 
+/** ok/bad = tarkistettu kortti, lukittu = päätepiste ennen tarkistusta, null = neutraali. */
+export type VpkSolmuTila = "ok" | "bad" | "lukittu" | null;
+export type VpkSolmu = { k: string; num: number; tila: VpkSolmuTila };
+export type VpkJakso = { a: string; b: string; tyyppi: VpkLinkki | null };
+type Tila = VpkSolmuTila;
+
+export type VaalipiiriKarttaProps =
+  | { mode: "selaa"; rivit: VpRivi[] }
+  | {
+      mode: "reitti";
+      /** Näytettävät solmut (geometrian avain 01–13, järjestysnumero, tila). */
+      solmut?: VpkSolmu[];
+      /** Piirrettävät viivat solmujen välillä (tyyppi null = ei rajaa → punainen katkoviiva). */
+      jaksot?: VpkJakso[];
+      nimet?: boolean;
+      neutraali?: boolean;
+      /** Vaalipiirien nimet (aria ja solmujen nimilaput). */
+      nimi: (k: string) => string;
+    };
+
+export default function VaalipiiriKartta(p: VaalipiiriKarttaProps) {
+  return p.mode === "selaa" ? <Selaa rivit={p.rivit} /> : <Reitti {...p} />;
+}
+
+/** Yhteinen pohja: 13 vaalipiirin polut. Tila antaa täytön, reunan ja (selailussa) tapahtumat. */
+function Alueet({
+  alueet = VAALIPIIRI_GEOM,
+  tayta,
+  reuna,
+  leveys,
+  tapahtumat,
+}: {
+  alueet?: Array<{ k: string; d: string }>;
+  tayta: (k: string) => string;
+  reuna: string;
+  leveys: number;
+  tapahtumat?: (k: string) => DOMAttributes<SVGPathElement>;
+}) {
+  return (
+    <>
+      {alueet.map((a) => (
+        <path key={a.k} d={a.d} fill={tayta(a.k)} stroke={reuna} strokeWidth={leveys} strokeLinejoin="round" {...tapahtumat?.(a.k)} />
+      ))}
+    </>
+  );
+}
+
+// ── Selaa (Vaalit-hub) ───────────────────────────────────
+const PIENET = ["Ahvenanmaa", "Helsinki"];
+
+function Selaa({ rivit }: { rivit: VpRivi[] }) {
+  const [hover, setHover] = useState<string | null>(null);
+  const max = Math.max(...rivit.map((r) => r.paikat), 1);
+  const yht = rivit.reduce((s, r) => s + r.paikat, 0);
+  const tayta = (r: VpRivi) => {
+    if (r.k === hover) return "#B4A5FF";
+    const t = Math.sqrt(r.paikat / max);
+    const a = [36, 31, 51], b = [78, 66, 138];
+    return `rgb(${a.map((v, i) => Math.round(v + (b[i] - v) * t)).join(",")})`;
+  };
+  const hv = rivit.find((r) => r.k === hover);
+  const pois = () => setHover(null);
+  const jarj = [...rivit].sort((a, b) => a.k.localeCompare(b.k));
+
+  return (
+    <div className="vl-vp">
+      <div className="vl-vp-kartta">
+        <div className="vl-vp-svgwrap">
+          <svg viewBox={`0 0 ${VP_W} ${VP_H}`} role="img" aria-label={`Suomen kartta, jossa ${rivit.length} vaalipiiriä ja niiden paikkamäärät`}>
+            <Alueet
+              alueet={rivit}
+              tayta={(k) => tayta(rivit.find((r) => r.k === k)!)}
+              reuna="#17140E"
+              leveys={2}
+              tapahtumat={(k) => ({ onMouseEnter: () => setHover(k), onMouseLeave: pois, onClick: () => setHover(k) })}
+            />
+            {rivit
+              .filter((r) => !PIENET.includes(r.nimi))
+              .map((r) => (
+                <text key={r.k} x={r.cx} y={r.cy + 8} textAnchor="middle" className="vl-vp-luku" fill={r.k === hover ? "#131109" : "#F5F0E6"}>
+                  {r.paikat}
+                </text>
+              ))}
+            {rivit
+              .filter((r) => PIENET.includes(r.nimi))
+              .map((r) => (
+                <circle key={r.k} cx={r.cx} cy={r.cy} r={11} fill="none" stroke={r.k === hover ? "#B6FF3C" : "#F5F0E6"} strokeWidth={3} />
+              ))}
+          </svg>
+          {hv && (
+            <div className="vl-vp-tip" role="status" style={{ left: `${(hv.cx / VP_W) * 100}%`, top: `${(hv.cy / VP_H) * 100}%` }}>
+              <span className="vl-vp-tip-nimi">
+                {hv.nimi} · <span>{hv.paikat} {hv.paikat === 1 ? "paikka" : "paikkaa"}</span>
+              </span>
+              {hv.alue && <span className="vl-vp-tip-alue">{hv.alue}</span>}
+            </div>
+          )}
+        </div>
+        <div className="vl-vp-laatat">
+          {PIENET.map((n) => rivit.find((r) => r.nimi === n))
+            .filter((r): r is VpRivi => !!r)
+            .map((r) => (
+              <button
+                key={r.k}
+                type="button"
+                className={r.k === hover ? "vl-vp-laatta on" : "vl-vp-laatta"}
+                onMouseEnter={() => setHover(r.k)}
+                onMouseLeave={pois}
+                onFocus={() => setHover(r.k)}
+                onBlur={pois}
+                onClick={() => setHover(r.k)}
+              >
+                <span className="vl-vp-laatta-nimi">
+                  <span className="vl-vp-rengas" aria-hidden="true" />
+                  {r.nimi}
+                </span>
+                <span className="vl-vp-laatta-luku">{r.paikat}</span>
+              </button>
+            ))}
+        </div>
+      </div>
+      <ol className="vl-vp-lista">
+        {jarj.map((r) => (
+          <li key={r.k} className={r.k === hover ? "on" : ""} onMouseEnter={() => setHover(r.k)} onMouseLeave={pois}>
+            <span className="vl-vp-k">{r.k}</span>
+            <span className="vl-vp-nimet">
+              <span className="vl-vp-nimi">{r.nimi}</span>
+              {r.alue && <span className="vl-vp-alue">{r.alue}</span>}
+            </span>
+            <span className="vl-vp-arvo">
+              <span className="vl-vp-palkki">
+                <span style={{ width: `${(r.paikat / max) * 100}%` }} />
+              </span>
+              <span className="vl-vp-paikat">{r.paikat}</span>
+            </span>
+          </li>
+        ))}
+        <li className="vl-vp-yht">
+          <span>Yhteensä</span>
+          <span>{yht}</span>
+        </li>
+      </ol>
+    </div>
+  );
+}
+
+// ── Reitti (Vaalipiiriketju) ─────────────────────────────
 /** Solmujen paikat, jotka CD siirsi keskipisteestä (Uusimaa, Varsinais-Suomi, Ahvenanmaa). */
 const POS: Record<string, [number, number]> = { "02": [236, 668], "03": [96, 650], "05": [22, 684] };
 const HKI: [number, number] = [192, 683.5];
@@ -24,12 +177,6 @@ const HKI_LAATTA: [number, number] = [343, 694];
 const SOLMU_R = 15;
 const GEOM = new Map(VAALIPIIRI_GEOM.map((g) => [g.k, g]));
 const ZOOM = VAALIPIIRI_GEOM.filter((g) => ["01", "02", "06", "08"].includes(g.k));
-
-/** ok/bad = tarkistettu kortti, lukittu = päätepiste ennen tarkistusta, null = neutraali. */
-export type VpkSolmuTila = "ok" | "bad" | "lukittu" | null;
-export type VpkSolmu = { k: string; num: number; tila: VpkSolmuTila };
-export type VpkJakso = { a: string; b: string; tyyppi: VpkLinkki | null };
-type Tila = VpkSolmuTila;
 
 const paikka = (k: string): [number, number] => (k === "01" ? HKI : POS[k] ?? [GEOM.get(k)!.cx, GEOM.get(k)!.cy]);
 /** Solmun piirtopaikka (Helsinki laatassa). */
@@ -62,22 +209,13 @@ function viiva(a: [number, number], b: [number, number], esteet: Array<[number, 
   return `M${a[0]} ${a[1]}Q${mx.toFixed(1)} ${my.toFixed(1)} ${b[0]} ${b[1]}`;
 }
 
-export default function VpkKartta({
+function Reitti({
   solmut = [],
   jaksot: jaksoData = [],
   nimet = true,
   neutraali = false,
   nimi,
-}: {
-  /** Näytettävät solmut (geometrian avain 01–13, järjestysnumero, tila). */
-  solmut?: VpkSolmu[];
-  /** Piirrettävät viivat solmujen välillä (tyyppi null = ei rajaa → punainen katkoviiva). */
-  jaksot?: VpkJakso[];
-  nimet?: boolean;
-  neutraali?: boolean;
-  /** Vaalipiirien nimet (aria ja solmujen nimilaput). */
-  nimi: (k: string) => string;
-}) {
+}: Extract<VaalipiiriKarttaProps, { mode: "reitti" }>) {
   const reitilla = new Set(solmut.map((s) => s.k));
   const solmuPaikat = new Map(solmut.map((s) => [s.k, solmunPaikka(s.k)]));
   const jaksot = jaksoData.map((j) => {
@@ -98,9 +236,7 @@ export default function VpkKartta({
 
   return (
     <svg className="vpk-kartta" viewBox="0 0 400 745" role="img" aria-label={aria}>
-      {VAALIPIIRI_GEOM.map((g) => (
-        <path key={g.k} d={g.d} fill={reitilla.has(g.k) ? "#2F2850" : "#211E29"} stroke="#131109" strokeWidth={1.6} strokeLinejoin="round" />
-      ))}
+      <Alueet tayta={(k) => (reitilla.has(k) ? "#2F2850" : "#211E29")} reuna="#131109" leveys={1.6} />
       {jaksot.map((j, i) => (
         <g key={i}>
           <path d={j.d} fill="none" stroke="#131109" strokeWidth={10} strokeLinecap="round" />
