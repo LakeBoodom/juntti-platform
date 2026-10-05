@@ -99,7 +99,7 @@
 .tn20 .vl-rivi { display: flex; gap: clamp(10px, 1.2cqw, 18px); overflow-x: auto; padding-bottom: 6px; scroll-snap-type: x mandatory; }
 .tn20 .vl-rivi > * { scroll-snap-align: start; }
 @media (min-width: 760px) {
-  .tn20 .vl-rivi--ruudukko { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); overflow: visible; }
+  .tn20 .vl-rivi--ruudukko { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); overflow: visible; }
   /* Leveässä ruudukossa 16:10 jättäisi ~190 px tyhjää motiivialuetta → matalampi. */
   .tn20 .vl-rivi--ruudukko .vl-kortti-kuva { aspect-ratio: 16 / 7; }
   /* Poliitikot: desktopilla 2 riviä × 6 (katselmus §2.3: ei leikkautuvaa vaakariviä ilman vihjettä). */
@@ -107,6 +107,7 @@
 }
 @media (min-width: 1100px) {
   .tn20 .vl-rivi--henkilot { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+  .tn20 .vl-rivi--ruudukko { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 }
 .tn20 .vl-kortti {
   flex: 0 0 clamp(212px, 22cqw, 240px); display: flex; flex-direction: column; overflow: hidden;
@@ -132,7 +133,8 @@
 .tn20 .vl-kortti-teksti { display: flex; flex-direction: column; gap: 6px; padding: clamp(12px, 1.2cqw, 16px); min-width: 0; container-type: inline-size; }
 .tn20 .vl-kortti-otsikko {
   font-family: var(--tn-font-display); font-weight: 900; text-transform: uppercase; line-height: 1.02; letter-spacing: -0.012em;
-  font-size: clamp(16px, 1.5cqw, 19px); text-wrap: balance; overflow-wrap: normal; word-break: keep-all;
+  /* KORTTISÄÄNTÖ (mitattu 5.10.: "RAUTATIEASEMALLE" vuoti 768 px:n ruudukossa) → pisimmän sanan mukaan. */
+  font-size: min(19px, calc(100cqw / (var(--vl-lw, 10) * 0.82))); text-wrap: balance; overflow-wrap: normal; word-break: keep-all;
 }
 .tn20 .vl-kortti-meta { font-size: 13px; font-weight: 600; color: var(--vl-muted); }
 

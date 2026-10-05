@@ -47,6 +47,8 @@ function siemenPisteet(n: number, k: number, seed: number): Set<number> {
   return out;
 }
 
+const pisinSana = (t: string) => Math.max(...t.split(/[\s–-]+/).map((w) => w.length), 8);
+
 function paiviaVaaleihin(): { ennen: boolean; paivia: number } {
   const t = tanaan();
   const nyt = Date.UTC(t.y, t.m - 1, t.d);
@@ -76,7 +78,9 @@ function VisaKortti({ v, puoli }: { v: VaalitVisa; puoli: string }) {
         )}
       </span>
       <span className="vl-kortti-teksti">
-        <span className="vl-kortti-otsikko">{v.otsikko}</span>
+        <span className="vl-kortti-otsikko" style={{ ["--vl-lw" as string]: pisinSana(v.otsikko) }}>
+          {v.otsikko}
+        </span>
         <span className="vl-kortti-meta">{v.koti ? `Visa · ${v.koti}-kokoelmasta` : v.meta}</span>
       </span>
     </a>
@@ -116,7 +120,9 @@ export default async function VaalitHub() {
           <span className="vl-tagi">Pakka</span>
         </span>
         <span className="vl-kortti-teksti">
-          <span className="vl-kortti-otsikko">{p.otsikko}</span>
+          <span className="vl-kortti-otsikko" style={{ ["--vl-lw" as string]: pisinSana(p.otsikko) }}>
+            {p.otsikko}
+          </span>
           <span className="vl-kortti-meta">{p.meta}</span>
         </span>
       </a>
