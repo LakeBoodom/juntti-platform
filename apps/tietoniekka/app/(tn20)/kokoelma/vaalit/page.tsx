@@ -15,6 +15,7 @@ import { helsinginPaiva } from "@/lib/aika";
 import { kokoelmanPelit, type KokoelmaPeli } from "@/lib/pelirekisteri";
 import { haeVaalitHub, pisteetPolkuna, puolikaari, VAALIEN_VAIHEET, VAALIPAIVA, type VaalitVisa } from "@/lib/vaalit/data";
 import VaalipiiriKartta from "./VaalipiiriKartta";
+import VpkHubKortti from "@/components/tn20/vaalipiiriketju/VpkHubKortti";
 
 export const revalidate = 3600;
 
@@ -230,14 +231,18 @@ export default async function VaalitHub() {
             <div className="vl-osio-head">
               <h2 id="vl-pelit-h" className="vl-h2">Pelit</h2>
             </div>
-            {paivanPelit.map((p) => (
-              <a key={p.href} className="vl-paivan-kortti" href={p.href}>
-                <span className="vl-tagi vl-tagi--vahva">Päivän peli{p.numero ? ` · #${p.numero(helsinginPaiva().iso)}` : ""}</span>
-                <span className="vl-paivan-otsikko">{p.otsikko}</span>
-                <span className="vl-kortti-meta">{p.meta}</span>
-                <span className="vl-cta">Pelaa</span>
-              </a>
-            ))}
+            {paivanPelit.map((p) =>
+              p.slug === "vaalipiiriketju" ? (
+                <VpkHubKortti key={p.href} href={p.href} otsikko={p.otsikko} meta={p.meta} numero={p.numero?.(helsinginPaiva().iso) ?? 1} />
+              ) : (
+                <a key={p.href} className="vl-paivan-kortti" href={p.href}>
+                  <span className="vl-tagi vl-tagi--vahva">Päivän peli{p.numero ? ` · #${p.numero(helsinginPaiva().iso)}` : ""}</span>
+                  <span className="vl-paivan-otsikko">{p.otsikko}</span>
+                  <span className="vl-kortti-meta">{p.meta}</span>
+                  <span className="vl-cta">Pelaa</span>
+                </a>
+              ),
+            )}
             {pakat.length > 0 && (
               <div id="jarjestys" className="vl-alaosio">
                 <div className="vl-ryhma-head">

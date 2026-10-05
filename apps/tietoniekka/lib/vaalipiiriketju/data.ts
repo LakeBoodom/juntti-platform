@@ -144,30 +144,51 @@ function sekoita<T>(a: T[], r: () => number): T[] {
   return b;
 }
 
-/** Satunnainen yksinkertainen polku (8 vaalipiiriä), Ahvenanmaa vain päässä. */
-function polku(d: VpkData, r: () => number): string[] | null {
+/** Reitit, joilla on Helsinki tai Lappi, saavat 3-kertaisen painon (Heikki 5.10.2026). Painottamatta
+ *  Keski-Suomi on 89 %:ssa reiteistä mutta Helsinki 13 % ja Lappi 14 % (≈ kerran viikossa); painolla 3
+ *  kumpikin ≈ 1,9 kertaa viikossa, Keski-Suomi 88 %. */
+const HARVINAISET = ["Helsinki", "Lappi"];
+const HARVINAISEN_PAINO = 3;
+const polkuValimuisti = new WeakMap<VpkData, { polut: string[][]; painot: number[]; summa: number }>();
+
+/** Kaikki suunnatut yksinkertaiset 8 vaalipiirin polut (5 502 = 2 751 reittiä × 2 suuntaa); Ahvenanmaa vain päässä. */
+function polut(d: VpkData) {
+  const valmis = polkuValimuisti.get(d);
+  if (valmis) return valmis;
   const naapurit = new Map<string, string[]>(d.vaalipiirit.map((v) => [v.id, []]));
   for (const avain of Object.keys(d.linkit)) {
     const [a, b] = avain.split("-");
     naapurit.get(a)?.push(b);
     naapurit.get(b)?.push(a);
   }
+  for (const n of naapurit.values()) n.sort();
   const ahv = d.vaalipiirit.find((v) => v.nimi === "Ahvenanmaa")?.id;
-  const kelpaa = (p: string[]) => !ahv || !p.includes(ahv) || p[0] === ahv || p.at(-1) === ahv;
-  const etsi = (p: string[]): string[] | null => {
-    if (p.length === VPK_KORTTEJA) return kelpaa(p) ? p : null;
-    for (const n of sekoita(naapurit.get(p.at(-1)!) ?? [], r)) {
-      if (p.includes(n)) continue;
-      const tulos = etsi([...p, n]);
-      if (tulos) return tulos;
+  const harvinaiset = new Set(d.vaalipiirit.filter((v) => HARVINAISET.includes(v.nimi)).map((v) => v.id));
+  const kaikki: string[][] = [];
+  const kulje = (p: string[]) => {
+    if (p.length === VPK_KORTTEJA) {
+      if (!ahv || !p.slice(1, -1).includes(ahv)) kaikki.push(p);
+      return;
     }
-    return null;
+    for (const n of naapurit.get(p.at(-1)!) ?? []) if (!p.includes(n)) kulje([...p, n]);
   };
-  for (const alku of sekoita(d.vaalipiirit.map((v) => v.id), r)) {
-    const p = etsi([alku]);
-    if (p) return p;
+  for (const v of d.vaalipiirit) kulje([v.id]);
+  const painot = kaikki.map((p) => (p.some((x) => harvinaiset.has(x)) ? HARVINAISEN_PAINO : 1));
+  const tulos = { polut: kaikki, painot, summa: painot.reduce((x, y) => x + y, 0) };
+  polkuValimuisti.set(d, tulos);
+  return tulos;
+}
+
+/** Painotettu satunnainen polku; päät = lukitut kortit 1 ja 8. */
+function polku(d: VpkData, r: () => number): string[] | null {
+  const { polut: kaikki, painot, summa } = polut(d);
+  if (!kaikki.length) return null;
+  let x = r() * summa;
+  for (let i = 0; i < kaikki.length; i++) {
+    x -= painot[i];
+    if (x < 0) return kaikki[i];
   }
-  return null;
+  return kaikki[kaikki.length - 1];
 }
 
 function painotettu(ehdokkaat: Ehdokas[], r: () => number): Ehdokas {
@@ -180,9 +201,9 @@ function painotettu(ehdokkaat: Ehdokas[], r: () => number): Ehdokas {
   return ehdokkaat[ehdokkaat.length - 1];
 }
 
-/** viimeksi: edustaja → päivän järjestysnumero, jolloin hän oli viimeksi kierroksessa. */
-function paivanValinta(d: VpkData, iso: string, nyt: number, viimeksi: Map<string, number>) {
-  const r = satunnainen(`vaalipiiriketju-${iso}`);
+/** viimeksi: edustaja → päivän järjestysnumero, jolloin hän oli viimeksi kierroksessa (tyhjä = harjoitus). */
+function valinta(d: VpkData, siemen: string, nyt: number, viimeksi: Map<string, number>) {
+  const r = satunnainen(siemen);
   const p = polku(d, r);
   if (!p) return null;
   const valitut = p.map((vp) => {
@@ -203,32 +224,44 @@ export async function paivanKierros(iso: string): Promise<VpkKierros | null> {
   return d ? laskeKierros(d, iso) : null;
 }
 
+/** Harjoitusketju (?ketju=<siemen>): satunnainen, ei vaikuta päivän tulokseen eikä toistoestoon. */
+export async function harjoitusKierros(iso: string, siemen: string): Promise<VpkKierros | null> {
+  const d = await haeData();
+  if (!d) return null;
+  const v = valinta(d, `vaalipiiriketju-harjoitus-${siemen}`, 0, new Map());
+  return v ? kierros(d, iso, v, siemen) : null;
+}
+
 export function laskeKierros(d: VpkData, iso: string): VpkKierros | null {
   const viimeksi = new Map<string, number>();
   const alku = iso < VPK_JULKAISU ? iso : VPK_JULKAISU;
   let paiva = alku;
   let tanaan: Ehdokas[] | null = null;
   for (let i = 0; i < 5000 && paiva <= iso; i++) {
-    const valinta = paivanValinta(d, paiva, i, viimeksi);
-    for (const e of valinta ?? []) viimeksi.set(e.id, i);
-    if (paiva === iso) tanaan = valinta;
+    const v = valinta(d, `vaalipiiriketju-${paiva}`, i, viimeksi);
+    for (const e of v ?? []) viimeksi.set(e.id, i);
+    if (paiva === iso) tanaan = v;
     paiva = lisaaPaivia(paiva, 1);
   }
-  if (!tanaan) return null;
+  return tanaan ? kierros(d, iso, tanaan, null) : null;
+}
 
-  // Lähtöjärjestys: sekoitettu niin, ettei se ole reitti eikä käänteinen reitti.
-  const r = satunnainen(`vaalipiiriketju-pino-${iso}`);
-  const ids = tanaan.map((e) => e.id);
-  let pino = sekoita(ids, r);
-  for (let i = 0; i < 10 && (pino.join() === ids.join() || pino.join() === [...ids].reverse().join()); i++) pino = sekoita(ids, r);
+function kierros(d: VpkData, iso: string, valitut: Ehdokas[], harjoitus: string | null): VpkKierros {
+  // Päät lukittuina paikoille 1 ja 8; kuusi keskimmäistä sekoitetaan niin, ettei pino ole reitti
+  // eikä käänteinen reitti.
+  const r = satunnainen(`vaalipiiriketju-pino-${harjoitus ?? iso}`);
+  const keski = valitut.slice(1, -1).map((e) => e.id);
+  let pino = sekoita(keski, r);
+  for (let i = 0; i < 10 && (pino.join() === keski.join() || pino.join() === [...keski].reverse().join()); i++) pino = sekoita(keski, r);
 
   const huomenna = lisaaPaivia(iso, 1);
   return {
     iso,
     numero: vpkNumero(iso),
+    harjoitus,
     paivays: paivaysTeksti(iso),
     huomenna: `#${vpkNumero(huomenna)} · ${paivaysTeksti(huomenna, true)}`,
-    reitti: tanaan.map(({ paino: _p, ...e }) => e),
+    reitti: valitut.map(({ paino: _p, ...e }) => e),
     pino,
     vaalipiirit: d.vaalipiirit,
     linkit: d.linkit,

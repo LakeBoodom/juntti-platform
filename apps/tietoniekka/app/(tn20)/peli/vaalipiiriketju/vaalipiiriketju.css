@@ -134,7 +134,15 @@
 }
 .tn20 .vpk .vpk-visa:hover { background: rgba(180, 165, 255, .22); }
 
+/* Lukittu ketjun pää (kortit 1 ja 8, Heikki 5.10.2026): vaalipiiri näkyy, ei siirrettävissä. */
+.tn20 .vpk-kortti[data-tila="lukittu"] { --bd: rgba(180, 165, 255, .45); --bg: linear-gradient(90deg, rgba(180, 165, 255, .1), #1c1810 70%); }
+.tn20 .vpk-kortti[data-tila="lukittu"] .vpk-rivi-num { background: var(--vpk-lila-2); border-color: var(--vpk-lila-2); color: #131109; }
+.tn20 .vpk-lukko { width: 18px; height: 18px; flex: none; }
+.tn20 .vpk-lukko path { stroke: var(--vpk-lila); stroke-width: 1.9; fill: none; stroke-linejoin: round; }
+
 /* ── Mobiili: napautusruudukko ─────────────────────────── */
+.tn20 .vpk-mobiili { display: flex; flex-direction: column; gap: 8px; }
+.tn20 .vpk-mkartta { display: flex; flex-direction: column; gap: 10px; padding: 14px; border-radius: 18px; border: 1px solid #241e13; background: #17130b; }
 .tn20 .vpk-ruudukko { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
 .tn20 .vpk-napautus { cursor: pointer; border-radius: 14px; touch-action: manipulation; user-select: none; -webkit-tap-highlight-color: transparent; }
 .tn20 .vpk-napautus:focus-visible, .tn20 .vpk-vedettava:focus-visible { outline: 3px solid var(--vpk-lime); outline-offset: 2px; }
@@ -234,6 +242,9 @@
   border-radius: 14px; border: 1px solid rgba(180, 165, 255, .5); color: var(--vpk-lila-2); font-size: 14px; font-weight: 800;
 }
 .tn20 .vpk .vpk-toissija:hover { background: rgba(180, 165, 255, .1); color: var(--vpk-teksti); }
+.tn20 .vpk-toissija:is(button) { background: transparent; cursor: pointer; font-family: inherit; }
+/* Kolmas toiminto (pelilinkki): tekstilinkki koko leveydellä napin alla. */
+.tn20 .vpk .vpk-kolmas { flex: 1 1 100%; display: inline-flex; align-items: center; justify-content: center; min-height: 44px; font-size: 14px; font-weight: 800; text-align: center; }
 .tn20 .vpk-tulos-grid { display: flex; flex-direction: column; gap: 18px; }
 @media (min-width: 1080px) {
   .tn20 .vpk-tulos-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(340px, 440px); gap: clamp(20px, 2.4vw, 40px); align-items: start; }
