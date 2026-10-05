@@ -29,6 +29,7 @@ export const COLLECTION_ACCENT: Record<string, string> = {
   luonto: "#3FBF7F",
   "tunnetut-henkilot": "#C9A96A",
   juhlat: "#E8A320",
+  vaalit: "#B4A5FF",
 };
 export const COLLECTION_HUB: Record<string, string> = {
   tv: "/kokoelma/tv",
@@ -41,6 +42,7 @@ export const COLLECTION_HUB: Record<string, string> = {
   luonto: "/kokoelma/luonto",
   "tunnetut-henkilot": "/kokoelma/tunnetut-henkilot",
   juhlat: "/kokoelma/juhlat",
+  vaalit: "/kokoelma/vaalit",
 };
 /* ── Kokoelman tunnistus (QA-003/013 + Heikki 1, 2, 5 — 29.8.2026):
    kaupunkivisat ovat kannassa collection=yleistieto/category=kaupungit,
@@ -59,6 +61,8 @@ export function resolveCollection(q: { collection: string | null; category: stri
   if (cat === "kaupungit") return { key: "kaupungit", label: "Suomen kaupungit", hub: "/kokoelma/kaupungit", bg: KAUPUNGIT_HERO_IMG, accent: "#E8A320" };
   /* Tiede & teknologia (20.9.2026): visat ovat kannassa yleistietoa, kokoelma
      tunnistetaan kategoriasta — sama periaate kuin kaupunkivisoilla. */
+  /* Vaalit ja politiikka (5.10.2026): eduskuntavaalivisat ovat category='politiikka'. */
+  if (cat === "politiikka") return { key: "vaalit", label: "Vaalit ja politiikka", hub: "/kokoelma/vaalit", bg: "/20/vaalit/hero.webp", accent: "#B4A5FF" };
   if (cat === "tiede-teknologia") return { key: "tiede", label: "Tiede & teknologia", hub: "/kokoelma/tiede", bg: TIEDE_HERO.img, accent: TIEDE_ACCENT };
   if (cat === "jaakiekko" || genre === "jaakiekko") return { key: "jaakiekko", label: "Jääkiekko", hub: "/kokoelma/jaakiekko", bg: JK_HERO.img, accent: JK_ACCENT };
   if (genre === "jalkapallo") return { key: "jalkapallo", label: "Jalkapallo", hub: "/kokoelma/jalkapallo", bg: JP_HERO.img, accent: "#B6FF3C" };
@@ -83,6 +87,7 @@ export const COLLECTION_BG: Record<string, string> = {
   luonto: "/20/luonto/hero-landing.webp",
   "tunnetut-henkilot": "/20/teema-tunnetut-henkilot.webp",
   juhlat: "/20/juhlat/halloween.webp",
+  vaalit: "/20/vaalit/hero.webp",
 };
 export const COLLECTION_LABEL: Record<string, string> = {
   tv: "TV & Suoratoisto",
@@ -96,6 +101,7 @@ export const COLLECTION_LABEL: Record<string, string> = {
   luonto: "Luonto",
   "tunnetut-henkilot": "Tunnetut henkilöt",
   juhlat: "Juhlat",
+  vaalit: "Vaalit ja politiikka",
 };
 
 
@@ -117,5 +123,6 @@ export const COLLECTION_NEIGHBORS: Record<string, string[]> = {
   tiede: ["luonto", "historia"],
   "tunnetut-henkilot": ["tv", "musiikki", "urheilu"],
   juhlat: ["kulttuuri", "historia"],
+  vaalit: ["historia", "tunnetut-henkilot"],
   yleistieto: ["historia", "matkakohteet", "luonto"],
 };

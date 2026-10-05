@@ -11,10 +11,11 @@ import { NAV_COLLECTIONS, NAV_MODES, hubHref } from "@/lib/nav";
 import { JP_CLUBS, JP_EURO, JP_PL_GENERAL, JP_CL, JP_FINNS } from "@/lib/jalkapallo";
 import { JK_TEAMS, JK_DERBIES, JK_GENERAL, JK_LIONS, JK_NHL } from "@/lib/jaakiekko";
 import { KAUPUNGIT } from "@/lib/kaupungit";
+import { RISTIIN } from "@/lib/vaalit/data";
 
 export const metadata: Metadata = {
   title: "Kaikki kokoelmat – tietovisat aiheittain | Tietoniekka",
-  description: "Valitse aihe: TV & suoratoisto, urheilu, jääkiekko, jalkapallo, elokuvat, musiikki, maantieto, Suomen kaupungit, tunnetut henkilöt, kulttuuri, historia, luonto, tiede & teknologia ja juhlat.",
+  description: "Valitse aihe: TV & suoratoisto, urheilu, jääkiekko, jalkapallo, elokuvat, musiikki, maantieto, Suomen kaupungit, tunnetut henkilöt, kulttuuri, historia, luonto, tiede & teknologia, juhlat sekä vaalit ja politiikka.",
   alternates: { canonical: "/kokoelmat" },
   ...jakoMeta({
     title: "Kaikki kokoelmat – tietovisat aiheittain",
@@ -41,6 +42,7 @@ const JK_SLUGS = new Set(
 /* Suomen kaupungit (28.8.2026): visat ovat kannassa yleistieto-kokoelmaa,
    sama laskentaperiaate kuin Jääkiekko/Jalkapallo. */
 const KAUPUNGIT_SLUGS = new Set(KAUPUNGIT.map((c) => c.quizSlug));
+const VAALIT_RISTIIN = new Set(RISTIIN);
 
 async function getCounts(): Promise<Record<string, number>> {
   try {
@@ -56,6 +58,9 @@ async function getCounts(): Promise<Record<string, number>> {
       /* Tiede & teknologia (20.9.2026): visat ovat yleistietoa, kokoelma
          tunnistetaan kategoriasta. */
       if (r.category === "tiede-teknologia") counts.tiede = (counts.tiede ?? 0) + 1;
+      /* Vaalit ja politiikka (5.10.2026): omat visat category=politiikka + ristiinlistatut. */
+      /* collection='vaalit' on jo laskettu yllä; tässä vain muualle kirjatut politiikkavisat ja ristiinlistatut. */
+      if ((r.category === "politiikka" && r.collection !== "vaalit") || (r.slug && VAALIT_RISTIIN.has(r.slug))) counts.vaalit = (counts.vaalit ?? 0) + 1;
     }
     return counts;
   } catch {

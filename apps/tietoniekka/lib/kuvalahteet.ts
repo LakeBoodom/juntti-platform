@@ -23,7 +23,7 @@ export type Kuvalahde = {
   /** Visan slug = kuvatiedoston nimi kansiossa public/20/<kokoelma>/ */
   slug: string;
   /** Kokoelma, jonka kansiossa kuva on. */
-  kokoelma: "musiikki" | "kaupungit" | "jaakiekko";
+  kokoelma: "musiikki" | "kaupungit" | "jaakiekko" | "vaalit";
   /** Mitä kuvassa on — näytetään lähdesivulla. */
   kuvaus: string;
   /** Tiedoston nimi Wikimedia Commonsissa (ilman File:-etuliitettä). */
@@ -84,6 +84,7 @@ export const KUVALAHTEET: Kuvalahde[] = [
   // ─── Kaupungit (12.9.2026) ───
   { slug: "espoo", kokoelma: "kaupungit", kuvaus: "Hanasaari ja Espoon saaristo ilmasta", tiedosto: "Hanasaari, Espoo 2019-10-05.jpg", tekija: "Joneikifi", lisenssi: "CC BY-SA 4.0", lisenssiUrl: CC("by-sa/4.0"), vuosi: "2019" },
   { slug: "hameenlinna", kokoelma: "kaupungit", kuvaus: "Hämeen linna", tiedosto: "Häme Castle (23499025921).jpg", tekija: "দেবর্ষি রায় (Debarshi Ray)", lisenssi: "CC BY-SA 2.0", lisenssiUrl: CC("by-sa/2.0"), vuosi: "2015" },
+  { slug: "hero", kokoelma: "vaalit", kuvaus: "Eduskuntatalo, Helsinki (Vaalit ja politiikka -kokoelman pääkuva)", tiedosto: "Eduskuntatalo Helsinki 2022-09-16 10.jpg", tekija: "Leonhard Lenz", lisenssi: "CC0", lisenssiUrl: "https://creativecommons.org/publicdomain/zero/1.0/", vuosi: "2022", muokkaus: "violetti duotone, rajaus" },
   { slug: "helsinki", kokoelma: "kaupungit", kuvaus: "Senaatintori, Helsinki", tiedosto: "Helsinki Senate Square Terrace East 2020-07-01.jpg", tekija: "JoAlanen", lisenssi: "CC0", lisenssiUrl: "https://creativecommons.org/publicdomain/zero/1.0/", vuosi: "2020" },
   { slug: "joensuu", kokoelma: "kaupungit", kuvaus: "Pielisjoen ranta, Joensuu", tiedosto: "East bank of Pielisjoki-river in Joensuu.jpg", tekija: "Zache", lisenssi: "CC BY-SA 3.0", lisenssiUrl: CC("by-sa/3.0"), vuosi: "2006" },
   { slug: "jyvaskyla", kokoelma: "kaupungit", kuvaus: "Jyväskylän satama", tiedosto: "Jyväskylä harbour.jpg", tekija: "Roland Struwe", lisenssi: "CC BY-SA 3.0", lisenssiUrl: CC("by-sa/3.0"), vuosi: "2008" },
