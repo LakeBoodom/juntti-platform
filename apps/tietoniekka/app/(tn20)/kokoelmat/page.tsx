@@ -59,7 +59,8 @@ async function getCounts(): Promise<Record<string, number>> {
          tunnistetaan kategoriasta. */
       if (r.category === "tiede-teknologia") counts.tiede = (counts.tiede ?? 0) + 1;
       /* Vaalit ja politiikka (5.10.2026): omat visat category=politiikka + ristiinlistatut. */
-      if (r.category === "politiikka" || (r.slug && VAALIT_RISTIIN.has(r.slug))) counts.vaalit = (counts.vaalit ?? 0) + 1;
+      /* collection='vaalit' on jo laskettu yllä; tässä vain muualle kirjatut politiikkavisat ja ristiinlistatut. */
+      if ((r.category === "politiikka" && r.collection !== "vaalit") || (r.slug && VAALIT_RISTIIN.has(r.slug))) counts.vaalit = (counts.vaalit ?? 0) + 1;
     }
     return counts;
   } catch {
