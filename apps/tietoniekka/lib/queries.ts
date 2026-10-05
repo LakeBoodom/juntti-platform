@@ -174,14 +174,24 @@ export async function getPublishedQuizSlugs(): Promise<{ slug: string; updated_a
   const sb = getSupabase();
   if (!sb) return [];
   const siteId = await getSiteId();
-  let q = sb
-    .from("quizzes")
-    .select("slug, updated_at, game_mode" as never)
-    .eq("status", "published")
-    .not("slug", "is", null);
-  if (siteId) q = q.eq("site_id", siteId);
-  const { data } = await q;
-  return (data ?? []) as unknown as { slug: string; updated_at: string | null; game_mode: string | null }[];
+  // Sivuittain 1000 rivin erissä: PostgREST palauttaa kerralla enintään 1000 riviä, joten yksi haku
+  // pudottaisi sitemapista visat 1000:n jälkeen (5.10.2026: 784 julkaistua). Järjestys id:n mukaan → vakaat sivut.
+  const SIVU = 1000;
+  const kaikki: { slug: string; updated_at: string | null; game_mode: string | null }[] = [];
+  for (let alku = 0; alku < 100_000; alku += SIVU) {
+    let q = sb
+      .from("quizzes")
+      .select("slug, updated_at, game_mode" as never)
+      .eq("status", "published")
+      .not("slug", "is", null);
+    if (siteId) q = q.eq("site_id", siteId);
+    const { data, error } = await q.order("id").range(alku, alku + SIVU - 1);
+    if (error) break;
+    const rivit = (data ?? []) as unknown as { slug: string; updated_at: string | null; game_mode: string | null }[];
+    kaikki.push(...rivit);
+    if (rivit.length < SIVU) break;
+  }
+  return kaikki;
 }
 
 /** Hae random julkaistu visa kategoriasta. */

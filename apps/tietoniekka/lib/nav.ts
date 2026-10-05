@@ -57,6 +57,8 @@ export const NAV_MODES: NavMode[] = [
   { href: "/peli/tupla-tai-kuitti", label: "Tupla tai kuitti", desc: "Tuplaa potti tai kuittaa ajoissa", color: "#E8A320" },
   // Kuntaliitos (Heikki 26.9.2026): karttapelien ensimmäinen, päivän reitti + satunnaiset
   { href: "/peli/kuntaliitos", label: "Kuntaliitos", desc: "Rakenna reitti naapurikuntien kautta", color: "#159A9C" },
+  // Vaalipiiriketju (Heikki 5.10.2026): Kuntaliitoksen viereen, päivän peli vaalipiireistä
+  { href: "/peli/vaalipiiriketju", label: "Vaalipiiriketju", desc: "Ketjuta kansanedustajat vaalipiiristä toiseen", color: "#B4A5FF" },
   // Rajanaapurit (Heikki 27.9.2026): Kuntaliitoksen sisarpeli valtioilla ja lipuilla
   { href: "/peli/rajanaapurit", label: "Rajanaapurit", desc: "Rakenna reitti naapurivaltioiden kautta", color: "#F2B233" },
   { href: "/megavisat", label: "Megavisat", desc: "20–50 kysymystä — pitkä peli", color: "#E8A320" },

@@ -11,6 +11,7 @@ import type { MetadataRoute } from "next";
 import { TEEMAT, TUPLA_SIVU } from "@/lib/tuplaTaiKuitti";
 import { KL_SIVU } from "@/lib/kuntaliitos";
 import { JULKAISTUT, pakkaHref } from "@/lib/jarjesta/pakat";
+import { VPK_SIVU } from "@/lib/vaalipiiriketju";
 import { RN_SIVU } from "@/lib/rajanaapurit";
 import { NAV_COLLECTIONS } from "@/lib/nav";
 import { KATEGORIAT } from "@/lib/kuvavisat2026";
@@ -41,6 +42,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     u(RN_SIVU, "daily", 0.7),
     u("/peli/ikajarjestys", "weekly", 0.7),
     ...JULKAISTUT.map((p) => u(pakkaHref(p), "monthly", 0.6)),
+    u(VPK_SIVU, "daily", 0.7),
     u("/kuvavisa/viikko", "weekly", 0.7),
     u("/kuvien-lahteet", "monthly", 0.2),
     u("/tietosuoja", "yearly", 0.2),

@@ -275,3 +275,8 @@
 .tn20 .vl-kasvo-ala { font-size: 12px; font-weight: 600; color: var(--vl-muted); line-height: 1.25; }
 /* Pitkä linkkiteksti rivittyy 320 px:ssä sanojen välistä (mitattu 5.10.: nowrap vuoti 62 px). */
 #kasvot .vl-kaikki { margin-top: 14px; white-space: normal; overflow-wrap: normal; word-break: keep-all; }
+/* Vaalipiiriketjun Pelattu-tila (selaintallenne, sama kuin pelinäkymän tuloskortti: 6 ruutua). */
+.tn20 .vl-paivan-pelattu { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; }
+.tn20 .vl-paivan-ruudut { display: flex; gap: 4px; }
+.tn20 .vl-paivan-ruudut span { width: 14px; height: 14px; border-radius: 4px; background: #FF6B4A; }
+.tn20 .vl-paivan-ruudut span[data-ok] { background: #B6FF3C; }
