@@ -8,6 +8,18 @@ import type { VpkLinkki } from "@/lib/vaalipiiriketju";
 /** Solmujen paikat, jotka CD siirsi keskipisteestä (Uusimaa, Varsinais-Suomi, Ahvenanmaa). */
 const POS: Record<string, [number, number]> = { "02": [236, 668], "03": [96, 650], "05": [22, 684] };
 const HKI: [number, number] = [192, 683.5];
+/** Nimilappujen paikat suhteessa solmuun (testattu 5.10.: CD:n "x > 250 → vasemmalle" -sääntö
+ *  kasasi Keski-Suomen, Savo-Karjalan, Kaakkois-Suomen ja Hämeen laput päällekkäin ja Uusimaan
+ *  lappu leikkautui Helsinki-laattaan). Oletus: oikealle. */
+const LAPPU: Record<string, { dx: number; dy: number; a: "start" | "middle" | "end" }> = {
+  "02": { dx: -4, dy: 34, a: "middle" },
+  "03": { dx: 0, dy: 34, a: "middle" },
+  "04": { dx: -22, dy: 5, a: "end" },
+  "05": { dx: -14, dy: 34, a: "start" },
+  "08": { dx: 22, dy: 5, a: "start" },
+  "09": { dx: 0, dy: -24, a: "middle" },
+  "11": { dx: 0, dy: 34, a: "middle" },
+};
 const HKI_LAATTA: [number, number] = [343, 694];
 const SOLMU_R = 15;
 const GEOM = new Map(VAALIPIIRI_GEOM.map((g) => [g.k, g]));
@@ -102,7 +114,7 @@ export default function VpkKartta({
       {reitti.map((k, i) => {
         if (k === "01") return null;
         const [x, y] = paikka(k);
-        const vasen = x > 250;
+        const lappu = LAPPU[k] ?? { dx: 22, dy: 5, a: "start" as const };
         return (
           <g key={k}>
             <circle cx={x} cy={y} r={SOLMU_R} fill={solmuVari(tilat[i] ?? null, neutraali)} stroke="#131109" strokeWidth={3} />
@@ -110,7 +122,7 @@ export default function VpkKartta({
               {i + 1}
             </text>
             {nimet && (
-              <text x={vasen ? x - 22 : x + 22} y={y + 5} textAnchor={vasen ? "end" : "start"} fontSize={14} fontWeight={700} fill="#F5F0E6" stroke="#131109" strokeWidth={4} paintOrder="stroke">
+              <text x={x + lappu.dx} y={y + lappu.dy} textAnchor={lappu.a} fontSize={14} fontWeight={700} fill="#F5F0E6" stroke="#131109" strokeWidth={4} paintOrder="stroke">
                 {nimi(k)}
               </text>
             )}

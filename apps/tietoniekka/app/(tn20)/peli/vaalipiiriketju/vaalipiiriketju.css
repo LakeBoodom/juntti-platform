@@ -98,6 +98,11 @@
 /* Laatta (mobiili, 171 px @ 390) */
 .tn20 .vpk-kortti--laatta { display: flex; flex-direction: column; gap: 8px; min-height: 92px; height: 100%; padding: 11px 12px 10px; }
 .tn20 .vpk-kortti--laatta[data-tila="ok"], .tn20 .vpk-kortti--laatta[data-tila="bad"] { min-height: 112px; }
+/* 320 px: laatta 140 px → pisin puolue (Kristillisdemokraatit) vaatii 11 px ja kapeamman reunan (mitattu 5.10., CD 12 px). */
+@media (max-width: 359.98px) {
+  .tn20 .vpk-kortti--laatta { padding: 11px 10px 10px; }
+  .tn20 .vpk-kortti--laatta .vpk-kortti-puolue { font-size: 11px; }
+}
 .tn20 .vpk-kortti-ala { display: flex; align-items: center; justify-content: space-between; gap: 6px; margin-top: auto; padding-top: 7px; border-top: 1px solid rgba(255, 107, 74, .25); }
 .tn20 .vpk-kortti[data-tila="ok"] .vpk-kortti-ala { border-top-color: rgba(182, 255, 60, .22); }
 .tn20 .vpk-laatta-num {

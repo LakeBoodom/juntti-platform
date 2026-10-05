@@ -81,8 +81,9 @@ function Kortti({ e, muoto, tila, num, vp, visa, kahva }: { e: VpkEdustaja; muot
   if (muoto === "laatta") {
     return (
       <span className="vpk-kortti vpk-kortti--laatta" data-tila={tila}>
-        <span className="vpk-kortti-t" style={num ? { paddingRight: 30 } : undefined}>
-          <span className="vpk-kortti-nimi" lang="fi">{e.nimi}</span>
+        <span className="vpk-kortti-t">
+          {/* Numeromerkki on nimen rivillä → tila vain nimelle; puolue saa koko leveyden (320 px). */}
+          <span className="vpk-kortti-nimi" lang="fi" style={num ? { paddingRight: 30 } : undefined}>{e.nimi}</span>
           <span className="vpk-kortti-puolue">{e.puolue}</span>
         </span>
         {paljastettu && (
