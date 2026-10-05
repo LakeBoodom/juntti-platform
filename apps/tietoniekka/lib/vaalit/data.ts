@@ -33,7 +33,8 @@ export type Kasvo = { href: string; name: string; ala: string | null; image_url:
 export type KasvoRivi = { avain: string; otsikko: string; kasvot: Kasvo[] };
 
 /** Puolueen näyttönimi (Vaalipiiriketju-katselmus §3): kannassa lyhyt muoto, vain SDP avataan. */
-export const puolueNimi = (p: string | null | undefined) => (p === "SDP" ? "Sosialidemokraatit" : p ?? null);
+import { puolueNimi } from "./puolue";
+export { puolueNimi };
 export type VaalitVisa = { href: string; otsikko: string; meta: string; koti: string | null; kotiKey: string | null };
 
 export type VaalitHub = {

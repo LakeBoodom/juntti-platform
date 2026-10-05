@@ -1,12 +1,11 @@
 "use client";
 // Laadullinen järjestyspakka (brief 4.10.2026): Ikäjärjestyksen järjestämis- ja paljastuskomponentit,
-// pisteytys CD-designin mukaan (oikea paikka 10 p, yhden sijan päässä 5 p). Tasatulokset: kumpi
-// tahansa järjestys on oikein, ja paljastus kertoo "tasan".
+// pisteytys yhteinen pakkapelien kanssa (lib/jarjesta/pisteytys.ts: 10/5, tasatulokset "tasan").
 import { useMemo, useState } from "react";
 import { ReorderableChainList } from "@/components/tn20/ReorderableChainList";
 import { SuuntaindikaattoriBadge } from "@/components/tn20/SuuntaindikaattoriBadge";
 import { RevealSequencer, type RevealItem } from "@/components/tn20/RevealSequencer";
-import type { ChainScoreResult } from "@/components/tn20/ChainResultSummary";
+import { arvioi, arvoLisat, pisteet, PISTEOHJE } from "@/lib/jarjesta/pisteytys";
 import { TkGameNav } from "@/components/tn20/TkGameNav";
 
 export type OmaKohde = { id: string; name: string; role: string; image_url: string | null; value: number; valueLabel: string };
@@ -18,15 +17,6 @@ function sekoita<T>(a: T[]): T[] {
     [b[i], b[j]] = [b[j], b[i]];
   }
   return b;
-}
-
-/** Jokaiselle sijoitetulle: lähin oikea sija (tasatuloksissa lähin samanarvoinen paikka). */
-function arvioi(order: OmaKohde[], oikea: OmaKohde[]) {
-  return order.map((k, i) => {
-    const paikat = oikea.map((o, j) => (o.value === k.value ? j : -1)).filter((j) => j >= 0);
-    const lahin = paikat.reduce((best, j) => (Math.abs(j - i) < Math.abs(best - i) ? j : best), paikat[0] ?? i);
-    return { lahin, oikein: lahin === i, tasan: paikat.length > 1 };
-  });
 }
 
 export default function OmaJarjestysClient({
@@ -49,22 +39,11 @@ export default function OmaJarjestysClient({
   const oikea = useMemo(() => [...kohteet].sort((a, b) => (direction === "desc" ? b.value - a.value : a.value - b.value)), [kohteet, direction]);
   const arviot = useMemo(() => arvioi(order, oikea), [order, oikea]);
 
-  const tulos: ChainScoreResult = useMemo(() => {
-    let score = 0;
-    let pisin = 0;
-    let jakso = 0;
-    arviot.forEach((a, i) => {
-      if (a.oikein) score += 10;
-      else if (Math.abs(a.lahin - i) === 1) score += 5;
-      jakso = a.oikein ? jakso + 1 : 0;
-      pisin = Math.max(pisin, jakso);
-    });
-    return { score, correctCount: arviot.filter((a) => a.oikein).length, totalCount: order.length, longestCorrectChain: pisin };
-  }, [arviot, order.length]);
+  const tulos = useMemo(() => pisteet(arviot), [arviot]);
 
   const revealItems: RevealItem[] = order.map((k, i) => {
     const a = arviot[i];
-    const lisat = [a.tasan ? "tasan" : null, a.oikein ? null : `oikea sija ${a.lahin + 1}.`].filter(Boolean).join(" · ");
+    const lisat = arvoLisat(a);
     return {
       id: k.id,
       name: k.name,
@@ -91,7 +70,7 @@ export default function OmaJarjestysClient({
           summaryProps={{ newRoundLabel: "Pelaa uudelleen", collectionHref: takaisin.href, collectionLabel: `Takaisin: ${takaisin.nimi} →` }}
         />
         <p className="tk-jarj-lahde">
-          Oikea paikka 10 p · yhden sijan päässä 5 p{tilastot ? ` · ${tilastot}` : ""}
+          {PISTEOHJE}{tilastot ? ` · ${tilastot}` : ""}
         </p>
       </main>
     );

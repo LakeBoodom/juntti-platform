@@ -9,6 +9,7 @@
 //   /og/kokoelma/<avain>           kokoelmahub
 //   /og/sivu/<avain>               pelimuodot ja muut sivut (tupla-tai-kuitti, kuntaliitos …)
 //   /og/henkilo/<slug>             henkilösivu (erä B3): nimi + rooli, henkilökuva 3:4-korttina
+//   /og/jarjesta/<pakka>           Laita järjestykseen -pakka (lib/jarjesta/pakat.ts)
 //
 // Satori (ImageResponse) ei osaa WebP:tä, joten kuvat muunnetaan sharpilla JPEG:ksi. Kuvat luetaan
 // tiedostojärjestelmästä (next.config.mjs: outputFileTracingIncludes), jolloin myös preview-
@@ -20,6 +21,7 @@ import { join } from "node:path";
 import sharp from "sharp";
 import { getSupabase } from "@/lib/supabase";
 import { henkiloSlug } from "@/lib/henkiloSlug";
+import { haePakka } from "@/lib/jarjesta/pakat";
 import { getSiteId } from "@/lib/queries";
 import { resolveCollection, COLLECTION_ACCENT, COLLECTION_BG, COLLECTION_LABEL } from "@/lib/visanKokoelma";
 import { KATEGORIAT } from "@/lib/kuvavisat2026";
@@ -328,6 +330,10 @@ export async function GET(req: Request, ctx: { params: Promise<{ polku: string[]
         tausta: await kuvaUri(c.image_url, W, H, { x: 0.5, y: 0.3 }, true),
         alarivi: c.role ?? undefined,
       };
+  } else if (tyyppi === "jarjesta" && haePakka(avain)) {
+    const p = haePakka(avain)!;
+    const otsikko = p.otsikko.charAt(0).toUpperCase() + p.otsikko.slice(1);
+    kortti = { eyebrow: "Laita järjestykseen", otsikko, accent: "#E8A320", tausta: await kuvaUri(p.kuva, W, H) };
   } else if (tyyppi === "sivu" && SIVUT[avain]) {
     const s = SIVUT[avain];
     kortti = { eyebrow: s.eyebrow, otsikko: s.otsikko, accent: s.accent, tausta: await kuvaUri(s.kuva, W, H) };
