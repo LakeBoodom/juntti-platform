@@ -273,4 +273,5 @@
 .tn20 .vl-kasvo-teksti { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
 .tn20 .vl-kasvo-nimi { font-size: 14.5px; font-weight: 700; line-height: 1.2; overflow-wrap: normal; word-break: keep-all; }
 .tn20 .vl-kasvo-ala { font-size: 12px; font-weight: 600; color: var(--vl-muted); line-height: 1.25; }
-#kasvot .vl-kaikki { margin-top: 14px; }
+/* Pitkä linkkiteksti rivittyy 320 px:ssä sanojen välistä (mitattu 5.10.: nowrap vuoti 62 px). */
+#kasvot .vl-kaikki { margin-top: 14px; white-space: normal; overflow-wrap: normal; word-break: keep-all; }
