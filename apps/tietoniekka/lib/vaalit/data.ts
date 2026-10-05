@@ -29,38 +29,47 @@ export const RISTIIN = [
 ];
 
 export type VpRivi = { k: string; nimi: string; alue: string | null; paikat: number; cx: number; cy: number; d: string };
-export type PoliitikkoKortti = { href: string; name: string; role: string | null; image_url: string | null };
+export type Kasvo = { href: string; name: string; ala: string | null; image_url: string | null };
+export type KasvoRivi = { avain: string; otsikko: string; kasvot: Kasvo[] };
+
+/** Puolueen näyttönimi (Vaalipiiriketju-katselmus §3): kannassa lyhyt muoto, vain SDP avataan. */
+export const puolueNimi = (p: string | null | undefined) => (p === "SDP" ? "Sosialidemokraatit" : p ?? null);
 export type VaalitVisa = { href: string; otsikko: string; meta: string; koti: string | null; kotiKey: string | null };
 
 export type VaalitHub = {
   kansanedustajia: number;
   tilanne: string | null;
   vaalipiirit: VpRivi[];
-  poliitikot: PoliitikkoKortti[];
-  poliitikkoja: number;
+  /** Vallan kasvot (toteutusbrief 5.10. §1): puoluejohtajat, pääministerit 1987–, presidentit. */
+  kasvot: KasvoRivi[];
   omatVisat: VaalitVisa[];
   ristiinVisat: VaalitVisa[];
 };
 
-type Celeb = { name: string; role: string | null; image_url: string | null; priority: number | null; trivia_quiz_id: string | null };
+type Celeb = { id: string; name: string; role: string | null; image_url: string | null; politiikka_roolit: string[] | null };
 type Kortti = { id: string; slug: string | null; custom_slug: string | null; title: string; display_title: string | null; collection: string | null; category: string | null; genre: string | null; question_count: number | null };
 
 export async function haeVaalitHub(): Promise<VaalitHub> {
   const sb = getSupabase();
   const siteId = await getSiteId();
-  const tyhja: VaalitHub = { kansanedustajia: 0, tilanne: null, vaalipiirit: [], poliitikot: [], poliitikkoja: 0, omatVisat: [], ristiinVisat: [] };
+  const tyhja: VaalitHub = { kansanedustajia: 0, tilanne: null, vaalipiirit: [], kasvot: [], omatVisat: [], ristiinVisat: [] };
   if (!sb || !siteId) return tyhja;
   /* eslint-disable @typescript-eslint/no-explicit-any */
   const db = sb as any;
   const SEL = "id, slug, custom_slug, title, display_title, collection, category, genre, question_count";
-  const [istuvat, vp, celebs, omat, ristiin] = await Promise.all([
+  const [istuvat, vp, celebs, omat, ristiin, puolueet] = await Promise.all([
     db.from("fact_attributes").select("as_of", { count: "exact" }).eq("attr_key", "mp_sitting").eq("num_value", 1).order("as_of", { ascending: false }).limit(1),
-    db.from("vaalipiirit").select("short_name, seats_2023"),
-    db.from("celebrities").select("name, role, image_url, priority, trivia_quiz_id").eq("site_id", siteId).eq("ryhma", "poliitikot").limit(500),
-    db.from("quiz_cards").select(SEL).eq("site_id", siteId).eq("category", "politiikka").order("title"),
+    // Paikat vaalipiiri-entiteeteistä (julkisesti luettavissa; role_label = lyhyt nimi, vp_seats).
+    db.from("fact_attributes").select("num_value, fact_entities!inner(role_label, kind, status)").eq("attr_key", "vp_seats").eq("fact_entities.kind", "vaalipiiri"),
+    // RLS piilottaa henkilöt, joiden visa on luonnos → rivit täyttyvät julkaisun myötä.
+    db.from("celebrities").select("id, name, role, image_url, politiikka_roolit").eq("site_id", siteId).not("politiikka_roolit", "is", null).limit(500),
+    db.from("quiz_cards").select(SEL).eq("site_id", siteId).eq("category", "politiikka").eq("collection", "vaalit").order("title"),
     db.from("quiz_cards").select(SEL).eq("site_id", siteId).in("slug", RISTIIN),
+    db.from("fact_attributes").select("num_value, fact_entities!inner(name, kind)").eq("attr_key", "party_seats").eq("fact_entities.kind", "party"),
   ]);
-  const paikat = new Map(((vp.data ?? []) as Array<{ short_name: string; seats_2023: number }>).map((r) => [r.short_name, r.seats_2023]));
+  const paikat = new Map(
+    ((vp.data ?? []) as Array<{ num_value: number; fact_entities: { role_label: string } }>).map((r) => [r.fact_entities.role_label, Number(r.num_value)]),
+  );
   const vaalipiirit = VAALIPIIRI_GEOM.filter((g) => paikat.has(g.nimi)).map((g) => ({
     k: g.k,
     nimi: g.nimi,
@@ -72,16 +81,63 @@ export async function haeVaalitHub(): Promise<VaalitHub> {
     d: g.d,
   }));
 
-  const kaikki = (celebs.data ?? []) as Celeb[];
-  // 12 kuvallista poliitikkoa, järjestys vaihtuu päivittäin (aakkosjärjestys toi joka päivä samat
-  // A-alkuiset, ensimmäisenä Abraham Lincolnin). Siemen = päivä → ISR-sivu pysyy samana koko päivän.
-  const t = new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Helsinki" }).format(new Date());
-  let siemen = [...t].reduce((h, c) => (h * 31 + c.charCodeAt(0)) >>> 0, 7);
-  const rnd = () => ((siemen = (siemen * 1664525 + 1013904223) >>> 0) / 4294967296);
-  const kuvalliset = kaikki.filter((c) => c.image_url).map((c) => ({ c, r: rnd() })).sort((a, b) => a.r - b.r).map((x) => x.c);
-  const poliitikot = [...kuvalliset, ...kaikki.filter((c) => !c.image_url)]
-    .slice(0, 12)
-    .map((c) => ({ href: henkiloHref(c.name), name: c.name, role: c.role, image_url: c.image_url }));
+  // Vallan kasvot: henkilöiden person-entiteettien attribuutit (pm_start, pres_start, mp_party).
+  const henkilot = (celebs.data ?? []) as Celeb[];
+  const idt = henkilot.map((c) => c.id);
+  const attrs = new Map<string, Record<string, { num: number; text: string | null }>>();
+  if (idt.length) {
+    const { data } = await db
+      .from("fact_attributes")
+      .select("attr_key, num_value, text_value, display_value, fact_entities!inner(celebrity_id, kind)")
+      .in("attr_key", ["pm_start", "pm_days", "pres_start", "mp_party"])
+      .eq("fact_entities.kind", "person")
+      .in("fact_entities.celebrity_id", idt);
+    for (const r of (data ?? []) as Array<{ attr_key: string; num_value: number | null; text_value: string | null; display_value: string | null; fact_entities: { celebrity_id: string } }>) {
+      const m = attrs.get(r.fact_entities.celebrity_id) ?? {};
+      m[r.attr_key] = { num: Number(r.num_value), text: r.text_value ?? r.display_value };
+      attrs.set(r.fact_entities.celebrity_id, m);
+    }
+  }
+  const paikkoja = new Map(((puolueet.data ?? []) as Array<{ num_value: number; fact_entities: { name: string } }>).map((r) => [r.fact_entities.name, Number(r.num_value)]));
+  const kasvo = (c: Celeb, ala: string | null): Kasvo => ({ href: henkiloHref(c.name), name: c.name, ala, image_url: c.image_url });
+  const roolissa = (r: string) => henkilot.filter((c) => c.politiikka_roolit?.includes(r));
+  const vuosi = (n: number | undefined) => (Number.isFinite(n) ? new Date((n as number) * 1000).getUTCFullYear() : 0);
+  const puolue = (c: Celeb) => attrs.get(c.id)?.mp_party?.text ?? null;
+  // Pääministeririvin alarivi = pääministerikausi (ei celebrities.role, joka on esim. Stubbilla presidentti).
+  // Kannassa ei ole päättymispäivää: loppu = pm_start + pm_days; istuvalla (ei pm_days) "2023–".
+  // 1987– kaudet ovat yhtenäisiä, joten summa = kausi.
+  const pmKausi = (c: Celeb) => {
+    const a = attrs.get(c.id);
+    const alku = a?.pm_start?.num;
+    if (!Number.isFinite(alku)) return c.role;
+    const paivat = a?.pm_days?.num;
+    const loppu = Number.isFinite(paivat) ? vuosi((alku as number) + (paivat as number) * 86400) : null;
+    return `Pääministeri ${vuosi(alku)}–${loppu ?? ""}`;
+  };
+  const kasvot: KasvoRivi[] = [
+    {
+      avain: "puoluejohtajat",
+      otsikko: "Puoluejohtajat 2027 vaaleissa",
+      kasvot: roolissa("puoluejohtaja")
+        .sort((a, b) => (paikkoja.get(puolue(b) ?? "") ?? 0) - (paikkoja.get(puolue(a) ?? "") ?? 0))
+        .map((c) => kasvo(c, puolueNimi(puolue(c)))),
+    },
+    {
+      avain: "paaministerit",
+      otsikko: "Pääministerit Holkerista Orpoon",
+      kasvot: roolissa("paaministeri")
+        .filter((c) => vuosi(attrs.get(c.id)?.pm_start?.num) >= 1987)
+        .sort((a, b) => (attrs.get(a.id)?.pm_start?.num ?? 0) - (attrs.get(b.id)?.pm_start?.num ?? 0))
+        .map((c) => kasvo(c, pmKausi(c))),
+    },
+    {
+      avain: "presidentit",
+      otsikko: "Tasavallan presidentit",
+      kasvot: roolissa("presidentti")
+        .sort((a, b) => (attrs.get(a.id)?.pres_start?.num ?? 0) - (attrs.get(b.id)?.pres_start?.num ?? 0))
+        .map((c) => kasvo(c, c.role)),
+    },
+  ].filter((r) => r.kasvot.length > 0);
 
   const kortti = (q: Kortti): VaalitVisa => {
     const r = resolveCollection(q);
@@ -100,8 +156,7 @@ export async function haeVaalitHub(): Promise<VaalitHub> {
     kansanedustajia: istuvat.count ?? 0,
     tilanne: (istuvat.data?.[0]?.as_of as string | undefined) ?? null,
     vaalipiirit,
-    poliitikot,
-    poliitikkoja: kaikki.length,
+    kasvot,
     omatVisat: ((omat.data ?? []) as Kortti[]).map(kortti),
     ristiinVisat: ristiinJarj.map(kortti),
   };

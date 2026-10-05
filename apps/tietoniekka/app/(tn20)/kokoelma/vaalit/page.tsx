@@ -1,7 +1,8 @@
-// VAALIT JA POLITIIKKA -hub v1 (Claude Design 5.10.2026 + katselmus kierros 1, Cowork 5.10.).
-// v1 = vain olemassa oleva sisältö: hero + vaalilaskuri, Poliitikot henkilöinä, Visat, vaalipiirikartta,
-// johdanto. Pelirivit (päivän peli, Laita järjestykseen, Kumpi?) ja niiden mode-chipit renderöidään vain
-// lib/pelirekisteri.ts:n perusteella — kun peli julkaistaan, rivi ilmestyy ilman hubin muutosta.
+// VAALIT JA POLITIIKKA -hub (Claude Design 5.10.2026 + katselmus, toteutusbrief "hubin uusi järjestys" 5.10.).
+// Järjestys: hero + vaalilaskuri → Eduskuntavaalit-visat → Pelit (päivän peli, Laita järjestykseen,
+// vaalipiirikartta) → Suomen politiikan historia → Vallan kasvot (puoluejohtajat, pääministerit, presidentit)
+// → johdanto. Periaate: eduskuntavaalien kokoelma, ei Tunnetut henkilöt -sivun jatko-osa.
+// Pelirivit ja niiden mode-chipit renderöidään vain lib/pelirekisteri.ts:n perusteella — kun peli julkaistaan, rivi ilmestyy ilman hubin muutosta.
 // Kaikki luvut kannasta (lib/vaalit/data.ts). ISR 1 h (vaalilaskuri päivittyy päivittäin).
 // Staattinen segmentti ohittaa dynaamisen [collection]-reitin.
 import "./vaalit.css";
@@ -19,7 +20,7 @@ export const revalidate = 3600;
 const POLKU = "/kokoelma/vaalit";
 const OTSIKKO = "Vaalit ja politiikka – tietovisat ja pelit eduskunnasta | Tietoniekka";
 const KUVAUS =
-  "Tunnetko eduskunnan? Kansanedustajat, 13 vaalipiiriä, poliitikot henkilöinä ja Suomen politiikan historia visoina. Laskuri eduskuntavaaleihin 18.4.2027.";
+  "Tunnetko eduskunnan? Eduskuntavaalit, 13 vaalipiiriä, puoluejohtajat, pääministerit ja presidentit sekä Suomen politiikan historia visoina. Laskuri eduskuntavaaleihin 18.4.2027.";
 
 export async function generateMetadata(): Promise<Metadata> {
   return {
@@ -94,22 +95,21 @@ export default async function VaalitHub() {
   const puoli = pisteetPolkuna(hemi);
   const paivanPelit = kokoelmanPelit("vaalit", "paivan-peli");
   const pakat = kokoelmanPelit("vaalit", "jarjesta");
-  const kumpi = kokoelmanPelit("vaalit", "kumpi");
-  const peleja = paivanPelit.length + pakat.length + kumpi.length;
+  const peleja = paivanPelit.length + pakat.length;
   const visoja = d.omatVisat.length + d.ristiinVisat.length;
   const vaalipiireja = d.vaalipiirit.length;
+  const pelitOsio = peleja > 0 || vaalipiireja > 0;
 
   const modet = [
-    ...(paivanPelit.length ? [{ nimi: paivanPelit[0].otsikko, meta: "päivittäin", href: "#paivan-peli" }] : []),
-    ...(pakat.length ? [{ nimi: "Laita järjestykseen", meta: `${pakat.length} ${pakat.length === 1 ? "pakka" : "pakkaa"}`, href: "#jarjestys" }] : []),
-    ...(kumpi.length ? [{ nimi: "Kumpi?", meta: `${kumpi.length} ${kumpi.length === 1 ? "pakka" : "pakkaa"}`, href: "#kumpi" }] : []),
-    ...(d.poliitikkoja ? [{ nimi: "Poliitikot", meta: String(d.poliitikkoja), href: "#poliitikot" }] : []),
-    ...(visoja ? [{ nimi: "Visat", meta: `${visoja} visaa`, href: "#visat" }] : []),
+    ...(d.omatVisat.length ? [{ nimi: "Eduskuntavaalit", meta: `${d.omatVisat.length} visaa`, href: "#visat" }] : []),
+    ...(peleja ? [{ nimi: "Pelit", meta: `${peleja} ${peleja === 1 ? "peli" : "peliä"}`, href: "#pelit" }] : []),
     ...(vaalipiireja ? [{ nimi: "Vaalipiirit", meta: String(vaalipiireja), href: "#vaalipiirit" }] : []),
+    ...(d.ristiinVisat.length ? [{ nimi: "Politiikan historia", meta: `${d.ristiinVisat.length} visaa`, href: "#historia" }] : []),
+    ...(d.kasvot.length ? [{ nimi: "Vallan kasvot", meta: "", href: "#kasvot" }] : []),
   ];
 
   const pakkaKortti = (p: KokoelmaPeli, i: number) => {
-    const valitut = p.korosta === 0 || p.korosta === undefined ? siemenPisteet(200, 8, i * 4 + 3) : new Set(Array.from({ length: p.korosta }, (_, j) => j));
+    const valitut = siemenPisteet(200, 8, i * 4 + 3);
     return (
       <a key={p.href} className="vl-kortti" href={p.href} style={{ ["--vl-acc" as string]: "#B4A5FF" }}>
         <span className="vl-kortti-kuva" style={{ background: "radial-gradient(90% 80% at 50% 100%, rgba(180,165,255,.16), transparent 70%)" }}>
@@ -156,7 +156,7 @@ export default async function VaalitHub() {
             <ul className="vl-chipit">
               {d.kansanedustajia > 0 && <li>{d.kansanedustajia} kansanedustajaa</li>}
               {vaalipiireja > 0 && <li>{vaalipiireja} vaalipiiriä</li>}
-              {d.poliitikkoja > 0 && <li>{d.poliitikkoja} henkilövisaa</li>}
+              {visoja > 0 && <li>{visoja} visaa</li>}
               {peleja > 0 && <li>{peleja} {peleja === 1 ? "peli" : "peliä"}</li>}
             </ul>
           </div>
@@ -189,13 +189,46 @@ export default async function VaalitHub() {
                 </li>
               ))}
             </ol>
+            {!ennen && paivanPelit[0] && (
+              <a className="vl-cta vl-cta--leveä" href={paivanPelit[0].href}>
+                Pelaa uutta {paivanPelit[0].otsikko}a
+              </a>
+            )}
           </div>
         </div>
       </section>
 
       <div className="vl-runko">
-        {paivanPelit.length > 0 && (
-          <section id="paivan-peli" className="vl-paivan">
+        {modet.length > 1 && (
+          <nav className="vl-modet" aria-label="Kokoelman sisältö">
+            {modet.map((m) => (
+              <a key={m.href} href={m.href}>
+                {m.nimi}
+                {m.meta && <span>{m.meta}</span>}
+              </a>
+            ))}
+          </nav>
+        )}
+
+        {d.omatVisat.length > 0 && (
+          <section id="visat" aria-labelledby="vl-visat-h">
+            <div className="vl-osio-head">
+              <h2 id="vl-visat-h" className="vl-h2">Eduskuntavaalit</h2>
+              <p>Vaalit, eduskunta ja hallitukset visoina.</p>
+            </div>
+            <div className="vl-rivi vl-rivi--ruudukko vl-rivi--isot">
+              {d.omatVisat.map((v) => (
+                <VisaKortti key={v.href} v={v} puoli={puoli} />
+              ))}
+            </div>
+          </section>
+        )}
+
+        {pelitOsio && (
+          <section id="pelit" aria-labelledby="vl-pelit-h" className="vl-pelit">
+            <div className="vl-osio-head">
+              <h2 id="vl-pelit-h" className="vl-h2">Pelit</h2>
+            </div>
             {paivanPelit.map((p) => (
               <a key={p.href} className="vl-paivan-kortti" href={p.href}>
                 <span className="vl-tagi vl-tagi--vahva">Päivän peli</span>
@@ -204,143 +237,95 @@ export default async function VaalitHub() {
                 <span className="vl-cta">Pelaa</span>
               </a>
             ))}
+            {pakat.length > 0 && (
+              <div id="jarjestys" className="vl-alaosio">
+                <div className="vl-ryhma-head">
+                  <h3>Laita järjestykseen</h3>
+                  <span>Kahdeksan nimeä, yksi oikea järjestys.</span>
+                </div>
+                <div className="vl-rivi">{pakat.map(pakkaKortti)}</div>
+              </div>
+            )}
+            {vaalipiireja > 0 && (
+              <div id="vaalipiirit" className="vl-alaosio">
+                <div className="vl-ryhma-head">
+                  <h3>{vaalipiireja} vaalipiiriä</h3>
+                  <span>Eduskunnan 200 paikkaa jaetaan vaalipiirien kesken Suomen kansalaisten määrän mukaan. Ahvenanmaa valitsee aina yhden edustajan.</span>
+                </div>
+                <VaalipiiriKartta rivit={d.vaalipiirit} />
+              </div>
+            )}
           </section>
         )}
 
-        {modet.length > 1 && (
-          <nav className="vl-modet" aria-label="Kokoelman sisältö">
-            {modet.map((m) => (
-              <a key={m.href} href={m.href}>
-                {m.nimi}
-                <span>{m.meta}</span>
-              </a>
+        {d.ristiinVisat.length > 0 && (
+          <section id="historia" aria-labelledby="vl-hist-h">
+            <div className="vl-osio-head">
+              <h2 id="vl-hist-h" className="vl-h2">Suomen politiikan historia</h2>
+              <p>Mukana myös Historia- ja Kulttuuri-kokoelmista.</p>
+            </div>
+            <div className="vl-rivi vl-rivi--ruudukko">
+              {d.ristiinVisat.map((v) => (
+                <VisaKortti key={v.href} v={v} puoli={puoli} />
+              ))}
+            </div>
+          </section>
+        )}
+
+        {d.kasvot.length > 0 && (
+          <section id="kasvot" aria-labelledby="vl-kasvot-h">
+            <div className="vl-osio-head">
+              <h2 id="vl-kasvot-h" className="vl-h2">Vallan kasvot</h2>
+            </div>
+            {d.kasvot.map((r) => (
+              <div key={r.avain} className="vl-alaosio">
+                <div className="vl-ryhma-head">
+                  <h3>{r.otsikko}</h3>
+                  <span>{r.kasvot.length}</span>
+                </div>
+                <ul className="vl-kasvot">
+                  {r.kasvot.map((k) => (
+                    <li key={k.href}>
+                      <a className="vl-kasvo" href={k.href}>
+                        <span className="vl-kasvo-kuva">
+                          {k.image_url ? (
+                            // eslint-disable-next-line @next/next/no-img-element
+                            <img src={k.image_url} alt="" loading="lazy" />
+                          ) : (
+                            <span aria-hidden="true">
+                              {k.name
+                                .split(/\s+/)
+                                .map((w) => w[0])
+                                .join("")
+                                .slice(0, 2)}
+                            </span>
+                          )}
+                        </span>
+                        <span className="vl-kasvo-teksti">
+                          <span className="vl-kasvo-nimi">{k.name}</span>
+                          {k.ala && <span className="vl-kasvo-ala">{k.ala}</span>}
+                        </span>
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </div>
             ))}
-          </nav>
-        )}
-
-        {pakat.length > 0 && (
-          <section id="jarjestys" aria-labelledby="vl-jarj-h">
-            <div className="vl-osio-head">
-              <h2 id="vl-jarj-h" className="vl-h2">Laita järjestykseen</h2>
-              <p>Kahdeksan nimeä, yksi oikea järjestys.</p>
-            </div>
-            <div className="vl-rivi">{pakat.map(pakkaKortti)}</div>
-          </section>
-        )}
-
-        {kumpi.length > 0 && (
-          <section id="kumpi" aria-labelledby="vl-kumpi-h">
-            <div className="vl-osio-head">
-              <h2 id="vl-kumpi-h" className="vl-h2">Kumpi?</h2>
-              <p>Kaksi vaihtoehtoa, nopea päätös.</p>
-            </div>
-            <div className="vl-rivi">
-              {kumpi.map((p) => (
-                <a key={p.href} className="vl-kumpi" href={p.href}>
-                  <span className="vl-kumpi-ab" aria-hidden="true">
-                    <span>A</span>vai<span>B</span>
-                  </span>
-                  <span className="vl-kortti-teksti">
-                    <span className="vl-kortti-otsikko">{p.otsikko}</span>
-                    <span className="vl-kortti-meta">{p.meta}</span>
-                  </span>
-                </a>
-              ))}
-            </div>
-          </section>
-        )}
-
-        {d.poliitikot.length > 0 && (
-          <section id="poliitikot" aria-labelledby="vl-pol-h">
-            <div className="vl-osio-head vl-osio-head--linkki">
-              <div>
-                <h2 id="vl-pol-h" className="vl-h2">Poliitikot henkilöinä</h2>
-                <p>{d.poliitikkoja} poliitikkoa — jokaisella oma sivu ja henkilövisa.</p>
-              </div>
-              <a className="vl-kaikki" href="/henkilot/poliitikot">
-                Kaikki {d.poliitikkoja} poliitikkoa →
-              </a>
-            </div>
-            <div className="vl-rivi vl-rivi--henkilot">
-              {d.poliitikot.map((p) => (
-                <a key={p.href} className="vl-henkilo" href={p.href}>
-                  <span className="vl-henkilo-kuva">
-                    {p.image_url ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img src={p.image_url} alt="" loading="lazy" />
-                    ) : (
-                      <span className="vl-henkilo-ini" aria-hidden="true">
-                        {p.name
-                          .split(/\s+/)
-                          .map((w) => w[0])
-                          .join("")
-                          .slice(0, 2)}
-                      </span>
-                    )}
-                    <span className="vl-duotone" aria-hidden="true" />
-                  </span>
-                  <span className="vl-henkilo-nimi">{p.name}</span>
-                  {p.role && <span className="vl-henkilo-rooli">{p.role}</span>}
-                </a>
-              ))}
-            </div>
-          </section>
-        )}
-
-        {visoja > 0 && (
-          <section id="visat" aria-labelledby="vl-visat-h">
-            <div className="vl-osio-head">
-              <h2 id="vl-visat-h" className="vl-h2">Visat</h2>
-            </div>
-            {d.omatVisat.length > 0 && (
-              <div className="vl-visaryhma">
-                <div className="vl-ryhma-head">
-                  <h3>Eduskuntavaalit</h3>
-                  <span>Kokoelman omat visat</span>
-                </div>
-                <div className="vl-rivi vl-rivi--ruudukko">
-                  {d.omatVisat.map((v) => (
-                    <VisaKortti key={v.href} v={v} puoli={puoli} />
-                  ))}
-                </div>
-              </div>
-            )}
-            {d.ristiinVisat.length > 0 && (
-              <div className="vl-visaryhma">
-                <div className="vl-ryhma-head">
-                  <h3>Suomen politiikan historia</h3>
-                  <span>Mukana myös toisista kokoelmista</span>
-                </div>
-                <div className="vl-rivi vl-rivi--ruudukko">
-                  {d.ristiinVisat.map((v) => (
-                    <VisaKortti key={v.href} v={v} puoli={puoli} />
-                  ))}
-                </div>
-              </div>
-            )}
-          </section>
-        )}
-
-        {vaalipiireja > 0 && (
-          <section id="vaalipiirit" aria-labelledby="vl-vp-h">
-            <div className="vl-osio-head">
-              <h2 id="vl-vp-h" className="vl-h2">{vaalipiireja} vaalipiiriä</h2>
-              <p>Eduskunnan 200 paikkaa jaetaan vaalipiirien kesken Suomen kansalaisten määrän mukaan. Ahvenanmaa valitsee aina yhden edustajan.</p>
-            </div>
-            <VaalipiiriKartta rivit={d.vaalipiirit} />
+            <a className="vl-kaikki" href="/henkilot/poliitikot">
+              Lisää poliitikkoja Tunnetut henkilöt -kokoelmassa →
+            </a>
           </section>
         )}
 
         <section className="vl-johdanto" aria-labelledby="vl-joh-h">
           <h2 id="vl-joh-h" className="vl-h2">Tietoa kokoelmasta</h2>
           <p>
-            Vaalit ja politiikka kokoaa Tietoniekan eduskuntaan ja Suomen poliittiseen historiaan liittyvät visat yhteen paikkaan.
-            {peleja > 0 ? " Pelit käyttävät istuvan eduskunnan kansanedustajia." : ""}
+            Vaalit ja politiikka kokoaa Tietoniekan eduskuntaan ja Suomen poliittiseen historiaan liittyvät visat
+            {peleja ? " ja pelit" : ""} yhteen paikkaan.{peleja ? " Pelit käyttävät istuvan eduskunnan kansanedustajia." : ""}
           </p>
           <p>
-            Kokoelmassa on {d.poliitikkoja} henkilövisaa poliitikoista ja valtionpäämiehistä
-            {d.omatVisat.length ? ", visoja eduskuntavaaleista" : ""} sekä visoja Suomen politiikan historiasta. Osa visoista kuuluu myös
-            Historia- tai Kulttuuri-kokoelmaan, ja kortti kertoo sen.
+            Kokoelmassa on {d.omatVisat.length ? "visoja eduskuntavaaleista ja " : ""}visoja Suomen politiikan historiasta. Osa visoista kuuluu myös
+            Historia- tai Kulttuuri-kokoelmaan, ja kortti kertoo sen.{d.kasvot.length ? " Puoluejohtajilla, pääministereillä ja presidenteillä on omat henkilösivunsa." : ""}
           </p>
           <p>
             Kansanedustajien tiedot tulevat eduskunnan avoimesta datasta ja vaalipiirien rajat Tilastokeskukselta. Kun eduskuntavaalit

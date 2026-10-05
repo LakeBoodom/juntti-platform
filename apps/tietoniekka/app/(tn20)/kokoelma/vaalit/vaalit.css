@@ -235,3 +235,42 @@
 .tn20 .vl-johdanto .vl-lahteet { margin-top: 6px; padding-top: 14px; border-top: 1px solid var(--vl-line-2); font-size: 13px; font-weight: 600; color: var(--vl-muted); }
 
 @media (prefers-reduced-motion: reduce) { .tn20 .vl * { transition: none !important; } }
+
+/* ── Uusi järjestys (toteutusbrief 5.10.) ─────────────────────────── */
+.tn20 .vl-pelit { display: flex; flex-direction: column; gap: clamp(18px, 2cqw, 28px); }
+.tn20 .vl-pelit .vl-osio-head { margin-bottom: 0; }
+.tn20 .vl-alaosio { display: flex; flex-direction: column; gap: 10px; }
+.tn20 .vl-alaosio + .vl-alaosio { margin-top: clamp(14px, 1.6cqw, 22px); }
+.tn20 .vl-cta--leveä { justify-content: center; width: 100%; padding: 0 16px; font-size: 15px; text-decoration: none; }
+/* Eduskuntavaalit-visat isoina kortteina */
+@media (min-width: 760px) {
+  .tn20 .vl-rivi--isot { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .tn20 .vl-rivi--isot .vl-kortti-kuva { aspect-ratio: 16 / 6; }
+  .tn20 .vl-rivi--isot .vl-kortti-otsikko { font-size: min(26px, calc(100cqw / (var(--vl-lw, 10) * 0.82))); }
+}
+@media (min-width: 1100px) {
+  .tn20 .vl-rivi--isot { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .tn20 .vl-rivi--isot .vl-kortti-kuva { aspect-ratio: 16 / 9; }
+  .tn20 .vl-rivi--isot .vl-kortti-otsikko { font-size: min(22px, calc(100cqw / (var(--vl-lw, 10) * 0.82))); }
+}
+/* Vallan kasvot: pienet avatar-kortit (ei duotone-galleriaa) */
+.tn20 .vl-kasvot { list-style: none; margin: 0; padding: 0 0 6px; display: flex; gap: 10px; overflow-x: auto; scrollbar-width: none; }
+.tn20 .vl-kasvot::-webkit-scrollbar { display: none; }
+@media (min-width: 760px) {
+  .tn20 .vl-kasvot { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); overflow: visible; }
+}
+.tn20 .vl-kasvot li { flex: 0 0 210px; min-width: 0; }
+.tn20 .vl-kasvo {
+  display: flex; align-items: center; gap: 12px; min-height: 64px; padding: 8px 12px 8px 8px; border-radius: 999px;
+  border: 1px solid var(--vl-line); background: #1c1810; color: #f5f0e6; text-decoration: none;
+}
+.tn20 .vl-kasvo:hover { border-color: var(--vl-acc); }
+.tn20 .vl-kasvo-kuva {
+  flex: none; width: 48px; height: 48px; border-radius: 999px; overflow: hidden; background: #221e2c;
+  display: flex; align-items: center; justify-content: center; font-family: var(--tn-font-display); font-weight: 900; font-size: 15px; color: var(--vl-acc-2);
+}
+.tn20 .vl-kasvo-kuva img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 20%; display: block; filter: grayscale(0.25); }
+.tn20 .vl-kasvo-teksti { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.tn20 .vl-kasvo-nimi { font-size: 14.5px; font-weight: 700; line-height: 1.2; overflow-wrap: normal; word-break: keep-all; }
+.tn20 .vl-kasvo-ala { font-size: 12px; font-weight: 600; color: var(--vl-muted); line-height: 1.25; }
+#kasvot .vl-kaikki { margin-top: 14px; }
