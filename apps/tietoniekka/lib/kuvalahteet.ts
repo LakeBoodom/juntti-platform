@@ -23,7 +23,7 @@ export type Kuvalahde = {
   /** Visan slug = kuvatiedoston nimi kansiossa public/20/<kokoelma>/ */
   slug: string;
   /** Kokoelma, jonka kansiossa kuva on. */
-  kokoelma: "musiikki" | "kaupungit" | "jaakiekko" | "vaalit" | "historia" | "maantieto";
+  kokoelma: "musiikki" | "kaupungit" | "jaakiekko" | "vaalit" | "historia" | "maantieto" | "luonto";
   /** Mitä kuvassa on — näytetään lähdesivulla. */
   kuvaus: string;
   /** Tiedoston nimi Wikimedia Commonsissa (ilman File:-etuliitettä). */
@@ -101,6 +101,11 @@ export const KUVALAHTEET: Kuvalahde[] = [
   { slug: "etusivu-historia", kokoelma: "historia", kuvaus: "Turun linna (etusivun Historia-kortti)", tiedosto: "Turku Castle in September 2024.jpg", tekija: "Christian David", lisenssi: "CC BY-SA 4.0", lisenssiUrl: CC("by-sa/4.0"), vuosi: "2024" },
   // Maantieto: Suomen majakat -visa ja etusivun Maantieto-kortti (Heikki 6.10.2026, AI-kuvan tilalle).
   { slug: "suomen-majakat", kokoelma: "maantieto", kuvaus: "Bengtskärin majakka, Kemiönsaari", tiedosto: "Bengtskär lighthouse 2023.jpg", tekija: "Janne Räkköläinen", lisenssi: "CC BY-SA 2.0", lisenssiUrl: CC("by-sa/2.0"), vuosi: "2023" },
+  // Luonto (Heikki 6.10.2026): oikeat valokuvat AI-kuvien tilalle, public/20/luonto/<slug>.webp (1600×900).
+  { slug: "etusivu-luonto", kokoelma: "luonto", kuvaus: "Revontulet Saanan yllä, Kilpisjärvi (etusivun Luonto-kortti)", tiedosto: "Aurora borealis over Saana fell.jpg", tekija: "WikiLucas00", lisenssi: "CC BY-SA 4.0", lisenssiUrl: CC("by-sa/4.0"), vuosi: "2020" },
+  { slug: "jarvien-katketyt-ihmeet-visa", kokoelma: "luonto", kuvaus: "Luosujärvi ja Ylläs, Kolari", tiedosto: "Luosujärvi lake and Ylläs fell in Kolari, Lapland, Finland, 2021 June.jpg", tekija: "Ximonic (Simo Räsänen)", lisenssi: "CC BY-SA 3.0", lisenssiUrl: CC("by-sa/3.0"), vuosi: "2021" },
+  { slug: "tiedatko-metsosta-kaiken", kokoelma: "luonto", kuvaus: "Soidinmetso", tiedosto: "Tetrao urogallus (mating display) (26738644457).jpg", tekija: "Tero Laakso", lisenssi: "CC BY 2.0", lisenssiUrl: CC("by/2.0"), vuosi: "2018" },
+  { slug: "suomen-kansallispuistot-visa", kokoelma: "luonto", kuvaus: "Kolin kansallispuisto, näkymä Pielisjärvelle", tiedosto: "Koli National Park, Finland (52159129197).jpg", tekija: "Ninara", lisenssi: "CC BY 2.0", lisenssiUrl: CC("by/2.0"), vuosi: "2022" },
   { slug: "helsinki", kokoelma: "kaupungit", kuvaus: "Senaatintori, Helsinki", tiedosto: "Helsinki Senate Square Terrace East 2020-07-01.jpg", tekija: "JoAlanen", lisenssi: "CC0", lisenssiUrl: "https://creativecommons.org/publicdomain/zero/1.0/", vuosi: "2020" },
   { slug: "joensuu", kokoelma: "kaupungit", kuvaus: "Pielisjoen ranta, Joensuu", tiedosto: "East bank of Pielisjoki-river in Joensuu.jpg", tekija: "Zache", lisenssi: "CC BY-SA 3.0", lisenssiUrl: CC("by-sa/3.0"), vuosi: "2006" },
   { slug: "jyvaskyla", kokoelma: "kaupungit", kuvaus: "Jyväskylän satama", tiedosto: "Jyväskylä harbour.jpg", tekija: "Roland Struwe", lisenssi: "CC BY-SA 3.0", lisenssiUrl: CC("by-sa/3.0"), vuosi: "2008" },
