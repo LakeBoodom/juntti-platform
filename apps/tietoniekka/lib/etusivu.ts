@@ -17,7 +17,7 @@ export type HeaderPromo = { key: "uusin" | "suosittu"; kicker: string; label: st
 /* Ylätunnisteen nostot: "Uusin kokoelma" näkyy ≥ 1560 px, "Suosittu nyt" ≥ 700 px
    (mitattu raja, ks. topbar.css). */
 export const HEADER_PROMOS: HeaderPromo[] = [
-  { key: "uusin", kicker: "Uusin kokoelma", label: "Tiede & teknologia", href: "/kokoelma/tiede" },
+  { key: "uusin", kicker: "Uusin kokoelma", label: "Vaalit ja politiikka", href: "/kokoelma/vaalit" },
   { key: "suosittu", kicker: "Suosittu nyt", label: "Elokuvat", href: "/kokoelma/elokuvat" },
 ];
 
