@@ -47,9 +47,10 @@ export const POPULAR_COLLECTIONS: CollectionCard[] = [
   /* 6.10.2026 (Heikki): AI-kuvien tilalle oikeat valokuvat kokoelmien omista visoista; Vaalit ja politiikka
      Elokuvien tilalle. Jääkiekko = Leijonien MM-kulta 2026 -visan kuva, Luonto = Suomen marjat,
      Suomen kaupungit = Helsinki (Senaatintori, sama kuva kuin kaupungit-kokoelmassa, isompana),
-     Maantieto = Bengtskärin majakka (Suomen majakat -visan kuva, oikea valokuva AI-kuvan tilalle). */
+     Maantieto = Bengtskärin majakka (Suomen majakat -visan kuva, oikea valokuva AI-kuvan tilalle),
+     Historia = Turun linna (Commons, CC BY-SA 4.0). */
   { key: "jaakiekko", title: "Jääkiekko", href: "/kokoelma/jaakiekko", img: "/20/jaakiekko/jk-leijonat-mm2026-kuva.webp", pos: "center 40%" },
-  { key: "historia", title: "Historia", href: "/kokoelma/historia", img: "/20/etusivu/sp-historia-2026.webp", pos: "center 40%" },
+  { key: "historia", title: "Historia", href: "/kokoelma/historia", img: "/20/etusivu/sp-turun-linna.webp", pos: "center 45%" },
   { key: "luonto", title: "Luonto", href: "/kokoelma/luonto", img: "/20/luonto/suomen-marjat-visa.webp", pos: "center 50%" },
   { key: "maantieto", title: "Maantieto", href: "/kokoelma/matkakohteet", img: "/20/maantieto/suomen-majakat.webp", pos: "56% 50%" },
   { key: "kaupungit", title: "Suomen kaupungit", href: "/kokoelma/kaupungit", img: "/20/etusivu/sp-helsinki.webp", pos: "center 55%" },
