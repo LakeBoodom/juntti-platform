@@ -205,6 +205,21 @@
   color: #f5f0e6;
 }
 
+/* Suositut kokoelmat -kortin intro (Heikki 6.10.2026): 14–15 px, vaalea harmaa 80 % → otsikko pysyy
+   pääosassa. text-wrap: balance → kapeassa (2 saraketta mobiilissa) rivi katkeaa siististi eikä
+   viimeiselle riville jää yksi sana; sanat eivät katkea (KORTTISÄÄNTÖ). */
+.tn20 .tn-es-card-text { min-width: 0; display: block; }
+.tn20 .tn-es-card-desc {
+  display: block; margin-top: 7px; font-size: clamp(13.5px, 1.2cqw, 15px); font-weight: 600; line-height: 1.3;
+  color: rgba(245, 240, 230, 0.8); text-wrap: balance; overflow-wrap: normal; word-break: keep-all;
+}
+/* < 360 px: kortti on 2 sarakkeessa ~136 px leveä → 4:3:ssa intro (3–4 riviä) nosti otsikon kortin
+   yläreunaan (mitattu 6.10.: otsikko 11–18 % korkeudella). Neliökortti + 12 px → otsikko ≥ 38 %. */
+@media (max-width: 359.98px) {
+  .tn20 .tn-es-card { aspect-ratio: 1 / 1; }
+  .tn20 .tn-es-card-desc { font-size: 12px; line-height: 1.25; margin-top: 5px; }
+}
+
 /* ── Laura ja Mikko ───────────────────────────────────────────────────── */
 .tn20 .tn-es-hosts { display: flex; flex-direction: column; gap: clamp(10px, 1.2cqw, 18px); }
 .tn20 .tn-es-hosts-lede { margin: 0 0 clamp(3px, 0.4cqw, 7px); max-width: 92ch; font-size: clamp(12.5px, 1.25cqw, 17px); line-height: 1.45; color: #cfc7b6; text-wrap: pretty; }
