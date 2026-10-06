@@ -345,6 +345,7 @@ export default async function VaalitHub() {
           <p className="vl-lahteet">
             {fiPvm(d.tilanne) ? `Kansanedustajatiedot: eduskunnan avoin data, tilanne ${fiPvm(d.tilanne)}. ` : ""}
             Vaalipiirien rajat: Tilastokeskus, CC BY 4.0. Kuva: Eduskuntatalo, Leonhard Lenz / Wikimedia Commons, CC0 (muokattu).
+            Visojen kuvien tekijät ja lisenssit: <a href="/kuvien-lahteet">Kuvien lähteet</a>.
           </p>
         </section>
       </div>

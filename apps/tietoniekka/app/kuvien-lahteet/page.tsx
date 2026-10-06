@@ -24,6 +24,7 @@ export default function KuvienLahteetPage() {
   const kaupungit = KUVALAHTEET.filter((k) => k.kokoelma === "kaupungit");
   const jaakiekko = KUVALAHTEET.filter((k) => k.kokoelma === "jaakiekko");
   const vaalit = KUVALAHTEET.filter((k) => k.kokoelma === "vaalit");
+  const historia = KUVALAHTEET.filter((k) => k.kokoelma === "historia");
 
   return (
     <main
@@ -97,6 +98,8 @@ export default function KuvienLahteetPage() {
 
         <h2 style={{ fontSize: 22, margin: "34px 0 14px" }}>Vaalit ja politiikka -kokoelma</h2>
         <Lista rivit={vaalit} />
+        <h2 style={{ fontSize: 22, margin: "34px 0 14px" }}>Historia-kokoelma</h2>
+        <Lista rivit={historia} />
         <p style={{ color: "rgba(255,255,255,0.6)", fontSize: 14, margin: "10px 0 0" }}>
           Vaalipiirikartan rajat: Tilastokeskus, vaalipiirit 1:4,5 milj., CC BY 4.0 (yksinkertaistettu).
         </p>
