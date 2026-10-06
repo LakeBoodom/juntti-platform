@@ -23,7 +23,7 @@ export type Kuvalahde = {
   /** Visan slug = kuvatiedoston nimi kansiossa public/20/<kokoelma>/ */
   slug: string;
   /** Kokoelma, jonka kansiossa kuva on. */
-  kokoelma: "musiikki" | "kaupungit" | "jaakiekko" | "vaalit" | "historia";
+  kokoelma: "musiikki" | "kaupungit" | "jaakiekko" | "vaalit" | "historia" | "maantieto";
   /** Mitä kuvassa on — näytetään lähdesivulla. */
   kuvaus: string;
   /** Tiedoston nimi Wikimedia Commonsissa (ilman File:-etuliitettä). */
@@ -98,6 +98,8 @@ export const KUVALAHTEET: Kuvalahde[] = [
   { slug: "kekkosen-suomi-kylma-sota-idansuhteet", kokoelma: "historia", kuvaus: "Presidentti Urho Kekkonen", tiedosto: "Urho-Kekkonen-1977-c.jpg", tekija: "Kuvasiskot / Museovirasto", lisenssi: "CC BY 4.0", lisenssiUrl: CC("by/4.0"), vuosi: "1977", muokkaus: "koko kuva + sumennettu jatke sivuilla" },
   { slug: "mannerheim-visa", kokoelma: "historia", kuvaus: "Marsalkka C. G. E. Mannerheim", tiedosto: "Carl Gustaf Emil Mannerheim.png", tekija: "SA-kuva", lisenssi: "Public domain", lisenssiUrl: "", vuosi: "1940-luku", muokkaus: "koko kuva + sumennettu jatke sivuilla" },
   { slug: "suomi-1980-luvulla", kokoelma: "historia", kuvaus: "Union-huoltoasema yöllä Helsingissä", tiedosto: "Union petrol station at night in Helsinki, 1980s.jpg", tekija: "Harri Ahola / Helsingin kaupunginmuseo", lisenssi: "CC BY 4.0", lisenssiUrl: CC("by/4.0"), vuosi: "1980-luku" },
+  // Maantieto: Suomen majakat -visa ja etusivun Maantieto-kortti (Heikki 6.10.2026, AI-kuvan tilalle).
+  { slug: "suomen-majakat", kokoelma: "maantieto", kuvaus: "Bengtskärin majakka, Kemiönsaari", tiedosto: "Bengtskär lighthouse 2023.jpg", tekija: "Janne Räkköläinen", lisenssi: "CC BY-SA 2.0", lisenssiUrl: CC("by-sa/2.0"), vuosi: "2023" },
   { slug: "helsinki", kokoelma: "kaupungit", kuvaus: "Senaatintori, Helsinki", tiedosto: "Helsinki Senate Square Terrace East 2020-07-01.jpg", tekija: "JoAlanen", lisenssi: "CC0", lisenssiUrl: "https://creativecommons.org/publicdomain/zero/1.0/", vuosi: "2020" },
   { slug: "joensuu", kokoelma: "kaupungit", kuvaus: "Pielisjoen ranta, Joensuu", tiedosto: "East bank of Pielisjoki-river in Joensuu.jpg", tekija: "Zache", lisenssi: "CC BY-SA 3.0", lisenssiUrl: CC("by-sa/3.0"), vuosi: "2006" },
   { slug: "jyvaskyla", kokoelma: "kaupungit", kuvaus: "Jyväskylän satama", tiedosto: "Jyväskylä harbour.jpg", tekija: "Roland Struwe", lisenssi: "CC BY-SA 3.0", lisenssiUrl: CC("by-sa/3.0"), vuosi: "2008" },

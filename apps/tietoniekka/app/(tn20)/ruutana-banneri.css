@@ -1,0 +1,99 @@
+/* RUUTANA-BANNERI — CD "TN Luonto ruutana -banneri" 5a (6.10.2026), komponentti
+   components/tn20/RuutanaBanneri.tsx. Mitat designista: desktop 1160 × 268 (kuva 720 px oikealla),
+   tabletti 760 × 240 (kuva 460 px), mobiili 380 × 600 (pystykuva koko alalla).
+   FONTTI (KORTTISÄÄNTÖ): designin Archivo wdth 68–86 → "Archivo Variable" kuten muissa CD-nostoissa;
+   sanat eivät katkea (white-space: nowrap per sana), otsikko rivittyy sanojen välistä. */
+
+.tn20 .rb-wrap { container-type: inline-size; }
+.tn20 .rb {
+  --rb-display: "Archivo Variable", "Archivo", sans-serif;
+  --rb-amber: #f2b544;
+  position: relative; display: flex; align-items: center; height: 268px; border-radius: 18px; overflow: hidden;
+  border: 1px solid #1c2733; background: #070b10; color: #eef3f7; text-decoration: none;
+  font-family: var(--tn-font-body);
+}
+.tn20 .rb:hover { border-color: #2a3a4a; color: #eef3f7; }
+.tn20 .rb-kuva { position: absolute; right: 0; top: 0; width: 62%; height: 100%; overflow: hidden; }
+.tn20 .rb-kuva img {
+  position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 30% 62%;
+  animation: rbDrift 20s ease-in-out infinite alternate;
+}
+.tn20 .rb-kuva-pysty { display: none; }
+.tn20 .rb-varjo {
+  position: absolute; right: 0; top: 0; width: 62%; height: 100%; pointer-events: none;
+  background: linear-gradient(90deg, #070b10 0%, rgba(7, 11, 16, .7) 22%, rgba(7, 11, 16, 0) 55%);
+}
+.tn20 .rb-teksti { position: relative; display: flex; flex-direction: column; gap: 14px; padding: 0 38px; max-width: 52%; }
+.tn20 .rb-yla { position: relative; display: flex; align-items: center; gap: 10px; white-space: nowrap; }
+.tn20 .rb > .rb-yla { display: none; }
+.tn20 .rb-tagi {
+  height: 24px; display: flex; align-items: center; padding: 0 10px; border-radius: 6px;
+  background: #9fd8ff; color: #0b1016; font-size: 11px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase;
+}
+.tn20 .rb-visa { font-size: 13px; font-weight: 700; }
+.tn20 .rb-h {
+  margin: 0; font-family: var(--rb-display); font-weight: 900; font-variation-settings: "wdth" 70;
+  font-size: 36px; line-height: .98; letter-spacing: -.02em; text-wrap: balance;
+}
+.tn20 .rb-sana {
+  display: inline-block; white-space: nowrap; margin-right: .24em;
+  animation: rbSanaSisaan 520ms cubic-bezier(.2, .7, .2, 1) var(--rb-viive) both;
+}
+.tn20 .rb-sana--viim { margin-right: 0; }
+.tn20 .rb-korostus {
+  color: #0b1016; padding: 0 .12em; margin: 0 -.04em; border-radius: .12em;
+  background-image: linear-gradient(var(--rb-amber), var(--rb-amber)); background-repeat: no-repeat; background-position: 0 55%;
+  background-size: 100% 100%;
+  animation: rbKorostus 480ms cubic-bezier(.6, 0, .2, 1) var(--rb-viive) both;
+}
+.tn20 .rb-kysymys {
+  display: inline-block; color: var(--rb-amber); margin-left: .06em; transform-origin: 50% 80%;
+  animation: rbKysymys 4200ms ease-in-out var(--rb-viive) infinite;
+}
+.tn20 .rb-cta {
+  align-self: flex-start; height: 44px; display: inline-flex; align-items: center; justify-content: center; padding: 0 22px;
+  border-radius: 999px; background: #b6ff3c; color: #0b1016;
+  font-family: var(--rb-display); font-weight: 900; font-variation-settings: "wdth" 86; font-size: 14px; text-transform: uppercase; white-space: nowrap;
+  animation: rbNouse 500ms cubic-bezier(.2, .7, .2, 1) var(--rb-viive) both;
+}
+
+/* Tabletti 760 × 240 */
+@container (max-width: 859.98px) {
+  .tn20 .rb { height: 240px; border-radius: 16px; }
+  .tn20 .rb-kuva, .tn20 .rb-varjo { width: 60.5%; }
+  .tn20 .rb-kuva img { object-position: 32% 62%; }
+  .tn20 .rb-varjo { background: linear-gradient(90deg, #070b10 0%, rgba(7, 11, 16, .7) 26%, rgba(7, 11, 16, 0) 62%); }
+  .tn20 .rb-teksti { gap: 11px; padding: 0 26px; max-width: 55%; }
+  .tn20 .rb-yla { gap: 9px; }
+  .tn20 .rb-tagi { height: 22px; padding: 0 9px; font-size: 10px; }
+  .tn20 .rb-visa { font-size: 12px; }
+  .tn20 .rb-h { font-size: 27px; font-variation-settings: "wdth" 68; line-height: 1; }
+  .tn20 .rb-cta { height: 38px; font-size: 12px; }
+}
+
+/* Mobiili 380 × 600: pystykuva koko alalla, merkit ylhäällä, kysymys ja nappi alhaalla */
+@container (max-width: 519.98px) {
+  .tn20 .rb { height: auto; aspect-ratio: 380 / 600; flex-direction: column; justify-content: space-between; align-items: stretch; }
+  .tn20 .rb-kuva, .tn20 .rb-varjo { inset: 0; width: 100%; }
+  .tn20 .rb-kuva-laaja { display: none; }
+  .tn20 .rb-kuva-pysty { display: block; object-position: 50% 58%; }
+  .tn20 .rb-varjo {
+    background: linear-gradient(to bottom, rgba(7, 11, 16, .55) 0%, rgba(7, 11, 16, 0) 18%, rgba(7, 11, 16, 0) 50%, rgba(7, 11, 16, .85) 72%, #070b10 100%);
+  }
+  .tn20 .rb > .rb-yla { display: flex; gap: 8px; padding: 16px 16px 0; }
+  .tn20 .rb-yla--sisa { display: none; }
+  .tn20 .rb-visa { text-shadow: 0 1px 6px rgba(0, 0, 0, .6); }
+  .tn20 .rb-teksti { gap: 14px; padding: 0 18px 18px; max-width: none; }
+  .tn20 .rb-h { font-size: min(31px, 8.2cqw); font-variation-settings: "wdth" 70; }
+  .tn20 .rb-cta { align-self: stretch; height: 48px; font-size: 15px; }
+}
+
+@keyframes rbSanaSisaan { from { opacity: 0; transform: translateY(14px); filter: blur(6px); } to { opacity: 1; transform: none; filter: none; } }
+@keyframes rbNouse { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+@keyframes rbKorostus { from { background-size: 0% 100%; } to { background-size: 100% 100%; } }
+@keyframes rbKysymys { 0%, 86%, 100% { transform: scale(1); } 91% { transform: scale(1.22) rotate(-6deg); } 95% { transform: scale(.96); } }
+@keyframes rbDrift { from { transform: scale(1.06) translate(0, 0); } to { transform: scale(1.06) translate(-1.2%, -1%); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .tn20 .rb-kuva img, .tn20 .rb-sana, .tn20 .rb-korostus, .tn20 .rb-kysymys, .tn20 .rb-cta { animation: none; }
+}

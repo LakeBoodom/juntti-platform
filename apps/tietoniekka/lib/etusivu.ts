@@ -8,6 +8,8 @@
 // 960 px, hero 1600 px, juontajat 300 px neliö). `pos` = designin
 // background-position per kuva (README: "kuvien rajaukset — älä arvaa").
 
+import { NAV_COLLECTIONS, NAV_MODES } from "./nav";
+
 /** Ylätunnisteen tagline (design: "500+ visaa" = enemmän kuin 500, Heikki 28.8.:
     riittävä tarkkuus — ei lasketa kannasta). */
 export const SITE_TAGLINE = "Suomalainen tietovisasivusto · 500+ visaa";
@@ -18,7 +20,7 @@ export type HeaderPromo = { key: "uusin" | "suosittu"; kicker: string; label: st
    (mitattu raja, ks. topbar.css). */
 export const HEADER_PROMOS: HeaderPromo[] = [
   { key: "uusin", kicker: "Uusin kokoelma", label: "Vaalit ja politiikka", href: "/kokoelma/vaalit" },
-  { key: "suosittu", kicker: "Suosittu nyt", label: "Elokuvat", href: "/kokoelma/elokuvat" },
+  { key: "suosittu", kicker: "Suosittu nyt", label: "Suomen kaupungit", href: "/kokoelma/kaupungit" },
 ];
 
 /* Kategoriarivi (designin lopullisen HTML:n mukaan — README:n 9:n lista hävisi
@@ -42,12 +44,16 @@ export type CollectionCard = { key: string; title: string; href: string; img: st
 
 /* Suositut kokoelmat — 6 korttia (4:3), ei visamääriä (HTML voittaa README:n). */
 export const POPULAR_COLLECTIONS: CollectionCard[] = [
-  { key: "jaakiekko", title: "Jääkiekko", href: "/kokoelma/jaakiekko", img: "/20/etusivu/sp-latka.webp", pos: "center 28%" },
+  /* 6.10.2026 (Heikki): AI-kuvien tilalle oikeat valokuvat kokoelmien omista visoista; Vaalit ja politiikka
+     Elokuvien tilalle. Jääkiekko = Leijonien MM-kulta 2026 -visan kuva, Luonto = Suomen marjat,
+     Suomen kaupungit = Helsinki (Senaatintori, sama kuva kuin kaupungit-kokoelmassa, isompana),
+     Maantieto = Bengtskärin majakka (Suomen majakat -visan kuva, oikea valokuva AI-kuvan tilalle). */
+  { key: "jaakiekko", title: "Jääkiekko", href: "/kokoelma/jaakiekko", img: "/20/jaakiekko/jk-leijonat-mm2026-kuva.webp", pos: "center 40%" },
   { key: "historia", title: "Historia", href: "/kokoelma/historia", img: "/20/etusivu/sp-historia-2026.webp", pos: "center 40%" },
-  { key: "luonto", title: "Luonto", href: "/kokoelma/luonto", img: "/20/etusivu/sp-kuikka.webp", pos: "center 46%" },
-  { key: "maantieto", title: "Maantieto", href: "/kokoelma/matkakohteet", img: "/20/etusivu/coll-maantieto.webp", pos: "center 46%" },
-  { key: "kaupungit", title: "Suomen kaupungit", href: "/kokoelma/kaupungit", img: "/20/etusivu/coll-kaupungit.webp", pos: "center 46%" },
-  { key: "elokuvat", title: "Elokuvat", href: "/kokoelma/elokuvat", img: "/20/etusivu/coll-elokuvat.webp", pos: "center 44%" },
+  { key: "luonto", title: "Luonto", href: "/kokoelma/luonto", img: "/20/luonto/suomen-marjat-visa.webp", pos: "center 50%" },
+  { key: "maantieto", title: "Maantieto", href: "/kokoelma/matkakohteet", img: "/20/maantieto/suomen-majakat.webp", pos: "56% 50%" },
+  { key: "kaupungit", title: "Suomen kaupungit", href: "/kokoelma/kaupungit", img: "/20/etusivu/sp-helsinki.webp", pos: "center 55%" },
+  { key: "vaalit", title: "Vaalit ja politiikka", href: "/kokoelma/vaalit", img: "/20/vaalit/hero.webp", pos: "center 45%" },
 ];
 
 export type Host = {
@@ -70,7 +76,7 @@ export const HOSTS: Host[] = [
     img: "/20/etusivu/host-laura.webp",
     accent: "gold",
     cards: [
-      { key: "tv", title: "TV & suoratoisto", desc: "Sarjat, tähdet ja suoratoistohitit", href: "/kokoelma/tv", img: "/20/etusivu/l-tv.webp", pos: "center 34%" },
+      { key: "tv", title: "TV & suoratoisto", desc: "Sarjat, tähdet ja suoratoistohitit", href: "/kokoelma/tv", img: "/20/etusivu/l-tv-masked-singer.webp", pos: "center 35%" },
       { key: "jalkapallo", title: "Jalkapallo", desc: "Seurat, pelaajat ja arvokisat", href: "/kokoelma/jalkapallo", img: "/20/etusivu/l-jalkapallo.webp", pos: "center 38%" },
     ],
   },
@@ -83,7 +89,7 @@ export const HOSTS: Host[] = [
     accent: "lime",
     cards: [
       { key: "megavisat", title: "Megavisat", desc: "Pitkät visat todellisille tietoniekoille", href: "/megavisat", img: "/20/etusivu/coll-megavisat.webp", pos: "center 50%" },
-      { key: "urheilu", title: "Urheilu", desc: "Lajit, legendat ja ennätykset", href: "/kokoelma/urheilu", img: "/20/etusivu/m-urheilu.webp", pos: "center 42%" },
+      { key: "urheilu", title: "Urheilu", desc: "Lajit, legendat ja ennätykset", href: "/kokoelma/urheilu", img: "/20/urheilulajit/f1-kaikki.webp", pos: "center 50%" },
     ],
   },
 ];
@@ -93,26 +99,14 @@ export const HOSTS_INTRO = {
   lede: "Laura ja Mikko johdattavat Tietoniekan visoihin ja nostavat esiin omat suosikkiaiheensa.",
 };
 
-/* Footerin kokoelmalinkit — KAIKKI kokoelmat (Heikki 28.8.2026, designin
-   "Suomi"-rivin tilalle täysi lista teemasivujen järjestyksessä). */
-export const FOOTER_COLLECTIONS = [
-  { label: "TV & suoratoisto", href: "/kokoelma/tv" },
-  { label: "Urheilu", href: "/kokoelma/urheilu" },
-  { label: "Jääkiekko", href: "/kokoelma/jaakiekko" },
-  { label: "Jalkapallo", href: "/kokoelma/jalkapallo" },
-  { label: "Elokuvat", href: "/kokoelma/elokuvat" },
-  { label: "Musiikki", href: "/kokoelma/musiikki" },
-  { label: "Maantieto", href: "/kokoelma/matkakohteet" },
-  { label: "Suomen kaupungit", href: "/kokoelma/kaupungit" },
-  { label: "Tunnetut henkilöt", href: "/kokoelma/tunnetut-henkilot" },
-  { label: "Kulttuuri", href: "/kokoelma/kulttuuri" },
-  { label: "Historia", href: "/kokoelma/historia" },
-  { label: "Luonto", href: "/kokoelma/luonto" },
-];
+/* Footerin kokoelma- ja pelimuotolinkit johdetaan navigaation rekisteristä (lib/nav.ts), jotta
+   uudet kokoelmat ja pelimuodot tulevat alatunnisteeseen automaattisesti (Heikki 6.10.2026:
+   Vaalit, Tiede, Juhlat ja reittipelit puuttuivat käsin ylläpidetystä listasta). */
+export const FOOTER_COLLECTIONS = NAV_COLLECTIONS.map((c) => ({ label: c.label, href: `/kokoelma/${c.slug}` }));
 
+/* Pelimuodot = navigaation pelimuodot + etusivun omat nostot (Päivän visa, Henkilövisat). */
 export const FOOTER_MODES = [
-  { label: "Kuvavisat", href: "/kokoelma/kuvavisat" },
-  { label: "Megavisat", href: "/megavisat" },
+  ...NAV_MODES.map((m) => ({ label: m.label, href: m.href })),
   { label: "Päivän visa", href: "/#paivan-visa" },
   { label: "Henkilövisat", href: "/kokoelma/tunnetut-henkilot" },
 ];
