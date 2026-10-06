@@ -35,7 +35,15 @@ export type KasvoRivi = { avain: string; otsikko: string; kasvot: Kasvo[] };
 /** Puolueen näyttönimi (Vaalipiiriketju-katselmus §3): kannassa lyhyt muoto, vain SDP avataan. */
 import { puolueNimi } from "./puolue";
 export { puolueNimi };
-export type VaalitVisa = { href: string; otsikko: string; meta: string; koti: string | null; kotiKey: string | null };
+export type VaalitVisa = {
+  href: string;
+  otsikko: string;
+  meta: string;
+  koti: string | null;
+  kotiKey: string | null;
+  /** Visan oma kuva (quizzes.hero_image) ja sen fokus; null → kokoelman kuviopohja. */
+  kuva: { src: string; x: number; y: number } | null;
+};
 
 export type VaalitHub = {
   kansanedustajia: number;
@@ -140,6 +148,14 @@ export async function haeVaalitHub(): Promise<VaalitHub> {
     },
   ].filter((r) => r.kasvot.length > 0);
 
+  // Visan oma kuva: quizzes.hero_image (quiz_cards-näkymässä ei ole kuvasarakkeita).
+  const visaIdt = [...((omat.data ?? []) as Kortti[]), ...((ristiin.data ?? []) as Kortti[])].map((q) => q.id);
+  const kuvat = new Map<string, { src: string; x: number; y: number }>();
+  if (visaIdt.length) {
+    const { data } = await db.from("quizzes").select("id, hero_image, hero_focal_x, hero_focal_y").in("id", visaIdt);
+    for (const q of (data ?? []) as Array<{ id: string; hero_image: string | null; hero_focal_x: number | null; hero_focal_y: number | null }>)
+      if (q.hero_image) kuvat.set(q.id, { src: q.hero_image, x: Number(q.hero_focal_x ?? 0.5), y: Number(q.hero_focal_y ?? 0.5) });
+  }
   const kortti = (q: Kortti): VaalitVisa => {
     const r = resolveCollection(q);
     return {
@@ -148,6 +164,7 @@ export async function haeVaalitHub(): Promise<VaalitHub> {
       meta: q.question_count ? `${q.question_count} kysymystä` : "Visa",
       koti: r.key === "vaalit" ? null : r.label,
       kotiKey: r.key === "vaalit" ? null : r.key,
+      kuva: kuvat.get(q.id) ?? null,
     };
   };
   const ristiinRivit = (ristiin.data ?? []) as Kortti[];

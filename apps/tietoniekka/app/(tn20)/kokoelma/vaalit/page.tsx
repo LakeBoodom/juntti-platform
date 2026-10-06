@@ -68,13 +68,17 @@ function VisaKortti({ v, puoli }: { v: VaalitVisa; puoli: string }) {
   const tyyli = v.kotiKey ? KOTI_TYYLI[v.kotiKey] ?? KOTI_TYYLI.historia : OMA_TYYLI;
   return (
     <a className="vl-kortti" href={v.href} style={{ ["--vl-acc" as string]: tyyli.accent }}>
-      <span className="vl-kortti-kuva" style={{ background: tyyli.bg }}>
+      <span className={v.kuva ? "vl-kortti-kuva vl-kortti-kuva--kuva" : "vl-kortti-kuva"} style={{ background: tyyli.bg }}>
+        {v.kuva && (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={v.kuva.src} alt="" loading="lazy" style={{ objectPosition: `${v.kuva.x * 100}% ${v.kuva.y * 100}%` }} />
+        )}
         {v.koti ? (
           <span className="vl-koti">
             <span aria-hidden="true" />
             {v.koti}
           </span>
-        ) : (
+        ) : v.kuva ? null : (
           <svg viewBox="0 0 200 104" aria-hidden="true">
             <path d={puoli} stroke="#6A5DB0" strokeWidth={5.2} strokeLinecap="round" fill="none" />
           </svg>

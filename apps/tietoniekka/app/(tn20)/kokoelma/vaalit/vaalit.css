@@ -280,3 +280,7 @@
 .tn20 .vl-paivan-ruudut { display: flex; gap: 4px; }
 .tn20 .vl-paivan-ruudut span { width: 14px; height: 14px; border-radius: 4px; background: #FF6B4A; }
 .tn20 .vl-paivan-ruudut span[data-ok] { background: #B6FF3C; }
+/* Visan oma kuva (quizzes.hero_image, 6.10.2026): valokuva kortin kuvapaikalle, kokoelmamerkki päällä. */
+.tn20 .vl-kortti-kuva--kuva { overflow: hidden; }
+.tn20 .vl-kortti-kuva--kuva img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
+.tn20 .vl-kortti-kuva--kuva .vl-koti { z-index: 1; }
