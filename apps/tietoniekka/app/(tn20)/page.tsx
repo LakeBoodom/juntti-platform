@@ -235,7 +235,10 @@ export default async function Etusivu20({
                 <img className="tn-es-card-img" src={c.img} alt="" loading="lazy" style={{ objectPosition: c.pos }} />
                 <span className="tn-es-card-shade" aria-hidden />
                 <span className="tn-es-card-foot">
-                  <span className="tn-es-card-title">{c.title}</span>
+                  <span className="tn-es-card-text">
+                    <span className="tn-es-card-title">{c.title}</span>
+                    {c.desc && <span className="tn-es-card-desc">{c.desc}</span>}
+                  </span>
                   <span className="tn-es-arrow" aria-hidden>→</span>
                 </span>
               </a>
