@@ -4,7 +4,7 @@
 //   ylätunniste (TopBar layoutista: tagline, nostot, Päivän putki) → kategoriarivi →
 //   Päivän visa (19.9.2026: sivun ensimmäinen osio) → Kuvavisat-banneri (18.9.2026,
 //   korvasi lippuvisa-heron ja viikkovisapromon) → Suositut kokoelmat (6) →
-//   Tiede & teknologia -banneri → Suositut kokoelmat (6) →
+//   Luonto–ruutana-banneri → Suositut kokoelmat (6) →
 //   Kuka on vanhin? -banneri → Päivän sankari → Laura ja Mikko (profiilit + 4
 //   korttia) → Uusimmat visat -ticker → footer.
 // Poistuneet: Laura & Mikko -duohero, upotettu ensimmäinen kysymys, putkinauha,
@@ -23,7 +23,7 @@ import { rakennaPaivanVisa } from "@/lib/paivanVisaData";
 import PaivanSankari from "@/components/tn20/PaivanSankari";
 import { muotoileSankari, type SankariRivi } from "@/lib/paivanSankari";
 import { KuvavisatBanneri, IkajarjestysBanneri } from "@/components/tn20/EtusivunBannerit";
-import { TiedeBanneri } from "@/components/tn20/TiedeBanneri";
+import { RuutanaBanneri } from "@/components/tn20/RuutanaBanneri";
 import { TuplaBanneri } from "@/components/tn20/TuplaBanneri";
 import { RajanaapuritBanneri } from "@/components/tn20/RajanaapuritBanneri";
 import { KuntaliitosBanneri } from "@/components/tn20/KuntaliitosBanneri";
@@ -41,6 +41,7 @@ import "./tupla-banneri.css";
 import "./kuntaliitos-banneri.css";
 import "./rajanaapurit-banneri.css";
 import "./juhlat-banneri.css";
+import "./ruutana-banneri.css";
 
 /* SEO-erä A4 (2.10.2026): ISR 5 min. Esikatseluparametreja (?pv, ?sankari, ?juhlapvm) ei lueta
    tuotannossa, jotta sivu voidaan välimuistittaa; keskiyön vaihto: PaivaVahti. */
@@ -217,9 +218,9 @@ export default async function Etusivu20({
             Bannerin otsikko on etusivun h1. */}
         <KuvavisatBanneri yhteenveto={kvYhteenveto} viikko={viikko} />
 
-        {/* ─── Tiede & teknologia -mainosbanneri (Heikki 20.9.2026):
-            Kuvavisat-bannerin alla ennen Suosittuja kokoelmia ─── */}
-        <TiedeBanneri />
+        {/* ─── Luonto–ruutana-koukkubanneri (CD 5a, Heikki 6.10.2026; korvasi Tiede & teknologia
+            -bannerin): Kuvavisat-bannerin alla ennen Suosittuja kokoelmia ─── */}
+        <RuutanaBanneri />
 
         {/* ─── Suositut kokoelmat ─── */}
         <section aria-labelledby="suositut">
