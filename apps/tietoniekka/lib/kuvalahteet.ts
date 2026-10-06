@@ -23,7 +23,7 @@ export type Kuvalahde = {
   /** Visan slug = kuvatiedoston nimi kansiossa public/20/<kokoelma>/ */
   slug: string;
   /** Kokoelma, jonka kansiossa kuva on. */
-  kokoelma: "musiikki" | "kaupungit" | "jaakiekko" | "vaalit";
+  kokoelma: "musiikki" | "kaupungit" | "jaakiekko" | "vaalit" | "historia";
   /** Mitä kuvassa on — näytetään lähdesivulla. */
   kuvaus: string;
   /** Tiedoston nimi Wikimedia Commonsissa (ilman File:-etuliitettä). */
@@ -85,6 +85,14 @@ export const KUVALAHTEET: Kuvalahde[] = [
   { slug: "espoo", kokoelma: "kaupungit", kuvaus: "Hanasaari ja Espoon saaristo ilmasta", tiedosto: "Hanasaari, Espoo 2019-10-05.jpg", tekija: "Joneikifi", lisenssi: "CC BY-SA 4.0", lisenssiUrl: CC("by-sa/4.0"), vuosi: "2019" },
   { slug: "hameenlinna", kokoelma: "kaupungit", kuvaus: "Hämeen linna", tiedosto: "Häme Castle (23499025921).jpg", tekija: "দেবর্ষি রায় (Debarshi Ray)", lisenssi: "CC BY-SA 2.0", lisenssiUrl: CC("by-sa/2.0"), vuosi: "2015" },
   { slug: "hero", kokoelma: "vaalit", kuvaus: "Eduskuntatalo, Helsinki (Vaalit ja politiikka -kokoelman pääkuva)", tiedosto: "Eduskuntatalo Helsinki 2022-09-16 10.jpg", tekija: "Leonhard Lenz", lisenssi: "CC0", lisenssiUrl: "https://creativecommons.org/publicdomain/zero/1.0/", vuosi: "2022", muokkaus: "violetti duotone, rajaus" },
+  // Historian visat Vaalit ja politiikka -hubissa (Heikin valinnat 6.10.2026). Kuvat public/20/historia/<slug>.webp
+  // (1600×900); muotokuvissa koko kuva + saman kuvan sumennettu jatke sivuilla.
+  { slug: "suomen-presidentit-visa", kokoelma: "historia", kuvaus: "Presidentinlinna, Helsinki", tiedosto: "The Presidential Palace, Helsinki, Finland 05.jpg", tekija: "Paasikivi", lisenssi: "CC BY-SA 4.0", lisenssiUrl: CC("by-sa/4.0"), vuosi: "2016" },
+  { slug: "suomen-itsenaistyminen-visa", kokoelma: "historia", kuvaus: "Svinhufvudin senaatti istunnossa 27.11.1917", tiedosto: "Senate1917.jpg", tekija: "Tuntematon / Museovirasto", lisenssi: "Public domain", lisenssiUrl: "", vuosi: "1917" },
+  { slug: "autonomian-aika-visa", kokoelma: "historia", kuvaus: "Porvoon valtiopäivät 1809, Emanuel Thelningin maalaus", tiedosto: "Porvoon valtiopäivät 1809 by Emanuel Thelning.jpg", tekija: "Emanuel Thelning", lisenssi: "Public domain", lisenssiUrl: "", vuosi: "1812" },
+  { slug: "kekkosen-suomi-kylma-sota-idansuhteet", kokoelma: "historia", kuvaus: "Presidentti Urho Kekkonen", tiedosto: "Urho-Kekkonen-1977-c.jpg", tekija: "Kuvasiskot / Museovirasto", lisenssi: "CC BY 4.0", lisenssiUrl: CC("by/4.0"), vuosi: "1977", muokkaus: "koko kuva + sumennettu jatke sivuilla" },
+  { slug: "mannerheim-visa", kokoelma: "historia", kuvaus: "Marsalkka C. G. E. Mannerheim", tiedosto: "Carl Gustaf Emil Mannerheim.png", tekija: "SA-kuva", lisenssi: "Public domain", lisenssiUrl: "", vuosi: "1940-luku", muokkaus: "koko kuva + sumennettu jatke sivuilla" },
+  { slug: "suomi-1980-luvulla", kokoelma: "historia", kuvaus: "Union-huoltoasema yöllä Helsingissä", tiedosto: "Union petrol station at night in Helsinki, 1980s.jpg", tekija: "Harri Ahola / Helsingin kaupunginmuseo", lisenssi: "CC BY 4.0", lisenssiUrl: CC("by/4.0"), vuosi: "1980-luku" },
   { slug: "helsinki", kokoelma: "kaupungit", kuvaus: "Senaatintori, Helsinki", tiedosto: "Helsinki Senate Square Terrace East 2020-07-01.jpg", tekija: "JoAlanen", lisenssi: "CC0", lisenssiUrl: "https://creativecommons.org/publicdomain/zero/1.0/", vuosi: "2020" },
   { slug: "joensuu", kokoelma: "kaupungit", kuvaus: "Pielisjoen ranta, Joensuu", tiedosto: "East bank of Pielisjoki-river in Joensuu.jpg", tekija: "Zache", lisenssi: "CC BY-SA 3.0", lisenssiUrl: CC("by-sa/3.0"), vuosi: "2006" },
   { slug: "jyvaskyla", kokoelma: "kaupungit", kuvaus: "Jyväskylän satama", tiedosto: "Jyväskylä harbour.jpg", tekija: "Roland Struwe", lisenssi: "CC BY-SA 3.0", lisenssiUrl: CC("by-sa/3.0"), vuosi: "2008" },
