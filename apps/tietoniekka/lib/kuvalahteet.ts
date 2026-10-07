@@ -83,7 +83,7 @@ export const KUVALAHTEET: Kuvalahde[] = [
 
   // ─── Kaupungit (12.9.2026) ───
   { slug: "espoo", kokoelma: "kaupungit", kuvaus: "Dipoli, Otaniemi, Espoo", tiedosto: "Dipoli11.jpg", tekija: "Halaszo", lisenssi: "CC BY-SA 4.0", lisenssiUrl: CC("by-sa/4.0"), vuosi: "2017" },
-  { slug: "hameenlinna", kokoelma: "kaupungit", kuvaus: "Hämeen linna", tiedosto: "Häme Castle (23499025921).jpg", tekija: "দেবর্ষি রায় (Debarshi Ray)", lisenssi: "CC BY-SA 2.0", lisenssiUrl: CC("by-sa/2.0"), vuosi: "2015" },
+  { slug: "hameenlinna", kokoelma: "kaupungit", kuvaus: "Hämeen linna Varikonniemeltä", tiedosto: "Hame Castle 2019-08.jpg", tekija: "Kanta-Hämeen kuvapankki", lisenssi: "CC0", lisenssiUrl: "https://creativecommons.org/publicdomain/zero/1.0/", vuosi: "2019" },
   { slug: "hero", kokoelma: "vaalit", kuvaus: "Eduskuntatalo, Helsinki (Vaalit ja politiikka -kokoelman pääkuva)", tiedosto: "Eduskuntatalo Helsinki 2022-09-16 10.jpg", tekija: "Leonhard Lenz", lisenssi: "CC0", lisenssiUrl: "https://creativecommons.org/publicdomain/zero/1.0/", vuosi: "2022", muokkaus: "violetti duotone, rajaus" },
   // Eduskuntavaalivisat (Heikin valinnat 6.10.2026). Kuvat public/20/vaalit/visat/<slug>.webp (1600×900).
   { slug: "eduskuntatalo-graniittia-pylvaita-ja-salaisia-istuntoja", kokoelma: "vaalit", kuvaus: "Eduskunnan täysistuntosali", tiedosto: "Eduskunnan täysistuntosali 2022 (202311;+G71820).jpg", tekija: "Pekka Vyhtinen", lisenssi: "CC BY 4.0", lisenssiUrl: CC("by/4.0"), vuosi: "2022" },
@@ -124,13 +124,13 @@ export const KUVALAHTEET: Kuvalahde[] = [
   { slug: "tunturin-salainen-elama-lappi-visa", kokoelma: "luonto", kuvaus: "Saana ruskan aikaan, Kilpisjärvi", tiedosto: "Saana fell in Finnish Lapland, 2021 September.jpg", tekija: "Ninara", lisenssi: "CC BY 2.0", lisenssiUrl: CC("by/2.0"), vuosi: "2021" },
   { slug: "revontulet-tiedatko-mista-ne-tulevat", kokoelma: "luonto", kuvaus: "Revontulet Saanan yllä, Kilpisjärvi", tiedosto: "Aurora borealis over Saana fell.jpg", tekija: "WikiLucas00", lisenssi: "CC BY-SA 4.0", lisenssiUrl: CC("by-sa/4.0"), vuosi: "2020" },
   { slug: "saimaan-norppa", kokoelma: "luonto", kuvaus: "Saimaannorppa, Rantasalmi", tiedosto: "Pusa hispida saimensis 431602934.jpg", tekija: "Jan Ebr & Ivana Ebrová", lisenssi: "CC BY 4.0", lisenssiUrl: CC("by/4.0"), vuosi: "2024" },
-  { slug: "helsinki", kokoelma: "kaupungit", kuvaus: "Senaatintori, Helsinki", tiedosto: "Helsinki Senate Square Terrace East 2020-07-01.jpg", tekija: "JoAlanen", lisenssi: "CC0", lisenssiUrl: "https://creativecommons.org/publicdomain/zero/1.0/", vuosi: "2020" },
+  { slug: "helsinki", kokoelma: "kaupungit", kuvaus: "Uspenskin katedraali, Helsinki", tiedosto: "Uspenski Cathedral In Helsinki.jpg", tekija: "John Samuel", lisenssi: "CC BY-SA 4.0", lisenssiUrl: CC("by-sa/4.0"), vuosi: "2019" },
   { slug: "joensuu", kokoelma: "kaupungit", kuvaus: "Joensuun kaupungintalo (Eliel Saarinen)", tiedosto: "Joensuu Town Hall 1.jpg", tekija: "Tomisti", lisenssi: "CC BY-SA 4.0", lisenssiUrl: CC("by-sa/4.0") },
   { slug: "jyvaskyla", kokoelma: "kaupungit", kuvaus: "Jyväskylän satama", tiedosto: "Jyväskylä harbour.jpg", tekija: "Roland Struwe", lisenssi: "CC BY-SA 3.0", lisenssiUrl: CC("by-sa/3.0"), vuosi: "2008" },
-  { slug: "kouvola", kokoelma: "kaupungit", kuvaus: "Pyhän Ristin kirkko, Kouvola", tiedosto: "Kouvolan pyhän ristin kirkko.jpg", tekija: "Motopark", lisenssi: "CC BY-SA 3.0", lisenssiUrl: CC("by-sa/3.0"), vuosi: "2013" },
+  { slug: "kouvola", kokoelma: "kaupungit", kuvaus: "Sr1-veturi Kouvolan asemalla", tiedosto: "Sr1 at Kouvola station 20240730.jpg", tekija: "VynedJ", lisenssi: "CC BY 4.0", lisenssiUrl: CC("by/4.0"), vuosi: "2024" },
   { slug: "kuopio", kokoelma: "kaupungit", kuvaus: "Kuopion kauppahalli", tiedosto: "Kuopio Market Hall (Market Square, Kuopio, Finland) Aug 25, 2026.jpg", tekija: "Lasse Keskinen", lisenssi: "CC BY 4.0", lisenssiUrl: CC("by/4.0"), vuosi: "2026" },
-  { slug: "lahti", kokoelma: "kaupungit", kuvaus: "Salpausselän hyppyrimäet, Lahti", tiedosto: "Lahti skijumps.jpg", tekija: "sdbj", lisenssi: "CC BY 2.0", lisenssiUrl: CC("by/2.0"), vuosi: "2005" },
-  { slug: "lappeenranta", kokoelma: "kaupungit", kuvaus: "Lappeenrannan satama", tiedosto: "Lappeenranta harbour.JPG", tekija: "MKFI", lisenssi: "Public domain", lisenssiUrl: "", vuosi: "2011" },
+  { slug: "lahti", kokoelma: "kaupungit", kuvaus: "Lahden kaupungintalo (Eliel Saarinen) illalla", tiedosto: "Lahti Town Hall, April 2014.JPG", tekija: "Trogain", lisenssi: "CC BY-SA 3.0", lisenssiUrl: CC("by-sa/3.0"), vuosi: "2014" },
+  { slug: "lappeenranta", kokoelma: "kaupungit", kuvaus: "De Bange -tykit Lappeenrannan linnoituksessa", tiedosto: "De Bange 90 mm Lappeenranta 1.JPG", tekija: "MKFI", lisenssi: "Public domain", lisenssiUrl: "", vuosi: "2011" },
   { slug: "mikkeli", kokoelma: "kaupungit", kuvaus: "Mikkelin tuomiokirkko Hallituskadulta", tiedosto: "Hallituskatu - Mikkeli Cathedral.jpg", tekija: "Tiia Monto", lisenssi: "CC BY-SA 4.0", lisenssiUrl: CC("by-sa/4.0"), vuosi: "2018" },
   { slug: "oulu", kokoelma: "kaupungit", kuvaus: "Toripolliisi, Oulun kauppatori", tiedosto: "Toripolliisi 2026.jpg", tekija: "Alphaios", lisenssi: "CC0", lisenssiUrl: "https://creativecommons.org/publicdomain/zero/1.0/", vuosi: "2026" },
   { slug: "pori", kokoelma: "kaupungit", kuvaus: "Yyterin hiekkaranta, Pori", tiedosto: "Yyteri beach (45572598264).jpg", tekija: "kooikkari", lisenssi: "CC BY-SA 2.0", lisenssiUrl: CC("by-sa/2.0"), vuosi: "2018" },
@@ -190,7 +190,7 @@ export const KUVALAHTEET: Kuvalahde[] = [
   { slug: "salo", kokoelma: "kaupungit", kuvaus: "Uskelan kirkko, Salo", tiedosto: "Uskela Church.jpg", tekija: "Vnnen", lisenssi: "CC BY-SA 3.0", lisenssiUrl: CC("by-sa/3.0"), vuosi: "2009" },
   { slug: "seinajoki", kokoelma: "kaupungit", kuvaus: "Aalto-keskus ja Lakeuden Ristin kellotorni, Seinäjoki", tiedosto: "Seinäjoki 2023.jpg", tekija: "Zache", lisenssi: "CC BY 4.0", lisenssiUrl: CC("by/4.0"), vuosi: "2023" },
   { slug: "tampere", kokoelma: "kaupungit", kuvaus: "Tampereen keskusta Näsinneulasta", tiedosto: "Tampere center from Näsinneula.jpg", tekija: "Leo-setä", lisenssi: "CC BY 2.0", lisenssiUrl: CC("by/2.0"), vuosi: "2011" },
-  { slug: "turku", kokoelma: "kaupungit", kuvaus: "Turun tuomiokirkko ja Aurajoki", tiedosto: "Kirjastosilta, Aurajoki ja Turun tuomiokirkko, kuvattuna Itäiseltä Rantakadulta, Turku, 8.12.2013.jpg", tekija: "Markus Rantala (Makele-90)", lisenssi: "CC BY-SA 3.0", lisenssiUrl: CC("by-sa/3.0"), vuosi: "2013" },
+  { slug: "turku", kokoelma: "kaupungit", kuvaus: "Turun linna talvella", tiedosto: "Turun linna maaliskuu 2013 2.jpg", tekija: "kallerna", lisenssi: "CC BY-SA 3.0", lisenssiUrl: CC("by-sa/3.0"), vuosi: "2013" },
   { slug: "vaasa", kokoelma: "kaupungit", kuvaus: "Vaasan kirkko ja keskusta vesitornista", tiedosto: "Vaasa Church from water tower.jpg", tekija: "Roland Struwe", lisenssi: "CC BY-SA 3.0", lisenssiUrl: CC("by-sa/3.0"), vuosi: "2008" },
   { slug: "vantaa", kokoelma: "kaupungit", kuvaus: "Tiedekeskus Heureka, Vantaa", tiedosto: "Heureka.jpg", tekija: "Danila Talikov", lisenssi: "CC BY-SA 3.0", lisenssiUrl: CC("by-sa/3.0"), vuosi: "2013" },
 ];
