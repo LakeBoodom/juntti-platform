@@ -288,6 +288,10 @@
   min-height: calc(100svh - var(--tngHud, 92px));
   display: flex; flex-direction: column; justify-content: flex-end;
 }
+/* Kuvakerros (7.10.2026): vaakanäkymässä koko heron tausta kuten ennen, mobiilissa oma 6:5-alue
+   (ks. "Visan pääkuva mobiili" tiedoston lopussa). Sumennettu kopio ja häivytys vain mobiilissa. */
+.tn20 .tng-heromedia { position: absolute; inset: 0; z-index: 0; }
+.tn20 .tng-heroblur, .tn20 .tng-herofade { display: none; }
 .tn20 .tng-heroimg { position: absolute; inset: 0; z-index: 0; width: 100%; height: 100%; object-fit: cover; }
 /* Henkilövisan käsittely = sivuston vakioduotone (sama resepti kuin
    henkilökorteissa ja päivän sankarin kuvanauhassa, tn20.css): harmaasävy →
@@ -1082,3 +1086,61 @@
 .tn20 a.tng-herocat:hover { text-decoration: underline; text-underline-offset: 3px; }
 .tn20 .tng-reshenkilo { align-self: flex-start; margin-top: 2px; font-size: clamp(13px, 1.2cqw, 15px); font-weight: 800; color: var(--tnAccText, #e4c98e); text-decoration: none; }
 .tn20 .tng-reshenkilo:hover { text-decoration: underline; text-underline-offset: 3px; }
+
+/* ── VISAN PÄÄKUVA MOBIILI (handoff 7.10.2026, malli 3b + varamalli 4) ──────────────────────
+   Alle 768 px kuva ei ole enää koko näkymän juliste vaan matala 6:5-alue (enintään 340 px),
+   jonka alla kategoria, otsikko, "Aloita visa" ja murupolku — nappi näkyy 390 × 844:ssä ilman
+   vieritystä. Rajaus kohdepisteen mukaan (hero_focal_x/y → object-position, inline-tyyli).
+   Varamalli 4 (data-mode="fit-blur", lib/herotila.ts): kuva < 1200 px tai sivusuhde > 1,9 →
+   koko kuva näkyy rajaamatta, tausta täytetään saman kuvan sumennetulla kopiolla.
+   Kuvaus ja kysymysmäärä piilotetaan designin mukaisesti; kuvalähde säilyy (lisenssi). */
+@media (max-width: 767.98px) {
+  .tn20 .tng-heroview { min-height: 0; justify-content: flex-start; background: #0E0C07; }
+  .tn20 .tng-hero[data-kind="henkilo"] .tng-heroview::before { display: none; }
+  .tn20 .tng-heromedia { position: relative; inset: auto; flex: none; width: 100%; aspect-ratio: 6 / 5; max-height: 340px; overflow: hidden; isolation: isolate; }
+  .tn20 .tng-herofade { display: block; position: absolute; left: 0; right: 0; bottom: 0; z-index: 2; height: 90px; background: linear-gradient(to bottom, rgba(14, 12, 7, 0), #0E0C07); pointer-events: none; }
+  .tn20 .tng-hero[data-kind="henkilo"] .tng-heromedia::before {
+    content: ""; position: absolute; inset: 0; z-index: 1; pointer-events: none;
+    background: linear-gradient(100deg, rgba(124, 79, 201, 0.34), rgba(20, 18, 12, 0) 66%);
+  }
+  .tn20 .tng-hero[data-mode="fit-blur"] .tng-heroblur {
+    display: block; position: absolute; inset: -30px; z-index: 0; width: calc(100% + 60px); height: calc(100% + 60px);
+    object-fit: cover; filter: blur(22px) saturate(1.2) brightness(0.55);
+  }
+  /* Pystykeskitetty, ei rajausta. Pystykuvalla max-height + contain pitää koko kuvan näkyvissä. */
+  .tn20 .tng-hero[data-mode="fit-blur"] .tng-heroimg {
+    inset: auto; top: 50%; left: 0; z-index: 1; width: 100%; height: auto; max-height: 100%;
+    object-fit: contain; transform: translateY(-50%); box-shadow: 0 18px 40px rgba(0, 0, 0, 0.45);
+  }
+  .tn20 .tng-hero:not([data-kind="ei-kuvaa"]) .tng-heroshade { display: none; }
+
+  .tn20 .tng-herobody { margin-top: -30px; max-height: none; gap: 12px; padding: 0 18px 24px; }
+  .tn20 .tng-hero[data-kind="ei-kuvaa"] .tng-herobody { margin-top: 0; padding-top: 28px; }
+  .tn20 .tng-herocat { order: 1; gap: 8px; font-family: var(--tn-font-body); font-size: 12px; font-weight: 800; letter-spacing: 0.16em; }
+  .tn20 .tng-heroh1 { order: 2; }
+  .tn20 .tng-herorow { display: contents; }
+  .tn20 .tng-herobtn {
+    order: 3; align-self: flex-start; min-height: 48px; padding: 0 22px; border-radius: 12px;
+    background: var(--tnAcc); color: #131109; font-family: "Archivo Variable", var(--tn-font-display);
+    font-variation-settings: "wdth" 100; font-size: 15px;
+  }
+  .tn20 .tng-hero .tng-crumbs { order: 4; font-size: 12px; color: #8A826F; }
+  .tn20 .tng-hero .tng-crumbs a, .tn20 .tng-hero .tng-crumbs [aria-current] { color: #8A826F; }
+  .tn20 .tng-herocredit { order: 5; margin-top: -6px; font-size: 11px; color: rgba(245, 240, 230, 0.45); }
+  .tn20 .tng-herop, .tn20 .tng-herometa { display: none; }
+  /* Otsikko: Archivo Variable 900 wdth 118, 30 px, rivikorkeus 1 (handoff). KORTTISÄÄNTÖ: pisin
+     sana rajaa koon. Mitattu 7.10.2026 (versaali, pisimmät suomen sanat, leveys / em / merkki):
+     wdth 118 → 0,86 · wdth 100 → 0,75 · wdth 87 → 0,66; kertoimissa +4–5 % marginaali.
+     wdth 118 mahtuu 30 px:nä 390 px:n palstaan vain ≤ 13 merkin sanoilla, joten pitkät sanat
+     (120/748 visaa) kapenevat ennen kuin pienenevät: 14–17 merkkiä wdth 100, 18+ wdth 87
+     (data-lwb, GameClient). Rivimäärää ei rajata, jottei pitkä nimi leikkaudu. */
+  .tn20 .tng .tng-heroh1 {
+    --tng-h1: 30px; --tng-lwk: 0.9; --tng-h1cap: calc((100cqw - 36px) / (var(--tng-lw, 1) * var(--tng-lwk)));
+    display: block; -webkit-line-clamp: none; overflow: visible; max-width: none;
+    font-family: "Archivo Variable", var(--tn-font-display); font-variation-settings: "wdth" 118;
+    line-height: 1; letter-spacing: 0; color: #F5F0E6; text-shadow: none;
+    min-width: min(100%, calc(var(--tng-lw, 1) * var(--tng-lwk) * 1em));
+  }
+  .tn20 .tng .tng-heroh1[data-lwb="l"] { --tng-lwk: 0.79; font-variation-settings: "wdth" 100; }
+  .tn20 .tng .tng-heroh1[data-lwb="xl"] { --tng-lwk: 0.7; font-variation-settings: "wdth" 87; }
+}
