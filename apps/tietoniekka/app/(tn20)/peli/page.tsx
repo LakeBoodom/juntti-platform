@@ -22,6 +22,7 @@ import { KAUPUNGIT } from "@/lib/kaupungit";
 import { resolveCollection, COLLECTION_LABEL } from "@/lib/visanKokoelma";
 import { type Learn } from "@/components/tn20/LearnArticle";
 import GameClient, { type GameQuiz } from "./GameClient";
+import { heroMode } from "@/lib/herotila";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 
@@ -677,6 +678,7 @@ export default async function Peli20({
            kortti näyttää tarkan ammatin, ei geneeristä "urheilija"). */
         roleLabel: isPerson ? celeb?.role ?? null : null,
         kind: (isPerson ? "henkilo" : heroImage ? "kuva" : "ei-kuvaa") as "henkilo" | "kuva" | "ei-kuvaa",
+        mode: heroMode(quiz.hero_image),
       }
     : null;
 

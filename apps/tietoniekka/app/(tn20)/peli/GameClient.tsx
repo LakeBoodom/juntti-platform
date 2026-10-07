@@ -89,6 +89,8 @@ export type GameQuiz = {
     srcSmall?: string | null;
     /** Henkilövisan ammatti kannasta (esim. "Jääkiekkoilija") */
     roleLabel?: string | null;
+    /** Mobiilin kuvatila (lib/herotila.ts): cover = 3b-rajaus, fit-blur = varamalli 4. */
+    mode?: "cover" | "fit-blur";
   } | null;
   /** Erä B6: henkilövisan henkilösivu — aloitusnäkymän yläotsikko ja tulosnäkymän "Lue lisää …" -linkki. */
   henkilo?: { href: string; linkki: string } | null;
@@ -1037,21 +1039,31 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
               ilman vieritystä myös 360 × 640:ssä. Vaaka ≥ 768 px = 1c (kuva
               kirkkaana, tummennus vain tekstin puolella), pysty = 2b pystyjuliste. */}
           {phase === "start" && hero && (
-            <section className="tng-hero" data-kind={hero.kind} data-side={hero.side} aria-label="Visan aloitus">
+            <section className="tng-hero" data-kind={hero.kind} data-side={hero.side} data-mode={hero.mode ?? "cover"} aria-label="Visan aloitus">
               <div className="tng-heroview">
+                {/* Kuvakerros: vaakanäkymässä koko heron tausta kuten ennen; mobiilissa (< 768 px)
+                    oma 6:5-alue tekstin yläpuolella (handoff "Visan pääkuva mobiili" 7.10.2026).
+                    fit-blur-tilan sumennettu taustakopio näkyy vain mobiilissa. */}
                 {hero.image && (
-                  /* eslint-disable-next-line @next/next/no-img-element */
-                  <img
-                    className="tng-heroimg"
-                    src={hero.image}
-                    srcSet={hero.srcSet ?? undefined}
-                    sizes="100vw"
-                    alt={hero.alt ?? ""}
-                    fetchPriority="high"
-                    decoding="async"
-                    onError={heroImgError}
-                    style={{ objectPosition: `${Math.round(hero.focalX * 100)}% ${Math.round(hero.focalY * 100)}%` }}
-                  />
+                  <div className="tng-heromedia">
+                    {hero.mode === "fit-blur" && (
+                      /* eslint-disable-next-line @next/next/no-img-element */
+                      <img className="tng-heroblur" src={hero.image} srcSet={hero.srcSet ?? undefined} sizes="100vw" alt="" aria-hidden decoding="async" />
+                    )}
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      className="tng-heroimg"
+                      src={hero.image}
+                      srcSet={hero.srcSet ?? undefined}
+                      sizes="100vw"
+                      alt={hero.alt ?? ""}
+                      fetchPriority="high"
+                      decoding="async"
+                      onError={heroImgError}
+                      style={{ objectPosition: `${Math.round(hero.focalX * 100)}% ${Math.round(hero.focalY * 100)}%` }}
+                    />
+                    <div className="tng-herofade" aria-hidden />
+                  </div>
                 )}
                 <div className="tng-heroshade" aria-hidden />
 
