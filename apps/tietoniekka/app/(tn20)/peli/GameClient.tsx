@@ -1080,7 +1080,7 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
                   ) : (
                     <span className="tng-herocat"><i aria-hidden />{hero.roleLabel ? `${category} · ${hero.roleLabel}` : quiz.genreLabel ? `${category} · ${quiz.genreLabel}` : category}</span>
                   )}
-                  <h1 ref={startH1Ref} className="tng-heroh1" data-len={heroLen} style={{ ["--tng-lw" as string]: heroLw }}>{quiz.title}</h1>
+                  <h1 ref={startH1Ref} className="tng-heroh1" data-len={heroLen} data-lwb={heroLw >= 18 ? "xl" : heroLw >= 14 ? "l" : undefined} style={{ ["--tng-lw" as string]: heroLw }}>{quiz.title}</h1>
                   {quiz.teaser && <p className="tng-herop">{quiz.teaser}</p>}
                   <div className="tng-herorow">
                     <button type="button" className="tng-herobtn" onClick={startGame}>Aloita visa <span aria-hidden>→</span></button>

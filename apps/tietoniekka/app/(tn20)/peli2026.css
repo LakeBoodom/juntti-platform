@@ -1129,13 +1129,18 @@
   .tn20 .tng-herocredit { order: 5; margin-top: -6px; font-size: 11px; color: rgba(245, 240, 230, 0.45); }
   .tn20 .tng-herop, .tn20 .tng-herometa { display: none; }
   /* Otsikko: Archivo Variable 900 wdth 118, 30 px, rivikorkeus 1 (handoff). KORTTISÄÄNTÖ: pisin
-     sana rajaa koon — wdth 118 versaali on leveämpi kuin staattinen Archivo, kerroin RATIO mitattu
-     Range-menetelmällä (ks. kalibrointi alla). Rivimäärää ei rajata, jottei pitkä nimi leikkaudu. */
+     sana rajaa koon. Mitattu 7.10.2026 (versaali, pisimmät suomen sanat, leveys / em / merkki):
+     wdth 118 → 0,86 · wdth 100 → 0,75 · wdth 87 → 0,66; kertoimissa +4–5 % marginaali.
+     wdth 118 mahtuu 30 px:nä 390 px:n palstaan vain ≤ 13 merkin sanoilla, joten pitkät sanat
+     (120/748 visaa) kapenevat ennen kuin pienenevät: 14–17 merkkiä wdth 100, 18+ wdth 87
+     (data-lwb, GameClient). Rivimäärää ei rajata, jottei pitkä nimi leikkaudu. */
   .tn20 .tng .tng-heroh1 {
-    --tng-h1: 30px; --tng-h1cap: calc((100cqw - 36px) / (var(--tng-lw, 1) * 0.9));
+    --tng-h1: 30px; --tng-lwk: 0.9; --tng-h1cap: calc((100cqw - 36px) / (var(--tng-lw, 1) * var(--tng-lwk)));
     display: block; -webkit-line-clamp: none; overflow: visible; max-width: none;
     font-family: "Archivo Variable", var(--tn-font-display); font-variation-settings: "wdth" 118;
     line-height: 1; letter-spacing: 0; color: #F5F0E6; text-shadow: none;
-    min-width: min(100%, calc(var(--tng-lw, 1) * 0.9em));
+    min-width: min(100%, calc(var(--tng-lw, 1) * var(--tng-lwk) * 1em));
   }
+  .tn20 .tng .tng-heroh1[data-lwb="l"] { --tng-lwk: 0.79; font-variation-settings: "wdth" 100; }
+  .tn20 .tng .tng-heroh1[data-lwb="xl"] { --tng-lwk: 0.7; font-variation-settings: "wdth" 87; }
 }
