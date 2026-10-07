@@ -7,7 +7,7 @@ import mitat from "./kuvamitat.json";
 
 export type HeroTila = "cover" | "fit-blur";
 
-const MITAT = mitat as Record<string, [number, number]>;
+const MITAT = mitat as Record<string, number[]>;
 
 export function heroMode(kuva: string | null | undefined): HeroTila {
   const m = kuva ? MITAT[kuva.split("?")[0]] : undefined;
