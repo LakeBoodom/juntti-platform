@@ -126,7 +126,7 @@ export const KUVALAHTEET: Kuvalahde[] = [
   { slug: "saimaan-norppa", kokoelma: "luonto", kuvaus: "Saimaannorppa, Rantasalmi", tiedosto: "Pusa hispida saimensis 431602934.jpg", tekija: "Jan Ebr & Ivana Ebrová", lisenssi: "CC BY 4.0", lisenssiUrl: CC("by/4.0"), vuosi: "2024" },
   { slug: "helsinki", kokoelma: "kaupungit", kuvaus: "Uspenskin katedraali, Helsinki", tiedosto: "Uspenski Cathedral In Helsinki.jpg", tekija: "John Samuel", lisenssi: "CC BY-SA 4.0", lisenssiUrl: CC("by-sa/4.0"), vuosi: "2019" },
   { slug: "joensuu", kokoelma: "kaupungit", kuvaus: "Joensuun kaupungintalo (Eliel Saarinen)", tiedosto: "Joensuu Town Hall 1.jpg", tekija: "Tomisti", lisenssi: "CC BY-SA 4.0", lisenssiUrl: CC("by-sa/4.0") },
-  { slug: "jyvaskyla", kokoelma: "kaupungit", kuvaus: "Jyväskylän satama", tiedosto: "Jyväskylä harbour.jpg", tekija: "Roland Struwe", lisenssi: "CC BY-SA 3.0", lisenssiUrl: CC("by-sa/3.0"), vuosi: "2008" },
+  { slug: "jyvaskyla", kokoelma: "kaupungit", kuvaus: "M/s Rhea Jyväskylän satamassa", tiedosto: "Jyväskylä harbour - boat.jpg", tekija: "Tiia Monto", lisenssi: "CC BY-SA 3.0", lisenssiUrl: CC("by-sa/3.0"), vuosi: "2012" },
   { slug: "kouvola", kokoelma: "kaupungit", kuvaus: "Sr1-veturi Kouvolan asemalla", tiedosto: "Sr1 at Kouvola station 20240730.jpg", tekija: "VynedJ", lisenssi: "CC BY 4.0", lisenssiUrl: CC("by/4.0"), vuosi: "2024" },
   { slug: "kuopio", kokoelma: "kaupungit", kuvaus: "Kuopion kauppahalli", tiedosto: "Kuopio Market Hall (Market Square, Kuopio, Finland) Aug 25, 2026.jpg", tekija: "Lasse Keskinen", lisenssi: "CC BY 4.0", lisenssiUrl: CC("by/4.0"), vuosi: "2026" },
   { slug: "lahti", kokoelma: "kaupungit", kuvaus: "Lahden kaupungintalo (Eliel Saarinen) illalla", tiedosto: "Lahti Town Hall, April 2014.JPG", tekija: "Trogain", lisenssi: "CC BY-SA 3.0", lisenssiUrl: CC("by-sa/3.0"), vuosi: "2014" },
@@ -134,7 +134,7 @@ export const KUVALAHTEET: Kuvalahde[] = [
   { slug: "mikkeli", kokoelma: "kaupungit", kuvaus: "Mikkelin tuomiokirkko Hallituskadulta", tiedosto: "Hallituskatu - Mikkeli Cathedral.jpg", tekija: "Tiia Monto", lisenssi: "CC BY-SA 4.0", lisenssiUrl: CC("by-sa/4.0"), vuosi: "2018" },
   { slug: "oulu", kokoelma: "kaupungit", kuvaus: "Toripolliisi, Oulun kauppatori", tiedosto: "Toripolliisi 2026.jpg", tekija: "Alphaios", lisenssi: "CC0", lisenssiUrl: "https://creativecommons.org/publicdomain/zero/1.0/", vuosi: "2026" },
   { slug: "pori", kokoelma: "kaupungit", kuvaus: "Yyterin hiekkaranta, Pori", tiedosto: "Yyteri beach (45572598264).jpg", tekija: "kooikkari", lisenssi: "CC BY-SA 2.0", lisenssiUrl: CC("by-sa/2.0"), vuosi: "2018" },
-  { slug: "porvoo", kokoelma: "kaupungit", kuvaus: "Porvoon vanhat rantamakasiinit", tiedosto: "Old Porvoo riverside.jpg", tekija: "kallerna", lisenssi: "CC BY-SA 3.0", lisenssiUrl: CC("by-sa/3.0"), vuosi: "2010" },
+  { slug: "porvoo", kokoelma: "kaupungit", kuvaus: "Vanhan Porvoon katu", tiedosto: "Porvoo Old Town (75) (35876957683).jpg", tekija: "Richard Mortel", lisenssi: "CC BY 2.0", lisenssiUrl: CC("by/2.0") },
   { slug: "rovaniemi", kokoelma: "kaupungit", kuvaus: "Jätkänkynttilä-silta ja Kemijoki, Rovaniemi", tiedosto: "Jätkänkynttilä Bridge 5.jpg", tekija: "kallerna", lisenssi: "CC BY-SA 4.0", lisenssiUrl: CC("by-sa/4.0"), vuosi: "2022" },
   /* Jääkiekko (1.10.2026): Satakunnan derbyn visakuva, rajattu (public/20/jaakiekko/jk-derby-satakunta-2019c.webp).
      Kuvassa näkyvät molemmat joukkueet: Ässät kiittää yleisöä, Lukon pelaajat taustalla. */
@@ -188,11 +188,11 @@ export const KUVALAHTEET: Kuvalahde[] = [
   { slug: "nuoret-leijonat-mm-2016-kulta", kokoelma: "jaakiekko", kuvaus: "Jesse Puljujärvi nuorten MM-kisoissa 2016", tiedosto: "Jesse-Puljujärvi.jpg", tekija: "Oonanur", lisenssi: "CC BY-SA 4.0", lisenssiUrl: CC("by-sa/4.0"), vuosi: "2016", muokkaus: "suurennettu, ympärillä sumennettu jatke samasta kuvasta" },
   { slug: "nuoret-leijonat-mm-2019-kulta", kokoelma: "jaakiekko", kuvaus: "Kaapo Kakko, Seattle Kraken 2025", tiedosto: "Kakko 1st 3 12 (54383609894).jpg", tekija: "Jenn G", lisenssi: "CC BY-SA 2.0", lisenssiUrl: CC("by-sa/2.0"), vuosi: "2025", muokkaus: "pienennetty, ympärillä sumennettu jatke samasta kuvasta" },
   { slug: "salo", kokoelma: "kaupungit", kuvaus: "Uskelan kirkko, Salo", tiedosto: "Uskela Church.jpg", tekija: "Vnnen", lisenssi: "CC BY-SA 3.0", lisenssiUrl: CC("by-sa/3.0"), vuosi: "2009" },
-  { slug: "seinajoki", kokoelma: "kaupungit", kuvaus: "Aalto-keskus ja Lakeuden Ristin kellotorni, Seinäjoki", tiedosto: "Seinäjoki 2023.jpg", tekija: "Zache", lisenssi: "CC BY 4.0", lisenssiUrl: CC("by/4.0"), vuosi: "2023" },
-  { slug: "tampere", kokoelma: "kaupungit", kuvaus: "Tampereen keskusta Näsinneulasta", tiedosto: "Tampere center from Näsinneula.jpg", tekija: "Leo-setä", lisenssi: "CC BY 2.0", lisenssiUrl: CC("by/2.0"), vuosi: "2011" },
+  { slug: "seinajoki", kokoelma: "kaupungit", kuvaus: "Lakeuden Risti -kirkko (Alvar Aalto), Seinäjoki", tiedosto: "Lakeuden risti church 20180925.jpg", tekija: "Santeri Viinamäki", lisenssi: "CC BY-SA 4.0", lisenssiUrl: CC("by-sa/4.0"), vuosi: "2018" },
+  { slug: "tampere", kokoelma: "kaupungit", kuvaus: "Tampereen tuomiokirkko", tiedosto: "Tampere Cathedral.jpg", tekija: "Tiia Monto", lisenssi: "CC BY-SA 4.0", lisenssiUrl: CC("by-sa/4.0"), vuosi: "2017" },
   { slug: "turku", kokoelma: "kaupungit", kuvaus: "Turun linna talvella", tiedosto: "Turun linna maaliskuu 2013 2.jpg", tekija: "kallerna", lisenssi: "CC BY-SA 3.0", lisenssiUrl: CC("by-sa/3.0"), vuosi: "2013" },
-  { slug: "vaasa", kokoelma: "kaupungit", kuvaus: "Vaasan kirkko ja keskusta vesitornista", tiedosto: "Vaasa Church from water tower.jpg", tekija: "Roland Struwe", lisenssi: "CC BY-SA 3.0", lisenssiUrl: CC("by-sa/3.0"), vuosi: "2008" },
-  { slug: "vantaa", kokoelma: "kaupungit", kuvaus: "Tiedekeskus Heureka, Vantaa", tiedosto: "Heureka.jpg", tekija: "Danila Talikov", lisenssi: "CC BY-SA 3.0", lisenssiUrl: CC("by-sa/3.0"), vuosi: "2013" },
+  { slug: "vaasa", kokoelma: "kaupungit", kuvaus: "Vapaudenpatsas Vaasan torilla", tiedosto: "Statue of Liberty Vaasa Finland July 2022.jpg", tekija: "Amirmojiry", lisenssi: "CC BY-SA 4.0", lisenssiUrl: CC("by-sa/4.0"), vuosi: "2022" },
+  { slug: "vantaa", kokoelma: "kaupungit", kuvaus: "Tiedekeskus Heureka ja Tiedepuisto Galilei, Vantaa", tiedosto: "Heureka, Tiedepuisto Galilei.jpg", tekija: "Abc10", lisenssi: "CC BY-SA 4.0", lisenssiUrl: CC("by-sa/4.0"), vuosi: "2016" },
 ];
 
 /** Commons-tiedostosivun osoite — lisenssiehtojen vaatima linkki lähteeseen. */
