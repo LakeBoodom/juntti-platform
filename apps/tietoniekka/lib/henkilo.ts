@@ -347,8 +347,10 @@ export async function haeHenkiloSivu(slug: string): Promise<HenkiloSivu | { ohja
     .eq("celebrity_id", c.id)
     .gt("score", 0)
     .order("score", { ascending: false })
-    .limit(20);
-  const linkkiIdt = ((linkit ?? []) as Array<{ quiz_id: string }>).map((l) => l.quiz_id).filter((id) => id !== c.trivia_quiz_id);
+    .limit(100);
+  // 8.10.2026: taulussa ovat kaikki osumat (ei valmiiksi 4/henkilö) → rajaus tässä.
+  const pisteet = new Map(((linkit ?? []) as Array<{ quiz_id: string; score: number }>).map((l) => [l.quiz_id, Number(l.score)]));
+  let linkkiIdt = [...pisteet.keys()].filter((id) => id !== c.trivia_quiz_id);
   const taytto = [
     ...kaikki.filter((x) => c.laji && x.laji === c.laji).sort(jarjesta),
     ...kaikki.filter((x) => !(c.laji && x.laji === c.laji) && ryhmaOf(x.ryhma, x.laji) === r).sort(jarjesta),
@@ -362,6 +364,9 @@ export async function haeHenkiloSivu(slug: string): Promise<HenkiloSivu | { ohja
       .select("id, slug, custom_slug, title, display_title, collection")
       .in("id", haettavat);
     const julkaistu = new Map(((kortit ?? []) as VisaKortti[]).map((k) => [k.id, k]));
+    // score desc; tasapisteissä aihevisat ennen muiden henkilöiden henkilövisoja.
+    const henkiloVisa = (id: string) => (julkaistu.get(id)?.collection === "tunnetut-henkilot" ? 1 : 0);
+    linkkiIdt = linkkiIdt.sort((a, b) => (pisteet.get(b) ?? 0) - (pisteet.get(a) ?? 0) || henkiloVisa(a) - henkiloVisa(b));
     const lisaa = (id: string, meta: string | undefined) => {
       const k = julkaistu.get(id);
       if (!k || aiheet.length >= MAX_AIHEET || aiheet.some((a) => a.href === visaHref(k))) return;

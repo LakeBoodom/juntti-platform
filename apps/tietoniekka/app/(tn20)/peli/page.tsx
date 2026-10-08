@@ -823,7 +823,7 @@ async function haeVisassaMukana(sb: NonNullable<ReturnType<typeof getSupabase>>,
     .eq("quiz_id", quizId)
     .gt("score", 0)
     .order("score", { ascending: false })
-    .limit(12);
+    .limit(40);
   const idt = ((linkit ?? []) as Array<{ celebrity_id: string }>).map((l) => l.celebrity_id);
   if (!idt.length) return [];
   const { data: hlot } = await sb.from("celebrities").select("id, name, image_url").in("id", idt);

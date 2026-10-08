@@ -1107,7 +1107,7 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
                   {quiz.henkilo ? (
                     <a className="tng-herocat" href={quiz.henkilo.href}><i aria-hidden />{hero.roleLabel ? `${category} · ${hero.roleLabel}` : category}</a>
                   ) : (
-                    <span className="tng-herocat"><i aria-hidden />{hero.roleLabel ? `${category} · ${hero.roleLabel}` : quiz.genreLabel ? `${category} · ${quiz.genreLabel}` : category}</span>
+                    <span className="tng-herocat"><i aria-hidden />{hero.roleLabel ? `${category} · ${hero.roleLabel}` : quiz.genreLabel && quiz.genreLabel.toLowerCase() !== category.toLowerCase() ? `${category} · ${quiz.genreLabel}` : category}</span>
                   )}
                   <h1 ref={startH1Ref} className="tng-heroh1" data-len={heroLen} data-lwb={heroLw >= 18 ? "xl" : heroLw >= 14 ? "l" : undefined} style={{ ["--tng-lw" as string]: heroLw }}>{quiz.title}</h1>
                   {quiz.teaser && <p className="tng-herop">{quiz.teaser}</p>}
