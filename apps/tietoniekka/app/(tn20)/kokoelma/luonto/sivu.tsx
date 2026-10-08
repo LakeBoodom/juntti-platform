@@ -254,7 +254,7 @@ export default async function LuontoLanding({
           ) : (
             <ShowAllCards total={nakyvat.length}>
               {nakyvat.map((k) => (
-                <a key={k.key} className="tnl3-kortti" href={k.href}>
+                <a key={k.key} className="tnl3-kortti" href={k.href} style={{ ["--lw" as string]: pisin(k.otsikko) }}>
                   <span className="tnl3-kortti-media">
                     {k.kuva && (
                       // eslint-disable-next-line @next/next/no-img-element
