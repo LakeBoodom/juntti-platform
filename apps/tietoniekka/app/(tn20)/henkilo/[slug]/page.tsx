@@ -114,8 +114,8 @@ export default async function HenkiloPage({ params }: { params: Promise<{ slug: 
           suuri={String(ika)}
           yksikko="v"
           korostus
+          merkki={<span className="hub-synttarit-merkki">Synttärit tänään</span>}
           rivit={[
-            <span key="m" className="hub-synttarit-merkki">Synttärit tänään</span>,
             <span key="l" className="hub-fakta-lause">
               {h.name} täyttää tänään <strong>{ika}</strong> vuotta
             </span>,

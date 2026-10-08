@@ -94,6 +94,7 @@
   font-size: 12px; font-weight: 900; letter-spacing: 0.14em; text-transform: uppercase; line-height: 1.2; white-space: nowrap;
   box-shadow: 0 6px 18px -8px rgba(240, 196, 107, 0.8);
 }
+.tn20 .hub-fakta-merkki { grid-column: 1 / -1; display: flex; margin-bottom: 14px; }
 .tn20 .hub-synttarit-merkki::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: #1a1408; }
 @media (min-width: 1100px) { .tn20 .hub-fakta.hub-fakta--synttarit { padding: 18px 20px; } }
 

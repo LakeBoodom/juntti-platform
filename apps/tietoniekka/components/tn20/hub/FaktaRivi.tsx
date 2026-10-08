@@ -10,6 +10,7 @@ export default function FaktaRivi({
   suuriAla,
   rivit,
   korostus = false,
+  merkki,
 }: {
   /** "46" tai "1930–2001". */
   suuri: string;
@@ -20,10 +21,13 @@ export default function FaktaRivi({
   rivit: ReactNode[];
   /** Syntymäpäivä: kultainen korostus (henkilösivu 8.10.2026, Päivän sankarin synttärityyli). */
   korostus?: boolean;
+  /** Koko lohkon levyinen merkki ison luvun ja rivien yllä ("Synttärit tänään"). */
+  merkki?: ReactNode;
 }) {
   const vali = suuri.includes("–");
   return (
     <div className={korostus ? "hub-fakta hub-fakta--synttarit" : "hub-fakta"}>
+      {merkki && <div className="hub-fakta-merkki">{merkki}</div>}
       <div className="hub-fakta-suuri">
         <div className={vali ? "hub-fakta-luku hub-fakta-luku--vali" : "hub-fakta-luku"}>
           {vali ? (
