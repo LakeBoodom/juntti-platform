@@ -583,7 +583,7 @@ export default async function Peli20({
 
   const resolved = resolveCollection(quiz);
   /* Ristiinnostot (SEO-erä A3): portaittainen, satunnaistettu haku — ks. lib/related.ts. */
-  const [{ data: qs }, genreRes, relatedRes, celebRes] = await Promise.all([
+  const [{ data: qs }, genreRes, relatedRes, celebRes, mukana] = await Promise.all([
     sb
       .from("questions")
       .select("sort_order, question_text, explanation, answers")
@@ -598,6 +598,7 @@ export default async function Peli20({
     quiz.collection === "tunnetut-henkilot"
       ? sb.from("celebrities").select("name, role, image_url, wikipedia_url, nimi_elatiivi" as never).eq("trivia_quiz_id", quiz.id).maybeSingle()
       : Promise.resolve({ data: null }),
+    haeVisassaMukana(sb, quiz.id),
   ]);
 
   const collection = quiz.collection ?? "yleistieto";
@@ -729,6 +730,7 @@ export default async function Peli20({
         fact: row.explanation,
       };
     }),
+    mukana,
     related: (relatedRows.slice(0, 3)).map((r) => ({
       id: r.id,
       title: r.display_title ?? r.title,
@@ -808,4 +810,27 @@ export default async function Peli20({
       )}
     </>
   );
+}
+
+/** "Visassa mukana" (8.10.2026): henkilöt, jotka celebrity_related_quizzes liittää visaan (score > 0,
+ *  score desc, enintään 6) → linkit heidän henkilösivuilleen. celebrities-RLS piilottaa henkilöt,
+ *  joiden oma visa on luonnos, joten linkit osoittavat vain olemassa oleviin sivuihin. */
+async function haeVisassaMukana(sb: NonNullable<ReturnType<typeof getSupabase>>, quizId: string) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data: linkit } = await (sb as any)
+    .from("celebrity_related_quizzes")
+    .select("celebrity_id, score")
+    .eq("quiz_id", quizId)
+    .gt("score", 0)
+    .order("score", { ascending: false })
+    .limit(12);
+  const idt = ((linkit ?? []) as Array<{ celebrity_id: string }>).map((l) => l.celebrity_id);
+  if (!idt.length) return [];
+  const { data: hlot } = await sb.from("celebrities").select("id, name, image_url").in("id", idt);
+  const kartta = new Map(((hlot ?? []) as Array<{ id: string; name: string; image_url: string | null }>).map((h) => [h.id, h]));
+  return idt
+    .map((id) => kartta.get(id))
+    .filter((h): h is { id: string; name: string; image_url: string | null } => !!h)
+    .slice(0, 6)
+    .map((h) => ({ name: h.name, href: henkiloHref(h.name), image_url: h.image_url }));
 }

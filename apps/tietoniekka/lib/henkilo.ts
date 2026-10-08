@@ -7,6 +7,7 @@ import { getSiteId } from "./queries";
 import { lajiMonikko, ryhma, ryhmaOf, type RyhmaKey } from "./henkiloRyhmat";
 import { lueFaktat, type Fakta } from "./henkiloKaava";
 import { visaHref } from "./visaHref";
+import { COLLECTION_LABEL } from "./visanKokoelma";
 import { henkiloSlug } from "./henkiloSlug";
 import { nimiVuotaa, rakennaVuotolista, vastaustenLuvut, type VisanKysymys } from "./vuotolista";
 import { haeLaatuArvot, haeLaatuDefit, lukuSana, valitseLaatuPakka, type LaatuArvo, type PoolHenkilo } from "./laadullinen";
@@ -99,7 +100,8 @@ export type HenkiloSivu = {
   wikipedia_url: string | null;
   visa: { id: string; href: string; otsikko: string; fanitasot: string[] | null } | null;
   nosto: JarjestysNosto | null;
-  /** "Muista kokoelmista": 0–3 aihevisaa. */
+  /** "Liittyvät visat" (8.10.2026): celebrity_related_quizzes (score > 0, score desc, enintään 4),
+   *  täydennettynä saman lajin / ryhmän henkilövisoilla. */
   aiheet: PeliLinkki[];
   muut: { otsikko: string; laatat: Laatta[]; kaikki: number; kaikkiHref: string | null };
   samanaPaivana: Laatta[];
@@ -108,32 +110,24 @@ export type HenkiloSivu = {
 type Rivi = {
   id: string; slug: string | null; name: string; role: string | null; ryhma: string | null; laji: string | null;
   image_url: string | null; birth_date: string | null; death_date: string | null; priority: number | null;
+  trivia_quiz_id: string | null;
 };
 
-const KEVYT = "id, slug, name, role, ryhma, laji, image_url, birth_date, death_date, priority";
+const KEVYT = "id, slug, name, role, ryhma, laji, image_url, birth_date, death_date, priority, trivia_quiz_id";
 
-/** Aihevisat (ei henkilövisoja) ryhmän / lajin mukaan — "Muista kokoelmista". */
-function aiheSuodatin(r: RyhmaKey, laji: string | null): { genre?: string; collections: string[] } {
-  if (r === "urheilijat") {
-    const lajiGenre = ["jaakiekko", "jalkapallo", "moottoriurheilu", "tennis", "golf"];
-    return laji && lajiGenre.includes(laji) ? { genre: laji, collections: ["urheilu"] } : { collections: ["urheilu"] };
-  }
-  if (r === "muusikot") return { collections: ["musiikki"] };
-  if (r === "nayttelijat") return laji === "komedia" ? { genre: "komedia", collections: ["tv"] } : { collections: ["elokuvat", "tv"] };
-  if (r === "poliitikot") return { collections: ["historia"] };
-  if (r === "media") return { collections: ["tv", "elokuvat"] };
-  if (r === "kirjailijat") return { collections: ["kulttuuri"] };
-  return { collections: ["yleistieto", "historia"] };
-}
+/** Ryhmän monikko Ikäjärjestys-otsikkoon ("Jare Brand ja muut muusikot"). null = ei taivu luontevasti
+ *  → otsikkona fact_attribute_defs.jarjesta_title ("Ikäjärjestys"). */
+const RYHMA_MONIKKO: Record<RyhmaKey, string | null> = {
+  urheilijat: "urheilijat",
+  muusikot: "muusikot",
+  nayttelijat: "näyttelijät",
+  poliitikot: "poliitikot",
+  media: null,
+  kirjailijat: "kirjailijat ja taiteilijat",
+  vaikuttajat: null,
+};
 
-function sekoita<T>(a: T[]): T[] {
-  const b = a.slice();
-  for (let i = b.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [b[i], b[j]] = [b[j], b[i]];
-  }
-  return b;
-}
+type VisaKortti = { id: string; slug: string | null; custom_slug: string | null; title: string; display_title: string | null; collection: string | null };
 
 /* Päivän siemen: sama henkilö + sama päivä → samat vastustajat kortilla ja pelissä (Cowork 3.10.). */
 function siemen(s: string): () => number {
@@ -316,10 +310,19 @@ export async function haeHenkiloSivu(slug: string): Promise<HenkiloSivu | { ohja
     }
     if (valitut.length >= 4) {
       const jasenet = [itse, ...valitut.map(pool)];
+      // 8.10.2026: "Jare Brand ja muusikot ja artistit" → "Jare Brand ja muut muusikot". Kysymys
+      // "Kuka on vanhin?" on kortin merkkirivillä heti otsikon yllä. Jos ryhmän nimi ei taivu
+      // ("Media- ja elokuvantekijät"), otsikko on fact_attribute_defs.jarjesta_title.
+      const monikko = lajiRiittaa && lajiNimi ? lajiNimi : RYHMA_MONIKKO[r];
+      let otsikko = monikko ? `${c.name} ja muut ${monikko}` : "";
+      if (!otsikko) {
+        const { data: def } = await sb.from("fact_attribute_defs").select("jarjesta_title").eq("attr_key", "birth").maybeSingle();
+        otsikko = (def as { jarjesta_title: string | null } | null)?.jarjesta_title || "Ikäjärjestys";
+      }
       nosto = {
         merkki: "Ikäjärjestys",
         kysymys: "Kuka on vanhin?",
-        otsikko: `${c.name} ja ${lajiRiittaa && lajiNimi ? lajiNimi : ryhma(r).nimi.toLowerCase()}`,
+        otsikko,
         kuvaus: `Järjestä ${c.name} ja ${lukuSana(valitut.length)} muuta syntymäpäivän mukaan.`,
         // category: "Arvo 10 uutta" jatkaa saman ryhmän kierroksilla.
         href: `/peli/ikajarjestys?henkilot=${jasenet.map((x) => x.id).join(",")}&category=${r}`,
@@ -331,19 +334,44 @@ export async function haeHenkiloSivu(slug: string): Promise<HenkiloSivu | { ohja
     }
   }
 
+  // Liittyvät visat (8.10.2026): visat, joiden kysymyksissä henkilö mainitaan (celebrity_related_quizzes,
+  // vain score > 0 — 0-rivit ovat vanhoja ajoja). Enintään 4, score desc, vain julkaistut (quiz_cards).
+  // Täyttö saman lajin, sitten saman ryhmän henkilöiden omilla visoilla (prioriteettijärjestys). Satunnaisia
+  // saman kokoelman visoja ei enää näytetä (Hyypiällä oli Leeds United).
   const aiheet: PeliLinkki[] = [];
-  const f = aiheSuodatin(r, c.laji);
+  const MAX_AIHEET = 4;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  let aq = (sb as any)
-    .from("quiz_cards")
-    .select("id, slug, custom_slug, title, display_title, collection, game_mode")
-    .in("collection", f.collections)
-    .neq("game_mode", "mega")
-    .limit(60);
-  if (f.genre) aq = aq.eq("genre", f.genre);
-  const { data: aiheRivit } = await aq;
-  for (const a of sekoita((aiheRivit ?? []) as Array<{ id: string; slug: string | null; custom_slug: string | null; title: string; display_title: string | null; collection: string; game_mode: string | null }>).slice(0, 3)) {
-    aiheet.push({ eyebrow: "Visa", otsikko: a.display_title ?? a.title, href: visaHref(a), meta: KOKOELMA_NIMI[a.collection] ?? undefined });
+  const { data: linkit } = await (sb as any)
+    .from("celebrity_related_quizzes")
+    .select("quiz_id, score")
+    .eq("celebrity_id", c.id)
+    .gt("score", 0)
+    .order("score", { ascending: false })
+    .limit(20);
+  const linkkiIdt = ((linkit ?? []) as Array<{ quiz_id: string }>).map((l) => l.quiz_id).filter((id) => id !== c.trivia_quiz_id);
+  const taytto = [
+    ...kaikki.filter((x) => c.laji && x.laji === c.laji).sort(jarjesta),
+    ...kaikki.filter((x) => !(c.laji && x.laji === c.laji) && ryhmaOf(x.ryhma, x.laji) === r).sort(jarjesta),
+  ].filter((x) => x.trivia_quiz_id && x.trivia_quiz_id !== c.trivia_quiz_id);
+  const tayttoIdt = taytto.slice(0, 12).map((x) => x.trivia_quiz_id!);
+  const haettavat = [...new Set([...linkkiIdt, ...tayttoIdt])];
+  if (haettavat.length) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data: kortit } = await (sb as any)
+      .from("quiz_cards")
+      .select("id, slug, custom_slug, title, display_title, collection")
+      .in("id", haettavat);
+    const julkaistu = new Map(((kortit ?? []) as VisaKortti[]).map((k) => [k.id, k]));
+    const lisaa = (id: string, meta: string | undefined) => {
+      const k = julkaistu.get(id);
+      if (!k || aiheet.length >= MAX_AIHEET || aiheet.some((a) => a.href === visaHref(k))) return;
+      aiheet.push({ eyebrow: "Visa", otsikko: k.display_title ?? k.title, href: visaHref(k), meta });
+    };
+    for (const id of linkkiIdt) {
+      const col = julkaistu.get(id)?.collection ?? "";
+      lisaa(id, KOKOELMA_NIMI[col] ?? COLLECTION_LABEL[col] ?? undefined);
+    }
+    for (const id of tayttoIdt) lisaa(id, "Henkilövisa");
   }
 
   return {
@@ -380,6 +408,12 @@ export async function haeHenkiloSivu(slug: string): Promise<HenkiloSivu | { ohja
 }
 
 const KOKOELMA_NIMI: Record<string, string> = {
+  "tunnetut-henkilot": "Henkilövisa",
+  maantieto: "Maantieto",
+  luonto: "Luonto",
+  tiede: "Tiede",
+  juhlat: "Juhlat",
+  politiikka: "Politiikka",
   urheilu: "Urheilu",
   musiikki: "Musiikki",
   elokuvat: "Elokuvat",

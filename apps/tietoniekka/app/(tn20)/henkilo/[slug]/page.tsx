@@ -1,7 +1,9 @@
 // Erä B3 (3.10.2026): henkilösivu /henkilo/<slug> — Henkilosivu_design_v0.2 (3a desktop = 2a, 3c mobiili = 1a).
 // Lohkot ovat yleisiä komponentteja (components/tn20/hub/*), henkilökohtainen logiikka (ikä,
-// synttärilaskuri, edesmennyt) on tässä tiedostossa. ISR 3600: laskuri voi olla korkeintaan tunnin
-// vanha. Esittely ja Lyhyesti näkyvät vain Heikin hyväksymille (facts_reviewed_at), muille bio_short.
+// synttärilaskuri, edesmennyt) on tässä tiedostossa. Ikä ja laskuri lasketaan Europe/Helsinki-ajassa
+// (lib/henkilo.ts tanaan()); ISR 3600 → sivu ja <title> uusiutuvat useita kertoja vuorokaudessa, joten
+// syntymäpäivänä ikä vaihtuu viimeistään tunnin kuluttua puolestayöstä. Esittely ja Lyhyesti näkyvät
+// vain Heikin hyväksymille (facts_reviewed_at), muille bio_short.
 import "../../henkilo.css";
 import type { Metadata } from "next";
 import { notFound, permanentRedirect } from "next/navigation";
@@ -35,17 +37,28 @@ function kuvaus(h: HenkiloSivu): string {
   return osat.join(" ").trim();
 }
 
+/** <title> ikähakuihin (8.10.2026): "Anssi Kela ikä – 54 vuotta", syntymäpäivänä "… täyttää tänään 54
+ *  vuotta", edesmenneellä "… – syntymäpäivä ja tietovisa". Sama Open Graph -otsikkona. */
+function sivuOtsikko(h: HenkiloSivu): string {
+  if (h.death || !h.birth) return `${h.name} – syntymäpäivä ja tietovisa | Tietoniekka`;
+  const nyt = tanaan();
+  const ika = vuodet(h.birth, nyt);
+  return paiviaSynttariin(h.birth, nyt) === 0
+    ? `${h.name} täyttää tänään ${ika} vuotta | Tietoniekka`
+    : `${h.name} ikä – ${ika} vuotta | Tietoniekka`;
+}
+
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const slug = decodeURIComponent((await params).slug);
   const h = await haeHenkiloSivu(slug);
   if (!h || "ohjaa" in h) return {};
   const url = henkiloHref(h.slug);
-  const title = h.death ? `${h.name} – elämä, syntymäpäivä ja tietovisa` : `${h.name} – ikä, syntymäpäivä ja tietovisa`;
+  const title = sivuOtsikko(h);
   return {
-    title: `${title} | Tietoniekka`,
+    title: { absolute: title },
     description: kuvaus(h),
     alternates: { canonical: url },
-    ...jakoMeta({ title: h.name, description: kuvaus(h), url, kuva: `/og/henkilo/${encodeURIComponent(h.slug)}` }),
+    ...jakoMeta({ title, description: kuvaus(h), url, kuva: `/og/henkilo/${encodeURIComponent(h.slug)}` }),
   };
 }
 
@@ -59,12 +72,17 @@ export default async function HenkiloPage({ params }: { params: Promise<{ slug: 
   const R = ryhma(h.ryhma);
   const rooli = [h.role, h.nickname ? `”${h.nickname}”` : null].filter(Boolean).join(" · ");
 
-  // Faktalohko: elossa iso ikä + "Täyttää N · X päivän päästä"; edesmennyt vuosiväli + "N vuotta" + neutraali chip.
+  // Faktalohko: elossa iso ikä + lause "X on N-vuotias" + "Täyttää N · X päivän päästä"; edesmennyt
+  // vuosiväli + "N vuotta" + neutraali chip. Päivämäärät <time datetime>-elementteinä (ikähaut 8.10.2026).
   let fakta: React.ReactNode = null;
+  let synttarit = false;
   if (h.birth) {
     const syntRivi = (
       <>
-        {h.death ? "Syntyi" : "Syntynyt"} <strong>{fiPvm(h.birth)}</strong>
+        {h.death ? "Syntyi" : "Syntynyt"}{" "}
+        <strong>
+          <time dateTime={h.birthIso ?? undefined}>{fiPvm(h.birth)}</time>
+        </strong>
         {h.birth_place ? ` ${h.birth_place}` : ""}
       </>
     );
@@ -76,7 +94,10 @@ export default async function HenkiloPage({ params }: { params: Promise<{ slug: 
           rivit={[
             syntRivi,
             <>
-              Kuoli <strong>{fiPvm(h.death)}</strong>
+              Kuoli{" "}
+              <strong>
+                <time dateTime={h.deathIso ?? undefined}>{fiPvm(h.death)}</time>
+              </strong>
               {h.death_place ? ` ${h.death_place}` : ""}
             </>,
             <Chip key="c" chip={{ tyyli: "neutraali", teksti: `Olisi nyt ${vuodet(h.birth, nyt)} v · syntymäpäivä ${h.birth.d}.${h.birth.m}.` }} />,
@@ -86,15 +107,33 @@ export default async function HenkiloPage({ params }: { params: Promise<{ slug: 
     } else {
       const ika = vuodet(h.birth, nyt);
       const p = paiviaSynttariin(h.birth, nyt);
-      fakta = (
+      synttarit = p === 0;
+      // Iso "53 v" on visuaalinen; sama tieto kokonaisena lauseena tietoriveillä (ei piilotekstiä).
+      fakta = synttarit ? (
+        <FaktaRivi
+          suuri={String(ika)}
+          yksikko="v"
+          korostus
+          rivit={[
+            <span key="m" className="hub-synttarit-merkki">Synttärit tänään</span>,
+            <span key="l" className="hub-fakta-lause">
+              {h.name} täyttää tänään <strong>{ika}</strong> vuotta
+            </span>,
+            syntRivi,
+          ]}
+        />
+      ) : (
         <FaktaRivi
           suuri={String(ika)}
           yksikko="v"
           rivit={[
+            <span key="l" className="hub-fakta-lause">
+              {h.name} on <strong>{ika}</strong>-vuotias
+            </span>,
             syntRivi,
             <span key="t" className="hub-fakta-tayttaa">
-              <span>{p === 0 ? `Täyttää tänään ${ika}` : `Täyttää ${ika + 1}`}</span>
-              {p > 0 && <Chip chip={{ tyyli: "kulta", teksti: paivaaTeksti(p) }} />}
+              <span>Täyttää {ika + 1}</span>
+              <Chip chip={{ tyyli: "kulta", teksti: paivaaTeksti(p) }} />
             </span>,
           ]}
         />
@@ -175,6 +214,7 @@ export default async function HenkiloPage({ params }: { params: Promise<{ slug: 
                 otsikko={h.elatiivi ? `Pelaa ${h.elatiivi}` : `Pelaa: ${h.name}`}
                 pelit={hyllyPelit}
                 muista={h.aiheet.map((a) => ({ otsikko: a.otsikko, href: a.href, meta: a.meta }))}
+                muistaOtsikko="Liittyvät visat"
               />
             </div>
           </div>

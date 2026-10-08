@@ -197,11 +197,14 @@ export default function PeliHylly({
   otsikko,
   pelit,
   muista = [],
+  muistaOtsikko = "Muista kokoelmista",
   kaikki,
 }: {
   otsikko: string;
   pelit: HyllyPeli[];
   muista?: HyllyLinkki[];
+  /** Listan otsikko (henkilösivulla "Liittyvät visat"). */
+  muistaOtsikko?: string;
   /** 5+ pelillä "Kaikki <nimen> pelit" -linkki. */
   kaikki?: { href: string; teksti: string };
 }) {
@@ -234,7 +237,7 @@ export default function PeliHylly({
       )}
       {muista.length > 0 && (
         <div className="hub-muista">
-          <span className="hub-muista-otsikko">Muista kokoelmista</span>
+          <span className="hub-muista-otsikko">{muistaOtsikko}</span>
           <ul>
             {muista.map((m) => (
               <li key={m.href}>
