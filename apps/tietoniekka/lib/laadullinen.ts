@@ -18,8 +18,13 @@ export type LaatuDef = {
   winner: "high" | "low";
   /** "F1-voittoja", "Rallin MM-tittelejä" */
   mittari: string;
-  /** "eniten F1-voittoja" / "vähiten …" */
+  /** Pakan otsikko: fact_attribute_defs.jarjesta_title ("Eniten F1-voittoja", "Pääministerit
+   *  aikajärjestyksessä"); varalla johdettu "eniten F1-voittoja". */
   otsikko: string;
+  /** rank_label: "eniten voittoja ottaneesta vähimpään", "ensimmäisestä viimeisimpään". */
+  jarjestys: string;
+  /** Akselin päät: määrämittarilla "Eniten"/"Vähiten", aikajärjestyksessä "Ensin"/"Viimeisenä". */
+  akseli: [string, string];
 };
 
 export type LaatuArvo = { celebId: string; value: number; display: string; asOf: string | null };
@@ -29,21 +34,28 @@ const pieniAlku = (s: string) => (s.length > 1 && s[1] === s[1].toLowerCase() &&
 export async function haeLaatuDefit(sb: Sb): Promise<Map<string, LaatuDef>> {
   const { data } = await sb
     .from("fact_attribute_defs")
-    .select("attr_key, unit_label, winner, fact_template, rank_label")
+    .select("attr_key, unit_label, winner, fact_template, rank_label, jarjesta_title")
     .eq("kind", "person")
     .not("rank_label", "is", null)
     .neq("attr_key", "birth");
   const m = new Map<string, LaatuDef>();
-  for (const d of (data ?? []) as Array<{ attr_key: string; unit_label: string | null; winner: string | null; fact_template: string | null }>) {
-    const mittari = (d.fact_template ?? "").split(":")[0].trim();
+  for (const d of (data ?? []) as Array<{ attr_key: string; unit_label: string | null; winner: string | null; fact_template: string | null; rank_label: string | null; jarjesta_title: string | null }>) {
+    // 8.10.2026: kaikki templatet eivät ole muotoa "Mittari: {a} …" (pm_start: "{a} aloitti pääministerinä
+    // {apvm}, …") → otsikko tulee jarjesta_titlesta, ei templaten alusta. Ilman kumpaakaan mittari ohitetaan.
+    const alku = (d.fact_template ?? "").split(":")[0].trim();
+    const jt = d.jarjesta_title?.trim() || null;
+    const mittari = alku && !alku.includes("{") ? alku : jt;
     if (!mittari) continue;
     const winner = d.winner === "low" ? "low" : "high";
+    const maara = !jt || /^(eniten|vähiten|pisimpään|lyhimpään)\b/i.test(jt);
     m.set(d.attr_key, {
       attr_key: d.attr_key,
       unit_label: d.unit_label ?? "",
       winner,
       mittari,
-      otsikko: `${winner === "high" ? "eniten" : "vähiten"} ${pieniAlku(mittari)}`,
+      otsikko: jt ?? `${winner === "high" ? "eniten" : "vähiten"} ${pieniAlku(mittari)}`,
+      jarjestys: d.rank_label?.trim() || `${winner === "high" ? "eniten" : "vähiten"} ylimmäksi`,
+      akseli: maara ? (winner === "high" ? ["Eniten", "Vähiten"] : ["Vähiten", "Eniten"]) : ["Ensin", "Viimeisenä"],
     });
   }
   return m;

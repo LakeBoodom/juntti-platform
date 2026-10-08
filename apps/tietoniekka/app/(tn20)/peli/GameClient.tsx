@@ -117,7 +117,36 @@ export type GameQuiz = {
   spare?: GameQuestion[];
   questions: GameQuestion[];
   related: GameRelated[];
+  /** "Visassa mukana" (8.10.2026): henkilösivut, jotka celebrity_related_quizzes liittää visaan. */
+  mukana?: Array<{ name: string; href: string; image_url: string | null }>;
 };
+
+/** "Visassa mukana": oikeat <a href> -linkit henkilösivuille (SSR-renderöity aloitusnäkymä). */
+function VisassaMukana({ hlot }: { hlot?: GameQuiz["mukana"] }) {
+  if (!hlot?.length) return null;
+  return (
+    <nav className="tng-mukana" aria-label="Visassa mukana">
+      <span className="tng-mukana-t">Visassa mukana</span>
+      <ul>
+        {hlot.map((h) => (
+          <li key={h.href}>
+            <a href={h.href}>
+              <span className="tng-mukana-kuva" aria-hidden>
+                {h.image_url ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={h.image_url} alt="" loading="lazy" decoding="async" />
+                ) : (
+                  h.name.split(/\s+/).map((w) => w[0]).join("").slice(0, 2)
+                )}
+              </span>
+              {h.name}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+  );
+}
 
 type Hist = "ok" | "bad" | "skipped";
 
@@ -1078,7 +1107,7 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
                   {quiz.henkilo ? (
                     <a className="tng-herocat" href={quiz.henkilo.href}><i aria-hidden />{hero.roleLabel ? `${category} · ${hero.roleLabel}` : category}</a>
                   ) : (
-                    <span className="tng-herocat"><i aria-hidden />{hero.roleLabel ? `${category} · ${hero.roleLabel}` : quiz.genreLabel ? `${category} · ${quiz.genreLabel}` : category}</span>
+                    <span className="tng-herocat"><i aria-hidden />{hero.roleLabel ? `${category} · ${hero.roleLabel}` : quiz.genreLabel && quiz.genreLabel.toLowerCase() !== category.toLowerCase() ? `${category} · ${quiz.genreLabel}` : category}</span>
                   )}
                   <h1 ref={startH1Ref} className="tng-heroh1" data-len={heroLen} data-lwb={heroLw >= 18 ? "xl" : heroLw >= 14 ? "l" : undefined} style={{ ["--tng-lw" as string]: heroLw }}>{quiz.title}</h1>
                   {quiz.teaser && <p className="tng-herop">{quiz.teaser}</p>}
@@ -1087,6 +1116,7 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
                     <span className="tng-herometa">{countLabel}</span>
                     {heroCredit && <span className="tng-herocredit">{heroCredit}</span>}
                   </div>
+                  <VisassaMukana hlot={quiz.mukana} />
                 </div>
 
                 {/* Henkilövisan kuvapaneeli: vaakanäkymässä täyskorkea oikea laita,
@@ -1213,6 +1243,7 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
                 <button type="button" className="tng-start-btn" onClick={startGame}>Aloita visa <span aria-hidden>→</span></button>
                 <span className="tng-start-count">{countLabel}</span>
               </div>
+              <VisassaMukana hlot={quiz.mukana} />
             </section>
           )}
 
