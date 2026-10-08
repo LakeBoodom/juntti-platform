@@ -26,6 +26,9 @@ import {
   LUONTO_HERO, LUONTO_SUBS, LUONTO_AIHE_MIN, LUONTO_CURATED, LUONTO_KUVAVISAT, LUONTO_NOSTO_KUVAVISA, luontoImg,
 } from "@/lib/luonto";
 import { ShowAllCards } from "./ShowAllCards";
+import AaniKortti, { type KorttiNayte } from "@/components/tn20/aanivisa/AaniKortti";
+import { aanivisaHref } from "@/lib/aanivisat";
+import { haeNayte, julkaistutRyhmat, viikonPaaryhma } from "@/lib/aanivisat/data";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://tietoniekka.fi";
 
@@ -49,10 +52,10 @@ type Card = {
   subcollection: string | null; badge: string | null; published_at: string | null;
 };
 
-/** Listan kortti: tietovisa tai kuvavisa (äänivisa vaiheessa 4). */
+/** Listan kortti: tietovisa, kuvavisa tai äänivisa. */
 type Kohde = {
   key: string;
-  muoto: "tietovisa" | "kuvavisa";
+  muoto: "tietovisa" | "kuvavisa" | "aanivisa";
   otsikko: string;
   teaser: string | null;
   href: string;
@@ -94,6 +97,9 @@ const IkoniKuva = ({ vari = "#0F0D07" }: { vari?: string }) => (
 const IkoniTieto = () => (
   <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 6h14M5 12h14M5 18h9" stroke="#0F0D07" strokeWidth="2.4" strokeLinecap="round" /></svg>
 );
+const IkoniAani = ({ vari = "#4ADE80" }: { vari?: string }) => (
+  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4z" fill={vari} /><path d="M16 8.5a5 5 0 0 1 0 7" stroke={vari} strokeWidth="2" fill="none" strokeLinecap="round" /></svg>
+);
 const IkoniTahti = () => (
   <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.5l2.6 5.6 6.1.8-4.5 4.2 1.2 6-5.4-3-5.4 3 1.2-6-4.5-4.2 6.1-.8z" fill="#E8A320" /></svg>
 );
@@ -109,14 +115,17 @@ export default async function LuontoLanding({
   const sb = getSupabase();
   if (!sb) return <main style={{ padding: 32 }}>Ei tietokantayhteyttä.</main>;
 
-  const [cardsRes, pc, kuvavisat] = await Promise.all([
+  const [cardsRes, pc, kuvavisat, aaniRyhmat] = await Promise.all([
     sb.from("quiz_cards" as never)
       .select("id, slug, custom_slug, title, display_title, teaser, subcollection, badge, published_at")
       .eq("collection", "luonto")
       .order("published_at", { ascending: false }),
     getPageContent("luonto"),
     haeKuvavisat(),
+    julkaistutRyhmat(),
   ]);
+  // Äänivisat (vaihe 4): vain julkaistut ryhmät (≥ 10 aktiivista ääntä; previewssä myös ei-aktiiviset).
+  const naytteet = (await Promise.all(aaniRyhmat.map((r) => haeNayte(r)))).filter((n): n is NonNullable<typeof n> => !!n);
   const cards = (cardsRes.data ?? []) as unknown as Card[];
 
   const tietovisat: Kohde[] = cards.map((c) => ({
@@ -132,13 +141,17 @@ export default async function LuontoLanding({
   const kuvaKohteet: Kohde[] = kuvavisat.map((k) => ({
     key: `kv-${k.key}`, muoto: "kuvavisa", otsikko: k.otsikko, teaser: k.kuvaus, href: k.href, kuva: k.kuvat[0] ?? null, aihe: null,
   }));
-  const kaikki = [...kuvaKohteet, ...tietovisat];
+  const aaniKohteet: Kohde[] = naytteet.map((n) => ({
+    key: `av-${n.ryhma.key}`, muoto: "aanivisa", otsikko: n.ryhma.otsikko, teaser: n.ryhma.kortti, href: aanivisaHref(n.ryhma), kuva: n.sono, aihe: null,
+  }));
+  const kaikki = [...aaniKohteet, ...kuvaKohteet, ...tietovisat];
   const maara = kaikki.length;
 
   // Aiheet: alle LUONTO_AIHE_MIN visan aihe ei saa suodatinta (brief §1.2), mutta näkyy tilastorivillä.
   const aiheet = LUONTO_SUBS.map((s) => ({ ...s, n: tietovisat.filter((c) => c.aihe === s.key).length }));
   const aiheSuodattimet = aiheet.filter((a) => a.n >= LUONTO_AIHE_MIN);
   const pelimuotoSuodattimet = [
+    ...(aaniKohteet.length ? [{ key: "aanivisat", label: "Äänivisat", ikoni: <IkoniAani /> }] : []),
     ...(kuvaKohteet.length ? [{ key: "kuvavisat", label: "Kuvavisat", ikoni: <IkoniKuva vari="#4ADE80" /> }] : []),
   ];
   const tunnettu = filter === "kaikki" || pelimuotoSuodattimet.some((p) => p.key === filter) || aiheSuodattimet.some((a) => a.key === filter);
@@ -146,6 +159,7 @@ export default async function LuontoLanding({
   const nakyvat =
     aktiivinen === "kaikki" ? kaikki
     : aktiivinen === "kuvavisat" ? kuvaKohteet
+    : aktiivinen === "aanivisat" ? aaniKohteet
     : kaikki.filter((k) => k.aihe === aktiivinen);
 
   const tilasto = `${maara} visaa · ${luettelo(aiheet.filter((a) => a.n > 0).map((a) => a.sana))}`;
@@ -155,6 +169,15 @@ export default async function LuontoLanding({
   const pick = cards.find((c) => c.slug === LUONTO_CURATED.lauranJaMikon) ?? null;
   const pickOtsikko = pick ? pick.display_title ?? pick.title : "";
   const pisin = (t: string) => Math.max(...t.split(/\s+/).map((w) => w.length), 6);
+  // Äänivisa-kortti: kuluvan viikon pääryhmä, kun julkaistuja ryhmiä on useampi (brief §4).
+  const paa = naytteet.length ? viikonPaaryhma(naytteet.map((n) => n.ryhma), naytteet[0].viikko) : null;
+  const paaNayte = naytteet.find((n) => n.ryhma.key === paa?.key) ?? null;
+  const aaniKortti: KorttiNayte | null = paaNayte
+    ? {
+        ryhma: paaNayte.ryhma.key, otsikko: paaNayte.ryhma.otsikko, kuvaus: paaNayte.ryhma.kortti, href: aanivisaHref(paaNayte.ryhma),
+        vuosi: paaNayte.vuosi, viikko: paaNayte.viikko, audio: paaNayte.audio, sono: paaNayte.sono, jakso: paaNayte.jakso, tauko: paaNayte.tauko,
+      }
+    : null;
 
   const article = pc?.learn ? (
     <LearnArticle learn={pc.learn} fallbackTitle="Luonto" accent="#3FBF7F" />
@@ -183,10 +206,11 @@ export default async function LuontoLanding({
 
       <div className="tnl-shell">
         {/* ─── Valitse pelimuoto ─── */}
-        {(nostoKuva || pick) && (
+        {(aaniKortti || nostoKuva || pick) && (
           <section className="tnl3-osio">
             <h2 className="tnl3-h2">Valitse pelimuoto</h2>
-            <div className="tnl3-muodot" data-n={(nostoKuva ? 1 : 0) + (pick ? 1 : 0)}>
+            <div className="tnl3-muodot" data-n={(aaniKortti ? 1 : 0) + (nostoKuva ? 1 : 0) + (pick ? 1 : 0)} data-aani={aaniKortti ? "" : undefined}>
+              {aaniKortti && <AaniKortti k={aaniKortti} />}
               {nostoKuva && (
                 <a className="tnl3-muoto" href={nostoKuva.href} style={{ ["--lw" as string]: pisin(nostoKuva.otsikko) }}>
                   <span className="tnl3-muoto-media tnl3-muoto-media--kaksi">
@@ -254,13 +278,14 @@ export default async function LuontoLanding({
           ) : (
             <ShowAllCards total={nakyvat.length}>
               {nakyvat.map((k) => (
-                <a key={k.key} className="tnl3-kortti" href={k.href} style={{ ["--lw" as string]: pisin(k.otsikko) }}>
+                <a key={k.key} className="tnl3-kortti" data-muoto={k.muoto} href={k.href} style={{ ["--lw" as string]: pisin(k.otsikko) }}>
                   <span className="tnl3-kortti-media">
                     {k.kuva && (
                       // eslint-disable-next-line @next/next/no-img-element
                       <img src={k.kuva} alt="" loading="lazy" />
                     )}
                     {k.muoto === "kuvavisa" && <span className="tnl3-pilleri tnl3-pilleri--pieni"><IkoniKuva />Kuvavisa</span>}
+                    {k.muoto === "aanivisa" && <span className="tnl3-pilleri tnl3-pilleri--pieni tnl3-pilleri--aani"><IkoniAani vari="#0F0D07" />Äänivisa</span>}
                     {k.uusi && <span className="tnl-badge">Uusi</span>}
                   </span>
                   <span className="tnl3-kortti-teksti">

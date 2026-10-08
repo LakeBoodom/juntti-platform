@@ -84,6 +84,42 @@
   display: flex; align-items: center; justify-content: center; color: var(--l3-vihrea); font-size: 18px;
 }
 
+/* ── Äänivisa-kortti (vaihe 4, design v3.0 + äänivisadesign 2c) ──────────
+   Kortti on div; otsikkolinkki venytetään koko kortin päälle (::after), näytenappi sen yläpuolella. */
+.tn20 .tnl3-muodot[data-aani][data-n="2"] { grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); }
+.tn20 .tnl3-muoto--aani { position: relative; border-color: rgba(74, 222, 128, 0.55); }
+.tn20 .tnl3-muoto-media--sono { background: #0A0905; }
+.tn20 .tnl3-sono { position: absolute; inset: 0; }
+.tn20 .tnl3-sono img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: fill; }
+.tn20 .tnl3-sono-pohja { filter: grayscale(1) brightness(0.55); opacity: 0.5; }
+.tn20 .tnl3-sono-kohta { position: absolute; top: 0; bottom: 0; width: 2px; margin-left: -1px; background: #B6FF3C; box-shadow: 0 0 14px 2px rgba(182, 255, 60, 0.55); }
+@media (prefers-reduced-motion: reduce) {
+  .tn20 .tnl3-sono[data-soi] .tnl3-sono-vari { clip-path: none !important; }
+  .tn20 .tnl3-sono-kohta { display: none; }
+}
+.tn20 .tnl3-pilleri--aani { background: var(--l3-vihrea); }
+.tn20 .tnl3-nayte {
+  position: absolute; z-index: 2; left: 14px; top: calc(220px - 58px); display: inline-flex; align-items: center; gap: 8px; height: 44px;
+  padding: 0 16px 0 7px; border-radius: 999px; background: rgba(15, 13, 7, 0.88); border: 1px solid #37301F; color: #F4EEE0;
+  font: inherit; font-size: 14px; font-weight: 700; cursor: pointer;
+}
+.tn20 .tnl3-nayte:hover { border-color: var(--l3-vihrea); }
+.tn20 .tnl3-nayte:focus-visible { outline: 2px solid var(--l3-vihrea); outline-offset: 2px; }
+.tn20 .tnl3-nayte-pallo { width: 32px; height: 32px; border-radius: 50%; background: var(--l3-vihrea); display: flex; align-items: center; justify-content: center; }
+.tn20 .tnl3-venyva { color: var(--l3-teksti); text-decoration: none; }
+.tn20 .tnl3-venyva::after { content: ""; position: absolute; inset: 0; z-index: 1; border-radius: 18px; }
+.tn20 .tnl3-venyva:focus-visible { outline: none; }
+.tn20 .tnl3-venyva:focus-visible::after { outline: 2px solid var(--l3-vihrea); outline-offset: 3px; }
+.tn20 .tnl3-muoto--aani .tnl3-muoto-otsikko { font-size: min(30px, calc((100cqw - 140px) / (var(--lw, 8) * 0.68))); }
+.tn20 .tnl3-aani-meta { font-size: 13px; font-weight: 700; color: var(--l3-vihrea); }
+.tn20 .tnl3-pelaa {
+  flex: none; display: flex; align-items: center; min-height: 50px; padding: 0 22px; border-radius: 12px; background: var(--l3-vihrea); color: #0F0D07;
+  font-family: var(--l3-display); font-weight: 900; font-size: 15px; text-transform: uppercase;
+}
+.tn20 .tnl3-kortti[data-muoto="aanivisa"] { border-color: rgba(74, 222, 128, 0.45); }
+.tn20 .tnl3-kortti[data-muoto="aanivisa"] .tnl3-kortti-media { background: #0A0905; }
+.tn20 .tnl3-kortti[data-muoto="aanivisa"] .tnl3-kortti-media img { object-fit: fill; }
+
 /* ── Suodattimet ────────────────────────────────────────────────────── */
 .tn20 .tnl3-suodattimet { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
 .tn20 .tnl3-chip {
@@ -142,6 +178,9 @@
   .tn20 .tnl3-h1-l2 { font-size: 28px; }
   .tn20 .tnl3-muodot[data-n="3"] { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .tn20 .tnl3-muodot[data-n="3"] > :first-child { grid-column: 1 / -1; }
+  .tn20 .tnl3-muodot[data-aani] > .tnl3-muoto--aani { grid-column: 1 / -1; }
+  .tn20 .tnl3-muodot[data-aani][data-n="2"] { grid-template-columns: minmax(0, 1fr); }
+  .tn20 .tnl3-nayte { top: calc(180px - 58px); }
   .tn20 .tnl3-muoto-media { height: 180px; }
 }
 
@@ -171,6 +210,11 @@
   .tn20 .tnl3-muoto-ala { padding: 12px 12px 14px; }
   .tn20 .tnl3-muoto-teksti { gap: 5px; }
   .tn20 .tnl3-muoto-kuvaus, .tn20 .tnl3-nuoli { display: none; }
+  .tn20 .tnl3-muoto--aani .tnl3-muoto-media { aspect-ratio: auto; height: 140px; }
+  .tn20 .tnl3-nayte { left: 12px; top: calc(140px - 56px); }
+  .tn20 .tnl3-muoto--aani .tnl3-muoto-ala { align-items: center; padding: 14px 16px 16px; }
+  .tn20 .tnl3-muoto--aani .tnl3-muoto-otsikko { font-size: min(22px, calc((100cqw - 118px) / (var(--lw, 8) * 0.6))); }
+  .tn20 .tnl3-pelaa { min-height: 46px; padding: 0 18px; font-size: 14px; }
   .tn20 .tnl3-muoto-otsikko { font-size: min(18px, calc((100cqw - 24px) / (var(--lw, 8) * 0.6))); font-variation-settings: "wdth" 68; line-height: 1; }
   .tn20 .tnl3-lm { font-size: 10px; letter-spacing: 0.12em; gap: 5px; }
   .tn20 .tnl3-lm svg { width: 12px; height: 12px; }

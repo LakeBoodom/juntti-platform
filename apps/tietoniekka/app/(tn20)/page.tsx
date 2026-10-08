@@ -24,6 +24,8 @@ import PaivanSankari from "@/components/tn20/PaivanSankari";
 import { muotoileSankari, type SankariRivi } from "@/lib/paivanSankari";
 import { KuvavisatBanneri, IkajarjestysBanneri } from "@/components/tn20/EtusivunBannerit";
 import { RuutanaBanneri } from "@/components/tn20/RuutanaBanneri";
+import AaniBanneri from "@/components/tn20/aanivisa/AaniBanneri";
+import { haeAaniBanneri } from "@/lib/aanivisat/data";
 import { TuplaBanneri } from "@/components/tn20/TuplaBanneri";
 import { RajanaapuritBanneri } from "@/components/tn20/RajanaapuritBanneri";
 import { KuntaliitosBanneri } from "@/components/tn20/KuntaliitosBanneri";
@@ -42,6 +44,7 @@ import "./kuntaliitos-banneri.css";
 import "./rajanaapurit-banneri.css";
 import "./juhlat-banneri.css";
 import "./ruutana-banneri.css";
+import "./aanivisa-banneri.css";
 
 /* SEO-erä A4 (2.10.2026): ISR 5 min. Esikatseluparametreja (?pv, ?sankari, ?juhlapvm) ei lueta
    tuotannossa, jotta sivu voidaan välimuistittaa; keskiyön vaihto: PaivaVahti. */
@@ -157,14 +160,14 @@ export default async function Etusivu20({
   const sp = ESIKATSELU ? await searchParams : {};
   const one = (k: string) => (typeof sp[k] === "string" ? (sp[k] as string) : null);
   const sankariParam = ESIKATSELU ? one("sankari") : null;
-  const [data, vv, kvYhteenveto, henkilot] = await Promise.all([
+  const [data, vv, kvYhteenveto, henkilot, aaniBanneri] = await Promise.all([
     getData({
       pvTila: one("pv"),
       sankariPaiva: sankariParam && /^\d{4}-\d{2}-\d{2}$/.test(sankariParam) ? sankariParam : null,
       /* ?juhlapvm=YYYY-MM-DD: Juhlat-banneri toisena päivänä (vain esikatselu) */
       juhlaPaiva: ESIKATSELU && /^\d{4}-\d{2}-\d{2}$/.test(one("juhlapvm") ?? "") ? one("juhlapvm") : null,
     }),
-    getViikkovisa(), getKuvavisaYhteenveto(), getBanneriHenkilot(),
+    getViikkovisa(), getKuvavisaYhteenveto(), getBanneriHenkilot(), haeAaniBanneri(),
   ]);
   if (!data) return <main style={{ padding: 32 }}>Ei tietokantayhteyttä.</main>;
   /* Viikkovisa näkyy nyt Kuvavisat-bannerin merkkinä (kierros 12);
@@ -220,7 +223,11 @@ export default async function Etusivu20({
 
         {/* ─── Luonto–ruutana-koukkubanneri (CD 5a, Heikki 6.10.2026; korvasi Tiede & teknologia
             -bannerin): Kuvavisat-bannerin alla ennen Suosittuja kokoelmia ─── */}
-        <RuutanaBanneri />
+        {/* Äänivisabanneri (8.10.2026) vuorottelee ruutana-bannerin kanssa samalla Luonto-paikalla:
+            parillisina päivinä äänivisa, kun jokin ääniryhmä on julkaistu (esikatselu: ?banneri=aani). */}
+        {aaniBanneri && (one("banneri") === "aani" || (one("banneri") !== "ruutana" && Math.floor(Date.UTC(today.vuosi, today.kk - 1, today.pv) / 86400000) % 2 === 0))
+          ? <AaniBanneri b={aaniBanneri} />
+          : <RuutanaBanneri />}
 
         {/* ─── Suositut kokoelmat ─── */}
         <section aria-labelledby="suositut">

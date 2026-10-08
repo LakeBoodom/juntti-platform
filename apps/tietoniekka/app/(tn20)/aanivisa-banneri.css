@@ -1,0 +1,63 @@
+/* ÄÄNIVISABANNERI (äänivisadesign 3a–3d, 8.10.2026). Komponentti components/tn20/aanivisa/AaniBanneri.tsx.
+   Mitat kuten ruutana-bannerissa (ruutana-banneri.css): desktop 1160 × 268, tabletti ≤ 860 → 240,
+   mobiili < 520 pystymalli 380 × 520. Koko banneri on linkki (.ab-linkki venyy alle), Kuuntele- ja CTA-
+   painikkeet sen päällä. FONTTI (KORTTISÄÄNTÖ): "Archivo Variable" wdth 72, pisin sana "Tunnistatko"
+   (11 merkkiä × 0,59 em) → koko rajataan kontin leveyden mukaan. */
+.tn20 .ab-wrap { container-type: inline-size; }
+.tn20 .ab {
+  --ab-display: "Archivo Variable", "Archivo", sans-serif;
+  position: relative; display: flex; align-items: center; height: 268px; border-radius: 18px; overflow: hidden;
+  border: 1px solid #241E13; background: #0A0905; color: #FFFBF2;
+}
+.tn20 .ab-linkki { position: absolute; inset: 0; z-index: 1; border-radius: inherit; }
+.tn20 .ab-linkki:focus-visible { outline: 2px solid #4ADE80; outline-offset: -3px; }
+.tn20 .ab-oikea { position: absolute; right: 0; top: 0; bottom: 0; width: 55%; pointer-events: none; }
+.tn20 .ab-sono { position: absolute; inset: 0; display: block; }
+.tn20 .ab-sono img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: fill; }
+.tn20 .ab-sono-pohja { filter: grayscale(1) brightness(0.55); opacity: 0.5; }
+.tn20 .ab-sono-kohta { position: absolute; top: 0; bottom: 0; width: 2px; margin-left: -1px; background: #B6FF3C; box-shadow: 0 0 14px 2px rgba(182, 255, 60, 0.55); }
+.tn20 .ab-varjo { position: absolute; inset: 0; background: linear-gradient(90deg, #0A0905 0%, rgba(10, 9, 5, 0.5) 22%, rgba(10, 9, 5, 0) 50%); }
+.tn20 .ab-teksti { position: relative; display: flex; flex-direction: column; gap: 16px; padding: 0 40px; max-width: 620px; pointer-events: none; }
+.tn20 .ab-tagi {
+  align-self: flex-start; height: 24px; display: flex; align-items: center; padding: 0 10px; border-radius: 6px; background: #4ADE80; color: #0F0D07;
+  font-size: 11px; font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase;
+}
+.tn20 .ab-h {
+  margin: 0; font-family: var(--ab-display); font-weight: 900; font-variation-settings: "wdth" 72; line-height: 0.95; text-transform: uppercase;
+  font-size: min(44px, calc(45cqw / (11 * 0.62))); overflow-wrap: normal; word-break: keep-all;
+}
+.tn20 .ab-mob-sono { display: none; }
+.tn20 .ab-rivi { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+.tn20 .ab-kuuntele, .tn20 .ab-cta { pointer-events: auto; position: relative; z-index: 2; }
+.tn20 .ab-kuuntele {
+  display: inline-flex; align-items: center; gap: 10px; height: 52px; padding: 0 20px 0 6px; border-radius: 999px;
+  border: 1px solid rgba(74, 222, 128, 0.6); background: rgba(74, 222, 128, 0.1); color: #FFFBF2; font: inherit; font-size: 15px; font-weight: 800; cursor: pointer;
+}
+.tn20 .ab-kuuntele-pallo { width: 40px; height: 40px; border-radius: 50%; background: #4ADE80; display: flex; align-items: center; justify-content: center; }
+.tn20 .ab-kuuntele:focus-visible, .tn20 .ab-cta:focus-visible { outline: 2px solid #FFFBF2; outline-offset: 3px; }
+.tn20 .ab-cta {
+  display: inline-flex; align-items: center; gap: 6px; height: 52px; padding: 0 22px; border-radius: 999px; background: #B6FF3C; color: #0F0D07;
+  font-family: var(--ab-display); font-weight: 900; font-variation-settings: "wdth" 86; font-size: 14px; text-transform: uppercase; text-decoration: none; white-space: nowrap;
+}
+.tn20 .ab-cta:hover { color: #0F0D07; filter: brightness(1.05); }
+@media (prefers-reduced-motion: reduce) {
+  .tn20 .ab-sono-vari { clip-path: none !important; }
+  .tn20 .ab-sono-kohta { display: none; }
+}
+@container (max-width: 859.98px) {
+  .tn20 .ab { height: 240px; border-radius: 16px; }
+  .tn20 .ab-teksti { padding: 0 26px; gap: 13px; max-width: 58%; }
+  .tn20 .ab-h { font-size: min(32px, calc(52cqw / (11 * 0.62))); }
+  .tn20 .ab-kuuntele, .tn20 .ab-cta { height: 46px; }
+}
+@container (max-width: 519.98px) {
+  .tn20 .ab { height: auto; min-height: 520px; flex-direction: column; align-items: stretch; border-radius: 16px; }
+  .tn20 .ab-oikea { display: none; }
+  .tn20 .ab-teksti { flex: 1; max-width: none; padding: 20px 18px 18px; gap: 12px; }
+  .tn20 .ab-tagi { height: 22px; padding: 0 9px; font-size: 10px; }
+  .tn20 .ab-h { font-size: min(36px, calc((100cqw - 36px) / (11 * 0.62))); }
+  .tn20 .ab-mob-sono { display: block; position: relative; flex: 1; min-height: 220px; margin: 4px -18px; }
+  .tn20 .ab-rivi { flex-direction: column; align-items: stretch; gap: 10px; }
+  .tn20 .ab-kuuntele { height: 54px; padding-right: 18px; }
+  .tn20 .ab-cta { justify-content: center; font-size: 15px; }
+}
