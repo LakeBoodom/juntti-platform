@@ -56,7 +56,7 @@ export default async function OmaJarjestysPage({ searchParams }: { searchParams:
   return (
     <OmaJarjestysClient
       otsikko={def.otsikko.charAt(0).toUpperCase() + def.otsikko.slice(1)}
-      suunta={def.winner === "high" ? "Eniten ylimmäksi" : "Vähiten ylimmäksi"}
+      suunta={`${def.akseli[0]} ylimmäksi`}
       direction={def.winner === "high" ? "desc" : "asc"}
       kohteet={kohteet}
       tilastot={asOf ? `Tilastot: ${fiPvm(asOf)}` : null}

@@ -284,11 +284,11 @@ export async function haeHenkiloSivu(slug: string): Promise<HenkiloSivu | { ohja
         merkki: "Laita järjestykseen",
         kysymys: pakka.def.winner === "high" ? "Kuka on kärjessä?" : "Kuka on ensimmäinen?",
         otsikko: pakka.def.otsikko.charAt(0).toUpperCase() + pakka.def.otsikko.slice(1),
-        kuvaus: `Järjestä ${c.name} ja ${lukuSana(muita)} muuta – ${pakka.def.otsikko} ylimmäksi.`,
+        kuvaus: `Järjestä ${c.name} ja ${lukuSana(muita)} muuta: ${pakka.def.jarjestys}.`,
         href: `/peli/jarjesta/oma?a=${pakka.def.attr_key}&h=${pakka.jasenet.map((x) => x.id).join(",")}&p=${henkiloSlug(c.name)}`,
         laatat: nostoLaatat(pakka.jasenet),
         lisaa: Math.max(0, pakka.jasenet.length - 4),
-        akseli: pakka.def.winner === "high" ? ["Eniten", "Vähiten"] : ["Vähiten", "Eniten"],
+        akseli: pakka.def.akseli,
         tilastot: p ? `Tilastot: ${fiPvm(p)}` : null,
       };
     }
