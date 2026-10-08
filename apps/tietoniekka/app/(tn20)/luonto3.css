@@ -1,0 +1,188 @@
+/* LUONTO-KOKOELMA v3.0 (CD "TN Luonto-kokoelma v3.0", 1a desktop 1280 / 1b mobiili 390; 8.10.2026).
+   Värit designista: tausta #0D1C13/#12261A, reunat #1F3A28/#2A4A35, korostus #4ADE80, teksti #FFFBF2.
+   FONTTI (KORTTISÄÄNTÖ): designin Archivo wdth 74–80 → "Archivo Variable" (wdth toimii), sanat eivät
+   katkea; kortin otsikon koko rajataan pisimmän sanan mukaan (--lw × 0,7 em, wdth 80 versaali mitattu
+   ≈ 0,64 em/merkki + marginaali). */
+
+.tn20 .tnl3 {
+  --l3-display: "Archivo Variable", "Archivo", "Barlow Condensed", sans-serif;
+  --l3-vihrea: #4ADE80;
+  --l3-pohja: #12261A;
+  --l3-reuna: #2A4A35;
+  --l3-teksti: #FFFBF2;
+  --l3-muted: #CBC1AD;
+}
+.tn20 .tnl3 .tnl3-vain-mob { display: none; }
+
+/* ── Hero ───────────────────────────────────────────────────────────── */
+.tn20 .tnl3-hero {
+  position: relative; max-width: 1240px; width: calc(100% - 64px); margin: 0 auto; height: 260px;
+  border-radius: 22px; overflow: hidden; border: 1px solid #1F3A28; background: #0D1C13;
+}
+.tn20 .tnl3-hero-kuva { position: absolute; right: 0; top: 0; bottom: 0; width: 62%; }
+.tn20 .tnl3-hero-kuva img { width: 100%; height: 100%; object-fit: cover; object-position: 78% 62%; display: block; }
+.tn20 .tnl3-hero-kuva::after {
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(90deg, #0D1C13 0%, rgba(13, 28, 19, 0.75) 22%, rgba(13, 28, 19, 0) 55%);
+}
+.tn20 .tnl3-hero-teksti {
+  position: relative; height: 100%; display: flex; flex-direction: column; justify-content: center; gap: 14px;
+  padding: 0 48px; max-width: 600px; box-sizing: border-box;
+}
+.tn20 .tnl3-eyebrow { font-size: 12px; font-weight: 800; letter-spacing: 0.2em; text-transform: uppercase; color: var(--l3-vihrea); }
+.tn20 .tnl3-h1 {
+  margin: 0; font-family: var(--l3-display); font-weight: 900; font-variation-settings: "wdth" 74;
+  font-size: 64px; line-height: 0.9; text-transform: uppercase; color: var(--l3-vihrea);
+  overflow-wrap: normal; word-break: keep-all; hyphens: none;
+}
+.tn20 .tnl3-h1-l2 { display: block; font-size: 34px; line-height: 1.05; color: var(--l3-teksti); }
+.tn20 .tnl3-tilasto { font-size: 15px; font-weight: 600; color: var(--l3-muted); }
+
+/* ── Osiot ──────────────────────────────────────────────────────────── */
+.tn20 .tnl3-osio { display: flex; flex-direction: column; gap: 18px; margin-top: 52px; }
+.tn20 .tnl3-osio-head { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; }
+.tn20 .tnl3-h2 {
+  margin: 0; font-family: var(--l3-display); font-weight: 900; font-variation-settings: "wdth" 74;
+  font-size: 34px; line-height: 1; text-transform: uppercase; color: var(--l3-teksti);
+}
+.tn20 .tnl3-maara { font-size: 14px; color: #A79E8C; white-space: nowrap; }
+
+/* ── Valitse pelimuoto ──────────────────────────────────────────────── */
+.tn20 .tnl3-muodot { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+/* Vaihe 4: äänivisa ensimmäisenä ja leveänä → data-n="3" + .tnl3-muoto--levea */
+.tn20 .tnl3-muodot[data-n="3"] { grid-template-columns: minmax(0, 1.35fr) repeat(2, minmax(0, 1fr)); }
+.tn20 .tnl3-muodot[data-n="1"] { grid-template-columns: minmax(0, 1fr); }
+.tn20 .tnl3-muoto {
+  display: flex; flex-direction: column; border-radius: 18px; overflow: hidden; border: 1px solid var(--l3-reuna);
+  background: var(--l3-pohja); color: inherit; text-decoration: none; container-type: inline-size;
+  transition: border-color 0.15s, transform 0.15s;
+}
+.tn20 .tnl3-muoto:hover { border-color: #3F6B4E; transform: translateY(-2px); color: inherit; }
+.tn20 .tnl3-muoto:focus-visible { outline: 2px solid var(--l3-vihrea); outline-offset: 3px; }
+.tn20 .tnl3-muoto-media { position: relative; display: block; height: 220px; background: #1A160D; overflow: hidden; }
+.tn20 .tnl3-muoto-media img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.tn20 .tnl3-muoto-media--kaksi { display: grid; grid-template-columns: 1fr 1fr; gap: 2px; }
+.tn20 .tnl3-pilleri {
+  position: absolute; left: 14px; top: 14px; display: inline-flex; align-items: center; gap: 7px; height: 30px;
+  padding: 0 12px 0 9px; border-radius: 999px; background: var(--l3-teksti); color: #0F0D07;
+  font-size: 12px; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; pointer-events: none; white-space: nowrap;
+}
+.tn20 .tnl3-pilleri svg { width: 16px; height: 16px; flex: none; }
+.tn20 .tnl3-muoto-ala { flex: 1; display: flex; align-items: flex-end; gap: 14px; padding: 18px 20px 20px; }
+.tn20 .tnl3-muoto-teksti { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 8px; }
+.tn20 .tnl3-muoto-otsikko {
+  font-family: var(--l3-display); font-weight: 900; font-variation-settings: "wdth" 80; line-height: 0.95;
+  text-transform: uppercase; color: var(--l3-teksti); overflow-wrap: normal; word-break: keep-all; hyphens: none;
+  font-size: min(26px, calc((100cqw - 98px) / (var(--lw, 8) * 0.7)));
+}
+.tn20 .tnl3-muoto-kuvaus { font-size: 15px; line-height: 1.45; color: var(--l3-muted); }
+.tn20 .tnl3-lm { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 800; letter-spacing: 0.16em; text-transform: uppercase; color: #E8A320; }
+.tn20 .tnl3-lm svg { width: 14px; height: 14px; flex: none; }
+.tn20 .tnl3-nuoli {
+  flex: none; width: 44px; height: 44px; border-radius: 50%; border: 1px solid #3F6B4E;
+  display: flex; align-items: center; justify-content: center; color: var(--l3-vihrea); font-size: 18px;
+}
+
+/* ── Suodattimet ────────────────────────────────────────────────────── */
+.tn20 .tnl3-suodattimet { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.tn20 .tnl3-chip {
+  display: inline-flex; align-items: center; gap: 6px; height: 40px; padding: 0 16px; box-sizing: border-box;
+  border-radius: 999px; border: 1px solid var(--l3-reuna); color: #DED5C2; font-size: 14px; font-weight: 700;
+  text-decoration: none; white-space: nowrap; transition: border-color 0.15s, color 0.15s;
+}
+.tn20 .tnl3-chip--muoto { border-color: rgba(74, 222, 128, 0.55); color: #F4EEE0; padding-left: 12px; }
+.tn20 .tnl3-chip svg { width: 17px; height: 17px; flex: none; }
+.tn20 .tnl3-chip:hover { border-color: var(--l3-vihrea); color: var(--l3-teksti); }
+.tn20 .tnl3-chip[data-active] { background: #B6FF3C; border-color: #B6FF3C; color: #131109; }
+.tn20 .tnl3-chip[data-active] svg rect, .tn20 .tnl3-chip[data-active] svg circle { stroke: #131109; }
+.tn20 .tnl3-chip[data-active] svg circle { fill: #131109; }
+.tn20 .tnl3-chip:focus-visible { outline: 2px solid var(--l3-vihrea); outline-offset: 2px; }
+.tn20 .tnl3-chip-vali { width: 1px; height: 24px; margin: 0 6px; background: #37301F; }
+
+/* ── Kaikki-ruudukko ────────────────────────────────────────────────── */
+.tn20 .tnl3-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; }
+.tn20 .tnl3-gridwrap:not([data-open]) .tnl3-grid > .tnl3-kortti:nth-child(n + 9) { display: none; }
+.tn20 .tnl3-showall {
+  display: flex; align-items: center; justify-content: center; min-height: 50px; margin: 18px auto 0; padding: 0 26px;
+  border-radius: 999px; border: 1px solid #3F6B4E; background: transparent; color: #F4EEE0;
+  font: inherit; font-size: 15px; font-weight: 700; cursor: pointer;
+}
+.tn20 .tnl3-showall:hover { border-color: var(--l3-vihrea); }
+.tn20 .tnl3-showall:focus-visible { outline: 2px solid var(--l3-vihrea); outline-offset: 2px; }
+.tn20 .tnl3-kortti {
+  position: relative; display: flex; flex-direction: column; border-radius: 16px; overflow: hidden;
+  border: 1px solid var(--l3-reuna); background: var(--l3-pohja); color: inherit; text-decoration: none;
+  transition: border-color 0.15s, transform 0.15s;
+}
+.tn20 .tnl3-kortti:hover { border-color: #3F6B4E; transform: translateY(-2px); color: inherit; }
+.tn20 .tnl3-kortti:focus-visible { outline: 2px solid var(--l3-vihrea); outline-offset: 3px; }
+.tn20 .tnl3-kortti-media { position: relative; display: block; aspect-ratio: 16 / 10; background: #1A160D; overflow: hidden; }
+.tn20 .tnl3-kortti-media img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.tn20 .tnl3-pilleri--pieni { left: 10px; top: 10px; height: 26px; gap: 6px; padding: 0 10px 0 8px; font-size: 11px; }
+.tn20 .tnl3-pilleri--pieni svg { width: 14px; height: 14px; }
+.tn20 .tnl3-kortti-teksti { display: flex; flex-direction: column; gap: 6px; padding: 14px 16px 18px; }
+.tn20 .tnl3-kortti-otsikko { font-size: 18px; font-weight: 800; line-height: 1.2; color: var(--l3-teksti); overflow-wrap: break-word; }
+.tn20 .tnl3-kortti-teaser {
+  font-size: 14px; line-height: 1.45; color: var(--l3-muted);
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+}
+
+/* ── Tabletti ───────────────────────────────────────────────────────── */
+@media (max-width: 1100px) {
+  .tn20 .tnl3-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+@media (max-width: 960px) {
+  .tn20 .tnl3-hero { width: calc(100% - 52px); height: 240px; }
+  .tn20 .tnl3-hero-teksti { padding: 0 32px; }
+  .tn20 .tnl3-h1 { font-size: 52px; }
+  .tn20 .tnl3-h1-l2 { font-size: 28px; }
+  .tn20 .tnl3-muodot[data-n="3"] { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .tn20 .tnl3-muodot[data-n="3"] > :first-child { grid-column: 1 / -1; }
+  .tn20 .tnl3-muoto-media { height: 180px; }
+}
+
+/* ── Mobiili 1b ─────────────────────────────────────────────────────── */
+@media (max-width: 640px) {
+  .tn20 .tnl3 .tnl3-vain-desk { display: none; }
+  .tn20 .tnl3 .tnl3-vain-mob { display: inline; }
+  .tn20 .tnl3-hero { width: 100%; height: 200px; border-radius: 0; border: 0; margin-top: -8px; }
+  .tn20 .tnl3-hero-kuva { width: 100%; }
+  .tn20 .tnl3-hero-kuva img { object-position: 76% 62%; }
+  .tn20 .tnl3-hero-kuva::after { background: linear-gradient(to bottom, rgba(17, 14, 8, 0) 20%, rgba(17, 14, 8, 0.92) 100%); }
+  .tn20 .tnl3-hero-teksti { justify-content: flex-end; gap: 6px; padding: 0 16px 16px; max-width: none; }
+  .tn20 .tnl3-eyebrow, .tn20 .tnl3-h1-l2 { display: none; }
+  .tn20 .tnl3-h1 { font-size: min(42px, calc((100vw - 32px) / (6 * 0.66))); }
+  .tn20 .tnl3-tilasto { font-size: 14px; color: #DED5C2; }
+  .tn20 .tnl3-osio { gap: 12px; margin-top: 32px; }
+  .tn20 .tnl3-h2 { font-size: 24px; }
+  .tn20 .tnl3-maara { font-size: 13px; }
+  .tn20 .tnl3-muodot, .tn20 .tnl3-muodot[data-n="3"] { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  .tn20 .tnl3-muodot[data-n="1"] { grid-template-columns: minmax(0, 1fr); }
+  .tn20 .tnl3-muoto { border-radius: 16px; }
+  .tn20 .tnl3-muoto-media { height: auto; aspect-ratio: 4 / 3; }
+  .tn20 .tnl3-muoto-media--kaksi { grid-template-columns: 1fr; }
+  .tn20 .tnl3-muoto-media--kaksi img + img { display: none; }
+  .tn20 .tnl3-pilleri { left: 8px; top: 8px; height: 24px; gap: 5px; padding: 0 9px 0 7px; font-size: 10px; }
+  .tn20 .tnl3-pilleri svg { width: 13px; height: 13px; }
+  .tn20 .tnl3-muoto-ala { padding: 12px 12px 14px; }
+  .tn20 .tnl3-muoto-teksti { gap: 5px; }
+  .tn20 .tnl3-muoto-kuvaus, .tn20 .tnl3-nuoli { display: none; }
+  .tn20 .tnl3-muoto-otsikko { font-size: min(18px, calc((100cqw - 24px) / (var(--lw, 8) * 0.7))); line-height: 1; }
+  .tn20 .tnl3-lm { font-size: 10px; letter-spacing: 0.12em; gap: 5px; }
+  .tn20 .tnl3-lm svg { width: 12px; height: 12px; }
+  .tn20 .tnl3-suodattimet { flex-wrap: nowrap; overflow-x: auto; margin: 0 -16px; padding: 0 16px 4px; scrollbar-width: none; }
+  .tn20 .tnl3-suodattimet::-webkit-scrollbar { display: none; }
+  .tn20 .tnl3-chip { flex: none; height: 44px; padding: 0 15px; }
+  .tn20 .tnl3-chip--muoto { padding-left: 11px; }
+  .tn20 .tnl3-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  .tn20 .tnl3-kortti { border-radius: 14px; }
+  .tn20 .tnl3-kortti-media { aspect-ratio: 4 / 3; }
+  .tn20 .tnl3-kortti-teksti { padding: 10px 12px 12px; }
+  .tn20 .tnl3-kortti-otsikko { font-size: 15px; font-weight: 700; line-height: 1.25; }
+  .tn20 .tnl3-kortti-teaser { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tn20 .tnl3-muoto, .tn20 .tnl3-kortti { transition: none; }
+  .tn20 .tnl3-muoto:hover, .tn20 .tnl3-kortti:hover { transform: none; }
+}

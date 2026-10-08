@@ -592,6 +592,8 @@ export type KuvavisaRow = {
       "Wikipedia / Wikimedia Commons" 575 rivillä ja NULL 94 rivillä —
       tyhjä = koko lähderivi jää pois, ei kovakoodattua oletusta. */
   source_credit: string | null;
+  /** Luonto v3.0 (8.10.2026): Suomen eläimet -rajauksen harhauttimet. */
+  similarity_group?: string | null;
 };
 
 // URL-slug → DB type -mappaus (frontti käyttää yksikkö-muotoja, DB monikko)
@@ -628,7 +630,7 @@ export async function getKuvavisat(
       `tagit` annetaan valmiina listana (maanosa→tagit puretaan kutsupaikalla),
       jotta tämä moduuli ei tarvitse importtia kuvavisat2026.ts:stä — se
       importoi getSiteId:n täältä ja syntyisi kehä. */
-  rajaus?: { taso?: string | null; tagit?: string[] | null },
+  rajaus?: { taso?: string | null; tagit?: string[] | null; /** tags-taulukon on sisällettävä nämä (alue=suomi) */ tagsSisaltaa?: string[] | null },
 ): Promise<KuvavisaRow[]> {
   const type = KUVAVISA_URL_TO_TYPE[urlSlug] ?? urlSlug;
   const sb = getSupabase();
@@ -638,13 +640,15 @@ export async function getKuvavisat(
 
   let q = sb
     .from("kuvavisas")
-    .select("id, type, question, image_url, options, correct_option, fact, source_credit")
+    .select("id, type, question, image_url, options, correct_option, fact, source_credit, similarity_group")
     .eq("site_id", siteId)
     .eq("type", type)
     .eq("active", true);
 
   if (rajaus?.taso) q = q.eq("difficulty", rajaus.taso);
   if (rajaus?.tagit && rajaus.tagit.length > 0) q = q.in("tag", rajaus.tagit);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  if (rajaus?.tagsSisaltaa && rajaus.tagsSisaltaa.length > 0) q = (q as any).contains("tags", rajaus.tagsSisaltaa);
 
   const { data, error } = await q
     .order("sort_order", { ascending: true })

@@ -246,6 +246,53 @@ export async function getKuvavisatHub(): Promise<{ kategoriat: KategoriaData[]; 
  * myös <title>-tagissa ja jakoteksteissä. Palauttaa null kun kortisto pelataan
  * kokonaan (silloin käytetään kortiston omaa nimeä).
  */
+/** Alueellinen rajaus (Luonto v3.0, 8.10.2026): /kuvavisa/elaimet?alue=suomi = vain Suomen eläimet
+ *  ('suomen_luonto' = any(tags)). Kuvavisat-kokoelman Eläimet pysyy koko 103 kuvan visana.
+ *  Pooli 8.10.2026: helppo 10, keski 9, vaikea 20 → kierros (10 + 2 varakorttia) ei riitä tasoittain,
+ *  joten rajaus koskee vain "kaikki"-tasoa; ?taso= ohittaa alueen (brief §1.3). */
+export const ALUEET: Record<string, { tag: string; otsikko: Record<string, string> }> = {
+  suomi: { tag: "suomen_luonto", otsikko: { elaimet: "Suomen eläimet" } },
+};
+
+export function alueRajaus(type: string, alue: string | null | undefined, taso: string | null | undefined) {
+  const a = alue ? ALUEET[alue] : undefined;
+  if (!a || taso || !a.otsikko[type]) return null;
+  return { key: alue as string, tag: a.tag, otsikko: a.otsikko[type] };
+}
+
+/** Suomen eläinten lajiryhmät harhauttimille: rajatussa visassa vaihtoehdot tulevat samasta
+ *  poolista, ja saman ryhmän lajit ensin (ilves ↔ ahma, ei ilves ↔ hauki). Kannan
+ *  similarity_group voittaa, jos se on asetettu. */
+const SUOMI_LAJIRYHMAT: Record<string, string[]> = {
+  pedot: ["Ahma", "Ilves", "Kettu", "Susi", "Ruskeakarhu", "Mäyrä", "Supikoira", "Naali"],
+  naataelaimet: ["Hilleri", "Kärppä", "Lumikko", "Minkki", "Näätä", "Saukko"],
+  sorkkaelaimet: ["Hirvi", "Poro", "Metsäkauris", "Metsäpeura", "Valkohäntäkauris", "Villisika"],
+  pienet: ["Liito-orava", "Majava", "Metsäjänis", "Metsämyyrä", "Orava", "Piisami", "Rusakko", "Siili"],
+  vesi: ["Ahven", "Ankerias", "Hauki", "Made", "Halli", "Saimaannorppa"],
+  matelijat: ["Kyy", "Rantakäärme", "Rupikonna", "Rupilisko", "Vaskitsa"],
+};
+const LAJIN_RYHMA = new Map(Object.entries(SUOMI_LAJIRYHMAT).flatMap(([r, lajit]) => lajit.map((l) => [l, r] as const)));
+
+/** Kolme harhautinta rajatusta poolista: 1) rivin omat vaihtoehdot, jotka ovat poolissa,
+ *  2) sama ryhmä, 3) muu pooli. `sekoita` tulee kutsujalta (palvelimen arvonta). */
+export function poolinHarhauttimet(
+  oikea: string,
+  omat: string[],
+  ryhma: string | null | undefined,
+  pooli: Array<{ correct_option: string; similarity_group?: string | null }>,
+  sekoita: <T>(a: T[]) => T[],
+): string[] {
+  const nimet = [...new Set(pooli.map((p) => p.correct_option))].filter((n) => n !== oikea);
+  const omaRyhma = ryhma ?? LAJIN_RYHMA.get(oikea) ?? null;
+  const ryhmaOf = (n: string) => pooli.find((p) => p.correct_option === n)?.similarity_group ?? LAJIN_RYHMA.get(n) ?? null;
+  const valitut: string[] = [];
+  const lisaa = (lista: string[]) => { for (const n of lista) if (valitut.length < 3 && !valitut.includes(n)) valitut.push(n); };
+  lisaa(sekoita(omat.filter((o) => o !== oikea && nimet.includes(o))));
+  if (omaRyhma) lisaa(sekoita(nimet.filter((n) => ryhmaOf(n) === omaRyhma)));
+  lisaa(sekoita(nimet));
+  return valitut;
+}
+
 export function variaationNimi(type: string, taso?: string | null, maanosaKey?: string | null): string | null {
   /* Viikkovisasta jaettu haaste: taso-kenttä kantaa viikkoavaimen ("2026-38"),
      jotta haastesivu ja sen og:title nimeävät visan "Viikkovisa 38 · Kuvat"

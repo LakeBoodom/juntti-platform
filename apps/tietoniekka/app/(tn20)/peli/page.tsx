@@ -11,7 +11,7 @@ import { henkiloHref } from "@/lib/henkiloSlug";
 import { visaHref } from "@/lib/visaHref";
 import { getSupabase } from "@/lib/supabase";
 import { getKuvavisat, getKuvavisatByIds } from "@/lib/queries";
-import { TASOT, MAANOSAT, KATEGORIAT, variaationNimi, getViikkovisa, getViikkoKollaasi, levynSavy, VIIKKOVISA_KUVIA } from "@/lib/kuvavisat2026";
+import { TASOT, MAANOSAT, KATEGORIAT, variaationNimi, alueRajaus, poolinHarhauttimet, getViikkovisa, getViikkoKollaasi, levynSavy, VIIKKOVISA_KUVIA } from "@/lib/kuvavisat2026";
 import { viikkoInfo, viikkoNimi, viikkoAvaimesta, VIIKKO_AKSENTTI } from "@/lib/viikkovisa";
 import { haeHaaste } from "@/lib/haaste";
 import { kulttuuriImg } from "@/lib/kulttuuri";
@@ -84,7 +84,7 @@ export async function generateMetadata(
     const taso = str("taso");
     const maanosa = str("maanosa");
     /* Viikkovisan haaste: taso = viikkoavain → "Viikkovisa 38 · Kuvat" */
-    const vari = variaationNimi(kuvavisa, taso, maanosa);
+    const vari = alueRajaus(kuvavisa, str("alue"), taso)?.otsikko ?? variaationNimi(kuvavisa, taso, maanosa);
     const t = vari ?? KUVAVISA_TITLES[kuvavisa] ?? "Kuvavisa";
     const kuvaDesc = KUVAVISA_DESC[kuvavisa] ?? "Yksi kuva, neljä vaihtoehtoa. Pelaa ilmainen kuvavisa Tietoniekassa.";
     return {
@@ -488,10 +488,14 @@ export default async function Peli20({
        (?ids=) ohittaa arvonnan kokonaan — siinä sarja on lukittu. */
     /* "viikko" ei ole kortisto: ilman id-listaa ei ole mitään pelattavaa. */
     if (kuvavisa === "viikko" && wantedIds.length === 0) notFound();
+    /* Luonto v3.0 (8.10.2026): ?alue=suomi rajaa poolin Suomen lajeihin (vain kaikki-taso). */
+    const alue = alueRajaus(kuvavisa, typeof params.alue === "string" ? params.alue : null, taso);
     const allRows =
       wantedIds.length > 0
         ? await getKuvavisatByIds(wantedIds)
-        : await getKuvavisat(kuvavisa, 500, { taso, tagit: maanosa ? [...maanosa.tagit] : null });
+        : await getKuvavisat(kuvavisa, 500, { taso, tagit: maanosa ? [...maanosa.tagit] : null, tagsSisaltaa: alue ? [alue.tag] : null });
+    /* Haastelinkissä (ids) pooli haetaan erikseen, jotta harhauttimet tulevat koko Suomen poolista. */
+    const aluePooli = alue ? (wantedIds.length > 0 ? await getKuvavisat(kuvavisa, 500, { tagsSisaltaa: [alue.tag] }) : allRows) : [];
     const arvottu = wantedIds.length > 0 ? allRows : sekoita(allRows);
     const rows = wantedIds.length > 0 ? arvottu : arvottu.slice(0, 10);
     const spareRows = wantedIds.length > 0 ? [] : arvottu.slice(10, 12);
@@ -517,7 +521,10 @@ export default async function Peli20({
        joka pelissä samalla paikalla, koska options tuli kannasta vakiojärjestyksessä. */
     const toQ = (r: (typeof rows)[number]) => ({
       question: r.question,
-      options: sekoita((r.options ?? []).slice(0, 4)),
+      // Rajatussa visassa harhauttimet samasta poolista (ei Pumaa Suomen eläimissä).
+      options: alue
+        ? sekoita([r.correct_option, ...poolinHarhauttimet(r.correct_option, r.options ?? [], r.similarity_group, aluePooli, sekoita)])
+        : sekoita((r.options ?? []).slice(0, 4)),
       correct: r.correct_option,
       fact: r.fact ?? null,
       image: r.image_url,
@@ -534,7 +541,7 @@ export default async function Peli20({
        Tyyppi luetaan riviltä eikä URL-slugista, koska slug ja kannan `type`
        eroavat osassa kortistoja (esim. /peli?kuvavisa=vaakuna → "vaakunat"). */
     const levy = KATEGORIAT.find((k) => k.type === rows[0]?.type)?.sovitus === "contain" ? "vaalea" : "tumma";
-    const variaatio = variaationNimi(kuvavisa, taso, maanosa?.key ?? null);
+    const variaatio = alue?.otsikko ?? variaationNimi(kuvavisa, taso, maanosa?.key ?? null);
     const game: GameQuiz = {
       id: "", // ei quizzes-riviä → pelikertaa ei tallenneta
       /* T4: "Afrikan liput" / "Vaikeat liput" — sama nimi kuin kokoelmasivun linkissä. */
@@ -550,7 +557,7 @@ export default async function Peli20({
       isSankari: false,
       kind: "kuva",
       plate: levy,
-      challengePath: `/kuvavisa/${encodeURIComponent(kuvavisa)}?ids=${rows.map((r) => r.id).join(",")}`,
+      challengePath: `/kuvavisa/${encodeURIComponent(kuvavisa)}?ids=${rows.map((r) => r.id).join(",")}${alue ? `&alue=${alue.key}` : ""}`,
       /* Haastelinkillä sarja on lukittu → ei uudelleenlatausta "Pelaa uudelleen" -napista. */
       reloadOnRestart: wantedIds.length === 0,
       autoStart: params.aloita === "1",
