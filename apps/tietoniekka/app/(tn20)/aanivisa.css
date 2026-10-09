@@ -121,7 +121,8 @@
   border: 1px solid var(--av-reuna); background: rgba(21, 17, 10, 0.9); color: var(--av-teksti); font: inherit; cursor: pointer;
   transition: border-color 0.15s, background 0.15s;
 }
-.tn20 .av-vaihtoehto:hover:not(:disabled) { border-color: var(--av-vihrea); }
+/* Hover vain hiirelle: kosketusnäytöllä napautus ei jätä seuraavan näkymän riviin korostusta. */
+@media (hover: hover) { .tn20 .av-vaihtoehto:hover:not(:disabled) { border-color: var(--av-vihrea); } }
 .tn20 .av-vaihtoehto:focus-visible { outline: 2px solid var(--av-vihrea); outline-offset: 2px; }
 .tn20 .av-vaihtoehto:disabled { cursor: default; }
 .tn20 .av-vaihtoehto-k {
@@ -193,6 +194,9 @@
     background: linear-gradient(to bottom, rgba(15, 13, 7, 0), rgba(15, 13, 7, 0.94) 30%, #0F0D07);
   }
   .tn20 .av-seuraava { width: 100%; }
+  /* Kuuntele uudelleen -rivillä ei mobiilissa jää tilaa minisonogrammille (näkyi muutaman px:n viiruna). */
+  .tn20 .av-uudelleen-sono { display: none; }
+  .tn20 .av-uudelleen-maa { margin-left: auto; }
   /* Kierros 2: paljastuksessa näkyvät vain oikea vastaus ja pelaajan väärä valinta; muut painuvat
      pehmeästi pois (desktopilla kaikki neljä jäävät näkyviin). margin-top kumoaa rivivälin (gap 8 px). */
   .tn20 .av-vaihtoehto[data-tila="muu"] { overflow: hidden; animation: avPiilo 300ms ease-in 150ms both; }
