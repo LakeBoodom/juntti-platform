@@ -113,6 +113,17 @@ export async function generateMetadata(
     };
   }
   if (slug || quizId) {
+    /* Lasten visa: otsikko datasta ("… lapsille / pienille"), luonnos (vain preview) ei indeksoidu. */
+    const lasten = await haeLastenVisa({ slug, quizId });
+    if (lasten) {
+      const kuvaus = lasten.kuvaus ?? `${lasten.otsikko} – tietovisa lapsille Tietoniekassa.`;
+      return {
+        title: `${lasten.otsikko}${suffix}`, description: kuvaus,
+        ...og(lasten.otsikko, kuvaus, `/og/visa/${encodeURIComponent(lasten.slug)}`, `/visa/${lasten.slug}`),
+        alternates: { canonical: `/visa/${lasten.slug}` },
+        ...(lasten.julkaistu ? {} : { robots: { index: false, follow: false } }),
+      };
+    }
     let q = sb.from("quizzes").select("title, display_title, teaser, description, slug, seo_title, seo_description, collection").eq("status", "published");
     q = quizId ? q.eq("id", quizId) : q.eq("slug", slug!);
     const { data } = await q.maybeSingle<{ title: string; display_title: string | null; teaser: string | null; description: string | null; slug: string | null; seo_title: string | null; seo_description: string | null; collection: string | null }>();

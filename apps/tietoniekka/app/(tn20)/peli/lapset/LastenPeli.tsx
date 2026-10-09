@@ -319,7 +319,7 @@ export default function LastenPeli({ visa, muut, takaisin }: { visa: LastenVisa;
         <span className="lp-nimilappu" data-kuka={puhuja}><Palkit pieni />{JUONTAJA_NIMI[puhuja]}</span>
       )}
       {opts.kupla !== false && kupla && (
-        <div className="lp-kupla" data-kuka={kupla.kuka} data-laji={kupla.laji} role="status" aria-live="polite">
+        <div className="lp-kupla" data-kuka={kupla.kuka} data-laji={kupla.laji} data-pitka={kupla.teksti.length > 70 || undefined} role="status" aria-live="polite">
           <div className="lp-kupla-yla">
             <span className="lp-kupla-nimi">{JUONTAJA_NIMI[kupla.kuka]}</span>
             {puhe && puhe.laji === kupla.laji && (

@@ -192,6 +192,9 @@
 .tn20 .lp-kupla .lp-stop { width: 32px; height: 32px; font-size: 12px; }
 .tn20 .lp-kupla p { margin: 0; font-size: 18px; font-weight: 700; line-height: 1.28; }
 .tn20 .lp-kupla[data-laji="reaktio"] p { font-family: var(--lp-cond); font-size: 26px; font-weight: 800; line-height: 1.05; }
+/* Pitkä teksti (intro ~100 merkkiä): leveämpi ja tiiviimpi, jotta kupla ei nouse vastausten päälle. */
+.tn20 .lp-kupla[data-pitka] { width: 240px; }
+.tn20 .lp-kupla[data-pitka] p { font-size: 15.5px; font-weight: 600; line-height: 1.25; }
 @keyframes lpKupla { from { opacity: 0; transform: translateY(10px) scale(.92); } to { opacity: 1; transform: none; } }
 @keyframes lpKuplaMikko { from { opacity: 0; transform: translateY(10px) scale(.92) rotate(-3deg); } to { opacity: 1; transform: rotate(-1.2deg); } }
 
@@ -247,8 +250,10 @@
 .tn20 .lp-tahdet span:nth-child(2) { animation-name: lpTahtiKeski; }
 .tn20 .lp-tulos-p { margin: 10px 24px 0; text-align: center; font-size: 18px; font-weight: 600; line-height: 1.4; }
 .tn20 .lp-tulos-napit { margin: 18px 16px 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
-.tn20 .lp-cta--pieni { min-height: 64px; border-radius: 20px; font-size: 22px; }
+/* KORTTISÄÄNTÖ: "PELAA UUDESTAAN" (15 merkkiä) ei mahdu yhdelle riville 320 px:n kahden sarakkeen napissa → rivittyy. */
+.tn20 .lp-cta--pieni { min-height: 64px; padding: 6px 10px; border-radius: 20px; font-size: 22px; line-height: 1; text-align: center; overflow-wrap: normal; word-break: keep-all; }
 .tn20 .lp-toissijainen {
+  padding: 6px 10px; text-align: center; line-height: 1;
   display: flex; align-items: center; justify-content: center; min-height: 64px; border-radius: 20px; background: var(--lp-rivi); border: 2.5px solid var(--lp-navy);
   color: var(--lp-navy); font-family: var(--lp-cond); font-weight: 800; font-size: 20px; cursor: pointer;
 }
@@ -288,6 +293,9 @@
   .tn20 .lp-kupla[data-kuka="mikko"] { left: 10px; }
   .tn20 .lp-kupla p { font-size: 16.5px; font-weight: 600; line-height: 1.3; }
   .tn20 .lp-kupla[data-laji="reaktio"] p { font-size: 22px; }
+  .tn20 .lp-kupla[data-pitka] { width: 244px; bottom: 99px; padding: 8px 12px; }
+  .tn20 .lp-kupla[data-pitka] p { font-size: 14.5px; line-height: 1.22; }
+  .tn20 .lp-kupla[data-pitka] .lp-kupla-yla { min-height: 18px; margin-bottom: 0; }
   .tn20 .lp-ala { height: 96px; border-top-width: 4px; padding: 10px 14px calc(20px + env(safe-area-inset-bottom)); }
   .tn20 .lp-vihje { min-height: 60px; border-radius: 16px; font-size: 19px; }
   .tn20 .lp-cta { min-height: 60px; font-size: 24px; }
