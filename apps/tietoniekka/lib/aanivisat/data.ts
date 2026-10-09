@@ -88,15 +88,13 @@ export async function haeAaniviikko(ryhma: RyhmaMeta): Promise<AaniViikko | null
   const siteId = await getSiteId();
   if (!sb || !siteId) return null;
   const esi = esikatselu();
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sbAny = sb as any;
-  let q = sbAny.from("aanivisat").select(SARAKKEET).eq("site_id", siteId).eq("ryhma", ryhma.key);
+  let q = sb.from("aanivisat").select(SARAKKEET).eq("site_id", siteId).eq("ryhma", ryhma.key);
   if (!esi) q = q.eq("active", true);
   const { data: pooliData } = await q;
   const pooli = (pooliData ?? []) as Rivi[];
   if (pooli.length < AANIVISA_MIN) return null;
 
-  const { data, error } = await sbAny.rpc("aanivisa_viikon_aanet", { p_site_id: siteId, p_ryhma: ryhma.key, p_vain_aktiiviset: !esi });
+  const { data, error } = await sb.rpc("aanivisa_viikon_aanet", { p_site_id: siteId, p_ryhma: ryhma.key, p_vain_aktiiviset: !esi });
   if (error) return null;
   const rivi = (Array.isArray(data) ? data[0] : data) as { vuosi: number; viikko: number; idt: string[] | null } | undefined;
   if (!rivi?.idt?.length) return null;
@@ -113,8 +111,7 @@ export async function julkaistutRyhmat(): Promise<RyhmaMeta[]> {
   const siteId = await getSiteId();
   if (!sb || !siteId) return [];
   const esi = esikatselu();
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  let q = (sb as any).from("aanivisat").select("ryhma").eq("site_id", siteId);
+  let q = sb.from("aanivisat").select("ryhma").eq("site_id", siteId);
   if (!esi) q = q.eq("active", true);
   const { data, error } = await q;
   if (error) return [];
@@ -163,8 +160,7 @@ export async function haeAaniLahteet(): Promise<AaniLahde[]> {
   const sb = getSupabase();
   const siteId = await getSiteId();
   if (!sb || !siteId) return [];
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  let q = (sb as any)
+  let q = sb
     .from("aanivisat")
     .select("ryhma, laji, tieteellinen, kuva_tekija, kuva_lisenssi, kuva_lahde_url, aani_tekija, aani_lisenssi, aani_lahde_url, aani_havainto_url")
     .eq("site_id", siteId)

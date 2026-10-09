@@ -23,6 +23,8 @@ const SITE_ID = "62d75f45-a857-4fdd-9a45-b70ceeee98a8";
 
 type Aani = {
   tunniste: string; ryhma: string; laji: string; tieteellinen: string; aanityyppi: string; vaikeus: string;
+  /** 'erottuva' | 'pikkulintu' (sääntö 9.10.2026: viikkosetissä enintään 5 pikkulintua). Puuttuva = pikkulintu. */
+  aaniryhma?: string;
   similarity_group: string; distractor_pool: string[]; fakta: string; audio: string; jakso_s: number; tauko_s: number; kesto_s: number;
   sonogrammi: string; aani_tekija: string; aani_lisenssi: string; aani_lahde_url: string; aani_havainto_url?: string; aani_maa: string; kuva: string;
 };
@@ -51,7 +53,7 @@ for (const a of data.aanet) {
   const kuvaUrl = kuvavisaLaji
     ? `(select image_url from kuvavisas where site_id = '${SITE_ID}' and type = 'linnut' and correct_option = ${q(kuvavisaLaji)} and active order by sort_order limit 1)`
     : q(polku(a.ryhma, "kuvat", `${a.tunniste}.webp`));
-  aaniRivit.push(`('${SITE_ID}', ${q(a.tunniste)}, ${q(a.ryhma)}, ${q(a.laji)}, ${q(a.tieteellinen)}, ${q(a.aanityyppi)}, ${q(a.vaikeus)}, ${q(a.similarity_group)}, ${j(a.distractor_pool)}, ${q(a.fakta)}, ${q(audio)}, ${a.jakso_s}, ${a.tauko_s}, ${a.kesto_s}, ${q(sono)}, ${q(a.aani_tekija)}, ${q(a.aani_lisenssi)}, ${q(a.aani_lahde_url)}, ${q(a.aani_havainto_url ?? null)}, ${q(a.aani_maa)}, ${kuvaUrl}, ${q(kv.tekija)}, ${q(kv.lisenssi)}, ${q(kv.sivu)})`);
+  aaniRivit.push(`('${SITE_ID}', ${q(a.tunniste)}, ${q(a.ryhma)}, ${q(a.laji)}, ${q(a.tieteellinen)}, ${q(a.aanityyppi)}, ${q(a.vaikeus)}, ${q(a.aaniryhma ?? null)}, ${q(a.similarity_group)}, ${j(a.distractor_pool)}, ${q(a.fakta)}, ${q(audio)}, ${a.jakso_s}, ${a.tauko_s}, ${a.kesto_s}, ${q(sono)}, ${q(a.aani_tekija)}, ${q(a.aani_lisenssi)}, ${q(a.aani_lahde_url)}, ${q(a.aani_havainto_url ?? null)}, ${q(a.aani_maa)}, ${kuvaUrl}, ${q(kv.tekija)}, ${q(kv.lisenssi)}, ${q(kv.sivu)})`);
   const krediitti = `${kv.tekija} / Wikimedia Commons, ${kv.lisenssi}`;
   const huom = `${kv.lisenssi}, ${kv.sivu}`;
   if (kuvavisaLaji) {
@@ -64,13 +66,14 @@ for (const a of data.aanet) {
 }
 
 const ulos = `-- Äänivisat: tuonti ${new Date().toISOString().slice(0, 10)} (scripts/import-aanivisat.ts)
-insert into aanivisat (site_id, tunniste, ryhma, laji, tieteellinen, aanityyppi, vaikeus, similarity_group, distractor_pool, fakta,
+insert into aanivisat (site_id, tunniste, ryhma, laji, tieteellinen, aanityyppi, vaikeus, aaniryhma, similarity_group, distractor_pool, fakta,
   audio_url, jakso_s, tauko_s, kesto_s, sono_url, aani_tekija, aani_lisenssi, aani_lahde_url, aani_havainto_url, aani_maa,
   kuva_url, kuva_tekija, kuva_lisenssi, kuva_lahde_url)
 values
 ${aaniRivit.join(",\n")}
 on conflict (site_id, ryhma, tunniste) do update set
   laji = excluded.laji, tieteellinen = excluded.tieteellinen, aanityyppi = excluded.aanityyppi, vaikeus = excluded.vaikeus,
+  aaniryhma = coalesce(excluded.aaniryhma, aanivisat.aaniryhma),
   similarity_group = excluded.similarity_group, distractor_pool = excluded.distractor_pool, fakta = excluded.fakta,
   audio_url = excluded.audio_url, jakso_s = excluded.jakso_s, tauko_s = excluded.tauko_s, kesto_s = excluded.kesto_s,
   sono_url = excluded.sono_url, aani_tekija = excluded.aani_tekija, aani_lisenssi = excluded.aani_lisenssi,
