@@ -22,6 +22,9 @@ import { KAUPUNGIT } from "@/lib/kaupungit";
 import { resolveCollection, COLLECTION_LABEL } from "@/lib/visanKokoelma";
 import { type Learn } from "@/components/tn20/LearnArticle";
 import GameClient, { type GameQuiz } from "./GameClient";
+import LastenPeli from "./lapset/LastenPeli";
+import { haeLastenVisa, haeMuutLastenVisat } from "@/lib/lapset/data";
+import "../lapset.css";
 import { heroMode } from "@/lib/herotila";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
@@ -578,6 +581,14 @@ export default async function Peli20({
       related,
     };
     return <GameClient quiz={game} />;
+  }
+
+  /* LASTEN VISAT (9.10.2026): target_age 4-7 / 8-12 → oma pelinäkymä (lib/lapset/data.ts).
+     Previewssä myös luonnokset, tuotannossa vain julkaistut. */
+  const lasten = await haeLastenVisa({ slug, quizId });
+  if (lasten) {
+    const muut = await haeMuutLastenVisat(lasten);
+    return <LastenPeli visa={lasten} muut={muut} takaisin={lasten.kokoelma ? `/kokoelma/${lasten.kokoelma}` : "/"} />;
   }
 
   let q = sb
