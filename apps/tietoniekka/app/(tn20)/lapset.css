@@ -256,7 +256,7 @@
 .tn20 .lp-tulos-p { margin: 10px 24px 0; text-align: center; font-size: 18px; font-weight: 600; line-height: 1.4; }
 .tn20 .lp-tulos-napit { margin: 18px 16px 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
 /* KORTTISÄÄNTÖ: "PELAA UUDESTAAN" (15 merkkiä) ei mahdu yhdelle riville 320 px:n kahden sarakkeen napissa → rivittyy. */
-.tn20 .lp-cta--pieni { min-height: 64px; padding: 6px 10px; border-radius: 20px; font-size: 22px; line-height: 1; text-align: center; overflow-wrap: normal; word-break: keep-all; }
+.tn20 .lp-cta--pieni { min-height: 64px; padding: 6px 10px; border-radius: 20px; font-size: min(22px, max(18px, calc(((min(100vw, 430px) - 42px) / 2 - 20px) / 7.6))); line-height: 1; text-align: center; overflow-wrap: normal; word-break: keep-all; }
 .tn20 .lp-toissijainen {
   padding: 6px 10px; text-align: center; line-height: 1;
   display: flex; align-items: center; justify-content: center; min-height: 64px; border-radius: 20px; background: var(--lp-rivi); border: 2.5px solid var(--lp-navy);
@@ -521,7 +521,8 @@
   .tn20 .lp-i-intro { margin-top: 14px; gap: 12px; }
   .tn20 .lp-i-intro p { font-size: 16px; }
   .tn20 .lp-i-kuva { aspect-ratio: auto; height: 150px; }
-  .tn20 .lp[data-ika="8-12"][data-vastattu] .lp-i-kuva { height: 84px; }
+  /* Matala näyttö: vastauksen jälkeen kuva väistyy kokonaan, jotta reaktio, Tiesitkö ja Seuraava mahtuvat (mitattu 375 × 667: +59 px). */
+  .tn20 .lp[data-ika="8-12"][data-vastattu] .lp-i-kuva { display: none; }
   .tn20 .lp-i-kysymysrivi { margin-top: 12px; }
   .tn20 .lp-i-vastaukset { margin-top: 12px; gap: 8px; }
   .tn20 .lp-i-vastaus { min-height: 54px; }
@@ -538,6 +539,8 @@
   .tn20 .lp[data-ika="8-12"] .lp-ika { height: 36px; padding: 0 16px; font-size: 17px; }
   .tn20 .lp[data-ika="8-12"] .lp-sulje, .tn20 .lp[data-ika="8-12"][data-vaihe="peli"] .lp-aani { height: 48px; }
   .tn20 .lp[data-ika="8-12"] .lp-sulje { width: 48px; }
+  .tn20 .lp[data-ika="8-12"][data-vaihe="peli"] .lp-aani { width: auto; padding: 0 18px 0 14px; font-size: 17px; }
+  .tn20 .lp[data-ika="8-12"][data-vaihe="peli"] .lp-aani-t { display: inline; }
   .tn20 .lp-lamput { height: 48px; padding: 0 14px; }
   .tn20 .lp-lamput-t { display: inline; }
   .tn20 .lp-i-edistys { position: absolute; left: 50%; top: 44px; width: 420px; margin: 0 0 0 -210px; gap: 5px; }
