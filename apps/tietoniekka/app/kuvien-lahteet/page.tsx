@@ -4,6 +4,8 @@ import Link from "next/link";
 import { KUVALAHTEET, commonsUrl, type Kuvalahde } from "@/lib/kuvalahteet";
 import { AANI_RYHMAT } from "@/lib/aanivisat";
 import { haeAaniLahteet, type AaniLahde } from "@/lib/aanivisat/data";
+import { getSupabase } from "@/lib/supabase";
+import { getSiteId } from "@/lib/queries";
 
 // Äänivisojen tekijätiedot tulevat kannasta (uudet äänet näkyvät tunnin sisällä).
 export const revalidate = 3600;
@@ -25,7 +27,7 @@ export const metadata: Metadata = {
 const PAIVITETTY = "9.10.2026";
 
 export default async function KuvienLahteetPage() {
-  const aanet = await haeAaniLahteet();
+  const [aanet, linnut] = await Promise.all([haeAaniLahteet(), haeLintukuvat()]);
   const musiikki = KUVALAHTEET.filter((k) => k.kokoelma === "musiikki");
   const kaupungit = KUVALAHTEET.filter((k) => k.kokoelma === "kaupungit");
   const jaakiekko = KUVALAHTEET.filter((k) => k.kokoelma === "jaakiekko");
@@ -112,6 +114,7 @@ export default async function KuvienLahteetPage() {
         <Lista rivit={maantieto} />
         <h2 style={{ fontSize: 22, margin: "34px 0 14px" }}>Luonto-kokoelma</h2>
         <Lista rivit={luonto} />
+        {linnut.length > 0 && <Lintukuvat rivit={linnut} />}
         {AANI_RYHMAT.map((r) => {
           const rivit = aanet.filter((a) => a.ryhma === r.key);
           if (!rivit.length) return null;
@@ -211,6 +214,59 @@ function Aanivisa({ otsikko, rivit }: { otsikko: string; rivit: AaniLahde[] }) {
                 {havaintoNimi(a.aani.lahde)}
               </a>{" "}
               · {a.aani.tekija} · {a.aani.lisenssi} · lyhennetty
+            </div>
+          </li>
+        ))}
+      </ul>
+    </>
+  );
+}
+
+/* Lintujen kuvavisa (9.10.2026): tekijä ja lisenssi kuvavisas-taulusta. source_credit muodossa
+   "Tekijä / Wikimedia Commons, Lisenssi", license_note "Lisenssi, https://commons…/File:…". */
+type Lintukuva = { laji: string; tekija: string; lisenssi: string; lahde: string | null };
+
+async function haeLintukuvat(): Promise<Lintukuva[]> {
+  const sb = getSupabase();
+  const siteId = await getSiteId();
+  if (!sb || !siteId) return [];
+  const { data, error } = await sb
+    .from("kuvavisas")
+    .select("correct_option, source_credit, license_note")
+    .eq("site_id", siteId)
+    .eq("type", "linnut")
+    .eq("active", true)
+    .order("correct_option");
+  if (error) return [];
+  return (data ?? []).flatMap((r) => {
+    const m = (r.source_credit ?? "").match(/^(.+?) \/ Wikimedia Commons, (.+)$/);
+    if (!m) return [];
+    const lahde = (r.license_note ?? "").match(/https:\/\/commons\.wikimedia\.org\/wiki\/File:\S+/)?.[0] ?? null;
+    return [{ laji: r.correct_option, tekija: m[1], lisenssi: m[2], lahde }];
+  });
+}
+
+function Lintukuvat({ rivit }: { rivit: Lintukuva[] }) {
+  return (
+    <>
+      <h2 style={{ fontSize: 22, margin: "34px 0 14px" }}>Lintujen kuvavisa</h2>
+      <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "grid", gap: 14 }}>
+        {rivit.map((k) => (
+          <li
+            key={"lintu-" + k.laji}
+            style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 10, padding: "12px 14px" }}
+          >
+            <div style={{ fontWeight: 600, marginBottom: 4 }}>{k.laji}</div>
+            <div style={{ fontSize: 14, color: "rgba(255,255,255,0.72)" }}>
+              Kuva:{" "}
+              {k.lahde ? (
+                <a href={k.lahde} target="_blank" rel="noopener noreferrer" style={linkki}>
+                  {commonsNimi(k.lahde)}
+                </a>
+              ) : (
+                "Wikimedia Commons"
+              )}{" "}
+              · {k.tekija} · {k.lisenssi} · rajattu
             </div>
           </li>
         ))}
