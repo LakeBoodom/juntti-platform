@@ -149,7 +149,7 @@
 /* Paljastus (1d/1e) */
 .tn20 .av-media--kuva { background: #1A160D; border: 0; }
 .tn20 .av-paljastus { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; animation: avNousu 360ms ease-out both; }
-.tn20 .av-paljastus-varjo { position: absolute; left: 0; right: 0; bottom: 0; height: 150px; background: linear-gradient(to bottom, rgba(10, 9, 5, 0), rgba(10, 9, 5, 0.92)); pointer-events: none; }
+.tn20 .av-paljastus-varjo { position: absolute; left: 0; right: 0; bottom: 0; height: 58%; background: linear-gradient(to bottom, rgba(10, 9, 5, 0), rgba(10, 9, 5, 0.92)); pointer-events: none; }
 .tn20 .av-paljastus-merkki {
   position: absolute; left: 14px; top: 14px; display: inline-flex; align-items: center; height: 30px; padding: 0 12px; border-radius: 999px;
   background: var(--av-teksti); color: #131109; font-size: 13px; font-weight: 800;
