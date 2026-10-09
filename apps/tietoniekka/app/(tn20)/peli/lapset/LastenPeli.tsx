@@ -26,7 +26,7 @@ import { IKA_MERKKI, JUONTAJA_ABL, JUONTAJA_NIMI, LASTEN_AIHEET, juontajaKuvat, 
 import { getSupabase } from "@/lib/supabase";
 
 type Vaihe = "intro" | "peli" | "tulos";
-type Laji = "intro" | "kysymys" | "vihje" | "reaktio" | "viimeinen" | "tiesitko" | "tulos";
+type Laji = "intro" | "kysymys" | "vihje" | "vinkit-loppu" | "reaktio" | "viimeinen" | "tiesitko" | "tulos";
 type Klippi = { url: string | null; kuka: Juontaja; laji: Laji; teksti?: string | null };
 type Kupla = { kuka: Juontaja; teksti: string; laji: Laji };
 
@@ -228,7 +228,7 @@ export default function LastenPeli({ visa, muut, takaisin }: { visa: LastenVisa;
       const avain = `${qi}:${kuka}`;
       if (!kysytyt.includes(avain)) {
         if (lamput <= 0) {
-          const loppu = valijuonto("vinkit-loppu", "vihje");
+          const loppu = valijuonto("vinkit-loppu", "vinkit-loppu");
           if (loppu) soita([loppu]);
           return;
         }
@@ -336,7 +336,7 @@ export default function LastenPeli({ visa, muut, takaisin }: { visa: LastenVisa;
       {vaihe !== "tulos" && <span className="lp-ika">{IKA_MERKKI[visa.ika]}</span>}
       <span className="lp-tyhja" />
       {!pienet && vaihe === "peli" && (
-        <span className="lp-lamput" role="img" aria-label={lamput > 0 ? `${lamput} vihjettä jäljellä` : "Vihjeet käytetty"}>
+        <span className="lp-lamput" role="img" aria-label={lamput > 0 ? `${lamput} ${lamput === 1 ? "vihje" : "vihjettä"} jäljellä` : "Vihjeet käytetty"}>
           {Array.from({ length: LAMPPUJA }, (_, i) => <span key={i} data-kaytetty={i >= lamput || undefined} aria-hidden="true">💡</span>)}
           <span className="lp-lamput-t" aria-hidden="true">{lamput > 0 ? `${lamput} ${lamput === 1 ? "vihje" : "vihjettä"}` : "Vihjeet käytetty"}</span>
         </span>
@@ -612,7 +612,7 @@ export default function LastenPeli({ visa, muut, takaisin }: { visa: LastenVisa;
                           disabled={!k.vihje[kuka]}
                           onClick={() => kysyVihje(kuka)}
                         >
-                          <Avatar kuka={kuka} puhuu={aktiivinen} />
+                          <Avatar kuka={kuka} puhuu={puhe?.kuka === kuka} />
                           <span>
                             {kertoo ? `${JUONTAJA_NIMI[kuka]} kertoo` : lukeeNyt ? `${JUONTAJA_NIMI[kuka]} lukee…` : kaytetty ? "Vihjeet käytetty" : `Kysy ${JUONTAJA_ABL[kuka]}`}
                           </span>
@@ -700,7 +700,7 @@ export default function LastenPeli({ visa, muut, takaisin }: { visa: LastenVisa;
         {tiesitko && k.tiesitko && (
           <section className="lp-tiesitko" aria-label="Tiesitkö">
             <div className="lp-tiesitko-yla">
-              <span className="lp-avatar" data-puhuu={puhe?.laji === "tiesitko" || undefined} style={{ backgroundImage: `url(${kuvat.avatar[lukija]})` }} aria-hidden="true" />
+              <span className="lp-avatar" data-kuka={lukija} data-puhuu={puhe?.laji === "tiesitko" || undefined} style={{ backgroundImage: `url(${kuvat.avatar[lukija]})` }} aria-hidden="true" />
               <span className="lp-tiesitko-otsikko">💡 Tiesitkö?</span>
               <span className="lp-tyhja" />
               {puhe?.laji === "tiesitko" && <button type="button" className="lp-stop" onClick={vaikene} aria-label="Lopeta puhe">■</button>}

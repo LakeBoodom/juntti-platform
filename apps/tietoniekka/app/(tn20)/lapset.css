@@ -418,7 +418,8 @@
   background-repeat: no-repeat;
 }
 .tn20 .lp-i-lukija .lp-i-avatar { width: 40px; height: 40px; border: 2px solid var(--lp-navy); box-sizing: border-box; }
-.tn20 .lp-i-avatar[data-kuka="mikko"] { background-color: var(--lp-kulta-v); }
+/* Mikon kuva on kokovartalokuva (kasvot ~17 % leveydestä, keskikohta 47 % / 23 %) → isompi suurennos. */
+.tn20 .lp-i-avatar[data-kuka="mikko"], .tn20 .lp-avatar[data-kuka="mikko"] { background-color: var(--lp-kulta-v); background-size: 300% auto; background-position: 45% 13%; }
 .tn20 .lp-i-avatar[data-puhuu] { width: 46px; height: 46px; animation: lpRengas 1.2s ease-in-out infinite; box-shadow: 0 0 0 3px var(--lp-kulta), 0 0 0 8px rgba(232, 163, 32, .3); }
 
 /* Kysymys (2f) */
@@ -502,7 +503,7 @@
 .tn20 .lp-i-vihjenapit { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
 .tn20 .lp-i-vihje {
   display: flex; align-items: center; gap: 10px; min-height: 64px; padding: 0 12px 0 8px; border-radius: 999px; background: var(--lp-rivi);
-  border: 2px solid var(--lp-navy); color: var(--lp-navy); font-family: var(--lp-cond); font-weight: 800; font-size: 19px; line-height: 1.05; text-align: left;
+  border: 2px solid var(--lp-navy); color: var(--lp-navy); font-family: var(--lp-cond); font-weight: 800; font-size: 17px; line-height: 1.05; text-align: left;
   cursor: pointer; transition: opacity .22s, background .22s;
 }
 .tn20 .lp-i-vihje[data-aktiivinen] { background: var(--lp-navy); color: var(--lp-kulta-v); }
