@@ -14,6 +14,8 @@
 //   3. Commons-kuvat lisätään myös kuvavisas-tauluun (type linnut, active=false — aktivoidaan samalla
 //      kun äänivisa julkaistaan), ja olemassa olevien lintukuvien yleinen "Wikipedia / Wikimedia
 //      Commons" -krediitti tarkennetaan tekijäksi ja lisenssiksi.
+//   4. aani_havainto_url: datassa GBIF-havainto; kantaan päivitettiin 9.10.2026 iNaturalist-havaintosivut
+//      (GBIF:n references-kenttä). Uusi tuonti ei korvaa iNaturalist-linkkiä GBIF-linkillä.
 import fs from "node:fs";
 import path from "node:path";
 
@@ -72,7 +74,7 @@ on conflict (site_id, ryhma, tunniste) do update set
   similarity_group = excluded.similarity_group, distractor_pool = excluded.distractor_pool, fakta = excluded.fakta,
   audio_url = excluded.audio_url, jakso_s = excluded.jakso_s, tauko_s = excluded.tauko_s, kesto_s = excluded.kesto_s,
   sono_url = excluded.sono_url, aani_tekija = excluded.aani_tekija, aani_lisenssi = excluded.aani_lisenssi,
-  aani_lahde_url = excluded.aani_lahde_url, aani_havainto_url = excluded.aani_havainto_url, aani_maa = excluded.aani_maa,
+  aani_lahde_url = excluded.aani_lahde_url, aani_havainto_url = case when aanivisat.aani_havainto_url like 'https://www.inaturalist.org/%' and excluded.aani_havainto_url like 'https://www.gbif.org/%' then aanivisat.aani_havainto_url else excluded.aani_havainto_url end, aani_maa = excluded.aani_maa,
   kuva_url = excluded.kuva_url, kuva_tekija = excluded.kuva_tekija, kuva_lisenssi = excluded.kuva_lisenssi, kuva_lahde_url = excluded.kuva_lahde_url,
   updated_at = now();
 update aanivisat set sono_ticks = ${j(data.sonogrammi.ticks)} where site_id = '${SITE_ID}';

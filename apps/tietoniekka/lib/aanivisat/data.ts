@@ -150,3 +150,33 @@ export function viikonPaaryhma(ryhmat: RyhmaMeta[], viikko: number): RyhmaMeta |
 }
 
 export type { AaniRyhma };
+
+/** /kuvien-lahteet: äänivisojen paljastuskuvien ja äänitteiden tekijätiedot (julkaisu 9.10.2026).
+ *  Tuotannossa vain aktiiviset äänet, previewssä kaikki (sama sääntö kuin pelissä). */
+export type AaniLahde = {
+  ryhma: string; laji: string; tieteellinen: string | null;
+  kuva: { tekija: string; lisenssi: string; lahde: string } | null;
+  aani: { tekija: string; lisenssi: string; lahde: string };
+};
+
+export async function haeAaniLahteet(): Promise<AaniLahde[]> {
+  const sb = getSupabase();
+  const siteId = await getSiteId();
+  if (!sb || !siteId) return [];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let q = (sb as any)
+    .from("aanivisat")
+    .select("ryhma, laji, tieteellinen, kuva_tekija, kuva_lisenssi, kuva_lahde_url, aani_tekija, aani_lisenssi, aani_lahde_url, aani_havainto_url")
+    .eq("site_id", siteId)
+    .order("laji");
+  if (!esikatselu()) q = q.eq("active", true);
+  const { data, error } = await q;
+  if (error) return [];
+  return ((data ?? []) as Rivi[]).map((r) => ({
+    ryhma: r.ryhma,
+    laji: r.laji,
+    tieteellinen: r.tieteellinen,
+    kuva: r.kuva_tekija && r.kuva_lisenssi && r.kuva_lahde_url ? { tekija: r.kuva_tekija, lisenssi: r.kuva_lisenssi, lahde: r.kuva_lahde_url } : null,
+    aani: { tekija: r.aani_tekija, lisenssi: r.aani_lisenssi, lahde: r.aani_havainto_url || r.aani_lahde_url },
+  }));
+}
