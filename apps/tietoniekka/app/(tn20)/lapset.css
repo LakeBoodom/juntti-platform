@@ -55,16 +55,17 @@
   flex: none; white-space: nowrap; display: inline-flex; align-items: center; height: 34px; padding: 0 14px; border-radius: 999px; border: 2px solid;
   font-family: var(--lp-cond); font-weight: 800; font-size: 16px; letter-spacing: .04em; text-transform: uppercase;
 }
-/* KORTTISÄÄNTÖ: Barlow Condensed 900 uppercase ≈ 0.52 em/merkki; pisin sana "KUVAVISA"/"JOULUPUKIN" (10)
-   → 350 px / (10 × 0.52) ≈ 67 px. CD 52 px mahtuu, marginaali 1.29×. */
+/* KORTTISÄÄNTÖ (Range-mittaus 9.10.2026): leveimmän rivin "SUOMEN ELÄIMET" leveys = 6.34 × fonttikoko.
+   Koko = min(CD 52 px, (sisältöleveys) / 6.6) → 320 px: 42 px, 390 px: 52 px. Marginaali 4 %. */
 .tn20 .lp-intro-h1 {
-  margin: 0; font-family: var(--lp-cond); font-weight: 900; font-size: 52px; line-height: .92; text-transform: uppercase;
+  margin: 0; font-family: var(--lp-cond); font-weight: 900; font-size: min(52px, calc((min(100vw, 430px) - 40px) / 6.6)); line-height: .92; text-transform: uppercase;
   text-wrap: balance; overflow-wrap: normal; word-break: keep-all;
 }
 .tn20 .lp-intro-p { margin: 0; font-size: 20px; line-height: 1.45; font-weight: 600; text-wrap: pretty; }
 
 /* Kysymys (2c) */
-.tn20 .lp-kysymys { margin: 18px 20px 0; font-family: var(--lp-cond); font-weight: 800; font-size: 36px; line-height: 1.02; text-wrap: balance; overflow-wrap: normal; word-break: keep-all; }
+/* KORTTISÄÄNTÖ: pisin sana "adventtisunnuntaita" (19) ≈ 8.6 × fonttikoko → min(CD 36 px, leveys / 8.9). */
+.tn20 .lp-kysymys { margin: 18px 20px 0; font-family: var(--lp-cond); font-weight: 800; font-size: min(36px, calc((min(100vw, 430px) - 40px) / 8.9)); line-height: 1.02; text-wrap: balance; overflow-wrap: normal; word-break: keep-all; }
 .tn20 .lp-kuuntele {
   margin: 14px 20px 0; display: flex; align-items: center; justify-content: center; gap: 12px; min-height: 56px; border: 0; border-radius: 999px;
   background: #E6DCC9; color: var(--lp-navy); font-family: var(--lp-cond); font-weight: 800; font-size: 21px; cursor: pointer;
@@ -96,7 +97,11 @@
 .tn20 .lp-vastaus:focus-visible { outline: 3px solid var(--lp-kulta); outline-offset: 3px; }
 .tn20 .lp-vastaus-kuva { position: relative; height: 100%; border-radius: 14px; overflow: hidden; background: #EFE6D5; }
 .tn20 .lp-vastaus-kuva img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
-.tn20 .lp-vastaus-n { font-family: var(--lp-cond); font-weight: 800; font-size: 30px; line-height: 1; overflow-wrap: anywhere; hyphens: auto; }
+/* KORTTISÄÄNTÖ: kuvavastausten pisin sana 13 merkkiä ("Polkupyörällä") ≈ 5.46 × fonttikoko; tekstisarake
+   = leveys − 194 px → min(CD 30 px, (leveys − 194) / 5.7): 320 px → 22 px, ≥ 360 px → 30 px.
+   Kuvattomat rivit ovat leveämpiä (pisin "Valkohäntäpeura" mahtuu 30 px:llä 320:ssa). */
+.tn20 .lp-vastaus-n { font-family: var(--lp-cond); font-weight: 800; font-size: min(30px, calc((min(100vw, 430px) - 194px) / 5.7)); line-height: 1; overflow-wrap: normal; word-break: keep-all; }
+.tn20 .lp-vastaus[data-kuvaton] .lp-vastaus-n { font-size: 30px; }
 /* Oikea: kulta + ⭐ (2h); valittu väärä: katkoviiva (2i); muut himmenevät */
 .tn20 .lp-vastaus[data-tila="oikea"] {
   padding: 6px; background: #FFF1CF; border: 3px solid var(--lp-kulta); box-shadow: 0 0 0 5px rgba(232, 163, 32, .25);
@@ -275,12 +280,13 @@
   .tn20 .lp-sulje, .tn20 .lp-aani { width: 44px; height: 44px; font-size: 18px; }
   .tn20 .lp-ika { height: 32px; padding: 0 12px; font-size: 15px; }
   .tn20 .lp-edistys { margin: 10px 14px 0; height: 6px; }
-  .tn20 .lp-kysymys { margin: 12px 18px 0; font-size: 31px; }
+  .tn20 .lp-kysymys { margin: 12px 18px 0; font-size: min(31px, calc((min(100vw, 430px) - 36px) / 8.9)); }
   .tn20 .lp-kuuntele { margin: 10px 18px 0; min-height: 48px; font-size: 19px; }
   .tn20 .lp-vastaukset { margin: 12px 14px 0; gap: 8px; }
   .tn20 .lp-vastaus { grid-template-columns: 100px minmax(0, 1fr); gap: 14px; height: 76px; padding: 6px; border-radius: 18px; }
   .tn20 .lp-vastaus-kuva { border-radius: 12px; }
-  .tn20 .lp-vastaus-n { font-size: 26px; }
+  .tn20 .lp-vastaus-n { font-size: min(26px, calc((min(100vw, 430px) - 158px) / 5.7)); }
+  .tn20 .lp-vastaus[data-kuvaton] .lp-vastaus-n { font-size: 26px; }
   .tn20 .lp-tahti { width: 38px; height: 38px; margin-top: -19px; font-size: 19px; }
   .tn20 .lp-elain-nappi { width: 84px; height: 84px; font-size: 30px; }
   .tn20 .lp-tiesitko { padding: 14px; }
@@ -301,7 +307,7 @@
   .tn20 .lp-cta { min-height: 60px; font-size: 24px; }
   .tn20 .lp-intro-kuva { height: 180px; }
   .tn20 .lp-intro-teksti { margin-top: 14px; gap: 8px; }
-  .tn20 .lp-intro-h1 { font-size: 44px; }
+  .tn20 .lp-intro-h1 { font-size: min(44px, calc((min(100vw, 430px) - 40px) / 6.6)); }
   .tn20 .lp-intro-p { font-size: 17px; }
 }
 
@@ -313,6 +319,7 @@
   .tn20 .lp[data-vaihe="peli"] .lp-aani-t { display: inline; }
   .tn20 .lp-edistys { margin: 16px auto 0; width: 360px; height: 10px; }
   .tn20 .lp-kysymys { margin: 20px auto 0; max-width: 1000px; text-align: center; font-size: 56px; line-height: 1; }
+  .tn20 .lp-vastaus-n { font-size: 30px; }
   .tn20 .lp-kuuntele { margin: 16px auto 0; padding: 0 32px; min-height: 60px; font-size: 22px; }
   .tn20 .lp-elain { margin: 16px auto 0; }
   .tn20 .lp-vastaukset { margin: 24px auto 0; display: grid; grid-template-columns: repeat(3, 250px); gap: 28px; }
@@ -337,6 +344,8 @@
   .tn20 .lp-kupla[data-kuka="mikko"]::before { right: auto; left: -13px; border-top: 0; border-right: 0; border-left: 2.5px solid var(--lp-navy); border-bottom: 2.5px solid var(--lp-navy); }
   .tn20 .lp-kupla p { font-size: 24px; font-weight: 600; line-height: 1.35; }
   .tn20 .lp-kupla[data-laji="reaktio"] p { font-size: 32px; }
+  .tn20 .lp-kupla[data-pitka] { width: 390px; }
+  .tn20 .lp-kupla[data-pitka] p { font-size: 20px; line-height: 1.3; }
   .tn20 .lp-ala { height: 130px; border-top-width: 6px; padding: 0 80px; justify-content: center; }
   .tn20 .lp-vihjenapit { flex: none; grid-template-columns: 300px 300px; gap: 324px; }
   .tn20 .lp-vihje { min-height: 68px; border-radius: 20px; font-size: 24px; }
@@ -347,6 +356,7 @@
 /* Desktop alle 960 px korkea: kahden rivin kysymys ei saa työntää alapalkkia näkymän alle (mitattu 1440 × 900: +46 px). */
 @media (min-width: 900px) and (min-height: 701px) and (max-height: 959.98px) {
   .tn20 .lp-kysymys { margin-top: 14px; font-size: 50px; }
+  .tn20 .lp-vastaus-n { font-size: 28px; }
   .tn20 .lp-kuuntele { margin-top: 12px; min-height: 54px; }
   .tn20 .lp-vastaukset { margin-top: 18px; grid-template-columns: repeat(3, 230px); }
   .tn20 .lp-kaista { height: 320px; }
