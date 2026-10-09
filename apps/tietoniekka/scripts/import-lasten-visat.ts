@@ -43,6 +43,14 @@ type KvRivi = { image_url: string; source_credit: string | null; license_note: s
 const kartta = JSON.parse(fs.readFileSync(karttaPolku, "utf8")) as Record<string, KvRivi>;
 /** Datan lajinimi → kuvavisan correct_option, kun ne eroavat. */
 const ALIAS: Record<string, string> = { Karhu: "Ruskeakarhu" };
+/** PUUTTUU-kuvat, jotka on haettu Commonsista suoraan lasten visoille (public/20/lapset/<avain>.webp, rajattu). */
+const OMAT_COMMONS: Record<string, KvRivi> = {
+  "v5-k04-riekko": {
+    image_url: "/20/lapset/v5-k04-riekko.webp",
+    source_credit: "Borealomas / Wikimedia Commons, CC BY-SA 4.0",
+    license_note: "CC BY-SA 4.0, https://commons.wikimedia.org/wiki/File:Willow_Ptarmigan.jpg",
+  },
+};
 const data = JSON.parse(fs.readFileSync(dataPolku, "utf8")) as { quizzes: Visa[] };
 fs.mkdirSync(ulos, { recursive: true });
 
@@ -81,7 +89,7 @@ for (const v of data.quizzes) {
     const puuttuu = qi.match(/^PUUTTUU:\s*([^\s(]+)/)?.[1];
     if (qi.startsWith("kuvavisa:") || puuttuu) {
       const laji = puuttuu ?? qi.slice("kuvavisa:".length).trim();
-      const r = kv(laji, `${v.code} k${nro(k)} kysymyskuva`);
+      const r = OMAT_COMMONS[`${v.code}-k${nro(k)}-${tiedostoksi(laji)}`] ?? kv(laji, `${v.code} k${nro(k)} kysymyskuva`);
       if (r) { kuva = q(r.image_url); krediitti = q(r.source_credit); lisenssi = q(r.license_note); }
     } else {
       const p = kuvaPolku(`${v.code}-k${nro(k)}`);
