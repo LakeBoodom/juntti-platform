@@ -3,11 +3,14 @@
 //
 //   intro (1a) → 10 ääntä (1b/1c/1g → 1d/1e) → tulos (1f). Desktop 1h/1i = kaksi saraketta.
 //
-// Ääni: yksi <audio>-elementti koko pelille. Aloita-napautus soittaa sen mykistettynä ja pysäyttää heti,
-// mikä avaa iOS Safarin äänilukon samalle elementille → kysymyksestä 2 alkaen ääni voi alkaa itsestään
-// (~0,6 s kysymyksen vaihtumisen jälkeen), jos yläpalkin Ääni-kytkin on päällä (tila laitteella).
-// Kysymys 1 soi aina napautuksella. Tiedostossa sama jakso soi kahdesti tauon kanssa (jakso, tauko):
-// sonogrammi pyyhkiytyy esiin kummallakin toistolla. Vastaaminen ei pysäytä ääntä.
+// Ääni (korjaukset kierros 2, 9.10.2026): yksi audio-elementti koko visalle, vain src vaihtuu. Aloita-napautus
+// kutsuu play()-metodia synkronisesti samassa käsittelijässä, joten se sekä avaa iOS Safarin äänilukon että
+// soittaa kysymyksen 1 (Aloita on "kysymys 1 soi napautuksella" -napautus). Kysymyksestä 2 alkaen ääni voi
+// alkaa itsestään (~0,6 s vaihdon jälkeen), jos yläpalkin Ääni-kytkin on päällä (tila laitteella).
+// Soittoviiva lasketaan datasta (jakso, tauko) ja currentTime-arvosta, ei audio.duration-arvosta (iOS antaa
+// NaN/Infinity ennen loadedmetadataa); animaatio alkaa playing-tapahtumasta ja kulkee niin kauan kuin ääni soi.
+// Seuraava ääni ladataan ennakkoon edellisen kysymyksen aikana. Tiedostossa sama jakso soi kahdesti tauon
+// kanssa (jakso, tauko): sonogrammi pyyhkiytyy esiin kummallakin toistolla. Vastaaminen ei pysäytä ääntä.
 // Väärä vastaus kuten aikuisten tavallisessa visassa (korjaukset 9.10.2026): punainen ✕ "Sinun valintasi",
 // oikea = lime ✓. Sonogrammissa ei taajuusmerkintöjä, soittorivillä ei toisto- eikä aikatekstejä.
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -104,13 +107,16 @@ export default function AanivisaClient({ viikko, jatka, sivu }: { viikko: AaniVi
   const [soi, setSoi] = useState(false);
   const [t, setT] = useState(0);
   const [soitettu, setSoitettu] = useState(false);
-  const [kesto, setKesto] = useState(0);
   const [soivaKortti, setSoivaKortti] = useState<number | null>(null);
   const [jaettu, setJaettu] = useState<string | null>(null);
   const [voiJakaa, setVoiJakaa] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const ennakkoRef = useRef<HTMLAudioElement | null>(null);
   const rafRef = useRef<number | null>(null);
   const autoRef = useRef<number | null>(null);
+  /** Soivan tiedoston kortti (tulosruutu) ja kokonaiskesto datasta: kesto = jakso + tauko + jakso. */
+  const korttiRef = useRef<number | null>(null);
+  const kestoRef = useRef(0);
   const vahennaLiiketta = useRef(false);
 
   const k = kysymykset[qi];
@@ -128,55 +134,60 @@ export default function AanivisaClient({ viikko, jatka, sivu }: { viikko: AaniVi
     setVoiJakaa(typeof navigator !== "undefined" && typeof navigator.share === "function");
   }, [ryhma.key, viikko.vuosi, viikko.viikko]);
 
-  const audio = useCallback(() => {
-    if (!audioRef.current) {
-      const a = new Audio();
-      a.preload = "auto";
-      audioRef.current = a;
-    }
-    return audioRef.current;
-  }, []);
-
   const pysaytaSeuranta = () => {
     if (rafRef.current != null) cancelAnimationFrame(rafRef.current);
     rafRef.current = null;
   };
-  const seuraa = useCallback(() => {
-    const a = audioRef.current;
-    if (!a) return;
-    setT(a.currentTime);
-    if (a.duration && Number.isFinite(a.duration)) setKesto(a.duration);
-    rafRef.current = requestAnimationFrame(seuraa);
+
+  /** Ainoa audio-elementti; tilat päivittyvät sen tapahtumista eivätkä play()-lupauksesta. */
+  const audio = useCallback(() => {
+    if (audioRef.current) return audioRef.current;
+    const a = new Audio();
+    a.preload = "auto";
+    a.setAttribute("playsinline", "");
+    const seuraa = () => {
+      if (a.paused) { rafRef.current = null; return; }
+      setT(a.currentTime);
+      rafRef.current = requestAnimationFrame(seuraa);
+    };
+    a.addEventListener("playing", () => {
+      const kortti = korttiRef.current;
+      setSoi(kortti == null);
+      setSoivaKortti(kortti);
+      if (kortti == null) setSoitettu(true);
+      pysaytaSeuranta();
+      rafRef.current = requestAnimationFrame(seuraa);
+    });
+    a.addEventListener("pause", () => {
+      pysaytaSeuranta();
+      setSoi(false);
+      setSoivaKortti(null);
+    });
+    a.addEventListener("ended", () => {
+      pysaytaSeuranta();
+      setSoi(false);
+      setSoivaKortti(null);
+      setT(kestoRef.current);
+    });
+    audioRef.current = a;
+    return a;
   }, []);
 
-  /** Soittaa annetun tiedoston alusta (uusi soitto aloittaa aina alusta). */
+  /** Soittaa tiedoston alusta. Kutsutaan suoraan napautuksen käsittelijästä (ei awaitia ennen play()-kutsua). */
   const soita = useCallback(
-    (src: string, kortti: number | null = null) => {
+    (q: AaniKysymys, kortti: number | null = null) => {
       const a = audio();
       if (autoRef.current) window.clearTimeout(autoRef.current);
-      if (!a.src.endsWith(src)) a.src = src;
-      a.currentTime = 0;
+      korttiRef.current = kortti;
+      kestoRef.current = q.jakso * 2 + q.tauko;
+      if (a.getAttribute("src") !== q.audio) a.src = q.audio;
+      try { a.currentTime = 0; } catch { /* metatiedot vielä latautumatta */ }
       a.muted = false;
-      a.onended = () => {
-        pysaytaSeuranta();
-        setSoi(false);
-        setSoivaKortti(null);
-        setT(a.duration || 0);
-      };
-      a.play()
-        .then(() => {
-          setSoi(kortti == null);
-          setSoivaKortti(kortti);
-          if (kortti == null) setSoitettu(true);
-          pysaytaSeuranta();
-          rafRef.current = requestAnimationFrame(seuraa);
-        })
-        .catch(() => {
-          setSoi(false);
-          setSoivaKortti(null);
-        });
+      setT(0);
+      const lupaus = a.play();
+      if (lupaus) lupaus.catch(() => { setSoi(false); setSoivaKortti(null); });
     },
-    [audio, seuraa],
+    [audio],
   );
 
   const pysayta = useCallback(() => {
@@ -186,10 +197,12 @@ export default function AanivisaClient({ viikko, jatka, sivu }: { viikko: AaniVi
     setSoivaKortti(null);
   }, []);
 
+  /** Yksi napautus = play tai pause heti; tila luetaan elementistä, ei Reactin tilasta. */
   const vaihdaSoitto = useCallback(() => {
-    if (soi) pysayta();
-    else if (k) soita(k.audio);
-  }, [soi, k, soita, pysayta]);
+    const a = audioRef.current;
+    if (a && !a.paused && korttiRef.current == null) pysayta();
+    else if (k) soita(k);
+  }, [k, soita, pysayta]);
 
   // Välilyönti soittaa ja pysäyttää (desktop).
   useEffect(() => {
@@ -205,14 +218,20 @@ export default function AanivisaClient({ viikko, jatka, sivu }: { viikko: AaniVi
     return () => window.removeEventListener("keydown", kasittele);
   }, [vaihe, vaihdaSoitto]);
 
-  // Kysymyksen vaihtuessa: nollaus ja automaattisoitto kysymyksestä 2 alkaen.
+  // Kysymyksen vaihtuessa: nollaus, automaattisoitto kysymyksestä 2 alkaen ja seuraavan äänen ennakkolataus.
   useEffect(() => {
     if (vaihe !== "peli" || !k) return;
-    setT(0);
-    setSoitettu(false);
-    setKesto(k.jakso * 2 + k.tauko);
-    if (qi > 0 && autosoitto) {
-      autoRef.current = window.setTimeout(() => soita(k.audio), 600);
+    if (qi > 0) {
+      setT(0);
+      setSoitettu(false);
+      if (autosoitto) autoRef.current = window.setTimeout(() => soita(k), 600);
+    }
+    const seur = kysymykset[qi + 1];
+    if (seur) {
+      if (!ennakkoRef.current) ennakkoRef.current = new Audio();
+      ennakkoRef.current.preload = "auto";
+      ennakkoRef.current.src = seur.audio;
+      ennakkoRef.current.load();
     }
     return () => {
       if (autoRef.current) window.clearTimeout(autoRef.current);
@@ -226,12 +245,10 @@ export default function AanivisaClient({ viikko, jatka, sivu }: { viikko: AaniVi
   }, []);
 
   const aloita = () => {
-    // Äänilukko: soitetaan mykistettynä ja pysäytetään heti saman napautuksen sisällä.
-    const a = audio();
-    a.src = kysymykset[0].audio;
-    a.muted = true;
-    const lupaus = a.play();
-    if (lupaus) lupaus.then(() => { a.pause(); a.currentTime = 0; a.muted = false; }).catch(() => { a.muted = false; });
+    // Synkroninen play() samassa napautuksessa: avaa äänilukon ja soittaa kysymyksen 1 (kierros 2, 9.10.2026).
+    setT(0);
+    setSoitettu(false);
+    soita(kysymykset[0]);
     setValinnat(kysymykset.map(() => null));
     setPisteet(0);
     setPutki(0);
@@ -299,7 +316,7 @@ export default function AanivisaClient({ viikko, jatka, sivu }: { viikko: AaniVi
   );
 
   const e = k ? edistyminen(t, k.jakso, k.tauko) : { toisto: 1, p1: 0, p2: 0, p: 0 };
-  const kokoKesto = kesto || (k ? k.jakso * 2 + k.tauko : 0);
+  const kokoKesto = k ? k.jakso * 2 + k.tauko : 0;
 
   /* ── Yläpalkki ── */
   const ylapalkki = (
@@ -399,7 +416,7 @@ export default function AanivisaClient({ viikko, jatka, sivu }: { viikko: AaniVi
                         <MiniSono src={q.sono} />
                       )}
                       <button type="button" className="av-aanikortti-soita" aria-label={soiNyt ? `Pysäytä: ${q.laji}` : `Soita: ${q.laji}`}
-                        onClick={() => (soiNyt ? pysayta() : soita(q.audio, i))}>
+                        onClick={() => (soiNyt ? pysayta() : soita(q, i))}>
                         <Toisto soi={soiNyt} koko={18} />
                       </button>
                       <span className="av-aanikortti-ok" data-ok={ok || undefined} aria-hidden="true">{ok ? "✓" : "✕"}</span>
