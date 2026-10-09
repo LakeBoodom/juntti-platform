@@ -8,10 +8,11 @@
 // (~0,6 s kysymyksen vaihtumisen jälkeen), jos yläpalkin Ääni-kytkin on päällä (tila laitteella).
 // Kysymys 1 soi aina napautuksella. Tiedostossa sama jakso soi kahdesti tauon kanssa (jakso, tauko):
 // sonogrammi pyyhkiytyy esiin kummallakin toistolla. Vastaaminen ei pysäytä ääntä.
-// Ei punaista: väärä vastaus = katkoviiva ja "Sinun valintasi", oikea = lime.
+// Väärä vastaus kuten aikuisten tavallisessa visassa (korjaukset 9.10.2026): punainen ✕ "Sinun valintasi",
+// oikea = lime ✓. Sonogrammissa ei taajuusmerkintöjä, soittorivillä ei toisto- eikä aikatekstejä.
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
-  KYTKIN_AVAIN, PERUSPISTEET, PUTKIBONUS, aika, arvio, lueTulos, tulosAvain,
+  KYTKIN_AVAIN, PERUSPISTEET, PUTKIBONUS, arvio, lueTulos, tulosAvain,
   type AaniKysymys, type AaniTallenne, type AaniViikko,
 } from "@/lib/aanivisat";
 
@@ -44,18 +45,12 @@ function edistyminen(t: number, jakso: number, tauko: number) {
   return { toisto: 2, p: p2, p1: 1, p2 };
 }
 
-function Sonogrammi({ k, t, soitettu, soi, ruudukko = true }: { k: AaniKysymys; t: number; soitettu: boolean; soi: boolean; ruudukko?: boolean }) {
+function Sonogrammi({ k, t, soitettu, soi }: { k: AaniKysymys; t: number; soitettu: boolean; soi: boolean }) {
   const e = edistyminen(t, k.jakso, k.tauko);
   // Ennen ensimmäistä soittoa vain harmaa kuva; soiton jälkeen väri jää soittokohtaan asti.
   const p = soitettu ? e.p : 0;
   return (
     <div className="av-sono" data-soi={soi || undefined}>
-      {ruudukko &&
-        k.ticks.map((tk) => (
-          <span key={tk.hz} className="av-sono-viiva" style={{ top: `${tk.y * 100}%` }}>
-            <span>{tk.hz >= 1000 ? `${tk.hz / 1000} kHz` : `${tk.hz} Hz`}</span>
-          </span>
-        ))}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img className="av-sono-harmaa" src={k.sono} alt="" draggable={false} />
       {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -407,7 +402,7 @@ export default function AanivisaClient({ viikko, jatka, sivu }: { viikko: AaniVi
                         onClick={() => (soiNyt ? pysayta() : soita(q.audio, i))}>
                         <Toisto soi={soiNyt} koko={18} />
                       </button>
-                      {ok && <span className="av-aanikortti-ok" aria-hidden="true">✓</span>}
+                      <span className="av-aanikortti-ok" data-ok={ok || undefined} aria-hidden="true">{ok ? "✓" : "✕"}</span>
                     </div>
                     <div className="av-aanikortti-teksti">
                       <span className="av-aanikortti-nimi">{q.laji}</span>
@@ -460,12 +455,6 @@ export default function AanivisaClient({ viikko, jatka, sivu }: { viikko: AaniVi
           {!vastattu ? (
             <div className="av-media">
               <Sonogrammi k={k} t={t} soitettu={soitettu} soi={soi} />
-              {!soitettu && !soi && (
-                <button type="button" className="av-iso-soita" onClick={() => soita(k.audio)}>
-                  <span className="av-iso-soita-pallo"><Toisto soi={false} koko={42} /></span>
-                  <span className="av-iso-soita-t">Soita ääni</span>
-                </button>
-              )}
               {soi && qi > 0 && autosoitto && t < 1.5 && <span className="av-auto">Soi automaattisesti</span>}
             </div>
           ) : (
@@ -474,7 +463,7 @@ export default function AanivisaClient({ viikko, jatka, sivu }: { viikko: AaniVi
                 // eslint-disable-next-line @next/next/no-img-element
                 <img className="av-paljastus" src={k.kuva.url} alt={k.laji} />
               ) : (
-                <Sonogrammi k={k} t={k.jakso} soitettu soi={false} ruudukko={false} />
+                <Sonogrammi k={k} t={k.jakso} soitettu soi={false} />
               )}
               <span className="av-paljastus-varjo" aria-hidden="true" />
               <span className="av-paljastus-merkki" data-ok={ok || undefined}>
@@ -490,22 +479,15 @@ export default function AanivisaClient({ viikko, jatka, sivu }: { viikko: AaniVi
 
           {!vastattu ? (
             <div className="av-soitin">
-              <button type="button" className="av-soitin-nappi" onClick={vaihdaSoitto} aria-label={soi ? "Pysäytä ääni" : "Soita ääni"}>
+              <button type="button" className="av-soitin-nappi" data-odottaa={!soitettu && !soi ? "" : undefined} onClick={vaihdaSoitto} aria-label={soi ? "Pysäytä ääni" : "Soita ääni"}>
                 <Toisto soi={soi} />
               </button>
-              <div className="av-soitin-palkit">
-                <div className="av-palkit">
-                  <span><span style={{ width: `${(soitettu ? e.p1 : 0) * 100}%` }} /></span>
-                  <span><span style={{ width: `${(soitettu ? e.p2 : 0) * 100}%` }} /></span>
-                </div>
-                <div className="av-soitin-ala">
-                  <span>{soitettu ? `${e.toisto}. toisto` : "2 toistoa"}</span>
-                  <span>
-                    {aika(soitettu ? t : 0)} / {aika(kokoKesto)}
-                    <span className="av-vain-desk"> · välilyönti toistaa</span>
-                  </span>
-                </div>
+              {/* Kaksi toistoa = palkin kaksi osaa; ei toisto- eikä aikatekstiä (korjaukset 9.10.2026). */}
+              <div className="av-palkit" role="progressbar" aria-label="Äänen eteneminen" aria-valuemin={0} aria-valuemax={Math.round(kokoKesto)} aria-valuenow={Math.round(soitettu ? t : 0)}>
+                <span><span style={{ width: `${(soitettu ? e.p1 : 0) * 100}%` }} /></span>
+                <span><span style={{ width: `${(soitettu ? e.p2 : 0) * 100}%` }} /></span>
               </div>
+              <span className="av-vain-desk av-vihje">Välilyönti toistaa</span>
             </div>
           ) : (
             <div className="av-uudelleen">
@@ -520,18 +502,19 @@ export default function AanivisaClient({ viikko, jatka, sivu }: { viikko: AaniVi
         </div>
 
         <div className="av-oikea">
-          {!vastattu && <h2 className="av-kysymys">Kenen ääni?</h2>}
+          {/* Otsikko vain ruudunlukijoille: tehtävä on sama joka kysymyksessä (korjaukset 9.10.2026). */}
+          {!vastattu && <h2 className="av-sr">Kenen ääni? Ääni {qi + 1} / {N}</h2>}
           <div className="av-vaihtoehdot" role="group" aria-label="Vaihtoehdot">
             {k.vaihtoehdot.map((v, i) => {
               const onOikea = v === k.laji;
               const onValittu = v === valittu;
-              const tila = !vastattu ? undefined : onOikea ? "oikea" : onValittu ? "valittu" : "muu";
+              const tila = !vastattu ? undefined : onOikea ? "oikea" : onValittu ? "vaara" : "muu";
               return (
                 <button key={v} type="button" className="av-vaihtoehto" data-tila={tila} disabled={vastattu} onClick={() => vastaa(v)}>
                   <span className="av-vaihtoehto-k">{"ABCD"[i]}</span>
                   <span className="av-vaihtoehto-n">{v}</span>
-                  {tila === "oikea" && <span className="av-vaihtoehto-t">{onValittu ? "Oikein" : "Oikea vastaus"}</span>}
-                  {tila === "valittu" && <span className="av-vaihtoehto-t">Sinun valintasi</span>}
+                  {tila === "oikea" && <span className="av-vaihtoehto-t"><i aria-hidden="true">✓</i>{onValittu ? "Oikein" : "Oikea vastaus"}</span>}
+                  {tila === "vaara" && <span className="av-vaihtoehto-t"><i aria-hidden="true">✕</i>Sinun valintasi</span>}
                 </button>
               );
             })}
