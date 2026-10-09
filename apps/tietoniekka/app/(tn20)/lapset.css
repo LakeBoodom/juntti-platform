@@ -344,6 +344,17 @@
   .tn20 .lp[data-vaihe="intro"] .lp-kehys, .tn20 .lp[data-vaihe="tulos"] .lp-kehys { max-width: 520px; }
 }
 
+/* Desktop alle 960 px korkea: kahden rivin kysymys ei saa työntää alapalkkia näkymän alle (mitattu 1440 × 900: +46 px). */
+@media (min-width: 900px) and (min-height: 701px) and (max-height: 959.98px) {
+  .tn20 .lp-kysymys { margin-top: 14px; font-size: 50px; }
+  .tn20 .lp-kuuntele { margin-top: 12px; min-height: 54px; }
+  .tn20 .lp-vastaukset { margin-top: 18px; grid-template-columns: repeat(3, 230px); }
+  .tn20 .lp-kaista { height: 320px; }
+  .tn20 .lp-duo { height: 220px; background-size: 470px auto; background-position: center -112px; }
+  .tn20 .lp-hehku { height: 220px; }
+  .tn20 .lp-kupla { bottom: 170px; }
+}
+
 /* Reduced motion: siirtymät 120 ms crossfadeiksi, renkaat staattisina, ei heilahdusta eikä palkkien liikettä */
 @media (prefers-reduced-motion: reduce) {
   .tn20 .lp *, .tn20 .lp *::before { animation-duration: 120ms !important; animation-iteration-count: 1 !important; transition-duration: 120ms !important; }
