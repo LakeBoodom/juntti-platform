@@ -483,8 +483,9 @@
 .tn20 .lp-i-tiesitko strong { font-weight: 800; }
 
 /* Kupla nappien yläpuolella (2g): häntä osoittaa puhujan avatariin */
+/* Kupla kelluu nappien yläpuolella (ei siirrä sisältöä): pitkä intro ei työnnä nappeja näkymän alle. */
 .tn20 .lp-i-kupla {
-  position: relative; margin: 0 16px 14px; padding: 12px 14px; border-radius: 20px; background: var(--lp-kupla); border: 2.5px solid var(--lp-navy);
+  position: absolute; left: 16px; right: 16px; bottom: calc(100% + 14px); z-index: 5; margin: 0; padding: 12px 14px; border-radius: 20px; background: var(--lp-kupla); border: 2.5px solid var(--lp-navy);
   box-shadow: 0 4px 0 var(--lp-navy); animation: lpKupla .26s ease-out both;
 }
 .tn20 .lp-i-kupla::after {
@@ -499,7 +500,7 @@
 .tn20 .lp-i-kupla[data-pitka] p { font-size: 16px; font-weight: 600; }
 @keyframes lpKuplaIMikko { from { opacity: 0; transform: translateY(10px) scale(.92) rotate(-3deg); } to { opacity: 1; transform: rotate(-1deg); } }
 
-.tn20 .lp-i-ala { padding: 0 16px calc(28px + env(safe-area-inset-bottom)); }
+.tn20 .lp-i-ala { position: relative; padding: 0 16px calc(28px + env(safe-area-inset-bottom)); }
 .tn20 .lp-i-vihjenapit { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
 .tn20 .lp-i-vihje {
   display: flex; align-items: center; gap: 10px; min-height: 64px; padding: 0 12px 0 8px; border-radius: 999px; background: var(--lp-rivi);
@@ -556,7 +557,7 @@
   .tn20 .lp-i-vastaus-n { font-size: 28px; }
   .tn20 .lp-i-tiesitko { margin: 16px 0 0; }
   .tn20 .lp-i-tiesitko p { font-size: 18px; }
-  .tn20 .lp-i-kupla { margin: 0 0 16px; padding: 16px 20px; border-radius: 22px; }
+  .tn20 .lp-i-kupla { left: 0; right: 0; bottom: calc(100% + 16px); padding: 16px 20px; border-radius: 22px; }
   .tn20 .lp-i-kupla p { font-size: 24px; }
   .tn20 .lp-i-kupla[data-pitka] p { font-size: 20px; }
   .tn20 .lp-i-ala { padding: 0; }

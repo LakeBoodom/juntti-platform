@@ -581,18 +581,18 @@ export default function LastenPeli({ visa, muut, takaisin }: { visa: LastenVisa;
               )}
 
               <div className="lp-venyke" />
-              {!vastattu && kupla && (
-                <div className="lp-i-kupla" data-kuka={kupla.kuka} data-pitka={kupla.teksti.length > 70 || undefined} role="status" aria-live="polite">
-                  <div className="lp-kupla-yla">
-                    <span className="lp-kupla-nimi">{JUONTAJA_NIMI[kupla.kuka]}{kupla.kuka === "mikko" ? " 😄" : ""}</span>
-                    {puhe && puhe.laji === kupla.laji && (
-                      <button type="button" className="lp-stop" onClick={vaikene} aria-label="Lopeta puhe">■</button>
-                    )}
-                  </div>
-                  <p>{kupla.teksti}</p>
-                </div>
-              )}
               <div className="lp-i-ala">
+                {!vastattu && kupla && (
+                  <div className="lp-i-kupla" data-kuka={kupla.kuka} data-pitka={kupla.teksti.length > 70 || undefined} role="status" aria-live="polite">
+                    <div className="lp-kupla-yla">
+                      <span className="lp-kupla-nimi">{JUONTAJA_NIMI[kupla.kuka]}{kupla.kuka === "mikko" ? " 😄" : ""}</span>
+                      {puhe && puhe.laji === kupla.laji && (
+                        <button type="button" className="lp-stop" onClick={vaikene} aria-label="Lopeta puhe">■</button>
+                      )}
+                    </div>
+                    <p>{kupla.teksti}</p>
+                  </div>
+                )}
                 {!vastattu ? (
                   <div className="lp-i-vihjenapit">
                     {(["laura", "mikko"] as Juontaja[]).map((kuka) => {
