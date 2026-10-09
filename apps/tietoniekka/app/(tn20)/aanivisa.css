@@ -1,0 +1,325 @@
+/* ÄÄNIVISA — pelinäkymä (CD "TN Aanivisat design" 1a–1i, 8.10.2026). Aikuisten pelinäkymän tokenit,
+   korostus Luonnon vihreä #4ADE80, oikein = sivuston lime #B6FF3C, CTA = pelinäkymän kulta. Ei punaista.
+   Mobiili: Seuraava-nappi kiinteässä alapalkissa (kuten pelinäkymässä), jotta se näkyy 390 × 667:ssä
+   ilman vieritystä, kun kuva on paljastettu. Desktop ≥ 900 px = 1h/1i kaksi saraketta.
+   FONTTI (KORTTISÄÄNTÖ): otsikot "Archivo Variable" wdth 76–80; lajinimet mahtuvat (pisin "Töyhtöhyyppä"
+   12 merkkiä × 0,64 em × 38 px ≈ 292 px < 326 px palsta 390 px:llä); pitkä nimi pienenee cqw-kaavalla. */
+
+.tn20 .av {
+  --av-display: "Archivo Variable", "Archivo", "Barlow Condensed", sans-serif;
+  --av-vihrea: #4ADE80;
+  --av-lime: #B6FF3C;
+  --av-teksti: #FFFBF2;
+  --av-reuna: #37301F;
+  --av-pohja: #15110A;
+  background: #0F0D07; color: #F4EEE0; min-height: calc(100svh - 64px);
+}
+.tn20 .av-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+
+/* ── Yläpalkki ─────────────────────────────────────────────────────── */
+.tn20 .av-yla { display: flex; align-items: center; gap: 12px; max-width: 1280px; margin: 0 auto; padding: 14px 16px; box-sizing: border-box; }
+.tn20 .av-sulje {
+  flex: none; width: 44px; height: 44px; border-radius: 50%; border: 1px solid var(--av-reuna);
+  display: flex; align-items: center; justify-content: center; font-size: 18px; color: #F4EEE0; text-decoration: none;
+}
+.tn20 .av-sulje:hover { border-color: var(--av-vihrea); color: var(--av-teksti); }
+.tn20 .av-yla-tila { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 6px; }
+.tn20 .av-yla-merkki { display: none; font-size: 13px; font-weight: 800; letter-spacing: 0.16em; text-transform: uppercase; color: var(--av-vihrea); white-space: nowrap; }
+.tn20 .av-yla-teksti { font-size: 13px; font-weight: 700; color: #CBC1AD; }
+.tn20 .av-yla-teksti[data-valmis] { color: var(--av-lime); }
+.tn20 .av-pipit { display: flex; gap: 3px; }
+.tn20 .av-pipit span { flex: 1; height: 6px; border-radius: 3px; background: #2A2416; }
+.tn20 .av-pipit [data-tila="ok"] { background: var(--av-lime); }
+/* Pipit kuten tavallisessa visassa (peli2026.css .tng-pip): väärä #ff6b4a, nykyinen #f2c46b. */
+.tn20 .av-pipit [data-tila="ohi"] { background: #ff6b4a; }
+.tn20 .av-pipit [data-tila="nyt"] { background: #f2c46b; box-shadow: 0 0 0 1px rgba(242, 196, 107, 0.35); }
+.tn20 .av-kytkin {
+  flex: none; display: inline-flex; align-items: center; gap: 7px; height: 44px; padding: 0 14px 0 11px; border-radius: 999px;
+  border: 1px solid var(--av-reuna); background: transparent; color: #F4EEE0; font: inherit; font-size: 14px; font-weight: 700; cursor: pointer;
+}
+.tn20 .av-kytkin[aria-pressed="true"] { border-color: var(--av-vihrea); background: rgba(74, 222, 128, 0.1); }
+.tn20 .av-kytkin[aria-pressed="false"] svg { opacity: 0.45; }
+.tn20 .av-kytkin-tila { font-size: 12px; font-weight: 700; color: #A79E8C; }
+.tn20 .av-kytkin:focus-visible, .tn20 .av-sulje:focus-visible { outline: 2px solid var(--av-vihrea); outline-offset: 2px; }
+
+/* ── Intro (1a) ────────────────────────────────────────────────────── */
+.tn20 .av--intro { display: flex; justify-content: center; }
+.tn20 .av-intro { position: relative; width: 100%; max-width: 640px; min-height: calc(100svh - 64px); display: flex; flex-direction: column; overflow: hidden; }
+.tn20 .av-intro-tausta { position: absolute; left: 0; right: 0; top: 0; height: 56%; opacity: 0.9; }
+.tn20 .av-intro-tausta img { width: 100%; height: 100%; object-fit: fill; filter: saturate(0.9); }
+.tn20 .av-intro-tausta::after {
+  content: ""; position: absolute; inset: 0;
+  background: linear-gradient(to bottom, rgba(15, 13, 7, 0.35) 0%, rgba(15, 13, 7, 0) 30%, rgba(15, 13, 7, 0.6) 70%, #0F0D07 100%);
+}
+.tn20 .av-intro-sisalto { position: relative; margin-top: auto; padding: 120px 20px 28px; display: flex; flex-direction: column; gap: 14px; }
+.tn20 .av-merkki { display: inline-flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 800; letter-spacing: 0.16em; text-transform: uppercase; color: var(--av-vihrea); }
+.tn20 .av-merkki i { width: 7px; height: 7px; border-radius: 50%; background: var(--av-vihrea); }
+.tn20 .av-intro-h1 {
+  margin: 0; font-family: var(--av-display); font-weight: 900; font-variation-settings: "wdth" 80; line-height: 0.94;
+  font-size: min(44px, calc((100vw - 40px) / (8 * 0.68))); text-transform: uppercase; color: var(--av-teksti); text-wrap: balance;
+  overflow-wrap: normal; word-break: keep-all;
+}
+.tn20 .av-intro-p { margin: 0; font-size: 17px; line-height: 1.5; color: #DED5C2; text-wrap: pretty; }
+.tn20 .av-intro-rivit { display: flex; flex-direction: column; gap: 8px; padding: 14px 0; border-top: 1px solid #241E13; border-bottom: 1px solid #241E13; }
+.tn20 .av-intro-rivit span { display: flex; align-items: center; gap: 10px; font-size: 15px; font-weight: 600; color: #F4EEE0; }
+.tn20 .av-intro-rivit svg { flex: none; }
+.tn20 .av-intro-rivit b { width: 20px; flex: none; text-align: center; color: var(--av-vihrea); font-weight: 800; }
+.tn20 .av-cta {
+  display: flex; align-items: center; justify-content: center; min-height: 56px; padding: 0 24px; border: 0; border-radius: 14px;
+  background: linear-gradient(180deg, #EFBE63, #E19E1C); color: #131109; cursor: pointer;
+  font-family: var(--av-display); font-weight: 900; font-size: 17px; letter-spacing: 0.02em; text-transform: uppercase;
+}
+.tn20 .av-cta:hover { filter: brightness(1.06); }
+.tn20 .av-cta:focus-visible { outline: 2px solid var(--av-teksti); outline-offset: 3px; }
+.tn20 .av-intro-ala { font-size: 13px; color: #A79E8C; text-align: center; }
+
+/* ── Peli ──────────────────────────────────────────────────────────── */
+.tn20 .av-peli { max-width: 1280px; margin: 0 auto; padding: 6px 16px 28px; display: flex; flex-direction: column; gap: 14px; box-sizing: border-box; }
+.tn20 .av-vasen, .tn20 .av-oikea { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+/* Korjaukset 9.10.2026: mobiilissa sonogrammi 116 px (kaikki neljä vaihtoehtoa näkyvät 390 × 667:ssä
+   ilman vieritystä). PNG venyy korkeussuunnassa (object-fit: fill). Paljastuskuva mobiilissa 160 px
+   (kierros 2): kuva, Kuuntele uudelleen, olennaiset vaihtoehdot ja Tiesitkö mahtuvat 390 × 844:ään. */
+.tn20 .av-media { position: relative; height: 116px; border-radius: 18px; overflow: hidden; background: #0A0905; border: 1px solid #241E13; container-type: inline-size; }
+.tn20 .av-media--kuva { height: 160px; }
+
+.tn20 .av-sono { position: absolute; inset: 0; }
+.tn20 .av-sono img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: fill; user-select: none; }
+.tn20 .av-sono-harmaa { filter: grayscale(1) brightness(0.55); opacity: 0.55; }
+.tn20 .av-sono-kohta { position: absolute; top: 0; bottom: 0; width: 2px; margin-left: -1px; background: var(--av-lime); box-shadow: 0 0 14px 2px rgba(182, 255, 60, 0.55); }
+@media (prefers-reduced-motion: reduce) {
+  /* Pyyhkiytyminen → suora värinvaihto: soidessa koko kuva värissä, ei liikkuvaa viivaa. */
+  .tn20 .av-sono[data-soi] .av-sono-vari { clip-path: none !important; }
+  .tn20 .av-sono-kohta { display: none; }
+}
+
+.tn20 .av-auto {
+  position: absolute; right: 12px; top: 12px; display: inline-flex; align-items: center; gap: 6px; height: 28px; padding: 0 11px;
+  border-radius: 999px; background: rgba(15, 13, 7, 0.8); border: 1px solid var(--av-reuna); font-size: 12px; font-weight: 700; color: #F4EEE0;
+}
+.tn20 .av-auto::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--av-lime); }
+
+.tn20 .av-soitin { display: flex; align-items: center; gap: 12px; }
+.tn20 .av-soitin .av-palkit { flex: 1; min-width: 0; }
+.tn20 .av-vihje { flex: none; font-size: 13px; font-weight: 700; color: #A79E8C; }
+/* Ennen ensimmäistä soittoa nappi sykkii kevyesti (iso keskinappi poistettu 9.10.2026). */
+.tn20 .av-soitin-nappi[data-odottaa] { box-shadow: 0 0 0 0 rgba(74, 222, 128, 0.45); animation: avSyke 1.8s ease-out infinite; }
+@keyframes avSyke { 0% { box-shadow: 0 0 0 0 rgba(74, 222, 128, 0.45); } 70%, 100% { box-shadow: 0 0 0 12px rgba(74, 222, 128, 0); } }
+@media (prefers-reduced-motion: reduce) { .tn20 .av-soitin-nappi[data-odottaa] { animation: none; box-shadow: 0 0 0 4px rgba(74, 222, 128, 0.25); } }
+.tn20 .av-soitin-nappi {
+  flex: none; width: 56px; height: 56px; border-radius: 50%; border: 0; background: var(--av-vihrea); cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+}
+.tn20 .av-soitin-nappi:focus-visible, .tn20 .av-uudelleen-nappi:focus-visible, .tn20 .av-aanikortti-soita:focus-visible { outline: 2px solid var(--av-teksti); outline-offset: 3px; }
+.tn20 .av-palkit { display: flex; gap: 4px; }
+.tn20 .av-palkit > span { flex: 1; height: 6px; border-radius: 3px; background: #2A2416; overflow: hidden; }
+.tn20 .av-palkit > span > span { display: block; height: 100%; background: var(--av-vihrea); }
+.tn20 .av-vain-desk { display: none; }
+
+.tn20 .av-vaihtoehdot { display: flex; flex-direction: column; gap: 10px; }
+.tn20 .av-vaihtoehto {
+  display: flex; align-items: center; gap: 12px; min-height: 58px; padding: 0 16px; border-radius: 14px; text-align: left;
+  border: 1px solid var(--av-reuna); background: rgba(21, 17, 10, 0.9); color: var(--av-teksti); font: inherit; cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+}
+/* Hover vain hiirelle: kosketusnäytöllä napautus ei jätä seuraavan näkymän riviin korostusta. */
+@media (hover: hover) { .tn20 .av-vaihtoehto:hover:not(:disabled) { border-color: var(--av-vihrea); } }
+.tn20 .av-vaihtoehto:focus-visible { outline: 2px solid var(--av-vihrea); outline-offset: 2px; }
+.tn20 .av-vaihtoehto:disabled { cursor: default; }
+.tn20 .av-vaihtoehto-k {
+  flex: none; width: 30px; height: 30px; border-radius: 8px; background: #2A2416; color: #DED5C2;
+  display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 800;
+}
+.tn20 .av-vaihtoehto-n { flex: 1; min-width: 0; font-size: 18px; font-weight: 700; }
+.tn20 .av-vaihtoehto-t { flex: none; font-size: 12px; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; color: #A79E8C; }
+.tn20 .av-vaihtoehto[data-tila="oikea"] { border-color: var(--av-lime); background: rgba(182, 255, 60, 0.1); }
+.tn20 .av-vaihtoehto[data-tila="oikea"] .av-vaihtoehto-k { background: var(--av-lime); color: #131109; }
+.tn20 .av-vaihtoehto[data-tila="oikea"] .av-vaihtoehto-t { color: #CBFF75; }
+/* Väärä kuten tavallisessa visassa (peli2026.css .tng-ans[data-state="wrong"]). */
+.tn20 .av-vaihtoehto[data-tila="vaara"] { border-color: #ff6b4a; background: rgba(255, 107, 74, 0.13); }
+.tn20 .av-vaihtoehto[data-tila="vaara"] .av-vaihtoehto-k { background: #ff6b4a; color: #0f0d07; }
+.tn20 .av-vaihtoehto[data-tila="vaara"] .av-vaihtoehto-t { color: #ffa88f; }
+.tn20 .av-vaihtoehto[data-tila="muu"] { opacity: 0.45; }
+.tn20 .av-vaihtoehto-t { display: inline-flex; align-items: center; gap: 6px; }
+.tn20 .av-vaihtoehto-t i { font-style: normal; font-size: 1.25em; line-height: 1; }
+/* Paljastuksen jälkeen matalammat rivit (1d/1e) */
+.tn20 .av--peli[data-vastattu] .av-vaihtoehdot { gap: 8px; }
+.tn20 .av--peli[data-vastattu] .av-vaihtoehto { min-height: 50px; padding: 0 14px; border-radius: 12px; }
+.tn20 .av--peli[data-vastattu] .av-vaihtoehto-k { width: 28px; height: 28px; font-size: 13px; }
+.tn20 .av--peli[data-vastattu] .av-vaihtoehto-n { font-size: 16px; }
+.tn20 .av--peli[data-vastattu] .av-vaihtoehto-t { font-size: 11px; }
+
+/* Paljastus (1d/1e) */
+.tn20 .av-media--kuva { background: #1A160D; border: 0; }
+.tn20 .av-paljastus { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; animation: avNousu 360ms ease-out both; }
+.tn20 .av-paljastus-varjo { position: absolute; left: 0; right: 0; bottom: 0; height: 72%; background: linear-gradient(to bottom, rgba(10, 9, 5, 0), rgba(10, 9, 5, 0.92)); pointer-events: none; }
+.tn20 .av-paljastus-merkki {
+  position: absolute; left: 14px; top: 14px; display: inline-flex; align-items: center; height: 30px; padding: 0 12px; border-radius: 999px;
+  background: var(--av-teksti); color: #131109; font-size: 13px; font-weight: 800;
+}
+.tn20 .av-paljastus-merkki[data-ok] { background: var(--av-lime); }
+.tn20 .av-paljastus-nimi { position: absolute; left: 18px; right: 18px; bottom: 16px; display: flex; flex-direction: column; gap: 4px; pointer-events: none; }
+.tn20 .av-paljastus-laji {
+  font-family: var(--av-display); font-weight: 900; font-variation-settings: "wdth" 80; line-height: 0.95; text-transform: uppercase; color: var(--av-teksti);
+  font-size: min(38px, calc((100cqw - 36px) / (12 * 0.68))); overflow-wrap: normal; word-break: keep-all;
+}
+.tn20 .av-paljastus-tiet { font-size: 15px; font-style: italic; color: #DED5C2; }
+.tn20 .av-paljastus-maa { display: none; position: absolute; right: 24px; bottom: 22px; font-size: 13px; font-weight: 700; color: #CBC1AD; }
+@keyframes avNousu { from { opacity: 0; transform: translateY(14px) scale(1.02); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .tn20 .av-paljastus { animation: none; } }
+
+.tn20 .av-uudelleen { display: flex; align-items: center; gap: 12px; padding: 10px 12px 10px 10px; border-radius: 16px; border: 1px solid var(--av-reuna); background: var(--av-pohja); }
+.tn20 .av-uudelleen-nappi { flex: none; width: 48px; height: 48px; border-radius: 50%; border: 0; background: var(--av-vihrea); cursor: pointer; display: flex; align-items: center; justify-content: center; }
+.tn20 .av-uudelleen-t { flex: none; font-size: 15px; font-weight: 700; color: var(--av-teksti); }
+.tn20 .av-uudelleen-sono { flex: 1; min-width: 0; height: 26px; position: relative; }
+.tn20 .av-minisono { width: 100%; height: 100%; object-fit: fill; display: block; }
+.tn20 .av-uudelleen-maa { flex: none; font-size: 12px; font-weight: 700; color: #A79E8C; }
+
+.tn20 .av-tiesitko { display: flex; flex-direction: column; gap: 6px; padding: 16px; border-radius: 16px; background: #17130B; border: 1px solid var(--av-reuna); }
+.tn20 .av-tiesitko span { font-size: 12px; font-weight: 800; letter-spacing: 0.16em; text-transform: uppercase; color: var(--av-vihrea); }
+.tn20 .av-tiesitko p { margin: 0; font-size: 17px; line-height: 1.45; color: #F4EEE0; text-wrap: pretty; }
+
+.tn20 .av-seuraava-rivi { display: flex; flex-direction: column-reverse; gap: 14px; }
+.tn20 .av-lahteet { display: flex; flex-direction: column; gap: 6px; padding: 12px 14px; border-radius: 12px; border: 1px solid #241E13; }
+.tn20 .av-lahteet > div { display: flex; gap: 12px; font-size: 13px; line-height: 1.4; color: #CBC1AD; min-width: 0; }
+.tn20 .av-lahteet a { color: #CBC1AD; text-decoration: underline; text-underline-offset: 3px; overflow-wrap: anywhere; }
+.tn20 .av-lahteet a:hover { color: var(--av-teksti); }
+.tn20 .av-lahde-l { flex: none; width: 40px; padding-top: 1px; font-size: 11px; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; color: #A79E8C; }
+
+/* Mobiili: Seuraava kiinteänä alapalkkina (näkyy aina ilman vieritystä). */
+@media (max-width: 899.98px) {
+  /* Kiinteän Seuraava-palkin korkeus + väli, jotta Tiesitkö ja lähteet voi lukea kokonaan. */
+  .tn20 .av--peli[data-vastattu] .av-peli { padding-bottom: calc(112px + env(safe-area-inset-bottom)); }
+  .tn20 .av-seuraava-palkki {
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 30; padding: 12px 16px calc(12px + env(safe-area-inset-bottom));
+    background: linear-gradient(to bottom, rgba(15, 13, 7, 0), rgba(15, 13, 7, 0.94) 30%, #0F0D07);
+  }
+  .tn20 .av-seuraava { width: 100%; }
+  /* Kuuntele uudelleen -rivillä ei mobiilissa jää tilaa minisonogrammille (näkyi muutaman px:n viiruna). */
+  .tn20 .av-uudelleen-sono { display: none; }
+  .tn20 .av-uudelleen-maa { margin-left: auto; }
+  /* Kierros 2: paljastuksessa näkyvät vain oikea vastaus ja pelaajan väärä valinta; muut painuvat
+     pehmeästi pois (desktopilla kaikki neljä jäävät näkyviin). margin-top kumoaa rivivälin (gap 8 px). */
+  .tn20 .av-vaihtoehto[data-tila="muu"] { overflow: hidden; animation: avPiilo 300ms ease-in 150ms both; }
+  @keyframes avPiilo {
+    from { opacity: 0.45; min-height: 50px; max-height: 50px; }
+    to { opacity: 0; min-height: 0; max-height: 0; margin-top: -8px; border-width: 0; visibility: hidden; }
+  }
+  @media (prefers-reduced-motion: reduce) { .tn20 .av-vaihtoehto[data-tila="muu"] { animation: none; display: none; } }
+}
+
+/* ── Tulos (1f) ────────────────────────────────────────────────────── */
+.tn20 .av-tulos { max-width: 720px; margin: 0 auto; padding: 6px 16px 40px; display: flex; flex-direction: column; gap: 18px; box-sizing: border-box; }
+.tn20 .av-tuloskortti {
+  display: flex; flex-direction: column; gap: 10px; padding: 20px; border-radius: 20px; border: 1px solid rgba(74, 222, 128, 0.4);
+  background: linear-gradient(160deg, rgba(74, 222, 128, 0.12), rgba(19, 16, 9, 0.94) 60%);
+}
+.tn20 .av-tulos-merkki { font-size: 12px; font-weight: 800; letter-spacing: 0.16em; text-transform: uppercase; color: var(--av-vihrea); }
+.tn20 .av-tulos-rivi { display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; }
+.tn20 .av-tulos-luku { font-family: var(--av-display); font-weight: 900; font-variation-settings: "wdth" 74; font-size: 80px; line-height: 0.85; color: var(--av-vihrea); }
+.tn20 .av-tulos-arvio { flex: 1; min-width: 140px; font-family: var(--av-display); font-weight: 900; font-size: 20px; line-height: 1.05; text-transform: uppercase; color: var(--av-teksti); text-wrap: balance; }
+.tn20 .av-tulos-teksti { font-size: 16px; line-height: 1.45; color: #DED5C2; }
+
+.tn20 .av-kortisto { display: flex; flex-direction: column; gap: 12px; }
+.tn20 .av-kortisto-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+.tn20 .av-kortisto-head h2, .tn20 .av-jatka h2, .tn20 .av-jaa h2 {
+  margin: 0; font-family: var(--av-display); font-weight: 900; font-variation-settings: "wdth" 76; font-size: 22px; text-transform: uppercase; color: var(--av-teksti);
+}
+.tn20 .av-kortisto-head span { font-size: 13px; color: #A79E8C; }
+.tn20 .av-kortisto-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.tn20 .av-aanikortti { display: flex; flex-direction: column; border-radius: 14px; overflow: hidden; border: 1px solid var(--av-reuna); background: var(--av-pohja); }
+/* Tunnistamatta jääneet kuten tavallisen visan tuloksissa väärät (peli2026.css .tng-sum[data-state="bad"]). */
+.tn20 .av-aanikortti { border-color: rgba(255, 107, 74, 0.45); }
+.tn20 .av-aanikortti[data-ok] { border-color: rgba(182, 255, 60, 0.45); }
+.tn20 .av-aanikortti-kuva { position: relative; aspect-ratio: 4 / 3; background: #1A160D; overflow: hidden; }
+/* Kuva absoluuttisena: pystykuva ei saa venyttää 4:3-kehystä (kurki, peukaloinen). */
+.tn20 .av-aanikortti-kuva img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
+.tn20 .av-aanikortti-soita {
+  position: absolute; right: 8px; bottom: 8px; width: 40px; height: 40px; border-radius: 50%; border: 0; background: var(--av-vihrea);
+  display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+}
+.tn20 .av-aanikortti-ok {
+  position: absolute; left: 8px; top: 8px; width: 26px; height: 26px; border-radius: 50%; background: var(--av-lime); color: #131109;
+  display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 900;
+}
+.tn20 .av-aanikortti-ok:not([data-ok]) { background: #ff6b4a; color: #0f0d07; }
+.tn20 .av-aanikortti-teksti { display: flex; flex-direction: column; gap: 2px; padding: 9px 11px 11px; min-width: 0; }
+.tn20 .av-aanikortti-nimi { font-size: 15px; font-weight: 700; color: var(--av-teksti); overflow-wrap: normal; word-break: keep-all; }
+.tn20 .av-aanikortti-tila { font-size: 12px; font-weight: 700; color: #A79E8C; }
+.tn20 .av-aanikortti-tila { color: #ffa88f; }
+.tn20 .av-aanikortti[data-ok] .av-aanikortti-tila { color: #CBFF75; }
+
+.tn20 .av-jaa { display: flex; flex-direction: column; gap: 10px; padding: 16px; border-radius: 18px; border: 1px solid var(--av-reuna); background: var(--av-pohja); }
+.tn20 .av-jaa h2 { font-size: 18px; }
+.tn20 .av-jaa-esikatselu { display: flex; align-items: center; gap: 12px; padding: 12px; border-radius: 12px; background: #0A0905; border: 1px solid #241E13; font-size: 14px; line-height: 1.4; color: #DED5C2; }
+.tn20 .av-jaa-sono { flex: none; width: 64px; height: 40px; border-radius: 6px; overflow: hidden; background: #0F0D07; }
+.tn20 .av-jaa-wa {
+  display: flex; align-items: center; justify-content: center; min-height: 52px; border-radius: 12px; background: #1EBE5D; color: #04220F;
+  font-weight: 800; font-size: 16px; text-decoration: none;
+}
+.tn20 .av-jaa-wa:hover { color: #04220F; filter: brightness(1.06); }
+.tn20 .av-jaa-rivi { display: flex; gap: 8px; }
+.tn20 .av-jaa-rivi button {
+  flex: 1; min-height: 46px; border-radius: 12px; border: 1px solid #6B5A36; background: transparent; color: #F4EEE0;
+  font: inherit; font-size: 14px; font-weight: 700; cursor: pointer;
+}
+.tn20 .av-jaa-rivi button:hover { border-color: #E8A320; }
+.tn20 .av-jatka { display: flex; flex-direction: column; gap: 10px; }
+.tn20 .av-jatka h2 { font-size: 20px; }
+.tn20 .av-jatka a {
+  display: flex; align-items: center; gap: 12px; min-height: 52px; padding: 0 14px; border-radius: 12px; border: 1px solid var(--av-reuna);
+  background: var(--av-pohja); color: var(--av-teksti); font-size: 16px; font-weight: 700; text-decoration: none;
+}
+.tn20 .av-jatka a span:first-child { flex: 1; min-width: 0; }
+.tn20 .av-jatka a span:last-child { color: var(--av-vihrea); font-weight: 800; }
+.tn20 .av-jatka a:hover { border-color: var(--av-vihrea); }
+
+/* ── Desktop 1h/1i ─────────────────────────────────────────────────── */
+@media (min-width: 900px) {
+  .tn20 .av-yla { gap: 24px; padding: 18px 40px; border-bottom: 1px solid #241E13; max-width: none; }
+  .tn20 .av-yla-tila { flex-direction: row; align-items: center; gap: 24px; }
+  .tn20 .av-yla-merkki { display: block; }
+  .tn20 .av-yla-tila .av-pipit { order: 1; flex: 1; gap: 4px; }
+  .tn20 .av-yla-teksti { order: 2; font-size: 15px; color: #F4EEE0; white-space: nowrap; }
+  .tn20 .av-peli { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); gap: 48px; padding: 40px; align-items: center; }
+  .tn20 .av--peli[data-vastattu] .av-peli { align-items: start; }
+  .tn20 .av-vasen { gap: 18px; }
+  .tn20 .av-media { height: 260px; border-radius: 24px; }
+  .tn20 .av-media--kuva { height: 400px; aspect-ratio: auto; }
+  .tn20 .av-soitin { gap: 16px; }
+  .tn20 .av-soitin-nappi { width: 64px; height: 64px; }
+  .tn20 .av-palkit > span { height: 7px; }
+  .tn20 .av-vain-desk { display: inline; }
+  .tn20 .av-oikea { gap: 22px; }
+  .tn20 .av-vaihtoehdot { gap: 12px; }
+  .tn20 .av-vaihtoehto { min-height: 72px; padding: 0 20px; border-radius: 16px; }
+  .tn20 .av-vaihtoehto-k { width: 34px; height: 34px; border-radius: 9px; font-size: 15px; }
+  .tn20 .av-vaihtoehto-n { font-size: 21px; }
+  .tn20 .av--peli[data-vastattu] .av-oikea { gap: 18px; }
+  .tn20 .av--peli[data-vastattu] .av-vaihtoehdot { gap: 10px; }
+  .tn20 .av--peli[data-vastattu] .av-vaihtoehto { min-height: 60px; padding: 0 18px; border-radius: 14px; }
+  .tn20 .av--peli[data-vastattu] .av-vaihtoehto-n { font-size: 19px; }
+  .tn20 .av--peli[data-vastattu] .av-vaihtoehto-t { font-size: 12px; }
+  .tn20 .av-paljastus-varjo { height: 180px; }
+  .tn20 .av-paljastus-merkki { left: 18px; top: 18px; height: 34px; padding: 0 14px; font-size: 14px; }
+  .tn20 .av-paljastus-nimi { left: 24px; right: 160px; bottom: 22px; }
+  .tn20 .av-paljastus-laji { font-size: min(56px, calc((100cqw - 184px) / (12 * 0.66))); line-height: 0.92; }
+  .tn20 .av-paljastus-tiet { font-size: 17px; }
+  .tn20 .av-paljastus-maa { display: block; }
+  .tn20 .av-uudelleen-maa { display: none; }
+  .tn20 .av-uudelleen { gap: 14px; padding: 10px 16px 10px 10px; }
+  .tn20 .av-uudelleen-nappi { width: 52px; height: 52px; }
+  .tn20 .av-uudelleen-t { font-size: 16px; }
+  .tn20 .av-uudelleen-sono { height: 32px; }
+  .tn20 .av-tiesitko { padding: 18px 20px; gap: 8px; }
+  .tn20 .av-tiesitko p { font-size: 19px; }
+  .tn20 .av-seuraava-rivi { flex-direction: row; align-items: center; gap: 16px; }
+  .tn20 .av-lahteet { flex: 1; min-width: 0; padding: 0; border: 0; gap: 4px; }
+  .tn20 .av-seuraava { padding: 0 30px; white-space: nowrap; }
+  .tn20 .av-intro-sisalto { padding: 180px 32px 48px; }
+  .tn20 .av-kortisto-grid { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+  .tn20 .av-tulos { max-width: 1100px; padding: 32px 40px 60px; }
+}
+
+/* Vercelin preview-työkalupalkki (vercel-live-feedback, vain esikatseluissa kirjautuneelle) kelluu oikeassa
+   reunassa ja peitti vastausnappien reunan → piilotetaan äänivisan sivulla. Tuotannossa sitä ei ole. */
+body:has(.av) vercel-live-feedback { display: none !important; }
