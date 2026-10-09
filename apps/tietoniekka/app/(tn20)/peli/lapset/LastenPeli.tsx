@@ -2,8 +2,9 @@
 // LASTEN VISAT — pelinäkymä (TOTEUTUSBRIEF_LASTEN_VISAT.md §4–5, design v0.3 "studiopöytä" 2a–2n, 9.10.2026).
 //
 // Pienet (4–7): juontajapari pöydän takana koko ajan, 3 kuvavastausta allekkain (rivi 100 px), ei pisteitä,
-// ei väärä-merkintää, tähtiä aina 3, Tiesitkö luetaan ääneen. Isommat (8–12) tulevat vaiheessa 3; siihen asti
-// ne käyttävät samaa näkymää.
+// ei väärä-merkintää, tähtiä aina 3, Tiesitkö luetaan ääneen. Isommat (8–12, vaihe 3): hero-intro, kysymyskuva,
+// kasvot vihjenapeissa, 3 vihjelamppua per visa (saman juontajan vihje samaan kysymykseen ei kuluta), oikea vihreä
+// #2e7d52 + ✓, reaktio + Tiesitkö tekstinä samassa kortissa, tähdet 3 = ≥ 80 %, 2 = ≥ 50 %, 1 = muuten.
 //
 // Ääni (design-päätökset + äänivisan iPhone-opit 9.10.2026):
 //   * Yksi audio-elementti koko visan ajan, vain src vaihtuu. Ensimmäinen ääni (intro + kysymys 1) käynnistetään
@@ -31,6 +32,8 @@ type Kupla = { kuka: Juontaja; teksti: string; laji: Laji };
 
 const AANI_AVAIN = "tn_lapset_aani";
 const TIESITKO_VIIVE = 1400;
+/** Isommat: 3 vihjelamppua per visa (saman juontajan vihje samaan kysymykseen uudestaan ei kuluta). */
+const LAMPPUJA = 3;
 
 function Palkit({ pieni = false }: { pieni?: boolean }) {
   return (
@@ -70,6 +73,10 @@ export default function LastenPeli({ visa, muut, takaisin }: { visa: LastenVisa;
   const [aani, setAani] = useState(true);
   const [elainSoi, setElainSoi] = useState(false);
   const [jaettu, setJaettu] = useState<string | null>(null);
+  const [lamput, setLamput] = useState(LAMPPUJA);
+  const [kysytyt, setKysytyt] = useState<string[]>([]);
+  const [tulokset, setTulokset] = useState<(boolean | null)[]>(() => kysymykset.map(() => null));
+  const [reaktio, setReaktio] = useState<string | null>(null);
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const elainRef = useRef<HTMLAudioElement | null>(null);
@@ -188,6 +195,10 @@ export default function LastenPeli({ visa, muut, takaisin }: { visa: LastenVisa;
     setValittu(null);
     setTiesitko(false);
     setOikeita(0);
+    setLamput(LAMPPUJA);
+    setKysytyt([]);
+    setTulokset(kysymykset.map(() => null));
+    setReaktio(null);
     tallennettu.current = false;
     setVaihe("peli");
     const intro = valijuonto(`intro-${pienet ? "pienet" : "isommat"}`, "intro");
@@ -212,6 +223,19 @@ export default function LastenPeli({ visa, muut, takaisin }: { visa: LastenVisa;
     if (puhe?.laji === "vihje" && puhe.kuka === kuka) { vaikene(); return; }
     const teksti = k.vihje[kuka];
     if (!teksti) return;
+    if (!pienet) {
+      // Isommat: lamppu kuluu vain uudesta vihjeestä; loppuneista kertoo visan lukija.
+      const avain = `${qi}:${kuka}`;
+      if (!kysytyt.includes(avain)) {
+        if (lamput <= 0) {
+          const loppu = valijuonto("vinkit-loppu", "vihje");
+          if (loppu) soita([loppu]);
+          return;
+        }
+        setLamput((n) => n - 1);
+        setKysytyt((l) => [...l, avain]);
+      }
+    }
     soita([{ url: kuka === "laura" ? k.audio.vihje_laura : k.audio.vihje_mikko, kuka, laji: "vihje", teksti }]);
   };
 
@@ -220,9 +244,17 @@ export default function LastenPeli({ visa, muut, takaisin }: { visa: LastenVisa;
     const ok = k.vastaukset[i]?.oikein ?? false;
     setValittu(i);
     if (ok) setOikeita((n) => n + 1);
-    const reaktio = valijuonto(ok ? "oikein" : pienet ? "melkein" : "vaarin", "reaktio");
-    const lista: Klippi[] = reaktio ? [reaktio] : [];
-    if (pienet && k.audio.tiesitko && k.tiesitko) lista.push({ url: k.audio.tiesitko, kuka: lukija, laji: "tiesitko", teksti: k.tiesitko });
+    setTulokset((t) => t.map((x, j) => (j === qi ? ok : x)));
+    const reaktioKlippi = valijuonto(ok ? "oikein" : pienet ? "melkein" : "vaarin", "reaktio");
+    setReaktio(reaktioKlippi?.teksti ?? null);
+    if (!pienet) {
+      // Isommat: reaktio kuuluu ääneen, mutta teksti on Tiesitkö-kortissa (ei kuplaa); Tiesitkö vain tekstiä.
+      soita(reaktioKlippi ? [{ ...reaktioKlippi, teksti: null }] : []);
+      setTiesitko(true);
+      return;
+    }
+    const lista: Klippi[] = reaktioKlippi ? [reaktioKlippi] : [];
+    if (k.audio.tiesitko && k.tiesitko) lista.push({ url: k.audio.tiesitko, kuka: lukija, laji: "tiesitko", teksti: k.tiesitko });
     soita(lista);
     if (tiesitkoAjastin.current) window.clearTimeout(tiesitkoAjastin.current);
     tiesitkoAjastin.current = window.setTimeout(() => setTiesitko(true), TIESITKO_VIIVE);
@@ -248,6 +280,7 @@ export default function LastenPeli({ visa, muut, takaisin }: { visa: LastenVisa;
       setQi(i);
       setValittu(null);
       setTiesitko(false);
+      setReaktio(null);
       soita(kysymyksenKlipit(i));
       ennakoi(kysymykset[i + 1]?.audio.kysymys ?? null);
       window.scrollTo({ top: 0 });
@@ -302,6 +335,12 @@ export default function LastenPeli({ visa, muut, takaisin }: { visa: LastenVisa;
       <a className="lp-sulje" href={takaisin} aria-label="Lopeta visa">✕</a>
       {vaihe !== "tulos" && <span className="lp-ika">{IKA_MERKKI[visa.ika]}</span>}
       <span className="lp-tyhja" />
+      {!pienet && vaihe === "peli" && (
+        <span className="lp-lamput" role="img" aria-label={lamput > 0 ? `${lamput} vihjettä jäljellä` : "Vihjeet käytetty"}>
+          {Array.from({ length: LAMPPUJA }, (_, i) => <span key={i} data-kaytetty={i >= lamput || undefined} aria-hidden="true">💡</span>)}
+          <span className="lp-lamput-t" aria-hidden="true">{lamput > 0 ? `${lamput} ${lamput === 1 ? "vihje" : "vihjettä"}` : "Vihjeet käytetty"}</span>
+        </span>
+      )}
       <button type="button" className="lp-aani" aria-pressed={aani} onClick={vaihdaAani} aria-label={aani ? "Ääni päällä – mykistä" : "Ääni pois – laita päälle"}>
         <span aria-hidden="true">{aani ? "🔊" : "🔇"}</span>
         <span className="lp-aani-t">{aani ? "Ääni päällä" : "Ääni pois"}</span>
@@ -332,6 +371,48 @@ export default function LastenPeli({ visa, muut, takaisin }: { visa: LastenVisa;
       <div className="lp-ala">{alapalkki}</div>
     </div>
   );
+
+  const Avatar = ({ kuka, puhuu = false }: { kuka: Juontaja; puhuu?: boolean }) => (
+    <span className="lp-i-avatar" data-kuka={kuka} data-puhuu={puhuu || undefined} style={{ backgroundImage: `url(${kuvat.avatar[kuka]})` }} aria-hidden="true" />
+  );
+  /** Kuvavisan valokuvien tekijätiedot (CC BY/BY-SA vaatii näkyvän merkinnän). Omat kuvitukset: ei merkintää. */
+  const kuvaLahteet = (q: LastenKysymys) => [...new Set([q.kuvaKrediitti, ...q.vastaukset.map((v) => v.kuvaKrediitti)].filter((x): x is string => !!x))];
+  const kynnys3 = Math.ceil(N * 0.8), kynnys2 = Math.ceil(N * 0.5);
+  const tahdet = pienet ? 3 : oikeita >= kynnys3 ? 3 : oikeita >= kynnys2 ? 2 : 1;
+
+  /* ── Intro, isommat (2b): hero kuten aikuisilla, ei juontajaparia ── */
+  if (vaihe === "intro" && !pienet) {
+    return (
+      <main className="lp" data-ika={visa.ika} data-vaihe="intro">
+        <div className="lp-kehys">
+          <div className="lp-i-hero">
+            {visa.kuva && (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={visa.kuva} alt="" />
+            )}
+            <span className="lp-i-hero-varjo" aria-hidden="true" />
+            <div className="lp-i-hero-yla">{ylapalkki}</div>
+            <div className="lp-i-hero-ala">
+              <span className="lp-ika">{IKA_MERKKI[visa.ika]}</span>
+              <h1 className="lp-i-h1">{visa.otsikko}</h1>
+            </div>
+          </div>
+          <div className="lp-i-intro">
+            {visa.kuvaus && <p>{visa.kuvaus}</p>}
+            <div className="lp-i-lamppukortti">
+              <span aria-hidden="true">💡💡💡</span>
+              <span>Käytössäsi on {LAMPPUJA} vihjettä. Käytä ne viisaasti!</span>
+            </div>
+          </div>
+          <div className="lp-venyke" />
+          <div className="lp-i-aloitus">
+            <span className="lp-i-lukija"><Avatar kuka={lukija} />{JUONTAJA_NIMI[lukija]} lukee kysymykset ääneen. Voit vastata heti.</span>
+            <button type="button" className="lp-cta lp-i-cta" onClick={aloitaVisa}>Aloita visa →</button>
+          </div>
+        </div>
+      </main>
+    );
+  }
 
   /* ── Intro (2a) ── */
   if (vaihe === "intro") {
@@ -377,9 +458,11 @@ export default function LastenPeli({ visa, muut, takaisin }: { visa: LastenVisa;
               <span>{kupla.teksti}</span>
             </div>
           )}
-          <h1 className="lp-tulos-h1">Mahtavaa!</h1>
-          <div className="lp-tahdet" aria-label="Kolme tähteä"><span>⭐</span><span>⭐</span><span>⭐</span></div>
-          <p className="lp-tulos-p">Pelasitte koko visan yhdessä.</p>
+          <h1 className="lp-tulos-h1">{tahdet === 3 ? "Mahtavaa!" : tahdet === 2 ? "Hienosti!" : "Hyvä yritys!"}</h1>
+          <div className="lp-tahdet" role="img" aria-label={`${tahdet} / 3 tähteä`}>
+            {[0, 1, 2].map((i) => <span key={i} data-sammunut={i >= tahdet || undefined}>⭐</span>)}
+          </div>
+          <p className="lp-tulos-p">{pienet ? "Pelasitte koko visan yhdessä." : `Tiesit ${oikeita}/${N}`}</p>
           <div className="lp-tulos-napit">
             <button type="button" className="lp-cta lp-cta--pieni" onClick={aloitaVisa}>Pelaa uudestaan</button>
             <button type="button" className="lp-toissijainen" onClick={jaa}>{jaettu ?? "Jaa perheelle"}</button>
@@ -412,6 +495,143 @@ export default function LastenPeli({ visa, muut, takaisin }: { visa: LastenVisa;
 
   /* ── Peli (2c, 2e, 2h–2j, 2l, 2n) ── */
   if (!k) return null;
+
+  /* ── Peli, isommat (2f, 2g, 2k, 2o): kasvot vihjenappien sisällä, kupla nappien yläpuolella ── */
+  if (!pienet) {
+    const oikeaI = k.vastaukset.findIndex((v) => v.oikein);
+    const lukee = puhe?.laji === "kysymys";
+    return (
+      <main className="lp" data-ika={visa.ika} data-vaihe="peli" data-vastattu={vastattu || undefined}>
+        <div className="lp-kehys">
+          {ylapalkki}
+          <div className="lp-i-edistys" style={{ gridTemplateColumns: `repeat(${N}, minmax(0, 1fr))` }} role="progressbar" aria-label="Edistyminen" aria-valuemin={1} aria-valuemax={N} aria-valuenow={qi + 1}>
+            {tulokset.map((t, i) => (
+              <span key={i} data-tila={i === qi && !vastattu ? "nyt" : t === true ? "oikein" : t === false ? "ohi" : undefined} />
+            ))}
+          </div>
+          <div className="lp-i-runko">
+            {k.kuva && (
+              <div className="lp-i-kuva">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={k.kuva} alt="" />
+                {k.kuvaKrediitti && <span className="lp-i-krediitti">{k.kuvaKrediitti}</span>}
+              </div>
+            )}
+            <div className="lp-i-oikea">
+              <div className="lp-i-kysymysrivi">
+                <h1 className="lp-i-kysymys">{k.teksti}</h1>
+                {!vastattu && (
+                  <button type="button" className="lp-i-kuuntele" data-lukee={lukee || undefined} onClick={kuunteleUudelleen} aria-label={lukee ? "Lopeta lukeminen" : "Kuuntele kysymys uudelleen"}>
+                    {lukee ? <Palkit pieni /> : <span aria-hidden="true">🔁</span>}
+                  </button>
+                )}
+              </div>
+
+              {k.elainaani && !vastattu && (
+                <div className="lp-elain">
+                  <button type="button" className="lp-elain-nappi" data-soi={elainSoi || undefined} onClick={soitaElainaani} aria-label={elainSoi ? "Pysäytä eläinääni" : "Kuuntele eläinääni"}>
+                    <span aria-hidden="true">{elainSoi ? "■" : "▶"}</span>
+                  </button>
+                  <span className="lp-elain-t">{elainSoi ? "Kuuntele tarkkaan…" : "Kuuntele ääni"}</span>
+                </div>
+              )}
+
+              <div className="lp-i-vastaukset" role="group" aria-label="Vaihtoehdot">
+                {k.vastaukset.map((v, i) => {
+                  const tila = !vastattu ? undefined : i === oikeaI ? "oikea" : i === valittu ? "valittu" : "muu";
+                  return (
+                    <button key={i} type="button" className="lp-i-vastaus" data-tila={tila} disabled={vastattu} onClick={() => vastaa(i)}>
+                      {v.kuva && (
+                        <span className="lp-i-vastaus-kuva">
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img src={v.kuva} alt="" />
+                        </span>
+                      )}
+                      <span className="lp-i-vastaus-n">{v.teksti}</span>
+                      {tila === "oikea" && <span className="lp-i-oikein" aria-label="Oikea vastaus">✓</span>}
+                      {tila === "valittu" && <span className="lp-i-valintasi">Sinun valintasi</span>}
+                    </button>
+                  );
+                })}
+              </div>
+
+              {tiesitko && (
+                <section className="lp-i-tiesitko" aria-label="Tiesitkö">
+                  {reaktio && (
+                    <div className="lp-i-reaktio">
+                      <Avatar kuka={lukija} puhuu={puhe?.laji === "reaktio"} />
+                      <span>{reaktio}</span>
+                    </div>
+                  )}
+                  {k.tiesitko && <p><strong>Tiesitkö?</strong> {k.tiesitko}</p>}
+                </section>
+              )}
+
+              {vastattu && (kuvaLahteet(k).filter((x) => x !== k.kuvaKrediitti).length > 0 || k.elainaani) && (
+                <p className="lp-lahde">
+                  {kuvaLahteet(k).filter((x) => x !== k.kuvaKrediitti).length > 0 && <>Kuvat: {kuvaLahteet(k).filter((x) => x !== k.kuvaKrediitti).join(" · ")}{k.elainaani ? " · " : ""}</>}
+                  {k.elainaani && (
+                    <>Ääni:{" "}
+                      {k.elainaani.lahdeUrl
+                        ? <a href={k.elainaani.lahdeUrl} target="_blank" rel="noopener noreferrer">{k.elainaani.tekija} / iNaturalist, {k.elainaani.lisenssi}</a>
+                        : <>{k.elainaani.tekija} / iNaturalist, {k.elainaani.lisenssi}</>}
+                    </>
+                  )}
+                </p>
+              )}
+
+              <div className="lp-venyke" />
+              {!vastattu && kupla && (
+                <div className="lp-i-kupla" data-kuka={kupla.kuka} data-pitka={kupla.teksti.length > 70 || undefined} role="status" aria-live="polite">
+                  <div className="lp-kupla-yla">
+                    <span className="lp-kupla-nimi">{JUONTAJA_NIMI[kupla.kuka]}{kupla.kuka === "mikko" ? " 😄" : ""}</span>
+                    {puhe && puhe.laji === kupla.laji && (
+                      <button type="button" className="lp-stop" onClick={vaikene} aria-label="Lopeta puhe">■</button>
+                    )}
+                  </div>
+                  <p>{kupla.teksti}</p>
+                </div>
+              )}
+              <div className="lp-i-ala">
+                {!vastattu ? (
+                  <div className="lp-i-vihjenapit">
+                    {(["laura", "mikko"] as Juontaja[]).map((kuka) => {
+                      const kertoo = puhe?.laji === "vihje" && puhe.kuka === kuka;
+                      const lukeeNyt = lukee && kuka === lukija;
+                      const aktiivinen = kertoo || lukeeNyt;
+                      const kaytetty = lamput <= 0 && !kysytyt.includes(`${qi}:${kuka}`);
+                      const toinenPuhuu = !!puhe && (puhe.laji === "vihje" || puhe.laji === "kysymys") && !aktiivinen;
+                      return (
+                        <button
+                          key={kuka}
+                          type="button"
+                          className="lp-i-vihje"
+                          data-kuka={kuka}
+                          data-aktiivinen={aktiivinen || undefined}
+                          data-himmea={toinenPuhuu || kaytetty || undefined}
+                          disabled={!k.vihje[kuka]}
+                          onClick={() => kysyVihje(kuka)}
+                        >
+                          <Avatar kuka={kuka} puhuu={aktiivinen} />
+                          <span>
+                            {kertoo ? `${JUONTAJA_NIMI[kuka]} kertoo` : lukeeNyt ? `${JUONTAJA_NIMI[kuka]} lukee…` : kaytetty ? "Vihjeet käytetty" : `Kysy ${JUONTAJA_ABL[kuka]}`}
+                          </span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <button type="button" className="lp-cta lp-seuraava" onClick={seuraava}>
+                    {qi + 1 < N ? "Seuraava →" : "Katso tulos →"}
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+    );
+  }
   const oikeaIndeksi = k.vastaukset.findIndex((v) => v.oikein);
   const lukeeKysymysta = puhe?.laji === "kysymys";
 
@@ -489,6 +709,9 @@ export default function LastenPeli({ visa, muut, takaisin }: { visa: LastenVisa;
           </section>
         )}
 
+        {vastattu && kuvaLahteet(k).length > 0 && (
+          <p className="lp-lahde">Kuvat: {kuvaLahteet(k).join(" · ")}</p>
+        )}
         {k.elainaani && vastattu && (
           <p className="lp-lahde">
             Ääni:{" "}
