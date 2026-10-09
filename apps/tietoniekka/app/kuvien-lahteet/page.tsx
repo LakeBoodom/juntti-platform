@@ -27,7 +27,11 @@ export const metadata: Metadata = {
 const PAIVITETTY = "9.10.2026";
 
 export default async function KuvienLahteetPage() {
-  const [aanet, linnut] = await Promise.all([haeAaniLahteet(), haeLintukuvat()]);
+  const [aanet, linnut, elaimet] = await Promise.all([
+    haeAaniLahteet(),
+    haeKuvavisaLahteet("linnut"),
+    haeKuvavisaLahteet("elaimet"),
+  ]);
   const musiikki = KUVALAHTEET.filter((k) => k.kokoelma === "musiikki");
   const kaupungit = KUVALAHTEET.filter((k) => k.kokoelma === "kaupungit");
   const jaakiekko = KUVALAHTEET.filter((k) => k.kokoelma === "jaakiekko");
@@ -114,7 +118,8 @@ export default async function KuvienLahteetPage() {
         <Lista rivit={maantieto} />
         <h2 style={{ fontSize: 22, margin: "34px 0 14px" }}>Luonto-kokoelma</h2>
         <Lista rivit={luonto} />
-        {linnut.length > 0 && <Lintukuvat rivit={linnut} />}
+        {linnut.length > 0 && <KuvavisaLahteet otsikko="Lintujen kuvavisa" avain="lintu" rivit={linnut} />}
+        {elaimet.length > 0 && <KuvavisaLahteet otsikko="Eläinten kuvavisa" avain="elain" rivit={elaimet} />}
         {AANI_RYHMAT.map((r) => {
           const rivit = aanet.filter((a) => a.ryhma === r.key);
           if (!rivit.length) return null;
@@ -222,11 +227,12 @@ function Aanivisa({ otsikko, rivit }: { otsikko: string; rivit: AaniLahde[] }) {
   );
 }
 
-/* Lintujen kuvavisa (9.10.2026): tekijä ja lisenssi kuvavisas-taulusta. source_credit muodossa
-   "Tekijä / Wikimedia Commons, Lisenssi", license_note "Lisenssi, https://commons…/File:…". */
-type Lintukuva = { laji: string; tekija: string; lisenssi: string; lahde: string | null };
+/* Kuvavisat (linnut ja eläimet, 9.10.2026): tekijä ja lisenssi kuvavisas-taulusta. source_credit muodossa
+   "Tekijä / Wikimedia Commons, Lisenssi", license_note "Lisenssi, https://commons…/File:…".
+   Rivit, joilla on vielä yleinen merkintä ilman tekijää, jätetään pois. */
+type KuvavisaLahde = { laji: string; tekija: string; lisenssi: string; lahde: string | null };
 
-async function haeLintukuvat(): Promise<Lintukuva[]> {
+async function haeKuvavisaLahteet(tyyppi: "linnut" | "elaimet"): Promise<KuvavisaLahde[]> {
   const sb = getSupabase();
   const siteId = await getSiteId();
   if (!sb || !siteId) return [];
@@ -234,7 +240,7 @@ async function haeLintukuvat(): Promise<Lintukuva[]> {
     .from("kuvavisas")
     .select("correct_option, source_credit, license_note")
     .eq("site_id", siteId)
-    .eq("type", "linnut")
+    .eq("type", tyyppi)
     .eq("active", true)
     .order("correct_option");
   if (error) return [];
@@ -246,14 +252,14 @@ async function haeLintukuvat(): Promise<Lintukuva[]> {
   });
 }
 
-function Lintukuvat({ rivit }: { rivit: Lintukuva[] }) {
+function KuvavisaLahteet({ otsikko, avain, rivit }: { otsikko: string; avain: string; rivit: KuvavisaLahde[] }) {
   return (
     <>
-      <h2 style={{ fontSize: 22, margin: "34px 0 14px" }}>Lintujen kuvavisa</h2>
+      <h2 style={{ fontSize: 22, margin: "34px 0 14px" }}>{otsikko}</h2>
       <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "grid", gap: 14 }}>
         {rivit.map((k) => (
           <li
-            key={"lintu-" + k.laji}
+            key={avain + "-" + k.laji}
             style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 10, padding: "12px 14px" }}
           >
             <div style={{ fontWeight: 600, marginBottom: 4 }}>{k.laji}</div>
