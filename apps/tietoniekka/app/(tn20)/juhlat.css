@@ -147,13 +147,13 @@
 /* Kapealla kuukausien nimet eivät mahdu 1/12-väliin: näytetään joka toinen */
 .tn20 .ju-aika-kk-lyhyt { display: none; }
 @container (max-width: 700px) {
-  .tn20 .ju-aika-kk--2 { font-size: 0; }
+  .tn20 .ju-aika-kk.ju-aika-kk--2 { font-size: 0; }
 }
 /* Puhelin (≤ 400 px kontti): viimeinen näkyvä nimi (esim. "MARRAS" joulukuussa) leikkautui oikeaan reunaan
    (mitattu 10.10.2026: 320 px → 272–335, reuna 302; 375 px → 321–384, reuna 357). Kolmikirjaimiset nimet
-   10 px / .08em → leveys ≈ 28 px, viimeinen 272+28 = 300 ≤ 302. */
+   10 px / .06em → leveys ≈ 27 px, viimeinen 272+27 = 299 ≤ 302 (mitattu .08em: 304, 2 px yli). */
 @container (max-width: 400px) {
-  .tn20 .ju-aika-kk { font-size: 10px; letter-spacing: .08em; }
+  .tn20 .ju-aika-kk { font-size: 10px; letter-spacing: .06em; }
   .tn20 .ju-aika-kk-pitka { display: none; }
   .tn20 .ju-aika-kk-lyhyt { display: inline; }
 }

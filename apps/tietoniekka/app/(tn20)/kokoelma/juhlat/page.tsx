@@ -122,7 +122,10 @@ export default async function JuhlatSivu({ searchParams }: { searchParams: Promi
   const kuukaudet: { left: string; label: string }[] = [];
   for (let i = 1; i <= 12; i++) {
     const t = Date.UTC(hp.vuosi, hp.kk - 1 + i, 1);
-    kuukaudet.push({ left: pct(t), label: kkLyhyt(t) });
+    // Viimeinen kuukausi osuu aina 91–100 %:n kohdalle: sen nimi ei mahdu oikeaan reunaan millään leveydellä → ei piirretä.
+    const left = pct(t);
+    if (parseFloat(left) > 91) continue;
+    kuukaudet.push({ left, label: kkLyhyt(t) });
   }
 
   /* ── Kaikki juhlavisat: juhlittain lähin ensin, sama visa vain kerran ── */
