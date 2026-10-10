@@ -8653,6 +8653,7 @@ export type Database = {
           explanation: string | null
           id: string
           image_credit: string | null
+          image_position: string | null
           image_license_note: string | null
           image_url: string | null
           question_text: string
@@ -8671,6 +8672,7 @@ export type Database = {
           explanation?: string | null
           id?: string
           image_credit?: string | null
+          image_position?: string | null
           image_license_note?: string | null
           image_url?: string | null
           question_text: string
@@ -8689,6 +8691,7 @@ export type Database = {
           explanation?: string | null
           id?: string
           image_credit?: string | null
+          image_position?: string | null
           image_license_note?: string | null
           image_url?: string | null
           question_text?: string

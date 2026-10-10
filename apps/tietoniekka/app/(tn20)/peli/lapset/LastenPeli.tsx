@@ -421,7 +421,7 @@ export default function LastenPeli({ visa, muut, takaisin }: { visa: LastenVisa;
             ))}
           </div>
           <span className="lp-aanikortti-tila" aria-live="polite">
-            {elainSoi ? `Ääni soi · ${aika(elainT)} / ${aika(kesto)}` : elainSoitettu ? "Kuuntele uudelleen, jos haluat" : "Napauta ja kuuntele"}
+            {elainSoi ? `${aika(elainT)} / ${aika(kesto)}` : elainSoitettu ? "Kuuntele uudelleen, jos haluat" : "Napauta ja kuuntele"}
           </span>
         </div>
       </div>
@@ -561,7 +561,7 @@ export default function LastenPeli({ visa, muut, takaisin }: { visa: LastenVisa;
             {k.kuva && (
               <div className="lp-i-kuva">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={k.kuva} alt="" />
+                <img src={k.kuva} alt="" style={k.kuvaKohdistus ? { objectPosition: k.kuvaKohdistus } : undefined} />
                 {k.kuvaKrediitti && <span className="lp-i-krediitti">{k.kuvaKrediitti}</span>}
               </div>
             )}
@@ -703,7 +703,7 @@ export default function LastenPeli({ visa, muut, takaisin }: { visa: LastenVisa;
         {k.kuva && k.tyyppi === "kuva" && (
           <div className="lp-kysymyskuva">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={k.kuva} alt="" />
+            <img src={k.kuva} alt="" style={k.kuvaKohdistus ? { objectPosition: k.kuvaKohdistus } : undefined} />
           </div>
         )}
 

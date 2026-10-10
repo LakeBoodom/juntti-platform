@@ -22,6 +22,8 @@ export type LastenKysymys = {
   teksti: string;
   kuva: string | null;
   kuvaKrediitti: string | null;
+  /** CSS object-position kysymyskuvalle (questions.image_position), esim. "center 20%". null = CSS-oletus. */
+  kuvaKohdistus: string | null;
   vastaukset: LastenVastaus[];
   vihje: Record<Juontaja, string | null>;
   tiesitko: string | null;
@@ -50,7 +52,7 @@ type VisaRivi = {
 };
 type KysymysRivi = {
   sort_order: number; question_text: string; question_type: string; explanation: string | null; answers: unknown;
-  image_url: string | null; image_credit: string | null; vihje_laura: string | null; vihje_mikko: string | null;
+  image_url: string | null; image_credit: string | null; image_position: string | null; vihje_laura: string | null; vihje_mikko: string | null;
   audio: unknown; animal_sound: unknown;
 };
 
@@ -72,7 +74,7 @@ export async function haeLastenVisa(opts: { slug?: string | null; quizId?: strin
 
   const { data: rivit } = await sb
     .from("questions")
-    .select("sort_order, question_text, question_type, explanation, answers, image_url, image_credit, vihje_laura, vihje_mikko, audio, animal_sound")
+    .select("sort_order, question_text, question_type, explanation, answers, image_url, image_credit, image_position, vihje_laura, vihje_mikko, audio, animal_sound")
     .eq("quiz_id", visa.id)
     .order("sort_order", { ascending: true });
 
@@ -88,6 +90,7 @@ export async function haeLastenVisa(opts: { slug?: string | null; quizId?: strin
       teksti: r.question_text,
       kuva: r.image_url,
       kuvaKrediitti: r.image_credit,
+      kuvaKohdistus: r.image_position,
       vastaukset,
       vihje: { laura: r.vihje_laura, mikko: r.vihje_mikko },
       tiesitko: r.explanation,

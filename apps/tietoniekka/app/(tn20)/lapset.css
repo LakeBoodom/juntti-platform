@@ -119,7 +119,7 @@
 @keyframes lpPonnahdus { from { transform: scale(.4); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 
 .tn20 .lp-kysymyskuva { margin: 16px 16px 0; aspect-ratio: 3 / 2; border-radius: 20px; overflow: hidden; background: #EFE6D5; }
-.tn20 .lp-kysymyskuva img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.tn20 .lp-kysymyskuva img { width: 100%; height: 100%; object-fit: cover; object-position: center 30%; display: block; }
 
 /* Eläinääni: 104 px nappi, ei soi itsestään */
 .tn20 .lp-elain { margin: 16px 20px 0; display: flex; align-items: center; gap: 16px; }
@@ -435,7 +435,10 @@
 .tn20 .lp-i-runko { flex: 1; display: flex; flex-direction: column; min-height: 0; }
 .tn20 .lp-i-oikea { flex: 1; display: flex; flex-direction: column; min-height: 0; }
 .tn20 .lp-i-kuva { position: relative; margin: 14px 16px 0; aspect-ratio: 16 / 9; border-radius: 20px; overflow: hidden; background: #1d2638; flex: none; transition: height .32s; }
-.tn20 .lp-i-kuva img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+/* Oletusrajaus center 30 %: eläinkuvissa pää on kuvan yläosassa, ja matalan näytön 358×150-rajaus leikkasi sen
+   keskitettynä pois (kuikka, metso, ilves, orava; tarkistettu 22 kuvasta 10.10.2026). Kuvakohtainen poikkeus
+   questions.image_position → inline object-position. */
+.tn20 .lp-i-kuva img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center 30%; }
 .tn20 .lp-i-krediitti {
   position: absolute; right: 8px; bottom: 6px; max-width: calc(100% - 16px); padding: 2px 8px; border-radius: 999px; background: rgba(15, 21, 32, .62);
   color: #E6DCC9; font-size: 10.5px; font-weight: 600; line-height: 1.5; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
