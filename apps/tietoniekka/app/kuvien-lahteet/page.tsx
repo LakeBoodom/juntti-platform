@@ -228,9 +228,10 @@ function Aanivisa({ otsikko, rivit }: { otsikko: string; rivit: AaniLahde[] }) {
 }
 
 /* Kuvavisat (linnut ja eläimet, 9.10.2026): tekijä ja lisenssi kuvavisas-taulusta. source_credit muodossa
-   "Tekijä / Wikimedia Commons, Lisenssi", license_note "Lisenssi, https://commons…/File:…".
+   "Tekijä / Wikimedia Commons, Lisenssi", license_note "Lisenssi, https://commons…/File:…" ja valinnaisesti
+   muokkaukset sulkeissa lopussa, esim. "(rajattu, kirkastettu)" – oletus "rajattu".
    Rivit, joilla on vielä yleinen merkintä ilman tekijää, jätetään pois. */
-type KuvavisaLahde = { laji: string; tekija: string; lisenssi: string; lahde: string | null };
+type KuvavisaLahde = { laji: string; tekija: string; lisenssi: string; lahde: string | null; muokkaus: string };
 
 async function haeKuvavisaLahteet(tyyppi: "linnut" | "elaimet"): Promise<KuvavisaLahde[]> {
   const sb = getSupabase();
@@ -248,7 +249,8 @@ async function haeKuvavisaLahteet(tyyppi: "linnut" | "elaimet"): Promise<Kuvavis
     const m = (r.source_credit ?? "").match(/^(.+?) \/ Wikimedia Commons, (.+)$/);
     if (!m) return [];
     const lahde = (r.license_note ?? "").match(/https:\/\/commons\.wikimedia\.org\/wiki\/File:\S+/)?.[0] ?? null;
-    return [{ laji: r.correct_option, tekija: m[1], lisenssi: m[2], lahde }];
+    const muokkaus = (r.license_note ?? "").match(/\(([^)]+)\)\s*$/)?.[1] ?? "rajattu";
+    return [{ laji: r.correct_option, tekija: m[1], lisenssi: m[2], lahde, muokkaus }];
   });
 }
 
@@ -272,7 +274,7 @@ function KuvavisaLahteet({ otsikko, avain, rivit }: { otsikko: string; avain: st
               ) : (
                 "Wikimedia Commons"
               )}{" "}
-              · {k.tekija} · {k.lisenssi} · rajattu
+              · {k.tekija} · {k.lisenssi} · {k.muokkaus}
             </div>
           </li>
         ))}
