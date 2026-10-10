@@ -236,8 +236,9 @@
   .tn20 .lps-ika-emoji { width: 96px; height: 96px; font-size: 50px; grid-column: 1; grid-row: 1; }
   .tn20 .lps-ika-teksti { grid-column: 2; grid-row: 1; gap: 6px; }
   .tn20 .lps-ika-ympyra { grid-column: 3; grid-row: 1; width: 44px; height: 44px; font-size: 24px; }
-  .tn20 .lps-ika-nimi { font-size: 40px; }
-  .tn20 .lps-ika-tapa { font-size: 20px; }
+  /* CD 46 px / 22 px. Tekstitila = (100vw − 164) / 2 − 230 ja "ISOMMAT 8–12" ≈ 5.5 em → kaava (mitattu 1024: 3 px yli 40 px:llä). */
+  .tn20 .lps-ika-nimi { font-size: min(46px, calc((100vw - 624px) / 11.4)); line-height: .92; }
+  .tn20 .lps-ika-tapa { font-size: 22px; }
 
   .tn20 .lps-runko { max-width: 1440px; box-sizing: border-box; padding: 72px 72px 88px; gap: 72px; }
   .tn20 .lps-osio { gap: 22px; }

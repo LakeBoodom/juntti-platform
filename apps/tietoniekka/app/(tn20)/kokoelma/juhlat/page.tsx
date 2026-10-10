@@ -79,7 +79,8 @@ export default async function JuhlatSivu({ searchParams }: { searchParams: Promi
   /* Lasten visat (vaihe 5, brief §7): lasten_aihe = juhlan slug. Levy noston alla + ikämerkki juhlan listassa.
      Piilossa, kunnes /lapset on näkyvissä (LAPSET_ENABLED); previewssä mukana myös luonnokset. */
   const lasten: LastenListaKortti[] = lapsetNakyvissa() ? (await haeLastenVisat()).filter((v) => v.kokoelma === JUHLAT_KOKOELMA) : [];
-  const lastenJuhlalle = (slug: string) => lasten.filter((v) => v.aihe === slug);
+  /* Pienet ensin, sitten isommat (kummankin sisällä uusin ensin, kuten haeLastenVisat palauttaa). */
+  const lastenJuhlalle = (slug: string) => lasten.filter((v) => v.aihe === slug).sort((a, b) => (a.ika === b.ika ? 0 : a.ika === "4-7" ? -1 : 1));
   const bySlug = new Map(visat.map((v) => [v.slug, v]));
   const nimi = (s: string) => bySlug.get(s)?.display_title ?? bySlug.get(s)?.title ?? s;
 

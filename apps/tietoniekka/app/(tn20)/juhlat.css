@@ -133,7 +133,9 @@
 }
 .tn20 .ju-secsub { font-size: 14px; font-weight: 600; color: var(--ju-muted); }
 
-.tn20 .ju-aika { position: relative; height: 82px; }
+/* 10.10.2026: joulukuussa viimeinen kuukausitunniste osui oikeaan reunaan ja levensi sivua 320 px:ssä
+   (335 px). Leikataan 10 px:n varalla (sivun reunatila ≥ 18 px), jolloin reunan pisteet näkyvät kokonaan. */
+.tn20 .ju-aika { position: relative; height: 82px; overflow-x: clip; overflow-clip-margin: 10px; }
 .tn20 .ju-aika-viiva { position: absolute; left: 0; right: 0; top: 50%; height: 1px; background: #3a3120; }
 .tn20 .ju-aika-kk {
   position: absolute; top: 0; bottom: 0; padding-left: 6px; border-left: 1px solid var(--ju-line);
