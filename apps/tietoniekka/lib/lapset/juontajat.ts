@@ -45,7 +45,7 @@ export const LASTEN_AIHEET: Record<string, LastenAihe> = {
     nosto: { otsikko: "Lasten eläinvisat", kuvaus: "Metsän ja talven eläimet – pienille ja isommille.", kuva: "/20/lapset/hero-v6.webp" },
   },
   linnut: {
-    nimi: "Linnut", emoji: "🐦", aksentti: "#2F6B45", kuva: "/20/lapset/hero-v8.webp", kuvaKohdistus: "60% 55%",
+    nimi: "Linnut", emoji: "🐦", aksentti: "#2F6B45", kuva: "/20/lapset/hero-v8.webp", kuvaKohdistus: "84% 50%",
     nosto: { otsikko: "Lasten lintuvisat", kuvaus: "Suomen linnut kuvina ja ääninä – pienille ja isommille.", kuva: "/20/lapset/hero-v8.webp" },
   },
   kirjat: {

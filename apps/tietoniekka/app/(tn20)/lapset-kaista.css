@@ -21,7 +21,8 @@
 }
 .tn20 .lk-p { margin: 0; font-size: 16px; line-height: 1.45; font-weight: 600; text-wrap: pretty; }
 .tn20 .lk-p--desktop, .tn20 .lk-cta { display: none; }
-.tn20 .lk-duo { height: 178px; background-size: 250px auto; background-position: center 0; background-repeat: no-repeat; }
+/* Kuvan ylin 21.7 % on läpinäkyvää → tausta nostetaan (250 px leveänä 68 px). */
+.tn20 .lk-duo { height: 178px; background-size: 250px auto; background-position: center -68px; background-repeat: no-repeat; }
 .tn20 .lk-iat { background: var(--lk-navy); border-top: 5px solid var(--lk-kulta); padding: 12px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
 .tn20 .lk-nyt { display: none; }
 .tn20 .lk-ika {
@@ -52,7 +53,7 @@
     background: var(--lk-navy); color: var(--lk-cream); font-family: var(--lk-cond); font-weight: 900; font-size: 21px; text-transform: uppercase;
   }
   .tn20 .lk-cta span { color: var(--lk-kulta-v); }
-  .tn20 .lk-duo { height: auto; background-size: 400px auto; background-position: center 18px; }
+  .tn20 .lk-duo { height: auto; background-size: 400px auto; background-position: center -80px; }
   .tn20 .lk-iat { background: none; border: 0; padding: 0; display: flex; flex-direction: column; justify-content: center; gap: 12px; }
   .tn20 .lk-nyt {
     display: flex; align-items: center; gap: 10px; font-family: var(--lk-cond); font-weight: 800; font-size: 17px; letter-spacing: .06em; text-transform: uppercase; color: #B8432F;
@@ -73,6 +74,6 @@
 /* 860–1099: kapeampi juontajasarake, jotta otsikko mahtuu */
 @container (min-width: 860px) and (max-width: 1099.98px) {
   .tn20 .lk { grid-template-columns: minmax(0, 1fr) 240px 320px; gap: 20px; padding: 0 24px 0 32px; }
-  .tn20 .lk-duo { background-size: 260px auto; background-position: center 40px; }
+  .tn20 .lk-duo { background-size: 260px auto; background-position: center -20px; }
   .tn20 .lk-h { font-size: clamp(48px, calc((100cqw - 616px) / 3.6), 72px); }
 }

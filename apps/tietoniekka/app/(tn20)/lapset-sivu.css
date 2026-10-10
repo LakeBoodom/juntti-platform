@@ -21,7 +21,7 @@
 }
 .tn20 .lps-sivu button { font: inherit; color: inherit; }
 .tn20 .lps-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
-.tn20 .lps-vain-desktop { display: none; }
+.tn20 .lps-vain-desktop, .tn20 .lps-kuka-huom.lps-vain-desktop { display: none; }
 
 /* Yhteiset merkit (ikä, ääni, Tulossa) */
 .tn20 .lps-merkki {
@@ -47,8 +47,9 @@
   background: var(--lps-navy); color: var(--lps-kulta-v); font-family: var(--lps-cond); font-weight: 800; font-size: 19px; letter-spacing: .04em; text-transform: uppercase;
 }
 .tn20 .lps-lede { margin: 0; font-size: 18px; line-height: 1.45; font-weight: 600; text-wrap: pretty; max-width: 34ch; }
+/* molemmat-innostuneet.webp: ylin 21.7 % läpinäkyvää → tausta nostetaan sen verran (330 px leveänä 89 px). */
 .tn20 .lps-duo {
-  height: 236px; margin-top: 6px; background-size: 330px auto; background-position: center 0; background-repeat: no-repeat;
+  height: 236px; margin-top: 6px; background-size: 330px auto; background-position: center -89px; background-repeat: no-repeat;
 }
 
 /* ── Kuka pelaa? ── */
@@ -157,7 +158,8 @@
   background: var(--lps-rivi); border: 2px solid var(--lps-raja); color: var(--lps-navy); text-decoration: none;
 }
 .tn20 .lps-visa-kuva { position: relative; width: 88px; height: 88px; border-radius: 13px; overflow: hidden; background: var(--lps-pohja); }
-.tn20 .lps-visa-kuva img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+/* Lasten visojen hero-kuvissa eläimet ovat yleensä oikealla puolella */
+.tn20 .lps-visa-kuva img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 70% 50%; }
 .tn20 .lps-visa-kuva .lps-emoji-pohja { font-size: 34px; }
 .tn20 .lps-visa-teksti { display: flex; flex-direction: column; gap: 5px; min-width: 0; }
 .tn20 .lps-visa-aihe { font-size: 12px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--lps-harmaa); }
@@ -212,8 +214,8 @@
 
 /* ── Desktop (3b/3d, ≥ 1024 px) ── */
 @media (min-width: 1024px) {
-  .tn20 .lps-vain-desktop { display: flex; }
-  .tn20 .lps-vain-mobiili { display: none; }
+  .tn20 .lps-vain-desktop, .tn20 .lps-kuka-huom.lps-vain-desktop { display: flex; }
+  .tn20 .lps-vain-mobiili, .tn20 .lps-kuka-huom.lps-vain-mobiili { display: none; }
   .tn20 .lps-hero-in {
     max-width: 1440px; padding: 56px 72px 0; box-sizing: border-box; display: grid; grid-template-columns: minmax(0, 1fr) 560px; gap: 24px; align-items: end;
   }
@@ -222,7 +224,7 @@
   .tn20 .lps-h1 { font-size: min(136px, calc((100vw - 728px) / 2.9)); letter-spacing: -.005em; }
   .tn20 .lps-pilleri { height: 44px; padding: 0 20px; font-size: 24px; }
   .tn20 .lps-lede { max-width: 30ch; font-size: 24px; line-height: 1.4; }
-  .tn20 .lps-duo { height: 440px; margin: 0; background-size: 560px auto; }
+  .tn20 .lps-duo { height: 440px; margin: 0; background-size: 560px auto; background-position: center -152px; }
 
   .tn20 .lps-kuka-in { max-width: 1440px; box-sizing: border-box; padding: 26px 72px 32px; gap: 16px; }
   .tn20 .lps-kuka-yla { display: flex; justify-content: space-between; align-items: baseline; gap: 20px; }
@@ -293,5 +295,5 @@
   .tn20 .lps-visat { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   .tn20 .lps-tulossa { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .tn20 .lps-hero-in { grid-template-columns: minmax(0, 1fr) 440px; }
-  .tn20 .lps-duo { height: 380px; background-size: 460px auto; }
+  .tn20 .lps-duo { height: 380px; background-size: 460px auto; background-position: center -125px; }
 }
