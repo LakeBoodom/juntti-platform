@@ -518,6 +518,11 @@
 .tn20 .lp-i-vihje[data-himmea] { opacity: .55; }
 .tn20 .lp-i-vihje:disabled { opacity: .4; cursor: default; }
 .tn20 .lp-i-vihje:focus-visible { outline: 3px solid var(--lp-kulta); outline-offset: 3px; }
+/* Kapea puhelin (375 px): nappi on 167 px leveä, ja "Kysy Lauralta" rivittyi kahdelle riville 17–18 px:llä
+   (KORTTISÄÄNTÖ). Mitattu 10.10.2026: 15 px + tiiviimpi väli → tekstille ~101 px, tarve ~88 px. */
+@media (max-width: 380px) {
+  .tn20 .lp-i-vihje { font-size: 15px !important; gap: 8px; padding: 0 10px 0 6px; }
+}
 .tn20 .lp[data-ika="8-12"] .lp-seuraava { width: 100%; min-height: 64px; border-radius: 20px; }
 .tn20 .lp[data-ika="8-12"] .lp-elain { margin-top: 14px; }
 
