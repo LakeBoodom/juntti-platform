@@ -39,13 +39,14 @@
 }
 
 @container (min-width: 860px) {
+  /* Etusivun kontti on 1440 px:ssä 1184 px (design olettaa 1440) → kapeammat sivusarakkeet, täysi koko ≥ 1300 px. */
   .tn20 .lk {
-    height: 340px; display: grid; grid-template-columns: minmax(0, 1fr) 400px 360px; gap: 28px; padding: 0 32px 0 48px; border-radius: 24px; box-sizing: border-box;
+    min-height: 340px; display: grid; grid-template-columns: minmax(0, 1fr) 300px 330px; gap: 28px; padding: 28px 32px 28px 48px; border-radius: 24px; box-sizing: border-box;
   }
   .tn20 .lk-teksti { padding: 0; justify-content: center; gap: 14px; }
   .tn20 .lk-pilleri { height: 32px; padding: 0 13px; font-size: 16px; }
-  /* CD 84 px; sarake 860 px:ssä ≈ 0 … kaava sarakkeen leveydestä (100cqw − 868 px). */
-  .tn20 .lk-h { font-size: clamp(52px, calc((100cqw - 868px) / 3.4), 84px); line-height: .84; }
+  /* CD 84 px. Tekstisarake = 100cqw − 766 px; "LASTEN VISAT" yhdellä rivillä ≈ 5.5 em → kaava /5.8. */
+  .tn20 .lk-h { font-size: clamp(52px, calc((100cqw - 766px) / 5.8), 84px); line-height: .84; }
   .tn20 .lk-p--mobiili { display: none; }
   .tn20 .lk-p--desktop { display: block; max-width: 30ch; font-size: 19px; }
   .tn20 .lk-cta {
@@ -53,7 +54,7 @@
     background: var(--lk-navy); color: var(--lk-cream); font-family: var(--lk-cond); font-weight: 900; font-size: 21px; text-transform: uppercase;
   }
   .tn20 .lk-cta span { color: var(--lk-kulta-v); }
-  .tn20 .lk-duo { height: auto; background-size: 400px auto; background-position: center -80px; }
+  .tn20 .lk-duo { height: auto; margin: -28px 0; background-size: 300px auto; background-position: center -40px; }
   .tn20 .lk-iat { background: none; border: 0; padding: 0; display: flex; flex-direction: column; justify-content: center; gap: 12px; }
   .tn20 .lk-nyt {
     display: flex; align-items: center; gap: 10px; font-family: var(--lk-cond); font-weight: 800; font-size: 17px; letter-spacing: .06em; text-transform: uppercase; color: #B8432F;
@@ -71,9 +72,14 @@
   .tn20 .lk-ika-tapa { display: block; font-size: 15px; font-weight: 600; color: #D3D8E0; }
   .tn20 .lk-nuoli { display: block; color: var(--lk-kulta-v); font-size: 24px; font-weight: 700; }
 }
-/* 860–1099: kapeampi juontajasarake, jotta otsikko mahtuu */
+@container (min-width: 1300px) {
+  .tn20 .lk { grid-template-columns: minmax(0, 1fr) 400px 360px; }
+  .tn20 .lk-duo { background-size: 400px auto; background-position: center -70px; }
+  .tn20 .lk-h { font-size: clamp(52px, calc((100cqw - 896px) / 5.8), 84px); }
+}
+/* 860–1099: kapeampi juontajasarake; otsikko saa rivittyä kahdelle riville ("LASTEN" ≈ 2.76 em) */
 @container (min-width: 860px) and (max-width: 1099.98px) {
-  .tn20 .lk { grid-template-columns: minmax(0, 1fr) 240px 320px; gap: 20px; padding: 0 24px 0 32px; }
+  .tn20 .lk { grid-template-columns: minmax(0, 1fr) 240px 320px; gap: 20px; padding: 28px 24px 28px 32px; }
   .tn20 .lk-duo { background-size: 260px auto; background-position: center -20px; }
-  .tn20 .lk-h { font-size: clamp(48px, calc((100cqw - 616px) / 3.6), 72px); }
+  .tn20 .lk-h { font-size: clamp(44px, calc((100cqw - 656px) / 3.1), 72px); }
 }
