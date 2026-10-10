@@ -258,7 +258,10 @@ export default async function JuhlatSivu({ searchParams }: { searchParams: Promi
           <div className="ju-aika" aria-hidden>
             <span className="ju-aika-viiva" />
             {kuukaudet.map((k, i) => (
-              <span key={k.left} className={`ju-aika-kk${i % 2 ? " ju-aika-kk--2" : ""}`} style={{ left: k.left }}>{k.label}</span>
+              <span key={k.left} className={`ju-aika-kk${i % 2 ? " ju-aika-kk--2" : ""}`} style={{ left: k.left }}>
+                <span className="ju-aika-kk-pitka">{k.label}</span>
+                <span className="ju-aika-kk-lyhyt">{k.label.slice(0, 3)}</span>
+              </span>
             ))}
             <span className="ju-aika-pisteet">
               {kalenteri.map((o) => {
