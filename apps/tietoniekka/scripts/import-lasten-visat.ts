@@ -43,6 +43,15 @@ type KvRivi = { image_url: string; source_credit: string | null; license_note: s
 const kartta = JSON.parse(fs.readFileSync(karttaPolku, "utf8")) as Record<string, KvRivi>;
 /** Datan lajinimi → kuvavisan correct_option, kun ne eroavat. */
 const ALIAS: Record<string, string> = { Karhu: "Ruskeakarhu" };
+/** Eläinäänten kesto ja 22 palkin aaltomuoto (RMS, 0–1), laskettu tiedostoista selaimen dekooderilla 10.10.2026.
+ *  Pelin soittopalkki ja aika lasketaan näistä eikä audio.duration-arvosta (iPhone-oppi). */
+const ELAINAANI_AALTO: Record<string, { kesto_s: number; aalto: number[] }> = {
+  "elainaani-susi.mp3": { kesto_s: 10.7, aalto: [0.38, 0.6, 0.44, 0.45, 0.55, 0.51, 0.51, 0.92, 0.58, 0.23, 0.12, 0.18, 0.56, 0.45, 0.46, 0.5, 0.53, 0.52, 0.53, 1, 0.3, 0.17] },
+  "elainaani-kettu.mp3": { kesto_s: 10.7, aalto: [0.12, 0.12, 0.12, 0.45, 1, 0.87, 0.12, 0.12, 0.12, 0.12, 0.12, 0.12, 0.12, 0.12, 0.12, 0.75, 0.99, 0.65, 0.12, 0.12, 0.12, 0.12] },
+  "elainaani-huuhkaja.mp3": { kesto_s: 10.7, aalto: [0.12, 0.12, 0.12, 0.12, 0.12, 0.69, 0.73, 0.12, 0.12, 0.12, 0.12, 0.12, 0.12, 0.12, 0.12, 0.12, 0.12, 1, 0.13, 0.12, 0.12, 0.12] },
+  "elainaani-kaki.mp3": { kesto_s: 10.7, aalto: [0.25, 0.31, 0.38, 0.12, 0.12, 1, 0.22, 0.12, 0.12, 0.12, 0.12, 0.18, 0.18, 0.43, 0.24, 0.12, 0.12, 1, 0.22, 0.12, 0.12, 0.12] },
+  "elainaani-kurki.mp3": { kesto_s: 10.7, aalto: [0.12, 0.96, 0.88, 0.6, 0.12, 0.12, 0.12, 0.12, 0.12, 0.12, 0.12, 0.12, 0.12, 0.99, 1, 0.26, 0.12, 0.12, 0.12, 0.12, 0.12, 0.12] },
+};
 /** PUUTTUU-kuvat, jotka on haettu Commonsista suoraan lasten visoille (public/20/lapset/<avain>.webp, rajattu). */
 const OMAT_COMMONS: Record<string, KvRivi> = {
   "v5-k04-riekko": {
@@ -124,7 +133,9 @@ for (const v of data.quizzes) {
       const e = k.animal_sound;
       const url = `/aanet/lapset/elainaanet/${path.basename(e.tiedosto)}`;
       if (!fs.existsSync(path.join(PUBLIC, url))) raportti.push(`${v.code} k${nro(k)}: eläinääni ${url} puuttuu`);
-      elain = q(JSON.stringify({ url, laji: e.laji, tieteellinen: e.tieteellinen, tekija: e.tekija, lisenssi: e.lisenssi, lahde: e.lahde, lahde_url: e.lahde_url })) + "::jsonb";
+      const mitat = ELAINAANI_AALTO[path.basename(e.tiedosto)];
+      if (!mitat) raportti.push(`${v.code} k${nro(k)}: eläinäänen ${path.basename(e.tiedosto)} kesto/aaltomuoto puuttuu`);
+      elain = q(JSON.stringify({ url, laji: e.laji, tieteellinen: e.tieteellinen, tekija: e.tekija, lisenssi: e.lisenssi, lahde: e.lahde, lahde_url: e.lahde_url, ...(mitat ?? {}) })) + "::jsonb";
     }
     return `(${k.sort_order}, ${q(k.question_text)}, ${q(k.question_type)}, ${q(k.explanation)}, jsonb_build_array(${vastaukset.join(", ")}), ${kuva}, ${krediitti}, ${lisenssi}, ${q(k.vihje_laura)}, ${q(k.vihje_mikko)}, ${q(audioJson)}::jsonb, ${elain})`;
   });

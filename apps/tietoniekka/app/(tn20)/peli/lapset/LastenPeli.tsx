@@ -62,6 +62,8 @@ export default function LastenPeli({ visa, muut, takaisin }: { visa: LastenVisa;
   const pienet = visa.ika === "4-7";
   const kuvat = juontajaKuvat(visa.aihe);
   const aihe = visa.aihe ? LASTEN_AIHEET[visa.aihe] : null;
+  /** Luontoerä: pöydän reuna ja aksentti metsänvihreä #2F6B45 (design 2l); joulu pysyy kultaisena. */
+  const luontoAksentti = visa.kokoelma === "luonto";
 
   const [vaihe, setVaihe] = useState<Vaihe>("intro");
   const [qi, setQi] = useState(0);
@@ -72,6 +74,8 @@ export default function LastenPeli({ visa, muut, takaisin }: { visa: LastenVisa;
   const [kupla, setKupla] = useState<Kupla | null>(null);
   const [aani, setAani] = useState(true);
   const [elainSoi, setElainSoi] = useState(false);
+  const [elainT, setElainT] = useState(0);
+  const [elainSoitettu, setElainSoitettu] = useState(false);
   const [jaettu, setJaettu] = useState<string | null>(null);
   const [lamput, setLamput] = useState(LAMPPUJA);
   const [kysytyt, setKysytyt] = useState<string[]>([]);
@@ -87,6 +91,7 @@ export default function LastenPeli({ visa, muut, takaisin }: { visa: LastenVisa;
   const edellinenReaktio = useRef<string | null>(null);
   const tiesitkoAjastin = useRef<number | null>(null);
   const tallennettu = useRef(false);
+  const elainRaf = useRef<number | null>(null);
 
   const k: LastenKysymys | undefined = kysymykset[qi];
   const vastattu = valittu != null;
@@ -281,6 +286,8 @@ export default function LastenPeli({ visa, muut, takaisin }: { visa: LastenVisa;
       setValittu(null);
       setTiesitko(false);
       setReaktio(null);
+      setElainT(0);
+      setElainSoitettu(false);
       soita(kysymyksenKlipit(i));
       ennakoi(kysymykset[i + 1]?.audio.kysymys ?? null);
       window.scrollTo({ top: 0 });
@@ -304,16 +311,31 @@ export default function LastenPeli({ visa, muut, takaisin }: { visa: LastenVisa;
     if (!uusi) vaikene();
   };
 
+  /** Eläinääni (design 2l): oma soitin, ei soi itsestään; soi kerran (tiedostossa ääni on kahdesti).
+   *  Edistyminen currentTime-arvosta ja datan kestosta, animaatio playing-tapahtumasta (iPhone-oppi). */
+  const lopetaElainSeuranta = () => {
+    if (elainRaf.current != null) cancelAnimationFrame(elainRaf.current);
+    elainRaf.current = null;
+  };
   const soitaElainaani = () => {
     if (!k?.elainaani) return;
     const e = elainRef.current ?? new Audio();
     elainRef.current = e;
-    if (!e.paused) { e.pause(); setElainSoi(false); return; }
+    if (!e.paused) { e.pause(); lopetaElainSeuranta(); setElainSoi(false); return; }
     vaikene();
-    e.onended = () => setElainSoi(false);
-    e.onplaying = () => setElainSoi(true);
+    const kesto = k.elainaani.kesto ?? 10;
+    const seuraa = () => {
+      if (e.paused) { elainRaf.current = null; return; }
+      setElainT(Math.min(e.currentTime, kesto));
+      elainRaf.current = requestAnimationFrame(seuraa);
+    };
+    e.onplaying = () => { setElainSoi(true); setElainSoitettu(true); lopetaElainSeuranta(); elainRaf.current = requestAnimationFrame(seuraa); };
+    e.onended = () => { lopetaElainSeuranta(); setElainSoi(false); setElainT(kesto); };
+    e.onpause = () => { lopetaElainSeuranta(); setElainSoi(false); };
+    e.setAttribute("playsinline", "");
     if (!e.src.endsWith(k.elainaani.url)) e.src = k.elainaani.url;
-    try { e.currentTime = 0; } catch { /* */ }
+    try { e.currentTime = 0; } catch { /* metatiedot latautumatta */ }
+    setElainT(0);
     e.play().catch(() => setElainSoi(false));
   };
 
@@ -372,7 +394,7 @@ export default function LastenPeli({ visa, muut, takaisin }: { visa: LastenVisa;
     </div>
   );
 
-  const Avatar = ({ kuka, puhuu = false }: { kuka: Juontaja; puhuu?: boolean }) => (
+  const avatar = (kuka: Juontaja, puhuu = false) => (
     <span className="lp-i-avatar" data-kuka={kuka} data-puhuu={puhuu || undefined} style={{ backgroundImage: `url(${kuvat.avatar[kuka]})` }} aria-hidden="true" />
   );
   /** Kuvavisan valokuvien tekijätiedot (CC BY/BY-SA vaatii näkyvän merkinnän). Omat kuvitukset: ei merkintää. */
@@ -380,10 +402,36 @@ export default function LastenPeli({ visa, muut, takaisin }: { visa: LastenVisa;
   const kynnys3 = Math.ceil(N * 0.8), kynnys2 = Math.ceil(N * 0.5);
   const tahdet = pienet ? 3 : oikeita >= kynnys3 ? 3 : oikeita >= kynnys2 ? 2 : 1;
 
+  const aika = (sek: number) => `0:${String(Math.floor(sek)).padStart(2, "0")}`;
+  /** Äänikortti (design 2l): 104 px nappi + aaltomuoto + aika; kuultu osa vihreänä. */
+  const elainKortti = (e: NonNullable<LastenKysymys["elainaani"]>) => {
+    const kesto = e.kesto ?? 10;
+    const osuus = elainSoitettu ? Math.min(1, elainT / kesto) : 0;
+    const palkit = e.aalto.length ? e.aalto : Array.from({ length: 22 }, (_, i) => 0.3 + 0.5 * Math.abs(Math.sin(i * 1.7)));
+    return (
+      <div className="lp-aanikortti" data-soi={elainSoi || undefined}>
+        <button type="button" className="lp-aanikortti-nappi" onClick={soitaElainaani} aria-label={elainSoi ? "Lopeta eläinääni" : "Kuuntele eläinääni"}>
+          <span className="lp-aanikortti-ikoni" aria-hidden="true">{elainSoi ? "■" : "▶"}</span>
+          <span className="lp-aanikortti-nt">{elainSoi ? "Lopeta" : elainSoitettu ? "Uudelleen" : "Kuuntele"}</span>
+        </button>
+        <div className="lp-aanikortti-oikea">
+          <div className="lp-aalto" aria-hidden="true">
+            {palkit.map((h, i) => (
+              <span key={i} style={{ height: `${Math.round((0.15 + 0.85 * h) * 100)}%` }} data-kuultu={(i + 0.5) / palkit.length <= osuus || undefined} />
+            ))}
+          </div>
+          <span className="lp-aanikortti-tila" aria-live="polite">
+            {elainSoi ? `Ääni soi · ${aika(elainT)} / ${aika(kesto)}` : elainSoitettu ? "Kuuntele uudelleen, jos haluat" : "Napauta ja kuuntele"}
+          </span>
+        </div>
+      </div>
+    );
+  };
+
   /* ── Intro, isommat (2b): hero kuten aikuisilla, ei juontajaparia ── */
   if (vaihe === "intro" && !pienet) {
     return (
-      <main className="lp" data-ika={visa.ika} data-vaihe="intro">
+      <main className="lp" data-ika={visa.ika} data-aksentti={luontoAksentti ? "luonto" : undefined} data-vaihe="intro">
         <div className="lp-kehys">
           <div className="lp-i-hero">
             {visa.kuva && (
@@ -406,7 +454,7 @@ export default function LastenPeli({ visa, muut, takaisin }: { visa: LastenVisa;
           </div>
           <div className="lp-venyke" />
           <div className="lp-i-aloitus">
-            <span className="lp-i-lukija"><Avatar kuka={lukija} />{JUONTAJA_NIMI[lukija]} lukee kysymykset ääneen. Voit vastata heti.</span>
+            <span className="lp-i-lukija">{avatar(lukija)}{JUONTAJA_NIMI[lukija]} lukee kysymykset ääneen. Voit vastata heti.</span>
             <button type="button" className="lp-cta lp-i-cta" onClick={aloitaVisa}>Aloita visa →</button>
           </div>
         </div>
@@ -417,7 +465,7 @@ export default function LastenPeli({ visa, muut, takaisin }: { visa: LastenVisa;
   /* ── Intro (2a) ── */
   if (vaihe === "intro") {
     return (
-      <main className="lp" data-ika={visa.ika} data-vaihe="intro">
+      <main className="lp" data-ika={visa.ika} data-aksentti={luontoAksentti ? "luonto" : undefined} data-vaihe="intro">
         <div className="lp-kehys">
           {ylapalkki}
           <div className="lp-intro-kuva">
@@ -447,7 +495,7 @@ export default function LastenPeli({ visa, muut, takaisin }: { visa: LastenVisa;
   /* ── Tulos (2m) ── */
   if (vaihe === "tulos") {
     return (
-      <main className="lp" data-ika={visa.ika} data-vaihe="tulos">
+      <main className="lp" data-ika={visa.ika} data-aksentti={luontoAksentti ? "luonto" : undefined} data-vaihe="tulos">
         <div className="lp-kehys">
           <div className="lp-tulos-hehku" aria-hidden="true" />
           {ylapalkki}
@@ -501,7 +549,7 @@ export default function LastenPeli({ visa, muut, takaisin }: { visa: LastenVisa;
     const oikeaI = k.vastaukset.findIndex((v) => v.oikein);
     const lukee = puhe?.laji === "kysymys";
     return (
-      <main className="lp" data-ika={visa.ika} data-vaihe="peli" data-vastattu={vastattu || undefined}>
+      <main className="lp" data-ika={visa.ika} data-aksentti={luontoAksentti ? "luonto" : undefined} data-vaihe="peli" data-vastattu={vastattu || undefined}>
         <div className="lp-kehys">
           {ylapalkki}
           <div className="lp-i-edistys" style={{ gridTemplateColumns: `repeat(${N}, minmax(0, 1fr))` }} role="progressbar" aria-label="Edistyminen" aria-valuemin={1} aria-valuemax={N} aria-valuenow={qi + 1}>
@@ -527,14 +575,7 @@ export default function LastenPeli({ visa, muut, takaisin }: { visa: LastenVisa;
                 )}
               </div>
 
-              {k.elainaani && !vastattu && (
-                <div className="lp-elain">
-                  <button type="button" className="lp-elain-nappi" data-soi={elainSoi || undefined} onClick={soitaElainaani} aria-label={elainSoi ? "Pysäytä eläinääni" : "Kuuntele eläinääni"}>
-                    <span aria-hidden="true">{elainSoi ? "■" : "▶"}</span>
-                  </button>
-                  <span className="lp-elain-t">{elainSoi ? "Kuuntele tarkkaan…" : "Kuuntele ääni"}</span>
-                </div>
-              )}
+              {k.elainaani && !vastattu && elainKortti(k.elainaani)}
 
               <div className="lp-i-vastaukset" role="group" aria-label="Vaihtoehdot">
                 {k.vastaukset.map((v, i) => {
@@ -559,7 +600,7 @@ export default function LastenPeli({ visa, muut, takaisin }: { visa: LastenVisa;
                 <section className="lp-i-tiesitko" aria-label="Tiesitkö">
                   {reaktio && (
                     <div className="lp-i-reaktio">
-                      <Avatar kuka={lukija} puhuu={puhe?.laji === "reaktio"} />
+                      {avatar(lukija, puhe?.laji === "reaktio")}
                       <span>{reaktio}</span>
                     </div>
                   )}
@@ -612,7 +653,7 @@ export default function LastenPeli({ visa, muut, takaisin }: { visa: LastenVisa;
                           disabled={!k.vihje[kuka]}
                           onClick={() => kysyVihje(kuka)}
                         >
-                          <Avatar kuka={kuka} puhuu={puhe?.kuka === kuka} />
+                          {avatar(kuka, puhe?.kuka === kuka)}
                           <span>
                             {kertoo ? `${JUONTAJA_NIMI[kuka]} kertoo` : lukeeNyt ? `${JUONTAJA_NIMI[kuka]} lukee…` : kaytetty ? "Vihjeet käytetty" : `Kysy ${JUONTAJA_ABL[kuka]}`}
                           </span>
@@ -636,11 +677,14 @@ export default function LastenPeli({ visa, muut, takaisin }: { visa: LastenVisa;
   const lukeeKysymysta = puhe?.laji === "kysymys";
 
   return (
-    <main className="lp" data-ika={visa.ika} data-vaihe="peli" data-vastattu={vastattu || undefined}>
+    <main className="lp" data-ika={visa.ika} data-aksentti={luontoAksentti ? "luonto" : undefined} data-vaihe="peli" data-vastattu={vastattu || undefined}>
       <div className="lp-kehys">
         {ylapalkki}
-        <div className="lp-edistys" role="progressbar" aria-label="Edistyminen" aria-valuemin={1} aria-valuemax={N} aria-valuenow={qi + 1}>
-          <span style={{ width: `${((qi + 1) / N) * 100}%` }} />
+        <div className="lp-edistysrivi">
+          <div className="lp-edistys" role="progressbar" aria-label="Edistyminen" aria-valuemin={1} aria-valuemax={N} aria-valuenow={qi + 1}>
+            <span style={{ width: `${((qi + 1) / N) * 100}%` }} />
+          </div>
+          {qi === N - 1 && N > 1 && <span className="lp-viimeinen">Viimeinen!</span>}
         </div>
         <h1 className="lp-kysymys">{k.teksti}</h1>
 
@@ -654,14 +698,7 @@ export default function LastenPeli({ visa, muut, takaisin }: { visa: LastenVisa;
           </button>
         )}
 
-        {k.elainaani && !vastattu && (
-          <div className="lp-elain">
-            <button type="button" className="lp-elain-nappi" data-soi={elainSoi || undefined} onClick={soitaElainaani} aria-label={elainSoi ? "Pysäytä eläinääni" : "Kuuntele eläinääni"}>
-              <span aria-hidden="true">{elainSoi ? "■" : "▶"}</span>
-            </button>
-            <span className="lp-elain-t">{elainSoi ? "Kuuntele tarkkaan…" : "Kuuntele ääni"}</span>
-          </div>
-        )}
+        {k.elainaani && !vastattu && elainKortti(k.elainaani)}
 
         {k.kuva && k.tyyppi === "kuva" && (
           <div className="lp-kysymyskuva">
@@ -670,7 +707,7 @@ export default function LastenPeli({ visa, muut, takaisin }: { visa: LastenVisa;
           </div>
         )}
 
-        <div className="lp-vastaukset" role="group" aria-label="Vaihtoehdot">
+        <div className="lp-vastaukset" role="group" aria-label="Vaihtoehdot" data-ruudukko={(k.tyyppi === "aani_kuvavastaukset" && !tiesitko && k.vastaukset.every((v) => v.kuva)) || undefined}>
           {k.vastaukset.map((v, i) => {
             const tila = !vastattu ? undefined : i === oikeaIndeksi ? "oikea" : i === valittu ? "valittu" : "muu";
             if (tiesitko && tila !== "oikea") return null;

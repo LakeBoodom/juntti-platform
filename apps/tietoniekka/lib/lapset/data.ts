@@ -15,7 +15,8 @@ export type LastenIka = (typeof LASTEN_IAT)[number];
 export const esikatselu = () => process.env.VERCEL_ENV !== "production";
 
 export type LastenVastaus = { teksti: string; oikein: boolean; kuva: string | null; kuvaKrediitti: string | null };
-export type Elainaani = { url: string; laji: string; tekija: string; lisenssi: string; lahdeUrl: string | null };
+/** kesto_s ja aalto (22 palkkia, 0–1) lasketaan tiedostosta etukäteen: soittopalkki ei luota audio.durationiin. */
+export type Elainaani = { url: string; laji: string; tekija: string; lisenssi: string; lahdeUrl: string | null; kesto: number | null; aalto: number[] };
 export type LastenKysymys = {
   tyyppi: "teksti" | "kuva" | "kuvavastaukset" | "aani" | "aani_kuvavastaukset";
   teksti: string;
@@ -92,7 +93,12 @@ export async function haeLastenVisa(opts: { slug?: string | null; quizId?: strin
       tiesitko: r.explanation,
       audio: { kysymys: str(au, "kysymys"), vihje_laura: str(au, "vihje_laura"), vihje_mikko: str(au, "vihje_mikko"), tiesitko: str(au, "tiesitko") },
       elainaani: ea && str(ea, "url")
-        ? { url: str(ea, "url")!, laji: str(ea, "laji") ?? "", tekija: str(ea, "tekija") ?? "", lisenssi: str(ea, "lisenssi") ?? "", lahdeUrl: str(ea, "lahde_url") }
+        ? {
+            url: str(ea, "url")!, laji: str(ea, "laji") ?? "", tekija: str(ea, "tekija") ?? "", lisenssi: str(ea, "lisenssi") ?? "",
+            lahdeUrl: str(ea, "lahde_url"),
+            kesto: typeof ea.kesto_s === "number" ? ea.kesto_s : null,
+            aalto: Array.isArray(ea.aalto) ? (ea.aalto as unknown[]).filter((x): x is number => typeof x === "number") : [],
+          }
         : null,
     };
   });

@@ -43,7 +43,9 @@
 .tn20 .lp[data-vaihe="intro"] .lp-aani-t { display: inline; }
 .tn20 .lp[data-vaihe="intro"] .lp-yla > .lp-ika { display: none; }
 
-.tn20 .lp-edistys { margin: 12px 16px 0; height: 8px; border-radius: 4px; background: var(--lp-raja); overflow: hidden; }
+.tn20 .lp-edistysrivi { margin: 12px 16px 0; display: flex; align-items: center; gap: 10px; }
+.tn20 .lp-edistys { flex: 1; height: 8px; border-radius: 4px; background: var(--lp-raja); overflow: hidden; }
+.tn20 .lp-viimeinen { flex: none; font-family: var(--lp-cond); font-weight: 800; font-size: 15px; text-transform: uppercase; letter-spacing: .06em; color: var(--lp-aksentti, var(--lp-kulta)); }
 .tn20 .lp-edistys span { display: block; height: 100%; border-radius: 4px; background: var(--lp-kulta); transition: width .3s ease; }
 
 /* Intro (2a) */
@@ -279,7 +281,8 @@
   .tn20 .lp-yla { padding: 12px 14px 0; gap: 8px; }
   .tn20 .lp-sulje, .tn20 .lp-aani { width: 44px; height: 44px; font-size: 18px; }
   .tn20 .lp-ika { height: 32px; padding: 0 12px; font-size: 15px; }
-  .tn20 .lp-edistys { margin: 10px 14px 0; height: 6px; }
+  .tn20 .lp-edistysrivi { margin: 10px 14px 0; }
+  .tn20 .lp-edistys { height: 6px; }
   .tn20 .lp-kysymys { margin: 12px 18px 0; font-size: min(31px, calc((min(100vw, 430px) - 36px) / 8.9)); }
   .tn20 .lp-kuuntele { margin: 10px 18px 0; min-height: 48px; font-size: 19px; }
   .tn20 .lp-vastaukset { margin: 12px 14px 0; gap: 8px; }
@@ -317,7 +320,8 @@
   .tn20 .lp-yla { padding: 24px 40px 0; gap: 16px; }
   .tn20 .lp[data-vaihe="peli"] .lp-aani { width: auto; padding: 0 18px 0 14px; font-size: 17px; }
   .tn20 .lp[data-vaihe="peli"] .lp-aani-t { display: inline; }
-  .tn20 .lp-edistys { margin: 16px auto 0; width: 360px; height: 10px; }
+  .tn20 .lp-edistysrivi { margin: 16px auto 0; width: 360px; }
+  .tn20 .lp-edistys { height: 10px; }
   .tn20 .lp-kysymys { margin: 20px auto 0; max-width: 1000px; text-align: center; font-size: 56px; line-height: 1; }
   .tn20 .lp-vastaus-n { font-size: 30px; }
   .tn20 .lp-kuuntele { margin: 16px auto 0; padding: 0 32px; min-height: 60px; font-size: 22px; }
@@ -566,6 +570,65 @@
   .tn20 .lp[data-ika="8-12"] .lp-lahde { text-align: left; margin-left: 0; }
   .tn20 .lp[data-ika="8-12"] .lp-elain { margin: 16px 0 0; }
   .tn20 .lp[data-ika="8-12"][data-vaihe="intro"] .lp-kehys { max-width: 520px; }
+}
+
+/* ══ ÄÄNIKYSYMYS (design 2l, vaihe 4, 10.10.2026) ══════════════════════════════════════════════
+   Eläinääni ei soi itsestään vaan 104 px:n napista. Kortti: nappi + 22 palkin aaltomuoto (laskettu tiedostosta)
+   + aika datan kestosta. Luontoerän aksentti #2F6B45 (pöydän reuna, edistymispalkki, Viimeinen!). */
+.tn20 .lp[data-aksentti="luonto"] { --lp-aksentti: #2F6B45; }
+.tn20 .lp[data-aksentti="luonto"] .lp-edistys span { background: var(--lp-aksentti); }
+.tn20 .lp[data-aksentti="luonto"] .lp-ala { border-top-color: var(--lp-aksentti); }
+
+.tn20 .lp-aanikortti {
+  margin: 16px 16px 0; display: grid; grid-template-columns: 104px minmax(0, 1fr); gap: 16px; align-items: center; padding: 16px;
+  border-radius: 28px; background: var(--lp-kupla); border: 2.5px solid #2F6B45;
+}
+.tn20 .lp-aanikortti-nappi {
+  width: 104px; height: 104px; border: 0; border-radius: 999px; background: #2F6B45; color: var(--lp-cream); cursor: pointer;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; box-shadow: 0 6px 0 rgba(15, 21, 32, .22);
+  transition: box-shadow .22s, transform .12s;
+}
+.tn20 .lp-aanikortti-nappi:active { transform: translateY(2px); }
+.tn20 .lp-aanikortti[data-soi] .lp-aanikortti-nappi { box-shadow: 0 0 0 6px rgba(47, 107, 69, .2); animation: lpAaniRengas 1.2s ease-in-out infinite; }
+.tn20 .lp-aanikortti-nappi:focus-visible { outline: 3px solid var(--lp-kulta); outline-offset: 4px; }
+.tn20 .lp-aanikortti-ikoni { font-size: 30px; line-height: 1; }
+.tn20 .lp-aanikortti-nt { font-family: var(--lp-cond); font-weight: 800; font-size: 15px; text-transform: uppercase; }
+.tn20 .lp-aanikortti-oikea { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.tn20 .lp-aalto { display: flex; align-items: center; gap: 3px; height: 56px; }
+.tn20 .lp-aalto span { flex: 1; min-height: 4px; border-radius: 3px; background: #CFD9CF; transition: background .12s; }
+.tn20 .lp-aalto span[data-kuultu] { background: #2F6B45; }
+.tn20 .lp-aanikortti-tila { font-family: var(--lp-cond); font-weight: 800; font-size: 18px; color: #2F6B45; }
+@keyframes lpAaniRengas {
+  0%, 100% { box-shadow: 0 0 0 6px rgba(47, 107, 69, .22); }
+  50% { box-shadow: 0 0 0 12px rgba(47, 107, 69, .1); }
+}
+
+/* Pienten äänikysymys: kuvavastaukset kolmena ruutuna rinnakkain (2l) */
+.tn20 .lp-vastaukset[data-ruudukko] { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.tn20 .lp-vastaukset[data-ruudukko] .lp-vastaus {
+  display: flex; flex-direction: column; height: auto; gap: 8px; padding: 6px 6px 10px; border-radius: 20px;
+}
+.tn20 .lp-vastaukset[data-ruudukko] .lp-vastaus[data-tila="oikea"] { padding: 5px 5px 9px; }
+.tn20 .lp-vastaukset[data-ruudukko] .lp-vastaus-kuva { width: 100%; height: auto; aspect-ratio: 1 / 1; border-radius: 15px; }
+/* KORTTISÄÄNTÖ: ruudun tekstileveys = (leveys − 52) / 3 − 16; pisin nimi "Huuhkaja"/"Sinisorsa" (9) ≈ 3.9 × koko. */
+.tn20 .lp-vastaukset[data-ruudukko] .lp-vastaus-n { text-align: center; font-size: min(22px, calc(((min(100vw, 430px) - 52px) / 3 - 16px) / 4.1)); }
+.tn20 .lp-vastaukset[data-ruudukko] .lp-tahti { top: 12px; right: 12px; margin-top: 0; width: 36px; height: 36px; font-size: 18px; }
+
+@media (max-height: 700px) {
+  .tn20 .lp-aanikortti { margin: 10px 14px 0; grid-template-columns: 84px minmax(0, 1fr); padding: 12px; gap: 12px; border-radius: 22px; }
+  .tn20 .lp-aanikortti-nappi { width: 84px; height: 84px; }
+  .tn20 .lp-aanikortti-ikoni { font-size: 24px; }
+  .tn20 .lp-aalto { height: 40px; }
+  .tn20 .lp-aanikortti-tila { font-size: 16px; }
+  .tn20 .lp-vastaukset[data-ruudukko] { gap: 8px; }
+}
+@media (min-width: 900px) and (min-height: 701px) {
+  .tn20 .lp-aanikortti { width: 100%; max-width: 640px; margin-left: auto; margin-right: auto; }
+  .tn20 .lp[data-ika="8-12"] .lp-aanikortti { margin: 20px 0 0; max-width: none; }
+  .tn20 .lp-vastaukset[data-ruudukko] { grid-template-columns: repeat(3, 220px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .tn20 .lp-aanikortti[data-soi] .lp-aanikortti-nappi { animation: none !important; box-shadow: 0 0 0 8px rgba(47, 107, 69, .2); }
 }
 
 /* Vercelin esikatselu-Toolbar (vain previewssä) peittäisi pelin napit */
