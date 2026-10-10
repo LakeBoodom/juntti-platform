@@ -19,6 +19,7 @@ type Rivi = {
   id: string; title: string; slug: string | null; custom_slug: string | null;
   collection: string | null; category: string | null; difficulty: string | null;
   status: string; created_at: string; updated_at: string | null; published_at: string | null;
+  target_age: string | null;
 };
 
 type Tilasto = {
@@ -41,7 +42,7 @@ export default async function QuizzesPage() {
   for (let alku = 0; ; alku += 1000) {
     const { data, error } = await admin
       .from("quizzes")
-      .select("id, title, slug, custom_slug, collection, category, difficulty, status, created_at, updated_at, published_at")
+      .select("id, title, slug, custom_slug, collection, category, difficulty, status, created_at, updated_at, published_at, target_age")
       .eq("site_id", site.id)
       .order("created_at", { ascending: false })
       .range(alku, alku + 999);
@@ -65,6 +66,7 @@ export default async function QuizzesPage() {
       category: r.category,
       difficulty: r.difficulty,
       status: r.status,
+      target_age: r.target_age,
       created_at: r.created_at,
       updated_at: r.updated_at ?? r.created_at,
       pelit: Number(t?.pelit ?? 0),

@@ -9,6 +9,19 @@ import { HeroEditor } from "./hero-editor";
 import { TIETONIEKKA_URL } from "@/lib/paivan-visa-yhteiset";
 import { QuestionCard } from "./question-card";
 import { QuizActionsBar } from "./quiz-actions-bar";
+import { LapsetMeta } from "./lapset-meta";
+import { LastenKysymys, type LastenKysymysData } from "./lasten-kysymys";
+import { IKA_MERKKI, onLastenVisa } from "@/lib/lapset";
+
+/* Lasten visojen äänet ja kuvat ovat sivuston public-kansiossa. Previewssä ne haetaan saman haaran
+   tietoniekka-previewistä (uudet tiedostot eivät ole vielä tuotannossa), muuten tietoniekka.fi:stä. */
+function mediaPohja(): string {
+  const haara = process.env.VERCEL_GIT_COMMIT_REF;
+  if (process.env.VERCEL_ENV === "preview" && haara) {
+    return `https://tietoniekka-git-${haara.toLowerCase().replace(/[^a-z0-9]+/g, "-")}-lakeboodoms-projects.vercel.app`;
+  }
+  return TIETONIEKKA_URL;
+}
 
 export const dynamic = "force-dynamic";
 
@@ -36,9 +49,12 @@ export default async function QuizDetailPage({
 
   const { data: questions } = await admin
     .from("questions")
-    .select("id, sort_order, question_text, answers, explanation")
+    .select("id, sort_order, question_text, answers, explanation, question_type, vihje_laura, vihje_mikko, image_url, image_credit, image_license_note, image_position, audio, animal_sound")
     .eq("quiz_id", id)
     .order("sort_order", { ascending: true });
+
+  const lasten = onLastenVisa(quiz.target_age);
+  const pohja = mediaPohja();
 
   const statusLabel =
     quiz.status === "published"
@@ -89,6 +105,11 @@ export default async function QuizDetailPage({
             <span className="inline-flex items-center rounded-full border px-2 py-0.5">
               {quiz.platform}
             </span>
+            {lasten && (
+              <span className="inline-flex items-center rounded-full border border-amber-500/40 bg-amber-50 px-2 py-0.5 text-amber-900 dark:bg-amber-950/30 dark:text-amber-200">
+                Lasten visa {IKA_MERKKI[quiz.target_age as "4-7" | "8-12"]}
+              </span>
+            )}
             {quiz.emoji_hint && (
               <span className="inline-flex items-center rounded-full border px-2 py-0.5">
                 {quiz.emoji_hint}
@@ -96,6 +117,10 @@ export default async function QuizDetailPage({
             )}
           </div>
           <QuizActionsBar id={quiz.id} status={quiz.status} />
+          <LapsetMeta
+            id={quiz.id}
+            initial={{ target_age: quiz.target_age, lukija: quiz.lukija, lasten_aihe: quiz.lasten_aihe }}
+          />
         </div>
 
         <HeroEditor
@@ -113,7 +138,19 @@ export default async function QuizDetailPage({
           <h2 className="text-lg font-semibold">
             Kysymykset ({questions?.length ?? 0})
           </h2>
-          {questions?.map((q: any, i: number) => (
+          {lasten && questions?.map((q: any, i: number) => (
+            <LastenKysymys
+              key={q.id}
+              id={q.id}
+              quizId={quiz.id}
+              sortOrder={q.sort_order}
+              isFirst={i === 0}
+              isLast={i === (questions?.length ?? 0) - 1}
+              mediaPohja={pohja}
+              initial={q as LastenKysymysData}
+            />
+          ))}
+          {!lasten && questions?.map((q: any, i: number) => (
             <QuestionCard
               key={q.id}
               id={q.id}
