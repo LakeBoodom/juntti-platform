@@ -610,8 +610,9 @@
 }
 .tn20 .lp-vastaukset[data-ruudukko] .lp-vastaus[data-tila="oikea"] { padding: 5px 5px 9px; }
 .tn20 .lp-vastaukset[data-ruudukko] .lp-vastaus-kuva { width: 100%; height: auto; aspect-ratio: 1 / 1; border-radius: 15px; }
-/* KORTTISÄÄNTÖ: ruudun tekstileveys = (leveys − 52) / 3 − 16; pisin nimi "Huuhkaja"/"Sinisorsa" (9) ≈ 3.9 × koko. */
-.tn20 .lp-vastaukset[data-ruudukko] .lp-vastaus-n { text-align: center; font-size: min(22px, calc(((min(100vw, 430px) - 52px) / 3 - 16px) / 4.1)); }
+/* KORTTISÄÄNTÖ (Range-mittaus 10.10.2026): ruudun tekstileveys = (leveys − 52) / 3 − 16; pisin nimi
+   "Laulujoutsen" (12) = 4.77 × koko → min(CD 22 px, leveys / 4.9): 390 px → 19.7 px, 320 px → 14.9 px. */
+.tn20 .lp-vastaukset[data-ruudukko] .lp-vastaus-n { text-align: center; font-size: min(22px, calc(((min(100vw, 430px) - 52px) / 3 - 16px) / 4.9)); }
 .tn20 .lp-vastaukset[data-ruudukko] .lp-tahti { top: 12px; right: 12px; margin-top: 0; width: 36px; height: 36px; font-size: 18px; }
 
 @media (max-height: 700px) {

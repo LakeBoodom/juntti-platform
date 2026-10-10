@@ -417,7 +417,7 @@ export default function LastenPeli({ visa, muut, takaisin }: { visa: LastenVisa;
         <div className="lp-aanikortti-oikea">
           <div className="lp-aalto" aria-hidden="true">
             {palkit.map((h, i) => (
-              <span key={i} style={{ height: `${Math.round((0.15 + 0.85 * h) * 100)}%` }} data-kuultu={(i + 0.5) / palkit.length <= osuus || undefined} />
+              <span key={i} style={{ height: `${Math.round((0.2 + 0.8 * Math.sqrt(h)) * 100)}%` }} data-kuultu={(i + 0.5) / palkit.length <= osuus || undefined} />
             ))}
           </div>
           <span className="lp-aanikortti-tila" aria-live="polite">
