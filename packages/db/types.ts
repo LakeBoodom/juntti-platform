@@ -8653,8 +8653,8 @@ export type Database = {
           explanation: string | null
           id: string
           image_credit: string | null
-          image_position: string | null
           image_license_note: string | null
+          image_position: string | null
           image_url: string | null
           question_text: string
           question_type: string
@@ -8672,8 +8672,8 @@ export type Database = {
           explanation?: string | null
           id?: string
           image_credit?: string | null
-          image_position?: string | null
           image_license_note?: string | null
+          image_position?: string | null
           image_url?: string | null
           question_text: string
           question_type?: string
@@ -8691,8 +8691,8 @@ export type Database = {
           explanation?: string | null
           id?: string
           image_credit?: string | null
-          image_position?: string | null
           image_license_note?: string | null
+          image_position?: string | null
           image_url?: string | null
           question_text?: string
           question_type?: string
@@ -9535,6 +9535,7 @@ export type Database = {
           slug: string | null
           subcollection: string | null
           tags: string[] | null
+          target_age: string | null
           teaser: string | null
           title: string | null
         }
@@ -9556,6 +9557,7 @@ export type Database = {
           slug?: string | null
           subcollection?: string | null
           tags?: string[] | null
+          target_age?: string | null
           teaser?: string | null
           title?: string | null
         }
@@ -9577,6 +9579,7 @@ export type Database = {
           slug?: string | null
           subcollection?: string | null
           tags?: string[] | null
+          target_age?: string | null
           teaser?: string | null
           title?: string | null
         }

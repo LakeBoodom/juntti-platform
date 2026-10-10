@@ -1,0 +1,78 @@
+/* ETUSIVUN LASTEN VISAT -KAISTA (design v0.2 3e/3f). Vaalea kortti tummalla etusivulla.
+   Mobiili (< 860 px kontti, 3e): teksti → juontajat → tumma ikävalintapohja. Desktop (≥ 860, 3f):
+   kolme saraketta, 340 px korkea. Fontit Barlow Condensed / Barlow. */
+.tn20 .lk-wrap { container-type: inline-size; }
+.tn20 .lk {
+  --lk-cream: #F4EDE0; --lk-navy: #0F1520; --lk-kulta: #E8A320; --lk-kulta-v: #F5BC45; --lk-rivi: #FFFAF0;
+  --lk-cond: "Barlow Condensed", "Archivo", sans-serif;
+  border-radius: 22px; overflow: hidden; background: var(--lk-cream); color: var(--lk-navy); font-family: "Barlow", "Instrument Sans", sans-serif;
+  display: flex; flex-direction: column;
+}
+.tn20 .lk a { color: inherit; text-decoration: none; }
+.tn20 .lk-teksti { padding: 20px 18px 0; display: flex; flex-direction: column; gap: 10px; }
+.tn20 .lk-pilleri {
+  align-self: flex-start; white-space: nowrap; display: flex; align-items: center; height: 28px; padding: 0 11px; border-radius: 999px;
+  background: var(--lk-navy); color: var(--lk-kulta-v); font-family: var(--lk-cond); font-weight: 800; font-size: 14px; letter-spacing: .05em; text-transform: uppercase;
+}
+/* CD 52 px; "LASTEN VISAT" ≈ 0.46 em × 12 = 287 px → 320 px:ssä (tila 252 px) kaava rajaa. */
+.tn20 .lk-h {
+  margin: 0; font-family: var(--lk-cond); font-weight: 900; font-size: min(52px, calc((100cqw - 36px) / 6)); line-height: .86; text-transform: uppercase;
+  overflow-wrap: normal; word-break: keep-all;
+}
+.tn20 .lk-p { margin: 0; font-size: 16px; line-height: 1.45; font-weight: 600; text-wrap: pretty; }
+.tn20 .lk-p--desktop, .tn20 .lk-cta { display: none; }
+.tn20 .lk-duo { height: 178px; background-size: 250px auto; background-position: center 0; background-repeat: no-repeat; }
+.tn20 .lk-iat { background: var(--lk-navy); border-top: 5px solid var(--lk-kulta); padding: 12px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.tn20 .lk-nyt { display: none; }
+.tn20 .lk-ika {
+  display: flex; align-items: center; gap: 8px; min-height: 56px; padding: 0 12px; border-radius: 16px; background: var(--lk-rivi);
+}
+.tn20 .lk-ika-emoji { font-size: 24px; flex: none; }
+.tn20 .lk-ika-teksti { display: flex; flex-direction: column; min-width: 0; }
+/* CD 19 px yhdellä rivillä. Kapealla (< 360 px) "ISOMMAT 8–12" ei mahdu → rivittyy sanojen välistä. */
+.tn20 .lk-ika-nimi { font-family: var(--lk-cond); font-weight: 900; font-size: 19px; line-height: .95; text-transform: uppercase; overflow-wrap: normal; word-break: keep-all; }
+.tn20 .lk-ika-tapa, .tn20 .lk-nuoli { display: none; }
+@media (hover: hover) {
+  .tn20 .lk-ika:hover { box-shadow: 0 0 0 3px var(--lk-kulta); }
+  .tn20 .lk-teksti:hover .lk-cta { background: #1d2738; }
+}
+
+@container (min-width: 860px) {
+  .tn20 .lk {
+    height: 340px; display: grid; grid-template-columns: minmax(0, 1fr) 400px 360px; gap: 28px; padding: 0 32px 0 48px; border-radius: 24px; box-sizing: border-box;
+  }
+  .tn20 .lk-teksti { padding: 0; justify-content: center; gap: 14px; }
+  .tn20 .lk-pilleri { height: 32px; padding: 0 13px; font-size: 16px; }
+  /* CD 84 px; sarake 860 px:ssä ≈ 0 … kaava sarakkeen leveydestä (100cqw − 868 px). */
+  .tn20 .lk-h { font-size: clamp(52px, calc((100cqw - 868px) / 3.4), 84px); line-height: .84; }
+  .tn20 .lk-p--mobiili { display: none; }
+  .tn20 .lk-p--desktop { display: block; max-width: 30ch; font-size: 19px; }
+  .tn20 .lk-cta {
+    align-self: flex-start; display: flex; align-items: center; gap: 10px; min-height: 52px; padding: 0 24px; border-radius: 999px;
+    background: var(--lk-navy); color: var(--lk-cream); font-family: var(--lk-cond); font-weight: 900; font-size: 21px; text-transform: uppercase;
+  }
+  .tn20 .lk-cta span { color: var(--lk-kulta-v); }
+  .tn20 .lk-duo { height: auto; background-size: 400px auto; background-position: center 18px; }
+  .tn20 .lk-iat { background: none; border: 0; padding: 0; display: flex; flex-direction: column; justify-content: center; gap: 12px; }
+  .tn20 .lk-nyt {
+    display: flex; align-items: center; gap: 10px; font-family: var(--lk-cond); font-weight: 800; font-size: 17px; letter-spacing: .06em; text-transform: uppercase; color: #B8432F;
+  }
+  .tn20 .lk-ika {
+    display: grid; grid-template-columns: 64px minmax(0, 1fr) auto; gap: 14px; min-height: 96px; padding: 0 20px 0 16px; border-radius: 20px;
+    background: var(--lk-navy); color: var(--lk-cream) !important; border-top: 4px solid var(--lk-kulta);
+  }
+  .tn20 .lk-ika-emoji {
+    width: 64px; height: 64px; border-radius: 999px; background: var(--lk-cream); display: flex; align-items: center; justify-content: center; font-size: 34px;
+  }
+  .tn20 .lk-ika[data-ika="8-12"] .lk-ika-emoji { background: var(--lk-kulta); }
+  .tn20 .lk-ika-teksti { gap: 3px; }
+  .tn20 .lk-ika-nimi { font-size: 30px; line-height: .92; }
+  .tn20 .lk-ika-tapa { display: block; font-size: 15px; font-weight: 600; color: #D3D8E0; }
+  .tn20 .lk-nuoli { display: block; color: var(--lk-kulta-v); font-size: 24px; font-weight: 700; }
+}
+/* 860–1099: kapeampi juontajasarake, jotta otsikko mahtuu */
+@container (min-width: 860px) and (max-width: 1099.98px) {
+  .tn20 .lk { grid-template-columns: minmax(0, 1fr) 240px 320px; gap: 20px; padding: 0 24px 0 32px; }
+  .tn20 .lk-duo { background-size: 260px auto; background-position: center 40px; }
+  .tn20 .lk-h { font-size: clamp(48px, calc((100cqw - 616px) / 3.6), 72px); }
+}

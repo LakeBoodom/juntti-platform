@@ -227,3 +227,44 @@
   /* Mobiilissa nimi kasvaa näytön mukaan: 11cqi → 390 px:llä 43 px, "ITSENÄISYYS-" ≈ 290 px / tilaa 310 px */
   .tn20 .ju-h2 { font-size: clamp(34px, 11cqi, 56px); }
 }
+
+/* ── Perheen pienille: lasten visat ajankohtaiseen juhlaan (lasten visat vaihe 5, 10.10.2026) ──
+   Vaalea levy heti noston alla (design-päätökset: "Juhlat-kokoelma: lasten rivi on vaalea levy").
+   Lasten pinnan värit (cream, navy, kulta) ja Barlow Condensed kuten /lapset-sivulla. */
+.tn20 .ju-lapset {
+  margin: clamp(18px, 2cqi, 28px) var(--ju-pad) 0; padding: clamp(18px, 2.4cqi, 32px); border-radius: 22px;
+  background: #F4EDE0; color: #0F1520; display: grid; gap: 16px;
+}
+.tn20 .ju-lapset-teksti { display: flex; flex-direction: column; gap: 10px; }
+.tn20 .ju-lapset-pilleri {
+  align-self: flex-start; white-space: nowrap; display: flex; align-items: center; height: 28px; padding: 0 11px; border-radius: 999px;
+  background: #0F1520; color: #F5BC45; font-family: "Barlow Condensed", "Archivo", sans-serif; font-weight: 800; font-size: 14px; letter-spacing: .05em; text-transform: uppercase;
+}
+/* "JOULUVISAT" ≈ 4.7 em: 320 px:ssä levyn sisäleveys ≈ 248 px → 48 px; kaava cqi:stä. */
+.tn20 .ju-lapset-h {
+  margin: 0; font-family: "Barlow Condensed", "Archivo", sans-serif; font-weight: 900; font-size: clamp(36px, calc((100cqi - 72px) / 5.4), 64px);
+  line-height: .88; text-transform: uppercase; overflow-wrap: normal; word-break: keep-all; text-wrap: balance;
+}
+.tn20 .ju-lapset-p { margin: 0; font-family: "Barlow", sans-serif; font-size: 16px; line-height: 1.45; font-weight: 600; }
+.tn20 .ju-lapset-kaikki {
+  align-self: flex-start; color: #0F1520 !important; font-family: "Barlow", sans-serif; font-size: 16px; font-weight: 700;
+  text-decoration: underline 2px #E8A320 !important; text-underline-offset: 5px;
+}
+.tn20 .ju-lapset-visat { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 8px; align-content: center; }
+.tn20 .ju-lapset-visa {
+  display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 10px; align-items: center; min-height: 60px; padding: 6px 16px 6px 10px;
+  border-radius: 18px; background: #0F1520; color: #F4EDE0;
+}
+.tn20 .ju-lapset-ika {
+  white-space: nowrap; padding: 4px 9px; border-radius: 999px; background: #F4EDE0; color: #0F1520;
+  font-family: "Barlow Condensed", "Archivo", sans-serif; font-weight: 800; font-size: 14px; text-transform: uppercase;
+}
+.tn20 .ju-lapset-nimi { font-family: "Barlow Condensed", "Archivo", sans-serif; font-weight: 800; font-size: 20px; line-height: 1.02; }
+.tn20 .ju-lapset-nuoli { color: #F5BC45; font-size: 22px; font-weight: 700; }
+@media (hover: hover) { .tn20 .ju-lapset-visa:hover { box-shadow: 0 0 0 3px #E8A320; } }
+@container (min-width: 900px) {
+  .tn20 .ju-lapset { grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr); gap: 32px; align-items: center; }
+  /* Tekstisarake ≈ (100cqi − 200) / 2.4 → "JOULUVISAT" (4.7 em) mahtuu kaavalla. */
+  .tn20 .ju-lapset-h { font-size: clamp(36px, calc((100cqi - 300px) / 11), 64px); }
+}
+.tn20 .ju-ryhma-lapset { display: inline-flex; align-items: center; gap: 8px; flex-wrap: wrap; }

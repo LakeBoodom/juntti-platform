@@ -141,3 +141,51 @@ export async function haeMuutLastenVisat(nykyinen: LastenVisa, maara = 6): Promi
   const muut = kortit.filter((k) => k.ika !== nykyinen.ika);
   return [...sama, ...muut].slice(0, maara);
 }
+
+/* ── /lapset-sivu, etusivun kaista ja Juhlat-levy (vaihe 5) ── */
+
+/** Feature flag (brief §10.7): /lapset ja etusivun kaista näkyvät tuotannossa vasta, kun Vercelin
+    ympäristömuuttuja LAPSET_ENABLED=1. Previewssä ne näkyvät aina. */
+export const lapsetNakyvissa = () => esikatselu() || ["1", "true"].includes(process.env.LAPSET_ENABLED ?? "");
+export const LAPSET_SIVU = "/lapset";
+
+export type LastenListaKortti = LastenKortti & {
+  /** Visassa on vähintään yksi aani*-kysymys (🔊 Äänikysymyksiä -merkki, brief §6: datasta). */
+  aani: boolean;
+  /** Lajitteluavain: published_at, luonnoksilla created_at */
+  aika: string;
+  /** quizzes.collection (juhlat / luonto): aikuisten kokoelmasivut näyttävät lasten visat ikämerkillä */
+  kokoelma: string | null;
+  julkaistu: boolean;
+};
+
+/** Kaikki tässä ympäristössä näkyvät lasten visat, uusin ensin. */
+export async function haeLastenVisat(): Promise<LastenListaKortti[]> {
+  const sb = getSupabase();
+  if (!sb) return [];
+  let q = sb
+    .from("quizzes")
+    .select("id, slug, title, display_title, target_age, lasten_aihe, image_url, status, published_at, created_at, collection")
+    .in("target_age", [...LASTEN_IAT]);
+  if (!esikatselu()) q = q.eq("status", "published");
+  const { data } = await q;
+  const rivit = ((data ?? []) as Array<{
+    id: string; slug: string; title: string; display_title: string | null; target_age: string; lasten_aihe: string | null;
+    image_url: string | null; status: string; published_at: string | null; created_at: string; collection: string | null;
+  }>).filter((r) => onIka(r.target_age));
+  if (!rivit.length) return [];
+
+  const { data: aanet } = await sb
+    .from("questions")
+    .select("quiz_id")
+    .in("quiz_id", rivit.map((r) => r.id))
+    .in("question_type", ["aani", "aani_kuvavastaukset"]);
+  const aaniVisat = new Set(((aanet ?? []) as Array<{ quiz_id: string }>).map((a) => a.quiz_id));
+
+  return rivit
+    .map((r) => ({
+      slug: r.slug, otsikko: r.display_title ?? r.title, ika: r.target_age as LastenIka, aihe: r.lasten_aihe, kuva: r.image_url,
+      aani: aaniVisat.has(r.id), aika: r.published_at ?? r.created_at, kokoelma: r.collection, julkaistu: r.status === "published",
+    }))
+    .sort((a, b) => (a.aika < b.aika ? 1 : a.aika > b.aika ? -1 : a.slug.localeCompare(b.slug)));
+}

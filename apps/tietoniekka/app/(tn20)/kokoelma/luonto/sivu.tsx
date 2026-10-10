@@ -13,6 +13,8 @@
 // (middleware). Suodatin on linkki → toimii ilman JS:ää ja Google seuraa sitä.
 
 import "../../luonto3.css";
+import { IkaMerkki } from "@/components/tn20/IkaMerkki";
+import { haeLastenVisat } from "@/lib/lapset/data";
 import { KokoelmaLd } from "@/components/tn20/KokoelmaLd";
 import { jakoMeta } from "@/lib/jakoMeta";
 import { visaHref } from "@/lib/visaHref";
@@ -50,6 +52,7 @@ type Card = {
   id: string; slug: string | null; custom_slug: string | null;
   title: string; display_title: string | null; teaser: string | null;
   subcollection: string | null; badge: string | null; published_at: string | null;
+  target_age: string | null;
 };
 
 /** Listan kortti: tietovisa, kuvavisa tai äänivisa. */
@@ -62,6 +65,8 @@ type Kohde = {
   kuva: string | null;
   aihe: string | null;
   uusi?: boolean;
+  /** Lasten visa → ikämerkki kuvan kulmaan (vaihe 5) */
+  ika?: string | null;
 };
 
 type KuvavisaTieto = { key: string; otsikko: string; kuvaus: string; href: string; kuvat: string[]; kuvia: number };
@@ -117,7 +122,7 @@ export default async function LuontoLanding({
 
   const [cardsRes, pc, kuvavisat, aaniRyhmat] = await Promise.all([
     sb.from("quiz_cards" as never)
-      .select("id, slug, custom_slug, title, display_title, teaser, subcollection, badge, published_at")
+      .select("id, slug, custom_slug, title, display_title, teaser, subcollection, badge, published_at, target_age")
       .eq("collection", "luonto")
       .order("published_at", { ascending: false }),
     getPageContent("luonto"),
@@ -127,6 +132,12 @@ export default async function LuontoLanding({
   // Äänivisat (vaihe 4): vain julkaistut ryhmät (≥ 10 aktiivista ääntä; previewssä myös ei-aktiiviset).
   const naytteet = (await Promise.all(aaniRyhmat.map((r) => haeNayte(r)))).filter((n): n is NonNullable<typeof n> => !!n);
   const cards = (cardsRes.data ?? []) as unknown as Card[];
+  /* Lasten visat (vaihe 5): oma kuva ja ikämerkki. Previewssä mukaan myös luonnokset (kuten lasten pelisivu). */
+  const lasten = (await haeLastenVisat()).filter((v) => v.kokoelma === "luonto");
+  const lastenKuva = new Map(lasten.map((v) => [v.slug, v.kuva]));
+  const lastenLuonnokset: Kohde[] = lasten
+    .filter((v) => !v.julkaistu && !cards.some((c) => c.slug === v.slug))
+    .map((v) => ({ key: `lv-${v.slug}`, muoto: "tietovisa", otsikko: v.otsikko, teaser: null, href: `/visa/${encodeURIComponent(v.slug)}`, kuva: v.kuva, aihe: null, ika: v.ika }));
 
   const tietovisat: Kohde[] = cards.map((c) => ({
     key: c.id,
@@ -134,9 +145,10 @@ export default async function LuontoLanding({
     otsikko: c.display_title ?? c.title,
     teaser: c.teaser,
     href: visaHref(c),
-    kuva: luontoImg(c.slug) ?? LUONTO_HERO,
+    kuva: (c.slug && lastenKuva.get(c.slug)) || luontoImg(c.slug) || LUONTO_HERO,
     aihe: c.subcollection,
     uusi: c.badge === "uusi",
+    ika: c.target_age,
   }));
   const kuvaKohteet: Kohde[] = kuvavisat.map((k) => ({
     key: `kv-${k.key}`, muoto: "kuvavisa", otsikko: k.otsikko, teaser: k.kuvaus, href: k.href, kuva: k.kuvat[0] ?? null, aihe: null,
@@ -144,7 +156,7 @@ export default async function LuontoLanding({
   const aaniKohteet: Kohde[] = naytteet.map((n) => ({
     key: `av-${n.ryhma.key}`, muoto: "aanivisa", otsikko: n.ryhma.otsikko, teaser: n.ryhma.kortti, href: aanivisaHref(n.ryhma), kuva: n.sono, aihe: null,
   }));
-  const kaikki = [...aaniKohteet, ...kuvaKohteet, ...tietovisat];
+  const kaikki = [...aaniKohteet, ...kuvaKohteet, ...tietovisat, ...lastenLuonnokset];
   const maara = kaikki.length;
 
   // Aiheet: alle LUONTO_AIHE_MIN visan aihe ei saa suodatinta (brief §1.2), mutta näkyy tilastorivillä.
@@ -287,6 +299,7 @@ export default async function LuontoLanding({
                     {k.muoto === "kuvavisa" && <span className="tnl3-pilleri tnl3-pilleri--pieni"><IkoniKuva />Kuvavisa</span>}
                     {k.muoto === "aanivisa" && <span className="tnl3-pilleri tnl3-pilleri--pieni tnl3-pilleri--aani"><IkoniAani vari="#0F0D07" />Äänivisa</span>}
                     {k.uusi && <span className="tnl-badge">Uusi</span>}
+                    <IkaMerkki ika={k.ika} kulma />
                   </span>
                   <span className="tnl3-kortti-teksti">
                     <span className="tnl3-kortti-otsikko">{k.otsikko}</span>

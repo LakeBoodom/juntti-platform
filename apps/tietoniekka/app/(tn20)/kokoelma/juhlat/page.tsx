@@ -24,6 +24,9 @@ import {
   JUHLAT_KOKOELMA, JUHLAT_SIVU, JUHLAT_YMPARI_VUODEN, faktat, helsinginKeskiyo, juhlaKalenteri, kkLyhyt,
   kuukausi, lyhyt, nostettava, paavisa, paiviaValissa, pitka, pvm, visaHref, type Esiintyma,
 } from "@/lib/juhlat";
+import { IkaMerkki } from "@/components/tn20/IkaMerkki";
+import { LAPSET_SIVU, haeLastenVisat, lapsetNakyvissa, type LastenListaKortti } from "@/lib/lapset/data";
+import { IKA_LYHYT, LASTEN_AIHEET } from "@/lib/lapset/juontajat";
 import "../../juhlat.css";
 
 /* SEO-erä A4: ISR 5 min (esikatselun ?pvm= luetaan vain previewissä). */
@@ -73,6 +76,10 @@ export default async function JuhlatSivu({ searchParams }: { searchParams: Promi
     .eq("collection" as unknown as "status", JUHLAT_KOKOELMA)
     .eq("status", "published");
   const visat = (data ?? []) as unknown as Visa[];
+  /* Lasten visat (vaihe 5, brief §7): lasten_aihe = juhlan slug. Levy noston alla + ikämerkki juhlan listassa.
+     Piilossa, kunnes /lapset on näkyvissä (LAPSET_ENABLED); previewssä mukana myös luonnokset. */
+  const lasten: LastenListaKortti[] = lapsetNakyvissa() ? (await haeLastenVisat()).filter((v) => v.kokoelma === JUHLAT_KOKOELMA) : [];
+  const lastenJuhlalle = (slug: string) => lasten.filter((v) => v.aihe === slug);
   const bySlug = new Map(visat.map((v) => [v.slug, v]));
   const nimi = (s: string) => bySlug.get(s)?.display_title ?? bySlug.get(s)?.title ?? s;
 
@@ -119,15 +126,18 @@ export default async function JuhlatSivu({ searchParams }: { searchParams: Promi
 
   /* ── Kaikki juhlavisat: juhlittain lähin ensin, sama visa vain kerran ── */
   const listattu = new Set<string>();
-  const ryhmat: { id: string; label: string; pvm: string; accent: string; visat: string[] }[] = [];
+  const ryhmat: { id: string; label: string; pvm: string; accent: string; visat: string[]; lapset: LastenListaKortti[] }[] = [];
   for (const o of kalenteri) {
     const rivit = o.julkaistut.filter((s) => !listattu.has(s));
-    if (!rivit.length) continue;
+    const lapsille = lastenJuhlalle(o.slug).filter((v) => !listattu.has(v.slug));
+    if (!rivit.length && !lapsille.length) continue;
     rivit.forEach((s) => listattu.add(s));
-    ryhmat.push({ id: `juhla-${o.slug}`, label: o.nimi, pvm: lyhyt(o.alku), accent: o.accent, visat: rivit });
+    lapsille.forEach((v) => listattu.add(v.slug));
+    ryhmat.push({ id: `juhla-${o.slug}`, label: o.nimi, pvm: lyhyt(o.alku), accent: o.accent, visat: rivit, lapset: lapsille });
   }
   const ympari = JUHLAT_YMPARI_VUODEN.filter((s) => bySlug.has(s));
-  if (ympari.length) ryhmat.push({ id: "ympari-vuoden", label: "Ympäri vuoden", pvm: "", accent: "#E8A320", visat: ympari });
+  if (ympari.length) ryhmat.push({ id: "ympari-vuoden", label: "Ympäri vuoden", pvm: "", accent: "#E8A320", visat: ympari, lapset: [] });
+  const nostonLapset = nosto ? lastenJuhlalle(nosto.slug) : [];
 
   const laskurinKohde = nosto ? helsinginKeskiyo(nosto.alku + (nosto.kohde ?? 0) * 864e5) : 0;
   const nostonFaktat = nosto ? faktat(nosto) : [];
@@ -213,6 +223,27 @@ export default async function JuhlatSivu({ searchParams }: { searchParams: Promi
         ) : (
           <section className="ju-nosto">
             <div className="ju-tyhja">Juhlavisat julkaistaan pian. Katso alta, mitä juhlia on tulossa.</div>
+          </section>
+        )}
+
+        {/* ─── Perheen pienille: lasten visat ajankohtaiseen juhlaan (brief §7) ─── */}
+        {nosto && nostonLapset.length > 0 && (
+          <section className="ju-lapset" aria-labelledby="ju-lapset-h">
+            <div className="ju-lapset-teksti">
+              <span className="ju-lapset-pilleri">Perheen pienille</span>
+              <h2 className="ju-lapset-h" id="ju-lapset-h">{LASTEN_AIHEET[nosto.slug]?.nosto.otsikko ?? `Lasten ${nosto.nimi.toLowerCase()}visat`}</h2>
+              <p className="ju-lapset-p">Laura ja Mikko lukevat kysymykset ääneen – pienille ja isommille.</p>
+              <a className="ju-lapset-kaikki" href={LAPSET_SIVU}>Kaikki lasten visat →</a>
+            </div>
+            <div className="ju-lapset-visat">
+              {nostonLapset.map((v) => (
+                <a key={v.slug} className="ju-lapset-visa" href={visaHref(v.slug)}>
+                  <span className="ju-lapset-ika" data-ika={v.ika}>{IKA_LYHYT[v.ika]}</span>
+                  <span className="ju-lapset-nimi">{v.otsikko}</span>
+                  <span className="ju-lapset-nuoli" aria-hidden>→</span>
+                </a>
+              ))}
+            </div>
           </section>
         )}
 
@@ -331,6 +362,12 @@ export default async function JuhlatSivu({ searchParams }: { searchParams: Promi
                   {g.visat.map((s) => (
                     <a key={s} className="ju-ryhma-rivi" href={visaHref(s)}>
                       <span>{nimi(s)}</span>
+                      <span className="ju-ryhma-pelaa">Pelaa →</span>
+                    </a>
+                  ))}
+                  {g.lapset.map((v) => (
+                    <a key={v.slug} className="ju-ryhma-rivi" href={visaHref(v.slug)}>
+                      <span className="ju-ryhma-lapset"><IkaMerkki ika={v.ika} /> {v.otsikko}</span>
                       <span className="ju-ryhma-pelaa">Pelaa →</span>
                     </a>
                   ))}

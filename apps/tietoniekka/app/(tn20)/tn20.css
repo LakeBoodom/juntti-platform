@@ -2517,3 +2517,14 @@
   text-underline-offset: 2px;
 }
 .tn20 .tne-kuvakrediitti a:hover { color: #fff; }
+
+/* ── Lasten visojen ikämerkki (vaihe 5, 10.10.2026; components/tn20/IkaMerkki.tsx) ──
+   Tummalla pinnalla cream-pilleri, lasten pinnoilla navy + kulta (design-päätökset). */
+.tn20 .tn-ikamerkki {
+  flex: none; display: inline-flex; align-items: center; white-space: nowrap; padding: 3px 9px; border-radius: 999px;
+  background: #F4EDE0; color: #0F1520; font-family: "Barlow Condensed", "Archivo", sans-serif; font-weight: 800; font-size: 14px;
+  line-height: 1.15; letter-spacing: .02em; text-transform: uppercase; vertical-align: middle;
+}
+.tn20 .tn-ikamerkki[data-pinta="lapset"] { background: #0F1520; color: #F5BC45; }
+.tn20 .tn-ikamerkki[data-pinta="lapset"][data-ika="8-12"] { background: #E8A320; color: #0F1520; }
+.tn20 .tn-ikamerkki--kulma { position: absolute; left: 10px; bottom: 10px; z-index: 2; box-shadow: 0 2px 8px rgba(0, 0, 0, .35); }

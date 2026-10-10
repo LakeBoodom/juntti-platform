@@ -18,6 +18,7 @@ import { KATEGORIAT } from "@/lib/kuvavisat2026";
 import { getPublishedQuizSlugs } from "@/lib/queries";
 import { haeHakemisto } from "@/lib/henkilot";
 import { KUUKAUDET, RYHMAT, kuukausiSlug } from "@/lib/henkiloRyhmat";
+import { LAPSET_SIVU, lapsetNakyvissa } from "@/lib/lapset/data";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://tietoniekka.fi";
 
@@ -44,6 +45,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...JULKAISTUT.map((p) => u(pakkaHref(p), "monthly", 0.6)),
     u(VPK_SIVU, "daily", 0.7),
     u("/kuvavisa/viikko", "weekly", 0.7),
+    /* Lasten visat (vaihe 5): /lapset vasta kun LAPSET_ENABLED; julkaistut lasten visat tulevat quizPagesista. */
+    ...(lapsetNakyvissa() ? [u(LAPSET_SIVU, "weekly", 0.8)] : []),
     u("/kuvien-lahteet", "monthly", 0.2),
     u("/tietosuoja", "yearly", 0.2),
   ];

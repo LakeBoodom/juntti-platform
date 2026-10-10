@@ -23,7 +23,7 @@ import { resolveCollection, COLLECTION_LABEL } from "@/lib/visanKokoelma";
 import { type Learn } from "@/components/tn20/LearnArticle";
 import GameClient, { type GameQuiz } from "./GameClient";
 import LastenPeli from "./lapset/LastenPeli";
-import { haeLastenVisa, haeMuutLastenVisat } from "@/lib/lapset/data";
+import { LAPSET_SIVU, haeLastenVisa, haeMuutLastenVisat, lapsetNakyvissa } from "@/lib/lapset/data";
 import "../lapset.css";
 import { heroMode } from "@/lib/herotila";
 import { notFound } from "next/navigation";
@@ -599,7 +599,8 @@ export default async function Peli20({
   const lasten = await haeLastenVisa({ slug, quizId });
   if (lasten) {
     const muut = await haeMuutLastenVisat(lasten);
-    return <LastenPeli visa={lasten} muut={muut} takaisin={lasten.kokoelma ? `/kokoelma/${lasten.kokoelma}` : "/"} />;
+    /* Vaihe 5: sulje-nappi vie /lapset-sivulle, kun se on näkyvissä (LAPSET_ENABLED / preview). */
+    return <LastenPeli visa={lasten} muut={muut} takaisin={lapsetNakyvissa() ? LAPSET_SIVU : lasten.kokoelma ? `/kokoelma/${lasten.kokoelma}` : "/"} />;
   }
 
   let q = sb
@@ -765,6 +766,7 @@ export default async function Peli20({
       title: r.display_title ?? r.title,
       meta: `${r.question_count} kysymystä`,
       href: relHref(r),
+      ika: r.target_age ?? null,
     })),
   };
 
