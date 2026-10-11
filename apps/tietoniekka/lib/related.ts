@@ -51,7 +51,9 @@ class Keraaja {
 }
 
 function pohja(sb: Sb, ohita: string[]): Kysely {
-  let q = sb.from("quiz_cards" as never).select(SEL).neq("game_mode" as never, "mega").limit(ERA);
+  /* Lasten visat (Heikki 11.10.2026) vain Lasten visat -kokoelmassa: ei aikuisten visojen ristinostoissa.
+     Lasten visojen omat ristinostot: lib/lapset/data.ts haeMuutLastenVisat. */
+  let q = sb.from("quiz_cards" as never).select(SEL).neq("game_mode" as never, "mega").not("target_age" as never, "in", "(4-7,8-12)").limit(ERA);
   if (ohita.length) q = q.not("id", "in", `(${ohita.join(",")})`);
   return q;
 }
