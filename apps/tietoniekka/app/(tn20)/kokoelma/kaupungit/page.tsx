@@ -27,7 +27,7 @@ import Crumbs from "@/components/tn20/Crumbs";
 import KaupunkiPelilauta from "@/components/tn20/KaupunkiPelilauta";
 import KaupunkiMatkapassi, { KaupunkiEdistyminen, KaupunkiMatkapassiBadge } from "@/components/tn20/KaupunkiMatkapassi";
 import { MobiiliSankari } from "@/components/tn20/MobiiliSankari";
-import { KAUPUNGIT, KAUPUNGIT_HERO_IMG, SUOMI_MEGA_SLUG, kaupunkiImg } from "@/lib/kaupungit";
+import { KAUPUNGIT, KAUPUNGIT_HERO_IMG, SUOMI_MEGA_SLUG, kaupunkiImg, kaupunkiKuvaTyyli } from "@/lib/kaupungit";
 
 export const revalidate = 300; // SEO-erä A4 (2.10.2026): ISR 5 min
 
@@ -119,7 +119,7 @@ export default async function KaupungitLanding() {
           <div className="tnk2-ctabox-bg" aria-hidden>
             {["helsinki", "tampere", "vaasa", "rovaniemi"].map((id) => (
               // eslint-disable-next-line @next/next/no-img-element
-              <img key={id} src={kaupunkiImg(id)} alt="" />
+              <img key={id} src={kaupunkiImg(id)} alt="" style={kaupunkiKuvaTyyli(id)} />
             ))}
           </div>
           <svg className="tnk2-ctabox-route" viewBox="0 0 100 40" preserveAspectRatio="none" aria-hidden>

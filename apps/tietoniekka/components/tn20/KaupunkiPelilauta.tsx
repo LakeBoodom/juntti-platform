@@ -15,7 +15,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import {
-  KAUPUNGIT, KAUPUNKI_REGIONS, KAUPUNKI_REITTI, kaupunkiImg, SUOMI_PATH,
+  KAUPUNGIT, KAUPUNKI_REGIONS, KAUPUNKI_REITTI, kaupunkiImg, kaupunkiKuvaTyyli, SUOMI_PATH,
   type Kaupunki, type KaupunkiSuunta,
 } from "@/lib/kaupungit";
 
@@ -165,7 +165,7 @@ export default function KaupunkiPelilauta({ publishedIds, questionCounts }: Prop
             <div className="tnk2-panel">
               <div className="tnk2-panel-media">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={kaupunkiImg(sel.id)} alt={sel.name} />
+                <img src={kaupunkiImg(sel.id)} alt={sel.name} style={kaupunkiKuvaTyyli(sel.id)} />
                 <div className="tnk2-panel-pills">
                   {selStamped && <span className="tnk2-pill tnk2-pill-stamp">✓ Leimattu</span>}
                   <span className="tnk2-pill tnk2-pill-region">{sel.region}</span>
@@ -249,7 +249,7 @@ export default function KaupunkiPelilauta({ publishedIds, questionCounts }: Prop
                 >
                   <div className="tnk2-card-face" data-sel={active} data-stamped={stamped}>
                     {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={kaupunkiImg(c.id)} alt="" loading="lazy" />
+                    <img src={kaupunkiImg(c.id)} alt="" loading="lazy" style={kaupunkiKuvaTyyli(c.id)} />
                     {stamped && <span className="tnk2-card-stamp">✓ Leimattu</span>}
                     <div className="tnk2-card-text">
                       <div className="tnk2-card-name">{c.name}</div>

@@ -103,7 +103,7 @@ export const JP_FEATURED = [
 export const JP_PL_GENERAL: JpCard[] = [
   { quizSlug: "valioliigan-ennatysvisa-numerot-eivat-valehtele", tag: "Yleisvisa", title: "Kaikki Valioliigasta", desc: "Mestarit, ennätykset ja tilastot yli kolmen vuosikymmenen ajalta.", img: jpImg("pl-kaikki"), pos: "center 40%", color: "#E8A320" },
   { quizSlug: "valioliigan-derbyvisa-verivihollisten-kartasto-vaikea", tag: "Derbyt", title: "Suuri derbyvisa", desc: "North West, North London, Merseyside — Englannin kuumimmat paikallispelit.", img: jpImg("pl-derby"), pos: "center 35%", color: "#B6FF3C" },
-  { quizSlug: "valioliigan-valmentajavisa-sivurintaman-nerot-vaikea", tag: "Penkin takana", title: "Legendaariset valmentajat", desc: "Ferguson, Wenger, Mourinho, Klopp. Kuka voitti mitä ja missä?", img: jpImg("pl-valmentajat"), pos: "center 30%", color: "#F5C518" },
+  { quizSlug: "valioliigan-valmentajavisa-sivurintaman-nerot-vaikea", tag: "Penkin takana", title: "Legendaariset valmentajat", desc: "Ferguson, Wenger, Mourinho, Klopp. Kuka voitti mitä ja missä?", img: jpImg("pl-valmentajat"), pos: "28% 30%", color: "#F5C518" },
   { quizSlug: "suomalaiset-valioliigassa-sisu-visa", tag: "Suomi", title: "Suomalaiset Valioliigassa", desc: "Hyypiä, Litmanen, Forss ja muut siniristin lähetit Englannissa.", img: jpImg("pl-suomalaiset"), pos: "center 40%", color: "#4FD1F5" },
 ];
 

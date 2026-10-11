@@ -36,12 +36,14 @@ export type Kaupunki = {
   py: number;
   /** Visan slug quizzes/quiz_cards-taulussa (varmistettu Supabasesta 28.8.2026). */
   quizSlug: string;
+  /** Kuvan rajaus (object-position), jos kohde ei ole keskellä. Oletus CSS:ssä "center 32%" (11.10.2026). */
+  kuvaPos?: string;
 };
 
 export const KAUPUNGIT: Kaupunki[] = [
   { id: "helsinki", name: "Helsinki", slogan: "Suuri Helsinki -tietovisa", region: "Pääkaupunkiseutu", px: 42.6, py: 96.6, quizSlug: "helsinki-stadin-kovat-pahkinat" },
   { id: "espoo", name: "Espoo", slogan: "Viiden keskustan kaupunki", region: "Pääkaupunkiseutu", px: 38.4, py: 96.3, quizSlug: "espoo-viiden-keskustan-kaupunki" },
-  { id: "vantaa", name: "Vantaa", slogan: "Kehä kolmosen kuningaskunta", region: "Pääkaupunkiseutu", px: 45.6, py: 93.3, quizSlug: "vantaa-kehakolmosen-kuningaskunta" },
+  { id: "vantaa", name: "Vantaa", slogan: "Kehä kolmosen kuningaskunta", region: "Pääkaupunkiseutu", px: 45.6, py: 93.3, quizSlug: "vantaa-kehakolmosen-kuningaskunta", kuvaPos: "80% 32%" },
   { id: "porvoo", name: "Porvoo", slogan: "Vanhan kaupungin kujilla", region: "Etelä-Suomi", px: 49.8, py: 94.6, quizSlug: "porvoo-punaiset-aitat-historia-visa" },
   { id: "lahti", name: "Lahti", slogan: "Suomen Chicagon salaisuudet", region: "Etelä-Suomi", px: 47.3, py: 89.6, quizSlug: "lahti-suomen-chicagon-salaisuudet" },
   { id: "hameenlinna", name: "Hämeenlinna", slogan: "Hämptonin harmaakivi ja Aulangon salat", region: "Etelä-Suomi", px: 39.4, py: 89.5, quizSlug: "hameenlinna-harmaakivi-aulanko-visa" },
@@ -58,7 +60,7 @@ export const KAUPUNGIT: Kaupunki[] = [
   { id: "kuopio", name: "Kuopio", slogan: "Viäntäen syvältä Savosta", region: "Itä-Suomi", px: 60.5, py: 73.6, quizSlug: "kuopio-viantaen-syvalta-savosta" },
   { id: "joensuu", name: "Joensuu", slogan: "Karjalan pääkaupunki", region: "Itä-Suomi", px: 74.1, py: 76.1, quizSlug: "jonssi-tentissa-joensuu-visa" },
   { id: "oulu", name: "Oulu", slogan: "Tervan tuoksua ja Merikosken kohinaa", region: "Pohjois-Suomi", px: 46.0, py: 54.7, quizSlug: "oulu-tervan-tuoksua-merikosken-kohinaa" },
-  { id: "rovaniemi", name: "Rovaniemi", slogan: "Napapiirin pintaa syvemmältä", region: "Pohjois-Suomi", px: 47.7, py: 40.4, quizSlug: "napapiirin-pintaa-syvemmalta-tentti" },
+  { id: "rovaniemi", name: "Rovaniemi", slogan: "Napapiirin pintaa syvemmältä", region: "Pohjois-Suomi", px: 47.7, py: 40.4, quizSlug: "napapiirin-pintaa-syvemmalta-tentti", kuvaPos: "66% 32%" },
 ];
 
 export const KAUPUNKI_REGIONS: KaupunkiSuunta[] = [
@@ -74,6 +76,11 @@ export const KAUPUNKI_REITTI: string[] = [
 ];
 
 export const kaupunkiImg = (id: string) => `/20/kaupungit/${id}.webp`;
+/** Kaupungin kuvan rajaus inline-tyylinä (vain jos kuvaPos on asetettu). */
+export const kaupunkiKuvaTyyli = (id: string) => {
+  const pos = KAUPUNGIT.find((k) => k.id === id)?.kuvaPos;
+  return pos ? { objectPosition: pos } : undefined;
+};
 
 export const KAUPUNGIT_HERO_IMG = "/20/kaupungit/hero-laura-mikko.webp";
 
