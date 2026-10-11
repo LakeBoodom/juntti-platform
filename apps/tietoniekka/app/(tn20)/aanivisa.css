@@ -73,6 +73,53 @@
 .tn20 .av-cta:focus-visible { outline: 2px solid var(--av-teksti); outline-offset: 3px; }
 .tn20 .av-intro-ala { font-size: 13px; color: #A79E8C; text-align: center; }
 
+/* ── Kuvallinen hero (CD "TN Aanivisat – bannerit ja hero", 11.10.2026) ─────────────────────────────
+   < 1100 px: pystykuva ylhäällä, teksti nousee kuvan päälle (-150 px). ≥ 1100 px: leveä kuva oikealle
+   tasattuna koko leveydelle, teksti vasempaan alakulmaan. Kuplien teksti on HTML:ää kuvan päällä:
+   sijainti % kuva-alueesta, fonttikoko cqw kuva-alueen leveydestä → pysyy kuplassa kaikilla leveyksillä.
+   Kuplat eivät soita ääntä (kuvan linnut ovat visan poolissa). */
+.tn20 .av--kuvahero .av-intro { min-height: 0; background: #131109; }
+.tn20 .av-hero-kuva { position: relative; container-type: inline-size; overflow: hidden; }
+.tn20 .av-hero-kuva img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.tn20 .av-hero-kuva--levea { display: none; }
+.tn20 .av-hero-kuva--pysty { width: 100%; }
+.tn20 .av-hero-kuva--pysty::after {
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(rgba(19, 17, 9, 0) 52%, rgba(19, 17, 9, 0.75) 74%, #131109 96%);
+}
+.tn20 .av-kupla {
+  position: absolute; z-index: 1; transform: translate(-50%, -50%); border-radius: 50%;
+  display: flex; align-items: center; justify-content: center; text-align: center; white-space: nowrap;
+  font-family: var(--av-display); font-weight: 900; font-variation-settings: "wdth" 78; text-transform: uppercase;
+  line-height: 1; color: #131109;
+}
+.tn20 .av--kuvahero .av-intro-sisalto { margin-top: -150px; padding: 0 20px 28px; }
+
+@media (min-width: 1100px) {
+  /* Korkeus seuraa kuvan kuvasuhdetta, 560–760 px. Kapeimmillaan kuva on palstaa leveämpi ja leikkautuu
+     vasemmalta (siellä on pelkkää metsää), leveimmillään vasemmalle jää tummaa taustaa. */
+  .tn20 .av--kuvahero .av-intro { max-width: none; aspect-ratio: 1916 / 821; min-height: 560px; max-height: 760px; display: block; background: #0B0904; }
+  .tn20 .av-hero-kuva--pysty { display: none; }
+  .tn20 .av-hero-kuva--levea { display: block; position: absolute; top: 0; right: 0; height: 100%; }
+  .tn20 .av-hero-kuva--levea::after {
+    content: ""; position: absolute; inset: 0; pointer-events: none;
+    background: linear-gradient(90deg, #0B0904 0%, rgba(11, 9, 4, 0.82) 3%, rgba(11, 9, 4, 0.5) 30%, rgba(11, 9, 4, 0) 46%),
+      linear-gradient(rgba(19, 17, 9, 0) 70%, #131109 100%);
+  }
+  /* Teksti kuvan vasempaan reunaan +80 px (kun kuva on kapeampi kuin palsta, siirtyy sen mukana). */
+  .tn20 .av--kuvahero .av-intro-sisalto {
+    position: absolute; z-index: 2; margin: 0; padding: 0; gap: 18px;
+    left: max(80px, calc(100% - 760px * 1916 / 821 + 80px)); bottom: 56px; width: min(520px, calc(100% * 0.46 - 40px));
+  }
+  /* h1: CD 78 px. "SUOMEN" 6 merkkiä, staattinen Archivo ≈ 0,68 em/merkki → 78 px ≈ 320 px, mahtuu 465 px:n
+     kapeimpaan palstaan (1100 px) kahdelle riville. */
+  .tn20 .av--kuvahero .av-intro-h1 { font-size: 78px; font-variation-settings: "wdth" 70; line-height: 0.88; }
+  .tn20 .av--kuvahero .av-intro-p { font-size: 18px; color: #CFC7B6; }
+  .tn20 .av--kuvahero .av-intro-rivit { border-color: rgba(245, 240, 230, 0.14); }
+  .tn20 .av--kuvahero .av-cta { min-height: 58px; font-size: 20px; }
+  .tn20 .av--kuvahero .av-intro-ala { text-align: left; }
+}
+
 /* ── Peli ──────────────────────────────────────────────────────────── */
 .tn20 .av-peli { max-width: 1280px; margin: 0 auto; padding: 6px 16px 28px; display: flex; flex-direction: column; gap: 14px; box-sizing: border-box; }
 .tn20 .av-vasen, .tn20 .av-oikea { display: flex; flex-direction: column; gap: 14px; min-width: 0; }

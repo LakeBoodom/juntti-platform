@@ -11,7 +11,7 @@ export type RyhmaMeta = {
   nimi: string;
   /** "Tunnistin 7/10 lintua äänestä" */
   monikko: string;
-  /** Pelin ja kortin otsikko: "Suomen linnut äänestä" */
+  /** Pelin ja kortin otsikko: "Suomen linnut" (Heikki 11.10.2026: "äänestä" pois) */
   otsikko: string;
   /** Introteksti (ei lajinimiä) */
   kuvaus: string;
@@ -19,7 +19,13 @@ export type RyhmaMeta = {
   kortti: string;
   /** Etusivun bannerin kysymys (ei lajinimeä) */
   banneri: string;
+  /** Aloitusnäkymän kuva (design "TN Aanivisat – bannerit ja hero" 11.10.2026): leveä ≥ 1100 px, pysty kapeammilla.
+      Kuplien tekstit ovat HTML:ää kuvan päällä (sijainti % kuvan alueesta, fonttikoko cqw kuvan leveydestä). */
+  hero?: { levea: KuvaKuplat; pysty: KuvaKuplat };
 };
+
+export type Kupla = { teksti: string; x: number; y: number; w: number; h: number; fs: number };
+export type KuvaKuplat = { src: string; pieni: string; leveys: number; korkeus: number; kuplat: Kupla[] };
 
 /** Uusi ryhmä = uusi rivi; näkyy vasta, kun kannassa on ≥ AANIVISA_MIN aktiivista ääntä. */
 export const AANI_RYHMAT: RyhmaMeta[] = [
@@ -28,10 +34,30 @@ export const AANI_RYHMAT: RyhmaMeta[] = [
     polku: "suomen-linnut",
     nimi: "Suomen linnut",
     monikko: "lintua",
-    otsikko: "Suomen linnut äänestä",
+    otsikko: "Suomen linnut",
     kuvaus: "Kymmenen lintua, kymmenen ääntä. Tunnistatko lajin pelkästä laulusta?",
     kortti: "Tunnistatko lajin pelkästä laulusta? Uudet äänet maanantaisin.",
     banneri: "Tunnistatko linnun äänestä?",
+    /* Kuvan linnut (käki, talitiainen, varis, huuhkaja) ovat myös visan poolissa. Siksi kuplat eivät soita ääntä
+       (design suositteli; odottaa Heikin päätöstä), vain ääntä kuvaava sana. */
+    hero: {
+      levea: {
+        src: "/20/aanivisat/hero/suomen_linnut-levea.webp", pieni: "/20/aanivisat/hero/suomen_linnut-levea-1200.webp", leveys: 1916, korkeus: 821,
+        kuplat: [
+          { teksti: "Kukkuu", x: 67.4, y: 8.4, w: 11.8, h: 14.4, fs: 1.79 },
+          { teksti: "Ti-ti-tyy", x: 84.3, y: 15.2, w: 8.7, h: 12.9, fs: 1.21 },
+          { teksti: "Kraa kraa", x: 69.3, y: 52, w: 10.3, h: 14.6, fs: 1.36 },
+          { teksti: "Huu-u", x: 94.2, y: 28.7, w: 10.8, h: 14.3, fs: 1.72 },
+        ],
+      },
+      pysty: {
+        src: "/20/aanivisat/hero/suomen_linnut-pysty.webp", pieni: "/20/aanivisat/hero/suomen_linnut-pysty-780.webp", leveys: 1122, korkeus: 1402,
+        kuplat: [
+          { teksti: "Kukkuu", x: 85.8, y: 13.3, w: 22, h: 10, fs: 3.43 },
+          { teksti: "Ti-ti-tyy", x: 89, y: 44, w: 18.1, h: 8.9, fs: 2.42 },
+        ],
+      },
+    },
   },
 ];
 

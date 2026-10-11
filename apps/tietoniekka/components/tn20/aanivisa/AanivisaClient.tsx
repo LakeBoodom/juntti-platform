@@ -16,7 +16,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   KYTKIN_AVAIN, PERUSPISTEET, PUTKIBONUS, arvio, lueTulos, tulosAvain,
-  type AaniKysymys, type AaniTallenne, type AaniViikko,
+  type AaniKysymys, type AaniTallenne, type AaniViikko, type KuvaKuplat,
 } from "@/lib/aanivisat";
 
 type Linkki = { otsikko: string; href: string };
@@ -343,15 +343,37 @@ export default function AanivisaClient({ viikko, jatka, sivu }: { viikko: AaniVi
   );
 
   /* ── Intro (1a) ── */
+  /* Kuvallinen hero (design 11.10.2026): kuva + kuplien tekstit kuvan päällä. Kuplan sijainti ja fonttikoko
+     suhteessa kuvaan (kuva-alue on container, cqw), joten ne pysyvät kohdallaan kaikilla leveyksillä. */
+  const kuvaKuplat = (k: KuvaKuplat, luokka: string) => (
+    <div className={`av-hero-kuva ${luokka}`} style={{ aspectRatio: `${k.leveys} / ${k.korkeus}` }} aria-hidden="true">
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src={k.src} srcSet={`${k.pieni} ${k.pieni.match(/-(\d+)\.webp$/)?.[1] ?? k.leveys}w, ${k.src} ${k.leveys}w`} sizes={luokka === "av-hero-kuva--levea" ? "100vw" : "(max-width: 560px) 100vw, 560px"} alt="" fetchPriority="high" />
+      {k.kuplat.map((b) => (
+        <span key={b.teksti} className="av-kupla" style={{ left: `${b.x}%`, top: `${b.y}%`, width: `${b.w}%`, height: `${b.h}%`, fontSize: `${b.fs}cqw` }}>
+          {b.teksti}
+        </span>
+      ))}
+    </div>
+  );
+
   if (vaihe === "intro") {
     const tausta = kysymykset[N - 1] ?? kysymykset[0];
+    const hero = ryhma.hero;
     return (
-      <main className="av av--intro">
+      <main className={hero ? "av av--intro av--kuvahero" : "av av--intro"}>
         <div className="av-intro">
-          <div className="av-intro-tausta" aria-hidden="true">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            {tausta && <img src={tausta.sono} alt="" />}
-          </div>
+          {hero ? (
+            <>
+              {kuvaKuplat(hero.levea, "av-hero-kuva--levea")}
+              {kuvaKuplat(hero.pysty, "av-hero-kuva--pysty")}
+            </>
+          ) : (
+            <div className="av-intro-tausta" aria-hidden="true">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              {tausta && <img src={tausta.sono} alt="" />}
+            </div>
+          )}
           <div className="av-intro-sisalto">
             <span className="av-merkki"><i />Luonto · Äänivisa</span>
             <h1 className="av-intro-h1">{ryhma.otsikko}</h1>
