@@ -26,7 +26,8 @@ export const revalidate = 3600;
 
 /* Kokoelmahubit: navigaation kokoelmat (sama lista kuin /kokoelmat) + Kuvavisat, joka on
    navigaatiossa pelimuotona mutta jolla on oma hub-sivunsa. */
-const COLLECTION_HUBS = [...NAV_COLLECTIONS.map((c) => c.slug), "kuvavisat"];
+/* Omalla osoitteella olevat kokoelmat (Lasten visat → /lapset) ovat sitemapissa omina riveinään. */
+const COLLECTION_HUBS = [...NAV_COLLECTIONS.filter((c) => !c.href).map((c) => c.slug), "kuvavisat"];
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const now = new Date();

@@ -7,7 +7,7 @@ import type { Metadata } from "next";
 // Luvut kannasta (quiz_cards), lista lib/nav.ts-kokoonpanosta (sama kuin valikoissa).
 import { getSupabase } from "@/lib/supabase";
 import Crumbs from "@/components/tn20/Crumbs";
-import { NAV_COLLECTIONS, NAV_MODES, hubHref } from "@/lib/nav";
+import { NAV_COLLECTIONS, NAV_MODES, navHref } from "@/lib/nav";
 import { JP_CLUBS, JP_EURO, JP_PL_GENERAL, JP_CL, JP_FINNS } from "@/lib/jalkapallo";
 import { JK_TEAMS, JK_DERBIES, JK_GENERAL, JK_LIONS, JK_NHL } from "@/lib/jaakiekko";
 import { KAUPUNGIT } from "@/lib/kaupungit";
@@ -48,9 +48,11 @@ async function getCounts(): Promise<Record<string, number>> {
   try {
     const sb = getSupabase();
     if (!sb) return {};
-    const { data } = await sb.from("quiz_cards" as never).select("collection, category, slug");
+    const { data } = await sb.from("quiz_cards" as never).select("collection, category, slug, target_age");
     const counts: Record<string, number> = {};
-    for (const r of (data ?? []) as Array<{ collection: string | null; category: string | null; slug: string | null }>) {
+    for (const r of (data ?? []) as Array<{ collection: string | null; category: string | null; slug: string | null; target_age: string | null }>) {
+      /* Lasten visat (11.10.2026) lasketaan vain Lasten visat -kokoelmaan, ei Luontoon tai Juhliin. */
+      if (r.target_age === "4-7" || r.target_age === "8-12") { counts.lapset = (counts.lapset ?? 0) + 1; continue; }
       if (r.collection) counts[r.collection] = (counts[r.collection] ?? 0) + 1;
       if (r.slug && JP_SLUGS.has(r.slug)) counts.jalkapallo = (counts.jalkapallo ?? 0) + 1;
       if (r.slug && JK_SLUGS.has(r.slug)) counts.jaakiekko = (counts.jaakiekko ?? 0) + 1;
@@ -91,7 +93,7 @@ export default async function KokoelmatPage() {
           <a
             key={c.slug}
             className="tn-colx-card"
-            href={hubHref(c.slug)}
+            href={navHref(c)}
             style={{ "--dot": c.color } as React.CSSProperties}
           >
             <span className="tn-menu-dot" aria-hidden />

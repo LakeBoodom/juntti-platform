@@ -234,3 +234,16 @@
   .tn20 .tnl3-muoto, .tn20 .tnl3-kortti { transition: none; }
   .tn20 .tnl3-muoto:hover, .tn20 .tnl3-kortti:hover { transform: none; }
 }
+
+/* Luontovisat lapsille (11.10.2026): lasten visat eivät näy Luonnon listassa, vaan tämä linkki vie /lapset-sivulle.
+   Lasten pinnan värit (cream + navy) erottavat sen aikuisten korteista. */
+.tn20 .tnl3-lapset {
+  margin-top: 18px; display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 14px; align-items: center;
+  padding: 14px 18px; border-radius: 16px; background: #F4EDE0; color: #0F1520; text-decoration: none;
+}
+.tn20 .tnl3-lapset-merkki { font-size: 22px; white-space: nowrap; }
+.tn20 .tnl3-lapset-teksti { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.tn20 .tnl3-lapset-otsikko { font-family: "Barlow Condensed", "Archivo", sans-serif; font-weight: 900; font-size: 22px; line-height: 1; text-transform: uppercase; overflow-wrap: normal; word-break: keep-all; }
+.tn20 .tnl3-lapset-kuvaus { font-size: 14px; font-weight: 600; line-height: 1.35; color: #3a4252; }
+.tn20 .tnl3-lapset .tnl3-nuoli { color: #0F1520; }
+@media (hover: hover) { .tn20 .tnl3-lapset:hover { box-shadow: 0 0 0 3px #F5BC45; } }

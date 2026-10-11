@@ -13,8 +13,7 @@
 // (middleware). Suodatin on linkki → toimii ilman JS:ää ja Google seuraa sitä.
 
 import "../../luonto3.css";
-import { IkaMerkki } from "@/components/tn20/IkaMerkki";
-import { haeLastenVisat } from "@/lib/lapset/data";
+import { LAPSET_SIVU, haeLastenVisat } from "@/lib/lapset/data";
 import { KokoelmaLd } from "@/components/tn20/KokoelmaLd";
 import { jakoMeta } from "@/lib/jakoMeta";
 import { visaHref } from "@/lib/visaHref";
@@ -65,8 +64,6 @@ type Kohde = {
   kuva: string | null;
   aihe: string | null;
   uusi?: boolean;
-  /** Lasten visa → ikämerkki kuvan kulmaan (vaihe 5) */
-  ika?: string | null;
 };
 
 type KuvavisaTieto = { key: string; otsikko: string; kuvaus: string; href: string; kuvat: string[]; kuvia: number };
@@ -131,13 +128,10 @@ export default async function LuontoLanding({
   ]);
   // Äänivisat (vaihe 4): vain julkaistut ryhmät (≥ 10 aktiivista ääntä; previewssä myös ei-aktiiviset).
   const naytteet = (await Promise.all(aaniRyhmat.map((r) => haeNayte(r)))).filter((n): n is NonNullable<typeof n> => !!n);
-  const cards = (cardsRes.data ?? []) as unknown as Card[];
-  /* Lasten visat (vaihe 5): oma kuva ja ikämerkki. Previewssä mukaan myös luonnokset (kuten lasten pelisivu). */
-  const lasten = (await haeLastenVisat()).filter((v) => v.kokoelma === "luonto");
-  const lastenKuva = new Map(lasten.map((v) => [v.slug, v.kuva]));
-  const lastenLuonnokset: Kohde[] = lasten
-    .filter((v) => !v.julkaistu && !cards.some((c) => c.slug === v.slug))
-    .map((v) => ({ key: `lv-${v.slug}`, muoto: "tietovisa", otsikko: v.otsikko, teaser: null, href: `/visa/${encodeURIComponent(v.slug)}`, kuva: v.kuva, aihe: null, ika: v.ika }));
+  /* Lasten visat (Heikki 11.10.2026) eivät näy Luonnossa: ne ovat vain Lasten visat -kokoelmassa (/lapset),
+     johon listan alla on linkki. */
+  const cards = ((cardsRes.data ?? []) as unknown as Card[]).filter((c) => c.target_age !== "4-7" && c.target_age !== "8-12");
+  const lastenMaara = (await haeLastenVisat()).filter((v) => v.kokoelma === "luonto").length;
 
   const tietovisat: Kohde[] = cards.map((c) => ({
     key: c.id,
@@ -145,10 +139,9 @@ export default async function LuontoLanding({
     otsikko: c.display_title ?? c.title,
     teaser: c.teaser,
     href: visaHref(c),
-    kuva: (c.slug && lastenKuva.get(c.slug)) || luontoImg(c.slug) || LUONTO_HERO,
+    kuva: luontoImg(c.slug) ?? LUONTO_HERO,
     aihe: c.subcollection,
     uusi: c.badge === "uusi",
-    ika: c.target_age,
   }));
   const kuvaKohteet: Kohde[] = kuvavisat.map((k) => ({
     key: `kv-${k.key}`, muoto: "kuvavisa", otsikko: k.otsikko, teaser: k.kuvaus, href: k.href, kuva: k.kuvat[0] ?? null, aihe: null,
@@ -156,7 +149,7 @@ export default async function LuontoLanding({
   const aaniKohteet: Kohde[] = naytteet.map((n) => ({
     key: `av-${n.ryhma.key}`, muoto: "aanivisa", otsikko: n.ryhma.otsikko, teaser: n.ryhma.kortti, href: aanivisaHref(n.ryhma), kuva: n.sono, aihe: null,
   }));
-  const kaikki = [...aaniKohteet, ...kuvaKohteet, ...tietovisat, ...lastenLuonnokset];
+  const kaikki = [...aaniKohteet, ...kuvaKohteet, ...tietovisat];
   const maara = kaikki.length;
 
   // Aiheet: alle LUONTO_AIHE_MIN visan aihe ei saa suodatinta (brief §1.2), mutta näkyy tilastorivillä.
@@ -299,7 +292,6 @@ export default async function LuontoLanding({
                     {k.muoto === "kuvavisa" && <span className="tnl3-pilleri tnl3-pilleri--pieni"><IkoniKuva />Kuvavisa</span>}
                     {k.muoto === "aanivisa" && <span className="tnl3-pilleri tnl3-pilleri--pieni tnl3-pilleri--aani"><IkoniAani vari="#0F0D07" />Äänivisa</span>}
                     {k.uusi && <span className="tnl-badge">Uusi</span>}
-                    <IkaMerkki ika={k.ika} kulma />
                   </span>
                   <span className="tnl3-kortti-teksti">
                     <span className="tnl3-kortti-otsikko">{k.otsikko}</span>
@@ -308,6 +300,16 @@ export default async function LuontoLanding({
                 </a>
               ))}
             </ShowAllCards>
+          )}
+          {lastenMaara > 0 && (
+            <a className="tnl3-lapset" href={LAPSET_SIVU}>
+              <span className="tnl3-lapset-merkki" aria-hidden="true">🧸 🚀</span>
+              <span className="tnl3-lapset-teksti">
+                <span className="tnl3-lapset-otsikko">Luontovisat lapsille</span>
+                <span className="tnl3-lapset-kuvaus">{lastenMaara} eläin- ja lintuvisaa pienille ja isommille Lasten visat -kokoelmassa</span>
+              </span>
+              <span className="tnl3-nuoli" aria-hidden="true">→</span>
+            </a>
           )}
         </section>
       </div>

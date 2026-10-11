@@ -8,6 +8,8 @@ export type NavCollection = {
   slug: string;   // quiz_cards.collection-arvo JA hub-URL:n segmentti
   label: string;  // näkyvä nimi (matkakohteet → "Maantieto", lukittu 15.8.2026)
   color: string;  // tunnusväri — valikossa vain 9px pisteenä ja hover-reunuksena
+  /** Oma osoite, jos kokoelma ei ole /kokoelma/<slug> (Lasten visat → /lapset) */
+  href?: string;
 };
 
 export const NAV_COLLECTIONS: NavCollection[] = [
@@ -41,6 +43,8 @@ export const NAV_COLLECTIONS: NavCollection[] = [
   { slug: "tiede", label: "Tiede & teknologia", color: "#5BE1FF" },
   /* Juhlat (Heikki 28.9.2026): vuoden juhlat ja perinteet, kannassa collection='juhlat'. */
   { slug: "juhlat", label: "Juhlat", color: "#E8A320" },
+  /* Lasten visat (Heikki 11.10.2026): oma kokoelmasivu /lapset (target_age 4-7 / 8-12). */
+  { slug: "lapset", label: "Lasten visat", color: "#F5BC45", href: "/lapset" },
 ];
 
 export type NavMode = {
@@ -63,9 +67,13 @@ export const NAV_MODES: NavMode[] = [
   { href: "/peli/rajanaapurit", label: "Rajanaapurit", desc: "Rakenna reitti naapurivaltioiden kautta", color: "#F2B233" },
   { href: "/megavisat", label: "Megavisat", desc: "20–50 kysymystä — pitkä peli", color: "#E8A320" },
   { href: "/kokoelma/kuvavisat", label: "Kuvavisat", desc: "Tunnista kuvasta — liput, vaakunat, linnut", color: "#4C9AFF" },
+  /* Äänivisat (Heikki 11.10.2026): toistaiseksi Luonto-kokoelman äänivisasuodatin; oma sivu, kun äänivisoja tulee lisää. */
+  { href: "/kokoelma/luonto?suodata=aanivisat#kaikki", label: "Äänivisat", desc: "Tunnista lintu äänestä", color: "#4ADE80" },
 ];
 
 export const hubHref = (slug: string) => `/kokoelma/${slug}`;
+/** Kokoelman osoite navigaatiossa: oma href (Lasten visat) tai /kokoelma/<slug>. */
+export const navHref = (c: Pick<NavCollection, "slug" | "href">) => c.href ?? hubHref(c.slug);
 
 /* Pelikuoren reitit: niillä on oma header (tng-top), joten sivuston TopBar ja
    alatunniste jäävät pois. /h/<koodi> on haastelinkki, joka renderöi saman

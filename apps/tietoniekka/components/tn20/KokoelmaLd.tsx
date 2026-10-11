@@ -14,13 +14,15 @@ type Kohde = { name: string; url: string };
 
 async function kohteet(avain: string): Promise<Kohde[]> {
   if (avain === "kuvavisat") return [...KATEGORIAT.map((k) => ({ name: k.otsikko, url: `/kuvavisa/${k.type}` })), { name: "Viikkovisa", url: "/kuvavisa/viikko" }];
-  if (avain === "kokoelmat") return NAV_COLLECTIONS.map((c) => ({ name: c.label, url: `/kokoelma/${c.slug}` }));
+  if (avain === "kokoelmat") return NAV_COLLECTIONS.map((c) => ({ name: c.label, url: c.href ?? `/kokoelma/${c.slug}` }));
   const sb = getSupabase();
   if (!sb) return [];
   const siteId = await getSiteId();
   let q = sb.from("quiz_cards" as never).select("id, slug, custom_slug, title, display_title, game_mode").order("title").limit(150);
   if (siteId) q = q.eq("site_id", siteId);
   q = avain === "megavisat" ? q.eq("game_mode" as never, "mega") : kokoelmanJoukko(q.neq("game_mode" as never, "mega"), { key: avain }, ERIKOIS.has(avain) ? null : avain);
+  /* Lasten visat (11.10.2026) kuuluvat vain /lapset-kokoelmaan, eivät Luonnon listaan. */
+  if (avain === "luonto") q = q.not("target_age" as never, "in", "(4-7,8-12)");
   const { data } = await q;
   return ((data ?? []) as unknown as Array<{ id: string; slug: string | null; custom_slug: string | null; title: string; display_title: string | null; game_mode: string | null }>)
     .map((r) => ({ name: r.display_title ?? r.title, url: visaHref(r) }));

@@ -28,7 +28,7 @@
 import "./topbar.css";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
-import { NAV_COLLECTIONS, NAV_MODES, hubHref, isGameRoute } from "@/lib/nav";
+import { NAV_COLLECTIONS, NAV_MODES, isGameRoute, navHref } from "@/lib/nav";
 import { HEADER_PROMOS, SITE_TAGLINE } from "@/lib/etusivu";
 import StreakButton from "./StreakButton";
 
@@ -100,7 +100,7 @@ export default function TopBar({ tagline }: { tagline?: string } = {}) {
   const home = pathname === "/";
   const isKuvavisat = pathname.startsWith("/kokoelma/kuvavisat");
   const activeKokoelmat =
-    (pathname.startsWith("/kokoelma") && !isKuvavisat) || pathname.startsWith("/kokoelmat");
+    (pathname.startsWith("/kokoelma") && !isKuvavisat) || pathname.startsWith("/kokoelmat") || pathname.startsWith("/lapset");
   const activePelimuodot = pathname.startsWith("/megavisat") || isKuvavisat || pathname.startsWith("/peli/tupla-tai-kuitti");
 
   /* Nuolinäppäimet valikon riveillä — eivät vieritä sivua */
@@ -150,7 +150,7 @@ export default function TopBar({ tagline }: { tagline?: string } = {}) {
                       <a
                         key={c.slug}
                         className="tn-menu-row"
-                        href={hubHref(c.slug)}
+                        href={navHref(c)}
                         style={{ "--dot": c.color } as React.CSSProperties}
                         onClick={() => closeMenu(false)}
                       >
@@ -257,7 +257,7 @@ export default function TopBar({ tagline }: { tagline?: string } = {}) {
               <a
                 key={c.slug}
                 className="tn-sheet-row"
-                href={hubHref(c.slug)}
+                href={navHref(c)}
                 style={{ "--dot": c.color } as React.CSSProperties}
                 onClick={() => setSheet(false)}
               >
