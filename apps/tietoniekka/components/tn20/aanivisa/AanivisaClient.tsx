@@ -397,7 +397,6 @@ export default function AanivisaClient({ viikko, jatka, sivu }: { viikko: AaniVi
             <button type="button" className="av-cta" onClick={aloita}>
               {aiempi ? "Pelaa uudelleen" : "Aloita visa"}
             </button>
-            <span className="av-intro-ala">{N} ääntä · ääni soi kahdesti, voit kuunnella uudelleen</span>
           </div>
         </div>
       </main>

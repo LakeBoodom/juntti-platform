@@ -71,7 +71,6 @@
 }
 .tn20 .av-cta:hover { filter: brightness(1.06); }
 .tn20 .av-cta:focus-visible { outline: 2px solid var(--av-teksti); outline-offset: 3px; }
-.tn20 .av-intro-ala { font-size: 13px; color: #A79E8C; text-align: center; }
 
 /* ── Kuvallinen hero (CD "TN Aanivisat – bannerit ja hero", 11.10.2026) ─────────────────────────────
    < 1100 px: pystykuva ylhäällä, teksti nousee kuvan päälle (-150 px). ≥ 1100 px: leveä kuva oikealle
@@ -124,7 +123,6 @@
   .tn20 .av--kuvahero .av-intro-p { font-size: 18px; color: #CFC7B6; }
   .tn20 .av--kuvahero .av-intro-rivit { border-color: rgba(245, 240, 230, 0.14); }
   .tn20 .av--kuvahero .av-cta { min-height: 58px; font-size: 20px; }
-  .tn20 .av--kuvahero .av-intro-ala { text-align: left; }
 }
 
 /* ── Peli ──────────────────────────────────────────────────────────── */
