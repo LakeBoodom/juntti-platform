@@ -33,6 +33,10 @@ import { JuhlatBanneri, juhlaBanneriNosto } from "@/components/tn20/JuhlatBanner
 import { JUHLAT_KOKOELMA, pvm } from "@/lib/juhlat";
 import { getViikkovisa } from "@/lib/kuvavisat2026";
 import { getKuvavisaYhteenveto, getBanneriHenkilot } from "@/lib/etusivunBannerit";
+import { LapsetKaista } from "@/components/tn20/LapsetKaista";
+import { haeLastenVisat, lapsetNakyvissa } from "@/lib/lapset/data";
+import { ajankohtainenJuhla } from "@/lib/lapset/nosto";
+import { juontajaKuvat } from "@/lib/lapset/juontajat";
 import {
   CATEGORY_CHIPS, POPULAR_COLLECTIONS, HOSTS, HOSTS_INTRO,
 } from "@/lib/etusivu";
@@ -45,6 +49,7 @@ import "./rajanaapurit-banneri.css";
 import "./juhlat-banneri.css";
 import "./ruutana-banneri.css";
 import "./aanivisa-banneri.css";
+import "./lapset-kaista.css";
 
 /* SEO-erä A4 (2.10.2026): ISR 5 min. Esikatseluparametreja (?pv, ?sankari, ?juhlapvm) ei lueta
    tuotannossa, jotta sivu voidaan välimuistittaa; keskiyön vaihto: PaivaVahti. */
@@ -160,7 +165,7 @@ export default async function Etusivu20({
   const sp = ESIKATSELU ? await searchParams : {};
   const one = (k: string) => (typeof sp[k] === "string" ? (sp[k] as string) : null);
   const sankariParam = ESIKATSELU ? one("sankari") : null;
-  const [data, vv, kvYhteenveto, henkilot, aaniBanneri] = await Promise.all([
+  const [data, vv, kvYhteenveto, henkilot, aaniBanneri, lastenVisat] = await Promise.all([
     getData({
       pvTila: one("pv"),
       sankariPaiva: sankariParam && /^\d{4}-\d{2}-\d{2}$/.test(sankariParam) ? sankariParam : null,
@@ -168,12 +173,22 @@ export default async function Etusivu20({
       juhlaPaiva: ESIKATSELU && /^\d{4}-\d{2}-\d{2}$/.test(one("juhlapvm") ?? "") ? one("juhlapvm") : null,
     }),
     getViikkovisa(), getKuvavisaYhteenveto(), getBanneriHenkilot(), haeAaniBanneri(),
+    /* Lasten visat -kaista (vaihe 5): piilossa tuotannossa, kunnes LAPSET_ENABLED=1 */
+    lapsetNakyvissa() ? haeLastenVisat() : Promise.resolve([]),
   ]);
   if (!data) return <main style={{ padding: 32 }}>Ei tietokantayhteyttä.</main>;
   /* Viikkovisa näkyy nyt Kuvavisat-bannerin merkkinä (kierros 12);
      null (ei aktiivisia kuvia) → merkki jää pois. */
   const viikko = vv ? { viikko: vv.viikko, kuvia: vv.kuvaIdt.length } : null;
   const { daily, juhla, sankari, today, latest } = data;
+  /* Lasten kaistan juhla (esim. joulu 8 vk ennen): sama ?juhlapvm-esikatselu kuin Juhlat-bannerilla */
+  const lastenPaiva = ESIKATSELU && /^\d{4}-\d{2}-\d{2}$/.test(one("juhlapvm") ?? "") ? one("juhlapvm")!.split("-").map(Number) : null;
+  const lastenJuhla = lastenVisat.length
+    ? ajankohtainenJuhla(
+        new Set(lastenVisat.map((v) => v.aihe).filter((a): a is string => !!a)),
+        lastenPaiva ? pvm(lastenPaiva[0], lastenPaiva[1], lastenPaiva[2]) : pvm(today.vuosi, today.kk, today.pv),
+      )
+    : null;
 
 
   /* Ticker duplikoidaan kertaalleen saumattomaan looppiin (design). */
@@ -252,6 +267,9 @@ export default async function Etusivu20({
             ))}
           </div>
         </section>
+
+        {/* ─── Lasten visat -kaista (design v0.2 3e/3f): heti Suosittujen kokoelmien jälkeen ─── */}
+        {lastenVisat.length > 0 && <LapsetKaista juhla={lastenJuhla} duo={juontajaKuvat(null).duo.innoissaan} />}
 
         {/* ─── Kuka on vanhin? -banneri (Design kierros 12B) — ennen juontajia ─── */}
         <IkajarjestysBanneri henkilot={henkilot} />

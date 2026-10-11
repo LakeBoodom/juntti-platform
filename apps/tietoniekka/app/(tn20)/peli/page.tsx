@@ -22,6 +22,9 @@ import { KAUPUNGIT } from "@/lib/kaupungit";
 import { resolveCollection, COLLECTION_LABEL } from "@/lib/visanKokoelma";
 import { type Learn } from "@/components/tn20/LearnArticle";
 import GameClient, { type GameQuiz } from "./GameClient";
+import LastenPeli from "./lapset/LastenPeli";
+import { LAPSET_SIVU, haeLastenVisa, haeMuutLastenVisat, lapsetNakyvissa } from "@/lib/lapset/data";
+import "../lapset.css";
 import { heroMode } from "@/lib/herotila";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
@@ -110,6 +113,17 @@ export async function generateMetadata(
     };
   }
   if (slug || quizId) {
+    /* Lasten visa: otsikko datasta ("… lapsille / pienille"), luonnos (vain preview) ei indeksoidu. */
+    const lasten = await haeLastenVisa({ slug, quizId });
+    if (lasten) {
+      const kuvaus = lasten.kuvaus ?? `${lasten.otsikko} – tietovisa lapsille Tietoniekassa.`;
+      return {
+        title: `${lasten.otsikko}${suffix}`, description: kuvaus,
+        ...og(lasten.otsikko, kuvaus, `/og/visa/${encodeURIComponent(lasten.slug)}`, `/visa/${lasten.slug}`),
+        alternates: { canonical: `/visa/${lasten.slug}` },
+        ...(lasten.julkaistu ? {} : { robots: { index: false, follow: false } }),
+      };
+    }
     let q = sb.from("quizzes").select("title, display_title, teaser, description, slug, seo_title, seo_description, collection").eq("status", "published");
     q = quizId ? q.eq("id", quizId) : q.eq("slug", slug!);
     const { data } = await q.maybeSingle<{ title: string; display_title: string | null; teaser: string | null; description: string | null; slug: string | null; seo_title: string | null; seo_description: string | null; collection: string | null }>();
@@ -580,6 +594,15 @@ export default async function Peli20({
     return <GameClient quiz={game} />;
   }
 
+  /* LASTEN VISAT (9.10.2026): target_age 4-7 / 8-12 → oma pelinäkymä (lib/lapset/data.ts).
+     Previewssä myös luonnokset, tuotannossa vain julkaistut. */
+  const lasten = await haeLastenVisa({ slug, quizId });
+  if (lasten) {
+    const muut = await haeMuutLastenVisat(lasten);
+    /* Vaihe 5: sulje-nappi vie /lapset-sivulle, kun se on näkyvissä (LAPSET_ENABLED / preview). */
+    return <LastenPeli visa={lasten} muut={muut} takaisin={lapsetNakyvissa() ? LAPSET_SIVU : lasten.kokoelma ? `/kokoelma/${lasten.kokoelma}` : "/"} />;
+  }
+
   let q = sb
     .from("quizzes")
     .select("id, slug, title, display_title, teaser, description, category, collection, genre, learn, hero_image, hero_focal_x, hero_focal_y, hero_side, hero_alt, fanitasot, updated_at")
@@ -743,6 +766,7 @@ export default async function Peli20({
       title: r.display_title ?? r.title,
       meta: `${r.question_count} kysymystä`,
       href: relHref(r),
+      ika: r.target_age ?? null,
     })),
   };
 

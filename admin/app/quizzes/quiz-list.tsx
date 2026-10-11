@@ -11,6 +11,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { ExternalLink, Search, X } from "lucide-react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { kokoelmaNimi } from "@/lib/kokoelmat";
+import { IKA_MERKKI, onLastenVisa } from "@/lib/lapset";
 
 export type ListaVisa = {
   id: string;
@@ -20,6 +21,8 @@ export type ListaVisa = {
   category: string | null;
   difficulty: string | null;
   status: string;
+  /** 4-7 / 8-12 = lasten visa (vaihe 6) */
+  target_age: string | null;
   created_at: string;
   updated_at: string;
   pelit: number;
@@ -64,6 +67,8 @@ function QuizListInner({ visat }: { visat: ListaVisa[] }) {
   const [haku, setHaku] = useState(q);
   const [tila, setTila] = useState(() => sp.get("tila") ?? "kaikki");
   const [kokoelma, setKokoelma] = useState(() => sp.get("kokoelma") ?? "kaikki");
+  /* Lasten visat -suodatin (brief §8): vain target_age 4-7 / 8-12 */
+  const [lapset, setLapset] = useState(() => sp.get("lapset") === "1");
   const [jarj, setJarj] = useState(() => {
     const j = sp.get("jarj");
     return JARJESTYKSET.some((o) => o.key === j) ? (j as string) : "uusimmat";
@@ -76,10 +81,11 @@ function QuizListInner({ visat }: { visat: ListaVisa[] }) {
     if (tila !== "kaikki") p.set("tila", tila);
     if (kokoelma !== "kaikki") p.set("kokoelma", kokoelma);
     if (jarj !== "uusimmat") p.set("jarj", jarj);
+    if (lapset) p.set("lapset", "1");
     const qs = p.toString();
     router.replace(qs ? `?${qs}` : "?", { scroll: false });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [q, tila, kokoelma, jarj]);
+  }, [q, tila, kokoelma, jarj, lapset]);
 
   const rikastettu = useMemo(
     () => visat.map((v) => ({ ...v, kokoelma: kokoelmaNimi(v), hakuteksti: normalisoi(`${v.title} ${v.slug ?? ""}`) })),
@@ -90,8 +96,10 @@ function QuizListInner({ visat }: { visat: ListaVisa[] }) {
      jotta napit kertovat montako osumaa valinta antaisi. */
   const hakuOsumat = useMemo(() => {
     const nq = normalisoi(q.trim());
-    return nq ? rikastettu.filter((v) => v.hakuteksti.includes(nq)) : rikastettu;
-  }, [rikastettu, q]);
+    const pohja = lapset ? rikastettu.filter((v) => onLastenVisa(v.target_age)) : rikastettu;
+    return nq ? pohja.filter((v) => v.hakuteksti.includes(nq)) : pohja;
+  }, [rikastettu, q, lapset]);
+  const lastenMaara = useMemo(() => visat.filter((v) => onLastenVisa(v.target_age)).length, [visat]);
 
   const tilaMaarat = useMemo(() => {
     const pohja = kokoelma === "kaikki" ? hakuOsumat : hakuOsumat.filter((v) => v.kokoelma === kokoelma);
@@ -138,7 +146,7 @@ function QuizListInner({ visat }: { visat: ListaVisa[] }) {
     return s;
   }, [hakuOsumat, tila, kokoelma, jarj]);
 
-  const suodatettu = q !== "" || tila !== "kaikki" || kokoelma !== "kaikki";
+  const suodatettu = q !== "" || tila !== "kaikki" || kokoelma !== "kaikki" || lapset;
 
   function kirjoitus(arvo: string) {
     setHaku(arvo);
@@ -152,6 +160,7 @@ function QuizListInner({ visat }: { visat: ListaVisa[] }) {
     setQ("");
     setTila("kaikki");
     setKokoelma("kaikki");
+    setLapset(false);
   }
 
   return (
@@ -220,6 +229,21 @@ function QuizListInner({ visat }: { visat: ListaVisa[] }) {
             ))}
           </select>
         </label>
+
+        {lastenMaara > 0 && (
+          <button
+            type="button"
+            aria-pressed={lapset}
+            onClick={() => setLapset((v) => !v)}
+            className={
+              lapset
+                ? "rounded-full border border-foreground bg-foreground px-3 py-1 text-sm text-background"
+                : "rounded-full border px-3 py-1 text-sm hover:bg-muted"
+            }
+          >
+            Lasten visat <span className={lapset ? "opacity-70" : "text-muted-foreground"}>{lastenMaara}</span>
+          </button>
+        )}
 
         <label className="flex items-center gap-2 sm:ml-auto">
           <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Järjestys</span>
@@ -292,6 +316,7 @@ function QuizListInner({ visat }: { visat: ListaVisa[] }) {
                       )}
                     </div>
                     <div className="truncate text-xs text-muted-foreground">
+                      {onLastenVisa(v.target_age) && <span className="mr-1 font-medium text-foreground">{IKA_MERKKI[v.target_age]} ·</span>}
                       {v.category ?? "—"}
                       {v.slug ? ` · ${v.slug}` : ""}
                     </div>

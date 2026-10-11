@@ -23,6 +23,7 @@
 // staattinen Archivo, suomen sanoja ei katkaista.
 
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { IkaMerkki } from "@/components/tn20/IkaMerkki";
 import { getSupabase, SITE_SLUG } from "../../../lib/supabase";
 import { PAIVAN_VISA_KEY, localDateKey } from "../../../components/tn20/PaivanVisaCard";
 import { ViikkoSinetti, KuvatIkoni } from "../../../components/tn20/Viikkosinetti";
@@ -51,7 +52,7 @@ export type GameQuestion = {
   plate?: "vaalea" | "tumma";
 };
 
-export type GameRelated = { id: string; title: string; meta: string; href?: string };
+export type GameRelated = { id: string; title: string; meta: string; href?: string; /** Lasten visan ikäryhmä → ikämerkki */ ika?: string | null };
 
 export type GameQuiz = {
   id: string;
@@ -1147,7 +1148,7 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
                     {quiz.related.slice(0, 3).map((r) => (
                       <a key={r.id} className="tng-herorec" href={r.href ?? quiz.hubHref}>
                         {r.title}
-                        <span>{r.meta}</span>
+                        <span>{r.ika && <><IkaMerkki ika={r.ika} /> </>}{r.meta}</span>
                       </a>
                     ))}
                   </div>
@@ -1587,7 +1588,7 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
                       <a key={r.id} className="tng-rec" href={r.href ?? `/peli?quiz_id=${r.id}`}>
                         <span className="tng-rec-text">
                           <span className="tng-rec-name">{r.title}</span>
-                          <span className="tng-rec-meta">{r.meta}</span>
+                          <span className="tng-rec-meta">{r.ika && <><IkaMerkki ika={r.ika} /> </>}{r.meta}</span>
                         </span>
                         <span className="tng-recarrow" aria-hidden>→</span>
                       </a>

@@ -11,9 +11,11 @@ export type RelatedRow = {
   id: string; slug: string | null; custom_slug: string | null;
   display_title: string | null; title: string; teaser: string | null;
   collection: string | null; genre: string | null; question_count: number;
+  /** Lasten visoilla 4-7 / 8-12 → ikämerkki ristinostoissa (vaihe 5) */
+  target_age?: string | null;
 };
 
-const SEL = "id, slug, custom_slug, display_title, title, teaser, collection, genre, question_count, category";
+const SEL = "id, slug, custom_slug, display_title, title, teaser, collection, genre, question_count, category, target_age";
 const ERA = 60;
 
 function sekoita<T>(a: T[]): T[] {

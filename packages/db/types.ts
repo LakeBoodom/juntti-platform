@@ -8646,37 +8646,61 @@ export type Database = {
       }
       questions: {
         Row: {
+          animal_sound: Json | null
           answers: Json
+          audio: Json | null
           created_at: string | null
           explanation: string | null
           id: string
+          image_credit: string | null
+          image_license_note: string | null
+          image_position: string | null
           image_url: string | null
           question_text: string
+          question_type: string
           quiz_id: string | null
           sort_order: number
           taso: number | null
+          vihje_laura: string | null
+          vihje_mikko: string | null
         }
         Insert: {
+          animal_sound?: Json | null
           answers: Json
+          audio?: Json | null
           created_at?: string | null
           explanation?: string | null
           id?: string
+          image_credit?: string | null
+          image_license_note?: string | null
+          image_position?: string | null
           image_url?: string | null
           question_text: string
+          question_type?: string
           quiz_id?: string | null
           sort_order?: number
           taso?: number | null
+          vihje_laura?: string | null
+          vihje_mikko?: string | null
         }
         Update: {
+          animal_sound?: Json | null
           answers?: Json
+          audio?: Json | null
           created_at?: string | null
           explanation?: string | null
           id?: string
+          image_credit?: string | null
+          image_license_note?: string | null
+          image_position?: string | null
           image_url?: string | null
           question_text?: string
+          question_type?: string
           quiz_id?: string | null
           sort_order?: number
           taso?: number | null
+          vihje_laura?: string | null
+          vihje_mikko?: string | null
         }
         Relationships: [
           {
@@ -8771,7 +8795,9 @@ export type Database = {
           ig_tilit: string[]
           image_url: string | null
           is_daily: boolean | null
+          lasten_aihe: string | null
           learn: Json | null
+          lukija: string | null
           platform: string
           play_count: number | null
           published_at: string | null
@@ -8813,7 +8839,9 @@ export type Database = {
           ig_tilit?: string[]
           image_url?: string | null
           is_daily?: boolean | null
+          lasten_aihe?: string | null
           learn?: Json | null
+          lukija?: string | null
           platform: string
           play_count?: number | null
           published_at?: string | null
@@ -8855,7 +8883,9 @@ export type Database = {
           ig_tilit?: string[]
           image_url?: string | null
           is_daily?: boolean | null
+          lasten_aihe?: string | null
           learn?: Json | null
+          lukija?: string | null
           platform?: string
           play_count?: number | null
           published_at?: string | null
@@ -9505,6 +9535,7 @@ export type Database = {
           slug: string | null
           subcollection: string | null
           tags: string[] | null
+          target_age: string | null
           teaser: string | null
           title: string | null
         }
@@ -9526,6 +9557,7 @@ export type Database = {
           slug?: string | null
           subcollection?: string | null
           tags?: string[] | null
+          target_age?: string | null
           teaser?: string | null
           title?: string | null
         }
@@ -9547,6 +9579,7 @@ export type Database = {
           slug?: string | null
           subcollection?: string | null
           tags?: string[] | null
+          target_age?: string | null
           teaser?: string | null
           title?: string | null
         }
