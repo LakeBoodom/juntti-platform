@@ -173,6 +173,8 @@ export async function updateQuizHero(
 
 const KOHDERYHMA_ARVOT = ["30-50", "50-70", "kaikki", "4-7", "8-12"];
 const KUVAPOLKU = /^(\/[\w\-./]+\.(webp|jpe?g|png|avif)|https:\/\/\S+)$/i;
+/** CSS object-position, jonka peli asettaa kysymyskuvalle (questions.image_position): esim. "center 20%". */
+const KUVARAJAUS = /^(left|center|right|\d{1,3}%)( (top|center|bottom|\d{1,3}%))?$/;
 const AANIPOLKU = /^(\/[\w\-./]+\.(mp3|m4a|ogg|wav)|https:\/\/\S+)$/i;
 const tai = (s: string | null | undefined) => (s ?? "").trim() || null;
 
@@ -236,6 +238,8 @@ export async function updateLastenKysymys(
   const kuva = input.image_url.trim();
   if (input.question_type === "kuva" && !kuva) return { ok: false as const, error: "Kysymyskuva puuttuu (tyyppi Kysymyskuva)" };
   if (kuva && !KUVAPOLKU.test(kuva)) return { ok: false as const, error: "Kysymyskuvan polku esim. /20/lapset/kuva.webp tai https://-osoite" };
+  const rajaus = tai(input.image_position);
+  if (rajaus && !KUVARAJAUS.test(rajaus)) return { ok: false as const, error: "Rajaus muodossa 'center 20%' (vaaka: left/center/right tai %, pysty: top/center/bottom tai %)" };
   const ea = input.animal_sound;
   if (aani && !ea.url.trim()) return { ok: false as const, error: "Eläinäänen tiedosto puuttuu (tyyppi Eläinääni)" };
   if (ea.url.trim() && !AANIPOLKU.test(ea.url.trim())) return { ok: false as const, error: "Eläinäänen polku esim. /aanet/lapset/elainaanet/elainaani-kaki.mp3" };
