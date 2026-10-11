@@ -144,9 +144,10 @@ export async function haeMuutLastenVisat(nykyinen: LastenVisa, maara = 6): Promi
 
 /* ── /lapset-sivu, etusivun kaista ja Juhlat-levy (vaihe 5) ── */
 
-/** Feature flag (brief §10.7): /lapset ja etusivun kaista näkyvät tuotannossa vasta, kun Vercelin
-    ympäristömuuttuja LAPSET_ENABLED=1. Previewssä ne näkyvät aina. */
-export const lapsetNakyvissa = () => esikatselu() || ["1", "true"].includes(process.env.LAPSET_ENABLED ?? "");
+/** Feature flag (brief §10.7). Lasten visat julkaistiin 11.10.2026, joten /lapset, etusivun kaista ja
+    Juhlat-levy näkyvät oletuksena. Hätäpiilotus tuotannossa: Vercelin ympäristömuuttuja LAPSET_ENABLED=0
+    + uudelleenjulkaisu. Previewssä ne näkyvät aina. */
+export const lapsetNakyvissa = () => esikatselu() || !["0", "false"].includes(process.env.LAPSET_ENABLED ?? "");
 export const LAPSET_SIVU = "/lapset";
 
 export type LastenListaKortti = LastenKortti & {
