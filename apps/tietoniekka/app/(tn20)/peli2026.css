@@ -1187,16 +1187,16 @@
   .tn20 .tng-hero[data-kind="kuva"] .tng-heroview { background: #0f0d07; }
   .tn20 .tng-hero[data-kind="kuva"] .tng-heroshade { display: none; }
   .tn20 .tng-hero[data-kind="kuva"] .tng-heromedia {
-    inset: 0 calc(var(--tng-teksti) - 96px) var(--tng-alaosa) 0;
-    -webkit-mask-image: linear-gradient(90deg, #000 calc(100% - 170px), transparent), linear-gradient(0deg, transparent, #000 110px);
-    mask-image: linear-gradient(90deg, #000 calc(100% - 170px), transparent), linear-gradient(0deg, transparent, #000 110px);
+    inset: 0 calc(var(--tng-teksti) - 48px) var(--tng-alaosa) 0;
+    -webkit-mask-image: linear-gradient(90deg, #000 calc(100% - 130px), transparent), linear-gradient(0deg, transparent, #000 110px);
+    mask-image: linear-gradient(90deg, #000 calc(100% - 130px), transparent), linear-gradient(0deg, transparent, #000 110px);
     -webkit-mask-composite: source-in;
     mask-composite: intersect;
   }
   .tn20 .tng-hero[data-kind="kuva"][data-side="left"] .tng-heromedia {
-    inset: 0 0 var(--tng-alaosa) calc(var(--tng-teksti) - 96px);
-    -webkit-mask-image: linear-gradient(270deg, #000 calc(100% - 170px), transparent), linear-gradient(0deg, transparent, #000 110px);
-    mask-image: linear-gradient(270deg, #000 calc(100% - 170px), transparent), linear-gradient(0deg, transparent, #000 110px);
+    inset: 0 0 var(--tng-alaosa) calc(var(--tng-teksti) - 48px);
+    -webkit-mask-image: linear-gradient(270deg, #000 calc(100% - 130px), transparent), linear-gradient(0deg, transparent, #000 110px);
+    mask-image: linear-gradient(270deg, #000 calc(100% - 130px), transparent), linear-gradient(0deg, transparent, #000 110px);
   }
   .tn20 .tng-hero[data-kind="kuva"] .tng-herobody { max-width: min(660px, var(--tng-teksti)); }
   .tn20 .tng-hero[data-kind="kuva"] .tng-heroh1 { --tng-h1cap: calc((min(660px, var(--tng-teksti)) - 2 * clamp(28px, 3.4cqw, 48px)) / (var(--tng-lw, 1) * 0.76)); }
