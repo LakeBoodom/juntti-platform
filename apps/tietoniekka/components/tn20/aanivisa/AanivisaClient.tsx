@@ -350,7 +350,7 @@ export default function AanivisaClient({ viikko, jatka, sivu }: { viikko: AaniVi
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img src={k.src} srcSet={`${k.pieni} ${k.pieni.match(/-(\d+)\.webp$/)?.[1] ?? k.leveys}w, ${k.src} ${k.leveys}w`} sizes={luokka === "av-hero-kuva--levea" ? "100vw" : "(max-width: 560px) 100vw, 560px"} alt="" fetchPriority="high" />
       {k.kuplat.map((b) => (
-        <span key={b.teksti} className="av-kupla" style={{ left: `${b.x}%`, top: `${b.y}%`, width: `${b.w}%`, height: `${b.h}%`, fontSize: `${b.fs}cqw` }}>
+        <span key={b.teksti} className="av-kupla" style={{ left: `${b.x}%`, top: `${b.y}%`, width: `${b.w}%`, height: `${b.h}%`, fontSize: `max(${b.fs}cqw, 9px)` }}>
           {b.teksti}
         </span>
       ))}
