@@ -25,7 +25,7 @@ import GameClient, { type GameQuiz } from "./GameClient";
 import LastenPeli from "./lapset/LastenPeli";
 import { LAPSET_SIVU, haeLastenVisa, haeMuutLastenVisat, lapsetNakyvissa } from "@/lib/lapset/data";
 import "../lapset.css";
-import { heroMode } from "@/lib/herotila";
+import { heroFokus, heroMode } from "@/lib/herotila";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 
@@ -685,9 +685,13 @@ export default async function Peli20({
      visat säilyttävät vanhan aloitusnäkymän; ?hero=uusi näyttää niille
      kuvattoman heron testiksi. */
   const heroOn = heroImage != null || heroParam === "uusi";
-  const heroFocalX = quiz.hero_focal_x != null ? Number(quiz.hero_focal_x) : 0.5;
-  /* Kasvokuvissa kiinnostava kohta on ylhäällä (CD: 0.12–0.18) */
-  const heroFocalY = quiz.hero_focal_y != null ? Number(quiz.hero_focal_y) : isPerson ? 0.15 : 0.4;
+  /* Kasvokuvissa kiinnostava kohta on ylhäällä (CD: 0.12–0.18). Visakuvissa (11.10.2026) kohdepiste
+     lasketaan kuvan sisällöstä, jos sitä ei ole asetettu käsin (lib/herotila.ts heroFokus). */
+  const fokus = isPerson
+    ? { x: quiz.hero_focal_x != null ? Number(quiz.hero_focal_x) : 0.5, y: quiz.hero_focal_y != null ? Number(quiz.hero_focal_y) : 0.15 }
+    : heroFokus(quiz.hero_image, quiz.hero_focal_x, quiz.hero_focal_y);
+  const heroFocalX = fokus.x;
+  const heroFocalY = fokus.y;
   /* hero_side on tallennettu kenttä: asetettu arvo voittaa laskennan aina.
      Henkilövisassa sääntöä ei ajeta lainkaan — kortti on aina oikealla. */
   const heroSide: "left" | "right" =

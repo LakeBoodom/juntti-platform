@@ -1169,3 +1169,37 @@
 @media (max-width: 767.98px) {
   .tn20 .tng-hero .tng-mukana { order: 6; margin-top: 2px; }
 }
+
+/* ── VISAN PÄÄKUVA DESKTOP: koko kuva näkyviin (Heikki 11.10.2026) ─────────────────────────
+   Ennen kuva täytti koko heron ja teksti + tummennus peitti toisen puolen, alalaidan lisävisat
+   alaosan → keskelle sommiteltu kohde (Colosseum, kukka, käärme) jäi piiloon. Nyt kuva on vain
+   tekstittömällä puolella ja lisävisojen yläpuolella; reunat häivytetään taustaan maskilla.
+   Kuva-alue on lähes 16:9 (≈1,5–1,8:1), joten sivuilta rajautuu enintään ~15 %. Rajaus ja
+   puolen valinta tulevat kohdepisteestä (käsin asetettu tai kuvan sisällöstä laskettu,
+   lib/herotila.ts). Henkilövisoja (oma korttiasettelu) ja kuvattomia ei muuteta. */
+@media (min-aspect-ratio: 1/1) and (min-width: 768px) {
+  .tn20 .tng-hero[data-kind="kuva"] {
+    /* Tekstipalsta: 52 % kapeilla näytöillä (otsikot mahtuvat), leveillä 42 %, kuitenkin ≥ 600 px */
+    --tng-teksti: min(52cqw, max(42cqw, 600px));
+    --tng-alaosa: 0px;
+  }
+  .tn20 .tng-hero[data-kind="kuva"]:has(.tng-heromore) { --tng-alaosa: clamp(150px, 21dvh, 210px); }
+  .tn20 .tng-hero[data-kind="kuva"] .tng-heroview { background: #0f0d07; }
+  .tn20 .tng-hero[data-kind="kuva"] .tng-heroshade { display: none; }
+  .tn20 .tng-hero[data-kind="kuva"] .tng-heromedia {
+    inset: 0 calc(var(--tng-teksti) - 96px) var(--tng-alaosa) 0;
+    -webkit-mask-image: linear-gradient(90deg, #000 calc(100% - 170px), transparent), linear-gradient(0deg, transparent, #000 110px);
+    mask-image: linear-gradient(90deg, #000 calc(100% - 170px), transparent), linear-gradient(0deg, transparent, #000 110px);
+    -webkit-mask-composite: source-in;
+    mask-composite: intersect;
+  }
+  .tn20 .tng-hero[data-kind="kuva"][data-side="left"] .tng-heromedia {
+    inset: 0 0 var(--tng-alaosa) calc(var(--tng-teksti) - 96px);
+    -webkit-mask-image: linear-gradient(270deg, #000 calc(100% - 170px), transparent), linear-gradient(0deg, transparent, #000 110px);
+    mask-image: linear-gradient(270deg, #000 calc(100% - 170px), transparent), linear-gradient(0deg, transparent, #000 110px);
+  }
+  .tn20 .tng-hero[data-kind="kuva"] .tng-herobody { max-width: min(660px, var(--tng-teksti)); }
+  .tn20 .tng-hero[data-kind="kuva"] .tng-heroh1 { --tng-h1cap: calc((min(660px, var(--tng-teksti)) - 2 * clamp(28px, 3.4cqw, 48px)) / (var(--tng-lw, 1) * 0.76)); }
+  /* Lisävisat eivät ole enää kuvan päällä: tasainen tausta ilman sumennusta */
+  .tn20 .tng-hero[data-kind="kuva"] .tng-heromore { background: #0f0d07; backdrop-filter: none; -webkit-backdrop-filter: none; }
+}
