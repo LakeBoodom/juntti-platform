@@ -119,6 +119,8 @@
   /* h1: CD 78 px. "SUOMEN" 6 merkkiä, staattinen Archivo ≈ 0,68 em/merkki → 78 px ≈ 320 px, mahtuu 465 px:n
      kapeimpaan palstaan (1100 px) kahdelle riville. */
   .tn20 .av--kuvahero .av-intro-h1 { font-size: 78px; font-variation-settings: "wdth" 70; line-height: 0.88; }
+  /* Kapeimmillaan (1100–1300 px) kuva leikkautuu vasemmalta ja käen pyrstö osuu ingressin alle → varjo luettavuuteen. */
+  .tn20 .av--kuvahero .av-intro-p, .tn20 .av--kuvahero .av-intro-rivit span { text-shadow: 0 1px 10px rgba(11, 9, 4, 0.85); }
   .tn20 .av--kuvahero .av-intro-p { font-size: 18px; color: #CFC7B6; }
   .tn20 .av--kuvahero .av-intro-rivit { border-color: rgba(245, 240, 230, 0.14); }
   .tn20 .av--kuvahero .av-cta { min-height: 58px; font-size: 20px; }
