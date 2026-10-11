@@ -24,7 +24,7 @@ export const metadata: Metadata = {
   }),
 };
 
-const PAIVITETTY = "9.10.2026";
+const PAIVITETTY = "11.10.2026";
 
 export default async function KuvienLahteetPage() {
   const [aanet, linnut, elaimet] = await Promise.all([
