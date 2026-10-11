@@ -2,10 +2,10 @@
 const nextConfig = {
   reactStrictMode: true,
   transpilePackages: ["@juntti/db"],
-  /* SEO-erä A2 (2.10.2026): jakokuvareitti lukee kuvat ja fontit tiedostojärjestelmästä
-     (Satori ei osaa WebP:tä → sharp muuntaa). Ilman tätä Vercelin funktiopaketista puuttuisivat. */
+  /* SEO-erä A2 (2.10.2026): jakokuvareitti lukee fontit tiedostojärjestelmästä.
+     Kuvat (public/) haetaan 11.10.2026 alkaen HTTP:llä, jotta ~83 Mt kuvia ei kopioidu funktiopakettiin. */
   outputFileTracingIncludes: {
-    "/og/[...polku]": ["./public/20/**/*", "./public/og-image.png", "./assets/og/**/*"],
+    "/og/[...polku]": ["./assets/og/**/*"],
   },
   images: {
     remotePatterns: [

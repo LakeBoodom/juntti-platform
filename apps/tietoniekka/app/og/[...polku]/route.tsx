@@ -11,9 +11,10 @@
 //   /og/henkilo/<slug>             henkilösivu (erä B3): nimi + rooli, henkilökuva 3:4-korttina
 //   /og/jarjesta/<pakka>           Laita järjestykseen -pakka (lib/jarjesta/pakat.ts)
 //
-// Satori (ImageResponse) ei osaa WebP:tä, joten kuvat muunnetaan sharpilla JPEG:ksi. Kuvat luetaan
-// tiedostojärjestelmästä (next.config.mjs: outputFileTracingIncludes), jolloin myös preview-
-// julkaisun uudet kuvat toimivat eikä Vercelin deployment protection estä hakua.
+// Satori (ImageResponse) ei osaa WebP:tä, joten kuvat muunnetaan sharpilla JPEG:ksi. Omat kuvat
+// (/20/…) haetaan saman julkaisun osoitteesta HTTP:llä (Vercelin tilankäyttö 11.10.2026: aiemmin koko
+// public/20 eli ~83 Mt kopioitiin funktiopakettiin jokaisessa julkaisussa). Projektissa ei ole
+// deployment protectionia, joten myös preview-julkaisut vastaavat hakuun.
 
 import { ImageResponse } from "next/og";
 import { readFile } from "node:fs/promises";
@@ -37,10 +38,15 @@ const KULTA = "#E8A320";
 
 /* ── Kuvat ─────────────────────────────────────────────────────────────── */
 
+/** Pyynnön origin (asetetaan GET:ssä): sama julkaisu, joten preview-kuvat löytyvät previewstä. */
+let origin = "https://tietoniekka.fi";
+
 async function paikallinen(polku: string): Promise<Buffer | null> {
   if (!polku.startsWith("/")) return null;
+  /* Ei readFile(public/…): tiedostojäljitys ottaisi silloin koko public/-kansion (~100 Mt) pakettiin. */
   try {
-    return await readFile(join(process.cwd(), "public", decodeURIComponent(polku)));
+    const r = await fetch(new URL(polku, origin));
+    return r.ok ? Buffer.from(await r.arrayBuffer()) : null;
   } catch {
     return null;
   }
@@ -299,6 +305,7 @@ export async function GET(req: Request, ctx: { params: Promise<{ polku: string[]
   const [tyyppi, avainRaw] = polku;
   const avain = decodeURIComponent(avainRaw ?? "");
   const url = new URL(req.url);
+  origin = url.origin;
   let kortti: Kortti | null = null;
 
   if (tyyppi === "visa" && avain) {
