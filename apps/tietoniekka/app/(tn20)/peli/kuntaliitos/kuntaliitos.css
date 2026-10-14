@@ -32,7 +32,7 @@
 }
 .tn20 .kl :where(button) { font: inherit; }
 .tn20 .kl-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; margin: 0; }
-.tn20 .kl-pikku { font-size: 10px; font-weight: 800; letter-spacing: .16em; text-transform: uppercase; color: var(--kl-ruskea); }
+.tn20 .kl-pikku { font-size: 11px; font-weight: 800; letter-spacing: .16em; text-transform: uppercase; color: var(--kl-ruskea); }
 
 /* ── Yläpalkki ─────────────────────────────────────────── */
 .tn20 .kl-bar {
@@ -52,7 +52,7 @@
   margin: 0; font-family: var(--kl-display); font-weight: 900; font-variation-settings: "wdth" 78;
   font-size: clamp(15px, 1.8cqi, 22px); line-height: 1; text-transform: uppercase; color: var(--kl-navy); white-space: nowrap;
 }
-.tn20 .kl-bar-laji { font-size: 10px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; color: var(--kl-ruskea); white-space: nowrap; }
+.tn20 .kl-bar-laji { font-size: 11px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; color: var(--kl-ruskea); white-space: nowrap; }
 .tn20 .kl-bar-r { display: flex; align-items: center; gap: clamp(10px, 1.4cqi, 18px); flex: none; }
 .tn20 .kl-mittari { display: flex; align-items: center; gap: 3px; }
 .tn20 .kl-seg { width: clamp(7px, .8cqi, 12px); height: 14px; border-radius: 2px; background: #ddd6c6; transition: background .2s; }
@@ -110,7 +110,7 @@
 .tn20 .kl-liitos[data-tila="bad"] .kl-kisko { background: repeating-linear-gradient(180deg, var(--kl-puna) 0 5px, transparent 5px 9px); }
 .tn20 .kl-pilleri {
   display: inline-flex; align-items: center; gap: 6px; padding: 4px 11px 4px 8px; border: 1px solid #ddd6c6; border-radius: 999px;
-  background: #fff; font-size: 10px; font-weight: 800; letter-spacing: .09em; text-transform: uppercase; white-space: nowrap;
+  background: #fff; font-size: 11px; font-weight: 800; letter-spacing: .09em; text-transform: uppercase; white-space: nowrap;
   animation: kl-nousu .26s ease-out both;
 }
 .tn20 .kl-pilleri svg { width: 13px; height: 13px; flex: none; }
@@ -137,7 +137,7 @@
 .tn20 .kl-kortti-num {
   position: absolute; top: -7px; left: -8px; width: 22px; height: 22px; border-radius: 999px; background: var(--kl-navy);
   display: flex; align-items: center; justify-content: center;
-  font-family: var(--kl-display); font-weight: 900; font-variation-settings: "wdth" 82; font-size: 11px; color: #fff;
+  font-family: var(--kl-display); font-weight: 900; font-variation-settings: "wdth" 82; font-size: 12px; color: #fff;
 }
 .tn20 .kl-kortti-t { flex: 1; min-width: 0; display: flex; flex-direction: column; align-items: flex-start; gap: 5px; }
 /* Nimen koko: pisin tila = listan leveys − porras (12 %) − kilpi − kiinteät välit (84 px).
@@ -149,7 +149,7 @@
 }
 /* Monisanaiset valtioiden nimet rivittyvät sanojen välistä; koko pisimmän sanan mukaan */
 .tn20 .kl-nimi--rivittyva { white-space: normal; text-wrap: balance; line-height: 1.05; }
-.tn20 .kl-maakunta { padding: 2px 8px; border-radius: 999px; background: #e9f3f2; color: var(--kl-teal-t); font-size: 10px; font-weight: 800; letter-spacing: .09em; text-transform: uppercase; white-space: nowrap; }
+.tn20 .kl-maakunta { padding: 2px 8px; border-radius: 999px; background: #e9f3f2; color: var(--kl-teal-t); font-size: 11px; font-weight: 800; letter-spacing: .09em; text-transform: uppercase; white-space: nowrap; }
 .tn20 .kl-kahva {
   flex: none; width: 28px; height: 28px; border-radius: 999px; background: #f5f1e8; border: 1px solid var(--kl-viiva);
   display: flex; align-items: center; justify-content: center; color: var(--kl-heikko); touch-action: none; cursor: grab;
@@ -179,7 +179,7 @@
 .tn20 .kl-kartta--akt { border-color: var(--kl-teal); }
 .tn20 .kl-kartta-yla { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 12px; margin-bottom: 10px; }
 .tn20 .kl-selite { display: flex; flex-wrap: wrap; gap: 6px 10px; }
-.tn20 .kl-selite > span { display: inline-flex; align-items: center; gap: 5px; font-size: 10px; font-weight: 700; color: var(--kl-heikko); }
+.tn20 .kl-selite > span { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; font-weight: 700; color: var(--kl-heikko); }
 .tn20 .kl-selite i { width: 15px; height: 4px; border-radius: 2px; }
 .tn20 .kl-selite-ok { background: var(--kl-teal); }
 .tn20 .kl-selite-bad { background: repeating-linear-gradient(90deg, var(--kl-puna) 0 4px, transparent 4px 7px); }
@@ -187,7 +187,7 @@
 .tn20 .kl-pari--bad { border-color: #f0cfc5; background: #fbe7e1; }
 .tn20 .kl-pari-t { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px; }
 .tn20 .kl-pari-t b { font-family: var(--kl-display); font-weight: 900; font-variation-settings: "wdth" 80; font-size: 13px; line-height: 1.1; color: var(--kl-navy); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.tn20 .kl-pari-t span { font-size: 10px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: var(--kl-teal-t); }
+.tn20 .kl-pari-t span { font-size: 11px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: var(--kl-teal-t); }
 .tn20 .kl-pari--bad .kl-pari-t span { color: var(--kl-puna-t); }
 
 /* Kartan kuvasuhde 4:5 = KL_KARTTA_SUHDE (lib/kuntaliitos/reitti.ts). Mobiilissa kartta
@@ -235,7 +235,7 @@
 /* Reunan lähellä nimilappu kartan sisäpuolelle, ettei se leikkaudu (Bosnia ja Hertsegovina) */
 .tn20 .kl-nasta--oik { align-items: flex-end; transform: translate(calc(-100% + var(--kl-pw) / 2), -62%); }
 .tn20 .kl-nasta--vas { align-items: flex-start; transform: translate(calc(var(--kl-pw) / -2), -62%); }
-.tn20 .kl-kartta-huomio { margin: 10px 0 0; font-size: 11px; line-height: 1.4; color: var(--kl-ruskea); text-align: center; }
+.tn20 .kl-kartta-huomio { margin: 10px 0 0; font-size: 12px; line-height: 1.4; color: var(--kl-ruskea); text-align: center; }
 
 /* ── Tulos, ratkaisu, toiminnot ────────────────────────── */
 .tn20 .kl-tulos {
@@ -255,7 +255,7 @@
 .tn20 .kl-ratkaisu { margin-top: 18px; padding: clamp(14px, 1.6cqi, 20px); border: 1px solid #c7d4dd; border-radius: 18px; background: #fff; box-shadow: 0 3px 0 #e3daca; }
 .tn20 .kl-ratkaisu ol { list-style: none; margin: 12px 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 10px; }
 .tn20 .kl-ratkaisu li { display: flex; flex-direction: column; align-items: center; gap: 5px; width: 66px; }
-.tn20 .kl-ratkaisu li span:last-child { font-size: 9px; font-weight: 800; letter-spacing: .03em; text-transform: uppercase; color: var(--kl-heikko); text-align: center; line-height: 1.15; overflow-wrap: anywhere; }
+.tn20 .kl-ratkaisu li span:last-child { font-size: 11px; font-weight: 800; letter-spacing: .03em; text-transform: uppercase; color: var(--kl-heikko); text-align: center; line-height: 1.15; overflow-wrap: anywhere; }
 
 .tn20 .kl-toiminto {
   position: sticky; bottom: 0; z-index: 3; margin-top: 18px; padding: 12px 0 16px;
@@ -330,7 +330,7 @@
 /* Maanosavalinta: segmentit (3d) */
 .tn20 .kl-segvalinta { display: flex; flex-direction: column; gap: 8px; margin-bottom: 14px; }
 .tn20 .kl-segvalinta-yla { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
-.tn20 .kl-segvalinta-reitti { font-size: 11px; font-weight: 700; color: var(--kl-heikko); white-space: nowrap; }
+.tn20 .kl-segvalinta-reitti { font-size: 12px; font-weight: 700; color: var(--kl-heikko); white-space: nowrap; }
 .tn20 .kl-segmentit {
   display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 3px; padding: 3px;
   border: 1px solid var(--kl-viiva); border-radius: 15px; background: #fff; box-shadow: 0 3px 0 #e3daca;

@@ -52,7 +52,7 @@
   display: inline-flex; align-items: center; gap: 9px; width: fit-content;
   padding: clamp(6px,.8cqw,10px) clamp(11px,1.3cqw,16px); border-radius: 999px;
   background: rgba(232,163,32,.13); border: 1px solid rgba(232,163,32,.45);
-  font-size: clamp(9px,1cqw,12px); font-weight: 800; letter-spacing: .14em;
+  font-size: clamp(11px,1cqw,12px); font-weight: 800; letter-spacing: .14em;
   text-transform: uppercase; color: var(--tnk2-accent); margin-bottom: clamp(12px,1.5cqw,20px);
 }
 .tn20 .tnk2-badge i { position: relative; width: 7px; height: 7px; display: block; }
@@ -84,11 +84,11 @@
   margin-bottom: clamp(10px,1.2cqw,15px);
 }
 .tn20 .tnk2-passport-label {
-  font-size: clamp(9px,.95cqw,12px); font-weight: 800; letter-spacing: .18em;
+  font-size: clamp(11px,.95cqw,12px); font-weight: 800; letter-spacing: .18em;
   text-transform: uppercase; color: var(--tnk2-meta);
 }
 .tn20 .tnk2-passport-pct {
-  font-size: clamp(9px,.95cqw,12px); font-weight: 800; letter-spacing: .1em;
+  font-size: clamp(11px,.95cqw,12px); font-weight: 800; letter-spacing: .1em;
   text-transform: uppercase; color: var(--tnk2-stamp);
 }
 .tn20 .tnk2-passport-num {
@@ -99,7 +99,7 @@
 .tn20 .tnk2-passport-num b { font-size: clamp(46px,5.6cqw,78px); color: var(--tnk2-stamp); font-weight: 900; }
 .tn20 .tnk2-passport-num span.tot { font-size: clamp(20px,2.2cqw,32px); color: var(--tnk2-meta-weak); }
 .tn20 .tnk2-passport-num span.lbl {
-  font-size: clamp(11px,1.15cqw,14px); font-family: var(--tn-font-body); font-weight: 700; line-height: 1.25;
+  font-size: clamp(12px,1.15cqw,14px); font-family: var(--tn-font-body); font-weight: 700; line-height: 1.25;
   color: var(--tnk2-ink-dim); align-self: flex-end; padding-bottom: 4px;
 }
 .tn20 .tnk2-passport-bar { height: 8px; border-radius: 999px; background: var(--tnk2-track); overflow: hidden; margin-bottom: clamp(12px,1.4cqw,18px); }
@@ -114,13 +114,13 @@
   font-size: clamp(15px,1.7cqw,22px); line-height: 1; color: var(--tnk2-ink-strong);
   overflow-wrap: normal; word-break: keep-all;
 }
-.tn20 .tnk2-passport-stat-k { font-size: clamp(9px,.92cqw,11.5px); font-weight: 700; color: var(--tnk2-meta); margin-top: 5px; }
+.tn20 .tnk2-passport-stat-k { font-size: clamp(12px,.92cqw,11.5px); font-weight: 700; color: var(--tnk2-meta); margin-top: 5px; }
 
 /* ── Osio-otsikko (yhteinen Pelilaudalle ja Kaikki kaupungit -osiolle) ── */
 .tn20 .tnk2-eyebrow-row { display: flex; align-items: baseline; gap: clamp(10px,1.4cqw,18px); margin-bottom: clamp(10px,1.2cqw,16px); }
 .tn20 .tnk2-eyebrow {
   font-family: var(--tn-font-display); font-weight: 900; font-variation-settings: "wdth" 62;
-  font-size: clamp(10px,1.05cqw,13px); letter-spacing: .22em; text-transform: uppercase;
+  font-size: clamp(11px,1.05cqw,13px); letter-spacing: .22em; text-transform: uppercase;
   color: var(--tnk2-accent); white-space: nowrap; flex: 0 0 auto;
 }
 .tn20 .tnk2-eyebrow-line { flex: 1; height: 1px; background: var(--tnk2-border-hair); }
@@ -164,13 +164,13 @@
   position: absolute; transform: translate(-50%,-190%); z-index: 5; pointer-events: none;
   padding: 5px 10px; border-radius: 7px; background: var(--tnk2-ink-strong); color: var(--tnk2-bg);
   font-family: var(--tn-font-display); font-weight: 900; font-variation-settings: "wdth" 68;
-  font-size: clamp(10px,1.15cqw,14px); letter-spacing: .03em; text-transform: uppercase;
+  font-size: clamp(11px,1.15cqw,14px); letter-spacing: .03em; text-transform: uppercase;
   white-space: nowrap; box-shadow: 0 6px 18px rgba(0,0,0,.55); overflow-wrap: normal; word-break: keep-all;
 }
 .tn20 .tnk2-legend {
   display: flex; flex-wrap: wrap; gap: clamp(10px,1.3cqw,18px); margin-top: clamp(12px,1.4cqw,18px);
   padding-top: clamp(12px,1.4cqw,18px); border-top: 1px solid var(--tnk2-track);
-  font-size: clamp(9.5px,.98cqw,12px); font-weight: 700; color: var(--tnk2-meta); white-space: nowrap;
+  font-size: clamp(12px,.98cqw,12px); font-weight: 700; color: var(--tnk2-meta); white-space: nowrap;
 }
 .tn20 .tnk2-legend span.item { display: flex; align-items: center; gap: 7px; }
 .tn20 .tnk2-legend span.dot { width: 11px; height: 11px; border-radius: 999px; display: inline-block; }
@@ -187,7 +187,7 @@
 .tn20 .tnk2-panel-pills { position: absolute; z-index: 2; left: clamp(14px,1.7cqw,24px); top: clamp(12px,1.5cqw,20px); display: flex; gap: 7px; flex-wrap: wrap; }
 .tn20 .tnk2-pill {
   padding: 5px 10px; border-radius: 999px; background: rgba(19,17,9,.82);
-  font-size: clamp(9px,.95cqw,12px); font-weight: 800; letter-spacing: .1em; text-transform: uppercase;
+  font-size: clamp(11px,.95cqw,12px); font-weight: 800; letter-spacing: .1em; text-transform: uppercase;
 }
 .tn20 .tnk2-pill-stamp { border: 1px solid var(--tnk2-stamp); color: var(--tnk2-stamp); }
 .tn20 .tnk2-pill-region { border: 1px solid rgba(245,240,230,.22); color: var(--tnk2-ink-strong); }
@@ -241,7 +241,7 @@
 @media (min-width: 960px) { .tn20 .tnk2-panel-stat-v--region { font-size: 11.7px; } /* 1024px: mitattu maxFit 12.7 (CD 17.4) */ }
 @media (min-width: 1280px) { .tn20 .tnk2-panel-stat-v--region { font-size: 13.2px; } /* 1440px: mitattu maxFit 15.7 (CD 22) — varovainen marginaali */ }
 @media (min-width: 1800px) { .tn20 .tnk2-panel-stat-v--region { font-size: 13.2px; } /* 1920/2450px: mitattu maxFit 14.2 (CD 22) */ }
-.tn20 .tnk2-panel-stat-k { font-size: clamp(9px,.92cqw,11.5px); font-weight: 700; color: var(--tnk2-meta); margin-top: 5px; }
+.tn20 .tnk2-panel-stat-k { font-size: clamp(12px,.92cqw,11.5px); font-weight: 700; color: var(--tnk2-meta); margin-top: 5px; }
 .tn20 .tnk2-panel-actions { display: flex; flex-wrap: wrap; align-items: center; gap: clamp(8px,1cqw,13px); }
 .tn20 .tnk2-cta {
   flex: 1 1 260px; max-width: 480px; text-align: center; padding: clamp(12px,1.4cqw,18px) clamp(18px,2.2cqw,30px);
@@ -266,7 +266,7 @@
   display: inline-flex; align-items: center; gap: 8px; min-height: 44px;
   padding: clamp(8px,.95cqw,12px) clamp(12px,1.4cqw,19px); border-radius: 999px;
   border: 1px solid var(--tnk2-border); background: transparent; color: var(--tnk2-ink-dim);
-  font-family: var(--tn-font-body); font-weight: 700; font-size: clamp(11px,1.15cqw,14px);
+  font-family: var(--tn-font-body); font-weight: 700; font-size: clamp(12px,1.15cqw,14px);
   cursor: pointer; white-space: nowrap; flex: 0 0 auto;
 }
 .tn20 .tnk2-filter:hover { border-color: var(--tnk2-meta); }
@@ -274,7 +274,7 @@
 .tn20 .tnk2-filter-count {
   display: inline-flex; align-items: center; justify-content: center; min-width: 20px; height: 20px;
   padding: 0 5px; border-radius: 999px; background: var(--tnk2-track); color: var(--tnk2-meta);
-  font-size: 10.5px; font-weight: 800;
+  font-size: 12px; font-weight: 800;
 }
 .tn20 .tnk2-filter[aria-pressed="true"] .tnk2-filter-count { background: rgba(19,17,9,.14); color: var(--tnk2-bg); }
 
@@ -300,7 +300,7 @@
   position: absolute; z-index: 2; left: clamp(10px,1.1cqw,14px); top: clamp(9px,1cqw,13px);
   display: flex; align-items: center; gap: 6px; padding: 4px 9px; border-radius: 999px;
   background: rgba(19,17,9,.85); border: 1px solid var(--tnk2-stamp); color: var(--tnk2-stamp);
-  font-size: clamp(8.5px,.9cqw,11px); font-weight: 800; letter-spacing: .1em; text-transform: uppercase; white-space: nowrap;
+  font-size: clamp(11px,.9cqw,11px); font-weight: 800; letter-spacing: .1em; text-transform: uppercase; white-space: nowrap;
 }
 .tn20 .tnk2-card-text { position: absolute; z-index: 2; left: clamp(11px,1.2cqw,16px); right: clamp(11px,1.2cqw,16px); bottom: clamp(10px,1.1cqw,15px); }
 .tn20 .tnk2-card-name {
@@ -313,7 +313,7 @@
      clamp-kaarella. CD:n alkuperäinen arvo oli kiinteä clamp(19px,2.2cqw,29px)
      kaikilla leveyksillä — se leikkautui 320/390/1024/1440px:ssä. Jokainen
      alla oleva arvo on mitattu max-fit miinus n. 1px marginaali. */
-  font-size: 10.2px; /* 320px: mitattu maxFit 11.2 (CD 19) */
+  font-size: 11px; /* 320px: mitattu maxFit 11.2 (CD 19) */
   line-height: .96; letter-spacing: -.018em; text-transform: uppercase;
   color: var(--tnk2-ink-strong); overflow-wrap: normal; word-break: keep-all;
 }
@@ -322,7 +322,7 @@
 @media (min-width: 960px) { .tn20 .tnk2-card-name { font-size: 19.2px; } /* 1024px: mitattu maxFit 20.2 (CD 22.5) */ }
 @media (min-width: 1280px) { .tn20 .tnk2-card-name { font-size: 27px; } /* 1440px: mitattu maxFit 28.4 (CD 29) */ }
 @media (min-width: 1800px) { .tn20 .tnk2-card-name { font-size: 29px; } /* 1920/2450px: mitattu maxFit 29 = CD-arvo, mahtuu täytenä */ }
-.tn20 .tnk2-card-slogan { font-size: clamp(10.5px,1.08cqw,13px); line-height: 1.35; color: var(--tnk2-ink-dim); margin-top: 7px; text-wrap: pretty; }
+.tn20 .tnk2-card-slogan { font-size: clamp(12px,1.08cqw,13px); line-height: 1.35; color: var(--tnk2-ink-dim); margin-top: 7px; text-wrap: pretty; }
 .tn20 .tnk2-card-tint { position: absolute; z-index: 2; left: 0; right: 0; bottom: 0; height: 4px; background: var(--tnk2-stamp); }
 
 /* ── CTA (Suomi-megavisa) ── */
@@ -350,7 +350,7 @@
 .tn20 .tnk2-ctabox-text { flex: 1 1 min(100%,380px); }
 .tn20 .tnk2-ctabox-badge {
   display: inline-flex; align-items: center; gap: 8px; padding: 6px 12px; border-radius: 999px;
-  border: 1px solid var(--tnk2-stamp); background: rgba(19,17,9,.6); font-size: clamp(9.5px,1cqw,12px);
+  border: 1px solid var(--tnk2-stamp); background: rgba(19,17,9,.6); font-size: clamp(11px,1cqw,12px);
   font-weight: 800; letter-spacing: .14em; text-transform: uppercase; color: var(--tnk2-stamp);
   margin-bottom: clamp(14px,1.7cqw,22px);
 }

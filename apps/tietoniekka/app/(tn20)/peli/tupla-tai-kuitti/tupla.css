@@ -51,7 +51,7 @@
 .tn20 .ttk-logo { font-family: var(--tn-font-display); font-weight: 900; font-size: 18px; letter-spacing: -.01em; color: var(--ink); text-decoration: none; white-space: nowrap; }
 .tn20 .ttk-logo span { color: var(--ttk-gold); }
 .tn20 .ttk-bar-r { display: flex; flex-direction: column; align-items: flex-end; gap: 3px; min-width: 0; text-align: right; }
-.tn20 .ttk-bar-top { font-family: var(--tn-font-display); font-weight: 900; font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted2); white-space: nowrap; }
+.tn20 .ttk-bar-top { font-family: var(--tn-font-display); font-weight: 900; font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted2); white-space: nowrap; }
 .tn20 .ttk-bar-name { font-size: 13px; font-weight: 700; color: var(--acc); white-space: nowrap; }
 
 /* ── Sanamerkki ──────────────────────────────────────── */
@@ -78,7 +78,7 @@
 }
 .tn20 .ttk-theme i { width: 22px; height: 3px; flex-shrink: 0; background: var(--acc); }
 .tn20 .ttk-edtag { display: flex; flex-wrap: wrap; align-items: baseline; column-gap: 6px; font-family: var(--tn-font-display); font-weight: 900; font-size: 13px; letter-spacing: .06em; text-transform: uppercase; }
-.tn20 .ttk-edtag small { color: var(--muted2); font-size: 10px; }
+.tn20 .ttk-edtag small { color: var(--muted2); font-size: 11px; }
 .tn20 .ttk-edtag em { font-style: normal; text-transform: none; letter-spacing: 0; font-family: var(--tn-font-body); font-weight: 700; color: var(--soft); white-space: nowrap; }
 .tn20 .ttk .acc { color: var(--acc); }
 .tn20 .ttk .kulta { color: var(--ttk-gold-l); }
@@ -103,7 +103,7 @@
 .tn20 .ttk-vlad li.turva b { color: var(--ttk-gold); }
 .tn20 .ttk-vlad li.huippu { border-color: var(--acc); }
 .tn20 .ttk-vlad li.huippu b { color: var(--acc); }
-.tn20 .ttk-vlad-n { font-size: 10px; font-weight: 600; color: var(--muted); font-variant-numeric: tabular-nums; width: 14px; }
+.tn20 .ttk-vlad-n { font-size: 12px; font-weight: 600; color: var(--muted); font-variant-numeric: tabular-nums; width: 14px; }
 .tn20 .ttk-vlad b { flex: 1; text-align: right; font-family: var(--tn-font-display); font-weight: 800; font-size: 13px; color: var(--muted); font-variant-numeric: tabular-nums; }
 .tn20 .ttk-start { display: flex; flex-direction: column; gap: 12px; }
 .tn20 .ttk-seed { margin: 0; display: flex; flex-wrap: wrap; justify-content: center; column-gap: 8px; row-gap: 4px; font-size: 14px; color: var(--muted2); }
@@ -125,7 +125,7 @@
 .tn20 .ttk-hud-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
 .tn20 .ttk-pot { display: flex; align-items: center; gap: 10px; }
 .tn20 .ttk-pot-c { display: flex; flex-direction: column; gap: 2px; }
-.tn20 .ttk-eyebrow { font-size: 10px; font-weight: 800; letter-spacing: .16em; text-transform: uppercase; color: var(--muted); white-space: nowrap; }
+.tn20 .ttk-eyebrow { font-size: 11px; font-weight: 800; letter-spacing: .16em; text-transform: uppercase; color: var(--muted); white-space: nowrap; }
 .tn20 .ttk-eyebrow--w { font-size: 12px; letter-spacing: .14em; color: var(--ink); }
 .tn20 .ttk-pot-v { position: relative; display: flex; align-items: baseline; gap: 6px; font-size: 13px; color: var(--soft); }
 .tn20 .ttk-pot-n { font-family: var(--tn-font-display); font-weight: 900; font-size: clamp(28px, 8.6cqi, 36px); line-height: .9; color: var(--ink); font-variant-numeric: tabular-nums; display: inline-block; transform-origin: left bottom; }
@@ -143,7 +143,7 @@
 .tn20 .ttk-lad-lock { color: var(--ttk-gold); }
 .tn20 .ttk-lad-c > span {
   width: 100%; height: 30px; border-radius: 7px; border: 1px solid var(--line); color: var(--muted); display: flex; align-items: center; justify-content: center;
-  font-family: var(--tn-font-display); font-weight: 800; font-size: 11px; font-variant-numeric: tabular-nums;
+  font-family: var(--tn-font-display); font-weight: 800; font-size: 12px; font-variant-numeric: tabular-nums;
   transition: background .22s, border-color .22s, color .22s;
 }
 .tn20 .ttk-lad-c.turva > span { border-color: rgba(232, 163, 32, .55); color: var(--ttk-gold); }

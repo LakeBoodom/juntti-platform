@@ -28,7 +28,7 @@
   display: inline-flex; align-items: center; gap: 9px;
   padding: clamp(6px,.8cqw,10px) clamp(11px,1.3cqw,16px); border-radius: 999px;
   background: rgba(182,255,60,.13); border: 1px solid rgba(182,255,60,.42);
-  font-size: clamp(9px,1cqw,12px); font-weight: 800; letter-spacing: .14em;
+  font-size: clamp(11px,1cqw,12px); font-weight: 800; letter-spacing: .14em;
   text-transform: uppercase; color: #B6FF3C; margin-bottom: clamp(12px,1.5cqw,20px);
 }
 .tn20 .tnjp-badge i { position: relative; width: 7px; height: 7px; display: block; }
@@ -71,7 +71,7 @@
 .tn20 .tnjp-part:focus-visible { outline: 2px solid #B6FF3C; outline-offset: -2px; }
 .tn20 .tnjp-part-kicker {
   display: block; font-family: var(--tn-font-display); font-weight: 900;
-  font-variation-settings: "wdth" 62; font-size: clamp(9px,.95cqw,12px);
+  font-variation-settings: "wdth" 62; font-size: clamp(11px,.95cqw,12px);
   letter-spacing: .2em; text-transform: uppercase; color: currentColor; margin-bottom: 7px;
 }
 .tn20 .tnjp-part-title {
@@ -80,7 +80,7 @@
   line-height: 1; letter-spacing: -.015em; text-transform: uppercase; color: #F5F0E6;
 }
 .tn20 .tnjp-part-meta {
-  display: block; font-size: clamp(10px,1.05cqw,13px); color: #8E8676;
+  display: block; font-size: clamp(12px,1.05cqw,13px); color: #8E8676;
   font-weight: 600; margin-top: 6px;
 }
 
@@ -92,7 +92,7 @@
 }
 .tn20 .tnjp-kicker {
   font-family: var(--tn-font-display); font-weight: 900; font-variation-settings: "wdth" 62;
-  font-size: clamp(10px,1.05cqw,13px); letter-spacing: .22em; text-transform: uppercase;
+  font-size: clamp(11px,1.05cqw,13px); letter-spacing: .22em; text-transform: uppercase;
   color: #B6FF3C; white-space: nowrap;
 }
 .tn20 .tnjp-kickrow i { flex: 1; height: 1px; background: #241E13; display: block; }
@@ -121,7 +121,7 @@
   line-height: 1; letter-spacing: -.015em; text-transform: uppercase; color: #F5F0E6;
 }
 .tn20 .tnjp-subhead i { flex: 1; height: 1px; background: #241E13; display: block; }
-.tn20 .tnjp-subhead-meta { font-size: clamp(10px,1.05cqw,13px); font-weight: 700; color: #8E8676; }
+.tn20 .tnjp-subhead-meta { font-size: clamp(12px,1.05cqw,13px); font-weight: 700; color: #8E8676; }
 
 /* ── Pinnalla nyt (featured, 4/3) ── */
 .tn20 .tnjp-featured {
@@ -147,7 +147,7 @@
   position: absolute; z-index: 1; left: clamp(11px,1.2cqw,16px); top: clamp(10px,1.1cqw,14px);
   padding: 4px 9px; border-radius: 999px; background: rgba(19,17,9,.82);
   border: 1px solid currentColor; color: currentColor;
-  font-size: clamp(9px,.95cqw,11.5px); font-weight: 800; letter-spacing: .1em;
+  font-size: clamp(11px,.95cqw,11.5px); font-weight: 800; letter-spacing: .1em;
   text-transform: uppercase; white-space: nowrap; max-width: calc(100% - 22px);
   overflow: hidden; text-overflow: ellipsis;
 }
@@ -162,7 +162,7 @@
   display: flex; align-items: center; justify-content: space-between; gap: 14px;
   padding: clamp(13px,1.5cqw,20px);
 }
-.tn20 .tnjp-fcard-desc { font-size: clamp(11.5px,1.2cqw,15px); line-height: 1.45; color: #B9AF9B; text-wrap: pretty; }
+.tn20 .tnjp-fcard-desc { font-size: clamp(12px,1.2cqw,15px); line-height: 1.45; color: #B9AF9B; text-wrap: pretty; }
 .tn20 .tnjp-fcard-play {
   flex: 0 0 auto; font-family: var(--tn-font-display); font-weight: 900;
   font-variation-settings: "wdth" 76; font-size: clamp(11px,1.1cqw,14px);
@@ -192,13 +192,13 @@
 .tn20 .tnjp-pill {
   padding: 5px 10px; border-radius: 999px; background: rgba(19,17,9,.82);
   border: 1px solid rgba(245,240,230,.22); color: #F5F0E6;
-  font-size: clamp(9px,.95cqw,12px); font-weight: 800; letter-spacing: .1em;
+  font-size: clamp(11px,.95cqw,12px); font-weight: 800; letter-spacing: .1em;
   text-transform: uppercase; white-space: nowrap;
 }
 .tn20 .tnjp-club { flex: 1.25 1 min(100%,360px); min-width: 0; }
 .tn20 .tnjp-club-kicker {
   font-family: var(--tn-font-display); font-weight: 900; font-variation-settings: "wdth" 62;
-  font-size: clamp(10px,1.05cqw,13px); letter-spacing: .22em; text-transform: uppercase;
+  font-size: clamp(11px,1.05cqw,13px); letter-spacing: .22em; text-transform: uppercase;
   margin-bottom: clamp(8px,1cqw,12px);
 }
 .tn20 .tnjp-club-name {
@@ -223,7 +223,7 @@
   line-height: 1.05; letter-spacing: -.01em; color: #F5F0E6;
 }
 .tn20 .tnjp-stats span {
-  display: block; font-size: clamp(9px,.95cqw,11.5px); font-weight: 800;
+  display: block; font-size: clamp(11px,.95cqw,11.5px); font-weight: 800;
   letter-spacing: .12em; text-transform: uppercase; color: #8E8676; margin-top: 6px;
 }
 .tn20 .tnjp-cta {
@@ -243,7 +243,7 @@
 }
 .tn20 .tnjp-wall { margin-top: clamp(16px,2cqw,28px); }
 .tn20 .tnjp-wall-head {
-  font-size: clamp(9px,.95cqw,12px); font-weight: 800; letter-spacing: .16em;
+  font-size: clamp(11px,.95cqw,12px); font-weight: 800; letter-spacing: .16em;
   text-transform: uppercase; color: #5F594C; margin-bottom: clamp(8px,1cqw,12px);
 }
 .tn20 .tnjp-wall-grid {
@@ -265,7 +265,7 @@
 .tn20 .tnjp-wall-short {
   position: absolute; z-index: 1; left: 5px; right: 3px; bottom: 3px;
   font-family: var(--tn-font-display); font-weight: 900; font-variation-settings: "wdth" 62;
-  font-size: 9px; letter-spacing: .04em; text-transform: uppercase; color: #F5F0E6;
+  font-size: 11px; letter-spacing: .04em; text-transform: uppercase; color: #F5F0E6;
   text-align: left; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
 .tn20 .tnjp-wall-card[data-active] { border: 2px solid #B6FF3C; }
@@ -307,7 +307,7 @@
   text-wrap: balance; overflow-wrap: normal; word-break: keep-all;
 }
 .tn20 .tnjp-plcard-desc {
-  display: block; font-size: clamp(10.5px,1.1cqw,13.5px); line-height: 1.45;
+  display: block; font-size: clamp(12px,1.1cqw,13.5px); line-height: 1.45;
   color: #CFC7B6; margin-top: 7px; text-wrap: pretty;
 }
 
@@ -323,7 +323,7 @@
 .tn20 .tnjp-filter {
   padding: clamp(8px,.9cqw,12px) clamp(13px,1.5cqw,20px); border-radius: 999px;
   border: 1px solid #3A3122; background: transparent; color: #B9AF9B; cursor: pointer;
-  font-family: inherit; font-size: clamp(11px,1.15cqw,14px); font-weight: 700;
+  font-family: inherit; font-size: clamp(12px,1.15cqw,14px); font-weight: 700;
   letter-spacing: .02em; white-space: nowrap;
 }
 .tn20 .tnjp-filter span { opacity: .55; margin-left: 7px; }
@@ -369,12 +369,12 @@
 }
 .tn20 .tnjp-ecard-body { display: block; padding: clamp(12px,1.4cqw,18px); }
 .tn20 .tnjp-ecard-hook {
-  display: block; font-size: clamp(11px,1.15cqw,14px); line-height: 1.45; color: #B9AF9B;
+  display: block; font-size: clamp(12px,1.15cqw,14px); line-height: 1.45; color: #B9AF9B;
   text-wrap: pretty; margin-bottom: clamp(9px,1.1cqw,14px);
 }
 .tn20 .tnjp-ecard-foot {
   display: flex; align-items: center; justify-content: space-between; gap: 12px;
-  font-size: clamp(9.5px,1cqw,12px); font-weight: 800; letter-spacing: .1em;
+  font-size: clamp(11px,1cqw,12px); font-weight: 800; letter-spacing: .1em;
   text-transform: uppercase; color: #5F594C;
 }
 .tn20 .tnjp-ecard-q { color: currentColor; }

@@ -41,7 +41,7 @@
 }
 .tn20 .tnt-kicker {
   display: flex; align-items: center; gap: 12px;
-  font-size: clamp(10px, 1.05cqw, 13px); font-weight: 800; letter-spacing: .28em;
+  font-size: clamp(11px, 1.05cqw, 13px); font-weight: 800; letter-spacing: .28em;
   text-transform: uppercase; color: var(--tnt-accent);
 }
 .tn20 .tnt-kicker i { width: clamp(20px, 3cqw, 34px); height: 2px; background: var(--tnt-accent); }
@@ -74,7 +74,7 @@
 .tn20 .tnt-btn:focus-visible { outline: 2px solid var(--tn-lime); outline-offset: 3px; }
 .tn20 .tnt-hero-meta {
   display: flex; align-items: center; gap: clamp(8px, 1cqw, 12px);
-  font-size: clamp(10px, 1.1cqw, 14px); font-weight: 700; letter-spacing: .1em;
+  font-size: clamp(11px, 1.1cqw, 14px); font-weight: 700; letter-spacing: .1em;
   text-transform: uppercase; color: #aebbd4;
 }
 .tn20 .tnt-hero-meta i { width: 4px; height: 4px; border-radius: 50%; background: var(--tnt-accent); }
@@ -88,7 +88,7 @@
   display: flex; align-items: center; gap: 8px;
   padding: clamp(9px, 1cqw, 13px) clamp(13px, 1.5cqw, 20px);
   border-radius: 999px; border: 1px solid #23304c; background: #0e1628; color: #c3cfe6;
-  font-size: clamp(10px, 1.05cqw, 13px); font-weight: 800; letter-spacing: .08em;
+  font-size: clamp(11px, 1.05cqw, 13px); font-weight: 800; letter-spacing: .08em;
   text-transform: uppercase; white-space: nowrap;
   transition: border-color 150ms, color 150ms;
 }
@@ -110,7 +110,7 @@
   overflow-wrap: normal; word-break: keep-all;
 }
 .tn20 .tnt-starthead span {
-  font-size: clamp(10px, 1.05cqw, 13px); font-weight: 700; letter-spacing: .12em;
+  font-size: clamp(11px, 1.05cqw, 13px); font-weight: 700; letter-spacing: .12em;
   text-transform: uppercase; color: #6e7d9b;
 }
 .tn20 .tnt-sechead {
@@ -130,7 +130,7 @@
   overflow-wrap: normal; word-break: keep-all;
 }
 .tn20 .tnt-secintro {
-  font-size: clamp(11px, 1.2cqw, 16px); line-height: 1.45; color: #93a1be;
+  font-size: clamp(12px, 1.2cqw, 16px); line-height: 1.45; color: #93a1be;
   max-width: 58ch; text-wrap: pretty;
 }
 
@@ -176,8 +176,8 @@
    kapenee nuolen verran, ja pisin sana "kummallisuudet" (14 merkkiä) vaatii
    ≈9 px marginaalin leveillä näytöillä, ≈38 px 320 px:ssä. */
 .tn20 .tnt-grid--start .tnt-card-name { font-size: clamp(14px, 1.45cqw, 20px); line-height: 1.05; }
-.tn20 .tnt-card-hook { font-size: clamp(10px, 1.05cqw, 13px); line-height: 1.45; color: #8e9cba; text-wrap: pretty; }
-.tn20 .tnt-grid--start .tnt-card-hook { font-size: clamp(11px, 1.1cqw, 14px); color: #93a1be; }
+.tn20 .tnt-card-hook { font-size: clamp(12px, 1.05cqw, 13px); line-height: 1.45; color: #8e9cba; text-wrap: pretty; }
+.tn20 .tnt-grid--start .tnt-card-hook { font-size: clamp(12px, 1.1cqw, 14px); color: #93a1be; }
 .tn20 .tnt-card-arrow {
   margin-top: auto; padding-top: clamp(10px, 1.1cqw, 14px);
   display: flex; align-items: center; justify-content: flex-end;
@@ -211,7 +211,7 @@
 }
 .tn20 .tnt-featured-kicker {
   display: flex; align-items: center; gap: 10px;
-  font-size: clamp(9px, 1cqw, 12px); font-weight: 800; letter-spacing: .18em;
+  font-size: clamp(11px, 1cqw, 12px); font-weight: 800; letter-spacing: .18em;
   text-transform: uppercase; color: var(--tnt-accent);
 }
 .tn20 .tnt-featured-kicker i { width: clamp(16px, 2cqw, 26px); height: 2px; background: var(--tnt-accent); }
@@ -223,7 +223,7 @@
 }
 .tn20 .tnt-featured-text { font-size: clamp(12px, 1.3cqw, 17px); line-height: 1.5; color: #aebbd4; max-width: 52ch; text-wrap: pretty; }
 .tn20 .tnt-featured-meta {
-  font-size: clamp(9px, 1cqw, 12px); font-weight: 800; letter-spacing: .1em;
+  font-size: clamp(11px, 1cqw, 12px); font-weight: 800; letter-spacing: .1em;
   text-transform: uppercase; color: #6e7d9b;
 }
 
@@ -231,7 +231,7 @@
   margin-top: clamp(34px, 4.4cqw, 68px); border-top: 1px solid #16203a; background: #070d1c;
   padding: clamp(22px, 3cqw, 40px) clamp(18px, 4cqw, 60px);
   display: flex; flex-wrap: wrap; gap: 14px; justify-content: space-between;
-  font-size: clamp(10px, 1.05cqw, 13px); color: #5a6785; font-weight: 600;
+  font-size: clamp(12px, 1.05cqw, 13px); color: #5a6785; font-weight: 600;
 }
 
 /* ── Etusivun mainosbanneri (design: "Etusivun mainosbanneri") ──────── */
@@ -257,7 +257,7 @@
 }
 .tn20 .tnt-banner-kicker {
   display: flex; align-items: center; gap: 10px;
-  font-size: clamp(9px, 1cqw, 12px); font-weight: 800; letter-spacing: .2em;
+  font-size: clamp(11px, 1cqw, 12px); font-weight: 800; letter-spacing: .2em;
   text-transform: uppercase; color: var(--tnt-accent);
 }
 .tn20 .tnt-banner-kicker i { width: clamp(14px, 1.8cqw, 24px); height: 2px; background: var(--tnt-accent); }
@@ -278,7 +278,7 @@
 }
 .tn20 .tnt-banner:hover .tnt-banner-btn { background: #c9ff6e; }
 .tn20 .tnt-banner-meta {
-  font-size: clamp(9px, 1cqw, 12px); font-weight: 800; letter-spacing: .1em;
+  font-size: clamp(11px, 1cqw, 12px); font-weight: 800; letter-spacing: .1em;
   text-transform: uppercase; color: #8e9cba;
 }
 

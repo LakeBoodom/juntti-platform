@@ -35,7 +35,7 @@
   padding: 6px 14px; border-radius: 999px; margin-bottom: clamp(12px,1.6cqw,22px);
   background: rgba(79,209,245,.14); border: 1px solid rgba(79,209,245,.45);
   color: #4FD1F5; font-weight: 800; letter-spacing: .14em; text-transform: uppercase;
-  font-size: clamp(9px,.95cqw,12px); white-space: nowrap;
+  font-size: clamp(11px,.95cqw,12px); white-space: nowrap;
 }
 .tn20 .tnj-status i {
   width: 7px; height: 7px; border-radius: 50%; background: #4FD1F5; display: block;
@@ -75,7 +75,7 @@
 .tn20 .tnj-score a:focus-visible { outline: 2px solid #4FD1F5; outline-offset: -2px; }
 .tn20 .tnj-score-kicker {
   display: block; color: #4FD1F5; font-weight: 900; letter-spacing: .18em;
-  text-transform: uppercase; font-size: clamp(9px,.95cqw,11px);
+  text-transform: uppercase; font-size: clamp(11px,.95cqw,11px);
   font-family: var(--tn-font-display); font-variation-settings: "wdth" 62;
 }
 .tn20 .tnj-score-title {
@@ -84,7 +84,7 @@
   font-size: clamp(17px,1.9cqw,26px); line-height: 1;
 }
 .tn20 .tnj-score-meta {
-  display: block; margin-top: 5px; color: #8E8676; font-size: clamp(10px,1.05cqw,13px); font-weight: 600;
+  display: block; margin-top: 5px; color: #8E8676; font-size: clamp(12px,1.05cqw,13px); font-weight: 600;
 }
 
 /* ── Eräotsikot ── */
@@ -95,7 +95,7 @@
 }
 .tn20 .tnj-kicker {
   font-family: var(--tn-font-display); font-weight: 900; font-variation-settings: "wdth" 62;
-  font-size: clamp(10px,1.05cqw,13px); letter-spacing: .22em; text-transform: uppercase;
+  font-size: clamp(11px,1.05cqw,13px); letter-spacing: .22em; text-transform: uppercase;
   color: #4FD1F5; white-space: nowrap;
 }
 .tn20 .tnj-kickrow i { flex: 1; height: 1px; background: #241E13; display: block; }
@@ -173,7 +173,7 @@
   --u: clamp(0.62px, 1.92cqw, 1px);
   position: absolute; z-index: 60; cursor: pointer;
   padding: 2px 6px; border-radius: 5px; white-space: nowrap;
-  font-size: clamp(8.5px, 1cqw, 12px); font-weight: 800; letter-spacing: .04em;
+  font-size: clamp(11px, 1cqw, 12px); font-weight: 800; letter-spacing: .04em;
   text-transform: uppercase;
   background: rgba(19,17,9,.86); color: #EDE6D8;
   border: 1px solid rgba(245,240,230,.24);
@@ -195,7 +195,7 @@
 
 .tn20 .tnj-map-note {
   margin: clamp(12px,1.4cqw,18px) 0 0; color: #8E8676;
-  font-size: clamp(11px,1.1cqw,13px); line-height: 1.5; max-width: 46ch; text-wrap: pretty;
+  font-size: clamp(12px,1.1cqw,13px); line-height: 1.5; max-width: 46ch; text-wrap: pretty;
 }
 
 /* Ruudunlukijan live-alue */
@@ -225,7 +225,7 @@
 .tn20 .tnj-pill {
   padding: 5px 11px; border-radius: 999px; background: rgba(19,17,9,.8);
   border: 1px solid rgba(245,240,230,.22); color: #F5F0E6;
-  font-size: clamp(9px,.95cqw,12px); font-weight: 800; letter-spacing: .1em;
+  font-size: clamp(11px,.95cqw,12px); font-weight: 800; letter-spacing: .1em;
   text-transform: uppercase; white-space: nowrap;
 }
 .tn20 .tnj-team-name {
@@ -259,7 +259,7 @@
 /* Paitaseinä */
 .tn20 .tnj-wall-head {
   color: #8E8676; font-weight: 800; letter-spacing: .16em; text-transform: uppercase;
-  font-size: clamp(9px,.95cqw,12px); margin-bottom: clamp(8px,1cqw,12px);
+  font-size: clamp(11px,.95cqw,12px); margin-bottom: clamp(8px,1cqw,12px);
 }
 .tn20 .tnj-wall-grid {
   display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%,72px),1fr));
@@ -280,7 +280,7 @@
 .tn20 .tnj-wall-short {
   position: absolute; z-index: 1; left: 6px; bottom: 4px; right: 4px;
   font-family: var(--tn-font-display); font-weight: 900; font-variation-settings: "wdth" 62;
-  font-size: 9px; letter-spacing: .04em; text-transform: uppercase; color: #F5F0E6;
+  font-size: 11px; letter-spacing: .04em; text-transform: uppercase; color: #F5F0E6;
   text-align: left; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
 .tn20 .tnj-wall-card[data-active] { opacity: 1; border: 2px solid #4FD1F5; }
@@ -365,7 +365,7 @@
   position: absolute; z-index: 1; left: clamp(10px,1.2cqw,15px); top: clamp(9px,1.1cqw,14px);
   padding: 4px 10px; border-radius: 999px; background: rgba(19,17,9,.82);
   border: 1px solid currentColor; color: currentColor;
-  font-size: clamp(8.5px,.9cqw,11px); font-weight: 800; letter-spacing: .1em;
+  font-size: clamp(11px,.9cqw,11px); font-weight: 800; letter-spacing: .1em;
   text-transform: uppercase; white-space: nowrap; max-width: calc(100% - 20px);
   overflow: hidden; text-overflow: ellipsis;
 }

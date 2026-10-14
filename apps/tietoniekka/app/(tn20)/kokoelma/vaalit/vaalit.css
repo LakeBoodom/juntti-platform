@@ -66,8 +66,8 @@
 .tn20 .vl-vaiheet li { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
 .tn20 .vl-vaihe-palkki { height: 4px; border-radius: 999px; background: #2e2944; }
 .tn20 .vl-vaiheet li.on .vl-vaihe-palkki { background: var(--vl-acc); }
-.tn20 .vl-vaihe-nimi { font-size: 11px; font-weight: 700; line-height: 1.25; color: var(--vl-text-2); hyphens: manual; }
-.tn20 .vl-vaihe-aika { font-size: 11px; font-weight: 600; color: var(--vl-muted); white-space: nowrap; }
+.tn20 .vl-vaihe-nimi { font-size: 12px; font-weight: 700; line-height: 1.25; color: var(--vl-text-2); hyphens: manual; }
+.tn20 .vl-vaihe-aika { font-size: 12px; font-weight: 600; color: var(--vl-muted); white-space: nowrap; }
 
 /* ── Runko ────────────────────────────────────────────────────────── */
 .tn20 .vl-runko {
@@ -128,7 +128,7 @@
 .tn20 .vl-koti span { width: 7px; height: 7px; border-radius: 999px; background: var(--vl-acc); }
 .tn20 .vl-tagi {
   position: absolute; top: 10px; left: 10px; padding: 3px 8px; border-radius: 999px; background: rgba(19, 17, 9, 0.7); border: 1px solid var(--vl-line);
-  font-size: 10px; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; color: var(--vl-acc-2);
+  font-size: 11px; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; color: var(--vl-acc-2);
 }
 .tn20 .vl-kortti-teksti { display: flex; flex-direction: column; gap: 6px; padding: clamp(12px, 1.2cqw, 16px); min-width: 0; container-type: inline-size; }
 .tn20 .vl-kortti-otsikko {
@@ -143,7 +143,7 @@
   flex: 0 0 clamp(250px, 30cqw, 400px); display: flex; align-items: center; gap: 14px; padding: clamp(14px, 1.4cqw, 20px);
   border-radius: clamp(12px, 1.3cqw, 18px); border: 1px solid var(--vl-line); background: #1c1810; color: #f5f0e6; text-decoration: none;
 }
-.tn20 .vl-kumpi-ab { flex: none; display: flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 800; color: var(--vl-muted); }
+.tn20 .vl-kumpi-ab { flex: none; display: flex; align-items: center; gap: 4px; font-size: 12px; font-weight: 800; color: var(--vl-muted); }
 .tn20 .vl-kumpi-ab span {
   width: 40px; height: 52px; border-radius: 8px; border: 1px solid rgba(180, 165, 255, 0.45); background: #221e2c;
   display: flex; align-items: center; justify-content: center; font-family: var(--tn-font-display); font-weight: 900; font-size: 16px; color: var(--vl-acc-2);

@@ -55,7 +55,7 @@
 .tn20 .tnu-part:focus-visible { outline: 2px solid #B6FF3C; outline-offset: -2px; }
 .tn20 .tnu-part-kicker {
   display: block; font-family: var(--tn-font-display); font-weight: 900;
-  font-variation-settings: "wdth" 62; font-size: clamp(9px,.95cqw,12px);
+  font-variation-settings: "wdth" 62; font-size: clamp(11px,.95cqw,12px);
   letter-spacing: .2em; text-transform: uppercase; color: currentColor; margin-bottom: 7px;
 }
 .tn20 .tnu-part-title {
@@ -64,7 +64,7 @@
   line-height: 1; letter-spacing: -.015em; text-transform: uppercase; color: #F5F0E6;
 }
 .tn20 .tnu-part-meta {
-  display: block; font-size: clamp(10px,1.05cqw,13px); color: #8E8676;
+  display: block; font-size: clamp(12px,1.05cqw,13px); color: #8E8676;
   font-weight: 600; margin-top: 6px;
 }
 
@@ -80,11 +80,11 @@
 }
 .tn20 .tnu-kicker {
   font-family: var(--tn-font-display); font-weight: 900; font-variation-settings: "wdth" 62;
-  font-size: clamp(10px,1.05cqw,13px); letter-spacing: .22em; text-transform: uppercase;
+  font-size: clamp(11px,1.05cqw,13px); letter-spacing: .22em; text-transform: uppercase;
   white-space: nowrap;
 }
 .tn20 .tnu-kickrow i { flex: 1; height: 1px; background: #241E13; display: block; }
-.tn20 .tnu-count { font-size: clamp(10px,1.05cqw,13px); font-weight: 700; color: #8E8676; white-space: nowrap; }
+.tn20 .tnu-count { font-size: clamp(12px,1.05cqw,13px); font-weight: 700; color: #8E8676; white-space: nowrap; }
 .tn20 .tnu-headrow {
   display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between;
   gap: clamp(12px,1.8cqw,28px); margin-bottom: clamp(18px,2.4cqw,34px);
@@ -121,7 +121,7 @@
   position: absolute; z-index: 1; left: clamp(11px,1.2cqw,16px); top: clamp(10px,1.1cqw,14px);
   padding: 4px 9px; border-radius: 999px; background: rgba(19,17,9,.82);
   border: 1px solid currentColor; color: currentColor;
-  font-size: clamp(9px,.95cqw,11.5px); font-weight: 800; letter-spacing: .1em;
+  font-size: clamp(11px,.95cqw,11.5px); font-weight: 800; letter-spacing: .1em;
   text-transform: uppercase; white-space: nowrap; max-width: calc(100% - 22px);
   overflow: hidden; text-overflow: ellipsis;
 }
@@ -163,7 +163,7 @@
 .tn20 .tnu-ocard[data-ratio="21/9"] .tnu-ocard-title { font-size: clamp(26px,3.4cqw,48px); line-height: .9; letter-spacing: -.024em; }
 .tn20 .tnu-ocard[data-ratio="16/9"] .tnu-ocard-title { font-size: clamp(22px,2.8cqw,38px); line-height: .92; letter-spacing: -.022em; }
 .tn20 .tnu-ocard-sub {
-  display: block; font-size: clamp(10.5px,1.1cqw,13.5px); line-height: 1.45;
+  display: block; font-size: clamp(12px,1.1cqw,13.5px); line-height: 1.45;
   color: #CFC7B6; margin-top: 7px; text-wrap: pretty; max-width: 46ch;
 }
 .tn20 .tnu-ocard-foot {
@@ -194,7 +194,7 @@
 }
 .tn20 .tnu-scard-body { display: block; padding: clamp(12px,1.4cqw,18px); }
 .tn20 .tnu-scard-sub {
-  display: block; font-size: clamp(11px,1.15cqw,14px); line-height: 1.45; color: #B9AF9B;
+  display: block; font-size: clamp(12px,1.15cqw,14px); line-height: 1.45; color: #B9AF9B;
   text-wrap: pretty; margin-bottom: clamp(9px,1.1cqw,14px);
 }
 .tn20 .tnu-scard-foot {
@@ -221,7 +221,7 @@
   position: absolute; z-index: 1; left: clamp(14px,1.6cqw,22px); top: clamp(12px,1.4cqw,18px);
   padding: 5px 11px; border-radius: 999px; background: rgba(19,17,9,.82);
   border: 1px solid currentColor; color: currentColor;
-  font-size: clamp(9px,.95cqw,12px); font-weight: 800; letter-spacing: .12em;
+  font-size: clamp(11px,.95cqw,12px); font-weight: 800; letter-spacing: .12em;
   text-transform: uppercase; white-space: nowrap;
 }
 .tn20 .tnu-gate-text {
@@ -239,7 +239,7 @@
   gap: 10px; margin-top: 9px;
 }
 .tn20 .tnu-gate-desc {
-  font-size: clamp(11.5px,1.2cqw,15px); line-height: 1.45; color: #CFC7B6;
+  font-size: clamp(12px,1.2cqw,15px); line-height: 1.45; color: #CFC7B6;
   max-width: 40ch; text-wrap: pretty;
 }
 

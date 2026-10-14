@@ -153,7 +153,7 @@
    (mitattu 10.10.2026: 320 px → 272–335, reuna 302; 375 px → 321–384, reuna 357). Kolmikirjaimiset nimet
    10 px / .06em → leveys ≈ 27 px, viimeinen 272+27 = 299 ≤ 302 (mitattu .08em: 304, 2 px yli). */
 @container (max-width: 400px) {
-  .tn20 .ju-aika-kk { font-size: 10px; letter-spacing: .06em; }
+  .tn20 .ju-aika-kk { font-size: 11px; letter-spacing: .06em; }
   .tn20 .ju-aika-kk-pitka { display: none; }
   .tn20 .ju-aika-kk-lyhyt { display: inline; }
 }
@@ -194,7 +194,7 @@
 .tn20 a.ju-t2-kortti:hover { border-color: #3a3120; color: #f5f0e6; }
 .tn20 .ju-t2-pv { width: 64px; height: 64px; border-radius: 13px; border: 1px solid; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; }
 .tn20 .ju-t2-pv b { font-family: var(--ju-display); font-weight: 900; font-variation-settings: "wdth" 76; font-size: 24px; line-height: 1; }
-.tn20 .ju-t2-pv small { font-size: 10px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; }
+.tn20 .ju-t2-pv small { font-size: 11px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; }
 .tn20 .ju-t2-teksti { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
 /* CD 21 px + ellipsis. "ITSENÄISYYSPÄIVÄ" ei saa leikkautua: koko pienenee laatan leveyden mukaan
    (tekstille jää 100cqi − 102 px; 16 merkkiä ≈ 9,8 em wdth 78). 284 px:n laatassa 18,5 px. */

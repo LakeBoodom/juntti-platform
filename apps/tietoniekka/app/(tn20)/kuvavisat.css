@@ -365,7 +365,7 @@
   color: var(--tn-amber, #e8a320);
 }
 .tn20 .kv-card-cta .kv-caret {
-  font-size: 10px;
+  font-size: 12px;
   opacity: 0.55;
   transition: transform 220ms cubic-bezier(0.2, 0.8, 0.2, 1);
 }

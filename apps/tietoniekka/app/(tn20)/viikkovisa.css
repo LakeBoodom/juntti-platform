@@ -44,7 +44,7 @@
   border-radius: 7px; border: 1px solid #3a3120; color: #cfc7b6;
   font-size: 11px; font-weight: 800; letter-spacing: 0.16em; text-transform: uppercase; white-space: nowrap;
 }
-.tn20 .vv-merkkirivi[data-koko="s"] .vv-pilleri { height: 22px; padding: 0 9px; font-size: 10px; letter-spacing: 0.14em; }
+.tn20 .vv-merkkirivi[data-koko="s"] .vv-pilleri { height: 22px; padding: 0 9px; font-size: 11px; letter-spacing: 0.14em; }
 
 /* ── Napit ─────────────────────────────────────────────────────────────── */
 .tn20 .vv-btn {
@@ -121,7 +121,7 @@
 /* ── Aloitusnäkymä (kierros 11, korjattu) ──────────────────────────────── */
 /* HUD:n oikea laita aloitusvaiheessa: "Viikko 38 · voimassa su 20.9. asti" */
 .tn20 .vv-hud {
-  margin-left: auto; font-size: clamp(10px, 0.9cqw, 12px); font-weight: 800;
+  margin-left: auto; font-size: clamp(11px, 0.9cqw, 12px); font-weight: 800;
   letter-spacing: 0.14em; text-transform: uppercase; color: #8e8676; white-space: nowrap;
 }
 .tn20 .vv-hud-lyhyt { display: none; }

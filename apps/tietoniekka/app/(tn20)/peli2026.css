@@ -68,7 +68,7 @@
 .tn20 .tng-cat {
   display: inline-flex; align-items: center; gap: 7px; padding: 6px 13px; border-radius: 999px;
   background: var(--tnAccWash); border: 1px solid var(--tnAccBorder); color: var(--tnAccText);
-  font-size: clamp(10px, 0.95cqw, 13px); font-weight: 800; letter-spacing: 0.11em; text-transform: uppercase; white-space: nowrap;
+  font-size: clamp(11px, 0.95cqw, 13px); font-weight: 800; letter-spacing: 0.11em; text-transform: uppercase; white-space: nowrap;
 }
 .tn20 .tng-progress { flex: 1 1 170px; min-width: 118px; display: flex; flex-direction: column; gap: 7px; }
 .tn20 .tng-pips { display: flex; gap: 4px; }
@@ -78,13 +78,13 @@
 .tn20 .tng-pip[data-state="skipped"] { background: #cbc1ad; }
 .tn20 .tng-pip[data-state="now"] { background: #f2c46b; box-shadow: 0 0 0 1px rgba(242, 196, 107, 0.35); }
 .tn20 .tng-progress-row { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
-.tn20 .tng-qcount { font-size: clamp(10.5px, 1cqw, 14px); font-weight: 800; letter-spacing: 0.13em; text-transform: uppercase; color: #cbc1ad; white-space: nowrap; }
+.tn20 .tng-qcount { font-size: clamp(11px, 1cqw, 14px); font-weight: 800; letter-spacing: 0.13em; text-transform: uppercase; color: #cbc1ad; white-space: nowrap; }
 .tn20 .tng-qcount b { color: #fffbf2; font-weight: 800; }
-.tn20 .tng-done { display: inline-flex; align-items: center; gap: 8px; font-size: clamp(10.5px, 1cqw, 14px); font-weight: 800; letter-spacing: 0.13em; text-transform: uppercase; color: #cbff75; white-space: nowrap; }
-.tn20 .tng-right { font-size: clamp(10.5px, 1cqw, 14px); font-weight: 700; color: #a79e8c; white-space: nowrap; }
+.tn20 .tng-done { display: inline-flex; align-items: center; gap: 8px; font-size: clamp(11px, 1cqw, 14px); font-weight: 800; letter-spacing: 0.13em; text-transform: uppercase; color: #cbff75; white-space: nowrap; }
+.tn20 .tng-right { font-size: clamp(12px, 1cqw, 14px); font-weight: 700; color: #a79e8c; white-space: nowrap; }
 .tn20 .tng-stats { display: flex; align-items: center; gap: clamp(11px, 1.4cqw, 22px); }
 .tn20 .tng-stat { display: flex; flex-direction: column; align-items: flex-end; gap: 3px; }
-.tn20 .tng-stat-l { font-size: clamp(9.5px, 0.88cqw, 12.5px); font-weight: 800; letter-spacing: 0.15em; text-transform: uppercase; color: #a79e8c; }
+.tn20 .tng-stat-l { font-size: clamp(11px, 0.88cqw, 12.5px); font-weight: 800; letter-spacing: 0.15em; text-transform: uppercase; color: #a79e8c; }
 .tn20 .tng-stat-v { display: inline-flex; align-items: center; gap: 6px; font-family: var(--tn-font-display); font-weight: 900; font-size: clamp(19px, 1.9cqw, 30px); line-height: 1; color: #fffbf2; }
 .tn20 .tng-stat-v--streak { color: #f7ce7e; }
 .tn20 .tng-flame { display: block; animation: tngFlame 2.6s var(--ease-standard) infinite; }
@@ -151,9 +151,9 @@
 .tn20 .tng-qimg[data-ready="1"] { opacity: 1; }
 .tn20 .tng-imgerr { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; padding: 20px; background: #141009; text-align: center; z-index: 2; }
 .tn20 .tng-imgerr-t { font-size: clamp(13px, 1.2cqw, 16px); font-weight: 800; color: #ffa88f; }
-.tn20 .tng-imgerr-p { max-width: 36ch; font-size: clamp(11.5px, 1.05cqw, 14px); line-height: 1.45; color: #beb4a0; }
+.tn20 .tng-imgerr-p { max-width: 36ch; font-size: clamp(12px, 1.05cqw, 14px); line-height: 1.45; color: #beb4a0; }
 .tn20 .tng-imgerr-row { display: flex; align-items: center; gap: 9px; flex-wrap: wrap; justify-content: center; }
-.tn20 .tng-mediameta { display: flex; flex-direction: column; gap: 2px; font-size: clamp(10.5px, 0.95cqw, 13px); line-height: 1.35; color: #a79e8c; }
+.tn20 .tng-mediameta { display: flex; flex-direction: column; gap: 2px; font-size: clamp(12px, 0.95cqw, 13px); line-height: 1.35; color: #a79e8c; }
 .tn20 .tng-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 
 /* Odotusilmoitus kuvan latautuessa */
@@ -177,7 +177,7 @@
 .tn20 .tng-badge { flex: 0 0 auto; display: grid; place-items: center; width: clamp(30px, 2.8cqw, 38px); height: clamp(30px, 2.8cqw, 38px); border-radius: 10px; background: #37301f; color: #ded5c2; font-family: var(--tn-font-display); font-weight: 900; font-size: clamp(14px, 1.3cqw, 18px); }
 .tn20 .tng-abody { flex: 1 1 auto; min-width: 0; display: flex; align-items: center; gap: clamp(10px, 1.2cqw, 18px); }
 .tn20 .tng-atext { flex: 1 1 auto; min-width: 0; font-size: clamp(15.5px, 1.45cqw, 21px); font-weight: 600; line-height: 1.3; color: #f4eee0; hyphens: none; -webkit-hyphens: none; overflow-wrap: break-word; text-wrap: pretty; }
-.tn20 .tng-anote { flex: 0 0 auto; display: inline-flex; align-items: center; justify-content: flex-end; gap: 7px; min-width: clamp(132px, 11.6cqw, 172px); font-size: clamp(10.5px, 1cqw, 13.5px); font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: #cbc1ad; white-space: nowrap; }
+.tn20 .tng-anote { flex: 0 0 auto; display: inline-flex; align-items: center; justify-content: flex-end; gap: 7px; min-width: clamp(132px, 11.6cqw, 172px); font-size: clamp(11px, 1cqw, 13.5px); font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: #cbc1ad; white-space: nowrap; }
 .tn20 .tng-anote i { font-style: normal; font-size: 1.25em; line-height: 1; }
 .tn20 .tng-ans[data-state="sel"] { border-color: #f2c46b; background: rgba(242, 196, 107, 0.13); }
 .tn20 .tng-ans[data-state="correct"] { border-color: #b6ff3c; background: rgba(182, 255, 60, 0.13); animation: tngGlow 0.7s ease-out; }
@@ -208,7 +208,7 @@
 .tn20 .tng-fb[data-fb="bad"] .tng-fbtitle { color: #ffa88f; }
 .tn20 .tng-fbpts { margin-left: auto; padding: 7px 14px; border-radius: 999px; border: 1px solid #3f3624; background: rgba(15, 13, 7, 0.6); font-size: clamp(12px, 1.1cqw, 15px); font-weight: 800; color: #fffbf2; white-space: nowrap; }
 .tn20 .tng-fb-body { display: flex; flex-direction: column; gap: 6px; }
-.tn20 .tng-kicker { font-size: clamp(10.5px, 1cqw, 13px); font-weight: 800; letter-spacing: 0.16em; text-transform: uppercase; color: #f7ce7e; }
+.tn20 .tng-kicker { font-size: clamp(11px, 1cqw, 13px); font-weight: 800; letter-spacing: 0.16em; text-transform: uppercase; color: #f7ce7e; }
 .tn20 .tng-fb-correct { font-size: clamp(13px, 1.2cqw, 16px); font-weight: 700; color: #cbff75; }
 .tn20 .tng-tip { font-size: clamp(14.5px, 1.35cqw, 19px); line-height: 1.55; color: #e3daca; text-wrap: pretty; max-width: 66ch; }
 /* «Tiesitkö?» -selitys (CD kierros 5, arvo 4): selitys ei pienennä fonttia vaan
@@ -252,7 +252,7 @@
 }
 .tn20 .tng-next:hover { filter: brightness(1.07); transform: translateY(-1px); }
 .tn20 .tng-next:focus-visible { outline: 2px solid #ffe0a3; outline-offset: 3px; }
-.tn20 .tng-hint { margin-left: auto; font-size: clamp(11px, 1.05cqw, 14px); font-weight: 700; color: #a79e8c; text-align: right; white-space: nowrap; }
+.tn20 .tng-hint { margin-left: auto; font-size: clamp(12px, 1.05cqw, 14px); font-weight: 700; color: #a79e8c; text-align: right; white-space: nowrap; }
 
 /* ── Aloitusnäkymä ────────────────────────────────────────────────────── */
 .tn20 .tng-main[data-mode="aloitus"] { align-content: center; min-height: calc(100dvh - var(--tngHud, 92px)); }
@@ -318,7 +318,7 @@
   max-height: 37%;
   padding: 0 clamp(16px, 5vw, 28px) clamp(18px, 3.4vh, 30px);
 }
-.tn20 .tng-crumbs { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font-size: clamp(11.5px, 1cqw, 13px); font-weight: 600; color: #8e8676; }
+.tn20 .tng-crumbs { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font-size: clamp(12px, 1cqw, 13px); font-weight: 600; color: #8e8676; }
 .tn20 .tng-crumbs a { color: #a79e8c; }
 .tn20 .tng-crumbs a:hover { color: #f2c46b; }
 .tn20 .tng-crumbs [aria-current] { color: #cfc7b6; }
@@ -355,7 +355,7 @@
 .tn20 .tng-herobtn:focus-visible { outline: 2px solid #fffbf2; outline-offset: 3px; }
 .tn20 .tng-herometa { font-size: clamp(11.5px, 1.05cqw, 13px); font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase; color: #a79e8c; }
 /* Kuvalähde: mobiilissa kysymysmäärän perässä, ei koskaan kuvan päällä pillerissä */
-.tn20 .tng-herocredit { font-size: clamp(10.5px, 0.95cqw, 12px); font-weight: 700; letter-spacing: 0.02em; color: rgba(255, 251, 242, 0.55); }
+.tn20 .tng-herocredit { font-size: clamp(12px, 0.95cqw, 12px); font-weight: 700; letter-spacing: 0.02em; color: rgba(255, 251, 242, 0.55); }
 
 /* Henkilövisan kuvakortti: kiinteä 3:4, ei koskaan koko taustakuvaksi.
    Pystyssä kortti nousee tekstin yläpuolelle (order: -1) — muuten henkilöstä
@@ -379,7 +379,7 @@
 .tn20 .tng-herorec { display: flex; flex-direction: column; justify-content: flex-end; gap: 6px; min-height: 78px; padding: 14px 16px; border-radius: 13px; border: 1px solid #2a2317; background: rgba(22, 18, 10, 0.9); font-size: clamp(14px, 1.45cqw, 15.5px); font-weight: 600; line-height: 1.25; color: #ede4d2; transition: border-color 0.15s, transform 0.15s; }
 .tn20 .tng-herorec:hover { border-color: #7a6740; transform: translateY(-2px); color: #fffbf2; }
 .tn20 .tng-herorec:focus-visible { outline: 2px solid #f2c46b; outline-offset: 3px; }
-.tn20 .tng-herorec span { font-size: clamp(10.5px, 1cqw, 11.5px); font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; color: #8a806d; }
+.tn20 .tng-herorec span { font-size: clamp(11px, 1cqw, 11.5px); font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; color: #8a806d; }
 
 /* Matalat PYSTYruudut: kuvaus antaa periksi, ei otsikko eikä nappi (CD sääntö 3).
    Vain pystyssä: vaakanäkymässä teksti on omassa palstassaan ja tilaa riittää,
@@ -463,16 +463,16 @@
 .tn20 .tng-rescard { position: relative; overflow: hidden; display: flex; flex-direction: column; gap: clamp(10px, 1.1cqw, 16px); padding: clamp(18px, 2.1cqw, 34px); border-radius: 20px; border: 1px solid var(--tnAccBorder); background: linear-gradient(150deg, var(--tnAccWash) 0%, rgba(19, 16, 9, 0.94) 46%, rgba(19, 16, 9, 0.97) 100%); animation: tngRise 0.35s ease-out; }
 .tn20 .tng-rescard[data-perfect="1"] { animation: tngRise 0.35s ease-out, tngPerfect 2.6s var(--ease-standard) 1 0.3s; }
 .tn20 .tng-rescard-top { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
-.tn20 .tng-rescat { display: inline-flex; align-items: center; gap: 8px; font-size: clamp(10px, 0.92cqw, 13px); font-weight: 800; letter-spacing: 0.15em; text-transform: uppercase; color: var(--tnAccText); white-space: nowrap; }
+.tn20 .tng-rescat { display: inline-flex; align-items: center; gap: 8px; font-size: clamp(11px, 0.92cqw, 13px); font-weight: 800; letter-spacing: 0.15em; text-transform: uppercase; color: var(--tnAccText); white-space: nowrap; }
 .tn20 .tng-rescat i { width: 7px; height: 7px; border-radius: 50%; background: var(--tnAcc); }
-.tn20 .tng-resdate { margin-left: auto; font-size: clamp(10px, 0.92cqw, 13px); font-weight: 700; letter-spacing: 0.1em; color: #a79e8c; }
+.tn20 .tng-resdate { margin-left: auto; font-size: clamp(12px, 0.92cqw, 13px); font-weight: 700; letter-spacing: 0.1em; color: #a79e8c; }
 .tn20 .tng-resnums { display: flex; align-items: flex-end; gap: clamp(16px, 2cqw, 36px); flex-wrap: wrap; }
 .tn20 .tng-bignum { display: flex; align-items: baseline; font-family: var(--tn-font-display); font-weight: 900; font-size: clamp(66px, 7.6cqw, 124px); line-height: 0.8; letter-spacing: -0.03em; color: #fffbf2; }
 .tn20 .tng-bignum b { color: var(--tnAccText); font-weight: 900; }
 .tn20 .tng-bignum i { font-style: normal; padding: 0 0.06em; color: #6b6151; font-size: 0.78em; }
 .tn20 .tng-resmeta { display: flex; flex-direction: column; gap: clamp(8px, 0.9cqw, 12px); padding-bottom: 0.35em; }
 .tn20 .tng-resmeta > div { display: flex; flex-direction: column; gap: 2px; }
-.tn20 .tng-resmeta-l { font-size: clamp(9.5px, 0.88cqw, 12px); font-weight: 800; letter-spacing: 0.15em; text-transform: uppercase; color: #a79e8c; }
+.tn20 .tng-resmeta-l { font-size: clamp(11px, 0.88cqw, 12px); font-weight: 800; letter-spacing: 0.15em; text-transform: uppercase; color: #a79e8c; }
 .tn20 .tng-resmeta-v { font-family: var(--tn-font-display); font-weight: 900; font-size: clamp(20px, 2cqw, 30px); line-height: 1; color: #fffbf2; }
 /* KORTTISÄÄNTÖ: pisin sana "HARJOITELTAVAA" (n. 9,7 × fonttikoko px) mahtuu kortin sisäleveyteen (100cqw − 70px) myös 320 px:ssä */
 .tn20 .tng-restitle { margin: 0; font-family: var(--tn-font-display); font-weight: 900; font-size: min(clamp(24px, 3cqw, 46px), calc(10.3cqw - 7.3px)); line-height: 1; letter-spacing: -0.015em; text-transform: uppercase; color: #fffbf2; text-wrap: balance; hyphens: none; overflow-wrap: normal; word-break: keep-all; }
@@ -481,8 +481,8 @@
 
 .tn20 .tng-sumwrap { display: flex; flex-direction: column; gap: clamp(10px, 1.1cqw, 14px); }
 .tn20 .tng-sumhead { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
-.tn20 .tng-sumlabel { font-size: clamp(10px, 0.92cqw, 13px); font-weight: 800; letter-spacing: 0.16em; text-transform: uppercase; color: #cbc1ad; }
-.tn20 .tng-sumtext { font-size: clamp(11.5px, 1.05cqw, 14px); font-weight: 700; color: #a79e8c; white-space: nowrap; }
+.tn20 .tng-sumlabel { font-size: clamp(11px, 0.92cqw, 13px); font-weight: 800; letter-spacing: 0.16em; text-transform: uppercase; color: #cbc1ad; }
+.tn20 .tng-sumtext { font-size: clamp(12px, 1.05cqw, 14px); font-weight: 700; color: #a79e8c; white-space: nowrap; }
 .tn20 .tng-ghost { display: inline-flex; align-items: center; gap: 9px; min-height: 44px; padding: 11px 18px; border-radius: 12px; border: 1px solid #4c4028; background: rgba(23, 19, 11, 0.85); color: #f7ce7e; font-size: clamp(12px, 1.1cqw, 15px); font-weight: 800; white-space: nowrap; cursor: pointer; transition: border-color 0.15s, color 0.15s; }
 .tn20 .tng-ghost:hover { border-color: #f2c46b; color: #ffe0a3; }
 .tn20 .tng-ghost:focus-visible { outline: 2px solid #f2c46b; outline-offset: 3px; }
@@ -529,7 +529,7 @@
 .tn20 .tng-wa:hover { filter: brightness(1.06); transform: translateY(-1px); color: #04220f; }
 .tn20 .tng-wa:focus-visible { outline: 2px solid #7bf0ac; outline-offset: 3px; }
 .tn20 .tng-sharepreview { display: flex; flex-direction: column; gap: 6px; padding: clamp(11px, 1.2cqw, 16px); border-radius: 12px; border: 1px dashed #4c4028; background: rgba(15, 13, 7, 0.55); }
-.tn20 .tng-sharepreview-l { font-size: clamp(9.5px, 0.88cqw, 12px); font-weight: 800; letter-spacing: 0.15em; text-transform: uppercase; color: #a79e8c; }
+.tn20 .tng-sharepreview-l { font-size: clamp(11px, 0.88cqw, 12px); font-weight: 800; letter-spacing: 0.15em; text-transform: uppercase; color: #a79e8c; }
 .tn20 .tng-sharepreview-t { font-size: clamp(13px, 1.2cqw, 16px); line-height: 1.5; color: #e3daca; text-wrap: pretty; }
 .tn20 .tng-sharepreview-u { font-size: clamp(12px, 1.1cqw, 14.5px); color: var(--tnAccText); word-break: break-all; }
 .tn20 .tng-sharewrap { display: flex; flex-direction: column; gap: clamp(9px, 1cqw, 13px); }
@@ -552,7 +552,7 @@
 .tn20 .tng-rec:focus-visible { outline: 2px solid #f2c46b; outline-offset: 3px; }
 .tn20 .tng-rec-text { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
 .tn20 .tng-rec-name { font-family: var(--tn-font-display); font-weight: 900; font-size: clamp(15px, 1.35cqw, 19px); line-height: 1.1; color: #fffbf2; }
-.tn20 .tng-rec-meta { font-size: clamp(11.5px, 1.05cqw, 14px); font-weight: 600; color: #a79e8c; }
+.tn20 .tng-rec-meta { font-size: clamp(12px, 1.05cqw, 14px); font-weight: 600; color: #a79e8c; }
 .tn20 .tng-recarrow { flex: 0 0 auto; color: var(--tnAccText); font-size: 19px; line-height: 1; transition: transform 0.18s; }
 
 /* ── Tarkastelupaneeli + lightbox ─────────────────────────────────────── */
@@ -577,7 +577,7 @@
 .tn20 .tng-rvrow { display: flex; flex-direction: column; gap: 5px; padding: 14px 16px; border-radius: 13px; border: 1px solid #37301f; background: rgba(21, 17, 10, 0.9); }
 .tn20 .tng-rvrow[data-kind="bad"] { border-color: rgba(255, 107, 74, 0.42); background: rgba(255, 107, 74, 0.09); }
 .tn20 .tng-rvrow--correct { border-color: rgba(182, 255, 60, 0.42); background: rgba(182, 255, 60, 0.1); }
-.tn20 .tng-rvrow-l { font-size: 10.5px; font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase; color: #a79e8c; }
+.tn20 .tng-rvrow-l { font-size: 11px; font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase; color: #a79e8c; }
 .tn20 .tng-rvrow--correct .tng-rvrow-l { color: #cbff75; }
 .tn20 .tng-rvrow-v { font-size: 15.5px; font-weight: 600; line-height: 1.35; color: #f4eee0; }
 .tn20 .tng-dlg-tip { font-size: 15px; line-height: 1.55; color: #e3daca; text-wrap: pretty; }
@@ -850,7 +850,7 @@
   display: inline-flex; align-items: center; gap: 7px;
   height: 28px; padding: 0 13px; border-radius: 999px;
   border: 1px solid #3a3120; background: transparent; color: #cfc7b6;
-  font-size: clamp(11.5px, 1cqw, 13px); font-weight: 600; cursor: zoom-in;
+  font-size: clamp(12px, 1cqw, 13px); font-weight: 600; cursor: zoom-in;
   transition: border-color 0.15s, color 0.15s;
 }
 .tn20 .tng-zoomrow:hover:not(:disabled) { border-color: #6b5a36; color: #f4eee0; }
@@ -956,11 +956,11 @@
      kutistu lukituksessa, koska vain reunaväri, tausta ja merkki muuttuvat. */
   .tn20 .tng[data-lock="1"] .tng-ans { min-height: 0; height: clamp(50px, 4.4cqw, 64px); padding: 0 clamp(13px, 1.4cqw, 18px); border-radius: 13px; }
   .tn20 .tng[data-lock="1"] .tng-main[data-mode="peli"] .tng-agroup { gap: clamp(7px, 0.7cqw, 9px); }
-  .tn20 .tng[data-lock="1"] .tng-badge { width: clamp(24px, 2.05cqw, 28px); height: clamp(24px, 2.05cqw, 28px); border-radius: 7px; font-size: clamp(11px, 0.95cqw, 13px); }
+  .tn20 .tng[data-lock="1"] .tng-badge { width: clamp(24px, 2.05cqw, 28px); height: clamp(24px, 2.05cqw, 28px); border-radius: 7px; font-size: clamp(12px, 0.95cqw, 13px); }
   .tn20 .tng[data-lock="1"] .tng-atext { font-size: clamp(15px, 1.33cqw, 18px); line-height: 1.2; }
-  .tn20 .tng[data-lock="1"] .tng-anote { min-width: clamp(92px, 7.8cqw, 124px); font-size: clamp(9.5px, 0.8cqw, 11px); }
+  .tn20 .tng[data-lock="1"] .tng-anote { min-width: clamp(92px, 7.8cqw, 124px); font-size: clamp(11px, 0.8cqw, 11px); }
   .tn20 .tng[data-lock="1"] .tng-fbtitle { font-size: clamp(21px, 2.05cqw, 30px); }
-  .tn20 .tng[data-lock="1"] .tng-fbpts { padding: 5px 11px; font-size: clamp(11px, 0.95cqw, 12px); }
+  .tn20 .tng[data-lock="1"] .tng-fbpts { padding: 5px 11px; font-size: clamp(12px, 0.95cqw, 12px); }
   .tn20 .tng[data-lock="1"] .tng-tip { font-size: clamp(14px, 1.2cqw, 17px); line-height: 1.45; max-width: none; }
   .tn20 .tng[data-lock="1"] .tng-main[data-mode="peli"] .tng-act { padding: 0; min-height: clamp(48px, 3.75cqw, 52px); gap: 14px; }
   .tn20 .tng[data-lock="1"] .tng-next { min-height: clamp(48px, 3.75cqw, 52px); padding: 0 clamp(24px, 2.2cqw, 30px); border-radius: 999px; font-size: clamp(14px, 1.2cqw, 16px); }
@@ -984,7 +984,7 @@
   .tn20 .tng[data-lock="1"] .tng-qh { flex: 0 0 auto; max-width: none; font-size: clamp(18px, min(5.6vw, 3.1dvh), 26px); line-height: 1.08; }
   .tn20 .tng[data-lock="1"] .tng-ans { min-height: 0; height: clamp(46px, 6.1dvh, 56px); padding: 0 13px; border-radius: 12px; }
   .tn20 .tng[data-lock="1"] .tng-main[data-mode="peli"] .tng-agroup { gap: 7px; }
-  .tn20 .tng[data-lock="1"] .tng-badge { width: 24px; height: 24px; font-size: 11px; }
+  .tn20 .tng[data-lock="1"] .tng-badge { width: 24px; height: 24px; font-size: 12px; }
   .tn20 .tng[data-lock="1"] .tng-atext { font-size: clamp(14px, 3.9vw, 16px); }
   .tn20 .tng[data-lock="1"] .tng-fb, .tn20 .tng[data-lock="1"] .tng-fbwait { padding: 12px 14px; border-radius: 14px; gap: 6px; }
   /* Tulos siirtyy alapalkkiin → otsikko pois lohkosta. Ruudunlukija saa
@@ -993,9 +993,9 @@
   .tn20 .tng[data-lock="1"] .tng-fb[data-fb] { border-color: #2c2517; background: #17140d; }
   .tn20 .tng[data-lock="1"] .tng-fb-correct[data-dup="1"] { display: none; }
   .tn20 .tng[data-lock="1"] .tng-tip { font-size: 14px; line-height: 1.42; max-width: none; }
-  .tn20 .tng[data-lock="1"] .tng-kicker { font-size: 9.5px; }
+  .tn20 .tng[data-lock="1"] .tng-kicker { font-size: 11px; }
   .tn20 .tng[data-lock="1"] .tng-medialine { min-height: 20px; gap: 10px; align-items: flex-start; }
-  .tn20 .tng[data-lock="1"] .tng-credit { font-size: 9px; letter-spacing: 0.1em; padding-top: 4px; }
+  .tn20 .tng[data-lock="1"] .tng-credit { font-size: 11px; letter-spacing: 0.1em; padding-top: 4px; }
   .tn20 .tng[data-lock="1"] .tng-zoomrow { height: 26px; padding: 0 11px; font-size: 12px; }
 
   .tn20 .tng[data-lock="1"] .tng-main[data-mode="peli"] .tng-act {
@@ -1126,7 +1126,7 @@
   }
   .tn20 .tng-hero .tng-crumbs { order: 4; font-size: 12px; color: #8A826F; }
   .tn20 .tng-hero .tng-crumbs a, .tn20 .tng-hero .tng-crumbs [aria-current] { color: #8A826F; }
-  .tn20 .tng-herocredit { order: 5; margin-top: -6px; font-size: 11px; color: rgba(245, 240, 230, 0.45); }
+  .tn20 .tng-herocredit { order: 5; margin-top: -6px; font-size: 12px; color: rgba(245, 240, 230, 0.45); }
   .tn20 .tng-herop, .tn20 .tng-herometa { display: none; }
   /* Otsikko: Archivo Variable 900 wdth 118, 30 px, rivikorkeus 1 (handoff). KORTTISÄÄNTÖ: pisin
      sana rajaa koon. Mitattu 7.10.2026 (versaali, pisimmät suomen sanat, leveys / em / merkki):
@@ -1162,7 +1162,7 @@
 .tn20 .tng-mukana a:focus-visible { outline: 2px solid #f2c46b; outline-offset: 2px; }
 .tn20 .tng-mukana-kuva {
   flex: none; width: 26px; height: 26px; border-radius: 50%; overflow: hidden; background: #2a2317;
-  display: inline-flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 900; color: #a79e8c;
+  display: inline-flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 900; color: #a79e8c;
 }
 .tn20 .tng-mukana-kuva img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 20%; filter: grayscale(0.25); }
 .tn20 .tng-start .tng-mukana { margin-top: 4px; }

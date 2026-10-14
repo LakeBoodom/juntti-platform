@@ -156,7 +156,7 @@
 .tn20 .tnl3-kortti:focus-visible { outline: 2px solid var(--l3-vihrea); outline-offset: 3px; }
 .tn20 .tnl3-kortti-media { position: relative; display: block; aspect-ratio: 16 / 10; background: #1A160D; overflow: hidden; }
 .tn20 .tnl3-kortti-media img { width: 100%; height: 100%; object-fit: cover; display: block; }
-.tn20 .tnl3-pilleri--pieni { left: 10px; top: 10px; height: 26px; gap: 6px; padding: 0 10px 0 8px; font-size: 11px; }
+.tn20 .tnl3-pilleri--pieni { left: 10px; top: 10px; height: 26px; gap: 6px; padding: 0 10px 0 8px; font-size: 12px; }
 .tn20 .tnl3-pilleri--pieni svg { width: 14px; height: 14px; }
 .tn20 .tnl3-kortti-teksti { display: flex; flex-direction: column; gap: 6px; padding: 14px 16px 18px; }
 .tn20 .tnl3-kortti-otsikko {
@@ -206,7 +206,7 @@
   .tn20 .tnl3-muoto-media { height: auto; aspect-ratio: 4 / 3; }
   .tn20 .tnl3-muoto-media--kaksi { grid-template-columns: 1fr; }
   .tn20 .tnl3-muoto-media--kaksi img + img { display: none; }
-  .tn20 .tnl3-pilleri { left: 8px; top: 8px; height: 24px; gap: 5px; padding: 0 9px 0 7px; font-size: 10px; }
+  .tn20 .tnl3-pilleri { left: 8px; top: 8px; height: 24px; gap: 5px; padding: 0 9px 0 7px; font-size: 11px; }
   .tn20 .tnl3-pilleri svg { width: 13px; height: 13px; }
   .tn20 .tnl3-muoto-ala { padding: 12px 12px 14px; }
   .tn20 .tnl3-muoto-teksti { gap: 5px; }
@@ -217,7 +217,7 @@
   .tn20 .tnl3-muoto--aani .tnl3-muoto-otsikko { font-size: min(22px, calc((100cqw - 118px) / (var(--lw, 8) * 0.6))); }
   .tn20 .tnl3-pelaa { min-height: 46px; padding: 0 18px; font-size: 14px; }
   .tn20 .tnl3-muoto-otsikko { font-size: min(18px, calc((100cqw - 24px) / (var(--lw, 8) * 0.6))); font-variation-settings: "wdth" 68; line-height: 1; }
-  .tn20 .tnl3-lm { font-size: 10px; letter-spacing: 0.12em; gap: 5px; }
+  .tn20 .tnl3-lm { font-size: 11px; letter-spacing: 0.12em; gap: 5px; }
   .tn20 .tnl3-lm svg { width: 12px; height: 12px; }
   .tn20 .tnl3-suodattimet { flex-wrap: nowrap; overflow-x: auto; margin: 0 -16px; padding: 0 16px 4px; scrollbar-width: none; }
   .tn20 .tnl3-suodattimet::-webkit-scrollbar { display: none; }
