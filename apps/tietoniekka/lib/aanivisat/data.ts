@@ -129,7 +129,7 @@ export async function haeNayte(ryhma: RyhmaMeta): Promise<AaniNayte | null> {
   return v && k ? { ryhma, vuosi: v.vuosi, viikko: v.viikko, audio: k.audio, sono: k.sono, jakso: k.jakso, tauko: k.tauko } : null;
 }
 
-/** Etusivun banneri: pääryhmän näyte (null = ei julkaistua äänivisaa → banneria ei näytetä). */
+/** Etusivun banneri: kuluvan viikon pääryhmän kuva ja tekstit (null = ei julkaistua äänivisaa → banneria ei näytetä). */
 export async function haeAaniBanneri() {
   const ryhmat = await julkaistutRyhmat();
   if (!ryhmat.length) return null;
@@ -138,7 +138,9 @@ export async function haeAaniBanneri() {
   const paa = viikonPaaryhma(ryhmat, ensin.viikko) ?? ryhmat[0];
   const n = paa.key === ensin.ryhma.key ? ensin : await haeNayte(paa);
   if (!n) return null;
-  return { href: `/aanivisa/${n.ryhma.polku}`, viikko: n.viikko, audio: n.audio, sono: n.sono, jakso: n.jakso, tauko: n.tauko, kysymys: n.ryhma.banneri };
+  const r = n.ryhma;
+  if (!r.hero) return null; // kuvaton ryhmä → ruutana-banneri
+  return { href: `/aanivisa/${r.polku}`, otsikko: r.banneri, ingressi: r.banneriIngressi, levea: r.hero.levea, pysty: r.hero.pysty };
 }
 
 /** Kuluvan viikon pääryhmä, kun ryhmiä on useampi: kiertää ISO-viikon mukaan. */

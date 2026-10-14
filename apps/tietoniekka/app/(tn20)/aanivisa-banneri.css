@@ -1,63 +1,88 @@
-/* ÄÄNIVISABANNERI (äänivisadesign 3a–3d, 8.10.2026). Komponentti components/tn20/aanivisa/AaniBanneri.tsx.
-   Mitat kuten ruutana-bannerissa (ruutana-banneri.css): desktop 1160 × 268, tabletti ≤ 860 → 240,
-   mobiili < 520 pystymalli 380 × 520. Koko banneri on linkki (.ab-linkki venyy alle), Kuuntele- ja CTA-
-   painikkeet sen päällä. FONTTI (KORTTISÄÄNTÖ): "Archivo Variable" wdth 72, pisin sana "Tunnistatko"
-   (11 merkkiä × 0,59 em) → koko rajataan kontin leveyden mukaan. */
+/* ÄÄNIVISABANNERI (CD "TN Aanivisat – bannerit ja hero" 2a, 14.10.2026). Komponentti
+   components/tn20/aanivisa/AaniBanneri.tsx. Kolme asettelua kontin leveyden mukaan kuten ruutana-bannerissa:
+   desktop ≥ 860 (1160 × 268), tabletti 520–859 (760 × 230), mobiili < 520 (pystykuva 250 px + teksti alla).
+   Leveä kuva on aina täyskorkea ja tasattu oikeaan reunaan; vasen reuna häivytetään kuvan omalla liukuvärillä,
+   jotta kuvan reuna ei näy millään leveydellä (designin liukuväri oli bannerin leveyteen sidottu).
+   Kuplat: sijainti % kuva-alueesta, fonttikoko cqw kuva-alueen leveydestä (data lib/aanivisat.ts hero).
+   FONTTI (KORTTISÄÄNTÖ): designin Archivo wdth 70 → "Archivo Variable" (wdth-akseli ladattu tn20-layoutissa). */
 .tn20 .ab-wrap { container-type: inline-size; }
 .tn20 .ab {
   --ab-display: "Archivo Variable", "Archivo", sans-serif;
+  --ab-bg: #131109;
   position: relative; display: flex; align-items: center; height: 268px; border-radius: 18px; overflow: hidden;
-  border: 1px solid #241E13; background: #0A0905; color: #FFFBF2;
+  border: 1px solid #2C2517; background: var(--ab-bg); color: #F5F0E6; text-decoration: none;
+  font-family: var(--tn-font-body);
 }
-.tn20 .ab-linkki { position: absolute; inset: 0; z-index: 1; border-radius: inherit; }
-.tn20 .ab-linkki:focus-visible { outline: 2px solid #4ADE80; outline-offset: -3px; }
-.tn20 .ab-oikea { position: absolute; right: 0; top: 0; bottom: 0; width: 55%; pointer-events: none; }
-.tn20 .ab-sono { position: absolute; inset: 0; display: block; }
-.tn20 .ab-sono img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: fill; }
-.tn20 .ab-sono-pohja { filter: grayscale(1) brightness(0.55); opacity: 0.5; }
-.tn20 .ab-sono-kohta { position: absolute; top: 0; bottom: 0; width: 2px; margin-left: -1px; background: #B6FF3C; box-shadow: 0 0 14px 2px rgba(182, 255, 60, 0.55); }
-.tn20 .ab-varjo { position: absolute; inset: 0; background: linear-gradient(90deg, #0A0905 0%, rgba(10, 9, 5, 0.5) 22%, rgba(10, 9, 5, 0) 50%); }
-.tn20 .ab-teksti { position: relative; display: flex; flex-direction: column; gap: 16px; padding: 0 40px; max-width: 620px; pointer-events: none; }
-.tn20 .ab-tagi {
-  align-self: flex-start; height: 24px; display: flex; align-items: center; padding: 0 10px; border-radius: 6px; background: #4ADE80; color: #0F0D07;
-  font-size: 11px; font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase;
+.tn20 .ab:hover { color: #F5F0E6; border-color: #3D3320; }
+.tn20 .ab:focus-visible { outline: 2px solid #4ADE80; outline-offset: 3px; }
+
+.tn20 .ab-kuva { position: absolute; display: block; container-type: inline-size; }
+.tn20 .ab-kuva img { position: absolute; inset: 0; display: block; width: 100%; height: 100%; }
+.tn20 .ab-kuva--levea { right: 0; top: 0; height: 100%; }
+.tn20 .ab-kuva--levea::after {
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(90deg, var(--ab-bg) 0%, rgba(19, 17, 9, 0.6) 14%, rgba(19, 17, 9, 0) 34%);
 }
+.tn20 .ab-varjo { position: absolute; inset: 0; pointer-events: none; }
+.tn20 .ab-kupla {
+  position: absolute; z-index: 1; transform: translate(-50%, -50%);
+  display: flex; align-items: center; justify-content: center; white-space: nowrap;
+  font-family: var(--ab-display); font-weight: 900; font-variation-settings: "wdth" 78; line-height: 1;
+  text-transform: uppercase; color: #131109;
+}
+.tn20 .ab-mob { display: none; }
+
+.tn20 .ab-teksti {
+  position: relative; display: flex; flex-direction: column; justify-content: center; gap: 14px;
+  max-width: 520px; padding-left: 44px;
+}
+.tn20 .ab-tagi, .tn20 .ab-mob-tagi {
+  display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 800; letter-spacing: 0.18em;
+  text-transform: uppercase; color: #4ADE80;
+}
+.tn20 .ab-piste { width: 9px; height: 9px; border-radius: 50%; background: #4ADE80; flex: none; }
+/* KORTTISÄÄNTÖ: CD 52 px. Pisin sana "LAULAA?" (7 merkkiä) tarvitsee 0,67 × 7 × 52 ≈ 244 px, tilaa on
+   ≥ 340 px (tekstipalsta 520 − 44 − marginaali) → designin koko käy sellaisenaan; otsikko rivittyy sanojen
+   välistä kahdelle riville. Mitattu 320–2450 px, 0 ylivuotoa. */
 .tn20 .ab-h {
-  margin: 0; font-family: var(--ab-display); font-weight: 900; font-variation-settings: "wdth" 72; line-height: 0.95; text-transform: uppercase;
-  font-size: min(44px, calc(45cqw / (11 * 0.62))); overflow-wrap: normal; word-break: keep-all;
+  margin: 0; font-family: var(--ab-display); font-weight: 900; font-variation-settings: "wdth" 70;
+  font-size: 52px; line-height: 0.9; letter-spacing: -0.02em; text-transform: uppercase; color: #F5F0E6;
+  text-wrap: balance; overflow-wrap: normal; word-break: keep-all;
 }
-.tn20 .ab-mob-sono { display: none; }
-.tn20 .ab-rivi { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
-.tn20 .ab-kuuntele, .tn20 .ab-cta { pointer-events: auto; position: relative; z-index: 2; }
-.tn20 .ab-kuuntele {
-  display: inline-flex; align-items: center; gap: 10px; height: 52px; padding: 0 20px 0 6px; border-radius: 999px;
-  border: 1px solid rgba(74, 222, 128, 0.6); background: rgba(74, 222, 128, 0.1); color: #FFFBF2; font: inherit; font-size: 15px; font-weight: 800; cursor: pointer;
-}
-.tn20 .ab-kuuntele-pallo { width: 40px; height: 40px; border-radius: 50%; background: #4ADE80; display: flex; align-items: center; justify-content: center; }
-.tn20 .ab-kuuntele:focus-visible, .tn20 .ab-cta:focus-visible { outline: 2px solid #FFFBF2; outline-offset: 3px; }
+.tn20 .ab-ingressi { margin: 0; font-size: 16px; line-height: 1.5; color: #CFC7B6; }
 .tn20 .ab-cta {
-  display: inline-flex; align-items: center; gap: 6px; height: 52px; padding: 0 22px; border-radius: 999px; background: #B6FF3C; color: #0F0D07;
-  font-family: var(--ab-display); font-weight: 900; font-variation-settings: "wdth" 86; font-size: 14px; text-transform: uppercase; text-decoration: none; white-space: nowrap;
+  align-self: flex-start; display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 22px;
+  border-radius: 12px; background: linear-gradient(#EFBE63, #E19E1C); color: #131109;
+  font-family: var(--ab-display); font-weight: 900; font-variation-settings: "wdth" 82; font-size: 15px;
+  letter-spacing: 0.04em; text-transform: uppercase; white-space: nowrap;
 }
-.tn20 .ab-cta:hover { color: #0F0D07; filter: brightness(1.05); }
-@media (prefers-reduced-motion: reduce) {
-  .tn20 .ab-sono-vari { clip-path: none !important; }
-  .tn20 .ab-sono-kohta { display: none; }
-}
+.tn20 .ab:hover .ab-cta { filter: brightness(1.06); }
+
+/* Tabletti 760 × 230. Kapeimmillaan (520 px) leveä kuva ulottuu tekstin alle → lisävarjo tekstin puolelle. */
 @container (max-width: 859.98px) {
-  .tn20 .ab { height: 240px; border-radius: 16px; }
-  .tn20 .ab-teksti { padding: 0 26px; gap: 13px; max-width: 58%; }
-  .tn20 .ab-h { font-size: min(32px, calc(52cqw / (11 * 0.62))); }
-  .tn20 .ab-kuuntele, .tn20 .ab-cta { height: 46px; }
+  .tn20 .ab { height: 230px; border-radius: 16px; }
+  .tn20 .ab-varjo { background: linear-gradient(90deg, var(--ab-bg) 0, rgba(19, 17, 9, 0.85) 250px, rgba(19, 17, 9, 0) 420px); }
+  .tn20 .ab-teksti { max-width: 340px; padding-left: 28px; gap: 11px; }
+  .tn20 .ab-tagi { font-size: 11px; gap: 7px; }
+  .tn20 .ab-piste { width: 8px; height: 8px; }
+  .tn20 .ab-h { font-size: 40px; }
+  .tn20 .ab-ingressi { font-size: 14px; }
+  .tn20 .ab-cta { padding: 0 18px; font-size: 14px; }
 }
+
+/* Mobiili: pystykuva ylhäällä (250 / 380 kontin leveydestä, kuva nostettu 14 / 380), teksti ja täysleveä nappi alla. */
 @container (max-width: 519.98px) {
-  .tn20 .ab { height: auto; min-height: 520px; flex-direction: column; align-items: stretch; border-radius: 16px; }
-  .tn20 .ab-oikea { display: none; }
-  .tn20 .ab-teksti { flex: 1; max-width: none; padding: 20px 18px 18px; gap: 12px; }
-  .tn20 .ab-tagi { height: 22px; padding: 0 9px; font-size: 10px; }
-  .tn20 .ab-h { font-size: min(36px, calc((100cqw - 36px) / (11 * 0.62))); }
-  .tn20 .ab-mob-sono { display: block; position: relative; flex: 1; min-height: 220px; margin: 4px -18px; }
-  .tn20 .ab-rivi { flex-direction: column; align-items: stretch; gap: 10px; }
-  .tn20 .ab-kuuntele { height: 54px; padding-right: 18px; }
-  .tn20 .ab-cta { justify-content: center; font-size: 15px; }
+  .tn20 .ab { height: auto; flex-direction: column; align-items: stretch; }
+  .tn20 .ab-kuva--levea, .tn20 .ab-varjo, .tn20 .ab-tagi { display: none; }
+  .tn20 .ab-mob { display: block; position: relative; height: calc(100cqw * 250 / 380); overflow: hidden; }
+  .tn20 .ab-mob::after {
+    content: ""; position: absolute; inset: 0; pointer-events: none;
+    background: linear-gradient(rgba(19, 17, 9, 0) 62%, var(--ab-bg) 100%);
+  }
+  .tn20 .ab-kuva--pysty { left: 0; top: calc(-100cqw * 14 / 380); width: 100%; }
+  .tn20 .ab-mob-tagi { position: absolute; z-index: 2; left: 18px; bottom: 14px; font-size: 11px; gap: 7px; }
+  .tn20 .ab-teksti { max-width: none; padding: 6px 18px 18px; gap: 10px; }
+  .tn20 .ab-h { font-size: 34px; }
+  .tn20 .ab-ingressi { font-size: 15px; }
+  .tn20 .ab-cta { align-self: stretch; justify-content: center; min-height: 48px; font-size: 15px; }
 }

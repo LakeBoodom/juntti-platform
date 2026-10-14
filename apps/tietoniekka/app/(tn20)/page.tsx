@@ -238,7 +238,7 @@ export default async function Etusivu20({
 
         {/* ─── Luonto–ruutana-koukkubanneri (CD 5a, Heikki 6.10.2026; korvasi Tiede & teknologia
             -bannerin): Kuvavisat-bannerin alla ennen Suosittuja kokoelmia ─── */}
-        {/* Äänivisabanneri (8.10.2026) vuorottelee ruutana-bannerin kanssa samalla Luonto-paikalla:
+        {/* Äänivisabanneri (8.10.2026, kuvitettu versio 14.10.2026) vuorottelee ruutana-bannerin kanssa samalla Luonto-paikalla:
             parillisina päivinä äänivisa, kun jokin ääniryhmä on julkaistu (esikatselu: ?banneri=aani). */}
         {aaniBanneri && (one("banneri") === "aani" || (one("banneri") !== "ruutana" && Math.floor(Date.UTC(today.vuosi, today.kk - 1, today.pv) / 86400000) % 2 === 0))
           ? <AaniBanneri b={aaniBanneri} />

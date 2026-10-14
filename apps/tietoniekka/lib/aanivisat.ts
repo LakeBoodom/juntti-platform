@@ -17,8 +17,9 @@ export type RyhmaMeta = {
   kuvaus: string;
   /** Luonto-kortin lyhyt kuvaus */
   kortti: string;
-  /** Etusivun bannerin kysymys (ei lajinimeä) */
+  /** Etusivun bannerin otsikko ja ingressi (ei lajinimeä) */
   banneri: string;
+  banneriIngressi: string;
   /** Aloitusnäkymän kuva (design "TN Aanivisat – bannerit ja hero" 11.10.2026): leveä ≥ 1100 px, pysty kapeammilla.
       Kuplien tekstit ovat HTML:ää kuvan päällä (sijainti % kuvan alueesta, fonttikoko cqw kuvan leveydestä). */
   hero?: { levea: KuvaKuplat; pysty: KuvaKuplat };
@@ -37,9 +38,10 @@ export const AANI_RYHMAT: RyhmaMeta[] = [
     otsikko: "Suomen linnut",
     kuvaus: "Kymmenen lintua, kymmenen ääntä. Tunnistatko lajin pelkästä laulusta?",
     kortti: "Tunnistatko lajin pelkästä laulusta? Uudet äänet maanantaisin.",
-    banneri: "Tunnistatko linnun äänestä?",
+    banneri: "Kuka siellä laulaa?",
+    banneriIngressi: "Tunnista Suomen linnut äänestä.",
     /* Kuvan linnut (käki, talitiainen, varis, huuhkaja) ovat myös visan poolissa. Siksi kuplat eivät soita ääntä
-       (design suositteli; odottaa Heikin päätöstä), vain ääntä kuvaava sana. */
+       (design suositteli; odottaa Heikin päätöstä), vain ääntä kuvaava sana. Sama kuva on etusivun bannerissa. */
     hero: {
       levea: {
         src: "/20/aanivisat/hero/suomen_linnut-levea.webp", pieni: "/20/aanivisat/hero/suomen_linnut-levea-1200.webp", leveys: 1916, korkeus: 821,
