@@ -27,6 +27,7 @@ Claude does all technical execution.
 - **Admin auth**: Supabase magic-link, email allowlist gated in middleware (`heikki.aura@uplause.com`).
 - **Icons in admin**: Lucide React. Homepage uses emoji fallback until `Juntti — Countdown Icons.pdf` is processed into Lucide-style SVG set.
 - **Fonts (juntti.com)**: Roboto Condensed 700/900, Nunito 400/700/800/900, Caveat 600/700. Google Fonts in `layout.tsx`.
+- **Fontit (tietoniekka)**: Barlow + Barlow Condensed (1.0-näkymät ja 2.0-leipäteksti), Archivo (2.0-korttijärjestelmä: staattinen `@fontsource/archivo` 500/700/900 + `@fontsource-variable/archivo` leveysakselia käyttäville). Ei muita. Instrument Sans poistettu 14.10.2026.
 - **Monorepo**: npm workspaces. `npm install --prefix=../..` at Vercel root.
 
 ## Project Structure
@@ -161,3 +162,24 @@ sana ei rivity vaan leikkautuu `overflow: hidden`iin.
    `word-break: keep-all` kanssa.
 6. Kalibroitu koko dokumentoidaan CSS-kommenttiin (mitattu tarve +
    CD:n alkuperäinen arvo + marginaali).
+
+## UI-LAATUSÄÄNNÖT — tietoniekka (UI-laatukatselmus 2026-10-14)
+
+Skilli `tietoniekka-ui-laatu` on näiden sääntöjen lähde; tässä tiivistelmä.
+
+1. **Liike vain transform/opacity.** Kestot ja käyrät tokeneista (`globals.css` `:root`):
+   `--dur-fast/-base/-slow`, `--ease-standard/-emphasized/-exit`. Ei `ease-in-out`ia, ei
+   width-, height- eikä box-shadow-transitioita. Palkin täyttö: `transform: scaleX(var(--fill))`.
+2. **Yksi looppi per näkymä, ja vain tilan ilmaisin** (latain, live-piste, Putki-liekki
+   elossa olevalle putkelle). Koristeloopit eivät ole sallittuja. Sisääntuloanimaatio ajetaan kerran.
+3. **Teksti ≥ 12 px mobiilissa.** Badget ja chipit ≥ 11 px. Poikkeuksena aria-hidden-koristeteksti.
+4. **Kosketuskohteet ≥ 44 px** (footerin toissijaiset linkit ≥ 32 px + 12 px väli). Pientä
+   visuaalista elementtiä voi kasvattaa osuma-alueella (::before + negatiivinen marginaali).
+5. **Ensisijainen CTA on aina lime-pilleri:** jaettu luokka `.tn-cta-lime` (tn20.css). Kortin
+   oma väri näkyy taustassa, badgessa ja motiivissa, ei napissa. Huom: `.tn-cta` on eri luokka
+   (kokoelmasivujen CTA).
+6. **Ei kuvia suoraan Wikimediasta etusivulle.** Käytä omia kopioita `public/`-kansiossa,
+   krediitit `lib/kuvalahteet.ts`.
+7. **Fokus näkyy aina** (2 px rengas, ei `outline: none` ilman korvaavaa `:focus-visible`-tyyliä).
+   Skip-linkki `#main` on (tn20)-layoutissa.
+
