@@ -4,7 +4,8 @@
 // Kolme asettelua yhdestä DOMista kontin leveyden mukaan (ruutana-banneri.css): desktop ≥ 860
 // (1160 × 268), tabletti 520–859 (760 × 240), mobiili < 520 (pystykuva, 380 × 600).
 // Animaatio CSS:llä (n. 2,5 s kerran): sanat nousevat, "alkoholia" saa meripihkakorostuksen, nappi
-// tulee viimeisenä; kuva liukuu 20 s; kysymysmerkki nykäisee 4,2 s välein. prefers-reduced-motion:
+// tulee viimeisenä; kysymysmerkki nykäisee kerran (UI-laatu 14.10.2026: kuvan 20 s:n liuku ja toistuva
+// nykäys poistettu koristelooppeina). prefers-reduced-motion:
 // kaikki näkyy heti ilman liikettä.
 import type { CSSProperties } from "react";
 import { visaHref } from "@/lib/visaHref";
