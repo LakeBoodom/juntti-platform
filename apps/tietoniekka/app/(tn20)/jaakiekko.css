@@ -388,7 +388,7 @@
   left: clamp(10px,1.2cqw,15px); right: clamp(10px,1.2cqw,15px); bottom: clamp(10px,1.2cqw,15px);
   container-type: inline-size;
   --tnj-tfs: clamp(16px,1.85cqw,24px);
-  --tnj-dfs: clamp(10.5px,1.08cqw,13.5px);
+  --tnj-dfs: clamp(12px,1.08cqw,13.5px); /* UI-laatu K2: 10,5 → 12 px min (kuvaus on 3 rivin line-clamp, ei ylivuotoa) */
 }
 .tn20 .tnj-grid[data-size="l"] .tnj-card-text { --tnj-tfs: clamp(19px,2.1cqw,28px); }
 .tn20 .tnj-card[data-bar] .tnj-card-text { bottom: calc(clamp(10px,1.2cqw,15px) + 5px); }
