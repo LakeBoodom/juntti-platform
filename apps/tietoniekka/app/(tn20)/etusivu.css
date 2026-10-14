@@ -191,15 +191,16 @@
   gap: 10px;
 }
 .tn20 .tn-es-card-foot--h { bottom: clamp(10px, 1.1cqw, 16px); }
-/* Kortin otsikko: CD clamp(16px, 1.6cqw, 25px). KORTTISÄÄNTÖ-kalibrointi 28.8.2026
-   (Range-mittaus 320–2450px, staattinen Archivo): 2 sarakkeen mobiilissa pisin sana
-   "SUORATOISTO" (11 merkkiä) tarvitsi 320px:ssä ≤10.9px ja 390px:ssä ≤15.2px
-   (5 % marginaali) → kapealla koko seuraa säiliötä calc(6.14cqw − 8.75px), muuten
-   CD:n arvo. ≥ 768px CD:n koko mahtuu (tarve ≤19.7px, 3 saraketta). */
+/* Kortin otsikko: CD clamp(16px, 1.6cqw, 25px). KORTTISÄÄNTÖ-kalibrointi 14.10.2026 (korvaa 28.8.:n
+   "SUORATOISTO"-mitoituksen, joka pienensi otsikot 320 px:ssä 10,9 px:iin): nykyisten korttien leveimmän
+   sanan "MAANTIETO" Range-mitta 6,564 em (Archivo 900, versaali); otsikon tila 2 sarakkeen mobiilissa
+   0,5 × leveys − 70 px (mitattu 90 px @320, 125 px @390). Raja (tila / (6,564 × 1,05)) =
+   calc(7.25cqw − 10.16px) → 13,1 px @320, 15,9 px @360, 16 px (CD) @390. Alaraja 12 px.
+   Uusi korttiotsikko, jonka pisin sana on yli 6,56 em (≈ 10 versaalia), vaatii uuden mittauksen. */
 .tn20 .tn-es-card-title {
   display: block;
   min-width: 0;
-  font-size: min(clamp(16px, 1.6cqw, 25px), calc(6.14cqw - 8.75px));
+  font-size: min(clamp(16px, 1.6cqw, 25px), max(12px, calc(7.25cqw - 10.16px)));
   line-height: 1;
   letter-spacing: -0.015em;
   color: #f5f0e6;
