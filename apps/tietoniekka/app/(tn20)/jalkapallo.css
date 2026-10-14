@@ -248,7 +248,8 @@
   text-transform: uppercase; color: var(--tn-text-dim); margin-bottom: clamp(8px,1cqw,12px);
 }
 .tn20 .tnjp-wall-grid {
-  display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%,76px),1fr));
+  /* UI-laatu K2 14.10.2026: ruutu 76 → 96 px, jotta 11 px:n lyhenne ("SUNDERLAND") mahtuu ilman ellipsiä */
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%,96px),1fr));
   gap: clamp(5px,.7cqw,9px);
 }
 .tn20 .tnjp-wall-card {

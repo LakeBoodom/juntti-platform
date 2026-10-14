@@ -262,7 +262,8 @@
   font-size: clamp(11px,.95cqw,12px); margin-bottom: clamp(8px,1cqw,12px);
 }
 .tn20 .tnj-wall-grid {
-  display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%,72px),1fr));
+  /* UI-laatu K2 14.10.2026: ruutu 72 → 96 px (11 px:n lyhenne mahtuu) */
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%,96px),1fr));
   gap: clamp(5px,.7cqw,9px);
 }
 .tn20 .tnj-wall-card {
