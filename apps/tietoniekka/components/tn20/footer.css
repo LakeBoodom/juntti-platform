@@ -23,8 +23,10 @@
   font-weight: 700;
 }
 .tn20 .tn-es-foot-ig:hover { border-color: var(--tn-gold); color: #f5f0e6; }
-.tn20 .tn-es-foot-col { flex: 1 1 min(46%, 170px); min-width: 0; display: flex; flex-direction: column; gap: 9px; }
-.tn20 .tn-es-foot-col a { font-size: clamp(12.5px, 1.15cqw, 14.5px); font-weight: 600; color: #cfc7b6; }
+/* UI-laatu 14.10.2026: linkkien osuma-alue ≥ 32 px ja väli 12 px (toissijainen navigaatio) */
+.tn20 .tn-es-foot-col { flex: 1 1 min(46%, 170px); min-width: 0; display: flex; flex-direction: column; gap: 12px; }
+.tn20 .tn-es-foot-col .tn-es-foot-h { margin-bottom: -4px; }
+.tn20 .tn-es-foot-col a { display: inline-flex; align-items: center; align-self: flex-start; min-height: 32px; padding: 6px 0; box-sizing: border-box; font-size: clamp(12.5px, 1.15cqw, 14.5px); font-weight: 600; color: #cfc7b6; }
 .tn20 .tn-es-foot-col a:hover { color: var(--tn-lime); }
 .tn20 .tn-es-foot a:focus-visible { outline: 2px solid var(--tn-lime); outline-offset: 2px; border-radius: 4px; }
 .tn20 .tn-es-foot-base {

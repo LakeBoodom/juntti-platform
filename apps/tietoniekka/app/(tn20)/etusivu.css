@@ -87,7 +87,7 @@
   flex: 0 0 auto;
   display: inline-flex;
   align-items: center;
-  min-height: 38px;
+  min-height: 44px; /* UI-laatu 14.10.2026: kosketuskohde 38 → 44 px */
   padding: 0 clamp(13px, 1.3cqw, 18px);
   border: 1px solid var(--tn-line);
   border-radius: 999px;
@@ -299,7 +299,15 @@
   font-size: 11px; font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase;
   transition: border-color 150ms, background 150ms;
 }
-.tn20 a.tn-es-pv-badge:hover { border-color: var(--tn-gold); background: rgba(232, 163, 32, 0.12); }
+/* UI-laatu 14.10.2026: linkkibadgen osuma-alue 44 px. Näkyvä pilleri piirretään ::before-pseudolla
+   (28/26 px), ankkuri itse on 44 px korkea ja negatiivinen marginaali pitää rivin korkeuden ennallaan. */
+.tn20 a.tn-es-pv-badge { position: relative; isolation: isolate; height: 44px; margin-block: -8px; border-color: transparent; }
+.tn20 a.tn-es-pv-badge::before {
+  content: ""; position: absolute; z-index: -1; inset: 8px 0; border-radius: 999px; border: 1px solid #6b4e13;
+  transition: border-color 150ms, background 150ms;
+}
+.tn20 a.tn-es-pv-badge:hover { background: none; }
+.tn20 a.tn-es-pv-badge:hover::before { border-color: var(--tn-gold); background: rgba(232, 163, 32, 0.12); }
 .tn20 a.tn-es-pv-badge:focus-visible { outline: 2px solid var(--tn-gold); outline-offset: 2px; }
 .tn20 .tn-es-pv-badge--done { border-color: rgba(182, 255, 60, 0.5); background: rgba(182, 255, 60, 0.12); color: var(--tn-lime); }
 .tn20 .tn-es-pv-meta { font-size: 12px; font-weight: 600; color: #8e8676; }
@@ -362,6 +370,8 @@
   .tn20 .tn-es-pv-body { display: contents; }
   .tn20 .tn-es-pv-meta { display: none; }
   .tn20 .tn-es-pv-badge { align-self: flex-start; height: 26px; padding: 0 12px; font-size: 11px; }
+  .tn20 a.tn-es-pv-badge { height: 44px; margin-block: -9px; }
+  .tn20 a.tn-es-pv-badge::before { inset: 9px 0; }
   .tn20 .tn-es-pv-titlebox { --tnpv-tfs: clamp(21px, 7.4cqi, 28px); }
   .tn20 .tn-es-pv-title { line-height: 0.95; }
   .tn20 .tn-es-pv-lede { font-size: 14px; line-height: 1.5; }

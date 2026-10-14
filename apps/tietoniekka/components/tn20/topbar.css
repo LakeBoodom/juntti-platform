@@ -39,6 +39,8 @@
   font-size: clamp(20px, 2.1vw, 29px);
   line-height: 1;
   letter-spacing: -0.012em;
+  /* UI-laatu 14.10.2026: osuma-alue ≥ 44 px; negatiivinen marginaali pitää asettelun ennallaan */
+  align-items: center; min-height: 44px; margin-block: calc((1em - 44px) / 2);
 }
 .tn20 .tn-tagline {
   font-size: clamp(11px, calc(8.7px + 0.34vw), 12px); /* UI-laatu 14.10.2026: min 10 → 11 px */
