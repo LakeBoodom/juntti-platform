@@ -32,7 +32,26 @@ export type SynttaritCelebrityInput = {
   image_url: string | null;
   wikipedia_url: string | null;
   platform: "synttarit" | "both";
+  // Synttärit beta (migraatio 20261108). bio_intro ja facts ovat jaettuja Tietoniekan henkilösivun kanssa.
+  bio_intro: string | null;
+  facts: { label: string; value: string }[];
+  tiesitko: string | null;
+  image_credit: string | null;
+  image_license: string | null;
 };
+
+function extraFields(input: SynttaritCelebrityInput) {
+  const facts = input.facts
+    .map((f) => ({ label: f.label.trim(), value: f.value.trim() }))
+    .filter((f) => f.label && f.value);
+  return {
+    bio_intro: input.bio_intro?.trim() || null,
+    facts: facts.length ? facts : null,
+    tiesitko: input.tiesitko?.trim() || null,
+    image_credit: input.image_credit?.trim() || null,
+    image_license: input.image_license?.trim() || null,
+  };
+}
 
 function validate(input: SynttaritCelebrityInput): string | null {
   if (!input.name.trim()) return "Nimi puuttuu";
@@ -42,6 +61,8 @@ function validate(input: SynttaritCelebrityInput): string | null {
   if (input.death_date && !/^\d{4}-\d{2}-\d{2}$/.test(input.death_date))
     return "Kuolinpäivä muodossa YYYY-MM-DD tai tyhjä";
   if (!input.role.trim()) return "Rooli puuttuu";
+  if (input.facts.some((f) => !!f.label.trim() !== !!f.value.trim()))
+    return "Tietolaatikon rivillä pitää olla sekä otsikko että arvo";
   return null;
 }
 
@@ -62,6 +83,7 @@ export async function createSynttaritCelebrity(
     image_url: input.image_url?.trim() || null,
     wikipedia_url: input.wikipedia_url?.trim() || null,
     platform: input.platform,
+    ...extraFields(input),
     priority: 10,
     is_hero: false,
   } as any);
@@ -92,6 +114,7 @@ export async function updateSynttaritCelebrity(
       image_url: input.image_url?.trim() || null,
       wikipedia_url: input.wikipedia_url?.trim() || null,
       platform: input.platform,
+      ...extraFields(input),
     } as any)
     .eq("id", id);
 
