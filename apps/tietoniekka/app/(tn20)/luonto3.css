@@ -3,7 +3,8 @@
    FONTTI (KORTTISÄÄNTÖ): designin Archivo wdth 74–80 → "Archivo Variable" (wdth toimii), sanat eivät
    katkea; kortin otsikon koko rajataan pisimmän sanan mukaan (--lw = pisimmän sanan merkkimäärä).
    Mitattu 8.10.2026 Range-menetelmällä (em/merkki, pisimmät sanat): Archivo wdth 80 versaali 0,641,
-   wdth 68 versaali 0,561, Instrument Sans 700 0,589 → kertoimet 0,68 / 0,6 / 0,62 (≈ 5 % marginaali). */
+   wdth 68 versaali 0,561, Instrument Sans 700 0,589 → kertoimet 0,68 / 0,6 / 0,62 (≈ 5 % marginaali).
+   14.10.2026: leipäteksti Instrument Sans → Barlow 700 (kapeampi), joten 0,62-kerroin jättää lisää varaa. */
 
 .tn20 .tnl3 {
   --l3-display: "Archivo Variable", "Archivo", "Barlow Condensed", sans-serif;
