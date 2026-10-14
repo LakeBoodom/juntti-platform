@@ -1114,7 +1114,7 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
                   <h1 ref={startH1Ref} className="tng-heroh1" data-len={heroLen} data-lwb={heroLw >= 18 ? "xl" : heroLw >= 14 ? "l" : undefined} style={{ ["--tng-lw" as string]: heroLw }}>{quiz.title}</h1>
                   {quiz.teaser && <p className="tng-herop">{quiz.teaser}</p>}
                   <div className="tng-herorow">
-                    <button type="button" className="tng-herobtn" onClick={startGame}>Aloita visa <span aria-hidden>→</span></button>
+                    <button type="button" className="tng-herobtn tn-cta-lime" onClick={startGame}>Aloita visa <span aria-hidden>→</span></button>
                     <span className="tng-herometa">{countLabel}</span>
                     {heroCredit && <span className="tng-herocredit">{heroCredit}</span>}
                   </div>
@@ -1242,7 +1242,7 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
               )}
               {quiz.teaser && <p className="tng-start-p">{quiz.teaser}</p>}
               <div className="tng-start-row">
-                <button type="button" className="tng-start-btn" onClick={startGame}>Aloita visa <span aria-hidden>→</span></button>
+                <button type="button" className="tng-start-btn tn-cta-lime" onClick={startGame}>Aloita visa <span aria-hidden>→</span></button>
                 <span className="tng-start-count">{countLabel}</span>
               </div>
               <VisassaMukana hlot={quiz.mukana} />
@@ -1435,7 +1435,7 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
                     </div>
                   )}
                   {locked ? (
-                    <button ref={nextBtnRef} type="button" className="tng-next" onClick={advance}>
+                    <button ref={nextBtnRef} type="button" className="tng-next tn-cta-lime" onClick={advance}>
                       {qi >= total - 1 ? "Näytä tulos" : "Seuraava"} <span aria-hidden>→</span>
                     </button>
                   ) : (

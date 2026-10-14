@@ -245,13 +245,13 @@
 .tn20 .tng-life span { white-space: nowrap; }
 .tn20 .tng-next {
   flex: 0 0 auto; margin-left: auto; display: inline-flex; align-items: center; justify-content: center; gap: 10px;
-  min-height: clamp(52px, 4.4cqw, 60px); padding: 15px clamp(24px, 2.5cqw, 42px); border-radius: 14px; border: 0;
-  background: linear-gradient(180deg, #efbe63, #e19e1c); color: #100d06;
+  /* UI-laatu K2 (Heikki 14.10.2026): ensisijainen CTA lime-pilleri → väri ja muoto .tn-cta-limestä */
+  min-height: clamp(52px, 4.4cqw, 60px); padding: 15px clamp(24px, 2.5cqw, 42px); border: 0;
   font-family: var(--tn-font-display); font-weight: 900; font-size: clamp(13.5px, 1.3cqw, 18px); letter-spacing: 0.04em; text-transform: uppercase; white-space: nowrap; cursor: pointer;
-  box-shadow: 0 8px 20px -14px rgba(232, 163, 32, 0.55); transition: filter 0.15s, transform 0.15s;
+  transition: background-color var(--dur-fast) var(--ease-standard), transform 0.15s;
 }
-.tn20 .tng-next:hover { filter: brightness(1.07); transform: translateY(-1px); }
-.tn20 .tng-next:focus-visible { outline: 2px solid #ffe0a3; outline-offset: 3px; }
+.tn20 .tng-next:hover { transform: translateY(-1px); }
+.tn20 .tng-next:focus-visible { outline: 2px solid #fffbf2; outline-offset: 3px; }
 .tn20 .tng-hint { margin-left: auto; font-size: clamp(12px, 1.05cqw, 14px); font-weight: 700; color: #a79e8c; text-align: right; white-space: nowrap; }
 
 /* ── Aloitusnäkymä ────────────────────────────────────────────────────── */
@@ -263,8 +263,8 @@
 .tn20 .tng-start-h1 { margin: 0; max-width: 18ch; font-family: var(--tn-font-display); font-weight: 900; font-size: clamp(42px, min(7.4cqw, 14dvh), 132px); line-height: 0.88; letter-spacing: -0.03em; text-transform: uppercase; color: #fffbf2; hyphens: none; overflow-wrap: normal; word-break: keep-all; text-wrap: balance; text-shadow: 0 4px 40px rgba(0, 0, 0, 0.7); }
 .tn20 .tng-start-p { margin: 0; max-width: 44ch; font-size: clamp(15px, 1.5cqw, 22px); line-height: 1.45; color: #ded5c2; text-wrap: pretty; }
 .tn20 .tng-start-row { display: flex; align-items: center; gap: clamp(12px, 1.6cqw, 22px); flex-wrap: wrap; }
-.tn20 .tng-start-btn { display: inline-flex; align-items: center; justify-content: center; gap: 12px; min-height: clamp(54px, 4.8cqw, 66px); padding: 16px clamp(26px, 2.6cqw, 44px); border-radius: 15px; border: 0; background: var(--tnAcc); color: #0c0a05; font-family: var(--tn-font-display); font-weight: 900; font-size: clamp(14px, 1.4cqw, 19px); letter-spacing: 0.04em; text-transform: uppercase; white-space: nowrap; cursor: pointer; box-shadow: 0 12px 30px -18px rgba(0, 0, 0, 0.9); transition: filter 0.15s, transform 0.15s; }
-.tn20 .tng-start-btn:hover { filter: brightness(1.08); transform: translateY(-1px); }
+.tn20 .tng-start-btn { display: inline-flex; align-items: center; justify-content: center; gap: 12px; min-height: clamp(54px, 4.8cqw, 66px); padding: 16px clamp(26px, 2.6cqw, 44px); border: 0; font-family: var(--tn-font-display); font-weight: 900; font-size: clamp(14px, 1.4cqw, 19px); letter-spacing: 0.04em; text-transform: uppercase; white-space: nowrap; cursor: pointer; box-shadow: 0 12px 30px -18px rgba(0, 0, 0, 0.9); transition: filter 0.15s, transform 0.15s; }
+.tn20 .tng-start-btn:hover { transform: translateY(-1px); }
 .tn20 .tng-start-btn:focus-visible { outline: 2px solid #fffbf2; outline-offset: 3px; }
 .tn20 .tng-start-count { font-size: clamp(11.5px, 1.05cqw, 14px); font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase; color: #a79e8c; white-space: nowrap; }
 
@@ -350,8 +350,8 @@
 }
 .tn20 .tng-herop { margin: 0; max-width: 44ch; font-size: clamp(14.5px, 1.4cqw, 18px); line-height: 1.5; color: #ded5c2; text-wrap: pretty; }
 .tn20 .tng-herorow { display: flex; align-items: center; gap: clamp(12px, 1.6cqw, 20px); flex-wrap: wrap; }
-.tn20 .tng-herobtn { display: inline-flex; align-items: center; justify-content: center; gap: 12px; min-height: clamp(52px, 4.8cqw, 58px); padding: 16px clamp(24px, 2.6cqw, 34px); border-radius: 14px; border: 0; background: var(--tnAcc); color: #0c0a05; font-family: var(--tn-font-display); font-weight: 900; font-size: clamp(14px, 1.4cqw, 16px); letter-spacing: 0.04em; text-transform: uppercase; white-space: nowrap; cursor: pointer; box-shadow: 0 12px 30px -18px rgba(0, 0, 0, 0.9); transition: filter 0.15s, transform 0.15s; }
-.tn20 .tng-herobtn:hover { filter: brightness(1.08); transform: translateY(-1px); }
+.tn20 .tng-herobtn { display: inline-flex; align-items: center; justify-content: center; gap: 12px; min-height: clamp(52px, 4.8cqw, 58px); padding: 16px clamp(24px, 2.6cqw, 34px); border: 0; font-family: var(--tn-font-display); font-weight: 900; font-size: clamp(14px, 1.4cqw, 16px); letter-spacing: 0.04em; text-transform: uppercase; white-space: nowrap; cursor: pointer; box-shadow: 0 12px 30px -18px rgba(0, 0, 0, 0.9); transition: filter 0.15s, transform 0.15s; }
+.tn20 .tng-herobtn:hover { transform: translateY(-1px); }
 .tn20 .tng-herobtn:focus-visible { outline: 2px solid #fffbf2; outline-offset: 3px; }
 .tn20 .tng-herometa { font-size: clamp(11.5px, 1.05cqw, 13px); font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase; color: #a79e8c; }
 /* Kuvalähde: mobiilissa kysymysmäärän perässä, ei koskaan kuvan päällä pillerissä */
@@ -963,7 +963,7 @@
   .tn20 .tng[data-lock="1"] .tng-fbpts { padding: 5px 11px; font-size: clamp(12px, 0.95cqw, 12px); }
   .tn20 .tng[data-lock="1"] .tng-tip { font-size: clamp(14px, 1.2cqw, 17px); line-height: 1.45; max-width: none; }
   .tn20 .tng[data-lock="1"] .tng-main[data-mode="peli"] .tng-act { padding: 0; min-height: clamp(48px, 3.75cqw, 52px); gap: 14px; }
-  .tn20 .tng[data-lock="1"] .tng-next { min-height: clamp(48px, 3.75cqw, 52px); padding: 0 clamp(24px, 2.2cqw, 30px); border-radius: 999px; font-size: clamp(14px, 1.2cqw, 16px); }
+  .tn20 .tng[data-lock="1"] .tng-next { min-height: clamp(48px, 3.75cqw, 52px); padding: 0 clamp(24px, 2.2cqw, 30px); font-size: clamp(14px, 1.2cqw, 16px); }
 }
 
 /* ── C. Mobiili ja tabletti pystyyn (9d): yksi palsta, kiinteä alapalkki ── */
@@ -1009,7 +1009,7 @@
     border-top: 1px solid #2c2517; background: #17140d;
     min-height: 0; gap: 12px;
   }
-  .tn20 .tng[data-lock="1"] .tng-main[data-mode="peli"] .tng-act > .tng-next { flex: 0 0 auto; margin-left: auto; min-height: 52px; padding: 0 22px; border-radius: 999px; }
+  .tn20 .tng[data-lock="1"] .tng-main[data-mode="peli"] .tng-act > .tng-next { flex: 0 0 auto; margin-left: auto; min-height: 52px; padding: 0 22px; }
   .tn20 .tng[data-lock="1"] .tng-main[data-mode="peli"] .tng-act > .tng-hint { flex: 1 1 auto; margin-left: 0; text-align: center; }
   .tn20 .tng[data-lock="1"] .tng-actres { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
 }
@@ -1120,8 +1120,8 @@
   .tn20 .tng-heroh1 { order: 2; }
   .tn20 .tng-herorow { display: contents; }
   .tn20 .tng-herobtn {
-    order: 3; align-self: flex-start; min-height: 48px; padding: 0 22px; border-radius: 12px;
-    background: var(--tnAcc); color: #131109; font-family: "Archivo Variable", var(--tn-font-display);
+    order: 3; align-self: flex-start; min-height: 48px; padding: 0 22px;
+    font-family: "Archivo Variable", var(--tn-font-display);
     font-variation-settings: "wdth" 100; font-size: 15px;
   }
   .tn20 .tng-hero .tng-crumbs { order: 4; font-size: 12px; color: #8A826F; }
