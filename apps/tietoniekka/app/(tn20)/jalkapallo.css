@@ -399,3 +399,8 @@
   .tn20 .tnjp-fcard, .tn20 .tnjp-plcard, .tn20 .tnjp-ecard { transition: none; }
   .tn20 .tnjp-fcard:hover, .tn20 .tnjp-plcard:hover, .tn20 a.tnjp-ecard:hover { transform: none; }
 }
+
+/* ── Kosketuskohteet (UI-laatu K2 14.10.2026): ≥ 44 px osuma-alue. Pienille tekstilinkeille pystytäyte +
+   negatiivinen marginaali (asettelu ei muutu), napeille min-height, karttapisteille ::before-alue. ── */
+.tn20 .tnjp-cta { min-height: 44px; }
+.tn20 .tnjp-filter { min-height: 44px; }

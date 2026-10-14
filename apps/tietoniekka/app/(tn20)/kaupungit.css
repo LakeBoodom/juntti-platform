@@ -29,7 +29,6 @@
 }
 
 @keyframes tnk2Pulse { 0%,100% { opacity:.4; transform:scale(1); } 50% { opacity:0; transform:scale(2.6); } }
-@keyframes tnk2Dash { to { stroke-dashoffset:-28; } }
 
 .tn20 .tnk2 { background: var(--tnk2-bg); color: var(--tnk2-ink-strong); }
 
@@ -151,7 +150,7 @@
 .tn20 .tnk2-mapstage { position: relative; width: 100%; aspect-ratio: 600/1000; }
 .tn20 .tnk2-mapstage svg.tnk2-land { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
 .tn20 .tnk2-mapstage svg.tnk2-route { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; overflow: visible; }
-.tn20 .tnk2-route path { animation: tnk2Dash 1.8s linear infinite; }
+/* UI-laatu K2 14.10.2026: reittiviivan juokseva katkoviiva oli koristelooppi → staattinen katkoviiva */
 .tn20 .tnk2-dot-btn {
   position: absolute; transform: translate(-50%,-50%); padding: 0; border: 0; background: transparent;
   cursor: pointer; z-index: 3; line-height: 0; min-width: 32px; min-height: 32px;
@@ -342,7 +341,7 @@
   background: linear-gradient(to bottom, rgba(19,17,9,.75) 0%, rgba(19,17,9,0) 34%, rgba(19,17,9,0) 62%, rgba(19,17,9,.82) 100%);
 }
 .tn20 .tnk2-ctabox-route { position: absolute; left: 46%; top: 0; width: 54%; height: 100%; opacity: .5; z-index: 1; }
-.tn20 .tnk2-ctabox-route path { animation: tnk2Dash 1.8s linear infinite; }
+
 .tn20 .tnk2-ctabox-content {
   position: relative; z-index: 2; width: 100%; padding: clamp(24px,3.2cqw,54px); display: flex; flex-wrap: wrap;
   align-items: center; justify-content: space-between; gap: clamp(18px,2.4cqw,40px);
@@ -387,3 +386,7 @@
   .tn20 .tnk2-ctabox-btn { width: 100%; white-space: normal; }
   .tn20 .tnk2-ctabox::before { background: rgba(19,17,9,.86); }
 }
+
+/* ── Kosketuskohteet (UI-laatu K2 14.10.2026): ≥ 44 px osuma-alue. Pienille tekstilinkeille pystytäyte +
+   negatiivinen marginaali (asettelu ei muutu), napeille min-height, karttapisteille ::before-alue. ── */
+.tn20 .tnk2-dot-btn::before { content: ""; position: absolute; left: 50%; top: 50%; width: 44px; height: 44px; transform: translate(-50%, -50%); }

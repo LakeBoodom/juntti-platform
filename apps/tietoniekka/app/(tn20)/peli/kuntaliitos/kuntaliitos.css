@@ -447,3 +447,7 @@
 @media (prefers-reduced-motion: reduce) {
   .tn20 .kl *, .tn20 .kl *::before { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; }
 }
+
+/* ── Kosketuskohteet (UI-laatu K2 14.10.2026): ≥ 44 px osuma-alue. Pienille tekstilinkeille pystytäyte +
+   negatiivinen marginaali (asettelu ei muutu), napeille min-height, karttapisteille ::before-alue. ── */
+.tn20 .kl-logo { padding-block: 14.5px; margin-block: -14.5px; }

@@ -465,3 +465,8 @@
   .tn20 .tnj-map-dot:hover { transform: translate(-50%,-50%); }
   .tn20 .tnj-card:hover { transform: none; }
 }
+
+/* ── Kosketuskohteet (UI-laatu K2 14.10.2026): ≥ 44 px osuma-alue. Pienille tekstilinkeille pystytäyte +
+   negatiivinen marginaali (asettelu ei muutu), napeille min-height, karttapisteille ::before-alue. ── */
+.tn20 .tnj-map-dot::before { content: ""; position: absolute; left: 50%; top: 50%; width: 44px; height: 44px; transform: translate(-50%, -50%); }
+.tn20 .tnj-cta { min-height: 44px; }

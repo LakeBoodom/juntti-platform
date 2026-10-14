@@ -383,3 +383,8 @@
 .tn20 .hs-hubryhma:hover { border-color: rgba(201, 169, 106, 0.6); }
 .tn20 .hs-hubryhma-nimi { font-size: 17px; font-weight: 700; line-height: 1.25; overflow-wrap: normal; word-break: keep-all; }
 .tn20 .hs-hubryhma-n { font-size: 13.5px; font-weight: 700; color: #c9a96a; }
+
+/* ── Kosketuskohteet (UI-laatu K2 14.10.2026): ≥ 44 px osuma-alue. Pienille tekstilinkeille pystytäyte +
+   negatiivinen marginaali (asettelu ei muutu), napeille min-height, karttapisteille ::before-alue. ── */
+.tn20 .hub-laatat-kaikki { display: inline-block; padding-block: 13.5px; margin-block: -13.5px; }
+.tn20 .hub-lahde a { padding-block: 13px; margin-block: -13px; }

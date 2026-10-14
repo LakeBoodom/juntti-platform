@@ -458,3 +458,7 @@
   text-transform: uppercase;
 }
 .tn20 .tn-colx-foot { padding: 26px 0 60px; }
+
+/* ── Kosketuskohteet (UI-laatu K2 14.10.2026): ≥ 44 px osuma-alue. Pienille tekstilinkeille pystytäyte +
+   negatiivinen marginaali (asettelu ei muutu), napeille min-height, karttapisteille ::before-alue. ── */
+.tn20 .tn-crumbrow a { display: inline-flex; align-items: center; min-height: 44px; }

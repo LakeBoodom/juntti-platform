@@ -1203,3 +1203,8 @@
   /* Lisävisat eivät ole enää kuvan päällä: tasainen tausta ilman sumennusta */
   .tn20 .tng-hero[data-kind="kuva"] .tng-heromore { background: #0f0d07; backdrop-filter: none; -webkit-backdrop-filter: none; }
 }
+
+/* ── Kosketuskohteet (UI-laatu K2 14.10.2026): ≥ 44 px osuma-alue. Pienille tekstilinkeille pystytäyte +
+   negatiivinen marginaali (asettelu ei muutu), napeille min-height, karttapisteille ::before-alue. ── */
+.tn20 .tng-logo, .tn20 .tng-crumbs a, .tn20 .tng-start-crumbs a, .tn20 .tng-heromore-all { padding-block: 14.5px; margin-block: -14.5px; }
+.tn20 .tng-mukana a { min-height: 44px; }
