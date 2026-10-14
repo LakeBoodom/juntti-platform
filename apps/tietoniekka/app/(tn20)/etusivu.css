@@ -205,6 +205,10 @@
   letter-spacing: -0.015em;
   color: #f5f0e6;
 }
+/* Juontajakortit (.tn-es-hcard) käyttävät samaa luokkaa, mutta pisin sana on "SUORATOISTO" (7,81 em, mitattu
+   14.10.2026) samassa tilassa → säilyttää 28.8.:n kalibroinnin calc(6.14cqw − 8.75px): 11 px @320 (85,9 px /
+   90 px tilaa), 13,4 px @360, 15,2 px @390. 12 px:n alaraja ei mahdu 320 px:ssä ilman sanan katkaisua. */
+.tn20 .tn-es-hcard .tn-es-card-title { font-size: min(clamp(16px, 1.6cqw, 25px), max(11px, calc(6.14cqw - 8.75px))); }
 
 /* Suositut kokoelmat -kortin intro (Heikki 6.10.2026): 14–15 px, vaalea harmaa 80 % → otsikko pysyy
    pääosassa. text-wrap: balance → kapeassa (2 saraketta mobiilissa) rivi katkeaa siististi eikä
