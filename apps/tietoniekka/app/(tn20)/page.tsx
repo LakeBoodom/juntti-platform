@@ -270,7 +270,7 @@ export default async function Etusivu20({
         </section>
 
         {/* ─── Lasten visat -kaista (design v0.2 3e/3f): heti Suosittujen kokoelmien jälkeen ─── */}
-        {lastenVisat.length > 0 && <LapsetKaista juhla={lastenJuhla} duo={juontajaKuvat(null).duo.innoissaan} />}
+        {lastenVisat.length > 0 && <LapsetKaista juhla={lastenJuhla} duo={juontajaKuvat(null).duo.innoissaan.replace(/\.webp$/, "-800.webp")} />}
 
         {/* ─── Kuka on vanhin? -banneri (Design kierros 12B) — ennen juontajia ─── */}
         <IkajarjestysBanneri henkilot={henkilot} />

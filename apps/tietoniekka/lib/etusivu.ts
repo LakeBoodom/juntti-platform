@@ -12,6 +12,8 @@ import { NAV_COLLECTIONS, NAV_MODES } from "./nav";
 
 /** Ylätunnisteen tagline (design: "500+ visaa" = enemmän kuin 500, Heikki 28.8.:
     riittävä tarkkuus — ei lasketa kannasta). */
+/* UI-laatu 14.10.2026: etusivun kortit käyttävät *-kortti.webp-versioita (720 px, q76): kortti on enintään
+   ~400 px leveä, alkuperäiset (960–1600 px) jäävät kokoelmasivujen heroiksi. */
 export const SITE_TAGLINE = "Suomalainen tietovisasivusto · 500+ visaa";
 
 export type HeaderPromo = { key: "uusin" | "suosittu"; kicker: string; label: string; href: string };
@@ -50,12 +52,12 @@ export const POPULAR_COLLECTIONS: CollectionCard[] = [
      Suomen kaupungit = Helsinki (Senaatintori, sama kuva kuin kaupungit-kokoelmassa, isompana),
      Maantieto = Bengtskärin majakka (Suomen majakat -visan kuva, oikea valokuva AI-kuvan tilalle),
      Historia = Turun linna (Commons, CC BY-SA 4.0), Luonto = revontulet Saanan yllä (Commons, CC BY-SA 4.0). */
-  { key: "jaakiekko", title: "Jääkiekko", href: "/kokoelma/jaakiekko", img: "/20/jaakiekko/jk-leijonat-mm2026-kuva.webp", pos: "center 40%", desc: "SM-liiga, Leijonat ja NHL" },
-  { key: "historia", title: "Historia", href: "/kokoelma/historia", img: "/20/etusivu/sp-turun-linna.webp", pos: "center 45%", desc: "Linnat, sodat ja presidentit" },
+  { key: "jaakiekko", title: "Jääkiekko", href: "/kokoelma/jaakiekko", img: "/20/jaakiekko/jk-leijonat-mm2026-kuva-kortti.webp", pos: "center 40%", desc: "SM-liiga, Leijonat ja NHL" },
+  { key: "historia", title: "Historia", href: "/kokoelma/historia", img: "/20/etusivu/sp-turun-linna-kortti.webp", pos: "center 45%", desc: "Linnat, sodat ja presidentit" },
   { key: "luonto", title: "Luonto", href: "/kokoelma/luonto", img: "/20/etusivu/sp-revontulet.webp", pos: "center 40%", desc: "Linnut, eläimet ja ilmiöt" },
-  { key: "maantieto", title: "Maantieto", href: "/kokoelma/matkakohteet", img: "/20/maantieto/suomen-majakat.webp", pos: "56% 50%", desc: "Majakat, saaret ja maailman ääret" },
-  { key: "kaupungit", title: "Suomen kaupungit", href: "/kokoelma/kaupungit", img: "/20/etusivu/sp-helsinki.webp", pos: "center 55%", desc: "Helsingistä Rovaniemelle" },
-  { key: "vaalit", title: "Vaalit ja politiikka", href: "/kokoelma/vaalit", img: "/20/vaalit/hero.webp", pos: "center 45%", desc: "Vaalit, puolueet ja pääministerit" },
+  { key: "maantieto", title: "Maantieto", href: "/kokoelma/matkakohteet", img: "/20/maantieto/suomen-majakat-kortti.webp", pos: "56% 50%", desc: "Majakat, saaret ja maailman ääret" },
+  { key: "kaupungit", title: "Suomen kaupungit", href: "/kokoelma/kaupungit", img: "/20/etusivu/sp-helsinki-kortti.webp", pos: "center 55%", desc: "Helsingistä Rovaniemelle" },
+  { key: "vaalit", title: "Vaalit ja politiikka", href: "/kokoelma/vaalit", img: "/20/vaalit/hero-kortti.webp", pos: "center 45%", desc: "Vaalit, puolueet ja pääministerit" },
 ];
 
 export type Host = {
@@ -78,8 +80,8 @@ export const HOSTS: Host[] = [
     img: "/20/etusivu/host-laura.webp",
     accent: "gold",
     cards: [
-      { key: "tv", title: "TV & suoratoisto", desc: "Sarjat, tähdet ja suoratoistohitit", href: "/kokoelma/tv", img: "/20/etusivu/l-tv-masked-singer.webp", pos: "center 35%" },
-      { key: "jalkapallo", title: "Jalkapallo", desc: "Seurat, pelaajat ja arvokisat", href: "/kokoelma/jalkapallo", img: "/20/etusivu/l-jalkapallo.webp", pos: "center 38%" },
+      { key: "tv", title: "TV & suoratoisto", desc: "Sarjat, tähdet ja suoratoistohitit", href: "/kokoelma/tv", img: "/20/etusivu/l-tv-masked-singer-kortti.webp", pos: "center 35%" },
+      { key: "jalkapallo", title: "Jalkapallo", desc: "Seurat, pelaajat ja arvokisat", href: "/kokoelma/jalkapallo", img: "/20/etusivu/l-jalkapallo-kortti.webp", pos: "center 38%" },
     ],
   },
   {
@@ -90,8 +92,8 @@ export const HOSTS: Host[] = [
     img: "/20/etusivu/host-mikko.webp",
     accent: "lime",
     cards: [
-      { key: "megavisat", title: "Megavisat", desc: "Pitkät visat todellisille tietoniekoille", href: "/megavisat", img: "/20/etusivu/coll-megavisat.webp", pos: "center 50%" },
-      { key: "urheilu", title: "Urheilu", desc: "Lajit, legendat ja ennätykset", href: "/kokoelma/urheilu", img: "/20/urheilulajit/f1-kaikki.webp", pos: "center 50%" },
+      { key: "megavisat", title: "Megavisat", desc: "Pitkät visat todellisille tietoniekoille", href: "/megavisat", img: "/20/etusivu/coll-megavisat-kortti.webp", pos: "center 50%" },
+      { key: "urheilu", title: "Urheilu", desc: "Lajit, legendat ja ennätykset", href: "/kokoelma/urheilu", img: "/20/urheilulajit/f1-kaikki-kortti.webp", pos: "center 50%" },
     ],
   },
 ];
