@@ -39,7 +39,10 @@
 
   /* --- Typografia --- */
   --tn-font-display: "Archivo", "Barlow Condensed", sans-serif;
-  --tn-font-body: "Instrument Sans", "Barlow", sans-serif;
+  /* UI-laatu kierros 1 (14.10.2026): Instrument Sans → Barlow (sama paino). Archivo pysyy staattisena:
+     variable-versioon vaihto aktivoisi ~65 otsikon "wdth"-asetukset (kokoelmat tv/urheilu/jääkiekko/
+     jalkapallo/kaupungit/megavisat), jotka nyt eivät vaikuta → otsikot kapenisivat näkyvästi. */
+  --tn-font-body: "Barlow", sans-serif;
 
   /* --- Fluid-perusmitat (container queries + clamp) --- */
   --tn-space-xs: clamp(4px, 0.5cqw, 6px);

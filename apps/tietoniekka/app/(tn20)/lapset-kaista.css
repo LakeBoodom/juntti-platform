@@ -5,7 +5,7 @@
 .tn20 .lk {
   --lk-cream: #F4EDE0; --lk-navy: #0F1520; --lk-kulta: #E8A320; --lk-kulta-v: #F5BC45; --lk-rivi: #FFFAF0;
   --lk-cond: "Barlow Condensed", "Archivo", sans-serif;
-  border-radius: 22px; overflow: hidden; background: var(--lk-cream); color: var(--lk-navy); font-family: "Barlow", "Instrument Sans", sans-serif;
+  border-radius: 22px; overflow: hidden; background: var(--lk-cream); color: var(--lk-navy); font-family: "Barlow", sans-serif;
   display: flex; flex-direction: column;
 }
 .tn20 .lk a { color: inherit; text-decoration: none; }

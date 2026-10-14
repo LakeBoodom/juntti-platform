@@ -6,9 +6,6 @@ import type { Metadata } from "next";
 import "@fontsource/archivo/500.css";
 import "@fontsource/archivo/700.css";
 import "@fontsource/archivo/900.css";
-import "@fontsource/instrument-sans/400.css";
-import "@fontsource/instrument-sans/600.css";
-import "@fontsource/instrument-sans/700.css";
 import "../(tn20)/tn20.css";
 import "../(tn20)/etusivu.css";
 

@@ -13,7 +13,7 @@
   --lp-kupla: #FFFDF8;
   --lp-harmaa: #5B6475;
   --lp-cond: "Barlow Condensed", "Archivo", sans-serif;
-  --lp-body: "Barlow", "Instrument Sans", sans-serif;
+  --lp-body: "Barlow", sans-serif;
   min-height: 100vh; min-height: 100dvh; background: var(--lp-cream); color: var(--lp-navy); font-family: var(--lp-body);
 }
 .tn20 .lp-kehys { position: relative; max-width: 430px; margin: 0 auto; min-height: 100vh; min-height: 100dvh; display: flex; flex-direction: column; overflow: hidden; }

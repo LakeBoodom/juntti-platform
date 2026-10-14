@@ -15,7 +15,7 @@
   --lps-harmaa: #5B6475;
   --lps-vaalea: #D3D8E0;
   --lps-cond: "Barlow Condensed", "Archivo", sans-serif;
-  --lps-body: "Barlow", "Instrument Sans", sans-serif;
+  --lps-body: "Barlow", sans-serif;
   background: var(--lps-cream); color: var(--lps-navy); font-family: var(--lps-body);
   overflow: hidden;
 }

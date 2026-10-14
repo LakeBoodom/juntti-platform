@@ -1,13 +1,11 @@
 // TIETONIEKKA 2.0 — oma layout (Neon Night). Skoopattu .tn20-luokkaan,
-// jotta nykyinen sivusto ei muutu. Fontit: Archivo (display) + Instrument Sans (body).
+// jotta nykyinen sivusto ei muutu. Fontit: Archivo (display) + Barlow (body, juurilayoutista).
+// UI-laatu kierros 1 (14.10.2026): Instrument Sans poistettu, leipäteksti Barlow'lla (3 fonttitiedostoa vähemmän).
 import { getSiteStats, visaMaara } from "@/lib/siteStats";
 import type { Metadata } from "next";
 import "@fontsource/archivo/500.css";
 import "@fontsource/archivo/700.css";
 import "@fontsource/archivo/900.css";
-import "@fontsource/instrument-sans/400.css";
-import "@fontsource/instrument-sans/600.css";
-import "@fontsource/instrument-sans/700.css";
 /* KUVAVISAT 2.0 (17.9.2026): variable-Archivo leveysakselilla (wdth 62–125).
    Käytössä VAIN kuvavisat.css:n --kv-display-tokenin kautta — muu sivusto jää
    staattiseen Archivoon, ks. kuvavisat.css:n fonttikommentti. */
