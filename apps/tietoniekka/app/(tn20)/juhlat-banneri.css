@@ -62,11 +62,11 @@
 }
 .tn20 .jub-s { font-size: 15px; font-weight: 600; color: #e6dfd0; }
 .tn20 .jub-cta {
-  height: 48px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 0 22px; border-radius: 999px;
-  background: #b6ff3c; color: #131109; font-family: var(--jub-display); font-weight: 900; font-variation-settings: "wdth" 86;
+  height: 48px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 0 22px;
+  font-family: var(--jub-display); font-weight: 900; font-variation-settings: "wdth" 86;
   font-size: 15px; text-transform: uppercase; white-space: nowrap;
 }
-.tn20 .jub:hover .jub-cta { background: #cbff6e; }
+
 
 .tn20 .jub-cd {
   position: absolute; right: 14px; top: 158px; transform: translateY(-100%); z-index: 2;

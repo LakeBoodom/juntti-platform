@@ -26,7 +26,9 @@
 .tn20 .lk-iat { background: var(--lk-navy); border-top: 5px solid var(--lk-kulta); padding: 12px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
 .tn20 .lk-nyt { display: none; }
 .tn20 .lk-ika {
-  display: flex; align-items: center; gap: 8px; min-height: 56px; padding: 0 12px; border-radius: 16px; background: var(--lk-rivi);
+  display: flex; align-items: center; gap: 8px; min-height: 56px; padding: 0 12px; border-radius: 16px;
+  /* UI-laatu 14.10.2026: ikävalinnat ovat valintoja, eivät CTA → toissijainen tyyli (läpinäkyvä, 1,5 px reunus) */
+  background: transparent; border: 1.5px solid var(--lk-navy);
 }
 .tn20 .lk-ika-emoji { font-size: 24px; flex: none; }
 .tn20 .lk-ika-teksti { display: flex; flex-direction: column; min-width: 0; }
@@ -35,7 +37,6 @@
 .tn20 .lk-ika-tapa, .tn20 .lk-nuoli { display: none; }
 @media (hover: hover) {
   .tn20 .lk-ika:hover { box-shadow: 0 0 0 3px var(--lk-kulta); }
-  .tn20 .lk-teksti:hover .lk-cta { background: #1d2738; }
 }
 
 @container (min-width: 860px) {
@@ -50,10 +51,9 @@
   .tn20 .lk-p--mobiili { display: none; }
   .tn20 .lk-p--desktop { display: block; max-width: 30ch; font-size: 19px; }
   .tn20 .lk-cta {
-    align-self: flex-start; display: flex; align-items: center; gap: 10px; min-height: 52px; padding: 0 24px; border-radius: 999px;
-    background: var(--lk-navy); color: var(--lk-cream); font-family: var(--lk-cond); font-weight: 900; font-size: 21px; text-transform: uppercase;
+    align-self: flex-start; display: flex; align-items: center; gap: 10px; min-height: 52px; padding: 0 24px;
+    font-family: var(--lk-cond); font-weight: 900; font-size: 21px; text-transform: uppercase;
   }
-  .tn20 .lk-cta span { color: var(--lk-kulta-v); }
   .tn20 .lk-duo { height: auto; margin: -28px 0; background-size: 300px auto; background-position: center -40px; }
   .tn20 .lk-iat { background: none; border: 0; padding: 0; display: flex; flex-direction: column; justify-content: center; gap: 12px; }
   .tn20 .lk-nyt {
@@ -61,7 +61,7 @@
   }
   .tn20 .lk-ika {
     display: grid; grid-template-columns: 64px minmax(0, 1fr) auto; gap: 14px; min-height: 96px; padding: 0 20px 0 16px; border-radius: 20px;
-    background: var(--lk-navy); color: var(--lk-cream) !important; border-top: 4px solid var(--lk-kulta);
+    background: var(--lk-navy); color: var(--lk-cream) !important; border: 0; border-top: 4px solid var(--lk-kulta);
   }
   .tn20 .lk-ika-emoji {
     width: 64px; height: 64px; border-radius: 999px; background: var(--lk-cream); display: flex; align-items: center; justify-content: center; font-size: 34px;

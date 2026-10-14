@@ -45,7 +45,7 @@ export function RuutanaBanneri() {
               <span className="rb-kysymys" style={viive(KOROSTUS_MS + 900)}>?</span>
             </span>
           </span>
-          <span className="rb-cta" style={viive(KOROSTUS_MS + 400)}>Ota selvää →</span>
+          <span className="rb-cta tn-cta-lime" style={viive(KOROSTUS_MS + 400)}>Ota selvää →</span>
         </span>
       </a>
     </div>

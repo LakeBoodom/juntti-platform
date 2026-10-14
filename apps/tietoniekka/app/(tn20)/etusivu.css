@@ -349,11 +349,9 @@
 .tn20 .tn-es-pv-actions { margin-top: auto; display: flex; }
 .tn20 .tn-es-pv-btn {
   height: 52px; display: inline-flex; align-items: center; gap: 11px; padding: 0 26px;
-  border-radius: 999px; background: var(--tn-lime); color: #131109;
   font-family: var(--tn-font-display); font-weight: 900; font-size: 16px; text-transform: uppercase; white-space: nowrap;
 }
 .tn20 .tn-es-pv-btn span { font-size: 19px; line-height: 1; }
-.tn20 .tn-es-pv-btn:hover { background: #c9ff6e; }
 .tn20 .tn-es-pv-btn:focus-visible { outline: 2px solid var(--tn-lime); outline-offset: 3px; }
 
 /* Mobiili (14b, 380 px): laatta ennen kuvaa, kuva 2:1, nappi täysleveä. */

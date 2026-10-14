@@ -99,9 +99,9 @@ export default function PaivanVisaCard({ data, esikatselu = false }: { data: Pai
           {tila !== "B" && laatta(false)}
           <div className="tn-es-pv-actions">
             {played ? (
-              <a className="tn-es-pv-btn" href={data.playedHref}>Lisää visoja <span aria-hidden>→</span></a>
+              <a className="tn-es-pv-btn tn-cta-lime" href={data.playedHref}>Lisää visoja <span aria-hidden>→</span></a>
             ) : (
-              <a className="tn-es-pv-btn" href={data.playHref} onClick={klikkaus}>Pelaa päivän visa <span aria-hidden>→</span></a>
+              <a className="tn-es-pv-btn tn-cta-lime" href={data.playHref} onClick={klikkaus}>Pelaa päivän visa <span aria-hidden>→</span></a>
             )}
           </div>
         </div>

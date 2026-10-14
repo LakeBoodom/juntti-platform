@@ -50,7 +50,7 @@ export function RajanaapuritBanneri() {
         </span>
         <span className="klb-h">Rajanaapurit</span>
         <span className="klb-s">Järjestä valtiot reitiksi, jossa jokainen rajaa seuraavaa.</span>
-        <span className="klb-cta">Rakenna reitti <span aria-hidden="true">→</span></span>
+        <span className="klb-cta tn-cta-lime">Rakenna reitti <span aria-hidden="true">→</span></span>
       </span>
     </a>
   );

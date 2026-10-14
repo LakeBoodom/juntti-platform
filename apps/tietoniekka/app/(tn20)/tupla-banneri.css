@@ -23,11 +23,11 @@
 .tn20 .tkb-rivi { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 .tn20 .tkb-s { font-size: 14px; line-height: 1.4; color: #cfc7b6; text-wrap: pretty; }
 .tn20 .tkb-cta {
-  height: 52px; padding: 0 22px; flex-shrink: 0; border-radius: 999px; background: #b6ff3c; color: #131109;
+  height: 52px; padding: 0 22px; flex-shrink: 0;
   display: flex; align-items: center; font-family: var(--tn-font-display); font-weight: 900; font-size: 16px; white-space: nowrap;
 }
 .tn20 .tkb-cta-d { display: none; }
-.tn20 .tkb:hover .tkb-cta { background: #cbff6e; }
+
 .tn20 .tkb:focus-visible { outline: 3px solid #b6ff3c; outline-offset: 3px; }
 
 /* Tabletti: leveämpi kuva vaatii enemmän korkeutta, ettei kasvoja rajata */

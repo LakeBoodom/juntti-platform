@@ -632,6 +632,16 @@
   text-align: center; font-size: 16px; font-weight: 800; text-decoration: none;
 }
 .tn20 .tn-putki-cta:hover { filter: brightness(1.06); }
+/* ── Ensisijainen CTA (UI-laatu 14.10.2026) ──────────────────────────────────
+   Sama toiminto näyttää samalta kaikkialla: lime-pilleri, tumma teksti, versaali. Teemakortin oma väri
+   näkyy taustassa/badgessa/motiivissa, ei tässä napissa. Koko ja fontti tulevat kortin omasta luokasta;
+   tämä luokka omistaa värin, muodon ja hover-tilan (kortin omissa säännöissä ei saa olla niitä). */
+.tn20 .tn-cta-lime {
+  border-radius: 999px; background: var(--tn-lime); color: #131109; text-transform: uppercase;
+  transition: background-color var(--dur-fast) var(--ease-standard);
+}
+.tn20 .tn-cta-lime:hover, .tn20 a:hover .tn-cta-lime { background: #cbff6e; }
+
 @keyframes tn-putki-flame { 0%, 100% { transform: translateY(0) scale(1); } 50% { transform: translateY(-2px) scale(1.06); } }
 @keyframes tn-putki-pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.35; } }
 

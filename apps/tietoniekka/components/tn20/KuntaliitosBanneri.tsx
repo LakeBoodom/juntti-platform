@@ -59,7 +59,7 @@ export function KuntaliitosBanneri() {
         </span>
         <span className="klb-h">Kuntaliitos</span>
         <span className="klb-s">Järjestä kunnat ketjuksi, jossa jokainen on edellisen rajanaapuri.</span>
-        <span className="klb-cta">Rakenna reitti <span aria-hidden="true">→</span></span>
+        <span className="klb-cta tn-cta-lime">Rakenna reitti <span aria-hidden="true">→</span></span>
       </span>
     </a>
   );

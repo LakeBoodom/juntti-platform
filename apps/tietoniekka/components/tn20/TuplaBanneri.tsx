@@ -22,7 +22,7 @@ export function TuplaBanneri() {
         <img className="tkb-logo" src="/20/tupla/logo.webp" alt="Tupla tai kuitti" width={640} height={374} loading="lazy" />
         <span className="tkb-rivi">
           <span className="tkb-s">Tietoniekan versio rakastetusta tietovisaklassikosta.</span>
-          <span className="tkb-cta">
+          <span className="tkb-cta tn-cta-lime">
             <span className="tkb-cta-m">PELAA</span>
             <span className="tkb-cta-d">TESTAA UUSI PELIMUOTO</span>
           </span>

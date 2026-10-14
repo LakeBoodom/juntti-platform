@@ -54,11 +54,10 @@
 .tn20 .ab-ingressi { margin: 0; font-size: 16px; line-height: 1.5; color: #CFC7B6; }
 .tn20 .ab-cta {
   align-self: flex-start; display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 22px;
-  border-radius: 12px; background: linear-gradient(#EFBE63, #E19E1C); color: #131109;
   font-family: var(--ab-display); font-weight: 900; font-variation-settings: "wdth" 82; font-size: 15px;
   letter-spacing: 0.04em; text-transform: uppercase; white-space: nowrap;
 }
-.tn20 .ab:hover .ab-cta { filter: brightness(1.06); }
+
 
 /* Tabletti 760 × 230. Kapeimmillaan (520 px) leveä kuva ulottuu tekstin alle → lisävarjo tekstin puolelle. */
 @container (max-width: 859.98px) {

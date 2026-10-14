@@ -69,7 +69,7 @@ export function KuvavisatBanneri({
         </h2>
         {meta[0] && <p className="eb-mmeta">{meta.filter(Boolean).join(" · ")}</p>}
         <div className="eb-row">
-          <a className="eb-btn" href="/kokoelma/kuvavisat">
+          <a className="eb-btn tn-cta-lime" href="/kokoelma/kuvavisat">
             Selaa kuvavisoja <span aria-hidden="true">→</span>
           </a>
           {viikko && (
@@ -148,7 +148,7 @@ export function IkajarjestysBanneri({ henkilot }: { henkilot: BanneriHenkilo[] }
           Järjestä {ROUND_SIZE} tunnettua kasvoa syntymäpäivän mukaan<span className="eb-vain-mob"> · 2&nbsp;min</span>
         </p>
         <div className="eb-row">
-          <a className="eb-btn" href={href}>
+          <a className="eb-btn tn-cta-lime" href={href}>
             Arvo kierros <span aria-hidden="true">→</span>
           </a>
           <p className="eb-sub eb-sub--desk">

@@ -77,7 +77,7 @@ export function JuhlatBanneri({ nosto, tanaan }: { nosto: Esiintyma; tanaan: num
       </span>
       <span className="jub-ala">
         <span className="jub-s">{ala}</span>
-        <span className="jub-cta">{cta} <span aria-hidden>→</span></span>
+        <span className="jub-cta tn-cta-lime">{cta} <span aria-hidden>→</span></span>
       </span>
       <span className="jub-cd">
         <span className="jub-cd-n"><Laskenta paivia={paivia} /></span>

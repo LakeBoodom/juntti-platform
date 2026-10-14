@@ -38,7 +38,7 @@ export default function AaniBanneri({ b }: { b: AaniBanneriData }) {
           <span className="ab-tagi"><span className="ab-piste" aria-hidden="true" />Luonto · Äänivisa</span>
           <span className="ab-h">{b.otsikko}</span>
           <span className="ab-ingressi">{b.ingressi}</span>
-          <span className="ab-cta">Kuuntele ja vastaa <span aria-hidden="true">→</span></span>
+          <span className="ab-cta tn-cta-lime">Kuuntele ja vastaa <span aria-hidden="true">→</span></span>
         </span>
       </a>
     </div>

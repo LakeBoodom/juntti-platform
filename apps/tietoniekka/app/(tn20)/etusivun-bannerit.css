@@ -58,7 +58,7 @@
 .tn20 .eb--ika .eb-row { gap: 16px; }
 .tn20 .eb-btn {
   height: 50px; display: inline-flex; align-items: center; justify-content: center; gap: 12px; padding: 0 26px;
-  border-radius: 999px; background: #b6ff3c; color: #131109 !important;
+  color: #131109 !important;
   font-family: var(--eb-display); font-weight: 900; font-variation-settings: "wdth" 86;
   font-size: 16px; text-transform: uppercase; white-space: nowrap; text-decoration: none;
   box-shadow: 0 12px 30px -14px rgba(182, 255, 60, 0.7);
