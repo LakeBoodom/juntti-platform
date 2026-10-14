@@ -84,8 +84,8 @@
 }
 .tn20 .eb-vv-t { display: flex; flex-direction: column; gap: 1px; }
 .tn20 .eb-vv-nimi { font-family: var(--eb-display); font-weight: 900; font-variation-settings: "wdth" 80; font-size: 15px; letter-spacing: 0.02em; text-transform: uppercase; color: #f5f0e6; }
-.tn20 .eb-vv-uusi { font-size: 10px; font-weight: 700; letter-spacing: 0.13em; text-transform: uppercase; color: #7dd9ec; }
-.tn20 .eb-vv-pelaa { display: none; margin-left: auto; font-size: 11px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; color: #7dd9ec; }
+.tn20 .eb-vv-uusi { font-size: 11px; font-weight: 700; letter-spacing: 0.13em; text-transform: uppercase; color: #7dd9ec; }
+.tn20 .eb-vv-pelaa { display: none; margin-left: auto; font-size: 12px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; color: #7dd9ec; }
 
 /* ── 12A kuvatodiste ──────────────────────────────────────────────────── */
 .tn20 .eb-strip { display: none; }
@@ -119,7 +119,7 @@
    leikkautuva kortti ei näy terävänä siivuna. */
 .tn20 .eb-ketju-varjo { position: absolute; inset: 0; z-index: 3; pointer-events: none; background: linear-gradient(90deg, var(--eb-bg) 0%, var(--eb-bg) 8%, rgba(23, 20, 12, 0) 30%); }
 .tn20 .eb-ketju-viiva { position: absolute; left: 34px; right: 24px; top: 50%; height: 1px; background: linear-gradient(90deg, rgba(199, 155, 255, 0), rgba(199, 155, 255, 0.5) 18%, rgba(199, 155, 255, 0.5) 82%, rgba(199, 155, 255, 0)); }
-.tn20 .eb-ketju-akseli { position: absolute; z-index: 4; left: 34px; right: 24px; top: calc(50% + 86px); display: flex; justify-content: space-between; font-size: 10px; font-weight: 800; letter-spacing: 0.2em; text-transform: uppercase; color: var(--eb-violet-soft); }
+.tn20 .eb-ketju-akseli { position: absolute; z-index: 4; left: 34px; right: 24px; top: calc(50% + 86px); display: flex; justify-content: space-between; font-size: 11px; font-weight: 800; letter-spacing: 0.2em; text-transform: uppercase; color: var(--eb-violet-soft); }
 /* Rivi ankkuroituu oikeaan: kapeammalla ketjulla vasemmanpuoleiset kasvot
    jäävät häivytyksen alle eikä "+6 kasvoa" -laatta leikkaudu. */
 .tn20 .eb-ketju-rivi { position: relative; z-index: 2; width: 100%; display: flex; align-items: center; justify-content: flex-end; gap: 12px; padding: 0 6px 0 0; }
@@ -138,7 +138,7 @@
 }
 .tn20 .eb-kasvo-raahaa {
   position: absolute; left: 8px; top: 8px; height: 22px; display: flex; align-items: center; padding: 0 8px; border-radius: 6px;
-  background: #b6ff3c; color: #131109; font-size: 10px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase;
+  background: #b6ff3c; color: #131109; font-size: 11px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase;
 }
 .tn20 .eb-lisaa {
   flex: 0 0 auto; width: 78px; height: 150px; border-radius: 12px;
@@ -146,7 +146,7 @@
   display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
 }
 .tn20 .eb-lisaa-n { font-family: var(--eb-display); font-weight: 900; font-variation-settings: "wdth" 74; font-size: 28px; line-height: 1; color: var(--eb-violet); }
-.tn20 .eb-lisaa-l { font-size: 10px; font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase; color: var(--eb-violet-soft); }
+.tn20 .eb-lisaa-l { font-size: 11px; font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase; color: var(--eb-violet-soft); }
 
 /* Näkyvyysapurit (desktop-, kapea- ja mobiilisisältö samassa DOMissa) */
 .tn20 .eb-vain-kapea, .tn20 .eb-vain-mob, .tn20 .eb-sub--kapea { display: none; }
@@ -159,8 +159,8 @@
   .tn20 .eb-sub--kapea { display: block; }
   .tn20 .eb-text { gap: 11px; padding-left: 28px; }
   .tn20 .eb-tags { gap: 8px; }
-  .tn20 .eb-tag { height: 22px; padding: 0 9px; font-size: 10px; }
-  .tn20 .eb-meta { font-size: 10px; }
+  .tn20 .eb-tag { height: 22px; padding: 0 9px; font-size: 11px; }
+  .tn20 .eb-meta { font-size: 11px; }
   .tn20 .eb-h { font-size: 40px; }
   .tn20 .eb-row { gap: 10px; }
   .tn20 .eb-btn { height: 44px; padding: 0 20px; gap: 10px; font-size: 14px; box-shadow: none; }
@@ -193,7 +193,7 @@
   .tn20 .eb-kasvo--vain-desk { display: none; }
   .tn20 .eb-kasvo--raahaa { width: 98px; height: 134px; transform: translateY(-6px) rotate(-1.5deg); }
   .tn20 .eb-kasvo-nro { left: 7px; top: 7px; width: 20px; height: 20px; font-size: 11px; }
-  .tn20 .eb-kasvo-raahaa { left: 7px; top: 7px; height: 20px; padding: 0 7px; font-size: 9px; }
+  .tn20 .eb-kasvo-raahaa { left: 7px; top: 7px; height: 20px; padding: 0 7px; font-size: 11px; }
   .tn20 .eb-lisaa { width: 54px; height: 118px; border-radius: 11px; }
   .tn20 .eb-lisaa-n { font-size: 22px; }
 }

@@ -249,7 +249,7 @@
    ≤15.3px (mitattu 128.5px @17px vs. 122px tilaa) → min(CD, 4.7cqw) = 15.0px @320,
    ≥ 362px CD:n arvo (28.8.2026). */
 .tn20 .tn-es-host-name { font-size: min(clamp(17px, 1.7cqw, 25px), 4.7cqw); line-height: 1; letter-spacing: -0.018em; color: #f5f0e6; }
-.tn20 .tn-es-host-role { margin-top: 6px; font-size: clamp(10.5px, 1cqw, 13px); font-weight: 700; color: var(--tn-gold); }
+.tn20 .tn-es-host-role { margin-top: 6px; font-size: clamp(12px, 1cqw, 13px); font-weight: 700; color: var(--tn-gold); }
 .tn20 .tn-es-host[data-accent="lime"] .tn-es-host-role { color: var(--tn-lime); }
 .tn20 .tn-es-host-cards { display: flex; flex-wrap: wrap; gap: clamp(10px, 1.2cqw, 18px); }
 .tn20 .tn-es-hcard { flex: 1 1 min(46%, 150px); min-height: clamp(140px, calc(60px + 11cqw), 210px); }
@@ -257,7 +257,7 @@
 .tn20 .tn-es-host[data-accent="gold"] .tn-es-hcard:focus-visible { outline-color: var(--tn-gold); }
 .tn20 .tn-es-host[data-accent="lime"] .tn-es-hcard:hover { border-color: var(--tn-lime); }
 .tn20 .tn-es-hcard-text { min-width: 0; display: block; }
-.tn20 .tn-es-hcard-desc { display: block; margin-top: 6px; font-size: clamp(10.5px, 1cqw, 13px); font-weight: 600; color: #b9af9b; text-wrap: pretty; }
+.tn20 .tn-es-hcard-desc { display: block; margin-top: 6px; font-size: clamp(12px, 1cqw, 13px); font-weight: 600; color: #b9af9b; text-wrap: pretty; }
 
 /* ── Päivän visa (Design v0.3 kierros 14, 19.9.2026) ─────────────────────
    Kortti on oma container (tnpv): työpöytä ≥ 640 px kortin leveydellä, alle
@@ -333,7 +333,7 @@
 .tn20 .tn-es-pv-stamp {
   align-self: flex-start; height: 20px; display: inline-flex; align-items: center; padding: 0 8px;
   border-radius: 5px; background: var(--tn-lime); color: #131109;
-  font-size: 10px; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; white-space: nowrap;
+  font-size: 11px; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; white-space: nowrap;
 }
 .tn20 .tn-es-pv-hook-h { margin: 0; font-size: 19px; font-weight: 700; line-height: 1.25; color: #f5f0e6; text-wrap: pretty; overflow-wrap: break-word; }
 .tn20 .tn-es-pv-hook-t { margin: 0; font-size: 14px; line-height: 1.5; color: #cfc7b6; text-wrap: pretty; overflow-wrap: break-word; }
@@ -361,7 +361,7 @@
   .tn20 .tn-es-pv-media { min-height: 0; aspect-ratio: 2 / 1; border-radius: 11px; }
   .tn20 .tn-es-pv-body { display: contents; }
   .tn20 .tn-es-pv-meta { display: none; }
-  .tn20 .tn-es-pv-badge { align-self: flex-start; height: 26px; padding: 0 12px; font-size: 10px; }
+  .tn20 .tn-es-pv-badge { align-self: flex-start; height: 26px; padding: 0 12px; font-size: 11px; }
   .tn20 .tn-es-pv-titlebox { --tnpv-tfs: clamp(21px, 7.4cqi, 28px); }
   .tn20 .tn-es-pv-title { line-height: 0.95; }
   .tn20 .tn-es-pv-lede { font-size: 14px; line-height: 1.5; }
@@ -397,7 +397,7 @@
 /* Tekstipalsta on container: nimi sovitetaan pisimpään sanaansa
    (--sank-lw, esim. "Grahn-Laasonen"), kuten Päivän visan otsikko. */
 .tn20 .tn-es-sank-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 7px; container-type: inline-size; }
-.tn20 .tn-es-sank-kicker { font-size: 10px; font-weight: 800; letter-spacing: 0.18em; text-transform: uppercase; color: #93a86b; }
+.tn20 .tn-es-sank-kicker { font-size: 11px; font-weight: 800; letter-spacing: 0.18em; text-transform: uppercase; color: #93a86b; }
 .tn20 .tn-es-sank-namerow { display: flex; align-items: baseline; flex-wrap: wrap; column-gap: 12px; row-gap: 4px; }
 .tn20 .tn-es-sank-name {
   font-family: var(--tn-font-display); font-weight: 900; text-transform: uppercase;

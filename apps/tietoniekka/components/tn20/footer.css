@@ -7,7 +7,7 @@
 .tn20 .tn-es-foot-brand { flex: 1.4 1 min(100%, 300px); min-width: 0; }
 .tn20 .tn-es-foot-logo { display: flex; align-items: baseline; gap: 1px; font-size: clamp(20px, 2cqw, 28px); line-height: 1; letter-spacing: -0.012em; }
 .tn20 .tn-es-foot-desc { margin: 10px 0 0; max-width: 38ch; font-size: clamp(12.5px, 1.15cqw, 15px); line-height: 1.5; color: #b9af9b; text-wrap: pretty; }
-.tn20 .tn-es-foot-h { margin-bottom: 3px; font-size: clamp(10px, 0.9cqw, 11.5px); font-weight: 800; letter-spacing: 0.16em; text-transform: uppercase; color: #8e8676; }
+.tn20 .tn-es-foot-h { margin-bottom: 3px; font-size: clamp(11px, 0.9cqw, 11.5px); font-weight: 800; letter-spacing: 0.16em; text-transform: uppercase; color: #8e8676; }
 .tn20 .tn-es-foot-brand .tn-es-foot-h { margin: clamp(16px, 1.8cqw, 26px) 0 0; }
 .tn20 .tn-es-foot-ig {
   display: inline-flex;
@@ -36,7 +36,7 @@
   align-items: center;
   justify-content: space-between;
   gap: 10px;
-  font-size: clamp(11px, 1cqw, 13px);
+  font-size: clamp(12px, 1cqw, 13px); /* UI-laatu 14.10.2026: © ja Tehty Suomessa ≥ 12 px */
   font-weight: 600;
   color: #8e8676;
 }

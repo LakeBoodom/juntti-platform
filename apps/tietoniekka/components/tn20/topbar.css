@@ -41,7 +41,7 @@
   letter-spacing: -0.012em;
 }
 .tn20 .tn-tagline {
-  font-size: clamp(10px, calc(8.7px + 0.34vw), 12px);
+  font-size: clamp(11px, calc(8.7px + 0.34vw), 12px); /* UI-laatu 14.10.2026: min 10 → 11 px */
   font-weight: 500;
   line-height: 1.2;
   color: #b9af9b;
