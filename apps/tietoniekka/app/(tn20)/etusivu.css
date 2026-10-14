@@ -442,6 +442,9 @@
   overflow-x: auto;
   overscroll-behavior-x: contain;
   scrollbar-width: none;
+  /* UI-laatu 14.10.2026: ei automaattista liikettä — käyttäjä vierittää, sirut napsahtavat paikoilleen */
+  scroll-snap-type: x mandatory;
+  scroll-padding-inline: 64px;
   /* Reunahäivytys: symmetrinen 64px kummassakin reunassa (CD:ssä 3 % / 8 %
      epäsymmetrinen — Heikin katselmus 28.8. ilta). Maski ei estä klikkauksia. */
   mask-image: linear-gradient(90deg, transparent 0, #000 64px, #000 calc(100% - 64px), transparent 100%);
@@ -453,15 +456,11 @@
   flex-wrap: nowrap;
   gap: clamp(9px, 1cqw, 14px);
   width: max-content;
-  padding: 2px 0 4px;
-  animation: tnTicker 52s linear infinite;
+  padding: 2px 64px 4px;
 }
-.tn20 .tn-es-ticker:hover .tn-es-ticker-track,
-.tn20 .tn-es-ticker:focus-within .tn-es-ticker-track { animation-play-state: paused; }
-@keyframes tnTicker { from { transform: translateX(0); } to { transform: translateX(-50%); } }
-@container (max-width: 1100px) { .tn20 .tn-es-ticker-track { animation: none; } }
 .tn20 .tn-es-chip {
   flex: 0 0 auto;
+  scroll-snap-align: start;
   display: inline-flex;
   align-items: center;
   gap: 9px;
@@ -482,7 +481,6 @@
 
 /* ── Reduced motion ───────────────────────────────────────────────────── */
 @media (prefers-reduced-motion: reduce) {
-  .tn20 .tn-es-ticker-track { animation: none; }
   .tn20 .tn-es-arrow { transition: none; }
   .tn20 a:hover .tn-es-arrow,
   .tn20 a:focus-visible .tn-es-arrow { transform: none; }

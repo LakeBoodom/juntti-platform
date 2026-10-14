@@ -16,7 +16,8 @@
 .tn20 .rb-kuva { position: absolute; right: 0; top: 0; width: 62%; height: 100%; overflow: hidden; }
 .tn20 .rb-kuva img {
   position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 30% 62%;
-  animation: rbDrift 20s ease-in-out infinite alternate;
+  /* UI-laatu 14.10.2026: 20 s:n drift-looppi pois; rajaus (scale 1.06) pidetään ennallaan */
+  transform: scale(1.06);
 }
 .tn20 .rb-kuva-pysty { display: none; }
 .tn20 .rb-varjo {
@@ -48,7 +49,7 @@
 }
 .tn20 .rb-kysymys {
   display: inline-block; color: var(--rb-amber); margin-left: .06em; transform-origin: 50% 80%;
-  animation: rbKysymys 4200ms ease-in-out var(--rb-viive) infinite;
+  animation: rbKysymys var(--dur-slow, 480ms) var(--ease-emphasized, cubic-bezier(0.22, 1, 0.36, 1)) var(--rb-viive) 1 both;
 }
 .tn20 .rb-cta {
   align-self: flex-start; height: 44px; display: inline-flex; align-items: center; justify-content: center; padding: 0 22px;
@@ -91,9 +92,8 @@
 @keyframes rbSanaSisaan { from { opacity: 0; transform: translateY(14px); filter: blur(6px); } to { opacity: 1; transform: none; filter: none; } }
 @keyframes rbNouse { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
 @keyframes rbKorostus { from { background-size: 0% 100%; } to { background-size: 100% 100%; } }
-@keyframes rbKysymys { 0%, 86%, 100% { transform: scale(1); } 91% { transform: scale(1.22) rotate(-6deg); } 95% { transform: scale(.96); } }
-@keyframes rbDrift { from { transform: scale(1.06) translate(0, 0); } to { transform: scale(1.06) translate(-1.2%, -1%); } }
+@keyframes rbKysymys { 0%, 100% { transform: scale(1); } 45% { transform: scale(1.22) rotate(-6deg); } 75% { transform: scale(.96); } }
 
 @media (prefers-reduced-motion: reduce) {
-  .tn20 .rb-kuva img, .tn20 .rb-sana, .tn20 .rb-korostus, .tn20 .rb-kysymys, .tn20 .rb-cta { animation: none; }
+  .tn20 .rb-sana, .tn20 .rb-korostus, .tn20 .rb-kysymys, .tn20 .rb-cta { animation: none; }
 }

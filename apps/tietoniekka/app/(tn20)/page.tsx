@@ -192,7 +192,8 @@ export default async function Etusivu20({
 
 
   /* Ticker duplikoidaan kertaalleen saumattomaan looppiin (design). */
-  const tickerItems = [...latest, ...latest];
+  /* UI-laatu 14.10.2026: ticker ei enää pyöri → ei tuplattua listaa, vaan vieritettävä rivi. */
+  const tickerItems = latest;
 
   return (
     <main className="tn-es-page">
@@ -327,8 +328,6 @@ export default async function Etusivu20({
                   key={`${t.id}-${i}`}
                   className="tn-es-chip"
                   href={t.href}
-                  aria-hidden={i >= latest.length || undefined}
-                  tabIndex={i >= latest.length ? -1 : undefined}
                 >
                   <i aria-hidden />
                   {t.name}

@@ -593,8 +593,9 @@
   width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center;
   border: 1px solid #42611F; background: var(--tn-bg-deep);
   font-size: 21px; color: var(--tn-lime);
-  animation: tn-putki-flame 2.4s ease-in-out infinite;
 }
+/* UI-laatu 14.10.2026: liekki liikkuu vain, kun putki on elossa (tilan ilmaisin, ainoa looppi etusivulla) */
+.tn20 .tn-putki-btn[data-elossa] .tn-putki-flame { animation: tn-putki-flame 2.4s var(--ease-standard, ease-in-out) infinite; }
 .tn20 .tn-putki-label { font-size: 11px; font-weight: 800; letter-spacing: 0.18em; text-transform: uppercase; color: var(--tn-lime); }
 .tn20 .tn-putki-pill {
   display: inline-flex; align-items: center; gap: 7px; padding: 8px 13px;
@@ -608,7 +609,7 @@
   font-family: var(--tn-font-display); font-weight: 900;
   font-variation-settings: "wdth" 68;
   font-size: clamp(64px, 9cqw, 96px); line-height: 0.82; color: var(--tn-lime);
-  animation: tn-putki-glowanim 3.4s ease-in-out infinite;
+  filter: drop-shadow(0 0 12px rgba(182,255,60,0.4));
 }
 .tn20 .tn-putki-num span {
   font-family: var(--tn-font-display); font-weight: 900;
@@ -632,7 +633,7 @@
 .tn20 .tn-putki-cta:hover { filter: brightness(1.06); }
 @keyframes tn-putki-flame { 0%, 100% { transform: translateY(0) scale(1); } 50% { transform: translateY(-2px) scale(1.06); } }
 @keyframes tn-putki-pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.35; } }
-@keyframes tn-putki-glowanim { 0%, 100% { filter: drop-shadow(0 0 12px rgba(182,255,60,0.4)); } 50% { filter: drop-shadow(0 0 28px rgba(182,255,60,0.7)); } }
+
 
 /* Isot hero-nostot */
 .tn20 .tn-feature-grid { display: grid; gap: var(--tn-space-md); }

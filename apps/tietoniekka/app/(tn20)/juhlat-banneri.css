@@ -19,11 +19,10 @@
   content: ""; position: absolute; inset: 0;
   background: linear-gradient(to top, #0f0d07 0%, rgba(15, 13, 7, .35) 45%, transparent 75%);
 }
-/* Lyhdyn lepatus kuvan päällä (juhlan värin hehku) */
+/* Lyhdyn hehku kuvan päällä (juhlan väri). UI-laatu 14.10.2026: lepatusluuppi pois (koristelooppi). */
 .tn20 .jub-lyhty {
   position: absolute; right: 20px; top: -30px; width: 300px; height: 240px; pointer-events: none; mix-blend-mode: screen;
-  background: radial-gradient(closest-side, var(--jub-lyhty), transparent 70%);
-  animation: jub-lepatus 3.6s steps(1, end) infinite;
+  background: radial-gradient(closest-side, var(--jub-lyhty), transparent 70%); opacity: .85;
 }
 
 .tn20 .jub-meta {
@@ -53,7 +52,8 @@
 }
 .tn20 .jub-q {
   display: inline-block; color: var(--jub-a); margin-left: .04em; transform-origin: 50% 80%;
-  animation: jub-q 4200ms ease-in-out var(--jub-q) infinite;
+  /* UI-laatu 14.10.2026: kerran sisääntulon yhteydessä, ei looppia */
+  animation: jub-q var(--dur-slow, 480ms) var(--ease-emphasized, cubic-bezier(0.22, 1, 0.36, 1)) var(--jub-q) 1 both;
 }
 
 .tn20 .jub-ala {
@@ -131,11 +131,9 @@
 @keyframes jub-sana { from { opacity: 0; transform: translateY(14px); filter: blur(6px); } to { opacity: 1; transform: none; filter: none; } }
 @keyframes jub-nousu { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
 @keyframes jub-nousu-cd { from { opacity: 0; translate: 0 8px; } to { opacity: 1; translate: 0 0; } }
-@keyframes jub-q { 0%, 86%, 100% { transform: scale(1); } 91% { transform: scale(1.22) rotate(-6deg); } 95% { transform: scale(.96); } }
-@keyframes jub-lepatus { 0%, 100% { opacity: .85; } 8% { opacity: .55; } 12% { opacity: .95; } 30% { opacity: .7; } 34% { opacity: 1; } 55% { opacity: .78; } 61% { opacity: .62; } 64% { opacity: .92; } 82% { opacity: .74; } }
+@keyframes jub-q { 0%, 100% { transform: scale(1); } 45% { transform: scale(1.22) rotate(-6deg); } 75% { transform: scale(.96); } }
 @keyframes jub-hl { from { background-size: 0% 100%; } to { background-size: 100% 100%; } }
 
 @media (prefers-reduced-motion: reduce) {
   .tn20 .jub-sana, .tn20 .jub-hl, .tn20 .jub-q, .tn20 .jub-ala, .tn20 .jub-cd { animation: none; }
-  .tn20 .jub-lyhty { animation: none; opacity: .8; }
 }

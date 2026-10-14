@@ -78,6 +78,7 @@ export default function StreakButton() {
       <button
         type="button"
         className="tn-putki-btn"
+        data-elossa={days > 0 ? "" : undefined}
         aria-label={aria}
         aria-expanded={open}
         onClick={() => setOpen((o) => !o)}

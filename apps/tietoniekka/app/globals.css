@@ -471,11 +471,7 @@ img { display: block; max-width: 100%; }
   letter-spacing: 0.1em;
   padding: 4px 12px;
   border-radius: var(--radius-pill);
-  animation: pulse 1.4s ease-in-out infinite;
-}
-@keyframes pulse {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.06); }
+  /* UI-laatu 14.10.2026: sykeluuppi pois — korostus värillä */
 }
 
 @media (min-width: 768px) {
@@ -1719,7 +1715,8 @@ img { display: block; max-width: 100%; }
     transparent 80%
   );
   transform: skewX(-20deg);
-  animation: ctaShimmer 4.5s ease-in-out infinite;
+  /* UI-laatu 14.10.2026: shimmer-looppi pois; pseudo piilossa */
+  display: none;
   pointer-events: none;
   z-index: 0;
 }
@@ -1728,10 +1725,7 @@ img { display: block; max-width: 100%; }
   position: relative;
   z-index: 1;
 }
-@keyframes ctaShimmer {
-  0% { left: -150%; }
-  35%, 100% { left: 150%; }
-}
+
 
 /* ─── 3. STICKY TOPBAR + SHADOW ─────────────────────────────────────── */
 .topbar {
@@ -1769,13 +1763,7 @@ body.is-scrolled .topbar {
 .kuvavisa-featured .flag-stage .flag-emoji {
   display: inline-block;
   transform-origin: 50% 80%;
-  animation: flagWave 3.2s ease-in-out infinite;
-}
-@keyframes flagWave {
-  0%, 100% { transform: skewX(0deg) rotate(0deg); }
-  25%      { transform: skewX(-3deg) rotate(-1deg); }
-  50%      { transform: skewX(0deg) rotate(0deg); }
-  75%      { transform: skewX(3deg) rotate(1deg); }
+  /* UI-laatu 14.10.2026: flagWave-looppi pois */
 }
 
 /* ─── 5. HERO-OTSIKON SPLIT-SAAPUMINEN ──────────────────────────────── */
@@ -3242,11 +3230,7 @@ div.pinnalla-event-card.pinnalla-event-card--neon {
   padding: 3px 10px;
   margin-left: 10px;
   vertical-align: 1px;
-  animation: pinnalla-pulse 1.6s ease-in-out infinite;
-}
-@keyframes pinnalla-pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.65; }
+  /* UI-laatu 14.10.2026: pulssiluuppi pois (badgea ei tällä hetkellä renderöidä missään) */
 }
 .pinnalla-count {
   display: flex;

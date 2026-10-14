@@ -24,19 +24,18 @@
 .tn20 .klb--rn .klb-kysymys b { color: #c8900f; }
 .tn20 .klb--rn .klb-meta { color: #7a5200; }
 
-/* Animaatio (8 s): Itävalta → kisko → Unkari → kisko → "?"; ketju näkyvissä suurimman osan ajasta.
-   Käyttää erillisiä translate/scale-ominaisuuksia, jotta laattojen oma kallistus (transform) säilyy. */
-.tn20 .klb--rn .klb-anim { animation: 8s cubic-bezier(.2, .8, .2, 1) infinite both; }
-.tn20 .klb--rn .klb-anim--1 { animation-name: klb-rn-in1; }
-.tn20 .klb--rn .klb-anim--kisko1 { animation-name: klb-rn-kisko1; transform-origin: left center; }
-.tn20 .klb--rn .klb-anim--2 { animation-name: klb-rn-in2; }
-.tn20 .klb--rn .klb-anim--kisko2 { animation-name: klb-rn-kisko2; transform-origin: left center; }
-.tn20 .klb--rn .klb-anim--q { animation-name: klb-rn-q; }
-@keyframes klb-rn-in1 { 0% { opacity: 0; translate: 0 16px; } 7%, 90% { opacity: 1; translate: 0 0; } 97%, 100% { opacity: 0; translate: 0 0; } }
-@keyframes klb-rn-kisko1 { 0%, 11% { opacity: 0; scale: 0 1; } 18%, 90% { opacity: 1; scale: 1 1; } 97%, 100% { opacity: 0; scale: 1 1; } }
-@keyframes klb-rn-in2 { 0%, 17% { opacity: 0; translate: 0 16px; } 25%, 90% { opacity: 1; translate: 0 0; } 97%, 100% { opacity: 0; translate: 0 0; } }
-@keyframes klb-rn-kisko2 { 0%, 29% { opacity: 0; scale: 0 1; } 35%, 90% { opacity: 1; scale: 1 1; } 97%, 100% { opacity: 0; scale: 1 1; } }
-@keyframes klb-rn-q { 0%, 35% { opacity: 0; scale: .7; } 42% { opacity: 1; scale: 1.07; } 46%, 60% { opacity: 1; scale: 1; } 64% { scale: 1.05; } 68%, 90% { opacity: 1; scale: 1; } 97%, 100% { opacity: 0; scale: 1; } }
+/* Animaatio: Itävalta → kisko → Unkari → kisko → "?". UI-laatu 14.10.2026: 8 s:n silmukka → rakentuu
+   KERRAN ja jää näkyviin (koristelooppi pois). Erilliset translate/scale-ominaisuudet, jotta laattojen
+   oma kallistus (transform) säilyy. */
+.tn20 .klb--rn .klb-anim { animation: var(--dur-slow, 480ms) var(--ease-emphasized, cubic-bezier(0.22, 1, 0.36, 1)) 1 both; }
+.tn20 .klb--rn .klb-anim--1 { animation-name: klb-rn-in; animation-delay: 150ms; }
+.tn20 .klb--rn .klb-anim--kisko1 { animation-name: klb-rn-kisko; animation-delay: 450ms; transform-origin: left center; }
+.tn20 .klb--rn .klb-anim--2 { animation-name: klb-rn-in; animation-delay: 700ms; }
+.tn20 .klb--rn .klb-anim--kisko2 { animation-name: klb-rn-kisko; animation-delay: 1000ms; transform-origin: left center; }
+.tn20 .klb--rn .klb-anim--q { animation-name: klb-rn-q; animation-delay: 1250ms; }
+@keyframes klb-rn-in { from { opacity: 0; translate: 0 16px; } to { opacity: 1; translate: 0 0; } }
+@keyframes klb-rn-kisko { from { opacity: 0; scale: 0 1; } to { opacity: 1; scale: 1 1; } }
+@keyframes klb-rn-q { 0% { opacity: 0; scale: .7; } 60% { opacity: 1; scale: 1.07; } 100% { opacity: 1; scale: 1; } }
 
 /* ── Tabletti (staattinen) ── */
 @media (min-width: 600px) {
