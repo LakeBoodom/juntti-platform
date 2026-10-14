@@ -44,7 +44,7 @@
 }
 .tn20 .tn-tagline {
   font-size: clamp(11px, calc(8.7px + 0.34vw), 12px); /* UI-laatu 14.10.2026: min 10 → 11 px */
-  font-weight: 500;
+  font-weight: 400; /* UI-laatu 14.10.2026: 500 → 400, ainoa Barlow 500 etusivulla (yksi fonttitiedosto vähemmän) */
   line-height: 1.2;
   color: #b9af9b;
   white-space: nowrap;
@@ -447,7 +447,8 @@
   border-color: color-mix(in srgb, var(--dot, #ffffff) 55%, transparent);
 }
 .tn20 .tn-colx-card:focus-visible { outline: 2px solid var(--tn-lime); outline-offset: 2px; }
-.tn20 .tn-colx-count { margin-left: auto; color: var(--tn-text-dim); font-weight: 600; font-size: 12.5px; white-space: nowrap; }
+/* 14.10.2026: pelimuotojen kuvaus ("Ketjuta kansanedustajat vaalipiiristä toiseen") ei mahtunut 390 px:ssä nowrapilla → sivu leveni 429 px:iin. Saa rivittyä. */
+.tn20 .tn-colx-count { margin-left: auto; min-width: 0; color: var(--tn-text-dim); font-weight: 600; font-size: 12.5px; text-align: right; text-wrap: balance; overflow-wrap: normal; word-break: keep-all; }
 .tn20 .tn-colx-sub {
   margin: 26px 0 4px;
   color: var(--tn-text-dim);

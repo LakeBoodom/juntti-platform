@@ -42,4 +42,5 @@
   font-weight: 600;
   color: #8e8676;
 }
-
+/* UI-laatu 14.10.2026: footerin logolinkin osuma-alue ≥ 32 px (negatiivinen marginaali pitää asettelun) */
+.tn20 .tn-es-foot-logo { padding-block: 6px; margin-block: -6px; }
