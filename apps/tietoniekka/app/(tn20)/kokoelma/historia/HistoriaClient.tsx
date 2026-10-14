@@ -78,7 +78,7 @@ export default function HistoriaClient({ data }: { data: HistoriaData }) {
               <div className="tnh-progress-info">
                 <span className="tnh-progress-label">Oma edistyminen</span>
                 <span className="tnh-progress-pct">{pct}%</span>
-                <div className="tnh-bar"><i style={{ width: `${pct}%` }} /></div>
+                <div className="tnh-bar"><i style={{ "--fill": pct / 100 } as React.CSSProperties} /></div>
                 <span className="tnh-progress-note">
                   {playedEra}/{eraQuizzes.length} aikakausivisaa pelattu
                   {nextUp ? <> · seuraava: {nextUp.title}</> : <> · kaikki pelattu!</>}
@@ -139,7 +139,7 @@ export default function HistoriaClient({ data }: { data: HistoriaData }) {
                       <h3 className="tnh-era-title">{e.title}</h3>
                       <p className="tnh-era-desc">{e.desc}</p>
                       <div className="tnh-era-meter">
-                        <div className="tnh-bar tnh-bar-mini"><i style={{ width: s.n > 0 ? `${(s.p / s.n) * 100}%` : "0%" }} /></div>
+                        <div className="tnh-bar tnh-bar-mini"><i style={{ "--fill": s.n > 0 ? s.p / s.n : 0 } as React.CSSProperties} /></div>
                         <span>{s.p}/{s.n} pelattu</span>
                       </div>
                     </div>

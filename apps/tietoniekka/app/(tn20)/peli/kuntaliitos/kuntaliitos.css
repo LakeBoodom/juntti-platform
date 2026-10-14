@@ -129,7 +129,7 @@
 }
 .tn20 .kl-kortti:focus-visible { outline: 3px solid var(--kl-navy); outline-offset: 4px; }
 .tn20 .kl-kortti[data-tila="lepo"]:hover { border-color: #bdb39c; transform: translateY(-1px); }
-.tn20 .kl-kortti[data-tila="valittu"] { border-color: var(--kl-teal); box-shadow: 0 3px 0 var(--kl-teal-t), 0 10px 20px rgba(14, 58, 92, .14); animation: kl-syke 1.6s ease-in-out infinite; }
+.tn20 .kl-kortti[data-tila="valittu"] { border-color: var(--kl-teal); box-shadow: 0 3px 0 var(--kl-teal-t), 0 10px 20px rgba(14, 58, 92, .14); animation: kl-syke 1.6s var(--ease-standard) infinite; }
 .tn20 .kl-kortti[data-tila="siirtyva"] { z-index: 2; border-color: var(--kl-teal); box-shadow: 0 14px 26px rgba(10, 44, 71, .28), 0 4px 0 var(--kl-teal-t); transform: translateY(-2px) rotate(-.5deg); cursor: grabbing; }
 .tn20 .kl-kortti[data-tila="lukittu"] { background: #ede7d9; border-color: #d5cbb4; box-shadow: 0 3px 0 #c9bea4; cursor: default; }
 .tn20 .kl-kortti-kilpi { position: relative; flex: none; }
@@ -362,7 +362,7 @@
 .tn20 .kl--rajanaapurit .kl-kortti-num { top: -8px; left: -9px; box-shadow: 0 0 0 2px #fff; }
 .tn20 .kl--rajanaapurit .kl-nimi { font-variation-settings: "wdth" 78; hyphens: manual; }
 .tn20 .kl--rajanaapurit .kl-maakunta { background: #e6edf2; color: var(--kl-navy); }
-.tn20 .kl--rajanaapurit .kl-kortti[data-tila="valittu"] { border: 2px solid var(--kl-kulta-3); animation: kl-syke-kulta 1.6s ease-in-out infinite; }
+.tn20 .kl--rajanaapurit .kl-kortti[data-tila="valittu"] { border: 2px solid var(--kl-kulta-3); animation: kl-syke-kulta 1.6s var(--ease-standard) infinite; }
 .tn20 .kl--rajanaapurit .kl-kortti[data-tila="siirtyva"] { border-color: var(--kl-kulta-3); box-shadow: 0 14px 26px rgba(10, 44, 71, .28), 0 4px 0 #9a6a06; }
 .tn20 .kl--rajanaapurit .kl-kortti[data-tila="lukittu"] { border-style: dashed; }
 .tn20 .kl--rajanaapurit .kl-kahva--lukko { background: #e3dccb; }

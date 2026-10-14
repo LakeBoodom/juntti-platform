@@ -136,7 +136,8 @@
   border: 1px solid color-mix(in srgb, var(--tn-card-accent, var(--tn-gold)) 28%, var(--tn-line));
   overflow: hidden;
   isolation: isolate;
-  transition: transform 160ms ease, border-color 160ms ease, box-shadow 160ms ease;
+  /* UI-laatu 14.10.2026: box-shadow ei animoidu (hover-varjo vaihtuu suoraan) */
+  transition: transform 160ms var(--ease-standard), border-color 160ms var(--ease-standard);
 }
 .tn20 .tn-card a:hover .tn-card-face,
 .tn20 .tn-card a:focus-visible .tn-card-face {
@@ -221,7 +222,7 @@
   border: 1px solid color-mix(in srgb, var(--tn-amber) 30%, var(--tn-line));
   background: linear-gradient(175deg, #6b4e86 0%, #2c1f38 55%, var(--tn-bg-deep) 100%);
   isolation: isolate;
-  transition: transform 160ms ease, border-color 160ms ease, box-shadow 160ms ease;
+  transition: transform 160ms var(--ease-standard), border-color 160ms var(--ease-standard);
 }
 .tn20 .tn-card a:hover .tn-person-face,
 .tn20 .tn-card a:focus-visible .tn-person-face {
@@ -595,7 +596,7 @@
   font-size: 21px; color: var(--tn-lime);
 }
 /* UI-laatu 14.10.2026: liekki liikkuu vain, kun putki on elossa (tilan ilmaisin, ainoa looppi etusivulla) */
-.tn20 .tn-putki-btn[data-elossa] .tn-putki-flame { animation: tn-putki-flame 2.4s var(--ease-standard, ease-in-out) infinite; }
+.tn20 .tn-putki-btn[data-elossa] .tn-putki-flame { animation: tn-putki-flame 2.4s var(--ease-standard) infinite; }
 .tn20 .tn-putki-label { font-size: 11px; font-weight: 800; letter-spacing: 0.18em; text-transform: uppercase; color: var(--tn-lime); }
 .tn20 .tn-putki-pill {
   display: inline-flex; align-items: center; gap: 7px; padding: 8px 13px;
@@ -603,7 +604,7 @@
   font-size: 12px; font-weight: 700; color: var(--tn-text-soft); white-space: nowrap;
 }
 .tn20 .tn-putki-pill i { width: 6px; height: 6px; border-radius: 50%; background: var(--tn-lime); }
-.tn20 .tn-putki-pill[data-off] i { background: var(--tn-text-dim); animation: tn-putki-pulse 1.6s ease-in-out infinite; }
+.tn20 .tn-putki-pill[data-off] i { background: var(--tn-text-dim); animation: tn-putki-pulse 1.6s var(--ease-standard) infinite; }
 .tn20 .tn-putki-num { position: relative; display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; }
 .tn20 .tn-putki-num b {
   font-family: var(--tn-font-display); font-weight: 900;
@@ -1434,7 +1435,8 @@
 .tn20 .tnh-progress-label { display: inline-block; font-size: 10.5px; font-weight: 800; letter-spacing: 0.16em; text-transform: uppercase; color: var(--tn-text-muted); margin-right: 10px; }
 .tn20 .tnh-progress-pct { font-family: var(--tn-font-display); font-weight: 900; color: var(--tn-lime); font-size: 18px; }
 .tn20 .tnh-bar { height: 7px; border-radius: 999px; background: #2a2418; overflow: hidden; margin: 8px 0 6px; }
-.tn20 .tnh-bar i { display: block; height: 100%; border-radius: 999px; background: var(--tn-lime); transition: width 0.4s ease; }
+/* UI-laatu 14.10.2026: täyttö transformilla (--fill 0–1), ei width-transitiota */
+.tn20 .tnh-bar i { display: block; height: 100%; border-radius: 999px; background: var(--tn-lime); transform: scaleX(var(--fill, 0)); transform-origin: left; transition: transform var(--dur-base) var(--ease-standard); }
 .tn20 .tnh-bar-mini { width: 150px; margin: 0; height: 5px; }
 .tn20 .tnh-progress-note { font-size: 12.5px; color: var(--tn-text-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: block; }
 .tn20 .tnh-cta {

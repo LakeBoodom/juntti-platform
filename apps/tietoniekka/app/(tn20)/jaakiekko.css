@@ -39,7 +39,7 @@
 }
 .tn20 .tnj-status i {
   width: 7px; height: 7px; border-radius: 50%; background: #4FD1F5; display: block;
-  animation: tnjPulse 2s ease-in-out infinite;
+  animation: tnjPulse 2s var(--ease-standard) infinite;
 }
 @keyframes tnjPulse {
   0%, 100% { opacity: 1; transform: scale(1); }

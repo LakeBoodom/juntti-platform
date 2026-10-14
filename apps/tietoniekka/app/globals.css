@@ -10,6 +10,14 @@
    ===================================================================== */
 
 :root {
+  /* ─── Liike (UI-laatu 14.10.2026): vain transform/opacity, näillä kestoilla ja käyrillä ─── */
+  --dur-fast: 120ms;
+  --dur-base: 240ms;
+  --dur-slow: 480ms;
+  --ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-emphasized: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-exit: cubic-bezier(0.4, 0, 1, 1);
+
   /* ─── Brändivärit ───────────────────────────────────────────────── */
   --color-surface-dark: #0f1520;
   --color-surface-card-dark: #1a2130;
@@ -197,7 +205,7 @@ img { display: block; max-width: 100%; }
   justify-content: center;
   gap: var(--space-sm);
   border-radius: var(--radius-pill);
-  transition: transform 0.18s var(--ease-out), background 0.2s, border-color 0.2s, box-shadow 0.2s;
+  transition: transform 0.18s var(--ease-out), background 0.2s, border-color 0.2s;
   text-decoration: none;
 }
 .btn:active { transform: scale(0.97); }
@@ -1747,7 +1755,7 @@ img { display: block; max-width: 100%; }
   background: var(--color-surface-dark);
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   z-index: -1;
-  transition: box-shadow 0.25s var(--ease-out), border-bottom-color 0.25s var(--ease-out);
+  transition: border-bottom-color 0.25s var(--ease-out);
 }
 body.is-scrolled .topbar::before {
   box-shadow: 0 6px 20px -6px rgba(0, 0, 0, 0.6);
@@ -1790,8 +1798,8 @@ body.is-scrolled .topbar {
   border-color: var(--color-brand-gold) !important;
   transform: scale(1.015);
   box-shadow: var(--shadow-gold);
-  transition: background 0.15s, color 0.15s, border-color 0.15s,
-              transform 0.15s, box-shadow 0.15s;
+  transition: background var(--dur-fast), color var(--dur-fast), border-color var(--dur-fast),
+              transform var(--dur-fast);
 }
 .quiz-option.is-clicked .badge,
 .visa-option.is-clicked .badge {
@@ -2403,7 +2411,7 @@ a.sankari-photo {
   border-radius: 999px;
   cursor: pointer;
   box-shadow: var(--peli-shadow-md);
-  transition: transform 0.15s var(--ease-out), box-shadow 0.2s;
+  transition: transform 0.15s var(--ease-out);
   text-decoration: none;
   display: inline-block;
 }
@@ -2453,7 +2461,8 @@ a.sankari-photo {
   height: 100%;
   background: linear-gradient(90deg, var(--peli-gold), var(--peli-gold-light));
   border-radius: 999px;
-  transition: width 0.5s var(--ease-out);
+  transform: scaleX(var(--fill, 0)); transform-origin: left;
+  transition: transform var(--dur-base) var(--ease-standard);
 }
 .peli-score-pill, .peli-streak-pill {
   display: inline-flex;
@@ -3409,7 +3418,7 @@ div.pinnalla-event-card.pinnalla-event-card--neon {
 .kumpi-score b { color: var(--color-brand-gold); font-size: 14px; margin-left: 5px; }
 .kumpi-streak { background: var(--color-brand-gold); color: var(--color-surface-dark); font-weight: 700; }
 .kumpi-progress { height: 5px; background: rgba(15,21,32,0.13); border-radius: 99px; margin-top: 11px; overflow: hidden; }
-.kumpi-progress i { display: block; height: 100%; background: var(--color-brand-gold); transition: width 0.35s ease; }
+.kumpi-progress i { display: block; height: 100%; background: var(--color-brand-gold); transform: scaleX(var(--fill, 0)); transform-origin: left; transition: transform var(--dur-base) var(--ease-standard); }
 .kumpi-meta {
   display: flex; justify-content: space-between; align-items: center; margin-top: 9px;
   font-family: "Barlow Condensed", sans-serif; font-size: 12px;

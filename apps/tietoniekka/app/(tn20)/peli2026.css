@@ -87,7 +87,7 @@
 .tn20 .tng-stat-l { font-size: clamp(9.5px, 0.88cqw, 12.5px); font-weight: 800; letter-spacing: 0.15em; text-transform: uppercase; color: #a79e8c; }
 .tn20 .tng-stat-v { display: inline-flex; align-items: center; gap: 6px; font-family: var(--tn-font-display); font-weight: 900; font-size: clamp(19px, 1.9cqw, 30px); line-height: 1; color: #fffbf2; }
 .tn20 .tng-stat-v--streak { color: #f7ce7e; }
-.tn20 .tng-flame { display: block; animation: tngFlame 2.6s ease-in-out infinite; }
+.tn20 .tng-flame { display: block; animation: tngFlame 2.6s var(--ease-standard) infinite; }
 .tn20 .tng-statsep { width: 1px; height: clamp(30px, 2.8cqw, 38px); background: #332b1b; }
 .tn20 [data-hide="1"] { display: none !important; }
 
@@ -158,7 +158,7 @@
 
 /* Odotusilmoitus kuvan latautuessa */
 .tn20 .tng-wait { display: flex; align-items: center; gap: 11px; padding: 12px 15px; border-radius: 12px; border: 1px solid #37301f; background: rgba(15, 13, 7, 0.6); font-size: clamp(12px, 1.1cqw, 15px); font-weight: 700; color: #cbc1ad; }
-.tn20 .tng-wait i { flex: 0 0 auto; width: 9px; height: 9px; border-radius: 50%; background: #f2c46b; animation: tngPulse 1.1s ease-in-out infinite; }
+.tn20 .tng-wait i { flex: 0 0 auto; width: 9px; height: 9px; border-radius: 50%; background: #f2c46b; animation: tngPulse 1.1s var(--ease-standard) infinite; }
 
 /* Vastauslista */
 .tn20 .tng-agroup { display: flex; flex-direction: column; gap: clamp(9px, 1cqw, 14px); }
@@ -461,7 +461,7 @@
 .tn20 .tng-resleft { min-width: 0; display: flex; flex-direction: column; gap: clamp(14px, 1.6cqw, 22px); padding: 0 clamp(16px, 2.6cqw, 44px); }
 .tn20 .tng-resright { min-width: 0; display: flex; flex-direction: column; gap: clamp(12px, 1.3cqw, 18px); padding: 0 clamp(16px, 2.6cqw, 44px); }
 .tn20 .tng-rescard { position: relative; overflow: hidden; display: flex; flex-direction: column; gap: clamp(10px, 1.1cqw, 16px); padding: clamp(18px, 2.1cqw, 34px); border-radius: 20px; border: 1px solid var(--tnAccBorder); background: linear-gradient(150deg, var(--tnAccWash) 0%, rgba(19, 16, 9, 0.94) 46%, rgba(19, 16, 9, 0.97) 100%); animation: tngRise 0.35s ease-out; }
-.tn20 .tng-rescard[data-perfect="1"] { animation: tngRise 0.35s ease-out, tngPerfect 2.6s ease-in-out 1 0.3s; }
+.tn20 .tng-rescard[data-perfect="1"] { animation: tngRise 0.35s ease-out, tngPerfect 2.6s var(--ease-standard) 1 0.3s; }
 .tn20 .tng-rescard-top { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
 .tn20 .tng-rescat { display: inline-flex; align-items: center; gap: 8px; font-size: clamp(10px, 0.92cqw, 13px); font-weight: 800; letter-spacing: 0.15em; text-transform: uppercase; color: var(--tnAccText); white-space: nowrap; }
 .tn20 .tng-rescat i { width: 7px; height: 7px; border-radius: 50%; background: var(--tnAcc); }
