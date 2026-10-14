@@ -273,7 +273,7 @@
 .tn20 .tnk2-filter[aria-pressed="true"] { background: var(--tnk2-ink-strong); color: var(--tnk2-bg); border-color: var(--tnk2-ink-strong); }
 .tn20 .tnk2-filter-count {
   display: inline-flex; align-items: center; justify-content: center; min-width: 20px; height: 20px;
-  padding: 0 5px; border-radius: 999px; background: var(--tnk2-track); color: var(--tnk2-meta);
+  padding: 0 5px; border-radius: 999px; background: var(--tnk2-track); color: var(--tn-text-muted);
   font-size: 12px; font-weight: 800;
 }
 .tn20 .tnk2-filter[aria-pressed="true"] .tnk2-filter-count { background: rgba(19,17,9,.14); color: var(--tnk2-bg); }

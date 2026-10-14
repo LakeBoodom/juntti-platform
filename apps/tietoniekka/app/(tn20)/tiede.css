@@ -111,7 +111,7 @@
 }
 .tn20 .tnt-starthead span {
   font-size: clamp(11px, 1.05cqw, 13px); font-weight: 700; letter-spacing: .12em;
-  text-transform: uppercase; color: #6e7d9b;
+  text-transform: uppercase; color: #8291b0;
 }
 .tn20 .tnt-sechead {
   display: flex; align-items: flex-start; gap: clamp(12px, 1.6cqw, 22px);
@@ -224,14 +224,14 @@
 .tn20 .tnt-featured-text { font-size: clamp(12px, 1.3cqw, 17px); line-height: 1.5; color: #aebbd4; max-width: 52ch; text-wrap: pretty; }
 .tn20 .tnt-featured-meta {
   font-size: clamp(11px, 1cqw, 12px); font-weight: 800; letter-spacing: .1em;
-  text-transform: uppercase; color: #6e7d9b;
+  text-transform: uppercase; color: #8291b0;
 }
 
 .tn20 .tnt-foot {
   margin-top: clamp(34px, 4.4cqw, 68px); border-top: 1px solid #16203a; background: #070d1c;
   padding: clamp(22px, 3cqw, 40px) clamp(18px, 4cqw, 60px);
   display: flex; flex-wrap: wrap; gap: 14px; justify-content: space-between;
-  font-size: clamp(12px, 1.05cqw, 13px); color: #5a6785; font-weight: 600;
+  font-size: clamp(12px, 1.05cqw, 13px); color: #8291b0; font-weight: 600;
 }
 
 /* ── Etusivun mainosbanneri (design: "Etusivun mainosbanneri") ──────── */

@@ -139,7 +139,7 @@
 .tn20 .ju-aika-viiva { position: absolute; left: 0; right: 0; top: 50%; height: 1px; background: #3a3120; }
 .tn20 .ju-aika-kk {
   position: absolute; top: 0; bottom: 0; padding-left: 6px; border-left: 1px solid var(--ju-line);
-  font-size: 11px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; color: #7c7462;
+  font-size: 11px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; color: var(--tn-text-dim);
 }
 .tn20 .ju-aika-pisteet { position: absolute; left: 0; right: 0; top: 50%; }
 .tn20 .ju-aika-piste { position: absolute; top: 0; transform: translate(-50%, -50%); border-radius: 50%; box-shadow: 0 0 0 3px #131109; }
@@ -206,13 +206,13 @@
 .tn20 .ju-t2-meta { font-size: 13px; font-weight: 600; color: var(--ju-muted); }
 
 .tn20 .ju-t3 { display: flex; flex-direction: column; gap: 12px; padding-top: clamp(6px, 1cqi, 14px); }
-.tn20 .ju-t3-otsikko, .tn20 .ju-t3-label { font-size: 12px; font-weight: 800; letter-spacing: .18em; text-transform: uppercase; color: #7c7462; }
+.tn20 .ju-t3-otsikko, .tn20 .ju-t3-label { font-size: 12px; font-weight: 800; letter-spacing: .18em; text-transform: uppercase; color: var(--tn-text-dim); }
 .tn20 .ju-t3-label { font-size: 11px; letter-spacing: .14em; }
 .tn20 .ju-t3-kuut { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 190px), 1fr)); gap: 14px clamp(14px, 2cqi, 28px); }
 .tn20 .ju-t3-kk { display: flex; flex-direction: column; gap: 6px; padding-top: 10px; border-top: 1px solid var(--ju-line); }
 .tn20 .ju-t3-rivi { display: flex; align-items: baseline; gap: 8px; font-size: 14px; font-weight: 500; color: #a79e8c; }
 .tn20 a.ju-t3-rivi:hover { color: #f5f0e6; }
-.tn20 .ju-t3-pvm { min-width: 40px; color: #7c7462; font-variant-numeric: tabular-nums; }
+.tn20 .ju-t3-pvm { min-width: 40px; color: var(--tn-text-dim); font-variant-numeric: tabular-nums; }
 
 /* ── Kaikki juhlavisat ── */
 .tn20 .ju-ryhmat { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr)); gap: clamp(12px, 1.4cqi, 18px); align-items: start; }

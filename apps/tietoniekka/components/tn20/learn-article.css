@@ -68,7 +68,7 @@
   border-top: 1px solid #241e13;
   font-size: 12px;
   line-height: 1.7;
-  color: #5f594c;
+  color: var(--tn-text-dim);
 }
 .tn-learn-sources a { color: #8e8676; text-decoration: underline; text-underline-offset: 2px; }
 .tn-learn-sources a:hover { color: #fff; }

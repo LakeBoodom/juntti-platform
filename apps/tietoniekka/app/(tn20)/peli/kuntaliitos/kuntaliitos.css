@@ -18,6 +18,7 @@
   --kl-navy: #0e3a5c;
   --kl-navy-v: #07253c;
   --kl-teal: #159a9c;
+  --kl-teal-teksti: #0e7375; /* UI-laatu K2: teal tekstinä kermalla 3,23 → 5,31:1 */
   --kl-teal-t: #0a6e70;
   --kl-puna: #d8543c;
   --kl-puna-t: #a63a25;
@@ -45,7 +46,7 @@
   flex: none; font-family: var(--kl-display); font-weight: 900; font-variation-settings: "wdth" 72; font-size: 15px;
   letter-spacing: .02em; line-height: 1; color: var(--kl-navy); text-decoration: none;
 }
-.tn20 .kl-logo span { color: var(--kl-teal); }
+.tn20 .kl-logo span { color: var(--kl-teal-teksti); }
 .tn20 .kl-bar-sep { flex: none; width: 1px; height: 18px; background: #dcd3bf; }
 .tn20 .kl-bar-nimi { display: flex; align-items: baseline; gap: 8px; min-width: 0; }
 .tn20 .kl-bar-nimi h1 {
@@ -286,7 +287,7 @@
 .tn20 .kl-tilanne-rivi { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; font-size: 13px; color: var(--kl-heikko); }
 .tn20 .kl-tilanne-rivi b { font-family: var(--kl-display); font-weight: 900; font-variation-settings: "wdth" 82; font-size: 20px; line-height: 1; color: var(--kl-navy); }
 .tn20 .kl-tilanne-rivi b.kl-iso { font-size: 26px; line-height: .9; }
-.tn20 .kl-tilanne-rivi b.kl-teal { color: var(--kl-teal); }
+.tn20 .kl-tilanne-rivi b.kl-teal { color: var(--kl-teal-teksti); }
 .tn20 .kl-tilanne-rivi--viiva { padding-top: 10px; border-top: 1px solid #ede7d9; }
 .tn20 .kl-mittari--levea { gap: 4px; }
 .tn20 .kl-mittari--levea .kl-seg { flex: 1; width: auto; height: 10px; border-radius: 3px; }

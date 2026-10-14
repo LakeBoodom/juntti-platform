@@ -22,7 +22,7 @@
 .tn20 .vpk a { color: var(--vpk-lila); text-decoration: none; }
 .tn20 .vpk a:hover { color: var(--vpk-lila-2); }
 .tn20 .vpk :where(h1, h2, p, ol) { margin: 0; }
-.tn20 .vpk-pikku { font-size: 11px; font-weight: 800; letter-spacing: .16em; text-transform: uppercase; color: #5f594c; }
+.tn20 .vpk-pikku { font-size: 11px; font-weight: 800; letter-spacing: .16em; text-transform: uppercase; color: var(--tn-text-dim); }
 .tn20 .vpk-pikku--lila { color: var(--vpk-lila); }
 .tn20 .vpk-pikku--vali { margin: 0 0 10px 2px; }
 .tn20 .vpk-lila { color: var(--vpk-lila); white-space: nowrap; }
@@ -37,12 +37,12 @@
   border-bottom: 1px solid #241e13; background: #0f0d07;
 }
 .tn20 .vpk-bar-l { display: flex; align-items: center; gap: 12px; min-width: 0; }
-.tn20 .vpk .vpk-logo { font-family: var(--vpk-display); font-weight: 900; font-variation-settings: "wdth" 72; font-size: 15px; letter-spacing: .02em; line-height: 1; color: #5f594c; flex: none; }
+.tn20 .vpk .vpk-logo { font-family: var(--vpk-display); font-weight: 900; font-variation-settings: "wdth" 72; font-size: 15px; letter-spacing: .02em; line-height: 1; color: var(--tn-text-dim); flex: none; }
 .tn20 .vpk-logo span { color: #e8a320; }
 .tn20 .vpk-bar-sep { width: 1px; height: 18px; background: #2b2317; flex: none; }
 .tn20 .vpk-bar-nimi { font-family: var(--vpk-display); font-weight: 900; font-variation-settings: "wdth" 78; font-size: 17px; text-transform: uppercase; line-height: 1; white-space: nowrap; }
 .tn20 .vpk-bar-r { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; flex: none; }
-.tn20 .vpk-bar-pikku { font-size: 11px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; color: #5f594c; }
+.tn20 .vpk-bar-pikku { font-size: 11px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; color: var(--tn-text-dim); }
 .tn20 .vpk-bar-arvo { font-family: var(--vpk-display); font-weight: 900; font-variation-settings: "wdth" 82; font-size: 18px; line-height: 1; }
 
 /* ── Runko ─────────────────────────────────────────────── */
@@ -165,7 +165,7 @@
 }
 .tn20 .vpk-paikka {
   display: flex; align-items: center; gap: 12px; min-height: 64px; padding: 0 12px; border-radius: 14px;
-  border: 1px dashed #3a3122; color: #5f594c; font-size: 13px; font-weight: 600;
+  border: 1px dashed #3a3122; color: var(--tn-text-dim); font-size: 13px; font-weight: 600;
 }
 .tn20 .vpk-paikka[data-yli] { border-color: var(--vpk-lime); background: rgba(182, 255, 60, .08); }
 .tn20 .vpk-paikka-num {

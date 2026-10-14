@@ -364,7 +364,7 @@
 .tn20 .tnj-card-tag {
   position: absolute; z-index: 1; left: clamp(10px,1.2cqw,15px); top: clamp(9px,1.1cqw,14px);
   padding: 4px 10px; border-radius: 999px; background: rgba(19,17,9,.82);
-  border: 1px solid currentColor; color: currentColor;
+  border: 1px solid currentColor; color: color-mix(in srgb, currentColor 75%, #fff);
   font-size: clamp(11px,.9cqw,11px); font-weight: 800; letter-spacing: .1em;
   text-transform: uppercase; white-space: nowrap; max-width: calc(100% - 20px);
   overflow: hidden; text-overflow: ellipsis;

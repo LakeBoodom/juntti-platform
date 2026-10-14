@@ -215,7 +215,7 @@
   border-top: 1px solid var(--vl-line-2); border-radius: 8px;
 }
 .tn20 .vl-vp-lista li.on { background: rgba(180, 165, 255, 0.12); }
-.tn20 .vl-vp-k { font-size: 12px; font-weight: 700; color: #6b6455; }
+.tn20 .vl-vp-k { font-size: 12px; font-weight: 700; color: var(--tn-text-dim); }
 .tn20 .vl-vp-nimet { min-width: 0; display: flex; flex-direction: column; gap: 1px; }
 .tn20 .vl-vp-nimi { font-size: 15px; font-weight: 700; }
 .tn20 .vl-vp-lista li.on .vl-vp-nimi, .tn20 .vl-vp-lista li.on .vl-vp-paikat { color: var(--vl-acc-2); }

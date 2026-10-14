@@ -120,7 +120,7 @@
 .tn20 .tnu-card-tag {
   position: absolute; z-index: 1; left: clamp(11px,1.2cqw,16px); top: clamp(10px,1.1cqw,14px);
   padding: 4px 9px; border-radius: 999px; background: rgba(19,17,9,.82);
-  border: 1px solid currentColor; color: currentColor;
+  border: 1px solid currentColor; color: color-mix(in srgb, currentColor 75%, #fff); /* seuraväri tekstinä ≥ 4,5:1 */
   font-size: clamp(11px,.95cqw,11.5px); font-weight: 800; letter-spacing: .1em;
   text-transform: uppercase; white-space: nowrap; max-width: calc(100% - 22px);
   overflow: hidden; text-overflow: ellipsis;
@@ -128,7 +128,7 @@
 .tn20 .tnu-start {
   font-family: var(--tn-font-display); font-weight: 900; font-variation-settings: "wdth" 76;
   font-size: clamp(11px,1.1cqw,14px); text-transform: uppercase; letter-spacing: .04em;
-  color: currentColor; white-space: nowrap;
+  color: color-mix(in srgb, currentColor 75%, #fff); white-space: nowrap;
 }
 
 /* Overlay-kortti (21/9 lead, 4/5, 16/9, portit): kaikki teksti kuvan päällä */
@@ -253,7 +253,7 @@
 .tn20 .tnu-footer { border-top: 1px solid #241E13; }
 .tn20 .tnu-footer > div {
   display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px;
-  padding-top: 18px; padding-bottom: 22px; color: #5F594C; font-weight: 600; font-size: 13px;
+  padding-top: 18px; padding-bottom: 22px; color: var(--tn-text-dim); font-weight: 600; font-size: 13px;
 }
 .tn20 .tnu-footer a { color: inherit; text-decoration: none; }
 
