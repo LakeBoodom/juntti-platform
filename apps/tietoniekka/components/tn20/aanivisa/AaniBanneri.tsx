@@ -15,7 +15,7 @@ function Kuva({ k, luokka, sizes }: { k: KuvaKuplat; luokka: string; sizes: stri
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img src={k.pieni} srcSet={`${k.pieni} ${leveys(k)}w, ${k.src} ${k.leveys}w`} sizes={sizes} alt="" loading="lazy" />
       {k.kuplat.map((b) => (
-        <span key={b.teksti} className="ab-kupla" style={{ left: `${b.x}%`, top: `${b.y}%`, width: `${b.w}%`, height: `${b.h}%`, fontSize: `max(${b.fs}cqw, 8px)` }}>
+        <span key={b.teksti} className="ab-kupla" style={{ left: `${b.x}%`, top: `${b.y}%`, width: `${b.w}%`, height: `${b.h}%`, fontSize: `max(calc(${b.fs}cqw * var(--ab-kupla-k, 1)), 8px)` }}>
           {b.teksti}
         </span>
       ))}

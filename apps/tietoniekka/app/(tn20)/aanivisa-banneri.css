@@ -18,7 +18,9 @@
 
 .tn20 .ab-kuva { position: absolute; display: block; container-type: inline-size; }
 .tn20 .ab-kuva img { position: absolute; inset: 0; display: block; width: 100%; height: 100%; }
-.tn20 .ab-kuva--levea { right: 0; top: 0; height: 100%; }
+/* Kuplien fonttikoko = heron arvo × --ab-kupla-k. Desktopilla 1,15: tekstin leveys 59–79 % kuplasta (heron
+   arvoilla 45–69 %, CD:n arvoilla "Kraa kraa" 89 % → liian tiukka). Tabletilla 1, koska kuva on pienempi. */
+.tn20 .ab-kuva--levea { right: 0; top: 0; height: 100%; --ab-kupla-k: 1.15; }
 .tn20 .ab-kuva--levea::after {
   content: ""; position: absolute; inset: 0; pointer-events: none;
   background: linear-gradient(90deg, var(--ab-bg) 0%, rgba(19, 17, 9, 0.6) 14%, rgba(19, 17, 9, 0) 34%);
@@ -61,6 +63,7 @@
 /* Tabletti 760 × 230. Kapeimmillaan (520 px) leveä kuva ulottuu tekstin alle → lisävarjo tekstin puolelle. */
 @container (max-width: 859.98px) {
   .tn20 .ab { height: 230px; border-radius: 16px; }
+  .tn20 .ab-kuva--levea { --ab-kupla-k: 1; }
   .tn20 .ab-varjo { background: linear-gradient(90deg, var(--ab-bg) 0, rgba(19, 17, 9, 0.85) 250px, rgba(19, 17, 9, 0) 420px); }
   .tn20 .ab-teksti { max-width: 340px; padding-left: 28px; gap: 11px; }
   .tn20 .ab-tagi { font-size: 11px; gap: 7px; }
@@ -70,14 +73,15 @@
   .tn20 .ab-cta { padding: 0 18px; font-size: 14px; }
 }
 
-/* Mobiili: pystykuva ylhäällä (250 / 380 kontin leveydestä, kuva nostettu 14 / 380), teksti ja täysleveä nappi alla. */
+/* Mobiili: pystykuva ylhäällä, teksti ja täysleveä nappi alla. Kuva-alue 300 / 380 kontin leveydestä (CD 250 / 380:
+   talitiainen jäi liukuvärin ja Äänivisa-tagin alle), kuva nostettu 14 / 380 kuten designissa. */
 @container (max-width: 519.98px) {
   .tn20 .ab { height: auto; flex-direction: column; align-items: stretch; }
   .tn20 .ab-kuva--levea, .tn20 .ab-varjo, .tn20 .ab-tagi { display: none; }
-  .tn20 .ab-mob { display: block; position: relative; height: calc(100cqw * 250 / 380); overflow: hidden; }
+  .tn20 .ab-mob { display: block; position: relative; height: calc(100cqw * 300 / 380); overflow: hidden; }
   .tn20 .ab-mob::after {
     content: ""; position: absolute; inset: 0; pointer-events: none;
-    background: linear-gradient(rgba(19, 17, 9, 0) 62%, var(--ab-bg) 100%);
+    background: linear-gradient(rgba(19, 17, 9, 0) 72%, var(--ab-bg) 100%);
   }
   .tn20 .ab-kuva--pysty { left: 0; top: calc(-100cqw * 14 / 380); width: 100%; }
   .tn20 .ab-mob-tagi { position: absolute; z-index: 2; left: 18px; bottom: 14px; font-size: 11px; gap: 7px; }
