@@ -47,7 +47,8 @@ export function pisinSana(t: string): number {
   return Math.max(1, ...t.split(/\s+/).map((w) => Array.from(w).length));
 }
 
-export default function PaivanVisaCard({ data, esikatselu = false }: { data: PaivanVisaData; esikatselu?: boolean }) {
+/** lcp: kortti on sivun ensimmäinen kuva (ei Juhlat-banneria) → kuva ladataan korkealla prioriteetilla. */
+export default function PaivanVisaCard({ data, esikatselu = false, lcp = true }: { data: PaivanVisaData; esikatselu?: boolean; lcp?: boolean }) {
   const [played, setPlayed] = useState(false);
   /* Adminin esikatselussa ei lueta pelattu-tilaa (kortti aina pelaamaton). */
   useEffect(() => { if (!esikatselu) setPlayed(isPlayedToday()); }, [esikatselu]);
@@ -78,7 +79,7 @@ export default function PaivanVisaCard({ data, esikatselu = false }: { data: Pai
         <div className="tn-es-pv-media" data-kuva={data.imageUrl ? "1" : "0"}>
           {data.imageUrl && (
             // eslint-disable-next-line @next/next/no-img-element
-            <img src={data.imageUrl} alt={data.imageAlt} fetchPriority="high" style={{ objectPosition: data.imagePos }} />
+            <img src={data.imageUrl} alt={data.imageAlt} fetchPriority={lcp ? "high" : "auto"} loading={lcp ? "eager" : "lazy"} style={{ objectPosition: data.imagePos }} />
           )}
         </div>
         <div className="tn-es-pv-body">

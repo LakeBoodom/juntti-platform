@@ -222,7 +222,7 @@ export default async function Etusivu20({
             )}
             <PaivaVahti pvm={today.iso} />
           </div>
-          {daily ? <PaivanVisaCard data={daily} /> : <div className="tn-es-pv tn-es-pv--empty">Päivän visa palaa huomenna.</div>}
+          {daily ? <PaivanVisaCard data={daily} lcp={!juhla} /> : <div className="tn-es-pv tn-es-pv--empty">Päivän visa palaa huomenna.</div>}
         </section>
 
         {/* ─── Tupla tai kuitti -banneri (CD v0.2 3B): heti Päivän visan alla (Heikki 26.9.2026) ─── */}

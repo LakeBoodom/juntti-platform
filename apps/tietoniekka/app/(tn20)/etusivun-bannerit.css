@@ -128,6 +128,12 @@
   border: 1px solid rgba(199, 155, 255, 0.45); box-shadow: 0 22px 44px -22px rgba(0, 0, 0, 0.95); background: #231a33;
 }
 .tn20 .eb-kasvo img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 22%; display: block; filter: grayscale(1); }
+/* Varahenkilö ilman omaa kuvaa: nimikirjaimet kokoelman violetilla (ei Wikimedia-hotlinkkiä) */
+.tn20 .eb-kasvo-nimikirjaimet {
+  display: flex; align-items: center; justify-content: center; width: 100%; height: 100%;
+  background: linear-gradient(170deg, #3a2a55, #231a33); color: #e7d8ff;
+  font-family: var(--eb-display); font-weight: 900; font-size: 34px; letter-spacing: .02em;
+}
 .tn20 .eb-kasvo-savy { position: absolute; inset: 0; background: linear-gradient(rgba(120, 60, 200, 0.42), rgba(24, 15, 38, 0.78)); }
 .tn20 .eb-kasvo--raahaa { width: 130px; height: 168px; border-color: #b6ff3c; box-shadow: 0 0 0 3px rgba(182, 255, 60, 0.16), 0 26px 50px -22px rgba(0, 0, 0, 0.95); transform: translateY(-8px) rotate(-1.5deg); }
 .tn20 .eb-kasvo--raahaa .eb-kasvo-savy { background: linear-gradient(rgba(120, 60, 200, 0.3), rgba(24, 15, 38, 0.72)); }

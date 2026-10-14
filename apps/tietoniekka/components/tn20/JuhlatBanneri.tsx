@@ -53,6 +53,9 @@ export function JuhlatBanneri({ nosto, tanaan }: { nosto: Esiintyma; tanaan: num
             srcSet={`${kuva.replace(/\.webp$/, "-800.webp")} 800w, ${kuva} 1600w`}
             sizes="(min-width: 1200px) 600px, (min-width: 600px) 400px, 100vw"
             alt=""
+            /* UI-laatu 14.10.2026: Juhlat-banneri on etusivun ensimmäinen kuva (LCP) */
+            fetchPriority="high"
+            loading="eager"
           />
         )}
         <span className="jub-lyhty" />

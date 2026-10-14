@@ -30,7 +30,18 @@ export async function getKuvavisaYhteenveto(): Promise<KuvavisaYhteenveto | null
   };
 }
 
+/** image = oma kopio public/-kansiossa tai "" (→ nimikirjaimet). Ei koskaan Wikimedia-osoitetta. */
 export type BanneriHenkilo = { id: string; name: string; image: string };
+
+/* UI-laatu 14.10.2026: etusivu ei lataa kuvia suoraan Wikimediasta (Taylor Swiftin PNG oli sivun
+   suurin resurssi, 199 kt). Designin neljällä henkilöllä on omat 240×320-kopiot (krediitit
+   lib/kuvalahteet.ts, kokoelma "ikajarjestys"); varalle tulevat henkilöt näytetään nimikirjaimin. */
+const OMAT_KASVOT: Record<string, string> = {
+  "Leonardo DiCaprio": "/20/ikajarjestys/kasvot/leonardo-dicaprio.webp",
+  "Kimi Räikkönen": "/20/ikajarjestys/kasvot/kimi-raikkonen.webp",
+  "Taylor Swift": "/20/ikajarjestys/kasvot/taylor-swift.webp",
+  "Sanna Marin": "/20/ikajarjestys/kasvot/sanna-marin.webp",
+};
 
 /* Designin henkilöt (paikanpitäjinä designissa, oikeat kuvat kannasta).
    Tunnettuja eri aloilta ja eri vuosikymmeniltä, jotta "vanhin → nuorin"
@@ -66,5 +77,5 @@ export async function getBanneriHenkilot(): Promise<BanneriHenkilo[]> {
   /* Järjestys vanhimmasta nuorimpaan — kuva havainnollistaa pelin ideaa. */
   return rivit
     .sort((a, b) => (a.birth_date ?? "").localeCompare(b.birth_date ?? ""))
-    .map((r) => ({ id: r.id, name: r.name, image: r.image_url! }));
+    .map((r) => ({ id: r.id, name: r.name, image: OMAT_KASVOT[r.name] ?? "" }));
 }

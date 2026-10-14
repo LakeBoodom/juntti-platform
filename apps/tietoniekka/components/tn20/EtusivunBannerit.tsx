@@ -127,8 +127,12 @@ export function IkajarjestysBanneri({ henkilot }: { henkilot: BanneriHenkilo[] }
   const kasvo = (h: BanneriHenkilo | undefined, luokka: string, merkki: React.ReactNode) =>
     h ? (
       <figure className={`eb-kasvo ${luokka}`}>
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={h.image} alt="" loading="lazy" referrerPolicy="no-referrer" />
+        {h.image ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={h.image} alt="" loading="lazy" width={240} height={320} />
+        ) : (
+          <span className="eb-kasvo-nimikirjaimet">{h.name.split(/\s+/).map((o) => o[0]).slice(0, 2).join("")}</span>
+        )}
         <span className="eb-kasvo-savy" />
         {merkki}
       </figure>

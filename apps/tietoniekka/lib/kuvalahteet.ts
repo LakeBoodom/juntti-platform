@@ -23,7 +23,7 @@ export type Kuvalahde = {
   /** Visan slug = kuvatiedoston nimi kansiossa public/20/<kokoelma>/ */
   slug: string;
   /** Kokoelma, jonka kansiossa kuva on. */
-  kokoelma: "musiikki" | "kaupungit" | "jaakiekko" | "vaalit" | "historia" | "maantieto" | "luonto";
+  kokoelma: "musiikki" | "kaupungit" | "jaakiekko" | "vaalit" | "historia" | "maantieto" | "luonto" | "ikajarjestys";
   /** Mitä kuvassa on — näytetään lähdesivulla. */
   kuvaus: string;
   /** Tiedoston nimi Wikimedia Commonsissa (ilman File:-etuliitettä). */
@@ -214,6 +214,12 @@ export const KUVALAHTEET: Kuvalahde[] = [
   { slug: "turku", kokoelma: "kaupungit", kuvaus: "Turun linna talvella", tiedosto: "Turun linna maaliskuu 2013 2.jpg", tekija: "kallerna", lisenssi: "CC BY-SA 3.0", lisenssiUrl: CC("by-sa/3.0"), vuosi: "2013" },
   { slug: "vaasa", kokoelma: "kaupungit", kuvaus: "Vapaudenpatsas Vaasan torilla", tiedosto: "Statue of Liberty Vaasa Finland July 2022.jpg", tekija: "Amirmojiry", lisenssi: "CC BY-SA 4.0", lisenssiUrl: CC("by-sa/4.0"), vuosi: "2022" },
   { slug: "vantaa", kokoelma: "kaupungit", kuvaus: "Tiedekeskus Heureka ja Tiedepuisto Galilei, Vantaa", tiedosto: "Heureka, Tiedepuisto Galilei.jpg", tekija: "Abc10", lisenssi: "CC BY-SA 4.0", lisenssiUrl: CC("by-sa/4.0"), vuosi: "2016" },
+  /* Etusivun "Kuka on vanhin?" -noston kasvot (UI-laatu 14.10.2026): omat 240×320-kopiot
+     public/20/ikajarjestys/kasvot/<slug>.webp — ei enää suoraa linkkiä Wikimediaan. Mustavalkoisuus CSS:llä. */
+  { slug: "leonardo-dicaprio", kokoelma: "ikajarjestys", kuvaus: "Leonardo DiCaprio 2025", tiedosto: "LeoPTABFI191125-28 (cropped).jpg", tekija: "Raph_PH", lisenssi: "CC BY 4.0", lisenssiUrl: CC("by/4.0"), vuosi: "2025", muokkaus: "rajattu 3:4 (240×320), näytetään mustavalkoisena" },
+  { slug: "kimi-raikkonen", kokoelma: "ikajarjestys", kuvaus: "Kimi Räikkönen 2019", tiedosto: "F12019 Schloss Gabelhofen (22) (cropped).jpg", tekija: "XaviYuahanda", lisenssi: "CC BY-SA 4.0", lisenssiUrl: CC("by-sa/4.0"), vuosi: "2019", muokkaus: "rajattu 3:4 (240×320), näytetään mustavalkoisena" },
+  { slug: "taylor-swift", kokoelma: "ikajarjestys", kuvaus: "Taylor Swift, MTV Video Music Awards 2023", tiedosto: "Taylor Swift at the 2023 MTV Video Music Awards (3).png", tekija: "iHeartRadioCA", lisenssi: "CC BY 3.0", lisenssiUrl: CC("by/3.0"), vuosi: "2023", muokkaus: "rajattu 3:4 (240×320), näytetään mustavalkoisena" },
+  { slug: "sanna-marin", kokoelma: "ikajarjestys", kuvaus: "Sanna Marin, Eurooppa-neuvosto 2023", tiedosto: "Eurooppa-neuvosto 23.–24.3.2023 (52766857233) (cropped).jpg", tekija: "Rami Kurth, valtioneuvoston kanslia", lisenssi: "CC BY 2.0", lisenssiUrl: CC("by/2.0"), vuosi: "2023", muokkaus: "rajattu 3:4 (240×320), näytetään mustavalkoisena" },
 ];
 
 /** Commons-tiedostosivun osoite — lisenssiehtojen vaatima linkki lähteeseen. */
