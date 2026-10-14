@@ -1494,7 +1494,7 @@
 
 /* Pystyaikajana */
 .tn20 .tnh-timeline { list-style: none; margin: 26px 0 0; padding: 0; }
-.tn20 .tnh-era { display: grid; grid-template-columns: 34px 1fr; gap: 0 14px; padding-bottom: clamp(28px, 4vw, 44px); position: relative; }
+.tn20 .tnh-era { display: grid; grid-template-columns: 34px minmax(0, 1fr); /* K2: 1fr → minmax(0,1fr), pitkä sana ei levitä sivua 320 px:ssä */ gap: 0 14px; padding-bottom: clamp(28px, 4vw, 44px); position: relative; }
 .tn20 .tnh-era-rail { grid-row: 1 / span 2; position: relative; }
 .tn20 .tnh-era-rail::before { content: ""; position: absolute; left: 16px; top: 34px; bottom: -14px; width: 2px; background: #2a2418; }
 .tn20 .tnh-era:last-child .tnh-era-rail::before { display: none; }
@@ -1506,7 +1506,8 @@
 }
 .tn20 .tnh-era-num[data-done] { border-color: var(--tn-lime); color: var(--tn-lime); }
 .tn20 .tnh-era-years { color: var(--tn-gold); font-size: 11px; font-weight: 800; letter-spacing: 0.16em; text-transform: uppercase; margin-bottom: 6px; }
-.tn20 .tnh-era-title { font-family: var(--tn-font-display); font-weight: 900; font-size: clamp(21px, 2.4vw, 30px); line-height: 0.98; letter-spacing: -0.012em; text-transform: uppercase; margin: 0 0 8px; }
+/* KORTTISÄÄNTÖ K2 14.10.2026: "JÄLLEENRAKENNUKSEN" (13,56 em) leveni 320 px:ssä → raja (100vw − 88px) / 14,24 = 16,3 px @320, 21 px ≥ 390 */
+.tn20 .tnh-era-title { font-family: var(--tn-font-display); font-weight: 900; font-size: min(clamp(21px, 2.4vw, 30px), calc((100vw - 88px) / 14.24)); line-height: 0.98; letter-spacing: -0.012em; text-transform: uppercase; margin: 0 0 8px; }
 .tn20 .tnh-era-desc { margin: 0 0 10px; color: var(--tn-text-soft); font-size: 13.5px; line-height: 1.55; max-width: 46ch; }
 .tn20 .tnh-era-meter { display: flex; align-items: center; gap: 10px; font-size: 12px; font-weight: 700; color: var(--tn-text-muted); }
 .tn20 .tnh-era-quizzes { display: flex; flex-direction: column; gap: 8px; margin-top: 14px; }
