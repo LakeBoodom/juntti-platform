@@ -2567,3 +2567,5 @@
 .tn20 .tn-chipnav a { min-height: 44px; }
 .tn20 .tnh-toggle button { min-height: 44px; }
 .tn20 .tn-morelink { display: inline-block; padding-block: 13.5px; margin-block: -13.5px; }
+/* Historian aikajanan otsikkorivi: Jana/Kaudet-valitsin ei mahtunut otsikon viereen 320 px:ssä (sivu leveni 341 px:iin) → rivittyy */
+.tn20 .tnh .tn-section-head { flex-wrap: wrap; row-gap: 12px; }

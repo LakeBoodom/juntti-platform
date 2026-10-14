@@ -91,7 +91,9 @@
 }
 .tn20 .tnu-h2 {
   margin: 0; font-family: var(--tn-font-display); font-weight: 900;
-  font-variation-settings: "wdth" 70; font-size: clamp(30px,5cqw,72px);
+  /* KORTTISÄÄNTÖ 14.10.2026: "URHEILUHISTORIA" (15 versaalia, staattinen Archivo ≈ 10,2 em) ei mahtunut 320 px:ssä
+     30 px:llä (306 px / 288 px) → raja (100cqw − 32px) / 10,8 = 26,7 px @320; ≥ 360 px ennallaan 30 px. */
+  font-variation-settings: "wdth" 70; font-size: min(clamp(30px,5cqw,72px), calc((100cqw - 32px) / 10.8));
   line-height: .88; letter-spacing: -.02em; text-transform: uppercase; color: #F5F0E6;
   max-width: 20ch;
 }
