@@ -29,7 +29,7 @@ export function KuntaliitosBanneri() {
       <span className="klb-ketju" aria-hidden="true">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img className="klb-kartta" src="/20/kuntaliitos/palapeli.webp" alt="" loading="lazy" />
-        <svg className="klb-polku" viewBox="0 0 160 240" preserveAspectRatio="none">
+        <svg className="klb-polku" viewBox="0 0 160 240" preserveAspectRatio="none" aria-hidden="true" focusable="false">
           <path d="M30 222 C 54 178, 84 150, 72 110 S 104 44, 134 30" />
           <circle cx="30" cy="222" r="7" />
           <circle cx="72" cy="110" r="7" />
@@ -39,7 +39,7 @@ export function KuntaliitosBanneri() {
           <span className="klb-liitos">
             <i />
             <span className="klb-pill">
-              <svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5" /></svg>
+              <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 12.5l4.5 4.5L19 7.5" /></svg>
               Yhteinen raja
             </span>
           </span>

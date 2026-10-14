@@ -632,6 +632,14 @@
   text-align: center; font-size: 16px; font-weight: 800; text-decoration: none;
 }
 .tn20 .tn-putki-cta:hover { filter: brightness(1.06); }
+/* ── Skip-linkki (UI-laatu 14.10.2026): ensimmäinen Tab-pysähdys, näkyy vain fokuksessa ── */
+.tn20 .skip-link {
+  position: absolute; left: -9999px; top: 8px; z-index: 1000; padding: 12px 18px; border-radius: 999px;
+  background: var(--tn-lime); color: #131109; font-weight: 800; text-decoration: none;
+}
+.tn20 .skip-link:focus { left: 12px; outline: 2px solid #f5f0e6; outline-offset: 2px; }
+.tn20 #main:focus { outline: none; }
+
 /* ── Ensisijainen CTA (UI-laatu 14.10.2026) ──────────────────────────────────
    Sama toiminto näyttää samalta kaikkialla: lime-pilleri, tumma teksti, versaali. Teemakortin oma väri
    näkyy taustassa/badgessa/motiivissa, ei tässä napissa. Koko ja fontti tulevat kortin omasta luokasta;
@@ -2396,8 +2404,10 @@
 .tn20 .tn-personsearch svg { flex: none; color: var(--tn-text-dim); }
 .tn20 .tn-personsearch input {
   flex: 1; min-width: 0; border: 0; background: transparent; color: inherit;
-  font-family: inherit; font-size: clamp(14px, 1.4cqw, 18px); outline: none;
+  font-family: inherit; font-size: clamp(14px, 1.4cqw, 18px);
 }
+/* UI-laatu 14.10.2026: näkyvä fokusrengas (ei outline: none) */
+.tn20 .tn-personsearch input:focus-visible { outline: 2px solid var(--tn-lime); outline-offset: 2px; border-radius: 4px; }
 .tn20 .tn-personsearch input::placeholder { color: var(--tn-text-dim); }
 
 /* Kategoriat + lajittelu */

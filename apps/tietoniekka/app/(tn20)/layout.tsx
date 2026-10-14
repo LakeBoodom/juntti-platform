@@ -39,8 +39,12 @@ export default async function Tn20Layout({ children }: { children: React.ReactNo
   const tagline = `Suomalainen tietovisasivusto · ${visaMaara(await getSiteStats())}`;
   return (
     <div className="tn20">
+      {/* UI-laatu 14.10.2026: skip-linkki ensimmäiseksi; kohde on sisällön alussa (sivujen omat <main>-elementit
+          vaihtelevat, joten ankkuri on layoutissa). */}
+      <a href="#main" className="skip-link">Siirry sisältöön</a>
       {/* Navigaatiojärjestelmä (lukittu 17.8.2026) — piiloutuu itse pelinäkymässä */}
       <TopBar tagline={tagline} />
+      <span id="main" tabIndex={-1} />
       {children}
       {/* Yhteinen alatunniste kaikille sivuille (QA-005, 29.8.2026) */}
       <SiteFooter />
