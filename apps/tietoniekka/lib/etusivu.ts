@@ -42,7 +42,8 @@ export const CATEGORY_CHIPS = [
 /* Lippuvisa-hero (ETUSIVU_HERO) poistettu 18.9.2026: etusivun yläosan korvasi
    Kuvavisat-banneri (components/tn20/EtusivunBannerit.tsx, Design kierros 12A). */
 
-export type CollectionCard = { key: string; title: string; href: string; img: string; pos: string; desc?: string };
+/** alt: kuvan sisältö (SEO 16.10.2026: Google käyttää alt-tekstiä kuvan tunnistamiseen). */
+export type CollectionCard = { key: string; title: string; href: string; img: string; pos: string; desc?: string; alt?: string };
 
 /* Suositut kokoelmat — 6 korttia (4:3), ei visamääriä (HTML voittaa README:n).
    desc = lyhyt intro otsikon alla (Heikki 6.10.2026): "X, Y ja Z" -rakenne, ei lauseita eikä huutomerkkejä. */
@@ -52,12 +53,12 @@ export const POPULAR_COLLECTIONS: CollectionCard[] = [
      Suomen kaupungit = Helsinki (Senaatintori, sama kuva kuin kaupungit-kokoelmassa, isompana),
      Maantieto = Bengtskärin majakka (Suomen majakat -visan kuva, oikea valokuva AI-kuvan tilalle),
      Historia = Turun linna (Commons, CC BY-SA 4.0), Luonto = revontulet Saanan yllä (Commons, CC BY-SA 4.0). */
-  { key: "jaakiekko", title: "Jääkiekko", href: "/kokoelma/jaakiekko", img: "/20/jaakiekko/jk-leijonat-mm2026-kuva-kortti.webp", pos: "center 40%", desc: "SM-liiga, Leijonat ja NHL" },
-  { key: "historia", title: "Historia", href: "/kokoelma/historia", img: "/20/etusivu/sp-turun-linna-kortti.webp", pos: "center 45%", desc: "Linnat, sodat ja presidentit" },
-  { key: "luonto", title: "Luonto", href: "/kokoelma/luonto", img: "/20/etusivu/sp-revontulet.webp", pos: "center 40%", desc: "Linnut, eläimet ja ilmiöt" },
-  { key: "maantieto", title: "Maantieto", href: "/kokoelma/matkakohteet", img: "/20/maantieto/suomen-majakat-kortti.webp", pos: "56% 50%", desc: "Majakat, saaret ja maailman ääret" },
-  { key: "kaupungit", title: "Suomen kaupungit", href: "/kokoelma/kaupungit", img: "/20/etusivu/sp-helsinki-kortti.webp", pos: "center 55%", desc: "Helsingistä Rovaniemelle" },
-  { key: "vaalit", title: "Vaalit ja politiikka", href: "/kokoelma/vaalit", img: "/20/vaalit/hero-kortti.webp", pos: "center 45%", desc: "Vaalit, puolueet ja pääministerit" },
+  { key: "jaakiekko", alt: "Leijonat rivissä jäähallissa ennen MM-ottelua", title: "Jääkiekko", href: "/kokoelma/jaakiekko", img: "/20/jaakiekko/jk-leijonat-mm2026-kuva-kortti.webp", pos: "center 40%", desc: "SM-liiga, Leijonat ja NHL" },
+  { key: "historia", alt: "Turun linna kesällä", title: "Historia", href: "/kokoelma/historia", img: "/20/etusivu/sp-turun-linna-kortti.webp", pos: "center 45%", desc: "Linnat, sodat ja presidentit" },
+  { key: "luonto", alt: "Revontulet tunturin yllä", title: "Luonto", href: "/kokoelma/luonto", img: "/20/etusivu/sp-revontulet.webp", pos: "center 40%", desc: "Linnut, eläimet ja ilmiöt" },
+  { key: "maantieto", alt: "Bengtskärin majakka Saaristomerellä", title: "Maantieto", href: "/kokoelma/matkakohteet", img: "/20/maantieto/suomen-majakat-kortti.webp", pos: "56% 50%", desc: "Majakat, saaret ja maailman ääret" },
+  { key: "kaupungit", alt: "Helsingin keskusta ylhäältä kuvattuna", title: "Suomen kaupungit", href: "/kokoelma/kaupungit", img: "/20/etusivu/sp-helsinki-kortti.webp", pos: "center 55%", desc: "Helsingistä Rovaniemelle" },
+  { key: "vaalit", alt: "Eduskuntatalon pylväät ja portaat", title: "Vaalit ja politiikka", href: "/kokoelma/vaalit", img: "/20/vaalit/hero-kortti.webp", pos: "center 45%", desc: "Vaalit, puolueet ja pääministerit" },
 ];
 
 export type Host = {
@@ -80,8 +81,8 @@ export const HOSTS: Host[] = [
     img: "/20/etusivu/host-laura.webp",
     accent: "gold",
     cards: [
-      { key: "tv", title: "TV & suoratoisto", desc: "Sarjat, tähdet ja suoratoistohitit", href: "/kokoelma/tv", img: "/20/etusivu/l-tv-masked-singer-kortti.webp", pos: "center 35%" },
-      { key: "jalkapallo", title: "Jalkapallo", desc: "Seurat, pelaajat ja arvokisat", href: "/kokoelma/jalkapallo", img: "/20/etusivu/l-jalkapallo-kortti.webp", pos: "center 38%" },
+      { key: "tv", alt: "Naamioitunut laulaja tv-studion lavalla", title: "TV & suoratoisto", desc: "Sarjat, tähdet ja suoratoistohitit", href: "/kokoelma/tv", img: "/20/etusivu/l-tv-masked-singer-kortti.webp", pos: "center 35%" },
+      { key: "jalkapallo", alt: "Jalkapalloilija täydellä stadionilla", title: "Jalkapallo", desc: "Seurat, pelaajat ja arvokisat", href: "/kokoelma/jalkapallo", img: "/20/etusivu/l-jalkapallo-kortti.webp", pos: "center 38%" },
     ],
   },
   {
@@ -92,8 +93,8 @@ export const HOSTS: Host[] = [
     img: "/20/etusivu/host-mikko.webp",
     accent: "lime",
     cards: [
-      { key: "megavisat", title: "Megavisat", desc: "Pitkät visat todellisille tietoniekoille", href: "/megavisat", img: "/20/etusivu/coll-megavisat-kortti.webp", pos: "center 50%" },
-      { key: "urheilu", title: "Urheilu", desc: "Lajit, legendat ja ennätykset", href: "/kokoelma/urheilu", img: "/20/urheilulajit/f1-kaikki-kortti.webp", pos: "center 50%" },
+      { key: "megavisat", alt: "Valaistu tietovisastudio", title: "Megavisat", desc: "Pitkät visat todellisille tietoniekoille", href: "/megavisat", img: "/20/etusivu/coll-megavisat-kortti.webp", pos: "center 50%" },
+      { key: "urheilu", alt: "Formula 1 -auto kilparadalla", title: "Urheilu", desc: "Lajit, legendat ja ennätykset", href: "/kokoelma/urheilu", img: "/20/urheilulajit/f1-kaikki-kortti.webp", pos: "center 50%" },
     ],
   },
 ];

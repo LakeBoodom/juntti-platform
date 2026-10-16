@@ -79,7 +79,7 @@ export default function PaivanVisaCard({ data, esikatselu = false, lcp = true }:
         <div className="tn-es-pv-media" data-kuva={data.imageUrl ? "1" : "0"}>
           {data.imageUrl && (
             // eslint-disable-next-line @next/next/no-img-element
-            <img src={data.imageUrl} alt={data.imageAlt} fetchPriority={lcp ? "high" : "auto"} loading={lcp ? "eager" : "lazy"} style={{ objectPosition: data.imagePos }} />
+            <img src={data.imageUrl} alt={data.imageAlt || data.title} fetchPriority={lcp ? "high" : "auto"} loading={lcp ? "eager" : "lazy"} style={{ objectPosition: data.imagePos }} />
           )}
         </div>
         <div className="tn-es-pv-body">

@@ -2,6 +2,7 @@
 // jotta nykyinen sivusto ei muutu. Fontit: Archivo (display) + Barlow (body, juurilayoutista).
 // UI-laatu kierros 1 (14.10.2026): Instrument Sans poistettu, leipäteksti Barlow'lla (3 fonttitiedostoa vähemmän).
 import { getSiteStats, visaMaara } from "@/lib/siteStats";
+import { brand } from "@/config/brand";
 import type { Metadata } from "next";
 import "@fontsource/archivo/500.css";
 import "@fontsource/archivo/700.css";
@@ -22,12 +23,13 @@ import SiteFooter from "@/components/tn20/SiteFooter";
    (kokoelmat, pelisivut) antavat omansa. noindex poistettu julkaisussa
    31.8.2026 — 2.0 on nyt tuotanto juuressa ja indeksoitavissa. */
 export async function generateMetadata(): Promise<Metadata> {
-  const maara = visaMaara(await getSiteStats());
+  const stats = await getSiteStats();
   return {
   /* absolute: juurilayoutin template ("%s | Tietoniekka") tuplaisi muuten
      brändin etusivun otsikkoon (havaittu julkaisu-QA:ssa 31.8.2026).
-     SEO-erä A8: visamäärä kannasta (lib/siteStats.ts). */
-  title: { absolute: `Tietoniekka – suomalainen tietovisasivusto · ${maara}` },
+     SEO-erä A8: visamäärä kannasta (lib/siteStats.ts).
+     SEO 16.10.2026 (Heikki): hakusana "tietovisat" alkuun, brändi loppuun. H1 ennallaan. */
+  title: { absolute: `Tietovisat – yli ${stats.quizzesFloor} ilmaista visaa | ${brand.name}` },
   description:
     "Ilmaisia tietovisoja jääkiekosta, jalkapallosta, elokuvista, musiikista, historiasta ja luonnosta. Päivän visa, megavisat ja kuvavisat – pelaa ilman kirjautumista.",
   };

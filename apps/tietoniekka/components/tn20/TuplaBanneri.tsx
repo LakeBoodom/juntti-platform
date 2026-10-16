@@ -8,13 +8,8 @@ import { TUPLA_SIVU } from "@/lib/tuplaTaiKuitti";
 export function TuplaBanneri() {
   return (
     <a className="tkb" href={TUPLA_SIVU} aria-label="Tupla tai kuitti – testaa uusi pelimuoto">
-      <span className="tkb-kuva" aria-hidden="true">
-        <picture>
-          <source media="(min-width: 980px)" srcSet="/20/tupla/banneri-desk.webp" />
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/20/tupla/banneri-mob.webp" alt="" loading="lazy" />
-        </picture>
-      </span>
+      {/* SEO 16.10.2026: koristekuva CSS-taustana (tupla-banneri.css), ei <img> → ei hakutuloksen pikkukuvaehdokas */}
+      <span className="tkb-kuva" aria-hidden="true" />
       <span className="tkb-tag tkb-tag--m">Uusi pelimuoto</span>
       <span className="tkb-teksti">
         <span className="tkb-tag tkb-tag--d">Uusi pelimuoto</span>

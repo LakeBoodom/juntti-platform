@@ -45,7 +45,7 @@ export default function PaivanSankari({ data }: { data: PaivanSankariData }) {
         <span className="tn-es-sank-img" aria-hidden>
           {kuvaOk && data.kuva ? (
             // eslint-disable-next-line @next/next/no-img-element
-            <img src={data.kuva} alt="" style={{ objectPosition: data.kuvaPos }} onError={() => setKuvaOk(false)} />
+            <img src={data.kuva} alt={data.nimi} style={{ objectPosition: data.kuvaPos }} onError={() => setKuvaOk(false)} />
           ) : (
             <span className="tn-es-sank-initials">{nimikirjaimet(data.nimi)}</span>
           )}

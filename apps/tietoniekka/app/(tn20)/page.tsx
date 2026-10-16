@@ -16,6 +16,7 @@ import { PaivaVahti } from "@/components/tn20/PaivaVahti";
 import { visaHref } from "@/lib/visaHref";
 import { getSupabase, SITE_SLUG } from "@/lib/supabase";
 import { brand } from "@/config/brand";
+import { JsonLd, abs } from "@/lib/jsonLd";
 import { helsinginPaiva } from "@/lib/aika";
 import PaivanVisaCard from "@/components/tn20/PaivanVisaCard";
 import { paivanVisaTila, type PaivanVisaData } from "@/lib/paivanVisa";
@@ -197,6 +198,22 @@ export default async function Etusivu20({
 
   return (
     <main className="tn-es-page">
+      {/* SEO 16.10.2026: etusivun WebPage, pääkuvana brändin jakokuva. Ohjaa Googlen hakutuloksen
+          pikkukuvan pois koristebannereista (ne ovat CSS-taustoja). */}
+      <JsonLd
+        data={{
+          "@context": "https://schema.org",
+          "@type": "WebPage",
+          "@id": `${abs("/")}#webpage`,
+          url: abs("/"),
+          name: `Tietovisat – ilmaisia tietovisoja | ${brand.name}`,
+          inLanguage: "fi-FI",
+          isPartOf: { "@id": `${abs("/")}#website` },
+          about: { "@id": `${abs("/")}#organization` },
+          primaryImageOfPage: { "@type": "ImageObject", url: abs("/og-image.png"), width: 1200, height: 630 },
+          image: abs("/og-image.png"),
+        }}
+      />
       {/* ─── Kategoriarivi ─── */}
       <div className="tn-es-catbar">
         <nav className="tn-es-cats" aria-label="Kategoriat">
@@ -255,7 +272,7 @@ export default async function Etusivu20({
             {POPULAR_COLLECTIONS.map((c) => (
               <a key={c.key} className="tn-es-card" href={c.href}>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img className="tn-es-card-img" src={c.img} alt="" loading="lazy" style={{ objectPosition: c.pos }} />
+                <img className="tn-es-card-img" src={c.img} alt={c.alt ?? ""} loading="lazy" style={{ objectPosition: c.pos }} />
                 <span className="tn-es-card-shade" aria-hidden />
                 <span className="tn-es-card-foot">
                   <span className="tn-es-card-text">

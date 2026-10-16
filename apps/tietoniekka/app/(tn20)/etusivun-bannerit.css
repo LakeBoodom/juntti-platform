@@ -99,10 +99,10 @@
   position: absolute; margin: 0; overflow: hidden; border-radius: 13px;
   border: 1px solid #2f2718; box-shadow: 0 26px 48px -24px rgba(0, 0, 0, 0.95);
 }
-.tn20 .eb-kortti img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.tn20 .eb-kortti .eb-kuva { display: block; width: 100%; height: 100%; background-position: center; background-size: cover; background-repeat: no-repeat; }
 .tn20 .eb-kortti--rakennus { right: 344px; top: 26px; width: 200px; height: 216px; transform: rotate(-2.5deg); }
 .tn20 .eb-kortti--liput { right: 158px; top: 14px; width: 196px; height: 196px; transform: rotate(2deg); background: #f4efe4; display: flex; align-items: center; justify-content: center; padding: 18px; }
-.tn20 .eb-kortti--liput img { width: auto; height: auto; max-width: 100%; max-height: 100%; object-fit: contain; }
+.tn20 .eb-kortti--liput .eb-kuva { background-size: contain; }
 .tn20 .eb-kortti--maalaukset { right: 128px; top: 118px; width: 170px; height: 134px; transform: rotate(-1.4deg); }
 .tn20 .eb-kortti--elaimet { right: 22px; top: 34px; width: 214px; height: 200px; transform: rotate(1.8deg); border-color: rgba(34, 211, 238, 0.4); }
 .tn20 .eb-kortti-savy { position: absolute; inset: 0; background: linear-gradient(200deg, rgba(34, 211, 238, 0.22), rgba(11, 9, 4, 0.55)); }
@@ -231,7 +231,7 @@
   .tn20 .eb--kv .eb-mmeta { display: block; }
   .tn20 .eb-strip { display: block; position: relative; height: 132px; }
   .tn20 .eb-strip-kuvat { position: absolute; inset: 0; display: flex; }
-  .tn20 .eb-strip-kuvat img { width: 33.4%; height: 100%; object-fit: cover; display: block; }
+  .tn20 .eb-strip-kuvat .eb-kuva { width: 33.4%; height: 100%; display: block; background-position: center; background-size: cover; background-repeat: no-repeat; }
   .tn20 .eb-strip-varjo { position: absolute; inset: 0; background: linear-gradient(to top, var(--eb-bg) 6%, rgba(23, 20, 12, 0.55) 48%, rgba(34, 211, 238, 0.12) 100%); }
   .tn20 .eb-strip-tag { position: absolute; left: 16px; top: 14px; }
 

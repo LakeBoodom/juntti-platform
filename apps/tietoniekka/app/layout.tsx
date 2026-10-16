@@ -1,6 +1,7 @@
 import { getSiteStats, yliVisaa, visaMaara } from "@/lib/siteStats";
 import type { Metadata, Viewport } from "next";
 import Script from "next/script";
+import { JsonLd } from "@/lib/jsonLd";
 
 /* Self-hosted fontit (brief osio 2): @fontsource-paketit — woff2:t tulevat
    npm-paketista ja tarjoillaan omalta domainilta. Ei kutsuja Googleen. */
@@ -96,42 +97,36 @@ export default async function RootLayout({
   return (
     <html lang="fi">
       <body>
-        {/* JSON-LD: Organization + WebSite — helps Google + LLM crawlers */}
-        <Script
-          id="ld-organization"
-          type="application/ld+json"
-          strategy="beforeInteractive"
-        >
-          {JSON.stringify({
+        {/* JSON-LD: Organization + WebSite. SEO 16.10.2026: tavallisina <script type="application/ld+json">
+            -tageina (ennen next/script beforeInteractive → päätyi self.__next_s-taulukkoon eikä näkynyt
+            HTML:ssä rakenteisena datana). @id:t yhdistävät etusivun WebPage-olioon (app/(tn20)/page.tsx).
+            Logo = neliön T-merkki (Googlen logosuositus), jakokuva og-image.png on sivun pääkuva. */}
+        <JsonLd
+          data={{
             "@context": "https://schema.org",
             "@type": "Organization",
+            "@id": `${SITE_URL}/#organization`,
             name: brand.name,
             url: SITE_URL,
-            logo: `${SITE_URL}/og-image.png`,
+            logo: { "@type": "ImageObject", url: `${SITE_URL}/icon-512.png`, width: 512, height: 512 },
+            image: `${SITE_URL}/og-image.png`,
             description: `${brand.name} — suomalainen tietovisasivusto. ${yliVisaa(stats)}: Päivän visa, kokoelmat, megavisat ja kuvavisat. Aina ilmainen, ei rekisteröitymistä.`,
             /* SEO-erä A9: Instagram-tili */
             sameAs: ["https://www.instagram.com/tietoniekka/"],
-          })}
-        </Script>
-        <Script
-          id="ld-website"
-          type="application/ld+json"
-          strategy="beforeInteractive"
-        >
-          {JSON.stringify({
+          }}
+        />
+        <JsonLd
+          data={{
             "@context": "https://schema.org",
             "@type": "WebSite",
+            "@id": `${SITE_URL}/#website`,
             name: brand.name,
             url: SITE_URL,
             inLanguage: "fi-FI",
             description: `Suomenkielisiä tietovisoja: Päivän visa, kokoelmat (urheilu, jääkiekko, jalkapallo, elokuvat, tv, musiikki, historia, luonto, matkakohteet, kulttuuri, Suomen kaupungit, tunnetut henkilöt), megavisat ja kuvavisat (liput, vaakunat, linnut, kasvit, eläimet). Tietoniekka on ilmainen suomalainen tietovisasivusto.`,
-            publisher: {
-              "@type": "Organization",
-              name: brand.name,
-              url: SITE_URL,
-            },
-          })}
-        </Script>
+            publisher: { "@id": `${SITE_URL}/#organization` },
+          }}
+        />
         {children}
         {/* Vercel Web Analytics (31.8.2026) — Hobby-taso, sivulataukset ilman
             evästeitä. Skripti suoraan (ei @vercel/analytics-pakettia, jottei

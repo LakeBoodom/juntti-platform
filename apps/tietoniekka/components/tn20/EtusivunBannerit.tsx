@@ -38,15 +38,14 @@ export function KuvavisatBanneri({
   return (
     <section className="eb eb--kv" aria-labelledby="eb-kv-h">
       <div className="eb-in">
-      {/* Mobiilin kuvakaista (380): kolme kuvaa rinnakkain, tagi päällä */}
+      {/* Mobiilin kuvakaista (380): kolme kuvaa rinnakkain, tagi päällä.
+          SEO 16.10.2026: bannerin kuvitus CSS-taustakuvina (ei <img>), jotta Google ei valitse
+          koristekuvaa (gorilla) etusivun hakutuloksen pikkukuvaksi. */}
       <div className="eb-strip" aria-hidden="true">
         <div className="eb-strip-kuvat">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={`${KUVA}rakennus.webp`} alt="" loading="lazy" />
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={`${KUVA}maalaukset.webp`} alt="" loading="lazy" />
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={`${KUVA}elaimet.webp`} alt="" loading="lazy" />
+          <span className="eb-kuva" style={{ backgroundImage: `url(${KUVA}rakennus.webp)` }} />
+          <span className="eb-kuva" style={{ backgroundImage: `url(${KUVA}maalaukset.webp)` }} />
+          <span className="eb-kuva" style={{ backgroundImage: `url(${KUVA}elaimet.webp)` }} />
         </div>
         <span className="eb-strip-varjo" />
         <span className="eb-tag eb-tag--amber eb-strip-tag">Uusi kokoelma</span>
@@ -90,20 +89,16 @@ export function KuvavisatBanneri({
       <div className="eb-visual" aria-hidden="true">
         <span className="eb-visual-varjo" />
         <figure className="eb-kortti eb-kortti--rakennus">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={`${KUVA}rakennus.webp`} alt="" loading="lazy" />
+          <span className="eb-kuva" style={{ backgroundImage: `url(${KUVA}rakennus.webp)` }} />
         </figure>
         <figure className="eb-kortti eb-kortti--liput">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={`${KUVA}liput.webp`} alt="" loading="lazy" />
+          <span className="eb-kuva" style={{ backgroundImage: `url(${KUVA}liput.webp)` }} />
         </figure>
         <figure className="eb-kortti eb-kortti--maalaukset">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={`${KUVA}maalaukset.webp`} alt="" loading="lazy" />
+          <span className="eb-kuva" style={{ backgroundImage: `url(${KUVA}maalaukset.webp)` }} />
         </figure>
         <figure className="eb-kortti eb-kortti--elaimet">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={`${KUVA}elaimet.webp`} alt="" loading="lazy" />
+          <span className="eb-kuva" style={{ backgroundImage: `url(${KUVA}elaimet.webp)` }} />
           <span className="eb-kortti-savy" />
           {viikko && (
             <span className="eb-setti">
@@ -129,7 +124,7 @@ export function IkajarjestysBanneri({ henkilot }: { henkilot: BanneriHenkilo[] }
       <figure className={`eb-kasvo ${luokka}`}>
         {h.image ? (
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={h.image} alt="" loading="lazy" width={240} height={320} />
+          <img src={h.image} alt={h.name} loading="lazy" width={240} height={320} />
         ) : (
           <span className="eb-kasvo-nimikirjaimet">{h.name.split(/\s+/).map((o) => o[0]).slice(0, 2).join("")}</span>
         )}
