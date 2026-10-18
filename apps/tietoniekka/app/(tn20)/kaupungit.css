@@ -235,8 +235,14 @@
    leimastatus — eivät ylivuotaneet, joten niille jätettiin CD:n alkuperäinen
    koko). Oma --region-luokka pienemmällä, mitatulla koolla: arvo = mitattu
    max-fit miinus n. 1px marginaali jokaisella leveysaskeleella. */
-.tn20 .tnk2-panel-stat-v--region { font-size: 10.2px; line-height: 1.05; } /* 320px: mitattu maxFit 11.2 (CD 15) */
-@media (min-width: 375px) { .tn20 .tnk2-panel-stat-v--region { font-size: 7.2px; } /* 390/768px: mitattu maxFit 8.2 (CD 15) */ }
+/* T3 (UI-laatu 18.10.2026): 7,2–10,2 px oli liian pieni. Alle 960 px:n suunta-solu saa koko rivin
+   (kaksi saraketta, suunta alle), jolloin "Pääkaupunkiseutu" mahtuu CD:n 15 px:llä (16 × 0,62 × 15 ≈ 149 px,
+   solu ≥ 250 px 320 px:n näytöllä). ≥ 960 px ennallaan (mitatut 11,7–13,2 px). */
+.tn20 .tnk2-panel-stat-v--region { font-size: 15px; line-height: 1.05; }
+@media (max-width: 959px) {
+  .tn20 .tnk2-panel-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .tn20 .tnk2-panel-stats > div:last-child { grid-column: 1 / -1; }
+}
 @media (min-width: 960px) { .tn20 .tnk2-panel-stat-v--region { font-size: 11.7px; } /* 1024px: mitattu maxFit 12.7 (CD 17.4) */ }
 @media (min-width: 1280px) { .tn20 .tnk2-panel-stat-v--region { font-size: 13.2px; } /* 1440px: mitattu maxFit 15.7 (CD 22) — varovainen marginaali */ }
 @media (min-width: 1800px) { .tn20 .tnk2-panel-stat-v--region { font-size: 13.2px; } /* 1920/2450px: mitattu maxFit 14.2 (CD 22) */ }

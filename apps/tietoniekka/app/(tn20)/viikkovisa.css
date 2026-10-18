@@ -22,12 +22,12 @@
 /* ── Merkki: numerolohko + "Viikkovisa / uusi maanantaina" ─────────────── */
 .tn20 .vv-merkkirivi { display: inline-flex; align-items: center; flex-wrap: wrap; gap: 10px; }
 .tn20 .vv-merkki {
-  --nro: 27px; --nimi: 11px; --uusi: 10px; --pad: 13px; --r: 9px;
+  --nro: 27px; --nimi: 11px; --uusi: 11px; --pad: 13px; --r: 9px;
   display: inline-flex; align-items: stretch; flex: 0 0 auto;
   border: 1px solid var(--vv-acc); border-radius: var(--r);
 }
-.tn20 .vv-merkki[data-koko="s"] { --nro: 19px; --nimi: 10px; --uusi: 10px; --pad: 10px; --r: 8px; }
-.tn20 .vv-merkki[data-koko="l"] { --nro: 31px; --nimi: 12px; --uusi: 10px; --pad: 15px; --r: 10px; }
+.tn20 .vv-merkki[data-koko="s"] { --nro: 19px; --nimi: 11px; --uusi: 11px; --pad: 10px; --r: 8px; }
+.tn20 .vv-merkki[data-koko="l"] { --nro: 31px; --nimi: 12px; --uusi: 11px; --pad: 15px; --r: 10px; }
 .tn20 .vv-merkki-nro {
   display: flex; align-items: center; padding: 0 var(--pad);
   border-radius: calc(var(--r) - 1px) 0 0 calc(var(--r) - 1px);
@@ -37,6 +37,7 @@
 }
 .tn20 .vv-merkki-teksti { display: flex; flex-direction: column; justify-content: center; gap: 3px; min-width: 0; padding: 6px calc(var(--pad) + 1px); }
 .tn20 .vv-merkki-nimi { font-size: var(--nimi); font-weight: 800; letter-spacing: 0.18em; text-transform: uppercase; color: var(--vv-acc); white-space: nowrap; }
+/* T3 (UI-laatu 18.10.2026): "Uusi maanantaina" ja pienen merkin nimi 10 → 11 px (badge-taso). */
 .tn20 .vv-merkki-uusi { font-size: var(--uusi); font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: #a79e8c; white-space: nowrap; }
 /* Kategoria on alaotsikko: neutraali, ei omaa väriä (design). */
 .tn20 .vv-pilleri {
