@@ -29,6 +29,9 @@
   display: flex; align-items: center; gap: 8px; min-height: 56px; padding: 0 12px; border-radius: 16px;
   /* UI-laatu 14.10.2026: ikävalinnat ovat valintoja, eivät CTA → toissijainen tyyli (läpinäkyvä, 1,5 px reunus) */
   background: transparent; border: 1.5px solid var(--lk-navy);
+  /* Korjaus 18.10.2026: mobiilissa ikärivin pohja on navy (.lk-iat) → navy teksti ja reunus olivat näkymättömiä
+     (kontrasti 1,0:1, 14.10.–18.10. tuotannossa). Kerma teksti + vaalea reunus; desktop (≥ 860) asettaa omansa. */
+  color: var(--lk-cream); border-color: rgba(244, 237, 224, 0.45);
 }
 .tn20 .lk-ika-emoji { font-size: 24px; flex: none; }
 .tn20 .lk-ika-teksti { display: flex; flex-direction: column; min-width: 0; }
