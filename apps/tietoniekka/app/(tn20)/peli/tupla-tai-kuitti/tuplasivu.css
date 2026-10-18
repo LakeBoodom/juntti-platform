@@ -94,6 +94,17 @@
 .tn20 .tks-arvo { display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 20px 0 4px; margin-top: 16px; border-top: 1px solid var(--line); font-size: 14px; color: var(--soft); }
 .tn20 .tks-arvo button { height: 52px; padding: 0 24px; border-radius: 999px; border: 1px solid var(--line2); background: transparent; color: var(--ink); font: inherit; font-size: 15px; font-weight: 700; cursor: pointer; }
 
+/* T7 (UI-laatu 18.10.2026): mobiilissa matalampi hero ja aiheet ennen sääntöjä ja historiaa, jotta
+   ensimmäinen teema näkyy 390 × 844:ssä ilman vieritystä. .tks-feat puretaan (contents), jolloin
+   nosto, aiheet ja Näin pelaat järjestetään order-arvoilla. */
+@media (max-width: 899px) {
+  .tn20 .tks-hero img { aspect-ratio: 16 / 7; object-position: 50% 30%; }
+  .tn20 .tks-feat { display: contents; }
+  .tn20 .tks-nosto { order: 1; }
+  .tn20 .tks-aiheet { order: 2; }
+  .tn20 .tks-rules { order: 3; }
+  .tn20 .tks-intro { order: 4; }
+}
 @media (min-width: 900px) {
   .tn20 .tks { padding: 24px 24px 72px; }
   .tn20 .tks-hero { border-radius: 24px 24px 0 0; overflow: hidden; }

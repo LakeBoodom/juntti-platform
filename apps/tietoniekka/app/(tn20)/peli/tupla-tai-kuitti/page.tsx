@@ -80,18 +80,6 @@ export default function TuplaTaiKuittiSivu() {
           <span>Tupla tai kuitti</span> – Tietoniekan versio rakastetusta tietovisaklassikosta
         </h1>
 
-        <ol className="tks-intro">
-          {ESITTELY.map((e, i) => (
-            <li key={e.h}>
-              <span className="tks-num">{String(i + 1).padStart(2, "0")}</span>
-              <div>
-                <b>{e.h}</b>
-                <span>{e.s}</span>
-              </div>
-            </li>
-          ))}
-        </ol>
-
         <div className="tks-feat">
           <a className="tks-nosto" href={pelaa(nosto.slug)} style={{ "--acc": nosto.accent } as CSSProperties}>
             <span className="tks-nosto-kuvio" aria-hidden="true" />
@@ -142,6 +130,21 @@ export default function TuplaTaiKuittiSivu() {
             <ArvoTeema polut={TEEMAT.map((t) => pelaa(t.slug))} />
           </section>
         )}
+
+        {/* T7 (UI-laatu 18.10.2026): ohjelman historia aiheiden jälkeen — pelaaja näkee valittavan
+            teeman ensimmäisessä näkymässä (390 × 844). Mobiilissa järjestys CSS:llä: nosto → aiheet →
+            Näin pelaat → historia. */}
+        <ol className="tks-intro">
+          {ESITTELY.map((e, i) => (
+            <li key={e.h}>
+              <span className="tks-num">{String(i + 1).padStart(2, "0")}</span>
+              <div>
+                <b>{e.h}</b>
+                <span>{e.s}</span>
+              </div>
+            </li>
+          ))}
+        </ol>
       </div>
     </main>
   );
