@@ -7,13 +7,19 @@
 // jäi ilman kumpaakaan. Kevyt oma paluulinkki kaikkiin kolmeen vaiheeseen
 // (aloitus, järjestäminen, paljastus+tulos) — ei täyttä HUD:ia, koska
 // Ikäjärjestyksellä ei ole tavallisen visan kysymyslaskuria/putkea.
-export function TkGameNav() {
+/** `paluu`: kokoelmasivu, jolle pelistä palataan (UI-laatu 18.10.2026, T10: Ikäjärjestys → Tunnetut henkilöt). */
+export function TkGameNav({ paluu }: { paluu?: { href: string; label: string } } = {}) {
   return (
     <nav className="tk-gamenav" aria-label="Sivuston navigaatio">
       <a className="tk-gamenav-home" href="/" aria-label="Tietoniekka etusivu">
         <b>TIETO</b>
         <span>NIEKKA</span>
       </a>
+      {paluu && (
+        <a className="tk-gamenav-paluu" href={paluu.href}>
+          ← {paluu.label}
+        </a>
+      )}
     </nav>
   );
 }

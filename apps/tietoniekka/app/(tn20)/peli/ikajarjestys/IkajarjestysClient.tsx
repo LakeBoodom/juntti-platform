@@ -27,6 +27,8 @@ import { RevealSequencer, type RevealItem } from "@/components/tn20/RevealSequen
 import { calculateChainScore } from "@/components/tn20/ChainResultSummary";
 import { TkGameNav } from "@/components/tn20/TkGameNav";
 
+const PALUU = { href: "/kokoelma/tunnetut-henkilot", label: "Tunnetut henkilöt" };
+
 const LAST_SEEN_KEY = "tk-ikajarjestys-viimeksi-nahdyt";
 
 function readLastSeen(): string[] {
@@ -120,7 +122,7 @@ export default function IkajarjestysClient({
   if (phase === "start" || phase === "loading") {
     return (
       <main className="tk-page tk-page--start">
-        <TkGameNav />
+        <TkGameNav paluu={PALUU} />
         <CategoryPicker
           open
           variant="inline"
@@ -158,7 +160,7 @@ export default function IkajarjestysClient({
   if (phase === "revealing" && scoreResult) {
     return (
       <main className="tk-page">
-        <TkGameNav />
+        <TkGameNav paluu={PALUU} />
         <RevealSequencer
           items={revealItems}
           result={scoreResult}
@@ -175,7 +177,7 @@ export default function IkajarjestysClient({
   // phase === "ordering"
   return (
     <main className="tk-page">
-      <TkGameNav />
+      <TkGameNav paluu={PALUU} />
       <header className="tk-order-head">
         <SuuntaindikaattoriBadge direction={DEFAULT_DIRECTION} />
         <h1 className="tk-order-title">Tietoketju: Ikäjärjestys</h1>
