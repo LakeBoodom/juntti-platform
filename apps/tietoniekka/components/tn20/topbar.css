@@ -300,7 +300,7 @@
 .tn20 .tn-crumbrow-in { overflow-x: auto; scrollbar-width: none; white-space: nowrap; }
 .tn20 .tn-crumbrow-in::-webkit-scrollbar { display: none; }
 .tn20 .tn-crumbrow-seg { flex: none; }
-.tn20 .tn-crumbrow a { color: var(--tn-text-dim); text-decoration: none; }
+.tn20 .tn-crumbrow a { color: var(--tn-text-dim); text-decoration: none; display: inline-flex; align-items: center; justify-content: center; min-height: 44px; min-width: 44px; } /* T5 18.10.: "Etusivu" oli 43 px leveä */
 .tn20 .tn-crumbrow a:hover { color: var(--tn-text-soft); }
 .tn20 .tn-crumbrow a:focus-visible { outline: 2px solid var(--tn-lime); outline-offset: 2px; }
 .tn20 .tn-crumbrow-seg { display: inline-flex; align-items: center; gap: 8px; }

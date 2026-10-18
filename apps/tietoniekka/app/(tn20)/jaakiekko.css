@@ -475,4 +475,8 @@
 /* ── Kosketuskohteet (UI-laatu K2 14.10.2026): ≥ 44 px osuma-alue. Pienille tekstilinkeille pystytäyte +
    negatiivinen marginaali (asettelu ei muutu), napeille min-height, karttapisteille ::before-alue. ── */
 .tn20 .tnj-map-dot::before { content: ""; position: absolute; left: 50%; top: 50%; width: 44px; height: 44px; transform: translate(-50%, -50%); }
+/* T5 (UI-laatu 18.10.2026): eteläiset pallot ovat osin päällekkäin → pienin pallo päällimmäiseksi,
+   jotta sen 44 px:n osuma-alue ei jää ison naapurin alle. --dot on pallon koko (13–26). */
+.tn20 .tnj-map-dot { z-index: calc(40 - var(--dot)); }
+.tn20 .tnj-map-dot:hover, .tn20 .tnj-map-dot:focus-visible { z-index: 40; }
 .tn20 .tnj-cta { min-height: 44px; }

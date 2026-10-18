@@ -37,7 +37,7 @@
   border-bottom: 1px solid #241e13; background: #0f0d07;
 }
 .tn20 .vpk-bar-l { display: flex; align-items: center; gap: 12px; min-width: 0; }
-.tn20 .vpk .vpk-logo { font-family: var(--vpk-display); font-weight: 900; font-variation-settings: "wdth" 72; font-size: 15px; letter-spacing: .02em; line-height: 1; color: var(--tn-text-dim); flex: none; }
+.tn20 .vpk .vpk-logo { font-family: var(--vpk-display); font-weight: 900; font-variation-settings: "wdth" 72; font-size: 15px; letter-spacing: .02em; line-height: 1; color: var(--tn-text-dim); flex: none; padding: 9px 0; margin: -9px 0; } /* T5 18.10.: osuma-alue 15 → 33 px */
 .tn20 .vpk-logo span { color: #e8a320; }
 .tn20 .vpk-bar-sep { width: 1px; height: 18px; background: #2b2317; flex: none; }
 .tn20 .vpk-bar-nimi { font-family: var(--vpk-display); font-weight: 900; font-variation-settings: "wdth" 78; font-size: 17px; text-transform: uppercase; line-height: 1; white-space: nowrap; }
@@ -55,7 +55,7 @@
 .tn20 .vpk-otsake { display: flex; flex-direction: column; gap: 6px; }
 .tn20 .vpk-polku { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; font-size: 12px; font-weight: 700; color: var(--vpk-heikko); }
 .tn20 .vpk-polku > * { white-space: nowrap; }
-.tn20 .vpk-polku a { display: inline-flex; align-items: center; min-height: 28px; }
+.tn20 .vpk-polku a { display: inline-flex; align-items: center; min-height: 44px; margin-block: -8px; } /* T5 18.10.: 28 → 44 px, negatiivinen marginaali pitää rivin korkeuden */
 /* CD 30 px / clamp(40, 4vw, 60). VAALIPIIRIKETJU on 15 merkkiä: wdth 70 → mahtuu 288 px:iin (mitattu). */
 .tn20 .vpk-h1 {
   font-family: var(--vpk-display); font-weight: 900; font-variation-settings: "wdth" 70;
