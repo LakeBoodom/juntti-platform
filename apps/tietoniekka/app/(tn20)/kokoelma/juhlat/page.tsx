@@ -320,7 +320,7 @@ export default async function JuhlatSivu({ searchParams }: { searchParams: Promi
                 <>
                   <span className="ju-t2-pv" style={{ background: hexA(o.accent, 0.14), borderColor: hexA(o.accent, 0.5) }}>
                     <b>{new Date(o.alku).getUTCDate()}</b>
-                    <small style={{ color: o.accent }}>{kkLyhyt(o.alku)}</small>
+                    <small style={{ ["--juhla" as string]: o.accent }}>{kkLyhyt(o.alku)}</small>
                   </span>
                   <span className="ju-t2-teksti">
                     <span className="ju-t2-nimi">{o.nimi}</span>

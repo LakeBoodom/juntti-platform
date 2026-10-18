@@ -194,7 +194,7 @@
 .tn20 a.ju-t2-kortti:hover { border-color: #3a3120; color: #f5f0e6; }
 .tn20 .ju-t2-pv { width: 64px; height: 64px; border-radius: 13px; border: 1px solid; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; }
 .tn20 .ju-t2-pv b { font-family: var(--ju-display); font-weight: 900; font-variation-settings: "wdth" 76; font-size: 24px; line-height: 1; }
-.tn20 .ju-t2-pv small { font-size: 11px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; color: color-mix(in srgb, currentColor 60%, #fff); } /* T4 18.10.: juhlan väri tekstinä 4,07:1 → vaalennettu */
+.tn20 .ju-t2-pv small { font-size: 11px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; color: color-mix(in srgb, var(--juhla, currentColor) 60%, #fff); } /* T4 18.10.: juhlan väri tekstinä 4,07:1 → vaalennettu */
 .tn20 .ju-t2-teksti { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
 /* CD 21 px + ellipsis. "ITSENÄISYYSPÄIVÄ" ei saa leikkautua: koko pienenee laatan leveyden mukaan
    (tekstille jää 100cqi − 102 px; 16 merkkiä ≈ 9,8 em wdth 78). 284 px:n laatassa 18,5 px. */

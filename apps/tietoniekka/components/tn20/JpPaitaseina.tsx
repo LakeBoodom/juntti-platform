@@ -50,7 +50,7 @@ export default function JpPaitaseina({ clubs, defaultClubId }: { clubs: JpWallCl
 
       {/* Valittu seura: tiedot */}
       <div className="tnjp-club">
-        <div className="tnjp-club-kicker" style={{ color: c.color }}>Seuravisa</div>
+        <div className="tnjp-club-kicker" style={{ ["--seura" as string]: c.color }}>Seuravisa</div>
         <h3 className="tnjp-club-name">{c.name}</h3>
         <p className="tnjp-club-hook">{c.hook}</p>
         <div className="tnjp-stats">

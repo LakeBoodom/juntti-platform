@@ -197,7 +197,7 @@
   font-family: var(--tn-font-display); font-weight: 900; font-variation-settings: "wdth" 62;
   font-size: clamp(11px,1.05cqw,13px); letter-spacing: .22em; text-transform: uppercase;
   margin-bottom: clamp(8px,1cqw,12px);
-  color: color-mix(in srgb, currentColor 50%, #fff); /* T4 18.10.: 75 → 50 % (#EF0107 4,21:1) */
+  color: color-mix(in srgb, var(--seura, currentColor) 50%, #fff); /* T4 18.10.: seuraväri muuttujasta (inline-väri ohitti vaalennuksen), 50 % (#EF0107 4,21:1 → ≥ 4,5) */
 }
 .tn20 .tnjp-club-name {
   margin: 0 0 clamp(12px,1.5cqw,20px); font-family: var(--tn-font-display); font-weight: 900;

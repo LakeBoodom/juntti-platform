@@ -116,12 +116,12 @@ export default function TuplaTaiKuittiSivu() {
           <section className="tks-aiheet" aria-labelledby="tks-aiheet-h">
             <h2 id="tks-aiheet-h">Aiheet</h2>
             <ul>
-              {muut.map((t) => (
+              {muut.map((t, i) => (
                 <li key={t.slug}>
                   <a href={pelaa(t.slug)} style={{ "--acc": t.accent, "--kuvio": t.kuvio } as CSSProperties}>
                     <span className="tks-kortti-kuvio" aria-hidden="true" />
                     {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={t.kuva} alt="" width={256} height={256} loading="lazy" />
+                    <img src={t.kuva} alt="" width={256} height={256} loading={i < 4 ? undefined : "lazy"} />
                     <span className="tks-kortti-nimi">{t.nimi}</span>
                   </a>
                 </li>

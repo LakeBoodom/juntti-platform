@@ -238,7 +238,7 @@ export default async function LuontoLanding({
                 <a className="tnl3-muoto" href={visaHref(pick)} style={{ ["--lw" as string]: pisin(pickOtsikko) }}>
                   <span className="tnl3-muoto-media">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={luontoImg(pick.slug) ?? LUONTO_HERO} alt="" loading="lazy" />
+                    <img src={luontoImg(pick.slug) ?? LUONTO_HERO} alt="" />
                     <span className="tnl3-pilleri"><IkoniTieto />Tietovisa</span>
                   </span>
                   <span className="tnl3-muoto-ala">

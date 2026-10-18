@@ -52,8 +52,8 @@ export default function JpSuurseurat({ clubs }: { clubs: JpEuroCard[] }) {
               <span className="tnjp-ecard-body">
                 <span className="tnjp-ecard-hook">{c.hook}</span>
                 <span className="tnjp-ecard-foot">
-                  <span>{c.stadium}</span>
-                  <span className="tnjp-ecard-q">{c.questionCount} kys.</span>
+                  <span className="tn-card-meta">{c.stadium}</span>
+                  <span className="tnjp-ecard-q tn-card-meta">{c.questionCount} kys.</span>
                 </span>
               </span>
             </span>
