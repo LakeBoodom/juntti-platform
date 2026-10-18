@@ -56,8 +56,9 @@ export type Pakka = {
   /** Kortin nimi: entiteetin nimi (oletus) tai role_label (vaalipiirit: "Savo-Karjala"). */
   nimiKentta?: "name" | "role_label";
   collection: { slug: string; nimi: string };
-  /** Hubin pakkakortti. */
-  kortti: { otsikko: string; meta: string };
+  /** Hubin pakkakortti. `kuvat`: kolme kasvoa (public/, 240×320) rinnakkain tai yksi valokuva (16:10).
+   *  Ilman kuvia kortti näyttää puolikaarimotiivin. Krediitit lib/kuvalahteet.ts. */
+  kortti: { otsikko: string; meta: string; kuvat?: string[] };
   /** Jakokuvan taustakuva (public/). */
   kuva: string;
 };
@@ -86,7 +87,7 @@ export const PAKAT: Pakka[] = [
     etuliite: "presidentiksi",
     pick: 8,
     collection: VAALIT,
-    kortti: { otsikko: "Presidentit", meta: "Virkaanastumisjärjestys" },
+    kortti: { otsikko: "Presidentit", meta: "Virkaanastumisjärjestys", kuvat: ["/20/vaalit/kasvot/paasikivi.webp", "/20/vaalit/kasvot/koivisto.webp", "/20/vaalit/kasvot/niinisto.webp"] },
     kuva: VAALIT_KUVA,
   },
   {
@@ -106,7 +107,7 @@ export const PAKAT: Pakka[] = [
     etuliite: "pääministeriksi",
     pick: 8,
     collection: VAALIT,
-    kortti: { otsikko: "Pääministerit", meta: "Aikajärjestys" },
+    kortti: { otsikko: "Pääministerit", meta: "Aikajärjestys", kuvat: ["/20/vaalit/kasvot/holkeri.webp", "/20/vaalit/kasvot/aho.webp", "/20/vaalit/kasvot/marin.webp"] },
     kuva: VAALIT_KUVA,
   },
   {
@@ -125,7 +126,7 @@ export const PAKAT: Pakka[] = [
     yksikko: "päivää",
     pick: 8,
     collection: VAALIT,
-    kortti: { otsikko: "Pääministerikausien pituus", meta: "Päivinä" },
+    kortti: { otsikko: "Pääministerikausien pituus", meta: "Päivinä", kuvat: ["/20/vaalit/kasvot/kallio.webp", "/20/vaalit/kasvot/lipponen.webp", "/20/vaalit/kasvot/vanhanen.webp"] },
     kuva: VAALIT_KUVA,
   },
   {
@@ -147,7 +148,7 @@ export const PAKAT: Pakka[] = [
     piilotaKuva: true,
     rooliAttr: "mp_party",
     collection: VAALIT,
-    kortti: { otsikko: "Pisimpään eduskunnassa", meta: "Istuvat kansanedustajat" },
+    kortti: { otsikko: "Pisimpään eduskunnassa", meta: "Istuvat kansanedustajat", kuvat: ["/20/vaalit/kasvot/zyskowicz.webp", "/20/vaalit/kasvot/tuomioja.webp", "/20/vaalit/kasvot/rasanen.webp"] },
     kuva: VAALIT_KUVA,
   },
   {
@@ -167,7 +168,7 @@ export const PAKAT: Pakka[] = [
     pick: 8,
     piilotaKuva: true,
     collection: VAALIT,
-    kortti: { otsikko: "Eduskuntaryhmät", meta: "Koon mukaan" },
+    kortti: { otsikko: "Eduskuntaryhmät", meta: "Koon mukaan", kuvat: ["/20/vaalit/pakat/eduskuntaryhmat.webp"] },
     kuva: VAALIT_KUVA,
   },
   {
@@ -188,7 +189,7 @@ export const PAKAT: Pakka[] = [
     pick: 8,
     piilotaKuva: true,
     collection: VAALIT,
-    kortti: { otsikko: "Puolueiden ikä", meta: "Perustamisvuosi" },
+    kortti: { otsikko: "Puolueiden ikä", meta: "Perustamisvuosi", kuvat: ["/20/vaalit/pakat/puolueet-ika.webp"] },
     kuva: VAALIT_KUVA,
   },
   {
@@ -209,7 +210,7 @@ export const PAKAT: Pakka[] = [
     piilotaKuva: true,
     nimiKentta: "role_label",
     collection: VAALIT,
-    kortti: { otsikko: "Vaalipiirit", meta: "Paikkamäärän mukaan" },
+    kortti: { otsikko: "Vaalipiirit", meta: "Paikkamäärän mukaan", kuvat: ["/20/vaalit/pakat/vaalipiirit-paikat.webp"] },
     kuva: VAALIT_KUVA,
   },
 

@@ -14,7 +14,12 @@ export default function VpkHubKortti({ href, otsikko, meta, numero }: { href: st
     setTulos(lueTallenne(iso));
   }, []);
   return (
-    <a className="vl-paivan-kortti" href={href}>
+    <a className="vl-paivan-kortti vl-paivan-kortti--kuva" href={href}>
+      {/* Valokuva (Heikki 18.10.2026): Eduskunnan täysistuntosali, krediitti lib/kuvalahteet.ts. */}
+      <span className="vl-paivan-kuva" aria-hidden="true">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src="/20/vaalit/vaalipiiriketju.webp" alt="" loading="lazy" />
+      </span>
       <span className="vl-tagi vl-tagi--vahva">Päivän peli · #{n}</span>
       <span className="vl-paivan-otsikko">{otsikko}</span>
       {tulos ? (

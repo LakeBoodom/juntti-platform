@@ -114,11 +114,64 @@ export function KuvavisatBanneri({
 }
 
 export function IkajarjestysBanneri({ henkilot }: { henkilot: BanneriHenkilo[] }) {
-  const href = "/peli/ikajarjestys?category=kaikki&autostart=1";
+  return (
+    <KasvoketjuBanneri
+      id="eb-ika-h"
+      tagi="Uusi pelimuoto"
+      meta="Tunnetut henkilöt"
+      otsikko={["Kuka on", "vanhin?"]}
+      subKapea={<>Järjestä {ROUND_SIZE} tunnettua kasvoa syntymäpäivän mukaan<span className="eb-vain-mob"> · 2&nbsp;min</span></>}
+      subDesk={<>Järjestä {ROUND_SIZE} tunnettua kasvoa<br />syntymäpäivän mukaan · 2&nbsp;min</>}
+      href="/peli/ikajarjestys?category=kaikki&autostart=1"
+      cta="Arvo kierros"
+      henkilot={henkilot}
+      kierros={ROUND_SIZE}
+      lisaa="kasvoa"
+      akseli={["Vanhin", "Nuorin"]}
+    />
+  );
+}
+
+/** Kasvoketjunosto (12B-rakenne): teksti + CTA vasemmalla, järjestettävien kasvojen ketju oikealla.
+ *  Käytössä etusivun "Kuka on vanhin?" -nostossa ja Vaalit-hubin Laita järjestykseen -nostossa
+ *  (Heikki 18.10.2026). Tyylit etusivun-bannerit.css (.eb--ika). */
+export function KasvoketjuBanneri({
+  id,
+  tagi,
+  meta,
+  otsikko,
+  taso = "h2",
+  subKapea,
+  subDesk,
+  href,
+  cta,
+  henkilot,
+  kierros,
+  lisaa,
+  akseli,
+  luokka,
+}: {
+  id: string;
+  tagi: string;
+  meta?: string;
+  otsikko: [string, string];
+  taso?: "h2" | "h3";
+  subKapea: React.ReactNode;
+  subDesk: React.ReactNode;
+  href: string;
+  cta: string;
+  henkilot: BanneriHenkilo[];
+  /** Kierroksen koko: "+N"-laatta = kierros − näkyvät kasvot. */
+  kierros: number;
+  lisaa: string;
+  akseli: [string, string];
+  luokka?: string;
+}) {
   /* Desktopissa neljä kasvoa (1, 2, Raahaa, 4), tabletissa ja mobiilissa
      kolme (1, Raahaa, 3) — toinen kortti piilotetaan CSS:llä ja viimeisen
      numero vaihtuu. Loput kierroksen kasvoista "+N kasvoa" -laatassa. */
   const [a, b, c, d] = henkilot;
+  const Otsikko = taso;
   const kasvo = (h: BanneriHenkilo | undefined, luokka: string, merkki: React.ReactNode) =>
     h ? (
       <figure className={`eb-kasvo ${luokka}`}>
@@ -133,28 +186,22 @@ export function IkajarjestysBanneri({ henkilot }: { henkilot: BanneriHenkilo[] }
       </figure>
     ) : null;
   return (
-    <section className="eb eb--ika" aria-labelledby="eb-ika-h">
+    <section className={luokka ? `eb eb--ika ${luokka}` : "eb eb--ika"} aria-labelledby={id}>
       <div className="eb-in">
       <div className="eb-text">
         <div className="eb-tags">
-          <span className="eb-tag eb-tag--violet">Uusi pelimuoto</span>
-          <span className="eb-meta eb-vain-desk">Tunnetut henkilöt</span>
+          <span className="eb-tag eb-tag--violet">{tagi}</span>
+          {meta && <span className="eb-meta eb-vain-desk">{meta}</span>}
         </div>
-        <h2 className="eb-h" id="eb-ika-h">
-          Kuka on <span className="eb-rivi">vanhin?</span>
-        </h2>
-        <p className="eb-sub eb-sub--kapea">
-          Järjestä {ROUND_SIZE} tunnettua kasvoa syntymäpäivän mukaan<span className="eb-vain-mob"> · 2&nbsp;min</span>
-        </p>
+        <Otsikko className="eb-h" id={id}>
+          {otsikko[0]} <span className="eb-rivi">{otsikko[1]}</span>
+        </Otsikko>
+        <p className="eb-sub eb-sub--kapea">{subKapea}</p>
         <div className="eb-row">
           <a className="eb-btn tn-cta-lime" href={href}>
-            Arvo kierros <span aria-hidden="true">→</span>
+            {cta} <span aria-hidden="true">→</span>
           </a>
-          <p className="eb-sub eb-sub--desk">
-            Järjestä {ROUND_SIZE} tunnettua kasvoa
-            <br />
-            syntymäpäivän mukaan · 2&nbsp;min
-          </p>
+          <p className="eb-sub eb-sub--desk">{subDesk}</p>
         </div>
       </div>
 
@@ -163,8 +210,8 @@ export function IkajarjestysBanneri({ henkilot }: { henkilot: BanneriHenkilo[] }
           <span className="eb-ketju-varjo" />
           <span className="eb-ketju-viiva" />
           <span className="eb-ketju-akseli">
-            <span>Vanhin</span>
-            <span>Nuorin</span>
+            <span>{akseli[0]}</span>
+            <span>{akseli[1]}</span>
           </span>
           <div className="eb-ketju-rivi">
             {kasvo(a, "", <span className="eb-kasvo-nro">1</span>)}
@@ -180,10 +227,10 @@ export function IkajarjestysBanneri({ henkilot }: { henkilot: BanneriHenkilo[] }
             )}
             <span className="eb-lisaa">
               <span className="eb-lisaa-n">
-                <span className="eb-vain-desk">+{ROUND_SIZE - 4}</span>
-                <span className="eb-vain-kapea">+{ROUND_SIZE - 3}</span>
+                <span className="eb-vain-desk">+{kierros - 4}</span>
+                <span className="eb-vain-kapea">+{kierros - 3}</span>
               </span>
-              <span className="eb-lisaa-l eb-vain-desk">kasvoa</span>
+              <span className="eb-lisaa-l eb-vain-desk">{lisaa}</span>
             </span>
           </div>
         </div>

@@ -19,6 +19,8 @@ export type KokoelmaPeli = {
   korosta?: number;
   /** Päivän peli: päivän numero (#1 = julkaisupäivä), lasketaan renderöidessä. */
   numero?: (iso: string) => number;
+  /** Kortin kuvat (public/): kolme kasvoa tai yksi valokuva. */
+  kuvat?: string[];
 };
 
 // Laita järjestykseen -pakat tulevat suoraan pakkakonfiguraatiosta (julkaistu: true).
@@ -38,6 +40,7 @@ export const PELIT: KokoelmaPeli[] = [
     slug: p.slug,
     otsikko: p.kortti.otsikko,
     meta: p.kortti.meta,
+    kuvat: p.kortti.kuvat,
     href: pakkaHref(p),
   })),
 ];

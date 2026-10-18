@@ -284,3 +284,24 @@
 .tn20 .vl-kortti-kuva--kuva { overflow: hidden; }
 .tn20 .vl-kortti-kuva--kuva img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
 .tn20 .vl-kortti-kuva--kuva .vl-koti { z-index: 1; }
+/* ── Pelit-osion kuvat (Heikki 18.10.2026) ─────────────────────────────── */
+/* Pakkakortin kolme kasvoa rinnakkain: mustavalkoiset + violetti sävy kuten kasvoketjussa
+   (vanhat mv-muotokuvat ja uudet värikuvat yhtenäisiksi). */
+.tn20 .vl-kortti-kuva--kasvot { display: flex; padding: 0; gap: 2px; background: #231a33; }
+.tn20 .vl-kortti-kuva--kasvot img { position: relative; inset: auto; flex: 1 1 0; min-width: 0; object-position: 50% 22%; filter: grayscale(1); }
+.tn20 .vl-kortti-kuva--kasvot::after { content: ""; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(rgba(120, 60, 200, 0.32), rgba(24, 15, 38, 0.55)); }
+.tn20 .vl-kortti-kuva--kasvot .vl-tagi { z-index: 1; }
+.tn20 .vl-kortti-kuva--pakka:not(.vl-kortti-kuva--kasvot)::after { content: ""; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(180deg, rgba(19, 17, 9, 0.35), rgba(19, 17, 9, 0) 40%); }
+.tn20 .vl-kortti-kuva--pakka .vl-tagi { z-index: 1; }
+/* Laita järjestykseen -nosto (KasvoketjuBanneri): marginaali korttiriviin. Otsikon pisin sana
+   JÄRJESTYKSEEN (13 merkkiä) on etusivun TUNNISTATKOa pidempi → koot kalibroitu erikseen (mitattu 18.10.). */
+.tn20 .eb--jarj { margin-bottom: 4px; }
+/* Vaalipiiriketjun nosto: valokuva oikealle, häivytys tekstin puolelle. Mobiilissa kuva yläkaistana. */
+.tn20 .vl-paivan-kortti--kuva { position: relative; overflow: hidden; isolation: isolate; min-height: clamp(220px, 22vw, 300px); justify-content: center; }
+.tn20 .vl-paivan-kortti--kuva > :not(.vl-paivan-kuva) { position: relative; z-index: 1; }
+.tn20 .vl-paivan-kuva { position: absolute; top: 0; right: 0; bottom: 0; width: 60%; z-index: 0; pointer-events: none; -webkit-mask-image: linear-gradient(90deg, transparent, #000 48%); mask-image: linear-gradient(90deg, transparent, #000 48%); }
+.tn20 .vl-paivan-kuva img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 55%; display: block; filter: saturate(0.85) brightness(0.82); }
+@media (max-width: 599px) {
+  .tn20 .vl-paivan-kortti--kuva { padding-top: 150px; min-height: 0; }
+  .tn20 .vl-paivan-kuva { left: 0; bottom: auto; width: 100%; height: 190px; -webkit-mask-image: linear-gradient(180deg, #000 45%, transparent); mask-image: linear-gradient(180deg, #000 45%, transparent); }
+}

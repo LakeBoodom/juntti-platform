@@ -5,6 +5,7 @@
 // Pelirivit ja niiden mode-chipit renderöidään vain lib/pelirekisteri.ts:n perusteella — kun peli julkaistaan, rivi ilmestyy ilman hubin muutosta.
 // Kaikki luvut kannasta (lib/vaalit/data.ts). ISR 1 h (vaalilaskuri päivittyy päivittäin).
 // Staattinen segmentti ohittaa dynaamisen [collection]-reitin.
+import "../../etusivun-bannerit.css";
 import "./vaalit.css";
 import type { Metadata } from "next";
 import Crumbs from "@/components/tn20/Crumbs";
@@ -16,6 +17,7 @@ import { kokoelmanPelit, type KokoelmaPeli } from "@/lib/pelirekisteri";
 import { haeVaalitHub, pisteetPolkuna, puolikaari, VAALIEN_VAIHEET, VAALIPAIVA, type VaalitVisa } from "@/lib/vaalit/data";
 import VaalipiiriKartta from "@/components/tn20/vaalipiirit/VaalipiiriKartta";
 import VpkHubKortti from "@/components/tn20/vaalipiiriketju/VpkHubKortti";
+import { KasvoketjuBanneri } from "@/components/tn20/EtusivunBannerit";
 
 export const revalidate = 3600;
 
@@ -49,6 +51,15 @@ function siemenPisteet(n: number, k: number, seed: number): Set<number> {
   }
   return out;
 }
+
+/** Laita järjestykseen -noston kasvoketju (Heikki 18.10.2026): neljä presidenttiä oikeassa järjestyksessä,
+ *  omat kopiot public/20/vaalit/kasvot (krediitit lib/kuvalahteet.ts). */
+const KETJU = [
+  { id: "stahlberg", name: "K. J. Ståhlberg" },
+  { id: "kekkonen", name: "Urho Kekkonen" },
+  { id: "halonen", name: "Tarja Halonen" },
+  { id: "stubb", name: "Alexander Stubb" },
+].map((h) => ({ ...h, image: `/20/vaalit/kasvot/${h.id}.webp` }));
 
 const pisinSana = (t: string) => Math.max(...t.split(/[\s–-]+/).map((w) => w.length), 8);
 
@@ -118,13 +129,23 @@ export default async function VaalitHub() {
     const valitut = siemenPisteet(200, 8, i * 4 + 3);
     return (
       <a key={p.href} className="vl-kortti" href={p.href} style={{ ["--vl-acc" as string]: "#B4A5FF" }}>
-        <span className="vl-kortti-kuva" style={{ background: "radial-gradient(90% 80% at 50% 100%, rgba(180,165,255,.16), transparent 70%)" }}>
-          <svg viewBox="0 0 200 104" aria-hidden="true">
-            <path d={puoli} stroke="#352F4C" strokeWidth={5.2} strokeLinecap="round" fill="none" />
-            <path d={pisteetPolkuna(hemi.filter((_, j) => valitut.has(j)))} stroke="#D6CEFF" strokeWidth={5.2} strokeLinecap="round" fill="none" />
-          </svg>
-          <span className="vl-tagi">Pakka</span>
-        </span>
+        {p.kuvat?.length ? (
+          <span className={p.kuvat.length > 1 ? "vl-kortti-kuva vl-kortti-kuva--kuva vl-kortti-kuva--pakka vl-kortti-kuva--kasvot" : "vl-kortti-kuva vl-kortti-kuva--kuva vl-kortti-kuva--pakka"}>
+            {p.kuvat.map((src) => (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img key={src} src={src} alt="" loading="lazy" />
+            ))}
+            <span className="vl-tagi">Pakka</span>
+          </span>
+        ) : (
+          <span className="vl-kortti-kuva" style={{ background: "radial-gradient(90% 80% at 50% 100%, rgba(180,165,255,.16), transparent 70%)" }}>
+            <svg viewBox="0 0 200 104" aria-hidden="true">
+              <path d={puoli} stroke="#352F4C" strokeWidth={5.2} strokeLinecap="round" fill="none" />
+              <path d={pisteetPolkuna(hemi.filter((_, j) => valitut.has(j)))} stroke="#D6CEFF" strokeWidth={5.2} strokeLinecap="round" fill="none" />
+            </svg>
+            <span className="vl-tagi">Pakka</span>
+          </span>
+        )}
         <span className="vl-kortti-teksti">
           <span className="vl-kortti-otsikko" style={{ ["--vl-lw" as string]: pisinSana(p.otsikko) }}>
             {p.otsikko}
@@ -249,10 +270,23 @@ export default async function VaalitHub() {
             )}
             {pakat.length > 0 && (
               <div id="jarjestys" className="vl-alaosio">
-                <div className="vl-ryhma-head">
-                  <h3>Laita järjestykseen</h3>
-                  <span>Kahdeksan nimeä, yksi oikea järjestys.</span>
-                </div>
+                {/* Heikki 18.10.2026: nosto kertoo pelimuodon kasvoketjulla kuten etusivun "Kuka on vanhin?". */}
+                <KasvoketjuBanneri
+                  id="vl-jarj-h"
+                  luokka="eb--jarj"
+                  taso="h3"
+                  tagi="Pelimuoto"
+                  meta={`${pakat.length} pakkaa`}
+                  otsikko={["Laita", "järjestykseen"]}
+                  subKapea={<>Kahdeksan nimeä, yksi oikea järjestys<span className="eb-vain-mob"> · 2&nbsp;min</span></>}
+                  subDesk={<>Kahdeksan nimeä, yksi oikea järjestys.<br />Valitse pakka alta · 2&nbsp;min</>}
+                  href={(pakat.find((p) => p.slug === "presidentit") ?? pakat[0]).href}
+                  cta="Aloita presidenteistä"
+                  henkilot={KETJU}
+                  kierros={8}
+                  lisaa="nimeä"
+                  akseli={["Ensimmäinen", "Viimeisin"]}
+                />
                 <div className="vl-rivi">{pakat.map(pakkaKortti)}</div>
               </div>
             )}
