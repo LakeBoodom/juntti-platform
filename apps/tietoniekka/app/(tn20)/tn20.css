@@ -2099,8 +2099,12 @@
 .tn20 .tnt-lm-attr { color: #46D6C8; font-weight: 800; text-transform: uppercase; letter-spacing: 0.18em; font-size: clamp(11px, 1.05cqw, 13px); }
 .tn20 .tnt-lm-title {
   font-family: var(--tn-font-display); font-weight: 900; text-transform: uppercase;
-  font-size: clamp(26px, 3.4cqw, 44px); letter-spacing: -0.015em; line-height: 0.95;
-  margin: 10px 0 12px;
+  /* KORTTISÄÄNTÖ (UI-laatu 18.10.2026, T1): otsikko tulee datasta. "KANARIANSAARET" (14 merkkiä,
+     0,69 em/merkki) vuoti 26 px:llä 11 px 320 px:n näytöllä: kortin tekstipalsta = 100vw − 80 px.
+     Raja (100vw − 80 px) / (14 × 0,69 × 1,03) → 24 px @320, CD:n 26–44 px ≥ 360 px:stä. Kahden
+     palstan asettelussa (≥ 780 px) palsta on leveämpi kuin tarve, joten vw-raja ei pienennä sitä. */
+  font-size: min(clamp(26px, 3.4cqw, 44px), calc((100vw - 80px) / 9.95)); letter-spacing: -0.015em; line-height: 0.95;
+  margin: 10px 0 12px; overflow-wrap: normal; word-break: keep-all;
 }
 .tn20 .tnt-lm-desc { color: #B3CBD1; font-size: clamp(13px, 1.35cqw, 16px); line-height: 1.55; max-width: 46ch; margin: 0 0 clamp(16px, 2cqw, 24px); }
 
@@ -2183,7 +2187,11 @@
 .tn20 .tne-crumb a:hover { color: #F5F0E6; }
 .tn20 .tne-crumb span { color: #FF8566; }
 .tn20 .tne-title {
-  margin: 0 0 14px; font-family: var(--tn-font-display); font-weight: 900;
+  /* KORTTISÄÄNTÖ (UI-laatu 18.10.2026, T1): CD:n wdth 70 toimii vain variable-Archivolla. Staattisella
+     TV:n "SUORATOISTO" vei 0,71 em/merkki → 98 px:llä 763 px palstassa 546 px (yli 25–247 px, 1024–1920).
+     Variablella ≈ 0,49 em/merkki → 534 px ≤ 546 px; sama koko (CD 98 px) säilyy. Koskee myös
+     Elokuvat- ja Musiikki-heroja (sama luokka, kapeampi = mahtuu varmemmin). */
+  margin: 0 0 14px; font-family: "Archivo Variable", var(--tn-font-display); font-weight: 900;
   font-variation-settings: "wdth" 70;
   font-size: clamp(40px,7.6cqw,98px); line-height: .86; letter-spacing: -.02em;
   text-transform: uppercase; color: #F5F0E6;

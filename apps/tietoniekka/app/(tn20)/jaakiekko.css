@@ -46,11 +46,16 @@
   50% { opacity: .45; transform: scale(.72); }
 }
 .tn20 .tnj-title {
-  margin: 0 0 14px; font-family: var(--tn-font-display); font-weight: 900;
+  margin: 0 0 14px; font-weight: 900;
+  /* KORTTISÄÄNTÖ (UI-laatu 18.10.2026, T1): CD:n wdth 68 vaatii variable-Archivon — staattisella
+     "JÄÄKIEKOSTA" vei 0,69 em/merkki ja valui palstan yli 52 px (1024), 387 px (1440), 436 px (1920).
+     Variablella 0,487 em/merkki. Palstan sisäleveys desktopissa 616–645 px → tarve ≤ 616 / (11 × 0,487)
+     = 115 px; raja 110 px (+4 % marginaali). CD:n alkuperäinen yläraja 138 px. */
+  font-family: "Archivo Variable", var(--tn-font-display);
   font-variation-settings: "wdth" 68;
   /* line-height .94: KAIKKI-rivillä ei alapidennyksiä, joten JÄÄKIEKOSTA-rivin
      Ä-pisteet tarvitsevat ~.9em baseline-välin — .82 upotti ne ylärivin päälle */
-  font-size: clamp(42px,9.4cqw,138px); line-height: .94; letter-spacing: -.025em;
+  font-size: clamp(42px,9.4cqw,110px); line-height: .94; letter-spacing: -.025em;
   text-transform: uppercase; color: #F5F0E6; max-width: 16ch;
 }
 .tn20 .tnj-title b { display: block; font-weight: inherit; color: #4FD1F5; }
