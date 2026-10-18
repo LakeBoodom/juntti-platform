@@ -182,4 +182,7 @@ Skilli `tietoniekka-ui-laatu` on näiden sääntöjen lähde; tässä tiivistelm
    krediitit `lib/kuvalahteet.ts`.
 7. **Fokus näkyy aina** (2 px rengas, ei `outline: none` ilman korvaavaa `:focus-visible`-tyyliä).
    Skip-linkki `#main` on (tn20)-layoutissa.
+8. **Kokoelmasivut:** uusi teemasivu käyttää jaettua korttikehotetta (`.tn-card-cta`, "Pelaa →") ja
+   metariviä (`.tn-card-meta`), ei omia. Henkilökuvat aina `henkiloKuva()`-apurin kautta (omat kopiot,
+   ei Wikimedia-hotlinkkejä). Tarkemmin `apps/tietoniekka/DESIGN_SYSTEM.md` (18.10.2026).
 
