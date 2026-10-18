@@ -1,4 +1,5 @@
 "use client";
+import { henkiloKuva } from "@/lib/henkilokuvat";
 // Aihesivujen pelihylly (erä B4, design v0.3 4a/4b). Hyllyn sääntö (CD):
 //   - ensimmäinen peli on aina nosto (lime CTA — ainoa täytetty painike)
 //   - pelityypillä oma aksentti: Ikäjärjestys violetti, henkilövisa meripihka
@@ -86,9 +87,9 @@ function Nosto({ peli }: { peli: HyllyPeli }) {
           {peli.laatat.map((l) => (
             <span key={l.name} className={l.oma ? "hub-ika-laatta hub-ika-laatta--oma" : "hub-ika-laatta"}>
               <span className="hub-ika-kuva">
-                {l.image_url ? (
+                {henkiloKuva(l.image_url) ? (
                   // eslint-disable-next-line @next/next/no-img-element
-                  <img src={l.image_url} alt="" loading="lazy" />
+                  <img src={henkiloKuva(l.image_url)!} alt="" loading="lazy" />
                 ) : (
                   <span className="hub-laatta-ini" aria-hidden="true">
                     {l.name

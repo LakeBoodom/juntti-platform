@@ -5,6 +5,7 @@
 // Pelirivit ja niiden mode-chipit renderöidään vain lib/pelirekisteri.ts:n perusteella — kun peli julkaistaan, rivi ilmestyy ilman hubin muutosta.
 // Kaikki luvut kannasta (lib/vaalit/data.ts). ISR 1 h (vaalilaskuri päivittyy päivittäin).
 // Staattinen segmentti ohittaa dynaamisen [collection]-reitin.
+import { henkiloKuva } from "@/lib/henkilokuvat";
 import "../../etusivun-bannerit.css";
 import "./vaalit.css";
 import type { Metadata } from "next";
@@ -283,9 +284,9 @@ export default async function VaalitHub() {
                     <li key={k.href}>
                       <a className="vl-kasvo" href={k.href}>
                         <span className="vl-kasvo-kuva">
-                          {k.image_url ? (
+                          {henkiloKuva(k.image_url) ? (
                             // eslint-disable-next-line @next/next/no-img-element
-                            <img src={k.image_url} alt="" loading="lazy" />
+                            <img src={henkiloKuva(k.image_url)!} alt="" loading="lazy" />
                           ) : (
                             <span aria-hidden="true">
                               {k.name

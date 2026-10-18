@@ -8,6 +8,7 @@
 // ("600+"): Heikin linjaus 18.9. poisti eksaktit kuvamäärät, koska ne
 // heittelevät datan mukana — pyöristetty alaraja pysyy totena.
 
+import { henkiloKuva } from "@/lib/henkilokuvat";
 import { getSupabase } from "@/lib/supabase";
 import { getSiteId } from "@/lib/queries";
 import { KATEGORIAT } from "@/lib/kuvavisat2026";
@@ -77,5 +78,5 @@ export async function getBanneriHenkilot(): Promise<BanneriHenkilo[]> {
   /* Järjestys vanhimmasta nuorimpaan — kuva havainnollistaa pelin ideaa. */
   return rivit
     .sort((a, b) => (a.birth_date ?? "").localeCompare(b.birth_date ?? ""))
-    .map((r) => ({ id: r.id, name: r.name, image: OMAT_KASVOT[r.name] ?? "" }));
+    .map((r) => ({ id: r.id, name: r.name, image: OMAT_KASVOT[r.name] ?? henkiloKuva(r.image_url) ?? "" }));
 }

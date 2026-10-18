@@ -221,7 +221,7 @@ export default async function LuontoLanding({
                   <span className="tnl3-muoto-media tnl3-muoto-media--kaksi">
                     {nostoKuva.kuvat.map((u) => (
                       // eslint-disable-next-line @next/next/no-img-element
-                      <img key={u} src={u} alt="" loading="lazy" />
+                      <img key={u} src={u} alt="" />
                     ))}
                     <span className="tnl3-pilleri"><IkoniKuva />Kuvavisa</span>
                   </span>

@@ -17,13 +17,14 @@
 //     kuva + saman kuvan sumennettu jatke sivuilla). Rajaus on muokkaus, joten
 //     BY-SA-kuvien osalta sivu ilmoittaa muokatun kuvan olevan saatavilla
 //     samalla lisenssillä (share-alike).
-//  4. Uusi kuva ei mene tuotantoon ilman riviä tässä tiedostossa.
+//  4. Uusi kuva ei mene tuotantoon ilman riviä tässä tiedostossa. Poikkeus: henkilökuvien omat kopiot
+//     (376 kpl, 18.10.2026) ovat generoituina lib/henkilokuvalahteet.ts:ssä samassa muodossa.
 
 export type Kuvalahde = {
   /** Visan slug = kuvatiedoston nimi kansiossa public/20/<kokoelma>/ */
   slug: string;
   /** Kokoelma, jonka kansiossa kuva on. */
-  kokoelma: "musiikki" | "kaupungit" | "jaakiekko" | "vaalit" | "historia" | "maantieto" | "luonto" | "ikajarjestys";
+  kokoelma: "musiikki" | "kaupungit" | "jaakiekko" | "vaalit" | "historia" | "maantieto" | "luonto" | "ikajarjestys" | "henkilot";
   /** Mitä kuvassa on — näytetään lähdesivulla. */
   kuvaus: string;
   /** Tiedoston nimi Wikimedia Commonsissa (ilman File:-etuliitettä). */

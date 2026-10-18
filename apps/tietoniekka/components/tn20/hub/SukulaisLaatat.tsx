@@ -1,6 +1,6 @@
 // Aihesivujen "Muut …" -laatat (erä B4): 6 kuvalaattaa (desktop ruudukko, mobiili vaakavieritys).
 // Kuvaton = nimikirjaimet samalla violetilla pohjalla (design 3a, Kovalainen-esimerkki).
-import { wikiPikkukuva } from "@/lib/wikikuva";
+import { henkiloKuva } from "@/lib/henkilokuvat";
 
 export type SukulaisLaatta = { href: string; name: string; image_url: string | null; ala: string };
 
@@ -44,9 +44,9 @@ export default function SukulaisLaatat({
           <li key={l.href}>
             <a href={l.href} className="hub-laatta">
               <span className="hub-laatta-kuva">
-                {l.image_url ? (
+                {henkiloKuva(l.image_url) ? (
                   // eslint-disable-next-line @next/next/no-img-element
-                  <img src={wikiPikkukuva(l.image_url, 250)} alt="" loading="lazy" />
+                  <img src={henkiloKuva(l.image_url)!} alt="" loading="lazy" />
                 ) : (
                   <span className="hub-laatta-ini" aria-hidden="true">
                     {nimikirjaimet(l.name)}

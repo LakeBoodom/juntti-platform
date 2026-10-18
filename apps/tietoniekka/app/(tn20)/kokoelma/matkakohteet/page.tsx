@@ -132,10 +132,10 @@ export default async function MaantietoLanding() {
           <section className="tnt-section">
             <h2 className="tnt-h2">Tietoniekan poiminnat</h2>
             <div className="tnt-picks">
-              {poiminnat.map((c) => (
+              {poiminnat.map((c, i) => (
                 <a key={c.id} className="tnt-pick" href={playHref(c)}>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={maantietoImg(c.slug) ?? MAANTIETO_HERO} alt="" loading="lazy" />
+                  <img src={maantietoImg(c.slug) ?? MAANTIETO_HERO} alt="" loading={i === 0 ? "eager" : "lazy"} />
                   <span className="tnt-pick-body">
                     <span className="tnt-pick-title">{c.display_title ?? c.title}</span>
                     <span className="tnt-pick-desc">{descFor(c)}</span>

@@ -2,6 +2,7 @@
 // korttigrafiikka = f(collection, genre, badge, hash(id) % 3)
 // Kehys, chip, badge ja tekstit AINA koodissa — ei koskaan leivottuna kuvaan.
 
+import { henkiloKuva } from "@/lib/henkilokuvat";
 import { Motif, PersonSilhouette } from "./motifs";
 
 /* Deterministinen A/B/C-variaatio: sama visa saa aina saman ilmeen. */
@@ -181,11 +182,14 @@ export function PersonCard({
   dateChip,
   ageLabel,
   href,
+  eager = false,
 }: {
   person: PersonCardData;
   dateChip?: string;
   ageLabel?: string;
   href?: string;
+  /** Ensimmäisessä näkymässä (Tunnetut henkilöt -synttärikaruselli): ei lazy-latausta (T6, 18.10.2026). */
+  eager?: boolean;
 }) {
   const link = href ?? (person.slug ? `/sankari/${person.slug}` : "#");
   const meta = [person.role, `${person.question_count ?? 5} kys.`].filter(Boolean).join(" · ");
@@ -194,10 +198,10 @@ export function PersonCard({
     <article className="tn-card">
       <a href={link} aria-label={person.name}>
         <div className="tn-person-face">
-          {person.image_url ? (
+          {henkiloKuva(person.image_url) ? (
             <>
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img className="tn-person-photo" src={person.image_url} alt="" loading="lazy" />
+              <img className="tn-person-photo" src={henkiloKuva(person.image_url)!} alt="" loading={eager ? "eager" : "lazy"} />
               <div className="tn-person-tint" />
               {/* Henkilökuvat tulevat Wikipediasta (CC) — lähdemaininta on
                   lisenssiehto (Heikki 10.8.2026), mutta Heikin toiveesta

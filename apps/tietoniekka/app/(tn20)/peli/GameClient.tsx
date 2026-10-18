@@ -1,4 +1,5 @@
 "use client";
+import { henkiloKuva } from "@/lib/henkilokuvat";
 // TIETONIEKKA 2.0 — PELINÄKYMÄ 2026 PROD (design_handoff_peli_2026_prod +
 // design_handoff_kuvavisa_2026_prod, toteutettu 28.–29.8.2026). Korvasi pelikuoren
 // 2A "Jaettu lava" + Tuloskortti A:n kokonaan (Heikki 28.8.: "korvaa samaan tapaan
@@ -30,7 +31,6 @@ import { ViikkoSinetti, KuvatIkoni } from "../../../components/tn20/Viikkosinett
 import { lueViikkoTulos, tallennaViikkoTulos, type ViikkoInfo, type ViikkoTulos } from "../../../lib/viikkovisa";
 import type { KollaasiKuva } from "../../../lib/kuvavisat2026";
 import { igAvaus, igValmis } from "../../../lib/igMittaus";
-import { wikiPikkukuva } from "@/lib/wikikuva";
 import "../peli2026.css";
 
 const BASE_POINTS = 100;
@@ -134,9 +134,9 @@ function VisassaMukana({ hlot }: { hlot?: GameQuiz["mukana"] }) {
           <li key={h.href}>
             <a href={h.href}>
               <span className="tng-mukana-kuva" aria-hidden>
-                {h.image_url ? (
+                {henkiloKuva(h.image_url) ? (
                   // eslint-disable-next-line @next/next/no-img-element
-                  <img src={wikiPikkukuva(h.image_url, 60)} alt="" loading="lazy" decoding="async" width={60} height={60} />
+                  <img src={henkiloKuva(h.image_url)!} alt="" loading="lazy" decoding="async" width={60} height={60} />
                 ) : (
                   h.name.split(/\s+/).map((w) => w[0]).join("").slice(0, 2)
                 )}

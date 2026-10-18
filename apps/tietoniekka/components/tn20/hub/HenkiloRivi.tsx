@@ -1,13 +1,14 @@
 // Hakemistorivi (erä B3, design 3e): 44 px kuva, nimi, "Rooli · ikä", nuoli. Kuvaton = nimikirjaimet.
+import { henkiloKuva } from "@/lib/henkilokuvat";
 export type HenkiloRiviData = { href: string; name: string; meta: string; image_url: string | null };
 
 export default function HenkiloRivi({ r }: { r: HenkiloRiviData }) {
   return (
     <a className="hk-rivi" href={r.href}>
       <span className="hk-rivi-kuva">
-        {r.image_url ? (
+        {henkiloKuva(r.image_url) ? (
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={r.image_url} alt="" loading="lazy" />
+          <img src={henkiloKuva(r.image_url)!} alt="" loading="lazy" />
         ) : (
           <span className="hub-laatta-ini" aria-hidden="true">
             {r.name

@@ -1,3 +1,4 @@
+import { HENKILOKUVALAHTEET } from "@/lib/henkilokuvalahteet";
 import { jakoMeta } from "@/lib/jakoMeta";
 import type { Metadata } from "next";
 import Link from "next/link";
@@ -121,6 +122,8 @@ export default async function KuvienLahteetPage() {
         <Lista rivit={luonto} />
         <h2 style={{ fontSize: 22, margin: "34px 0 14px" }}>Etusivu: Kuka on vanhin?</h2>
         <Lista rivit={ikajarjestys} />
+        <h2 style={{ fontSize: 22, margin: "34px 0 14px" }}>Henkilökuvat (henkilösivut, Tunnetut henkilöt, Päivän sankari, Ikäjärjestys)</h2>
+        <Lista rivit={HENKILOKUVALAHTEET} />
         {linnut.length > 0 && <KuvavisaLahteet otsikko="Lintujen kuvavisa" avain="lintu" rivit={linnut} />}
         {elaimet.length > 0 && <KuvavisaLahteet otsikko="Eläinten kuvavisa" avain="elain" rivit={elaimet} />}
         {AANI_RYHMAT.map((r) => {

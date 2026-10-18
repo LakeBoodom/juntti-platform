@@ -10,6 +10,7 @@
 // keskeltä). Fonttikoot kalibroitu varovaisiksi lähtöarvoiksi (KORTTISÄÄNTÖ
 // kohta 8) — mitattu Range-menetelmällä 320–2560px, ks. tietoketju.css.
 
+import { henkiloKuva } from "@/lib/henkilokuvat";
 import { forwardRef } from "react";
 import { PersonSilhouette } from "./motifs";
 
@@ -108,11 +109,11 @@ export const RankingCard = forwardRef<HTMLDivElement, RankingCardProps>(function
 
       {!person.hideThumb && (
       <div className="tk-rcard-thumb">
-        {person.image_url ? (
+        {henkiloKuva(person.image_url) ? (
           // draggable={false}: ilman tätä hiiriraahaus kortin kuvasta käynnistäisi
           // selaimen oman kuvanraahauksen ja keskeyttäisi kortin siirron.
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={person.image_url} alt="" loading="lazy" draggable={false} />
+          <img src={henkiloKuva(person.image_url)!} alt="" loading="lazy" draggable={false} />
         ) : (
           <div className="tk-rcard-silhouette">
             <PersonSilhouette />

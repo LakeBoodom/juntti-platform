@@ -1,4 +1,5 @@
 "use client";
+import { henkiloKuva } from "@/lib/henkilokuvat";
 // TIETONIEKKA 2.0 — TUNNETUT HENKILÖT: "Selaa kaikkia" -selain (26.8.2026 CD-design,
 // design_handoff_tunnetut_henkilot/README.md). Korvaa aiemman palvelinpuolen
 // suodata-query-param-version: haku + kategoria + lajittelu + sivutus toimivat
@@ -237,10 +238,10 @@ function PersonBrowserInner({ people }: { people: BrowserPerson[] }) {
             {visible.map((p) => (
               <a key={p.id} className="tn-personlist-row" href={p.href}>
                 <div className="tn-personlist-photo">
-                  {p.image_url ? (
+                  {henkiloKuva(p.image_url) ? (
                     <>
                       {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src={p.image_url} alt="" loading="lazy" />
+                      <img src={henkiloKuva(p.image_url)!} alt="" loading="lazy" />
                       <div className="tn-person-tint" />
                     </>
                   ) : (

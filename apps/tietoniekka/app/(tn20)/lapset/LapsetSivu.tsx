@@ -1,4 +1,5 @@
 "use client";
+import { pieniKuva } from "@/lib/pienetKuvat";
 // LASTEN VISAT — /lapset-sivun sisältö (design v0.2: 3a/3c mobiili, 3b/3d desktop).
 //
 // Ikävalinta ("Kuka pelaa?") suodattaa nostun, aiheet, kaikki visat ja Tulossa-kaistan. Se muistetaan
@@ -104,7 +105,7 @@ export default function LapsetSivu({
   const kuvaTaiEmoji = (kuva: string | null, emoji: string, aksentti: string, kohdistus?: string | null) =>
     kuva ? (
       /* eslint-disable-next-line @next/next/no-img-element */
-      <img src={kuva} alt="" loading="lazy" style={kohdistus ? { objectPosition: kohdistus } : undefined} />
+      <img src={pieniKuva(kuva)} alt="" loading="lazy" style={kohdistus ? { objectPosition: kohdistus } : undefined} />
     ) : (
       <span className="lps-emoji-pohja" style={{ background: aksentti }} aria-hidden>{emoji}</span>
     );

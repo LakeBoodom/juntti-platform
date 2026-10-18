@@ -7,6 +7,7 @@
 // Mobiiliteksti on mallipohjan oma variantti, ei katkaisu: nimi jätetään pois
 // virkkeen alusta, koska se on jo otsikkorivillä.
 
+import { henkiloKuva } from "@/lib/henkilokuvat";
 import { henkiloHref } from "./henkiloSlug";
 import { visaHref } from "@/lib/visaHref";
 import { pvmOsat } from "@/lib/aika";
@@ -107,7 +108,7 @@ export function muotoileSankari(s: SankariRivi): PaivanSankariData {
     elinvuodet,
     kicker,
     teksti: oma ? { desktop: oma, mobile: oma } : { desktop, mobile },
-    kuva: s.image_url || null,
+    kuva: henkiloKuva(s.image_url), // T6 18.10.2026: oma kopio, ei Wikimedia-hotlinkkiä
     kuvaPos: `${pct(s.image_focal_x, 0.5)} ${pct(s.image_focal_y, 0.3)}`,
     henkiloHref: henkiloHref(s.name),
     playHref: `${visaHref({ slug: s.quiz_slug, custom_slug: s.custom_slug, id: s.quiz_id })}${s.quiz_slug || s.custom_slug ? "?" : "&"}paivan_sankari=1`,

@@ -722,7 +722,7 @@ async function PersonHub({ hub }: { hub: HubMeta }) {
               const m = today.getMonth() - b.getMonth();
               if (m < 0 || (m === 0 && today.getDate() < b.getDate())) a--;
               return (
-                <PersonCard key={c.id} person={c} dateChip={chip} ageLabel={`${dist === 0 ? a : a + 1} vuotta`} href={henkiloHref(c.name)} />
+                <PersonCard key={c.id} person={c} dateChip={chip} ageLabel={`${dist === 0 ? a : a + 1} vuotta`} href={henkiloHref(c.name)} eager />
               );
             })}
           </div>
