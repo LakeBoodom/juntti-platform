@@ -143,8 +143,10 @@
   content: ""; position: absolute; inset: 0; pointer-events: none;
   background: linear-gradient(to top, rgba(19,17,9,.95) 4%, rgba(19,17,9,.1) 52%, transparent 74%);
 }
+/* T8 (UI-laatu 18.10.2026): kaikkien lohkojen pääkortit (layout "lead", 21/9). F1-kortin kuvausteksti kulki
+   kirkkaiden valojen päältä → vahvempi alagradientti (tekstin alue ≥ 60 % peitto). */
 .tn20 .tnu-ocard[data-wide]::after {
-  background: linear-gradient(to top, rgba(19,17,9,.95) 6%, rgba(19,17,9,.18) 58%, transparent 82%);
+  background: linear-gradient(to top, rgba(19,17,9,.95) 0%, rgba(19,17,9,.8) 30%, rgba(19,17,9,.6) 50%, transparent 78%);
 }
 .tn20 .tnu-ocard-text {
   position: absolute; z-index: 1; left: clamp(12px,1.4cqw,20px); right: clamp(12px,1.4cqw,20px);

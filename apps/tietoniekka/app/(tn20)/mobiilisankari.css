@@ -27,9 +27,12 @@
   .tn20 .tnms-media { position: relative; height: clamp(180px, 52vw, 230px); overflow: hidden; }
   .tn20 .tnms[data-module] .tnms-media { height: 170px; }
   .tn20 .tnms-media img { display: block; width: 100%; height: 100%; object-fit: cover; }
+  /* T8 (UI-laatu 18.10.2026): 600–768 px:ssä sankari ja ensimmäinen osio olivat keskitetty 568 px:n palsta
+     (teksti 124 px:stä), muut osiot tn-shellin reunasta (24 px). Nyt sama vasen reuna kaikilla: sankarin
+     tekstipalsta pysyy lukumitassa (max 520 px) mutta alkaa reunasta, alakokoelmalista on täysleveä. */
   .tn20 .tnms-body {
     position: relative; z-index: 1;
-    max-width: calc(520px + 2 * var(--page-x)); margin: 0 auto;
+    max-width: calc(520px + 2 * var(--page-x)); margin: 0;
     padding: 24px var(--page-x) 24px;
   }
 
@@ -89,7 +92,7 @@
 
   /* ── Ensimmäinen osio: alakokoelmat listana ── */
   .tn20 .tnms-first {
-    display: block; max-width: calc(520px + 2 * var(--page-x)); margin: 0 auto 32px;
+    display: block; max-width: none; margin: 0 auto 32px;
     padding: 0 var(--page-x);
   }
   .tn20 .tnms-sechead { margin: 0 0 8px; }
