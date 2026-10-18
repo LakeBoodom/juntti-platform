@@ -183,8 +183,8 @@ export default async function KulttuuriLanding({
                 <span className="tnk-pick-label">★ Lauran ja Mikon valinta</span>
                 <span className="tnk-cardtitle">{pick.display_title ?? pick.title}</span>
                 <CardMeta c={pick} />
+                <span className="tn-card-cta">Pelaa →</span>
               </span>
-              <span className="tn-card-cta">Pelaa →</span>
             </a>
           </section>
         )}

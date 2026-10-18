@@ -1419,7 +1419,7 @@
 .tn20 .tnk-pick-media img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .tn20 .tnk-pick-body { display: flex; flex-direction: column; gap: 5px; min-width: 0; }
 .tn20 .tnk-pick-label { color: var(--tn-gold); font-size: 11px; font-weight: 800; letter-spacing: 0.16em; text-transform: uppercase; }
-.tn20 .tnk-pick .tn-card-cta { margin-left: auto; flex: 0 0 auto; }
+.tn20 .tnk-pick-body .tn-card-cta { margin-top: 2px; } /* T2: kehote tekstipalstassa — oikeassa reunassa se kavensi otsikon 68 px:iin @320 */
 
 /* ── Pelinäkymä visan omalla kuvalla (topic image) ──
    Desktop: vasen lava näyttää kuvan värillisenä (ei grayscale-pesua).
@@ -1520,14 +1520,15 @@
 .tn20 .tnh-era-meter { display: flex; align-items: center; gap: 10px; font-size: 12px; font-weight: 700; color: var(--tn-text-muted); }
 .tn20 .tnh-era-quizzes { display: flex; flex-direction: column; gap: 8px; margin-top: 14px; }
 .tn20 .tnh-quiz {
-  display: flex; align-items: center; gap: 12px; padding: 12px 16px;
+  /* T1 (18.10.2026): 320 px:ssä otsikolle jäi 94 px ("suomalaisuuden" vuoti 11–36 px) → metarivi rivittyy alle. */
+  display: flex; flex-wrap: wrap; align-items: center; gap: 4px 12px; padding: 12px 16px;
   border: 1px solid var(--tn-line); border-radius: 12px; background: var(--tn-surface);
   text-decoration: none; color: var(--tn-text);
 }
 .tn20 .tnh-quiz:hover { border-color: var(--tn-gold); }
 .tn20 .tnh-quiz[data-played] { background: color-mix(in srgb, var(--tn-lime) 5%, var(--tn-surface)); }
-.tn20 .tnh-quiz-title { flex: 1 1 auto; min-width: 0; font-weight: 700; font-size: 14.5px; }
-.tn20 .tnh-quiz-meta { display: inline-flex; align-items: center; gap: 8px; flex: 0 0 auto; }
+.tn20 .tnh-quiz-title { flex: 1 1 12em; min-width: 0; font-weight: 700; font-size: 14.5px; overflow-wrap: normal; word-break: keep-all; }
+.tn20 .tnh-quiz-meta { display: inline-flex; align-items: center; gap: 8px; flex: 0 0 auto; margin-left: auto; }
 .tn20 .tnh-dot { width: 9px; height: 9px; border-radius: 50%; border: 1.5px solid var(--tn-text-dim); flex: 0 0 auto; }
 .tn20 .tnh-dot[data-on] { background: var(--tn-lime); border-color: var(--tn-lime); }
 @media (min-width: 900px) {
@@ -2197,7 +2198,7 @@
      Elokuvat- ja Musiikki-heroja (sama luokka, kapeampi = mahtuu varmemmin). */
   margin: 0 0 14px; font-family: "Archivo Variable", var(--tn-font-display); font-weight: 900;
   font-variation-settings: "wdth" 70;
-  font-size: clamp(40px,7.6cqw,98px); line-height: .86; letter-spacing: -.02em;
+  font-size: clamp(40px,7.6cqw,92px); line-height: .86; /* ≥ 1920: palsta 516 px → SUORATOISTO tarvitsee ≤ 92 px (CD 98) */ letter-spacing: -.02em;
   text-transform: uppercase; color: #F5F0E6;
 }
 .tn20 .tne-title b { display: block; font-weight: inherit; color: #FF5C3D; }
@@ -2266,7 +2267,7 @@
 }
 .tn20 .tne-feat-name {
   margin: 0; position: absolute; left: clamp(14px,1.6cqw,20px); right: clamp(14px,1.6cqw,20px); bottom: clamp(12px,1.4cqw,18px);
-  z-index: 1; font-family: var(--tn-font-display); font-weight: 900; font-variation-settings: "wdth" 74;
+  z-index: 1; font-family: "Archivo Variable", var(--tn-font-display); font-weight: 900; font-variation-settings: "wdth" 74; /* T1 18.10.: variable → wdth toimii ("HÄMÄHÄKKIMIES-" vuoti 6 px) */
   font-size: clamp(22px,2.5cqw,34px); line-height: .96; text-transform: uppercase; color: #F5F0E6;
   text-wrap: balance;
 }
@@ -2282,11 +2283,11 @@
   margin-bottom: clamp(14px,1.6cqw,20px);
 }
 .tn20 .tne-section-num {
-  flex: none; font-family: var(--tn-font-display); font-weight: 900; font-variation-settings: "wdth" 66;
+  flex: none; font-family: "Archivo Variable", var(--tn-font-display); font-weight: 900; font-variation-settings: "wdth" 66;
   font-size: clamp(20px,2.3cqw,32px); color: var(--tne-accent, #FF5C3D);
 }
 .tn20 .tne-section-title {
-  flex: 1; margin: 0; font-family: var(--tn-font-display); font-weight: 900; font-variation-settings: "wdth" 74;
+  flex: 1; min-width: 0; margin: 0; font-family: "Archivo Variable", var(--tn-font-display); font-weight: 900; font-variation-settings: "wdth" 74; /* T1 18.10.: "KULTTIELOKUVAT" vuoti 6 px @320 */
   font-size: clamp(20px,2.5cqw,34px); text-transform: uppercase; color: #F5F0E6; text-wrap: balance;
 }
 .tn20 .tne-section-count { flex: none; font-size: clamp(12px,1.1cqw,13px); font-weight: 700; color: var(--tn-text-dim); }
@@ -2316,7 +2317,7 @@
 }
 .tn20 .tne-card-name {
   margin: 0; position: absolute; left: clamp(10px,1.05cqw,15px); right: clamp(10px,1.05cqw,15px); bottom: clamp(9px,1cqw,14px);
-  z-index: 1; font-family: var(--tn-font-display); font-weight: 900; font-variation-settings: "wdth" 74;
+  z-index: 1; font-family: "Archivo Variable", var(--tn-font-display); font-weight: 900; font-variation-settings: "wdth" 74; /* T1 18.10.: "LEIJONAKUNINGAS" vuoti 5 px @1024 */
   font-size: clamp(14px,1.45cqw,20px); line-height: .98; letter-spacing: -.01em; text-transform: uppercase;
   color: #F5F0E6; text-wrap: balance;
 }

@@ -91,10 +91,10 @@
 .tn20 .tks-aiheet li:last-child:nth-child(odd) { grid-column: 1 / -1; }
 .tn20 .tks-aiheet img { position: relative; align-self: flex-end; width: 80px; height: 80px; object-fit: contain; filter: drop-shadow(0 10px 14px rgba(0, 0, 0, .5)); }
 /* KORTTISÄÄNTÖ (UI-laatu 18.10.2026, T1): "SUORATOISTO" (11 merkkiä, ≈ 0,68 em/merkki) vuoti 8 px
-   320 px:n tiilessä (sisäleveys 111 px). Koko tiilen leveydestä: 100cqi / 7,6 → 14,6 px @320,
+   320 px:n tiilessä (sisäleveys 111 px). Koko tiilen leveydestä: 100cqi / 8,4 → 13,2 px @320 (mitattu 0,73 em/merkki),
    CD:n 16 px ≥ 360 px:stä. */
 .tn20 .tks-aiheet a { container-type: inline-size; }
-.tn20 .tks-kortti-nimi { position: relative; font-family: var(--tn-font-display); font-weight: 900; font-size: min(16px, calc(100cqi / 7.6)); line-height: 1.02; text-transform: uppercase; text-wrap: balance; overflow-wrap: normal; word-break: keep-all; }
+.tn20 .tks-kortti-nimi { position: relative; font-family: var(--tn-font-display); font-weight: 900; font-size: min(16px, calc(100cqi / 8.4)); line-height: 1.02; text-transform: uppercase; text-wrap: balance; overflow-wrap: normal; word-break: keep-all; }
 .tn20 .tks-arvo { display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 20px 0 4px; margin-top: 16px; border-top: 1px solid var(--line); font-size: 14px; color: var(--soft); }
 .tn20 .tks-arvo button { height: 52px; padding: 0 24px; border-radius: 999px; border: 1px solid var(--line2); background: transparent; color: var(--ink); font: inherit; font-size: 15px; font-weight: 700; cursor: pointer; }
 
