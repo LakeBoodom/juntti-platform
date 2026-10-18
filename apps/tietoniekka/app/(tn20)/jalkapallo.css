@@ -146,7 +146,7 @@
 .tn20 .tnjp-card-tag {
   position: absolute; z-index: 1; left: clamp(11px,1.2cqw,16px); top: clamp(10px,1.1cqw,14px);
   padding: 4px 9px; border-radius: 999px; background: rgba(19,17,9,.82);
-  border: 1px solid currentColor; color: color-mix(in srgb, currentColor 75%, #fff);
+  border: 1px solid currentColor; color: color-mix(in srgb, currentColor 50%, #fff); /* T4 (UI-laatu 18.10.2026): 75 % → 50 % seuraväriä — tummimmat seuravärit (Espanja 3,65:1, Seuravisa #EF0107 4,21:1) jäivät alle 4,5:1. */
   font-size: clamp(11px,.95cqw,11.5px); font-weight: 800; letter-spacing: .1em;
   text-transform: uppercase; white-space: nowrap; max-width: calc(100% - 22px);
   overflow: hidden; text-overflow: ellipsis;
@@ -197,7 +197,7 @@
   font-family: var(--tn-font-display); font-weight: 900; font-variation-settings: "wdth" 62;
   font-size: clamp(11px,1.05cqw,13px); letter-spacing: .22em; text-transform: uppercase;
   margin-bottom: clamp(8px,1cqw,12px);
-  color: color-mix(in srgb, currentColor 75%, #fff);
+  color: color-mix(in srgb, currentColor 50%, #fff); /* T4 18.10.: 75 → 50 % (#EF0107 4,21:1) */
 }
 .tn20 .tnjp-club-name {
   margin: 0 0 clamp(12px,1.5cqw,20px); font-family: var(--tn-font-display); font-weight: 900;

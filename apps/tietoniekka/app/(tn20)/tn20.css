@@ -2549,7 +2549,7 @@
   margin: clamp(28px,3.4cqw,48px) 0 0;
   font-size: 13px;
   line-height: 1.5;
-  color: rgba(255,255,255,0.42);
+  color: rgba(255,255,255,0.5); /* T4 18.10.2026: .42 = 4,09:1 → .5 ≈ 5,1:1 */
 }
 .tn20 .tne-kuvakrediitti a {
   color: rgba(255,255,255,0.62);
