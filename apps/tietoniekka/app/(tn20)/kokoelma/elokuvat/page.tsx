@@ -138,7 +138,7 @@ export default async function ElokuvatLanding() {
                     </span>
                     <span className="tne-feat-body">
                       <p className="tne-feat-hook">{f.hook}</p>
-                      <span className="tne-feat-cta">Pelaa visa →</span>
+                      <span className="tne-feat-cta tn-card-cta">Pelaa →</span>
                     </span>
                   </a>
                 );

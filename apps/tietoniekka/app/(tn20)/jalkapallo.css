@@ -163,11 +163,8 @@
   padding: clamp(13px,1.5cqw,20px);
 }
 .tn20 .tnjp-fcard-desc { font-size: clamp(12px,1.2cqw,15px); line-height: 1.45; color: #B9AF9B; text-wrap: pretty; }
-.tn20 .tnjp-fcard-play {
-  flex: 0 0 auto; font-family: var(--tn-font-display); font-weight: 900;
-  font-variation-settings: "wdth" 76; font-size: clamp(11px,1.1cqw,14px);
-  text-transform: uppercase; letter-spacing: .04em; color: color-mix(in srgb, currentColor 75%, #fff);
-}
+/* T2 (UI-laatu 18.10.2026): muoto jaetusta .tn-card-cta:sta, seuran väri säilyy. */
+.tn20 .tnjp-fcard-play { flex: 0 0 auto; --teema-aksentti: color-mix(in srgb, currentColor 75%, #fff); }
 
 /* ── Lohko A: valittu seura + paitaseinä ── */
 .tn20 .tnjp-stage {
@@ -374,12 +371,8 @@
   display: block; font-size: clamp(12px,1.15cqw,14px); line-height: 1.45; color: #B9AF9B;
   text-wrap: pretty; margin-bottom: clamp(9px,1.1cqw,14px);
 }
-.tn20 .tnjp-ecard-foot {
-  display: flex; align-items: center; justify-content: space-between; gap: 12px;
-  font-size: clamp(11px,1cqw,12px); font-weight: 800; letter-spacing: .1em;
-  text-transform: uppercase; color: var(--tn-text-dim);
-}
-.tn20 .tnjp-ecard-q { color: currentColor; }
+/* T2: metarivi .tn-card-meta, kehote .tn-card-cta. */
+.tn20 .tnjp-ecard-foot { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 .tn20 .tnjp-ecard[data-tulossa] { cursor: default; }
 .tn20 .tnjp-ecard[data-tulossa] img { opacity: .45; }
 .tn20 .tnjp-ecard[data-tulossa] .tnjp-ecard-name { color: #B9AF9B; }

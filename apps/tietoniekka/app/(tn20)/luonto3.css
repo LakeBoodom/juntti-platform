@@ -80,6 +80,8 @@
 .tn20 .tnl3-muoto-kuvaus { font-size: 15px; line-height: 1.45; color: var(--l3-muted); }
 .tn20 .tnl3-lm { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 800; letter-spacing: 0.16em; text-transform: uppercase; color: #E8A320; }
 .tn20 .tnl3-lm svg { width: 14px; height: 14px; flex: none; }
+/* T2 (18.10.2026): muotokorttien kehote on jaettu .tn-card-cta; nuoli jää vain Lasten visat -linkkiin. */
+.tn20 .tnl3-muoto .tn-card-cta { flex: none; --teema-aksentti: var(--l3-vihrea); }
 .tn20 .tnl3-nuoli {
   flex: none; width: 44px; height: 44px; border-radius: 50%; border: 1px solid #3F6B4E;
   display: flex; align-items: center; justify-content: center; color: var(--l3-vihrea); font-size: 18px;
@@ -211,6 +213,7 @@
   .tn20 .tnl3-muoto-ala { padding: 12px 12px 14px; }
   .tn20 .tnl3-muoto-teksti { gap: 5px; }
   .tn20 .tnl3-muoto-kuvaus, .tn20 .tnl3-nuoli { display: none; }
+  .tn20 .tnl3-muoto .tn-card-cta { align-self: flex-end; }
   .tn20 .tnl3-muoto--aani .tnl3-muoto-media { aspect-ratio: auto; height: 140px; }
   .tn20 .tnl3-nayte { left: 12px; top: calc(140px - 56px); }
   .tn20 .tnl3-muoto--aani .tnl3-muoto-ala { align-items: center; padding: 14px 16px 16px; }

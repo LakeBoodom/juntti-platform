@@ -137,6 +137,9 @@
   font-size: min(19px, calc(100cqw / (var(--vl-lw, 10) * 0.82))); text-wrap: balance; overflow-wrap: normal; word-break: keep-all;
 }
 .tn20 .vl-kortti-meta { font-size: 13px; font-weight: 600; color: var(--vl-muted); }
+/* T2 (UI-laatu 18.10.2026): jaettu korttikehote kortin aksenttivärillä, kortin alalaidassa. */
+.tn20 .vl-kortti .tn-card-cta { --teema-aksentti: var(--vl-acc); margin-top: auto; padding-top: 4px; }
+.tn20 .vl-kortti-teksti { flex: 1; }
 
 /* Kumpi? (rekisteristä) */
 .tn20 .vl-kumpi {

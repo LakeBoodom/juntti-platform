@@ -190,7 +190,7 @@ export default async function MegavisatLanding() {
                   <span className="tnm2-card-desc">{card.desc}</span>
                   <span className="tnm2-card-foot">
                     <span className="tnm2-card-duration">{megaDuration(count)} · yksi istunto</span>
-                    <span className="tnm2-card-cta">Aloita →</span>
+                    <span className="tnm2-card-cta tn-card-cta">Pelaa →</span>
                   </span>
                 </span>
               </a>

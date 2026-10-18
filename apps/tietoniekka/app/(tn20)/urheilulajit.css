@@ -127,11 +127,8 @@
   text-transform: uppercase; white-space: nowrap; max-width: calc(100% - 22px);
   overflow: hidden; text-overflow: ellipsis;
 }
-.tn20 .tnu-start {
-  font-family: var(--tn-font-display); font-weight: 900; font-variation-settings: "wdth" 76;
-  font-size: clamp(11px,1.1cqw,14px); text-transform: uppercase; letter-spacing: .04em;
-  color: color-mix(in srgb, currentColor 75%, #fff); white-space: nowrap;
-}
+/* T2 (UI-laatu 18.10.2026): muoto jaetusta .tn-card-cta:sta, lajin väri säilyy. */
+.tn20 .tnu-start { --teema-aksentti: color-mix(in srgb, currentColor 75%, #fff); white-space: nowrap; }
 
 /* Overlay-kortti (21/9 lead, 4/5, 16/9, portit): kaikki teksti kuvan päällä */
 .tn20 .tnu-ocard {

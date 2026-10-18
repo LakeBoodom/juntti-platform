@@ -229,7 +229,7 @@
   display: flex; align-items: center; justify-content: space-between; gap: 10px;
 }
 .tn20 .tnm2-card-duration { font-size: clamp(12px,1.05cqw,13px); font-weight: 700; color: #8E8676; }
-.tn20 .tnm2-card-cta { font-size: clamp(12px,1.2cqw,15px); font-weight: 800; color: #E8A320; white-space: nowrap; }
+.tn20 .tnm2-card-cta { --teema-aksentti: #E8A320; } /* T2: muoto .tn-card-cta:sta */
 
 /* ── Näin mega toimii ── */
 .tn20 .tnm2-rules {

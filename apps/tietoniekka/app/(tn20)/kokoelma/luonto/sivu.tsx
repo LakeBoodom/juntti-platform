@@ -230,7 +230,7 @@ export default async function LuontoLanding({
                       <span className="tnl3-muoto-otsikko">{nostoKuva.otsikko}</span>
                       <span className="tnl3-muoto-kuvaus">{nostoKuva.kuvaus}</span>
                     </span>
-                    <span className="tnl3-nuoli" aria-hidden="true">→</span>
+                    <span className="tn-card-cta">Pelaa →</span>
                   </span>
                 </a>
               )}
@@ -250,7 +250,7 @@ export default async function LuontoLanding({
                       </span>
                       <span className="tnl3-muoto-otsikko">{pickOtsikko}</span>
                     </span>
-                    <span className="tnl3-nuoli" aria-hidden="true">→</span>
+                    <span className="tn-card-cta">Pelaa →</span>
                   </span>
                 </a>
               )}

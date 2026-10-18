@@ -100,6 +100,7 @@ function VisaKortti({ v, puoli }: { v: VaalitVisa; puoli: string }) {
           {v.otsikko}
         </span>
         <span className="vl-kortti-meta">{v.koti ? `Visa · ${v.koti}-kokoelmasta` : v.meta}</span>
+        <span className="tn-card-cta">Pelaa →</span>
       </span>
     </a>
   );
@@ -151,6 +152,7 @@ export default async function VaalitHub() {
             {p.otsikko}
           </span>
           <span className="vl-kortti-meta">{p.meta}</span>
+          <span className="tn-card-cta">Pelaa →</span>
         </span>
       </a>
     );

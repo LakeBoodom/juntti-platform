@@ -50,7 +50,7 @@ const playHref = (c: Card) =>
 
 function CardMeta({ c }: { c: Card }) {
   return (
-    <span className="tnk-cardmeta">
+    <span className="tnk-cardmeta tn-card-meta">
       {c.question_count} kysymystä
     </span>
   );
@@ -163,7 +163,7 @@ export default async function KulttuuriLanding({
                     <span className="tnk-cardtitle">{c.display_title ?? c.title}</span>
                     <CardMeta c={c} />
                     {c.teaser && <span className="tnk-cardteaser">{c.teaser}</span>}
-                    <span className="tnk-arrow" aria-hidden>→</span>
+                    <span className="tn-card-cta">Pelaa →</span>
                   </span>
                 </a>
               ))}
@@ -184,7 +184,7 @@ export default async function KulttuuriLanding({
                 <span className="tnk-cardtitle">{pick.display_title ?? pick.title}</span>
                 <CardMeta c={pick} />
               </span>
-              <span className="tnk-arrow" aria-hidden>→</span>
+              <span className="tn-card-cta">Pelaa →</span>
             </a>
           </section>
         )}
@@ -212,7 +212,7 @@ export default async function KulttuuriLanding({
                     <span className="tnk-cardtitle">{c.display_title ?? c.title}</span>
                     <CardMeta c={c} />
                     {c.teaser && <span className="tnk-cardteaser">{c.teaser}</span>}
-                    <span className="tnk-arrow" aria-hidden>→</span>
+                    <span className="tn-card-cta">Pelaa →</span>
                   </span>
                 </a>
               ))}

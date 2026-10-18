@@ -227,7 +227,7 @@
 }
 .tn20 .ju-ryhma-rivi span:first-child { text-wrap: pretty; }
 .tn20 .ju-ryhma-rivi:hover { color: #b6ff3c; }
-.tn20 .ju-ryhma-pelaa { flex: none; font-size: 13px; font-weight: 700; color: #b6ff3c; }
+.tn20 .ju-ryhma-pelaa { flex: none; } /* T2: muoto .tn-card-cta:sta */
 
 /* Mobiili: laskurin laatat jakavat rivin tasan */
 @container (max-width: 520px) {

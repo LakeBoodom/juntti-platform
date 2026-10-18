@@ -81,11 +81,7 @@ function Kortti({
           <span className="tnt-card-name">{nimi}</span>
           <span className="tnt-card-hook">{hook}</span>
         </span>
-        {nuoli && (
-          <span className="tnt-card-arrow" aria-hidden>
-            <i>→</i>
-          </span>
-        )}
+        {nuoli && <span className="tn-card-cta">Pelaa →</span>}
       </span>
     </a>
   );

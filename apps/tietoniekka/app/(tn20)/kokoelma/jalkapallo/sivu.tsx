@@ -94,8 +94,8 @@ function ThemeCard({ c, playHref, variant }: { c: JpCard; playHref: string | nul
       <span className="tnjp-ecard-body">
         <span className="tnjp-ecard-hook">{c.desc}</span>
         <span className="tnjp-ecard-foot">
-          <span>10 kys.</span>
-          <span className="tnjp-ecard-q">{playHref ? "Pelaa →" : "Tulossa"}</span>
+          <span className="tn-card-meta">10 kys.</span>
+          <span className={playHref ? "tnjp-ecard-q tn-card-cta" : "tnjp-ecard-q tn-card-meta"}>{playHref ? "Pelaa →" : "Tulossa"}</span>
         </span>
       </span>
     </span>
@@ -228,7 +228,7 @@ export default async function JalkapalloLanding({
                   </span>
                   <span className="tnjp-fcard-body">
                     <span className="tnjp-fcard-desc">{f.desc}</span>
-                    <span className="tnjp-fcard-play">Pelaa →</span>
+                    <span className="tnjp-fcard-play tn-card-cta">Pelaa →</span>
                   </span>
                 </span>
               </a>

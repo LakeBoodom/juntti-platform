@@ -139,7 +139,7 @@ export default async function MaantietoLanding() {
                   <span className="tnt-pick-body">
                     <span className="tnt-pick-title">{c.display_title ?? c.title}</span>
                     <span className="tnt-pick-desc">{descFor(c)}</span>
-                    <span className="tnt-pick-arrow" aria-hidden="true">→</span>
+                    <span className="tn-card-cta">Pelaa →</span>
                   </span>
                 </a>
               ))}

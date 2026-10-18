@@ -178,18 +178,9 @@
 .tn20 .tnt-grid--start .tnt-card-name { font-size: clamp(14px, 1.45cqw, 20px); line-height: 1.05; }
 .tn20 .tnt-card-hook { font-size: clamp(12px, 1.05cqw, 13px); line-height: 1.45; color: #8e9cba; text-wrap: pretty; }
 .tn20 .tnt-grid--start .tnt-card-hook { font-size: clamp(12px, 1.1cqw, 14px); color: #93a1be; }
-.tn20 .tnt-card-arrow {
-  margin-top: auto; padding-top: clamp(10px, 1.1cqw, 14px);
-  display: flex; align-items: center; justify-content: flex-end;
-}
-.tn20 .tnt-grid--start .tnt-card-arrow { margin-top: 0; padding-top: 0; flex: none; }
-.tn20 .tnt-card-arrow i {
-  width: clamp(28px, 3cqw, 38px); height: clamp(28px, 3cqw, 38px); border-radius: 999px;
-  border: 1px solid var(--tnt-accent); display: flex; align-items: center; justify-content: center;
-  color: var(--tnt-accent); font-style: normal; font-size: clamp(13px, 1.4cqw, 17px); line-height: 1;
-  transition: background 160ms, color 160ms;
-}
-.tn20 .tnt-card:hover .tnt-card-arrow i { background: var(--tnt-accent); color: #060b18; }
+/* T2 (UI-laatu 18.10.2026): nuolirengas → jaettu .tn-card-cta tieteen aksenttivärillä. */
+.tn20 .tnt-card .tn-card-cta { --teema-aksentti: var(--tnt-accent); margin-top: auto; padding-top: clamp(10px, 1.1cqw, 14px); align-self: flex-end; }
+.tn20 .tnt-grid--start .tnt-card .tn-card-cta { margin-top: 0; padding-top: 0; flex: none; align-self: center; }
 
 /* ── Nostettu visa ──────────────────────────────────────────────────── */
 .tn20 .tnt-featured {
@@ -223,7 +214,7 @@
 }
 .tn20 .tnt-featured-text { font-size: clamp(12px, 1.3cqw, 17px); line-height: 1.5; color: #aebbd4; max-width: 52ch; text-wrap: pretty; }
 .tn20 .tnt-featured-meta {
-  font-size: clamp(11px, 1cqw, 12px); font-weight: 800; letter-spacing: .1em;
+  font-size: 12px; font-weight: 800; letter-spacing: .1em;
   text-transform: uppercase; color: #8291b0;
 }
 

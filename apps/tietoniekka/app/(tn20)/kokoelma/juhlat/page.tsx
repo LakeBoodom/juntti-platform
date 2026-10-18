@@ -369,13 +369,13 @@ export default async function JuhlatSivu({ searchParams }: { searchParams: Promi
                   {g.visat.map((s) => (
                     <a key={s} className="ju-ryhma-rivi" href={visaHref(s)}>
                       <span>{nimi(s)}</span>
-                      <span className="ju-ryhma-pelaa">Pelaa →</span>
+                      <span className="ju-ryhma-pelaa tn-card-cta">Pelaa →</span>
                     </a>
                   ))}
                   {g.lapset.map((v) => (
                     <a key={v.slug} className="ju-ryhma-rivi" href={visaHref(v.slug)}>
                       <span className="ju-ryhma-lapset"><IkaMerkki ika={v.ika} /> {v.otsikko}</span>
-                      <span className="ju-ryhma-pelaa">Pelaa →</span>
+                      <span className="ju-ryhma-pelaa tn-card-cta">Pelaa →</span>
                     </a>
                   ))}
                 </div>

@@ -83,7 +83,7 @@ function VisaKortti({
       <span className="tnu-scard-body">
         <span className="tnu-scard-sub">{v.sub}</span>
         <span className="tnu-scard-foot">
-          <span className="tnu-start">{playHref ? "Aloita visa →" : "Tulossa"}</span>
+          <span className={playHref ? "tnu-start tn-card-cta" : "tnu-start tn-card-meta"}>{playHref ? "Pelaa →" : "Tulossa"}</span>
         </span>
       </span>
     </span>
@@ -102,7 +102,7 @@ function VisaKortti({
         <span className="tnu-ocard-sub">{v.sub}</span>
         <span className="tnu-ocard-foot">
           <span />
-          <span className="tnu-start">{playHref ? "Aloita visa →" : "Tulossa"}</span>
+          <span className={playHref ? "tnu-start tn-card-cta" : "tnu-start tn-card-meta"}>{playHref ? "Pelaa →" : "Tulossa"}</span>
         </span>
       </span>
     </span>

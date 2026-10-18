@@ -253,7 +253,7 @@ function PersonBrowserInner({ people }: { people: BrowserPerson[] }) {
                   <div className="tn-personlist-name">{p.name}</div>
                   {p.role && <div className="tn-personlist-role">{p.role}</div>}
                 </div>
-                <span className="tn-personlist-cta">Pelaa →</span>
+                <span className="tn-personlist-cta tn-card-cta">Pelaa →</span>
               </a>
             ))}
           </div>

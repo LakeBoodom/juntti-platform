@@ -148,7 +148,7 @@ export default function HistoriaClient({ data }: { data: HistoriaData }) {
                         <a key={q.id} className="tnh-quiz" href={q.href} data-played={played.has(q.id) || undefined}>
                           <Dot on={played.has(q.id)} />
                           <span className="tnh-quiz-title">{q.title}</span>
-                          <span className="tnh-quiz-meta">{q.questions} kysymystä</span>
+                          <span className="tnh-quiz-meta tn-card-meta">{q.questions} kysymystä</span>
                         </a>
                       ))}
                     </div>
@@ -190,7 +190,7 @@ export default function HistoriaClient({ data }: { data: HistoriaData }) {
                 <a key={t.id} className="tnh-theme" href={t.href} data-played={played.has(t.id) || undefined}>
                   <small>{t.tag ?? "Teema"}</small>
                   <b>{t.title}</b>
-                  <span className="tnh-quiz-meta"><Dot on={played.has(t.id)} /> {t.questions} kysymystä</span>
+                  <span className="tnh-quiz-meta tn-card-meta"><Dot on={played.has(t.id)} /> {t.questions} kysymystä</span>
                 </a>
               ))}
             </div>
