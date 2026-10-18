@@ -1,7 +1,7 @@
 // VAALIT JA POLITIIKKA -hub (Claude Design 5.10.2026 + katselmus, toteutusbrief "hubin uusi järjestys" 5.10.).
-// Järjestys: hero + vaalilaskuri → Eduskuntavaalit-visat → Pelit (päivän peli, Laita järjestykseen,
-// vaalipiirikartta) → Suomen politiikan historia → Vallan kasvot (puoluejohtajat, pääministerit, presidentit)
-// → johdanto. Periaate: eduskuntavaalien kokoelma, ei Tunnetut henkilöt -sivun jatko-osa.
+// Järjestys (Heikki 18.10.2026): hero + vaalilaskuri → Eduskuntavaalit-visat → Suomen politiikan historia
+// → Vallan kasvot (puoluejohtajat, pääministerit, presidentit) → Pelit (päivän peli, Laita järjestykseen,
+// vaalipiirikartta) → johdanto. Periaate: eduskuntavaalien kokoelma, ei Tunnetut henkilöt -sivun jatko-osa.
 // Pelirivit ja niiden mode-chipit renderöidään vain lib/pelirekisteri.ts:n perusteella — kun peli julkaistaan, rivi ilmestyy ilman hubin muutosta.
 // Kaikki luvut kannasta (lib/vaalit/data.ts). ISR 1 h (vaalilaskuri päivittyy päivittäin).
 // Staattinen segmentti ohittaa dynaamisen [collection]-reitin.
@@ -119,10 +119,10 @@ export default async function VaalitHub() {
 
   const modet = [
     ...(d.omatVisat.length ? [{ nimi: "Eduskuntavaalit", meta: `${d.omatVisat.length} visaa`, href: "#visat" }] : []),
-    ...(peleja ? [{ nimi: "Pelit", meta: `${peleja} ${peleja === 1 ? "peli" : "peliä"}`, href: "#pelit" }] : []),
-    ...(vaalipiireja ? [{ nimi: "Vaalipiirit", meta: String(vaalipiireja), href: "#vaalipiirit" }] : []),
     ...(d.ristiinVisat.length ? [{ nimi: "Politiikan historia", meta: `${d.ristiinVisat.length} visaa`, href: "#historia" }] : []),
     ...(d.kasvot.length ? [{ nimi: "Vallan kasvot", meta: "", href: "#kasvot" }] : []),
+    ...(peleja ? [{ nimi: "Pelit", meta: `${peleja} ${peleja === 1 ? "peli" : "peliä"}`, href: "#pelit" }] : []),
+    ...(vaalipiireja ? [{ nimi: "Vaalipiirit", meta: String(vaalipiireja), href: "#vaalipiirit" }] : []),
   ];
 
   const pakkaKortti = (p: KokoelmaPeli, i: number) => {
@@ -251,57 +251,6 @@ export default async function VaalitHub() {
           </section>
         )}
 
-        {pelitOsio && (
-          <section id="pelit" aria-labelledby="vl-pelit-h" className="vl-pelit">
-            <div className="vl-osio-head">
-              <h2 id="vl-pelit-h" className="vl-h2">Pelit</h2>
-            </div>
-            {paivanPelit.map((p) =>
-              p.slug === "vaalipiiriketju" ? (
-                <VpkHubKortti key={p.href} href={p.href} otsikko={p.otsikko} meta={p.meta} numero={p.numero?.(helsinginPaiva().iso) ?? 1} />
-              ) : (
-                <a key={p.href} className="vl-paivan-kortti" href={p.href}>
-                  <span className="vl-tagi vl-tagi--vahva">Päivän peli{p.numero ? ` · #${p.numero(helsinginPaiva().iso)}` : ""}</span>
-                  <span className="vl-paivan-otsikko">{p.otsikko}</span>
-                  <span className="vl-kortti-meta">{p.meta}</span>
-                  <span className="vl-cta">Pelaa</span>
-                </a>
-              ),
-            )}
-            {pakat.length > 0 && (
-              <div id="jarjestys" className="vl-alaosio">
-                {/* Heikki 18.10.2026: nosto kertoo pelimuodon kasvoketjulla kuten etusivun "Kuka on vanhin?". */}
-                <KasvoketjuBanneri
-                  id="vl-jarj-h"
-                  luokka="eb--jarj"
-                  taso="h3"
-                  tagi="Pelimuoto"
-                  meta={`${pakat.length} pakkaa`}
-                  otsikko={["Laita", "järjestykseen"]}
-                  subKapea={<>Kahdeksan nimeä, yksi oikea järjestys<span className="eb-vain-mob"> · 2&nbsp;min</span></>}
-                  subDesk={<>Kahdeksan nimeä, yksi oikea järjestys.<br />Valitse pakka alta · 2&nbsp;min</>}
-                  href={(pakat.find((p) => p.slug === "presidentit") ?? pakat[0]).href}
-                  cta="Aloita presidenteistä"
-                  henkilot={KETJU}
-                  kierros={8}
-                  lisaa="nimeä"
-                  akseli={["Ensimmäinen", "Viimeisin"]}
-                />
-                <div className="vl-rivi">{pakat.map(pakkaKortti)}</div>
-              </div>
-            )}
-            {vaalipiireja > 0 && (
-              <div id="vaalipiirit" className="vl-alaosio">
-                <div className="vl-ryhma-head">
-                  <h3>{vaalipiireja} vaalipiiriä</h3>
-                  <span>Eduskunnan 200 paikkaa jaetaan vaalipiirien kesken Suomen kansalaisten määrän mukaan. Ahvenanmaa valitsee aina yhden edustajan.</span>
-                </div>
-                <VaalipiiriKartta mode="selaa" rivit={d.vaalipiirit} />
-              </div>
-            )}
-          </section>
-        )}
-
         {d.ristiinVisat.length > 0 && (
           <section id="historia" aria-labelledby="vl-hist-h">
             <div className="vl-osio-head">
@@ -358,6 +307,57 @@ export default async function VaalitHub() {
             <a className="vl-kaikki" href="/henkilot/poliitikot">
               Lisää poliitikkoja Tunnetut henkilöt -kokoelmassa →
             </a>
+          </section>
+        )}
+
+        {pelitOsio && (
+          <section id="pelit" aria-labelledby="vl-pelit-h" className="vl-pelit">
+            <div className="vl-osio-head">
+              <h2 id="vl-pelit-h" className="vl-h2">Pelit</h2>
+            </div>
+            {paivanPelit.map((p) =>
+              p.slug === "vaalipiiriketju" ? (
+                <VpkHubKortti key={p.href} href={p.href} otsikko={p.otsikko} meta={p.meta} numero={p.numero?.(helsinginPaiva().iso) ?? 1} />
+              ) : (
+                <a key={p.href} className="vl-paivan-kortti" href={p.href}>
+                  <span className="vl-tagi vl-tagi--vahva">Päivän peli{p.numero ? ` · #${p.numero(helsinginPaiva().iso)}` : ""}</span>
+                  <span className="vl-paivan-otsikko">{p.otsikko}</span>
+                  <span className="vl-kortti-meta">{p.meta}</span>
+                  <span className="vl-cta">Pelaa</span>
+                </a>
+              ),
+            )}
+            {pakat.length > 0 && (
+              <div id="jarjestys" className="vl-alaosio">
+                {/* Heikki 18.10.2026: nosto kertoo pelimuodon kasvoketjulla kuten etusivun "Kuka on vanhin?". */}
+                <KasvoketjuBanneri
+                  id="vl-jarj-h"
+                  luokka="eb--jarj"
+                  taso="h3"
+                  tagi="Pelimuoto"
+                  meta={`${pakat.length} pakkaa`}
+                  otsikko={["Laita", "järjestykseen"]}
+                  subKapea={<>Kahdeksan nimeä, yksi oikea järjestys<span className="eb-vain-mob"> · 2&nbsp;min</span></>}
+                  subDesk={<>Kahdeksan nimeä, yksi oikea järjestys.<br />Valitse pakka alta · 2&nbsp;min</>}
+                  href={(pakat.find((p) => p.slug === "presidentit") ?? pakat[0]).href}
+                  cta="Aloita presidenteistä"
+                  henkilot={KETJU}
+                  kierros={8}
+                  lisaa="nimeä"
+                  akseli={["Ensimmäinen", "Viimeisin"]}
+                />
+                <div className="vl-rivi">{pakat.map(pakkaKortti)}</div>
+              </div>
+            )}
+            {vaalipiireja > 0 && (
+              <div id="vaalipiirit" className="vl-alaosio">
+                <div className="vl-ryhma-head">
+                  <h3>{vaalipiireja} vaalipiiriä</h3>
+                  <span>Eduskunnan 200 paikkaa jaetaan vaalipiirien kesken Suomen kansalaisten määrän mukaan. Ahvenanmaa valitsee aina yhden edustajan.</span>
+                </div>
+                <VaalipiiriKartta mode="selaa" rivit={d.vaalipiirit} />
+              </div>
+            )}
           </section>
         )}
 
