@@ -213,7 +213,10 @@
   .tn20 .tnl3-muoto-ala { padding: 12px 12px 14px; }
   .tn20 .tnl3-muoto-teksti { gap: 5px; }
   .tn20 .tnl3-muoto-kuvaus, .tn20 .tnl3-nuoli { display: none; }
-  .tn20 .tnl3-muoto .tn-card-cta { align-self: flex-end; }
+  /* Korjaus 19.10.2026: kehote vei mobiilissa vaakatilan (tekstipalsta 17 px @320) → kehote tekstin alle. */
+  .tn20 .tnl3-muoto:not(.tnl3-muoto--aani) .tnl3-muoto-ala { flex-direction: column; align-items: flex-start; gap: 8px; }
+  .tn20 .tnl3-muoto-teksti { align-self: stretch; }
+  .tn20 .tnl3-muoto .tn-card-cta { align-self: flex-start; }
   .tn20 .tnl3-muoto--aani .tnl3-muoto-media { aspect-ratio: auto; height: 140px; }
   .tn20 .tnl3-nayte { left: 12px; top: calc(140px - 56px); }
   .tn20 .tnl3-muoto--aani .tnl3-muoto-ala { align-items: center; padding: 14px 16px 16px; }
