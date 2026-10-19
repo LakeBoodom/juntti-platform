@@ -97,38 +97,6 @@ export function MobiiliOsioOtsikko(p: { eyebrow: string; count?: string; title: 
   );
 }
 
-/** Alakokoelmat yksipalstaisena listana (Jalkapallon malli) — ei orpoa solua. */
-export function MobiiliLista(p: {
-  accent: string;
-  eyebrow: string;
-  count?: string;
-  title: string;
-  rows: Array<{ kicker?: string; name: string; meta?: string; href: string; color?: string }>;
-  children?: ReactNode;
-  /** Ankkuri PaluuOsioihin-linkeille (19.10.2026). */
-  id?: string;
-}) {
-  return (
-    <section className="tnms-first tn-paluu-kohde" id={p.id} style={{ "--tnms-acc": p.accent } as CSSProperties}>
-      <MobiiliOsioOtsikko eyebrow={p.eyebrow} count={p.count} title={p.title} />
-      <ul className="tnms-list">
-        {p.rows.map((r) => (
-          <li key={r.href + r.name}>
-            <a href={r.href}>
-              <span className="tnms-list-main">
-                {r.kicker && <span className="tnms-list-kicker" style={r.color ? { color: r.color } : undefined}>{r.kicker}</span>}
-                <span className="tnms-list-name">{r.name}</span>
-              </span>
-              {r.meta && <span className="tnms-list-meta">{r.meta}</span>}
-            </a>
-          </li>
-        ))}
-      </ul>
-      {p.children}
-    </section>
-  );
-}
-
 /** Edistymismittari (Historia, Suomen kaupungit) — yksi komponentti, ei painiketta. */
 export function MobiiliEdistyminen(p: { label: string; pct: number; lines: string[] }) {
   const pct = Math.max(0, Math.min(100, Math.round(p.pct)));

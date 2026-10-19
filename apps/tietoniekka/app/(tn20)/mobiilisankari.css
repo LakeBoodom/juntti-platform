@@ -12,8 +12,7 @@
 
   /* Yksi tekstilinja: murupolku, sankari, osiot ja kortit samasta reunasta. */
   .tn20 .tn-shell,
-  .tn20 .tnl-shell,
-  .tn20 .tnt-shell { padding-left: var(--page-x); padding-right: var(--page-x); }
+  .tn20 .tnl-shell { padding-left: var(--page-x); padding-right: var(--page-x); }
 
   /* ── Sankari ── */
   .tn20 .tnms {
@@ -107,17 +106,6 @@
     text-transform: uppercase; color: #F5F0E6; margin: 12px 0 0;
   }
   .tn20 .tnms-sechead-note { margin: 8px 0 0; font-size: 15px; line-height: 1.45; color: #C9C3B6; }
-  .tn20 .tnms-list { list-style: none; margin: 12px 0 0; padding: 0; border-top: 1px solid #2A2720; }
-  .tn20 .tnms-list li { border-bottom: 1px solid #2A2720; }
-  .tn20 .tnms-list a {
-    display: flex; align-items: center; justify-content: space-between; gap: 16px;
-    min-height: 64px; padding: 10px 0; text-decoration: none; color: inherit;
-  }
-  .tn20 .tnms-list-main { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
-  .tn20 .tnms-list-kicker { font-size: 11px; font-weight: 800; letter-spacing: 0.16em; text-transform: uppercase; color: var(--tnms-acc); }
-  .tn20 .tnms-list-name { font-family: var(--tn-font-display); font-size: 19px; font-weight: 800; line-height: 1.1; color: #F5F0E6; }
-  .tn20 .tnms-list-meta { flex: 0 1 45%; text-align: right; font-size: 13px; line-height: 1.35; color: #A39B8A; }
-  .tn20 .tnms-list a:active .tnms-list-name { color: var(--tnms-acc); }
 }
 
 @media (max-width: 768px) and (min-width: 414px) {
@@ -138,7 +126,6 @@
   /* Sankarin ja ensimmäisen osion väli on aina 32 px (sankarin alareuna + hiusviiva):
      sivujen omat yläreunukset oli mitoitettu vanhan sankarin perään. */
   .tn20 .tnms + .tn-shell { padding-top: 0 !important; }
-  .tn20 .tnms + .tnt-hero + .tn-shell > .tnt-section:first-child { padding-top: 0; }
   .tn20 .tnk2-herowrap.tnms-desk + .tn-shell { padding-top: 0; }
   .tn20 .tnms + .tn-hero + .tn-shell > .tn-section:first-child { padding-top: 0 !important; }
   .tn20 .tnms + .tn-shell > .tnh-eranav { padding-top: 0; }

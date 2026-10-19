@@ -655,26 +655,6 @@
 }
 .tn20 .tn-cta-lime:hover, .tn20 a:hover .tn-cta-lime { background: #cbff6e; }
 
-/* Kokoelmasivujen jaettu korttikehote (UI-laatu 18.10.2026, T2). Kortti itse on linkki; tämä on
-   visuaalinen vihje (<span>), ei erillinen linkki. Teksti aina "Pelaa →". Teemaväri muuttujasta
-   --teema-aksentti (aseta kortin omaan sääntöön), oletuksena lime. Ei taustaa, ei pilleriä —
-   lime-pilleri (.tn-cta-lime) on vain sivun yhdelle ensisijaiselle toiminnolle. */
-/* Paluulinkki osiovalintaan pitkillä teemasivuilla (kierros 2, 19.10.2026): components/tn20/PaluuOsioihin.tsx. */
-.tn20 .tn-paluu { display: flex; justify-content: flex-end; margin: clamp(18px, 2.2cqw, 30px) 0 0; }
-.tn20 .tn-paluu a {
-  display: inline-flex; align-items: center; gap: 6px; min-height: 44px; padding: 0 16px; border-radius: 999px;
-  border: 1px solid var(--tn-line); color: var(--tn-text-soft); font-size: 13px; font-weight: 700; text-decoration: none;
-  transition: border-color var(--dur-fast) var(--ease-standard);
-}
-.tn20 .tn-paluu a:hover { border-color: var(--tn-text-muted); }
-.tn20 .tn-paluu a:focus-visible { outline: 2px solid var(--tn-lime); outline-offset: 2px; }
-.tn20 .tn-paluu-desk { display: none !important; }
-@media (min-width: 769px) {
-  .tn20 .tn-paluu-mob { display: none !important; }
-  .tn20 .tn-paluu-desk { display: inline-flex !important; }
-}
-.tn20 .tn-paluu-kohde { scroll-margin-top: 76px; }
-
 .tn20 .tn-card-cta {
   display: inline-flex; align-items: center; font-size: 13px; font-weight: 700; line-height: 1.2;
   text-transform: uppercase; letter-spacing: .06em; white-space: nowrap;
@@ -1895,51 +1875,6 @@
 @media (prefers-reduced-motion: reduce) {
   .tn20 .tnm-nosto, .tn20 .tnm-card, .tn20 .tnm-cta { transition: none; }
   .tn20 .tnm-nosto:hover, .tn20 .tnm-card:hover { transform: none; }
-}
-
-/* ═══════════ .tnt-POHJA — alun perin Maantieto-landing (CD 15.8.2026) ═══════════
-   Maantieto siirtyi kokoelmarungolle 19.10.2026; jäljellä olevat säännöt käyttää Tiede
-   (tiede.css rakentaa näiden päälle), kunnes sekin siirtyy. Petrooli + teal: sivun pohja #04141A, pinnat #08222A, reunat #17414E,
-   aksentti #46D6C8 (vain otsikoissa/koristeissa) — lime edelleen ainoa
-   toimintaväri (värikuri kuten Kulttuurissa ja Luonnossa). */
-
-.tn20 .tnt { background: #04141A; color: var(--tn-text); }
-.tn20 .tnt-section { padding-top: clamp(28px, 4cqw, 64px); }
-.tn20 .tnt-h2 {
-  font-family: var(--tn-font-display); font-weight: 900; text-transform: uppercase;
-  font-size: clamp(20px, 2.6cqw, 34px); letter-spacing: -0.01em; margin: 0 0 clamp(14px, 1.8cqw, 22px);
-}
-
-/* Hero */
-.tn20 .tnt-hero {
-  display: grid; background: #072027;
-  border-bottom: 1px solid #17414E;
-}
-@container (min-width: 860px) { .tn20 .tnt-hero { grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); } }
-.tn20 .tnt-chip { color: #B3CBD1; font-size: 14px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; }
-.tn20 .tnt-chip b { color: var(--tn-text); }
-
-/* Pelaa myös nämä — kuvakorttiruudukko */
-.tn20 .tnt-grid { display: grid; gap: clamp(12px, 1.5cqw, 20px); }
-@container (min-width: 640px) { .tn20 .tnt-grid { grid-template-columns: 1fr 1fr 1fr; } }
-@container (min-width: 1100px) { .tn20 .tnt-grid { grid-template-columns: repeat(5, 1fr); } }
-.tn20 .tnt-card {
-  display: flex; flex-direction: column; overflow: hidden; text-decoration: none; color: inherit;
-  background: #08222A; border: 1px solid #17414E; border-radius: 14px;
-  transition: border-color 0.16s, transform 0.16s;
-}
-@media (hover: hover) and (pointer: fine) {
-  .tn20 .tnt-card:hover { border-color: #46D6C8; transform: translateY(-3px); }
-  .tn20 .tnt-card:hover img { transform: scale(1.04); }
-}
-.tn20 .tnt-card-media { position: relative; display: block; aspect-ratio: 16 / 10; overflow: hidden; }
-.tn20 .tnt-card-media img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.25s; }
-.tn20 .tnt-card-body { display: grid; gap: 5px; padding: clamp(11px, 1.2cqw, 15px); }
-
-@media (prefers-reduced-motion: reduce) {
-  .tn20 .tnt-card, .tn20 .tnt-card-media img { transition: none; }
-  .tn20 .tnt-card:hover { transform: none; }
-  .tn20 .tnt-card:hover img { transform: none; }
 }
 
 /* ══════════ TUNNETUT HENKILÖT — "Selaa kaikkia" -selain (.tn-personbrowser) ══════════
