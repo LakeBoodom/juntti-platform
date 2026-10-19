@@ -51,11 +51,29 @@ type Rivi = {
  *  Safari ei katkaise yhdysmerkistä, kun otsikossa on word-break: keep-all (Heikki 19.10.2026:
  *  "HÄMÄHÄKKIMIES-ELOKUVAT" leikkautui iPhonessa). Koko lasketaan pisinSana:lla yhdysmerkin osista. */
 /*  Vain yhdyssanan sisällä (kirjain ennen viivaa): "Uuno Turhapuro -elokuvat" ei saa jättää viivaa rivin loppuun. */
-export const katko = (t: string) => t.replace(/(?<=\p{L})-(?=\p{L})/gu, "-\u200B");
+/*  Yli TAVUTUSRAJA-kirjaimiset sanat saavat tavuviivamahdollisuudet (U+00AD, tavuta) — muuten koko kutistui
+    alle 11 px:n ("ulkomaalaisvahvistukset" 320 px:n kortissa, 19.10.2026). */
+export const katko = (t: string) =>
+  t.replace(/(?<=\p{L})-(?=\p{L})/gu, "-\u200B").replace(new RegExp(`\\p{L}{${TAVUTUSRAJA + 1},}`, "gu"), tavuta);
 
-/** Pisin sana (kirjaimia) — KORTTISÄÄNTÖ-koon laskentaan. Yhdysmerkki erottaa osat (katko). */
+/** Sanat, joita pidemmät tavutetaan; KORTTISÄÄNTÖ-koko lasketaan enintään tämän mittaisesta sanasta. */
+export const TAVUTUSRAJA = 14;
+const VOKAALI = /[aeiouyäöå]/i;
+/** Suomen tavusääntö (yksinkertaistettu): tavuraja konsonantin eteen, kun konsonanttia seuraa vokaali
+ *  ("ul-ko-maa-lais-vah-vis-tuk-set"). Vähintään 3 kirjainta tavuviivan kummallekin puolelle. */
+export function tavuta(sana: string): string {
+  const k = [...sana];
+  let out = "";
+  k.forEach((c, i) => {
+    const raja = i >= 3 && k.length - i >= 3 && !VOKAALI.test(c) && VOKAALI.test(k[i + 1] ?? "") && /\p{L}/u.test(c);
+    out += (raja ? "\u00AD" : "") + c;
+  });
+  return out;
+}
+
+/** Pisin sana (kirjaimia, enintään TAVUTUSRAJA) — KORTTISÄÄNTÖ-koon laskentaan. Yhdysmerkki erottaa osat. */
 export const pisinSana = (t: string) =>
-  Math.max(4, ...t.split(/[\s–—-]+/).map((w) => w.replace(/[^\p{L}\d]/gu, "").length));
+  Math.min(TAVUTUSRAJA, Math.max(4, ...t.split(/[\s–—-]+/).map((w) => w.replace(/[^\p{L}\d]/gu, "").length)));
 
 export async function haeRunkoData(k: Kokoelma): Promise<RunkoData | null> {
   const sb = getSupabase();
