@@ -83,7 +83,7 @@ export default function KokoelmaRunko({ d, tunnusosa, jalkiosa }: { d: RunkoData
   const monta = d.pelit.length > 3;
 
   return (
-    <main className={`rk ${runkoCond.variable}`} data-runko style={{ "--teema-aksentti": k.accent, "--rk-acc": k.accent } as CSSProperties}>
+    <main className={`rk ${runkoCond.variable}`} data-runko style={{ "--rk-acc": k.accent } as CSSProperties}>
       <KokoelmaLd avain={k.slug} nimi={k.nimi} polku={`/kokoelma/${k.slug}`} />
       <Crumbs items={[{ label: "Kokoelmat", href: "/kokoelmat" }, { label: k.nimi }]} />
 

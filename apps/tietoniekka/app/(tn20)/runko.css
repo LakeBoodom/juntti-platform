@@ -16,6 +16,9 @@
   --rk-x: clamp(20px, 4vw, 48px);
   --rk-max: calc(1184px + 2 * var(--rk-x));
   --rk-vali: clamp(40px, 3.9vw, 56px);
+  /* Korttikehotteen (.tn-card-cta, 13 px) teemaväri vaalennettuna: Musiikin violetti #A855F7 jäi korttipinnalla
+     4,33:1:een (vaatimus 4,5:1); 85 % + valkoinen → 5,4:1. Sama kaikille kokoelmille (DESIGN_SYSTEM.md). */
+  --teema-aksentti: color-mix(in srgb, var(--rk-acc) 85%, #fff);
   --rk-bg: #131109;
   --rk-ink: #f5f0e6;
   --rk-soft: #cfc7b6;
