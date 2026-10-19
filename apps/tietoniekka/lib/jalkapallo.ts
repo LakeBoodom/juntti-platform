@@ -1,15 +1,7 @@
-// TIETONIEKKA 2.0 — JALKAPALLO-TEEMASIVUN sisältökonfiguraatio
-// (CD "TN Jalkapallo -teemasivu" 25.8.2026, design_handoff_jalkapallo_teemasivu).
-// Yhdeksäs teemasivu. Kaikki tekstit (hookit, kuvaukset, otsikot) ovat CD:n
-// designcopya README:n ja design_ref-datataulukoiden mukaan — tarkistetaan
-// copy/SEO-passissa. Kausisidonnainen badge JP_KAUSI:ssa.
-// Kuvat: public/20/jalkapallo/<id>.webp — puretttu CD:n handover-paketin
-// web-optimoiduista kuvista (max 900px, hero 1600px, README §Assets).
-
-export const JP_KAUSI = {
-  /** Heron pillerin teksti — päivitetään kausittain. */
-  badge: "Kausipaketti 2026–27",
-};
+// JALKAPALLO — visalistat ja kuvat (CD "TN Jalkapallo -teemasivu" 25.8.2026). Kokoelmasivu on rungolla
+// 19.10.2026 alkaen (lib/kokoelmat/jalkapallo.ts); paitaseinä, suurseurojen maasuodatin ja "Pinnalla nyt"
+// poistettiin. Listat ovat yhä kuvien, visamäärien (kokoelmaMaarat) ja pelinäkymän lähde.
+// Kuvat: public/20/jalkapallo/<id>.webp (max 900 px, hero 1600 px).
 
 export const jpImg = (id: string) => `/20/jalkapallo/${id}.webp`;
 
@@ -21,13 +13,6 @@ export const JP_HERO = {
     "Yli 40 visaa — seurasi historia, legendat ja suomalaiset eurokentillä.",
   ] as const,
 };
-
-/** Osiovalinta heron alareunassa (CD: Lohko A/B/C). */
-export const JP_PARTS = [
-  { kicker: "Lohko A", title: "Valioliiga", meta: "20 seuravisaa + yleisvisat", href: "#valioliiga", color: "#B6FF3C" },
-  { kicker: "Lohko B", title: "Suurseurat", meta: "Espanja, Italia, Saksa, Ranska", href: "#suurseurat", color: "#B6FF3C" },
-  { kicker: "Lohko C", title: "Mestarien liiga", meta: "Historia, finaalit, suomalaiset", href: "#mestarienliiga", color: "#E8A320" },
-] as const;
 
 export type JpClub = {
   id: string; quizSlug: string; name: string; short: string; city: string;
@@ -85,19 +70,10 @@ export const JP_EURO: JpEuroClub[] = [
   { id: "benfica", quizSlug: "euroopan-suurseurat-benfica", name: "Benfica", country: "Muu Eurooppa", founded: 1904, stadium: "Estádio da Luz", color: "#E8443A", hook: "Lissabonin kotkat, Eusébio ja Estádio da Luzin punainen meri." },
 ];
 
-export const JP_FILTERS = ["Kaikki", "Espanja", "Italia", "Saksa", "Ranska", "Muu Eurooppa"] as const;
-
 export type JpCard = {
   quizSlug: string; tag: string; title: string; desc: string;
   img: string; pos: string; color: string;
 };
-
-/** Pinnalla nyt (CD: showFeatured) — kolme visaa, kolme liigaa. */
-export const JP_FEATURED = [
-  { quizSlug: "arsenal-fc-legendat", league: "Valioliiga", title: "Arsenal", desc: "Invincibles, Wenger ja Tykkimiesten vuosikymmenet.", img: jpImg("arsenal"), pos: "center 45%", color: "#EF0107" },
-  { quizSlug: "euroopan-suurseurat-bayern-munchen", league: "Bundesliiga", title: "Bayern München", desc: "Allianz Arena ja Saksan pysyvä mestari.", img: jpImg("bayern"), pos: "center 40%", color: "#E2231A" },
-  { quizSlug: "euroopan-suurseurat-real-madrid", league: "La Liga", title: "Real Madrid", desc: "Bernabéu, valkoinen paita ja Euroopan ennätykset.", img: jpImg("realmadrid"), pos: "center 45%", color: "#E8A320" },
-] as const;
 
 /** Valioliigan yleisvisat (4, pystykortit 4/5). */
 export const JP_PL_GENERAL: JpCard[] = [
@@ -129,6 +105,12 @@ export const JP_FINNS: JpCard[] = [
 /** Päivän visa -kortin kuvahaku (etusivu): jalkapallovisan quiz-slug → kuva.
     Sama periaate kuin teemakohtaiset <teema>Img-funktiot, mutta avaimena on
     quiz-slug koska kuvatiedostot on nimetty design-id:n mukaan. */
+const QUIZ_POS = new Map<string, string>(
+  [...JP_PL_GENERAL, ...JP_CL, ...JP_FINNS].map((c) => [c.quizSlug, c.pos] as const),
+);
+/** Kokoelmasivun (runko) korttikuvan rajauskohta. */
+export const jalkapalloQuizPos = (slug: string) => QUIZ_POS.get(slug);
+
 const QUIZ_IMG = new Map<string, string>([
   ...JP_CLUBS.map((c) => [c.quizSlug, jpImg(c.id)] as const),
   ...JP_EURO.map((c) => [c.quizSlug, jpImg(c.id)] as const),
