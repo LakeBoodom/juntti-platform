@@ -1,29 +1,9 @@
-// JÄÄKIEKKO — teemasivun data ja kuratointi (CD "TN Jaakiekko -teemasivu"
-// 22.8.2026, design_handoff_jaakiekko/README.md). Kahdeksas teemasivu; ainoa
-// jossa on interaktiivinen komponentti (Suomi-kaukalokartta, KiekkoKartta.tsx).
-//
-// - Kartan koordinaatit ovat design/teams.json-tiedostosta VERBATIM — niitä
-//   EI pyöristetä eikä lasketa uudelleen (README 1a; sidottu jk-suomi-kaukalo-
-//   kuvan tarkkaan rajaukseen 1050×1498).
-// - Koukut, badget ja korttien copy referenssistä sanasta sanaan. CD:n
-//   huomautus: mitään faktaväittämiä (mestaruusmäärät, vuosiluvut, nimet) EI
-//   ole faktatarkistettu → tarkistetaan copy/SEO-passissa, ei korjata itse.
-// - quizSlug kytkee kortin kantaan: kortti on pelattava kun slugia vastaava
-//   JULKAISTU visa löytyy, muuten "Tulossa"-tila (README luku 3). Kartta ja
-//   paitaseinä näyttävät aina kaikki 17 seuraa. TPS:llä ja Lukolla ei ole
-//   vielä visaa kannassa (22.8.) → quizSlug silti valmiina odottamassa? EI —
-//   niille null kunnes Heikki luo visat (slug ei ole tiedossa etukäteen).
-
-/** ── KAUSICONFIG — kaikki kauden vaihtuessa päivittyvä yhdessä paikassa ── */
-export const JK_KAUSI = {
-  /** Heron tilamerkki */
-  statusPill: "Kausipaketti 2026–27",
-  /** Kartan oletosvalinta: hallitseva mestari (README 1c — ei kovakoodata indeksiä) */
-  defaultTeamId: "tappara",
-};
+// JÄÄKIEKKO — visalistat ja kuvat (CD "TN Jaakiekko -teemasivu" 22.8.2026). Kokoelmasivu on rungolla
+// 19.10.2026 alkaen (lib/kokoelmat/jaakiekko.ts); kaukalokartta ja paitaseinä poistettiin (Heikki 19.10.:
+// kartat pois kokoelmasivuilta). Listat ovat yhä kuvien, visamäärien (kokoelmaMaarat) ja etusivun lähde.
+// - JkTeam-rivien kartta- ja korttikentät (x/y, hook, badge) ovat entisen sivun dataa; niitä ei enää näytetä.
 
 export const JK_ACCENT = "#4FD1F5";
-export const JK_ACCENT_LIGHT = "#8FE4FB";
 
 export const JK_HERO = {
   img: "/20/jaakiekko/jk-hero-arena.webp",
@@ -31,31 +11,6 @@ export const JK_HERO = {
   intro:
     "Liiga, leijonat, legendat ja tarunhohtoinen NHL. Testaa tietosi Suomen suosituimmasta lajista.",
 };
-
-export const JK_PERIODS = [
-  { kicker: "1. erä", title: "Liiga", meta: "Seurat, legendat, historialliset saavutukset", href: "#liiga" },
-  { kicker: "2. erä", title: "Leijonat", meta: "MM, olympialaiset, nuorten MM", href: "#leijonat" },
-  { kicker: "3. erä", title: "NHL", meta: "Suomalaiset NHL:ssä", href: "#nhl" },
-];
-
-export const JK_COPY = {
-  liigaTitle: "Pelaa seuravisa",
-  liigaIntro: "Suomi on yksi iso kaukalo. Etsi joukkueesi kartalta tai paitaseinältä.",
-  mapFootnote: (n: number) =>
-    `Kaukalo on Suomen kartta: siniviivat, punainen keskiviiva ja ${n} seuraa kotikaupungeissaan. Napauta palloa tai nimeä — pallon koko kertoo kaikkien aikojen SM-kullat.`,
-  derbyTitle: "Derbyvisat",
-  generalKicker: "Jatkoerä",
-  generalTitle: "Liigan kohokohdat",
-  generalIntro: "Seurarajat ylittävät klassikot: maalivahdit, maalitykit, kovanaamat, tuomarit ja penkin takana kiehuvat valmentajat.",
-  lionsTitle: "Leijonien kultavisat",
-  lionsIntro: "Kaikki Leijonien kultamitalit: viisi MM-kultaa, olympiavoitto ja kolme nuorten maailmanmestaruutta.",
-  nhlTitle: "Suomen NHL historia",
-  nhlIntro: "Kolme visaa suomalaisista NHL:ssä — pioneereista ennätyksiin ja unohtuneisiin tilastotarinoihin.",
-};
-
-/** Kartan pohjakuva — 1050×1498, läpinäkyvä, EI rajattu (koordinaatisto sidottu tähän). */
-export const JK_MAP_IMG = "/20/jaakiekko/jk-suomi-kaukalo.webp";
-export const JK_MAP_RATIO = "1050 / 1498";
 
 export type JkTeam = {
   id: string;
@@ -214,6 +169,10 @@ export function jkTeamImg(id: string): string {
     quiz-slug → sivun kuvakortti. Kattaa seuravisat (paitakuvat) ja kaikki
     korttiruudukot. Sama periaate kuin jalkapalloQuizImg — avaimena
     quiz-slug, koska kuvatiedostot on nimetty design-id:n mukaan. */
+const QUIZ_POS = new Map<string, string>(
+  [...JK_DERBIES, ...JK_GENERAL, ...JK_LIONS, ...JK_NHL].filter((c) => c.quizSlug && c.pos).map((c) => [c.quizSlug!, c.pos!] as const),
+);
+
 const QUIZ_IMG = new Map<string, string>([
   ...JK_TEAMS.filter((t) => t.quizSlug).map((t) => [t.quizSlug!, jkTeamImg(t.id)] as const),
   ...[...JK_DERBIES, ...JK_GENERAL, ...JK_LIONS, ...JK_NHL]
@@ -224,3 +183,10 @@ const QUIZ_IMG = new Map<string, string>([
 export function jaakiekkoQuizImg(slug: string | null | undefined): string | null {
   return slug ? QUIZ_IMG.get(slug) ?? null : null;
 }
+
+/** Kokoelmasivun (runko) korttikuva: 800 px kopio (public/20/jaakiekko/k/, 19.10.2026) — alkuperäiset
+    1600 px valokuvat jäävät pelinäkymälle ja etusivulle. */
+export function jaakiekkoQuizImgKortti(slug: string | null | undefined): string | null {
+  return jaakiekkoQuizImg(slug)?.replace("/20/jaakiekko/", "/20/jaakiekko/k/") ?? null;
+}
+export const jaakiekkoQuizPos = (slug: string) => QUIZ_POS.get(slug);

@@ -2094,22 +2094,6 @@
   color: var(--tn-lime); font-family: inherit; font-size: 14px; font-weight: 800;
 }
 
-/* ─── Kuvakrediitti (12.9.2026) ───────────────────────────────────────────
-   Vapaasti lisensoidut valokuvat vaativat tekijämaininnan (CC BY / CC BY-SA).
-   Pienikokoinen rivi kokoelmasivun lopussa; tekijäluettelo /kuvien-lahteet. */
-.tn20 .tne-kuvakrediitti {
-  margin: clamp(28px,3.4cqw,48px) 0 0;
-  font-size: 13px;
-  line-height: 1.5;
-  color: rgba(255,255,255,0.5); /* T4 18.10.2026: .42 = 4,09:1 → .5 ≈ 5,1:1 */
-}
-.tn20 .tne-kuvakrediitti a {
-  color: rgba(255,255,255,0.62);
-  text-decoration: underline;
-  text-underline-offset: 2px;
-}
-.tn20 .tne-kuvakrediitti a:hover { color: #fff; }
-
 /* ── Lasten visojen ikämerkki (vaihe 5, 10.10.2026; components/tn20/IkaMerkki.tsx) ──
    Tummalla pinnalla cream-pilleri, lasten pinnoilla navy + kulta (design-päätökset). */
 .tn20 .tn-ikamerkki {
@@ -2120,10 +2104,6 @@
 .tn20 .tn-ikamerkki[data-pinta="lapset"] { background: #0F1520; color: #F5BC45; }
 .tn20 .tn-ikamerkki[data-pinta="lapset"][data-ika="8-12"] { background: #E8A320; color: #0F1520; }
 .tn20 .tn-ikamerkki--kulma { position: absolute; left: 10px; bottom: 10px; z-index: 2; box-shadow: 0 2px 8px rgba(0, 0, 0, .35); }
-
-/* ── Kosketuskohteet (UI-laatu K2 14.10.2026): ≥ 44 px osuma-alue. Pienille tekstilinkeille pystytäyte +
-   negatiivinen marginaali (asettelu ei muutu), napeille min-height, karttapisteille ::before-alue. ── */
-.tn20 .tne-kuvakrediitti a { padding-block: 14px; margin-block: -14px; }
 .tn20 .tn-chipnav a { min-height: 44px; }
 .tn20 .tnh-toggle button { min-height: 44px; }
 .tn20 .tn-morelink { display: inline-block; padding-block: 13.5px; margin-block: -13.5px; }
