@@ -50,6 +50,10 @@ export type Kokoelma = {
   haku: { collection?: string; category?: string; sectionTags?: boolean };
   /** Korttikuva visan slugista; oletuksena quizzes.hero_image. */
   korttikuva?: (slug: string) => string | null;
+  /** Korttikuvan object-position visan slugista (esim. "center 40%"); oletuksena keskitetty. */
+  korttikuvaPos?: (slug: string) => string | undefined;
+  /** Kuvakrediittirivi sivun loppuun (CC BY / CC BY-SA -valokuvat), linkki /kuvien-lahteet. */
+  kuvakrediitti?: string;
   /** Kortin metarivi (vuosi, maa, aihe). Kysymysmäärä lisätään automaattisesti vain, jos ≠ 10. */
   metarivi?: (v: { genre: string | null; subcollection: string | null; category: string | null }) => string;
 };

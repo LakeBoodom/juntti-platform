@@ -112,6 +112,10 @@
 .tn20 .rk-chip:hover { border-color: #8e8676; }
 .tn20 .rk-chip span { font-size: 13px; font-weight: 600; color: var(--rk-muted); }
 
+/* Kuvakrediitti (CC BY / CC BY-SA -valokuvat) V6:n jälkeen, ennen V7:ää — erillinen rivi, ei kuvan päällä. */
+.tn20 .rk-krediitti { max-width: var(--rk-max); margin: 0 auto; padding: 28px var(--rk-x) 0; box-sizing: border-box; font-size: 12px; line-height: 1.5; color: var(--rk-muted); }
+.tn20 .rk-krediitti a { color: inherit; text-decoration: underline; text-underline-offset: 2px; display: inline-block; padding: 14px 0; margin: -14px 0; }
+
 /* ── V5 Osiot ─────────────────────────────────────────────────────────── */
 .tn20 .rk-osio, .tn20 .rk-pelit, .tn20 .rk-lisaa {
   display: flex; flex-direction: column; gap: 14px; max-width: var(--rk-max); margin: 0 auto; padding: var(--rk-vali) var(--rk-x) 0;

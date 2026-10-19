@@ -80,9 +80,11 @@ export async function haeRunkoData(k: Kokoelma): Promise<RunkoData | null> {
       nimi: r.display_title ?? r.title,
       href: visaHref(r),
       kuva,
-      kuvaPos: r.hero_image && !k.korttikuva?.(r.slug ?? "") && r.hero_focal_x != null
-        ? `${Math.round(Number(r.hero_focal_x) * 100)}% ${Math.round(Number(r.hero_focal_y ?? 0.5) * 100)}%`
-        : undefined,
+      kuvaPos: r.slug && k.korttikuva?.(r.slug)
+        ? k.korttikuvaPos?.(r.slug)
+        : r.hero_image && r.hero_focal_x != null
+          ? `${Math.round(Number(r.hero_focal_x) * 100)}% ${Math.round(Number(r.hero_focal_y ?? 0.5) * 100)}%`
+          : undefined,
       meta: metaOsat.filter(Boolean).join(" · "),
       playCount: r.play_count ?? 0,
     };

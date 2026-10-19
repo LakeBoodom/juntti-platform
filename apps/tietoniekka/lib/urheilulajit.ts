@@ -1,15 +1,7 @@
-// TIETONIEKKA 2.0 — URHEILUN TEEMASIVUN lohkomalli (CD "TN Urheilu
-// -teemasivu" 26.8.2026, design_handoff_urheilu_teemasivu/README.md).
-// Sivu on urheilun "muut lajit" -kokoelma: jääkiekolla ja jalkapallolla on
-// omat teemasivut — tänne vain porttikortit, EI niiden visoja (README:n
-// kielto). README:n tärkein vaatimus on LAAJENNETTAVUUS: uusi lohko tai visa
-// lisätään TÄHÄN tiedostoon (ei sivukoodiin) — kirjain ("Lohko F"), tausta
-// (parillinen tumma), kicker-väri (viimeinen oranssi) ja visamäärät ovat
-// järjestyksen funktioita jotka sivu johtaa itse. Ei lohkokohtaista
-// erikoiskoodia: Lohko A:n pääkortti on layout: "lead", ei F1-erikoisuus.
-// card_ratio on rajattu enum; uuden lohkon suhde valitaan niin että se EROAA
-// naapureistaan (toimituksellinen rytmisääntö, README §Laajennettavuus).
-// Kaikki tekstit ovat CD:n designcopya — tarkistetaan copy/SEO-passissa.
+// URHEILU — lajivisojen kuvat ja rajaukset (CD "TN Urheilu -teemasivu" 26.8.2026). Sivu on rungolla
+// 19.10.2026 alkaen (lib/kokoelmat/urheilu.ts); osiot tulevat section_tags-tagista (f1, ralli, golf,
+// tennis, urheiluhistoria). UL_LOHKOT säilyy kuvien ja rajausten lähteenä (kokoelmasivu, etusivun
+// Päivän visa, pelinäkymä); lohkojen tekstikentät eivät enää näy sivulla.
 
 export const ulImg = (id: string) => `/20/urheilulajit/${id}.webp`;
 
@@ -106,24 +98,16 @@ export const UL_LOHKOT: UlLohko[] = [
   },
 ];
 
-/** Omat teemasivut -porttikortit (README: portteja, EI visalistoja —
-    eivät koskaan avaudu paikan päällä eivätkä näytä yksittäisiä visoja). */
-export const UL_GATES = [
-  { title: "Jääkiekko", desc: "Liigajoukkueet, Leijonat ja suomalaiset NHL:ssä. Kokonainen teemasivu omalla rakenteellaan.", href: "/kokoelma/jaakiekko", img: ulImg("gate-hockey"), pos: "center 40%", color: "#4FD1F5" },
-  { title: "Jalkapallo", desc: "Valioliiga, Euroopan suurseurat ja Mestarien liiga. Yli 40 visaa omalla teemasivullaan.", href: "/kokoelma/jalkapallo", img: ulImg("gate-football"), pos: "center 38%", color: "#B6FF3C" },
-] as const;
-
-/** Johdetut arvot (README §Laajennettavuus — ei koskaan kovakoodata):
-    kirjain, tausta ja kicker-väri ovat lohkon PAIKAN funktioita. */
-export const ulKicker = (index: number) => `Lohko ${"ABCDEFGHIJ"[index] ?? "?"}`;
-export const ulDark = (index: number) => index % 2 === 1;
-export const ulKickerColor = (index: number, count: number) =>
-  index === count - 1 ? "#E8A320" : "#B6FF3C";
-
 /** Päivän visa -kortin kuvahaku (etusivu): lajivisan quiz-slug → kuva. */
 const QUIZ_IMG = new Map<string, string>(
   UL_LOHKOT.flatMap((l) => l.visat.map((v) => [v.quizSlug, v.img] as const)),
 );
+const QUIZ_POS = new Map<string, string>(
+  UL_LOHKOT.flatMap((l) => l.visat.map((v) => [v.quizSlug, v.pos] as const)),
+);
+
+/** Kokoelmasivun (runko) korttikuvan rajauskohta. */
+export const urheilulajitQuizPos = (slug: string) => QUIZ_POS.get(slug);
 
 export function urheilulajitQuizImg(slug: string | null | undefined): string | null {
   return slug ? QUIZ_IMG.get(slug) ?? null : null;
