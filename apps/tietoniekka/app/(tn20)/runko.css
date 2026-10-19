@@ -10,8 +10,11 @@
    ============================================================ */
 
 .tn20 .rk {
-  --rk-x: clamp(20px, 5vw, 72px);
-  --rk-max: calc(1296px + 2 * var(--rk-x));
+  /* Poikkeama CD:stä (72 px / 1296 px): runko tasataan sivuston yläpalkin ja murupolun linjaan
+     (.tn-shell 1280 px, sivureuna enintään 48 px → sisältö 1184 px), muuten 1440 px:ssä olisi kaksi
+     eri vasenta reunaa (128 / 72 px). Mobiilissa CD:n 20 px. */
+  --rk-x: clamp(20px, 4vw, 48px);
+  --rk-max: calc(1184px + 2 * var(--rk-x));
   --rk-vali: clamp(40px, 3.9vw, 56px);
   --rk-bg: #131109;
   --rk-ink: #f5f0e6;
@@ -60,7 +63,7 @@
   .tn20 .rk-hero { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); min-height: 500px; max-width: 1440px; margin: 0 auto; }
   .tn20 .rk-hero-kuva { order: 2; height: auto; }
   .tn20 .rk-hero-kuva::after { background: linear-gradient(90deg, var(--rk-bg) 0%, rgba(19, 17, 9, 0) 40%), linear-gradient(to top, var(--rk-bg) 0%, rgba(19, 17, 9, 0) 30%); }
-  .tn20 .rk-hero-teksti { order: 1; justify-content: center; gap: 16px; margin: 0; padding: 56px 40px 48px var(--rk-x); }
+  .tn20 .rk-hero-teksti { order: 1; justify-content: center; gap: 16px; margin: 0; padding: 56px 40px 48px max(var(--rk-x), calc((min(100vw, 1440px) - 1184px) / 2)); }
   .tn20 .rk-eyebrow { font-size: 16px; letter-spacing: .2em; }
   .tn20 .rk-h1 { --rk-katto: 80px; line-height: .88; letter-spacing: -.01em; }
   .tn20 .rk-h1[data-lyhyt] { --rk-katto: 128px; }
