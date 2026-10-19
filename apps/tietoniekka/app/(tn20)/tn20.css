@@ -659,6 +659,22 @@
    visuaalinen vihje (<span>), ei erillinen linkki. Teksti aina "Pelaa →". Teemaväri muuttujasta
    --teema-aksentti (aseta kortin omaan sääntöön), oletuksena lime. Ei taustaa, ei pilleriä —
    lime-pilleri (.tn-cta-lime) on vain sivun yhdelle ensisijaiselle toiminnolle. */
+/* Paluulinkki osiovalintaan pitkillä teemasivuilla (kierros 2, 19.10.2026): components/tn20/PaluuOsioihin.tsx. */
+.tn20 .tn-paluu { display: flex; justify-content: flex-end; margin: clamp(18px, 2.2cqw, 30px) 0 0; }
+.tn20 .tn-paluu a {
+  display: inline-flex; align-items: center; gap: 6px; min-height: 44px; padding: 0 16px; border-radius: 999px;
+  border: 1px solid var(--tn-line); color: var(--tn-text-soft); font-size: 13px; font-weight: 700; text-decoration: none;
+  transition: border-color var(--dur-fast) var(--ease-standard);
+}
+.tn20 .tn-paluu a:hover { border-color: var(--tn-text-muted); }
+.tn20 .tn-paluu a:focus-visible { outline: 2px solid var(--tn-lime); outline-offset: 2px; }
+.tn20 .tn-paluu-desk { display: none !important; }
+@media (min-width: 769px) {
+  .tn20 .tn-paluu-mob { display: none !important; }
+  .tn20 .tn-paluu-desk { display: inline-flex !important; }
+}
+.tn20 .tn-paluu-kohde { scroll-margin-top: 76px; }
+
 .tn20 .tn-card-cta {
   display: inline-flex; align-items: center; font-size: 13px; font-weight: 700; line-height: 1.2;
   text-transform: uppercase; letter-spacing: .06em; white-space: nowrap;

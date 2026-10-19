@@ -19,6 +19,8 @@ import type { Metadata } from "next";
 import { getSupabase } from "@/lib/supabase";
 import Crumbs from "@/components/tn20/Crumbs";
 import { MobiiliLista, MobiiliSankari } from "@/components/tn20/MobiiliSankari";
+import { PaluuOsioihin } from "@/components/tn20/PaluuOsioihin";
+
 import {
   TIEDE_ALOITA, TIEDE_ALOITA_KICKER, TIEDE_BANNERI, TIEDE_FOOTNOTE, TIEDE_HERO, TIEDE_KATEGORIA,
   TIEDE_NOSTO, TIEDE_SECTIONS, tiedeImg,
@@ -133,6 +135,7 @@ export default async function TiedeLanding() {
         eyebrow="Kategoriat"
         count={`${sections.length} ryhmää`}
         title="Valitse ala"
+        id="alat-mob"
         rows={sections.map((s) => ({ name: s.title, meta: `${s.cards.length} visaa`, href: `#${s.id}` }))}
       />
       <div className="tnt-shell">
@@ -161,7 +164,7 @@ export default async function TiedeLanding() {
           </section>
 
           {/* ─── Aihepiirichipit ─── */}
-          <nav className="tnt-chips tnms-desk" aria-label="Aihepiirit">
+          <nav className="tnt-chips tnms-desk tn-paluu-kohde" id="alat" aria-label="Aihepiirit">
             {sections.map((s) => (
               <a key={s.id} className="tnt-chip" href={`#${s.id}`}>
                 {s.title}<b>{s.cards.length}</b>
@@ -201,6 +204,7 @@ export default async function TiedeLanding() {
                     return <Kortti key={c.id} card={c} nimi={t.nimi} hook={t.koukku} />;
                   })}
                 </div>
+                <PaluuOsioihin label="Alat" mobId="alat-mob" deskId="alat" />
               </section>
 
               {i === 1 && nosto && (

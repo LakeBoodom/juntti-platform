@@ -30,6 +30,8 @@ import { getSupabase } from "@/lib/supabase";
 import { getPageContent } from "@/lib/pageContent";
 import Crumbs from "@/components/tn20/Crumbs";
 import { MobiiliLista, MobiiliSankari } from "@/components/tn20/MobiiliSankari";
+import { PaluuOsioihin } from "@/components/tn20/PaluuOsioihin";
+
 import JpPaitaseina, { type JpWallClub } from "@/components/tn20/JpPaitaseina";
 import JpSuurseurat, { type JpEuroCard } from "@/components/tn20/JpSuurseurat";
 import {
@@ -173,6 +175,7 @@ export default async function JalkapalloLanding({
         eyebrow="Lohkot"
         count={`${JP_PARTS.length} lohkoa`}
         title="Valitse sarja"
+        id="lohkot-mob"
         rows={JP_PARTS.map((p) => ({ kicker: p.kicker, name: p.title, meta: p.meta, href: p.href, color: p.color }))}
       />
 
@@ -196,7 +199,7 @@ export default async function JalkapalloLanding({
           </p>
         </div>
         <div className="tn-shell">
-          <nav className="tnjp-parts" aria-label="Sivun osiot">
+          <nav className="tnjp-parts tn-paluu-kohde" id="lohkot" aria-label="Sivun osiot">
             {JP_PARTS.map((p) => (
               <a key={p.href} className="tnjp-part" href={p.href} style={{ color: p.color }}>
                 <span className="tnjp-part-kicker">{p.kicker}</span>
@@ -265,6 +268,7 @@ export default async function JalkapalloLanding({
             <ThemeCard key={c.quizSlug} c={c} playHref={hrefFor(bySlug.get(c.quizSlug))} variant="pl" />
           ))}
         </div>
+        <PaluuOsioihin label="Lohkot" mobId="lohkot-mob" deskId="lohkot" />
       </section>
 
       {/* ─── Lohko B — Euroopan suurseurat (tumma vyö) ─── */}
@@ -282,6 +286,7 @@ export default async function JalkapalloLanding({
             </p>
           </div>
           <JpSuurseurat clubs={euroCards} />
+          <PaluuOsioihin label="Lohkot" mobId="lohkot-mob" deskId="lohkot" />
         </div>
       </div>
 
@@ -318,6 +323,7 @@ export default async function JalkapalloLanding({
             ))}
           </div>
         </div>
+        <PaluuOsioihin label="Lohkot" mobId="lohkot-mob" deskId="lohkot" />
       </section>
 
       {/* Alatunniste tulee layoutista (SiteFooter, QA-005 29.8.2026) */}

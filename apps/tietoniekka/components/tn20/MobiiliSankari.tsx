@@ -105,9 +105,11 @@ export function MobiiliLista(p: {
   title: string;
   rows: Array<{ kicker?: string; name: string; meta?: string; href: string; color?: string }>;
   children?: ReactNode;
+  /** Ankkuri PaluuOsioihin-linkeille (19.10.2026). */
+  id?: string;
 }) {
   return (
-    <section className="tnms-first" style={{ "--tnms-acc": p.accent } as CSSProperties}>
+    <section className="tnms-first tn-paluu-kohde" id={p.id} style={{ "--tnms-acc": p.accent } as CSSProperties}>
       <MobiiliOsioOtsikko eyebrow={p.eyebrow} count={p.count} title={p.title} />
       <ul className="tnms-list">
         {p.rows.map((r) => (

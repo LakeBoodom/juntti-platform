@@ -34,6 +34,8 @@ import { getSupabase } from "@/lib/supabase";
 import { getPageContent } from "@/lib/pageContent";
 import Crumbs from "@/components/tn20/Crumbs";
 import { MobiiliLista, MobiiliSankari } from "@/components/tn20/MobiiliSankari";
+import { PaluuOsioihin } from "@/components/tn20/PaluuOsioihin";
+
 import {
   UL_HERO, UL_LOHKOT, UL_GATES, ulKicker, ulDark, ulKickerColor,
   type UlLohko, type UlVisa,
@@ -162,6 +164,7 @@ export default async function UrheiluLanding() {
               <VisaKortti key={v.quizSlug} v={v} ratio={l.ratio} playHref={hrefFor(bySlug.get(v.quizSlug))} />
             ))}
           </div>
+          <PaluuOsioihin label="Lohkot" mobId="lohkot-mob" deskId="lohkot" />
         </div>
       </section>
     );
@@ -186,6 +189,7 @@ export default async function UrheiluLanding() {
         eyebrow="Lohkot"
         count={`${blocks.length} lohkoa`}
         title="Valitse laji"
+        id="lohkot-mob"
         rows={blocks.map(({ l, count }, i) => ({ kicker: ulKicker(i), name: l.navTitle, meta: `${count} visaa`, href: `#${l.slug}`, color: ulKickerColor(i, blocks.length) }))}
       />
 
@@ -208,7 +212,7 @@ export default async function UrheiluLanding() {
           </p>
         </div>
         <div className="tn-shell">
-          <nav className="tnu-parts" aria-label="Lajilohkot">
+          <nav className="tnu-parts tn-paluu-kohde" id="lohkot" aria-label="Lajilohkot">
             {blocks.map(({ l, count }, i) => (
               <a key={l.slug} className="tnu-part" href={`#${l.slug}`} style={{ color: ulKickerColor(i, blocks.length) }}>
                 <span className="tnu-part-kicker">{ulKicker(i)}</span>

@@ -27,6 +27,8 @@ import { getSupabase } from "@/lib/supabase";
 import { getPageContent } from "@/lib/pageContent";
 import Crumbs from "@/components/tn20/Crumbs";
 import { MobiiliLista, MobiiliSankari } from "@/components/tn20/MobiiliSankari";
+import { PaluuOsioihin } from "@/components/tn20/PaluuOsioihin";
+
 import KiekkoKartta, { type KarttaTeam } from "@/components/tn20/KiekkoKartta";
 import {
   JK_KAUSI, JK_HERO, JK_PERIODS, JK_COPY, JK_TEAMS,
@@ -169,6 +171,7 @@ export default async function JaakiekkoLanding() {
         eyebrow="Erät"
         count={`${JK_PERIODS.length} erää`}
         title="Valitse erä"
+        id="erat-mob"
         rows={JK_PERIODS.map((p) => ({ kicker: p.kicker, name: p.title, meta: p.meta, href: p.href }))}
       />
       <div className="tn-shell" style={{ paddingTop: "clamp(14px,2vw,26px)" }}>
@@ -188,7 +191,7 @@ export default async function JaakiekkoLanding() {
             <p className="tnj-lede">{JK_HERO.intro}</p>
           </div>
         </section>
-        <nav className="tnj-score tnms-desk" aria-label="Sivun osiot">
+        <nav className="tnj-score tnms-desk tn-paluu-kohde" id="erat" aria-label="Sivun osiot">
           {JK_PERIODS.map((p) => (
             <a key={p.href} href={p.href}>
               <span className="tnj-score-kicker">{p.kicker}</span>
@@ -222,6 +225,7 @@ export default async function JaakiekkoLanding() {
             <i aria-hidden />
           </div>
           <CardGrid cards={derbies} size="l" />
+          <PaluuOsioihin label="Erät" mobId="erat-mob" deskId="erat" />
         </section>
       </div>
 
@@ -240,6 +244,7 @@ export default async function JaakiekkoLanding() {
             <div className="tnj-general-wrap">
               <CardGrid cards={general} size="s" variant="general" />
             </div>
+            <PaluuOsioihin label="Erät" mobId="erat-mob" deskId="erat" />
           </section>
         </div>
       </div>
@@ -259,6 +264,7 @@ export default async function JaakiekkoLanding() {
           <div className="tnj-lions-wrap">
             <CardGrid cards={lions} size="s" variant="lions" />
           </div>
+          <PaluuOsioihin label="Erät" mobId="erat-mob" deskId="erat" />
         </section>
 
         {/* ─── 3. erä — NHL ─── */}
@@ -272,6 +278,7 @@ export default async function JaakiekkoLanding() {
             <p className="tnj-intro">{JK_COPY.nhlIntro}</p>
           </div>
           <CardGrid cards={nhl} size="l" />
+          <PaluuOsioihin label="Erät" mobId="erat-mob" deskId="erat" />
         </section>
         {/* Kuvakrediitti — seura- ja derbykorttien valokuvat ovat CC BY / CC BY-SA / public domain
             (1.10.2026). Tekijät ja lisenssit listattu sivulla /kuvien-lahteet. Erillinen rivi, ei kuvan päällä. */}
