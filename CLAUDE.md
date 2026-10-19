@@ -158,6 +158,9 @@ sana ei rivity vaan leikkautuu `overflow: hidden`iin.
 4. Mittaus jokaiselle otsikkoselektorille vähintään leveyksillä
    320/390/768/1024/1440/1920/2450 px. "0 ylivuotoa" on osa valmiin
    työn määritelmää.
+   **Lisäksi WebKitillä** (Safarin moottori, Heikki 19.10.2026) leveyksillä 320/375/390/430:
+   `apps/tietoniekka/scripts/korttisaanto-webkit.cjs`. Chromium ei näe Safarin eroja (Safari ei
+   katkaise yhdysmerkistä `keep-all`-otsikoissa → runko lisää U+200B:n renderöinnissä, `katko()`).
 5. `text-wrap: balance` vain yhdessä `overflow-wrap: normal` +
    `word-break: keep-all` kanssa.
 6. Kalibroitu koko dokumentoidaan CSS-kommenttiin (mitattu tarve +
