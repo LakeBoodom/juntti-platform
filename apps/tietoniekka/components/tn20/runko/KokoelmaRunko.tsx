@@ -14,6 +14,7 @@ import RunkoHeroCta from "./RunkoHeroCta";
 import RunkoNaytaKaikki from "./RunkoNaytaKaikki";
 import RunkoMetapeli from "./RunkoMetapeli";
 import { PeliIkoniSvg } from "./PeliIkoni";
+import { runkoCond } from "./runkoFontti";
 
 const metapeliPaalla = () => ["1", "true"].includes(process.env.METAPELI_ENABLED ?? "");
 const esikatselu = () => process.env.VERCEL_ENV !== "production";
@@ -79,7 +80,7 @@ export default function KokoelmaRunko({ d, tunnusosa, jalkiosa }: { d: RunkoData
   const monta = d.pelit.length > 3;
 
   return (
-    <main className="rk" data-runko style={{ "--teema-aksentti": k.accent, "--rk-acc": k.accent } as CSSProperties}>
+    <main className={`rk ${runkoCond.variable}`} data-runko style={{ "--teema-aksentti": k.accent, "--rk-acc": k.accent } as CSSProperties}>
       <KokoelmaLd avain={k.slug} nimi={k.nimi} polku={`/kokoelma/${k.slug}`} />
       <Crumbs items={[{ label: "Kokoelmat", href: "/kokoelmat" }, { label: k.nimi }]} />
 
