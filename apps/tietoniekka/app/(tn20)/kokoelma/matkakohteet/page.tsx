@@ -6,7 +6,6 @@ import "../../runko.css";
 import type { Metadata } from "next";
 import { jakoMeta } from "@/lib/jakoMeta";
 import { getPageContent } from "@/lib/pageContent";
-import { LearnArticle } from "@/components/tn20/LearnArticle";
 import KokoelmaRunko from "@/components/tn20/runko/KokoelmaRunko";
 import { haeRunkoData } from "@/lib/kokoelmat/data";
 import { MATKAKOHTEET } from "@/lib/kokoelmat/matkakohteet";
@@ -26,18 +25,7 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function MaantietoLanding() {
-  const [d, pc] = await Promise.all([haeRunkoData(MATKAKOHTEET), getPageContent("matkakohteet")]);
+  const d = await haeRunkoData(MATKAKOHTEET);
   if (!d) return <main style={{ padding: 32 }}>Ei tietokantayhteyttä.</main>;
-  return (
-    <KokoelmaRunko
-      d={d}
-      jalkiosa={
-        pc?.learn ? (
-          <div className="rk-jalki">
-            <LearnArticle learn={pc.learn} fallbackTitle="Maantieto" accent={MATKAKOHTEET.accent} />
-          </div>
-        ) : null
-      }
-    />
-  );
+  return <KokoelmaRunko d={d} />;
 }

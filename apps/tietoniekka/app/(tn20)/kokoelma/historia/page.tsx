@@ -11,7 +11,6 @@ import { visaHref } from "@/lib/visaHref";
 import type { Metadata } from "next";
 import { getSupabase } from "@/lib/supabase";
 import { getPageContent } from "@/lib/pageContent";
-import { LearnArticle } from "@/components/tn20/LearnArticle";
 import Crumbs from "@/components/tn20/Crumbs";
 import HistoriaClient, { type HistoriaData, type HistoriaCard } from "./HistoriaClient";
 
@@ -64,13 +63,10 @@ export default async function HistoriaPage() {
   const sb = getSupabase();
   if (!sb) return <main style={{ padding: 32 }}>Ei tietokantayhteyttä.</main>;
 
-  const [cardsRes, pc] = await Promise.all([
-    sb.from("quiz_cards" as never)
-      .select("id, slug, custom_slug, title, display_title, teaser, subcollection, question_count")
-      .eq("collection", "historia")
-      .order("published_at", { ascending: true }),
-    getPageContent("historia"),
-  ]);
+  const cardsRes = await sb.from("quiz_cards" as never)
+    .select("id, slug, custom_slug, title, display_title, teaser, subcollection, question_count")
+    .eq("collection", "historia")
+    .order("published_at", { ascending: true });
   const rows = (cardsRes.data ?? []) as unknown as Row[];
 
   const toCard = (r: Row): HistoriaCard => ({
@@ -90,9 +86,6 @@ export default async function HistoriaPage() {
     lapileikkaus: rows.filter((r) => r.subcollection === "lapileikkaus").map(toCard)[0] ?? null,
   };
 
-  const article = pc?.learn ? (
-    <LearnArticle learn={pc.learn} fallbackTitle="Suomen historia" accent="#E8A320" />
-  ) : null;
 
   return (
     <>
@@ -101,7 +94,6 @@ export default async function HistoriaPage() {
       <KokoelmaLd avain="historia" nimi="Historia" polku="/kokoelma/historia" />
       <Crumbs items={[{ label: "Kokoelmat", href: "/kokoelmat" }, { label: "Historia" }]} />
       <HistoriaClient data={data} />
-      {article}
     </>
   );
 }

@@ -20,7 +20,7 @@ export const MATKAKOHTEET: Kokoelma = {
   sections: [
     { slug: "maapallon-ennatykset", eyebrow: "Ääripäät", title: "Maapallon ennätykset", chip: "Ennätykset", featured: "maailman-syrjaisimmat-paikat" },
     { slug: "saa-ja-ilmasto", eyebrow: "Sää", title: "Sää ja ilmasto", featured: "maailman-kylmimmat-kolkat" },
-    { slug: "matkakohteet", eyebrow: "Matkalle", title: "Kaupungit, saaret ja rannikot", chip: "Matkakohteet", featured: "kanariansaaret-tiedatko-tarpeeksi" },
+    { slug: "matkakohteet", eyebrow: "Matkalle", title: "Kaupungit ja saaret", featured: "kanariansaaret-tiedatko-tarpeeksi" },
   ],
   related: ["kaupungit", "luonto", "historia"],
   mastery: { name: kokoelmaKortti("matkakohteet")!.mastery.name, icon: "kompassi" },

@@ -19,7 +19,6 @@ import { PersonBrowser, type BrowserPerson } from "@/components/tn20/PersonBrows
 import { CollectionPageGamePromo } from "@/components/tn20/CollectionPageGamePromo";
 import { WideCard } from "@/components/tn20/WideCard";
 import { MOTIF_PATHS, motifPathFor } from "@/components/tn20/motif-paths";
-import { LearnArticle } from "@/components/tn20/LearnArticle";
 import { ShowMoreGrid } from "@/components/tn20/ShowMoreGrid";
 import Crumbs from "@/components/tn20/Crumbs";
 import { MobiiliSankari } from "@/components/tn20/MobiiliSankari";
@@ -275,12 +274,6 @@ export default async function KokoelmaHub({
   const sb = getSupabase();
   if (!sb) return <main style={{ padding: 32 }}>Ei tietokantayhteyttä.</main>;
 
-  /* Kokoelman oma aiheopas (page_content) — SEO_STRATEGIA.md §5.2 */
-  const pc = await getPageContent(collection);
-  const article = pc?.learn ? (
-    <LearnArticle learn={pc.learn} fallbackTitle={hub.name} accent={hub.accent} />
-  ) : null;
-
   /* ── Tunnetut henkilöt (ennallaan) ── */
   if (hub.source.kind === "person") {
     return <PersonHub hub={hub} />;
@@ -400,7 +393,7 @@ export default async function KokoelmaHub({
   }
 
   return (
-    <HubShell hub={hub} count={cards.length} filter={filter} filters={filters} basePath={basePath} filterGroups={filterGroups} article={article}>
+    <HubShell hub={hub} count={cards.length} filter={filter} filters={filters} basePath={basePath} filterGroups={filterGroups}>
       {rowsOut.map((row) => (
         <section key={row.title} className="tn-section" style={{ paddingTop: 8, paddingBottom: 0 }}>
           <div className="tn-hubrow-head">
@@ -476,14 +469,13 @@ export default async function KokoelmaHub({
 /* ─────────── Kuori: hero + suodattimet ─────────── */
 
 function HubShell({
-  hub, count, filter, filters, basePath, children, article, filterGroups,
+  hub, count, filter, filters, basePath, children, filterGroups,
 }: {
   hub: HubMeta; count: number; filter: string;
   filters: Array<{ key: string; label: string }>; basePath?: string;
   children: React.ReactNode;
   /* Kokoelman oma aiheopas (page_content). Renderöidään palvelimelta
      visalistan alle — SEO_STRATEGIA.md §5.2. */
-  article?: React.ReactNode;
   /* Kokoelman omat suodatinrivit (urheilun laji + sarja, 11.8.2026) —
      kun annettu, geneerinen Pelitapa + Sarja/laji -pari ohitetaan. */
   filterGroups?: Array<{ label: string; items: Array<{ key: string; label: string; href: string; active: boolean }> }>;
@@ -581,7 +573,6 @@ function HubShell({
         </section>
         {children}
       </div>
-      {article}
     </main>
   );
 }

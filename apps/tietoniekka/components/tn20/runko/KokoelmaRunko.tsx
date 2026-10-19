@@ -8,7 +8,7 @@
 import type { CSSProperties, ReactNode } from "react";
 import Crumbs from "@/components/tn20/Crumbs";
 import { KokoelmaLd } from "@/components/tn20/KokoelmaLd";
-import { pisinSana, type RunkoData, type RunkoKortti } from "@/lib/kokoelmat/data";
+import { katko, pisinSana, type RunkoData, type RunkoKortti } from "@/lib/kokoelmat/data";
 import type { RunkoVisa } from "@/lib/kokoelmat/tyypit";
 import RunkoHeroCta from "./RunkoHeroCta";
 import RunkoNaytaKaikki from "./RunkoNaytaKaikki";
@@ -30,7 +30,7 @@ function KorttiB({ v, laaja, eka }: { v: RunkoVisa; laaja: boolean; eka: boolean
       <span className="rk-pelattu" aria-hidden="true">✓</span>
       <span className="rk-b-teksti">
         {v.meta && <span className="tn-card-meta rk-b-meta">{v.meta}</span>}
-        <h3 className="rk-b-nimi">{v.nimi}</h3>
+        <h3 className="rk-b-nimi">{katko(v.nimi)}</h3>
         <span className="tn-card-cta">Pelaa →</span>
       </span>
     </a>
@@ -49,7 +49,7 @@ function KorttiA({ v }: { v: RunkoKortti }) {
         <span className="rk-pelattu" aria-hidden="true">✓</span>
       </span>
       <span className="rk-a-teksti">
-        <h3 className="rk-a-nimi">{v.nimi}</h3>
+        <h3 className="rk-a-nimi">{katko(v.nimi)}</h3>
         {v.meta && <span className="tn-card-meta">{v.meta}</span>}
         <span className="tn-card-cta">Pelaa →</span>
       </span>
@@ -64,7 +64,7 @@ function RiviC({ v }: { v: RunkoKortti }) {
         {/* eslint-disable-next-line @next/next/no-img-element */}
         {v.kuva && <img src={v.kuva} alt="" loading="lazy" width={48} height={48} />}
         <span className="rk-c-teksti">
-          <span className="rk-c-nimi">{v.nimi}</span>
+          <span className="rk-c-nimi">{katko(v.nimi)}</span>
           {v.meta && <span className="tn-card-meta">{v.meta}</span>}
         </span>
         <span className="rk-pelattu" aria-hidden="true">✓</span>
@@ -74,7 +74,7 @@ function RiviC({ v }: { v: RunkoKortti }) {
   );
 }
 
-export default function KokoelmaRunko({ d, tunnusosa, jalkiosa }: { d: RunkoData; tunnusosa?: ReactNode; jalkiosa?: ReactNode }) {
+export default function KokoelmaRunko({ d, tunnusosa }: { d: RunkoData; tunnusosa?: ReactNode }) {
   const { k, osiot } = d;
   const otsikko = `${k.title}${k.highlight ?? ""}`;
   const lyhyt = otsikko.trim().length <= 12;
@@ -105,8 +105,8 @@ export default function KokoelmaRunko({ d, tunnusosa, jalkiosa }: { d: RunkoData
             data-lyhyt={lyhyt || undefined}
             style={{ "--lw": pisinSana(otsikko) } as CSSProperties}
           >
-            {k.title}
-            {k.highlight && <span>{k.highlight}</span>}
+            {katko(k.title)}
+            {k.highlight && <span>{katko(k.highlight)}</span>}
           </h1>
           <p className="rk-ingress">{k.ingress}</p>
           <span className="rk-tilasto">
@@ -156,7 +156,7 @@ export default function KokoelmaRunko({ d, tunnusosa, jalkiosa }: { d: RunkoData
               </div>
             )}
             <div className="rk-osio-otsake">
-              <h2 id={`osio-${o.slug}-h`} className="rk-h2">{o.title}</h2>
+              <h2 id={`osio-${o.slug}-h`} className="rk-h2">{katko(o.title)}</h2>
               <span className="rk-osio-maara" data-osio-maara={o.maara}>{o.maara} visaa</span>
             </div>
             {(o.b || a.length > 0) && (
@@ -198,7 +198,7 @@ export default function KokoelmaRunko({ d, tunnusosa, jalkiosa }: { d: RunkoData
               <a key={p.slug} className="rk-peli" href={p.href} data-yli={i >= 3 || undefined} data-tulossa={p.tila === "tulossa" || undefined}>
                 <span className="rk-peli-ikoni" aria-hidden="true"><PeliIkoniSvg ikoni={p.ikoni} /></span>
                 <span className="rk-peli-teksti">
-                  <span className="rk-peli-nimi">{p.nimi}</span>
+                  <span className="rk-peli-nimi">{katko(p.nimi)}</span>
                   <span className="rk-peli-kuvaus">{p.kuvaus}</span>
                 </span>
                 <span className="tn-card-cta">{p.tila === "tulossa" ? "Tulossa" : "Pelaa →"}</span>
@@ -218,7 +218,7 @@ export default function KokoelmaRunko({ d, tunnusosa, jalkiosa }: { d: RunkoData
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={m.img} alt="" loading="lazy" style={m.pos ? { objectPosition: m.pos } : undefined} />
                 <span className="rk-kokoelma-teksti">
-                  <span className="rk-kokoelma-nimi">{m.nimi}</span>
+                  <span className="rk-kokoelma-nimi">{katko(m.nimi)}</span>
                   <span className="tn-card-meta">{m.maara} visaa</span>
                 </span>
               </a>
@@ -227,7 +227,6 @@ export default function KokoelmaRunko({ d, tunnusosa, jalkiosa }: { d: RunkoData
         </section>
       )}
 
-      {jalkiosa}
     </main>
   );
 }

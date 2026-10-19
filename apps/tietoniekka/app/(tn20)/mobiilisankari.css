@@ -135,16 +135,6 @@
 }
 
 @media (max-width: 768px) {
-  /* Aiheopas (LearnArticle) samaan tekstilinjaan kuin sivun muu sisältö. */
-  .tn20 .tn-learn-in { padding-left: var(--page-x); padding-right: var(--page-x); }
-}
-@media (max-width: 420px) {
-  /* KORTTISÄÄNTÖ: "PÄHKINÄNKUORESSA" (16 merkkiä) mahtuu 360 px:llä vasta ~22 px:n
-     koossa — mitattu 331 px / 28 px, tila 320 px. Koko skaalautuu leveyden mukaan. */
-  .tn20 .tn-learn-title { font-size: clamp(20px, 6.2vw, 28px); }
-}
-
-@media (max-width: 768px) {
   /* Sankarin ja ensimmäisen osion väli on aina 32 px (sankarin alareuna + hiusviiva):
      sivujen omat yläreunukset oli mitoitettu vanhan sankarin perään. */
   .tn20 .tnms + .tn-shell { padding-top: 0 !important; }

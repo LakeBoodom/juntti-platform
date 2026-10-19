@@ -21,7 +21,6 @@ import type { Metadata } from "next";
 import { getSupabase } from "@/lib/supabase";
 import { getSiteId } from "@/lib/queries";
 import { getPageContent } from "@/lib/pageContent";
-import { LearnArticle } from "@/components/tn20/LearnArticle";
 import Crumbs from "@/components/tn20/Crumbs";
 import {
   LUONTO_HERO, LUONTO_SUBS, LUONTO_AIHE_MIN, LUONTO_CURATED, LUONTO_KUVAVISAT, LUONTO_NOSTO_KUVAVISA, luontoImg,
@@ -117,12 +116,11 @@ export default async function LuontoLanding({
   const sb = getSupabase();
   if (!sb) return <main style={{ padding: 32 }}>Ei tietokantayhteyttä.</main>;
 
-  const [cardsRes, pc, kuvavisat, aaniRyhmat] = await Promise.all([
+  const [cardsRes, kuvavisat, aaniRyhmat] = await Promise.all([
     sb.from("quiz_cards" as never)
       .select("id, slug, custom_slug, title, display_title, teaser, subcollection, badge, published_at, target_age")
       .eq("collection", "luonto")
       .order("published_at", { ascending: false }),
-    getPageContent("luonto"),
     haeKuvavisat(),
     julkaistutRyhmat(),
   ]);
@@ -184,9 +182,6 @@ export default async function LuontoLanding({
       }
     : null;
 
-  const article = pc?.learn ? (
-    <LearnArticle learn={pc.learn} fallbackTitle="Luonto" accent="#3FBF7F" />
-  ) : null;
 
   return (
     <main className="tnl tnl3" style={{ minHeight: "100dvh", paddingBottom: 60 }}>
@@ -313,7 +308,6 @@ export default async function LuontoLanding({
           )}
         </section>
       </div>
-      {article}
     </main>
   );
 }

@@ -20,7 +20,7 @@ import { urheiluImg } from "@/lib/urheilu";
 import { maantietoImg } from "@/lib/maantieto";
 import { KAUPUNGIT } from "@/lib/kaupungit";
 import { resolveCollection, COLLECTION_LABEL } from "@/lib/visanKokoelma";
-import { type Learn } from "@/components/tn20/LearnArticle";
+import { type Learn } from "@/lib/learn";
 import GameClient, { type GameQuiz } from "./GameClient";
 import LastenPeli from "./lapset/LastenPeli";
 import { LAPSET_SIVU, haeLastenVisa, haeMuutLastenVisat, lapsetNakyvissa } from "@/lib/lapset/data";
@@ -796,7 +796,7 @@ export default async function Peli20({
       {/* Crawlattavat sisäiset linkit: murupolku + ristiinnostot. Ennen näitä
           sivulla oli vain kaksi sisäistä linkkiä mutta neljä ulkoista
           lähdelinkkiä. (SEO_STRATEGIA.md §13.6) */}
-      <nav className="tn-seo-nav tn-learn-ssr" aria-label="Murupolku">
+      <nav className="tn-seo-nav tn-seo-ssr" aria-label="Murupolku">
         <div className="tn-seo-in">
           <a href="/">Etusivu</a>
           <span aria-hidden="true"> / </span>
@@ -826,7 +826,7 @@ export default async function Peli20({
       />
 
       {relatedRows.length > 0 && (
-        <section className="tn-seo-related tn-learn-ssr">
+        <section className="tn-seo-related tn-seo-ssr">
           <div className="tn-seo-in">
             <h2>Lisää {collectionLabel.toLowerCase()}-visoja</h2>
             <ul>

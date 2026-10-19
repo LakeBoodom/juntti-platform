@@ -5,7 +5,6 @@ import "../../runko.css";
 import type { Metadata } from "next";
 import { jakoMeta } from "@/lib/jakoMeta";
 import { getPageContent } from "@/lib/pageContent";
-import { LearnArticle } from "@/components/tn20/LearnArticle";
 import KokoelmaRunko from "@/components/tn20/runko/KokoelmaRunko";
 import { haeRunkoData } from "@/lib/kokoelmat/data";
 import { TV } from "@/lib/kokoelmat/tv";
@@ -23,18 +22,7 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function TvLanding() {
-  const [d, pc] = await Promise.all([haeRunkoData(TV), getPageContent("tv")]);
+  const d = await haeRunkoData(TV);
   if (!d) return <main style={{ padding: 32 }}>Ei tietokantayhteyttä.</main>;
-  return (
-    <KokoelmaRunko
-      d={d}
-      jalkiosa={
-        pc?.learn ? (
-          <div className="rk-jalki">
-            <LearnArticle learn={pc.learn} fallbackTitle="TV & Suoratoisto" accent={TV.accent} />
-          </div>
-        ) : null
-      }
-    />
-  );
+  return <KokoelmaRunko d={d} />;
 }

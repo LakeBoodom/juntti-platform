@@ -1,7 +1,6 @@
-// Kokoelmahubien ja pelimuotosivujen oma sisältö (page_content-taulu).
-// Sama learn-rakenne kuin quizzes.learn — ks. SEO_STRATEGIA.md §5.2.
+// Kokoelmahubien ja pelimuotosivujen oma sisältö (page_content-taulu): SEO-otsikko ja -kuvaus.
+// learn-sarakkeen aiheopasta ei enää näytetä (Heikki 19.10.2026: ei erillisiä hakukonetekstejä).
 import { getSupabase } from "./supabase";
-import type { Learn } from "@/components/tn20/LearnArticle";
 
 export type PageContent = {
   slug: string;
@@ -9,7 +8,6 @@ export type PageContent = {
   name: string;
   seo_title: string | null;
   seo_description: string | null;
-  learn: Learn | null;
 };
 
 export async function getPageContent(slug: string): Promise<PageContent | null> {
@@ -17,7 +15,7 @@ export async function getPageContent(slug: string): Promise<PageContent | null> 
   if (!sb) return null;
   const { data } = await sb
     .from("page_content" as never)
-    .select("slug, kind, name, seo_title, seo_description, learn")
+    .select("slug, kind, name, seo_title, seo_description")
     .eq("slug", slug)
     .maybeSingle<PageContent>();
   return data ?? null;

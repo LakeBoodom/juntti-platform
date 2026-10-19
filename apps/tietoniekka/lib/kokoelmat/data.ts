@@ -47,7 +47,12 @@ type Rivi = {
   hero_focal_x: number | null; hero_focal_y: number | null; target_age: string | null;
 };
 
-/** Pisin sana (kirjaimia) — KORTTISÄÄNTÖ-koon laskentaan. */
+/** Näkymätön katkaisukohta (U+200B) jokaisen yhdysmerkin jälkeen — vain renderöinnissä, data ennallaan.
+ *  Safari ei katkaise yhdysmerkistä, kun otsikossa on word-break: keep-all (Heikki 19.10.2026:
+ *  "HÄMÄHÄKKIMIES-ELOKUVAT" leikkautui iPhonessa). Koko lasketaan pisinSana:lla yhdysmerkin osista. */
+export const katko = (t: string) => t.replace(/-(?=\S)/g, "-\u200B");
+
+/** Pisin sana (kirjaimia) — KORTTISÄÄNTÖ-koon laskentaan. Yhdysmerkki erottaa osat (katko). */
 export const pisinSana = (t: string) =>
   Math.max(4, ...t.split(/[\s–—-]+/).map((w) => w.replace(/[^\p{L}\d]/gu, "").length));
 

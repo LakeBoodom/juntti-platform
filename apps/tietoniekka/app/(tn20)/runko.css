@@ -57,6 +57,9 @@
 .tn20 .rk-h1 span { color: var(--rk-acc); }
 .tn20 .rk-ingress { margin: 0; max-width: 46ch; font-size: 16px; line-height: 1.5; color: var(--rk-soft); text-wrap: pretty; }
 .tn20 .rk-tilasto { font-size: 14px; font-weight: 600; color: var(--rk-muted); }
+/* Heron napin selite (Heikki 19.10.2026): "Suosituin tässä kokoelmassa" / "Seuraavaksi sinulle" / "Arvottu visa". */
+.tn20 .rk-cta-ryhma { display: flex; flex-direction: column; align-items: flex-start; gap: 8px; }
+.tn20 .rk-cta-selite { font-size: 13px; line-height: 1.3; color: var(--tn-text-muted); }
 .tn20 .rk-cta {
   display: inline-flex; align-items: center; min-height: 52px; max-width: 100%; padding: 10px 24px;
   font-family: var(--rk-cond); font-weight: 800; font-size: 18px; line-height: 1.1; letter-spacing: .02em;
@@ -110,7 +113,7 @@
 .tn20 .rk-chip span { font-size: 13px; font-weight: 600; color: var(--rk-muted); }
 
 /* ── V5 Osiot ─────────────────────────────────────────────────────────── */
-.tn20 .rk-osio, .tn20 .rk-pelit, .tn20 .rk-lisaa, .tn20 .rk-jalki {
+.tn20 .rk-osio, .tn20 .rk-pelit, .tn20 .rk-lisaa {
   display: flex; flex-direction: column; gap: 14px; max-width: var(--rk-max); margin: 0 auto; padding: var(--rk-vali) var(--rk-x) 0;
   scroll-margin-top: 64px;
 }
