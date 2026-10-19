@@ -245,8 +245,8 @@ export default async function LuontoLanding({
                     <span className="tnl3-muoto-teksti">
                       <span className="tnl3-lm">
                         <IkoniTahti />
-                        <span className="tnl3-vain-desk">Lauran ja Mikon valinta</span>
-                        <span className="tnl3-vain-mob">L&amp;M valinta</span>
+                        {/* Nimi yhtenäistetty 19.10.2026 (Heikki): sama "Lauran ja Mikon valinta" myös mobiilissa. */}
+                        <span>Lauran ja Mikon valinta</span>
                       </span>
                       <span className="tnl3-muoto-otsikko">{pickOtsikko}</span>
                     </span>

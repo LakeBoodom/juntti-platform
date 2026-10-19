@@ -65,13 +65,13 @@ export const MAANTIETO_DESC: Record<string, string> = {
 export const MAANTIETO_CURATED = {
   /** Hero-CTA "Aloita maailmanmatka" -kohde. */
   cta: "maailman-syrjaisimmat-paikat",
-  /** Tietoniekan poiminnat (3 vaakakorttia). */
+  /** "Tietoniekka suosittelee" (3 vaakakorttia; ennen "Tietoniekan poiminnat"). */
   poiminnat: [
     "maailman-syrjaisimmat-paikat",
     "valimeren-saaret-visa-tunnetko-saaristot",
     "maailman-kylmimmat-kolkat",
   ],
-  /** Lauran ja Mikon poiminta. */
+  /** "Lauran ja Mikon valinta" (ennen "poiminta"). */
   lm: "kanariansaaret-tiedatko-tarpeeksi",
 };
 

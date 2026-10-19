@@ -127,10 +127,10 @@ export default async function MaantietoLanding() {
       </section>
 
       <div className="tn-shell">
-        {/* ─── Tietoniekan poiminnat: 3 vaakakorttia (CD) ─── */}
+        {/* ─── Tietoniekka suosittelee: 3 vaakakorttia (CD; nimi yhtenäistetty 19.10.2026, Heikki) ─── */}
         {poiminnat.length > 0 && (
           <section className="tnt-section">
-            <h2 className="tnt-h2">Tietoniekan poiminnat</h2>
+            <h2 className="tnt-h2">Tietoniekka suosittelee</h2>
             <div className="tnt-picks">
               {poiminnat.map((c, i) => (
                 <a key={c.id} className="tnt-pick" href={playHref(c)}>
@@ -147,14 +147,14 @@ export default async function MaantietoLanding() {
           </section>
         )}
 
-        {/* ─── Lauran ja Mikon poiminta (CD: Kanariansaaret) ─── */}
+        {/* ─── Lauran ja Mikon valinta (CD: Kanariansaaret; nimi yhtenäistetty 19.10.2026) ─── */}
         {lm && (
           <section className="tnt-section">
             <div className="tnt-lm">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={MAANTIETO_LM} alt="Laura ja Mikko matkalla" loading="lazy" />
               <div className="tnt-lm-body">
-                <span className="tnt-lm-attr">★ Lauran ja Mikon poiminta</span>
+                <span className="tnt-lm-attr">★ Lauran ja Mikon valinta</span>
                 <h2 className="tnt-lm-title">{lm.display_title ?? lm.title}</h2>
                 <p className="tnt-lm-desc">{descFor(lm)}</p>
                 <a className="tnt-cta" href={playHref(lm)}>Pelaa poiminta</a>
