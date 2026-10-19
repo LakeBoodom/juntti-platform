@@ -1,29 +1,14 @@
-// TIETONIEKKA 2.0 — MUSIIKKI: teemasivun uusi design (CD "TN Musiikki
-// -teemasivu" 19.8.2026, design_handoff_musiikki/README.md). Korvaa
-// geneerisen hub-templaten ([collection]/page.tsx) tälle kokoelmalle —
-// staattinen segmentti ohittaa dynaamisen reitin, sama malli kuin TV:llä.
-//
-// Rakenteellisesti IDENTTINEN TV & Suoratoisto -sivun kanssa (README: "sama
-// komponentti eri datalla ilman rakenteellisia poikkeuksia") — erot ovat
-// konfiguraatiota: violetti #A24BFF/#C68BFF (.tne-mus), 6 aihepiiriä,
-// oma herokuva (70% 50%). Poimitut TOISTUVAT aihepiireissä (Heikki 19.8. —
-// sama sääntö kuin TV:llä). Kolme festarivisaa (Blockfest, Euroviisut,
-// Weekend Festival) EI näy sivulla (Heikin päätös 19.8. — design on totuus).
-// Tietoisia poisjättöjä: ei vaikeustasoja, putkea, kysymysmääriä,
-// genremerkintöjä korteissa, ei suosituin/trendaa, ei poimintaselitettä.
-
-import { KokoelmaLd } from "@/components/tn20/KokoelmaLd";
-import { jakoMeta } from "@/lib/jakoMeta";
-import { visaHref } from "@/lib/visaHref";
+// MUSIIKKI yhteisellä rungolla (TOTEUTUSBRIEF "Kokoelmasivun runko ja pelikehys", vaihe 3, 19.10.2026).
+// Sisältö ja ilme tulevat asetuksesta lib/kokoelmat/musiikki.ts, visat osioihin quizzes.section_tags-
+// tagista. Vanha sivukohtainen toteutus (CD "TN Musiikki -teemasivu" 19.8.2026) poistettu.
+import "../../runko.css";
 import type { Metadata } from "next";
-import { getSupabase } from "@/lib/supabase";
+import { jakoMeta } from "@/lib/jakoMeta";
 import { getPageContent } from "@/lib/pageContent";
-import Crumbs from "@/components/tn20/Crumbs";
-import { MobiiliSankari } from "@/components/tn20/MobiiliSankari";
-import {
-  MUSIIKKI_HERO, MUSIIKKI_HERO_POSITION, musiikkiIntro, MUSIIKKI_BADGE,
-  MUSIIKKI_FEATURED, MUSIIKKI_SECTIONS, musiikkiImg,
-} from "@/lib/musiikki";
+import { LearnArticle } from "@/components/tn20/LearnArticle";
+import KokoelmaRunko from "@/components/tn20/runko/KokoelmaRunko";
+import { haeRunkoData } from "@/lib/kokoelmat/data";
+import { MUSIIKKI } from "@/lib/kokoelmat/musiikki";
 
 export const revalidate = 300; // SEO-erä A4 (2.10.2026): ISR 5 min
 
@@ -36,171 +21,22 @@ export async function generateMetadata(): Promise<Metadata> {
     pc?.seo_description ??
     "Artistivisat suomirapista stadionien supertähtiin — testaa kuinka tarkasti kuuntelet.";
   const canonical = `${SITE_URL}/kokoelma/musiikki`;
-  return {
-    title, description,
-    alternates: { canonical },
-    ...jakoMeta({ title, description, url: canonical, kuva: "/og/kokoelma/musiikki" }),
-  };
+  return { title, description, alternates: { canonical }, ...jakoMeta({ title, description, url: canonical, kuva: "/og/kokoelma/musiikki" }) };
 }
 
-type Card = {
-  id: string; slug: string | null; custom_slug: string | null;
-  title: string; display_title: string | null; teaser: string | null;
-  question_count: number; published_at: string | null;
-};
-
-const playHref = (c: Card) =>
-  visaHref(c);
-
-const cardName = (c: Card) => c.display_title ?? c.title;
-
 export default async function MusiikkiLanding() {
-  const sb = getSupabase();
-  if (!sb) return <main style={{ padding: 32 }}>Ei tietokantayhteyttä.</main>;
-
-  const [cardsRes, pc] = await Promise.all([
-    sb.from("quiz_cards" as never)
-      .select("id, slug, custom_slug, title, display_title, teaser, question_count, published_at")
-      .eq("collection", "musiikki")
-      .order("published_at", { ascending: false }),
-    getPageContent("musiikki"),
-  ]);
-  const cards = (cardsRes.data ?? []) as unknown as Card[];
-  const bySlug = new Map(cards.map((c) => [c.slug ?? "", c]));
-
-  // "Tietoniekka suosittelee" — täsmälleen 3. Poimitut TOISTUVAT aihepiireissä
-  // (Heikin päätös 19.8.) — ruudukkoa EI suodateta featured-slugeilla.
-  const featured = MUSIIKKI_FEATURED
-    .map((f) => ({ ...f, card: bySlug.get(f.slug) }))
-    .filter((f): f is typeof f & { card: Card } => Boolean(f.card));
-
-  const sections = MUSIIKKI_SECTIONS.map((section) => ({
-    ...section,
-    cards: section.quizzes
-      .map((q) => {
-        const card = bySlug.get(q.slug);
-        return card ? { card, hook: q.hook } : null;
-      })
-      .filter((x): x is { card: Card; hook: string } => Boolean(x)),
-  })).filter((s) => s.cards.length > 0);
-  const sectionCount = sections.length;
-  // Sivun visamäärä = kuratoitujen osioiden uniikit visat (44, 24.9.2026) — EI koko
-  // kokoelman rivimäärä, koska festarivisat eivät ole sivulla (Heikki 19.8.).
-  const count = new Set(sections.flatMap((s) => s.cards.map(({ card }) => card.id))).size;
-
+  const [d, pc] = await Promise.all([haeRunkoData(MUSIIKKI), getPageContent("musiikki")]);
+  if (!d) return <main style={{ padding: 32 }}>Ei tietokantayhteyttä.</main>;
   return (
-    <main className="tnk tne-mus" style={{ minHeight: "100dvh", paddingBottom: 60 }}>
-      {/* Murupolkurivi palkin alla (nav-speksi 17.8.2026) */}
-      <KokoelmaLd avain="musiikki" nimi="Musiikki" polku="/kokoelma/musiikki" />
-      <Crumbs items={[{ label: "Kokoelmat", href: "/kokoelmat" }, { label: "Musiikki" }]} />
-      <MobiiliSankari
-        accent="#C68BFF"
-        eyebrow="Teemakokoelma"
-        title={["Musiikki ja", "Artistit"]}
-        lead={musiikkiIntro(count)}
-        stats={[{ n: count, label: "visaa" }, { n: sectionCount, label: "lajityyppiä" }]}
-        image={{ src: MUSIIKKI_HERO, position: MUSIIKKI_HERO_POSITION }}
-      />
-      <div className="tn-shell" style={{ paddingTop: "clamp(14px,2vw,26px)" }}>
-        {/* ─── Hero ─── */}
-        <section className="tne-hero tnms-desk">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            className="tne-hero-img"
-            src={MUSIIKKI_HERO}
-            alt=""
-            style={{ objectPosition: MUSIIKKI_HERO_POSITION }}
-          />
-          <div className="tne-hero-body">
-            {/* Kaksirivinen otsikko on typografinen ratkaisu (README §Hero) */}
-            <h1 className="tne-title">
-              Musiikki ja{" "}<b>Artistit</b>
-            </h1>
-            <p className="tne-lede">{musiikkiIntro(count)}</p>
-            <div className="tne-pills">
-              <span className="tne-pill" data-accent>{count} visaa</span>
-              <span className="tne-pill">{sectionCount} lajityyppiä</span>
-              <span className="tne-pill">{MUSIIKKI_BADGE}</span>
-            </div>
+    <KokoelmaRunko
+      d={d}
+      jalkiosa={
+        pc?.learn ? (
+          <div className="rk-jalki">
+            <LearnArticle learn={pc.learn} fallbackTitle="Musiikki" accent={MUSIIKKI.accent} />
           </div>
-        </section>
-
-        {/* ─── Tietoniekka suosittelee — EI selitekappaletta ─── */}
-        {featured.length > 0 && (
-          <section className="tne-section">
-            <div className="tne-section-head">
-              <div>
-                <div className="tne-eyebrow"><i aria-hidden />Poiminnat</div>
-                <h2>Tietoniekka suosittelee</h2>
-              </div>
-            </div>
-            <div className="tne-feat-grid">
-              {featured.map((f, i) => {
-                const img = musiikkiImg(f.card.slug);
-                return (
-                  <a key={f.card.id} className="tne-feat" href={playHref(f.card)}>
-                    <span className="tne-feat-media" data-noimg={img ? undefined : true}
-                      style={img ? undefined : ({ ["--tne-fallback-accent" as string]: f.rankColor })}>
-                      {img && (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img src={img} alt={cardName(f.card)} />
-                      )}
-                      <span className="tne-feat-rank" style={{ color: f.rankColor }} aria-hidden>
-                        {i + 1}
-                      </span>
-                      <h3 className="tne-feat-name">{cardName(f.card)}</h3>
-                    </span>
-                    <span className="tne-feat-body">
-                      <p className="tne-feat-hook">{f.hook}</p>
-                      <span className="tne-feat-cta tn-card-cta">Pelaa →</span>
-                    </span>
-                  </a>
-                );
-              })}
-            </div>
-          </section>
-        )}
-
-        {/* ─── Aihepiirit 01–06 — kortit koukkuteksteillä ─── */}
-        {sections.map((section) => (
-          <section key={section.number} className="tne-section" style={{ ["--tne-accent" as string]: section.accent }}>
-            <div className="tne-section-title-row">
-              <span className="tne-section-num" aria-hidden>{section.number}</span>
-              <h2 className="tne-section-title">{section.title}</h2>
-              <span className="tne-section-count">{section.cards.length}</span>
-            </div>
-            <div className="tne-grid">
-              {section.cards.map(({ card: c, hook }) => {
-                const img = musiikkiImg(c.slug);
-                return (
-                  <a key={c.id} className="tne-card" href={playHref(c)} data-noimg={img ? undefined : true}>
-                    {img && (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img src={img} alt={cardName(c)} loading="lazy" />
-                    )}
-                    <span className="tne-card-text">
-                      <h3 className="tne-card-name">{cardName(c)}</h3>
-                      {hook && <span className="tne-card-hook">{hook}</span>}
-                    </span>
-                  </a>
-                );
-              })}
-            </div>
-          </section>
-        ))}
-
-        {/* "Musiikkivisat pähkinänkuoressa" -artikkeli (page_content.learn) poistettu
-            sivulta Heikin pyynnöstä 24.9.2026 — sisältö jää kantaan talteen. */}
-
-        {/* Kuvakrediitti — CC BY / CC BY-SA vaativat tekijämaininnan.
-            Tekijät ja lisenssit listattu sivulla /kuvien-lahteet (12.9.2026). */}
-        <p className="tne-kuvakrediitti">
-          Artistikuvat: Wikimedia Commons, CC BY / CC BY-SA ·{" "}
-          <a href="/kuvien-lahteet">tekijät ja lisenssit</a>
-        </p>
-      </div>
-
-      {/* Alatunniste tulee layoutista (SiteFooter, QA-005 29.8.2026) */}
-    </main>
+        ) : null
+      }
+    />
   );
 }
