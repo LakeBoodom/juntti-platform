@@ -28,6 +28,7 @@ export type Kokoelma = {
   ingress: string;
   /** Teemaväri = mestaruusmerkin väri. */
   accent: string;
+  /** image "" = kuvaa ei vielä ole → raidallinen paikka (CD 6a). */
   hero: { image: string; focalX?: number; focalY?: number; alt: string };
   /** Heron Pelaa-napin kohde: ensikävijälle suosituin, palaavalle seuraava pelaamaton. */
   cta: "suosituin" | "seuraava" | "arvo";
@@ -44,7 +45,9 @@ export type Kokoelma = {
   /** Mestaruus (metapeli, piilossa METAPELI_ENABLED-lipun takana). */
   mastery: { name: string; icon: string };
   /** Mistä kokoelman visat haetaan (quiz_cards). */
-  haku: { collection?: string; category?: string };
+  /** sectionTags: true = kokoelman visat ovat ne, joilla on jokin tämän kokoelman osiotageista
+   *  (uusi kokoelma ilman omaa collection-arvoa, esim. Euroviisut; visa voi kuulua useaan kokoelmaan). */
+  haku: { collection?: string; category?: string; sectionTags?: boolean };
   /** Korttikuva visan slugista; oletuksena quizzes.hero_image. */
   korttikuva?: (slug: string) => string | null;
   /** Kortin metarivi (vuosi, maa, aihe). Kysymysmäärä lisätään automaattisesti vain, jos ≠ 10. */

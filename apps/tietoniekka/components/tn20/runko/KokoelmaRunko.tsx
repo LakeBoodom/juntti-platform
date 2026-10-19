@@ -15,6 +15,7 @@ import RunkoNaytaKaikki from "./RunkoNaytaKaikki";
 import RunkoMetapeli from "./RunkoMetapeli";
 import { PeliIkoniSvg } from "./PeliIkoni";
 import { runkoCond } from "./runkoFontti";
+import Tunnusosa from "./Tunnusosa";
 
 const metapeliPaalla = () => ["1", "true"].includes(process.env.METAPELI_ENABLED ?? "");
 const esikatselu = () => process.env.VERCEL_ENV !== "production";
@@ -88,9 +89,12 @@ export default function KokoelmaRunko({ d, tunnusosa, jalkiosa }: { d: RunkoData
 
       {/* ─── V1 Hero ─── */}
       <section className="rk-hero" aria-labelledby="rk-h1">
-        <div className="rk-hero-kuva">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={k.hero.image} alt={k.hero.alt} fetchPriority="high" style={{ objectPosition: focal }} />
+        <div className="rk-hero-kuva" data-tyhja={!k.hero.image || undefined}>
+          {/* Kuvaa ei vielä ole → raidallinen paikka (CD 6a) */}
+          {k.hero.image && (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={k.hero.image} alt={k.hero.alt} fetchPriority="high" style={{ objectPosition: focal }} />
+          )}
         </div>
         <div className="rk-hero-teksti">
           <span className="rk-eyebrow">{k.eyebrow}</span>
@@ -136,8 +140,8 @@ export default function KokoelmaRunko({ d, tunnusosa, jalkiosa }: { d: RunkoData
         )}
       </div>
 
-      {/* ─── V4 Tunnusosa (valinnainen) ─── */}
-      {tunnusosa}
+      {/* ─── V4 Tunnusosa (valinnainen): sivun antama tai asetuksen signature ─── */}
+      {tunnusosa ?? <Tunnusosa k={k} />}
 
       {/* ─── V5 Osiot ─── */}
       {osiot.map((o, oi) => {

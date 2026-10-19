@@ -17,6 +17,8 @@ export type KokoelmaKortti = {
   suosio: number;
   /** Mestaruus: nimi, ikoni (merkkipohjan avain) ja väri. */
   mastery: { name: string; icon: string; color: string };
+  /** false = sivu ei vielä auki (alle 3 julkaistua visaa) → ei V7-naapuriksi. */
+  avoin?: boolean;
 };
 
 export const KOKOELMA_KORTIT: KokoelmaKortti[] = [
@@ -36,15 +38,18 @@ export const KOKOELMA_KORTIT: KokoelmaKortti[] = [
   { slug: "tiede", nimi: "Tiede & teknologia", href: "/kokoelma/tiede", img: "/20/kokoelmakortit/tiede.webp", teema: "tieto", suosio: 14, mastery: { name: "Tiedeniekka", icon: "tiede", color: "#4FD1FF" } },
   { slug: "juhlat", nimi: "Juhlat ja pyhät", href: "/kokoelma/juhlat", img: "/20/kokoelmakortit/juhlat.webp", teema: "viihde", suosio: 15, mastery: { name: "Juhlaniekka", icon: "juhla", color: "#E8A320" } },
   { slug: "kuvavisat", nimi: "Kuvavisat", href: "/kokoelma/kuvavisat", img: "/20/kokoelmakortit/kuvavisat.webp", teema: "tieto", suosio: 16, mastery: { name: "Kuvaniekka", icon: "kuva", color: "#4C9AFF" } },
+  /* Euroviisut (runko vaihe 2, 19.10.2026): ensimmäinen pelkästä asetuksesta syntynyt kokoelma. Kortti-
+     kuva puuttuu vielä; avoin: false, kunnes sivulla on ≥ 3 julkaistua visaa (lib/kokoelmat/euroviisut.ts). */
+  { slug: "euroviisut", nimi: "Euroviisut", href: "/kokoelma/euroviisut", img: "/20/kokoelmakortit/musiikki.webp", teema: "viihde", suosio: 17, mastery: { name: "Viisuniekka", icon: "viisut", color: "#FB7185" }, avoin: false },
 ];
 
 export const kokoelmaKortti = (slug: string) => KOKOELMA_KORTIT.find((k) => k.slug === slug) ?? null;
 
 /** V7: asetuksen naapurit tai automaattinen valinta (S6): sama pääteema ensin, sitten suosituimmat. */
 export function naapurit(slug: string, related?: string[]): KokoelmaKortti[] {
-  if (related?.length) return related.map(kokoelmaKortti).filter((k): k is KokoelmaKortti => Boolean(k)).slice(0, 3);
+  if (related?.length) return related.map(kokoelmaKortti).filter((k): k is KokoelmaKortti => Boolean(k) && k!.avoin !== false).slice(0, 3);
   const oma = kokoelmaKortti(slug);
-  return KOKOELMA_KORTIT.filter((k) => k.slug !== slug)
+  return KOKOELMA_KORTIT.filter((k) => k.slug !== slug && k.avoin !== false)
     .sort((a, b) => Number(b.teema === oma?.teema) - Number(a.teema === oma?.teema) || a.suosio - b.suosio)
     .slice(0, 3);
 }

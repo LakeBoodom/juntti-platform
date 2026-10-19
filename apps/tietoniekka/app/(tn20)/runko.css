@@ -242,3 +242,21 @@
 @media (prefers-reduced-motion: reduce) {
   .tn20 .rk-a, .tn20 .rk-b, .tn20 .rk-peli, .tn20 .rk-kokoelma, .tn20 .rk-chip, .tn20 .rk-c, .tn20 .rk-nayta { transition: none; }
 }
+
+/* ── V4 Tunnusosa (yhteinen kehys) + sijoitusnauha (runko vaihe 2) ───────
+   CD: täysi sisältöleveys, tausta #0F0D07, sisäväli 28–32 px, enintään 480 px mobiilissa. */
+.tn20 .rk-v4 { margin-top: var(--rk-vali); background: #0f0d07; border-top: 1px solid #241e13; border-bottom: 1px solid #241e13; }
+.tn20 .rk-v4-in { display: flex; flex-direction: column; gap: 16px; max-width: var(--rk-max); margin: 0 auto; padding: 28px var(--rk-x); max-height: 480px; }
+.tn20 .rk-v4-eyebrow { font-family: var(--rk-cond); font-weight: 700; font-size: 14px; letter-spacing: .18em; text-transform: uppercase; color: var(--rk-acc); }
+.tn20 .rk-nauha {
+  list-style: none; margin: 0; padding: 0 0 6px; display: flex; flex-direction: row-reverse; justify-content: flex-start;
+  align-items: flex-end; gap: 6px; height: 150px; overflow-x: auto; scrollbar-width: thin;
+}
+.tn20 .rk-nauha li { flex: 1 0 34px; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 4px; }
+.tn20 .rk-nauha-sija { font-family: var(--rk-arch); font-weight: 900; font-size: 14px; color: var(--rk-soft); }
+.tn20 .rk-nauha-palkki { display: block; width: 100%; height: var(--h); border-radius: 6px 6px 0 0; background: var(--rk-soft); opacity: .35; }
+.tn20 .rk-nauha-vuosi { font-size: 12px; font-weight: 600; color: var(--rk-muted); }
+.tn20 .rk-nauha li[data-karki] .rk-nauha-sija { color: var(--rk-acc); }
+.tn20 .rk-nauha li[data-karki] .rk-nauha-palkki { background: var(--rk-acc); opacity: 1; }
+/* Kuvaton hero (kuva tulossa): raidallinen paikka. */
+.tn20 .rk-hero-kuva[data-tyhja] { background: repeating-linear-gradient(135deg, color-mix(in srgb, var(--rk-acc) 14%, #1a170f) 0 12px, #17140d 12px 24px); }

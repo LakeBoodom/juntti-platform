@@ -59,6 +59,7 @@ export async function haeRunkoData(k: Kokoelma): Promise<RunkoData | null> {
     .select("id, slug, custom_slug, game_mode, title, display_title, genre, subcollection, category, play_count, question_count, section_tags, hero_image, hero_focal_x, hero_focal_y, target_age");
   if (k.haku.collection) q = q.eq("collection", k.haku.collection);
   if (k.haku.category) q = q.eq("category", k.haku.category);
+  if (k.haku.sectionTags) q = q.overlaps("section_tags", k.sections.map((s) => s.slug));
   const [{ data }, maarat] = await Promise.all([q, getCounts()]);
   const rivit = ((data ?? []) as unknown as Rivi[]).filter((r) => r.target_age !== "4-7" && r.target_age !== "8-12");
 
