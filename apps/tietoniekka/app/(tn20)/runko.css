@@ -26,7 +26,8 @@
   padding-bottom: 56px;
   color: var(--rk-ink);
 }
-.tn20 .rk a { color: inherit; text-decoration: none; }
+.tn20 .rk a:not(.tn-cta-lime) { color: inherit; }
+.tn20 .rk a { text-decoration: none; }
 .tn20 .rk a:focus-visible, .tn20 .rk button:focus-visible { outline: 2px solid var(--tn-lime); outline-offset: 2px; }
 
 /* ── V1 Hero ──────────────────────────────────────────────────────────── */
