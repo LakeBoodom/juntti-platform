@@ -3,7 +3,7 @@
 // Entiset nostot osioiden B-kortteina: Syrjäisimmät paikat (heron CTA ja 1. poiminta), Kylmimmät kolkat
 // (poiminta) ja Kanariansaaret (Lauran ja Mikon valinta). Kokoelma-arvo kannassa on 'matkakohteet'.
 import type { Kokoelma } from "./tyypit";
-import { MAANTIETO_HERO, maantietoImg } from "@/lib/maantieto";
+import { MAANTIETO_HERO, maantietoImgKortti } from "@/lib/maantieto";
 import { kokoelmaKortti } from "./rekisteri";
 
 export const MATKAKOHTEET: Kokoelma = {
@@ -25,5 +25,5 @@ export const MATKAKOHTEET: Kokoelma = {
   related: ["kaupungit", "luonto", "historia"],
   mastery: { name: kokoelmaKortti("matkakohteet")!.mastery.name, icon: "kompassi" },
   haku: { collection: "matkakohteet" },
-  korttikuva: maantietoImg,
+  korttikuva: maantietoImgKortti,
 };

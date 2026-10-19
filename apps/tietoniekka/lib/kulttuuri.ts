@@ -34,3 +34,9 @@ const IMG_SLUGS = new Set([
 export function kulttuuriImg(slug: string | null | undefined): string | null {
   return slug && IMG_SLUGS.has(slug) ? `/20/kulttuuri/${slug}.webp` : null;
 }
+
+/** Kokoelmasivun korttikuva: 800 px kopio (public/20/kulttuuri/k/), alkuperäiset 1600–1672 px jäävät pelinäkymälle.
+    Runko vaihe 3 (19.10.2026): alkuperäiset korteissa nostivat sivupainoa ~1 Mt. */
+export function kulttuuriImgKortti(slug: string | null | undefined): string | null {
+  return kulttuuriImg(slug)?.replace("/20/kulttuuri/", "/20/kulttuuri/k/") ?? null;
+}

@@ -4,7 +4,7 @@
 // (Kirjallisuuden klassikot) osioidensa B-kortteina. Vanhat ?suodata=<alakokoelma>-linkit ohjataan
 // middlewaressa osion ankkuriin (#osio-<alakokoelma>).
 import type { Kokoelma } from "./tyypit";
-import { KULTTUURI_HERO, kulttuuriImg } from "@/lib/kulttuuri";
+import { KULTTUURI_HERO, kulttuuriImgKortti } from "@/lib/kulttuuri";
 import { kokoelmaKortti } from "./rekisteri";
 
 export const KULTTUURI: Kokoelma = {
@@ -27,6 +27,6 @@ export const KULTTUURI: Kokoelma = {
   related: ["historia", "elokuvat", "musiikki"],
   mastery: { name: kokoelmaKortti("kulttuuri")!.mastery.name, icon: "kulttuuri" },
   haku: { collection: "kulttuuri" },
-  korttikuva: kulttuuriImg,
+  korttikuva: kulttuuriImgKortti,
 };
 

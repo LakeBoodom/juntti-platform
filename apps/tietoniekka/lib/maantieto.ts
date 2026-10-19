@@ -32,3 +32,9 @@ const IMG_SLUGS = new Set([
 export function maantietoImg(slug: string | null | undefined): string | null {
   return slug && IMG_SLUGS.has(slug) ? `/20/maantieto/${slug}.webp` : null;
 }
+
+/** Kokoelmasivun korttikuva: 800 px kopio (public/20/maantieto/k/), alkuperäiset 1600–1672 px jäävät pelinäkymälle.
+    Runko vaihe 3 (19.10.2026): alkuperäiset korteissa nostivat sivupainoa ~1 Mt. */
+export function maantietoImgKortti(slug: string | null | undefined): string | null {
+  return maantietoImg(slug)?.replace("/20/maantieto/", "/20/maantieto/k/") ?? null;
+}
