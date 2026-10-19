@@ -229,8 +229,10 @@
   background: var(--rk-card); border: 1px solid var(--rk-line); transition: transform var(--dur-fast) var(--ease-standard);
 }
 .tn20 .rk-peli-ikoni { flex: none; width: 52px; height: 52px; border-radius: 12px; border: 1.5px solid var(--rk-acc); display: grid; place-items: center; color: var(--rk-acc); }
-.tn20 .rk-peli-teksti { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
-.tn20 .rk-peli-nimi { font-family: var(--rk-cond); font-weight: 800; font-size: 19px; line-height: 1.05; letter-spacing: .01em; text-transform: uppercase; word-break: keep-all; overflow-wrap: normal; }
+.tn20 .rk-peli-teksti { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; container-type: inline-size; }
+/* KORTTISÄÄNTÖ (WebKit 19.10.2026): 280 px:n vierityskortissa nimelle jää ~110 px; "RAJANAAPURIT" 19 px:llä
+   ylitti sen 5 px:llä Safarissa. Koko pisimmästä sanasta (Barlow Condensed 800 ≈ 0,52 em/merkki + 8 % varaa). */
+.tn20 .rk-peli-nimi { font-family: var(--rk-cond); font-weight: 800; font-size: min(19px, calc(100cqi / (var(--lw, 10) * 0.56))); line-height: 1.05; letter-spacing: .01em; text-transform: uppercase; word-break: keep-all; overflow-wrap: normal; }
 .tn20 .rk-peli-kuvaus { font-size: 13px; line-height: 1.4; color: var(--rk-muted); text-wrap: pretty; }
 .tn20 .rk-peli .tn-card-cta { flex: none; }
 .tn20 .rk-peli[data-tulossa] .tn-card-cta { --teema-aksentti: #8e8676; }

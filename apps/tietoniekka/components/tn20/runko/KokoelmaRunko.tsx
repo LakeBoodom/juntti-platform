@@ -198,7 +198,7 @@ export default function KokoelmaRunko({ d, tunnusosa }: { d: RunkoData; tunnusos
               <a key={p.slug} className="rk-peli" href={p.href} data-yli={i >= 3 || undefined} data-tulossa={p.tila === "tulossa" || undefined}>
                 <span className="rk-peli-ikoni" aria-hidden="true"><PeliIkoniSvg ikoni={p.ikoni} /></span>
                 <span className="rk-peli-teksti">
-                  <span className="rk-peli-nimi">{katko(p.nimi)}</span>
+                  <span className="rk-peli-nimi" style={{ "--lw": pisinSana(p.nimi) } as CSSProperties}>{katko(p.nimi)}</span>
                   <span className="rk-peli-kuvaus">{p.kuvaus}</span>
                 </span>
                 <span className="tn-card-cta">{p.tila === "tulossa" ? "Tulossa" : "Pelaa →"}</span>
