@@ -5,7 +5,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Luonto, { generateMetadata as luontoMeta } from "../../kokoelma/luonto/sivu";
-import Kulttuuri, { generateMetadata as kulttuuriMeta } from "../../kokoelma/kulttuuri/sivu";
 import Jalkapallo, { generateMetadata as jalkapalloMeta } from "../../kokoelma/jalkapallo/sivu";
 import Kokoelma, { generateMetadata as kokoelmaMeta } from "../../kokoelma/[collection]/sivu";
 
@@ -16,7 +15,6 @@ type Props = { params: Promise<{ polku: string[] }>; searchParams: SP };
 
 const OMAT: Record<string, { Sivu: (p: { searchParams: SP }) => Promise<React.ReactElement>; meta: () => Promise<Metadata> }> = {
   luonto: { Sivu: Luonto, meta: luontoMeta },
-  kulttuuri: { Sivu: Kulttuuri, meta: kulttuuriMeta },
   jalkapallo: { Sivu: Jalkapallo, meta: jalkapalloMeta },
 };
 /** [collection]-reitin palvelemat hubit (staattiset kansiot varjostavat muut). */

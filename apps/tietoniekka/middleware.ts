@@ -4,10 +4,17 @@
 //   • /visa/<slug>?tulos=… / ?paivan_visa=1 / ?hero=… → kirjoitetaan sisäisesti /peli?visa=<slug>&…
 //     (dynaaminen; esim. tulosvariantin jakokuva og:image tarvitsee ?tulos=)
 //   • /peli?visa=<slug> (ei muita parametreja) → kirjoitetaan sisäisesti /visa/<slug> (ISR)
-//   • /kokoelma/<luonto|kulttuuri|jalkapallo|kuvavisat|tunnetut-henkilot>?suodata=… → /suodatettu/…
-// Osoite selaimessa ei muutu missään tapauksessa. Seurantaparametrit (fbclid, utm_*) eivät
+//   • /kokoelma/<luonto|jalkapallo|kuvavisat|tunnetut-henkilot>?suodata=… → /suodatettu/…
+//   • /kokoelma/kulttuuri?suodata=<alakokoelma> → 308 osion ankkuriin (runko 19.10.2026: suodatinchipit
+//     korvautuivat osioilla, joiden tunniste = alakokoelma)
+// Osoite selaimessa ei muutu (paitsi kulttuurin ohjauksessa). Seurantaparametrit (fbclid, utm_*) eivät
 // tee sivusta dynaamista — Facebook lisää fbclid:n jokaiseen jaettuun linkkiin.
 import { NextResponse, type NextRequest } from "next/server";
+
+/** Rungolle siirtyneiden kokoelmien osiot (= vanhat ?suodata=-arvot); lib/kokoelmat/<slug>.ts. */
+const RUNKO_OSIOT: Record<string, Set<string>> = {
+  kulttuuri: new Set(["taide-design", "kirjallisuus-tarinat", "musiikki-nayttamo", "elamantapa-ilmiot"]),
+};
 
 const SEURANTA = /^(fbclid|gclid|msclkid|igshid|ref|utm_.+)$/i;
 
@@ -25,8 +32,19 @@ export function middleware(req: NextRequest) {
     return NextResponse.rewrite(r);
   }
 
+  /* Rungolle siirtyneet kokoelmat: vanha suodatinlinkki → osion ankkuri (ei dynaamista reittiä). */
+  const runko = url.pathname.match(/^\/kokoelma\/(kulttuuri)\/?$/);
+  if (runko) {
+    const osio = url.searchParams.get("suodata");
+    if (!osio) return NextResponse.next();
+    const r = url.clone();
+    r.searchParams.delete("suodata");
+    r.hash = RUNKO_OSIOT[runko[1]]?.has(osio) ? `osio-${osio}` : "";
+    return NextResponse.redirect(r, 308);
+  }
+
   /* Suodatinparametrilliset hubit → dynaaminen /suodatettu/kokoelma/<x> (ISR-hub ei lue parametreja). */
-  const hub = url.pathname.match(/^\/kokoelma\/(luonto|kulttuuri|jalkapallo|kuvavisat|tunnetut-henkilot)\/?$/);
+  const hub = url.pathname.match(/^\/kokoelma\/(luonto|jalkapallo|kuvavisat|tunnetut-henkilot)\/?$/);
   if (hub) {
     if (avaimet.length === 0) return NextResponse.next();
     const r = url.clone();
