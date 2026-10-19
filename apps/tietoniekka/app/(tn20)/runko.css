@@ -1,0 +1,240 @@
+/* ============================================================
+   KOKOELMARUNKO V1–V7 (TOTEUTUSBRIEF "Kokoelmasivun runko ja pelikehys", 19.10.2026)
+   Mitat CD-arkista "Tietoniekka Kokoelmarunko ja pelikehys v2", osio 1A:
+   sivumarginaali 20 px (390) / 72 px (1440), sisältö enintään 1296 px, vyöhykkeiden väli 40 / 56 px,
+   säde kortti 14 / pääkortti 16 / chip ja nappi 999. Otsikot Barlow Condensed 800, leipä Barlow,
+   korttiotsikot Archivo 900 wdth 72 (variable — staattinen ei tue wdth-akselia, KORTTISÄÄNTÖ).
+   Otsikon koko = min(katto, käytettävä leveys / (pisin sana × kerroin)); --lw = pisimmän sanan
+   kirjainmäärä (palvelin laskee). Kertoimet mitattu 19.10.: Barlow Condensed 800 versaali 0,52 em,
+   Archivo Variable 900 wdth 72 versaali ≤ 0,62 em (CD:n arvo, marginaali sisältyy).
+   ============================================================ */
+
+.tn20 .rk {
+  --rk-x: clamp(20px, 5vw, 72px);
+  --rk-max: calc(1296px + 2 * var(--rk-x));
+  --rk-vali: clamp(40px, 3.9vw, 56px);
+  --rk-bg: #131109;
+  --rk-ink: #f5f0e6;
+  --rk-soft: #cfc7b6;
+  --rk-muted: #a79e8c;
+  --rk-line: #2c2517;
+  --rk-line2: #3a3120;
+  --rk-card: #1f1b14;
+  --rk-cond: "Barlow Condensed", sans-serif;
+  --rk-arch: "Archivo Variable", "Archivo", sans-serif;
+  container: rk / inline-size;
+  padding-bottom: 56px;
+  color: var(--rk-ink);
+}
+.tn20 .rk a { color: inherit; text-decoration: none; }
+.tn20 .rk a:focus-visible, .tn20 .rk button:focus-visible { outline: 2px solid var(--tn-lime); outline-offset: 2px; }
+
+/* ── V1 Hero ──────────────────────────────────────────────────────────── */
+.tn20 .rk-hero { position: relative; }
+.tn20 .rk-hero-kuva { position: relative; height: 184px; overflow: hidden; background: repeating-linear-gradient(135deg, #1f1b14 0 12px, #17140d 12px 24px); }
+.tn20 .rk-hero-kuva img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
+.tn20 .rk-hero-kuva::after { content: ""; position: absolute; inset: 0; background: linear-gradient(to top, var(--rk-bg) 0%, rgba(19, 17, 9, 0) 55%); }
+.tn20 .rk-hero-teksti {
+  position: relative; container-type: inline-size;
+  display: flex; flex-direction: column; align-items: flex-start; gap: 12px;
+  margin-top: -20px; padding: 0 var(--rk-x);
+}
+.tn20 .rk-eyebrow { font-family: var(--rk-cond); font-weight: 700; font-size: 14px; letter-spacing: .18em; text-transform: uppercase; color: var(--rk-acc); }
+.tn20 .rk-h1 {
+  --rk-katto: 46px;
+  margin: 0; font-family: var(--rk-cond); font-weight: 800; line-height: .9; letter-spacing: -.005em; text-transform: uppercase;
+  font-size: min(var(--rk-katto), calc(100cqi / (var(--lw, 10) * 0.52 * 1.04)));
+  word-break: keep-all; overflow-wrap: normal; text-wrap: balance;
+}
+.tn20 .rk-h1[data-lyhyt] { --rk-katto: 64px; }
+.tn20 .rk-h1 span { color: var(--rk-acc); }
+.tn20 .rk-ingress { margin: 0; max-width: 46ch; font-size: 16px; line-height: 1.5; color: var(--rk-soft); text-wrap: pretty; }
+.tn20 .rk-tilasto { font-size: 14px; font-weight: 600; color: var(--rk-muted); }
+.tn20 .rk-cta {
+  display: inline-flex; align-items: center; min-height: 52px; max-width: 100%; padding: 10px 24px;
+  font-family: var(--rk-cond); font-weight: 800; font-size: 18px; line-height: 1.1; letter-spacing: .02em;
+  overflow-wrap: anywhere;
+}
+@media (min-width: 900px) {
+  .tn20 .rk-hero { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); min-height: 500px; max-width: 1440px; margin: 0 auto; }
+  .tn20 .rk-hero-kuva { order: 2; height: auto; }
+  .tn20 .rk-hero-kuva::after { background: linear-gradient(90deg, var(--rk-bg) 0%, rgba(19, 17, 9, 0) 40%), linear-gradient(to top, var(--rk-bg) 0%, rgba(19, 17, 9, 0) 30%); }
+  .tn20 .rk-hero-teksti { order: 1; justify-content: center; gap: 16px; margin: 0; padding: 56px 40px 48px var(--rk-x); }
+  .tn20 .rk-eyebrow { font-size: 16px; letter-spacing: .2em; }
+  .tn20 .rk-h1 { --rk-katto: 80px; line-height: .88; letter-spacing: -.01em; }
+  .tn20 .rk-h1[data-lyhyt] { --rk-katto: 128px; }
+  .tn20 .rk-ingress { font-size: 19px; }
+  .tn20 .rk-tilasto { font-size: 15px; }
+  .tn20 .rk-cta { min-height: 56px; padding: 10px 30px; font-size: 20px; }
+}
+
+/* ── V2 + V3 ──────────────────────────────────────────────────────────── */
+.tn20 .rk-v23 { display: grid; gap: 28px; max-width: var(--rk-max); margin: 0 auto; padding: 16px var(--rk-x) 0; }
+.tn20 .rk-v23:empty { display: none; }
+@media (min-width: 900px) { .tn20 .rk-v23 { padding-top: 24px; } }
+@media (min-width: 1200px) {
+  /* V2 ja chipit samalla rivillä (CD-korjaus 6). */
+  .tn20 .rk-v23:has(.rk-v2)[data-v3] { grid-template-columns: minmax(0, 560px) minmax(0, 1fr); align-items: end; gap: 48px; padding-top: 32px; }
+}
+.tn20 .rk-v2 {
+  display: flex; align-items: center; gap: 12px; min-height: 64px; max-width: 760px; padding: 10px 14px;
+  border: 1px solid var(--rk-line); border-radius: 14px; background: #17140d;
+}
+.tn20 .rk-v2-merkki {
+  flex: none; width: 44px; height: 44px; border-radius: 999px; border: 2px solid var(--rk-acc); display: grid; place-items: center;
+  font-family: var(--rk-cond); font-weight: 800; font-size: 20px; color: var(--rk-acc);
+}
+.tn20 .rk-v2[data-tila="uusi"] .rk-v2-merkki { border-style: dashed; opacity: .8; }
+.tn20 .rk-v2-teksti { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+.tn20 .rk-v2-nimi { font-family: var(--rk-cond); font-weight: 800; font-size: 17px; text-transform: uppercase; letter-spacing: .02em; }
+.tn20 .rk-v2-ala { font-size: 13px; color: var(--rk-muted); }
+.tn20 .rk-v2-palkki { display: block; height: 4px; border-radius: 99px; background: var(--rk-line); overflow: hidden; }
+.tn20 .rk-v2-palkki i { display: block; height: 100%; background: var(--rk-acc); transform-origin: left; }
+
+.tn20 .rk-v3 { display: flex; flex-direction: column; gap: 10px; min-width: 0; scroll-margin-top: 76px; }
+.tn20 .rk-v3-otsikko { font-size: 12px; font-weight: 800; letter-spacing: .16em; text-transform: uppercase; color: #8e8676; }
+.tn20 .rk-chipit { display: flex; flex-wrap: wrap; gap: 8px; }
+.tn20 .rk-chip {
+  display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 16px; border-radius: 999px;
+  background: var(--rk-card); border: 1px solid var(--rk-line2); font-size: 15px; font-weight: 700; white-space: nowrap;
+  transition: border-color var(--dur-fast) var(--ease-standard);
+}
+.tn20 .rk-chip:hover { border-color: #8e8676; }
+.tn20 .rk-chip span { font-size: 13px; font-weight: 600; color: var(--rk-muted); }
+
+/* ── V5 Osiot ─────────────────────────────────────────────────────────── */
+.tn20 .rk-osio, .tn20 .rk-pelit, .tn20 .rk-lisaa, .tn20 .rk-jalki {
+  display: flex; flex-direction: column; gap: 14px; max-width: var(--rk-max); margin: 0 auto; padding: var(--rk-vali) var(--rk-x) 0;
+  scroll-margin-top: 64px;
+}
+.tn20 .rk-osio-eyebrow { display: flex; align-items: center; gap: 12px; }
+.tn20 .rk-osio-eyebrow span { font-family: var(--rk-cond); font-weight: 700; font-size: 14px; letter-spacing: .18em; text-transform: uppercase; color: var(--rk-acc); white-space: nowrap; }
+.tn20 .rk-osio-eyebrow i { flex: 1; height: 1px; background: var(--rk-line); }
+.tn20 .rk-osio-otsake { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 6px 16px; }
+.tn20 .rk-h2 {
+  margin: 0; font-family: var(--rk-cond); font-weight: 800; line-height: .92; text-transform: uppercase;
+  font-size: clamp(30px, 3.4cqi, 52px); word-break: keep-all; overflow-wrap: normal; text-wrap: balance;
+}
+.tn20 .rk-h2--pieni { font-size: clamp(26px, 2.6cqi, 40px); line-height: .95; }
+.tn20 .rk-osio-maara { font-size: 14px; font-weight: 600; color: var(--rk-muted); }
+
+.tn20 .rk-ruudukko { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+@media (min-width: 600px) { .tn20 .rk-ruudukko { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (min-width: 1024px) { .tn20 .rk-ruudukko { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+
+/* B: osion pääkortti. Mobiilissa 16/9 täysi sisältöleveys; desktopilla 2 saraketta ja A-kortit vieressä,
+   tai täysleveä enintään 360 px, jos A-kortteja on alle 2 (S5). */
+.tn20 .rk-b {
+  container-type: inline-size; position: relative; grid-column: 1 / -1; aspect-ratio: 16 / 9; min-width: 0;
+  display: flex; flex-direction: column; justify-content: flex-end; overflow: hidden; border-radius: 16px;
+  border: 1px solid var(--rk-line); background: repeating-linear-gradient(135deg, color-mix(in srgb, var(--rk-acc) 16%, transparent) 0 10px, color-mix(in srgb, var(--rk-acc) 6%, transparent) 10px 20px), #1a170f;
+  transition: transform var(--dur-fast) var(--ease-standard);
+}
+@media (min-width: 600px) {
+  .tn20 .rk-b:not([data-laaja]) { grid-column: span 2; aspect-ratio: auto; min-height: 260px; }
+  .tn20 .rk-b[data-laaja] { max-height: 360px; }
+}
+.tn20 .rk-b img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
+.tn20 .rk-b::after { content: ""; position: absolute; inset: 0; background: linear-gradient(to top, #131109 0%, rgba(19, 17, 9, .92) 30%, rgba(19, 17, 9, .35) 68%, rgba(19, 17, 9, 0) 100%); }
+.tn20 .rk-b-teksti { position: relative; z-index: 1; display: flex; flex-direction: column; align-items: flex-start; gap: 6px; padding: 16px 18px; max-width: 640px; }
+.tn20 .rk-b-meta { color: var(--rk-soft); }
+.tn20 .rk-b-nimi {
+  margin: 0; font-family: var(--rk-arch); font-weight: 900; font-variation-settings: "wdth" 72; line-height: .95; letter-spacing: -.015em; text-transform: uppercase;
+  font-size: min(40px, calc((100cqi - 36px) / (var(--lw, 10) * 0.62)));
+  word-break: keep-all; overflow-wrap: normal; text-wrap: balance;
+}
+
+/* A: kuva 16/10 + teksti */
+.tn20 .rk-a {
+  container-type: inline-size; position: relative; display: flex; flex-direction: column; min-width: 0; overflow: hidden;
+  border-radius: 14px; background: var(--rk-card); border: 1px solid var(--rk-line);
+  transition: transform var(--dur-fast) var(--ease-standard), border-color var(--dur-fast) var(--ease-standard);
+}
+.tn20 .rk-a-kuva { position: relative; aspect-ratio: 16 / 10; overflow: hidden; background: #1a170f; }
+.tn20 .rk-a-kuva img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
+.tn20 .rk-a-teksti { flex: 1; display: flex; flex-direction: column; align-items: flex-start; gap: 6px; padding: 12px 14px 14px; }
+.tn20 .rk-a-nimi {
+  margin: 0; font-family: var(--rk-arch); font-weight: 900; font-variation-settings: "wdth" 72; line-height: 1; letter-spacing: -.01em; text-transform: uppercase;
+  font-size: min(22px, calc((100cqi - 28px) / (var(--lw, 10) * 0.62)));
+  word-break: keep-all; overflow-wrap: normal; hyphens: manual; text-wrap: balance;
+}
+.tn20 .rk-a .tn-card-cta { margin-top: auto; padding-top: 4px; }
+@media (hover: hover) {
+  .tn20 .rk-a:hover, .tn20 .rk-b:hover, .tn20 .rk-peli:hover, .tn20 .rk-kokoelma:hover { transform: translateY(-2px); }
+  .tn20 .rk-a:hover { border-color: var(--rk-line2); }
+}
+
+/* C: listarivi 64 px */
+.tn20 .rk-c-lista { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--rk-line); max-width: 860px; }
+.tn20 .rk-c {
+  display: flex; align-items: center; gap: 14px; min-height: 64px; padding: 10px 4px; border-bottom: 1px solid var(--rk-line);
+  transition: background-color var(--dur-fast) var(--ease-standard);
+}
+.tn20 .rk-c:hover { background: #1a170f; }
+.tn20 .rk-c img { flex: none; width: 48px; height: 48px; border-radius: 10px; object-fit: cover; }
+.tn20 .rk-c-teksti { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+.tn20 .rk-c-nimi { font-size: 16px; font-weight: 700; line-height: 1.25; word-break: keep-all; overflow-wrap: normal; text-wrap: pretty; }
+.tn20 .rk-c .tn-card-cta { flex: none; }
+
+/* S2: katkaisu — mobiili B + 6, desktop B + 8. Piilotetut ovat HTML:ssä. */
+@media (max-width: 1023px) { .tn20 .rk-osio:not([data-auki]) .rk-yli-m { display: none; } }
+@media (min-width: 1024px) { .tn20 .rk-osio:not([data-auki]) .rk-yli-d { display: none; } }
+.tn20 .rk-osio-ala { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 24px; }
+.tn20 .rk-nayta {
+  display: none; align-items: center; gap: 8px; min-height: 44px; padding: 0 18px; border-radius: 999px;
+  background: transparent; border: 1.5px solid var(--rk-line2); color: var(--rk-ink); font: inherit; font-size: 15px; font-weight: 700; cursor: pointer;
+  transition: border-color var(--dur-fast) var(--ease-standard);
+}
+.tn20 .rk-nayta:hover { border-color: #8e8676; }
+@media (max-width: 1023px) { .tn20 .rk-nayta[data-m] { display: inline-flex; } }
+@media (min-width: 1024px) { .tn20 .rk-nayta[data-d] { display: inline-flex; } }
+.tn20 .rk-paluu { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; font-size: 14px; font-weight: 700; color: var(--rk-soft) !important; }
+
+/* Pelattu-merkki (METAPELI-lipun takana): näkyy vain, kun runko on data-metapeli-tilassa. */
+.tn20 .rk-pelattu { display: none; }
+.tn20 .rk[data-metapeli] [data-pelattu] .rk-pelattu {
+  display: flex; align-items: center; justify-content: center; position: absolute; top: 8px; right: 8px; z-index: 2;
+  min-width: 24px; height: 24px; padding: 0 7px; border-radius: 999px; background: rgba(19, 17, 9, .88);
+  font-size: 12px; font-weight: 700; color: var(--rk-acc);
+}
+.tn20 .rk[data-metapeli] .rk-c[data-pelattu] .rk-pelattu { position: static; }
+
+/* ── V6 Pelit ─────────────────────────────────────────────────────────── */
+.tn20 .rk-pelit { padding-top: calc(var(--rk-vali) + 24px); }
+.tn20 .rk-kaikki-pelit { display: none; align-items: center; min-height: 44px; font-size: 14px; font-weight: 700; color: var(--rk-soft) !important; }
+.tn20 .rk-pelit-rivi { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr)); gap: 12px; }
+@media (max-width: 767px) {
+  /* Yli 3 peliä: mobiilissa vaakarivi. */
+  .tn20 .rk-pelit[data-monta] .rk-pelit-rivi {
+    display: flex; overflow-x: auto; scroll-snap-type: x mandatory; margin: 0 calc(-1 * var(--rk-x)); padding: 0 var(--rk-x) 6px; scroll-padding: 0 var(--rk-x);
+  }
+  .tn20 .rk-pelit[data-monta] .rk-peli { flex: 0 0 280px; scroll-snap-align: start; }
+}
+@media (min-width: 768px) {
+  .tn20 .rk-pelit[data-monta] .rk-kaikki-pelit { display: inline-flex; }
+  .tn20 .rk-peli[data-yli] { display: none; }
+}
+.tn20 .rk-peli {
+  display: flex; align-items: center; gap: 14px; min-width: 0; min-height: 88px; padding: 14px 16px; border-radius: 14px;
+  background: var(--rk-card); border: 1px solid var(--rk-line); transition: transform var(--dur-fast) var(--ease-standard);
+}
+.tn20 .rk-peli-ikoni { flex: none; width: 52px; height: 52px; border-radius: 12px; border: 1.5px solid var(--rk-acc); display: grid; place-items: center; color: var(--rk-acc); }
+.tn20 .rk-peli-teksti { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+.tn20 .rk-peli-nimi { font-family: var(--rk-cond); font-weight: 800; font-size: 19px; line-height: 1.05; letter-spacing: .01em; text-transform: uppercase; word-break: keep-all; overflow-wrap: normal; }
+.tn20 .rk-peli-kuvaus { font-size: 13px; line-height: 1.4; color: var(--rk-muted); text-wrap: pretty; }
+.tn20 .rk-peli .tn-card-cta { flex: none; }
+.tn20 .rk-peli[data-tulossa] .tn-card-cta { --teema-aksentti: #8e8676; }
+
+/* ── V7 Lisää kokoelmia ───────────────────────────────────────────────── */
+.tn20 .rk-lisaa-rivi { display: grid; grid-template-columns: repeat(auto-fill, minmax(clamp(150px, 18cqi, 260px), 1fr)); gap: 12px; }
+.tn20 .rk-kokoelma {
+  display: flex; flex-direction: column; overflow: hidden; border-radius: 14px; background: var(--rk-card); border: 1px solid var(--rk-line);
+  transition: transform var(--dur-fast) var(--ease-standard);
+}
+.tn20 .rk-kokoelma img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; display: block; }
+.tn20 .rk-kokoelma-teksti { display: flex; flex-direction: column; gap: 2px; padding: 10px 12px 12px; }
+.tn20 .rk-kokoelma-nimi { font-family: var(--rk-cond); font-weight: 800; font-size: 19px; line-height: 1; text-transform: uppercase; word-break: keep-all; overflow-wrap: normal; }
+
+@media (prefers-reduced-motion: reduce) {
+  .tn20 .rk-a, .tn20 .rk-b, .tn20 .rk-peli, .tn20 .rk-kokoelma, .tn20 .rk-chip, .tn20 .rk-c, .tn20 .rk-nayta { transition: none; }
+}
