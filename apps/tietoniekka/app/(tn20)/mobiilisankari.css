@@ -142,16 +142,12 @@
   /* KORTTISÄÄNTÖ: "PÄHKINÄNKUORESSA" (16 merkkiä) mahtuu 360 px:llä vasta ~22 px:n
      koossa — mitattu 331 px / 28 px, tila 320 px. Koko skaalautuu leveyden mukaan. */
   .tn20 .tn-learn-title { font-size: clamp(20px, 6.2vw, 28px); }
-  /* Kahden palstan visakortti 360 px:llä: nimen tila 131 px, "LEIJONAKUNINGAS"
-     14 px / wdth 74 = 151 px → kapeampi leikkaus (wdth 62 ≈ −16 %) = 127 px. */
-  .tn20 .tne-card-name { font-family: "Archivo Variable", var(--tn-font-display); font-variation-settings: "wdth" 62; }
 }
 
 @media (max-width: 768px) {
   /* Sankarin ja ensimmäisen osion väli on aina 32 px (sankarin alareuna + hiusviiva):
      sivujen omat yläreunukset oli mitoitettu vanhan sankarin perään. */
   .tn20 .tnms + .tn-shell { padding-top: 0 !important; }
-  .tn20 .tnms + .tn-shell > .tnms-desk + .tne-section { margin-top: 0; }
   .tn20 .tnms + .tnt-hero + .tn-shell > .tnt-section:first-child { padding-top: 0; }
   .tn20 .tnk2-herowrap.tnms-desk + .tn-shell { padding-top: 0; }
   .tn20 .tnms + .tn-hero + .tn-shell > .tn-section:first-child { padding-top: 0 !important; }
