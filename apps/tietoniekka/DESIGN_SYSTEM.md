@@ -69,3 +69,9 @@ visat tulevat osioihin `quizzes.section_tags`-tagista. Ei sivukohtaista komponen
 - **V5 kortit** · A (kuva + teksti), B (osion pääkortti), C (listarivi). S1: ensimmäinen tai nostettu kuvallinen = B, muut kuvalliset A, kuvattomat C, 9. visasta alkaen C; jos B:n jälkeen alle 2 kuvallista, kaikki muut C. S2: mobiili B + 6, desktop B + 8, sitten "Näytä kaikki N visaa" (laajenee paikallaan).
 - **V6 pelit** · `lib/pelimuodot.ts` (pelimuotorekisteri, `serves`).
 - **V7 lisää kokoelmia** · `related` tai automaattisesti (sama pääteema, sitten suosituimmat; `lib/kokoelmat/rekisteri.ts`).
+- **Teemaväri** · `accent` = mestaruuden väri rekisteristä. Isot tekstit (h1-korostus, eyebrow) käyttävät sitä
+  sellaisenaan; korttikehote `.tn-card-cta` saa vaalennetun version (`color-mix(… 85 %, #fff)`, runko.css),
+  koska tummimmat teemavärit (Musiikin violetti) jäivät korttipinnalla alle 4,5:1:n.
+- **Siirto rungolle** (vaihe 3) · osiotagit migraatiolla nykyisistä käsilistoista, visamäärä tarkistetaan
+  ennen/jälkeen; entiset "Tietoniekka suosittelee" -nostot osioiden `featured`-B-korteiksi; vanhat
+  `?suodata=`-linkit ohjataan middlewaressa `#osio-<slug>`-ankkuriin.
