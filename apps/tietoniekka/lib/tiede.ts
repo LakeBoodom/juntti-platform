@@ -34,8 +34,9 @@ const TIEDE_KUVAT = new Set([
   "teknologian-ensimmaiset-hetket-visa",
   "tiedemyyttien-tarkastus-visa",
 ]);
-/** Kokoelmasivun (runko) korttikuva — null, jos visalla ei ole omaa kuvaa. */
-export const tiedeKorttikuva = (slug: string) => (TIEDE_KUVAT.has(slug) ? tiedeImg(slug) : null);
+/** Kokoelmasivun (runko) korttikuva — kevennetty kopio (public/20/tiede/k/, 19.10.2026); null, jos visalla
+    ei ole omaa kuvaa. */
+export const tiedeKorttikuva = (slug: string) => (TIEDE_KUVAT.has(slug) ? `/20/tiede/k/${slug}.webp` : null);
 
 export const TIEDE_HERO = {
   img: "/20/tiede/hero.webp",

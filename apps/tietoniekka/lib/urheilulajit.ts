@@ -108,6 +108,8 @@ const QUIZ_POS = new Map<string, string>(
 
 /** Kokoelmasivun (runko) korttikuvan rajauskohta. */
 export const urheilulajitQuizPos = (slug: string) => QUIZ_POS.get(slug);
+/** Kokoelmasivun (runko) korttikuva: 720 px kopio (public/20/urheilulajit/k/, 19.10.2026). */
+export const urheilulajitKorttikuva = (slug: string) => QUIZ_IMG.get(slug)?.replace("/20/urheilulajit/", "/20/urheilulajit/k/") ?? null;
 
 export function urheilulajitQuizImg(slug: string | null | undefined): string | null {
   return slug ? QUIZ_IMG.get(slug) ?? null : null;

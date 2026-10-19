@@ -4,7 +4,7 @@
 // nyt V7-naapureita. Haku: collection 'urheilu' + tämän kokoelman tagit (sama collection sisältää myös
 // jalkapallo- ja jääkiekkovisat, jotka eivät kuulu tänne).
 import type { Kokoelma } from "./tyypit";
-import { UL_HERO, urheilulajitQuizImg, urheilulajitQuizPos } from "@/lib/urheilulajit";
+import { UL_HERO, urheilulajitKorttikuva, urheilulajitQuizPos } from "@/lib/urheilulajit";
 import { kokoelmaKortti } from "./rekisteri";
 
 export const URHEILU: Kokoelma = {
@@ -28,6 +28,6 @@ export const URHEILU: Kokoelma = {
   related: ["jaakiekko", "jalkapallo", "tunnetut-henkilot"],
   mastery: { name: kokoelmaKortti("urheilu")!.mastery.name, icon: "urheilu" },
   haku: { collection: "urheilu", sectionTags: true },
-  korttikuva: urheilulajitQuizImg,
+  korttikuva: urheilulajitKorttikuva,
   korttikuvaPos: urheilulajitQuizPos,
 };
