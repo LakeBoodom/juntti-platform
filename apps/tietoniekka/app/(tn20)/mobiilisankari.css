@@ -40,7 +40,9 @@
   .tn20 .tnms[data-variant="overlay"] .tnms-media { height: 330px; }
   .tn20 .tnms[data-variant="overlay"] .tnms-media::after {
     content: ""; position: absolute; inset: 0;
-    background: linear-gradient(180deg, rgba(8, 7, 4, 0) 30%, rgba(8, 7, 4, 0.55) 62%, rgba(8, 7, 4, 0.88) 100%);
+    /* Kierros 2 (19.10.2026): kuvan alareunaan jäi sauma kuvaustekstin kohdalle, koska varjostus päättyi
+       88 % mustaan mutta sankarin pohja on --tnms-tint. Nyt varjostus päättyy täsmälleen pohjan sävyyn. */
+    background: linear-gradient(180deg, rgba(8, 7, 4, 0) 30%, rgba(8, 7, 4, 0.55) 58%, color-mix(in srgb, var(--tnms-tint) 92%, transparent) 86%, var(--tnms-tint) 100%);
   }
   .tn20 .tnms[data-variant="overlay"] .tnms-body { margin-top: -118px; padding-top: 0; }
   .tn20 .tnms[data-variant="overlay"] .tnms-lead { margin-top: 20px; }
