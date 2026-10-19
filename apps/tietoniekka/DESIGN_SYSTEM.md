@@ -22,7 +22,7 @@ Tila "Tulossa" (ei pelattavissa) on metarivi, ei kehote.
 
 | Luokka | Mihin | Muoto |
 |---|---|---|
-| `.tn-card-meta` | "10 kysymystä", "10 kys.", vuosiluvut, stadion, maa, rooli | 12 px, paino 600, `var(--tn-text-muted)`, ei versaalia. |
+| `.tn-card-meta` | Vuosi, maa, aihe, stadion, rooli. **Kysymysmäärä vain, kun se poikkeaa kymmenestä** (Megavisat 20–50, viikkovisa 15, "Kuka sanoi?" 15 — Heikki 19.10.2026). Vaikeustasoa ei näytetä koskaan. | 12 px, paino 600, `var(--tn-text-muted)`, ei versaalia. |
 
 Kortin oma metaluokka (esim. `.tnk-cardmeta`, `.tnh-quiz-meta`) saa määrittää vain asettelun
 (flex, gap); typografia tulee `.tn-card-meta`:sta.
@@ -55,3 +55,17 @@ malli. Kaikki tulevat järjestämispelit (Laita järjestykseen, Ikäjärjestys, 
 6. **Raahaus on lisä, ei ainoa tapa:** hiiri liikkeestä, kosketus pitkästä painalluksesta. Kaikki onnistuu
    ilman raahausta.
 7. Oikein/väärin ei ole pelkkä väri: rinnalla ✓/✗ tai teksti.
+
+## Kokoelmarunko (19.10.2026)
+
+Kokoelmasivut siirtyvät yhteiselle rungolle (`components/tn20/runko/KokoelmaRunko.tsx`, tyylit
+`app/(tn20)/runko.css`). Kokoelma on asetus `lib/kokoelmat/<slug>.ts` (tyyppi `lib/kokoelmat/tyypit.ts`),
+visat tulevat osioihin `quizzes.section_tags`-tagista. Ei sivukohtaista komponenttia.
+
+- **V1 hero** · eyebrow → h1 (koko pisimmästä sanasta) → ingressi (≤ 2 riviä) → tilastorivi → yksi `.tn-cta-lime` "Pelaa: <visa>".
+- **V2 oma edistyminen** · vain `METAPELI_ENABLED`-lipun takana (esikatselussa `?metapeli=1`).
+- **V3 osiochipit** · vain kun osioita ≥ 3; jokaisen osion lopussa "↑ <osioiden nimi>".
+- **V4 tunnusosa** · valinnainen: vain navigaatio, joka korvaa V3:n, tai yhdellä silmäyksellä luettava tieto, jota sivulla ei muuten ole.
+- **V5 kortit** · A (kuva + teksti), B (osion pääkortti), C (listarivi). S1: ensimmäinen tai nostettu kuvallinen = B, muut kuvalliset A, kuvattomat C, 9. visasta alkaen C; jos B:n jälkeen alle 2 kuvallista, kaikki muut C. S2: mobiili B + 6, desktop B + 8, sitten "Näytä kaikki N visaa" (laajenee paikallaan).
+- **V6 pelit** · `lib/pelimuodot.ts` (pelimuotorekisteri, `serves`).
+- **V7 lisää kokoelmia** · `related` tai automaattisesti (sama pääteema, sitten suosituimmat; `lib/kokoelmat/rekisteri.ts`).
