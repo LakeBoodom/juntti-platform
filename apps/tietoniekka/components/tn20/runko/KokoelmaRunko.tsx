@@ -19,11 +19,13 @@ import { runkoCond } from "./runkoFontti";
 const metapeliPaalla = () => ["1", "true"].includes(process.env.METAPELI_ENABLED ?? "");
 const esikatselu = () => process.env.VERCEL_ENV !== "production";
 
-function KorttiB({ v, laaja }: { v: RunkoVisa; laaja: boolean }) {
+/** eka = sivun ensimmäinen B (voi näkyä ensimmäisessä ruudussa): ei lazy, mutta matala prioriteetti,
+ *  ettei se kilpaile heron (LCP) kanssa. Muut B:t lazy. */
+function KorttiB({ v, laaja, eka }: { v: RunkoVisa; laaja: boolean; eka: boolean }) {
   return (
     <a className="rk-b" data-laaja={laaja || undefined} data-visa-id={v.id} href={v.href} style={{ "--lw": pisinSana(v.nimi) } as CSSProperties}>
       {/* eslint-disable-next-line @next/next/no-img-element */}
-      {v.kuva && <img src={v.kuva} alt="" style={v.kuvaPos ? { objectPosition: v.kuvaPos } : undefined} />}
+      {v.kuva && <img src={v.kuva} alt="" loading={eka ? undefined : "lazy"} fetchPriority={eka ? "low" : undefined} style={v.kuvaPos ? { objectPosition: v.kuvaPos } : undefined} />}
       <span className="rk-pelattu" aria-hidden="true">✓</span>
       <span className="rk-b-teksti">
         {v.meta && <span className="tn-card-meta rk-b-meta">{v.meta}</span>}
@@ -138,7 +140,7 @@ export default function KokoelmaRunko({ d, tunnusosa, jalkiosa }: { d: RunkoData
       {tunnusosa}
 
       {/* ─── V5 Osiot ─── */}
-      {osiot.map((o) => {
+      {osiot.map((o, oi) => {
         const a = o.kortit.filter((x) => x.muoto === "A");
         const c = o.kortit.filter((x) => x.muoto === "C");
         return (
@@ -155,7 +157,7 @@ export default function KokoelmaRunko({ d, tunnusosa, jalkiosa }: { d: RunkoData
             </div>
             {(o.b || a.length > 0) && (
               <div className="rk-ruudukko" data-a={a.length}>
-                {o.b && <KorttiB v={o.b} laaja={a.length < 2} />}
+                {o.b && <KorttiB v={o.b} laaja={a.length < 2} eka={oi === 0} />}
                 {a.map((v) => <KorttiA key={v.id} v={v} />)}
               </div>
             )}
