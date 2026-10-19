@@ -20,7 +20,7 @@
   --rk-line: #2c2517;
   --rk-line2: #3a3120;
   --rk-card: #1f1b14;
-  --rk-cond: var(--rk-cond-font, "Barlow Condensed"), "Barlow Condensed", sans-serif; /* next/font (runkoFontti.ts): esiladattu, ei CLS:ää */
+  --rk-cond: var(--rk-cond-font, "Barlow Condensed"), "Barlow Condensed", sans-serif; /* next/font (runkoFontti.ts): 800 esiladattu, 700 sivuston fontista */
   --rk-arch: "Archivo Variable", "Archivo", sans-serif;
   container: rk / inline-size;
   padding-bottom: 56px;
