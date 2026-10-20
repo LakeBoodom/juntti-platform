@@ -28,7 +28,7 @@ export function juhlatKokoelma(kalenteri: Esiintyma[], nosto: Esiintyma | null):
     ingress: "Visat vuoden juhliin ja perinteisiin. Ajankohtainen juhla on aina ylimpänä.",
     accent: kokoelmaKortti("juhlat")!.mastery.color,
     hero: nosto?.kuva
-      ? { image: kevyt(nosto.kuva), focalX: 0.5, focalY: 0.45, alt: nosto.nimi }
+      ? { image: nosto.kuva, focalX: 0.5, focalY: 0.45, alt: nosto.nimi }
       : { image: OLETUSKUVA, alt: "Juhlat" },
     cta: "suosituin",
     ctaSelite: nosto ? `Lähin juhla: ${nosto.nimi} ${lyhyt(nosto.alku)}` : undefined,

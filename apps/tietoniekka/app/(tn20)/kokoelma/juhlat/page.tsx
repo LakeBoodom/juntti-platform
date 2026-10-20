@@ -53,19 +53,35 @@ export default async function JuhlatSivu({ searchParams }: { searchParams: Promi
   const paaVisa = paa ? d.osiot.flatMap((o) => [...(o.b ? [o.b] : []), ...o.kortit]).find((v) => v.slug === paa) : null;
   if (paaVisa) d.suosituin = { id: paaVisa.id, nimi: paaVisa.nimi, href: paaVisa.href };
 
-  const paivat = Object.fromEntries(kalenteri.map((o) => [o.slug, lyhyt(o.alku)]));
+  /* Vuosikello: kalenterin juhlat, joilla on julkaistu visa. Yhteinen visa (Isän- ja äitienpäivä) näkyy vain
+     lähimmän juhlan osiossa, joten myöhempi juhla linkittää siihen osioon. */
+  const osioVisalle = new Map<string, string>();
+  for (const o of d.osiot) for (const v of [...(o.b ? [o.b] : []), ...o.kortit]) osioVisalle.set(v.slug, o.slug);
+  const rivit = kalenteri
+    .filter((o) => o.julkaistut.length > 0)
+    .map((o) => {
+      const oma = d.osiot.find((x) => x.slug === o.slug);
+      return {
+        slug: o.slug,
+        nimi: o.nimi,
+        pvm: lyhyt(o.alku),
+        osio: oma ? o.slug : osioVisalle.get(o.julkaistut[0]) ?? o.slug,
+        maara: oma?.maara ?? o.julkaistut.length,
+      };
+    });
+  const ympari = d.osiot.find((o) => o.slug === "ympari-vuoden");
+  if (ympari) rivit.push({ slug: ympari.slug, nimi: "Ympäri vuoden", pvm: "Koko vuosi", osio: ympari.slug, maara: ympari.maara });
+
   const kello = (
     <Juhlakello
       d={d}
-      paivat={paivat}
+      rivit={rivit}
       nosto={
         nosto
           ? {
-              nimi: nosto.nimi,
               pvm: pitka(nosto.alku),
               kohde: helsinginKeskiyo(nosto.alku + (nosto.kohde ?? 0) * 864e5),
               otsikko: nosto.laskuri ?? nosto.nimi,
-              osio: nosto.slug,
             }
           : null
       }

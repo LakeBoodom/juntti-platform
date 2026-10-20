@@ -270,10 +270,11 @@
 .tn20 .rk-v4 { scroll-margin-top: 64px; margin-top: var(--rk-vali); background: #0f0d07; border-top: 1px solid #241e13; border-bottom: 1px solid #241e13; }
 .tn20 .rk-v4-in { display: flex; flex-direction: column; gap: 16px; max-width: var(--rk-max); margin: 0 auto; padding: 28px var(--rk-x); max-height: 480px; }
 .tn20 .rk-v4-eyebrow { font-family: var(--rk-cond); font-weight: 700; font-size: 14px; letter-spacing: .18em; text-transform: uppercase; color: var(--rk-acc); }
+/* V4 tyyppi 3: ydinpelin kuvabanneri (Vaalit, Luonto) — vain sisältöreunat; bannerin ilme on sen omissa tyyleissä. */
+.tn20 .rk-v4-banneri { max-width: var(--rk-max); margin: var(--rk-vali) auto 0; padding: 0 var(--rk-x); box-sizing: border-box; }
+
 /* Juhlakello (V4, Juhlat): lähin juhla + laskuri (NostoLaskuri, .ju-cd-*) rivissä, alla vuosikello (.rk-aika). */
-.tn20 .rk-juhla { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 16px 24px; }
-.tn20 .rk-juhla-teksti { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
-.tn20 .rk-juhla h2 a { display: inline-block; padding: 6px 0; margin: -6px 0; color: inherit; text-decoration: none; } /* osuma-alue ≥ 44 px */
+.tn20 .rk-juhla { display: flex; flex-direction: column; gap: 12px; }
 .tn20 .rk-v4 .ju-cd { display: flex; flex-direction: column; gap: 8px; }
 .tn20 .rk-v4 .ju-cd-label { font-size: 12px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--rk-muted); }
 .tn20 .rk-v4 .ju-cd-osat { display: flex; gap: 8px; }
@@ -287,9 +288,10 @@
 .tn20 .rk-synt li { flex: 0 0 116px; scroll-snap-align: start; }
 .tn20 .rk-synt a { display: flex; flex-direction: column; align-items: center; gap: 4px; min-height: 44px; padding: 4px 0; color: var(--rk-ink); text-decoration: none; text-align: center; }
 .tn20 .rk-synt a:focus-visible { outline: 2px solid var(--tn-lime); outline-offset: 2px; border-radius: 12px; }
-.tn20 .rk-synt-kuva { width: 88px; height: 88px; border-radius: 50%; overflow: hidden; background: #1f1b12; border: 2px solid #2c2517; display: grid; place-items: center; font-family: var(--rk-cond); font-weight: 800; font-size: 28px; color: var(--rk-muted); }
+.tn20 .rk-synt-kuva { position: relative; width: 88px; height: 88px; border-radius: 50%; overflow: hidden; background: var(--ryhma, #1f1b12); border: 2px solid #2c2517; display: grid; place-items: center; font-family: var(--rk-cond); font-weight: 800; font-size: 28px; color: #131109; }
 .tn20 .rk-synt a:hover .rk-synt-kuva { border-color: var(--rk-acc); }
-.tn20 .rk-synt-kuva img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 22%; display: block; }
+
+.tn20 .rk-synt-kuva img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 22%; display: block; }
 .tn20 .rk-synt-pvm { margin-top: 4px; font-size: 12px; font-weight: 700; color: var(--rk-muted); }
 .tn20 .rk-synt-pvm[data-tanaan] { color: var(--rk-acc); }
 .tn20 .rk-synt-nimi { font-size: 13px; font-weight: 700; line-height: 1.25; overflow-wrap: normal; word-break: keep-all; hyphens: manual; }
@@ -309,10 +311,12 @@
 .tn20 .rk-haku-ei { font-size: 14px; color: var(--rk-muted); }
 .tn20 .rk-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 
-/* Vaalilaskuri (V4, Vaalit): iso päivämäärä + vaiheet (.rk-aika ilman linkkejä). */
-.tn20 .rk-laskuri { display: flex; align-items: baseline; flex-wrap: wrap; gap: 4px 14px; }
-.tn20 .rk-laskuri-luku { font-family: var(--rk-cond); font-weight: 800; font-size: clamp(64px, 9vw, 104px); line-height: .85; color: var(--rk-acc); font-variant-numeric: tabular-nums; }
-.tn20 .rk-aika-kohta { display: flex; flex-direction: column; gap: 4px; min-height: 64px; padding: 12px 12px 10px 0; border-top: 3px solid #3a3120; }
+/* Vaalilaskuri heron sisällä (Vaalit, 20.10.2026): iso luku teemavärillä + kaksirivinen selite. */
+.tn20 .rk-laskuri { display: flex; align-items: center; gap: 12px; margin: 0; }
+.tn20 .rk-laskuri-luku { font-family: var(--rk-cond); font-weight: 800; font-size: 48px; line-height: .85; color: var(--rk-acc); font-variant-numeric: tabular-nums; }
+.tn20 .rk-laskuri-teksti { display: flex; flex-direction: column; gap: 2px; font-size: 15px; font-weight: 700; line-height: 1.2; color: var(--rk-ink); }
+.tn20 .rk-laskuri-pvm { font-size: 13px; font-weight: 600; color: var(--rk-muted); }
+@media (min-width: 900px) { .tn20 .rk-laskuri-luku { font-size: 60px; } }
 
 /* Aikajana (V4, Historia; CD 2): vaakarivi, kausi 132 px, yläviiva 3 px. Korvaa V3:n. */
 .tn20 .rk-aika { display: flex; margin: 0; padding: 0 0 6px; list-style: none; overflow-x: auto; scroll-snap-type: x proximity; }

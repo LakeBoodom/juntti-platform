@@ -10,16 +10,18 @@ export type Ryhma = {
   nimi: string;
   /** Lyhyt muoto murupolkuun ja chippeihin ("Muusikot"). */
   lyhyt: string;
+  /** Ryhmän väri (kuvattoman henkilön nimikirjainpohja, 20.10.2026); sivuston teemaväreistä, tumma teksti päällä. */
+  vari: string;
 };
 
 export const RYHMAT: Ryhma[] = [
-  { key: "urheilijat", nimi: "Urheilijat", lyhyt: "Urheilijat" },
-  { key: "muusikot", nimi: "Muusikot ja artistit", lyhyt: "Muusikot" },
-  { key: "nayttelijat", nimi: "Näyttelijät ja koomikot", lyhyt: "Näyttelijät" },
-  { key: "poliitikot", nimi: "Poliitikot ja valtionpäämiehet", lyhyt: "Poliitikot" },
-  { key: "media", nimi: "Media- ja elokuvantekijät", lyhyt: "Media" },
-  { key: "kirjailijat", nimi: "Kirjailijat ja taiteilijat", lyhyt: "Kirjailijat" },
-  { key: "vaikuttajat", nimi: "Tiede, talous ja muut vaikuttajat", lyhyt: "Vaikuttajat" },
+  { key: "urheilijat", vari: "#4FD1F5", nimi: "Urheilijat", lyhyt: "Urheilijat" },
+  { key: "muusikot", vari: "#C084FC", nimi: "Muusikot ja artistit", lyhyt: "Muusikot" },
+  { key: "nayttelijat", vari: "#FF6FB5", nimi: "Näyttelijät ja koomikot", lyhyt: "Näyttelijät" },
+  { key: "poliitikot", vari: "#B4A5FF", nimi: "Poliitikot ja valtionpäämiehet", lyhyt: "Poliitikot" },
+  { key: "media", vari: "#FF7A5C", nimi: "Media- ja elokuvantekijät", lyhyt: "Media" },
+  { key: "kirjailijat", vari: "#E8A320", nimi: "Kirjailijat ja taiteilijat", lyhyt: "Kirjailijat" },
+  { key: "vaikuttajat", vari: "#35D6A0", nimi: "Tiede, talous ja muut vaikuttajat", lyhyt: "Vaikuttajat" },
 ];
 
 const MUUT_LAJI: Record<string, RyhmaKey> = {

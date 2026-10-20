@@ -36,6 +36,8 @@ export type KasvoRivi = { avain: string; otsikko: string; kasvot: Kasvo[] };
 import { puolueNimi } from "./puolue";
 export { puolueNimi };
 export type VaalitVisa = {
+  /** quiz_cards.id — pelihistoria (tn_played_quizzes) tunnistaa visan tällä. */
+  id: string;
   href: string;
   otsikko: string;
   meta: string;
@@ -159,6 +161,7 @@ export async function haeVaalitHub(): Promise<VaalitHub> {
   const kortti = (q: Kortti): VaalitVisa => {
     const r = resolveCollection(q);
     return {
+      id: q.id,
       href: visaHref(q),
       otsikko: q.display_title ?? q.title,
       meta: q.question_count ? `${q.question_count} kysymystä` : "Visa",

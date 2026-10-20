@@ -9,7 +9,7 @@ import { getSiteId } from "@/lib/queries";
 import { helsinginPaiva } from "@/lib/aika";
 import { henkiloKuva } from "@/lib/henkilokuvat";
 import { henkiloHref } from "@/lib/henkiloSlug";
-import { RYHMAT, ryhmaOf } from "@/lib/henkiloRyhmat";
+import { RYHMAT, ryhma, ryhmaOf } from "@/lib/henkiloRyhmat";
 import { kokoelmaKortti } from "./rekisteri";
 
 export const HENKILOT: Kokoelma = {
@@ -29,7 +29,7 @@ export const HENKILOT: Kokoelma = {
   haku: {},
 };
 
-export type Synttari = { nimi: string; href: string; kuva: string | null; paiva: string; ika: number };
+export type Synttari = { nimi: string; href: string; kuva: string | null; paiva: string; ika: number; vari: string };
 export type HakuHenkilo = { nimi: string; href: string };
 
 type Celeb = {
@@ -95,6 +95,7 @@ export async function haeHenkilot(): Promise<{ kohteet: UlkoinenKohde[]; synttar
       kuva: henkiloKuva(c.image_url),
       paiva: etaisyys === 0 ? "Tänään" : etaisyys === 1 ? "Huomenna" : `${pv}.${kk}.`,
       ika,
+      vari: ryhma(ryhmaOf(c.ryhma, c.laji)).vari,
     }));
 
   return { kohteet, synttarit, haku: kaikki.map((c) => ({ nimi: c.name, href: henkiloHref(c.name) })) };

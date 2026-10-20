@@ -38,7 +38,7 @@ export function vaalitKohteet(d: VaalitHub): UlkoinenKohde[] {
     lista.map((v, i) => ({
       tagit: [tagi],
       visa: {
-        id: v.href,
+        id: v.id,
         slug: v.href,
         nimi: v.otsikko,
         href: v.href,

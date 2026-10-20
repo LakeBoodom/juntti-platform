@@ -1,7 +1,7 @@
 "use client";
-// V2 OMA EDISTYMINEN + pelattu-tilat (runko §2). Kaikki on METAPELI_ENABLED-lipun takana
-// (oletus pois). Kun lippu on pois, komponentti ei piirrä mitään eikä jätä aukkoa: V3 nousee heron alle,
-// korttien ✓-merkit ja osioiden "x/n pelattu" eivät näy. Esikatselussa ?metapeli=1 näyttää päällä-tilan.
+// OMA ETENEMINEN + V2 (runko §2). Osioiden ja chippien "x/n pelattu" näkyy aina (Heikki 20.10.2026), kun
+// pelaaja on pelannut tästä kokoelmasta. METAPELI_ENABLED-lipun takana (oletus pois) ovat V2-rivi,
+// mestaruusmerkki/tasot ja korttien ✓-merkit; lipun ollessa pois V2 ei jätä aukkoa. Esikatselussa ?metapeli=1.
 //
 // Paikat rakennettu valmiiksi metapelin teknistä toteutusta varten. Nyt eteneminen lasketaan pelatuista
 // visoista (tn_played_quizzes); porrassääntö "vähintään 7/10 ensiyrityksellä" vaatii pisteytyksen.
@@ -25,34 +25,40 @@ export default function RunkoMetapeli({
   const [tila, setTila] = useState<{ pelattu: number } | null>(null);
 
   useEffect(() => {
-    const kaytossa = paalla || (esikatselu && new URLSearchParams(window.location.search).get("metapeli") === "1");
-    if (!kaytossa) return;
     let pelatut: string[] = [];
     try {
       pelatut = JSON.parse(window.localStorage.getItem("tn_played_quizzes") ?? "[]") as string[];
     } catch {}
     const ps = new Set(pelatut);
-    const juuri = document.querySelector<HTMLElement>("[data-runko]");
-    juuri?.setAttribute("data-metapeli", "");
+    const kaytossa = paalla || (esikatselu && new URLSearchParams(window.location.search).get("metapeli") === "1");
+    const kokoelmassa = visaIdt.filter((id) => ps.has(id)).length;
+
+    /* Oma eteneminen (Heikki 20.10.2026): osiochipit, osioiden otsikot ja aikajana näyttävät pelatut AINA,
+       ilman metapeli-lippua — mutta vain, jos pelaaja on pelannut tästä kokoelmasta (ensikävijä: pelkkä määrä). */
+    if (kokoelmassa > 0) {
+      document.querySelectorAll<HTMLElement>("section[data-osio]").forEach((osio) => {
+        const idt = new Set([...osio.querySelectorAll<HTMLElement>("[data-visa-id]")].map((e) => e.dataset.visaId));
+        const p = [...idt].filter((id) => id && ps.has(id)).length;
+        const n = idt.size;
+        osio.querySelectorAll<HTMLElement>(".rk-osio-maara").forEach((m) => (m.textContent = `${n} visaa · ${p} pelattu`));
+        const chip = document.querySelector<HTMLElement>(`.rk-chip[data-osio="${osio.dataset.osio}"] span`);
+        if (chip) chip.textContent = `${p}/${n}`;
+        /* Aikajana ja juhlakello (V4): "x/n pelattu" ja täysi kausi teemavärillä (CD 2). */
+        const aika = document.querySelector<HTMLElement>(`.rk-aika a[data-osio="${osio.dataset.osio}"]`);
+        if (aika) {
+          aika.querySelector(".rk-aika-maara")!.textContent = `${p}/${n} pelattu`;
+          aika.dataset.taso = p === 0 ? "" : p >= n ? "taysi" : "osa";
+        }
+      });
+    }
+
+    /* Metapeli-lipun takana: V2-rivi, mestaruusmerkki, tasot ja korttien ✓-merkit. */
+    if (!kaytossa) return;
+    document.querySelector<HTMLElement>("[data-runko]")?.setAttribute("data-metapeli", "");
     document.querySelectorAll<HTMLElement>("[data-visa-id]").forEach((el) => {
       el.toggleAttribute("data-pelattu", ps.has(el.dataset.visaId ?? ""));
     });
-    /* Osioiden ja chippien määrät: "3/14" ja "14 visaa · 3/14 pelattu". */
-    document.querySelectorAll<HTMLElement>("section[data-osio]").forEach((osio) => {
-      const idt = new Set([...osio.querySelectorAll<HTMLElement>("[data-visa-id]")].map((e) => e.dataset.visaId));
-      const p = [...idt].filter((id) => id && ps.has(id)).length;
-      const n = idt.size;
-      osio.querySelectorAll<HTMLElement>(".rk-osio-maara").forEach((m) => (m.textContent = `${n} visaa · ${p}/${n} pelattu`));
-      const chip = document.querySelector<HTMLElement>(`.rk-chip[data-osio="${osio.dataset.osio}"] span`);
-      if (chip) chip.textContent = `${p}/${n}`;
-      /* Aikajana (V4): "x/n pelattu" ja täysi kausi teemavärillä (CD 2). */
-      const aika = document.querySelector<HTMLElement>(`.rk-aika a[data-osio="${osio.dataset.osio}"]`);
-      if (aika) {
-        aika.querySelector(".rk-aika-maara")!.textContent = `${p}/${n} pelattu`;
-        aika.dataset.taso = p === 0 ? "" : p >= n ? "taysi" : "osa";
-      }
-    });
-    setTila({ pelattu: visaIdt.filter((id) => ps.has(id)).length });
+    setTila({ pelattu: kokoelmassa });
   }, [paalla, esikatselu, visaIdt]);
 
   if (!tila) return null;

@@ -62,10 +62,21 @@ Kokoelmasivut siirtyvät yhteiselle rungolle (`components/tn20/runko/KokoelmaRun
 `app/(tn20)/runko.css`). Kokoelma on asetus `lib/kokoelmat/<slug>.ts` (tyyppi `lib/kokoelmat/tyypit.ts`),
 visat tulevat osioihin `quizzes.section_tags`-tagista. Ei sivukohtaista komponenttia.
 
-- **V1 hero** · eyebrow → h1 (koko pisimmästä sanasta) → ingressi (≤ 2 riviä) → tilastorivi → yksi `.tn-cta-lime` "Pelaa: <visa>".
-- **V2 oma edistyminen** · vain `METAPELI_ENABLED`-lipun takana (esikatselussa `?metapeli=1`).
+- **V1 hero** · eyebrow → h1 (koko pisimmästä sanasta) → ingressi (≤ 2 riviä) → tilastorivi → selite → yksi
+  `.tn-cta-lime` "Pelaa: <visan lyhyt nimi>" (ajatusviivaa edeltävä osa, enintään 2 riviä 390 px:ssä). Herokuva
+  `<picture>`: mobiili (< 900 px) `<nimi>-800.webp`, desktop 1600 px, esilataus mediaehdolla.
+- **V2 oma edistyminen** · vain `METAPELI_ENABLED`-lipun takana (esikatselussa `?metapeli=1`), samoin
+  mestaruusmerkit, tasot ja korttien ✓-tulosmerkki. **Oma eteneminen näkyy aina** (Heikki 20.10.2026):
+  osiochipit "Pääkaupunkiseutu 2/3", osion otsikko "12 visaa · 4 pelattu" ja aikajanan "x/n pelattu"
+  anonyymista pelihistoriasta (`tn_played_quizzes`). Ensikävijällä pelkkä visamäärä.
 - **V3 osiochipit** · vain kun osioita ≥ 3; jokaisen osion lopussa "↑ <osioiden nimi>".
-- **V4 tunnusosa** · valinnainen: vain navigaatio, joka korvaa V3:n, tai yhdellä silmäyksellä luettava tieto, jota sivulla ei muuten ole.
+- **V4 tunnusosa** · valinnainen, **enintään yksi**. Kolme sallittua tyyppiä:
+  1. navigaatio, joka korvaa V3:n (Historian aikajana, Juhlien juhlakello),
+  2. yhdellä silmäyksellä luettava tieto, jota sivulla ei muuten ole (Euroviisujen sijoitusnauha, synttärit),
+  3. **kokoelman ydinpelin kuvabanneri** (Heikki 20.10.2026), kun banneri kertoo pelimuodosta paremmin kuin
+     tavallinen pelikortti (Vaalit: Laita järjestykseen -kasvoketju, Luonto: äänivisa). Peli pysyy myös
+     pelihyllyssä (V6). Paikka: `components/tn20/runko/PeliBanneri.tsx`. Jos kokoelmalla on lisäksi laskuri,
+     se siirtyy heroon (`heroLisa`, Vaalit).
 - **V5 kortit** · A (kuva + teksti), B (osion pääkortti), C (listarivi). S1: ensimmäinen tai nostettu kuvallinen = B, muut kuvalliset A, kuvattomat C, 9. visasta alkaen C; jos B:n jälkeen alle 2 kuvallista, kaikki muut C. S2: mobiili B + 6, desktop B + 8, sitten "Näytä kaikki N visaa" (laajenee paikallaan).
 - **V6 pelit** · `lib/pelimuodot.ts` (pelimuotorekisteri, `serves`).
 - **V7 lisää kokoelmia** · `related` tai automaattisesti (sama pääteema, sitten suosituimmat; `lib/kokoelmat/rekisteri.ts`).

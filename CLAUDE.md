@@ -168,6 +168,13 @@ sana ei rivity vaan leikkautuu `overflow: hidden`iin.
 6. Kalibroitu koko dokumentoidaan CSS-kommenttiin (mitattu tarve +
    CD:n alkuperäinen arvo + marginaali).
 
+## V4-SÄÄNTÖ — kokoelmasivun tunnusosa (Heikki 19.–20.10.2026)
+
+Kokoelmasivulla on enintään yksi tunnusosa (V4). Sallitut tyypit: (1) V3:n korvaava navigaatio,
+(2) yhdellä silmäyksellä luettava tieto, jota sivulla ei muuten ole, (3) kokoelman ydinpelin kuvabanneri,
+kun se kertoo pelimuodosta paremmin kuin pelikortti — peli pysyy myös pelihyllyssä (V6). Kartat eivät ole
+tunnusosia. Tarkemmin `apps/tietoniekka/DESIGN_SYSTEM.md` → Kokoelmarunko.
+
 ## UI-LAATUSÄÄNNÖT — tietoniekka (UI-laatukatselmus 2026-10-14)
 
 Skilli `tietoniekka-ui-laatu` on näiden sääntöjen lähde; tässä tiivistelmä.

@@ -6,6 +6,7 @@
 // Tyylit app/(tn20)/runko.css (sivu tuo). Palvelinkomponentti; selaimessa vain heron napin kohde,
 // "Näytä kaikki" ja metapelin pelattu-tilat.
 import type { CSSProperties, ReactNode } from "react";
+import { preload } from "react-dom";
 import Crumbs from "@/components/tn20/Crumbs";
 import { KokoelmaLd } from "@/components/tn20/KokoelmaLd";
 import { katko, pisinSana, type RunkoData, type RunkoKortti } from "@/lib/kokoelmat/data";
@@ -16,6 +17,10 @@ import RunkoMetapeli from "./RunkoMetapeli";
 import { PeliIkoniSvg } from "./PeliIkoni";
 import { runkoCond } from "./runkoFontti";
 import Tunnusosa from "./Tunnusosa";
+
+/** Heron mobiiliversio: jokaisesta runkosivun herokuvasta on 800 px kopio nimellä <nimi>-800.webp. */
+const MOBIILI = "(max-width: 899px)";
+const pieniKuva = (src: string) => (src.endsWith("-800.webp") ? src : src.replace(/\.webp$/, "-800.webp"));
 
 const metapeliPaalla = () => ["1", "true"].includes(process.env.METAPELI_ENABLED ?? "");
 const esikatselu = () => process.env.VERCEL_ENV !== "production";
@@ -75,13 +80,19 @@ function RiviC({ v }: { v: RunkoKortti }) {
 }
 
 /** v3Lisa: V3:n yläpuolelle tuleva lisä (Tunnetut henkilöt: henkilöhaku + A–Ö-linkki, brief §3). */
-export default function KokoelmaRunko({ d, tunnusosa, v3Lisa }: { d: RunkoData; tunnusosa?: ReactNode; v3Lisa?: ReactNode }) {
+/** heroLisa: heron tilastorivin alle tuleva lisä (Vaalit: vaalilaskuri, kun V4 on pelibanneri — Heikki 20.10.2026). */
+export default function KokoelmaRunko({ d, tunnusosa, v3Lisa, heroLisa }: { d: RunkoData; tunnusosa?: ReactNode; v3Lisa?: ReactNode; heroLisa?: ReactNode }) {
   const { k, osiot } = d;
   const otsikko = `${k.title}${k.highlight ?? ""}`;
   const lyhyt = otsikko.trim().length <= 12;
   const naytaV3 = osiot.length >= 3 && !k.signatureReplacesNav;
   const focal = `${Math.round((k.hero.focalX ?? 0.5) * 100)}% ${Math.round((k.hero.focalY ?? 0.5) * 100)}%`;
   const monta = d.pelit.length > 3;
+
+  if (k.hero.image) {
+    preload(pieniKuva(k.hero.image), { as: "image", fetchPriority: "high", media: MOBIILI });
+    preload(k.hero.image, { as: "image", fetchPriority: "high", media: "(min-width: 900px)" });
+  }
 
   return (
     <main className={`rk ${runkoCond.variable}`} data-runko style={{ "--rk-acc": k.accent } as CSSProperties}>
@@ -93,8 +104,13 @@ export default function KokoelmaRunko({ d, tunnusosa, v3Lisa }: { d: RunkoData; 
         <div className="rk-hero-kuva" data-tyhja={!k.hero.image || undefined}>
           {/* Kuvaa ei vielä ole → raidallinen paikka (CD 6a) */}
           {k.hero.image && (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={k.hero.image} alt={k.hero.alt} fetchPriority="high" style={{ objectPosition: focal }} />
+            /* Mobiili (< 900 px) lataa aina 800 px version (<nimi>-800.webp), desktop 1600 px (Heikki 20.10.2026:
+               1600 px kuva 390 px:n näytöllä). Esilataus mediaehdolla, ks. heroEsilataus. */
+            <picture>
+              <source media={MOBIILI} srcSet={pieniKuva(k.hero.image)} />
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={k.hero.image} alt={k.hero.alt} fetchPriority="high" style={{ objectPosition: focal }} />
+            </picture>
           )}
         </div>
         <div className="rk-hero-teksti">
@@ -113,6 +129,7 @@ export default function KokoelmaRunko({ d, tunnusosa, v3Lisa }: { d: RunkoData; 
           <span className="rk-tilasto">
             {d.visoja} visaa · {osiot.length} {osiot.length === 1 ? "osio" : "osiota"}
           </span>
+          {heroLisa}
           {d.suosituin && <RunkoHeroCta suosituin={d.suosituin} jarjestys={d.jarjestys} tila={k.cta} selite={k.ctaSelite} />}
         </div>
       </section>
