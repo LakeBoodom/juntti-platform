@@ -3,16 +3,14 @@
    yksi tekstilinja (--page-x), yksi osion aloitus, yksipalstaiset alakokoelmat.
    Sivun oma sankari (.tnms-desk) jää työpöydälle ennalleen. */
 
-.tn20 .tnms,
-.tn20 .tnms-first { display: none; }
+.tn20 .tnms { display: none; }
 
 @media (max-width: 768px) {
   .tn20 { --page-x: 20px; }
   .tn20 .tnms-desk { display: none !important; }
 
   /* Yksi tekstilinja: murupolku, sankari, osiot ja kortit samasta reunasta. */
-  .tn20 .tn-shell,
-  .tn20 .tnl-shell { padding-left: var(--page-x); padding-right: var(--page-x); }
+  .tn20 .tn-shell { padding-left: var(--page-x); padding-right: var(--page-x); }
 
   /* ── Sankari ── */
   .tn20 .tnms {
@@ -90,12 +88,6 @@
   .tn20 .tnms-progress-bar { height: 6px; margin: 10px 0 12px; border-radius: 99px; background: rgba(245, 240, 230, 0.08); overflow: hidden; }
   .tn20 .tnms-progress-bar i { display: block; height: 100%; border-radius: inherit; background: var(--tnms-acc); }
   .tn20 .tnms-progress-note { margin: 0; font-size: 14px; line-height: 1.45; color: #C9C3B6; }
-
-  /* ── Ensimmäinen osio: alakokoelmat listana ── */
-  .tn20 .tnms-first {
-    display: block; max-width: none; margin: 0 auto 32px;
-    padding: 0 var(--page-x);
-  }
   .tn20 .tnms-sechead { margin: 0 0 8px; }
   .tn20 .tnms-sechead-row { display: flex; align-items: center; gap: 12px; }
   .tn20 .tnms-sechead-eyebrow { font-size: 12px; font-weight: 800; letter-spacing: 0.16em; text-transform: uppercase; color: var(--tnms-acc); white-space: nowrap; }
@@ -113,20 +105,7 @@
 }
 
 @media (max-width: 768px) {
-  /* Kuvavisat: satunnaisnosto tekstilinkkinä sankarin alla (ei painiketta sankarissa). */
-  .tn20 .tnms-first--link { margin-top: -12px; margin-bottom: 8px; }
-  .tn20 .tnms-textlink {
-    display: inline-flex; align-items: center; gap: 8px; min-height: 44px;
-    font-size: 15px; font-weight: 700; color: #B6FF3C; text-decoration: underline;
-    text-underline-offset: 4px;
-  }
-}
-
-@media (max-width: 768px) {
   /* Sankarin ja ensimmäisen osion väli on aina 32 px (sankarin alareuna + hiusviiva):
      sivujen omat yläreunukset oli mitoitettu vanhan sankarin perään. */
   .tn20 .tnms + .tn-shell { padding-top: 0 !important; }
-  .tn20 .tnk2-herowrap.tnms-desk + .tn-shell { padding-top: 0; }
-  .tn20 .tnms + .tn-hero + .tn-shell > .tn-section:first-child { padding-top: 0 !important; }
-  .tn20 .tnms + .tn-shell > .tnh-eranav { padding-top: 0; }
 }
