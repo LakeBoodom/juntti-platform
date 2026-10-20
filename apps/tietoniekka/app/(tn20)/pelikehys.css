@@ -38,6 +38,11 @@
   /* Mobiilissa pelin aikana paluurivi piiloon, tila näkyy palkissa (CD 5a). */
   .tn20 .pk-palkki[data-pelissa] .pk-paluu { display: none; }
 }
+@media (max-width: 599px) {
+  /* Kapeassa pelinäkymässä tunnus väistyy: pelin nimi + tila ("Ketjussa 3/6") eivät muuten mahdu 320–390 px:iin
+     (VAALIPIIRIKETJU ylitti, mitattu 20.10.2026). Tunnus palaa aloitukseen ja tulokseen. */
+  .tn20 .pk-palkki[data-pelissa] :is(.pk-tunnus, .pk-erotin) { display: none; }
+}
 @media (min-width: 900px) {
   /* Desktopilla paluu samalle riville palkin oikeaan reunaan ei tarvita — rivit pysyvät, mutta paluurivi on ohut. */
   .tn20 .pk-palkki[data-pelissa] .pk-paluu { min-height: 44px; }

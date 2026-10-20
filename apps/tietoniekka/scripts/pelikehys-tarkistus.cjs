@@ -68,7 +68,8 @@ const TEKSTI = ".pk-h1,.pk-lause,.pk-peli,.pk-tila,.pk-paluu,.pk-nappi,.pk-vaiht
     }, [TEKSTI, koti]);
     if (r.status() !== 200) t.virheet.push(`HTTP ${r.status()}`);
     // Pelinäkymä: Aloita → palkin teksti ja korkeus.
-    if (t.ala) {
+    // Megavisan pelinäkymä on tavallisen visan HUD (K3, ei pelipalkkia) → vain aloitus tarkistetaan.
+    if (t.ala && !polku.includes("mega=")) {
       await Promise.all([p.waitForLoadState("load").catch(() => {}), p.click(".pk-aloitus .pk-nappi")]);
       await p.waitForTimeout(2500);
       const peli = await p.evaluate(() => {
