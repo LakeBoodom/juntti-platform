@@ -76,9 +76,13 @@ export function tavuta(sana: string): string {
 export const pisinSana = (t: string) =>
   Math.min(TAVUTUSRAJA, Math.max(4, ...t.split(/[\s–—-]+/).map((w) => w.replace(/[^\p{L}\d]/gu, "").length)));
 
-export async function haeRunkoData(k: Kokoelma): Promise<RunkoData | null> {
+/** Sivun oma tietolähde (Kuvavisat: kuvavisaluokat ja niiden muunnelmat), kun kohteet eivät ole quiz_cards-rivejä. */
+export type UlkoinenKohde = { tagit: string[]; visa: RunkoVisa };
+
+export async function haeRunkoData(k: Kokoelma, ulkoiset?: UlkoinenKohde[]): Promise<RunkoData | null> {
   const sb = getSupabase();
   if (!sb) return null;
+  if (ulkoiset) return kokoa(k, ulkoiset, await getCounts());
   let q = sb
     .from("quiz_cards" as never)
     .select("id, slug, custom_slug, game_mode, title, display_title, genre, subcollection, category, play_count, question_count, section_tags, hero_image, hero_focal_x, hero_focal_y, target_age, published_at");
@@ -112,14 +116,19 @@ export async function haeRunkoData(k: Kokoelma): Promise<RunkoData | null> {
     };
   };
 
+  return kokoa(k, rivit.map((r) => ({ tagit: r.section_tags ?? [], visa: visa(r) })), maarat);
+}
+
+/** Osiot, korttianatomia (S1), katkaisu (S2) ja hero/V6/V7-data kohteista. */
+function kokoa(k: Kokoelma, kohteet: UlkoinenKohde[], maarat: Record<string, number>): RunkoData {
   const nahty = new Set<string>();
   const osiot: RunkoOsio[] = k.sections
     .map((s) => {
-      let vs = rivit
-        .filter((r) => r.section_tags?.includes(s.slug))
+      let vs = kohteet
+        .filter((r) => r.tagit.includes(s.slug))
         /* uniikitOsiot: visa vain ensimmäisessä osiossa, johon se kuuluu (osioiden järjestys ratkaisee). */
-        .filter((r) => !k.uniikitOsiot || (!nahty.has(r.id) && (nahty.add(r.id), true)))
-        .map(visa)
+        .filter((r) => !k.uniikitOsiot || (!nahty.has(r.visa.id) && (nahty.add(r.visa.id), true)))
+        .map((r) => r.visa)
         .sort((a, b) =>
           k.jarjestys === "aika"
             ? (a.julkaistu ?? "").localeCompare(b.julkaistu ?? "")

@@ -78,6 +78,8 @@ export type RunkoVisa = {
   href: string;
   kuva: string | null;
   kuvaPos?: string;
+  /** "contain" = grafiikka (liput, vaakunat) näytetään kokonaisena levyn päällä, ei rajattuna. */
+  kuvaSovitus?: "contain";
   meta: string;
   pelattu?: boolean;
   soon?: boolean;

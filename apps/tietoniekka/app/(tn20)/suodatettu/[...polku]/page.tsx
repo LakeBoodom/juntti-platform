@@ -14,7 +14,7 @@ type Props = { params: Promise<{ polku: string[] }>; searchParams: SP };
 const OMAT: Record<string, { Sivu: (p: { searchParams: SP }) => Promise<React.ReactElement>; meta: () => Promise<Metadata> }> = {
 };
 /** [collection]-reitin palvelemat hubit (staattiset kansiot varjostavat muut). */
-const KOKOELMAHUBIT = new Set(["kuvavisat", "tunnetut-henkilot"]);
+const KOKOELMAHUBIT = new Set(["tunnetut-henkilot"]);
 
 async function kohde(params: Props["params"]) {
   const polku = (await params).polku;

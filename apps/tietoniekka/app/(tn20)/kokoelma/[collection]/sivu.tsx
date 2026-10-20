@@ -22,9 +22,6 @@ import { MOTIF_PATHS, motifPathFor } from "@/components/tn20/motif-paths";
 import { ShowMoreGrid } from "@/components/tn20/ShowMoreGrid";
 import Crumbs from "@/components/tn20/Crumbs";
 import { MobiiliSankari } from "@/components/tn20/MobiiliSankari";
-import { KuvavisatHub } from "@/components/tn20/KuvavisatHub";
-import { getKuvavisatHub, getViikkovisa } from "@/lib/kuvavisat2026";
-import { viikkoInfo } from "@/lib/viikkovisa";
 import { urheiluImg } from "@/lib/urheilu";
 import { getPageContent } from "@/lib/pageContent";
 import { notFound } from "next/navigation";
@@ -58,7 +55,7 @@ export async function generateMetadata(
 
 /* ─────────── Hub-konfiguraatio (CD:n designit) ─────────── */
 
-type HubSource = { kind: "collection" | "category"; value: string } | { kind: "kuvavisa" } | { kind: "person" };
+type HubSource = { kind: "collection" | "category"; value: string } | { kind: "person" };
 type HubMeta = {
   name: string;          // breadcrumbiin ja muihin yhteyksiin — aina kokonainen sana/nimi
   oneWord?: boolean;     // true = otsikko on yksi sana → yhdelle riville (ei rivinvaihtoa)
@@ -146,22 +143,6 @@ const HUBS: Record<string, HubMeta> = {
     modes: [],
     ctaTitle: (n) => `Kaikki ${n} matkavisaa`,
     ctaDesc: "Valitse maanosa tai kohde — tai ota satunnainen matka.",
-  },
-  kuvavisat: {
-    name: "Kuvavisat", oneWord: true,
-    titleTop: "Kuva", titleAccent: "visat",
-    accent: "#4C9AFF", accentLight: "#8FC0FF",
-    img: "/20/teema-liput.webp",
-    /* KUVAVISAT 2.0 (17.9.2026): sivu ei enää käytä HubShelliä, joten lede
-       jää vain generateMetadatan varakuvaukseksi (kutsutaan lede(0), eli
-       kuvamäärää ei voi käyttää) ja chips/ctaTitle/ctaDesc ovat tälle hubille
-       käyttämättömiä — tyyppi vaatii ne, muut hubit käyttävät. */
-    lede: () => "Tunnista liput, vaakunat, linnut, eläimet, maalaukset, rakennukset ja kasvit. Valitse kategoria ja sinulle sopiva vaikeustaso.",
-    chips: () => ["Kuvavisat"],
-    source: { kind: "kuvavisa" },
-    modes: [],
-    ctaTitle: () => "Ota satunnainen kortisto",
-    ctaDesc: "Yksi kuva, neljä vaihtoehtoa — kuinka tarkka silmäsi on?",
   },
   "tunnetut-henkilot": {
     name: "Tunnetut henkilöt",
@@ -277,41 +258,6 @@ export default async function KokoelmaHub({
   /* ── Tunnetut henkilöt (ennallaan) ── */
   if (hub.source.kind === "person") {
     return <PersonHub hub={hub} />;
-  }
-
-  /* ── Kuvavisat 2.0 (17.9.2026): kategoriat → visavariaatiot ──
-     Korvasi vanhan kortistoruudukon (SVG-motiivikortit, jotka käynnistivät pelin
-     suoraan). Uusi malli: kategoriakortti esikatselukuvilla avaa listan
-     visavariaatioita (vaikeustaso, lipuilla myös maanosa). Design:
-     Kuvavisat-2026-design.html näkymät 1a/1b. Oma kehys HubShellin sijaan:
-     herokuva (kierros 4) on samaa linjaa kuin muilla kokoelmilla, mutta
-     suodatinrivit ja visakortit eivät sovi kortistomalliin. Murupolku on
-     sivuston yhteinen (Crumbs, KuvavisatHubin sisällä). */
-  if (hub.source.kind === "kuvavisa") {
-    const [{ kategoriat }, vv] = await Promise.all([
-      getKuvavisatHub(),
-      getViikkovisa(),
-    ]);
-    if (kategoriat.length === 0) return <main style={{ padding: 32 }}>Kuvavisoja ei löytynyt.</main>;
-
-    /* "Arvo satunnainen kuvavisa": arvonta tehdään palvelimella per pyyntö
-       (ISR 5 min, SEO-erä A4), joten linkki vaihtuu viimeistään viiden minuutin välein. */
-    const kaikkiVariaatiot = kategoriat.flatMap((k) => k.variaatiot);
-    const satunnainenHref = kaikkiVariaatiot[Math.floor(Math.random() * kaikkiVariaatiot.length)]?.href ?? null;
-
-    /* Kierros 4 (18.9.2026): FAQ-osio ("Kuvavisat pähkinänkuoressa") EI tule
-       tälle sivulle — Heikin pyyntö 1, vastaavat on poistettu muualtakin.
-       page_content-rivi jää kantaan (generateMetadata voi yhä lukea sitä).
-       Viikkotiedot lasketaan palvelimella (viikkoInfo), ei selaimen kellosta. */
-    return (
-      <main style={{ minHeight: "100dvh" }}>
-        <KuvavisatHub
-          kategoriat={kategoriat}
-          satunnainenHref={satunnainenHref}
-          viikkovisa={vv ? { info: viikkoInfo(vv.vuosi, vv.viikko), kuvia: vv.kuvaIdt.length } : null}
-        />
-      </main>
-    );
   }
 
   /* ── Visahubit ── */
