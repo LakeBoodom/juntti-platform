@@ -15,7 +15,11 @@ const SEL = ".rk-h1,.rk-h2,.rk-b-nimi,.rk-a-nimi,.rk-c-nimi,.rk-peli-nimi,.rk-ko
   for (const s of SIVUT) for (const w of LEVEYDET) {
     const ctx = await b.newContext({ viewport: { width: w, height: 900 }, deviceScaleFactor: 2, isMobile: true, hasTouch: true });
     const p = await ctx.newPage();
-    const r = await p.goto(`${BASE}/kokoelma/${s}`, { waitUntil: "networkidle" });
+    let r = null;
+    for (let yritys = 0; yritys < 3 && !r; yritys++) {
+      try { r = await p.goto(`${BASE}/kokoelma/${s}`, { waitUntil: "load", timeout: 60000 }); } catch (e) { if (yritys === 2) throw e; }
+    }
+    await p.waitForTimeout(800);
     if (r.status() !== 200) { console.log(s, w, "HTTP", r.status()); await ctx.close(); continue; }
     await p.evaluate(() => document.fonts.ready);
     const tulos = await p.evaluate((SEL) => {
