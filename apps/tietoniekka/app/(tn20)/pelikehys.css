@@ -29,7 +29,8 @@
 .tn20 .pk-tunnus span { color: #e8a320; }
 .tn20 .pk-tunnus:focus-visible, .tn20 .pk-paluu:focus-visible { outline: 2px solid var(--tn-lime, #b6ff3c); outline-offset: 2px; }
 .tn20 .pk-erotin { flex: none; width: 1px; height: 18px; background: var(--pk-line); }
-.tn20 .pk-peli { flex: 1; min-width: 0; font-family: var(--rk-cond), "Barlow Condensed", sans-serif; font-weight: 800; font-size: 18px; line-height: 1; text-transform: uppercase; color: var(--pk-peli); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+/* Pelin nimi saa rivittyä kahdelle riville (56 px:n palkkiin mahtuu 2 × 16 px), ei katkaisua (KORTTISÄÄNTÖ). */
+.tn20 .pk-peli { flex: 1; min-width: 0; font-family: var(--rk-cond), "Barlow Condensed", sans-serif; font-weight: 800; font-size: clamp(15px, 4.6vw, 18px); line-height: 1; text-transform: uppercase; color: var(--pk-peli); overflow-wrap: normal; word-break: normal; }
 .tn20 .pk-tila { flex: none; display: flex; align-items: center; height: 32px; padding: 0 12px; border-radius: 999px; background: var(--pk-chip); font-size: 14px; font-weight: 700; color: var(--pk-ink); white-space: nowrap; font-variant-numeric: tabular-nums; }
 .tn20 .pk-paluu { display: flex; align-items: center; gap: 6px; min-height: 44px; padding: 0 clamp(16px, 4vw, 48px); max-width: 1296px; width: 100%; margin: 0 auto; box-sizing: border-box; border-top: 1px solid var(--pk-line); font-size: 14px; font-weight: 700; color: var(--pk-paluu); text-decoration: none; }
 .tn20 .pk-paluu:hover { text-decoration: underline; text-underline-offset: 3px; }
@@ -47,8 +48,8 @@
 .tn20 .pk-h1 { margin: 0; font-family: var(--rk-cond), "Barlow Condensed", sans-serif; font-weight: 800; font-size: clamp(40px, 11vw, 72px); line-height: .9; text-transform: uppercase; letter-spacing: -.005em; overflow-wrap: normal; word-break: normal; hyphens: manual; }
 .tn20 .pk-h1 span { color: var(--pk-acc); }
 /* KORTTISÄÄNTÖ: pitkä sana (Vaalipiiriketju, pakkojen otsikot) pienentää kokoa — 100cqi = aloituksen sisältöleveys,
-   Barlow Condensed 800 versaalina ≈ 0,56 em/merkki + 5 % marginaali. */
-.tn20 .pk-h1[style*="--pk-lw"] { font-size: min(clamp(40px, 11vw, 72px), calc(100cqi / (var(--pk-lw) * .59))); }
+   Barlow Condensed 800 versaalina leveimmillään ≈ 0,61 em/merkki (RAJANAAPURIT, WebKit 320 px) + 5 % marginaali. */
+.tn20 .pk-h1[style*="--pk-lw"] { font-size: min(clamp(40px, 11vw, 72px), calc(100cqi / (var(--pk-lw) * .64))); }
 .tn20 .pk-lause { margin: 0; max-width: 46ch; font-size: 16px; line-height: 1.5; color: var(--pk-dim); }
 .tn20 .pk-valinta { margin: 4px 0 0; padding: 0; border: 0; display: flex; flex-direction: column; gap: 8px; min-width: 0; }
 .tn20 .pk-valinta legend { padding: 0; margin-bottom: 8px; font-size: 12px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--pk-dim); }
@@ -81,7 +82,10 @@
 /* Valinta natiivina valikkona (Kuntaliitos: 18 maakuntaa ei mahdu ruutuun painikkeina). */
 .tn20 .pk-valinta--valikko { display: flex; flex-direction: column; gap: 8px; }
 .tn20 .pk-valinta-otsikko { font-size: 12px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--pk-dim); }
-.tn20 .pk-valikko { min-height: 52px; max-width: 420px; padding: 0 14px; border-radius: 12px; border: 1.5px solid var(--pk-line); background: var(--pk-kortti); color: var(--pk-ink); font: inherit; font-size: 16px; font-weight: 700; }
+/* Safari (iOS) ei kunnioita selectin korkeutta natiiviulkoasussa (mitattu 25 px, 20.10.2026) → oma ulkoasu ja nuoli. */
+.tn20 .pk-valikko { -webkit-appearance: none; appearance: none; height: 52px; min-height: 52px; width: 100%; max-width: 420px; padding: 0 44px 0 14px;
+  background-image: linear-gradient(45deg, transparent 50%, currentColor 50%), linear-gradient(135deg, currentColor 50%, transparent 50%);
+  background-position: calc(100% - 22px) 50%, calc(100% - 16px) 50%; background-size: 6px 6px; background-repeat: no-repeat; border-radius: 12px; border: 1.5px solid var(--pk-line); background-color: var(--pk-kortti); color: var(--pk-ink); font: inherit; font-size: 16px; font-weight: 700; }
 .tn20 .pk-valikko:focus-visible { outline: 2px solid var(--pk-acc); outline-offset: 2px; }
 
 /* ── K4 Tulos ──────────────────────────────────────────────────────────────────────── */
