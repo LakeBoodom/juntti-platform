@@ -17,6 +17,13 @@ import {
   type TuplaTeema,
 } from "@/lib/tuplaTaiKuitti";
 import { Kasa, Symboli, TuplaSprite, onTorni } from "@/components/tn20/TuplaIkonit";
+import Pelipalkki from "@/components/tn20/pelikehys/Pelipalkki";
+import PeliTulos from "@/components/tn20/pelikehys/PeliTulos";
+import { runkoCond } from "@/components/tn20/runko/runkoFontti";
+import { PELIMUODOT, seuraavatPelit } from "@/lib/pelimuodot";
+import { TEEMAT } from "@/lib/tuplaTaiKuitti";
+import TuplaAloitus from "../TuplaAloitus";
+import { TuplaSaannot, TuplaTausta } from "../ohjeet";
 import { getSupabase } from "@/lib/supabase";
 
 type Vaihe = "alku" | "kysymys" | "palaute" | "loppu";
@@ -136,17 +143,15 @@ function Tikapuut({ oikein, tila, napsahtaa }: { oikein: number; tila: LadTila; 
   );
 }
 
-function Ylapalkki({ t }: { t: TuplaTeema }) {
+/** K1 pelipalkki (pelikehys §4, 20.10.2026): paluu kokoelmiin; pelin aikana tila "Kysymys 4/10". */
+function Ylapalkki({ t, tila }: { t: TuplaTeema; tila?: string }) {
   return (
-    <header className="ttk-bar">
-      <a className="ttk-logo" href="/" aria-label="Tietoniekka etusivu">
-        <span>TIETO</span>NIEKKA
-      </a>
-      <span className="ttk-bar-r">
-        <span className="ttk-bar-top">{t.painos ? `${t.painos.x} vai ${t.painos.y}` : "Tupla tai kuitti"}</span>
-        <span className="ttk-bar-name">{t.painos?.nimi ?? t.nimi}</span>
-      </span>
-    </header>
+    <Pelipalkki
+      peli={t.painos ? t.painos.nimi : `Tupla tai kuitti · ${t.nimi}`}
+      koti={{ href: "/kokoelmat", nimi: "Kokoelmat" }}
+      tila={tila}
+      pelissa={!!tila}
+    />
   );
 }
 
@@ -202,6 +207,16 @@ export default function TuplaClient({ teema: t, sarja, siemen, paivanSarja, paiv
   const hudNayta = useLaskuri(hudLuku, vastattu ? potti(i) : hudLuku, vaara ? 450 : 300, vaara ? 150 : 0);
 
   useEffect(() => setParas(lueParas(avain)), [avain]);
+
+  /* K2-aloitus aihesivulla → ?aloita=1: peli alkaa heti (parametri pois osoitteesta). */
+  useEffect(() => {
+    const u = new URL(location.href);
+    if (u.searchParams.get("aloita") !== "1") return;
+    u.searchParams.delete("aloita");
+    history.replaceState(null, "", u.pathname + u.search);
+    alusta();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   function lopeta(syy: Syy, saalis: number, oik: number) {
     const lista = syy === "taydet" ? L.taydet : syy === "jaahy" ? (saalis > 0 ? L.turva : L.nolla) : saalis <= 4 ? L.pieni : L.kuitattu;
@@ -263,65 +278,31 @@ export default function TuplaClient({ teema: t, sarja, siemen, paivanSarja, paiv
 
   /* ── Aloitus ──────────────────────────────────────────────────────── */
   if (vaihe === "alku") {
-    const saannot = [
-      { n: 1, h: "Oikein tuplaa potin", s: `1 → 2 → 4 … 512 ${p.monta}.`, c: "var(--ttk-ok)", napit: false },
-      { n: 2, h: "Kuittaa tai tuplaa", s: "Ota potti tai jatka vaikeampaan.", c: "var(--acc)", napit: true },
-      { n: 3, h: t.painos ? `${t.painos.y} vie ${p.kaikki}` : "Väärin vie potin", s: `Turvatasot ${POTTI[TURVAT[0] - 1]} ja ${POTTI[TURVAT[1] - 1]} jäävät sinulle.`, c: "var(--ttk-red)", napit: false },
-    ];
+    const aiheet = TEEMAT.map((x) => ({ slug: x.slug, nimi: x.painos?.nimi ?? x.nimi, accent: x.accent }));
     return (
-      <main className="ttk" style={tyyli}>
+      <main className={`ttk ${runkoCond.variable}`} style={tyyli}>
         <TuplaSprite />
         <div className="ttk-kuvio" aria-hidden="true" />
         <Ylapalkki t={t} />
-        <section className="ttk-intro">
-          <Sanamerkki t={t} />
-          <p className="ttk-ingress">{t.kuvaus}</p>
-          <div className="ttk-rules">
-            <ol className="ttk-rules-l">
-              {saannot.map((r) => (
-                <li key={r.n}>
-                  <span className="ttk-rule-h">
-                    <b style={{ borderColor: r.c, color: r.c }}>{r.n}</b>
-                    {r.h}
-                  </span>
-                  <span className="ttk-rule-s">{r.s}</span>
-                  {r.napit && (
-                    <span className="ttk-chips" aria-hidden="true">
-                      <span className="ttk-chip ttk-chip--k">KUITTAA</span>
-                      <span className="ttk-chip ttk-chip--t">TUPLAA →</span>
-                    </span>
-                  )}
-                </li>
-              ))}
-            </ol>
-            <ol className="ttk-vlad" aria-label="Tikapuut 1–512">
-              {solut(0, "alku")
-                .reverse()
-                .map((c) => (
-                  <li key={c.askel} className={c.tila}>
-                    <span className="ttk-vlad-n">{c.askel}</span>
-                    <Symboli id="ttk-lukko" koko={[10, 11]} style={{ opacity: c.lukko ? 1 : 0, color: "var(--ttk-gold)" }} />
-                    <b>{c.arvo}</b>
-                  </li>
-                ))}
-            </ol>
-          </div>
-          <div className="ttk-start">
-            <button className="ttk-cta" onClick={alusta}>ALOITA</button>
-            <p className="ttk-seed">
-              <span>
-                <b>{paivanSarja ? `Päivän sarja ${paivays}` : "Oma sarja"}</b> · {paivanSarja ? "sama kaikille tänään" : "sama kuin haastajallasi"}
-              </span>
-              <button type="button" className="ttk-link" onClick={arvoUusi}>Arvo uusi sarja</button>
-            </p>
-            {paras != null && paras > 0 && (
-              <p className="ttk-best">
-                <Symboli id={`ttk-${p.ikoni}`} koko={20} />
-                Paras tuloksesi tässä sarjassa: {maara(paras, p)}
-              </p>
-            )}
-          </div>
-        </section>
+        {/* K2 aloitus (CD 5b): aiheen valinta, "Aloita · <aihe>", ohjeet avattavina. */}
+        <div data-iho="tumma" className="pk-sisalto">
+          <TuplaAloitus
+            aiheet={aiheet}
+            valittu={t.slug}
+            onAloita={alusta}
+            saannot={<TuplaSaannot />}
+            tausta={<TuplaTausta />}
+            alarivi={
+              <>
+                <span>
+                  <b>{paivanSarja ? `Päivän sarja ${paivays}` : "Oma sarja"}</b> · {paivanSarja ? "sama kaikille tänään" : "sama kuin haastajallasi"} ·{" "}
+                </span>
+                <button type="button" onClick={arvoUusi}>Arvo uusi sarja</button>
+                {paras != null && paras > 0 && <span className="pk-alarivi-paras"> · Paras tuloksesi tässä sarjassa: {maara(paras, p)}</span>}
+              </>
+            }
+          />
+        </div>
       </main>
     );
   }
@@ -345,10 +326,10 @@ export default function TuplaClient({ teema: t, sarja, siemen, paivanSarja, paiv
   const turvaHud = turvassa(oikeat);
 
   return (
-    <main className={`ttk ttk--peli ${vaara ? "ttk--hukka" : ""}`} style={tyyli}>
+    <main className={`ttk ttk--peli ${runkoCond.variable} ${vaara ? "ttk--hukka" : ""}`} style={tyyli}>
       <TuplaSprite />
       <div className="ttk-kuvio ttk-kuvio--matala" aria-hidden="true" />
-      <Ylapalkki t={t} />
+      <Ylapalkki t={t} tila={`Kysymys ${i + 1}/${sarja.length}`} />
       <div className="ttk-hud">
         <div className="ttk-hud-row">
           <div className="ttk-pot">
@@ -508,52 +489,70 @@ function Tulos({ t, loppu, paras, jaettu, haasta, alusta, arvoUusi, tyyli }: {
   // Kasan korkeus kertoo matkan (jäähyllä turvatun osan korkeus)
   const kasaN = syy === "taydet" ? 10 : syy === "jaahy" ? (saalis >= POTTI[TURVAT[1] - 1] ? TURVAT[1] : saalis > 0 ? TURVAT[0] : 0) : oikein;
   const ladTila: LadTila = syy === "taydet" ? "taydet" : syy === "jaahy" ? "hukka" : "kuitti";
+  /* K4 (pelikehys §4): 1 tulos → (2 metapeli, lipun takana) → 3 "Pelaa uusi kierros" → 4 Haasta kaveri → 5 seuraava peli. */
+  const peliSlug = `tupla-${t.slug}`;
+  const koti = PELIMUODOT.find((x) => x.slug === peliSlug)?.serves[0];
   return (
-    <main className={`ttk ttk--tulos ttk--${syy}`} style={tyyli}>
+    <main className={`ttk ttk--tulos ttk--${syy} ${runkoCond.variable}`} style={tyyli}>
       <TuplaSprite />
       <div className="ttk-glow" aria-hidden="true" />
       <Ylapalkki t={t} />
-      <section className="ttk-res">
-        <span className="ttk-res-h">{otsikko}</span>
-        <div className="ttk-res-row">
-          <div className="ttk-res-n">
-            <b className={syy === "jaahy" && saalis ? "kulta" : ""}>{luku}</b>
-            <span>{saalis === 1 ? p.yksi : p.monta}</span>
-          </div>
-          <span className="ttk-res-kasa">
-            <Kasa p={p.ikoni} n={kasaN} s={58} className="ttk-kasa--tulos" />
-            {syy === "taydet" && (
-              <span className="ttk-burst" aria-hidden="true">
-                {Array.from({ length: 12 }, (_, k) => (
-                  <svg key={k} style={{ ["--a" as string]: `${(k / 12) * 360}deg`, ["--d" as string]: `${110 + (k % 3) * 20}px` }}>
-                    <use href={`#ttk-${p.ikoni}`} />
-                  </svg>
-                ))}
+      <div data-iho="tumma" className="pk-sisalto">
+        <PeliTulos
+          eyebrow={otsikko}
+          iso={
+            <>
+              <span className={syy === "jaahy" && saalis ? "kulta" : undefined}>{luku}</span> {saalis === 1 ? p.yksi : p.monta}
+            </>
+          }
+          ala={
+            <>
+              {l1}
+              {loppu.l2 && <> {loppu.l2}</>}
+            </>
+          }
+          lisa={
+            <div className="ttk-res-lisa">
+              <span className="ttk-res-kasa">
+                <Kasa p={p.ikoni} n={kasaN} s={58} className="ttk-kasa--tulos" />
+                {syy === "taydet" && (
+                  <span className="ttk-burst" aria-hidden="true">
+                    {Array.from({ length: 12 }, (_, k) => (
+                      <svg key={k} style={{ ["--a" as string]: `${(k / 12) * 360}deg`, ["--d" as string]: `${110 + (k % 3) * 20}px` }}>
+                        <use href={`#ttk-${p.ikoni}`} />
+                      </svg>
+                    ))}
+                  </span>
+                )}
               </span>
-            )}
-          </span>
-        </div>
-        <div className="ttk-res-l">
-          <span className="ttk-res-l1">{l1}</span>
-          {loppu.l2 && <span className="ttk-res-l2">{loppu.l2}</span>}
-        </div>
-        <Tikapuut oikein={syy === "taydet" ? 10 : oikein} tila={ladTila} />
-        {paras != null && paras > 0 && (
-          <p className="ttk-res-best">
-            <span>Paras tuloksesi tässä sarjassa: {maara(paras, p)}</span>
-            {loppu.uusiEnnatys && <span className="ttk-pill">Uusi ennätys</span>}
-          </p>
-        )}
-        <div className="ttk-actions">
-          <button className="ttk-cta" onClick={haasta}>
-            <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M10 13V3M6 6.5L10 2.5l4 4M4 11v5.5h12V11" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" /></svg>
-            {jaettu ? "LINKKI JAETTU ✓" : "HAASTA KAVERI"}
-          </button>
-          <button className="ttk-btn2" onClick={alusta}>Pelaa sama sarja uudelleen</button>
-          <button className="ttk-btn2" onClick={arvoUusi}>Arvo uusi sarja</button>
-        </div>
-        <a className="ttk-back" href={t.paluu.href}>← {t.paluu.teksti}</a>
-      </section>
+              <Tikapuut oikein={syy === "taydet" ? 10 : oikein} tila={ladTila} />
+              {paras != null && paras > 0 && (
+                <p className="ttk-res-best">
+                  <span>Paras tuloksesi tässä sarjassa: {maara(paras, p)}</span>
+                  {loppu.uusiEnnatys && <span className="ttk-pill">Uusi ennätys</span>}
+                </p>
+              )}
+            </div>
+          }
+          paatoiminto={
+            <button type="button" className="pk-nappi" onClick={arvoUusi}>
+              Pelaa uusi kierros
+            </button>
+          }
+          harjoitus={
+            <button type="button" className="pk-linkki" onClick={alusta}>
+              Pelaa sama sarja uudelleen
+            </button>
+          }
+          haasta={
+            <button type="button" className="pk-haasta" onClick={haasta}>
+              <svg viewBox="0 0 20 20" width="18" height="18" aria-hidden="true"><path d="M10 13V3M6 6.5L10 2.5l4 4M4 11v5.5h12V11" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" /></svg>
+              {jaettu ? "Linkki jaettu ✓" : "Haasta kaveri"}
+            </button>
+          }
+          seuraavat={seuraavatPelit(peliSlug, koti)}
+        />
+      </div>
     </main>
   );
 }

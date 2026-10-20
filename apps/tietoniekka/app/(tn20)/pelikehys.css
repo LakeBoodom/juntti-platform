@@ -1,0 +1,98 @@
+/* PELIKEHYS K1–K4 (TOTEUTUSBRIEF "Kokoelmasivun runko ja pelikehys" §4, CD-arkki 5a–5k, 20.10.2026).
+   Yhteinen kehys peleille: K1 pelipalkki, K2 aloitus, K4 tulos. K3-pelilauta on pelin oma.
+   Iho saa jäädä: tumma (Tupla tai kuitti, Ikäjärjestys, Megavisat), kerma + laivastonsininen nappi
+   (reittipelit), violetti (Vaalipiiriketju). Tummalla iholla pääpainike on lime; näkymässä enintään yksi lime. */
+
+.tn20 .pk { min-height: 100dvh; background: var(--pk-bg); color: var(--pk-ink); }
+.tn20 [data-iho] {
+  --pk-bg: #131109; --pk-bar: #131109; --pk-line: #2c2517; --pk-ink: #f5f0e6; --pk-dim: #a79e8c; --pk-chip: #1f1b14;
+  --pk-logo: #f5f0e6; --pk-peli: #f5f0e6; --pk-paluu: #cfc7b6; --pk-acc: #e8a320; --pk-kortti: #1f1b14;
+  --pk-nappi: #b6ff3c; --pk-nappi-ink: #131109; --pk-nappi-varjo: none; --pk-nappi-sade: 999px;
+}
+.tn20 [data-iho="kerma"] {
+  --pk-bg: #f2ede2; --pk-bar: #fbf8f1; --pk-line: #e0d8c6; --pk-ink: #12222c; --pk-dim: #4e5c64; --pk-chip: #ede7d9;
+  --pk-logo: #12222c; --pk-peli: #0e3a5c; --pk-paluu: #0e3a5c; --pk-acc: #0a6e70; --pk-kortti: #ffffff;
+  --pk-nappi: #0e3a5c; --pk-nappi-ink: #ffffff; --pk-nappi-varjo: 0 5px 0 #07253c; --pk-nappi-sade: 16px;
+}
+.tn20 [data-iho="violetti"] {
+  --pk-bg: #120f1f; --pk-bar: #120f1f; --pk-line: #2e2747; --pk-ink: #f3efff; --pk-dim: #a99fd6; --pk-chip: #1d1830;
+  --pk-logo: #f3efff; --pk-peli: #f3efff; --pk-paluu: #cfc6f5; --pk-acc: #b4a5ff; --pk-kortti: #1d1830;
+}
+
+/* ── K1 Pelipalkki: 56 px + paluurivi 44 px ─────────────────────────────────────────── */
+.tn20 .pk-palkki { display: flex; flex-direction: column; background: var(--pk-bar); border-bottom: 1px solid var(--pk-line); font-family: var(--tn-font-body, "Barlow", sans-serif); }
+.tn20 .pk-palkki-rivi { display: flex; align-items: center; gap: 12px; height: 56px; padding: 0 clamp(16px, 4vw, 48px); max-width: 1296px; width: 100%; margin: 0 auto; box-sizing: border-box; }
+.tn20 .pk-tunnus { flex: none; display: flex; align-items: center; min-height: 44px; font-family: "Archivo Variable", "Archivo", sans-serif; font-weight: 900; font-variation-settings: "wdth" 72; font-size: 15px; letter-spacing: .02em; color: var(--pk-logo); text-decoration: none; }
+.tn20 .pk-tunnus span { color: #e8a320; }
+.tn20 .pk-tunnus:focus-visible, .tn20 .pk-paluu:focus-visible { outline: 2px solid var(--tn-lime, #b6ff3c); outline-offset: 2px; }
+.tn20 .pk-erotin { flex: none; width: 1px; height: 18px; background: var(--pk-line); }
+.tn20 .pk-peli { flex: 1; min-width: 0; font-family: var(--rk-cond), "Barlow Condensed", sans-serif; font-weight: 800; font-size: 18px; line-height: 1; text-transform: uppercase; color: var(--pk-peli); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tn20 .pk-tila { flex: none; display: flex; align-items: center; height: 32px; padding: 0 12px; border-radius: 999px; background: var(--pk-chip); font-size: 14px; font-weight: 700; color: var(--pk-ink); white-space: nowrap; font-variant-numeric: tabular-nums; }
+.tn20 .pk-paluu { display: flex; align-items: center; gap: 6px; min-height: 44px; padding: 0 clamp(16px, 4vw, 48px); max-width: 1296px; width: 100%; margin: 0 auto; box-sizing: border-box; border-top: 1px solid var(--pk-line); font-size: 14px; font-weight: 700; color: var(--pk-paluu); text-decoration: none; }
+.tn20 .pk-paluu:hover { text-decoration: underline; text-underline-offset: 3px; }
+@media (max-width: 899px) {
+  /* Mobiilissa pelin aikana paluurivi piiloon, tila näkyy palkissa (CD 5a). */
+  .tn20 .pk-palkki[data-pelissa] .pk-paluu { display: none; }
+}
+@media (min-width: 900px) {
+  /* Desktopilla paluu samalle riville palkin oikeaan reunaan ei tarvita — rivit pysyvät, mutta paluurivi on ohut. */
+  .tn20 .pk-palkki[data-pelissa] .pk-paluu { min-height: 44px; }
+}
+
+/* ── K2 Aloitus ────────────────────────────────────────────────────────────────────── */
+.tn20 .pk-aloitus { display: flex; flex-direction: column; gap: 16px; max-width: 720px; margin: 0 auto; padding: 24px clamp(20px, 4vw, 48px) 40px; box-sizing: border-box; color: var(--pk-ink); }
+.tn20 .pk-h1 { margin: 0; font-family: var(--rk-cond), "Barlow Condensed", sans-serif; font-weight: 800; font-size: clamp(40px, 11vw, 72px); line-height: .9; text-transform: uppercase; letter-spacing: -.005em; overflow-wrap: normal; word-break: normal; hyphens: manual; }
+.tn20 .pk-h1 span { color: var(--pk-acc); }
+.tn20 .pk-lause { margin: 0; max-width: 46ch; font-size: 16px; line-height: 1.5; color: var(--pk-dim); }
+.tn20 .pk-valinta { margin: 4px 0 0; padding: 0; border: 0; display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.tn20 .pk-valinta legend { padding: 0; margin-bottom: 8px; font-size: 12px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--pk-dim); }
+.tn20 .pk-vaihtoehdot { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+@media (min-width: 640px) { .tn20 .pk-vaihtoehdot { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+.tn20 .pk-vaihtoehto { position: relative; display: flex; align-items: center; gap: 10px; min-height: 48px; padding: 8px 12px; border-radius: 12px; border: 1.5px solid var(--pk-line); background: var(--pk-kortti); font-size: 15px; font-weight: 700; line-height: 1.2; color: var(--pk-ink); cursor: pointer; }
+.tn20 .pk-vaihtoehto input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+.tn20 .pk-vaihtoehto-piste { flex: none; width: 14px; height: 14px; border-radius: 50%; border: 2px solid var(--va, var(--pk-acc)); }
+.tn20 .pk-vaihtoehto:has(input:checked) { border-color: var(--va, var(--pk-acc)); }
+.tn20 .pk-vaihtoehto:has(input:checked) .pk-vaihtoehto-piste { background: var(--va, var(--pk-acc)); }
+.tn20 .pk-vaihtoehto:has(input:focus-visible) { outline: 2px solid var(--tn-lime, #b6ff3c); outline-offset: 2px; }
+.tn20 .pk-toiminto { display: flex; flex-direction: column; align-items: flex-start; gap: 10px; margin-top: 4px; }
+.tn20 .pk-nappi { display: inline-flex; align-items: center; justify-content: center; min-height: 56px; padding: 0 28px; border: 0; border-radius: var(--pk-nappi-sade); background: var(--pk-nappi); color: var(--pk-nappi-ink); box-shadow: var(--pk-nappi-varjo); font-family: var(--rk-cond), "Barlow Condensed", sans-serif; font-weight: 800; font-size: 20px; letter-spacing: .02em; text-transform: uppercase; text-decoration: none; cursor: pointer; }
+.tn20 .pk-nappi:hover { filter: brightness(1.06); }
+.tn20 .pk-nappi:focus-visible { outline: 2px solid var(--pk-ink); outline-offset: 3px; }
+.tn20 .pk-alarivi { font-size: 13px; line-height: 1.5; color: var(--pk-dim); }
+.tn20 .pk-sisalto { position: relative; z-index: 1; }
+.tn20 .pk-alarivi button, .tn20 .pk-linkki { display: inline-flex; align-items: center; min-height: 44px; margin: -12px 0; padding: 0; border: 0; background: none; font: inherit; font-weight: 700; color: var(--pk-ink); text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+.tn20 .pk-ohjeet { display: flex; flex-direction: column; border-top: 1px solid var(--pk-line); margin-top: 8px; }
+.tn20 .pk-ohje { border-bottom: 1px solid var(--pk-line); }
+.tn20 .pk-ohje summary { display: flex; align-items: center; justify-content: space-between; min-height: 52px; font-size: 15px; font-weight: 700; color: var(--pk-ink); cursor: pointer; list-style: none; }
+.tn20 .pk-ohje summary::-webkit-details-marker { display: none; }
+.tn20 .pk-ohje summary span { font-size: 20px; color: var(--pk-dim); }
+.tn20 .pk-ohje[open] summary span { transform: rotate(45deg); }
+.tn20 .pk-ohje summary:focus-visible { outline: 2px solid var(--tn-lime, #b6ff3c); outline-offset: 2px; }
+.tn20 .pk-ohje-sisalto { padding: 0 0 16px; font-size: 15px; line-height: 1.55; color: var(--pk-dim); }
+.tn20 .pk-ohje-sisalto b { color: var(--pk-ink); }
+.tn20 .pk-ohje-sisalto ol, .tn20 .pk-ohje-sisalto ul { margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 8px; }
+
+/* ── K4 Tulos ──────────────────────────────────────────────────────────────────────── */
+.tn20 .pk-tulos { display: flex; flex-direction: column; gap: 24px; max-width: 720px; margin: 0 auto; padding: 24px clamp(20px, 4vw, 48px) 40px; box-sizing: border-box; color: var(--pk-ink); }
+.tn20 .pk-tulos-yla { display: flex; flex-direction: column; gap: 8px; }
+.tn20 .pk-tulos-eyebrow { font-family: var(--rk-cond), "Barlow Condensed", sans-serif; font-weight: 700; font-size: 14px; letter-spacing: .18em; text-transform: uppercase; color: var(--pk-acc); }
+.tn20 .pk-tulos-iso { margin: 0; font-family: var(--rk-cond), "Barlow Condensed", sans-serif; font-weight: 800; font-size: clamp(48px, 14vw, 88px); line-height: .88; text-transform: uppercase; }
+.tn20 .pk-tulos-ala { margin: 0; max-width: 46ch; font-size: 16px; line-height: 1.5; color: var(--pk-dim); }
+.tn20 .pk-tulos-toiminnot { display: flex; flex-direction: column; align-items: flex-start; gap: 12px; }
+.tn20 .pk-harjoitus { margin: -4px 0 0; font-size: 13px; color: var(--pk-dim); }
+.tn20 .pk-haasta { display: inline-flex; align-items: center; gap: 8px; min-height: 48px; padding: 0 20px; border-radius: 999px; border: 1.5px solid var(--pk-line); background: transparent; color: var(--pk-ink); font: inherit; font-size: 15px; font-weight: 700; cursor: pointer; }
+.tn20 .pk-haasta:hover { border-color: var(--pk-acc); }
+.tn20 .pk-haasta:focus-visible { outline: 2px solid var(--tn-lime, #b6ff3c); outline-offset: 2px; }
+.tn20 .pk-seuraava { display: flex; flex-direction: column; gap: 12px; padding-top: 8px; border-top: 1px solid var(--pk-line); }
+.tn20 .pk-seuraava-h { margin: 16px 0 0; font-family: var(--rk-cond), "Barlow Condensed", sans-serif; font-weight: 800; font-size: 26px; line-height: 1; text-transform: uppercase; }
+.tn20 .pk-seuraava-rivi { display: grid; grid-template-columns: 1fr; gap: 10px; }
+.tn20 .pk-pelikortti { display: flex; align-items: center; gap: 14px; min-height: 88px; padding: 14px 16px; border-radius: 14px; background: var(--pk-kortti); border: 1px solid var(--pk-line); color: var(--pk-ink); text-decoration: none; box-sizing: border-box; }
+.tn20 .pk-pelikortti:hover { border-color: var(--pk-acc); }
+.tn20 .pk-pelikortti:focus-visible { outline: 2px solid var(--tn-lime, #b6ff3c); outline-offset: 2px; }
+.tn20 .pk-pelikortti-ikoni { flex: none; width: 52px; height: 52px; border-radius: 12px; border: 1.5px solid var(--pk-acc); display: grid; place-items: center; color: var(--pk-acc); }
+.tn20 .pk-pelikortti-teksti { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; container-type: inline-size; }
+.tn20 .pk-pelikortti-nimi { font-family: var(--rk-cond), "Barlow Condensed", sans-serif; font-weight: 800; font-size: 19px; line-height: 1.05; text-transform: uppercase; overflow-wrap: normal; word-break: normal; hyphens: manual; }
+.tn20 .pk-pelikortti-kuvaus { font-size: 13px; line-height: 1.4; color: var(--pk-dim); }
+.tn20 .pk-pelikortti-cta { flex: none; font-size: 13px; font-weight: 700; color: var(--pk-acc); white-space: nowrap; }
+@media (min-width: 900px) { .tn20 .pk-tulos { max-width: 1000px; } .tn20 .pk-seuraava-rivi { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (prefers-reduced-motion: reduce) { .tn20 .pk-ohje[open] summary span { transform: none; } }

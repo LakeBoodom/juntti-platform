@@ -291,3 +291,10 @@
   .tn20 .ttk *, .tn20 .ttk .ttk-sheet, .tn20 .ttk .ttk-scrim { animation: none !important; transition: none !important; }
   .tn20 .ttk-x2, .tn20 .ttk-burst { display: none; }
 }
+
+/* Pelikehys K4 (20.10.2026): tulos PeliTulos-rungossa — tuloksen sävy ja Tuplan oma tulosgrafiikka (kasa, tikapuut). */
+.tn20 .ttk .pk-sisalto { position: relative; z-index: 1; }
+.tn20 .ttk--kuittasi .pk-tulos-eyebrow { color: var(--ttk-gold-l); }
+.tn20 .ttk--jaahy .pk-tulos-eyebrow { color: var(--ttk-red); }
+.tn20 .ttk--taydet .pk-tulos-eyebrow, .tn20 .ttk--taydet .pk-tulos-iso > span { color: var(--acc); }
+.tn20 .ttk-res-lisa { display: flex; flex-direction: column; gap: 14px; margin-top: 8px; container-type: inline-size; }

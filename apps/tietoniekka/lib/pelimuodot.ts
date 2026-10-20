@@ -73,3 +73,15 @@ export const PELIMUODOT: Pelimuoto[] = [
 /** Kokoelman pelit: pelattavat ensin, sitten tulossa olevat. */
 export const kokoelmanPelimuodot = (kokoelma: string) =>
   PELIMUODOT.filter((p) => p.serves.includes(kokoelma)).sort((a, b) => Number(a.tila === "tulossa") - Number(b.tila === "tulossa"));
+
+/** K4 "Seuraava peli" (§4): 2–3 peliä rekisteristä, saman kokoelman pelit ensin, nykyinen peli pois.
+ *  Ensin eri pelimuodot (yksi per ikoni), sitten täydennys. */
+export function seuraavatPelit(nykyinen: string, koti?: string, n = 3): Pelimuoto[] {
+  const ehdokkaat = PELIMUODOT.filter((p) => p.slug !== nykyinen && p.tila === "pelattava");
+  const kotona = (p: Pelimuoto) => !!koti && p.serves.includes(koti);
+  const jarj = [...ehdokkaat.filter(kotona), ...ehdokkaat.filter((p) => !kotona(p))];
+  const valitut: Pelimuoto[] = [];
+  for (const p of jarj) if (valitut.length < n && !valitut.some((v) => v.ikoni === p.ikoni)) valitut.push(p);
+  for (const p of jarj) if (valitut.length < n && !valitut.includes(p)) valitut.push(p);
+  return valitut;
+}

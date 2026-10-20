@@ -84,6 +84,5 @@ export const navHref = (c: Pick<NavCollection, "slug" | "href">) => c.href ?? hu
    pelisivun — B1 (18.9.2026): se puuttui listalta, ja haasteen aloitus- ja
    tulosnäkymässä näkyi kaksi yläpalkkia päällekkäin. */
 export const isGameRoute = (pathname: string) =>
-  // Tupla tai kuitti -aihesivu on kokoelmasivu (sivuston navigaatio), sen pelit eivät
-  pathname !== "/peli/tupla-tai-kuitti" &&
+  // Pelikehys (vaihe 4, 20.10.2026): myös Tupla tai kuitin aihesivu on pelin K2-aloitus omalla pelipalkillaan.
   (pathname.startsWith("/peli") || pathname.startsWith("/visa") || pathname.startsWith("/h/"));
