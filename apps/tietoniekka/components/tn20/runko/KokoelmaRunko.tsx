@@ -30,7 +30,7 @@ function KorttiB({ v, laaja, eka }: { v: RunkoVisa; laaja: boolean; eka: boolean
       <span className="rk-pelattu" aria-hidden="true">✓</span>
       <span className="rk-b-teksti">
         {v.meta && <span className="tn-card-meta rk-b-meta">{v.meta}</span>}
-        <h3 className="rk-b-nimi">{katko(v.nimi)}</h3>
+        <h3 className="rk-b-nimi">{katko(v.nimi, true)}</h3>
         <span className="tn-card-cta">Pelaa →</span>
       </span>
     </a>
@@ -49,7 +49,7 @@ function KorttiA({ v }: { v: RunkoKortti }) {
         <span className="rk-pelattu" aria-hidden="true">✓</span>
       </span>
       <span className="rk-a-teksti">
-        <h3 className="rk-a-nimi">{katko(v.nimi)}</h3>
+        <h3 className="rk-a-nimi">{katko(v.nimi, true)}</h3>
         {v.meta && <span className="tn-card-meta">{v.meta}</span>}
         <span className="tn-card-cta">Pelaa →</span>
       </span>
@@ -106,8 +106,8 @@ export default function KokoelmaRunko({ d, tunnusosa, v3Lisa }: { d: RunkoData; 
             data-lyhyt={lyhyt || undefined}
             style={{ "--lw": pisinSana(otsikko) } as CSSProperties}
           >
-            {katko(k.title)}
-            {k.highlight && <span>{katko(k.highlight)}</span>}
+            {katko(k.title, true)}
+            {k.highlight && <span>{katko(k.highlight, true)}</span>}
           </h1>
           <p className="rk-ingress">{k.ingress}</p>
           <span className="rk-tilasto">
@@ -158,7 +158,7 @@ export default function KokoelmaRunko({ d, tunnusosa, v3Lisa }: { d: RunkoData; 
               </div>
             )}
             <div className="rk-osio-otsake">
-              <h2 id={`osio-${o.slug}-h`} className="rk-h2">{katko(o.title)}</h2>
+              <h2 id={`osio-${o.slug}-h`} className="rk-h2">{katko(o.title, true)}</h2>
               <span className="rk-osio-maara" data-osio-maara={o.maara}>{o.maara} visaa</span>
             </div>
             {(o.b || a.length > 0) && (
@@ -200,7 +200,7 @@ export default function KokoelmaRunko({ d, tunnusosa, v3Lisa }: { d: RunkoData; 
               <a key={p.slug} className="rk-peli" href={p.href} data-yli={i >= 3 || undefined} data-tulossa={p.tila === "tulossa" || undefined}>
                 <span className="rk-peli-ikoni" aria-hidden="true"><PeliIkoniSvg ikoni={p.ikoni} /></span>
                 <span className="rk-peli-teksti">
-                  <span className="rk-peli-nimi" style={{ "--lw": pisinSana(p.nimi) } as CSSProperties}>{katko(p.nimi)}</span>
+                  <span className="rk-peli-nimi" style={{ "--lw": pisinSana(p.nimi) } as CSSProperties}>{katko(p.nimi, true)}</span>
                   <span className="rk-peli-kuvaus">{p.kuvaus}</span>
                 </span>
                 <span className="tn-card-cta">{p.tila === "tulossa" ? "Tulossa" : "Pelaa →"}</span>
@@ -226,7 +226,7 @@ export default function KokoelmaRunko({ d, tunnusosa, v3Lisa }: { d: RunkoData; 
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={m.img} alt="" loading="lazy" style={m.pos ? { objectPosition: m.pos } : undefined} />
                 <span className="rk-kokoelma-teksti">
-                  <span className="rk-kokoelma-nimi">{katko(m.nimi)}</span>
+                  <span className="rk-kokoelma-nimi">{katko(m.nimi, true)}</span>
                   <span className="tn-card-meta">{m.maara} visaa</span>
                 </span>
               </a>

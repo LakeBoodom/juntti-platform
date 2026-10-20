@@ -54,8 +54,13 @@ type Rivi = {
 /*  Vain yhdyssanan sisällä (kirjain ennen viivaa): "Uuno Turhapuro -elokuvat" ei saa jättää viivaa rivin loppuun. */
 /*  Yli TAVUTUSRAJA-kirjaimiset sanat saavat tavuviivamahdollisuudet (U+00AD, tavuta) — muuten koko kutistui
     alle 11 px:n ("ulkomaalaisvahvistukset" 320 px:n kortissa, 19.10.2026). */
-export const katko = (t: string) =>
-  t.replace(/(?<=\p{L})-(?=\p{L})/gu, "-\u200B").replace(new RegExp(`\\p{L}{${TAVUTUSRAJA + 1},}`, "gu"), tavuta);
+/*  versaali: otsikko on CSS:llä versaalia (text-transform). WebKit valitsee tavutuskohdan pienaakkosten
+    leveyksillä ja ylittää rivin isoilla kirjaimilla ("PÄÄMINISTERIKAU-" +8 px, 20.10.2026) → tavutettava sana
+    kirjoitetaan valmiiksi isoilla kirjaimilla, jolloin mittaus osuu. */
+export const katko = (t: string, versaali = false) =>
+  t
+    .replace(/(?<=\p{L})-(?=\p{L})/gu, "-\u200B")
+    .replace(new RegExp(`\\p{L}{${TAVUTUSRAJA + 1},}`, "gu"), (w) => tavuta(versaali ? w.toLocaleUpperCase("fi") : w));
 
 /** Sanat, joita pidemmät tavutetaan; KORTTISÄÄNTÖ-koko lasketaan enintään tämän mittaisesta sanasta. */
 export const TAVUTUSRAJA = 14;

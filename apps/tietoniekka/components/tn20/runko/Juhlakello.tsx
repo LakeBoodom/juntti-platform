@@ -2,7 +2,7 @@
 // korvaa V3:n"). Ylhäällä lähin iso juhla ja laskuri (NostoLaskuri, Suomen aikaa), alla vuosikello: juhlat
 // tästä päivästä vuoden eteenpäin päivämäärineen ja visamäärineen (sama .rk-aika-rivi kuin Historian
 // aikajanassa, metapelin "x/n pelattu" toimii samoin). Linkit vievät juhlan osioon (#osio-<juhla>).
-import type { RunkoData } from "@/lib/kokoelmat/data";
+import { katko, type RunkoData } from "@/lib/kokoelmat/data";
 import { NostoLaskuri } from "@/components/tn20/juhlat/Laskurit";
 
 export type JuhlakelloNosto = { nimi: string; pvm: string; kohde: number; otsikko: string; osio: string };
@@ -28,7 +28,7 @@ export default function Juhlakello({ d, nosto, paivat }: { d: RunkoData; nosto: 
             <li key={o.slug}>
               <a href={`#osio-${o.slug}`} data-osio={o.slug}>
                 <span className="rk-aika-vuodet">{paivat[o.slug] ?? "Koko vuosi"}</span>
-                <span className="rk-aika-nimi">{o.chip ?? o.title}</span>
+                <span className="rk-aika-nimi">{katko(o.chip ?? o.title, true)}</span>
                 <span className="rk-aika-maara">{o.maara === 1 ? "1 visa" : `${o.maara} visaa`}</span>
               </a>
             </li>

@@ -1,7 +1,7 @@
 // V4 TUNNUSOSA "aikajana" (runko vaihe 3, Historia; CD-arkki kierros 2, kohta 2): aikakaudet vaakarivinä —
 // vuodet, lyhyt nimi ja visamäärä. Korvaa V3-osiochipit (signatureReplacesNav), joten osioiden lopun
 // paluulinkki osoittaa tänne (#osiot). Metapelin "x/n pelattu" täyttää .rk-aika-maara-kentät (RunkoMetapeli).
-import type { RunkoData } from "@/lib/kokoelmat/data";
+import { katko, type RunkoData } from "@/lib/kokoelmat/data";
 
 export default function Aikajana({ d }: { d: RunkoData }) {
   const { k, osiot } = d;
@@ -15,7 +15,7 @@ export default function Aikajana({ d }: { d: RunkoData }) {
             <li key={o.slug}>
               <a href={`#osio-${o.slug}`} data-osio={o.slug}>
                 {o.vuodet && <span className="rk-aika-vuodet">{o.vuodet}</span>}
-                <span className="rk-aika-nimi">{o.chip ?? o.title}</span>
+                <span className="rk-aika-nimi">{katko(o.chip ?? o.title, true)}</span>
                 <span className="rk-aika-maara">{o.maara} visaa</span>
               </a>
             </li>
