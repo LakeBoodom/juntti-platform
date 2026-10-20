@@ -74,7 +74,8 @@ function RiviC({ v }: { v: RunkoKortti }) {
   );
 }
 
-export default function KokoelmaRunko({ d, tunnusosa }: { d: RunkoData; tunnusosa?: ReactNode }) {
+/** v3Lisa: V3:n yläpuolelle tuleva lisä (Tunnetut henkilöt: henkilöhaku + A–Ö-linkki, brief §3). */
+export default function KokoelmaRunko({ d, tunnusosa, v3Lisa }: { d: RunkoData; tunnusosa?: ReactNode; v3Lisa?: ReactNode }) {
   const { k, osiot } = d;
   const otsikko = `${k.title}${k.highlight ?? ""}`;
   const lyhyt = otsikko.trim().length <= 12;
@@ -125,6 +126,7 @@ export default function KokoelmaRunko({ d, tunnusosa }: { d: RunkoData; tunnusos
           ikoni={k.mastery.icon}
           visaIdt={d.jarjestys.map((v) => v.id)}
         />
+        {v3Lisa}
         {naytaV3 && (
           <nav id="osiot" className="rk-v3" aria-label={k.osiotNimi}>
             <span className="rk-v3-otsikko">{k.osiotNimi}</span>
