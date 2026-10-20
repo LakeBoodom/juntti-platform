@@ -4,7 +4,6 @@
 // Canonical tulee alkuperäisen sivun metadatasta (= suodattamaton hub).
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import Luonto, { generateMetadata as luontoMeta } from "../../kokoelma/luonto/sivu";
 import Kokoelma, { generateMetadata as kokoelmaMeta } from "../../kokoelma/[collection]/sivu";
 
 export const dynamic = "force-dynamic";
@@ -13,7 +12,6 @@ type SP = Promise<Record<string, string | string[] | undefined>>;
 type Props = { params: Promise<{ polku: string[] }>; searchParams: SP };
 
 const OMAT: Record<string, { Sivu: (p: { searchParams: SP }) => Promise<React.ReactElement>; meta: () => Promise<Metadata> }> = {
-  luonto: { Sivu: Luonto, meta: luontoMeta },
 };
 /** [collection]-reitin palvelemat hubit (staattiset kansiot varjostavat muut). */
 const KOKOELMAHUBIT = new Set(["kuvavisat", "tunnetut-henkilot"]);

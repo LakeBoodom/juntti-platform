@@ -184,7 +184,7 @@ export default function KokoelmaRunko({ d, tunnusosa }: { d: RunkoData; tunnusos
 
       {/* ─── V6 Pelit tässä kokoelmassa (pelimuotorekisteri, S4) ─── */}
       {d.pelit.length > 0 && (
-        <section className="rk-pelit" aria-labelledby="rk-pelit-h" data-monta={monta || undefined}>
+        <section id="pelit" className="rk-pelit" aria-labelledby="rk-pelit-h" data-monta={monta || undefined}>
           <div className="rk-osio-otsake">
             <h2 id="rk-pelit-h" className="rk-h2 rk-h2--pieni">Pelit tässä kokoelmassa</h2>
             {monta && (

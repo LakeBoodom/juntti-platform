@@ -214,7 +214,7 @@
 .tn20 .rk[data-metapeli] .rk-c[data-pelattu] .rk-pelattu { position: static; }
 
 /* ── V6 Pelit ─────────────────────────────────────────────────────────── */
-.tn20 .rk-pelit { padding-top: calc(var(--rk-vali) + 24px); }
+.tn20 .rk-pelit { padding-top: calc(var(--rk-vali) + 24px); scroll-margin-top: 40px; }
 .tn20 .rk-kaikki-pelit { display: none; align-items: center; min-height: 44px; font-size: 14px; font-weight: 700; color: var(--rk-soft) !important; }
 .tn20 .rk-pelit-rivi { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr)); gap: 12px; }
 @media (max-width: 767px) {
