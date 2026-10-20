@@ -3,6 +3,7 @@
 // tulosnäkymän "Seuraava peli" (K4) hakevat pelit täältä — kokoelman asetuksessa ei ole pelilistaa.
 // Uusi pelimuoto tai Tupla tai kuitin aihe ilmestyy oikeille sivuille itsestään.
 import { TEEMAT, TUPLA_SIVU } from "./tuplaTaiKuitti";
+import { JULKAISTUT, pakkaHref } from "./jarjesta/pakat";
 
 export type PeliIkoni = "kuva" | "aani" | "ika" | "jarjestys" | "kartta" | "tupla" | "kumpi" | "ketju";
 
@@ -55,6 +56,17 @@ export const PELIMUODOT: Pelimuoto[] = [
   { slug: "kuvavisa-kasvit", nimi: "Kuvavisa: Suomen kasvit ja puut", ikoni: "kuva", kuvaus: "Lehti, kukka ja kaarna tunnistettavina.", href: "/kuvavisa/kasvit", tila: "pelattava", serves: ["luonto"] },
   /* Suomen kaupungit -megavisa (50 kysymystä) — entisen Kaupungit-sivun nosto (runko vaihe 3, 20.10.2026). */
   { slug: "mega-suomen-kaupungit", nimi: "Megavisa: Suomen kaupungit", ikoni: "jarjestys", kuvaus: "50 kysymystä kaikista 20 kaupungista.", href: "/peli?mega=suomen-kaupungit-mega", tila: "pelattava", serves: ["kaupungit"] },
+  /* Laita järjestykseen -pakat (julkaistut, lib/jarjesta/pakat.ts) palvelevat oman kokoelmansa sivua
+     (runko vaihe 3, 20.10.2026: Vaalit-hubin pakkakortit → V6). */
+  ...JULKAISTUT.map((p) => ({
+    slug: `jarjesta-${p.slug}`,
+    nimi: `Laita järjestykseen: ${p.kortti.otsikko}`,
+    ikoni: "jarjestys" as const,
+    kuvaus: p.kortti.meta,
+    href: pakkaHref(p),
+    tila: "pelattava" as const,
+    serves: [p.collection.slug],
+  })),
   { slug: "megavisat", nimi: "Megavisat", ikoni: "jarjestys", kuvaus: "20–50 kysymystä yhdellä kertaa.", href: "/megavisat", tila: "pelattava", serves: [] },
 ];
 

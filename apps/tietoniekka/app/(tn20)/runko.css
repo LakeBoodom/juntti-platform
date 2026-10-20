@@ -302,6 +302,11 @@
 .tn20 .rk-haku-ei { font-size: 14px; color: var(--rk-muted); }
 .tn20 .rk-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 
+/* Vaalilaskuri (V4, Vaalit): iso päivämäärä + vaiheet (.rk-aika ilman linkkejä). */
+.tn20 .rk-laskuri { display: flex; align-items: baseline; flex-wrap: wrap; gap: 4px 14px; }
+.tn20 .rk-laskuri-luku { font-family: var(--rk-cond); font-weight: 800; font-size: clamp(64px, 9vw, 104px); line-height: .85; color: var(--rk-acc); font-variant-numeric: tabular-nums; }
+.tn20 .rk-aika-kohta { display: flex; flex-direction: column; gap: 4px; min-height: 64px; padding: 12px 12px 10px 0; border-top: 3px solid #3a3120; }
+
 /* Aikajana (V4, Historia; CD 2): vaakarivi, kausi 132 px, yläviiva 3 px. Korvaa V3:n. */
 .tn20 .rk-aika { display: flex; margin: 0; padding: 0 0 6px; list-style: none; overflow-x: auto; scroll-snap-type: x proximity; }
 .tn20 .rk-aika li { flex: 1 0 132px; scroll-snap-align: start; }
