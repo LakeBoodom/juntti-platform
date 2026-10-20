@@ -21,6 +21,8 @@ import { maantietoImg } from "@/lib/maantieto";
 import { KAUPUNGIT } from "@/lib/kaupungit";
 import { resolveCollection, COLLECTION_LABEL } from "@/lib/visanKokoelma";
 import { type Learn } from "@/lib/learn";
+import { megaDuration } from "@/lib/megavisat";
+import { seuraavatPelit } from "@/lib/pelimuodot";
 import GameClient, { type GameQuiz } from "./GameClient";
 import LastenPeli from "./lapset/LastenPeli";
 import { LAPSET_SIVU, haeLastenVisa, haeMuutLastenVisat, lapsetNakyvissa } from "@/lib/lapset/data";
@@ -429,6 +431,25 @@ export default async function Peli20({
       isSankari: false,
       kind: "teksti",
       challengePath: `/peli?mega=${encodeURIComponent(mega)}`,
+      autoStart: params.aloita === "1",
+      /* Pelikehys (TOTEUTUSBRIEF §4, 20.10.2026): K1 paluu /kokoelmat, K2 aloitus, K4 tulos. */
+      kehys: {
+        peli: "Megavisat",
+        koti: { href: "/kokoelmat", nimi: "Kokoelmat" },
+        lause: mq.teaser ?? "Yksi istunto ilman taukoja: pelaa loppuun asti. Vain pisteet ja putki.",
+        alarivi: `${questions.length} kysymystä · ${megaDuration(questions.length)} · yksi istunto`,
+        ohjeet: [
+          {
+            otsikko: "Näin mega toimii",
+            kohdat: [
+              { t: "Yksi istunto, ei taukoja", d: "Mega ei tallenna välitilaa. Poistuminen kesken päättää kierroksen." },
+              { t: "Putki ratkaisee", d: "Peräkkäiset oikeat kasvattavat kerrointa. Yksi väärä nollaa sen." },
+              { t: "Kysymykset kaikista kokoelmista", d: "Jokaisen kysymyksen yllä näkyy, mistä visasta se on." },
+            ],
+          },
+        ],
+        seuraavat: seuraavatPelit("megavisat", undefined, 4).filter((p) => !p.href.endsWith(`=${mega}`)).slice(0, 3),
+      },
       questions,
       related: rel.map((r) => ({
         id: r.id,

@@ -32,6 +32,11 @@ import { lueViikkoTulos, tallennaViikkoTulos, type ViikkoInfo, type ViikkoTulos 
 import type { KollaasiKuva } from "../../../lib/kuvavisat2026";
 import { igAvaus, igValmis } from "../../../lib/igMittaus";
 import "../peli2026.css";
+import Pelipalkki from "@/components/tn20/pelikehys/Pelipalkki";
+import PeliKehys from "@/components/tn20/pelikehys/PeliKehys";
+import PeliAloitus from "@/components/tn20/pelikehys/PeliAloitus";
+import PeliTulos from "@/components/tn20/pelikehys/PeliTulos";
+import type { Pelimuoto } from "@/lib/pelimuodot";
 
 const BASE_POINTS = 100;
 const STREAK_BONUS = 50;
@@ -121,6 +126,16 @@ export type GameQuiz = {
   related: GameRelated[];
   /** "Visassa mukana" (8.10.2026): henkilösivut, jotka celebrity_related_quizzes liittää visaan. */
   mukana?: Array<{ name: string; href: string; image_url: string | null }>;
+  /** Pelikehys K1/K2/K4 (TOTEUTUSBRIEF §4, 20.10.2026) — vain Megavisat; tavallinen visa ei kuulu kehykseen.
+      Aloitus ja tulos tulevat kehyksestä, pelinäkymä (K3) on tämän komponentin oma. */
+  kehys?: {
+    peli: string;
+    koti: { href: string; nimi: string };
+    lause: string;
+    alarivi: string;
+    ohjeet: Array<{ otsikko: string; kohdat: Array<{ t: string; d: string }> }>;
+    seuraavat: Pelimuoto[];
+  };
 };
 
 /** "Visassa mukana": oikeat <a href> -linkit henkilösivuille (SSR-renderöity aloitusnäkymä). */
@@ -985,6 +1000,80 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
       </span>
     </button>
   );
+
+  /* ── Pelikehys (Megavisat): K2-aloitus ja K4-tulos kehyksestä, K3-pelinäkymä alla ennallaan ── */
+  const kehys = quiz.kehys;
+  if (kehys && phase === "start") {
+    return (
+      <PeliKehys iho="tumma">
+        <Pelipalkki iho="tumma" peli={kehys.peli} koti={kehys.koti} />
+        <main>
+          <PeliAloitus
+            otsikko={quiz.title}
+            lause={kehys.lause}
+            toiminto={
+              <button type="button" className="pk-nappi" onClick={startGame}>
+                Aloita mega
+              </button>
+            }
+            alarivi={kehys.alarivi}
+            ohjeet={kehys.ohjeet.map((o) => ({
+              otsikko: o.otsikko,
+              sisalto: (
+                <ol>
+                  {o.kohdat.map((k) => (
+                    <li key={k.t}>
+                      <b>{k.t}.</b> {k.d}
+                    </li>
+                  ))}
+                </ol>
+              ),
+            }))}
+          />
+        </main>
+      </PeliKehys>
+    );
+  }
+  if (kehys && done) {
+    const uusi = quiz.related[0];
+    return (
+      <PeliKehys iho="tumma">
+        <Pelipalkki iho="tumma" peli={kehys.peli} koti={kehys.koti} />
+        <main>
+          <PeliTulos
+            eyebrow={`${kehys.peli} · ${quiz.title}`}
+            iso={`${right}/${total} oikein`}
+            ala={`${score} pistettä · ${tier.title}`}
+            paatoiminto={
+              uusi ? (
+                <a className="pk-nappi" href={uusi.href}>
+                  Pelaa uusi megavisa
+                </a>
+              ) : (
+                <button type="button" className="pk-nappi" onClick={restart}>
+                  Pelaa uudelleen
+                </button>
+              )
+            }
+            harjoitus={
+              uusi ? (
+                <button type="button" className="pk-linkki" onClick={restart}>
+                  Pelaa sama mega uudelleen
+                </button>
+              ) : undefined
+            }
+            haasta={
+              <button type="button" className="pk-haasta" onClick={() => (typeof navigator !== "undefined" && "share" in navigator ? nativeShare() : copyLink())}>
+                {copyState === "copied" ? "Linkki kopioitu" : "Haasta kaveri"}
+              </button>
+            }
+            seuraavat={kehys.seuraavat}
+          />
+          <p className="tng-sr" role="status" aria-live="polite">{copyState ? liveStatus : ""}</p>
+        </main>
+      </PeliKehys>
+    );
+  }
 
   return (
     <div ref={rootRef} className="tng" style={accentVars} data-kuva={isKuva ? "1" : undefined} data-lock={lukittu ? "1" : undefined} data-plate={isKuva ? (q?.plate ?? quiz.plate ?? "tumma") : undefined}>
