@@ -77,10 +77,12 @@
 .tn20 .pk-ohje { border-bottom: 1px solid var(--pk-line); }
 .tn20 .pk-ohje summary { display: flex; align-items: center; justify-content: space-between; min-height: 52px; font-size: 15px; font-weight: 700; color: var(--pk-ink); cursor: pointer; list-style: none; }
 .tn20 .pk-ohje summary::-webkit-details-marker { display: none; }
-.tn20 .pk-ohje summary span { font-size: 20px; color: var(--pk-dim); }
-/* +-merkki omassa 24 px:n laatikossa: 45° kierretty × pysyy laatikon sisällä (ei ylitä reunaa, mitattu 20.10.2026). */
-.tn20 :is(.pk-ohje, .pk-lapikaynti) summary span { flex: none; display: grid; place-items: center; width: 24px; height: 24px; line-height: 1; }
-.tn20 .pk-ohje[open] summary span { transform: rotate(45deg); }
+.tn20 .pk-ohje summary span { color: var(--pk-dim); }
+/* +-merkki 24 px:n laatikossa. Laatikko ei kierry (kierretty laatikko ylitti reunan 5 px, mitattu 20.10.2026):
+   merkki piirretään ::before-elementtiin ja vain se kiertyy ×:ksi. */
+.tn20 :is(.pk-ohje, .pk-lapikaynti) summary span { flex: none; display: grid; place-items: center; width: 24px; height: 24px; font-size: 0; }
+.tn20 :is(.pk-ohje, .pk-lapikaynti) summary span::before { content: "+"; font-size: 20px; line-height: 1; }
+.tn20 :is(.pk-ohje, .pk-lapikaynti)[open] summary span::before { transform: rotate(45deg); }
 .tn20 .pk-ohje summary:focus-visible { outline: 2px solid var(--tn-lime, #b6ff3c); outline-offset: 2px; }
 .tn20 .pk-ohje-sisalto { padding: 0 0 16px; font-size: 15px; line-height: 1.55; color: var(--pk-dim); }
 .tn20 .pk-ohje-sisalto b { color: var(--pk-ink); }
@@ -108,8 +110,7 @@
 .tn20 .pk-lapikaynti { margin-top: 8px; border-block: 1px solid var(--pk-line); }
 .tn20 .pk-lapikaynti summary { display: flex; align-items: center; justify-content: space-between; min-height: 52px; font-size: 15px; font-weight: 700; color: var(--pk-ink); cursor: pointer; list-style: none; }
 .tn20 .pk-lapikaynti summary::-webkit-details-marker { display: none; }
-.tn20 .pk-lapikaynti summary span { font-size: 20px; color: var(--pk-dim); }
-.tn20 .pk-lapikaynti[open] summary span { transform: rotate(45deg); }
+.tn20 .pk-lapikaynti summary span { color: var(--pk-dim); }
 .tn20 .pk-lapikaynti summary:focus-visible { outline: 2px solid var(--tn-lime, #b6ff3c); outline-offset: 2px; }
 .tn20 .pk-lapikaynti .tng-sumwrap { padding-bottom: 16px; }
 .tn20 .pk-harjoitus { margin: -4px 0 0; font-size: 13px; color: var(--pk-dim); }
@@ -129,4 +130,4 @@
 .tn20 .pk-pelikortti-kuvaus { font-size: 13px; line-height: 1.4; color: var(--pk-dim); }
 .tn20 .pk-pelikortti-cta { flex: none; font-size: 13px; font-weight: 700; color: var(--pk-acc); white-space: nowrap; }
 @media (min-width: 900px) { .tn20 .pk-tulos { max-width: 1000px; } .tn20 .pk-seuraava-rivi { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
-@media (prefers-reduced-motion: reduce) { .tn20 :is(.pk-ohje, .pk-lapikaynti)[open] summary span { transform: none; } }
+@media (prefers-reduced-motion: reduce) { .tn20 :is(.pk-ohje, .pk-lapikaynti)[open] summary span::before { transform: none; } }
