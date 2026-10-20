@@ -1,21 +1,8 @@
-// SUOMEN KAUPUNGIT — teemasivun data (CD "TN Suomen kaupungit -teemasivu"
-// 27.8.2026, design_handoff_suomen_kaupungit/README.md). Kymmenes teemasivu;
-// idea on matkapassi: käyttäjä valitsee kaupungin Suomen kartalta (tai
-// ruudukosta), pelaa sen visan ja ansaitsee leiman.
-//
-// - Kartan koordinaatit (px/py) ja Suomen SVG-path ovat design-arvoja,
-//   käsin asemoitu prototyypin SVG-Suomen päälle — säilytetty sellaisenaan
-//   (README: "EI pyöristetä eikä lasketa uudelleen").
-// - quizSlug-arvot löydetty ja varmistettu Supabasesta 28.8.2026 (Heikki
-//   toimitti kaupunki→otsikko-mäppäyksen chattiin, koska visojen slugit
-//   eivät vastaa README:n design-id:tä). Kaikki 20 julkaistu (aiemmin
-//   draft, 10 kysymystä/visa — README oletti 20, todellisuus on 10).
-// - Leima ansaitaan PELAAMALLA visa loppuun, ei tuloksesta riippuen
-//   (Heikin päätös 28.8.2026). Ei kirjautumista — leimat localStoragessa
-//   (sama periaate kuin Putki), avain "tn_kaupunkileimat" (ks. GameClient.tsx
-//   stampCity()). Kirjautumaton käyttäjä näkee siis aina oman selaimensa
-//   leimatilanteen, ei synkkaa laitteiden välillä (README:n avoin kysymys
-//   #2 ratkaistu näin — designattu tila ei ollut valmis).
+// SUOMEN KAUPUNGIT — kaupunkien data ja kuvat (CD "TN Suomen kaupungit -teemasivu" 27.8.2026). Kokoelmasivu on
+// rungolla 20.10.2026 alkaen (lib/kokoelmat/kaupungit.ts): kartta ja matkapassin pelilauta poistuivat (brief §3),
+// alueet ovat osioita. px/py-kartta-arvot jäävät dataan, mutta niitä ei enää piirretä. GameClient kirjoittaa yhä
+// leimat (tn_kaupunkileimat), vaikka sivu ei niitä näytä — metapelin eteneminen korvaa ne V2:ssa.
+// quizSlug-arvot varmistettu Supabasesta 28.8.2026.
 
 export type KaupunkiSuunta =
   | "Pääkaupunkiseutu"
@@ -63,31 +50,13 @@ export const KAUPUNGIT: Kaupunki[] = [
   { id: "rovaniemi", name: "Rovaniemi", slogan: "Napapiirin pintaa syvemmältä", region: "Pohjois-Suomi", px: 47.7, py: 40.4, quizSlug: "napapiirin-pintaa-syvemmalta-tentti", kuvaPos: "66% 32%" },
 ];
 
-export const KAUPUNKI_REGIONS: KaupunkiSuunta[] = [
-  "Pääkaupunkiseutu", "Etelä-Suomi", "Lounais-Suomi", "Länsi-Suomi", "Itä-Suomi", "Pohjois-Suomi",
-];
-
-/** Maantieteellisesti järkevä kierrosreitti (README:n data, ei aakkosjärjestys) —
-    ohjaa matkareitin piirtymisen ja "seuraava etappi" -laskennan. */
-export const KAUPUNKI_REITTI: string[] = [
-  "helsinki", "vantaa", "porvoo", "kouvola", "lappeenranta", "mikkeli", "kuopio",
-  "joensuu", "jyvaskyla", "tampere", "hameenlinna", "lahti", "espoo", "salo",
-  "turku", "pori", "seinajoki", "vaasa", "oulu", "rovaniemi",
-];
-
 export const kaupunkiImg = (id: string) => `/20/kaupungit/${id}.webp`;
-/** Kaupungin kuvan rajaus inline-tyylinä (vain jos kuvaPos on asetettu). */
-export const kaupunkiKuvaTyyli = (id: string) => {
-  const pos = KAUPUNGIT.find((k) => k.id === id)?.kuvaPos;
-  return pos ? { objectPosition: pos } : undefined;
-};
-
 export const KAUPUNGIT_HERO_IMG = "/20/kaupungit/hero-laura-mikko.webp";
 
-/** Suomen SVG-path (viewBox 0 0 600 1000) — design-referenssistä VERBATIM, ei piirretä uudelleen. */
-export const SUOMI_PATH =
-  "M398.629,137.806L392.836,213.579L452.89,283.551L416.716,360.233L462.357,471.82L435.933,552.51L471.259,620.603L455.292,678.699L513.367,738.397L498.53,781.868L462.074,830.234L378.14,934.172L306.924,940.506L237.827,969.416L173.958,986L151.208,942.927L113.198,916.844L121.959,836.548L102.883,760.731L121.676,710.419L157.284,655.171L247.011,556.899L273.152,537.402L269.196,497.62L214.512,452.454L201.371,414.587L200.24,258.741L139.056,186.581L86.633,133.339L110.23,104.103L153.893,162.225L205.045,156.881L247.153,183.116L284.598,134.829L303.956,52.839L364.858,14L415.162,59.571Z";
-
-/** Suomi-megavisa CTA-kohde (QA-001, 29.8.2026): Suomen kaupungit -megavisa
-    (50 kysymystä, julkaistu 28.8.) pelataan ?mega=<slug>-osoitteessa. */
-export const SUOMI_MEGA_SLUG = "suomen-kaupungit-mega";
+/** Kokoelmasivun (runko) korttikuva ja rajaus visan slugista: 800 px kopio (public/20/kaupungit/k/, 20.10.2026). */
+const KAUPUNKI_SLUGISTA = new Map(KAUPUNGIT.map((k) => [k.quizSlug, k]));
+export const kaupunkiKorttikuva = (slug: string) => {
+  const k = KAUPUNKI_SLUGISTA.get(slug);
+  return k ? `/20/kaupungit/k/${k.id}.webp` : null;
+};
+export const kaupunkiKorttiPos = (slug: string) => KAUPUNKI_SLUGISTA.get(slug)?.kuvaPos ?? "center 32%";

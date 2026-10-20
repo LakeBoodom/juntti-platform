@@ -1,33 +1,13 @@
-// TIETONIEKKA 2.0 — SUOMEN KAUPUNGIT: teemasivu (CD "TN Suomen kaupungit
-// -teemasivu" 27.8.2026, design_handoff_suomen_kaupungit/README.md).
-// Kymmenes teemasivu. Staattinen segmentti ohittaa dynaamisen
-// [collection]-reitin — sama malli kuin Jääkiekko/Jalkapallo/Urheilu:
-// visat ovat kannassa "yleistieto"-kokoelmaa, mutta teemasivu nostetaan
-// navigaatioon omana kohtanaan ja visamäärä lasketaan tämän sivun omasta
-// slugilistasta (lib/kaupungit.ts KAUPUNGIT), ei collection-kentästä.
-//
-// Matkapassi-konsepti: kartta on pelilauta, leimat kertyvät pelaamalla
-// (ei tuloksesta riippuen — Heikin päätös 28.8.2026), tallennus
-// localStorageen ilman kirjautumista (ks. KaupunkiPelilauta.tsx).
-//
-// Kaikki 20 kaupunkivisaa julkaistiin tämän sivun rakentamisen yhteydessä
-// 28.8.2026 (olivat draft, 10 kysymystä/visa — löydettiin ja varmistettiin
-// Heikin toimittamalla kaupunki→otsikko-mäppäyksellä, koska README:n
-// design-id ei vastaa visojen oikeita slugeja). Suomi-megavisa-CTA linkkaa
-// Suomen kaupungit -megavisaan ?mega=-osoitteella (QA-001, 29.8.2026; aiemmin
-// ?visa=kaikki-suomesta-mega, joka antoi tyhjän sivun).
-
-import { KokoelmaLd } from "@/components/tn20/KokoelmaLd";
-import { jakoMeta } from "@/lib/jakoMeta";
-import "../../kaupungit.css";
+// SUOMEN KAUPUNGIT yhteisellä rungolla (TOTEUTUSBRIEF "Kokoelmasivun runko ja pelikehys", vaihe 3, 20.10.2026).
+// Sisältö ja ilme tulevat asetuksesta lib/kokoelmat/kaupungit.ts, visat osioihin quizzes.section_tags-tagista.
+// Vanha sivukohtainen toteutus (CD 27.8.2026: kartta-pelilauta, matkapassi) poistettu.
+import "../../runko.css";
 import type { Metadata } from "next";
-import { getSupabase } from "@/lib/supabase";
+import { jakoMeta } from "@/lib/jakoMeta";
 import { getPageContent } from "@/lib/pageContent";
-import Crumbs from "@/components/tn20/Crumbs";
-import KaupunkiPelilauta from "@/components/tn20/KaupunkiPelilauta";
-import KaupunkiMatkapassi, { KaupunkiEdistyminen, KaupunkiMatkapassiBadge } from "@/components/tn20/KaupunkiMatkapassi";
-import { MobiiliSankari } from "@/components/tn20/MobiiliSankari";
-import { KAUPUNGIT, KAUPUNGIT_HERO_IMG, SUOMI_MEGA_SLUG, kaupunkiImg, kaupunkiKuvaTyyli } from "@/lib/kaupungit";
+import KokoelmaRunko from "@/components/tn20/runko/KokoelmaRunko";
+import { haeRunkoData } from "@/lib/kokoelmat/data";
+import { KAUPUNGIT_KOKOELMA } from "@/lib/kokoelmat/kaupungit";
 
 export const revalidate = 300; // SEO-erä A4 (2.10.2026): ISR 5 min
 
@@ -37,122 +17,13 @@ export async function generateMetadata(): Promise<Metadata> {
   const pc = await getPageContent("kaupungit");
   const title = pc?.seo_title ?? "Suomen kaupungit — matkusta halki Suomen tietovisoina";
   const description =
-    pc?.seo_description ??
-    "20 kaupunkia, 20 visaa. Valitse kaupunki kartalta, pelaa ja kerää leimoja matkapassiisi.";
+    pc?.seo_description ?? "20 kaupunkia, 20 visaa Helsingistä Rovaniemelle. Kuinka hyvin tunnet Suomen kaupungit?";
   const canonical = `${SITE_URL}/kokoelma/kaupungit`;
-  return {
-    title, description,
-    alternates: { canonical },
-    ...jakoMeta({ title, description, url: canonical, kuva: "/og/kokoelma/kaupungit" }),
-  };
+  return { title, description, alternates: { canonical }, ...jakoMeta({ title, description, url: canonical, kuva: "/og/kokoelma/kaupungit" }) };
 }
 
-type Row = { slug: string; published_at: string | null; question_count: number | null };
-
 export default async function KaupungitLanding() {
-  const sb = getSupabase();
-  if (!sb) return <main style={{ padding: 32 }}>Ei tietokantayhteyttä.</main>;
-
-  const slugs = KAUPUNGIT.map((c) => c.quizSlug);
-  const { data } = await sb
-    .from("quiz_cards" as never)
-    .select("slug, published_at, question_count")
-    .in("slug", slugs);
-  const bySlug = new Map(((data ?? []) as unknown as Row[]).map((r) => [r.slug, r]));
-
-  const publishedIds = new Set(
-    KAUPUNGIT.filter((c) => bySlug.get(c.quizSlug)?.published_at).map((c) => c.id),
-  );
-  const questionCounts: Record<string, number> = {};
-  for (const c of KAUPUNGIT) {
-    questionCounts[c.id] = bySlug.get(c.quizSlug)?.question_count ?? 10;
-  }
-
-  return (
-    <main className="tnk tnk2" style={{ minHeight: "100dvh" }}>
-      <KokoelmaLd avain="kaupungit" nimi="Suomen kaupungit" polku="/kokoelma/kaupungit" />
-      <Crumbs
-        items={[
-          { label: "Kokoelmat", href: "/kokoelmat" },
-          { label: "Maantieto", href: "/kokoelma/matkakohteet" },
-          { label: "Suomen kaupungit" },
-        ]}
-      />
-
-      {/* Mobiili (CD 24.9.): kuva yllä, teksti alla, matkapassi yhteisenä edistymismittarina */}
-      <MobiiliSankari
-        accent="#35D6A0"
-        eyebrow="Kaupunkivisat"
-        title={["Matkusta", "halki Suomen"]}
-        lead="Jokaisella kaupungilla on oma visansa. Pelaa, kerää leimoja matkapassiisi ja katso, kuinka pitkälle matkasi kantaa."
-        stats={[{ n: KAUPUNGIT.length, label: "kaupunkia" }, { n: Object.values(questionCounts).reduce((a, b) => a + b, 0), label: "kysymystä" }]}
-        image={{ src: KAUPUNGIT_HERO_IMG }}
-        module={<KaupunkiEdistyminen />}
-      />
-
-      {/* ─── Hero + matkapassi ─── */}
-      <section className="tnk2-herowrap tnms-desk">
-        <div className="tnk2-hero-bg">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={KAUPUNGIT_HERO_IMG} alt="" fetchPriority="high" />
-        </div>
-        <div className="tn-shell tnk2-hero">
-          <span className="tnk2-badge">
-            <i aria-hidden />Kaupunkivisat
-          </span>
-          <h1 className="tnk2-h1">
-            Matkusta<br />halki Suomen
-          </h1>
-          <p className="tnk2-lede">
-            Jokaisella kaupungilla on oma visansa. Pelaa, kerää leimoja matkapassiisi ja katso, kuinka pitkälle
-            matkasi kantaa.
-          </p>
-          <KaupunkiMatkapassi />
-        </div>
-      </section>
-
-      <KaupunkiPelilauta publishedIds={publishedIds} questionCounts={questionCounts} />
-
-      {/* ─── CTA — Suomi-megavisa ─── */}
-      <section className="tn-shell tnk2-ctasection">
-        <div className="tnk2-ctabox">
-          <div className="tnk2-ctabox-bg" aria-hidden>
-            {["helsinki", "tampere", "vaasa", "rovaniemi"].map((id) => (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img key={id} src={kaupunkiImg(id)} alt="" style={kaupunkiKuvaTyyli(id)} />
-            ))}
-          </div>
-          <svg className="tnk2-ctabox-route" viewBox="0 0 100 40" preserveAspectRatio="none" aria-hidden>
-            <path
-              d="M2,32 C24,27 30,13 52,16 C72,19 80,8 98,12" fill="none" stroke="#35D6A0" strokeWidth={1.5}
-              strokeDasharray="4 6" strokeLinecap="round" vectorEffect="non-scaling-stroke"
-            />
-          </svg>
-          <div className="tnk2-ctabox-content">
-            <div className="tnk2-ctabox-text">
-              <KaupunkiMatkapassiBadge />
-              <h3 className="tnk2-h3">Valmis koko Suomen kierrokseen?</h3>
-              <p className="tnk2-ctabox-desc">
-                Kysymyksiä kaikista 20 kaupungista yhdessä visassa. Jätä kartta sivuun ja katso, kuinka hyvin tunnet
-                Suomen.
-              </p>
-            </div>
-            <a className="tnk2-ctabox-btn" href={`/peli?mega=${SUOMI_MEGA_SLUG}`}>Pelaa Suomen kaupungit -megavisa</a>
-          </div>
-        </div>
-      </section>
-
-      {/* Kuvakrediitti — CC BY / CC BY-SA vaativat tekijämaininnan.
-          Tekijät ja lisenssit listattu sivulla /kuvien-lahteet (12.9.2026).
-          Merkintä on erillinen rivi, ei koskaan kuvan päällä. */}
-      <div className="tn-shell">
-        <p className="tne-kuvakrediitti">
-          Kaupunkikuvat: Wikimedia Commons, CC BY / CC BY-SA / public domain ·{" "}
-          <a href="/kuvien-lahteet">tekijät ja lisenssit</a>
-        </p>
-      </div>
-
-      {/* Alatunniste tulee layoutista (SiteFooter, QA-005 29.8.2026) */}
-    </main>
-  );
+  const d = await haeRunkoData(KAUPUNGIT_KOKOELMA);
+  if (!d) return <main style={{ padding: 32 }}>Ei tietokantayhteyttä.</main>;
+  return <KokoelmaRunko d={d} />;
 }
