@@ -19,6 +19,9 @@
   --pk-logo: #f3efff; --pk-peli: #f3efff; --pk-paluu: #cfc6f5; --pk-acc: #b4a5ff; --pk-kortti: #1d1830;
 }
 
+/* Kehyksen napit [data-iho]-tarkkuudella: pelien omat nollaukset (esim. Tuplan .ttk :where(button) { color: inherit })
+   ovat muuten yhtä tarkkoja ja voittaisivat latausjärjestyksellä (20.10.2026). */
+
 /* ── K1 Pelipalkki: 56 px + paluurivi 44 px ─────────────────────────────────────────── */
 .tn20 .pk-palkki { display: flex; flex-direction: column; background: var(--pk-bar); border-bottom: 1px solid var(--pk-line); font-family: var(--tn-font-body, "Barlow", sans-serif); }
 .tn20 .pk-palkki-rivi { display: flex; align-items: center; gap: 12px; height: 56px; padding: 0 clamp(16px, 4vw, 48px); max-width: 1296px; width: 100%; margin: 0 auto; box-sizing: border-box; }
@@ -55,12 +58,12 @@
 .tn20 .pk-vaihtoehto:has(input:checked) .pk-vaihtoehto-piste { background: var(--va, var(--pk-acc)); }
 .tn20 .pk-vaihtoehto:has(input:focus-visible) { outline: 2px solid var(--tn-lime, #b6ff3c); outline-offset: 2px; }
 .tn20 .pk-toiminto { display: flex; flex-direction: column; align-items: flex-start; gap: 10px; margin-top: 4px; }
-.tn20 .pk-nappi { display: inline-flex; align-items: center; justify-content: center; min-height: 56px; padding: 0 28px; border: 0; border-radius: var(--pk-nappi-sade); background: var(--pk-nappi); color: var(--pk-nappi-ink); box-shadow: var(--pk-nappi-varjo); font-family: var(--rk-cond), "Barlow Condensed", sans-serif; font-weight: 800; font-size: 20px; letter-spacing: .02em; text-transform: uppercase; text-decoration: none; cursor: pointer; }
-.tn20 .pk-nappi:hover { filter: brightness(1.06); }
-.tn20 .pk-nappi:focus-visible { outline: 2px solid var(--pk-ink); outline-offset: 3px; }
+.tn20 [data-iho] .pk-nappi { display: inline-flex; align-items: center; justify-content: center; min-height: 56px; padding: 0 28px; border: 0; border-radius: var(--pk-nappi-sade); background: var(--pk-nappi); color: var(--pk-nappi-ink); box-shadow: var(--pk-nappi-varjo); font-family: var(--rk-cond), "Barlow Condensed", sans-serif; font-weight: 800; font-size: 20px; letter-spacing: .02em; text-transform: uppercase; text-decoration: none; cursor: pointer; }
+.tn20 [data-iho] .pk-nappi:hover { filter: brightness(1.06); }
+.tn20 [data-iho] .pk-nappi:focus-visible { outline: 2px solid var(--pk-ink); outline-offset: 3px; }
 .tn20 .pk-alarivi { font-size: 13px; line-height: 1.5; color: var(--pk-dim); }
 .tn20 .pk-sisalto { position: relative; z-index: 1; }
-.tn20 .pk-alarivi button, .tn20 .pk-linkki { display: inline-flex; align-items: center; min-height: 44px; margin: -12px 0; padding: 0; border: 0; background: none; font: inherit; font-weight: 700; color: var(--pk-ink); text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+.tn20 [data-iho] .pk-alarivi button, .tn20 [data-iho] .pk-linkki { display: inline-flex; align-items: center; min-height: 44px; margin: -12px 0; padding: 0; border: 0; background: none; font: inherit; font-weight: 700; color: var(--pk-ink); text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
 .tn20 .pk-ohjeet { display: flex; flex-direction: column; border-top: 1px solid var(--pk-line); margin-top: 8px; }
 .tn20 .pk-ohje { border-bottom: 1px solid var(--pk-line); }
 .tn20 .pk-ohje summary { display: flex; align-items: center; justify-content: space-between; min-height: 52px; font-size: 15px; font-weight: 700; color: var(--pk-ink); cursor: pointer; list-style: none; }
@@ -80,9 +83,9 @@
 .tn20 .pk-tulos-ala { margin: 0; max-width: 46ch; font-size: 16px; line-height: 1.5; color: var(--pk-dim); }
 .tn20 .pk-tulos-toiminnot { display: flex; flex-direction: column; align-items: flex-start; gap: 12px; }
 .tn20 .pk-harjoitus { margin: -4px 0 0; font-size: 13px; color: var(--pk-dim); }
-.tn20 .pk-haasta { display: inline-flex; align-items: center; gap: 8px; min-height: 48px; padding: 0 20px; border-radius: 999px; border: 1.5px solid var(--pk-line); background: transparent; color: var(--pk-ink); font: inherit; font-size: 15px; font-weight: 700; cursor: pointer; }
-.tn20 .pk-haasta:hover { border-color: var(--pk-acc); }
-.tn20 .pk-haasta:focus-visible { outline: 2px solid var(--tn-lime, #b6ff3c); outline-offset: 2px; }
+.tn20 [data-iho] .pk-haasta { display: inline-flex; align-items: center; gap: 8px; min-height: 48px; padding: 0 20px; border-radius: 999px; border: 1.5px solid var(--pk-line); background: transparent; color: var(--pk-ink); font: inherit; font-size: 15px; font-weight: 700; cursor: pointer; }
+.tn20 [data-iho] .pk-haasta:hover { border-color: var(--pk-acc); }
+.tn20 [data-iho] .pk-haasta:focus-visible { outline: 2px solid var(--tn-lime, #b6ff3c); outline-offset: 2px; }
 .tn20 .pk-seuraava { display: flex; flex-direction: column; gap: 12px; padding-top: 8px; border-top: 1px solid var(--pk-line); }
 .tn20 .pk-seuraava-h { margin: 16px 0 0; font-family: var(--rk-cond), "Barlow Condensed", sans-serif; font-weight: 800; font-size: 26px; line-height: 1; text-transform: uppercase; }
 .tn20 .pk-seuraava-rivi { display: grid; grid-template-columns: 1fr; gap: 10px; }
