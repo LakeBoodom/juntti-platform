@@ -6,7 +6,12 @@ import { ReorderableChainList } from "@/components/tn20/ReorderableChainList";
 import { SuuntaindikaattoriBadge } from "@/components/tn20/SuuntaindikaattoriBadge";
 import { RevealSequencer, type RevealItem } from "@/components/tn20/RevealSequencer";
 import { arvioi, arvoLisat, pisteet, PISTEOHJE } from "@/lib/jarjesta/pisteytys";
-import { TkGameNav } from "@/components/tn20/TkGameNav";
+import Pelipalkki from "@/components/tn20/pelikehys/Pelipalkki";
+import PeliKehys from "@/components/tn20/pelikehys/PeliKehys";
+import PeliTulos from "@/components/tn20/pelikehys/PeliTulos";
+import { seuraavatPelit } from "@/lib/pelimuodot";
+
+const PELI = "Laita järjestykseen";
 
 export type OmaKohde = { id: string; name: string; role: string; image_url: string | null; value: number; valueLabel: string };
 
@@ -36,6 +41,13 @@ export default function OmaJarjestysClient({
 }) {
   const [order, setOrder] = useState<OmaKohde[]>(kohteet);
   const [paljastettu, setPaljastettu] = useState(false);
+  const [jaettu, setJaettu] = useState(false);
+  const uudelleen = () => {
+    setOrder(sekoita(kohteet));
+    setPaljastettu(false);
+    setJaettu(false);
+    window.scrollTo({ top: 0 });
+  };
   const oikea = useMemo(() => [...kohteet].sort((a, b) => (direction === "desc" ? b.value - a.value : a.value - b.value)), [kohteet, direction]);
   const arviot = useMemo(() => arvioi(order, oikea), [order, oikea]);
 
@@ -55,40 +67,69 @@ export default function OmaJarjestysClient({
     };
   });
 
+  async function haasta() {
+    const url = location.href;
+    const teksti = `Sain ${tulos.correctCount}/${tulos.totalCount} oikein: ${otsikko}. Pystytkö parempaan?`;
+    try {
+      if (navigator.share) await navigator.share({ title: PELI, text: teksti, url });
+      else await navigator.clipboard.writeText(`${teksti} ${url}`);
+      setJaettu(true);
+    } catch {
+      // jako peruttu
+    }
+  }
+
+  // Pelikehys K1 (20.10.2026): paluu henkilösivulle, jolta pakka avattiin.
   if (paljastettu) {
     return (
-      <main className="tk-page">
-        <TkGameNav />
-        <RevealSequencer
-          items={revealItems}
-          result={tulos}
-          onNewRound={() => {
-            setOrder(sekoita(kohteet));
-            setPaljastettu(false);
-            window.scrollTo({ top: 0 });
-          }}
-          summaryProps={{ newRoundLabel: "Pelaa uudelleen", collectionHref: takaisin.href, collectionLabel: `Takaisin: ${takaisin.nimi} →` }}
-        />
-        <p className="tk-jarj-lahde">
-          {PISTEOHJE}{tilastot ? ` · ${tilastot}` : ""}
-        </p>
-      </main>
+      <PeliKehys iho="tumma">
+        <Pelipalkki iho="tumma" peli={PELI} koti={takaisin} />
+        <main className="tk-page">
+          <RevealSequencer
+            items={revealItems}
+            tulos={
+              /* K4 (pelikehys, 20.10.2026): tulos → Pelaa uudelleen → Haasta kaveri → seuraava peli. */
+              <PeliTulos
+                eyebrow={`${PELI} · ${otsikko}`}
+                iso={`${tulos.correctCount}/${tulos.totalCount} oikein`}
+                ala={`${tulos.score} pistettä · pisin oikea ketju ${tulos.longestCorrectChain}`}
+                paatoiminto={
+                  <button type="button" className="pk-nappi" onClick={uudelleen}>
+                    Pelaa uudelleen
+                  </button>
+                }
+                haasta={
+                  <button type="button" className="pk-haasta" onClick={haasta}>
+                    {jaettu ? "Haaste jaettu" : "Haasta kaveri"}
+                  </button>
+                }
+                seuraavat={seuraavatPelit("", "tunnetut-henkilot")}
+              />
+            }
+          />
+          <p className="tk-jarj-lahde">
+            {PISTEOHJE}{tilastot ? ` · ${tilastot}` : ""}
+          </p>
+        </main>
+      </PeliKehys>
     );
   }
 
   return (
-    <main className="tk-page">
-      <TkGameNav />
-      <header className="tk-order-head">
-        <SuuntaindikaattoriBadge label={suunta.toUpperCase()} />
-        <h1 className="tk-order-title">{otsikko}</h1>
-        <p className="tk-order-desc">Raahaa tai napauta korteista järjestääksesi ne. Kun järjestys tuntuu oikealta, paljasta tulos.</p>
-      </header>
-      <ReorderableChainList items={order} onReorder={setOrder} />
-      <button type="button" className="tk-btn-primary tk-order-cta" onClick={() => setPaljastettu(true)}>
-        Paljasta järjestys
-      </button>
-      {tilastot && <p className="tk-jarj-lahde">{tilastot}</p>}
-    </main>
+    <PeliKehys iho="tumma">
+      <Pelipalkki iho="tumma" peli={PELI} koti={takaisin} tila={`${order.length} korttia`} pelissa />
+      <main className="tk-page">
+        <header className="tk-order-head">
+          <SuuntaindikaattoriBadge label={suunta.toUpperCase()} />
+          <h1 className="tk-order-title">{otsikko}</h1>
+          <p className="tk-order-desc">Raahaa tai napauta korteista järjestääksesi ne. Kun järjestys tuntuu oikealta, paljasta tulos.</p>
+        </header>
+        <ReorderableChainList items={order} onReorder={setOrder} />
+        <button type="button" className="tk-btn-primary tk-order-cta" onClick={() => setPaljastettu(true)}>
+          Paljasta järjestys
+        </button>
+        {tilastot && <p className="tk-jarj-lahde">{tilastot}</p>}
+      </main>
+    </PeliKehys>
   );
 }

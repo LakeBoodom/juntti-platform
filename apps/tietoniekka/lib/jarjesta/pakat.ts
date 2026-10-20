@@ -284,9 +284,6 @@ export const haePakka = (slug: string) => JULKAISTUT.find((p) => p.slug === slug
 
 export const pakkaHref = (p: Pakka) => `/peli/jarjesta/${p.slug}`;
 
-/** Kokoelman nimi taivutettuna linkkiin: "Jääkiekko-kokoelmaan", "Vaalit ja politiikka -kokoelmaan". */
-export const kokoelmaanTeksti = (nimi: string) => `${nimi}${/\s/.test(nimi) ? " -" : "-"}kokoelmaan →`;
-
 /** Yksi arvottu kohde. Rakenne on RankingCardPerson-yhteensopiva (id, name, role, image_url). */
 export type JarjestysKohde = {
   id: string;

@@ -43,9 +43,12 @@
 }
 
 /* ── K2 Aloitus ────────────────────────────────────────────────────────────────────── */
-.tn20 .pk-aloitus { display: flex; flex-direction: column; gap: 16px; max-width: 720px; margin: 0 auto; padding: 24px clamp(20px, 4vw, 48px) 40px; box-sizing: border-box; color: var(--pk-ink); }
+.tn20 .pk-aloitus { container-type: inline-size; display: flex; flex-direction: column; gap: 16px; max-width: 720px; margin: 0 auto; padding: 24px clamp(20px, 4vw, 48px) 40px; box-sizing: border-box; color: var(--pk-ink); }
 .tn20 .pk-h1 { margin: 0; font-family: var(--rk-cond), "Barlow Condensed", sans-serif; font-weight: 800; font-size: clamp(40px, 11vw, 72px); line-height: .9; text-transform: uppercase; letter-spacing: -.005em; overflow-wrap: normal; word-break: normal; hyphens: manual; }
 .tn20 .pk-h1 span { color: var(--pk-acc); }
+/* KORTTISÄÄNTÖ: pitkä sana (Vaalipiiriketju, pakkojen otsikot) pienentää kokoa — 100cqi = aloituksen sisältöleveys,
+   Barlow Condensed 800 versaalina ≈ 0,56 em/merkki + 5 % marginaali. */
+.tn20 .pk-h1[style*="--pk-lw"] { font-size: min(clamp(40px, 11vw, 72px), calc(100cqi / (var(--pk-lw) * .59))); }
 .tn20 .pk-lause { margin: 0; max-width: 46ch; font-size: 16px; line-height: 1.5; color: var(--pk-dim); }
 .tn20 .pk-valinta { margin: 4px 0 0; padding: 0; border: 0; display: flex; flex-direction: column; gap: 8px; min-width: 0; }
 .tn20 .pk-valinta legend { padding: 0; margin-bottom: 8px; font-size: 12px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--pk-dim); }

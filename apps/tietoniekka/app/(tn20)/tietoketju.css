@@ -28,8 +28,7 @@
 
 /* ---------- Jaetut painikkeet ---------- */
 
-.tn20 .tk-btn-primary,
-.tn20 .tk-btn-secondary {
+.tn20 .tk-btn-primary {
   display: inline-flex; align-items: center; justify-content: center;
   height: 56px; padding: 0 28px; border-radius: 999px;
   font-family: var(--tn-font-display); font-weight: 900; font-size: 15px;
@@ -43,11 +42,6 @@
   background: var(--tk-lime); color: var(--tk-bg);
 }
 .tn20 .tk-btn-primary:hover { filter: brightness(1.06); }
-.tn20 .tk-btn-secondary {
-  background: transparent; color: var(--tk-text-primary);
-  border: 1px solid var(--tk-border-2); font-weight: 700;
-}
-.tn20 .tk-btn-secondary:hover { border-color: var(--tk-text-tertiary); }
 
 .tn20 .tk-sr-only {
   position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
@@ -244,155 +238,7 @@
   font-family: var(--tn-font-body); font-weight: 700; font-size: 13px; text-decoration: underline;
   cursor: pointer; padding: 8px;
 }
-/* ---------- ChainResultSummary ---------- */
-
-.tn20 .tk-result {
-  display: flex; flex-direction: column; align-items: center; gap: 8px;
-  padding: clamp(24px, 6vw, 48px) 16px; text-align: center;
-}
-.tn20 .tk-result-score {
-  font-family: var(--tn-font-display); font-weight: 900; color: var(--tk-text-primary);
-  font-size: clamp(48px, 14vw, 88px); line-height: 1;
-}
-.tn20 .tk-result-score-label {
-  color: var(--tk-text-tertiary); font-size: 13px; font-weight: 700;
-  text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 12px;
-}
-.tn20 .tk-result-stats { display: flex; gap: 28px; margin-bottom: 24px; flex-wrap: wrap; justify-content: center; }
-.tn20 .tk-result-stat { display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 88px; }
-.tn20 .tk-result-stat-value { font-family: var(--tn-font-display); font-weight: 900; font-size: 24px; color: var(--tk-text-primary); }
-.tn20 .tk-result-stat-label {
-  font-size: 11px; color: var(--tk-text-muted); text-transform: uppercase; letter-spacing: 0.08em;
-  overflow-wrap: normal; word-break: keep-all;
-}
-.tn20 .tk-result-cta { margin-bottom: 10px; }
-.tn20 .tk-result-collection-link {
-  color: var(--tk-text-tertiary); font-size: 13px; font-weight: 700;
-  text-decoration: underline; text-underline-offset: 3px;
-  margin-top: 4px; padding: 6px 4px; /* kosketusalue ilman visuaalista korostusta */
-  overflow-wrap: normal; word-break: keep-all;
-}
-.tn20 .tk-result-collection-link:hover { color: var(--tk-text-secondary); }
-
-/* ---------- Kategoriachipit (CategoryPicker + CollectionPageGamePromo) ----------
-   KATSELMOINTILÖYDÖS (merkittävä, 2026-09-16): ohje sallii amberin (#E8A320)
-   "vain identiteettiin (ei isoihin nappipintoihin)". Aiempi is-active-tila
-   täytti koko chipin amberilla — se on toistuva, jaettuun tietoketju.css:ään
-   kirjattu interaktiivinen nappipinta, joka periytyisi kaikkiin tuleviin
-   Tietoketju-peleihin. Korjattu: lepotila on nyt neutraali (tk-surface-2/
-   tk-border-2), aktiivinen tila korostuu tekstiväri+reunaviiva-yhdistelmällä
-   (tk-text-primary/tk-surface-2), ja amber näkyy chipissä enää pienenä
-   identiteettipilkkuna (::before) — sama rooli kuin eyebrow-tekstillä. */
-.tn20 .tk-chiprow { display: flex; flex-wrap: wrap; gap: 8px; }
-.tn20 .tk-chip-amber {
-  display: inline-flex; align-items: center; justify-content: center; gap: 7px;
-  height: 40px; padding: 0 16px; border-radius: 999px;
-  border: 1px solid var(--tk-border-2);
-  background: var(--tk-surface-2);
-  color: var(--tk-text-secondary);
-  font-family: var(--tn-font-display); font-weight: 700; font-size: 13px;
-  letter-spacing: 0.01em; cursor: pointer;
-  overflow-wrap: normal; word-break: keep-all; white-space: normal; text-align: center;
-}
-.tn20 .tk-chip-amber::before {
-  content: ""; flex: 0 0 auto; width: 6px; height: 6px; border-radius: 999px;
-  background: var(--tk-amber);
-}
-.tn20 .tk-chip-amber.is-active {
-  background: var(--tk-surface); border-color: var(--tk-text-tertiary);
-  color: var(--tk-text-primary); font-weight: 900;
-}
-
-/* ---------- CategoryPicker ---------- */
-
-.tn20 .tk-sheet-backdrop {
-  position: fixed; inset: 0; z-index: 80;
-  background: color-mix(in srgb, black 55%, transparent);
-  display: flex; align-items: flex-end; justify-content: center;
-}
-.tn20 .tk-picker {
-  width: 100%; max-width: 520px;
-  background: var(--tk-surface); border: 1px solid var(--tk-border);
-  border-radius: 22px 22px 0 0;
-  padding: 18px 20px clamp(20px, 5vw, 32px);
-  display: flex; flex-direction: column; gap: 14px;
-  position: relative;
-}
-.tk-sheet-backdrop .tk-picker { border-radius: 22px 22px 0 0; }
-.tn20 .tk-page--start .tk-picker {
-  border-radius: 22px; margin: clamp(16px, 6vw, 48px) auto; max-width: 560px;
-}
-.tn20 .tk-picker-handle {
-  width: 40px; height: 4px; border-radius: 999px; background: var(--tk-border-2);
-  align-self: center; margin-bottom: 4px;
-}
-.tn20 .tk-picker-close {
-  position: absolute; top: 12px; right: 14px; background: none; border: none;
-  color: var(--tk-text-tertiary); font-size: 22px; line-height: 1; cursor: pointer;
-  width: 32px; height: 32px;
-}
-.tn20 .tk-picker-title {
-  font-family: var(--tn-font-display); font-weight: 900; font-size: clamp(22px, 5vw, 30px);
-  color: var(--tk-text-primary); margin: 0;
-  text-transform: uppercase; letter-spacing: 0.01em;
-  overflow-wrap: normal; word-break: keep-all;
-  /* KATSELMOINTILÖYDÖS (merkittävä, 2026-09-16): uppercase lisätty tn20.css:n
-     muun otsikkokäytännön mukaisesti (Archivo + uppercase kaikissa vastaavan
-     tason otsikoissa). Uppercase kasvattaa glyyfileveyttä — kalibroitu
-     uudelleen Range-menetelmällä "Tietoketju: Ikäjärjestys" ja pisimmällä
-     kategorianimellä, 0 ylivuotoa 320–2450px, sama clamp-arvo riitti. */
-}
-.tn20 .tk-picker-desc {
-  color: var(--tk-text-secondary); font-size: 14px; line-height: 1.5; margin: 0;
-  max-width: 46ch;
-}
 .tn20 .tk-picker-direction { align-self: flex-start; }
-.tn20 .tk-picker-start { margin-top: 6px; }
-
-/* ---------- CollectionPageGamePromo ---------- */
-
-.tn20 .tk-promo {
-  display: flex; flex-direction: column; gap: 20px;
-  padding: 24px; border-radius: 22px;
-  border: 1px solid var(--tk-border); background: var(--tk-surface);
-}
-@media (min-width: 860px) {
-  .tn20 .tk-promo { flex-direction: row; align-items: center; justify-content: space-between; gap: 32px; }
-  .tn20 .tk-promo-copy { flex: 1 1 auto; }
-  .tn20 .tk-promo-peek { flex: 0 0 auto; }
-}
-.tn20 .tk-promo-eyebrow {
-  color: var(--tk-amber); font-family: var(--tn-font-display); font-weight: 800;
-  font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; margin-bottom: 6px;
-}
-.tn20 .tk-promo-title {
-  font-family: var(--tn-font-display); font-weight: 900; color: var(--tk-text-primary);
-  font-size: clamp(22px, 4.4vw, 34px); line-height: 1.05; margin: 0 0 10px;
-  text-transform: uppercase; letter-spacing: 0.01em;
-  overflow-wrap: normal; word-break: keep-all;
-  /* KATSELMOINTILÖYDÖS (merkittävä, 2026-09-16): ks. .tk-picker-title-kommentti —
-     sama uppercase-yhdenmukaistus ja -kalibrointi. */
-}
-.tn20 .tk-promo-desc { color: var(--tk-text-secondary); font-size: 14px; line-height: 1.5; margin: 0 0 12px; max-width: 48ch; }
-.tn20 .tk-promo-direction { margin-bottom: 14px; }
-.tn20 .tk-promo-chips { margin-bottom: 16px; }
-.tn20 .tk-promo-cta { max-width: 260px; }
-
-.tn20 .tk-promo-peek {
-  display: flex; margin-left: 4px;
-}
-.tn20 .tk-promo-peek-card {
-  /* Ei enää kiinteää leveyttä (ks. .tk-rcard--peek-kommentti yllä) — kortti on
-     nyt vain kuva, joten leveys tulee sisällöstä (thumb 64px + padding 8px*2 +
-     reunaviiva 2px = 82px). Mitattu Range-menetelmällä 320–2450px 2026-09-16:
-     0 ylivuotoa, koska tekstiä ei enää ole. */
-  width: fit-content;
-  margin-left: -20px;
-  transform: rotate(calc((var(--tk-peek-i, 0) - 1.5) * 3deg));
-  filter: brightness(calc(1 - var(--tk-peek-i, 0) * 0.06));
-}
-.tn20 .tk-promo-peek-card:first-child { margin-left: 0; }
-.tn20 .tk-promo-peek-card .tk-rcard-handle { display: none; }
 
 /* ---------- Pelisivun runko (app/(tn20)/peli/ikajarjestys) ---------- */
 
@@ -401,29 +247,6 @@
   padding: clamp(24px, 6vw, 48px) 16px clamp(60px, 10vw, 100px);
   display: flex; flex-direction: column; gap: 20px;
 }
-.tn20 .tk-page--start { max-width: 100%; padding-left: 0; padding-right: 0; }
-
-/* NAVIGAATIOKORJAUS (2026-09-17): kevyt paluulinkki etusivulle — ainoa tie
-   pois pelisivulta, koska TopBar piiloutuu /peli-poluilla (ks. TopBar.tsx)
-   eikä Ikäjärjestyksellä ole tavallisen visan tng-top-HUD:ia. Sama logotyyli
-   kuin GameClientin tng-logo, jotta pelikuori tuntuu yhtenäiseltä. */
-.tn20 .tk-gamenav { display: flex; margin: 0 0 -4px; }
-.tn20 .tk-page--start .tk-gamenav { padding: 0 16px; }
-.tn20 .tk-gamenav-home {
-  display: flex; align-items: baseline; gap: 1px;
-  font-family: var(--tn-font-display); font-weight: 900;
-  font-size: 17px; line-height: 1; letter-spacing: 0.01em;
-  padding: 8px 2px; margin: -8px -2px; /* isompi kosketusalue ilman visuaalista siirtymää (UI-laatu 18.10.: ≥ 32 px) */
-}
-/* Paluulinkki kokoelmasivulle (T10, 18.10.2026), kuten Vaalipiiriketjun "← Vaalit ja politiikka". */
-.tn20 .tk-gamenav { align-items: center; justify-content: space-between; gap: 12px; }
-.tn20 .tk-gamenav-paluu {
-  display: inline-flex; align-items: center; min-height: 44px; margin: -12px 0;
-  font-size: 13px; font-weight: 700; color: var(--tk-text-secondary, inherit); text-decoration: none; white-space: nowrap;
-}
-.tn20 .tk-gamenav-paluu:hover { text-decoration: underline; }
-.tn20 .tk-gamenav-home b { color: #e8a320; font-weight: 900; }
-.tn20 .tk-gamenav-home span { color: var(--tk-text-primary); }
 
 .tn20 .tk-order-head { display: flex; flex-direction: column; gap: 10px; align-items: flex-start; }
 .tn20 .tk-order-title {
@@ -431,24 +254,17 @@
   font-size: clamp(26px, 6vw, 40px); line-height: 1.05; margin: 0;
   text-transform: uppercase; letter-spacing: 0.01em;
   overflow-wrap: normal; word-break: keep-all;
-  /* KATSELMOINTILÖYDÖS (merkittävä, 2026-09-16): ks. .tk-picker-title-kommentti —
-     sama uppercase-yhdenmukaistus ja -kalibrointi. */
 }
 .tn20 .tk-order-desc { color: var(--tk-text-secondary); font-size: 14px; line-height: 1.5; margin: 0; max-width: 52ch; }
 .tn20 .tk-order-cta { position: sticky; bottom: 16px; }
+/* Pelikehyksen K4-tulos paljastuslistan alla: sivun oma reunus riittää (20.10.2026). */
+.tn20 .tk-page .pk-tulos { padding: 8px 0 0; }
 .tn20 .tk-loading { color: var(--tk-text-tertiary); text-align: center; font-size: 14px; margin-top: 16px; }
 
 @media (prefers-reduced-motion: reduce) {
   .tn20 .tk-rcard-ghost,
   .tn20 .tk-chainlist * { transition: none !important; }
 }
-
-/* SEO-erä A7 (2.10.2026): "Näin pelaat" aloitusnäkymän alla (Kuntaliitoksen kl-infon malliin). */
-.tn20 .tk-info { max-width: 560px; margin: 0 auto clamp(32px, 8vw, 64px); padding: 0 20px; color: var(--tk-text-secondary, rgba(247,242,230,.78)); }
-.tn20 .tk-info h2 { margin: 0 0 12px; font-family: var(--tn-font-display); font-weight: 900; font-size: 18px; text-transform: uppercase; letter-spacing: .02em; color: var(--tk-text-primary, #f7f2e6); }
-.tn20 .tk-info ol { margin: 0 0 12px; padding-left: 20px; display: flex; flex-direction: column; gap: 8px; font-size: 15px; line-height: 1.5; }
-.tn20 .tk-info p { margin: 0; font-size: 14px; line-height: 1.5; }
-.tn20 .tk-info a { color: var(--tk-amber, #E8A320); text-decoration: underline; text-underline-offset: 2px; }
 
 /* ─── LAITA JÄRJESTYKSEEN (3.10.2026) ───────────────────────────────────────
    Pakan otsikko on uppercase ja sanat eivät katkea (keep-all), joten koko rajataan
@@ -457,16 +273,9 @@
    320–2450 px: 0.78 antoi MAAOTTELUENNÄTYKSET-sanalle 99 % leveydestä → 0.82 ≈ 6 % marginaali).
    Yläraja = Ikäjärjestyksen alkuperäiset koot. */
 .tn20 .tk-jarj-cq { container-type: inline-size; }
-.tn20 .tk-picker .tk-jarj-title { font-size: min(clamp(22px, 5vw, 30px), calc(100cqw / (var(--tk-lw, 10) * 0.82))); line-height: 1.08; }
 .tn20 .tk-order-head .tk-jarj-title { font-size: min(clamp(26px, 6vw, 40px), calc(100cqw / (var(--tk-lw, 10) * 0.82))); }
-.tn20 .tk-jarj-eyebrow {
-  display: block; margin-bottom: 6px;
-  font-size: 12px; font-weight: 800; letter-spacing: 0.12em; color: var(--tk-amber);
-}
-.tn20 .tk-jarj-rajaus { margin: -6px 0 0; font-size: 13px; line-height: 1.45; color: var(--tk-text-tertiary); }
 .tn20 .tk-jarj-muut { margin: 0; padding-left: 18px; display: flex; flex-direction: column; gap: 6px; font-size: 15px; }
 .tn20 .tk-jarj-muut a { color: var(--tk-text-primary); }
-.tn20 .tk-info .tk-jarj-muut-h { margin-top: 28px; }
 /* Laita järjestykseen / laadulliset pakat (4.10.2026): paljastettu arvo omalla rivillään. */
 .tn20 .tk-rcard-value {
   margin-top: 3px;
@@ -475,7 +284,3 @@
   overflow-wrap: normal; word-break: keep-all; white-space: normal;
 }
 .tn20 .tk-jarj-lahde { max-width: 560px; margin: 0 auto 40px; padding: 0 20px; font-size: 12.5px; color: var(--tk-text-muted); text-align: center; }
-
-/* ── Kosketuskohteet (UI-laatu K2 14.10.2026): ≥ 44 px osuma-alue. Pienille tekstilinkeille pystytäyte +
-   negatiivinen marginaali (asettelu ei muutu), napeille min-height, karttapisteille ::before-alue. ── */
-.tn20 .tk-chip-amber { min-height: 44px; }

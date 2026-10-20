@@ -382,6 +382,7 @@ export default function VpkClient({
         <main>
           <PeliAloitus
             otsikko={<>{VPK_NIMI} <span>#{k.numero}</span></>}
+            pisinSana={VPK_NIMI.length}
             lause="Järjestä kuusi kansanedustajaa ketjuksi niin, että jokaisen vaalipiiri rajautuu edellisen vaalipiiriin."
             toiminto={
               <button type="button" className="pk-nappi" onClick={() => { setVaihe("peli"); window.scrollTo({ top: 0 }); }}>

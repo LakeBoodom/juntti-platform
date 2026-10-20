@@ -7,7 +7,6 @@
 import { useMemo, useState } from "react";
 import { haeJarjestysKierros } from "@/lib/jarjesta/kierros";
 import {
-  kokoelmaanTeksti,
   oikeaJarjestys,
   type JarjestysKohde,
   type Pakka,
@@ -19,7 +18,13 @@ import {
   RevealSequencer,
   type RevealItem,
 } from "@/components/tn20/RevealSequencer";
-import { TkGameNav } from "@/components/tn20/TkGameNav";
+import Pelipalkki from "@/components/tn20/pelikehys/Pelipalkki";
+import PeliKehys from "@/components/tn20/pelikehys/PeliKehys";
+import PeliAloitus from "@/components/tn20/pelikehys/PeliAloitus";
+import PeliTulos from "@/components/tn20/pelikehys/PeliTulos";
+import { seuraavatPelit } from "@/lib/pelimuodot";
+
+const PELI = "Laita järjestykseen";
 
 type Phase = "start" | "loading" | "ordering" | "revealing";
 
@@ -57,6 +62,9 @@ export default function JarjestaClient({
   const [order, setOrder] = useState<JarjestysKohde[]>([]);
   const [phase, setPhase] = useState<Phase>("start");
   const [notice, setNotice] = useState<string | null>(null);
+  const [jaettu, setJaettu] = useState(false);
+  // Pelikehys K1: paluu pakan kotikokoelmaan.
+  const koti = { href: `/kokoelma/${pakka.collection.slug}`, nimi: pakka.collection.nimi };
   // KORTTISÄÄNTÖ: otsikko on uppercase eikä sanoja katkaista → koko pisimmän sanan mukaan (CSS).
   const lwTyyli = {
     "--tk-lw": Math.max(...pakka.otsikko.split(/\s+/).map((w) => w.length), 8),
@@ -76,7 +84,21 @@ export default function JarjestaClient({
     [arviot, round],
   );
 
+  async function haasta() {
+    if (!scoreResult) return;
+    const url = `${location.origin}${location.pathname}`;
+    const teksti = `Sain ${scoreResult.correctCount}/${scoreResult.totalCount} oikein: ${PELI} – ${iso(pakka.otsikko)}. Pystytkö parempaan?`;
+    try {
+      if (navigator.share) await navigator.share({ title: PELI, text: teksti, url });
+      else await navigator.clipboard.writeText(`${teksti} ${url}`);
+      setJaettu(true);
+    } catch {
+      // jako peruttu
+    }
+  }
+
   async function aloita() {
+    setJaettu(false);
     setPhase("loading");
     setNotice(null);
     const next = await haeJarjestysKierros(
@@ -131,112 +153,112 @@ export default function JarjestaClient({
 
   if (phase === "start" || phase === "loading") {
     return (
-      <main className="tk-page tk-page--start">
-        <TkGameNav />
-        <div className="tk-picker tk-jarj-cq" style={lwTyyli}>
-          <div className="tk-picker-handle" aria-hidden="true" />
-          <h1 className="tk-picker-title tk-jarj-title">
-            <span className="tk-jarj-eyebrow">Laita järjestykseen:</span>{" "}
-            {iso(pakka.otsikko)}
-          </h1>
-          <p className="tk-picker-desc">{pakka.kuvaus}</p>
-          <p className="tk-jarj-rajaus">{pakka.rajaus}</p>
-          <SuuntaindikaattoriBadge
-            label={pakka.suunta.toUpperCase()}
-            className="tk-picker-direction"
+      <PeliKehys iho="tumma">
+        <Pelipalkki iho="tumma" peli={PELI} koti={koti} />
+        <main>
+          {/* K2 (pelikehys, 20.10.2026): h1 → lause → suunta → Aloita → ohjeet avattavina. */}
+          <PeliAloitus
+            otsikko={iso(pakka.otsikko)}
+            lause={pakka.kuvaus}
+            valinta={<SuuntaindikaattoriBadge label={pakka.suunta.toUpperCase()} className="tk-picker-direction" />}
+            toiminto={
+              <button type="button" className="pk-nappi" onClick={aloita} disabled={phase === "loading"}>
+                {phase === "loading" ? "Arvotaan…" : "Aloita kierros"}
+              </button>
+            }
+            alarivi={notice ? <span role="alert">{notice}</span> : pakka.rajaus}
+            ohjeet={[
+              {
+                otsikko: "Näin pelaat",
+                sisalto: (
+                  <ol>
+                    <li>
+                      <b>Järjestä {pakka.pick} korttia</b> – {pakka.suunta.toLowerCase()}. Raahaa korttia tai napauta kahta korttia vaihtaaksesi niiden paikat.
+                    </li>
+                    <li>
+                      <b>Paljasta järjestys.</b> Näet jokaisen oikean arvon ja sen, mitkä kortit osuivat oikealle paikalle.
+                    </li>
+                    <li>
+                      <b>Pisteet:</b> oikea paikka 10 p, yhden sijan päässä 5 p. Jos kahdella kortilla on sama arvo, kumpi tahansa järjestys on oikein.
+                    </li>
+                  </ol>
+                ),
+              },
+              ...(muut.length > 0
+                ? [
+                    {
+                      otsikko: "Muut järjestyspelit",
+                      sisalto: (
+                        <ul className="tk-jarj-muut">
+                          {muut.map((m) => (
+                            <li key={m.href}>
+                              <a href={m.href}>{iso(m.otsikko)}</a>
+                            </li>
+                          ))}
+                        </ul>
+                      ),
+                    },
+                  ]
+                : []),
+            ]}
           />
-          <button
-            type="button"
-            className="tk-btn-primary tk-picker-start"
-            onClick={aloita}
-            disabled={phase === "loading"}
-          >
-            {phase === "loading" ? "Arvotaan…" : "Aloita kierros"}
-          </button>
-          {notice && (
-            <p className="tk-loading" role="alert">
-              {notice}
-            </p>
-          )}
-        </div>
-        <section className="tk-info" aria-labelledby="tk-info-h">
-          <h2 id="tk-info-h">Näin pelaat</h2>
-          <ol>
-            <li>
-              <b>Järjestä {pakka.pick} korttia</b> –{" "}
-              {pakka.suunta.toLowerCase()}. Raahaa korttia tai napauta kahta
-              korttia vaihtaaksesi niiden paikat.
-            </li>
-            <li>
-              <b>Paljasta järjestys.</b> Näet jokaisen oikean arvon ja sen,
-              mitkä kortit osuivat oikealle paikalle.
-            </li>
-            <li>
-              <b>Pisteet:</b> oikea paikka 10 p, yhden sijan päässä 5 p.
-              Jos kahdella kortilla on sama arvo, kumpi tahansa järjestys on
-              oikein.
-            </li>
-          </ol>
-          {muut.length > 0 && (
-            <>
-              <h2 className="tk-jarj-muut-h">Muut järjestyspelit</h2>
-              <ul className="tk-jarj-muut">
-                {muut.map((m) => (
-                  <li key={m.href}>
-                    <a href={m.href}>{iso(m.otsikko)}</a>
-                  </li>
-                ))}
-              </ul>
-            </>
-          )}
-        </section>
-      </main>
+        </main>
+      </PeliKehys>
     );
   }
 
-  const summaryProps = {
-    newRoundLabel: `Arvo ${pakka.pick} uutta`,
-    collectionHref: `/kokoelma/${pakka.collection.slug}`,
-    collectionLabel: kokoelmaanTeksti(pakka.collection.nimi),
-  };
-
   if (phase === "revealing" && scoreResult) {
     return (
-      <main className="tk-page">
-        <TkGameNav />
-        <RevealSequencer
-          items={revealItems}
-          result={scoreResult}
-          onNewRound={aloita}
-          summaryProps={summaryProps}
-        />
-        <p className="tk-jarj-lahde">
-          {PISTEOHJE}
-          {lahteet.length > 0 ? ` · Lähde: ${lahteet.join(", ")}` : ""}
-        </p>
-      </main>
+      <PeliKehys iho="tumma">
+        <Pelipalkki iho="tumma" peli={PELI} koti={koti} />
+        <main className="tk-page">
+          <RevealSequencer
+            items={revealItems}
+            tulos={
+              /* K4 (pelikehys, 20.10.2026): tulos → Pelaa uusi → Haasta kaveri → seuraava peli. */
+              <PeliTulos
+                eyebrow={`${PELI} · ${iso(pakka.otsikko)}`}
+                iso={`${scoreResult.correctCount}/${scoreResult.totalCount} oikein`}
+                ala={`${scoreResult.score} pistettä · pisin oikea ketju ${scoreResult.longestCorrectChain}`}
+                paatoiminto={
+                  <button type="button" className="pk-nappi" onClick={aloita}>
+                    Pelaa uusi kierros
+                  </button>
+                }
+                haasta={
+                  <button type="button" className="pk-haasta" onClick={haasta}>
+                    {jaettu ? "Haaste jaettu" : "Haasta kaveri"}
+                  </button>
+                }
+                seuraavat={seuraavatPelit(`jarjesta-${pakka.slug}`, pakka.collection.slug)}
+              />
+            }
+          />
+          <p className="tk-jarj-lahde">
+            {PISTEOHJE}
+            {lahteet.length > 0 ? ` · Lähde: ${lahteet.join(", ")}` : ""}
+          </p>
+        </main>
+      </PeliKehys>
     );
   }
 
   return (
-    <main className="tk-page">
-      <TkGameNav />
-      <header className="tk-order-head tk-jarj-cq" style={lwTyyli}>
-        <SuuntaindikaattoriBadge label={pakka.suunta.toUpperCase()} />
-        <h1 className="tk-order-title tk-jarj-title">{iso(pakka.otsikko)}</h1>
-        <p className="tk-order-desc">
-          Raahaa tai napauta korteista järjestääksesi ne. Kun järjestys tuntuu
-          oikealta, paljasta tulos.
-        </p>
-      </header>
-      <ReorderableChainList items={order} onReorder={setOrder} />
-      <button
-        type="button"
-        className="tk-btn-primary tk-order-cta"
-        onClick={() => setPhase("revealing")}
-      >
-        Paljasta järjestys
-      </button>
-    </main>
+    <PeliKehys iho="tumma">
+      <Pelipalkki iho="tumma" peli={PELI} koti={koti} tila={`${order.length} korttia`} pelissa />
+      <main className="tk-page">
+        <header className="tk-order-head tk-jarj-cq" style={lwTyyli}>
+          <SuuntaindikaattoriBadge label={pakka.suunta.toUpperCase()} />
+          <h1 className="tk-order-title tk-jarj-title">{iso(pakka.otsikko)}</h1>
+          <p className="tk-order-desc">
+            Raahaa tai napauta korteista järjestääksesi ne. Kun järjestys tuntuu oikealta, paljasta tulos.
+          </p>
+        </header>
+        <ReorderableChainList items={order} onReorder={setOrder} />
+        <button type="button" className="tk-btn-primary tk-order-cta" onClick={() => setPhase("revealing")}>
+          Paljasta järjestys
+        </button>
+      </main>
+    </PeliKehys>
   );
 }

@@ -1,6 +1,6 @@
 "use client";
 // TIETOKETJU: IKÄJÄRJESTYS — pelinäkymän tilakone.
-// Vaiheet: aloitus (CategoryPicker) → järjestäminen (ReorderableChainList)
+// Vaiheet: aloitus (pelikehys K2) → järjestäminen (ReorderableChainList)
 // → paljastus (RevealSequencer, sisältää nyt myös pisteet+jatkonapit samalla
 // sivulla, ks. RevealSequencer-kommentti "LIVE-QA-LÖYDÖS 2") → arvo uudet.
 // Erillinen kolmas "tulos"-vaihe on poistettu 2026-09-16 Heikin pyynnöstä.
@@ -211,8 +211,6 @@ export default function IkajarjestysClient({
         <main className="tk-page">
           <RevealSequencer
             items={revealItems}
-            result={scoreResult}
-            onNewRound={() => startRound(category)}
             tulos={
               /* K4 (pelikehys, 20.10.2026): tulos → Pelaa uusi → Haasta kaveri → seuraava peli. */
               <PeliTulos
@@ -253,7 +251,7 @@ export default function IkajarjestysClient({
   // phase === "ordering"
   return (
     <PeliKehys iho="tumma">
-      <Pelipalkki iho="tumma" peli={PELI} koti={KOTI} tila="Vanhin → nuorin" pelissa />
+      <Pelipalkki iho="tumma" peli={PELI} koti={KOTI} tila={`${order.length} henkilöä`} pelissa />
       <main className="tk-page">
         <header className="tk-order-head">
           <SuuntaindikaattoriBadge direction={DEFAULT_DIRECTION} />

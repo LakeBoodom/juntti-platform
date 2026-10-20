@@ -1,7 +1,7 @@
 // TIETOKETJU: IKÄJÄRJESTYS — pelisivun server-loader.
 // Kun tullaan promo-linkistä (?category=...&autostart=1), ensimmäinen
 // kierros arvotaan jo palvelimella (ei tyhjää välähdystä ennen peliä).
-// Ilman autostartia sivu avaa CategoryPicker-aloitusnäkymän clientillä.
+// Ilman autostartia sivu avaa pelikehyksen K2-aloituksen (aihevalinta) clientillä.
 
 import { JsonLd, peliLd } from "@/lib/jsonLd";
 import { jakoMeta } from "@/lib/jakoMeta";

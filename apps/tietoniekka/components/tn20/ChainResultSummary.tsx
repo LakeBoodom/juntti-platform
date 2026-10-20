@@ -1,8 +1,5 @@
-// TIETOKETJU: IKÄJÄRJESTYS — ChainResultSummary.
-// Tulosnäkymä: pisteet, "N/10 oikein", pisin oikea ketju, pääpainike
-// "ARVO 10 UUTTA" (AINOA lime-pinta tässä näkymässä) ja toissijainen
-// "Vaihda aihetta". Ei toista paljastuksen yksittäisiä oikea/väärä-merkintöjä
-// (tehtävänanto) — tämä näkymä näyttää vain koosteen, ei henkilölistaa.
+// TIETOKETJU: IKÄJÄRJESTYS — pistelasku (ChainScoreResult).
+// Tulosnäkymä on pelikehyksen PeliTulos (K4, 20.10.2026); entinen ChainResultSummary-komponentti poistettu.
 
 export type ChainScoreResult = {
   score: number;
@@ -47,60 +44,4 @@ export function calculateChainScore(placedOrder: { id: string }[], correctOrder:
   }
 
   return { score, correctCount, totalCount: placedOrder.length, longestCorrectChain };
-}
-
-export type ChainResultSummaryProps = {
-  result: ChainScoreResult;
-  onNewRound: () => void;
-  /** Puuttuu = ei "Vaihda aihetta" -nappia (Laita järjestykseen -pakoilla ei ole aiheita). */
-  onChangeCategory?: () => void;
-  newRoundLabel?: string;
-  changeCategoryLabel?: string;
-  collectionHref?: string;
-  collectionLabel?: string;
-};
-
-export function ChainResultSummary({
-  result,
-  onNewRound,
-  onChangeCategory,
-  newRoundLabel = "Arvo 10 uutta",
-  changeCategoryLabel = "Vaihda aihetta",
-  collectionHref = "/kokoelma/tunnetut-henkilot",
-  collectionLabel = "Tunnetut henkilöt -kokoelmaan →",
-}: ChainResultSummaryProps) {
-  return (
-    <div className="tk-result">
-      <div className="tk-result-score">{result.score}</div>
-      <div className="tk-result-score-label">pistettä</div>
-
-      <div className="tk-result-stats">
-        <div className="tk-result-stat">
-          <div className="tk-result-stat-value">
-            {result.correctCount}/{result.totalCount}
-          </div>
-          <div className="tk-result-stat-label">oikein</div>
-        </div>
-        <div className="tk-result-stat">
-          <div className="tk-result-stat-value">{result.longestCorrectChain}</div>
-          <div className="tk-result-stat-label">pisin oikea ketju</div>
-        </div>
-      </div>
-
-      <button type="button" className="tk-btn-primary tk-result-cta" onClick={onNewRound}>
-        {newRoundLabel}
-      </button>
-      {onChangeCategory && (
-        <button type="button" className="tk-btn-secondary" onClick={onChangeCategory}>
-          {changeCategoryLabel}
-        </button>
-      )}
-      {/* NAVIGAATIOKORJAUS (2026-09-17, Heikin pyyntö): tulosnäkymästä pitää
-          päästä myös Tunnetut henkilöt -kokoelman pääsivulle, ei vain uuteen
-          kierrokseen tai aiheen vaihtoon tämän pelin sisällä. */}
-      <a className="tk-result-collection-link" href={collectionHref}>
-        {collectionLabel}
-      </a>
-    </div>
-  );
 }

@@ -6,7 +6,8 @@ import { getSupabase } from "@/lib/supabase";
 import { arvoTeksti, haeLaatuArvot, haeLaatuDefit } from "@/lib/laadullinen";
 import { fiPvm, parsePvm } from "@/lib/henkilo";
 import { henkiloSlug } from "@/lib/henkiloSlug";
-import { TkGameNav } from "@/components/tn20/TkGameNav";
+import Pelipalkki from "@/components/tn20/pelikehys/Pelipalkki";
+import PeliKehys from "@/components/tn20/pelikehys/PeliKehys";
 import OmaJarjestysClient, { type OmaKohde } from "./OmaJarjestysClient";
 
 export const dynamic = "force-dynamic";
@@ -27,12 +28,14 @@ export default async function OmaJarjestysPage({ searchParams }: { searchParams:
   const def = defit.get(a);
   if (!sb || !def || ids.length < 3) {
     return (
-      <main className="tk-page">
-        <TkGameNav />
-        <p className="tk-loading" role="alert">
-          Tätä järjestystä ei löytynyt. <a href={p ? `/henkilo/${p}` : "/henkilot"}>Takaisin</a>
-        </p>
-      </main>
+      <PeliKehys iho="tumma">
+        <Pelipalkki iho="tumma" peli="Laita järjestykseen" koti={{ href: "/kokoelma/tunnetut-henkilot", nimi: "Tunnetut henkilöt" }} />
+        <main className="tk-page">
+          <p className="tk-loading" role="alert">
+            Tätä järjestystä ei löytynyt. <a href={p ? `/henkilo/${p}` : "/kokoelma/tunnetut-henkilot"}>Takaisin</a>
+          </p>
+        </main>
+      </PeliKehys>
     );
   }
   const [arvot, { data: celebs }] = await Promise.all([
@@ -60,7 +63,7 @@ export default async function OmaJarjestysPage({ searchParams }: { searchParams:
       direction={def.winner === "high" ? "desc" : "asc"}
       kohteet={kohteet}
       tilastot={asOf ? `Tilastot: ${fiPvm(asOf)}` : null}
-      takaisin={oma ? { href: `/henkilo/${p}`, nimi: oma.name } : { href: "/henkilot", nimi: "Tunnetut henkilöt" }}
+      takaisin={oma ? { href: `/henkilo/${p}`, nimi: oma.name } : { href: "/kokoelma/tunnetut-henkilot", nimi: "Tunnetut henkilöt" }}
     />
   );
 }
