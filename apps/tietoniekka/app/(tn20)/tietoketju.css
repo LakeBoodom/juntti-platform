@@ -258,7 +258,7 @@
 .tn20 .tk-order-desc { color: var(--tk-text-secondary); font-size: 14px; line-height: 1.5; margin: 0; max-width: 52ch; }
 .tn20 .tk-order-cta { position: sticky; bottom: 16px; }
 /* Pelikehyksen K4-tulos paljastuslistan alla: sivun oma reunus riittää (20.10.2026). */
-.tn20 .tk-page .pk-tulos { padding: 8px 0 0; }
+.tn20 .tk-page .pk-tulos { width: 100%; margin: 0; padding: 8px 0 0; } /* flex-sarakkeessa auto-marginaali kutisti tuloksen sisältönsä levyiseksi */
 .tn20 .tk-loading { color: var(--tk-text-tertiary); text-align: center; font-size: 14px; margin-top: 16px; }
 
 @media (prefers-reduced-motion: reduce) {
