@@ -3,6 +3,7 @@
 // Mobiilissa pelin aikana (pelissa) paluurivi piilotetaan ja tilalle tulee pelin oma tila ("Ketjussa 3/6");
 // desktopilla tila ja paluu mahtuvat yhtä aikaa. Iho: tumma (oletus), kerma (reittipelit), violetti (Vaalipiiriketju).
 // Sivuston yläpalkki on peleissä piilossa (lib/nav.ts isGameRoute), joten tämä on pelin ainoa navigaatio.
+import "@/app/(tn20)/pelikehys.css";
 import type { ReactNode } from "react";
 
 export type PeliIho = "tumma" | "kerma" | "violetti";
