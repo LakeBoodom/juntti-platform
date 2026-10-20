@@ -12,11 +12,16 @@
 //     Jaettava tulos on aina päivän ketjun tulos.
 // Katselmuksen korjaukset: Tarkista-nappi tarttuvassa alapalkissa myös desktopissa (§1), kaari
 // väärälle linkille (§2, VpkKartta), SDP → Sosialidemokraatit (§3, data), Visa-linkki vain
-// julkaistulle visalle (§4, data), pelilinkki pakkaan vain kun se on julki (§5, sivu),
+// julkaistulle visalle (§4, data), seuraava peli rekisteristä (pelikehys K4, 20.10.2026),
 // yhteinen numerointi (§6), oikea reitti = päivän generoitu reitti (§7).
 
 import { useEffect, useMemo, useRef, useState, type CSSProperties, type KeyboardEvent, type PointerEvent as RPointerEvent } from "react";
 import { getSupabase } from "@/lib/supabase";
+import Pelipalkki from "@/components/tn20/pelikehys/Pelipalkki";
+import PeliAloitus from "@/components/tn20/pelikehys/PeliAloitus";
+import { SeuraavaPeli } from "@/components/tn20/pelikehys/PeliTulos";
+import { runkoCond } from "@/components/tn20/runko/runkoFontti";
+import { seuraavatPelit } from "@/lib/pelimuodot";
 import {
   jakoteksti,
   lueTallenne,
@@ -33,7 +38,7 @@ import {
 } from "@/lib/vaalipiiriketju";
 import VaalipiiriKartta, { type VpkJakso, type VpkSolmu } from "@/components/tn20/vaalipiirit/VaalipiiriKartta";
 
-type Vaihe = "peli" | "tulos";
+type Vaihe = "alku" | "peli" | "tulos";
 type KorttiTila = "lepo" | "valittu" | "veto" | "ok" | "bad" | "lukittu";
 
 const TYHJA: Array<string | null> = Array(VPK_JARJESTETTAVIA).fill(null);
@@ -152,18 +157,18 @@ function Kortti({ e, muoto, tila, num, vp, visa, kahva, salkku }: { e: VpkEdusta
 
 export default function VpkClient({
   k,
-  pakka,
   hubHref,
   lahde,
+  aloitaHeti = false,
 }: {
+  /** K2-aloituksen ohitus: harjoitusketju (?ketju=) tai ?aloita=1. */
+  aloitaHeti?: boolean;
   k: VpkKierros;
-  /** Tuloksen pelilinkki: Pääministerit-pakka, kun se on julki; muuten hubin pakkarivi (katselmus §5). */
-  pakka: { href: string; teksti: string };
   hubHref: string;
   lahde: string;
 }) {
   const [slots, setSlots] = useState<Array<string | null>>(TYHJA);
-  const [vaihe, setVaihe] = useState<Vaihe>("peli");
+  const [vaihe, setVaihe] = useState<Vaihe>(aloitaHeti ? "peli" : "alku");
   const [paljastettu, setPaljastettu] = useState(0);
   const [pelattu, setPelattu] = useState(false);
   const [paivanTulos, setPaivanTulos] = useState<VpkTallenne | null>(null);
@@ -342,8 +347,6 @@ export default function VpkClient({
   const otsikko = (
     <div className="vpk-otsake">
       <div className="vpk-polku">
-        <a href={hubHref}>← Vaalit ja politiikka</a>
-        <span aria-hidden="true">·</span>
         {harjoitus ? (
           <>
             <span>Harjoitusketju</span>
@@ -357,9 +360,6 @@ export default function VpkClient({
       <h1 className="vpk-h1">
         {VPK_NIMI} <span>{harjoitus ? "Harjoitus" : `#${k.numero}`}</span>
       </h1>
-      <p className="vpk-lede">
-        Ketjun alku ja loppu ovat valmiina. Järjestä kuusi kansanedustajaa väliin niin, että jokaisen vaalipiiri rajautuu edellisen vaalipiiriin.
-      </p>
       <p className="vpk-ohje">
         <span className="vpk-vain-kapea">Napauta kortteja ketjun järjestyksessä. Napauta uudelleen poistaaksesi.</span>
         <span className="vpk-vain-levea">Raahaa kortti ketjuun tai klikkaa sitä. Klikkaus ketjussa palauttaa kortin pinoon. Näppäimistöllä Enter.</span>
@@ -374,21 +374,52 @@ export default function VpkClient({
     </div>
   );
 
+  /* ── K2 aloitus (pelikehys, 20.10.2026): h1 → lause → päivän ketju → Aloita → ohjeet avattavina ── */
+  if (vaihe === "alku") {
+    return (
+      <div className={`vpk ${runkoCond.variable}`} data-iho="violetti">
+        <Pelipalkki iho="violetti" peli={VPK_NIMI} koti={{ href: hubHref, nimi: "Vaalit ja politiikka" }} />
+        <main>
+          <PeliAloitus
+            otsikko={<>{VPK_NIMI} <span>#{k.numero}</span></>}
+            lause="Järjestä kuusi kansanedustajaa ketjuksi niin, että jokaisen vaalipiiri rajautuu edellisen vaalipiiriin."
+            toiminto={
+              <button type="button" className="pk-nappi" onClick={() => { setVaihe("peli"); window.scrollTo({ top: 0 }); }}>
+                Aloita ketju
+              </button>
+            }
+            alarivi={<><b>Päivän ketju #{k.numero}</b> · {k.paivays} · sama kaikille tänään</>}
+            ohjeet={[
+              {
+                otsikko: "Näin pelaat",
+                sisalto: (
+                  <>
+                    <ol>
+                      <li><b>Ketjun päät ovat valmiina.</b> Ensimmäinen ja viimeinen kansanedustaja on lukittu paikoilleen, ja heidän vaalipiirinsä näkyy kartalla.</li>
+                      <li><b>Järjestä kuusi väliin.</b> Jokainen kortti on istuva kansanedustaja eri vaalipiiristä. Vaalipiiri paljastuu vasta tarkistuksessa. Ahvenanmaalta pääsee lautalla Varsinais-Suomeen.</li>
+                      <li><b>Mikä tahansa ehjä ketju kelpaa.</b> Kortti on oikein, jos sen vaalipiiri rajautuu edelliseen; viimeisen pitää rajautua myös ketjun loppuun.</li>
+                      <li><b>Näppäimistö:</b> Enter lisää kortin ketjuun tai palauttaa sen pinoon.</li>
+                    </ol>
+                    <p className="vpk-lahde">{lahde}</p>
+                  </>
+                ),
+              },
+            ]}
+          />
+        </main>
+      </div>
+    );
+  }
+
   return (
-    <div className="vpk" ref={juuri}>
-      <header className="vpk-bar">
-        <span className="vpk-bar-l">
-          <a className="vpk-logo" href="/" aria-label="Tietoniekka etusivulle">
-            <span>TIETO</span>NIEKKA
-          </a>
-          <span className="vpk-bar-sep" aria-hidden="true" />
-          <span className="vpk-bar-nimi">{VPK_NIMI}</span>
-        </span>
-        <span className="vpk-bar-r">
-          <span className="vpk-bar-pikku">{meta.nimi}</span>
-          <span className="vpk-bar-arvo" style={{ color: meta.vari }}>{meta.arvo}</span>
-        </span>
-      </header>
+    <div className={`vpk ${runkoCond.variable}`} data-iho="violetti" ref={juuri}>
+      <Pelipalkki
+        iho="violetti"
+        peli={VPK_NIMI}
+        koti={{ href: hubHref, nimi: "Vaalit ja politiikka" }}
+        tila={pelissa ? `Ketjussa ${sijoitettu}/${VPK_JARJESTETTAVIA}` : undefined}
+        pelissa={pelissa}
+      />
 
       {pelissa ? (
         <div className="vpk-main vpk-main--peli">
@@ -524,21 +555,11 @@ export default function VpkClient({
             uusiKetju={uusiKetju}
             jaa={paivanTulos ? jaa : null}
             jaettu={jaettu}
-            pakka={pakka}
-            hubHref={hubHref}
           />
         )
       )}
 
-      <section className="vpk-info" aria-labelledby="vpk-info-h">
-        <h2 id="vpk-info-h">Näin pelaat</h2>
-        <ol>
-          <li><b>Ketjun päät ovat valmiina.</b> Ensimmäinen ja viimeinen kansanedustaja on lukittu paikoilleen, ja heidän vaalipiirinsä näkyy kartalla.</li>
-          <li><b>Järjestä kuusi väliin.</b> Jokainen kortti on istuva kansanedustaja eri vaalipiiristä. Vaalipiiri paljastuu vasta tarkistuksessa. Ahvenanmaalta pääsee lautalla Varsinais-Suomeen.</li>
-          <li><b>Mikä tahansa ehjä ketju kelpaa.</b> Kortti on oikein, jos sen vaalipiiri rajautuu edelliseen; viimeisen pitää rajautua myös ketjun loppuun. Uusi päivän ketju joka päivä, ja harjoitusketjuja voi pelata niin monta kuin haluaa.</li>
-        </ol>
-        <p className="vpk-lahde">{lahde}</p>
-      </section>
+      <p className="vpk-lahde vpk-lahde--ala">{lahde}</p>
     </div>
   );
 }
@@ -560,8 +581,6 @@ function Tulos(p: {
   uusiKetju: () => void;
   jaa: (() => void) | null;
   jaettu: boolean;
-  pakka: { href: string; teksti: string };
-  hubHref: string;
 }) {
   const { k, tulos, koko, edustajat, paljastettu, valmis } = p;
   const vp = koko.map((id) => edustajat.get(id)!.vp);
@@ -634,21 +653,20 @@ function Tulos(p: {
         <p className="vpk-tuomio">{tuomio}</p>
         {valmis && (
           <div className="vpk-napit">
+            {/* K4 (pelikehys): tulos → Pelaa uusi → harjoitusselite pienellä → Haasta kaveri → seuraava peli */}
             <button type="button" className="vpk-jaa" onClick={p.uusiKetju}>
               Pelaa uusi ketju
             </button>
+            <p className="pk-harjoitus">Uusi ketju on harjoitus eikä vaikuta päivän tulokseen.</p>
             {p.jaa ? (
               <button type="button" className="vpk-toissija" onClick={p.jaa}>
-                {p.jaettu ? "Tulos jaettu" : p.harjoitus ? `Jaa päivän tulos #${k.numero}` : "Jaa tulos"}
+                {p.jaettu ? "Haaste jaettu" : "Haasta kaveri"}
               </button>
             ) : (
               <a className="vpk-toissija" href={VPK_SIVU}>
                 Pelaa päivän ketju #{k.numero}
               </a>
             )}
-            <a className="vpk-kolmas" href={p.pakka.href}>
-              {p.pakka.teksti} →
-            </a>
           </div>
         )}
       </div>
@@ -718,11 +736,9 @@ function Tulos(p: {
             </div>
           )}
 
-          <a className="vpk-takaisin" href={p.hubHref}>
-            ← Takaisin Vaalit ja politiikka
-          </a>
         </div>
       </div>
+      {valmis && <SeuraavaPeli seuraavat={seuraavatPelit("vaalipiiriketju", "vaalit")} />}
     </div>
   );
 }

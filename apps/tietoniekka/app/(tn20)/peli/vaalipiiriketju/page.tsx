@@ -8,7 +8,6 @@ import type { Metadata } from "next";
 import { JsonLd, peliLd } from "@/lib/jsonLd";
 import { jakoMeta } from "@/lib/jakoMeta";
 import { helsinginPaiva } from "@/lib/aika";
-import { haePakka, pakkaHref } from "@/lib/jarjesta/pakat";
 import { VPK_NIMI, VPK_SIVU } from "@/lib/vaalipiiriketju";
 import { harjoitusKierros, paivanKierros } from "@/lib/vaalipiiriketju/data";
 import VpkClient from "@/components/tn20/vaalipiiriketju/VpkClient";
@@ -37,14 +36,11 @@ export default async function VaalipiiriketjuSivu({ searchParams }: Props) {
   const ketju = typeof sp.ketju === "string" && SIEMEN.test(sp.ketju) ? sp.ketju : null;
   const iso = helsinginPaiva().iso;
   const k = ketju ? await harjoitusKierros(iso, ketju) : await paivanKierros(iso);
-  // Katselmus §5: pelilinkki Pääministerit-pakkaan vasta kun se on julki, muuten hubin pakkariviin.
-  const pm = haePakka("paaministerit");
-  const pakka = pm ? { href: pakkaHref(pm), teksti: "Pelaa Laita järjestykseen: Pääministerit" } : { href: `${HUB}#jarjestys`, teksti: "Laita järjestykseen -pelit" };
   return (
     <>
       <JsonLd data={peliLd({ name: VPK_NIMI, url: VPK_SIVU, description: KUVAUS })} />
       {k ? (
-        <VpkClient k={k} pakka={pakka} hubHref={HUB} lahde={LAHDE} />
+        <VpkClient k={k} hubHref={HUB} lahde={LAHDE} aloitaHeti={!!ketju || sp.aloita === "1"} />
       ) : (
         <div className="vpk">
           <div className="vpk-virhe" role="alert">

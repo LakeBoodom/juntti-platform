@@ -42,23 +42,29 @@ export default function PeliTulos({
         {harjoitus && <p className="pk-harjoitus">{harjoitus}</p>}
         {haasta}
       </div>
-      {seuraavat.length > 0 && (
-        <nav className="pk-seuraava" aria-labelledby="pk-seuraava-h">
-          <h2 id="pk-seuraava-h" className="pk-seuraava-h">Seuraava peli</h2>
-          <div className="pk-seuraava-rivi">
-            {seuraavat.map((p) => (
-              <a key={p.slug} className="pk-pelikortti" href={p.href}>
-                <span className="pk-pelikortti-ikoni" aria-hidden="true"><PeliIkoniSvg ikoni={p.ikoni} /></span>
-                <span className="pk-pelikortti-teksti">
-                  <span className="pk-pelikortti-nimi">{p.nimi}</span>
-                  <span className="pk-pelikortti-kuvaus">{p.kuvaus}</span>
-                </span>
-                <span className="pk-pelikortti-cta">Pelaa →</span>
-              </a>
-            ))}
-          </div>
-        </nav>
-      )}
+      <SeuraavaPeli seuraavat={seuraavat} />
     </section>
+  );
+}
+
+/** K4:n viides osa erikseen pelien omiin tulosnäkymiin (Vaalipiiriketju): 2–3 peliä rekisteristä. */
+export function SeuraavaPeli({ seuraavat }: { seuraavat: Pelimuoto[] }) {
+  if (!seuraavat.length) return null;
+  return (
+    <nav className="pk-seuraava" aria-labelledby="pk-seuraava-h">
+      <h2 id="pk-seuraava-h" className="pk-seuraava-h">Seuraava peli</h2>
+      <div className="pk-seuraava-rivi">
+        {seuraavat.map((p) => (
+          <a key={p.slug} className="pk-pelikortti" href={p.href}>
+            <span className="pk-pelikortti-ikoni" aria-hidden="true"><PeliIkoniSvg ikoni={p.ikoni} /></span>
+            <span className="pk-pelikortti-teksti">
+              <span className="pk-pelikortti-nimi">{p.nimi}</span>
+              <span className="pk-pelikortti-kuvaus">{p.kuvaus}</span>
+            </span>
+            <span className="pk-pelikortti-cta">Pelaa →</span>
+          </a>
+        ))}
+      </div>
+    </nav>
   );
 }

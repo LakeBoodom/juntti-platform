@@ -29,22 +29,6 @@
 @media (max-width: 1079.98px) { .tn20 .vpk-vain-levea { display: none !important; } }
 @media (min-width: 1080px) { .tn20 .vpk-vain-kapea { display: none !important; } }
 
-/* ── Yläpalkki ─────────────────────────────────────────── */
-.tn20 .vpk-bar {
-  position: sticky; top: 0; z-index: 10;
-  display: flex; align-items: center; justify-content: space-between; gap: 12px;
-  min-height: 52px; padding: 0 clamp(14px, 2.4vw, 40px);
-  border-bottom: 1px solid #241e13; background: #0f0d07;
-}
-.tn20 .vpk-bar-l { display: flex; align-items: center; gap: 12px; min-width: 0; }
-.tn20 .vpk .vpk-logo { font-family: var(--vpk-display); font-weight: 900; font-variation-settings: "wdth" 72; font-size: 15px; letter-spacing: .02em; line-height: 1; color: var(--tn-text-dim); flex: none; padding: 9px 0; margin: -9px 0; } /* T5 18.10.: osuma-alue 15 → 33 px */
-.tn20 .vpk-logo span { color: #e8a320; }
-.tn20 .vpk-bar-sep { width: 1px; height: 18px; background: #2b2317; flex: none; }
-.tn20 .vpk-bar-nimi { font-family: var(--vpk-display); font-weight: 900; font-variation-settings: "wdth" 78; font-size: 17px; text-transform: uppercase; line-height: 1; white-space: nowrap; }
-.tn20 .vpk-bar-r { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; flex: none; }
-.tn20 .vpk-bar-pikku { font-size: 11px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; color: var(--tn-text-dim); }
-.tn20 .vpk-bar-arvo { font-family: var(--vpk-display); font-weight: 900; font-variation-settings: "wdth" 82; font-size: 18px; line-height: 1; }
-
 /* ── Runko ─────────────────────────────────────────────── */
 .tn20 .vpk-main { box-sizing: border-box; width: 100%; margin: 0 auto; padding: 16px 16px 0; display: flex; flex-direction: column; gap: 16px; }
 @media (min-width: 1080px) {
@@ -63,11 +47,9 @@
   overflow-wrap: normal; word-break: keep-all;
 }
 .tn20 .vpk-h1 span { color: var(--vpk-lila); white-space: nowrap; }
-.tn20 .vpk-lede { margin-top: 2px; font-size: 14px; line-height: 1.45; color: #cfc7b6; max-width: 60ch; text-wrap: pretty; }
 .tn20 .vpk-ohje { font-size: 12px; line-height: 1.4; color: var(--vpk-heikko); }
 @media (min-width: 1080px) {
   .tn20 .vpk-h1 { font-size: clamp(40px, 4vw, 60px); }
-  .tn20 .vpk-lede { font-size: 17px; }
 }
 
 /* ── TN-Edustajakortti ─────────────────────────────────── */
@@ -243,8 +225,8 @@
 }
 .tn20 .vpk .vpk-toissija:hover { background: rgba(180, 165, 255, .1); color: var(--vpk-teksti); }
 .tn20 .vpk-toissija:is(button) { background: transparent; cursor: pointer; font-family: inherit; }
-/* Kolmas toiminto (pelilinkki): tekstilinkki koko leveydellä napin alla. */
-.tn20 .vpk .vpk-kolmas { flex: 1 1 100%; display: inline-flex; align-items: center; justify-content: center; min-height: 44px; font-size: 14px; font-weight: 800; text-align: center; }
+/* K4: harjoitusselite omalle rivilleen Pelaa uusi -napin alle. */
+.tn20 .vpk-napit .pk-harjoitus { flex: 1 1 100%; margin: -4px 0 0; }
 .tn20 .vpk-tulos-grid { display: flex; flex-direction: column; gap: 18px; }
 @media (min-width: 1080px) {
   .tn20 .vpk-tulos-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(340px, 440px); gap: clamp(20px, 2.4vw, 40px); align-items: start; }
@@ -285,13 +267,7 @@
 .tn20 .vpk-ratkaisu li { line-height: 1.35; }
 .tn20 .vpk-ratkaisu b { font-weight: 700; color: var(--vpk-teksti); }
 .tn20 .vpk-ratkaisu span { color: var(--vpk-lila); }
-.tn20 .vpk .vpk-takaisin { display: inline-flex; align-items: center; min-height: 44px; font-size: 14px; font-weight: 700; }
 
-/* ── Näin pelaat + lähteet ─────────────────────────────── */
-.tn20 .vpk-info { box-sizing: border-box; max-width: 1400px; margin: 0 auto; padding: 36px 16px 56px; display: flex; flex-direction: column; gap: 12px; }
-@media (min-width: 1080px) { .tn20 .vpk-info { padding: 24px clamp(20px, 2.6vw, 44px) 64px; } }
-.tn20 .vpk-info h2 { font-family: var(--vpk-display); font-weight: 900; font-variation-settings: "wdth" 76; font-size: 20px; text-transform: uppercase; }
-.tn20 .vpk-info ol { padding-left: 18px; display: flex; flex-direction: column; gap: 8px; max-width: 70ch; font-size: 14px; line-height: 1.5; color: #cfc7b6; }
-.tn20 .vpk-info b { color: var(--vpk-teksti); }
+/* ── Lähteet ── (Näin pelaat siirtyi aloituksen avattavaksi ohjeeksi, pelikehys K2 20.10.2026) */
 .tn20 .vpk-lahde { font-size: 12px; line-height: 1.5; color: var(--vpk-heikko); }
 .tn20 .vpk-virhe { display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 80px 16px; text-align: center; }
