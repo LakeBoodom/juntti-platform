@@ -39,6 +39,8 @@ export function juhlatKokoelma(kalenteri: Esiintyma[], nosto: Esiintyma | null):
     tunnusosaTeksti: { eyebrow: "Vuosikello", otsikko: "Vuosikello" },
     uniikitOsiot: true,
     lapset: true,
+    /* Korttikuvat: juhlakuvien valmiit 800 px versiot (1600 px alkuperäiset painoivat 1,8 Mt, 20.10.2026). */
+    kuvaKevyt: (src) => (src.startsWith("/20/juhlat/") ? kevyt(src) : src),
     related: ["kulttuuri", "historia", "tv"],
     mastery: { name: kokoelmaKortti("juhlat")!.mastery.name, icon: "juhla" },
     haku: { collection: "juhlat" },

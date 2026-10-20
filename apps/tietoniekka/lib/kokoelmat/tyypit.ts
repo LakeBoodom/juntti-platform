@@ -62,6 +62,8 @@ export type Kokoelma = {
   haku: { collection?: string; category?: string; sectionTags?: boolean };
   /** Korttikuva visan slugista; oletuksena quizzes.hero_image. */
   korttikuva?: (slug: string) => string | null;
+  /** Korttikuvan kevyempi versio (Juhlat: quizzes.hero_image → valmis -800.webp). */
+  kuvaKevyt?: (src: string) => string;
   /** Korttikuvan object-position visan slugista (esim. "center 40%"); oletuksena keskitetty. */
   korttikuvaPos?: (slug: string) => string | undefined;
   /** Kuvakrediittirivi sivun loppuun (CC BY / CC BY-SA -valokuvat), linkki /kuvien-lahteet. */

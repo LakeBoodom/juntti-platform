@@ -98,7 +98,8 @@ export async function haeRunkoData(k: Kokoelma, ulkoiset?: UlkoinenKohde[]): Pro
   const rivit = ((data ?? []) as unknown as Rivi[]).filter((r) => lapsetMukaan || (r.target_age !== "4-7" && r.target_age !== "8-12"));
 
   const visa = (r: Rivi): RunkoVisa => {
-    const kuva = (r.slug && k.korttikuva?.(r.slug)) || r.hero_image || null;
+    const kuva0 = (r.slug && k.korttikuva?.(r.slug)) || r.hero_image || null;
+    const kuva = kuva0 && k.kuvaKevyt ? k.kuvaKevyt(kuva0) : kuva0;
     const metaOsat = [k.metarivi?.(r) ?? ""];
     /* Heikin päätös 19.10.2026: kysymysmäärä vain, kun se poikkeaa kymmenestä. Vaikeustasoa ei koskaan. */
     if (r.target_age === "4-7" || r.target_age === "8-12") metaOsat.unshift(`Lapsille ${r.target_age.replace("-", "–")} v.`);

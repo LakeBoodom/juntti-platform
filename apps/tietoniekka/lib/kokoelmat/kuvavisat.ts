@@ -25,6 +25,10 @@ export const KUVAVISAT: Kokoelma = {
   haku: {},
 };
 
+/** Esikatselukuvien kevyet kopiot (public/20/kuvavisat/k/<type>.webp, 800 px, 20.10.2026): alkuperäiset tallennustilan
+ *  JPG/PNG-kuvat olivat jopa 770 kt. Kopio = kategorian ensimmäinen kuva (sort_order) tekohetkellä. */
+const KEVYET = new Set(["elaimet", "henkilot", "kasvit", "linnut", "liput", "maalaukset", "rakennukset", "vaakunat"]);
+
 /** Kategoriat ja muunnelmat rungon kohteiksi: "Kaikki" ensin (B), sitten tasot ja maanosat. */
 export function kuvavisaKohteet(kategoriat: KategoriaData[]): UlkoinenKohde[] {
   return kategoriat.flatMap((k) => {
@@ -37,7 +41,7 @@ export function kuvavisaKohteet(kategoriat: KategoriaData[]): UlkoinenKohde[] {
         slug: v.href,
         nimi: v.label,
         href: v.href,
-        kuva: v.kaikki ? k.esikatselut[0] ?? null : null,
+        kuva: v.kaikki ? (KEVYET.has(k.meta.type) ? `/20/kuvavisat/k/${k.meta.type}.webp` : k.esikatselut[0] ?? null) : null,
         kuvaPos: v.kaikki ? k.meta.kuvaKohdistus : undefined,
         kuvaSovitus: v.kaikki && k.meta.sovitus === "contain" ? "contain" : undefined,
         meta: v.kaikki ? k.meta.kuvaus : "",

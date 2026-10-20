@@ -38,5 +38,5 @@ export const HISTORIA: Kokoelma = {
   related: ["vaalit", "kulttuuri", "kaupungit"],
   mastery: { name: kokoelmaKortti("historia")!.mastery.name, icon: "historia" },
   haku: { collection: "historia" },
-  korttikuva: (slug) => (KUVAT.has(slug) ? `/20/historia/${slug}.webp` : null),
+  korttikuva: (slug) => (KUVAT.has(slug) ? `/20/historia/k/${slug}.webp` : null), // 800 px kopiot (20.10.2026)
 };
