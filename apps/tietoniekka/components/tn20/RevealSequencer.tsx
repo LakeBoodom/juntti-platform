@@ -29,7 +29,7 @@
 // onReveal-callback on siis pelkkä ilmoitus ("kaikki paljastettu, laske
 // pisteet nyt") — ei enää näkymänvaihto.
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { RankingCard, type RankingCardState } from "./RankingCard";
 import { ChainResultSummary, type ChainResultSummaryProps, type ChainScoreResult } from "./ChainResultSummary";
 import { usePrefersReducedMotion } from "@/lib/usePrefersReducedMotion";
@@ -59,6 +59,7 @@ export function RevealSequencer({
   onNewRound,
   onChangeCategory,
   summaryProps,
+  tulos,
 }: {
   items: RevealItem[];
   /** Valmiiksi laskettu pistetulos — näytetään korttilistan alla heti kun kaikki on paljastettu. */
@@ -67,6 +68,8 @@ export function RevealSequencer({
   onChangeCategory?: () => void;
   /** Laita järjestykseen: tulosnäkymän tekstit ja linkit (oletukset = Ikäjärjestys). */
   summaryProps?: Pick<ChainResultSummaryProps, "newRoundLabel" | "changeCategoryLabel" | "collectionHref" | "collectionLabel">;
+  /** Pelikehyksen K4-tulos (PeliTulos, 20.10.2026) korvaa ChainResultSummaryn, kun annettu. */
+  tulos?: ReactNode;
 }) {
   const ordered = [...items].sort((a, b) => a.placedPosition - b.placedPosition);
   const reducedMotion = usePrefersReducedMotion();
@@ -127,7 +130,7 @@ export function RevealSequencer({
       </div>
 
       {allRevealed ? (
-        <ChainResultSummary result={result} onNewRound={onNewRound} onChangeCategory={onChangeCategory} {...summaryProps} />
+        (tulos ?? <ChainResultSummary result={result} onNewRound={onNewRound} onChangeCategory={onChangeCategory} {...summaryProps} />)
       ) : (
         <button type="button" className="tk-reveal-skip" onClick={revealAllNow}>
           Näytä heti →

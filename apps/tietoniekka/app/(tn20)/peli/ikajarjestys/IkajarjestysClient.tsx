@@ -11,7 +11,7 @@
 // tallennusta pelaajan järjestyksestä — sessionStorage tyhjenee välilehden
 // sulkeutuessa eikä mitään kirjoiteta kantaan pelin aikana.
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, type CSSProperties } from "react";
 import { getChainRound } from "@/lib/ikajarjestys";
 import {
   DEFAULT_DIRECTION,
@@ -20,14 +20,24 @@ import {
   sortForDirection,
   type ChainPerson,
 } from "@/lib/ikajarjestysConstants";
-import { CategoryPicker } from "@/components/tn20/CategoryPicker";
 import { ReorderableChainList } from "@/components/tn20/ReorderableChainList";
 import { SuuntaindikaattoriBadge } from "@/components/tn20/SuuntaindikaattoriBadge";
 import { RevealSequencer, type RevealItem } from "@/components/tn20/RevealSequencer";
 import { calculateChainScore } from "@/components/tn20/ChainResultSummary";
-import { TkGameNav } from "@/components/tn20/TkGameNav";
+import Pelipalkki from "@/components/tn20/pelikehys/Pelipalkki";
+import PeliKehys from "@/components/tn20/pelikehys/PeliKehys";
+import PeliAloitus from "@/components/tn20/pelikehys/PeliAloitus";
+import PeliTulos from "@/components/tn20/pelikehys/PeliTulos";
+import { seuraavatPelit } from "@/lib/pelimuodot";
+import { CHAIN_CATEGORIES } from "@/lib/personCategories";
+import { RYHMAT } from "@/lib/henkiloRyhmat";
 
-const PALUU = { href: "/kokoelma/tunnetut-henkilot", label: "Tunnetut henkilöt" };
+// Pelikehys K1 (20.10.2026): paluu kotikokoelmaan Tunnetut henkilöt.
+const KOTI = { href: "/kokoelma/tunnetut-henkilot", nimi: "Tunnetut henkilöt" };
+const PELI = "Ikäjärjestys";
+/** K2-valinnassa ryhmien lyhyet nimet, jotta kahdeksan vaihtoehtoa mahtuu 390 × 844:ään napin kanssa. */
+const LYHYT = new Map<string, string>([["kaikki", "Kaikki"], ...RYHMAT.map((r) => [r.key as string, r.lyhyt] as [string, string])]);
+const VARI = new Map<string, string>(RYHMAT.map((r) => [r.key as string, r.vari]));
 
 const LAST_SEEN_KEY = "tk-ikajarjestys-viimeksi-nahdyt";
 
@@ -72,10 +82,26 @@ export default function IkajarjestysClient({
   const [phase, setPhase] = useState<Phase>(initialRound && initialRound.length > 0 ? "ordering" : "start");
   const [emptyNotice, setEmptyNotice] = useState<string | null>(null);
   const [partialRoundNotice, setPartialRoundNotice] = useState<string | null>(null);
+  const [jaettu, setJaettu] = useState(false);
 
   const correctOrder = useMemo(() => (round ? sortForDirection(round, DEFAULT_DIRECTION) : []), [round]);
 
+  /** Haasta kaveri: sama kymmenikkö linkkinä (?henkilot=, sama kuin henkilösivun nosto). */
+  async function haasta() {
+    if (!round || !scoreResult) return;
+    const url = `${location.origin}/peli/ikajarjestys?henkilot=${round.map((p) => p.id).join(",")}`;
+    const teksti = `Sain ${scoreResult.correctCount}/${scoreResult.totalCount} oikein Ikäjärjestyksessä. Pystytkö parempaan?`;
+    try {
+      if (navigator.share) await navigator.share({ title: PELI, text: teksti, url });
+      else await navigator.clipboard.writeText(`${teksti} ${url}`);
+      setJaettu(true);
+    } catch {
+      // jako peruttu
+    }
+  }
+
   async function startRound(chosenCategory: string) {
+    setJaettu(false);
     setPhase("loading");
     setEmptyNotice(null);
     setPartialRoundNotice(null);
@@ -120,80 +146,132 @@ export default function IkajarjestysClient({
   const scoreResult = useMemo(() => (round ? calculateChainScore(order, correctOrder) : null), [order, round, correctOrder]);
 
   if (phase === "start" || phase === "loading") {
+    const aihe = LYHYT.get(pickerCategory) ?? "Kaikki";
     return (
-      <main className="tk-page tk-page--start">
-        <TkGameNav paluu={PALUU} />
-        <CategoryPicker
-          open
-          variant="inline"
-          selectedCategory={pickerCategory}
-          onSelectCategory={setPickerCategory}
-          onStart={() => startRound(pickerCategory)}
-          otsikkotaso="h1"
-        />
-        {/* SEO-erä A7 (2.10.2026): lyhyt "Näin pelaat" Kuntaliitoksen malliin + linkki henkilöhubiin. */}
-        <section className="tk-info" aria-labelledby="tk-info-h">
-          <h2 id="tk-info-h">Näin pelaat</h2>
-          <ol>
-            <li><b>Valitse aihe</b> yllä olevista vaihtoehdoista – tai pelaa kaikilla henkilöillä.</li>
-            <li><b>Järjestä kymmenen henkilöä</b> syntymävuoden mukaan vanhimmasta nuorimpaan – raahaa tai napauta kahta korttia vaihtaaksesi niiden paikat.</li>
-            <li><b>Tarkista järjestys.</b> Oikeat paikat paljastuvat yksi kerrallaan, ja näet jokaisen syntymävuoden.</li>
-          </ol>
-          <p>
-            Henkilöt ovat Tietoniekan <a href="/kokoelma/tunnetut-henkilot">tunnettujen henkilöiden</a> joukosta – jokaisesta on myös oma tietovisansa.
-          </p>
-        </section>
-        {phase === "loading" && (
-          <p className="tk-loading" role="status">
-            Arvotaan kierrosta…
-          </p>
-        )}
-        {emptyNotice && (
-          <p className="tk-loading" role="alert">
-            {emptyNotice}
-          </p>
-        )}
-      </main>
+      <PeliKehys iho="tumma">
+        <Pelipalkki iho="tumma" peli={PELI} koti={KOTI} />
+        <main>
+          {/* K2 (pelikehys, 20.10.2026): h1 → lause → aihe → Aloita → ohjeet avattavina. */}
+          <PeliAloitus
+            otsikko={PELI}
+            lause="Aseta kymmenen tunnettua suomalaista syntymävuoden mukaan vanhimmasta nuorimpaan."
+            valinta={
+              <fieldset className="pk-valinta">
+                <legend>Valitse aihe</legend>
+                <div className="pk-vaihtoehdot">
+                  {CHAIN_CATEGORIES.map((c) => (
+                    <label key={c.key} className="pk-vaihtoehto" style={VARI.has(c.key) ? ({ "--va": VARI.get(c.key) } as CSSProperties) : undefined}>
+                      <input type="radio" name="ika-aihe" value={c.key} checked={pickerCategory === c.key} onChange={() => setPickerCategory(c.key)} />
+                      <span className="pk-vaihtoehto-piste" aria-hidden="true" />
+                      {LYHYT.get(c.key) ?? c.label}
+                    </label>
+                  ))}
+                </div>
+              </fieldset>
+            }
+            toiminto={
+              <button type="button" className="pk-nappi" disabled={phase === "loading"} onClick={() => startRound(pickerCategory)}>
+                {phase === "loading" ? "Arvotaan…" : `Aloita · ${aihe}`}
+              </button>
+            }
+            alarivi={
+              emptyNotice ? (
+                <span role="alert">{emptyNotice}</span>
+              ) : phase === "loading" ? (
+                <span role="status">Arvotaan kierrosta…</span>
+              ) : undefined
+            }
+            ohjeet={[
+              {
+                otsikko: "Näin pelaat",
+                sisalto: (
+                  <>
+                    <ol>
+                      <li><b>Valitse aihe</b> – tai pelaa kaikilla henkilöillä.</li>
+                      <li><b>Järjestä kymmenen henkilöä</b> syntymävuoden mukaan vanhimmasta nuorimpaan – raahaa tai napauta kahta korttia vaihtaaksesi niiden paikat.</li>
+                      <li><b>Paljasta järjestys.</b> Oikeat paikat paljastuvat yksi kerrallaan, ja näet jokaisen syntymäajan.</li>
+                    </ol>
+                    <p>
+                      Henkilöt ovat <a href={KOTI.href}>tunnettujen henkilöiden</a> joukosta – jokaisesta on myös oma tietovisansa.
+                    </p>
+                  </>
+                ),
+              },
+            ]}
+          />
+        </main>
+      </PeliKehys>
     );
   }
 
   if (phase === "revealing" && scoreResult) {
     return (
-      <main className="tk-page">
-        <TkGameNav paluu={PALUU} />
-        <RevealSequencer
-          items={revealItems}
-          result={scoreResult}
-          onNewRound={() => startRound(category)}
-          onChangeCategory={() => {
-            setPickerCategory(category);
-            setPhase("start");
-          }}
-        />
-      </main>
+      <PeliKehys iho="tumma">
+        <Pelipalkki iho="tumma" peli={PELI} koti={KOTI} />
+        <main className="tk-page">
+          <RevealSequencer
+            items={revealItems}
+            result={scoreResult}
+            onNewRound={() => startRound(category)}
+            tulos={
+              /* K4 (pelikehys, 20.10.2026): tulos → Pelaa uusi → Haasta kaveri → seuraava peli. */
+              <PeliTulos
+                eyebrow={`${PELI} · ${LYHYT.get(category) ?? "Kaikki"}`}
+                iso={`${scoreResult.correctCount}/${scoreResult.totalCount} oikein`}
+                ala={`${scoreResult.score} pistettä · pisin oikea ketju ${scoreResult.longestCorrectChain}`}
+                paatoiminto={
+                  <button type="button" className="pk-nappi" onClick={() => startRound(category)}>
+                    Pelaa uusi kierros
+                  </button>
+                }
+                harjoitus={
+                  <button
+                    type="button"
+                    className="pk-linkki"
+                    onClick={() => {
+                      setPickerCategory(category);
+                      setPhase("start");
+                    }}
+                  >
+                    Vaihda aihetta
+                  </button>
+                }
+                haasta={
+                  <button type="button" className="pk-haasta" onClick={haasta}>
+                    {jaettu ? "Haaste jaettu" : "Haasta kaveri"}
+                  </button>
+                }
+                seuraavat={seuraavatPelit("ikajarjestys", "tunnetut-henkilot")}
+              />
+            }
+          />
+        </main>
+      </PeliKehys>
     );
   }
 
   // phase === "ordering"
   return (
-    <main className="tk-page">
-      <TkGameNav paluu={PALUU} />
-      <header className="tk-order-head">
-        <SuuntaindikaattoriBadge direction={DEFAULT_DIRECTION} />
-        <h1 className="tk-order-title">Tietoketju: Ikäjärjestys</h1>
-        <p className="tk-order-desc">
-          Raahaa tai napauta korteista järjestääksesi ne. Kun järjestys tuntuu oikealta, paljasta tulos.
-        </p>
-        {partialRoundNotice && (
-          <p className="tk-loading" role="status">
-            {partialRoundNotice}
+    <PeliKehys iho="tumma">
+      <Pelipalkki iho="tumma" peli={PELI} koti={KOTI} tila="Vanhin → nuorin" pelissa />
+      <main className="tk-page">
+        <header className="tk-order-head">
+          <SuuntaindikaattoriBadge direction={DEFAULT_DIRECTION} />
+          <h1 className="tk-order-title">{PELI}</h1>
+          <p className="tk-order-desc">
+            Raahaa tai napauta korteista järjestääksesi ne. Kun järjestys tuntuu oikealta, paljasta tulos.
           </p>
-        )}
-      </header>
-      <ReorderableChainList items={order} onReorder={setOrder} />
-      <button type="button" className="tk-btn-primary tk-order-cta" onClick={() => setPhase("revealing")}>
-        Paljasta järjestys
-      </button>
-    </main>
+          {partialRoundNotice && (
+            <p className="tk-loading" role="status">
+              {partialRoundNotice}
+            </p>
+          )}
+        </header>
+        <ReorderableChainList items={order} onReorder={setOrder} />
+        <button type="button" className="tk-btn-primary tk-order-cta" onClick={() => setPhase("revealing")}>
+          Paljasta järjestys
+        </button>
+      </main>
+    </PeliKehys>
   );
 }
