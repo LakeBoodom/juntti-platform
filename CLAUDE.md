@@ -162,7 +162,9 @@ sana ei rivity vaan leikkautuu `overflow: hidden`iin.
    `apps/tietoniekka/scripts/korttisaanto-webkit.cjs`. Chromium ei näe Safarin eroja (Safari ei
    katkaise yhdysmerkistä `keep-all`-otsikoissa → runko lisää U+200B:n renderöinnissä, `katko()`).
 5. `text-wrap: balance` vain yhdessä `overflow-wrap: normal` +
-   `word-break: keep-all` kanssa.
+   `word-break: keep-all` kanssa. **Poikkeus:** jos otsikossa on tavuviivoja (U+00AD, runko `katko()`),
+   käytä `word-break: normal` — WebKit ei katkaise tavuviivasta keep-all-tilassa (20.10.2026).
+   Latinalaisessa tekstissä keep-all ei muuten eroa normalista; `overflow-wrap: normal` estää katkon.
 6. Kalibroitu koko dokumentoidaan CSS-kommenttiin (mitattu tarve +
    CD:n alkuperäinen arvo + marginaali).
 

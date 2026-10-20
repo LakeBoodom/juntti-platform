@@ -116,6 +116,13 @@
 .tn20 .rk-krediitti { max-width: var(--rk-max); margin: 0 auto; padding: 28px var(--rk-x) 0; box-sizing: border-box; font-size: 12px; line-height: 1.5; color: var(--rk-muted); }
 .tn20 .rk-krediitti a { color: inherit; text-decoration: underline; text-underline-offset: 2px; display: inline-block; padding: 14px 0; margin: -14px 0; }
 
+/* Tavutus (U+00AD, katko()) rungon otsikoihin: WebKit EI katkaise tavuviivasta, kun word-break on keep-all
+   (mitattu 20.10.2026: "PÄÄMINISTERIKAUSIEN" +8 px). Latinalaisessa tekstissä keep-all ei muuten eroa normalista;
+   sanan katkeamisen keskeltä estää overflow-wrap: normal, joten word-break: normal on turvallinen. */
+.tn20 .rk :is(.rk-h1, .rk-h2, .rk-b-nimi, .rk-a-nimi, .rk-c-nimi, .rk-peli-nimi, .rk-kokoelma-nimi, .rk-aika-nimi, .rk-synt-nimi) {
+  word-break: normal; overflow-wrap: normal; -webkit-hyphens: manual; hyphens: manual;
+}
+
 /* ── V5 Osiot ─────────────────────────────────────────────────────────── */
 .tn20 .rk-osio, .tn20 .rk-pelit, .tn20 .rk-lisaa {
   display: flex; flex-direction: column; gap: 14px; max-width: var(--rk-max); margin: 0 auto; padding: var(--rk-vali) var(--rk-x) 0;
