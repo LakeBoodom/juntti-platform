@@ -102,6 +102,14 @@
 .tn20 .pk-tulos-toiminnot { display: flex; flex-direction: column; align-items: flex-start; gap: 12px; }
 .tn20 .pk-ketju { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0 0; padding: 0; list-style: none; }
 .tn20 .pk-ketju li { display: inline-flex; align-items: center; min-height: 32px; padding: 0 12px; border-radius: 999px; background: var(--pk-kortti); border: 1px solid var(--pk-line); font-size: 14px; font-weight: 700; }
+/* K4 vastausten läpikäynti (Megavisat, 20.10.2026): oletuksena kiinni, sisältönä tavallisen visan Vastauksesi-ruudukko. */
+.tn20 .pk-lapikaynti { margin-top: 8px; border-block: 1px solid var(--pk-line); }
+.tn20 .pk-lapikaynti summary { display: flex; align-items: center; justify-content: space-between; min-height: 52px; font-size: 15px; font-weight: 700; color: var(--pk-ink); cursor: pointer; list-style: none; }
+.tn20 .pk-lapikaynti summary::-webkit-details-marker { display: none; }
+.tn20 .pk-lapikaynti summary span { font-size: 20px; color: var(--pk-dim); }
+.tn20 .pk-lapikaynti[open] summary span { transform: rotate(45deg); }
+.tn20 .pk-lapikaynti summary:focus-visible { outline: 2px solid var(--tn-lime, #b6ff3c); outline-offset: 2px; }
+.tn20 .pk-lapikaynti .tng-sumwrap { padding-bottom: 16px; }
 .tn20 .pk-harjoitus { margin: -4px 0 0; font-size: 13px; color: var(--pk-dim); }
 .tn20 [data-iho] .pk-haasta { display: inline-flex; align-items: center; gap: 8px; min-height: 48px; padding: 0 20px; border-radius: 999px; border: 1.5px solid var(--pk-line); background: transparent; color: var(--pk-ink); font: inherit; font-size: 15px; font-weight: 700; cursor: pointer; }
 .tn20 [data-iho] .pk-haasta:hover { border-color: var(--pk-acc); }
@@ -118,4 +126,4 @@
 .tn20 .pk-pelikortti-kuvaus { font-size: 13px; line-height: 1.4; color: var(--pk-dim); }
 .tn20 .pk-pelikortti-cta { flex: none; font-size: 13px; font-weight: 700; color: var(--pk-acc); white-space: nowrap; }
 @media (min-width: 900px) { .tn20 .pk-tulos { max-width: 1000px; } .tn20 .pk-seuraava-rivi { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
-@media (prefers-reduced-motion: reduce) { .tn20 .pk-ohje[open] summary span { transform: none; } }
+@media (prefers-reduced-motion: reduce) { .tn20 :is(.pk-ohje, .pk-lapikaynti)[open] summary span { transform: none; } }

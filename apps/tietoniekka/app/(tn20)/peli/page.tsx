@@ -21,7 +21,7 @@ import { maantietoImg } from "@/lib/maantieto";
 import { KAUPUNGIT } from "@/lib/kaupungit";
 import { resolveCollection, COLLECTION_LABEL } from "@/lib/visanKokoelma";
 import { type Learn } from "@/lib/learn";
-import { megaDuration } from "@/lib/megavisat";
+import { megaDuration, megaMaarat, maaraTekstiin } from "@/lib/megavisat";
 import { seuraavatPelit } from "@/lib/pelimuodot";
 import GameClient, { type GameQuiz } from "./GameClient";
 import LastenPeli from "./lapset/LastenPeli";
@@ -103,10 +103,12 @@ export async function generateMetadata(
   }
   if (!sb) return {};
   if (mega) {
-    const { data } = await sb.from("quizzes").select("title, display_title, teaser").eq("slug", mega).maybeSingle<{ title: string; display_title: string | null; teaser: string | null }>();
+    const { data } = await sb.from("quizzes").select("id, title, display_title, teaser").eq("slug", mega).maybeSingle<{ id: string; title: string; display_title: string | null; teaser: string | null }>();
     if (!data) return { title: `Visaa ei löytynyt${suffix}` };
     const megaNimi = data.display_title ?? data.title;
-    const megaDesc = data.teaser ?? "Megavisa: yksi istunto ilman taukoja. Pelaa ilmaiseksi Tietoniekassa.";
+    // Kuvauksen kysymysmäärä datasta (pelattavat, ks. megaMaarat), ei kannan tekstistä.
+    const pelattavat = data.teaser ? (await megaMaarat(sb, [data.id])).get(data.id) : undefined;
+    const megaDesc = data.teaser ? (pelattavat ? maaraTekstiin(data.teaser, pelattavat) : data.teaser) : "Megavisa: yksi istunto ilman taukoja. Pelaa ilmaiseksi Tietoniekassa.";
     const megaUrl = `/peli?mega=${encodeURIComponent(mega)}`;
     return {
       title: `${megaNimi}${suffix}`, description: megaDesc,
@@ -408,13 +410,7 @@ export default async function Peli20({
       .order("created_at", { ascending: false })
       .limit(3);
     const megaIds = ((otherMegas ?? []) as unknown as Array<{ id: string }>).map((m) => m.id);
-    const { data: megaLinks } = megaIds.length
-      ? await sb.from("mega_questions" as never).select("mega_quiz_id").in("mega_quiz_id", megaIds)
-      : { data: [] };
-    const megaCount = new Map<string, number>();
-    for (const l of (megaLinks ?? []) as unknown as Array<{ mega_quiz_id: string }>) {
-      megaCount.set(l.mega_quiz_id, (megaCount.get(l.mega_quiz_id) ?? 0) + 1);
-    }
+    const megaCount = await megaMaarat(sb, megaIds);
     const rel = ((otherMegas ?? []) as unknown as Array<{ id: string; slug: string; title: string; display_title: string | null }>)
       .filter((m) => (megaCount.get(m.id) ?? 0) > 0)
       .map((m) => ({ id: m.id, display_title: m.display_title, title: m.title, teaser: null, collection: null, genre: null, question_count: megaCount.get(m.id) ?? 0, slug: m.slug }));
@@ -422,7 +418,7 @@ export default async function Peli20({
     const game: GameQuiz = {
       id: mq.id,
       title: mq.display_title ?? mq.title,
-      teaser: mq.teaser,
+      teaser: mq.teaser ? maaraTekstiin(mq.teaser, questions.length) : null,
       collectionLabel: "Megavisat",
       genreLabel: `${questions.length} kysymystä · kaikki kokoelmat`,
       hubHref: "/megavisat",
@@ -436,7 +432,7 @@ export default async function Peli20({
       kehys: {
         peli: "Megavisat",
         koti: { href: "/kokoelmat", nimi: "Kokoelmat" },
-        lause: mq.teaser ?? "Yksi istunto ilman taukoja: pelaa loppuun asti. Vain pisteet ja putki.",
+        lause: mq.teaser ? maaraTekstiin(mq.teaser, questions.length) : "Yksi istunto ilman taukoja: pelaa loppuun asti. Vain pisteet ja putki.",
         alarivi: `${questions.length} kysymystä · ${megaDuration(questions.length)} · yksi istunto`,
         ohjeet: [
           {

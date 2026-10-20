@@ -13,6 +13,8 @@
 // ansiosta) — jos jokin mega joskus poistuu/nimi vaihtuu, kortti häviää
 // automaattisesti hiljaa sen sijaan että linkki 404:ttäisi.
 
+import type { getSupabase } from "@/lib/supabase";
+
 export type MegaCard = {
   slug: string;
   /** Aihetagi kortissa (README:n data-taulukko, sanasta sanaan). */
@@ -93,4 +95,42 @@ export function megaDuration(questionCount: number): string {
   if (questionCount <= 20) return "~8 min";
   if (questionCount <= 50) return "~20 min";
   return "~40 min";
+}
+
+type Sb = NonNullable<ReturnType<typeof getSupabase>>;
+
+/** Pelattavien kysymysten määrä megaa kohden (Heikki 20.10.2026: luvut datasta, ei kovakoodattuina).
+    Lasketaan mega_questions-linkeistä ne, joiden kysymys tai kuva näkyy julkiselle lukijalle — RLS piilottaa
+    luonnosvisojen kysymykset, joten Yleistiedon megassa on 50 linkkiä mutta 45 pelattavaa. Sama luku kuin pelissä. */
+export async function megaMaarat(sb: Sb, megaIds: string[]): Promise<Map<string, number>> {
+  const maarat = new Map<string, number>();
+  if (!megaIds.length) return maarat;
+  const { data } = await sb.from("mega_questions" as never).select("mega_quiz_id, question_id, kuvavisa_id").in("mega_quiz_id", megaIds);
+  const linkit = (data ?? []) as unknown as Array<{ mega_quiz_id: string; question_id: string | null; kuvavisa_id: string | null }>;
+  const nakyvat = new Set<string>();
+  const hae = async (taulu: "questions" | "kuvavisas", idt: string[]) => {
+    for (let i = 0; i < idt.length; i += 100) {
+      const { data: rivit } = await sb.from(taulu).select("id").in("id", idt.slice(i, i + 100));
+      for (const r of (rivit ?? []) as unknown as Array<{ id: string }>) nakyvat.add(r.id);
+    }
+  };
+  await Promise.all([
+    hae("questions", [...new Set(linkit.flatMap((l) => (l.question_id ? [l.question_id] : [])))]),
+    hae("kuvavisas", [...new Set(linkit.flatMap((l) => (l.kuvavisa_id ? [l.kuvavisa_id] : [])))]),
+  ]);
+  for (const l of linkit) {
+    const id = l.question_id ?? l.kuvavisa_id;
+    if (id && nakyvat.has(id)) maarat.set(l.mega_quiz_id, (maarat.get(l.mega_quiz_id) ?? 0) + 1);
+  }
+  return maarat;
+}
+
+/** Kuvaustekstin kysymysmäärä todelliseksi: "50 kysymystä …" / "… 50 kysymyksessä" → pelattava määrä. */
+export const maaraTekstiin = (teksti: string, n: number) => teksti.replace(/\d+(?=\s+kysymy)/g, String(n));
+
+/** "20–50" tai yksi luku, kun kaikissa megoissa on yhtä monta kysymystä. */
+export function maaraVali(maarat: number[]): string | null {
+  if (!maarat.length) return null;
+  const min = Math.min(...maarat), max = Math.max(...maarat);
+  return min === max ? String(min) : `${min}–${max}`;
 }

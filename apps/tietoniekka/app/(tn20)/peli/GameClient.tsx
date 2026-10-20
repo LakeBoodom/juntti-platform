@@ -1001,6 +1001,81 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
     </button>
   );
 
+  /* Tulosnäkymän "Vastauksesi"-ruudukko ja tarkasteludialogi: sama komponentti tavallisen visan tuloksessa ja
+     pelikehyksen (Megavisat) tuloksessa (Heikki 20.10.2026). */
+  const vastaukset = (
+    <div className="tng-sumwrap">
+      <div className="tng-sumhead">
+        <span className="tng-sumlabel">Vastauksesi</span>
+        <span className="tng-sumtext">
+          {right} oikein, {Math.max(0, total - right - skipped)} väärin{skipped ? `, ${skipped} tekninen ohitus` : ""}
+        </span>
+        <button type="button" className="tng-ghost tng-ghost--right" onClick={(e) => openReview(0, e.currentTarget)}>
+          <svg width="17" height="17" viewBox="0 0 18 18" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M1.4 9S3.9 4 9 4s7.6 5 7.6 5-2.5 5-7.6 5S1.4 9 1.4 9z" /><circle cx="9" cy="9" r="2.1" /></svg>
+          Tarkastele vastauksia
+        </button>
+      </div>
+      <div className="tng-sumgrid" role="list">
+        {questions.map((_, i) => {
+          const st = hist[i] === "bad" ? "bad" : hist[i] === "ok" ? "ok" : hist[i] === "skipped" ? "skip" : "todo";
+          const label = st === "ok" ? "oikein" : st === "bad" ? "väärin" : st === "skip" ? "tekninen ohitus" : "ei vastattu";
+          return (
+            <button key={i} type="button" role="listitem" className="tng-sum" data-state={st} aria-label={`Kysymys ${i + 1}, ${label} — avaa vastaus`} onClick={(e) => openReview(i, e.currentTarget)}>
+              <i aria-hidden>{st === "ok" ? "✓" : st === "bad" ? "✕" : st === "skip" ? "⤼" : "–"}</i>{i + 1}
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+  const tarkastelu = review != null && rq ? (
+    <div className="tng-overlay">
+      <button type="button" className="tng-overlay-close" aria-label="Sulje vastausten tarkastelu" onClick={() => setReview(null)} />
+      <div ref={dlgRef} className="tng-dlg" role="dialog" aria-modal="true" aria-label="Vastausten tarkastelu" tabIndex={-1}>
+        <div className="tng-dlg-head">
+          <span className="tng-dlg-num">Kysymys {review + 1} / {total}</span>
+          <span className="tng-rvstate" data-kind={rvKind}>
+            <span aria-hidden>{rvKind === "ok" ? "✓" : rvKind === "bad" ? "✕" : rvKind === "tech" ? "⤼" : "–"}</span>
+            {rvKind === "ok" ? "Oikein" : rvKind === "bad" ? "Väärin" : rvKind === "tech" ? "Tekninen ohitus" : "Ei vastattu"}
+          </span>
+          <button type="button" className="tng-iconbtn tng-iconbtn--right" aria-label="Sulje" onClick={() => setReview(null)}>
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" aria-hidden="true"><path d="M3.5 3.5l9 9M12.5 3.5l-9 9" /></svg>
+          </button>
+        </div>
+        <div className="tng-dlg-body">
+          {rq.context && <span className="tng-context">{rq.context}</span>}
+          <h3 className="tng-dlg-q">{rq.question}</h3>
+          {rq.image && (
+            <div className="tng-dlg-img">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={rq.image} alt={`Kysymyksen kuva — oikea vastaus: ${rq.correct}`} />
+            </div>
+          )}
+          <div className="tng-rvrows">
+            <div className="tng-rvrow" data-kind={rvKind}>
+              <span className="tng-rvrow-l">Sinun vastauksesi</span>
+              <span className="tng-rvrow-v">{rp == null ? (rvKind === "tech" ? "Ohitettu teknisen virheen vuoksi — ei laskettu vääräksi" : "Ei vastattu") : rq.options[rp]}</span>
+            </div>
+            <div className="tng-rvrow tng-rvrow--correct">
+              <span className="tng-rvrow-l">Oikea vastaus</span>
+              <span className="tng-rvrow-v">{rq.correct}</span>
+            </div>
+          </div>
+          {rq.fact && (
+            <div className="tng-fb-body">
+              <span className="tng-kicker">Tiesitkö?</span>
+              <span className="tng-dlg-tip">{rq.fact}</span>
+            </div>
+          )}
+        </div>
+        <div className="tng-dlg-foot">
+          <button type="button" className="tng-navbtn" aria-label="Edellinen kysymys" disabled={review <= 0} onClick={() => setReview(Math.max(0, review - 1))}><span aria-hidden>←</span> Edellinen</button>
+          <button type="button" className="tng-navbtn tng-navbtn--right" aria-label="Seuraava kysymys" disabled={review >= total - 1} onClick={() => setReview(Math.min(total - 1, review + 1))}>Seuraava <span aria-hidden>→</span></button>
+        </div>
+      </div>
+    </div>
+  ) : null;
+
   /* ── Pelikehys (Megavisat): K2-aloitus ja K4-tulos kehyksestä, K3-pelinäkymä alla ennallaan ── */
   const kehys = quiz.kehys;
   if (kehys && phase === "start") {
@@ -1038,12 +1113,23 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
     const uusi = quiz.related[0];
     return (
       <PeliKehys iho="tumma">
+        <div ref={pageRef}>
         <Pelipalkki iho="tumma" peli={kehys.peli} koti={kehys.koti} />
         <main>
           <PeliTulos
             eyebrow={`${kehys.peli} · ${quiz.title}`}
             iso={`${right}/${total} oikein`}
             ala={`${score} pistettä · ${tier.title}`}
+            lisa={
+              /* K4: läpikäynti tuloksen alla, oletuksena kiinni (Heikki 20.10.2026: kysymyksiä on paljon). */
+              <details className="pk-lapikaynti">
+                <summary>
+                  Näytä vastauksesi ({total})
+                  <span aria-hidden="true">+</span>
+                </summary>
+                {vastaukset}
+              </details>
+            }
             paatoiminto={
               uusi ? (
                 <a className="pk-nappi" href={uusi.href}>
@@ -1071,6 +1157,8 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
           />
           <p className="tng-sr" role="status" aria-live="polite">{copyState ? liveStatus : ""}</p>
         </main>
+        </div>
+        {tarkastelu}
       </PeliKehys>
     );
   }
@@ -1588,29 +1676,7 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
                   )}
                 </div>
 
-                <div className="tng-sumwrap">
-                  <div className="tng-sumhead">
-                    <span className="tng-sumlabel">Vastauksesi</span>
-                    <span className="tng-sumtext">
-                      {right} oikein, {Math.max(0, total - right - skipped)} väärin{skipped ? `, ${skipped} tekninen ohitus` : ""}
-                    </span>
-                    <button type="button" className="tng-ghost tng-ghost--right" onClick={(e) => openReview(0, e.currentTarget)}>
-                      <svg width="17" height="17" viewBox="0 0 18 18" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M1.4 9S3.9 4 9 4s7.6 5 7.6 5-2.5 5-7.6 5S1.4 9 1.4 9z" /><circle cx="9" cy="9" r="2.1" /></svg>
-                      Tarkastele vastauksia
-                    </button>
-                  </div>
-                  <div className="tng-sumgrid" role="list">
-                    {questions.map((_, i) => {
-                      const st = hist[i] === "bad" ? "bad" : hist[i] === "ok" ? "ok" : hist[i] === "skipped" ? "skip" : "todo";
-                      const label = st === "ok" ? "oikein" : st === "bad" ? "väärin" : st === "skip" ? "tekninen ohitus" : "ei vastattu";
-                      return (
-                        <button key={i} type="button" role="listitem" className="tng-sum" data-state={st} aria-label={`Kysymys ${i + 1}, ${label} — avaa vastaus`} onClick={(e) => openReview(i, e.currentTarget)}>
-                          <i aria-hidden>{st === "ok" ? "✓" : st === "bad" ? "✕" : st === "skip" ? "⤼" : "–"}</i>{i + 1}
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
+                {vastaukset}
               </section>
 
               <section className="tng-resright" aria-label="Haasta kaveri ja jaa haaste">
@@ -1708,53 +1774,7 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
       )}
 
       {/* ── Vastausten tarkastelu ── */}
-      {review != null && rq && (
-        <div className="tng-overlay">
-          <button type="button" className="tng-overlay-close" aria-label="Sulje vastausten tarkastelu" onClick={() => setReview(null)} />
-          <div ref={dlgRef} className="tng-dlg" role="dialog" aria-modal="true" aria-label="Vastausten tarkastelu" tabIndex={-1}>
-            <div className="tng-dlg-head">
-              <span className="tng-dlg-num">Kysymys {review + 1} / {total}</span>
-              <span className="tng-rvstate" data-kind={rvKind}>
-                <span aria-hidden>{rvKind === "ok" ? "✓" : rvKind === "bad" ? "✕" : rvKind === "tech" ? "⤼" : "–"}</span>
-                {rvKind === "ok" ? "Oikein" : rvKind === "bad" ? "Väärin" : rvKind === "tech" ? "Tekninen ohitus" : "Ei vastattu"}
-              </span>
-              <button type="button" className="tng-iconbtn tng-iconbtn--right" aria-label="Sulje" onClick={() => setReview(null)}>
-                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" aria-hidden="true"><path d="M3.5 3.5l9 9M12.5 3.5l-9 9" /></svg>
-              </button>
-            </div>
-            <div className="tng-dlg-body">
-              {rq.context && <span className="tng-context">{rq.context}</span>}
-              <h3 className="tng-dlg-q">{rq.question}</h3>
-              {rq.image && (
-                <div className="tng-dlg-img">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={rq.image} alt={`Kysymyksen kuva — oikea vastaus: ${rq.correct}`} />
-                </div>
-              )}
-              <div className="tng-rvrows">
-                <div className="tng-rvrow" data-kind={rvKind}>
-                  <span className="tng-rvrow-l">Sinun vastauksesi</span>
-                  <span className="tng-rvrow-v">{rp == null ? (rvKind === "tech" ? "Ohitettu teknisen virheen vuoksi — ei laskettu vääräksi" : "Ei vastattu") : rq.options[rp]}</span>
-                </div>
-                <div className="tng-rvrow tng-rvrow--correct">
-                  <span className="tng-rvrow-l">Oikea vastaus</span>
-                  <span className="tng-rvrow-v">{rq.correct}</span>
-                </div>
-              </div>
-              {rq.fact && (
-                <div className="tng-fb-body">
-                  <span className="tng-kicker">Tiesitkö?</span>
-                  <span className="tng-dlg-tip">{rq.fact}</span>
-                </div>
-              )}
-            </div>
-            <div className="tng-dlg-foot">
-              <button type="button" className="tng-navbtn" aria-label="Edellinen kysymys" disabled={review <= 0} onClick={() => setReview(Math.max(0, review - 1))}><span aria-hidden>←</span> Edellinen</button>
-              <button type="button" className="tng-navbtn tng-navbtn--right" aria-label="Seuraava kysymys" disabled={review >= total - 1} onClick={() => setReview(Math.min(total - 1, review + 1))}>Seuraava <span aria-hidden>→</span></button>
-            </div>
-          </div>
-        </div>
-      )}
+      {tarkastelu}
     </div>
   );
 }

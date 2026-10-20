@@ -22,7 +22,7 @@ import type { Metadata } from "next";
 import { getSupabase } from "@/lib/supabase";
 import Crumbs from "@/components/tn20/Crumbs";
 import { MobiiliSankari } from "@/components/tn20/MobiiliSankari";
-import { MEGA_FEATURED, MEGA_GRID, megaDuration } from "@/lib/megavisat";
+import { MEGA_FEATURED, MEGA_GRID, megaDuration, megaMaarat, maaraVali } from "@/lib/megavisat";
 
 export const revalidate = 300; // SEO-erä A4 (2.10.2026): ISR 5 min
 
@@ -56,19 +56,10 @@ export default async function MegavisatLanding() {
   const quizzes = (quizRows ?? []) as unknown as Array<MegaRow & { id: string }>;
   const bySlug = new Map(quizzes.map((q) => [q.slug, q]));
 
-  // Kysymysmäärä lasketaan mega_questions-taulusta (MEGA_SPEC §1: mega on
-  // viittauskooste, ei kopio — question_count ei ole quizzes-sarake).
-  const idBySlug = new Map(quizzes.map((q) => [q.id, q.slug]));
-  const { data: linkRows } = await sb
-    .from("mega_questions" as never)
-    .select("mega_quiz_id")
-    .in("mega_quiz_id", quizzes.map((q) => q.id));
-  const countBySlug = new Map<string, number>();
-  for (const row of (linkRows ?? []) as unknown as Array<{ mega_quiz_id: string }>) {
-    const slug = idBySlug.get(row.mega_quiz_id);
-    if (!slug) continue;
-    countBySlug.set(slug, (countBySlug.get(slug) ?? 0) + 1);
-  }
+  // Kysymysmäärä = pelattavat kysymykset (megaMaarat: mega_questions-linkit, joiden kysymys näkyy julkisesti —
+  // sama luku kuin pelissä). Heikki 20.10.2026: kaikki sivun luvut datasta, ei kovakoodattuina.
+  const maaraById = await megaMaarat(sb, quizzes.map((q) => q.id));
+  const countBySlug = new Map(quizzes.map((q) => [q.slug, maaraById.get(q.id) ?? 0]));
 
   const featuredQuiz = bySlug.get(MEGA_FEATURED.slug);
   const featuredCount = countBySlug.get(MEGA_FEATURED.slug) ?? 0;
@@ -77,8 +68,11 @@ export default async function MegavisatLanding() {
     .filter((g) => g.quiz && g.count > 0);
 
   const totalMegas = (featuredQuiz && featuredCount > 0 ? 1 : 0) + gridItems.length;
-  const totalQuestions = (featuredQuiz && featuredCount > 0 ? featuredCount : 0) +
-    gridItems.reduce((sum, g) => sum + g.count, 0);
+  const kaikkiMaarat = [...(featuredQuiz && featuredCount > 0 ? [featuredCount] : []), ...gridItems.map((g) => g.count)];
+  const totalQuestions = kaikkiMaarat.reduce((sum, n) => sum + n, 0);
+  const vali = maaraVali(kaikkiMaarat);
+  const lyhin = kaikkiMaarat.length ? Math.min(...kaikkiMaarat) : 0;
+  const pisin = kaikkiMaarat.length ? Math.max(...kaikkiMaarat) : 0;
 
   return (
     <main className="tnm2" style={{ minHeight: "100dvh" }}>
@@ -94,7 +88,7 @@ export default async function MegavisatLanding() {
         eyebrow="Megavisat"
         title={["Pitkä", "peli"]}
         lead="Megavisa on yksi istunto ilman taukoja: valitse aihe ja pelaa loppuun asti. Ei selityksiä — vain pisteet ja putki."
-        stats={totalMegas > 0 ? [{ n: totalMegas, label: "megavisaa" }, { n: "20–50", label: "kysymystä per mega" }] : []}
+        stats={totalMegas > 0 ? [{ n: totalMegas, label: "megavisaa" }, ...(vali ? [{ n: vali, label: "kysymystä per mega" }] : [])] : []}
       />
 
       {/* ─── Hero: "Pitkä peli" ─── */}
@@ -125,10 +119,12 @@ export default async function MegavisatLanding() {
                   <span className="tnm2-stat-val">{totalMegas}</span>
                   <span className="tnm2-stat-label">megavisaa</span>
                 </div>
-                <div className="tnm2-stat">
-                  <span className="tnm2-stat-val">20–50</span>
-                  <span className="tnm2-stat-label">kysymystä per mega</span>
-                </div>
+                {vali && (
+                  <div className="tnm2-stat">
+                    <span className="tnm2-stat-val">{vali}</span>
+                    <span className="tnm2-stat-label">kysymystä per mega</span>
+                  </div>
+                )}
                 <div className="tnm2-stat">
                   <span className="tnm2-stat-val">0</span>
                   <span className="tnm2-stat-label">taukoa</span>
@@ -204,7 +200,13 @@ export default async function MegavisatLanding() {
         <h2 className="tnm2-h2">Näin mega toimii</h2>
         <div className="tnm2-rules">
           {[
-            { n: 1, t: "Valitse aihe", d: "Jokainen mega on oma kokonaisuutensa: 20 kysymystä kahvitauolle, 50 illan sessioon." },
+            {
+              n: 1,
+              t: "Valitse aihe",
+              d: lyhin && lyhin !== pisin
+                ? `Jokainen mega on oma kokonaisuutensa: ${lyhin} kysymystä kahvitauolle, ${pisin} illan sessioon.`
+                : "Jokainen mega on oma kokonaisuutensa: valitse aihe ja pelaa yhdellä istumalla.",
+            },
             { n: 2, t: "Yksi istunto, ei taukoja", d: "Mega ei tallenna välitilaa. Poistuminen kesken päättää kierroksen." },
             { n: 3, t: "Putki ratkaisee", d: "Peräkkäiset oikeat kasvattavat kerrointa. Yksi väärä nollaa sen." },
           ].map((r) => (

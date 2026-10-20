@@ -54,8 +54,9 @@ export const PELIMUODOT: Pelimuoto[] = [
   { slug: "kuvavisa-linnut", nimi: "Kuvavisa: Suomen linnut", ikoni: "kuva", kuvaus: "Siivet, nokat ja höyhenpuvut lähikuvassa.", href: "/kuvavisa/linnut", tila: "pelattava", serves: ["luonto"] },
   { slug: "kuvavisa-elaimet", nimi: "Kuvavisa: Suomen eläimet", ikoni: "kuva", kuvaus: "Pedot, sorkkaeläimet, kalat ja matelijat kuvasta.", href: "/kuvavisa/elaimet?alue=suomi", tila: "pelattava", serves: ["luonto"] },
   { slug: "kuvavisa-kasvit", nimi: "Kuvavisa: Suomen kasvit ja puut", ikoni: "kuva", kuvaus: "Lehti, kukka ja kaarna tunnistettavina.", href: "/kuvavisa/kasvit", tila: "pelattava", serves: ["luonto"] },
-  /* Suomen kaupungit -megavisa (50 kysymystä) — entisen Kaupungit-sivun nosto (runko vaihe 3, 20.10.2026). */
-  { slug: "mega-suomen-kaupungit", nimi: "Megavisa: Suomen kaupungit", ikoni: "jarjestys", kuvaus: "50 kysymystä kaikista 20 kaupungista.", href: "/peli?mega=suomen-kaupungit-mega", tila: "pelattava", serves: ["kaupungit"] },
+  /* Suomen kaupungit -megavisa — entisen Kaupungit-sivun nosto (runko vaihe 3, 20.10.2026). Rekisteri on staattinen,
+     joten kuvauksissa ei ole kysymysmääriä (Heikki 20.10.: luvut datasta) — määrä näkyy megan omalla sivulla. */
+  { slug: "mega-suomen-kaupungit", nimi: "Megavisa: Suomen kaupungit", ikoni: "jarjestys", kuvaus: "Kaikki 20 kaupunkia yhdessä istunnossa.", href: "/peli?mega=suomen-kaupungit-mega", tila: "pelattava", serves: ["kaupungit"] },
   /* Laita järjestykseen -pakat (julkaistut, lib/jarjesta/pakat.ts) palvelevat oman kokoelmansa sivua
      (runko vaihe 3, 20.10.2026: Vaalit-hubin pakkakortit → V6). */
   ...JULKAISTUT.map((p) => ({
@@ -67,7 +68,7 @@ export const PELIMUODOT: Pelimuoto[] = [
     tila: "pelattava" as const,
     serves: [p.collection.slug],
   })),
-  { slug: "megavisat", nimi: "Megavisat", ikoni: "jarjestys", kuvaus: "20–50 kysymystä yhdellä kertaa.", href: "/megavisat", tila: "pelattava", serves: [] },
+  { slug: "megavisat", nimi: "Megavisat", ikoni: "jarjestys", kuvaus: "Pitkät visat yhdellä istumalla.", href: "/megavisat", tila: "pelattava", serves: [] },
 ];
 
 /** Kokoelman pelit: pelattavat ensin, sitten tulossa olevat. */
