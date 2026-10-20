@@ -75,6 +75,12 @@
 .tn20 .pk-ohje-sisalto b { color: var(--pk-ink); }
 .tn20 .pk-ohje-sisalto ol, .tn20 .pk-ohje-sisalto ul { margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 8px; }
 
+/* Valinta natiivina valikkona (Kuntaliitos: 18 maakuntaa ei mahdu ruutuun painikkeina). */
+.tn20 .pk-valinta--valikko { display: flex; flex-direction: column; gap: 8px; }
+.tn20 .pk-valinta-otsikko { font-size: 12px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--pk-dim); }
+.tn20 .pk-valikko { min-height: 52px; max-width: 420px; padding: 0 14px; border-radius: 12px; border: 1.5px solid var(--pk-line); background: var(--pk-kortti); color: var(--pk-ink); font: inherit; font-size: 16px; font-weight: 700; }
+.tn20 .pk-valikko:focus-visible { outline: 2px solid var(--pk-acc); outline-offset: 2px; }
+
 /* ── K4 Tulos ──────────────────────────────────────────────────────────────────────── */
 .tn20 .pk-tulos { display: flex; flex-direction: column; gap: 24px; max-width: 720px; margin: 0 auto; padding: 24px clamp(20px, 4vw, 48px) 40px; box-sizing: border-box; color: var(--pk-ink); }
 .tn20 .pk-tulos-yla { display: flex; flex-direction: column; gap: 8px; }
@@ -82,6 +88,8 @@
 .tn20 .pk-tulos-iso { margin: 0; font-family: var(--rk-cond), "Barlow Condensed", sans-serif; font-weight: 800; font-size: clamp(48px, 14vw, 88px); line-height: .88; text-transform: uppercase; }
 .tn20 .pk-tulos-ala { margin: 0; max-width: 46ch; font-size: 16px; line-height: 1.5; color: var(--pk-dim); }
 .tn20 .pk-tulos-toiminnot { display: flex; flex-direction: column; align-items: flex-start; gap: 12px; }
+.tn20 .pk-ketju { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0 0; padding: 0; list-style: none; }
+.tn20 .pk-ketju li { display: inline-flex; align-items: center; min-height: 32px; padding: 0 12px; border-radius: 999px; background: var(--pk-kortti); border: 1px solid var(--pk-line); font-size: 14px; font-weight: 700; }
 .tn20 .pk-harjoitus { margin: -4px 0 0; font-size: 13px; color: var(--pk-dim); }
 .tn20 [data-iho] .pk-haasta { display: inline-flex; align-items: center; gap: 8px; min-height: 48px; padding: 0 20px; border-radius: 999px; border: 1.5px solid var(--pk-line); background: transparent; color: var(--pk-ink); font: inherit; font-size: 15px; font-weight: 700; cursor: pointer; }
 .tn20 [data-iho] .pk-haasta:hover { border-color: var(--pk-acc); }

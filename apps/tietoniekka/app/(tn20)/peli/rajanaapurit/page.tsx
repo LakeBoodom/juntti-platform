@@ -42,6 +42,7 @@ export default async function RajanaapuritSivu({ searchParams }: Props) {
     <>
       <JsonLd data={peliLd({ name: "Rajanaapurit", url: "/peli/rajanaapurit", description: "Järjestä kahdeksan valtiota reitiksi niin, että jokaisella vierekkäisellä parilla on yhteinen maaraja. Uusi päivän reitti joka päivä." })} />
       <ReittipeliClient
+        aloitaHeti={sp.aloita === "1" || typeof sp.reitti === "string"}
         peli="rajanaapurit"
         reitti={arvoReitti(siemen, maanosa?.nimi ?? null)}
         maakunnat={RN_MAANOSAT}
