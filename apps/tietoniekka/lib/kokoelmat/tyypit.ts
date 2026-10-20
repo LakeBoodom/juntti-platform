@@ -44,6 +44,12 @@ export type Kokoelma = {
   signatureReplacesNav?: boolean;
   /** V7-naapurit; tyhjä → sama pääteema ja suosituimmat (S6). */
   related?: string[];
+  /** Lasten visat (target_age 4-7 / 8-12) mukaan ikämerkinnällä, kun /lapset on näkyvissä (Juhlat). */
+  lapset?: boolean;
+  /** Visa näytetään vain ensimmäisessä osiossa, johon se kuuluu (Juhlat: lähin juhla). */
+  uniikitOsiot?: boolean;
+  /** Heron napin selite ensikävijälle (oletus "Suosituin tässä kokoelmassa"), esim. "Lähin juhla: Halloween 31.10.". */
+  ctaSelite?: string;
   /** Visojen järjestys osion sisällä: suosio (oletus) tai aika (julkaisujärjestys, Historian aikakaudet). */
   jarjestys?: "suosio" | "aika";
   /** Tulossa-rivit näkyviin (nyt vain historia). */

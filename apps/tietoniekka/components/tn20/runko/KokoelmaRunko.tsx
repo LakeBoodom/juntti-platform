@@ -112,7 +112,7 @@ export default function KokoelmaRunko({ d, tunnusosa }: { d: RunkoData; tunnusos
           <span className="rk-tilasto">
             {d.visoja} visaa · {osiot.length} {osiot.length === 1 ? "osio" : "osiota"}
           </span>
-          {d.suosituin && <RunkoHeroCta suosituin={d.suosituin} jarjestys={d.jarjestys} tila={k.cta} />}
+          {d.suosituin && <RunkoHeroCta suosituin={d.suosituin} jarjestys={d.jarjestys} tila={k.cta} selite={k.ctaSelite} />}
         </div>
       </section>
 

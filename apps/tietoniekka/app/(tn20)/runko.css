@@ -260,6 +260,18 @@
 .tn20 .rk-v4 { scroll-margin-top: 64px; margin-top: var(--rk-vali); background: #0f0d07; border-top: 1px solid #241e13; border-bottom: 1px solid #241e13; }
 .tn20 .rk-v4-in { display: flex; flex-direction: column; gap: 16px; max-width: var(--rk-max); margin: 0 auto; padding: 28px var(--rk-x); max-height: 480px; }
 .tn20 .rk-v4-eyebrow { font-family: var(--rk-cond); font-weight: 700; font-size: 14px; letter-spacing: .18em; text-transform: uppercase; color: var(--rk-acc); }
+/* Juhlakello (V4, Juhlat): lähin juhla + laskuri (NostoLaskuri, .ju-cd-*) rivissä, alla vuosikello (.rk-aika). */
+.tn20 .rk-juhla { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 16px 24px; }
+.tn20 .rk-juhla-teksti { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.tn20 .rk-juhla h2 a { color: inherit; text-decoration: none; }
+.tn20 .rk-v4 .ju-cd { display: flex; flex-direction: column; gap: 8px; }
+.tn20 .rk-v4 .ju-cd-label { font-size: 12px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--rk-muted); }
+.tn20 .rk-v4 .ju-cd-osat { display: flex; gap: 8px; }
+.tn20 .rk-v4 .ju-cd-osa { min-width: 76px; padding: 10px 12px 8px; border-radius: 14px; border: 1px solid #2c2517; background: #17140d; display: flex; flex-direction: column; gap: 4px; }
+.tn20 .rk-v4 .ju-cd-n { font-family: var(--rk-cond); font-weight: 800; font-size: 34px; line-height: .9; font-variant-numeric: tabular-nums; color: var(--rk-acc); }
+.tn20 .rk-v4 .ju-cd-u { font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--rk-muted); }
+@media (max-width: 480px) { .tn20 .rk-v4 .ju-cd, .tn20 .rk-v4 .ju-cd-osat { width: 100%; } .tn20 .rk-v4 .ju-cd-osa { flex: 1 1 0; min-width: 0; } }
+
 /* Aikajana (V4, Historia; CD 2): vaakarivi, kausi 132 px, yläviiva 3 px. Korvaa V3:n. */
 .tn20 .rk-aika { display: flex; margin: 0; padding: 0 0 6px; list-style: none; overflow-x: auto; scroll-snap-type: x proximity; }
 .tn20 .rk-aika li { flex: 1 0 132px; scroll-snap-align: start; }

@@ -5,6 +5,7 @@ import { visaHref } from "@/lib/visaHref";
 import { getCounts } from "@/lib/kokoelmaMaarat";
 import { kokoelmanPelimuodot, type Pelimuoto } from "@/lib/pelimuodot";
 import { naapurit, type KokoelmaKortti } from "./rekisteri";
+import { lapsetNakyvissa } from "@/lib/lapset/data";
 import type { Kokoelma, KokoelmaOsio, RunkoVisa } from "./tyypit";
 
 /** S2: ennen "Näytä kaikki" -nappia näkyy B + tämä määrä. */
@@ -85,12 +86,14 @@ export async function haeRunkoData(k: Kokoelma): Promise<RunkoData | null> {
   if (k.haku.category) q = q.eq("category", k.haku.category);
   if (k.haku.sectionTags) q = q.overlaps("section_tags", k.sections.map((s) => s.slug));
   const [{ data }, maarat] = await Promise.all([q, getCounts()]);
-  const rivit = ((data ?? []) as unknown as Rivi[]).filter((r) => r.target_age !== "4-7" && r.target_age !== "8-12");
+  const lapsetMukaan = k.lapset && lapsetNakyvissa();
+  const rivit = ((data ?? []) as unknown as Rivi[]).filter((r) => lapsetMukaan || (r.target_age !== "4-7" && r.target_age !== "8-12"));
 
   const visa = (r: Rivi): RunkoVisa => {
     const kuva = (r.slug && k.korttikuva?.(r.slug)) || r.hero_image || null;
     const metaOsat = [k.metarivi?.(r) ?? ""];
     /* Heikin päätös 19.10.2026: kysymysmäärä vain, kun se poikkeaa kymmenestä. Vaikeustasoa ei koskaan. */
+    if (r.target_age === "4-7" || r.target_age === "8-12") metaOsat.unshift(`Lapsille ${r.target_age.replace("-", "–")} v.`);
     if (r.question_count && r.question_count !== 10) metaOsat.push(`${r.question_count} kysymystä`);
     return {
       id: r.id,
@@ -109,10 +112,13 @@ export async function haeRunkoData(k: Kokoelma): Promise<RunkoData | null> {
     };
   };
 
+  const nahty = new Set<string>();
   const osiot: RunkoOsio[] = k.sections
     .map((s) => {
       let vs = rivit
         .filter((r) => r.section_tags?.includes(s.slug))
+        /* uniikitOsiot: visa vain ensimmäisessä osiossa, johon se kuuluu (osioiden järjestys ratkaisee). */
+        .filter((r) => !k.uniikitOsiot || (!nahty.has(r.id) && (nahty.add(r.id), true)))
         .map(visa)
         .sort((a, b) =>
           k.jarjestys === "aika"

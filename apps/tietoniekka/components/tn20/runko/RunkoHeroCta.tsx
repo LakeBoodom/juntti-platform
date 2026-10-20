@@ -6,15 +6,16 @@
 //   ensikävijä          → "Suosituin tässä kokoelmassa" + suosituin visa
 //   palaava (pelannut)  → "Seuraavaksi sinulle" + seuraava pelaamaton (sivun järjestyksessä)
 //   cta: "arvo"         → "Arvottu visa" + satunnainen pelaamaton
+//   asetuksen ctaSelite   → ensikävijän selite (Juhlat: "Lähin juhla: …" + lähimmän juhlan visa)
 import { useEffect, useState } from "react";
 
 type Visa = { id: string; nimi: string; href: string };
 
 const SELITE = { suosituin: "Suosituin tässä kokoelmassa", seuraava: "Seuraavaksi sinulle", arvo: "Arvottu visa" } as const;
 
-export default function RunkoHeroCta({ suosituin, jarjestys, tila }: { suosituin: Visa; jarjestys: Visa[]; tila: "suosituin" | "seuraava" | "arvo" }) {
+export default function RunkoHeroCta({ suosituin, jarjestys, tila, selite: oletusSelite }: { suosituin: Visa; jarjestys: Visa[]; tila: "suosituin" | "seuraava" | "arvo"; selite?: string }) {
   const [kohde, setKohde] = useState(suosituin);
-  const [selite, setSelite] = useState<string>(tila === "arvo" ? SELITE.arvo : SELITE.suosituin);
+  const [selite, setSelite] = useState<string>(tila === "arvo" ? SELITE.arvo : oletusSelite ?? SELITE.suosituin);
   useEffect(() => {
     let pelatut: string[] = [];
     try {
