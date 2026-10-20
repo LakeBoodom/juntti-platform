@@ -11,6 +11,8 @@ export type KokoelmaOsio = {
   chip?: string;
   /** Visan slug, joka nostetaan osion B-kortiksi (S1). */
   featured?: string;
+  /** Aikajanan (V4) vuosirivi, esim. "1809–1917". */
+  vuodet?: string;
 };
 
 export type Tunnusosa = "aikajana" | "vuosikiekko" | "laskuri" | "sijoitusnauha" | "synttarit";
@@ -36,10 +38,14 @@ export type Kokoelma = {
   osiotNimi: string;
   sections: KokoelmaOsio[];
   signature?: Tunnusosa;
+  /** V4:n eyebrow ja otsikko (aikajana: "Aikajana" / "Seitsemän aikakautta"). */
+  tunnusosaTeksti?: { eyebrow: string; otsikko: string };
   /** true = V4 korvaa V3:n (aikajana, vuosikiekko). */
   signatureReplacesNav?: boolean;
   /** V7-naapurit; tyhjä → sama pääteema ja suosituimmat (S6). */
   related?: string[];
+  /** Visojen järjestys osion sisällä: suosio (oletus) tai aika (julkaisujärjestys, Historian aikakaudet). */
+  jarjestys?: "suosio" | "aika";
   /** Tulossa-rivit näkyviin (nyt vain historia). */
   showSoon?: boolean;
   /** Mestaruus (metapeli, piilossa METAPELI_ENABLED-lipun takana). */
@@ -70,4 +76,5 @@ export type RunkoVisa = {
   pelattu?: boolean;
   soon?: boolean;
   playCount: number;
+  julkaistu?: string | null;
 };

@@ -257,9 +257,21 @@
 
 /* ── V4 Tunnusosa (yhteinen kehys) + sijoitusnauha (runko vaihe 2) ───────
    CD: täysi sisältöleveys, tausta #0F0D07, sisäväli 28–32 px, enintään 480 px mobiilissa. */
-.tn20 .rk-v4 { margin-top: var(--rk-vali); background: #0f0d07; border-top: 1px solid #241e13; border-bottom: 1px solid #241e13; }
+.tn20 .rk-v4 { scroll-margin-top: 64px; margin-top: var(--rk-vali); background: #0f0d07; border-top: 1px solid #241e13; border-bottom: 1px solid #241e13; }
 .tn20 .rk-v4-in { display: flex; flex-direction: column; gap: 16px; max-width: var(--rk-max); margin: 0 auto; padding: 28px var(--rk-x); max-height: 480px; }
 .tn20 .rk-v4-eyebrow { font-family: var(--rk-cond); font-weight: 700; font-size: 14px; letter-spacing: .18em; text-transform: uppercase; color: var(--rk-acc); }
+/* Aikajana (V4, Historia; CD 2): vaakarivi, kausi 132 px, yläviiva 3 px. Korvaa V3:n. */
+.tn20 .rk-aika { display: flex; margin: 0; padding: 0 0 6px; list-style: none; overflow-x: auto; scroll-snap-type: x proximity; }
+.tn20 .rk-aika li { flex: 1 0 132px; scroll-snap-align: start; }
+.tn20 .rk-aika a { display: flex; flex-direction: column; gap: 4px; min-height: 88px; padding: 12px 12px 10px 0; border-top: 3px solid #3a3120; color: var(--rk-ink); text-decoration: none; }
+.tn20 .rk-aika a:hover { border-top-color: var(--rk-acc); }
+.tn20 .rk-aika a:focus-visible { outline: 2px solid var(--tn-lime); outline-offset: 2px; }
+.tn20 .rk-aika a[data-taso="osa"] { border-top-color: #6b5236; }
+.tn20 .rk-aika a[data-taso="taysi"] { border-top-color: var(--rk-acc); }
+.tn20 .rk-aika-vuodet { font-size: 12px; font-weight: 600; color: var(--rk-muted); white-space: nowrap; }
+.tn20 .rk-aika-nimi { font-family: var(--rk-cond); font-weight: 800; font-size: 19px; line-height: 1; text-transform: uppercase; }
+.tn20 .rk-aika-maara { font-size: 12px; font-weight: 600; color: var(--rk-muted); }
+.tn20 .rk-aika a[data-taso="taysi"] .rk-aika-maara { color: var(--rk-acc); }
 .tn20 .rk-nauha {
   list-style: none; margin: 0; padding: 0 0 6px; display: flex; flex-direction: row-reverse; justify-content: flex-start;
   align-items: flex-end; gap: 6px; height: 150px; overflow-x: auto; scrollbar-width: thin;

@@ -141,7 +141,7 @@ export default function KokoelmaRunko({ d, tunnusosa }: { d: RunkoData; tunnusos
       </div>
 
       {/* ─── V4 Tunnusosa (valinnainen): sivun antama tai asetuksen signature ─── */}
-      {tunnusosa ?? <Tunnusosa k={k} />}
+      {tunnusosa ?? <Tunnusosa d={d} />}
 
       {/* ─── V5 Osiot ─── */}
       {osiot.map((o, oi) => {
@@ -172,9 +172,9 @@ export default function KokoelmaRunko({ d, tunnusosa }: { d: RunkoData; tunnusos
             )}
             <div className="rk-osio-ala">
               <RunkoNaytaKaikki maara={o.maara} mobiili={o.piilossaMobiili > 0} desktop={o.piilossaDesktop > 0} />
-              {naytaV3 && (
+              {(naytaV3 || k.signatureReplacesNav) && (
                 <a className="rk-paluu" href="#osiot">
-                  <span aria-hidden="true">↑</span> {k.osiotNimi}
+                  <span aria-hidden="true">↑</span> {k.signatureReplacesNav ? k.tunnusosaTeksti?.eyebrow ?? k.osiotNimi : k.osiotNimi}
                 </a>
               )}
             </div>

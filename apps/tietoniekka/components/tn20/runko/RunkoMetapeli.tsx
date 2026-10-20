@@ -45,6 +45,12 @@ export default function RunkoMetapeli({
       osio.querySelectorAll<HTMLElement>(".rk-osio-maara").forEach((m) => (m.textContent = `${n} visaa · ${p}/${n} pelattu`));
       const chip = document.querySelector<HTMLElement>(`.rk-chip[data-osio="${osio.dataset.osio}"] span`);
       if (chip) chip.textContent = `${p}/${n}`;
+      /* Aikajana (V4): "x/n pelattu" ja täysi kausi teemavärillä (CD 2). */
+      const aika = document.querySelector<HTMLElement>(`.rk-aika a[data-osio="${osio.dataset.osio}"]`);
+      if (aika) {
+        aika.querySelector(".rk-aika-maara")!.textContent = `${p}/${n} pelattu`;
+        aika.dataset.taso = p === 0 ? "" : p >= n ? "taysi" : "osa";
+      }
     });
     setTila({ pelattu: visaIdt.filter((id) => ps.has(id)).length });
   }, [paalla, esikatselu, visaIdt]);

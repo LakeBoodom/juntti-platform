@@ -44,7 +44,7 @@ type Rivi = {
   id: string; slug: string | null; custom_slug: string | null; game_mode: string | null; title: string; display_title: string | null;
   genre: string | null; subcollection: string | null; category: string | null; play_count: number | null;
   question_count: number | null; section_tags: string[] | null; hero_image: string | null;
-  hero_focal_x: number | null; hero_focal_y: number | null; target_age: string | null;
+  hero_focal_x: number | null; hero_focal_y: number | null; target_age: string | null; published_at: string | null;
 };
 
 /** Näkymätön katkaisukohta (U+200B) jokaisen yhdysmerkin jälkeen — vain renderöinnissä, data ennallaan.
@@ -80,7 +80,7 @@ export async function haeRunkoData(k: Kokoelma): Promise<RunkoData | null> {
   if (!sb) return null;
   let q = sb
     .from("quiz_cards" as never)
-    .select("id, slug, custom_slug, game_mode, title, display_title, genre, subcollection, category, play_count, question_count, section_tags, hero_image, hero_focal_x, hero_focal_y, target_age");
+    .select("id, slug, custom_slug, game_mode, title, display_title, genre, subcollection, category, play_count, question_count, section_tags, hero_image, hero_focal_x, hero_focal_y, target_age, published_at");
   if (k.haku.collection) q = q.eq("collection", k.haku.collection);
   if (k.haku.category) q = q.eq("category", k.haku.category);
   if (k.haku.sectionTags) q = q.overlaps("section_tags", k.sections.map((s) => s.slug));
@@ -105,6 +105,7 @@ export async function haeRunkoData(k: Kokoelma): Promise<RunkoData | null> {
           : undefined,
       meta: metaOsat.filter(Boolean).join(" · "),
       playCount: r.play_count ?? 0,
+      julkaistu: r.published_at,
     };
   };
 
@@ -113,7 +114,11 @@ export async function haeRunkoData(k: Kokoelma): Promise<RunkoData | null> {
       let vs = rivit
         .filter((r) => r.section_tags?.includes(s.slug))
         .map(visa)
-        .sort((a, b) => b.playCount - a.playCount || a.nimi.localeCompare(b.nimi, "fi"));
+        .sort((a, b) =>
+          k.jarjestys === "aika"
+            ? (a.julkaistu ?? "").localeCompare(b.julkaistu ?? "")
+            : b.playCount - a.playCount || a.nimi.localeCompare(b.nimi, "fi"),
+        );
       const fi = s.featured ? vs.findIndex((v) => v.slug === s.featured) : -1;
       if (fi > 0) vs = [vs[fi], ...vs.slice(0, fi), ...vs.slice(fi + 1)];
       /* S1: ensimmäinen (tai nostettu) on B, jos sillä on kuva. */
