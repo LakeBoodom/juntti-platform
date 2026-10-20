@@ -122,7 +122,8 @@
 .tn20 .pk-pelikortti:focus-visible { outline: 2px solid var(--tn-lime, #b6ff3c); outline-offset: 2px; }
 .tn20 .pk-pelikortti-ikoni { flex: none; width: 52px; height: 52px; border-radius: 12px; border: 1.5px solid var(--pk-acc); display: grid; place-items: center; color: var(--pk-acc); }
 .tn20 .pk-pelikortti-teksti { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; container-type: inline-size; }
-.tn20 .pk-pelikortti-nimi { font-family: var(--rk-cond), "Barlow Condensed", sans-serif; font-weight: 800; font-size: 19px; line-height: 1.05; text-transform: uppercase; overflow-wrap: normal; word-break: normal; hyphens: manual; }
+/* KORTTISÄÄNTÖ: nimi pisimmästä sanasta (IKÄJÄRJESTYS ylitti 320 px:ssä, mitattu 20.10.2026); 100cqi = tekstipalsta. */
+.tn20 .pk-pelikortti-nimi { font-family: var(--rk-cond), "Barlow Condensed", sans-serif; font-weight: 800; font-size: min(19px, calc(100cqi / (var(--pk-lw, 1) * .64))); line-height: 1.05; text-transform: uppercase; overflow-wrap: normal; word-break: normal; hyphens: manual; }
 .tn20 .pk-pelikortti-kuvaus { font-size: 13px; line-height: 1.4; color: var(--pk-dim); }
 .tn20 .pk-pelikortti-cta { flex: none; font-size: 13px; font-weight: 700; color: var(--pk-acc); white-space: nowrap; }
 @media (min-width: 900px) { .tn20 .pk-tulos { max-width: 1000px; } .tn20 .pk-seuraava-rivi { grid-template-columns: repeat(3, minmax(0, 1fr)); } }

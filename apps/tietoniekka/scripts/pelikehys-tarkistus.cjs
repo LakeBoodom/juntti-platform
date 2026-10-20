@@ -3,6 +3,7 @@
 //   - tekstin ylivuoto (Range-pohjainen, KORTTISÄÄNTÖ) pk-*-teksteille, vaakavieritys
 //   - pääpainike (.pk-aloitus .pk-nappi) ja valinta näkyvät ilman vieritystä (alareuna ≤ 844)
 //   - paluulinkki kotikokoelmaan (.pk-paluu href) ja kosketuskohteet ≥ 44 px kehyksen osissa
+//   - Megavisan tulos: läpikäynti kiinni, kohteet ≥ 44 px, K4-järjestys, ei ylivuotoa
 //   - Aloita-napin jälkeen pelinäkymän palkki: nimi ja tila mahtuvat, palkki 56 px, paluurivi piilossa mobiilissa
 // Käyttö (playwright erillisessä kansiossa, ks. korttisaanto-webkit.cjs):
 //   NODE_PATH=/tmp/wk/node_modules node apps/tietoniekka/scripts/pelikehys-tarkistus.cjs <perus-URL> [webkit|chromium]
@@ -93,6 +94,48 @@ const TEKSTI = ".pk-h1,.pk-lause,.pk-peli,.pk-tila,.pk-paluu,.pk-nappi,.pk-vaiht
     }
     virheita += t.virheet.length;
     console.log(`${MOOTTORI} ${polku} ${w}: nappi ${t.ala}px h1 ${t.h1} pelissä ${t.pelissa}${t.virheet.length ? " ✗ " + t.virheet.join("; ") : " ✓"}`);
+    await ctx.close();
+  }
+  // Megavisan K4-tulos: pelataan lyhin mega läpi (ensimmäinen vastaus joka kerta) ja mitataan tulos + läpikäynti.
+  for (const w of LEVEYDET) {
+    const ctx = await b.newContext({ viewport: { width: w, height: 844 }, deviceScaleFactor: 2, isMobile: MOOTTORI === "webkit", hasTouch: true });
+    const p = await ctx.newPage();
+    p.on("dialog", (d) => d.accept());
+    await p.goto(`${BASE}/peli?mega=maailman-kolkat-mega&aloita=1`, { waitUntil: "load", timeout: 60000 });
+    for (let i = 0; i < 80 && !(await p.$(".pk-tulos")); i++) {
+      const ans = await p.$(".tng-ans:not([disabled])");
+      if (ans) { await ans.click().catch(() => {}); await p.waitForTimeout(250); }
+      const seur = await p.$(".tng-next");
+      if (seur) { await seur.click().catch(() => {}); await p.waitForTimeout(250); }
+    }
+    const v = await p.evaluate(async (TEKSTI) => {
+      const out = [];
+      const t = document.querySelector(".pk-tulos");
+      if (!t) return ["ei tulosta"];
+      const d = t.querySelector(".pk-lapikaynti");
+      if (!d) out.push("ei läpikäyntiä");
+      else {
+        if (d.open) out.push("läpikäynti auki oletuksena");
+        const sm = d.querySelector("summary");
+        if (!/Näytä vastauksesi \(\d+\)/.test(sm.textContent)) out.push(`summary "${sm.textContent.trim()}"`);
+        if (sm.getBoundingClientRect().height < 43.5) out.push("summary < 44 px");
+        d.open = true; await new Promise((r) => setTimeout(r, 100));
+        d.querySelectorAll(".tng-sum,.tng-ghost").forEach((el) => { if (el.getBoundingClientRect().height < 43.5) out.push(`ruutu ${Math.round(el.getBoundingClientRect().height)} px`); });
+      }
+      const jarj = [...t.querySelectorAll(".pk-tulos-iso,.pk-lapikaynti,.pk-tulos-toiminnot .pk-nappi,.pk-haasta,.pk-seuraava")].map((e) => e.className.split(" ")[0]);
+      if (jarj.join(",") !== "pk-tulos-iso,pk-lapikaynti,pk-nappi,pk-haasta,pk-seuraava") out.push(`järjestys ${jarj.join(",")}`);
+      t.querySelectorAll(".pk-tulos-iso,.pk-tulos-ala,.pk-tulos-eyebrow,.pk-pelikortti-nimi,.pk-pelikortti-kuvaus,.tng-sumtext,.tng-sumlabel,.tng-ghost,.pk-lapikaynti summary").forEach((el) => {
+        const rg = document.createRange(); rg.selectNodeContents(el);
+        let bl = el; while (getComputedStyle(bl).display.startsWith("inline")) bl = bl.parentElement;
+        const q = bl.getBoundingClientRect();
+        if ([...rg.getClientRects()].some((x) => x.width > 0 && (x.right > q.right + 0.5 || x.left < q.left - 0.5))) out.push(`ylivuoto "${el.textContent.trim().slice(0, 30)}"`);
+      });
+      const hs = document.documentElement.scrollWidth - document.documentElement.clientWidth;
+      if (hs > 0) out.push(`vaakavieritys ${hs}px`);
+      return out;
+    }, TEKSTI);
+    virheita += v.length;
+    console.log(`${MOOTTORI} mega-tulos ${w}:${v.length ? " ✗ " + v.join("; ") : " ✓"}`);
     await ctx.close();
   }
   await b.close();

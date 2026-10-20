@@ -2,7 +2,7 @@
 // 3 päätoiminto "Pelaa uusi …" (karttaketjupeleissä harjoitusselite pienenä tekstinä napin alla, ei nappi) →
 // 4 "Haasta kaveri" → 5 seuraava peli: 2–3 korttia pelimuotorekisteristä, saman kokoelman pelit ensin.
 // Pelikohtainen tulosgrafiikka (tikapuut, reitti) tulee lisa-propsina tuloksen alle.
-import type { ReactNode } from "react";
+import type { CSSProperties, ReactNode } from "react";
 import type { Pelimuoto } from "@/lib/pelimuodot";
 import { PeliIkoniSvg } from "@/components/tn20/runko/PeliIkoni";
 
@@ -58,7 +58,7 @@ export function SeuraavaPeli({ seuraavat }: { seuraavat: Pelimuoto[] }) {
           <a key={p.slug} className="pk-pelikortti" href={p.href}>
             <span className="pk-pelikortti-ikoni" aria-hidden="true"><PeliIkoniSvg ikoni={p.ikoni} /></span>
             <span className="pk-pelikortti-teksti">
-              <span className="pk-pelikortti-nimi">{p.nimi}</span>
+              <span className="pk-pelikortti-nimi" style={{ "--pk-lw": Math.max(...p.nimi.split(/[\s-]+/).map((w) => w.length)) } as CSSProperties}>{p.nimi}</span>
               <span className="pk-pelikortti-kuvaus">{p.kuvaus}</span>
             </span>
             <span className="pk-pelikortti-cta">Pelaa →</span>
