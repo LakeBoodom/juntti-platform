@@ -159,10 +159,12 @@
 /* Grafiikka (Kuvavisat: liput, vaakunat) kokonaisena vaalealla levyllä — rajaus pilaisi vaakunan. Teksti pysyy
    luettavana, koska .rk-b:n tumma liukuväri on kuvan päällä. */
 .tn20 .rk-b img[data-sovitus="contain"] { object-fit: contain; padding: 8% 18% 34%; box-sizing: border-box; background: #ece6d8; }
-/* Henkilökuva (pystymuotoinen kasvokuva, 320 px leveä kopio): leveä B-kortti rajasi kuvasta vain otsa–nenä-kaistan
-   ja suurensi sen ~2,7-kertaiseksi (Heikki 21.10.2026). Kuva oikeaan reunaan omassa 4:5-mitassaan koko kortin
-   korkeudelta, vasen reuna häivytettynä korttiin; nimi pysyy vasemmassa alakulmassa liukuvärin päällä. */
-.tn20 .rk-b img[data-sovitus="henkilo"] { left: auto; right: 0; width: auto; max-width: 62%; aspect-ratio: 4 / 5; object-position: 50% 20%;
+/* Pysty- ja neliökuvat (Heikki 21.10.2026): leveä B-kortti rajasi niistä vain kaistan (Juhlien 4:5-kuvitukset 37 %,
+   henkilökuvat otsa–nenä, 320 px kuva suurennettuna ~2,7-kertaiseksi). Kuva kortin oikeaan reunaan koko korkeudelta
+   omassa mitassaan (width: auto = luontainen muoto), enintään 62 % leveydestä, vasen reuna häivytettynä korttiin; nimi
+   pysyy vasemmassa alakulmassa liukuvärin päällä. Henkilökortit merkitään jo palvelimella (data-sovitus="henkilo"),
+   muut selain merkitsee kuvan latauduttua (RunkoKuvaMuoto, data-muoto="pysty"). */
+.tn20 .rk-b img:is([data-sovitus="henkilo"], [data-muoto="pysty"]) { left: auto; right: 0; width: auto; max-width: 62%; object-position: 50% 20%;
   -webkit-mask-image: linear-gradient(to right, transparent 0, #000 38%); mask-image: linear-gradient(to right, transparent 0, #000 38%); }
 .tn20 .rk-b::after { content: ""; position: absolute; inset: 0; background: linear-gradient(to top, #131109 0%, rgba(19, 17, 9, .92) 30%, rgba(19, 17, 9, .35) 68%, rgba(19, 17, 9, 0) 100%); }
 .tn20 .rk-b-teksti { position: relative; z-index: 1; display: flex; flex-direction: column; align-items: flex-start; gap: 6px; padding: 16px 18px; max-width: 640px; }

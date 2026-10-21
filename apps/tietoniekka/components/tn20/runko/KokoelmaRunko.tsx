@@ -12,6 +12,7 @@ import { KokoelmaLd } from "@/components/tn20/KokoelmaLd";
 import { katko, pisinSana, type RunkoData, type RunkoKortti } from "@/lib/kokoelmat/data";
 import type { RunkoVisa } from "@/lib/kokoelmat/tyypit";
 import RunkoHeroCta from "./RunkoHeroCta";
+import RunkoKuvaMuoto from "./RunkoKuvaMuoto";
 import RunkoNaytaKaikki from "./RunkoNaytaKaikki";
 import RunkoMetapeli from "./RunkoMetapeli";
 import { PeliIkoniSvg } from "./PeliIkoni";
@@ -133,6 +134,8 @@ export default function KokoelmaRunko({ d, tunnusosa, v3Lisa, heroLisa }: { d: R
           {d.suosituin && <RunkoHeroCta suosituin={d.suosituin} jarjestys={d.jarjestys} tila={k.cta} selite={k.ctaSelite} />}
         </div>
       </section>
+
+      <RunkoKuvaMuoto />
 
       {/* ─── V2 + V3 ─── */}
       <div className="rk-v23" data-v3={naytaV3 || undefined}>
