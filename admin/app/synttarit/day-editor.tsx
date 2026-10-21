@@ -19,7 +19,12 @@ type Celebrity = {
   death_date: string | null;
   role: string;
   bio_short: string | null;
+  bio_intro: string | null;
+  facts: { label: string; value: string }[] | null;
+  tiesitko: string | null;
   image_url: string | null;
+  image_credit: string | null;
+  image_license: string | null;
   wikipedia_url?: string | null;
   priority: number;
   is_hero: boolean;
@@ -237,6 +242,11 @@ function CelebrityCard({
               image_url: celebrity.image_url,
               wikipedia_url: celebrity.wikipedia_url ?? null,
               platform: celebrity.platform as "synttarit" | "both",
+              bio_intro: celebrity.bio_intro,
+              facts: Array.isArray(celebrity.facts) ? celebrity.facts : [],
+              tiesitko: celebrity.tiesitko,
+              image_credit: celebrity.image_credit,
+              image_license: celebrity.image_license,
             }}
             onDone={() => {
               setEditOpen(false);
