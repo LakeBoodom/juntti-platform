@@ -11,8 +11,6 @@ import type { Kokoelma, KokoelmaOsio, RunkoVisa } from "./tyypit";
 /** S2: ennen "Näytä kaikki" -nappia näkyy osion ensimmäinen kortti + tämä määrä (21.10.2026: kaikki kortit samaa
     A-kokoa → rivit täysiä: mobiili 2 × 3 = 6, tabletti 3 × 2 = 6, desktop 4 × 2 = 8 korttia). */
 export const KATKAISU = { mobiili: 5, desktop: 7 } as const;
-/** S1: osion 9. visasta alkaen kaikki ovat C-rivejä. */
-const A_ENINTAAN_PAIKKA = 8;
 
 export type RunkoKortti = RunkoVisa & {
   /** A = kuva + teksti, C = listarivi. B on osion oma kenttä. */
@@ -146,13 +144,10 @@ function kokoa(k: Kokoelma, kohteet: UlkoinenKohde[], maarat: Record<string, num
          kuin muut (21.10.2026, leveä B-kortti poistettu). */
       const b = vs[0]?.kuva ? vs[0] : null;
       const loput = b ? vs.slice(1) : vs;
-      /* S1-tarkennus: jos ensimmäisen jälkeen on alle 2 kuvallista visaa, kaikki muut ovat C-rivejä. */
-      const kuvallisia = loput.slice(0, A_ENINTAAN_PAIKKA - (b ? 1 : 0)).filter((v) => v.kuva).length;
-      const kortit: RunkoKortti[] = loput.map((v, i) => {
-        const paikka = i + (b ? 2 : 1);
-        const muoto = v.kuva && paikka <= A_ENINTAAN_PAIKKA && kuvallisia >= 2 ? "A" : "C";
-        return { ...v, muoto, nro: i + 1 };
-      });
+      /* S1 (Heikki 21.10.2026): jokainen kuvallinen visa on kortti (A), myös 9. visasta alkaen ja vaikka kuvallisia
+         olisi vain kaksi (Pohjois-Suomi: Oulu ja Rovaniemi vierekkäin) — "Näytä kaikki" avaa kokonaiset kortit.
+         C-rivi vain kuvattomalle visalle. */
+      const kortit: RunkoKortti[] = loput.map((v, i) => ({ ...v, muoto: v.kuva ? "A" : "C", nro: i + 1 }));
       return {
         ...s,
         b,

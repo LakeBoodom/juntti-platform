@@ -38,7 +38,7 @@
 
 /* ── V1 Hero ──────────────────────────────────────────────────────────── */
 .tn20 .rk-hero { position: relative; }
-.tn20 .rk-hero-kuva { position: relative; height: 184px; overflow: hidden; background: repeating-linear-gradient(135deg, #1f1b14 0 12px, #17140d 12px 24px); }
+.tn20 .rk-hero-kuva { position: relative; height: 150px; overflow: hidden; background: repeating-linear-gradient(135deg, #1f1b14 0 12px, #17140d 12px 24px); }
 .tn20 .rk-hero-kuva img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
 .tn20 .rk-hero-kuva::after { content: ""; position: absolute; inset: 0; background: linear-gradient(to top, var(--rk-bg) 0%, rgba(19, 17, 9, 0) 55%); }
 .tn20 .rk-hero-teksti {
@@ -49,7 +49,8 @@
 .tn20 .rk-eyebrow { font-family: var(--rk-cond); font-weight: 700; font-size: 14px; letter-spacing: .18em; text-transform: uppercase; color: var(--rk-acc); }
 .tn20 .rk-h1 {
   --rk-katto: 46px;
-  margin: 0; font-family: var(--rk-cond); font-weight: 800; line-height: .9; letter-spacing: -.005em; text-transform: uppercase;
+  /* Riviväli .98 (oli .9/.88): ääkkösten pisteet osuivat ylemmän rivin kirjaimiin (Heikki 21.10.2026, "KAIKKI JÄÄKIEKOSTA"). */
+  margin: 0; font-family: var(--rk-cond); font-weight: 800; line-height: .98; letter-spacing: -.005em; text-transform: uppercase;
   font-size: min(var(--rk-katto), calc(100cqi / (var(--lw, 10) * 0.52 * 1.04)));
   word-break: keep-all; overflow-wrap: normal; text-wrap: balance;
 }
@@ -57,8 +58,11 @@
 .tn20 .rk-h1 span { color: var(--rk-acc); }
 .tn20 .rk-ingress { margin: 0; max-width: 46ch; font-size: 16px; line-height: 1.5; color: var(--rk-soft); text-wrap: pretty; }
 .tn20 .rk-tilasto { font-size: 14px; font-weight: 600; color: var(--rk-muted); }
-/* Heron napin selite (Heikki 19.10.2026): "Suosituin tässä kokoelmassa" / "Seuraavaksi sinulle" / "Arvottu visa". */
-.tn20 .rk-cta-ryhma { display: flex; flex-direction: column; align-items: flex-start; gap: 8px; }
+/* Heron napin selite (Heikki 19.10.2026): "Suosituin tässä kokoelmassa" / "Seuraavaksi sinulle" / "Arvottu visa".
+   21.10.2026: selite napin oikealle puolelle pystysuunnassa keskitettynä (ei erillisenä rivinä napin yläpuolella);
+   kapeassa näkymässä rivittyy napin alle. */
+.tn20 .rk-cta-ryhma { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; }
+.tn20 .rk-cta-ryhma .rk-cta-selite { order: 2; }
 .tn20 .rk-cta-selite { font-size: 13px; line-height: 1.3; color: var(--tn-text-muted); }
 .tn20 .rk-cta {
   display: inline-flex; align-items: center; min-height: 52px; max-width: 100%; padding: 10px 24px;
@@ -66,14 +70,16 @@
   overflow-wrap: anywhere;
 }
 @media (min-width: 900px) {
-  .tn20 .rk-hero { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); min-height: 500px; max-width: 1440px; margin: 0 auto; }
+  /* Matala hero (Heikki 21.10.2026): 500 px → ~340 px, jotta 1440 × 900:ssa ensimmäinen korttirivi kuvineen näkyy
+     ilman vieritystä. Kokoelmasivun hero esittelee, sivun sisältö ovat visat. */
+  .tn20 .rk-hero { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); min-height: 340px; max-width: 1440px; margin: 0 auto; }
   .tn20 .rk-hero-kuva { order: 2; height: auto; }
   .tn20 .rk-hero-kuva::after { background: linear-gradient(90deg, var(--rk-bg) 0%, rgba(19, 17, 9, 0) 40%), linear-gradient(to top, var(--rk-bg) 0%, rgba(19, 17, 9, 0) 30%); }
-  .tn20 .rk-hero-teksti { order: 1; justify-content: center; gap: 16px; margin: 0; padding: 56px 40px 48px max(var(--rk-x), calc((min(100vw, 1440px) - 1184px) / 2)); }
+  .tn20 .rk-hero-teksti { order: 1; justify-content: center; gap: 12px; margin: 0; padding: 28px 40px 28px max(var(--rk-x), calc((min(100vw, 1440px) - 1184px) / 2)); }
   .tn20 .rk-eyebrow { font-size: 16px; letter-spacing: .2em; }
-  .tn20 .rk-h1 { --rk-katto: 80px; line-height: .88; letter-spacing: -.01em; }
-  .tn20 .rk-h1[data-lyhyt] { --rk-katto: 128px; }
-  .tn20 .rk-ingress { font-size: 19px; }
+  .tn20 .rk-h1 { --rk-katto: 64px; letter-spacing: -.01em; }
+  .tn20 .rk-h1[data-lyhyt] { --rk-katto: 96px; }
+  .tn20 .rk-ingress { font-size: 17px; }
   .tn20 .rk-tilasto { font-size: 15px; }
   .tn20 .rk-cta { min-height: 56px; padding: 10px 30px; font-size: 20px; }
 }
