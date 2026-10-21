@@ -190,3 +190,18 @@ export function jaakiekkoQuizImgKortti(slug: string | null | undefined): string 
   return jaakiekkoQuizImg(slug)?.replace("/20/jaakiekko/", "/20/jaakiekko/k/") ?? null;
 }
 export const jaakiekkoQuizPos = (slug: string) => QUIZ_POS.get(slug);
+
+/** Korttikopiot, jotka on rajattu uudelleen alkuperäisestä valokuvasta 16:10-kortiksi (21.10.2026). Heron 1600 px
+    -kuvat ovat näissä "pystykuva + sumennettu jatke" -yhdistelmiä, jotka näyttivät kortissa oudolta zoomaukselta.
+    Rajaus on jo kohteessa, joten kortti ei käytä heron QUIZ_POS-arvoa; kohdistus hieman yläpuolelle, ettei pää
+    katkea leveässä B-kortissa. */
+const KORTTI_RAJATUT = new Set([
+  "ilves", "jyp", "kalpa", "karpat", "kiekko-espoo", "leijonat-mm2022", "leijonat-nuoret2014", "leijonat-nuoret2016",
+  "leijonat-nuoret2019", "leijonat-olympia2022", "liiga-finaalidraamat", "liiga-kovanaamat", "liiga-maalitykit",
+  "liiga-maalivahdit", "liiga-pistekuninkaat", "liiga-pomot", "liiga-tuomarit", "liiga-ulkomaalaiset",
+  "liiga-valmentajat", "lukko", "nhl-ennatykset", "pelicans",
+]);
+export function jaakiekkoKorttiPos(slug: string): string | undefined {
+  const id = jaakiekkoQuizImg(slug)?.match(/jk-(.+)-kuva\.webp$/)?.[1];
+  return id && KORTTI_RAJATUT.has(id) ? "50% 25%" : QUIZ_POS.get(slug);
+}

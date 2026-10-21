@@ -70,6 +70,7 @@ export async function haeHenkilot(): Promise<{ kohteet: UlkoinenKohde[]; synttar
       href: henkiloHref(c.name),
       kuva: henkiloKuva(c.image_url),
       kuvaPos: "50% 22%",
+      kuvaSovitus: "henkilo",
       meta: c.role ?? "",
       playCount: pelattu.get(c.trivia_quiz_id!) ?? 0,
     },

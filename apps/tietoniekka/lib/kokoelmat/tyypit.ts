@@ -80,8 +80,9 @@ export type RunkoVisa = {
   href: string;
   kuva: string | null;
   kuvaPos?: string;
-  /** "contain" = grafiikka (liput, vaakunat) näytetään kokonaisena levyn päällä, ei rajattuna. */
-  kuvaSovitus?: "contain";
+  /** "contain" = grafiikka (liput, vaakunat) näytetään kokonaisena levyn päällä, ei rajattuna.
+      "henkilo" = pystykasvokuva: B-kortissa kuva oikeaan reunaan omassa 4:5-mitassaan (ei leveää rajausta, 21.10.2026). */
+  kuvaSovitus?: "contain" | "henkilo";
   meta: string;
   pelattu?: boolean;
   soon?: boolean;

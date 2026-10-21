@@ -58,6 +58,7 @@ export function vaalitKohteet(d: VaalitHub): UlkoinenKohde[] {
         href: k.href,
         kuva: henkiloKuva(k.image_url),
         kuvaPos: "50% 22%",
+        kuvaSovitus: "henkilo",
         meta: k.ala ?? "",
         playCount: 1000 - i,
       },

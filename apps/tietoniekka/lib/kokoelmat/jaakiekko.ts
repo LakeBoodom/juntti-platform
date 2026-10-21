@@ -3,7 +3,7 @@
 // quizzes.section_tags-tagista (migraatio 20261115_jaakiekko_tagit). Kaukalokartta ja paitaseinä pois
 // (Heikki 19.10.: kartat pois kokoelmasivuilta). Liigaseurojen B-kortti = hallitseva mestari (Tappara).
 import type { Kokoelma } from "./tyypit";
-import { JK_HERO, jaakiekkoQuizImgKortti, jaakiekkoQuizPos } from "@/lib/jaakiekko";
+import { JK_HERO, jaakiekkoQuizImgKortti, jaakiekkoKorttiPos } from "@/lib/jaakiekko";
 import { kokoelmaKortti } from "./rekisteri";
 
 export const JAAKIEKKO: Kokoelma = {
@@ -28,6 +28,6 @@ export const JAAKIEKKO: Kokoelma = {
   mastery: { name: kokoelmaKortti("jaakiekko")!.mastery.name, icon: "kiekko" },
   haku: { category: "jaakiekko", sectionTags: true },
   korttikuva: jaakiekkoQuizImgKortti,
-  korttikuvaPos: jaakiekkoQuizPos,
+  korttikuvaPos: jaakiekkoKorttiPos,
   kuvakrediitti: "Valokuvat: Wikimedia Commons, CC BY / CC BY-SA / public domain",
 };
