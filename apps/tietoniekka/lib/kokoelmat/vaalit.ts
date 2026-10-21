@@ -4,6 +4,7 @@
 // sivun omana tietolähteenä (haeRunkoData(k, ulkoiset)); osioiden sisäinen järjestys säilyy (paikkamäärä,
 // aikajärjestys). V4 = vaalilaskuri (brief §3). Pelit (Vaalipiiriketju, Laita järjestykseen) V6:ssa.
 import type { Kokoelma } from "./tyypit";
+import { HISTORIA_KORTTIKUVAT } from "./historia";
 import type { UlkoinenKohde } from "./data";
 import type { VaalitHub } from "@/lib/vaalit/data";
 import { henkiloKuva } from "@/lib/henkilokuvat";
@@ -33,6 +34,11 @@ export const VAALIT: Kokoelma = {
 };
 
 /** Hubin data rungon kohteiksi. playCount = käänteinen järjestysnumero, jotta hubin järjestys säilyy. */
+const historiaKortti = (src: string) => {
+  const slug = src.match(/^\/20\/historia\/([^/]+)\.webp$/)?.[1];
+  return slug && HISTORIA_KORTTIKUVAT.has(slug) ? `/20/historia/k/${slug}.webp` : src;
+};
+
 export function vaalitKohteet(d: VaalitHub): UlkoinenKohde[] {
   const visat = (lista: VaalitHub["omatVisat"], tagi: string): UlkoinenKohde[] =>
     lista.map((v, i) => ({
@@ -42,8 +48,10 @@ export function vaalitKohteet(d: VaalitHub): UlkoinenKohde[] {
         slug: v.href,
         nimi: v.otsikko,
         href: v.href,
-        kuva: v.kuva?.src ?? null,
-        kuvaPos: v.kuva ? `${Math.round(v.kuva.x * 100)}% ${Math.round(v.kuva.y * 100)}%` : undefined,
+        // Historian visoilla korttiin Historian 800 px korttikopio (rajattu kortin mittaan; heron Kekkonen- ja
+        // Mannerheim-kuvat ovat "koko kuva + sumennettu jatke" -yhdistelmiä, 21.10.2026).
+        kuva: v.kuva ? historiaKortti(v.kuva.src) : null,
+        kuvaPos: v.kuva && historiaKortti(v.kuva.src) === v.kuva.src ? `${Math.round(v.kuva.x * 100)}% ${Math.round(v.kuva.y * 100)}%` : undefined,
         meta: v.koti ? `${v.koti}-kokoelmasta` : "",
         playCount: 1000 - i,
       },

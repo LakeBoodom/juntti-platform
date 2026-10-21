@@ -6,6 +6,8 @@ import type { Kokoelma } from "./tyypit";
 import { MUSIIKKI_HERO, musiikkiImg } from "@/lib/musiikki";
 import { kokoelmaKortti } from "./rekisteri";
 
+const KORTTI_RAJATUT = new Set(["kari-tapio-visa-iskelmalegenda"]);
+
 export const MUSIIKKI: Kokoelma = {
   slug: "musiikki",
   nimi: "Musiikki",
@@ -30,5 +32,6 @@ export const MUSIIKKI: Kokoelma = {
   related: ["euroviisut", "tv", "tunnetut-henkilot", "elokuvat"],
   mastery: { name: kokoelmaKortti("musiikki")!.mastery.name, icon: "musiikki" },
   haku: { collection: "musiikki" },
-  korttikuva: musiikkiImg,
+  /* Kari Tapion heron kuva on "kuva + sumennettu jatke" -yhdistelmä → kortissa oma rajaus alkuperäisestä (21.10.2026). */
+  korttikuva: (slug) => (KORTTI_RAJATUT.has(slug) ? `/20/musiikki/k/${slug}.webp` : musiikkiImg(slug)),
 };

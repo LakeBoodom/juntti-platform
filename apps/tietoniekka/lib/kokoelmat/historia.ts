@@ -5,7 +5,8 @@
 import type { Kokoelma } from "./tyypit";
 import { kokoelmaKortti } from "./rekisteri";
 
-const KUVAT = new Set([
+/** Visat, joilla on 800 px korttikopio public/20/historia/k/ (myös Vaalit käyttää näitä). */
+export const HISTORIA_KORTTIKUVAT = new Set([
   "autonomian-aika-visa", "kekkosen-suomi-kylma-sota-idansuhteet", "mannerheim-visa",
   "suomen-itsenaistyminen-visa", "suomen-presidentit-visa", "suomi-1980-luvulla",
 ]);
@@ -38,5 +39,5 @@ export const HISTORIA: Kokoelma = {
   related: ["vaalit", "kulttuuri", "kaupungit"],
   mastery: { name: kokoelmaKortti("historia")!.mastery.name, icon: "historia" },
   haku: { collection: "historia" },
-  korttikuva: (slug) => (KUVAT.has(slug) ? `/20/historia/k/${slug}.webp` : null), // 800 px kopiot (20.10.2026)
+  korttikuva: (slug) => (HISTORIA_KORTTIKUVAT.has(slug) ? `/20/historia/k/${slug}.webp` : null), // 800 px kopiot (20.10.2026)
 };
