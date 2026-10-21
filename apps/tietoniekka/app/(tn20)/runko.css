@@ -49,8 +49,8 @@
 .tn20 .rk-eyebrow { font-family: var(--rk-cond); font-weight: 700; font-size: 14px; letter-spacing: .18em; text-transform: uppercase; color: var(--rk-acc); }
 .tn20 .rk-h1 {
   --rk-katto: 46px;
-  /* Riviväli .98 (oli .9/.88): ääkkösten pisteet osuivat ylemmän rivin kirjaimiin (Heikki 21.10.2026, "KAIKKI JÄÄKIEKOSTA"). */
-  margin: 0; font-family: var(--rk-cond); font-weight: 800; line-height: .98; letter-spacing: -.005em; text-transform: uppercase;
+  /* Riviväli 1.04 (oli .9/.88): ääkkösten pisteet osuivat ylemmän rivin kirjaimiin (Heikki 21.10.2026, "KAIKKI JÄÄKIEKOSTA"). */
+  margin: 0; font-family: var(--rk-cond); font-weight: 800; line-height: 1.04; letter-spacing: -.005em; text-transform: uppercase;
   font-size: min(var(--rk-katto), calc(100cqi / (var(--lw, 10) * 0.52 * 1.04)));
   word-break: keep-all; overflow-wrap: normal; text-wrap: balance;
 }

@@ -62,7 +62,7 @@ Kokoelmasivut siirtyvät yhteiselle rungolle (`components/tn20/runko/KokoelmaRun
 `app/(tn20)/runko.css`). Kokoelma on asetus `lib/kokoelmat/<slug>.ts` (tyyppi `lib/kokoelmat/tyypit.ts`),
 visat tulevat osioihin `quizzes.section_tags`-tagista. Ei sivukohtaista komponenttia.
 
-- **V1 hero** · eyebrow → h1 (koko pisimmästä sanasta, riviväli .98, jotta ääkkösten pisteet eivät osu ylempään riviin) → ingressi (≤ 2 riviä) → tilastorivi → yksi
+- **V1 hero** · eyebrow → h1 (koko pisimmästä sanasta, riviväli 1.04, jotta ääkkösten pisteet eivät osu ylempään riviin) → ingressi (≤ 2 riviä) → tilastorivi → yksi
   `.tn-cta-lime` "Pelaa: <visan lyhyt nimi>" (ajatusviivaa edeltävä osa, enintään 2 riviä 390 px:ssä) ja sen selite napin oikealla puolella pystykeskitettynä.
   **Matala** (Heikki 21.10.2026): desktop ~340 px (h1 enintään 64 px), mobiilin kuva 150 px — ensimmäinen korttirivi kuvineen näkyy 1440 × 900:ssa
   ilman vieritystä. Herokuva `<picture>`: mobiili (< 900 px) `<nimi>-800.webp`, desktop 1600 px, esilataus mediaehdolla.
