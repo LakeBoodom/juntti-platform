@@ -203,5 +203,6 @@ const KORTTI_RAJATUT = new Set([
 ]);
 export function jaakiekkoKorttiPos(slug: string): string | undefined {
   const id = jaakiekkoQuizImg(slug)?.match(/jk-(.+)-kuva\.webp$/)?.[1];
+  if (id === "liiga-finaalidraamat") return "50% 0%"; // pokaalin kulho ylhäällä
   return id && KORTTI_RAJATUT.has(id) ? "50% 25%" : QUIZ_POS.get(slug);
 }
