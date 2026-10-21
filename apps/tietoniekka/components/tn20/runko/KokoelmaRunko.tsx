@@ -213,7 +213,14 @@ export default function KokoelmaRunko({ d, tunnusosa, v3Lisa, heroLisa, sisalto 
           <div className="rk-pelit-rivi">
             {d.pelit.map((p, i) => (
               <a key={p.slug} className="rk-peli" href={p.href} data-yli={i >= 3 || undefined} data-tulossa={p.tila === "tulossa" || undefined}>
-                <span className="rk-peli-ikoni" aria-hidden="true"><PeliIkoniSvg ikoni={p.ikoni} /></span>
+                {p.kuva ? (
+                  <span className="rk-peli-kuva" data-contain={p.kuva.contain || undefined} aria-hidden="true">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={p.kuva.src} alt="" loading="lazy" width={240} height={240} />
+                  </span>
+                ) : (
+                  <span className="rk-peli-ikoni" aria-hidden="true"><PeliIkoniSvg ikoni={p.ikoni} /></span>
+                )}
                 <span className="rk-peli-teksti">
                   <span className="rk-peli-nimi" style={{ "--lw": pisinSana(p.nimi) } as CSSProperties}>{katko(p.nimi, true)}</span>
                   <span className="rk-peli-kuvaus">{p.kuvaus}</span>

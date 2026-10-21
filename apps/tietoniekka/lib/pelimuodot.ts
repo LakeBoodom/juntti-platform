@@ -18,6 +18,9 @@ export type Pelimuoto = {
   tila: "pelattava" | "tulossa";
   /** Kokoelmat (kokoelmasivun slug), joita peli palvelee. */
   serves: string[];
+  /** Pelin oma kuva kokoelmasivun pelikorttiin ikonin tilalle (P6, Heikki 21.10.2026; toistaiseksi Luonnon pelit).
+   *  contain = kuvitus läpinäkyvällä taustalla kokonaisena (Tupla tai kuitin aiheikonit). */
+  kuva?: { src: string; contain?: boolean };
 };
 
 /** Tupla tai kuitin aihe → kokoelma. Kausipainokset (Halloween, joulu) palvelevat Juhlia. */
@@ -41,6 +44,7 @@ export const PELIMUODOT: Pelimuoto[] = [
     href: `${TUPLA_SIVU}/${t.slug}`,
     tila: "pelattava" as const,
     serves: [TUPLA_KOKOELMA[t.slug] ?? (t.painos ? "juhlat" : "")].filter(Boolean),
+    kuva: TUPLA_KOKOELMA[t.slug] === "luonto" ? { src: t.kuva, contain: true } : undefined,
   })),
   { slug: "kuntaliitos", nimi: "Kuntaliitos", ikoni: "ketju", kuvaus: "Rakenna reitti naapurikuntien kautta.", href: "/peli/kuntaliitos", tila: "pelattava", serves: ["kaupungit", "matkakohteet"] },
   { slug: "rajanaapurit", nimi: "Rajanaapurit", ikoni: "ketju", kuvaus: "Ketjuta maat yhteisen rajan kautta.", href: "/peli/rajanaapurit", tila: "pelattava", serves: ["matkakohteet"] },
@@ -49,11 +53,11 @@ export const PELIMUODOT: Pelimuoto[] = [
   /* Viikon kuvavisa (15 kuvaa, vaihtuu maanantaisin) — entinen "Tämän viikon visa" -kaista Kuvavisat-sivulla. */
   { slug: "kuvavisa-viikko", nimi: "Viikon kuvavisa", ikoni: "kuva", kuvaus: "15 kuvaa, uusi visa joka maanantai.", href: "/kuvavisa/viikko", tila: "pelattava", serves: ["kuvavisat"] },
   { slug: "kuvavisat", nimi: "Kuvavisat", ikoni: "kuva", kuvaus: "Tunnista liput, vaakunat, eläimet ja maalaukset kuvasta.", href: "/kokoelma/kuvavisat", tila: "pelattava", serves: ["matkakohteet"] },
-  { slug: "aanivisat", nimi: "Äänivisa: Suomen linnut", ikoni: "aani", kuvaus: "Tunnista lintu laulusta.", href: "/aanivisa/suomen-linnut", tila: "pelattava", serves: ["luonto"] },
+  { slug: "aanivisat", nimi: "Äänivisa: Suomen linnut", ikoni: "aani", kuvaus: "Tunnista lintu laulusta.", href: "/aanivisa/suomen-linnut", tila: "pelattava", serves: ["luonto"], kuva: { src: "/20/pelit/k/aanivisat.webp" } },
   /* Luonnon kuvavisat omina peleinään (runko vaihe 3, 20.10.2026: Luonto-sivun "Valitse pelimuoto" -kortit → V6). */
-  { slug: "kuvavisa-linnut", nimi: "Kuvavisa: Suomen linnut", ikoni: "kuva", kuvaus: "Siivet, nokat ja höyhenpuvut lähikuvassa.", href: "/kuvavisa/linnut", tila: "pelattava", serves: ["luonto"] },
-  { slug: "kuvavisa-elaimet", nimi: "Kuvavisa: Suomen eläimet", ikoni: "kuva", kuvaus: "Pedot, sorkkaeläimet, kalat ja matelijat kuvasta.", href: "/kuvavisa/elaimet?alue=suomi", tila: "pelattava", serves: ["luonto"] },
-  { slug: "kuvavisa-kasvit", nimi: "Kuvavisa: Suomen kasvit ja puut", ikoni: "kuva", kuvaus: "Lehti, kukka ja kaarna tunnistettavina.", href: "/kuvavisa/kasvit", tila: "pelattava", serves: ["luonto"] },
+  { slug: "kuvavisa-linnut", nimi: "Kuvavisa: Suomen linnut", ikoni: "kuva", kuvaus: "Siivet, nokat ja höyhenpuvut lähikuvassa.", href: "/kuvavisa/linnut", tila: "pelattava", serves: ["luonto"], kuva: { src: "/20/pelit/k/kuvavisa-linnut.webp" } },
+  { slug: "kuvavisa-elaimet", nimi: "Kuvavisa: Suomen eläimet", ikoni: "kuva", kuvaus: "Pedot, sorkkaeläimet, kalat ja matelijat kuvasta.", href: "/kuvavisa/elaimet?alue=suomi", tila: "pelattava", serves: ["luonto"], kuva: { src: "/20/pelit/k/kuvavisa-elaimet.webp" } },
+  { slug: "kuvavisa-kasvit", nimi: "Kuvavisa: Suomen kasvit ja puut", ikoni: "kuva", kuvaus: "Lehti, kukka ja kaarna tunnistettavina.", href: "/kuvavisa/kasvit", tila: "pelattava", serves: ["luonto"], kuva: { src: "/20/pelit/k/kuvavisa-kasvit.webp" } },
   /* Suomen kaupungit -megavisa — entisen Kaupungit-sivun nosto (runko vaihe 3, 20.10.2026). Rekisteri on staattinen,
      joten kuvauksissa ei ole kysymysmääriä (Heikki 20.10.: luvut datasta) — määrä näkyy megan omalla sivulla. */
   { slug: "mega-suomen-kaupungit", nimi: "Megavisa: Suomen kaupungit", ikoni: "jarjestys", kuvaus: "Kaikki 20 kaupunkia yhdessä istunnossa.", href: "/peli?mega=suomen-kaupungit-mega", tila: "pelattava", serves: ["kaupungit"] },
