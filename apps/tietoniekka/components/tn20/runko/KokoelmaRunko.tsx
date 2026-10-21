@@ -153,7 +153,7 @@ export default function KokoelmaRunko({ d, tunnusosa, v3Lisa, heroLisa }: { d: R
         const a = o.kortit.filter((x) => x.muoto === "A");
         const c = o.kortit.filter((x) => x.muoto === "C");
         return (
-          <section key={o.slug} id={`osio-${o.slug}`} className="rk-osio" data-osio={o.slug} aria-labelledby={`osio-${o.slug}-h`}>
+          <section key={o.slug} id={`osio-${o.slug}`} className="rk-osio" data-osio={o.slug} data-eka={oi === 0 || undefined} aria-labelledby={`osio-${o.slug}-h`}>
             {o.eyebrow && (
               <div className="rk-osio-eyebrow">
                 <span>{o.eyebrow}</span>

@@ -116,6 +116,14 @@
   transition: border-color var(--dur-fast) var(--ease-standard);
 }
 .tn20 .rk-chip:hover { border-color: #8e8676; }
+/* Mobiilissa chipit yhdellä vaakasuunnassa vieritettävällä rivillä (kolme riviä vei ~150 px, Heikki 21.10.2026).
+   Rivi ulottuu ruudun reunaan asti; sivu itse ei vieri sivuttain. */
+@media (max-width: 899px) {
+  .tn20 .rk-chipit { flex-wrap: nowrap; overflow-x: auto; overscroll-behavior-x: contain; scrollbar-width: none;
+    margin: 0 calc(-1 * var(--rk-x)); padding: 0 var(--rk-x); scroll-padding-inline: var(--rk-x); }
+  .tn20 .rk-chipit::-webkit-scrollbar { display: none; }
+  .tn20 .rk-chip { flex: none; }
+}
 .tn20 .rk-chip span { font-size: 13px; font-weight: 600; color: var(--rk-muted); }
 
 /* Kuvakrediitti (CC BY / CC BY-SA -valokuvat) V6:n jälkeen, ennen V7:ää — erillinen rivi, ei kuvan päällä. */
@@ -134,6 +142,9 @@
   display: flex; flex-direction: column; gap: 14px; max-width: var(--rk-max); margin: 0 auto; padding: var(--rk-vali) var(--rk-x) 0;
   scroll-margin-top: 64px;
 }
+/* Ensimmäinen osio lähemmäs heroa ja chippejä (Heikki 21.10.2026: visat näkyviin ilman vieritystä). */
+.tn20 .rk-osio[data-eka] { padding-top: 24px; }
+@media (min-width: 900px) { .tn20 .rk-osio[data-eka] { padding-top: 32px; } }
 .tn20 .rk-osio-eyebrow { display: flex; align-items: center; gap: 12px; }
 .tn20 .rk-osio-eyebrow span { font-family: var(--rk-cond); font-weight: 700; font-size: 14px; letter-spacing: .18em; text-transform: uppercase; color: var(--rk-acc); white-space: nowrap; }
 .tn20 .rk-osio-eyebrow i { flex: 1; height: 1px; background: var(--rk-line); }
