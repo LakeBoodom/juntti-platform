@@ -8,15 +8,16 @@ import { naapurit, type KokoelmaKortti } from "./rekisteri";
 import { lapsetNakyvissa } from "@/lib/lapset/data";
 import type { Kokoelma, KokoelmaOsio, RunkoVisa } from "./tyypit";
 
-/** S2: ennen "Näytä kaikki" -nappia näkyy B + tämä määrä. */
-export const KATKAISU = { mobiili: 6, desktop: 8 } as const;
+/** S2: ennen "Näytä kaikki" -nappia näkyy osion ensimmäinen kortti + tämä määrä (21.10.2026: kaikki kortit samaa
+    A-kokoa → rivit täysiä: mobiili 2 × 3 = 6, tabletti 3 × 2 = 6, desktop 4 × 2 = 8 korttia). */
+export const KATKAISU = { mobiili: 5, desktop: 7 } as const;
 /** S1: osion 9. visasta alkaen kaikki ovat C-rivejä. */
 const A_ENINTAAN_PAIKKA = 8;
 
 export type RunkoKortti = RunkoVisa & {
   /** A = kuva + teksti, C = listarivi. B on osion oma kenttä. */
   muoto: "A" | "C";
-  /** Järjestysnumero B:n jälkeen (1 = ensimmäinen B:n jälkeen) — CSS-katkaisu (S2). */
+  /** Järjestysnumero osion ensimmäisen kortin jälkeen (1 = toinen kortti) — CSS-katkaisu (S2). */
   nro: number;
 };
 
@@ -141,10 +142,11 @@ function kokoa(k: Kokoelma, kohteet: UlkoinenKohde[], maarat: Record<string, num
         );
       const fi = s.featured ? vs.findIndex((v) => v.slug === s.featured) : -1;
       if (fi > 0) vs = [vs[fi], ...vs.slice(0, fi), ...vs.slice(fi + 1)];
-      /* S1: ensimmäinen (tai nostettu) on B, jos sillä on kuva. */
+      /* S1: ensimmäinen (tai nostettu) on osion ensimmäinen kortti (b), jos sillä on kuva. Piirretään samana A-korttina
+         kuin muut (21.10.2026, leveä B-kortti poistettu). */
       const b = vs[0]?.kuva ? vs[0] : null;
       const loput = b ? vs.slice(1) : vs;
-      /* S1-tarkennus: jos B:n jälkeen on alle 2 kuvallista visaa, kaikki muut ovat C-rivejä. */
+      /* S1-tarkennus: jos ensimmäisen jälkeen on alle 2 kuvallista visaa, kaikki muut ovat C-rivejä. */
       const kuvallisia = loput.slice(0, A_ENINTAAN_PAIKKA - (b ? 1 : 0)).filter((v) => v.kuva).length;
       const kortit: RunkoKortti[] = loput.map((v, i) => {
         const paikka = i + (b ? 2 : 1);

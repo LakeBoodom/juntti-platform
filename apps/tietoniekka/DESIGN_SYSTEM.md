@@ -77,7 +77,7 @@ visat tulevat osioihin `quizzes.section_tags`-tagista. Ei sivukohtaista komponen
      tavallinen pelikortti (Vaalit: Laita järjestykseen -kasvoketju, Luonto: äänivisa). Peli pysyy myös
      pelihyllyssä (V6). Paikka: `components/tn20/runko/PeliBanneri.tsx`. Jos kokoelmalla on lisäksi laskuri,
      se siirtyy heroon (`heroLisa`, Vaalit).
-- **V5 kortit** · A (kuva + teksti), B (osion pääkortti), C (listarivi). S1: ensimmäinen tai nostettu kuvallinen = B, muut kuvalliset A, kuvattomat C, 9. visasta alkaen C; jos B:n jälkeen alle 2 kuvallista, kaikki muut C. S2: mobiili B + 6, desktop B + 8, sitten "Näytä kaikki N visaa" (laajenee paikallaan).
+- **V5 kortit** · A (kuva 16:10 + teksti) ja C (listarivi). **Ei leveää B-korttia** (Heikki 21.10.2026: leveä ~2:1-kortti rajasi pysty-, neliö- ja 4:3-kuvat kaistaksi, eikä "kuva oikealla" -muunnelma ollut tyylikäs) — osion ensimmäinen tai nostettu visa on vain ensimmäisenä samassa A-koossa. S1: kuvalliset A, kuvattomat C, 9. visasta alkaen C; jos ensimmäisen jälkeen alle 2 kuvallista, muut C. S2: täydet rivit — mobiili 6 (2 × 3), tabletti 6 (3 × 2), desktop 8 (4 × 2), sitten "Näytä kaikki N visaa" (laajenee paikallaan). Grafiikka (`kuvaSovitus: "contain"`) kokonaisena vaalealla levyllä.
 - **V6 pelit** · `lib/pelimuodot.ts` (pelimuotorekisteri, `serves`).
 - **V7 lisää kokoelmia** · `related` tai automaattisesti (sama pääteema, sitten suosituimmat; `lib/kokoelmat/rekisteri.ts`).
 - **Teemaväri** · `accent` = mestaruuden väri rekisteristä. Isot tekstit (h1-korostus, eyebrow) käyttävät sitä

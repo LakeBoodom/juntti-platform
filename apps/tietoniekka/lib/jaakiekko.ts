@@ -193,8 +193,7 @@ export const jaakiekkoQuizPos = (slug: string) => QUIZ_POS.get(slug);
 
 /** Korttikopiot, jotka on rajattu uudelleen alkuperäisestä valokuvasta 16:10-kortiksi (21.10.2026). Heron 1600 px
     -kuvat ovat näissä "pystykuva + sumennettu jatke" -yhdistelmiä, jotka näyttivät kortissa oudolta zoomaukselta.
-    Rajaus on jo kohteessa, joten kortti ei käytä heron QUIZ_POS-arvoa; kohdistus hieman yläpuolelle, ettei pää
-    katkea leveässä B-kortissa. */
+    Rajaus on jo kohteessa ja kortin mitassa (16:10), joten kortti ei käytä heron QUIZ_POS-arvoa. */
 const KORTTI_RAJATUT = new Set([
   "ilves", "jyp", "kalpa", "karpat", "kiekko-espoo", "leijonat-mm2022", "leijonat-nuoret2014", "leijonat-nuoret2016",
   "leijonat-nuoret2019", "leijonat-olympia2022", "liiga-finaalidraamat", "liiga-kovanaamat", "liiga-maalitykit",
@@ -203,6 +202,5 @@ const KORTTI_RAJATUT = new Set([
 ]);
 export function jaakiekkoKorttiPos(slug: string): string | undefined {
   const id = jaakiekkoQuizImg(slug)?.match(/jk-(.+)-kuva\.webp$/)?.[1];
-  if (id === "liiga-finaalidraamat") return "50% 0%"; // pokaalin kulho ylhäällä
-  return id && KORTTI_RAJATUT.has(id) ? "50% 25%" : QUIZ_POS.get(slug);
+  return id && KORTTI_RAJATUT.has(id) ? undefined : QUIZ_POS.get(slug);
 }

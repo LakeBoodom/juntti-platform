@@ -9,10 +9,9 @@ import type { CSSProperties, ReactNode } from "react";
 import { preload } from "react-dom";
 import Crumbs from "@/components/tn20/Crumbs";
 import { KokoelmaLd } from "@/components/tn20/KokoelmaLd";
-import { katko, pisinSana, type RunkoData, type RunkoKortti } from "@/lib/kokoelmat/data";
+import { KATKAISU, katko, pisinSana, type RunkoData, type RunkoKortti } from "@/lib/kokoelmat/data";
 import type { RunkoVisa } from "@/lib/kokoelmat/tyypit";
 import RunkoHeroCta from "./RunkoHeroCta";
-import RunkoKuvaMuoto from "./RunkoKuvaMuoto";
 import RunkoNaytaKaikki from "./RunkoNaytaKaikki";
 import RunkoMetapeli from "./RunkoMetapeli";
 import { PeliIkoniSvg } from "./PeliIkoni";
@@ -26,32 +25,18 @@ const pieniKuva = (src: string) => (src.endsWith("-800.webp") ? src : src.replac
 const metapeliPaalla = () => ["1", "true"].includes(process.env.METAPELI_ENABLED ?? "");
 const esikatselu = () => process.env.VERCEL_ENV !== "production";
 
-/** eka = sivun ensimmäinen B (voi näkyä ensimmäisessä ruudussa): ei lazy, mutta matala prioriteetti,
- *  ettei se kilpaile heron (LCP) kanssa. Muut B:t lazy. */
-function KorttiB({ v, laaja, eka }: { v: RunkoVisa; laaja: boolean; eka: boolean }) {
-  return (
-    <a className="rk-b" data-laaja={laaja || undefined} data-visa-id={v.id} href={v.href} style={{ "--lw": pisinSana(v.nimi) } as CSSProperties}>
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      {v.kuva && <img src={v.kuva} alt="" loading={eka ? undefined : "lazy"} fetchPriority={eka ? "low" : undefined} data-sovitus={v.kuvaSovitus} style={v.kuvaPos && v.kuvaSovitus !== "henkilo" ? { objectPosition: v.kuvaPos } : undefined} />}
-      <span className="rk-pelattu" aria-hidden="true">✓</span>
-      <span className="rk-b-teksti">
-        {v.meta && <span className="tn-card-meta rk-b-meta">{v.meta}</span>}
-        <h3 className="rk-b-nimi">{katko(v.nimi, true)}</h3>
-        <span className="tn-card-cta">Pelaa →</span>
-      </span>
-    </a>
-  );
-}
-
 const yli = (k: RunkoKortti) =>
-  [k.nro > 6 ? "rk-yli-m" : "", k.nro > 8 ? "rk-yli-d" : ""].filter(Boolean).join(" ") || undefined;
+  [k.nro > KATKAISU.mobiili ? "rk-yli-m" : "", k.nro > KATKAISU.desktop ? "rk-yli-d" : ""].filter(Boolean).join(" ") || undefined;
 
-function KorttiA({ v }: { v: RunkoKortti }) {
+/** Kaikki kuvalliset kortit ovat samaa A-muotoa (Heikki 21.10.2026: leveä B-kortti rajasi pysty-, neliö- ja
+ *  4:3-kuvat huonosti). Osion ensimmäinen tai nostettu visa on vain ensimmäisenä. eka = sivun ensimmäinen kortti
+ *  (voi näkyä ensimmäisessä ruudussa): ei lazy, mutta matala prioriteetti, ettei se kilpaile heron (LCP) kanssa. */
+function KorttiA({ v, eka }: { v: RunkoKortti; eka?: boolean }) {
   return (
     <a className={["rk-a", yli(v)].filter(Boolean).join(" ")} data-visa-id={v.id} href={v.href} style={{ "--lw": pisinSana(v.nimi) } as CSSProperties}>
       <span className="rk-a-kuva">
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={v.kuva!} alt="" loading="lazy" style={v.kuvaPos ? { objectPosition: v.kuvaPos } : undefined} />
+        <img src={v.kuva!} alt="" loading={eka ? undefined : "lazy"} fetchPriority={eka ? "low" : undefined} data-sovitus={v.kuvaSovitus} style={v.kuvaPos ? { objectPosition: v.kuvaPos } : undefined} />
         <span className="rk-pelattu" aria-hidden="true">✓</span>
       </span>
       <span className="rk-a-teksti">
@@ -135,8 +120,6 @@ export default function KokoelmaRunko({ d, tunnusosa, v3Lisa, heroLisa }: { d: R
         </div>
       </section>
 
-      <RunkoKuvaMuoto />
-
       {/* ─── V2 + V3 ─── */}
       <div className="rk-v23" data-v3={naytaV3 || undefined}>
         <RunkoMetapeli
@@ -183,7 +166,7 @@ export default function KokoelmaRunko({ d, tunnusosa, v3Lisa, heroLisa }: { d: R
             </div>
             {(o.b || a.length > 0) && (
               <div className="rk-ruudukko" data-a={a.length}>
-                {o.b && <KorttiB v={o.b} laaja={a.length < 2} eka={oi === 0} />}
+                {o.b && <KorttiA v={{ ...o.b, muoto: "A", nro: 0 }} eka={oi === 0} />}
                 {a.map((v) => <KorttiA key={v.id} v={v} />)}
               </div>
             )}

@@ -119,7 +119,7 @@
 /* Tavutus (U+00AD, katko()) rungon otsikoihin: WebKit EI katkaise tavuviivasta, kun word-break on keep-all
    (mitattu 20.10.2026: "PÄÄMINISTERIKAUSIEN" +8 px). Latinalaisessa tekstissä keep-all ei muuten eroa normalista;
    sanan katkeamisen keskeltä estää overflow-wrap: normal, joten word-break: normal on turvallinen. */
-.tn20 .rk :is(.rk-h1, .rk-h2, .rk-b-nimi, .rk-a-nimi, .rk-c-nimi, .rk-peli-nimi, .rk-kokoelma-nimi, .rk-aika-nimi, .rk-synt-nimi) {
+.tn20 .rk :is(.rk-h1, .rk-h2, .rk-a-nimi, .rk-c-nimi, .rk-peli-nimi, .rk-kokoelma-nimi, .rk-aika-nimi, .rk-synt-nimi) {
   word-break: normal; overflow-wrap: normal; -webkit-hyphens: manual; hyphens: manual;
 }
 
@@ -143,38 +143,6 @@
 @media (min-width: 600px) { .tn20 .rk-ruudukko { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
 @media (min-width: 1024px) { .tn20 .rk-ruudukko { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
 
-/* B: osion pääkortti. Mobiilissa 16/9 täysi sisältöleveys; desktopilla 2 saraketta ja A-kortit vieressä,
-   tai täysleveä enintään 360 px, jos A-kortteja on alle 2 (S5). */
-.tn20 .rk-b {
-  container-type: inline-size; position: relative; grid-column: 1 / -1; aspect-ratio: 16 / 9; min-width: 0;
-  display: flex; flex-direction: column; justify-content: flex-end; overflow: hidden; border-radius: 16px;
-  border: 1px solid var(--rk-line); background: repeating-linear-gradient(135deg, color-mix(in srgb, var(--rk-acc) 16%, transparent) 0 10px, color-mix(in srgb, var(--rk-acc) 6%, transparent) 10px 20px), #1a170f;
-  transition: transform var(--dur-fast) var(--ease-standard);
-}
-@media (min-width: 600px) {
-  .tn20 .rk-b:not([data-laaja]) { grid-column: span 2; aspect-ratio: auto; min-height: 260px; }
-  .tn20 .rk-b[data-laaja] { max-height: 360px; }
-}
-.tn20 .rk-b img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
-/* Grafiikka (Kuvavisat: liput, vaakunat) kokonaisena vaalealla levyllä — rajaus pilaisi vaakunan. Teksti pysyy
-   luettavana, koska .rk-b:n tumma liukuväri on kuvan päällä. */
-.tn20 .rk-b img[data-sovitus="contain"] { object-fit: contain; padding: 8% 18% 34%; box-sizing: border-box; background: #ece6d8; }
-/* Pysty- ja neliökuvat (Heikki 21.10.2026): leveä B-kortti rajasi niistä vain kaistan (Juhlien 4:5-kuvitukset 37 %,
-   henkilökuvat otsa–nenä, 320 px kuva suurennettuna ~2,7-kertaiseksi). Kuva kortin oikeaan reunaan koko korkeudelta
-   omassa mitassaan (width: auto = luontainen muoto), enintään 62 % leveydestä, vasen reuna häivytettynä korttiin; nimi
-   pysyy vasemmassa alakulmassa liukuvärin päällä. Henkilökortit merkitään jo palvelimella (data-sovitus="henkilo"),
-   muut selain merkitsee kuvan latauduttua (RunkoKuvaMuoto, data-muoto="pysty"). */
-.tn20 .rk-b img:is([data-sovitus="henkilo"], [data-muoto="pysty"]) { left: auto; right: 0; width: auto; max-width: 62%; object-position: 50% 20%;
-  -webkit-mask-image: linear-gradient(to right, transparent 0, #000 38%); mask-image: linear-gradient(to right, transparent 0, #000 38%); }
-.tn20 .rk-b::after { content: ""; position: absolute; inset: 0; background: linear-gradient(to top, #131109 0%, rgba(19, 17, 9, .92) 30%, rgba(19, 17, 9, .35) 68%, rgba(19, 17, 9, 0) 100%); }
-.tn20 .rk-b-teksti { position: relative; z-index: 1; display: flex; flex-direction: column; align-items: flex-start; gap: 6px; padding: 16px 18px; max-width: 640px; }
-.tn20 .rk-b-meta { color: var(--rk-soft); }
-.tn20 .rk-b-nimi {
-  margin: 0; font-family: var(--rk-arch); font-weight: 900; font-variation-settings: "wdth" 72; line-height: .95; letter-spacing: -.015em; text-transform: uppercase;
-  font-size: min(40px, calc((100cqi - 36px) / (var(--lw, 10) * 0.62)));
-  word-break: keep-all; overflow-wrap: normal; text-wrap: balance;
-}
-
 /* A: kuva 16/10 + teksti */
 .tn20 .rk-a {
   container-type: inline-size; position: relative; display: flex; flex-direction: column; min-width: 0; overflow: hidden;
@@ -183,6 +151,8 @@
 }
 .tn20 .rk-a-kuva { position: relative; aspect-ratio: 16 / 10; overflow: hidden; background: #1a170f; }
 .tn20 .rk-a-kuva img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
+/* Grafiikka (Kuvavisat: vaakunat, maalaukset) kokonaisena vaalealla levyllä — rajaus pilaisi vaakunan. */
+.tn20 .rk-a-kuva img[data-sovitus="contain"] { object-fit: contain; padding: 6% 10%; box-sizing: border-box; background: #ece6d8; }
 .tn20 .rk-a-teksti { flex: 1; display: flex; flex-direction: column; align-items: flex-start; gap: 6px; padding: 12px 14px 14px; }
 .tn20 .rk-a-nimi {
   margin: 0; font-family: var(--rk-arch); font-weight: 900; font-variation-settings: "wdth" 72; line-height: 1; letter-spacing: -.01em; text-transform: uppercase;
@@ -191,7 +161,7 @@
 }
 .tn20 .rk-a .tn-card-cta { margin-top: auto; padding-top: 4px; }
 @media (hover: hover) {
-  .tn20 .rk-a:hover, .tn20 .rk-b:hover, .tn20 .rk-peli:hover, .tn20 .rk-kokoelma:hover { transform: translateY(-2px); }
+  .tn20 .rk-a:hover, .tn20 .rk-peli:hover, .tn20 .rk-kokoelma:hover { transform: translateY(-2px); }
   .tn20 .rk-a:hover { border-color: var(--rk-line2); }
 }
 
@@ -269,7 +239,7 @@
 .tn20 .rk-kokoelma-nimi { font-family: var(--rk-cond); font-weight: 800; font-size: 19px; line-height: 1; text-transform: uppercase; word-break: keep-all; overflow-wrap: normal; }
 
 @media (prefers-reduced-motion: reduce) {
-  .tn20 .rk-a, .tn20 .rk-b, .tn20 .rk-peli, .tn20 .rk-kokoelma, .tn20 .rk-chip, .tn20 .rk-c, .tn20 .rk-nayta { transition: none; }
+  .tn20 .rk-a, .tn20 .rk-peli, .tn20 .rk-kokoelma, .tn20 .rk-chip, .tn20 .rk-c, .tn20 .rk-nayta { transition: none; }
 }
 
 /* ── V4 Tunnusosa (yhteinen kehys) + sijoitusnauha (runko vaihe 2) ───────
