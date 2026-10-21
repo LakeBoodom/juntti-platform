@@ -120,7 +120,7 @@
    Rivi ulottuu ruudun reunaan asti; sivu itse ei vieri sivuttain. */
 @media (max-width: 899px) {
   .tn20 .rk-chipit { flex-wrap: nowrap; overflow-x: auto; overscroll-behavior-x: contain; scrollbar-width: none;
-    margin: 0 calc(-1 * var(--rk-x)); padding: 0 var(--rk-x); scroll-padding-inline: var(--rk-x); }
+    margin: -4px calc(-1 * var(--rk-x)); padding: 4px var(--rk-x); scroll-padding-inline: var(--rk-x); } /* 4 px: fokusrengas ei leikkaudu */
   .tn20 .rk-chipit::-webkit-scrollbar { display: none; }
   .tn20 .rk-chip { flex: none; }
 }
