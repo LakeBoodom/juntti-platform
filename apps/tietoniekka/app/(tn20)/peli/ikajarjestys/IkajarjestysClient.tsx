@@ -64,9 +64,12 @@ type Phase = "start" | "loading" | "ordering" | "revealing";
 export default function IkajarjestysClient({
   initialCategory,
   initialRound,
+  kasvot = [],
 }: {
   initialCategory: string;
   initialRound: ChainPerson[] | null;
+  /** Aloituksen kasvoketju (P3, 21.10.2026): enintään 10 kuvallista henkilöä syntymäjärjestyksessä. */
+  kasvot?: Array<{ id: string; name: string; kuva: string }>;
 }) {
   const [category, setCategory] = useState(initialCategory);
   const [pickerCategory, setPickerCategory] = useState(initialCategory);
@@ -156,6 +159,24 @@ export default function IkajarjestysClient({
             otsikko={PELI}
             lause="Aseta kymmenen tunnettua suomalaista syntymävuoden mukaan vanhimmasta nuorimpaan."
             valinta={
+              <>
+              {kasvot.length >= 5 && (
+                <figure className="ika-kasvot">
+                  <ol aria-label="Esimerkki: tunnettuja suomalaisia syntymävuoden mukaan">
+                    {kasvot.map((h) => (
+                      <li key={h.id}>
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img src={h.kuva} alt={h.name} title={h.name} width={44} height={44} />
+                      </li>
+                    ))}
+                  </ol>
+                  <figcaption>
+                    <span>Vanhin</span>
+                    <i aria-hidden="true" />
+                    <span>Nuorin</span>
+                  </figcaption>
+                </figure>
+              )}
               <fieldset className="pk-valinta">
                 <legend>Valitse aihe</legend>
                 <div className="pk-vaihtoehdot">
@@ -168,6 +189,7 @@ export default function IkajarjestysClient({
                   ))}
                 </div>
               </fieldset>
+              </>
             }
             toiminto={
               <button type="button" className="pk-nappi" disabled={phase === "loading"} onClick={() => startRound(pickerCategory)}>

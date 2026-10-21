@@ -7,6 +7,7 @@ import { JsonLd, peliLd } from "@/lib/jsonLd";
 import { jakoMeta } from "@/lib/jakoMeta";
 import type { Metadata } from "next";
 import { getChainRound, getChainRoundByIds } from "@/lib/ikajarjestys";
+import { henkiloKuva } from "@/lib/henkilokuvat";
 import IkajarjestysClient from "./IkajarjestysClient";
 
 export const dynamic = "force-dynamic";
@@ -38,10 +39,25 @@ export default async function IkajarjestysPage({
   const henkilot = typeof sp.henkilot === "string" ? sp.henkilot.split(",") : null;
   const initialRound = henkilot ? await getChainRoundByIds(henkilot) : autostart ? await getChainRound(category) : null;
 
+  // P3 (Heikki 21.10.2026): aloitukseen kasvoketju — kymmenen kasvoa vanhimmasta nuorimpaan selittää pelin yhdellä
+  // silmäyksellä. Vain omat kuvakopiot (henkiloKuva); kaksi arvontaa, jotta kymmenen kuvallista löytyy.
+  let kasvot: Array<{ id: string; name: string; kuva: string; birthDate: string }> = [];
+  if (!initialRound) {
+    const ehdokkaat = [...(await getChainRound("kaikki")), ...(await getChainRound("kaikki"))];
+    const nahty = new Set<string>();
+    for (const p of ehdokkaat) {
+      const kuva = henkiloKuva(p.image_url);
+      if (!kuva || nahty.has(p.id) || kasvot.length >= 10) continue;
+      nahty.add(p.id);
+      kasvot.push({ id: p.id, name: p.name, kuva, birthDate: p.birthDate });
+    }
+    kasvot = kasvot.sort((a, b) => a.birthDate.localeCompare(b.birthDate));
+  }
+
   return (
     <>
       <JsonLd data={peliLd({ name: "Tietoketju: Ikäjärjestys", url: "/peli/ikajarjestys", description: "Aseta kymmenen tunnettua suomalaista syntymävuoden mukaiseen järjestykseen." })} />
-      <IkajarjestysClient initialCategory={category} initialRound={initialRound} />
+      <IkajarjestysClient initialCategory={category} initialRound={initialRound} kasvot={kasvot} />
     </>
   );
 }
