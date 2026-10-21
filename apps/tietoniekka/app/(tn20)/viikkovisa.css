@@ -257,3 +257,48 @@
 @media (prefers-reduced-motion: reduce) {
   .tn20 .vv-btn, .tn20 .vv-btn-outline { transition: none; }
 }
+
+/* Palautettu 21.10.2026 (P5): viikkovisan promo Kuvavisat-kokoelmassa heron alla. Poistettiin 20.10. (67d4548)
+   käyttämättömänä, kun ViikkovisaPromo-komponentti oli poistettu. */
+.tn20 .vv-meta { font-size: 14px; font-weight: 500; color: #8e8676; }
+.tn20 .vv-tulos { color: var(--vv-acc); white-space: nowrap; }
+
+/* ── Etusivun promo (10A a) ────────────────────────────────────────────── */
+.tn20 .vv-promo {
+  container-type: inline-size;
+  display: grid; grid-template-columns: minmax(0, 1fr) clamp(200px, 22cqw, 300px);
+  align-items: stretch; gap: clamp(24px, 3.2cqw, 46px);
+  padding: clamp(22px, 2.4cqw, 34px) clamp(22px, 2.8cqw, 40px);
+  border: 1px solid #2c2517; border-radius: clamp(14px, 1.5cqw, 20px);
+  background: #131109; color: #f5f0e6;
+}
+.tn20 .vv-promo-text { display: flex; flex-direction: column; justify-content: center; gap: 16px; min-width: 0; }
+/* KORTTISÄÄNTÖ: pisin sana "kaikille"/"tuloksesi" (9 merkkiä). Design 58 px
+   @1440 (wdth 72); kapeimmalla (320 px, sisäleveys ≈ 274 px) 0.95 × 274 /
+   (0.55 × 9) ≈ 52 px → alaraja 32 px jättää reilun marginaalin. Mitattu
+   Range-menetelmällä, ks. raportti. */
+.tn20 .vv-promo-h {
+  margin: 0; max-width: 22ch;
+  font-family: var(--vv-display); font-weight: 900; font-variation-settings: "wdth" 72;
+  font-size: clamp(32px, 4.2cqw, 58px); line-height: 0.92; letter-spacing: -0.02em;
+  text-transform: uppercase; color: #f5f0e6;
+  overflow-wrap: normal; word-break: keep-all; hyphens: none; text-wrap: balance;
+}
+.tn20 .vv-promo-p { margin: -4px 0 0; font-size: 15px; line-height: 1.5; color: #a79e8c; }
+.tn20 .vv-promo-row { display: flex; align-items: center; flex-wrap: wrap; gap: 12px 18px; }
+.tn20 .vv-promo-nro {
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 13px; border: 1px solid rgba(34, 211, 238, 0.28);
+  background: linear-gradient(160deg, rgba(34, 211, 238, 0.13), rgba(34, 211, 238, 0.02));
+  font-family: var(--vv-display); font-weight: 900; font-variation-settings: "wdth" 66;
+  font-size: clamp(110px, 13cqw, 160px); line-height: 0.82; letter-spacing: -0.04em;
+  color: var(--vv-acc); opacity: 0.92;
+}
+@container (max-width: 620px) {
+  .tn20 .vv-promo-nro { display: none; }
+}
+@media (max-width: 660px) {
+  .tn20 .vv-promo { grid-template-columns: minmax(0, 1fr); }
+  .tn20 .vv-promo-nro { display: none; }
+  .tn20 .vv-promo-row .vv-btn, .tn20 .vv-promo-row .vv-btn-outline { flex: 1 1 100%; }
+}

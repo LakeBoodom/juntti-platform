@@ -67,7 +67,15 @@ function RiviC({ v }: { v: RunkoKortti }) {
 
 /** v3Lisa: V3:n yläpuolelle tuleva lisä (Tunnetut henkilöt: henkilöhaku + A–Ö-linkki, brief §3). */
 /** heroLisa: heron tilastorivin alle tuleva lisä (Vaalit: vaalilaskuri, kun V4 on pelibanneri — Heikki 20.10.2026). */
-export default function KokoelmaRunko({ d, tunnusosa, v3Lisa, heroLisa }: { d: RunkoData; tunnusosa?: ReactNode; v3Lisa?: ReactNode; heroLisa?: ReactNode }) {
+export default function KokoelmaRunko({ d, tunnusosa, v3Lisa, heroLisa, sisalto }: {
+  d: RunkoData;
+  tunnusosa?: ReactNode;
+  v3Lisa?: ReactNode;
+  heroLisa?: ReactNode;
+  /** Sivun oma sisältö V2–V5:n tilalle (Kuvavisat: viikon visa + kategoriaruudukko, P5 21.10.2026).
+   *  Hero (V1), pelit (V6) ja lisää kokoelmia (V7) tulevat rungosta. */
+  sisalto?: ReactNode;
+}) {
   const { k, osiot } = d;
   const otsikko = `${k.title}${k.highlight ?? ""}`;
   const lyhyt = otsikko.trim().length <= 12;
@@ -120,6 +128,8 @@ export default function KokoelmaRunko({ d, tunnusosa, v3Lisa, heroLisa }: { d: R
         </div>
       </section>
 
+      {sisalto ?? (
+ <>
       {/* ─── V2 + V3 ─── */}
       <div className="rk-v23" data-v3={naytaV3 || undefined}>
         <RunkoMetapeli
@@ -186,6 +196,8 @@ export default function KokoelmaRunko({ d, tunnusosa, v3Lisa, heroLisa }: { d: R
           </section>
         );
       })}
+ </>
+      )}
 
       {/* ─── V6 Pelit tässä kokoelmassa (pelimuotorekisteri, S4) ─── */}
       {d.pelit.length > 0 && (

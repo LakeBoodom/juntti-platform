@@ -468,3 +468,31 @@
     transition: none;
   }
 }
+
+/* ---------- Kuvavisat rungon sisällä (P5, Heikki 21.10.2026) ----------
+   KuvavisaKategoriat (components/tn20/runko): viikon visa heti heron alla + kategoriaruudukko. Sama leveys ja
+   reunus kuin rungon osioilla; muuttujat kuten entisellä .kv-page:llä. Muunnelmat tiiviinä siruina. */
+.tn20 .kv-runko {
+  --kv-display: "Archivo Variable", "Archivo", "Barlow Condensed", sans-serif;
+  --kv-plate: #f4efe4;
+  --kv-plate-border: #cfc4ac;
+  display: flex; flex-direction: column; gap: clamp(28px, 4vw, 44px);
+  max-width: var(--rk-max, 1184px); margin: 0 auto; padding: 24px var(--rk-x, 16px) 0; box-sizing: border-box;
+}
+@media (min-width: 900px) { .tn20 .kv-runko { padding-top: 32px; } }
+/* Kahdeksan kategoriaa kahdelle riville leveällä näytöllä (4 × 2), sivu matalammaksi. */
+.tn20 .kv-runko .kv-grid { grid-template-columns: repeat(auto-fill, minmax(min(100%, 260px), 1fr)); gap: 18px; }
+.tn20 .kv-runko .kv-section { scroll-margin-top: 64px; }
+.tn20 .kv-sirut { display: flex; flex-wrap: wrap; gap: 8px; }
+.tn20 .kv-siru {
+  display: inline-flex; align-items: center; min-height: 44px; padding: 0 14px; box-sizing: border-box;
+  border: 1px solid #3a3122; border-radius: 999px; background: #1b1710;
+  font-size: 14px; font-weight: 700; color: var(--tn-text, #f5f0e6); text-decoration: none; white-space: nowrap;
+  transition: border-color 150ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.tn20 .kv-siru:hover { border-color: #8e8676; color: var(--tn-text, #f5f0e6); }
+.tn20 .kv-siru:focus-visible { outline: 2px solid var(--tn-amber, #e8a320); outline-offset: 2px; }
+/* "Kaikki liput": korostettu ääriviivalla (lime on toiminnon väri; täytetty lime kuuluu heron napille). */
+.tn20 .kv-siru--kaikki { border-color: var(--tn-lime, #b6ff3c); color: var(--tn-lime, #b6ff3c); font-weight: 800; }
+.tn20 .kv-siru--kaikki:hover { border-color: var(--tn-lime, #b6ff3c); color: var(--tn-lime, #b6ff3c); background: color-mix(in srgb, var(--tn-lime, #b6ff3c) 10%, transparent); }
+@media (prefers-reduced-motion: reduce) { .tn20 .kv-siru { transition: none; } }
