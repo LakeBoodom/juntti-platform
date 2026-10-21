@@ -11,6 +11,9 @@
 const pw = require("playwright");
 const BASE = process.argv[2];
 const MOOTTORI = process.argv[3] || "webkit";
+// Lautapelit (Kuntaliitos, Rajanaapurit, Vaalipiiriketju) alkavat suoraan laudalta ilman K2-aloitusta (Heikki 21.10.2026):
+// niistä tarkistetaan palkki, paluu, ylivuoto ja että pelilauta alkaa ensimmäisessä ruudussa.
+const LAUTA = new Set(["/peli/kuntaliitos", "/peli/rajanaapurit", "/peli/vaalipiiriketju"]);
 const PELIT = [
   ["/peli/tupla-tai-kuitti", "/kokoelmat"],
   ["/peli/tupla-tai-kuitti/sm-liiga", "/kokoelmat"],
@@ -37,7 +40,8 @@ const TEKSTI = ".pk-h1,.pk-lause,.pk-peli,.pk-tila,.pk-paluu,.pk-nappi,.pk-vaiht
     }
     await p.waitForTimeout(700);
     await p.evaluate(() => document.fonts.ready);
-    const t = await p.evaluate(([TEKSTI, koti]) => {
+    const lauta = LAUTA.has(polku);
+    const t = await p.evaluate(([TEKSTI, koti, lauta]) => {
       const virheet = [];
       const blokki = (el) => { let x = el; while (x && getComputedStyle(x).display.startsWith("inline")) x = x.parentElement; return x; };
       document.querySelectorAll(TEKSTI).forEach((el) => {
@@ -52,10 +56,11 @@ const TEKSTI = ".pk-h1,.pk-lause,.pk-peli,.pk-tila,.pk-paluu,.pk-nappi,.pk-vaiht
       });
       const hs = document.documentElement.scrollWidth - document.documentElement.clientWidth;
       if (hs > 0) virheet.push(`vaakavieritys ${hs}px`);
-      const nappi = document.querySelector(".pk-aloitus .pk-nappi");
-      const ala = nappi ? Math.round(nappi.getBoundingClientRect().bottom + scrollY) : null;
-      if (!nappi) virheet.push("ei aloitusnappia");
-      else if (ala > 844) virheet.push(`nappi alareuna ${ala} > 844`);
+      const nappi = document.querySelector(lauta ? ".kl-kortti, .kl-ketju li, .vpk-pino, .vpk-ketju" : ".pk-aloitus .pk-nappi");
+      const ala = nappi ? Math.round((lauta ? nappi.getBoundingClientRect().top : nappi.getBoundingClientRect().bottom) + scrollY) : null;
+      if (!nappi) virheet.push(lauta ? "ei pelilautaa" : "ei aloitusnappia");
+      else if (ala > 844) virheet.push(`${lauta ? "lauta alkaa" : "nappi alareuna"} ${ala} > 844`);
+      if (lauta && document.querySelector(".pk-aloitus")) virheet.push("K2-aloitus näkyy lautapelissä");
       const valinta = document.querySelector(".pk-aloitus .pk-valinta");
       if (valinta && valinta.getBoundingClientRect().bottom + scrollY > 844) virheet.push("valinta ei mahdu");
       const paluu = document.querySelector(".pk-paluu");
@@ -66,12 +71,12 @@ const TEKSTI = ".pk-h1,.pk-lause,.pk-peli,.pk-tila,.pk-paluu,.pk-nappi,.pk-vaiht
       });
       const h1 = document.querySelector(".pk-h1");
       return { virheet, ala, h1: h1 ? getComputedStyle(h1).fontSize : null };
-    }, [TEKSTI, koti]);
+    }, [TEKSTI, koti, lauta]);
     if (r.status() !== 200) t.virheet.push(`HTTP ${r.status()}`);
     // Pelinäkymä: Aloita → palkin teksti ja korkeus.
     // Megavisan pelinäkymä on tavallisen visan HUD (K3, ei pelipalkkia) → vain aloitus tarkistetaan.
     if (t.ala && !polku.includes("mega=")) {
-      await Promise.all([p.waitForLoadState("load").catch(() => {}), p.click(".pk-aloitus .pk-nappi")]);
+      if (!lauta) await Promise.all([p.waitForLoadState("load").catch(() => {}), p.click(".pk-aloitus .pk-nappi")]);
       await p.waitForTimeout(2500);
       const peli = await p.evaluate(() => {
         const v = [];

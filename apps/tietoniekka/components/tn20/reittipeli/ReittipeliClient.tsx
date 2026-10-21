@@ -20,7 +20,6 @@ import { getSupabase } from "@/lib/supabase";
 import { KL_PISTEET, KL_SIVU, KL_YHTEYKSIA, pariAvain, uusiReittiSiemen, type KlKunta, type KlReitti } from "@/lib/kuntaliitos";
 import { RN_SIVU } from "@/lib/rajanaapurit";
 import Pelipalkki from "@/components/tn20/pelikehys/Pelipalkki";
-import PeliAloitus from "@/components/tn20/pelikehys/PeliAloitus";
 import PeliTulos from "@/components/tn20/pelikehys/PeliTulos";
 import { runkoCond } from "@/components/tn20/runko/runkoFontti";
 import { seuraavatPelit } from "@/lib/pelimuodot";
@@ -70,7 +69,7 @@ const PELIT: Record<ReittipeliNimi, Peli> = {
   },
 };
 
-type Vaihe = "alku" | "peli" | "tarkistus" | "tulos";
+type Vaihe = "peli" | "tarkistus" | "tulos";
 type Tila = "ok" | "bad";
 
 const LIIKE_PX = 6;
@@ -282,11 +281,8 @@ export default function ReittipeliClient({
   lahde,
   maakunnat,
   maakuntaTunnus,
-  aloitaHeti = false,
 }: {
   peli: ReittipeliNimi;
-  /** K2-aloituksen ohitus: ?aloita=1 (aloitus valitsi alueen) tai haastelinkin ?reitti=. */
-  aloitaHeti?: boolean;
   reitti: KlReitti | null;
   maakunnat: Array<{ nimi: string; tunnus: string }>;
   maakuntaTunnus: string | null;
@@ -297,8 +293,8 @@ export default function ReittipeliClient({
 }) {
   const peli = PELIT[peliNimi];
   const [jarjestys, setJarjestys] = useState<string[]>(reitti?.alku ?? []);
-  const [vaihe, setVaihe] = useState<Vaihe>(aloitaHeti ? "peli" : "alku");
-  const [alue, setAlue] = useState<string>(maakuntaTunnus ?? "");
+  /* Palautus 21.10.2026 (Heikki): peli alkaa suoraan laudalta kuten ennen pelikehystä — ei K2-aloitusnäkymää. */
+  const [vaihe, setVaihe] = useState<Vaihe>("peli");
   const [paljastettu, setPaljastettu] = useState(0);
   const [valittu, setValittu] = useState<string | null>(null);
   const [raahattava, setRaahattava] = useState<string | null>(null);
@@ -339,6 +335,39 @@ export default function ReittipeliClient({
     return h ? `${peli.sivu}?${h}` : peli.sivu;
   };
   const maakuntaNimi = maakunnat.find((m) => m.tunnus === maakuntaTunnus)?.nimi ?? null;
+  const valitsin = peli.valitsin === "segmentit" ? (
+    // CD Rajanaapurit v0.2 3d: segmenttivalitsin, näkyy vain pelitilassa, valinta arpoo reitin heti
+    <div className="kl-segvalinta">
+      <div className="kl-segvalinta-yla">
+        <span id="kl-valinta-h" className="kl-pikku">{peli.valinta}</span>
+        <span className="kl-segvalinta-reitti">{paivanReitti ? `Päivän reitti · ${paivays}` : "Arvottu reitti"}</span>
+      </div>
+      <div className="kl-segmentit" role="group" aria-labelledby="kl-valinta-h">
+        {[{ nimi: peli.kaikkiLyhyt, tunnus: null as string | null }, ...maakunnat].map((m) => (
+          <button
+            key={m.tunnus ?? "kaikki"}
+            type="button"
+            aria-pressed={(maakuntaTunnus ?? null) === m.tunnus}
+            onClick={() => location.assign(osoite(undefined, m.tunnus))}
+          >
+            {m.nimi}
+          </button>
+        ))}
+      </div>
+    </div>
+  ) : (
+    <label className="kl-valinta">
+      <span>{peli.valinta}</span>
+      <span className="kl-valinta-kentta">
+        <select value={maakuntaTunnus ?? ""} onChange={(e) => location.assign(osoite(undefined, e.target.value || null))}>
+          <option value="">{peli.kaikki}</option>
+          {maakunnat.map((m) => <option key={m.tunnus} value={m.tunnus}>{m.nimi}</option>)}
+        </select>
+        <Ikoni d="M6 9l6 6 6-6" w={2.4} />
+      </span>
+      <span className="kl-valinta-reitti">{paivanReitti ? `Päivän reitti ${paivays}` : "Arvottu reitti"}</span>
+    </label>
+  );
   if (!reitti) return <Virhe peli={peli} uusi={() => location.assign(osoite(uusiReittiSiemen()))} />;
 
   // ── Siirrot ──
@@ -548,7 +577,16 @@ export default function ReittipeliClient({
         : `Katkokset on merkitty korttien väliin ja kartalle. Yritä uudelleen – järjestys säilyy, joten voit siirtää vain katkosten kohdalla olevia ${peli.alueita}.`;
 
   /* ── Pelikehys (vaihe 4, 20.10.2026): K1 palkki, K2 aloitus, K4 tulos ── */
-  const kehysTila = vaihe === "peli" || vaihe === "tarkistus" ? `Ketjussa ${oikein}/${KL_YHTEYKSIA}` : undefined;
+  /* Pelin tilanne palkissa kuten ennen pelikehystä: mittari (yhteys kerrallaan) + pisteet (palautus 21.10.2026). */
+  const kehysTila =
+    vaihe === "peli" || vaihe === "tarkistus" ? (
+      <>
+        <span className="kl-mittari" role="img" aria-label={`Oikeat yhteydet ${oikein} / ${KL_YHTEYKSIA}`}>
+          {mittari.map((t, i) => <span key={i} className={`kl-seg kl-seg--${t}`} />)}
+        </span>
+        <span className="kl-pisteet">{oikein * KL_PISTEET} p</span>
+      </>
+    ) : undefined;
   const palkki = <Pelipalkki iho="kerma" peli={peli.nimi} koti={peli.koti} tila={kehysTila} pelissa={!!kehysTila} />;
   const kotiKokoelma = peli.koti.href.split("/").pop();
   const ohjeet = (
@@ -563,53 +601,6 @@ export default function ReittipeliClient({
       <p className="kl-lahde">{lahde}</p>
     </>
   );
-
-  if (vaihe === "alku") {
-    const aloita = () => {
-      if ((alue || null) === (maakuntaTunnus ?? null)) { setVaihe("peli"); window.scrollTo({ top: 0 }); return; }
-      const u = osoite(undefined, alue || null);
-      location.assign(`${u}${u.includes("?") ? "&" : "?"}aloita=1`);
-    };
-    const alueet = [{ nimi: peli.kaikkiLyhyt, tunnus: "" }, ...maakunnat];
-    return (
-      <div className={`kl kl--${peliNimi} kl--alku ${runkoCond.variable}`} data-iho="kerma">
-        {palkki}
-        <main>
-          <PeliAloitus
-            otsikko={peli.nimi}
-            lause={peli.lause}
-            valinta={
-              peli.valitsin === "segmentit" ? (
-                <fieldset className="pk-valinta">
-                  <legend>{peli.valinta}</legend>
-                  <div className="pk-vaihtoehdot">
-                    {alueet.map((m) => (
-                      <label key={m.tunnus || "kaikki"} className="pk-vaihtoehto">
-                        <input type="radio" name="reitti-alue" value={m.tunnus} checked={alue === m.tunnus} onChange={() => setAlue(m.tunnus)} />
-                        <span className="pk-vaihtoehto-piste" aria-hidden="true" />
-                        {m.nimi}
-                      </label>
-                    ))}
-                  </div>
-                </fieldset>
-              ) : (
-                <label className="pk-valinta pk-valinta--valikko">
-                  <span className="pk-valinta-otsikko">{peli.valinta}</span>
-                  <select className="pk-valikko" value={alue} onChange={(e) => setAlue(e.target.value)}>
-                    <option value="">{peli.kaikki}</option>
-                    {maakunnat.map((m) => <option key={m.tunnus} value={m.tunnus}>{m.nimi}</option>)}
-                  </select>
-                </label>
-              )
-            }
-            toiminto={<button type="button" className="pk-nappi" onClick={aloita}>Rakenna reitti</button>}
-            alarivi={paivanReitti ? <><b>Päivän reitti {paivays}</b> · sama kaikille tänään</> : <b>Arvottu reitti</b>}
-            ohjeet={[{ otsikko: "Ohjeet ja näppäimet", sisalto: ohjeet }]}
-          />
-        </main>
-      </div>
-    );
-  }
 
   if (vaihe === "tulos" && taydet) {
     const eka = ratkaisu[0]?.n, vika = ratkaisu.at(-1)?.n;
@@ -650,6 +641,7 @@ export default function ReittipeliClient({
       <div className="kl-main">
         <h1 className="kl-sr">{peli.nimi}</h1>
         <div className="kl-peli">
+          {(peli.valitsin === "valikko" || vaihe === "peli") && valitsin}
           {vaihe === "tulos" && (
             <div className={`kl-tulos kl-tulos--${taydet ? "ok" : "bad"}`} role="status">
               <span className="kl-tulos-ik"><Ikoni d={taydet ? IKONI.ok : IKONI.katkos} w={2.8} /></span>
@@ -795,7 +787,10 @@ export default function ReittipeliClient({
         </aside>
       </div>
 
-      <p className="kl-lahde kl-lahde--ala">{lahde}</p>
+      <section className="kl-info" aria-labelledby="kl-info-h">
+        <h2 id="kl-info-h">Näin pelaat</h2>
+        {ohjeet}
+      </section>
     </div>
   );
 }

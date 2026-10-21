@@ -5,6 +5,7 @@
 // suoraan (onAloita); muuten siirrytään aiheen sivulle ?aloita=1 (peli alkaa heti).
 import { useState, type CSSProperties, type ReactNode } from "react";
 import PeliAloitus from "@/components/tn20/pelikehys/PeliAloitus";
+import "./tuplaaloitus.css";
 
 export type AiheValinta = { slug: string; nimi: string; accent: string };
 
@@ -30,9 +31,27 @@ export default function TuplaAloitus({
     if (onAloita && sel === valittu) onAloita();
     else location.assign(`/peli/tupla-tai-kuitti/${aihe.slug}?aloita=1`);
   };
+  /* Palautus 21.10.2026 (Heikki): studiokuva ja virallinen logo takaisin aloitukseen; aiheet ja Aloita kuvan alla,
+     aiheet edelleen ensimmäisessä näkymässä. Logo on sivun h1 (alt = pelin nimi). */
   return (
+    <>
+    <div className="tks-kuva">
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src="/20/tupla/studio.webp"
+        srcSet="/20/tupla/studio-800.webp 800w, /20/tupla/studio.webp 1672w"
+        sizes="(max-width: 760px) 100vw, 720px"
+        alt="Mikko ja Laura Tupla tai kuitti -studiossa"
+        width={1672}
+        height={941}
+        fetchPriority="high"
+      />
+    </div>
     <PeliAloitus
-      otsikko={<>Tupla <span>tai kuitti</span></>}
+      otsikko={
+        // eslint-disable-next-line @next/next/no-img-element
+        <img className="tks-logo" src="/20/tupla/logo.webp" alt="Tupla tai kuitti" width={640} height={374} />
+      }
       lause="Valitse aihe, vastaa ja päätä joka kierroksella: tuplaatko vai otatko kuitin."
       valinta={
         <fieldset className="pk-valinta">
@@ -59,5 +78,6 @@ export default function TuplaAloitus({
         { otsikko: "Pelin tausta", sisalto: tausta },
       ]}
     />
+    </>
   );
 }

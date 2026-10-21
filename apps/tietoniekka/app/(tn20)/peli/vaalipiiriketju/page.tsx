@@ -40,7 +40,7 @@ export default async function VaalipiiriketjuSivu({ searchParams }: Props) {
     <>
       <JsonLd data={peliLd({ name: VPK_NIMI, url: VPK_SIVU, description: KUVAUS })} />
       {k ? (
-        <VpkClient k={k} hubHref={HUB} lahde={LAHDE} aloitaHeti={!!ketju || sp.aloita === "1"} />
+        <VpkClient k={k} hubHref={HUB} lahde={LAHDE} />
       ) : (
         <div className="vpk">
           <div className="vpk-virhe" role="alert">

@@ -18,7 +18,6 @@
 import { useEffect, useMemo, useRef, useState, type CSSProperties, type KeyboardEvent, type PointerEvent as RPointerEvent } from "react";
 import { getSupabase } from "@/lib/supabase";
 import Pelipalkki from "@/components/tn20/pelikehys/Pelipalkki";
-import PeliAloitus from "@/components/tn20/pelikehys/PeliAloitus";
 import { SeuraavaPeli } from "@/components/tn20/pelikehys/PeliTulos";
 import { runkoCond } from "@/components/tn20/runko/runkoFontti";
 import { seuraavatPelit } from "@/lib/pelimuodot";
@@ -38,7 +37,7 @@ import {
 } from "@/lib/vaalipiiriketju";
 import VaalipiiriKartta, { type VpkJakso, type VpkSolmu } from "@/components/tn20/vaalipiirit/VaalipiiriKartta";
 
-type Vaihe = "alku" | "peli" | "tulos";
+type Vaihe = "peli" | "tulos";
 type KorttiTila = "lepo" | "valittu" | "veto" | "ok" | "bad" | "lukittu";
 
 const TYHJA: Array<string | null> = Array(VPK_JARJESTETTAVIA).fill(null);
@@ -159,16 +158,14 @@ export default function VpkClient({
   k,
   hubHref,
   lahde,
-  aloitaHeti = false,
 }: {
-  /** K2-aloituksen ohitus: harjoitusketju (?ketju=) tai ?aloita=1. */
-  aloitaHeti?: boolean;
   k: VpkKierros;
   hubHref: string;
   lahde: string;
 }) {
   const [slots, setSlots] = useState<Array<string | null>>(TYHJA);
-  const [vaihe, setVaihe] = useState<Vaihe>(aloitaHeti ? "peli" : "alku");
+  /* Palautus 21.10.2026 (Heikki): peli alkaa suoraan laudalta kuten ennen pelikehystä — ei K2-aloitusnäkymää. */
+  const [vaihe, setVaihe] = useState<Vaihe>("peli");
   const [paljastettu, setPaljastettu] = useState(0);
   const [pelattu, setPelattu] = useState(false);
   const [paivanTulos, setPaivanTulos] = useState<VpkTallenne | null>(null);
@@ -360,6 +357,9 @@ export default function VpkClient({
       <h1 className="vpk-h1">
         {VPK_NIMI} <span>{harjoitus ? "Harjoitus" : `#${k.numero}`}</span>
       </h1>
+      <p className="vpk-lede">
+        Ketjun alku ja loppu ovat valmiina. Järjestä kuusi kansanedustajaa väliin niin, että jokaisen vaalipiiri rajautuu edellisen vaalipiiriin.
+      </p>
       <p className="vpk-ohje">
         <span className="vpk-vain-kapea">Napauta kortteja ketjun järjestyksessä. Napauta uudelleen poistaaksesi.</span>
         <span className="vpk-vain-levea">Raahaa kortti ketjuun tai klikkaa sitä. Klikkaus ketjussa palauttaa kortin pinoon. Näppäimistöllä Enter.</span>
@@ -373,44 +373,6 @@ export default function VpkClient({
       <Kortti e={e} muoto="rivi" tila="lukittu" num={num} vp={vpNimi(e.vp)} />
     </div>
   );
-
-  /* ── K2 aloitus (pelikehys, 20.10.2026): h1 → lause → päivän ketju → Aloita → ohjeet avattavina ── */
-  if (vaihe === "alku") {
-    return (
-      <div className={`vpk ${runkoCond.variable}`} data-iho="violetti">
-        <Pelipalkki iho="violetti" peli={VPK_NIMI} koti={{ href: hubHref, nimi: "Vaalit ja politiikka" }} />
-        <main>
-          <PeliAloitus
-            otsikko={<>{VPK_NIMI} <span>#{k.numero}</span></>}
-            pisinSana={VPK_NIMI.length}
-            lause="Järjestä kuusi kansanedustajaa ketjuksi niin, että jokaisen vaalipiiri rajautuu edellisen vaalipiiriin."
-            toiminto={
-              <button type="button" className="pk-nappi" onClick={() => { setVaihe("peli"); window.scrollTo({ top: 0 }); }}>
-                Aloita ketju
-              </button>
-            }
-            alarivi={<><b>Päivän ketju #{k.numero}</b> · {k.paivays} · sama kaikille tänään</>}
-            ohjeet={[
-              {
-                otsikko: "Näin pelaat",
-                sisalto: (
-                  <>
-                    <ol>
-                      <li><b>Ketjun päät ovat valmiina.</b> Ensimmäinen ja viimeinen kansanedustaja on lukittu paikoilleen, ja heidän vaalipiirinsä näkyy kartalla.</li>
-                      <li><b>Järjestä kuusi väliin.</b> Jokainen kortti on istuva kansanedustaja eri vaalipiiristä. Vaalipiiri paljastuu vasta tarkistuksessa. Ahvenanmaalta pääsee lautalla Varsinais-Suomeen.</li>
-                      <li><b>Mikä tahansa ehjä ketju kelpaa.</b> Kortti on oikein, jos sen vaalipiiri rajautuu edelliseen; viimeisen pitää rajautua myös ketjun loppuun.</li>
-                      <li><b>Näppäimistö:</b> Enter lisää kortin ketjuun tai palauttaa sen pinoon.</li>
-                    </ol>
-                    <p className="vpk-lahde">{lahde}</p>
-                  </>
-                ),
-              },
-            ]}
-          />
-        </main>
-      </div>
-    );
-  }
 
   return (
     <div className={`vpk ${runkoCond.variable}`} data-iho="violetti" ref={juuri}>
@@ -560,7 +522,15 @@ export default function VpkClient({
         )
       )}
 
-      <p className="vpk-lahde vpk-lahde--ala">{lahde}</p>
+      <section className="vpk-info" aria-labelledby="vpk-info-h">
+        <h2 id="vpk-info-h">Näin pelaat</h2>
+        <ol>
+          <li><b>Ketjun päät ovat valmiina.</b> Ensimmäinen ja viimeinen kansanedustaja on lukittu paikoilleen, ja heidän vaalipiirinsä näkyy kartalla.</li>
+          <li><b>Järjestä kuusi väliin.</b> Jokainen kortti on istuva kansanedustaja eri vaalipiiristä. Vaalipiiri paljastuu vasta tarkistuksessa. Ahvenanmaalta pääsee lautalla Varsinais-Suomeen.</li>
+          <li><b>Mikä tahansa ehjä ketju kelpaa.</b> Kortti on oikein, jos sen vaalipiiri rajautuu edelliseen; viimeisen pitää rajautua myös ketjun loppuun. Uusi päivän ketju joka päivä, ja harjoitusketjuja voi pelata niin monta kuin haluaa.</li>
+        </ol>
+        <p className="vpk-lahde">{lahde}</p>
+      </section>
     </div>
   );
 }

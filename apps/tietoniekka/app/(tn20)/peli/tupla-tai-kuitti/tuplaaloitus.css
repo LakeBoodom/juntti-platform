@@ -1,0 +1,12 @@
+/* TUPLA TAI KUITTI — aloituksen studiokuva ja logo (palautus 21.10.2026, Heikki: "yhtenäisyys = sama kehys, ei sama
+   minimalismi"). Kuva matalana (16:7), logo h1:nä kuvan alareunan päällä; aiheet ja Aloita mahtuvat 390 × 844:ään. */
+.tn20 .tks-kuva { position: relative; max-width: 720px; margin: 0 auto; overflow: hidden; }
+.tn20 .tks-kuva img { display: block; width: 100%; height: auto; aspect-ratio: 16 / 7; object-fit: cover; object-position: 50% 30%; }
+.tn20 .tks-kuva::after { content: ""; position: absolute; inset: auto 0 0; height: 45%; background: linear-gradient(180deg, transparent, var(--pk-bg, #131109)); pointer-events: none; }
+.tn20 .tks-kuva + .pk-aloitus { position: relative; z-index: 1; margin-top: -44px; padding-top: 0; }
+.tn20 .tks-kuva + .pk-aloitus .pk-h1 { line-height: 0; }
+.tn20 .tks-logo { display: block; width: min(250px, 64%); height: auto; filter: drop-shadow(0 6px 18px rgba(0, 0, 0, .55)); }
+@media (min-width: 760px) {
+  .tn20 .tks-kuva { margin-top: 20px; border-radius: 20px 20px 0 0; }
+  .tn20 .tks-logo { width: 280px; }
+}

@@ -451,3 +451,8 @@
 /* ── Kosketuskohteet (UI-laatu K2 14.10.2026): ≥ 44 px osuma-alue. Pienille tekstilinkeille pystytäyte +
    negatiivinen marginaali (asettelu ei muutu), napeille min-height, karttapisteille ::before-alue. ── */
 .tn20 .kl-logo { padding-block: 14.5px; margin-block: -14.5px; }
+
+/* Palautus 21.10.2026: peli alkaa laudalta. Kuntaliitoksen valikon vieressä päivän reitin tieto (ennen palkissa),
+   ja palkin tilana mittari + pisteet. */
+.tn20 .kl-valinta-reitti { font-size: 11px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; color: var(--kl-ruskea); }
+.tn20 .kl .pk-tila { gap: 8px; }

@@ -271,3 +271,12 @@
 /* ── Lähteet ── (Näin pelaat siirtyi aloituksen avattavaksi ohjeeksi, pelikehys K2 20.10.2026) */
 .tn20 .vpk-lahde { font-size: 12px; line-height: 1.5; color: var(--vpk-heikko); }
 .tn20 .vpk-virhe { display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 80px 16px; text-align: center; }
+
+/* Palautus 21.10.2026 (Heikki): peli alkaa laudalta — lede ja "Näin pelaat" takaisin (98209d6e). */
+.tn20 .vpk-lede { margin-top: 2px; font-size: 14px; line-height: 1.45; color: #cfc7b6; max-width: 60ch; text-wrap: pretty; }
+@media (min-width: 1080px) { .tn20 .vpk-lede { font-size: 17px; } }
+.tn20 .vpk-info { box-sizing: border-box; max-width: 1400px; margin: 0 auto; padding: 36px 16px 56px; display: flex; flex-direction: column; gap: 12px; }
+@media (min-width: 1080px) { .tn20 .vpk-info { padding: 24px clamp(20px, 2.6vw, 44px) 64px; } }
+.tn20 .vpk-info h2 { font-family: var(--vpk-display); font-weight: 900; font-variation-settings: "wdth" 76; font-size: 20px; text-transform: uppercase; }
+.tn20 .vpk-info ol { padding-left: 18px; display: flex; flex-direction: column; gap: 8px; max-width: 70ch; font-size: 14px; line-height: 1.5; color: #cfc7b6; }
+.tn20 .vpk-info b { color: var(--vpk-teksti); }

@@ -43,7 +43,6 @@ export default async function KuntaliitosSivu({ searchParams }: Props) {
     <>
       <JsonLd data={peliLd({ name: "Kuntaliitos", url: "/peli/kuntaliitos", description: "Järjestä kahdeksan kuntaa reitiksi niin, että jokaisella vierekkäisellä parilla on yhteinen raja. Uusi päivän reitti joka päivä." })} />
       <ReittipeliClient
-        aloitaHeti={sp.aloita === "1" || typeof sp.reitti === "string"}
         peli="kuntaliitos"
         reitti={arvoReitti(siemen, maakunta?.nimi ?? null)}
         maakunnat={KL_MAAKUNNAT}

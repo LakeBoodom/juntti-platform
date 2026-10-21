@@ -87,3 +87,11 @@ visat tulevat osioihin `quizzes.section_tags`-tagista. Ei sivukohtaista komponen
 - **Siirto rungolle** (vaihe 3) · osiotagit migraatiolla nykyisistä käsilistoista, visamäärä tarkistetaan
   ennen/jälkeen; entiset "Tietoniekka suosittelee" -nostot osioiden `featured`-B-korteiksi; vanhat
   `?suodata=`-linkit ohjataan middlewaressa `#osio-<slug>`-ankkuriin.
+
+## Yhtenäisyys ja kuvitus (Heikki 21.10.2026)
+
+**Yhtenäisyys = sama kehys, ei sama minimalismi.** Pelikehys (K1 palkki ja paluu, K4 tulosjärjestys) on yhteinen,
+mutta pelin oma selittävä visuaalisuus säilyy: studiokuvat, logot, kasvoketjut, kartat, kuvitukset ja kategoriaruudukot.
+**Kuvitusta ei poisteta ilman Heikin hyväksyntää** — yhtenäistämisen nimissä poistettu kuvitus on regressio.
+Lautapelit (Kuntaliitos, Rajanaapurit, Vaalipiiriketju) alkavat suoraan laudalta (ketju, kartta, tilanne); K2-aloitus
+koskee vain pelejä, joissa valitaan ennen pelaamista (Tupla tai kuitti, Ikäjärjestys, Laita järjestykseen, Megavisat).
