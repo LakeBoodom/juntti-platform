@@ -32,6 +32,7 @@ import { lueViikkoTulos, tallennaViikkoTulos, type ViikkoInfo, type ViikkoTulos 
 import type { KollaasiKuva } from "../../../lib/kuvavisat2026";
 import { igAvaus, igValmis } from "../../../lib/igMittaus";
 import "../peli2026.css";
+import { lyhennettyNimi } from "@/lib/korttinimi";
 import Pelipalkki from "@/components/tn20/pelikehys/Pelipalkki";
 import PeliKehys from "@/components/tn20/pelikehys/PeliKehys";
 import PeliAloitus from "@/components/tn20/pelikehys/PeliAloitus";
@@ -139,6 +140,14 @@ export type GameQuiz = {
 };
 
 /** "Visassa mukana": oikeat <a href> -linkit henkilösivuille (SSR-renderöity aloitusnäkymä). */
+/** Haastevertailun lause (vaihe A): "Yksi oikein enemmän", "Kaksi oikein vähemmän", "Sama määrä oikeita". */
+const LUVUT = ["", "Yksi", "Kaksi", "Kolme", "Neljä", "Viisi", "Kuusi", "Seitsemän", "Kahdeksan", "Yhdeksän", "Kymmenen"];
+function erotusLause(ero: number): string {
+  if (ero === 0) return "Sama määrä oikeita";
+  const n = Math.abs(ero);
+  return `${LUVUT[n] ?? n} oikein ${ero > 0 ? "enemmän" : "vähemmän"}`;
+}
+
 function VisassaMukana({ hlot }: { hlot?: GameQuiz["mukana"] }) {
   if (!hlot?.length) return null;
   return (
@@ -884,11 +893,16 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
      "Voitatko kaverisi?". Canonical pysyy /visa/<slug>:nä. */
   const tulosParam = quiz.challengePath.startsWith("/visa/") && total > 0 ? `?tulos=${right}-${total}` : "";
   const challengeUrl = haasteKoodi ? `${origin}/h/${haasteKoodi}` : `${origin}${quiz.challengePath}${tulosParam}`;
-  const shareText = quiz.jakoNimi
+  /* Vaihe A (21.10.2026): haastettu lähettää vastahaasteen — "{visa} – sain n/10 Tietoniekassa, sinä m/10. Vastahaaste:
+     pystytkö parempaan?" (ei emojeita). */
+  const vastahaaste = quiz.haaste && done
+    ? `${quiz.jakoNimi ?? lyhennettyNimi(quiz.title)} – sain ${right}/${total} Tietoniekassa, sinä ${quiz.haaste.oikein}/${quiz.haaste.kysymyksia}. Vastahaaste: pystytkö parempaan?`
+    : null;
+  const shareText = vastahaaste ?? (quiz.jakoNimi
     ? `${quiz.jakoNimi} ${right}/${total} Tietoniekassa. Pystytkö parempaan?`
     /* Heikki 3.10.2026: visan nimessä on usein ajatusviiva ("Kimi Räikkönen – F1:n Jäämies"),
        joten "… -visassa"-taivutus kuulosti kömpelöltä → nimi lauseen loppuun. */
-    : `Sain ${right}/${total} Tietoniekan visassa ${quiz.title}. Pystytkö parempaan?`;
+    : `Sain ${right}/${total} Tietoniekan visassa ${quiz.title}. Pystytkö parempaan?`);
   const linkReady = !!quiz.challengePath;
   function clearCopyLater() { if (copyTimer.current) clearTimeout(copyTimer.current); copyTimer.current = setTimeout(() => setCopyState(null), 3000); }
   function copyLink() {
@@ -1289,7 +1303,14 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
                     <span className="tng-herocat"><i aria-hidden />{hero.roleLabel ? `${category} · ${hero.roleLabel}` : quiz.genreLabel && quiz.genreLabel.toLowerCase() !== category.toLowerCase() ? `${category} · ${quiz.genreLabel}` : category}</span>
                   )}
                   <h1 ref={startH1Ref} className="tng-heroh1" data-len={heroLen} data-lwb={heroLw >= 18 ? "xl" : heroLw >= 14 ? "l" : undefined} style={{ ["--tng-lw" as string]: heroLw }}>{quiz.title}</h1>
-                  {quiz.teaser && <p className="tng-herop">{quiz.teaser}</p>}
+                  {/* Vaihe A (21.10.2026): haastebanneri myös herollisessa aloituksessa (/visa/<slug>?tulos=). */}
+                  {quiz.haaste ? (
+                    <p className="tng-start-chal tng-start-chal--hero">
+                      <b>Kaverisi sai {quiz.haaste.oikein}/{quiz.haaste.kysymyksia}</b> – pystytkö parempaan?
+                    </p>
+                  ) : (
+                    quiz.teaser && <p className="tng-herop">{quiz.teaser}</p>
+                  )}
                   <div className="tng-herorow">
                     <button type="button" className="tng-herobtn tn-cta-lime" onClick={startGame}>Aloita visa <span aria-hidden>→</span></button>
                     <span className="tng-herometa">{countLabel}</span>
@@ -1413,8 +1434,8 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
                   voitettavaa — se on koko linkin syy. */}
               {quiz.haaste && (
                 <p className="tng-start-chal">
-                  <b>Kaverisi sai {quiz.haaste.oikein}/{quiz.haaste.kysymyksia}</b> — pystytkö parempaan?
-                  <span>Samat kuvat samassa järjestyksessä.</span>
+                  <b>Kaverisi sai {quiz.haaste.oikein}/{quiz.haaste.kysymyksia}</b> – pystytkö parempaan?
+                  {isKuva && <span>Samat kuvat samassa järjestyksessä.</span>}
                 </p>
               )}
               {quiz.teaser && <p className="tng-start-p">{quiz.teaser}</p>}
@@ -1665,13 +1686,11 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
                         <span className="tng-vs-l">Kaverisi</span>
                         <span className="tng-vs-v">{quiz.haaste.oikein}/{quiz.haaste.kysymyksia}</span>
                       </div>
-                      <p className="tng-vs-t">
-                        {right > quiz.haaste.oikein
-                          ? "Voitit haasteen."
-                          : right < quiz.haaste.oikein
-                            ? "Kaverisi vei tämän erän."
-                            : "Tasapeli."}
+                      {/* Vaihe A (arkki 3c): tuomio + yksi lause. */}
+                      <p className="tng-vs-tuomio">
+                        {right > quiz.haaste.oikein ? "Voitit kaverisi" : right < quiz.haaste.oikein ? "Kaverisi voitti" : "Tasapeli"}
                       </p>
+                      <p className="tng-vs-t">{erotusLause(right - quiz.haaste.oikein)} · {score} pistettä</p>
                     </div>
                   )}
                 </div>
@@ -1681,7 +1700,7 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
 
               <section className="tng-resright" aria-label="Haasta kaveri ja jaa haaste">
                 <div className="tng-chal">
-                  <h2 className="tng-chaltitle">Haasta kaveri — kumpi tietää enemmän?</h2>
+                  <h2 className="tng-chaltitle">{quiz.haaste ? "Lähetä vastahaaste" : "Haasta kaveri — kumpi tietää enemmän?"}</h2>
                   <ul className="tng-chalbullets">
                     <li><i aria-hidden />Kaveri saa täsmälleen saman kysymyssarjan.</li>
                     <li><i aria-hidden />Tuloksesi {right}/{total} on hänen vertailukohtansa.</li>
@@ -1693,7 +1712,7 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
                   </div>
                   <a className="tng-wa" href={waHref} target="_blank" rel="noopener" data-blocked={linkReady ? undefined : "true"} aria-disabled={!linkReady || undefined} tabIndex={shareTab} onClick={() => void markShared()}>
                     <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2 22l5.25-1.38a9.9 9.9 0 004.79 1.22c5.46 0 9.9-4.45 9.9-9.91C21.94 6.45 17.5 2 12.04 2zm5.8 14.16c-.24.68-1.4 1.3-1.93 1.35-.53.05-1.03.24-3.47-.72-2.94-1.16-4.78-4.2-4.92-4.4-.14-.2-1.16-1.55-1.16-2.96 0-1.4.73-2.09 1-2.38.26-.29.57-.36.76-.36h.56c.18.01.42-.07.65.5.24.58.82 2 .89 2.15.07.14.12.31.02.5-.1.2-.15.32-.29.5-.15.17-.31.39-.44.52-.15.14-.3.3-.13.59.17.29.75 1.23 1.6 2 1.1.97 2.03 1.28 2.32 1.42.29.15.46.12.63-.07.17-.2.73-.85.93-1.14.2-.29.39-.24.66-.15.27.1 1.7.8 1.99.95.29.14.48.22.55.34.07.12.07.71-.17 1.39z" /></svg>
-                    Haasta WhatsAppissa
+                    {quiz.haaste ? "Vastahaaste WhatsAppissa" : "Haasta WhatsAppissa"}
                   </a>
                   <div className="tng-sharepreview">
                     <span className="tng-sharepreview-l">Kaverille lähtee</span>

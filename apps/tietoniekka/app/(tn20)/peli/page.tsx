@@ -793,6 +793,15 @@ export default async function Peli20({
 
   if (game.questions.length === 0) notFound();
 
+  /* Haastetun polku (Tulosnäkymä ja jakaminen, vaihe A, 21.10.2026): /visa/<slug>?tulos=7-10 (middleware → ?tulos=)
+     tuo kaverin tuloksen aloitukseen ja tulosvertailuun. Virheellinen arvo (puuttuu, ei numero, n > total) →
+     tavallinen näkymä. */
+  const tulosHaaste = typeof params.tulos === "string" ? params.tulos.match(/^(\d{1,3})-(\d{1,3})$/) : null;
+  if (tulosHaaste) {
+    const oikein = Number(tulosHaaste[1]), kysymyksia = Number(tulosHaaste[2]);
+    if (kysymyksia > 0 && oikein <= kysymyksia) game.haaste = { oikein, kysymyksia, pisteet: 0 };
+  }
+
   const collectionLabel = resolved.label;
   const hubHref = resolved.hub;
 

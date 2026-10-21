@@ -1029,7 +1029,7 @@
    Värit ovat samat kuin palautteessa (lime oikein, punainen väärin, gold
    tasapeli) — ei uusia tokeneita. */
 .tn20 .tng-start-chal {
-  margin: 0; display: flex; flex-direction: column; gap: 4px;
+  margin: 0; display: block;
   padding: clamp(13px, 1.4cqw, 20px) clamp(15px, 1.6cqw, 22px);
   border-radius: 14px; border: 1px solid rgba(182, 255, 60, 0.4);
   background: rgba(182, 255, 60, 0.08);
@@ -1037,7 +1037,9 @@
   text-wrap: pretty;
 }
 .tn20 .tng-start-chal b { color: #cbff75; font-weight: 800; }
-.tn20 .tng-start-chal span { font-size: clamp(12px, 1.05cqw, 14px); font-weight: 600; color: #a79e8c; }
+/* Herollisessa aloituksessa banneri on ingressin paikalla (vaihe A). */
+.tn20 .tng-start-chal--hero { margin: 0; }
+.tn20 .tng-start-chal span { display: block; margin-top: 4px; font-size: clamp(12px, 1.05cqw, 14px); font-weight: 600; color: #a79e8c; }
 
 .tn20 .tng-vs {
   display: flex; flex-direction: column; gap: 7px;
@@ -1048,12 +1050,14 @@
 .tn20 .tng-vs-row { display: flex; align-items: baseline; gap: 12px; }
 .tn20 .tng-vs-l { flex: 1 1 auto; font-size: clamp(12px, 1.1cqw, 15px); font-weight: 700; color: #cbc1ad; }
 .tn20 .tng-vs-v { flex: 0 0 auto; font-family: var(--tn-font-display); font-weight: 900; font-size: clamp(18px, 1.7cqw, 24px); line-height: 1; color: #fffbf2; }
-.tn20 .tng-vs-t { margin: 3px 0 0; font-family: var(--tn-font-display); font-weight: 900; font-size: clamp(15px, 1.4cqw, 20px); line-height: 1.1; text-transform: uppercase; letter-spacing: -0.01em; }
+/* Vaihe A (21.10.2026, arkki 3c): tuomio isona ja värillisenä, alle yksi lause tavallisena tekstinä. */
+.tn20 .tng-vs-tuomio { margin: 6px 0 0; font-family: var(--tn-font-display); font-weight: 900; font-size: clamp(20px, 1.9cqw, 26px); line-height: 1.05; text-transform: uppercase; letter-spacing: -0.01em; }
+.tn20 .tng-vs-t { margin: 4px 0 0; font-size: 14px; font-weight: 600; line-height: 1.4; color: #cbc1ad; }
 .tn20 .tng-vs[data-vs="voitto"] { border-color: rgba(182, 255, 60, 0.42); }
-.tn20 .tng-vs[data-vs="voitto"] .tng-vs-t { color: #cbff75; }
+.tn20 .tng-vs[data-vs="voitto"] .tng-vs-tuomio { color: #cbff75; }
 .tn20 .tng-vs[data-vs="havio"] { border-color: rgba(255, 107, 74, 0.42); }
-.tn20 .tng-vs[data-vs="havio"] .tng-vs-t { color: #ffa88f; }
-.tn20 .tng-vs[data-vs="tasan"] .tng-vs-t { color: #f7ce7e; }
+.tn20 .tng-vs[data-vs="havio"] .tng-vs-tuomio { color: #ffa88f; }
+.tn20 .tng-vs[data-vs="tasan"] .tng-vs-tuomio { color: #f7ce7e; }
 /* P2: jakoruudukko on nyt yksi nappi — ei kolmen sarakkeen jäänne. */
 .tn20 .tng-sharegrid[data-cols="1"] { grid-template-columns: minmax(0, 1fr); }
 
