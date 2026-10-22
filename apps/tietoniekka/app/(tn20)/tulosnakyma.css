@@ -1,0 +1,133 @@
+/* TULOSNÄKYMÄ (Tulosnäkymä ja jakaminen, vaihe B, 22.10.2026; CD-arkki v0.3, 3a–3c). Komponentti:
+   components/tn20/tulos/TulosNakyma.tsx. Väri tulee visasta (--tnAcc, GameClientin accentVars).
+   Mitoitus: 390 × 844 → tulos ja WhatsApp-painike ilman vieritystä; 1440 × 900 → tulos, jako ja seuraava visa. */
+
+.tn20 .tn-tulos {
+  --tt-ink: #f5f0e6; --tt-soft: #cfc7b6; --tt-muted: #a79e8c; --tt-line: #2c2517; --tt-card: #1f1b14;
+  --tt-acc: var(--tnAcc, #2dd4bf);
+  box-sizing: border-box; width: 100%; max-width: 1296px; margin: 0 auto;
+  padding: 18px 16px 40px; display: flex; flex-direction: column; gap: 16px; color: var(--tt-ink);
+}
+.tn20 .tn-tulos-vasen { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+.tn20 .tn-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+
+/* ── Tulos ── */
+.tn20 .tn-tulos-tulos { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.tn20 .tn-tulos-eyebrow { font-family: var(--rk-cond, "Barlow Condensed"), "Barlow Condensed", sans-serif; font-weight: 700; font-size: 13px; letter-spacing: .18em; text-transform: uppercase; color: var(--tt-acc); }
+.tn20 .tn-tulos-rivi { display: flex; align-items: center; gap: 14px; min-width: 0; }
+.tn20 .tn-tulos-luku { flex: none; font-family: var(--rk-cond, "Barlow Condensed"), "Barlow Condensed", sans-serif; font-weight: 800; font-size: 76px; line-height: .86; letter-spacing: -.02em; }
+.tn20 .tn-tulos-luku b { font-weight: 800; color: var(--tt-ink); }
+.tn20 .tn-tulos-luku i { font-style: normal; color: var(--tt-acc); }
+.tn20 .tn-tulos-luku--pieni { font-size: 40px; color: var(--tt-muted); }
+.tn20 .tn-tulos-taso { display: flex; flex-direction: column; gap: 2px; min-width: 0; flex: 1 1 auto; }
+.tn20 .tn-tulos-tasonimi {
+  margin: 0; font-family: var(--rk-cond, "Barlow Condensed"), "Barlow Condensed", sans-serif; font-weight: 800; font-size: 24px; line-height: 1.02;
+  text-transform: uppercase; overflow-wrap: normal; word-break: normal; hyphens: manual;
+}
+.tn20 .tn-tulos-pisteet { font-size: 13px; font-weight: 600; color: var(--tt-muted); white-space: nowrap; }
+.tn20 .tn-tulos-lause { margin: 0; max-width: 56ch; font-size: 15px; line-height: 1.5; color: var(--tt-soft); text-wrap: pretty; }
+.tn20 .tn-tulos-lisa { align-self: flex-start; display: inline-flex; align-items: center; gap: 6px; min-height: 44px; font-size: 14px; font-weight: 700; color: var(--tt-acc); text-decoration: none; }
+.tn20 .tn-tulos-pikku { margin: 0; font-size: 12px; font-weight: 800; letter-spacing: .16em; text-transform: uppercase; color: var(--tt-muted); }
+
+/* Haastettu (3c): SINÄ iso, KAVERISI pienempi vieressä, tuomio ja lause. */
+.tn20 .tn-tulos-vs { display: flex; align-items: flex-end; gap: 20px; }
+.tn20 .tn-tulos-vs > div { display: flex; flex-direction: column; gap: 4px; }
+.tn20 .tn-tulos-kaveri { padding-bottom: 6px; }
+.tn20 .tn-tulos-tuomio { margin: 4px 0 0; font-family: var(--rk-cond, "Barlow Condensed"), "Barlow Condensed", sans-serif; font-weight: 800; font-size: 28px; line-height: 1; text-transform: uppercase; color: #e8a320; }
+.tn20 .tn-tulos-tuomio[data-tuomio="havio"] { color: #ffa88f; }
+.tn20 .tn-tulos-tuomio[data-tuomio="tasan"] { color: #f7ce7e; }
+
+/* ── Vastauksesi (oma laatikko, yksi painike) ── */
+.tn20 .tn-tulos-vastaukset {
+  display: flex; flex-direction: column; gap: 10px; width: 100%; min-height: 44px; padding: 12px 14px; box-sizing: border-box;
+  border: 1px solid var(--tt-line); border-radius: 14px; background: #17140d; color: inherit; font: inherit; text-align: left; cursor: pointer;
+}
+.tn20 .tn-tulos-vastaukset:hover { border-color: #3a3120; }
+.tn20 .tn-tulos-vastaukset:focus-visible { outline: 2px solid var(--tn-lime, #b6ff3c); outline-offset: 2px; }
+.tn20 .tn-tulos-vastaukset-yla { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.tn20 .tn-tulos-nayta { font-size: 14px; font-weight: 700; color: var(--tt-ink); }
+.tn20 .tn-tulos-ruudut { display: flex; flex-wrap: wrap; gap: 4px; }
+.tn20 .tn-tulos-ruutu {
+  flex: 1 1 0; min-width: 22px; max-width: 34px; aspect-ratio: 1; display: grid; place-items: center; border-radius: 6px;
+  font-size: 13px; font-weight: 900; line-height: 1;
+}
+.tn20 .tn-tulos-ruutu[data-tila="ok"] { background: #4ade80; color: #0b2414; }
+.tn20 .tn-tulos-ruutu[data-tila="bad"] { background: #f87171; color: #2a0b0b; }
+.tn20 .tn-tulos-ruutu[data-tila="ohi"] { background: #3a3120; color: var(--tt-soft); }
+
+/* ── Jakoalue ── */
+.tn20 .tn-tulos-jako { display: flex; flex-direction: column; gap: 12px; padding: 18px 16px; border: 1px solid var(--tt-line); border-radius: 18px; background: var(--tt-card); min-width: 0; }
+.tn20 .tn-tulos-jako-h { margin: 0; font-family: var(--rk-cond, "Barlow Condensed"), "Barlow Condensed", sans-serif; font-weight: 800; font-size: 26px; line-height: 1; text-transform: uppercase; overflow-wrap: normal; word-break: normal; }
+.tn20 .tn-tulos-jako-p { margin: -4px 0 0; font-size: 14px; line-height: 1.45; color: var(--tt-soft); }
+/* WhatsAppin vihreä #25D366; tumma teksti #0B1F12 → kontrasti ≈ 9,6:1 (valkoinen olisi 1,98:1). */
+.tn20 .tn-tulos-wa {
+  display: inline-flex; align-items: center; justify-content: center; gap: 10px; min-height: 56px; padding: 0 18px; border-radius: 999px;
+  background: #25d366; color: #0b1f12; text-decoration: none;
+  font-family: var(--rk-cond, "Barlow Condensed"), "Barlow Condensed", sans-serif; font-weight: 800; font-size: 20px; letter-spacing: .02em; text-transform: uppercase;
+}
+.tn20 .tn-tulos-wa:hover { filter: brightness(1.05); color: #0b1f12; }
+.tn20 .tn-tulos-wa:focus-visible { outline: 2px solid var(--tn-lime, #b6ff3c); outline-offset: 3px; }
+.tn20 .tn-tulos-wa[aria-disabled] { opacity: .5; pointer-events: none; }
+.tn20 .tn-tulos-kanavat { display: flex; gap: 8px; }
+.tn20 .tn-tulos-kanava {
+  flex: 1 1 0; display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 48px; padding: 0 14px; box-sizing: border-box;
+  border: 1px solid #3a3120; border-radius: 999px; background: transparent; color: var(--tt-ink); font: inherit; font-size: 15px; font-weight: 700; text-decoration: none; cursor: pointer; white-space: nowrap;
+}
+.tn20 .tn-tulos-kanava:hover { border-color: #8e8676; color: var(--tt-ink); }
+.tn20 .tn-tulos-kanava:focus-visible { outline: 2px solid var(--tn-lime, #b6ff3c); outline-offset: 2px; }
+.tn20 .tn-tulos-kanava:disabled { opacity: .5; cursor: default; }
+.tn20 .tn-tulos-kanava--ikoni { flex: none; width: 48px; padding: 0; }
+.tn20 .tn-tulos-esikatselu summary { display: flex; align-items: center; min-height: 44px; font-size: 13px; font-weight: 700; color: var(--tt-muted); cursor: pointer; list-style: none; }
+.tn20 .tn-tulos-esikatselu summary::-webkit-details-marker { display: none; }
+.tn20 .tn-tulos-esikatselu summary:focus-visible { outline: 2px solid var(--tn-lime, #b6ff3c); outline-offset: 2px; }
+.tn20 .tn-tulos-esikatselu-t { margin: 4px 0 0; padding: 12px 14px 0; border: 1px dashed #3a3120; border-bottom: 0; border-radius: 12px 12px 0 0; font-size: 14px; line-height: 1.5; color: var(--tt-soft); }
+.tn20 .tn-tulos-esikatselu-u { margin: 0; padding: 4px 14px 12px; border: 1px dashed #3a3120; border-top: 0; border-radius: 0 0 12px 12px; font-size: 12px; color: var(--tt-acc); overflow-wrap: anywhere; }
+
+/* ── Seuraava visa ── */
+.tn20 .tn-tulos-seuraava { display: flex; flex-direction: column; gap: 10px; }
+.tn20 .tn-tulos-kortit { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.tn20 .tn-tulos-kortti { display: flex; flex-direction: column; min-width: 0; overflow: hidden; border: 1px solid var(--tt-line); border-radius: 14px; background: var(--tt-card); color: var(--tt-ink); text-decoration: none; container-type: inline-size; }
+.tn20 .tn-tulos-kortti:hover { border-color: #3a3120; }
+.tn20 .tn-tulos-kortti:focus-visible { outline: 2px solid var(--tn-lime, #b6ff3c); outline-offset: 2px; }
+.tn20 .tn-tulos-kortti-kuva { position: relative; aspect-ratio: 16 / 10; background: repeating-linear-gradient(135deg, color-mix(in srgb, var(--tt-acc) 16%, transparent) 0 10px, color-mix(in srgb, var(--tt-acc) 6%, transparent) 10px 20px), #1a170f; }
+.tn20 .tn-tulos-kortti-kuva img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
+.tn20 .tn-tulos-kortti-teksti { display: flex; flex-direction: column; gap: 4px; padding: 10px 12px 12px; }
+.tn20 .tn-tulos-kortti-nimi { font-family: var(--rk-cond, "Barlow Condensed"), "Barlow Condensed", sans-serif; font-weight: 800; font-size: min(18px, 11cqi); line-height: 1.05; text-transform: uppercase; overflow-wrap: normal; word-break: normal; hyphens: manual; }
+.tn20 .tn-tulos-kortti-ala { font-size: 12px; line-height: 1.35; color: var(--tt-muted); }
+.tn20 .tn-tulos-kortti-cta { margin-top: 2px; font-size: 13px; font-weight: 700; color: var(--tt-acc); }
+
+/* ── Toissijaiset linkit ── */
+.tn20 .tn-tulos-linkit { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 22px; }
+.tn20 .tn-tulos-linkit a, .tn20 .tn-tulos-linkit button { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; padding: 0; border: 0; background: none; font: inherit; font-size: 15px; font-weight: 700; color: var(--tt-ink); text-decoration: none; cursor: pointer; }
+.tn20 .tn-tulos-linkit :is(a, button):focus-visible { outline: 2px solid var(--tn-lime, #b6ff3c); outline-offset: 2px; }
+
+/* Mobiili: jako heti vastausten jälkeen (WhatsApp ensimmäiseen ruutuun), seuraava visa ja linkit sen alle. */
+@media (max-width: 1023px) {
+  .tn20 .tn-tulos-vasen { display: contents; }
+  .tn20 .tn-tulos-tulos { order: 1; }
+  .tn20 .tn-tulos-vastaukset { order: 2; }
+  .tn20 .tn-tulos-jako { order: 3; }
+  .tn20 .tn-tulos-seuraava { order: 4; }
+  .tn20 .tn-tulos-linkit { order: 5; }
+}
+@media (max-width: 359px) {
+  .tn20 .tn-tulos-luku { font-size: 64px; }
+  .tn20 .tn-tulos-tasonimi { font-size: 21px; }
+  .tn20 .tn-tulos-wa { font-size: 18px; }
+}
+
+/* Desktop (3b): vasen palsta tulos + vastaukset + seuraava visa, oikealla jako. */
+@media (min-width: 1024px) {
+  .tn20 .tn-tulos { display: grid; grid-template-columns: minmax(0, 1fr) minmax(360px, 480px); gap: 40px; align-items: start; padding: 28px clamp(20px, 3vw, 72px) 56px; }
+  .tn20 .tn-tulos-luku { font-size: 112px; }
+  .tn20 .tn-tulos-luku--pieni { font-size: 56px; }
+  .tn20 .tn-tulos-tasonimi { font-size: 34px; }
+  .tn20 .tn-tulos-tuomio { font-size: 34px; }
+  .tn20 .tn-tulos-lause { font-size: 16px; }
+  .tn20 .tn-tulos-ruutu { max-width: 34px; }
+  .tn20 .tn-tulos-jako { position: sticky; top: 20px; padding: 24px 24px 18px; }
+  .tn20 .tn-tulos-jako-h { font-size: 30px; }
+  .tn20 .tn-tulos-kortit { gap: 14px; }
+  .tn20 .tn-tulos-kortti-kuva { aspect-ratio: 16 / 9; }
+}
+@media (prefers-reduced-motion: reduce) { .tn20 .tn-tulos-wa { transition: none; } }

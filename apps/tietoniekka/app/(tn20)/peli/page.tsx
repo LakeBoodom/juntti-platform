@@ -21,6 +21,7 @@ import { maantietoImg } from "@/lib/maantieto";
 import { KAUPUNGIT } from "@/lib/kaupungit";
 import { resolveCollection, COLLECTION_LABEL } from "@/lib/visanKokoelma";
 import { type Learn } from "@/lib/learn";
+import { visanKorttikuva } from "@/lib/kokoelmat/visanKorttikuva";
 import { megaDuration, megaMaarat, maaraTekstiin } from "@/lib/megavisat";
 import { seuraavatPelit } from "@/lib/pelimuodot";
 import GameClient, { type GameQuiz } from "./GameClient";
@@ -788,6 +789,8 @@ export default async function Peli20({
       meta: `${r.question_count} kysymystä`,
       href: relHref(r),
       ika: r.target_age ?? null,
+      ...visanKorttikuva(r),
+      kokoelma: COLLECTION_LABEL[r.collection ?? ""] ?? undefined,
     })),
   };
 

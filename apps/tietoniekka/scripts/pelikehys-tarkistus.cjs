@@ -8,6 +8,7 @@
 // Käyttö (playwright erillisessä kansiossa, ks. korttisaanto-webkit.cjs):
 //   NODE_PATH=/tmp/wk/node_modules node apps/tietoniekka/scripts/pelikehys-tarkistus.cjs <perus-URL> [webkit|chromium]
 // Chromium ajetaan koneen Chromella (CHROME_PATH tai macOS-oletuspolku).
+// Megan läpipeluu kirjoittaa quiz_plays-rivin session_id:llä "testi-claude-pelikehys" → poista testin jälkeen.
 const pw = require("playwright");
 const BASE = process.argv[2];
 const MOOTTORI = process.argv[3] || "webkit";
@@ -104,6 +105,8 @@ const TEKSTI = ".pk-h1,.pk-lause,.pk-peli,.pk-tila,.pk-paluu,.pk-nappi,.pk-vaiht
   // Megavisan K4-tulos: pelataan lyhin mega läpi (ensimmäinen vastaus joka kerta) ja mitataan tulos + läpikäynti.
   for (const w of LEVEYDET) {
     const ctx = await b.newContext({ viewport: { width: w, height: 844 }, deviceScaleFactor: 2, isMobile: MOOTTORI === "webkit", hasTouch: true });
+    // Testipelaus kirjautuu quiz_plays-tauluun: tunniste, jolla rivit löytyvät ja poistetaan (Heikki 22.10.2026).
+    await ctx.addInitScript(() => { try { localStorage.setItem("tn_session_id", "testi-claude-pelikehys"); } catch {} });
     const p = await ctx.newPage();
     p.on("dialog", (d) => d.accept());
     await p.goto(`${BASE}/peli?mega=maailman-kolkat-mega&aloita=1`, { waitUntil: "load", timeout: 60000 });

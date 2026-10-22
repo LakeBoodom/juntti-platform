@@ -33,6 +33,7 @@ import type { KollaasiKuva } from "../../../lib/kuvavisat2026";
 import { igAvaus, igValmis } from "../../../lib/igMittaus";
 import "../peli2026.css";
 import { lyhennettyNimi } from "@/lib/korttinimi";
+import TulosNakyma from "@/components/tn20/tulos/TulosNakyma";
 import Pelipalkki from "@/components/tn20/pelikehys/Pelipalkki";
 import PeliKehys from "@/components/tn20/pelikehys/PeliKehys";
 import PeliAloitus from "@/components/tn20/pelikehys/PeliAloitus";
@@ -59,7 +60,11 @@ export type GameQuestion = {
   plate?: "vaalea" | "tumma";
 };
 
-export type GameRelated = { id: string; title: string; meta: string; href?: string; /** Lasten visan ikäryhmä → ikämerkki */ ika?: string | null };
+export type GameRelated = {
+  id: string; title: string; meta: string; href?: string; /** Lasten visan ikäryhmä → ikämerkki */ ika?: string | null;
+  /** Tulosnäkymän "Seuraava visa" -kortti (vaihe B): kuva, kohdepiste ja kokoelman nimi. */
+  kuva?: string | null; kuvaPos?: string; kokoelma?: string;
+};
 
 export type GameQuiz = {
   id: string;
@@ -360,7 +365,6 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
   const [zoom, setZoom] = useState(false);
   const [imgs, setImgs] = useState<Record<string, "loading" | "ready" | "error">>({});
   const [bust, setBust] = useState<Record<number, number>>({});
-  const [shownScore, setShownScore] = useState(0);
   const [copyState, setCopyState] = useState<"copied" | "error" | "sharefail" | null>(null);
   /* «Tiesitkö?» -selitys: leikataan vain jos se ei mahdu (CD kierros 5, arvo 4) */
   const [tipClamped, setTipClamped] = useState(false);
@@ -393,7 +397,6 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
   const tipRef = useRef<HTMLSpanElement>(null);
   const recorded = useRef(false);
   const playIdRef = useRef<string | null>(null);
-  const rafRef = useRef<number | null>(null);
   const copyTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const done = phase === "end";
@@ -643,20 +646,6 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
     im.src = nxt.image;
   }, [questions]);
 
-  function countUp(target: number) {
-    if (rafRef.current) cancelAnimationFrame(rafRef.current);
-    const reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (reduce) { setShownScore(target); return; }
-    const t0 = performance.now(), dur = 700;
-    const tick = (t: number) => {
-      const p = Math.min(1, (t - t0) / dur);
-      const e = 1 - Math.pow(1 - p, 3);
-      setShownScore(Math.round(target * e));
-      if (p < 1) rafRef.current = requestAnimationFrame(tick);
-    };
-    rafRef.current = requestAnimationFrame(tick);
-  }
-
   async function recordPlay(finalScore: number) {
     if (recorded.current || !quiz.id) return; // kuvavisat: ei quizzes-riviä → ei tallennusta
     recorded.current = true;
@@ -754,7 +743,6 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
     updateDailyStreak();
     if (quiz.isSankari) { try { window.localStorage.setItem(PAIVAN_VISA_KEY, localDateKey()); } catch { /* no-op */ } }
     if (quiz.citySlug) stampCity(quiz.citySlug);
-    countUp(finalScore);
   }
 
   function lock(i: number) {
@@ -829,7 +817,7 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
       }
     }
     setPhase("play"); setQi(0); setSel(null); setLocked(false); setScore(0); setStreak(0); setRight(0);
-    setHist([]); setPicks([]); setRemoved([]); setLifeLeft(oljenkorsiTotal); setReview(null); setShownScore(0); setCopyState(null);
+    setHist([]); setPicks([]); setRemoved([]); setLifeLeft(oljenkorsiTotal); setReview(null); setCopyState(null);
     recorded.current = false; playIdRef.current = null;
     try { window.scrollTo(0, 0); } catch { /* no-op */ }
   }
@@ -896,7 +884,7 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
   /* Vaihe A (21.10.2026): haastettu lähettää vastahaasteen — "{visa} – sain n/10 Tietoniekassa, sinä m/10. Vastahaaste:
      pystytkö parempaan?" (ei emojeita). */
   const vastahaaste = quiz.haaste && done
-    ? `${quiz.jakoNimi ?? lyhennettyNimi(quiz.title)} – sain ${right}/${total} Tietoniekassa, sinä ${quiz.haaste.oikein}/${quiz.haaste.kysymyksia}. Vastahaaste: pystytkö parempaan?`
+    ? `${quiz.jakoNimi ?? lyhennettyNimi(quiz.title)} – sain ${right}/${total} Tietoniekassa, sinä ${quiz.haaste.oikein}/${quiz.haaste.kysymyksia}. Vastahaaste: ${right === total ? "pystytkö samaan?" : "pystytkö parempaan?"}`
     : null;
   const shareText = vastahaaste ?? (quiz.jakoNimi
     ? `${quiz.jakoNimi} ${right}/${total} Tietoniekassa. Pystytkö parempaan?`
@@ -957,15 +945,12 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
      samaan .tng-restitle-mitoitukseen kuin "Harjoiteltavaa jäi". */
   const faniIndeksi = [0, 40, 60, 80, 100].indexOf(tier.min);
   const fanitaso = !vk && quiz.fanitasot && faniIndeksi >= 0 ? quiz.fanitasot[faniIndeksi] : null;
-  const today = new Date();
-  const playedDate = `${today.getDate()}.${today.getMonth() + 1}.${today.getFullYear()}`;
   const liveStatus =
     copyState === "copied" ? "Haastelinkki kopioitu leikepöydälle."
     : copyState === "error" ? "Linkin kopiointi ei onnistunut. Yritä uudelleen."
     : copyState === "sharefail" ? "Jakaminen ei onnistunut. Yritä uudelleen."
     : linkReady ? "Haastelinkki valmis." : "Haastelinkkiä ei ole vielä luotu — jakaminen aktivoituu, kun linkki on olemassa.";
   const waHref = linkReady ? `https://wa.me/?text=${enc(`${shareText} ${challengeUrl}`)}` : undefined;
-  const shareTab = linkReady ? undefined : -1;
 
   const openReview = (i: number, opener?: HTMLElement | null) => {
     if (review == null) openerRef.current = opener ?? (document.activeElement as HTMLElement | null);
@@ -1177,6 +1162,57 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
     );
   }
 
+  /* ── Tulosnäkymä (Tulosnäkymä ja jakaminen, vaihe B, 22.10.2026): pelikehyksen palkki + TulosNakyma.
+        HUD, prosentti ja "n oikein, m väärin" -toistot pois; tulos näkyy kerran. ── */
+  if (done && !kehys) {
+    const lyhyt = lyhennettyNimi(quiz.title);
+    const h = quiz.haaste ?? null;
+    return (
+      <PeliKehys iho="tumma" style={accentVars}>
+        <div ref={pageRef}>
+          <Pelipalkki iho="tumma" peli={vk ? quiz.title : lyhyt} koti={{ href: quiz.hubHref || "/kokoelmat", nimi: category }} />
+          <main>
+            <TulosNakyma
+              eyebrow={vk ? quiz.title : `${lyhyt} · ${h ? "Haaste" : "Tulos"}`}
+              right={right}
+              total={total}
+              score={score}
+              tasonimi={fanitaso ?? tier.title}
+              lause={h ? `${erotusLause(right - h.oikein)} · ${score} pistettä` : tier.body}
+              lisaLinkki={quiz.henkilo ? { href: quiz.henkilo.href, teksti: quiz.henkilo.linkki } : null}
+              haaste={h}
+              vastaukset={hist.map((v) => (v === "ok" || v === "bad" || v === "skipped" ? v : undefined))}
+              avaaVastaukset={(i, el) => openReview(i, el)}
+              jako={{
+                valmis: linkReady,
+                waHref,
+                fbHref: linkReady ? `https://www.facebook.com/sharer/sharer.php?u=${enc(challengeUrl)}` : undefined,
+                teksti: shareText,
+                url: challengeUrl,
+                kopioitu: copyState === "copied",
+                kopioi: copyLink,
+                jaa: hasShare ? nativeShare : null,
+                merkitse: () => void markShared(),
+                tila: copyState ? liveStatus : "",
+              }}
+              seuraavat={quiz.related.map((r, i) => ({
+                id: r.id,
+                title: r.title,
+                href: r.href ?? `/peli?quiz_id=${r.id}`,
+                kuva: r.kuva ?? null,
+                kuvaPos: r.kuvaPos,
+                ala: i === 0 ? "Seuraava tässä kokoelmassa" : r.kokoelma ?? r.meta,
+              }))}
+              pelaaUudelleen={vk ? null : restart}
+              kaikki={vk ? { href: quiz.hubHref || "/kokoelma/kuvavisat", teksti: "Takaisin kortistoihin" } : { href: quiz.hubHref || "/kokoelmat", teksti: "Kaikki visat" }}
+            />
+          </main>
+        </div>
+        {tarkastelu}
+      </PeliKehys>
+    );
+  }
+
   return (
     <div ref={rootRef} className="tng" style={accentVars} data-kuva={isKuva ? "1" : undefined} data-lock={lukittu ? "1" : undefined} data-plate={isKuva ? (q?.plate ?? quiz.plate ?? "tumma") : undefined}>
       {/* Taustakuva vain tekstivisoissa: hero-aloitusnäkymällä on oma kuvansa,
@@ -1306,7 +1342,7 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
                   {/* Vaihe A (21.10.2026): haastebanneri myös herollisessa aloituksessa (/visa/<slug>?tulos=). */}
                   {quiz.haaste ? (
                     <p className="tng-start-chal tng-start-chal--hero">
-                      <b>Kaverisi sai {quiz.haaste.oikein}/{quiz.haaste.kysymyksia}</b> – pystytkö parempaan?
+                      <b>Kaverisi sai {quiz.haaste.oikein}/{quiz.haaste.kysymyksia}</b> – {quiz.haaste.oikein === quiz.haaste.kysymyksia ? "pystytkö samaan?" : "pystytkö parempaan?"}
                     </p>
                   ) : (
                     quiz.teaser && <p className="tng-herop">{quiz.teaser}</p>
@@ -1434,7 +1470,7 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
                   voitettavaa — se on koko linkin syy. */}
               {quiz.haaste && (
                 <p className="tng-start-chal">
-                  <b>Kaverisi sai {quiz.haaste.oikein}/{quiz.haaste.kysymyksia}</b> – pystytkö parempaan?
+                  <b>Kaverisi sai {quiz.haaste.oikein}/{quiz.haaste.kysymyksia}</b> – {quiz.haaste.oikein === quiz.haaste.kysymyksia ? "pystytkö samaan?" : "pystytkö parempaan?"}
                   {isKuva && <span>Samat kuvat samassa järjestyksessä.</span>}
                 </p>
               )}
@@ -1645,134 +1681,7 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
           )}
 
           {/* ── Tulosnäkymä ── */}
-          {done && (
-            <>
-              <section className="tng-resleft" aria-label="Tulos">
-                <div className="tng-rescard" data-perfect={pct === 100 ? "1" : "0"}>
-                  <div className="tng-rescard-top">
-                    {/* V4 (kierros 5): viikkovisassa yläotsikko on formaatin nimi
-                        ("Viikkovisa 38 · Kuvat"), ei kortiston kokoelma "Kuvavisat". */}
-                    <span className="tng-rescat"><i aria-hidden />{vk ? quiz.title : category}</span>
-                    <span className="tng-resdate">{playedDate}</span>
-                  </div>
-                  <div className="tng-resnums">
-                    <span className="tng-bignum" aria-hidden><b>{right}</b><i>/</i>{total}</span>
-                    <div className="tng-resmeta">
-                      <div><span className="tng-resmeta-l">Osumatarkkuus</span><span className="tng-resmeta-v">{pct} %</span></div>
-                      <div><span className="tng-resmeta-l">Pisteet</span><span className="tng-resmeta-v">{shownScore}</span></div>
-                    </div>
-                  </div>
-                  <span className="tng-sr">{right} oikein {total}:sta, osumatarkkuus {pct} prosenttia, {score} pistettä.</span>
-                  <h1 className="tng-restitle">{fanitaso ?? tier.title}</h1>
-                  <p className="tng-resbody">
-                    {fanitaso ? `${/[.!?]$/.test(tier.title) ? tier.title : `${tier.title}.`} ${tier.body}` : tier.body}
-                  </p>
-                  {/* Viikkovisassa nimi on jo yläotsikossa — ei toisteta. */}
-                  {!vk && <p className="tng-resname">{quiz.title}</p>}
-                  {quiz.henkilo && (
-                    <a className="tng-reshenkilo" href={quiz.henkilo.href}>
-                      {quiz.henkilo.linkki} <span aria-hidden>→</span>
-                    </a>
-                  )}
-                  {/* K3: vertailu haastajaan. Tasapeli on oma tapaus — "voitit"
-                      olisi väärin ja "häviisit" loukkaava kun tulos on sama. */}
-                  {quiz.haaste && (
-                    <div className="tng-vs" data-vs={right > quiz.haaste.oikein ? "voitto" : right < quiz.haaste.oikein ? "havio" : "tasan"}>
-                      <div className="tng-vs-row">
-                        <span className="tng-vs-l">Sinä</span>
-                        <span className="tng-vs-v">{right}/{total}</span>
-                      </div>
-                      <div className="tng-vs-row">
-                        <span className="tng-vs-l">Kaverisi</span>
-                        <span className="tng-vs-v">{quiz.haaste.oikein}/{quiz.haaste.kysymyksia}</span>
-                      </div>
-                      {/* Vaihe A (arkki 3c): tuomio + yksi lause. */}
-                      <p className="tng-vs-tuomio">
-                        {right > quiz.haaste.oikein ? "Voitit kaverisi" : right < quiz.haaste.oikein ? "Kaverisi voitti" : "Tasapeli"}
-                      </p>
-                      <p className="tng-vs-t">{erotusLause(right - quiz.haaste.oikein)} · {score} pistettä</p>
-                    </div>
-                  )}
-                </div>
-
-                {vastaukset}
-              </section>
-
-              <section className="tng-resright" aria-label="Haasta kaveri ja jaa haaste">
-                <div className="tng-chal">
-                  <h2 className="tng-chaltitle">{quiz.haaste ? "Lähetä vastahaaste" : "Haasta kaveri — kumpi tietää enemmän?"}</h2>
-                  <ul className="tng-chalbullets">
-                    <li><i aria-hidden />Kaveri saa täsmälleen saman kysymyssarjan.</li>
-                    <li><i aria-hidden />Tuloksesi {right}/{total} on hänen vertailukohtansa.</li>
-                    <li><i aria-hidden />Linkki avaa visan suoraan — kirjautumista ei tarvita.</li>
-                  </ul>
-                  <div className="tng-linkstatus" data-kind={linkReady ? "ready" : "demo"} role="status" aria-live="polite">
-                    <span className="tng-linkdot" aria-hidden />
-                    <span>{liveStatus}</span>
-                  </div>
-                  <a className="tng-wa" href={waHref} target="_blank" rel="noopener" data-blocked={linkReady ? undefined : "true"} aria-disabled={!linkReady || undefined} tabIndex={shareTab} onClick={() => void markShared()}>
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2 22l5.25-1.38a9.9 9.9 0 004.79 1.22c5.46 0 9.9-4.45 9.9-9.91C21.94 6.45 17.5 2 12.04 2zm5.8 14.16c-.24.68-1.4 1.3-1.93 1.35-.53.05-1.03.24-3.47-.72-2.94-1.16-4.78-4.2-4.92-4.4-.14-.2-1.16-1.55-1.16-2.96 0-1.4.73-2.09 1-2.38.26-.29.57-.36.76-.36h.56c.18.01.42-.07.65.5.24.58.82 2 .89 2.15.07.14.12.31.02.5-.1.2-.15.32-.29.5-.15.17-.31.39-.44.52-.15.14-.3.3-.13.59.17.29.75 1.23 1.6 2 1.1.97 2.03 1.28 2.32 1.42.29.15.46.12.63-.07.17-.2.73-.85.93-1.14.2-.29.39-.24.66-.15.27.1 1.7.8 1.99.95.29.14.48.22.55.34.07.12.07.71-.17 1.39z" /></svg>
-                    {quiz.haaste ? "Vastahaaste WhatsAppissa" : "Haasta WhatsAppissa"}
-                  </a>
-                  <div className="tng-sharepreview">
-                    <span className="tng-sharepreview-l">Kaverille lähtee</span>
-                    <span className="tng-sharepreview-t">{shareText}</span>
-                    <span className="tng-sharepreview-u">{challengeUrl}</span>
-                  </div>
-                </div>
-
-                <div className="tng-sharewrap">
-                  {hasShare && (
-                    <button type="button" className="tng-share tng-share--native" disabled={!linkReady} data-blocked={linkReady ? undefined : "true"} onClick={nativeShare}>
-                      <svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><circle cx="15" cy="4.6" r="2.4" /><circle cx="5" cy="10" r="2.4" /><circle cx="15" cy="15.4" r="2.4" /><path d="M7.1 8.8 12.9 5.8M7.1 11.2l5.8 3" /></svg>
-                      Haasta muissa sovelluksissa
-                    </button>
-                  )}
-                  {/* P2 (17.9.2026): Facebook, Telegram ja X pois. Kuvavisan
-                      haaste on kahdenvälinen viesti, ei julkaisu: Facebookin
-                      sharer ei välitä saatetekstiä lainkaan, Telegramin osuus
-                      kohderyhmässä on olematon, ja X:n jakonappi näytti
-                      linkistä vain esikatselun. Jäljelle jää se mitä oikeasti
-                      käytetään: WhatsApp, laitteen oma jako ja linkin kopiointi. */}
-                  <div className="tng-sharegrid" data-cols="1">
-                    <button type="button" className="tng-share" disabled={!linkReady} data-blocked={linkReady ? undefined : "true"} onClick={copyLink}>
-                      <svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="#CBC1AD" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><rect x="7" y="7" width="10" height="10" rx="2.4" /><path d="M13 4.6A2.6 2.6 0 0010.4 2H5.6A2.6 2.6 0 003 4.6v4.8A2.6 2.6 0 005.6 12" /></svg>
-                      <span style={{ whiteSpace: "nowrap" }}>{copyState === "copied" ? "Linkki kopioitu" : copyState === "error" ? "Kopiointi ei onnistunut" : "Kopioi linkki"}</span>
-                    </button>
-                  </div>
-                </div>
-
-                <div className="tng-resact">
-                  {/* Viikkovisa: yksi yritys → ei uudelleenpeluuta (linjaus 4.6). */}
-                  {!vk && (
-                    <button type="button" onClick={restart}>
-                      <svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M17 10a7 7 0 11-2.05-4.95M17 3v3.5h-3.5" /></svg>
-                      Pelaa uudelleen
-                    </button>
-                  )}
-                  {/* T5: vie kortiston kokoelmaan (esim. /kokoelma/kuvavisat), ei kaikkien kokoelmien listaan. */}
-                  <a href={quiz.hubHref || "/kokoelmat"}>{vk ? "Takaisin kortistoihin" : "Valitse uusi visa"}</a>
-                </div>
-              </section>
-
-              {quiz.related.length > 0 && (
-                <section className="tng-recs" aria-label="Lisää samasta aiheesta">
-                  <span className="tng-sumlabel">Lisää: {category}</span>
-                  <div className="tng-recgrid">
-                    {quiz.related.map((r) => (
-                      <a key={r.id} className="tng-rec" href={r.href ?? `/peli?quiz_id=${r.id}`}>
-                        <span className="tng-rec-text">
-                          <span className="tng-rec-name">{r.title}</span>
-                          <span className="tng-rec-meta">{r.ika && <><IkaMerkki ika={r.ika} /> </>}{r.meta}</span>
-                        </span>
-                        <span className="tng-recarrow" aria-hidden>→</span>
-                      </a>
-                    ))}
-                  </div>
-                </section>
-              )}
-            </>
-          )}
+          {/* Tulosnäkymä renderöidään omana näkymänään (TulosNakyma, vaihe B, 22.10.2026) — ks. yllä. */}
         </main>
       </div>
 

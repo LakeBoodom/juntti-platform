@@ -13,9 +13,13 @@ export type RelatedRow = {
   collection: string | null; genre: string | null; question_count: number;
   /** Lasten visoilla 4-7 / 8-12 → ikämerkki ristinostoissa (vaihe 5) */
   target_age?: string | null;
+  /** Tulosnäkymän "Seuraava visa" -kortin kuva (vaihe B, 22.10.2026). */
+  hero_image?: string | null;
+  hero_focal_x?: number | null;
+  hero_focal_y?: number | null;
 };
 
-const SEL = "id, slug, custom_slug, display_title, title, teaser, collection, genre, question_count, category, target_age";
+const SEL = "id, slug, custom_slug, display_title, title, teaser, collection, genre, question_count, category, target_age, hero_image, hero_focal_x, hero_focal_y";
 const ERA = 60;
 
 function sekoita<T>(a: T[]): T[] {
