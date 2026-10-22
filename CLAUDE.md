@@ -197,4 +197,7 @@ Skilli `tietoniekka-ui-laatu` on näiden sääntöjen lähde; tässä tiivistelm
 8. **Kokoelmasivut:** uusi teemasivu käyttää jaettua korttikehotetta (`.tn-card-cta`, "Pelaa →") ja
    metariviä (`.tn-card-meta`), ei omia. Henkilökuvat aina `henkiloKuva()`-apurin kautta (omat kopiot,
    ei Wikimedia-hotlinkkejä). Tarkemmin `apps/tietoniekka/DESIGN_SYSTEM.md` (18.10.2026).
+9. **Ei taglineja, aputekstejä eikä toissijaisia labeleita** (Heikki 22.10.2026). Jos näkymä
+   tarvitsee niitä ollakseen ymmärrettävä, korjaa layout — älä lisää selitettä. Ei koske
+   virheviestejä, tyhjiä tiloja eikä saavutettavuuslabeleita (aria-label, visuaalisesti piilotettu teksti).
 
