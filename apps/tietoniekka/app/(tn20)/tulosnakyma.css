@@ -55,34 +55,6 @@
 .tn20 .tn-tulos-ruutu[data-tila="bad"] { background: #f87171; color: #2a0b0b; }
 .tn20 .tn-tulos-ruutu[data-tila="ohi"] { background: #3a3120; color: var(--tt-soft); }
 
-/* ── Jakoalue ── */
-.tn20 .tn-tulos-jako { display: flex; flex-direction: column; gap: 12px; padding: 18px 16px; border: 1px solid var(--tt-line); border-radius: 18px; background: var(--tt-card); min-width: 0; }
-.tn20 .tn-tulos-jako-h { margin: 0; font-family: var(--rk-cond, "Barlow Condensed"), "Barlow Condensed", sans-serif; font-weight: 800; font-size: 26px; line-height: 1; text-transform: uppercase; overflow-wrap: normal; word-break: normal; }
-.tn20 .tn-tulos-jako-p { margin: -4px 0 0; font-size: 14px; line-height: 1.45; color: var(--tt-soft); }
-/* WhatsAppin vihreä #25D366; tumma teksti #0B1F12 → kontrasti ≈ 9,6:1 (valkoinen olisi 1,98:1). */
-.tn20 .tn-tulos-wa {
-  display: inline-flex; align-items: center; justify-content: center; gap: 10px; min-height: 56px; padding: 0 18px; border-radius: 999px;
-  background: #25d366; color: #0b1f12; text-decoration: none;
-  font-family: var(--rk-cond, "Barlow Condensed"), "Barlow Condensed", sans-serif; font-weight: 800; font-size: 20px; letter-spacing: .02em; text-transform: uppercase;
-}
-.tn20 .tn-tulos-wa:hover { filter: brightness(1.05); color: #0b1f12; }
-.tn20 .tn-tulos-wa:focus-visible { outline: 2px solid var(--tn-lime, #b6ff3c); outline-offset: 3px; }
-.tn20 .tn-tulos-wa[aria-disabled] { opacity: .5; pointer-events: none; }
-.tn20 .tn-tulos-kanavat { display: flex; gap: 8px; }
-.tn20 .tn-tulos-kanava {
-  flex: 1 1 0; display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 48px; padding: 0 14px; box-sizing: border-box;
-  border: 1px solid #3a3120; border-radius: 999px; background: transparent; color: var(--tt-ink); font: inherit; font-size: 15px; font-weight: 700; text-decoration: none; cursor: pointer; white-space: nowrap;
-}
-.tn20 .tn-tulos-kanava:hover { border-color: #8e8676; color: var(--tt-ink); }
-.tn20 .tn-tulos-kanava:focus-visible { outline: 2px solid var(--tn-lime, #b6ff3c); outline-offset: 2px; }
-.tn20 .tn-tulos-kanava:disabled { opacity: .5; cursor: default; }
-.tn20 .tn-tulos-kanava--ikoni { flex: none; width: 48px; padding: 0; }
-.tn20 .tn-tulos-esikatselu summary { display: flex; align-items: center; min-height: 44px; font-size: 13px; font-weight: 700; color: var(--tt-muted); cursor: pointer; list-style: none; }
-.tn20 .tn-tulos-esikatselu summary::-webkit-details-marker { display: none; }
-.tn20 .tn-tulos-esikatselu summary:focus-visible { outline: 2px solid var(--tn-lime, #b6ff3c); outline-offset: 2px; }
-.tn20 .tn-tulos-esikatselu-t { margin: 4px 0 0; padding: 12px 14px 0; border: 1px dashed #3a3120; border-bottom: 0; border-radius: 12px 12px 0 0; font-size: 14px; line-height: 1.5; color: var(--tt-soft); }
-.tn20 .tn-tulos-esikatselu-u { margin: 0; padding: 4px 14px 12px; border: 1px dashed #3a3120; border-top: 0; border-radius: 0 0 12px 12px; font-size: 12px; color: var(--tt-acc); overflow-wrap: anywhere; }
-
 /* ── Seuraava visa ── */
 .tn20 .tn-tulos-seuraava { display: flex; flex-direction: column; gap: 10px; }
 .tn20 .tn-tulos-kortit { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
@@ -106,14 +78,13 @@
   .tn20 .tn-tulos-vasen { display: contents; }
   .tn20 .tn-tulos-tulos { order: 1; }
   .tn20 .tn-tulos-vastaukset { order: 2; }
-  .tn20 .tn-tulos-jako { order: 3; }
+  .tn20 .tn-tulos > .tn-jako { order: 3; }
   .tn20 .tn-tulos-seuraava { order: 4; }
   .tn20 .tn-tulos-linkit { order: 5; }
 }
 @media (max-width: 359px) {
   .tn20 .tn-tulos-luku { font-size: 64px; }
   .tn20 .tn-tulos-tasonimi { font-size: 21px; }
-  .tn20 .tn-tulos-wa { font-size: 18px; }
 }
 
 /* Desktop (3b): vasen palsta tulos + vastaukset + seuraava visa, oikealla jako. */
@@ -125,9 +96,8 @@
   .tn20 .tn-tulos-tuomio { font-size: 34px; }
   .tn20 .tn-tulos-lause { font-size: 16px; }
   .tn20 .tn-tulos-ruutu { max-width: 34px; }
-  .tn20 .tn-tulos-jako { position: sticky; top: 20px; padding: 24px 24px 18px; }
-  .tn20 .tn-tulos-jako-h { font-size: 30px; }
+  .tn20 .tn-tulos > .tn-jako { position: sticky; top: 20px; padding: 24px 24px 18px; }
+  .tn20 .tn-tulos > .tn-jako .tn-jako-h { font-size: 30px; }
   .tn20 .tn-tulos-kortit { gap: 14px; }
   .tn20 .tn-tulos-kortti-kuva { aspect-ratio: 16 / 9; }
 }
-@media (prefers-reduced-motion: reduce) { .tn20 .tn-tulos-wa { transition: none; } }

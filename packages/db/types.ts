@@ -4175,6 +4175,204 @@ export type Database = {
         }
         Relationships: []
       }
+      _kookoo_q_backup_20261020: {
+        Row: {
+          animal_sound: Json | null
+          answers: Json | null
+          audio: Json | null
+          created_at: string | null
+          explanation: string | null
+          id: string | null
+          image_credit: string | null
+          image_license_note: string | null
+          image_position: string | null
+          image_url: string | null
+          question_text: string | null
+          question_type: string | null
+          quiz_id: string | null
+          sort_order: number | null
+          taso: number | null
+          vihje_laura: string | null
+          vihje_mikko: string | null
+        }
+        Insert: {
+          animal_sound?: Json | null
+          answers?: Json | null
+          audio?: Json | null
+          created_at?: string | null
+          explanation?: string | null
+          id?: string | null
+          image_credit?: string | null
+          image_license_note?: string | null
+          image_position?: string | null
+          image_url?: string | null
+          question_text?: string | null
+          question_type?: string | null
+          quiz_id?: string | null
+          sort_order?: number | null
+          taso?: number | null
+          vihje_laura?: string | null
+          vihje_mikko?: string | null
+        }
+        Update: {
+          animal_sound?: Json | null
+          answers?: Json | null
+          audio?: Json | null
+          created_at?: string | null
+          explanation?: string | null
+          id?: string | null
+          image_credit?: string | null
+          image_license_note?: string | null
+          image_position?: string | null
+          image_url?: string | null
+          question_text?: string | null
+          question_type?: string | null
+          quiz_id?: string | null
+          sort_order?: number | null
+          taso?: number | null
+          vihje_laura?: string | null
+          vihje_mikko?: string | null
+        }
+        Relationships: []
+      }
+      _kookoo_quiz_backup_20261020: {
+        Row: {
+          category: string | null
+          collection: string | null
+          created_at: string | null
+          created_by: string | null
+          custom_slug: string | null
+          description: string | null
+          difficulty: string | null
+          display_title: string | null
+          emoji_hint: string | null
+          era: string | null
+          fanitasot: Json | null
+          featured_in_category: boolean | null
+          game_mode: string | null
+          genre: string | null
+          hero_alt: string | null
+          hero_focal_x: number | null
+          hero_focal_y: number | null
+          hero_image: string | null
+          hero_side: string | null
+          id: string | null
+          ig_tilit: string[] | null
+          image_url: string | null
+          is_daily: boolean | null
+          lasten_aihe: string | null
+          learn: Json | null
+          lukija: string | null
+          platform: string | null
+          play_count: number | null
+          published_at: string | null
+          scheduled_for: string | null
+          section_tags: string[] | null
+          seo_description: string | null
+          seo_title: string | null
+          site_id: string | null
+          slug: string | null
+          status: string | null
+          subcollection: string | null
+          tags: string[] | null
+          target_age: string | null
+          teaser: string | null
+          title: string | null
+          tone: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          category?: string | null
+          collection?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          custom_slug?: string | null
+          description?: string | null
+          difficulty?: string | null
+          display_title?: string | null
+          emoji_hint?: string | null
+          era?: string | null
+          fanitasot?: Json | null
+          featured_in_category?: boolean | null
+          game_mode?: string | null
+          genre?: string | null
+          hero_alt?: string | null
+          hero_focal_x?: number | null
+          hero_focal_y?: number | null
+          hero_image?: string | null
+          hero_side?: string | null
+          id?: string | null
+          ig_tilit?: string[] | null
+          image_url?: string | null
+          is_daily?: boolean | null
+          lasten_aihe?: string | null
+          learn?: Json | null
+          lukija?: string | null
+          platform?: string | null
+          play_count?: number | null
+          published_at?: string | null
+          scheduled_for?: string | null
+          section_tags?: string[] | null
+          seo_description?: string | null
+          seo_title?: string | null
+          site_id?: string | null
+          slug?: string | null
+          status?: string | null
+          subcollection?: string | null
+          tags?: string[] | null
+          target_age?: string | null
+          teaser?: string | null
+          title?: string | null
+          tone?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          category?: string | null
+          collection?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          custom_slug?: string | null
+          description?: string | null
+          difficulty?: string | null
+          display_title?: string | null
+          emoji_hint?: string | null
+          era?: string | null
+          fanitasot?: Json | null
+          featured_in_category?: boolean | null
+          game_mode?: string | null
+          genre?: string | null
+          hero_alt?: string | null
+          hero_focal_x?: number | null
+          hero_focal_y?: number | null
+          hero_image?: string | null
+          hero_side?: string | null
+          id?: string | null
+          ig_tilit?: string[] | null
+          image_url?: string | null
+          is_daily?: boolean | null
+          lasten_aihe?: string | null
+          learn?: Json | null
+          lukija?: string | null
+          platform?: string | null
+          play_count?: number | null
+          published_at?: string | null
+          scheduled_for?: string | null
+          section_tags?: string[] | null
+          seo_description?: string | null
+          seo_title?: string | null
+          site_id?: string | null
+          slug?: string | null
+          status?: string | null
+          subcollection?: string | null
+          tags?: string[] | null
+          target_age?: string | null
+          teaser?: string | null
+          title?: string | null
+          tone?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       _krista_tags_backup_20260919: {
         Row: {
           backed_up_at: string | null
@@ -4355,6 +4553,66 @@ export type Database = {
           title?: string | null
           tone?: string | null
           updated_at?: string | null
+        }
+        Relationships: []
+      }
+      _kult_vuodet_backup_20261014: {
+        Row: {
+          animal_sound: Json | null
+          answers: Json | null
+          audio: Json | null
+          created_at: string | null
+          explanation: string | null
+          id: string | null
+          image_credit: string | null
+          image_license_note: string | null
+          image_position: string | null
+          image_url: string | null
+          question_text: string | null
+          question_type: string | null
+          quiz_id: string | null
+          sort_order: number | null
+          taso: number | null
+          vihje_laura: string | null
+          vihje_mikko: string | null
+        }
+        Insert: {
+          animal_sound?: Json | null
+          answers?: Json | null
+          audio?: Json | null
+          created_at?: string | null
+          explanation?: string | null
+          id?: string | null
+          image_credit?: string | null
+          image_license_note?: string | null
+          image_position?: string | null
+          image_url?: string | null
+          question_text?: string | null
+          question_type?: string | null
+          quiz_id?: string | null
+          sort_order?: number | null
+          taso?: number | null
+          vihje_laura?: string | null
+          vihje_mikko?: string | null
+        }
+        Update: {
+          animal_sound?: Json | null
+          answers?: Json | null
+          audio?: Json | null
+          created_at?: string | null
+          explanation?: string | null
+          id?: string | null
+          image_credit?: string | null
+          image_license_note?: string | null
+          image_position?: string | null
+          image_url?: string | null
+          question_text?: string | null
+          question_type?: string | null
+          quiz_id?: string | null
+          sort_order?: number | null
+          taso?: number | null
+          vihje_laura?: string | null
+          vihje_mikko?: string | null
         }
         Relationships: []
       }
@@ -4709,6 +4967,204 @@ export type Database = {
           play_count?: number | null
           published_at?: string | null
           scheduled_for?: string | null
+          seo_description?: string | null
+          seo_title?: string | null
+          site_id?: string | null
+          slug?: string | null
+          status?: string | null
+          subcollection?: string | null
+          tags?: string[] | null
+          target_age?: string | null
+          teaser?: string | null
+          title?: string | null
+          tone?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      _majakat_q_backup_20261020: {
+        Row: {
+          animal_sound: Json | null
+          answers: Json | null
+          audio: Json | null
+          created_at: string | null
+          explanation: string | null
+          id: string | null
+          image_credit: string | null
+          image_license_note: string | null
+          image_position: string | null
+          image_url: string | null
+          question_text: string | null
+          question_type: string | null
+          quiz_id: string | null
+          sort_order: number | null
+          taso: number | null
+          vihje_laura: string | null
+          vihje_mikko: string | null
+        }
+        Insert: {
+          animal_sound?: Json | null
+          answers?: Json | null
+          audio?: Json | null
+          created_at?: string | null
+          explanation?: string | null
+          id?: string | null
+          image_credit?: string | null
+          image_license_note?: string | null
+          image_position?: string | null
+          image_url?: string | null
+          question_text?: string | null
+          question_type?: string | null
+          quiz_id?: string | null
+          sort_order?: number | null
+          taso?: number | null
+          vihje_laura?: string | null
+          vihje_mikko?: string | null
+        }
+        Update: {
+          animal_sound?: Json | null
+          answers?: Json | null
+          audio?: Json | null
+          created_at?: string | null
+          explanation?: string | null
+          id?: string | null
+          image_credit?: string | null
+          image_license_note?: string | null
+          image_position?: string | null
+          image_url?: string | null
+          question_text?: string | null
+          question_type?: string | null
+          quiz_id?: string | null
+          sort_order?: number | null
+          taso?: number | null
+          vihje_laura?: string | null
+          vihje_mikko?: string | null
+        }
+        Relationships: []
+      }
+      _majakat_quiz_backup_20261020: {
+        Row: {
+          category: string | null
+          collection: string | null
+          created_at: string | null
+          created_by: string | null
+          custom_slug: string | null
+          description: string | null
+          difficulty: string | null
+          display_title: string | null
+          emoji_hint: string | null
+          era: string | null
+          fanitasot: Json | null
+          featured_in_category: boolean | null
+          game_mode: string | null
+          genre: string | null
+          hero_alt: string | null
+          hero_focal_x: number | null
+          hero_focal_y: number | null
+          hero_image: string | null
+          hero_side: string | null
+          id: string | null
+          ig_tilit: string[] | null
+          image_url: string | null
+          is_daily: boolean | null
+          lasten_aihe: string | null
+          learn: Json | null
+          lukija: string | null
+          platform: string | null
+          play_count: number | null
+          published_at: string | null
+          scheduled_for: string | null
+          section_tags: string[] | null
+          seo_description: string | null
+          seo_title: string | null
+          site_id: string | null
+          slug: string | null
+          status: string | null
+          subcollection: string | null
+          tags: string[] | null
+          target_age: string | null
+          teaser: string | null
+          title: string | null
+          tone: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          category?: string | null
+          collection?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          custom_slug?: string | null
+          description?: string | null
+          difficulty?: string | null
+          display_title?: string | null
+          emoji_hint?: string | null
+          era?: string | null
+          fanitasot?: Json | null
+          featured_in_category?: boolean | null
+          game_mode?: string | null
+          genre?: string | null
+          hero_alt?: string | null
+          hero_focal_x?: number | null
+          hero_focal_y?: number | null
+          hero_image?: string | null
+          hero_side?: string | null
+          id?: string | null
+          ig_tilit?: string[] | null
+          image_url?: string | null
+          is_daily?: boolean | null
+          lasten_aihe?: string | null
+          learn?: Json | null
+          lukija?: string | null
+          platform?: string | null
+          play_count?: number | null
+          published_at?: string | null
+          scheduled_for?: string | null
+          section_tags?: string[] | null
+          seo_description?: string | null
+          seo_title?: string | null
+          site_id?: string | null
+          slug?: string | null
+          status?: string | null
+          subcollection?: string | null
+          tags?: string[] | null
+          target_age?: string | null
+          teaser?: string | null
+          title?: string | null
+          tone?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          category?: string | null
+          collection?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          custom_slug?: string | null
+          description?: string | null
+          difficulty?: string | null
+          display_title?: string | null
+          emoji_hint?: string | null
+          era?: string | null
+          fanitasot?: Json | null
+          featured_in_category?: boolean | null
+          game_mode?: string | null
+          genre?: string | null
+          hero_alt?: string | null
+          hero_focal_x?: number | null
+          hero_focal_y?: number | null
+          hero_image?: string | null
+          hero_side?: string | null
+          id?: string | null
+          ig_tilit?: string[] | null
+          image_url?: string | null
+          is_daily?: boolean | null
+          lasten_aihe?: string | null
+          learn?: Json | null
+          lukija?: string | null
+          platform?: string | null
+          play_count?: number | null
+          published_at?: string | null
+          scheduled_for?: string | null
+          section_tags?: string[] | null
           seo_description?: string | null
           seo_title?: string | null
           site_id?: string | null
@@ -6651,6 +7107,491 @@ export type Database = {
           },
         ]
       }
+      areyoou_daily_picks: {
+        Row: {
+          auto: boolean
+          created_at: string
+          day: string
+          edition: string
+          test_id: string
+        }
+        Insert: {
+          auto?: boolean
+          created_at?: string
+          day: string
+          edition: string
+          test_id: string
+        }
+        Update: {
+          auto?: boolean
+          created_at?: string
+          day?: string
+          edition?: string
+          test_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "areyoou_daily_picks_edition_fkey"
+            columns: ["edition"]
+            isOneToOne: false
+            referencedRelation: "areyoou_editions"
+            referencedColumns: ["code"]
+          },
+          {
+            foreignKeyName: "areyoou_daily_picks_test_id_fkey"
+            columns: ["test_id"]
+            isOneToOne: false
+            referencedRelation: "areyoou_tests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      areyoou_dimensions: {
+        Row: {
+          id: string
+          key: string
+          label: string
+          sort: number
+          test_id: string
+        }
+        Insert: {
+          id?: string
+          key: string
+          label: string
+          sort?: number
+          test_id: string
+        }
+        Update: {
+          id?: string
+          key?: string
+          label?: string
+          sort?: number
+          test_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "areyoou_dimensions_test_id_fkey"
+            columns: ["test_id"]
+            isOneToOne: false
+            referencedRelation: "areyoou_tests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      areyoou_editions: {
+        Row: {
+          active: boolean
+          code: string
+          locale: string
+          name: string
+          path: string
+          sort: number
+          timezone: string
+        }
+        Insert: {
+          active?: boolean
+          code: string
+          locale: string
+          name: string
+          path: string
+          sort?: number
+          timezone: string
+        }
+        Update: {
+          active?: boolean
+          code?: string
+          locale?: string
+          name?: string
+          path?: string
+          sort?: number
+          timezone?: string
+        }
+        Relationships: []
+      }
+      areyoou_options: {
+        Row: {
+          effects: Json
+          id: string
+          label: string
+          media: Json | null
+          position: number
+          question_id: string
+        }
+        Insert: {
+          effects?: Json
+          id?: string
+          label: string
+          media?: Json | null
+          position: number
+          question_id: string
+        }
+        Update: {
+          effects?: Json
+          id?: string
+          label?: string
+          media?: Json | null
+          position?: number
+          question_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "areyoou_options_question_id_fkey"
+            columns: ["question_id"]
+            isOneToOne: false
+            referencedRelation: "areyoou_questions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      areyoou_profile_stats_daily: {
+        Row: {
+          count: number
+          day: string
+          profile_id: string
+        }
+        Insert: {
+          count?: number
+          day: string
+          profile_id: string
+        }
+        Update: {
+          count?: number
+          day?: string
+          profile_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "areyoou_profile_stats_daily_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "areyoou_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      areyoou_profiles: {
+        Row: {
+          card_line: string | null
+          description_md: string
+          expression: string
+          headline: string
+          id: string
+          look: Json | null
+          name: string
+          share_line: string | null
+          slug: string
+          sort: number
+          target_vector: Json
+          test_id: string
+        }
+        Insert: {
+          card_line?: string | null
+          description_md: string
+          expression?: string
+          headline: string
+          id?: string
+          look?: Json | null
+          name: string
+          share_line?: string | null
+          slug: string
+          sort?: number
+          target_vector: Json
+          test_id: string
+        }
+        Update: {
+          card_line?: string | null
+          description_md?: string
+          expression?: string
+          headline?: string
+          id?: string
+          look?: Json | null
+          name?: string
+          share_line?: string | null
+          slug?: string
+          sort?: number
+          target_vector?: Json
+          test_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "areyoou_profiles_test_id_fkey"
+            columns: ["test_id"]
+            isOneToOne: false
+            referencedRelation: "areyoou_tests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      areyoou_questions: {
+        Row: {
+          config: Json
+          id: string
+          media: Json | null
+          position: number
+          prompt: string
+          test_id: string
+          type: string
+        }
+        Insert: {
+          config?: Json
+          id?: string
+          media?: Json | null
+          position: number
+          prompt: string
+          test_id: string
+          type: string
+        }
+        Update: {
+          config?: Json
+          id?: string
+          media?: Json | null
+          position?: number
+          prompt?: string
+          test_id?: string
+          type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "areyoou_questions_test_id_fkey"
+            columns: ["test_id"]
+            isOneToOne: false
+            referencedRelation: "areyoou_tests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      areyoou_server_keys: {
+        Row: {
+          created_at: string
+          key_hash: string
+          note: string | null
+        }
+        Insert: {
+          created_at?: string
+          key_hash: string
+          note?: string | null
+        }
+        Update: {
+          created_at?: string
+          key_hash?: string
+          note?: string | null
+        }
+        Relationships: []
+      }
+      areyoou_stats_daily: {
+        Row: {
+          completes: number
+          copies: number
+          day: string
+          retakes: number
+          shares_fb: number
+          shares_sms: number
+          shares_wa: number
+          starts: number
+          test_id: string
+        }
+        Insert: {
+          completes?: number
+          copies?: number
+          day: string
+          retakes?: number
+          shares_fb?: number
+          shares_sms?: number
+          shares_wa?: number
+          starts?: number
+          test_id: string
+        }
+        Update: {
+          completes?: number
+          copies?: number
+          day?: string
+          retakes?: number
+          shares_fb?: number
+          shares_sms?: number
+          shares_wa?: number
+          starts?: number
+          test_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "areyoou_stats_daily_test_id_fkey"
+            columns: ["test_id"]
+            isOneToOne: false
+            referencedRelation: "areyoou_tests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      areyoou_tests: {
+        Row: {
+          created_at: string
+          created_by: string
+          cta_label: string | null
+          edition: string
+          est_minutes: number
+          hero_alt: string | null
+          hero_bubble: string | null
+          hero_image: string | null
+          hero_line: string | null
+          hero_scene: Json | null
+          id: string
+          intro_md: string
+          meta_description: string
+          pair_key: string | null
+          percent_dimension: string | null
+          percent_labels: Json | null
+          publish_at: string | null
+          result_mode: string
+          slug: string
+          source_ootko_slug: string | null
+          status: string
+          theme_id: string
+          tier: string
+          title_display: string
+          title_seo: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string
+          cta_label?: string | null
+          edition: string
+          est_minutes?: number
+          hero_alt?: string | null
+          hero_bubble?: string | null
+          hero_image?: string | null
+          hero_line?: string | null
+          hero_scene?: Json | null
+          id?: string
+          intro_md?: string
+          meta_description: string
+          pair_key?: string | null
+          percent_dimension?: string | null
+          percent_labels?: Json | null
+          publish_at?: string | null
+          result_mode?: string
+          slug: string
+          source_ootko_slug?: string | null
+          status?: string
+          theme_id: string
+          tier?: string
+          title_display: string
+          title_seo: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          cta_label?: string | null
+          edition?: string
+          est_minutes?: number
+          hero_alt?: string | null
+          hero_bubble?: string | null
+          hero_image?: string | null
+          hero_line?: string | null
+          hero_scene?: Json | null
+          id?: string
+          intro_md?: string
+          meta_description?: string
+          pair_key?: string | null
+          percent_dimension?: string | null
+          percent_labels?: Json | null
+          publish_at?: string | null
+          result_mode?: string
+          slug?: string
+          source_ootko_slug?: string | null
+          status?: string
+          theme_id?: string
+          tier?: string
+          title_display?: string
+          title_seo?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "areyoou_tests_edition_fkey"
+            columns: ["edition"]
+            isOneToOne: false
+            referencedRelation: "areyoou_editions"
+            referencedColumns: ["code"]
+          },
+          {
+            foreignKeyName: "areyoou_tests_theme_id_fkey"
+            columns: ["theme_id"]
+            isOneToOne: false
+            referencedRelation: "areyoou_themes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      areyoou_themes: {
+        Row: {
+          accessory: string | null
+          backdrop: string | null
+          color_ground: string
+          color_on_secondary: string
+          color_primary: string
+          color_secondary: string
+          created_at: string
+          cta_label: string
+          edition: string
+          id: string
+          in_nav: boolean
+          name: string
+          season_dates: Json
+          season_end_md: string | null
+          season_start_md: string | null
+          slug: string
+          sort: number
+        }
+        Insert: {
+          accessory?: string | null
+          backdrop?: string | null
+          color_ground: string
+          color_on_secondary: string
+          color_primary: string
+          color_secondary: string
+          created_at?: string
+          cta_label?: string
+          edition: string
+          id?: string
+          in_nav?: boolean
+          name: string
+          season_dates?: Json
+          season_end_md?: string | null
+          season_start_md?: string | null
+          slug: string
+          sort?: number
+        }
+        Update: {
+          accessory?: string | null
+          backdrop?: string | null
+          color_ground?: string
+          color_on_secondary?: string
+          color_primary?: string
+          color_secondary?: string
+          created_at?: string
+          cta_label?: string
+          edition?: string
+          id?: string
+          in_nav?: boolean
+          name?: string
+          season_dates?: Json
+          season_end_md?: string | null
+          season_start_md?: string | null
+          slug?: string
+          sort?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "areyoou_themes_edition_fkey"
+            columns: ["edition"]
+            isOneToOne: false
+            referencedRelation: "areyoou_editions"
+            referencedColumns: ["code"]
+          },
+        ]
+      }
       celebrities: {
         Row: {
           bio_intro: string | null
@@ -6664,8 +7605,10 @@ export type Database = {
           facts_reviewed_at: string | null
           id: string
           ig_tilit: string[]
+          image_credit: string | null
           image_focal_x: number | null
           image_focal_y: number | null
+          image_license: string | null
           image_url: string | null
           intro_text: string | null
           is_hero: boolean | null
@@ -6681,6 +7624,7 @@ export type Database = {
           ryhma: string | null
           site_id: string | null
           slug: string | null
+          tiesitko: string | null
           trivia_quiz_id: string | null
           wikipedia_url: string | null
         }
@@ -6696,8 +7640,10 @@ export type Database = {
           facts_reviewed_at?: string | null
           id?: string
           ig_tilit?: string[]
+          image_credit?: string | null
           image_focal_x?: number | null
           image_focal_y?: number | null
+          image_license?: string | null
           image_url?: string | null
           intro_text?: string | null
           is_hero?: boolean | null
@@ -6713,6 +7659,7 @@ export type Database = {
           ryhma?: string | null
           site_id?: string | null
           slug?: string | null
+          tiesitko?: string | null
           trivia_quiz_id?: string | null
           wikipedia_url?: string | null
         }
@@ -6728,8 +7675,10 @@ export type Database = {
           facts_reviewed_at?: string | null
           id?: string
           ig_tilit?: string[]
+          image_credit?: string | null
           image_focal_x?: number | null
           image_focal_y?: number | null
+          image_license?: string | null
           image_url?: string | null
           intro_text?: string | null
           is_hero?: boolean | null
@@ -6745,6 +7694,7 @@ export type Database = {
           ryhma?: string | null
           site_id?: string | null
           slug?: string | null
+          tiesitko?: string | null
           trivia_quiz_id?: string | null
           wikipedia_url?: string | null
         }
@@ -8566,6 +9516,418 @@ export type Database = {
         }
         Relationships: []
       }
+      ootko_daily_picks: {
+        Row: {
+          auto: boolean
+          created_at: string
+          day: string
+          test_id: string
+        }
+        Insert: {
+          auto?: boolean
+          created_at?: string
+          day: string
+          test_id: string
+        }
+        Update: {
+          auto?: boolean
+          created_at?: string
+          day?: string
+          test_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ootko_daily_picks_test_id_fkey"
+            columns: ["test_id"]
+            isOneToOne: false
+            referencedRelation: "ootko_tests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ootko_dimensions: {
+        Row: {
+          id: string
+          key: string
+          label: string
+          sort: number
+          test_id: string
+        }
+        Insert: {
+          id?: string
+          key: string
+          label: string
+          sort?: number
+          test_id: string
+        }
+        Update: {
+          id?: string
+          key?: string
+          label?: string
+          sort?: number
+          test_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ootko_dimensions_test_id_fkey"
+            columns: ["test_id"]
+            isOneToOne: false
+            referencedRelation: "ootko_tests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ootko_options: {
+        Row: {
+          effects: Json
+          id: string
+          label: string
+          media: Json | null
+          position: number
+          question_id: string
+        }
+        Insert: {
+          effects?: Json
+          id?: string
+          label: string
+          media?: Json | null
+          position: number
+          question_id: string
+        }
+        Update: {
+          effects?: Json
+          id?: string
+          label?: string
+          media?: Json | null
+          position?: number
+          question_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ootko_options_question_id_fkey"
+            columns: ["question_id"]
+            isOneToOne: false
+            referencedRelation: "ootko_questions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ootko_profile_stats_daily: {
+        Row: {
+          count: number
+          day: string
+          profile_id: string
+        }
+        Insert: {
+          count?: number
+          day?: string
+          profile_id: string
+        }
+        Update: {
+          count?: number
+          day?: string
+          profile_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ootko_profile_stats_daily_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "ootko_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ootko_profiles: {
+        Row: {
+          description_md: string
+          expression: string
+          headline: string
+          id: string
+          look: Json | null
+          name: string
+          share_line: string | null
+          slug: string
+          sort: number
+          target_vector: Json
+          test_id: string
+        }
+        Insert: {
+          description_md: string
+          expression?: string
+          headline: string
+          id?: string
+          look?: Json | null
+          name: string
+          share_line?: string | null
+          slug: string
+          sort?: number
+          target_vector: Json
+          test_id: string
+        }
+        Update: {
+          description_md?: string
+          expression?: string
+          headline?: string
+          id?: string
+          look?: Json | null
+          name?: string
+          share_line?: string | null
+          slug?: string
+          sort?: number
+          target_vector?: Json
+          test_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ootko_profiles_test_id_fkey"
+            columns: ["test_id"]
+            isOneToOne: false
+            referencedRelation: "ootko_tests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ootko_questions: {
+        Row: {
+          config: Json
+          id: string
+          media: Json | null
+          position: number
+          prompt: string
+          source_question_id: string | null
+          test_id: string
+          type: string
+        }
+        Insert: {
+          config?: Json
+          id?: string
+          media?: Json | null
+          position: number
+          prompt: string
+          source_question_id?: string | null
+          test_id: string
+          type: string
+        }
+        Update: {
+          config?: Json
+          id?: string
+          media?: Json | null
+          position?: number
+          prompt?: string
+          source_question_id?: string | null
+          test_id?: string
+          type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ootko_questions_test_id_fkey"
+            columns: ["test_id"]
+            isOneToOne: false
+            referencedRelation: "ootko_tests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ootko_server_keys: {
+        Row: {
+          created_at: string
+          key_hash: string
+          note: string | null
+        }
+        Insert: {
+          created_at?: string
+          key_hash: string
+          note?: string | null
+        }
+        Update: {
+          created_at?: string
+          key_hash?: string
+          note?: string | null
+        }
+        Relationships: []
+      }
+      ootko_stats_daily: {
+        Row: {
+          completes: number
+          copies: number
+          day: string
+          retakes: number
+          shares_fb: number
+          shares_sms: number
+          shares_wa: number
+          starts: number
+          test_id: string
+        }
+        Insert: {
+          completes?: number
+          copies?: number
+          day?: string
+          retakes?: number
+          shares_fb?: number
+          shares_sms?: number
+          shares_wa?: number
+          starts?: number
+          test_id: string
+        }
+        Update: {
+          completes?: number
+          copies?: number
+          day?: string
+          retakes?: number
+          shares_fb?: number
+          shares_sms?: number
+          shares_wa?: number
+          starts?: number
+          test_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ootko_stats_daily_test_id_fkey"
+            columns: ["test_id"]
+            isOneToOne: false
+            referencedRelation: "ootko_tests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ootko_tests: {
+        Row: {
+          created_at: string
+          cta_label: string | null
+          est_minutes: number
+          hero_alt: string | null
+          hero_bubble: string | null
+          hero_image: string | null
+          hero_line: string | null
+          hero_scene: Json | null
+          id: string
+          intro_md: string
+          meta_description: string
+          percent_dimension: string | null
+          percent_labels: Json | null
+          publish_at: string | null
+          result_mode: string
+          slug: string
+          status: string
+          theme_id: string
+          title_display: string
+          title_seo: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          cta_label?: string | null
+          est_minutes?: number
+          hero_alt?: string | null
+          hero_bubble?: string | null
+          hero_image?: string | null
+          hero_line?: string | null
+          hero_scene?: Json | null
+          id?: string
+          intro_md?: string
+          meta_description: string
+          percent_dimension?: string | null
+          percent_labels?: Json | null
+          publish_at?: string | null
+          result_mode?: string
+          slug: string
+          status?: string
+          theme_id: string
+          title_display: string
+          title_seo: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          cta_label?: string | null
+          est_minutes?: number
+          hero_alt?: string | null
+          hero_bubble?: string | null
+          hero_image?: string | null
+          hero_line?: string | null
+          hero_scene?: Json | null
+          id?: string
+          intro_md?: string
+          meta_description?: string
+          percent_dimension?: string | null
+          percent_labels?: Json | null
+          publish_at?: string | null
+          result_mode?: string
+          slug?: string
+          status?: string
+          theme_id?: string
+          title_display?: string
+          title_seo?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ootko_tests_theme_id_fkey"
+            columns: ["theme_id"]
+            isOneToOne: false
+            referencedRelation: "ootko_themes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ootko_themes: {
+        Row: {
+          accessory: string | null
+          backdrop: string | null
+          color_ground: string
+          color_on_secondary: string
+          color_primary: string
+          color_secondary: string
+          created_at: string
+          cta_label: string
+          id: string
+          in_nav: boolean
+          name: string
+          season_dates: Json
+          season_end_md: string | null
+          season_start_md: string | null
+          slug: string
+          sort: number
+        }
+        Insert: {
+          accessory?: string | null
+          backdrop?: string | null
+          color_ground: string
+          color_on_secondary: string
+          color_primary: string
+          color_secondary: string
+          created_at?: string
+          cta_label?: string
+          id?: string
+          in_nav?: boolean
+          name: string
+          season_dates?: Json
+          season_end_md?: string | null
+          season_start_md?: string | null
+          slug: string
+          sort?: number
+        }
+        Update: {
+          accessory?: string | null
+          backdrop?: string | null
+          color_ground?: string
+          color_on_secondary?: string
+          color_primary?: string
+          color_secondary?: string
+          created_at?: string
+          cta_label?: string
+          id?: string
+          in_nav?: boolean
+          name?: string
+          season_dates?: Json
+          season_end_md?: string | null
+          season_start_md?: string | null
+          slug?: string
+          sort?: number
+        }
+        Relationships: []
+      }
       page_content: {
         Row: {
           kind: string
@@ -8728,6 +10090,7 @@ export type Database = {
           quiz_id: string | null
           score: number | null
           session_id: string | null
+          share_channel: string | null
           shared: boolean | null
           total: number | null
         }
@@ -8739,6 +10102,7 @@ export type Database = {
           quiz_id?: string | null
           score?: number | null
           session_id?: string | null
+          share_channel?: string | null
           shared?: boolean | null
           total?: number | null
         }
@@ -8750,6 +10114,7 @@ export type Database = {
           quiz_id?: string | null
           score?: number | null
           session_id?: string | null
+          share_channel?: string | null
           shared?: boolean | null
           total?: number | null
         }
@@ -8795,6 +10160,7 @@ export type Database = {
           ig_tilit: string[]
           image_url: string | null
           is_daily: boolean | null
+          korttinimi: string | null
           lasten_aihe: string | null
           learn: Json | null
           lukija: string | null
@@ -8802,6 +10168,7 @@ export type Database = {
           play_count: number | null
           published_at: string | null
           scheduled_for: string | null
+          section_tags: string[]
           seo_description: string | null
           seo_title: string | null
           site_id: string | null
@@ -8839,6 +10206,7 @@ export type Database = {
           ig_tilit?: string[]
           image_url?: string | null
           is_daily?: boolean | null
+          korttinimi?: string | null
           lasten_aihe?: string | null
           learn?: Json | null
           lukija?: string | null
@@ -8846,6 +10214,7 @@ export type Database = {
           play_count?: number | null
           published_at?: string | null
           scheduled_for?: string | null
+          section_tags?: string[]
           seo_description?: string | null
           seo_title?: string | null
           site_id?: string | null
@@ -8883,6 +10252,7 @@ export type Database = {
           ig_tilit?: string[]
           image_url?: string | null
           is_daily?: boolean | null
+          korttinimi?: string | null
           lasten_aihe?: string | null
           learn?: Json | null
           lukija?: string | null
@@ -8890,6 +10260,7 @@ export type Database = {
           play_count?: number | null
           published_at?: string | null
           scheduled_for?: string | null
+          section_tags?: string[]
           seo_description?: string | null
           seo_title?: string | null
           site_id?: string | null
@@ -9234,6 +10605,105 @@ export type Database = {
         }
         Relationships: []
       }
+      synttarit_greetings: {
+        Row: {
+          age: number | null
+          created_at: string
+          id: string
+          recipient: string
+          sort: number
+          status: string
+          text: string
+          tone: string
+          updated_at: string
+        }
+        Insert: {
+          age?: number | null
+          created_at?: string
+          id?: string
+          recipient?: string
+          sort?: number
+          status?: string
+          text: string
+          tone: string
+          updated_at?: string
+        }
+        Update: {
+          age?: number | null
+          created_at?: string
+          id?: string
+          recipient?: string
+          sort?: number
+          status?: string
+          text?: string
+          tone?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      synttarit_pages: {
+        Row: {
+          age: number | null
+          body: Json
+          created_at: string
+          eyebrow: string | null
+          hero_image_credit: string | null
+          hero_image_url: string | null
+          id: string
+          ingress: string | null
+          meta_chips: string[]
+          meta_description: string | null
+          published_at: string | null
+          related_slugs: string[]
+          seo_title: string | null
+          slug: string
+          status: string
+          title: string
+          type: string
+          updated_at: string
+        }
+        Insert: {
+          age?: number | null
+          body?: Json
+          created_at?: string
+          eyebrow?: string | null
+          hero_image_credit?: string | null
+          hero_image_url?: string | null
+          id?: string
+          ingress?: string | null
+          meta_chips?: string[]
+          meta_description?: string | null
+          published_at?: string | null
+          related_slugs?: string[]
+          seo_title?: string | null
+          slug: string
+          status?: string
+          title: string
+          type: string
+          updated_at?: string
+        }
+        Update: {
+          age?: number | null
+          body?: Json
+          created_at?: string
+          eyebrow?: string | null
+          hero_image_credit?: string | null
+          hero_image_url?: string | null
+          id?: string
+          ingress?: string | null
+          meta_chips?: string[]
+          meta_description?: string | null
+          published_at?: string | null
+          related_slugs?: string[]
+          seo_title?: string | null
+          slug?: string
+          status?: string
+          title?: string
+          type?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       tmp_kuvavisat_2026_aktivointi: {
         Row: {
           id: string | null
@@ -9527,10 +10997,14 @@ export type Database = {
           display_title: string | null
           game_mode: string | null
           genre: string | null
+          hero_focal_x: number | null
+          hero_focal_y: number | null
+          hero_image: string | null
           id: string | null
           play_count: number | null
           published_at: string | null
           question_count: number | null
+          section_tags: string[] | null
           site_id: string | null
           slug: string | null
           subcollection: string | null
@@ -9549,10 +11023,14 @@ export type Database = {
           display_title?: string | null
           game_mode?: string | null
           genre?: string | null
+          hero_focal_x?: number | null
+          hero_focal_y?: number | null
+          hero_image?: string | null
           id?: string | null
           play_count?: number | null
           published_at?: string | null
           question_count?: never
+          section_tags?: string[] | null
           site_id?: string | null
           slug?: string | null
           subcollection?: string | null
@@ -9571,10 +11049,14 @@ export type Database = {
           display_title?: string | null
           game_mode?: string | null
           genre?: string | null
+          hero_focal_x?: number | null
+          hero_focal_y?: number | null
+          hero_image?: string | null
           id?: string | null
           play_count?: number | null
           published_at?: string | null
           question_count?: never
+          section_tags?: string[] | null
           site_id?: string | null
           slug?: string | null
           subcollection?: string | null
@@ -9792,6 +11274,34 @@ export type Database = {
           quiz_id: string
         }[]
       }
+      areyoou_daily_test: { Args: { p_edition: string }; Returns: string }
+      areyoou_home: {
+        Args: { p_edition: string; p_key?: string }
+        Returns: Json
+      }
+      areyoou_is_live: {
+        Args: { p_publish_at: string; p_status: string }
+        Returns: boolean
+      }
+      areyoou_key_ok: { Args: { p_key: string }; Returns: boolean }
+      areyoou_save_draft: {
+        Args: { p_key: string; p_test: Json }
+        Returns: string
+      }
+      areyoou_test_preview: {
+        Args: { p_edition: string; p_key: string; p_slug: string }
+        Returns: Json
+      }
+      areyoou_today: { Args: { p_edition: string }; Returns: string }
+      areyoou_track: {
+        Args: {
+          p_event: string
+          p_key: string
+          p_profile?: string
+          p_test: string
+        }
+        Returns: undefined
+      }
       disablelongtransactions: { Args: never; Returns: string }
       dropgeometrycolumn:
         | {
@@ -9975,6 +11485,30 @@ export type Database = {
         }[]
       }
       longtransactionsenabled: { Args: never; Returns: boolean }
+      ootko_etusivu: { Args: { p_key?: string }; Returns: Json }
+      ootko_is_live: {
+        Args: { p_publish_at: string; p_status: string }
+        Returns: boolean
+      }
+      ootko_key_ok: { Args: { p_key: string }; Returns: boolean }
+      ootko_paivan_testi: { Args: never; Returns: string }
+      ootko_tallenna_luonnos: {
+        Args: { p_key: string; p_test: Json }
+        Returns: string
+      }
+      ootko_testi_esikatselu: {
+        Args: { p_key: string; p_slug: string }
+        Returns: Json
+      }
+      ootko_track: {
+        Args: {
+          p_event: string
+          p_key: string
+          p_profile?: string
+          p_test: string
+        }
+        Returns: undefined
+      }
       paivan_sankari: {
         Args: { p_date: string; p_site: string }
         Returns: {
@@ -10661,8 +12195,10 @@ export type Database = {
           facts_reviewed_at: string | null
           id: string
           ig_tilit: string[]
+          image_credit: string | null
           image_focal_x: number | null
           image_focal_y: number | null
+          image_license: string | null
           image_url: string | null
           intro_text: string | null
           is_hero: boolean | null
@@ -10678,6 +12214,7 @@ export type Database = {
           ryhma: string | null
           site_id: string | null
           slug: string | null
+          tiesitko: string | null
           trivia_quiz_id: string | null
           wikipedia_url: string | null
         }[]

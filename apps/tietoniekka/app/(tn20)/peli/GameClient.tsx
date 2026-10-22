@@ -32,7 +32,8 @@ import { lueViikkoTulos, tallennaViikkoTulos, type ViikkoInfo, type ViikkoTulos 
 import type { KollaasiKuva } from "../../../lib/kuvavisat2026";
 import { igAvaus, igValmis } from "../../../lib/igMittaus";
 import "../peli2026.css";
-import { lyhennettyNimi } from "@/lib/korttinimi";
+import { lyhennettyNimi, jakoteksti, vastahaasteteksti } from "@/lib/korttinimi";
+import { useJako, type Jakokanava } from "@/components/tn20/jako/Jakoalue";
 import TulosNakyma from "@/components/tn20/tulos/TulosNakyma";
 import Pelipalkki from "@/components/tn20/pelikehys/Pelipalkki";
 import PeliKehys from "@/components/tn20/pelikehys/PeliKehys";
@@ -335,7 +336,6 @@ function fitHeading(el: HTMLElement | null, animate = false) {
   el.style.transition = prevTransition;
 }
 
-const enc = encodeURIComponent;
 
 export default function GameClient({ quiz }: { quiz: GameQuiz }) {
   const isKuva = quiz.kind === "kuva";
@@ -365,11 +365,9 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
   const [zoom, setZoom] = useState(false);
   const [imgs, setImgs] = useState<Record<string, "loading" | "ready" | "error">>({});
   const [bust, setBust] = useState<Record<number, number>>({});
-  const [copyState, setCopyState] = useState<"copied" | "error" | "sharefail" | null>(null);
   /* «Tiesitkö?» -selitys: leikataan vain jos se ei mahdu (CD kierros 5, arvo 4) */
   const [tipClamped, setTipClamped] = useState(false);
   const [tipOpen, setTipOpen] = useState(false);
-  const [hasShare, setHasShare] = useState(false);
   const [origin, setOrigin] = useState("https://tietoniekka.fi");
   /* K3: tulosnäkymässä luotu lyhyt haastetunnus (/h/abc123). null = ei vielä
      luotu tai luonti ei onnistunut → jaossa käytetään pitkää ?ids=-osoitetta,
@@ -397,7 +395,6 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
   const tipRef = useRef<HTMLSpanElement>(null);
   const recorded = useRef(false);
   const playIdRef = useRef<string | null>(null);
-  const copyTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const done = phase === "end";
   /* K6 (UX-korjaus 17.9.2026): kuvavisan kysymysnäkymä lukitaan ruudun
@@ -424,7 +421,6 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
 
   useEffect(() => {
     try { setOrigin(window.location.origin); } catch { /* no-op */ }
-    if (typeof navigator !== "undefined" && typeof navigator.share === "function") setHasShare(true);
     igAvaus(quiz.id); // Instagram-mittaus (?lahde=ig), lib/igMittaus.ts
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -696,18 +692,18 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
     } catch { /* best-effort: pitkä osoite jää käyttöön */ }
   }
 
-  async function markShared() {
+  /* Vaihe C: jakokanava kirjataan samalla päivityksellä (quiz_plays.share_channel, viimeisin kanava riittää). */
+  async function markShared(kanava: Jakokanava) {
     try {
       const sb = getSupabase();
       if (!sb || !playIdRef.current) return;
-      await sb.from("quiz_plays").update({ shared: true }).eq("id", playIdRef.current);
+      await sb.from("quiz_plays").update({ shared: true, share_channel: kanava }).eq("id", playIdRef.current);
     } catch { /* no-op */ }
   }
 
   function finish(finalScore: number, histNyt: Hist[] = hist, picksNyt: Array<number | null> = picks) {
     setPhase("end");
     setReview(null);
-    setCopyState(null);
     try { window.scrollTo(0, 0); } catch { /* no-op */ }
     try {
       if (quiz.id) {
@@ -817,7 +813,7 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
       }
     }
     setPhase("play"); setQi(0); setSel(null); setLocked(false); setScore(0); setStreak(0); setRight(0);
-    setHist([]); setPicks([]); setRemoved([]); setLifeLeft(oljenkorsiTotal); setReview(null); setCopyState(null);
+    setHist([]); setPicks([]); setRemoved([]); setLifeLeft(oljenkorsiTotal); setReview(null);
     recorded.current = false; playIdRef.current = null;
     try { window.scrollTo(0, 0); } catch { /* no-op */ }
   }
@@ -881,32 +877,12 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
      "Voitatko kaverisi?". Canonical pysyy /visa/<slug>:nä. */
   const tulosParam = quiz.challengePath.startsWith("/visa/") && total > 0 ? `?tulos=${right}-${total}` : "";
   const challengeUrl = haasteKoodi ? `${origin}/h/${haasteKoodi}` : `${origin}${quiz.challengePath}${tulosParam}`;
-  /* Vaihe A (21.10.2026): haastettu lähettää vastahaasteen — "{visa} – sain n/10 Tietoniekassa, sinä m/10. Vastahaaste:
-     pystytkö parempaan?" (ei emojeita). */
-  const vastahaaste = quiz.haaste && done
-    ? `${quiz.jakoNimi ?? lyhennettyNimi(quiz.title)} – sain ${right}/${total} Tietoniekassa, sinä ${quiz.haaste.oikein}/${quiz.haaste.kysymyksia}. Vastahaaste: ${right === total ? "pystytkö samaan?" : "pystytkö parempaan?"}`
-    : null;
-  const shareText = vastahaaste ?? (quiz.jakoNimi
-    ? `${quiz.jakoNimi} ${right}/${total} Tietoniekassa. Pystytkö parempaan?`
-    /* Heikki 3.10.2026: visan nimessä on usein ajatusviiva ("Kimi Räikkönen – F1:n Jäämies"),
-       joten "… -visassa"-taivutus kuulosti kömpelöltä → nimi lauseen loppuun. */
-    : `Sain ${right}/${total} Tietoniekan visassa ${quiz.title}. Pystytkö parempaan?`);
+  /* Vaihe C (22.10.2026): "{korttinimi} – sain n/10 Tietoniekassa: {tasonimi}. Pystytkö parempaan?" (täydet: "samaan"),
+     vastahaaste kuten vaiheessa A. Ei emojeita. Nimi = quizzes.korttinimi ?? lyhennetty title (page.tsx → jakoNimi);
+     viikkovisalla "Viikkovisa 38 · Kuvat". Tasonimi vain aihekohtaisista fanitasoista (fanitaso alla). */
+  const jakoNimi = quiz.jakoNimi ?? lyhennettyNimi(quiz.title);
   const linkReady = !!quiz.challengePath;
-  function clearCopyLater() { if (copyTimer.current) clearTimeout(copyTimer.current); copyTimer.current = setTimeout(() => setCopyState(null), 3000); }
-  function copyLink() {
-    const payload = `${shareText} ${challengeUrl}`;
-    const ok = () => { setCopyState("copied"); clearCopyLater(); void markShared(); };
-    const fail = () => { setCopyState("error"); clearCopyLater(); };
-    if (navigator.clipboard?.writeText) navigator.clipboard.writeText(payload).then(ok, fail);
-    else fail();
-  }
-  function nativeShare() {
-    if (!navigator.share) return;
-    navigator.share({ title: `Tietoniekka · ${quiz.title}`, text: shareText, url: challengeUrl })
-      .then(() => void markShared())
-      .catch((e: { name?: string }) => { if (e && e.name !== "AbortError") { setCopyState("sharefail"); clearCopyLater(); } });
-  }
-
+  const jakoUrl = linkReady ? challengeUrl : null;
   const category = quiz.collectionLabel;
   const countLabel = `${total} ${isKuva ? "kuvaa" : "kysymystä"}`;
   const hero = quiz.hero ?? null;
@@ -945,12 +921,11 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
      samaan .tng-restitle-mitoitukseen kuin "Harjoiteltavaa jäi". */
   const faniIndeksi = [0, 40, 60, 80, 100].indexOf(tier.min);
   const fanitaso = !vk && quiz.fanitasot && faniIndeksi >= 0 ? quiz.fanitasot[faniIndeksi] : null;
-  const liveStatus =
-    copyState === "copied" ? "Haastelinkki kopioitu leikepöydälle."
-    : copyState === "error" ? "Linkin kopiointi ei onnistunut. Yritä uudelleen."
-    : copyState === "sharefail" ? "Jakaminen ei onnistunut. Yritä uudelleen."
-    : linkReady ? "Haastelinkki valmis." : "Haastelinkkiä ei ole vielä luotu — jakaminen aktivoituu, kun linkki on olemassa.";
-  const waHref = linkReady ? `https://wa.me/?text=${enc(`${shareText} ${challengeUrl}`)}` : undefined;
+  const shareText = quiz.haaste && done
+    ? vastahaasteteksti(jakoNimi, right, total, quiz.haaste)
+    : jakoteksti(jakoNimi, right, total, fanitaso);
+  /* Megavisan pelikehys: oma "Haasta kaveri" -nappi, sama jaon logiikka kuin Jakoalueessa. */
+  const jako = useJako({ teksti: shareText, url: jakoUrl, otsikko: `Tietoniekka · ${quiz.title}`, onJaettu: (k) => void markShared(k) });
 
   const openReview = (i: number, opener?: HTMLElement | null) => {
     if (review == null) openerRef.current = opener ?? (document.activeElement as HTMLElement | null);
@@ -1148,13 +1123,13 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
               ) : undefined
             }
             haasta={
-              <button type="button" className="pk-haasta" onClick={() => (typeof navigator !== "undefined" && "share" in navigator ? nativeShare() : copyLink())}>
-                {copyState === "copied" ? "Linkki kopioitu" : "Haasta kaveri"}
+              <button type="button" className="pk-haasta" onClick={() => (jako.jaa ? jako.jaa() : jako.kopioi())}>
+                {jako.kopioitu ? "Linkki kopioitu" : "Haasta kaveri"}
               </button>
             }
             seuraavat={kehys.seuraavat}
           />
-          <p className="tng-sr" role="status" aria-live="polite">{copyState ? liveStatus : ""}</p>
+          <p className="tng-sr" role="status" aria-live="polite">{jako.tila}</p>
         </main>
         </div>
         {tarkastelu}
@@ -1183,18 +1158,7 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
               haaste={h}
               vastaukset={hist.map((v) => (v === "ok" || v === "bad" || v === "skipped" ? v : undefined))}
               avaaVastaukset={(i, el) => openReview(i, el)}
-              jako={{
-                valmis: linkReady,
-                waHref,
-                fbHref: linkReady ? `https://www.facebook.com/sharer/sharer.php?u=${enc(challengeUrl)}` : undefined,
-                teksti: shareText,
-                url: challengeUrl,
-                kopioitu: copyState === "copied",
-                kopioi: copyLink,
-                jaa: hasShare ? nativeShare : null,
-                merkitse: () => void markShared(),
-                tila: copyState ? liveStatus : "",
-              }}
+              jako={{ teksti: shareText, url: jakoUrl, natiiviOtsikko: `Tietoniekka · ${quiz.title}`, onJaettu: (k) => void markShared(k) }}
               seuraavat={quiz.related.map((r, i) => ({
                 id: r.id,
                 title: r.title,

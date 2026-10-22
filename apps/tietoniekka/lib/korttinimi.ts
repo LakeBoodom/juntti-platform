@@ -8,3 +8,16 @@ export function lyhennettyNimi(title: string): string {
 }
 
 export const korttinimi = (q: { korttinimi?: string | null; title: string }) => q.korttinimi?.trim() || lyhennettyNimi(q.title);
+
+/* Jakoteksti (vaihe C, 22.10.2026) — WhatsApp, Kopioi ja Jaa…; osoite lisätään perään erikseen. Ei emojeita.
+   "{nimi} – sain 7/10 Tietoniekassa: {tasonimi}. Pystytkö parempaan?" · täydet → "Pystytkö samaan?" ·
+   ilman tasonimeä kaksoispiste ja tasonimi jäävät pois. */
+export function jakoteksti(nimi: string, oikein: number, kysymyksia: number, tasonimi?: string | null): string {
+  const taso = tasonimi?.trim();
+  return `${nimi} – sain ${oikein}/${kysymyksia} Tietoniekassa${taso ? `: ${taso}` : ""}. ${oikein === kysymyksia ? "Pystytkö samaan?" : "Pystytkö parempaan?"}`;
+}
+
+/* Vastahaaste (vaihe A): "{nimi} – sain 8/10 Tietoniekassa, sinä 7/10. Vastahaaste: pystytkö parempaan?" */
+export function vastahaasteteksti(nimi: string, oikein: number, kysymyksia: number, kaveri: { oikein: number; kysymyksia: number }): string {
+  return `${nimi} – sain ${oikein}/${kysymyksia} Tietoniekassa, sinä ${kaveri.oikein}/${kaveri.kysymyksia}. Vastahaaste: ${oikein === kysymyksia ? "pystytkö samaan?" : "pystytkö parempaan?"}`;
+}

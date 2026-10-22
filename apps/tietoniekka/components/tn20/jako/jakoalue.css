@@ -1,0 +1,37 @@
+/* JAKOALUE (Tulosnäkymä ja jakaminen, vaihe C, 22.10.2026) — components/tn20/jako/Jakoalue.tsx.
+   Yleiskäyttöinen: tietovisan tulosnäkymä (TulosNakyma, sijoittelu tulosnakyma.css:ssä) ja pelimuodot.
+   Värit tulevat ympäröivästä näkymästä (--tt-* tulosnäkymässä); oletuksena pelikehyksen tumma iho. */
+.tn20 .tn-jako {
+  --tj-ink: var(--tt-ink, #f5f0e6); --tj-soft: var(--tt-soft, #cfc7b6); --tj-muted: var(--tt-muted, #a79e8c);
+  --tj-line: var(--tt-line, #2c2517); --tj-card: var(--tt-card, #1f1b14); --tj-raja: #3a3120;
+  --tj-acc: var(--tt-acc, var(--tnAcc, #2dd4bf));
+  box-sizing: border-box; color: var(--tj-ink);
+}
+.tn20 .tn-jako { display: flex; flex-direction: column; gap: 12px; padding: 18px 16px; border: 1px solid var(--tj-line); border-radius: 18px; background: var(--tj-card); min-width: 0; }
+.tn20 .tn-jako-h { margin: 0; font-family: var(--rk-cond, "Barlow Condensed"), "Barlow Condensed", sans-serif; font-weight: 800; font-size: 26px; line-height: 1; text-transform: uppercase; overflow-wrap: normal; word-break: normal; }
+/* WhatsAppin vihreä #25D366; tumma teksti #0B1F12 → kontrasti ≈ 9,6:1 (valkoinen olisi 1,98:1). */
+.tn20 .tn-jako-wa {
+  display: inline-flex; align-items: center; justify-content: center; gap: 10px; min-height: 56px; padding: 0 18px; border-radius: 999px;
+  background: #25d366; color: #0b1f12; text-decoration: none;
+  font-family: var(--rk-cond, "Barlow Condensed"), "Barlow Condensed", sans-serif; font-weight: 800; font-size: 20px; letter-spacing: .02em; text-transform: uppercase;
+}
+.tn20 .tn-jako-wa:hover { filter: brightness(1.05); color: #0b1f12; }
+.tn20 .tn-jako-wa:focus-visible { outline: 2px solid var(--tn-lime, #b6ff3c); outline-offset: 3px; }
+.tn20 .tn-jako-wa[aria-disabled] { opacity: .5; pointer-events: none; }
+.tn20 .tn-jako-kanavat { display: flex; gap: 8px; }
+.tn20 .tn-jako-kanava {
+  flex: 1 1 0; display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 48px; padding: 0 14px; box-sizing: border-box;
+  border: 1px solid var(--tj-raja); border-radius: 999px; background: transparent; color: var(--tj-ink); font: inherit; font-size: 15px; font-weight: 700; text-decoration: none; cursor: pointer; white-space: nowrap;
+}
+.tn20 .tn-jako-kanava:hover { border-color: #8e8676; color: var(--tj-ink); }
+.tn20 .tn-jako-kanava:focus-visible { outline: 2px solid var(--tn-lime, #b6ff3c); outline-offset: 2px; }
+.tn20 .tn-jako-kanava:disabled { opacity: .5; cursor: default; }
+.tn20 .tn-jako-kanava--ikoni { flex: none; width: 48px; padding: 0; }
+.tn20 .tn-jako-esikatselu summary { display: flex; align-items: center; min-height: 44px; font-size: 13px; font-weight: 700; color: var(--tj-muted); cursor: pointer; list-style: none; }
+.tn20 .tn-jako-esikatselu summary::-webkit-details-marker { display: none; }
+.tn20 .tn-jako-esikatselu summary:focus-visible { outline: 2px solid var(--tn-lime, #b6ff3c); outline-offset: 2px; }
+.tn20 .tn-jako-esikatselu-t { margin: 4px 0 0; padding: 12px 14px 0; border: 1px dashed var(--tj-raja); border-bottom: 0; border-radius: 12px 12px 0 0; font-size: 14px; line-height: 1.5; color: var(--tj-soft); }
+.tn20 .tn-jako-esikatselu-u { margin: 0; padding: 4px 14px 12px; border: 1px dashed var(--tj-raja); border-top: 0; border-radius: 0 0 12px 12px; font-size: 12px; color: var(--tj-acc); overflow-wrap: anywhere; }
+
+.tn20 .tn-jako-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+@media (max-width: 359px) { .tn20 .tn-jako-wa { font-size: 18px; } }

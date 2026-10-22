@@ -1,4 +1,4 @@
-// TULOSNÄKYMÄN tarkistus (Tulosnäkymä ja jakaminen, vaihe B, 22.10.2026): pelaa visan läpi kerran ja mittaa
+// TULOSNÄKYMÄN tarkistus (Tulosnäkymä ja jakaminen, vaiheet B–C, 22.10.2026): pelaa visan läpi kerran ja mittaa
 // tulosnäkymän leveyksillä 320/390/768/1024/1440/1920/2450 (KORTTISÄÄNTÖ, Range-mittaus):
 //   - otsikoiden ja tekstien ylivuoto, vaakavieritys, teksti ≥ 12 px, kosketuskohteet ≥ 44 px
 //   - 390 × 844: tulos ja WhatsApp-painike ilman vieritystä; 1440 × 900: tulos, jako ja seuraava visa
@@ -10,7 +10,7 @@ const MOOTTORI = process.argv[3] || "webkit";
 const POLUT = process.argv.slice(4).length ? process.argv.slice(4) : ["/peli?visa=joker-2019-tietovisa"];
 // 1440 ensin: mitataan tuoreesta latauksesta (WebKit ei asettele leveää ruudukkoa täysin uudelleen 390 → 1440 -koonmuutoksessa).
 const LEVEYDET = [1440, 2450, 1920, 1024, 768, 390, 320];
-const TEKSTI = ".tn-tulos-eyebrow,.tn-tulos-tasonimi,.tn-tulos-pisteet,.tn-tulos-tuomio,.tn-tulos-lause,.tn-tulos-pikku,.tn-tulos-nayta,.tn-tulos-jako-h,.tn-tulos-jako-p,.tn-tulos-wa,.tn-tulos-kanava,.tn-tulos-kortti-nimi,.tn-tulos-kortti-ala,.tn-tulos-kortti-cta,.tn-tulos-linkit a,.tn-tulos-linkit button,.pk-peli,.pk-paluu,.tn-tulos-esikatselu summary";
+const TEKSTI = ".tn-tulos-eyebrow,.tn-tulos-tasonimi,.tn-tulos-pisteet,.tn-tulos-tuomio,.tn-tulos-lause,.tn-tulos-pikku,.tn-tulos-nayta,.tn-jako-h,.tn-jako-wa,.tn-jako-kanava,.tn-tulos-kortti-nimi,.tn-tulos-kortti-ala,.tn-tulos-kortti-cta,.tn-tulos-linkit a,.tn-tulos-linkit button,.pk-peli,.pk-paluu,.tn-jako-esikatselu summary";
 (async () => {
   const b = MOOTTORI === "chromium"
     ? await pw.chromium.launch({ executablePath: process.env.CHROME_PATH || "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" })
@@ -29,6 +29,13 @@ const TEKSTI = ".tn-tulos-eyebrow,.tn-tulos-tasonimi,.tn-tulos-pisteet,.tn-tulos
       const n = await p.$(".tng-next"); if (n) { await n.click().catch(() => {}); await p.waitForTimeout(160); }
     }
     if (!(await p.$(".tn-tulos"))) { console.log(MOOTTORI, polku, "EI TULOSNÄKYMÄÄ"); virheita++; await ctx.close(); continue; }
+    // Vaihe C: jakoteksti briefin muodossa, ei emojeita; WhatsApp-linkissä sama teksti + osoite.
+    const jako = await p.evaluate(() => ({ t: document.querySelector(".tn-jako-esikatselu-t")?.textContent ?? "", wa: document.querySelector(".tn-jako-wa")?.getAttribute("href") ?? "" }));
+    const muoto = /^.+ – sain \d+\/\d+ Tietoniekassa(: [^.]+)?\. Pystytkö (parempaan|samaan)\?$|^.+ – sain \d+\/\d+ Tietoniekassa, sinä \d+\/\d+\. Vastahaaste: pystytkö (parempaan|samaan)\?$/u;
+    const emoji = /\p{Extended_Pictographic}/u;
+    const waT = decodeURIComponent(jako.wa.replace(/^https:\/\/wa\.me\/\?text=/, ""));
+    if (!muoto.test(jako.t) || emoji.test(jako.t) || !waT.startsWith(jako.t + " http")) { console.log(MOOTTORI, polku, "✗ jakoteksti:", JSON.stringify(jako.t), "| wa:", JSON.stringify(waT)); virheita++; }
+    else console.log(MOOTTORI, polku, "jakoteksti ✓", JSON.stringify(waT));
     for (const w of LEVEYDET) {
       const h = w === 1440 ? 900 : 844;
       await p.setViewportSize({ width: w, height: h }); await p.evaluate(() => scrollTo(0, 0)); await p.waitForTimeout(400);
@@ -48,8 +55,8 @@ const TEKSTI = ".tn-tulos-eyebrow,.tn-tulos-tasonimi,.tn-tulos-pisteet,.tn-tulos
         });
         const hs = document.documentElement.scrollWidth - innerWidth; if (hs > 0) out.push(`vaakavieritys ${hs}`);
         const ala = (s) => { const e = document.querySelector(s); return e ? Math.round(e.getBoundingClientRect().bottom + scrollY) : null; };
-        if (w === 390) { if (ala(".tn-tulos-wa") > 844) out.push(`WhatsApp ${ala(".tn-tulos-wa")} > 844`); if (ala(".tn-tulos-tulos") > 844) out.push("tulos > 844"); }
-        if (w === 1440) for (const s of [".tn-tulos-tulos", ".tn-tulos-jako", ".tn-tulos-seuraava"]) if (ala(s) > 900) out.push(`${s} ${ala(s)} > 900`);
+        if (w === 390) { if (ala(".tn-jako-wa") > 844) out.push(`WhatsApp ${ala(".tn-jako-wa")} > 844`); if (ala(".tn-tulos-tulos") > 844) out.push("tulos > 844"); }
+        if (w === 1440) for (const s of [".tn-tulos-tulos", ".tn-jako", ".tn-tulos-seuraava"]) if (ala(s) > 900) out.push(`${s} ${ala(s)} > 900`);
         return out;
       }, [TEKSTI, w]);
       virheita += v.length;

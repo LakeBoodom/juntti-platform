@@ -6,6 +6,7 @@
 // kaveri saa täsmälleen saman sarjan.
 
 import { JsonLd, breadcrumbLd, abs } from "@/lib/jsonLd";
+import { korttinimi } from "@/lib/korttinimi";
 import { haeRistiinnostot, type RelatedRow } from "@/lib/related";
 import { henkiloHref } from "@/lib/henkiloSlug";
 import { visaHref } from "@/lib/visaHref";
@@ -210,6 +211,8 @@ type QuizRow = {
   updated_at?: string | null;
   /* Aihekohtaiset tulostasot (migraatio 20260928, Instagram-kierros 4) */
   fanitasot?: unknown;
+  /* Jakokortin ja jakotekstin nimi (vaihe C, 22.10.2026); tyhjä → lyhennetty title */
+  korttinimi?: string | null;
 };
 
 export default async function Peli20({
@@ -623,7 +626,7 @@ export default async function Peli20({
 
   let q = sb
     .from("quizzes")
-    .select("id, slug, title, display_title, teaser, description, category, collection, genre, learn, hero_image, hero_focal_x, hero_focal_y, hero_side, hero_alt, fanitasot, updated_at")
+    .select("id, slug, title, display_title, teaser, description, category, collection, genre, learn, hero_image, hero_focal_x, hero_focal_y, hero_side, hero_alt, fanitasot, korttinimi, updated_at")
     .eq("status", "published");
   q = quizId ? q.eq("id", quizId) : q.eq("slug", slug!);
   const { data: quiz } = await q.maybeSingle<QuizRow>();
@@ -768,6 +771,7 @@ export default async function Peli20({
         ? { href: henkiloHref(celeb.name), linkki: celeb.nimi_elatiivi?.trim() ? `Lue lisää ${celeb.nimi_elatiivi.trim()}` : `Lue lisää: ${celeb.name}` }
         : null,
     citySlug: KAUPUNGIT.find((c) => c.quizSlug === quiz.slug)?.id ?? null,
+    jakoNimi: korttinimi({ korttinimi: quiz.korttinimi, title: quiz.display_title ?? quiz.title }),
     fanitasot:
       Array.isArray(quiz.fanitasot) && quiz.fanitasot.length === 5 && quiz.fanitasot.every((t) => typeof t === "string" && t.trim())
         ? (quiz.fanitasot as string[]).map((t) => t.trim())
