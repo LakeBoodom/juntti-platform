@@ -28,3 +28,12 @@ export function vastahaasteteksti(nimi: string, oikein: number, kysymyksia: numb
 export function pelijakoteksti(nimi: string, tulos: string, taydet = false): string {
   return `${nimi} – sain ${tulos} Tietoniekassa. ${taydet ? "Pystytkö samaan?" : "Pystytkö parempaan?"}`;
 }
+
+/* Tasonimi tuloksesta (quizzes.fanitasot, 5 nimeä, rajat 0/40/60/80/100 %) — sama logiikka kuin GameClientin
+   faniIndeksi. Jakokuvat (postikortin tasonauha) ja tuloslinkin og:description. */
+export function tasonimiTuloksesta(fanitasot: unknown, oikein: number, kysymyksia: number): string | null {
+  if (!Array.isArray(fanitasot) || fanitasot.length !== 5 || !fanitasot.every((t) => typeof t === "string" && t.trim())) return null;
+  const pct = kysymyksia > 0 ? (oikein / kysymyksia) * 100 : 0;
+  const i = pct >= 100 ? 4 : pct >= 80 ? 3 : pct >= 60 ? 2 : pct >= 40 ? 1 : 0;
+  return (fanitasot[i] as string).trim();
+}

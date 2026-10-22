@@ -6,7 +6,7 @@
 // kaveri saa täsmälleen saman sarjan.
 
 import { JsonLd, breadcrumbLd, abs } from "@/lib/jsonLd";
-import { korttinimi } from "@/lib/korttinimi";
+import { korttinimi, tasonimiTuloksesta } from "@/lib/korttinimi";
 import { haeRistiinnostot, type RelatedRow } from "@/lib/related";
 import { henkiloHref } from "@/lib/henkiloSlug";
 import { visaHref } from "@/lib/visaHref";
@@ -130,9 +130,9 @@ export async function generateMetadata(
         ...(lasten.julkaistu ? {} : { robots: { index: false, follow: false } }),
       };
     }
-    let q = sb.from("quizzes").select("title, display_title, teaser, description, slug, seo_title, seo_description, collection").eq("status", "published");
+    let q = sb.from("quizzes").select("title, display_title, teaser, description, slug, seo_title, seo_description, collection, korttinimi, fanitasot").eq("status", "published");
     q = quizId ? q.eq("id", quizId) : q.eq("slug", slug!);
-    const { data } = await q.maybeSingle<{ title: string; display_title: string | null; teaser: string | null; description: string | null; slug: string | null; seo_title: string | null; seo_description: string | null; collection: string | null }>();
+    const { data } = await q.maybeSingle<{ title: string; display_title: string | null; teaser: string | null; description: string | null; slug: string | null; seo_title: string | null; seo_description: string | null; collection: string | null; korttinimi: string | null; fanitasot: unknown }>();
     if (!data) return { title: `Visaa ei löytynyt${suffix}` };
     const name = data.display_title ?? data.title;
     /* Kanoninen osoite on /visa/<slug> (julkaisu 31.8.2026) — myös silloin kun
@@ -158,7 +158,18 @@ export async function generateMetadata(
       hakuOtsikko = `${henkilo} – tietovisa: kuinka hyvin tunnet?${suffix}`;
     }
     const visaPolku = data.slug ? `/visa/${data.slug}` : `/peli?quiz_id=${quizId}`;
-    const ogKuva = data.slug ? `/og/visa/${encodeURIComponent(data.slug)}${tulos ? `?tulos=${tulos}` : ""}` : "/og-image.png";
+    /* Vaihe D (22.10.2026): tuloslinkin postikortti ja og-kentät "{korttinimi} – pystytkö parempaan?" /
+       "Sain 7/10 Tietoniekassa: {tasonimi}." Virheellinen tulos (n > total) → tavallinen visakortti. */
+    const [n, kaikki] = (tulos ?? "").split("-").map(Number);
+    const jaettu = tulos && kaikki > 0 && n <= kaikki ? { n, kaikki } : null;
+    const ogKuva = data.slug ? `/og/visa/${encodeURIComponent(data.slug)}${jaettu ? `?tulos=${tulos}` : ""}` : "/og-image.png";
+    if (jaettu) {
+      const kn = korttinimi({ korttinimi: data.korttinimi, title: name });
+      const taso = tasonimiTuloksesta(data.fanitasot, jaettu.n, jaettu.kaikki);
+      const ogOtsikko = `${kn} – ${jaettu.n === jaettu.kaikki ? "pystytkö samaan?" : "pystytkö parempaan?"}`;
+      const ogKuvaus = `Sain ${jaettu.n}/${jaettu.kaikki} Tietoniekassa${taso ? `: ${taso}` : ""}.`;
+      return { title: hakuOtsikko, description: visaDesc, ...og(ogOtsikko, ogKuvaus, ogKuva, visaPolku), ...canonical };
+    }
     return { title: hakuOtsikko, description: visaDesc, ...og(name, visaDesc, ogKuva, visaPolku), ...canonical };
   }
   return { title: `Visaa ei löytynyt${suffix}` };
