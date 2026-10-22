@@ -105,6 +105,8 @@ export type GameQuiz = {
     roleLabel?: string | null;
     /** Mobiilin kuvatila (lib/herotila.ts): cover = 3b-rajaus, fit-blur = varamalli 4. */
     mode?: "cover" | "fit-blur";
+    /** Grafiikka (kuvavisan liput, vaakunat, maalaukset): kokonaisena myös vaakanäkymässä. */
+    sovitus?: "contain";
   } | null;
   /** Erä B6: henkilövisan henkilösivu — aloitusnäkymän yläotsikko ja tulosnäkymän "Lue lisää …" -linkki. */
   henkilo?: { href: string; linkki: string } | null;
@@ -1261,7 +1263,7 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
               ilman vieritystä myös 360 × 640:ssä. Vaaka ≥ 768 px = 1c (kuva
               kirkkaana, tummennus vain tekstin puolella), pysty = 2b pystyjuliste. */}
           {phase === "start" && hero && (
-            <section className="tng-hero" data-kind={hero.kind} data-side={hero.side} data-mode={hero.mode ?? "cover"} aria-label="Visan aloitus">
+            <section className="tng-hero" data-kind={hero.kind} data-side={hero.side} data-mode={hero.mode ?? "cover"} data-sovitus={hero.sovitus} aria-label="Visan aloitus">
               <div className="tng-heroview">
                 {/* Kuvakerros: vaakanäkymässä koko heron tausta kuten ennen; mobiilissa (< 768 px)
                     oma 6:5-alue tekstin yläpuolella (handoff "Visan pääkuva mobiili" 7.10.2026).

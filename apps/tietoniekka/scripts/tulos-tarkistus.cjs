@@ -3,6 +3,7 @@
 //   - otsikoiden ja tekstien ylivuoto, vaakavieritys, teksti ≥ 12 px, kosketuskohteet ≥ 44 px
 //   - 390 × 844: tulos ja WhatsApp-painike ilman vieritystä; 1440 × 900: tulos, jako ja seuraava visa
 // Testipelaus kirjautuu quiz_plays-tauluun session_id:llä "testi-claude-tulos" → poista testin jälkeen.
+// Kuvavisan haastetunnuksen luonti estetään (ei testirivejä kuvavisa_haasteet-tauluun).
 // Käyttö: NODE_PATH=…/node_modules node apps/tietoniekka/scripts/tulos-tarkistus.cjs <URL> [webkit|chromium] [polku…]
 const pw = require("playwright");
 const BASE = process.argv[2];
@@ -19,6 +20,8 @@ const TEKSTI = ".tn-tulos-eyebrow,.tn-tulos-tasonimi,.tn-tulos-pisteet,.tn-tulos
   for (const polku of POLUT) {
     const ctx = await b.newContext({ viewport: { width: 1440, height: 900 }, deviceScaleFactor: 1 });
     await ctx.addInitScript(() => { try { localStorage.setItem("tn_session_id", "testi-claude-tulos"); } catch {} });
+    // Kuvavisan haastetunnusta (kuvavisa_haasteet) ei luoda testissä: jako käyttää silloin pitkää ?ids=-osoitetta.
+    await ctx.route(/\/rest\/v1\/rpc\/kuvavisa_haaste_luo/, (r) => r.abort());
     const p = await ctx.newPage(); p.on("dialog", (d) => d.accept());
     await p.goto(BASE + polku, { waitUntil: "load", timeout: 180000 }); await p.waitForTimeout(1200);
     await p.click(".tng-herobtn, .tng-start-btn, .vv-btn");

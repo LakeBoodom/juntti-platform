@@ -12,6 +12,8 @@
 //   - Päivän ketju kerran päivässä (tulos selaimeen, "jo pelattu"); "Pelaa uusi ketju" arpoo
 //     harjoitusketjun (?ketju=), joka ei vaikuta päivän tulokseen.
 
+import { pelijakoteksti } from "./korttinimi";
+
 export const VPK_SIVU = "/peli/vaalipiiriketju";
 export const VPK_NIMI = "Vaalipiiriketju";
 export const VPK_KORTTEJA = 8;
@@ -95,7 +97,7 @@ export function tarkista(vpt: string[], linkit: Record<string, VpkLinkki>) {
 /** Jaettava teksti (CD 2k): ei nimiä, ei vaalipiirejä, ei reittiä. Aina päivän ketjun tulos. */
 export function jakoteksti(numero: number, kortit: boolean[]): string {
   const oikein = kortit.filter(Boolean).length;
-  return `${VPK_NIMI} #${numero} · ${oikein}/${VPK_JARJESTETTAVIA}\n${kortit.map((k) => (k ? "🟩" : "🟥")).join("")}`;
+  return pelijakoteksti(`${VPK_NIMI} #${numero}`, `${oikein}/${VPK_JARJESTETTAVIA}`, oikein === VPK_JARJESTETTAVIA);
 }
 
 /** Päivän ketjun tulos selaimessa (pelinäkymän "jo pelattu" ja hubin kortin Pelattu-tila). */

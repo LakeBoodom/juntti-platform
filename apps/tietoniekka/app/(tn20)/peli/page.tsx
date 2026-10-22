@@ -12,7 +12,7 @@ import { henkiloHref } from "@/lib/henkiloSlug";
 import { visaHref } from "@/lib/visaHref";
 import { getSupabase } from "@/lib/supabase";
 import { getKuvavisat, getKuvavisatByIds } from "@/lib/queries";
-import { TASOT, MAANOSAT, KATEGORIAT, variaationNimi, alueRajaus, poolinHarhauttimet, getViikkovisa, getViikkoKollaasi, levynSavy, VIIKKOVISA_KUVIA } from "@/lib/kuvavisat2026";
+import { TASOT, MAANOSAT, KATEGORIAT, variaationNimi, alueRajaus, poolinHarhauttimet, getViikkovisa, getViikkoKollaasi, levynSavy, VIIKKOVISA_KUVIA, kuvavisanKansi } from "@/lib/kuvavisat2026";
 import { viikkoInfo, viikkoNimi, viikkoAvaimesta, VIIKKO_AKSENTTI } from "@/lib/viikkovisa";
 import { haeHaaste } from "@/lib/haaste";
 import { kulttuuriImg } from "@/lib/kulttuuri";
@@ -577,6 +577,10 @@ export default async function Peli20({
        eroavat osassa kortistoja (esim. /peli?kuvavisa=vaakuna → "vaakunat"). */
     const levy = KATEGORIAT.find((k) => k.type === rows[0]?.type)?.sovitus === "contain" ? "vaalea" : "tumma";
     const variaatio = alue?.otsikko ?? variaationNimi(kuvavisa, taso, maanosa?.key ?? null);
+    /* Pikakorjaus 22.10.2026: aloitus näytti desktopilla tyhjän mustan alueen (ei heroa). Hero = kortiston
+       esikatselukuva kuten Kuvavisat-kokoelman kortissa; grafiikka (liput, vaakunat, maalaukset) kokonaisena
+       sumennetulla taustalla. Viikkovisan haasteella (sekakortisto) ei kansikuvaa. */
+    const kansi = kuvavisa === "viikko" ? null : await kuvavisanKansi(rows[0]?.type, new Set(rows.map((r) => r.id)));
     const game: GameQuiz = {
       id: "", // ei quizzes-riviä → pelikertaa ei tallenneta
       /* T4: "Afrikan liput" / "Vaikeat liput" — sama nimi kuin kokoelmasivun linkissä. */
@@ -587,6 +591,18 @@ export default async function Peli20({
       hubHref: "/kokoelma/kuvavisat",
       /* K1: ei taustakuvaa kuvavisoissa — tasainen brändipohja, ks. GameClient. */
       bgImg: "",
+      hero: kansi
+        ? {
+            image: kansi.src,
+            focalX: 0.5,
+            focalY: 0.45,
+            side: "right",
+            alt: `${variaatio ?? deck.title}${kansi.lahde ? `. Kuva: ${kansi.lahde}` : ""}`,
+            kind: "kuva",
+            mode: kansi.sovitus === "contain" ? "fit-blur" : "cover",
+            sovitus: kansi.sovitus === "contain" ? "contain" : undefined,
+          }
+        : null,
       /* Kuvavisat = designin sininen (kuvavisa-README) */
       accent: "#3B82F6",
       isSankari: false,

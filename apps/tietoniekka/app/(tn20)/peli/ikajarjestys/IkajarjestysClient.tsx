@@ -11,6 +11,7 @@
 // tallennusta pelaajan järjestyksestä — sessionStorage tyhjenee välilehden
 // sulkeutuessa eikä mitään kirjoiteta kantaan pelin aikana.
 
+import { pelijakoteksti } from "@/lib/korttinimi";
 import { useMemo, useState, type CSSProperties } from "react";
 import { getChainRound } from "@/lib/ikajarjestys";
 import {
@@ -93,7 +94,7 @@ export default function IkajarjestysClient({
   async function haasta() {
     if (!round || !scoreResult) return;
     const url = `${location.origin}/peli/ikajarjestys?henkilot=${round.map((p) => p.id).join(",")}`;
-    const teksti = `Sain ${scoreResult.correctCount}/${scoreResult.totalCount} oikein Ikäjärjestyksessä. Pystytkö parempaan?`;
+    const teksti = pelijakoteksti(PELI, `${scoreResult.correctCount}/${scoreResult.totalCount}`, scoreResult.correctCount === scoreResult.totalCount);
     try {
       if (navigator.share) await navigator.share({ title: PELI, text: teksti, url });
       else await navigator.clipboard.writeText(`${teksti} ${url}`);

@@ -1,6 +1,7 @@
 "use client";
 // Laadullinen järjestyspakka (brief 4.10.2026): Ikäjärjestyksen järjestämis- ja paljastuskomponentit,
 // pisteytys yhteinen pakkapelien kanssa (lib/jarjesta/pisteytys.ts: 10/5, tasatulokset "tasan").
+import { pelijakoteksti } from "@/lib/korttinimi";
 import { useMemo, useState } from "react";
 import { ReorderableChainList } from "@/components/tn20/ReorderableChainList";
 import { SuuntaindikaattoriBadge } from "@/components/tn20/SuuntaindikaattoriBadge";
@@ -69,7 +70,7 @@ export default function OmaJarjestysClient({
 
   async function haasta() {
     const url = location.href;
-    const teksti = `Sain ${tulos.correctCount}/${tulos.totalCount} oikein: ${otsikko}. Pystytkö parempaan?`;
+    const teksti = pelijakoteksti(otsikko, `${tulos.correctCount}/${tulos.totalCount}`, tulos.correctCount === tulos.totalCount);
     try {
       if (navigator.share) await navigator.share({ title: PELI, text: teksti, url });
       else await navigator.clipboard.writeText(`${teksti} ${url}`);

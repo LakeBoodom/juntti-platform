@@ -15,6 +15,7 @@
 // sivua, kosketuksella raahaus alkaa pitkästä painalluksesta, kahvasta heti. Napautus valitsee
 // kortin ja toinen napautus vaihtaa paikat. Näppäimistö: välilyönti valitsee, nuolet siirtävät.
 
+import { pelijakoteksti } from "@/lib/korttinimi";
 import { useEffect, useMemo, useRef, useState, type CSSProperties, type PointerEvent as RPointerEvent, type KeyboardEvent } from "react";
 import { getSupabase } from "@/lib/supabase";
 import { KL_PISTEET, KL_SIVU, KL_YHTEYKSIA, pariAvain, uusiReittiSiemen, type KlKunta, type KlReitti } from "@/lib/kuntaliitos";
@@ -517,9 +518,8 @@ export default function ReittipeliClient({
 
   async function haasta() {
     const url = `${location.origin}${osoite(siemen)}`;
-    const rivi = tulokset.map((t) => (t === "ok" ? "🟩" : "🟥")).join("");
     const nimi = (paivanReitti ? `${peli.nimi} · päivän reitti ${paivays}` : peli.nimi) + (maakuntaNimi ? ` (${maakuntaNimi})` : "");
-    const teksti = `${nimi}: ${rivi} ${oikein}/${KL_YHTEYKSIA}${yritys > 1 ? ` (${yritys}. yritys)` : ""}. Pystytkö rakentamaan reitin ${ratkaisu[0].n} – ${ratkaisu.at(-1)!.n}?`;
+    const teksti = pelijakoteksti(nimi, `${oikein}/${KL_YHTEYKSIA}`, oikein === KL_YHTEYKSIA);
     try {
       if (navigator.share) await navigator.share({ title: peli.nimi, text: teksti, url });
       else await navigator.clipboard.writeText(`${teksti} ${url}`);

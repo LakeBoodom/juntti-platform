@@ -119,15 +119,21 @@
 .tn20 [data-iho] .pk-haasta:focus-visible { outline: 2px solid var(--tn-lime, #b6ff3c); outline-offset: 2px; }
 .tn20 .pk-seuraava { display: flex; flex-direction: column; gap: 12px; padding-top: 8px; border-top: 1px solid var(--pk-line); }
 .tn20 .pk-seuraava-h { margin: 16px 0 0; font-family: var(--rk-cond), "Barlow Condensed", sans-serif; font-weight: 800; font-size: 26px; line-height: 1; text-transform: uppercase; }
+/* Pelikortit (pikakorjaus 22.10.2026, Heikki): vanhassa vaakakortissa kuvake ja "Pelaa →" söivät desktopin
+   kolmen sarakkeen kortista tekstipalstan, ja nimi kutistui 3,6–7,8 px:iin (mitattu 1440, WebKit). Nyt pystykortti:
+   kuvake ylhäällä, nimi 16–20 px (pisimmän sanan mukaan, saa rivittyä sanavälistä), kuvaus enintään 2 riviä,
+   "Pelaa →" omalla rivillään. Mobiilissa (< 600 px) kortit allekkain. */
 .tn20 .pk-seuraava-rivi { display: grid; grid-template-columns: 1fr; gap: 10px; }
-.tn20 .pk-pelikortti { display: flex; align-items: center; gap: 14px; min-height: 88px; padding: 14px 16px; border-radius: 14px; background: var(--pk-kortti); border: 1px solid var(--pk-line); color: var(--pk-ink); text-decoration: none; box-sizing: border-box; }
+@media (min-width: 600px) { .tn20 .pk-seuraava-rivi { grid-template-columns: repeat(auto-fit, minmax(176px, 1fr)); } }
+.tn20 .pk-pelikortti { display: flex; flex-direction: column; align-items: flex-start; gap: 8px; padding: 16px; border-radius: 14px; background: var(--pk-kortti); border: 1px solid var(--pk-line); color: var(--pk-ink); text-decoration: none; box-sizing: border-box; min-width: 0; container-type: inline-size; }
 .tn20 .pk-pelikortti:hover { border-color: var(--pk-acc); }
 .tn20 .pk-pelikortti:focus-visible { outline: 2px solid var(--tn-lime, #b6ff3c); outline-offset: 2px; }
-.tn20 .pk-pelikortti-ikoni { flex: none; width: 52px; height: 52px; border-radius: 12px; border: 1.5px solid var(--pk-acc); display: grid; place-items: center; color: var(--pk-acc); }
-.tn20 .pk-pelikortti-teksti { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; container-type: inline-size; }
-/* KORTTISÄÄNTÖ: nimi pisimmästä sanasta (IKÄJÄRJESTYS ylitti 320 px:ssä, mitattu 20.10.2026); 100cqi = tekstipalsta. */
-.tn20 .pk-pelikortti-nimi { font-family: var(--rk-cond), "Barlow Condensed", sans-serif; font-weight: 800; font-size: min(19px, calc(100cqi / (var(--pk-lw, 1) * .64))); line-height: 1.05; text-transform: uppercase; overflow-wrap: normal; word-break: normal; hyphens: manual; }
-.tn20 .pk-pelikortti-kuvaus { font-size: 13px; line-height: 1.4; color: var(--pk-dim); }
-.tn20 .pk-pelikortti-cta { flex: none; font-size: 13px; font-weight: 700; color: var(--pk-acc); white-space: nowrap; }
-@media (min-width: 900px) { .tn20 .pk-tulos { max-width: 1000px; } .tn20 .pk-seuraava-rivi { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+.tn20 .pk-pelikortti-ikoni { flex: none; width: 40px; height: 40px; border-radius: 10px; border: 1.5px solid var(--pk-acc); display: grid; place-items: center; color: var(--pk-acc); box-sizing: border-box; }
+.tn20 .pk-pelikortti-ikoni svg { width: 22px; height: 22px; }
+/* KORTTISÄÄNTÖ: 100cqi = kortin sisäleveys; .6 ≈ Barlow Condensed 800 uppercase -merkin leveys (em). Alaraja 16 px:
+   kapein kortti (176 px − 32 px) mahduttaa 16 px:llä 15–16 merkin sanan, pisin rekisterissä 15 (VAALIPIIRIKETJU). */
+.tn20 .pk-pelikortti-nimi { font-family: var(--rk-cond), "Barlow Condensed", sans-serif; font-weight: 800; font-size: clamp(16px, calc(100cqi / (var(--pk-lw, 1) * .6)), 20px); line-height: 1.08; text-transform: uppercase; overflow-wrap: normal; word-break: normal; hyphens: manual; text-wrap: balance; }
+.tn20 .pk-pelikortti-kuvaus { font-size: 14px; line-height: 1.4; color: var(--pk-dim); display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; line-clamp: 2; overflow: hidden; }
+.tn20 .pk-pelikortti-cta { margin-top: auto; padding-top: 2px; font-size: 14px; font-weight: 700; color: var(--pk-acc); white-space: nowrap; }
+@media (min-width: 900px) { .tn20 .pk-tulos { max-width: 1000px; } }
 @media (prefers-reduced-motion: reduce) { .tn20 :is(.pk-ohje, .pk-lapikaynti)[open] summary span::before { transform: none; } }

@@ -4,6 +4,7 @@
 // välimuistitetaan; kierros arvotaan vasta "Aloita"-napista (Server Action), joten
 // sivu ei lue searchParamsia eikä kaikille tarjoilla samaa välimuistissa olevaa kierrosta.
 
+import { PELIMUODOT } from "@/lib/pelimuodot";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { JsonLd, peliLd } from "@/lib/jsonLd";
@@ -36,7 +37,9 @@ export default async function JarjestaPakkaPage({ params }: { params: Promise<{ 
   // Muut järjestyspelit: saman kokoelman pakat ensin.
   const muut = JULKAISTUT.filter((x) => x.slug !== p.slug)
     .sort((a, b) => Number(b.collection.slug === p.collection.slug) - Number(a.collection.slug === p.collection.slug))
-    .map((x) => ({ href: pakkaHref(x), otsikko: x.otsikko }));
+    /* Pikakorjaus 22.10.2026: samat pelikortit kuin "Seuraava peli" (rekisterin rivi, nimi ilman pelin etuliitettä). */
+    .flatMap((x) => PELIMUODOT.filter((m) => m.slug === `jarjesta-${x.slug}`))
+    .map((m) => ({ ...m, nimi: m.nimi.replace(/^Laita järjestykseen: /, "") }));
   return (
     <>
       <JsonLd data={peliLd({ name: p.seoTitle, url: pakkaHref(p), description: p.kuvaus })} />

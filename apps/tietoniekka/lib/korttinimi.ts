@@ -21,3 +21,10 @@ export function jakoteksti(nimi: string, oikein: number, kysymyksia: number, tas
 export function vastahaasteteksti(nimi: string, oikein: number, kysymyksia: number, kaveri: { oikein: number; kysymyksia: number }): string {
   return `${nimi} – sain ${oikein}/${kysymyksia} Tietoniekassa, sinä ${kaveri.oikein}/${kaveri.kysymyksia}. Vastahaaste: ${oikein === kysymyksia ? "pystytkö samaan?" : "pystytkö parempaan?"}`;
 }
+
+/* Pelimuotojen väliaikainen jakoteksti (pikakorjaus 22.10.2026) samalla kaavalla:
+   "Tupla tai kuitti: SM-liiga – sain 32 kiekkoa Tietoniekassa. Pystytkö parempaan?" — ei emojeita eikä tulosriviä.
+   Kunnollinen jakoalue tulee pelimuotobriefissä (Jakoalue-komponentti). */
+export function pelijakoteksti(nimi: string, tulos: string, taydet = false): string {
+  return `${nimi} – sain ${tulos} Tietoniekassa. ${taydet ? "Pystytkö samaan?" : "Pystytkö parempaan?"}`;
+}

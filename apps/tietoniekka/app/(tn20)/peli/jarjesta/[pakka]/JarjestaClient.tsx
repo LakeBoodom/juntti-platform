@@ -4,6 +4,7 @@
 // suunta tulevat pakasta. Vaiheet: aloitus → järjestäminen → paljastus.
 // Toistonesto kuten Ikäjärjestyksessä: edellisen kierroksen id:t sessionStorageen.
 
+import { pelijakoteksti } from "@/lib/korttinimi";
 import { useMemo, useState } from "react";
 import { haeJarjestysKierros } from "@/lib/jarjesta/kierros";
 import {
@@ -21,8 +22,8 @@ import {
 import Pelipalkki from "@/components/tn20/pelikehys/Pelipalkki";
 import PeliKehys from "@/components/tn20/pelikehys/PeliKehys";
 import PeliAloitus from "@/components/tn20/pelikehys/PeliAloitus";
-import PeliTulos from "@/components/tn20/pelikehys/PeliTulos";
-import { seuraavatPelit } from "@/lib/pelimuodot";
+import PeliTulos, { Pelikortit } from "@/components/tn20/pelikehys/PeliTulos";
+import { seuraavatPelit, type Pelimuoto } from "@/lib/pelimuodot";
 
 const PELI = "Laita järjestykseen";
 
@@ -56,7 +57,7 @@ export default function JarjestaClient({
   muut,
 }: {
   pakka: Pakka;
-  muut: { href: string; otsikko: string }[];
+  muut: Pelimuoto[];
 }) {
   const [round, setRound] = useState<JarjestysKohde[] | null>(null);
   const [order, setOrder] = useState<JarjestysKohde[]>([]);
@@ -87,7 +88,7 @@ export default function JarjestaClient({
   async function haasta() {
     if (!scoreResult) return;
     const url = `${location.origin}${location.pathname}`;
-    const teksti = `Sain ${scoreResult.correctCount}/${scoreResult.totalCount} oikein: ${PELI} – ${iso(pakka.otsikko)}. Pystytkö parempaan?`;
+    const teksti = pelijakoteksti(`${PELI}: ${pakka.kortti.otsikko}`, `${scoreResult.correctCount}/${scoreResult.totalCount}`, scoreResult.correctCount === scoreResult.totalCount);
     try {
       if (navigator.share) await navigator.share({ title: PELI, text: teksti, url });
       else await navigator.clipboard.writeText(`${teksti} ${url}`);
@@ -189,13 +190,7 @@ export default function JarjestaClient({
                     {
                       otsikko: "Muut järjestyspelit",
                       sisalto: (
-                        <ul className="tk-jarj-muut">
-                          {muut.map((m) => (
-                            <li key={m.href}>
-                              <a href={m.href}>{iso(m.otsikko)}</a>
-                            </li>
-                          ))}
-                        </ul>
+                        <Pelikortit pelit={muut} />
                       ),
                     },
                   ]

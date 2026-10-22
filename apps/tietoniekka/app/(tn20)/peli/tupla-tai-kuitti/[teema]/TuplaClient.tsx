@@ -5,6 +5,7 @@
 // päätoiminnolle (Aloita, Katso tulos, Haasta kaveri), yksi per näkymä.
 // Ei kantaan kirjoittamista vielä; paras tulos muistetaan selaimessa sarjakohtaisesti.
 
+import { pelijakoteksti } from "@/lib/korttinimi";
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 import {
   LAUSEET_OLETUS,
@@ -258,7 +259,7 @@ export default function TuplaClient({ teema: t, sarja, siemen, paivanSarja, paiv
 
   async function haasta() {
     const url = `${location.origin}/peli/tupla-tai-kuitti/${t.slug}?sarja=${encodeURIComponent(siemen)}`;
-    const teksti = loppu ? `Sain ${maara(loppu.saalis, p)} Tupla tai kuitti -pelissä (${t.nimi}). Pystytkö parempaan?` : "Tupla tai kuitti";
+    const teksti = loppu ? pelijakoteksti(`Tupla tai kuitti: ${t.nimi}`, maara(loppu.saalis, p)) : `Tupla tai kuitti: ${t.nimi}`;
     try {
       if (navigator.share) await navigator.share({ title: "Tupla tai kuitti", text: teksti, url });
       else await navigator.clipboard.writeText(`${teksti} ${url}`);

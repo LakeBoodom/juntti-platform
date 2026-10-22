@@ -324,7 +324,7 @@ export default function VpkClient({
     const url = `${location.origin}${VPK_SIVU}`;
     try {
       if (navigator.share) await navigator.share({ title: `${VPK_NIMI} #${paivanTulos.numero}`, text: teksti, url });
-      else await navigator.clipboard.writeText(`${teksti}\n${url}`);
+      else await navigator.clipboard.writeText(`${teksti} ${url}`);
       setJaettu(true);
     } catch {
       // jako peruttu

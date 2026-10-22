@@ -437,3 +437,30 @@ export async function getViikkoKollaasi(viikonIdt: string[], siemen: string): Pr
   return [valitse("rakennukset"), valitse("liput"), valitse("vaakunat"), valitse("elaimet") ?? valitse("linnut")]
     .filter((k): k is KollaasiKuva => k !== null);
 }
+
+/** Kevyet esikatselukopiot (public/20/kuvavisat/k/<type>.webp ja <type>-2.webp, 21.10.2026): kortiston kaksi
+ *  ensimmäistä kuvaa sort_orderin mukaan, ≤ 800 px. Kuvavisat-kokoelman kortit ja kuvavisan aloituksen hero. */
+export const KEVYET_ESIKATSELUT = new Set(["elaimet", "henkilot", "kasvit", "linnut", "liput", "maalaukset", "rakennukset", "vaakunat"]);
+export const esikatselukopio = (type: string, i: number) => `/20/kuvavisat/k/${type}${i ? "-2" : ""}.webp`;
+
+/** Kuvavisan aloituksen hero (pikakorjaus 22.10.2026): kortiston esikatselukuva ja sen lähde kannasta. Kuva
+ *  valitaan niin, ettei se ole arvotun sarjan kysymys (ei vihjettä). null, jos kortistolla ei ole kevyttä kopiota. */
+export async function kuvavisanKansi(type: string | undefined, arvotut: Set<string>): Promise<{ src: string; lahde: string | null; sovitus: KuvaSovitus } | null> {
+  const meta = KATEGORIAT.find((k) => k.type === type);
+  if (!type || !meta || !KEVYET_ESIKATSELUT.has(type)) return null;
+  const sb = getSupabase();
+  const siteId = sb ? await getSiteId() : null;
+  if (!sb || !siteId) return null;
+  const { data } = await sb
+    .from("kuvavisas")
+    .select("id, source_credit")
+    .eq("site_id", siteId)
+    .eq("type", type)
+    .eq("active", true)
+    .order("sort_order", { ascending: true })
+    .limit(2);
+  const rivit = (data ?? []) as Array<{ id: string; source_credit: string | null }>;
+  if (rivit.length === 0) return null;
+  const i = arvotut.has(rivit[0].id) && rivit[1] && !arvotut.has(rivit[1].id) ? 1 : 0;
+  return { src: esikatselukopio(type, i), lahde: rivit[i]?.source_credit ?? null, sovitus: meta.sovitus };
+}

@@ -2,14 +2,13 @@
 // kategoriaruudukko esikatselukuvineen (palautettu KuvavisatHubista, poistettu 20.10. commitissa 4cae71d).
 // Kortti avaa muunnelmat tiiviinä siruina (ei täysleveinä riveinä). Natiivi <details>, ei JavaScriptiä.
 // Yhtenäisyys = sama kehys (rungon hero, pelit, lisää kokoelmia), ei sama minimalismi (DESIGN_SYSTEM.md).
-import { ryhmiteltyVariaatiot, variaatioKuvaus, type KategoriaData } from "@/lib/kuvavisat2026";
+import { ryhmiteltyVariaatiot, variaatioKuvaus, KEVYET_ESIKATSELUT, esikatselukopio, type KategoriaData } from "@/lib/kuvavisat2026";
 import { ViikkovisaPromo, type ViikkoPromoData } from "@/components/tn20/ViikkovisaPromo";
 
 /** Kevyet esikatselukopiot (public/20/kuvavisat/k/<type>.webp ja <type>-2.webp, 21.10.2026) — tallennustilan
  *  alkuperäiset olivat jopa 770 kt. Puuttuvalle kategorialle tallennustilan kuvat sellaisenaan. */
-const KEVYET = new Set(["elaimet", "henkilot", "kasvit", "linnut", "liput", "maalaukset", "rakennukset", "vaakunat"]);
 const esikatselut = (k: KategoriaData) =>
-  KEVYET.has(k.meta.type) ? [`/20/kuvavisat/k/${k.meta.type}.webp`, `/20/kuvavisat/k/${k.meta.type}-2.webp`] : k.esikatselut.slice(0, 2);
+  KEVYET_ESIKATSELUT.has(k.meta.type) ? [esikatselukopio(k.meta.type, 0), esikatselukopio(k.meta.type, 1)] : k.esikatselut.slice(0, 2);
 
 function KategoriaKortti({ k }: { k: KategoriaData }) {
   const ryhmat = ryhmiteltyVariaatiot(k.variaatiot);

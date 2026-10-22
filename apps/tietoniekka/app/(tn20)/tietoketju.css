@@ -274,8 +274,6 @@
    Yläraja = Ikäjärjestyksen alkuperäiset koot. */
 .tn20 .tk-jarj-cq { container-type: inline-size; }
 .tn20 .tk-order-head .tk-jarj-title { font-size: min(clamp(26px, 6vw, 40px), calc(100cqw / (var(--tk-lw, 10) * 0.82))); }
-.tn20 .tk-jarj-muut { margin: 0; padding-left: 18px; display: flex; flex-direction: column; gap: 6px; font-size: 15px; }
-.tn20 .tk-jarj-muut a { color: var(--tk-text-primary); }
 /* Laita järjestykseen / laadulliset pakat (4.10.2026): paljastettu arvo omalla rivillään. */
 .tn20 .tk-rcard-value {
   margin-top: 3px;

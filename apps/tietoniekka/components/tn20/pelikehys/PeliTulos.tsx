@@ -53,18 +53,25 @@ export function SeuraavaPeli({ seuraavat }: { seuraavat: Pelimuoto[] }) {
   return (
     <nav className="pk-seuraava" aria-labelledby="pk-seuraava-h">
       <h2 id="pk-seuraava-h" className="pk-seuraava-h">Seuraava peli</h2>
-      <div className="pk-seuraava-rivi">
-        {seuraavat.map((p) => (
-          <a key={p.slug} className="pk-pelikortti" href={p.href}>
-            <span className="pk-pelikortti-ikoni" aria-hidden="true"><PeliIkoniSvg ikoni={p.ikoni} /></span>
-            <span className="pk-pelikortti-teksti">
-              <span className="pk-pelikortti-nimi" style={{ "--pk-lw": Math.max(...p.nimi.split(/[\s-]+/).map((w) => w.length)) } as CSSProperties}>{p.nimi}</span>
-              <span className="pk-pelikortti-kuvaus">{p.kuvaus}</span>
-            </span>
-            <span className="pk-pelikortti-cta">Pelaa →</span>
-          </a>
-        ))}
-      </div>
+      <Pelikortit pelit={seuraavat} />
     </nav>
+  );
+}
+
+/** Pelikortit (pikakorjaus 22.10.2026): kuvake yläreunassa, nimi ≥ 16 px ja saa rivittyä, kuvaus enintään
+ *  2 rivillä, "Pelaa →" omalla rivillään. Mobiilissa kortit allekkain. Myös Laita järjestykseen -aloituksen
+ *  "Muut järjestyspelit". */
+export function Pelikortit({ pelit }: { pelit: Pelimuoto[] }) {
+  return (
+    <div className="pk-seuraava-rivi">
+      {pelit.map((p) => (
+        <a key={p.slug} className="pk-pelikortti" href={p.href}>
+          <span className="pk-pelikortti-ikoni" aria-hidden="true"><PeliIkoniSvg ikoni={p.ikoni} /></span>
+          <span className="pk-pelikortti-nimi" style={{ "--pk-lw": Math.max(...p.nimi.split(/[\s-]+/).map((w) => w.length)) } as CSSProperties}>{p.nimi}</span>
+          <span className="pk-pelikortti-kuvaus">{p.kuvaus}</span>
+          <span className="pk-pelikortti-cta">Pelaa →</span>
+        </a>
+      ))}
+    </div>
   );
 }
