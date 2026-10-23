@@ -10,8 +10,6 @@ import "./jakoalue.css";
 
 export type Jakokanava = "whatsapp" | "facebook" | "kopioi" | "jaa";
 
-/** Meta-sovelluksen "Tietoniekka_julkaisu" App ID (Share Dialog mobiilissa); tyhjä → sharer.php. */
-const FB_APP_ID = process.env.NEXT_PUBLIC_FB_APP_ID?.trim() || "";
 
 /** Jaon toiminnot ilman ulkoasua — pelimuodot, joilla on oma haasta-nappinsa, käyttävät tätä suoraan. */
 export function useJako({ teksti, url, otsikko, onJaettu }: {
@@ -107,14 +105,13 @@ export default function Jakoalue(p: {
             onClick={(e) => {
               const kirjaus = Promise.resolve(p.onJaettu?.("facebook"));
               /* Mobiili (Heikki 23.10.2026): iOS:n jakovalikossa ei näy Facebookia oletuksena, joten kosketuslaitteilla
-                 avataan Facebookin jako samassa välilehdessä: Share Dialog, kun Meta-sovelluksen App ID on asetettu
-                 (NEXT_PUBLIC_FB_APP_ID), muuten sharer.php. Kirjaus odotetaan ensin (≤ 0,7 s), koska sivun vaihto
-                 katkaisisi sen. Desktop: sharer.php uuteen välilehteen. */
+                 avataan sharer.php samassa välilehdessä (selaimen Facebook-kirjautuminen). Share Dialog
+                 (dialog/share?app_id=…&display=touch) antoi iPhonessa "The link you followed may be broken" (23.10.),
+                 joten se on pois käytöstä; fb:app_id-meta jää layoutiin. Kirjaus odotetaan ensin (≤ 0,7 s), koska sivun
+                 vaihto katkaisisi sen. Desktop: sharer.php uuteen välilehteen. */
               if (!kosketus) return;
               e.preventDefault();
-              const kohde = FB_APP_ID
-                ? `https://www.facebook.com/dialog/share?app_id=${encodeURIComponent(FB_APP_ID)}&display=touch&href=${encodeURIComponent(fb)}`
-                : e.currentTarget.href;
+              const kohde = e.currentTarget.href;
               void Promise.race([kirjaus, new Promise((r) => setTimeout(r, 700))]).then(() => { location.href = kohde; });
             }}
           >
