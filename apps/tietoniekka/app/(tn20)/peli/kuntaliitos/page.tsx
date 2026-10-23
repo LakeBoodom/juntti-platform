@@ -25,7 +25,7 @@ export async function generateMetadata({ searchParams }: { searchParams: Promise
     // Reittiparametrit (?reitti=) ovat saman sivun muunnelmia
     alternates: { canonical: "/peli/kuntaliitos" },
     ...jakoMeta({
-      ...(pelituloksenOg(sp, "rajaa") ?? {
+      ...(pelituloksenOg(sp, "yhteyttä") ?? {
         title: "Kuntaliitos – rakenna reitti naapurikuntien kautta",
         description: "Järjestä kahdeksan kuntaa reitiksi niin, että jokaisella vierekkäisellä parilla on yhteinen raja. Uusi päivän reitti joka päivä.",
       }),

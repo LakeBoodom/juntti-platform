@@ -24,7 +24,7 @@ export async function generateMetadata({ searchParams }: { searchParams: Promise
       "Järjestä kahdeksan valtiota reitiksi niin, että jokaisella vierekkäisellä parilla on yhteinen maaraja. Uusi päivän reitti joka päivä.",
     alternates: { canonical: "/peli/rajanaapurit" },
     ...jakoMeta({
-      ...(pelituloksenOg(sp, "rajaa") ?? {
+      ...(pelituloksenOg(sp, "yhteyttä") ?? {
         title: "Rajanaapurit – rakenna reitti naapurivaltioiden kautta",
         description: "Järjestä kahdeksan valtiota reitiksi niin, että jokaisella vierekkäisellä parilla on yhteinen maaraja. Uusi päivän reitti joka päivä.",
       }),

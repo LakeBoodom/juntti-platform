@@ -120,7 +120,7 @@ export async function generateMetadata(
     return {
       title: `${megaNimi}${suffix}`, description: megaDesc,
       ...(megaTulos
-        ? og(JAKO_OG_OTSIKKO, jakoKuvaus(`${megaTulos.n}/${megaTulos.kaikki}`, null, megaTulos.n === megaTulos.kaikki), `/og/mega/${encodeURIComponent(mega)}`, `${megaUrl}&tulos=${tulosRaw}`)
+        ? og(JAKO_OG_OTSIKKO, jakoKuvaus(`${megaTulos.n}/${megaTulos.kaikki} oikein`, null, megaTulos.n === megaTulos.kaikki), `/og/mega/${encodeURIComponent(mega)}`, `${megaUrl}&tulos=${tulosRaw}`)
         : og(megaNimi, megaDesc, `/og/mega/${encodeURIComponent(mega)}`, megaUrl)),
       alternates: { canonical: megaUrl },
     };

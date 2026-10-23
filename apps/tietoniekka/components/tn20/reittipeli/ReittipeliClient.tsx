@@ -612,7 +612,7 @@ export default function ReittipeliClient({
         <main>
           <PeliTulos
             eyebrow="Reitti valmis"
-            iso={`${oikein}/${KL_YHTEYKSIA} rajaa`}
+            iso={`${oikein}/${KL_YHTEYKSIA} yhteyttä`}
             ala={`${eka} → ${vika} ${peli.rajoja} pitkin, ${yritys <= 1 ? "ensimmäisellä tarkistuksella" : `${yritys}. yrityksellä`}. ${oikein * KL_PISTEET} pistettä.`}
             lisa={
               <>
