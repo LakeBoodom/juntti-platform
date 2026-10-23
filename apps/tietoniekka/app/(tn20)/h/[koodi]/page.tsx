@@ -12,7 +12,7 @@
 // Metadata on tarkoituksella OMA: juurilayoutin openGraph.title on kaikilla
 // sivuilla sama, ja juuri tämä osoite on se jonka kaveri saa WhatsAppissa.
 
-import { jakoMeta } from "@/lib/jakoMeta";
+import { jakoMeta, JAKO_OG_OTSIKKO, jakoKuvaus } from "@/lib/jakoMeta";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import Peli20 from "../../peli/page";
@@ -40,18 +40,16 @@ export async function generateMetadata(
   const description = `${nimi}: ${h.kysymyksia} kuvaa, neljä vaihtoehtoa. Samat kuvat samassa järjestyksessä kuin haastajalla.`;
   /* Vaihe D/E (23.10.2026): haastetunnuksen jakokuva on postikortti (tulos kannasta), ja Facebookin linkissä ?k=<kuvan id>
      kysymyskortti. og-kentät kuten /visa/-tuloslinkillä. */
-  const haaste = h.oikein === h.kysymyksia ? "Pystytkö samaan?" : "Pystytkö parempaan?";
   const kuvaParam = new URLSearchParams({ tulos: `${h.oikein}-${h.kysymyksia}`, nimi });
-  let ogOtsikko = `${nimi} – ${haaste.toLowerCase()}`;
+  /* og-kentät 23.10.2026 (Heikki): yhteinen otsikko ja "Sain 9/10. Pystytkö parempaan?" (kuvavisoilla ei tasonimeä). */
+  const ogOtsikko = JAKO_OG_OTSIKKO;
+  const ogKuvaus = jakoKuvaus(`${h.oikein}/${h.kysymyksia}`, null, h.oikein === h.kysymyksia);
   let ogOsoite = `/h/${koodi}`;
-  let ogKuvaus = `Sain ${h.oikein}/${h.kysymyksia} Tietoniekassa.`;
   if (typeof k === "string" && h.kuvaIdt.includes(k)) {
     const kysymys = await haeKuvakysymys(k);
     if (kysymys && mahtuuKorttiin({ question: kysymys.question, options: kysymys.options })) {
       kuvaParam.set("k", k);
       ogOsoite = `/h/${koodi}?k=${encodeURIComponent(k)}`;
-      ogOtsikko = kysymys.question;
-      ogKuvaus = `Sain ${h.oikein}/${h.kysymyksia} visassa ${nimi}. ${haaste}`;
     }
   }
   return {

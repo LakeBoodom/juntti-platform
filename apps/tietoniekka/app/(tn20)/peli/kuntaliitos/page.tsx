@@ -6,7 +6,7 @@
 // Reitti ja sen alueen kartta arvotaan palvelimella (lib/kuntaliitos/reitti.ts).
 
 import { JsonLd, peliLd } from "@/lib/jsonLd";
-import { jakoMeta, jakoOsoite } from "@/lib/jakoMeta";
+import { jakoMeta, jakoOsoite, pelituloksenOg } from "@/lib/jakoMeta";
 import type { Metadata } from "next";
 import { helsinginPaiva } from "@/lib/aika";
 import { arvoReitti, KL_LAHDE, KL_MAAKUNNAT, maakuntaTunnuksella } from "@/lib/kuntaliitos/reitti";
@@ -17,6 +17,7 @@ export const dynamic = "force-dynamic";
 
 /* og:url = jaettu haastelinkki parametreineen (Heikki 23.10.2026); canonical pysyy parametrittomana. */
 export async function generateMetadata({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }): Promise<Metadata> {
+  const sp = await searchParams;
   return {
     title: "Kuntaliitos – rakenna reitti naapurikuntien kautta | Tietoniekka",
     description:
@@ -24,9 +25,11 @@ export async function generateMetadata({ searchParams }: { searchParams: Promise
     // Reittiparametrit (?reitti=) ovat saman sivun muunnelmia
     alternates: { canonical: "/peli/kuntaliitos" },
     ...jakoMeta({
-      title: "Kuntaliitos – rakenna reitti naapurikuntien kautta",
-      description: "Järjestä kahdeksan kuntaa reitiksi niin, että jokaisella vierekkäisellä parilla on yhteinen raja. Uusi päivän reitti joka päivä.",
-      url: jakoOsoite("/peli/kuntaliitos", await searchParams, ["maakunta", "reitti"]),
+      ...(pelituloksenOg(sp, "rajaa") ?? {
+        title: "Kuntaliitos – rakenna reitti naapurikuntien kautta",
+        description: "Järjestä kahdeksan kuntaa reitiksi niin, että jokaisella vierekkäisellä parilla on yhteinen raja. Uusi päivän reitti joka päivä.",
+      }),
+      url: jakoOsoite("/peli/kuntaliitos", sp, ["maakunta", "reitti", "tulos"]),
       kuva: "/og/sivu/kuntaliitos",
     }),
   };

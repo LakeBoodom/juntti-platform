@@ -887,7 +887,10 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
   /* K3: /h/abc123 kun tunnus on luotu, muuten pitkä ?ids=-osoite. */
   /* SEO-erä A2: jaettu tulos → /visa/<slug>?tulos=8-10, jolloin jakokuvassa näkyy pistemäärä ja
      "Voitatko kaverisi?". Canonical pysyy /visa/<slug>:nä. */
-  const tulosParam = quiz.challengePath.startsWith("/visa/") && total > 0 ? `?tulos=${right}-${total}` : "";
+  /* Megavisa (23.10.2026): sama tulos linkkiin (&tulos=), jotta Facebookin og-kuvaus kertoo tuloksen. */
+  const tulosParam = total <= 0 ? ""
+    : quiz.challengePath.startsWith("/visa/") ? `?tulos=${right}-${total}`
+    : quiz.challengePath.startsWith("/peli?mega=") ? `&tulos=${right}-${total}` : "";
   const challengeUrl = haasteKoodi ? `${origin}/h/${haasteKoodi}` : `${origin}${quiz.challengePath}${tulosParam}`;
   /* Vaihe C (22.10.2026): "{korttinimi} – sain n/10 Tietoniekassa: {tasonimi}. Pystytkö parempaan?" (täydet: "samaan"),
      vastahaaste kuten vaiheessa A. Ei emojeita. Nimi = quizzes.korttinimi ?? lyhennetty title (page.tsx → jakoNimi);
@@ -1112,7 +1115,6 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
         <Pelipalkki iho="tumma" peli={kehys.peli} koti={kehys.koti} />
         <main>
           <PeliTulos
-            eyebrow={`${kehys.peli} · ${quiz.title}`}
             iso={`${right}/${total} oikein`}
             ala={`${score} pistettä · ${tier.title}`}
             lisa={
@@ -1169,7 +1171,6 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
           <Pelipalkki iho="tumma" peli={vk ? quiz.title : lyhyt} koti={{ href: quiz.hubHref || "/kokoelmat", nimi: category }} />
           <main>
             <TulosNakyma
-              eyebrow={vk ? quiz.title : `${lyhyt} · ${h ? "Haaste" : "Tulos"}`}
               right={right}
               total={total}
               score={score}
@@ -1239,22 +1240,15 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
                 <span key={i} className="tng-pip" data-state={hist[i] ?? (i === qi && !done ? "now" : "todo")} />
               ))}
             </div>
-            <div className="tng-progress-row">
-              {done ? (
-                <span className="tng-done">
-                  <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M2.5 8.6l3.3 3.3 7.7-7.8" /></svg>
-                  Visa valmis
-                </span>
-              ) : (
-                <span className="tng-qcount">Kysymys <b>{Math.min(qi + 1, total)}</b> / {total}</span>
-              )}
-              <span className="tng-right">{right} oikein</span>
-            </div>
+            {/* UI-sääntö 9 (Heikki 23.10.2026): "Kysymys 4 / 10" ja "3 oikein" pois näkyvistä — palkit kertovat
+                saman. Ruudunlukijalle sama tieto elävänä alueena. */}
+            <span className="tng-sr" aria-live="polite">{done ? "Visa valmis" : `Kysymys ${Math.min(qi + 1, total)}/${total}, ${right} oikein`}</span>
           </div>
           <div className="tng-stats" data-hide={phase === "start" ? "1" : "0"}>
             <div className="tng-stat">
-              <span className="tng-stat-l">Pisteet</span>
-              <span className="tng-stat-v">{score}</span>
+              {/* "Pisteet"-sana pois (UI-sääntö 9); luku ja ruudunlukijan teksti jäävät. */}
+              <span className="tng-stat-v" aria-hidden="true">{score}</span>
+              <span className="tng-sr">{score} pistettä</span>
             </div>
             {/* Päätös 5 (17.9.2026): PUTKI ei näy kuvavisan pelinäkymässä.
                 Pisteytyksen logiikkaan ei kosketa — putkibonus lasketaan ja
@@ -1264,7 +1258,7 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
               <>
                 <span className="tng-statsep" aria-hidden />
                 <div className="tng-stat tng-stat--streak">
-                  <span className="tng-stat-l">Putki</span>
+                  <span className="tng-sr">Putki</span>
                   <span className="tng-stat-v tng-stat-v--streak">
                     <svg className="tng-flame" width="14" height="17" viewBox="0 0 13 16" aria-hidden="true"><path d="M6.4 15.6C3.6 15.6 1.4 13.6 1.4 11c0-3.7 3.4-5.2 3.4-8.5 0-.9-.2-1.7-.5-2.5 3 1.2 5 3.7 5 6.4 0 .8-.2 1.5-.5 2.1 1-.1 1.6-.8 1.8-1.7.7 1 1 2.1 1 3.2 0 3.1-2.4 5.6-5.2 5.6z" fill="#E8A320" /></svg>
                     {streak}

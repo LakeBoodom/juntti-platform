@@ -13,7 +13,6 @@
 
 /* ── Tulos ── */
 .tn20 .tn-tulos-tulos { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
-.tn20 .tn-tulos-eyebrow { font-family: var(--rk-cond, "Barlow Condensed"), "Barlow Condensed", sans-serif; font-weight: 700; font-size: 13px; letter-spacing: .18em; text-transform: uppercase; color: var(--tt-acc); }
 .tn20 .tn-tulos-rivi { display: flex; align-items: center; gap: 14px; min-width: 0; }
 .tn20 .tn-tulos-luku { flex: none; font-family: var(--rk-cond, "Barlow Condensed"), "Barlow Condensed", sans-serif; font-weight: 800; font-size: 76px; line-height: .86; letter-spacing: -.02em; }
 .tn20 .tn-tulos-luku b { font-weight: 800; color: var(--tt-ink); }
@@ -37,18 +36,18 @@
 .tn20 .tn-tulos-tuomio[data-tuomio="havio"] { color: #ffa88f; }
 .tn20 .tn-tulos-tuomio[data-tuomio="tasan"] { color: #f7ce7e; }
 
-/* ── Vastauksesi (oma laatikko, yksi painike) ── */
+/* ── Vastauksesi (oma laatikko, yksi painike). 23.10.2026: otsikko pois (UI-sääntö 9) → ✓/✗-rivi ja "Näytä ▾" samalla rivillä. ── */
 .tn20 .tn-tulos-vastaukset {
-  display: flex; flex-direction: column; gap: 10px; width: 100%; min-height: 44px; padding: 12px 14px; box-sizing: border-box;
+  display: flex; flex-direction: row; align-items: center; gap: 12px; width: 100%; min-height: 44px; padding: 12px 14px; box-sizing: border-box;
   border: 1px solid var(--tt-line); border-radius: 14px; background: #17140d; color: inherit; font: inherit; text-align: left; cursor: pointer;
 }
 .tn20 .tn-tulos-vastaukset:hover { border-color: #3a3120; }
 .tn20 .tn-tulos-vastaukset:focus-visible { outline: 2px solid var(--tn-lime, #b6ff3c); outline-offset: 2px; }
-.tn20 .tn-tulos-vastaukset-yla { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.tn20 .tn-tulos-vastaukset-yla { order: 2; flex: none; display: flex; align-items: center; }
 .tn20 .tn-tulos-nayta { font-size: 14px; font-weight: 700; color: var(--tt-ink); }
-.tn20 .tn-tulos-ruudut { display: flex; flex-wrap: wrap; gap: 4px; }
+.tn20 .tn-tulos-ruudut { flex: 1 1 auto; min-width: 0; display: flex; flex-wrap: wrap; gap: 4px; }
 .tn20 .tn-tulos-ruutu {
-  flex: 1 1 0; min-width: 22px; max-width: 34px; aspect-ratio: 1; display: grid; place-items: center; border-radius: 6px;
+  flex: 1 1 0; min-width: 18px; max-width: 34px; aspect-ratio: 1; display: grid; place-items: center; border-radius: 6px;
   font-size: 13px; font-weight: 900; line-height: 1;
 }
 .tn20 .tn-tulos-ruutu[data-tila="ok"] { background: #4ade80; color: #0b2414; }

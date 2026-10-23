@@ -2,7 +2,7 @@
 // /peli/jarjesta/oma?a=<attr_key>&h=<celebrity-id:t>&p=<henkilön slug>. Täsmälleen ne henkilöt, jotka
 // henkilösivun kortti näytti. Parametrisivu → ei indeksoida (henkilösivu on indeksoitava sisältö).
 import type { Metadata } from "next";
-import { jakoMeta, jakoOsoite } from "@/lib/jakoMeta";
+import { jakoMeta, jakoOsoite, pelituloksenOg } from "@/lib/jakoMeta";
 import { getSupabase } from "@/lib/supabase";
 import { arvoTeksti, haeLaatuArvot, haeLaatuDefit } from "@/lib/laadullinen";
 import { fiPvm, parsePvm } from "@/lib/henkilo";
@@ -15,10 +15,11 @@ export const dynamic = "force-dynamic";
 /* Ilman omaa openGraphia og:url oli juuren SITE_URL → Facebook vei kaverin etusivulle (Heikki 23.10.2026).
    og:url = jaettu pakka parametreineen (a, h, p). */
 export async function generateMetadata({ searchParams }: { searchParams: Sp }): Promise<Metadata> {
+  const sp = await searchParams;
   return {
     title: "Laita järjestykseen | Tietoniekka",
     robots: { index: false, follow: true },
-    ...jakoMeta({ title: "Laita järjestykseen", description: "Järjestä kortit oikeaan järjestykseen – pystytkö parempaan?", url: jakoOsoite("/peli/jarjesta/oma", await searchParams, ["a", "h", "p"]), kuva: "/og/sivu/ikajarjestys" }),
+    ...jakoMeta({ ...(pelituloksenOg(sp, "oikein") ?? { title: "Laita järjestykseen", description: "Järjestä kortit oikeaan järjestykseen – pystytkö parempaan?" }), url: jakoOsoite("/peli/jarjesta/oma", sp, ["a", "h", "p", "tulos"]), kuva: "/og/sivu/ikajarjestys" }),
   };
 }
 

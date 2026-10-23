@@ -8,7 +8,7 @@ import { PELIMUODOT } from "@/lib/pelimuodot";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { JsonLd, peliLd } from "@/lib/jsonLd";
-import { jakoMeta } from "@/lib/jakoMeta";
+import { jakoMeta, jakoOsoite, pelituloksenOg } from "@/lib/jakoMeta";
 import { JULKAISTUT, haePakka, pakkaHref } from "@/lib/jarjesta/pakat";
 import JarjestaClient from "./JarjestaClient";
 
@@ -19,15 +19,17 @@ export function generateStaticParams() {
   return JULKAISTUT.map((p) => ({ pakka: p.slug }));
 }
 
-export async function generateMetadata({ params }: { params: Promise<{ pakka: string }> }): Promise<Metadata> {
+export async function generateMetadata({ params, searchParams }: { params: Promise<{ pakka: string }>; searchParams: Promise<Record<string, string | string[] | undefined>> }): Promise<Metadata> {
   const p = haePakka((await params).pakka);
+  /* Jaettu tulos (?tulos=n-total, 23.10.2026): og-kuvaus tuloksesta, og:url = jaettu linkki. */
+  const sp = await searchParams;
   if (!p) return {};
   const url = pakkaHref(p);
   return {
     title: `${p.seoTitle} | Tietoniekka`,
     description: `${p.kuvaus} ${p.rajaus}`,
     alternates: { canonical: url },
-    ...jakoMeta({ title: p.seoTitle, description: p.kuvaus, url, kuva: `/og/jarjesta/${p.slug}` }),
+    ...jakoMeta({ ...(pelituloksenOg(sp, "oikein") ?? { title: p.seoTitle, description: p.kuvaus }), url: jakoOsoite(url, sp, ["tulos"]), kuva: `/og/jarjesta/${p.slug}` }),
   };
 }
 

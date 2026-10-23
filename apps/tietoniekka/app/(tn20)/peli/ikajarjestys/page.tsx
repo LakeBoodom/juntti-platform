@@ -4,7 +4,7 @@
 // Ilman autostartia sivu avaa pelikehyksen K2-aloituksen (aihevalinta) clientillä.
 
 import { JsonLd, peliLd } from "@/lib/jsonLd";
-import { jakoMeta, jakoOsoite } from "@/lib/jakoMeta";
+import { jakoMeta, jakoOsoite, pelituloksenOg } from "@/lib/jakoMeta";
 import type { Metadata } from "next";
 import { getChainRound, getChainRoundByIds } from "@/lib/ikajarjestys";
 import { henkiloKuva } from "@/lib/henkilokuvat";
@@ -14,6 +14,7 @@ export const dynamic = "force-dynamic";
 
 /* og:url = jaettu haastelinkki parametreineen (Heikki 23.10.2026); canonical pysyy parametrittomana. */
 export async function generateMetadata({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }): Promise<Metadata> {
+  const sp = await searchParams;
   return {
     title: "Tietoketju: Ikäjärjestys – aseta henkilöt syntymävuoden mukaan | Tietoniekka",
     description:
@@ -21,9 +22,11 @@ export async function generateMetadata({ searchParams }: { searchParams: Promise
     /* SEO-erä A2/A7: canonical (?category= ja ?autostart= ovat saman sivun muunnelmia) + jakokuva. */
     alternates: { canonical: "/peli/ikajarjestys" },
     ...jakoMeta({
-      title: "Tietoketju: Ikäjärjestys",
-      description: "Aseta kymmenen tunnettua suomalaista syntymävuoden mukaiseen järjestykseen.",
-      url: jakoOsoite("/peli/ikajarjestys", await searchParams, ["category", "henkilot"]),
+      ...(pelituloksenOg(sp, "oikein") ?? {
+        title: "Tietoketju: Ikäjärjestys",
+        description: "Aseta kymmenen tunnettua suomalaista syntymävuoden mukaiseen järjestykseen.",
+      }),
+      url: jakoOsoite("/peli/ikajarjestys", sp, ["category", "henkilot", "tulos"]),
       kuva: "/og/sivu/ikajarjestys",
     }),
   };

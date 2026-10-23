@@ -7,7 +7,7 @@
 
 import { JsonLd, breadcrumbLd, abs } from "@/lib/jsonLd";
 import { korttinimi, tasonimiTuloksesta } from "@/lib/korttinimi";
-import { jakoOsoite } from "@/lib/jakoMeta";
+import { jakoOsoite, JAKO_OG_OTSIKKO, jakoKuvaus, jaettuTulos } from "@/lib/jakoMeta";
 import { mahtuuKorttiin } from "@/lib/kysymyskortti";
 import { haeRistiinnostot, type RelatedRow } from "@/lib/related";
 import { henkiloHref } from "@/lib/henkiloSlug";
@@ -115,9 +115,13 @@ export async function generateMetadata(
     const pelattavat = data.teaser ? (await megaMaarat(sb, [data.id])).get(data.id) : undefined;
     const megaDesc = data.teaser ? (pelattavat ? maaraTekstiin(data.teaser, pelattavat) : data.teaser) : "Megavisa: yksi istunto ilman taukoja. Pelaa ilmaiseksi Tietoniekassa.";
     const megaUrl = `/peli?mega=${encodeURIComponent(mega)}`;
+    /* Jaettu megatulos (&tulos=n-total, 23.10.2026): yhteinen jako-otsikko ja tuloskuvaus, og:url = jaettu linkki. */
+    const megaTulos = jaettuTulos(tulosRaw);
     return {
       title: `${megaNimi}${suffix}`, description: megaDesc,
-      ...og(megaNimi, megaDesc, `/og/mega/${encodeURIComponent(mega)}`, megaUrl),
+      ...(megaTulos
+        ? og(JAKO_OG_OTSIKKO, jakoKuvaus(`${megaTulos.n}/${megaTulos.kaikki}`, null, megaTulos.n === megaTulos.kaikki), `/og/mega/${encodeURIComponent(mega)}`, `${megaUrl}&tulos=${tulosRaw}`)
+        : og(megaNimi, megaDesc, `/og/mega/${encodeURIComponent(mega)}`, megaUrl)),
       alternates: { canonical: megaUrl },
     };
   }
@@ -161,15 +165,12 @@ export async function generateMetadata(
       hakuOtsikko = `${henkilo} – tietovisa: kuinka hyvin tunnet?${suffix}`;
     }
     const visaPolku = data.slug ? `/visa/${data.slug}` : `/peli?quiz_id=${quizId}`;
-    /* Vaihe D (22.10.2026): tuloslinkin postikortti ja og-kentät "{korttinimi} – pystytkö parempaan?" /
-       "Sain 7/10 Tietoniekassa: {tasonimi}." Virheellinen tulos (n > total) → tavallinen visakortti. */
-    const [n, kaikki] = (tulos ?? "").split("-").map(Number);
-    const jaettu = tulos && kaikki > 0 && n <= kaikki ? { n, kaikki } : null;
+    /* Vaihe D (22.10.2026): tuloslinkin postikortti; og-kentät 23.10.2026 yhteinen otsikko + "Sain 7/10: tasonimi.
+       Pystytkö parempaan?" Virheellinen tulos (n > total) → tavallinen visakortti. */
+    const jaettu = jaettuTulos(tulos);
     const ogKuva = data.slug ? `/og/visa/${encodeURIComponent(data.slug)}${jaettu ? `?tulos=${tulos}` : ""}` : "/og-image.png";
     if (jaettu) {
-      const kn = korttinimi({ korttinimi: data.korttinimi, title: name });
       const taso = tasonimiTuloksesta(data.fanitasot, jaettu.n, jaettu.kaikki);
-      const haaste = jaettu.n === jaettu.kaikki ? "Pystytkö samaan?" : "Pystytkö parempaan?";
       /* Vaihe E: &k=<id> → kysymyskortti, og:title = kysymys. k kelpaa vain, jos kysymys kuuluu visaan ja mahtuu korttiin. */
       const kParam = str("k");
       if (kParam && data.slug) {
@@ -178,13 +179,11 @@ export async function generateMetadata(
         if (kq && mahtuuKorttiin({ question: kq.question_text, options: vaihtoehdot, audio: kq.audio != null })) {
           const kKuva = `/og/visa/${encodeURIComponent(data.slug)}?tulos=${tulos}&k=${encodeURIComponent(kParam)}`;
           const kOsoite = `${visaPolku}?tulos=${tulos}&k=${encodeURIComponent(kParam)}`;
-          return { title: hakuOtsikko, description: visaDesc, ...og(kq.question_text, `Sain ${jaettu.n}/${jaettu.kaikki} visassa ${kn}${taso ? `: ${taso}` : ""}. ${haaste}`, kKuva, kOsoite), ...canonical };
+          return { title: hakuOtsikko, description: visaDesc, ...og(JAKO_OG_OTSIKKO, jakoKuvaus(`${jaettu.n}/${jaettu.kaikki}`, taso, jaettu.n === jaettu.kaikki), kKuva, kOsoite), ...canonical };
         }
       }
-      const ogOtsikko = `${kn} – ${haaste.toLowerCase()}`;
-      const ogKuvaus = `Sain ${jaettu.n}/${jaettu.kaikki} Tietoniekassa${taso ? `: ${taso}` : ""}.`;
       /* og:url = jaettu tuloslinkki (ei canonical), jotta Facebook ei korvaa postikorttia visakortilla. */
-      return { title: hakuOtsikko, description: visaDesc, ...og(ogOtsikko, ogKuvaus, ogKuva, `${visaPolku}?tulos=${tulos}`), ...canonical };
+      return { title: hakuOtsikko, description: visaDesc, ...og(JAKO_OG_OTSIKKO, jakoKuvaus(`${jaettu.n}/${jaettu.kaikki}`, taso, jaettu.n === jaettu.kaikki), ogKuva, `${visaPolku}?tulos=${tulos}`), ...canonical };
     }
     return { title: hakuOtsikko, description: visaDesc, ...og(name, visaDesc, ogKuva, visaPolku), ...canonical };
   }

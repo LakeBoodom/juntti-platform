@@ -5,12 +5,12 @@
 // Esikatseluvaiheessa ei linkitetä mistään eikä indeksoida.
 
 import { JsonLd, peliLd } from "@/lib/jsonLd";
-import { jakoMeta, jakoOsoite } from "@/lib/jakoMeta";
+import { jakoMeta, jakoOsoite, JAKO_OG_OTSIKKO, jakoKuvaus } from "@/lib/jakoMeta";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getSupabase } from "@/lib/supabase";
 import { helsinginPaiva } from "@/lib/aika";
-import { arvoSarja, teema as haeTeema, type KysymysRivi } from "@/lib/tuplaTaiKuitti";
+import { arvoSarja, teema as haeTeema, maara, loppuNimi, type KysymysRivi } from "@/lib/tuplaTaiKuitti";
 import TuplaClient from "./TuplaClient";
 import "../tupla.css";
 
@@ -25,15 +25,20 @@ export async function generateMetadata({ params, searchParams }: Props): Promise
   const t = haeTeema((await params).teema);
   /* og:url = jaettu haastelinkki (?sarja=), jotta kaveri saa saman sarjan (Heikki 23.10.2026). */
   const sp = await searchParams;
+  /* Jaettu tulos (?tulos=<saalis>&syy=kuittasi|jaahy|taydet): og-kuvaus "Sain 32 kiekkoa: Turva piti. Pystytkö parempaan?" */
+  const saalis = typeof sp.tulos === "string" && /^\d{1,3}$/.test(sp.tulos) ? Number(sp.tulos) : null;
+  const syy = typeof sp.syy === "string" && ["kuittasi", "jaahy", "taydet"].includes(sp.syy) ? sp.syy : null;
+  const jaettu = saalis != null && saalis <= 512 && syy ? { saalis, syy } : null;
   return {
     title: t ? `Tupla tai kuitti – ${t.nimi} | Tietoniekka` : "Tupla tai kuitti | Tietoniekka",
     description: t?.kuvaus,
     // Sarjaparametrit (?sarja=) ovat saman sivun muunnelmia
     alternates: t ? { canonical: `/peli/tupla-tai-kuitti/${t.slug}` } : undefined,
     ...jakoMeta({
-      title: t ? `Tupla tai kuitti – ${t.nimi}` : "Tupla tai kuitti",
-      description: t?.kuvaus,
-      url: t ? jakoOsoite(`/peli/tupla-tai-kuitti/${t.slug}`, sp, ["sarja"]) : "/peli/tupla-tai-kuitti",
+      ...(t && jaettu
+        ? { title: JAKO_OG_OTSIKKO, description: jakoKuvaus(maara(jaettu.saalis, t.palkinto), loppuNimi(t, jaettu.syy, jaettu.saalis), jaettu.syy === "taydet") }
+        : { title: t ? `Tupla tai kuitti – ${t.nimi}` : "Tupla tai kuitti", description: t?.kuvaus }),
+      url: t ? jakoOsoite(`/peli/tupla-tai-kuitti/${t.slug}`, sp, ["sarja", "tulos", "syy"]) : "/peli/tupla-tai-kuitti",
       kuva: "/og/sivu/tupla-tai-kuitti",
     }),
   };

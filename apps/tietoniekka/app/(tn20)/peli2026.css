@@ -77,14 +77,8 @@
 .tn20 .tng-pip[data-state="bad"] { background: #ff6b4a; }
 .tn20 .tng-pip[data-state="skipped"] { background: #cbc1ad; }
 .tn20 .tng-pip[data-state="now"] { background: #f2c46b; box-shadow: 0 0 0 1px rgba(242, 196, 107, 0.35); }
-.tn20 .tng-progress-row { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
-.tn20 .tng-qcount { font-size: clamp(11px, 1cqw, 14px); font-weight: 800; letter-spacing: 0.13em; text-transform: uppercase; color: #cbc1ad; white-space: nowrap; }
-.tn20 .tng-qcount b { color: #fffbf2; font-weight: 800; }
-.tn20 .tng-done { display: inline-flex; align-items: center; gap: 8px; font-size: clamp(11px, 1cqw, 14px); font-weight: 800; letter-spacing: 0.13em; text-transform: uppercase; color: #cbff75; white-space: nowrap; }
-.tn20 .tng-right { font-size: clamp(12px, 1cqw, 14px); font-weight: 700; color: #a79e8c; white-space: nowrap; }
 .tn20 .tng-stats { display: flex; align-items: center; gap: clamp(11px, 1.4cqw, 22px); }
 .tn20 .tng-stat { display: flex; flex-direction: column; align-items: flex-end; gap: 3px; }
-.tn20 .tng-stat-l { font-size: clamp(11px, 0.88cqw, 12.5px); font-weight: 800; letter-spacing: 0.15em; text-transform: uppercase; color: #a79e8c; }
 .tn20 .tng-stat-v { display: inline-flex; align-items: center; gap: 6px; font-family: var(--tn-font-display); font-weight: 900; font-size: clamp(19px, 1.9cqw, 30px); line-height: 1; color: #fffbf2; }
 .tn20 .tng-stat-v--streak { color: #f7ce7e; }
 .tn20 .tng-flame { display: block; animation: tngFlame 2.6s var(--ease-standard) infinite; }
@@ -550,7 +544,6 @@
 }
 @container tnq (max-width: 479px) {
   .tn20 .tng-statsep { display: none; }
-  .tn20 .tng-stat--streak .tng-stat-l { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
   .tn20 .tng-stat--streak { justify-content: center; }
   .tn20 .tng-stats { gap: 10px; }
   .tn20 .tng-top { gap: 9px; padding-left: 14px; padding-right: 14px; }
@@ -936,8 +929,6 @@
   .tn20 .tng[data-lock="1"] .tng-top { min-height: 52px; gap: 10px; }
   .tn20 .tng[data-lock="1"] .tng-brand { flex: 0 0 auto; }
   .tn20 .tng[data-lock="1"] .tng-cat, .tn20 .tng[data-lock="1"] .tng-brandsep { display: none; }
-  .tn20 .tng[data-lock="1"] .tng-progress-row { display: none; }
-  .tn20 .tng[data-lock="1"] .tng-stat-l { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
   .tn20 .tng[data-lock="1"] .tng-stat-v { font-size: 18px; }
 }
 

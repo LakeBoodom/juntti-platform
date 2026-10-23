@@ -69,7 +69,10 @@ export default function OmaJarjestysClient({
   });
 
   async function haasta() {
-    const url = location.href;
+    /* Tulos linkkiin (?tulos=n-total), jotta Facebookin og-kuvaus kertoo sen (23.10.2026). */
+    const u = new URL(location.href);
+    u.searchParams.set("tulos", `${tulos.correctCount}-${tulos.totalCount}`);
+    const url = u.toString();
     const teksti = pelijakoteksti(otsikko, `${tulos.correctCount}/${tulos.totalCount}`, tulos.correctCount === tulos.totalCount);
     try {
       if (navigator.share) await navigator.share({ title: PELI, text: teksti, url });

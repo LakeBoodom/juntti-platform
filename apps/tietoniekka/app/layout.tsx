@@ -41,6 +41,8 @@ function rakennaMetadata(Yli: string, yli: string): Metadata {
     "tietoniekka",
   ],
   authors: [{ name: brand.name }],
+  /* <meta property="fb:app_id"> vain, kun Meta-sovelluksen App ID on asetettu (Heikki 23.10.2026). */
+  ...(process.env.NEXT_PUBLIC_FB_APP_ID?.trim() ? { facebook: { appId: process.env.NEXT_PUBLIC_FB_APP_ID.trim() } } : {}),
   openGraph: {
     type: "website",
     locale: "fi_FI",

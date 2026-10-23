@@ -15,8 +15,8 @@ export type TulosVastaus = "ok" | "bad" | "skipped" | undefined;
 export type TulosSeuraava = { id: string; title: string; href: string; kuva?: string | null; kuvaPos?: string; ala: string };
 
 export default function TulosNakyma(p: {
-  /** Yläotsikko: "Suomen majakat · Tulos" / "Viikkovisa 38 · Kuvat". */
-  eyebrow: string;
+  /** Poistettu näkyvistä 23.10.2026 (UI-sääntö 9: visan nimi on jo yläpalkissa); ei enää käytössä. */
+  eyebrow?: string;
   right: number;
   total: number;
   score: number;
@@ -43,7 +43,6 @@ export default function TulosNakyma(p: {
     <div className="tn-tulos" data-haaste={h ? "1" : undefined}>
       <div className="tn-tulos-vasen">
         <section className="tn-tulos-tulos" aria-labelledby="tn-tulos-h">
-          <span className="tn-tulos-eyebrow">{p.eyebrow}</span>
           {h ? (
             <>
               <div className="tn-tulos-vs">
@@ -89,10 +88,10 @@ export default function TulosNakyma(p: {
           type="button"
           className="tn-tulos-vastaukset"
           onClick={(e) => p.avaaVastaukset(ensimmainenVaarin, e.currentTarget)}
-          aria-label={`Vastauksesi: ${p.right} oikein, ${p.total - p.right} väärin. Näytä vastaukset`}
+          aria-label={`Vastauksesi: ${p.right} oikein, ${p.total - p.right} väärin`}
         >
+          {/* UI-sääntö 9 (Heikki 23.10.2026): "Vastauksesi"-otsikko pois; ✓/✗-rivi ja "Näytä ▾" riittävät. */}
           <span className="tn-tulos-vastaukset-yla">
-            <span className="tn-tulos-pikku">Vastauksesi</span>
             <span className="tn-tulos-nayta">Näytä <span aria-hidden="true">▾</span></span>
           </span>
           <span className="tn-tulos-ruudut" aria-hidden="true">

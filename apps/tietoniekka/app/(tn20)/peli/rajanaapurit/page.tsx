@@ -6,7 +6,7 @@
 //   /peli/rajanaapurit?reitti=x7k2      tietty reitti (Arvo uusi reitti, haastelinkki)
 
 import { JsonLd, peliLd } from "@/lib/jsonLd";
-import { jakoMeta, jakoOsoite } from "@/lib/jakoMeta";
+import { jakoMeta, jakoOsoite, pelituloksenOg } from "@/lib/jakoMeta";
 import type { Metadata } from "next";
 import { helsinginPaiva } from "@/lib/aika";
 import { arvoReitti, RN_LAHDE, RN_MAANOSAT, maanosaTunnuksella } from "@/lib/rajanaapurit/reitti";
@@ -17,15 +17,18 @@ export const dynamic = "force-dynamic";
 
 /* og:url = jaettu haastelinkki parametreineen (Heikki 23.10.2026); canonical pysyy parametrittomana. */
 export async function generateMetadata({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }): Promise<Metadata> {
+  const sp = await searchParams;
   return {
     title: "Rajanaapurit – rakenna reitti naapurivaltioiden kautta | Tietoniekka",
     description:
       "Järjestä kahdeksan valtiota reitiksi niin, että jokaisella vierekkäisellä parilla on yhteinen maaraja. Uusi päivän reitti joka päivä.",
     alternates: { canonical: "/peli/rajanaapurit" },
     ...jakoMeta({
-      title: "Rajanaapurit – rakenna reitti naapurivaltioiden kautta",
-      description: "Järjestä kahdeksan valtiota reitiksi niin, että jokaisella vierekkäisellä parilla on yhteinen maaraja. Uusi päivän reitti joka päivä.",
-      url: jakoOsoite("/peli/rajanaapurit", await searchParams, ["maanosa", "reitti"]),
+      ...(pelituloksenOg(sp, "rajaa") ?? {
+        title: "Rajanaapurit – rakenna reitti naapurivaltioiden kautta",
+        description: "Järjestä kahdeksan valtiota reitiksi niin, että jokaisella vierekkäisellä parilla on yhteinen maaraja. Uusi päivän reitti joka päivä.",
+      }),
+      url: jakoOsoite("/peli/rajanaapurit", sp, ["maanosa", "reitti", "tulos"]),
       kuva: "/og/sivu/rajanaapurit",
     }),
   };

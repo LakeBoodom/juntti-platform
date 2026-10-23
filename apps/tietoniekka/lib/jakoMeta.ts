@@ -29,3 +29,28 @@ export function jakoOsoite(polku: string, sp: Record<string, string | string[] |
     });
   return osat.length ? `${polku}?${osat.join("&")}` : polku;
 }
+
+/* Jakolinkkien og-kentät (Heikki 23.10.2026): postikortti, kysymyskortti, kuvavisan haastelinkki ja pelimuodot.
+   Otsikko on sama kaikille; kuvaus kertoo tuloksen. Kortin kuva kertoo visan. */
+export const JAKO_OG_OTSIKKO = "Suomen monipuolisin tietovisa- ja pelipaikka – tietäjille, arvaajille ja tuurilla seilaajille.";
+
+/** "Sain 7/10: Rantalomailija. Pystytkö parempaan?" · täydet "Pystytkö samaan?" · ilman tasonimeä "Sain 7/10. …".
+ *  Pelimuodoissa tulos yksikköineen: "Sain 32 kiekkoa: Turva piti. Pystytkö parempaan?" */
+export function jakoKuvaus(tulos: string, tasonimi: string | null | undefined, taydet: boolean): string {
+  const t = tasonimi?.trim();
+  return `Sain ${tulos}${t ? `: ${t}` : ""}. ${taydet ? "Pystytkö samaan?" : "Pystytkö parempaan?"}`;
+}
+
+/** ?tulos=n-total → { n, kaikki }; virheellinen → null. */
+export function jaettuTulos(raw: string | string[] | undefined | null): { n: number; kaikki: number } | null {
+  const m = typeof raw === "string" ? raw.match(/^(\d{1,3})-(\d{1,3})$/) : null;
+  if (!m) return null;
+  const n = Number(m[1]), kaikki = Number(m[2]);
+  return kaikki > 0 && n <= kaikki ? { n, kaikki } : null;
+}
+
+/** Pelimuodon jaettu tulos ?tulos=n-total → og-otsikko ja -kuvaus ("Sain 6/7 rajaa. Pystytkö parempaan?"); muuten null. */
+export function pelituloksenOg(sp: Record<string, string | string[] | undefined>, yksikko: string): { title: string; description: string } | null {
+  const t = jaettuTulos(sp.tulos);
+  return t ? { title: JAKO_OG_OTSIKKO, description: jakoKuvaus(`${t.n}/${t.kaikki} ${yksikko}`, null, t.n === t.kaikki) } : null;
+}

@@ -87,7 +87,8 @@ export default function JarjestaClient({
 
   async function haasta() {
     if (!scoreResult) return;
-    const url = `${location.origin}${location.pathname}`;
+    /* Tulos linkkiin (?tulos=n-total), jotta Facebookin og-kuvaus kertoo sen (23.10.2026). */
+    const url = `${location.origin}${location.pathname}?tulos=${scoreResult.correctCount}-${scoreResult.totalCount}`;
     const teksti = pelijakoteksti(`${PELI}: ${pakka.kortti.otsikko}`, `${scoreResult.correctCount}/${scoreResult.totalCount}`, scoreResult.correctCount === scoreResult.totalCount);
     try {
       if (navigator.share) await navigator.share({ title: PELI, text: teksti, url });

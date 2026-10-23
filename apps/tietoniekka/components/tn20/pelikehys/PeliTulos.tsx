@@ -16,7 +16,8 @@ export default function PeliTulos({
   haasta,
   seuraavat,
 }: {
-  eyebrow: ReactNode;
+  /** Megavisa ei käytä (23.10.2026, UI-sääntö 9: nimi on yläpalkissa). */
+  eyebrow?: ReactNode;
   /** Iso tulos: "5 tuplausta", "6/6 rajaa". */
   iso: ReactNode;
   ala?: ReactNode;
@@ -31,7 +32,7 @@ export default function PeliTulos({
   return (
     <section className="pk-tulos" aria-labelledby="pk-tulos-h">
       <div className="pk-tulos-yla">
-        <span className="pk-tulos-eyebrow">{eyebrow}</span>
+        {eyebrow && <span className="pk-tulos-eyebrow">{eyebrow}</span>}
         <h1 id="pk-tulos-h" className="pk-tulos-iso">{iso}</h1>
         {ala && <p className="pk-tulos-ala">{ala}</p>}
         {lisa}

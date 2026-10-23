@@ -10,6 +10,9 @@ import "./jakoalue.css";
 
 export type Jakokanava = "whatsapp" | "facebook" | "kopioi" | "jaa";
 
+/** Meta-sovelluksen "Tietoniekka_julkaisu" App ID (Share Dialog mobiilissa); tyhjä → sharer.php. */
+const FB_APP_ID = process.env.NEXT_PUBLIC_FB_APP_ID?.trim() || "";
+
 /** Jaon toiminnot ilman ulkoasua — pelimuodot, joilla on oma haasta-nappinsa, käyttävät tätä suoraan. */
 export function useJako({ teksti, url, otsikko, onJaettu }: {
   teksti: string;
@@ -103,18 +106,16 @@ export default function Jakoalue(p: {
             rel="noopener"
             onClick={(e) => {
               const kirjaus = Promise.resolve(p.onJaettu?.("facebook"));
-              /* Mobiili (Heikki 23.10.2026): sharer.php avaa Facebook-sovelluksen, joka pudottaa linkin → tyhjä
-                 jakoikkuna. Kosketuslaitteilla jaetaan järjestelmän jakovalikolla pelkkä Facebook-osoite (sama kuin
-                 sharerissa, myös &k=); ilman navigator.sharea sharer.php samassa välilehdessä. Desktop: sharer.php. */
+              /* Mobiili (Heikki 23.10.2026): iOS:n jakovalikossa ei näy Facebookia oletuksena, joten kosketuslaitteilla
+                 avataan Facebookin jako samassa välilehdessä: Share Dialog, kun Meta-sovelluksen App ID on asetettu
+                 (NEXT_PUBLIC_FB_APP_ID), muuten sharer.php. Kirjaus odotetaan ensin (≤ 0,7 s), koska sivun vaihto
+                 katkaisisi sen. Desktop: sharer.php uuteen välilehteen. */
               if (!kosketus) return;
               e.preventDefault();
-              const sharer = e.currentTarget.href;
-              if (typeof navigator.share === "function") {
-                navigator.share({ url: fb }).catch((err: { name?: string }) => { if (err?.name !== "AbortError") void kirjaus.then(() => { location.href = sharer; }); });
-              } else {
-                /* Sama välilehti katkaisisi kirjauspyynnön → odotetaan se ensin (enintään 0,7 s). */
-                void Promise.race([kirjaus, new Promise((r) => setTimeout(r, 700))]).then(() => { location.href = sharer; });
-              }
+              const kohde = FB_APP_ID
+                ? `https://www.facebook.com/dialog/share?app_id=${encodeURIComponent(FB_APP_ID)}&display=touch&href=${encodeURIComponent(fb)}`
+                : e.currentTarget.href;
+              void Promise.race([kirjaus, new Promise((r) => setTimeout(r, 700))]).then(() => { location.href = kohde; });
             }}
           >
             <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="11" fill="#1877F2" /><path d="M13.4 19v-6h2l.3-2.4h-2.3V9.1c0-.7.2-1.2 1.2-1.2h1.2V5.8c-.2 0-1-.1-1.8-.1-1.8 0-3 1.1-3 3.1v1.8h-2V13h2v6h2.4z" fill="#fff" /></svg>
@@ -131,11 +132,6 @@ export default function Jakoalue(p: {
           </button>
         )}
       </div>
-      <details className="tn-jako-esikatselu">
-        <summary>Mitä kaverille lähtee?</summary>
-        <p className="tn-jako-esikatselu-t">{p.teksti}</p>
-        {p.url && <p className="tn-jako-esikatselu-u">{p.url}</p>}
-      </details>
       <p className="tn-jako-sr" role="status" aria-live="polite">{j.tila}</p>
     </section>
   );

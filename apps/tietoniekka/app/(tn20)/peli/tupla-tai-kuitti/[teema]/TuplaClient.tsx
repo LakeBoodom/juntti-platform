@@ -258,7 +258,8 @@ export default function TuplaClient({ teema: t, sarja, siemen, paivanSarja, paiv
   const arvoUusi = () => location.assign(`?sarja=${uusiSiemen()}`);
 
   async function haasta() {
-    const url = `${location.origin}/peli/tupla-tai-kuitti/${t.slug}?sarja=${encodeURIComponent(siemen)}`;
+    /* Tulos (saalis + lopetuksen syy) linkkiin, jotta Facebookin og-kuvaus kertoo sen (23.10.2026). */
+    const url = `${location.origin}/peli/tupla-tai-kuitti/${t.slug}?sarja=${encodeURIComponent(siemen)}${loppu ? `&tulos=${loppu.saalis}&syy=${loppu.syy}` : ""}`;
     const teksti = loppu ? pelijakoteksti(`Tupla tai kuitti: ${t.nimi}`, maara(loppu.saalis, p)) : `Tupla tai kuitti: ${t.nimi}`;
     try {
       if (navigator.share) await navigator.share({ title: "Tupla tai kuitti", text: teksti, url });

@@ -517,7 +517,9 @@ export default function ReittipeliClient({
   const arvoUusi = () => location.assign(osoite(uusiReittiSiemen()));
 
   async function haasta() {
-    const url = `${location.origin}${osoite(siemen)}`;
+    /* Tulos linkkiin (?tulos=n-total), jotta Facebookin og-kuvaus kertoo sen (23.10.2026). */
+    const polku = osoite(siemen);
+    const url = `${location.origin}${polku}${polku.includes("?") ? "&" : "?"}tulos=${oikein}-${KL_YHTEYKSIA}`;
     const nimi = (paivanReitti ? `${peli.nimi} · päivän reitti ${paivays}` : peli.nimi) + (maakuntaNimi ? ` (${maakuntaNimi})` : "");
     const teksti = pelijakoteksti(nimi, `${oikein}/${KL_YHTEYKSIA}`, oikein === KL_YHTEYKSIA);
     try {

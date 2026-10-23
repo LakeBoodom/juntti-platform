@@ -93,7 +93,8 @@ export default function IkajarjestysClient({
   /** Haasta kaveri: sama kymmenikkö linkkinä (?henkilot=, sama kuin henkilösivun nosto). */
   async function haasta() {
     if (!round || !scoreResult) return;
-    const url = `${location.origin}/peli/ikajarjestys?henkilot=${round.map((p) => p.id).join(",")}`;
+    /* Tulos linkkiin (?tulos=n-total), jotta Facebookin og-kuvaus kertoo sen (23.10.2026). */
+    const url = `${location.origin}/peli/ikajarjestys?henkilot=${round.map((p) => p.id).join(",")}&tulos=${scoreResult.correctCount}-${scoreResult.totalCount}`;
     const teksti = pelijakoteksti(PELI, `${scoreResult.correctCount}/${scoreResult.totalCount}`, scoreResult.correctCount === scoreResult.totalCount);
     try {
       if (navigator.share) await navigator.share({ title: PELI, text: teksti, url });

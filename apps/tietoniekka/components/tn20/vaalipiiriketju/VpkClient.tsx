@@ -321,7 +321,9 @@ export default function VpkClient({
   async function jaa() {
     if (!paivanTulos) return;
     const teksti = jakoteksti(paivanTulos.numero, paivanTulos.kortit);
-    const url = `${location.origin}${VPK_SIVU}`;
+    /* Tulos linkkiin (?tulos=n-total), jotta Facebookin og-kuvaus kertoo sen (23.10.2026). */
+    const oikein = paivanTulos.kortit.filter(Boolean).length;
+    const url = `${location.origin}${VPK_SIVU}?tulos=${oikein}-${VPK_JARJESTETTAVIA}`;
     try {
       if (navigator.share) await navigator.share({ title: `${VPK_NIMI} #${paivanTulos.numero}`, text: teksti, url });
       else await navigator.clipboard.writeText(`${teksti} ${url}`);

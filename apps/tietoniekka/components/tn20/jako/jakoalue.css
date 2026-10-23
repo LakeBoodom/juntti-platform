@@ -27,11 +27,6 @@
 .tn20 .tn-jako-kanava:focus-visible { outline: 2px solid var(--tn-lime, #b6ff3c); outline-offset: 2px; }
 .tn20 .tn-jako-kanava:disabled { opacity: .5; cursor: default; }
 .tn20 .tn-jako-kanava--ikoni { flex: none; width: 48px; padding: 0; }
-.tn20 .tn-jako-esikatselu summary { display: flex; align-items: center; min-height: 44px; font-size: 13px; font-weight: 700; color: var(--tj-muted); cursor: pointer; list-style: none; }
-.tn20 .tn-jako-esikatselu summary::-webkit-details-marker { display: none; }
-.tn20 .tn-jako-esikatselu summary:focus-visible { outline: 2px solid var(--tn-lime, #b6ff3c); outline-offset: 2px; }
-.tn20 .tn-jako-esikatselu-t { margin: 4px 0 0; padding: 12px 14px 0; border: 1px dashed var(--tj-raja); border-bottom: 0; border-radius: 12px 12px 0 0; font-size: 14px; line-height: 1.5; color: var(--tj-soft); }
-.tn20 .tn-jako-esikatselu-u { margin: 0; padding: 4px 14px 12px; border: 1px dashed var(--tj-raja); border-top: 0; border-radius: 0 0 12px 12px; font-size: 12px; color: var(--tj-acc); overflow-wrap: anywhere; }
 
 .tn20 .tn-jako-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 @media (max-width: 359px) { .tn20 .tn-jako-wa { font-size: 18px; } }

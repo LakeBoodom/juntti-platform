@@ -6,7 +6,7 @@
 
 import type { Metadata } from "next";
 import { JsonLd, peliLd } from "@/lib/jsonLd";
-import { jakoMeta } from "@/lib/jakoMeta";
+import { jakoMeta, jakoOsoite, pelituloksenOg } from "@/lib/jakoMeta";
 import { helsinginPaiva } from "@/lib/aika";
 import { VPK_NIMI, VPK_SIVU } from "@/lib/vaalipiiriketju";
 import { harjoitusKierros, paivanKierros } from "@/lib/vaalipiiriketju/data";
@@ -17,12 +17,16 @@ export const dynamic = "force-dynamic";
 
 const KUVAUS = "Järjestä kahdeksan kansanedustajaa ketjuksi niin, että jokaisen vaalipiiri rajautuu edellisen vaalipiiriin. Uusi ketju joka päivä.";
 
-export const metadata: Metadata = {
-  title: "Vaalipiiriketju – päivän peli kansanedustajista ja vaalipiireistä | Tietoniekka",
-  description: KUVAUS,
-  alternates: { canonical: VPK_SIVU },
-  ...jakoMeta({ title: "Vaalipiiriketju – päivän peli", description: KUVAUS, url: VPK_SIVU, kuva: "/og/sivu/vaalipiiriketju" }),
-};
+/* Jaettu tulos (?tulos=n-6, 23.10.2026): og-kuvaus tuloksesta, og:url = jaettu linkki; canonical parametriton. */
+export async function generateMetadata({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }): Promise<Metadata> {
+  const sp = await searchParams;
+  return {
+    title: "Vaalipiiriketju – päivän peli kansanedustajista ja vaalipiireistä | Tietoniekka",
+    description: KUVAUS,
+    alternates: { canonical: VPK_SIVU },
+    ...jakoMeta({ ...(pelituloksenOg(sp, "oikein") ?? { title: "Vaalipiiriketju – päivän peli", description: KUVAUS }), url: jakoOsoite(VPK_SIVU, sp, ["tulos"]), kuva: "/og/sivu/vaalipiiriketju" }),
+  };
+}
 
 const HUB = "/kokoelma/vaalit";
 const LAHDE = "Kansanedustajat: eduskunnan avoin data (istuvat kansanedustajat). Vaalipiirien rajat: Tilastokeskus, CC BY 4.0.";

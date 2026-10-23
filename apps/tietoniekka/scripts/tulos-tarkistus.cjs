@@ -11,7 +11,7 @@ const MOOTTORI = process.argv[3] || "webkit";
 const POLUT = process.argv.slice(4).length ? process.argv.slice(4) : ["/peli?visa=joker-2019-tietovisa"];
 // 1440 ensin: mitataan tuoreesta latauksesta (WebKit ei asettele leveää ruudukkoa täysin uudelleen 390 → 1440 -koonmuutoksessa).
 const LEVEYDET = [1440, 2450, 1920, 1024, 768, 390, 320];
-const TEKSTI = ".tn-tulos-eyebrow,.tn-tulos-tasonimi,.tn-tulos-pisteet,.tn-tulos-tuomio,.tn-tulos-lause,.tn-tulos-pikku,.tn-tulos-nayta,.tn-jako-h,.tn-jako-wa,.tn-jako-kanava,.tn-tulos-kortti-nimi,.tn-tulos-kortti-ala,.tn-tulos-kortti-cta,.tn-tulos-linkit a,.tn-tulos-linkit button,.pk-peli,.pk-paluu,.tn-jako-esikatselu summary";
+const TEKSTI = ".tn-tulos-tasonimi,.tn-tulos-pisteet,.tn-tulos-tuomio,.tn-tulos-lause,.tn-tulos-pikku,.tn-tulos-nayta,.tn-jako-h,.tn-jako-wa,.tn-jako-kanava,.tn-tulos-kortti-nimi,.tn-tulos-kortti-ala,.tn-tulos-kortti-cta,.tn-tulos-linkit a,.tn-tulos-linkit button,.pk-peli,.pk-paluu";
 (async () => {
   const b = MOOTTORI === "chromium"
     ? await pw.chromium.launch({ executablePath: process.env.CHROME_PATH || "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" })
@@ -33,10 +33,11 @@ const TEKSTI = ".tn-tulos-eyebrow,.tn-tulos-tasonimi,.tn-tulos-pisteet,.tn-tulos
     }
     if (!(await p.$(".tn-tulos"))) { console.log(MOOTTORI, polku, "EI TULOSNÄKYMÄÄ"); virheita++; await ctx.close(); continue; }
     // Vaihe C: jakoteksti briefin muodossa, ei emojeita; WhatsApp-linkissä sama teksti + osoite.
-    const jako = await p.evaluate(() => ({ t: document.querySelector(".tn-jako-esikatselu-t")?.textContent ?? "", wa: document.querySelector(".tn-jako-wa")?.getAttribute("href") ?? "" }));
+    const jako = await p.evaluate(() => ({ wa: document.querySelector(".tn-jako-wa")?.getAttribute("href") ?? "" }));
     const muoto = /^.+ – sain \d+\/\d+ Tietoniekassa(: [^.]+)?\. Pystytkö (parempaan|samaan)\?$|^.+ – sain \d+\/\d+ Tietoniekassa, sinä \d+\/\d+\. Vastahaaste: pystytkö (parempaan|samaan)\?$/u;
     const emoji = /\p{Extended_Pictographic}/u;
     const waT = decodeURIComponent(jako.wa.replace(/^https:\/\/wa\.me\/\?text=/, ""));
+    jako.t = waT.replace(/ https?:\/\/\S+$/, "");
     if (!muoto.test(jako.t) || emoji.test(jako.t) || !waT.startsWith(jako.t + " http")) { console.log(MOOTTORI, polku, "✗ jakoteksti:", JSON.stringify(jako.t), "| wa:", JSON.stringify(waT)); virheita++; }
     else console.log(MOOTTORI, polku, "jakoteksti ✓", JSON.stringify(waT));
     for (const w of LEVEYDET) {
