@@ -140,7 +140,7 @@ export default function TulosNakyma(p: {
 
       <Jakoalue
         otsikko={h ? "Lähetä vastahaaste" : taydet ? "Pystyykö kaveri samaan?" : "Pystyykö kaveri parempaan?"}
-        waNappi={h ? "Vastahaaste WhatsAppissa" : "Haasta WhatsAppissa"}
+        waNappi="Jaa WhatsAppissa"
         teksti={p.jako.teksti}
         url={p.jako.url}
         fbUrl={p.jako.fbUrl}

@@ -96,7 +96,6 @@
   .tn20 .tn-tulos-lause { font-size: 16px; }
   .tn20 .tn-tulos-ruutu { max-width: 34px; }
   .tn20 .tn-tulos > .tn-jako { position: sticky; top: 20px; padding: 24px 24px 18px; }
-  .tn20 .tn-tulos > .tn-jako .tn-jako-h { font-size: 30px; }
   .tn20 .tn-tulos-kortit { gap: 14px; }
   .tn20 .tn-tulos-kortti-kuva { aspect-ratio: 16 / 9; }
 }

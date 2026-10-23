@@ -11,7 +11,7 @@ const MOOTTORI = process.argv[3] || "webkit";
 const POLUT = process.argv.slice(4).length ? process.argv.slice(4) : ["/peli?visa=joker-2019-tietovisa"];
 // 1440 ensin: mitataan tuoreesta latauksesta (WebKit ei asettele leveää ruudukkoa täysin uudelleen 390 → 1440 -koonmuutoksessa).
 const LEVEYDET = [1440, 2450, 1920, 1024, 768, 390, 320];
-const TEKSTI = ".tn-tulos-tasonimi,.tn-tulos-pisteet,.tn-tulos-tuomio,.tn-tulos-lause,.tn-tulos-pikku,.tn-tulos-nayta,.tn-jako-h,.tn-jako-wa,.tn-jako-kanava,.tn-tulos-kortti-nimi,.tn-tulos-kortti-ala,.tn-tulos-kortti-cta,.tn-tulos-linkit a,.tn-tulos-linkit button,.pk-peli,.pk-paluu";
+const TEKSTI = ".tn-tulos-tasonimi,.tn-tulos-pisteet,.tn-tulos-tuomio,.tn-tulos-lause,.tn-tulos-pikku,.tn-tulos-nayta,.tn-jako-wa,.tn-jako-linkki,.tn-jako-kanava,.tn-tulos-kortti-nimi,.tn-tulos-kortti-ala,.tn-tulos-kortti-cta,.tn-tulos-linkit a,.tn-tulos-linkit button,.pk-peli,.pk-paluu";
 (async () => {
   const b = MOOTTORI === "chromium"
     ? await pw.chromium.launch({ executablePath: process.env.CHROME_PATH || "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" })
