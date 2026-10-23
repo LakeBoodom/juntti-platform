@@ -26,7 +26,12 @@
 .tn20 .tn-jako-kanava:hover { border-color: #8e8676; color: var(--tj-ink); }
 .tn20 .tn-jako-kanava:focus-visible { outline: 2px solid var(--tn-lime, #b6ff3c); outline-offset: 2px; }
 .tn20 .tn-jako-kanava:disabled { opacity: .5; cursor: default; }
-.tn20 .tn-jako-kanava--ikoni { flex: none; width: 48px; padding: 0; }
 
 .tn20 .tn-jako-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 @media (max-width: 359px) { .tn20 .tn-jako-wa { font-size: 18px; } }
+/* Kosketuslaitteilla vain WhatsApp + "Jaa linkkinä"; hiirellä Facebook + Kopioi (Heikki 23.10.2026). */
+.tn20 .tn-jako-kosketus { display: none; }
+@media (pointer: coarse) {
+  .tn20 .tn-jako-hiiri { display: none; }
+  .tn20 .tn-jako-kosketus { display: inline-flex; }
+}
