@@ -26,7 +26,10 @@ import { henkiloSlug } from "@/lib/henkiloSlug";
 import { haePakka } from "@/lib/jarjesta/pakat";
 import { getSiteId } from "@/lib/queries";
 import { resolveCollection, COLLECTION_ACCENT, COLLECTION_BG, COLLECTION_LABEL } from "@/lib/visanKokoelma";
-import { KATEGORIAT } from "@/lib/kuvavisat2026";
+import { KATEGORIAT, kuvavisanKansi, haeKuvakysymys } from "@/lib/kuvavisat2026";
+import { mahtuuKorttiin, korttiVaihtoehdot } from "@/lib/kysymyskortti";
+import { krediittiPolulle, krediittiTekstista, krediittirivi } from "@/lib/kuvakrediitti";
+import { henkiloKuva } from "@/lib/henkilokuvat";
 import { MEGA_FEATURED, MEGA_GRID } from "@/lib/megavisat";
 import { NAV_COLLECTIONS } from "@/lib/nav";
 import { korttinimi, tasonimiTuloksesta } from "@/lib/korttinimi";
@@ -81,11 +84,17 @@ async function kuvaUri(
   h: number,
   focal: { x?: number | null; y?: number | null } = {},
   sumea = false,
+  sovita = false,
 ): Promise<string | null> {
   if (!lahde) return null;
   const raw = lahde.startsWith("http") ? await etakuva(lahde) : await paikallinen(lahde);
   if (!raw) return null;
   try {
+    /* Grafiikka (liput, vaakunat, maalaukset) kokonaisena tummalla pohjalla — ei rajausta. */
+    if (sovita) {
+      const out = await sharp(raw).resize(w, h, { fit: "contain", background: "#1A170F" }).flatten({ background: "#1A170F" }).jpeg({ quality: 84 }).toBuffer();
+      return `data:image/jpeg;base64,${out.toString("base64")}`;
+    }
     const img = sharp(raw);
     const meta = await img.metadata();
     const sw = meta.width ?? w, sh = meta.height ?? h;
@@ -124,9 +133,11 @@ let postiFontit: { name: string; data: Buffer; weight: 700 | 800 | 900; style: "
 async function haePostiFontit() {
   if (postiFontit) return postiFontit;
   const lue = (f: string) => readFile(join(process.cwd(), "assets/og", f));
-  const [ac, b7, b8, bc8] = await Promise.all([lue("archivo-condensed-900.ttf"), lue("barlow-700.woff"), lue("barlow-800.woff"), lue("barlow-condensed-800.woff")]);
+  const [ac, as8, b7, b8, bc8] = await Promise.all([lue("archivo-condensed-900.ttf"), lue("archivo-semicondensed-800.ttf"), lue("barlow-700.woff"), lue("barlow-800.woff"), lue("barlow-condensed-800.woff")]);
   postiFontit = [
     { name: "Archivo Condensed", data: ac, weight: 900, style: "normal" },
+    /* Kysymyskortin kysymys (vaihe E): Archivo 800, wdth 80. */
+    { name: "Archivo SemiCondensed", data: as8, weight: 800, style: "normal" },
     { name: "Barlow", data: b7, weight: 700, style: "normal" },
     { name: "Barlow", data: b8, weight: 800, style: "normal" },
     { name: "Barlow Condensed", data: bc8, weight: 800, style: "normal" },
@@ -239,6 +250,8 @@ type Postikortti = {
   oikein: number;
   kysymyksia: number;
   tasonimi: string | null;
+  /** "Kuva: tekijä / lisenssi" (lib/kuvakrediitti.ts), vain nimeämistä vaativille lisensseille. */
+  krediitti: string | null;
 };
 
 const KERMA = "#F5F0E6";
@@ -262,6 +275,54 @@ function postiNimiKoko(nimi: string): number {
   const iso = nimi.toUpperCase();
   const pisin = Math.max(...iso.split(/\s+|(?<=-)/).map(emLeveys), 1.7);
   return Math.floor(Math.min(112, (SARAKE * 0.98) / pisin, (3 * SARAKE) / (emLeveys(iso) * 1.15)));
+}
+
+/* Kuvalähde (Heikki 23.10.2026): pieni himmeä rivi oikeaan alakulmaan, ei kilpaile brändirivin kanssa. */
+function Krediitti({ teksti }: { teksti: string | null }) {
+  if (!teksti) return null;
+  const t = teksti.length > 64 ? teksti.slice(0, 63) + "…" : teksti;
+  return <div style={{ position: "absolute", right: 36, bottom: 14, display: "flex", fontSize: 17, fontWeight: 700, color: "rgba(245,240,230,0.42)" }}>{t}</div>;
+}
+
+type VisaRivi = {
+  id: string; slug: string; title: string; display_title: string | null; korttinimi: string | null; fanitasot: unknown;
+  collection: string | null; category: string | null; genre: string | null;
+  hero_image: string | null; hero_focal_x: number | null; hero_focal_y: number | null; hero_alt: string | null;
+};
+
+async function haeVisa(slug: string): Promise<VisaRivi | null> {
+  const sb = getSupabase();
+  if (!sb) return null;
+  const siteId = await getSiteId();
+  let q = sb
+    .from("quizzes")
+    .select("id, slug, title, display_title, korttinimi, fanitasot, collection, category, genre, hero_image, hero_focal_x, hero_focal_y, hero_alt" as never)
+    .eq("slug", slug)
+    .eq("status", "published");
+  if (siteId) q = q.eq("site_id", siteId);
+  const { data } = await q.maybeSingle();
+  return data as unknown as VisaRivi | null;
+}
+
+/** Jakokortin kuva ja sen lähde: kokoelmasivun korttikuva (visanKorttikuva), henkilövisassa henkilön oma kopio. */
+async function visanKorttikuvaJaLahde(quiz: VisaRivi, w: number, h: number): Promise<{ kuva: string | null; krediitti: string | null }> {
+  const sb = getSupabase();
+  if (quiz.collection === "tunnetut-henkilot" && sb) {
+    const { data: c } = await sb.from("celebrities").select("image_url, image_credit, image_license").eq("trivia_quiz_id", quiz.id).maybeSingle();
+    const cel = c as { image_url: string | null; image_credit: string | null; image_license: string | null } | null;
+    const oma = henkiloKuva(cel?.image_url);
+    return {
+      kuva: await kuvaUri(oma ?? cel?.image_url ?? quiz.hero_image, w, h, { x: 0.5, y: 0.2 }),
+      krediitti: krediittiPolulle(oma) ?? krediittirivi(cel?.image_credit, cel?.image_license),
+    };
+  }
+  const kk = visanKorttikuva(quiz);
+  const [px, py] = (kk.kuvaPos ?? "").split(/\s+/).map((v) => (v.endsWith("%") ? Number(v.slice(0, -1)) / 100 : NaN));
+  const altLahde = quiz.hero_alt && /kuva:/i.test(quiz.hero_alt) ? quiz.hero_alt.slice(quiz.hero_alt.search(/kuva:/i) + 5).trim() : null;
+  return {
+    kuva: await kuvaUri(kk.kuva, w, h, { x: Number.isFinite(px) ? px : quiz.hero_focal_x, y: Number.isFinite(py) ? py : quiz.hero_focal_y }),
+    krediitti: krediittiPolulle(kk.kuva) ?? (kk.kuva === quiz.hero_image ? krediittiPolulle(quiz.hero_image) ?? krediittiTekstista(altLahde) : null),
+  };
 }
 
 async function piirraPostikortti(k: Postikortti) {
@@ -317,6 +378,7 @@ async function piirraPostikortti(k: Postikortti) {
           <div style={{ display: "flex", flexGrow: 1 }} />
           <div style={{ display: "flex", fontSize: 30, fontWeight: 800, color: KERMA }}>tietoniekka.fi</div>
         </div>
+        <Krediitti teksti={k.krediitti} />
       </div>
     ),
     { width: W, height: H, fonts: await haePostiFontit() },
@@ -326,33 +388,10 @@ async function piirraPostikortti(k: Postikortti) {
 }
 
 async function postikortti(slug: string, tulos: { score: number; total: number }): Promise<Postikortti | null> {
-  const sb = getSupabase();
-  if (!sb) return null;
-  const siteId = await getSiteId();
-  let q = sb
-    .from("quizzes")
-    .select("id, slug, title, display_title, korttinimi, fanitasot, collection, category, genre, hero_image, hero_focal_x, hero_focal_y" as never)
-    .eq("slug", slug)
-    .eq("status", "published");
-  if (siteId) q = q.eq("site_id", siteId);
-  const { data } = await q.maybeSingle();
-  const quiz = data as unknown as {
-    id: string; slug: string; title: string; display_title: string | null; korttinimi: string | null; fanitasot: unknown;
-    collection: string | null; category: string | null; genre: string | null;
-    hero_image: string | null; hero_focal_x: number | null; hero_focal_y: number | null;
-  } | null;
+  const quiz = await haeVisa(slug);
   if (!quiz) return null;
   const r = resolveCollection(quiz);
-  /* Kuva: sama korttikuva kuin kokoelmasivulla (visanKorttikuva), henkilövisassa henkilön kuva; kuvaton → kuvio. */
-  let kuva: string | null = null;
-  if (quiz.collection === "tunnetut-henkilot") {
-    const { data: c } = await sb.from("celebrities").select("image_url").eq("trivia_quiz_id", quiz.id).maybeSingle();
-    kuva = await kuvaUri((c as { image_url: string | null } | null)?.image_url ?? quiz.hero_image, 462, 344, { x: 0.5, y: 0.2 });
-  } else {
-    const kk = visanKorttikuva(quiz);
-    const [px, py] = (kk.kuvaPos ?? "").split(/\s+/).map((v) => (v.endsWith("%") ? Number(v.slice(0, -1)) / 100 : NaN));
-    kuva = await kuvaUri(kk.kuva, 462, 344, { x: Number.isFinite(px) ? px : quiz.hero_focal_x, y: Number.isFinite(py) ? py : quiz.hero_focal_y });
-  }
+  const { kuva, krediitti } = await visanKorttikuvaJaLahde(quiz, 462, 344);
   return {
     nimi: korttinimi({ korttinimi: quiz.korttinimi, title: quiz.display_title ?? quiz.title }),
     kategoria: r.label,
@@ -361,6 +400,162 @@ async function postikortti(slug: string, tulos: { score: number; total: number }
     oikein: tulos.score,
     kysymyksia: tulos.total,
     tasonimi: tasonimiTuloksesta(quiz.fanitasot, tulos.score, tulos.total),
+    krediitti,
+  };
+}
+
+/** Kuvavisan postikortti (/h/<koodi>): kortiston esikatselukuva, nimi variaatiosta (?nimi=). */
+async function kuvavisaPostikortti(kortisto: string, tulos: { score: number; total: number }, nimiParam: string | null): Promise<Postikortti | null> {
+  const kat = KATEGORIAT.find((k) => k.type === kortisto || (kortisto === "vaakuna" && k.type === "vaakunat"));
+  if (!kat) return null;
+  const kansi = await kuvavisanKansi(kat.type, new Set());
+  const nimi = nimiParam && nimiParam.length <= 40 && /^[\p{L}\d\s·–-]+$/u.test(nimiParam) ? nimiParam : kat.otsikko;
+  return {
+    nimi,
+    kategoria: "Kuvavisa",
+    accent: kat.accent,
+    kuva: kansi ? await kuvaUri(kansi.src, 462, 344, {}, false, kansi.sovitus === "contain") : null,
+    oikein: tulos.score,
+    kysymyksia: tulos.total,
+    tasonimi: null,
+    krediitti: krediittiTekstista(kansi?.lahde),
+  };
+}
+
+/* ── Kysymyskortti (vaihe E, CD-arkki 2a–2d, mitat osiosta 4A) ─────────────── */
+
+type Kysymyskortti = {
+  kysymys: string;
+  vaihtoehdot: string[]; // aakkosjärjestyksessä (oikea ei erotu)
+  visa: string;          // kehyksen kuvateksti = visan nimi
+  kategoria: string;
+  accent: string;
+  kuva: string | null;   // data-URI
+  kuvavisa: boolean;     // kuvakysymys: isompi kehys oikealla, sarake 600
+  oikein: number;
+  kysymyksia: number;
+  tasonimi: string | null;
+  krediitti: string | null;
+};
+
+async function piirraKysymyskortti(k: Kysymyskortti) {
+  const pic = k.kuvavisa;
+  const taydet = k.oikein === k.kysymyksia;
+  const sarake = pic ? 600 : 680;
+  /* KYSYMYSSÄÄNTÖ: ≤ 45 merkkiä 64 px, ≤ 90 merkkiä 52 px (pitkillä vaihtoehdoilla 42 px); yli 90 ei tule tänne. */
+  const pitka = k.vaihtoehdot.some((o) => o.length > 16) || (pic && k.vaihtoehdot.some((o) => o.length > 15));
+  const qKoko = k.kysymys.length <= 45 ? 64 : pitka ? 42 : 50;
+  const optW = pitka ? sarake : Math.floor((sarake - 10) / 2);
+  const optH = pitka ? 44 : 68;
+  const chip = pitka ? 34 : 46;
+  const tulosTeksti = `${k.oikein}/${k.kysymyksia}`;
+  const nauha = k.tasonimi && k.tasonimi.length <= 18 ? k.tasonimi : null;
+  const kehys = pic ? { x: 712, y: 56, w: 430, h: 500 } : { x: 826, y: 84, w: 320, h: 400 };
+  const sisa = { w: kehys.w - 24, h: kehys.h - 12 - 56 };
+  const img = new ImageResponse(
+    (
+      <div style={{ width: W, height: H, display: "flex", position: "relative", overflow: "hidden", background: POHJA, color: KERMA, fontFamily: "Barlow" }}>
+        <div style={{ position: "absolute", left: 0, top: 0, width: W, height: H, display: "flex", background: `radial-gradient(circle at 85% 40%, ${rgba(k.accent, 0.18)}, rgba(19,17,9,0) 50%)` }} />
+        <div style={{ position: "absolute", left: kehys.x, top: kehys.y, width: kehys.w, height: kehys.h, display: "flex", padding: "12px 12px 56px", background: KERMA, transform: "rotate(3deg)", boxShadow: "0 30px 60px rgba(0,0,0,0.5)" }}>
+          <div style={{ position: "relative", display: "flex", width: sisa.w, height: sisa.h, overflow: "hidden", background: "#1A170F" }}>
+            {k.kuva ? (
+              /* eslint-disable-next-line @next/next/no-img-element */
+              <img src={k.kuva} width={sisa.w} height={sisa.h} alt="" style={{ width: sisa.w, height: sisa.h }} />
+            ) : (
+              <div style={{ position: "absolute", left: 0, top: 0, width: sisa.w, height: sisa.h, display: "flex", background: `repeating-linear-gradient(135deg, ${rgba(k.accent, 0.3)} 0px, ${rgba(k.accent, 0.3)} 22px, ${rgba(k.accent, 0.12)} 22px, ${rgba(k.accent, 0.12)} 44px)` }} />
+            )}
+          </div>
+          <div style={{ position: "absolute", left: 18, right: 18, bottom: 12, display: "flex", fontFamily: "Barlow Condensed", fontWeight: 800, fontSize: k.visa.length > 18 ? 22 : 26, lineHeight: 1.05, textTransform: "uppercase", color: "#3A3120", overflow: "hidden", whiteSpace: "nowrap" }}>{k.visa}</div>
+        </div>
+        {/* Tulosleima 164 px, kehyksen oikeassa yläkulmassa */}
+        <div style={{ position: "absolute", left: pic ? 1040 : 1030, top: pic ? 24 : 40, width: 164, height: 164, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", borderRadius: 82, background: LEIMA, border: `7px solid ${POHJA}`, transform: "rotate(-8deg)", boxShadow: "0 14px 30px rgba(0,0,0,0.45)", color: POHJA }}>
+          <div style={{ display: "flex", fontSize: 17, fontWeight: 800, letterSpacing: 2.4, textTransform: "uppercase", lineHeight: 1 }}>Sain</div>
+          <div style={{ display: "flex", marginTop: 2, fontFamily: "Archivo Condensed", fontWeight: 900, fontSize: tulosTeksti.length > 4 ? 46 : 56, lineHeight: 0.95 }}>{tulosTeksti}</div>
+        </div>
+        {nauha && (
+          <div style={{ position: "absolute", right: 22, top: pic ? 178 : 194, display: "flex", transform: "rotate(-4deg)" }}>
+            <div style={{ display: "flex", alignItems: "center", height: 56, padding: "0 34px", background: POHJA, borderTop: `3px solid ${LEIMA}`, borderBottom: `3px solid ${LEIMA}`, fontFamily: "Barlow Condensed", fontWeight: 800, fontSize: 40, lineHeight: 1, letterSpacing: 1.6, textTransform: "uppercase", color: LEIMA, whiteSpace: "nowrap" }}>{nauha}</div>
+          </div>
+        )}
+        <div style={{ position: "absolute", left: 64, top: 52, bottom: 48, width: sarake, display: "flex", flexDirection: "column" }}>
+          <div style={{ display: "flex", alignItems: "center" }}>
+            <div style={{ display: "flex", fontFamily: "Archivo Condensed", fontWeight: 900, fontSize: 34, lineHeight: 1 }}>
+              <span style={{ color: LEIMA }}>TIETO</span>
+              <span style={{ color: KERMA }}>NIEKKA</span>
+            </div>
+            <div style={{ display: "flex", width: 2, height: 26, background: "#3A3120", margin: "0 16px" }} />
+            <div style={{ display: "flex", fontSize: 22, fontWeight: 800, letterSpacing: 3.5, textTransform: "uppercase", color: k.accent, whiteSpace: "nowrap" }}>{k.kategoria}</div>
+          </div>
+          <div style={{ display: "flex", flexGrow: 1, minHeight: 16 }} />
+          <div style={{ display: "flex", marginBottom: 12, fontSize: pitka ? 24 : 28, fontWeight: 700, lineHeight: 1.1, color: "#CFC7B6" }}>{taydet ? "Visan vaikein kysymys:" : "Tähän kompastuin:"}</div>
+          <div style={{ display: "flex", fontFamily: "Archivo SemiCondensed", fontWeight: 800, fontSize: qKoko, lineHeight: 1.08, letterSpacing: -0.01 * qKoko }}>{k.kysymys}</div>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: pitka ? 8 : 10, marginTop: pitka ? 18 : 24 }}>
+            {k.vaihtoehdot.map((o, i) => (
+              <div key={i} style={{ display: "flex", alignItems: "center", width: optW, height: optH, padding: "0 18px 0 10px", borderRadius: 999, background: "#1F1B14", border: "2px solid #3A3120" }}>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "center", width: chip, height: chip, marginRight: 14, borderRadius: chip / 2, background: "#2C2517", fontSize: pitka ? 20 : 24, fontWeight: 800, color: k.accent }}>{"ABCD"[i]}</div>
+                <div style={{ display: "flex", fontSize: pitka ? 25 : 30, fontWeight: 700, lineHeight: 1.1, whiteSpace: "nowrap", overflow: "hidden" }}>{o}</div>
+              </div>
+            ))}
+          </div>
+          <div style={{ display: "flex", flexGrow: 1, minHeight: 16 }} />
+          <div style={{ display: "flex", alignItems: "baseline" }}>
+            <div style={{ display: "flex", marginRight: 18, fontFamily: "Barlow Condensed", fontWeight: 800, fontSize: 40, lineHeight: 1, textTransform: "uppercase", color: "#B6FF3C", whiteSpace: "nowrap" }}>{taydet ? "Pystytkö samaan?" : "Pystytkö parempaan?"}</div>
+            <div style={{ display: "flex", fontSize: 26, fontWeight: 800, color: KERMA, whiteSpace: "nowrap" }}>tietoniekka.fi</div>
+          </div>
+        </div>
+        <Krediitti teksti={k.krediitti} />
+      </div>
+    ),
+    { width: W, height: H, fonts: await haePostiFontit() },
+  );
+  const jpg = await sharp(Buffer.from(await img.arrayBuffer())).jpeg({ quality: 82, mozjpeg: true }).toBuffer();
+  return new Response(new Uint8Array(jpg), { headers: { "Content-Type": "image/jpeg", "Cache-Control": "public, max-age=86400, s-maxage=604800" } });
+}
+
+/** Tietovisan kysymyskortti: k hyväksytään vain, jos kysymys kuuluu visaan ja mahtuu korttiin. */
+async function visanKysymyskortti(slug: string, tulos: { score: number; total: number }, kId: string): Promise<Kysymyskortti | null> {
+  const sb = getSupabase();
+  const quiz = await haeVisa(slug);
+  if (!sb || !quiz || !/^[0-9a-f-]{20,}$/i.test(kId)) return null;
+  const { data } = await sb.from("questions").select("question_text, answers, audio").eq("id", kId).eq("quiz_id", quiz.id).maybeSingle();
+  const kq = data as { question_text: string; answers: unknown; audio: unknown } | null;
+  const vaihtoehdot = Array.isArray(kq?.answers) ? (kq!.answers as Array<{ text: string }>).slice(0, 4).map((a) => a.text) : [];
+  if (!kq || !mahtuuKorttiin({ question: kq.question_text, options: vaihtoehdot, audio: kq.audio != null })) return null;
+  const r = resolveCollection(quiz);
+  const { kuva, krediitti } = await visanKorttikuvaJaLahde(quiz, 296, 332);
+  return {
+    kysymys: kq.question_text.trim(),
+    vaihtoehdot: korttiVaihtoehdot(vaihtoehdot),
+    visa: korttinimi({ korttinimi: quiz.korttinimi, title: quiz.display_title ?? quiz.title }),
+    kategoria: r.label,
+    accent: r.accent,
+    kuva,
+    kuvavisa: false,
+    oikein: tulos.score,
+    kysymyksia: tulos.total,
+    tasonimi: tasonimiTuloksesta(quiz.fanitasot, tulos.score, tulos.total),
+    krediitti,
+  };
+}
+
+/** Kuvavisan kysymyskortti (2c): kysymyksen kuva isossa kehyksessä, kuvateksti = visan nimi. */
+async function kuvavisanKysymyskortti(kortisto: string, tulos: { score: number; total: number }, kId: string, nimiParam: string | null): Promise<Kysymyskortti | null> {
+  const kq = await haeKuvakysymys(kId);
+  const kat = KATEGORIAT.find((k) => k.type === kq?.type);
+  if (!kq || !kat || !mahtuuKorttiin({ question: kq.question, options: kq.options })) return null;
+  const nimi = nimiParam && nimiParam.length <= 40 && /^[\p{L}\d\s·–-]+$/u.test(nimiParam) ? nimiParam : kat.otsikko;
+  return {
+    kysymys: kq.question.trim(),
+    vaihtoehdot: korttiVaihtoehdot(kq.options),
+    visa: nimi,
+    kategoria: "Kuvavisa",
+    accent: kat.accent,
+    kuva: await kuvaUri(kq.image, 406, 432, {}, false, kat.sovitus === "contain"),
+    kuvavisa: true,
+    oikein: tulos.score,
+    kysymyksia: tulos.total,
+    tasonimi: null,
+    krediitti: krediittiTekstista(kq.lahde),
   };
 }
 
@@ -465,7 +660,11 @@ export async function GET(req: Request, ctx: { params: Promise<{ polku: string[]
 
   if (tyyppi === "visa" && avain) {
     const tulos = parseTulos(url.searchParams.get("tulos"));
-    /* Vaihe D: tuloslinkki → postikortti; ilman tulosta (tai virheellisellä) nykyinen visakortti. */
+    /* Vaihe D: tuloslinkki → postikortti; ilman tulosta (tai virheellisellä) nykyinen visakortti.
+       Vaihe E: &k=<id> → kysymyskortti; kelpaamaton k → postikortti. */
+    const kId = url.searchParams.get("k");
+    const kk = tulos && kId ? await visanKysymyskortti(avain, tulos, kId) : null;
+    if (kk) return piirraKysymyskortti(kk);
     const pk = tulos ? await postikortti(avain, tulos) : null;
     if (pk) return piirraPostikortti(pk);
     kortti = await visaKortti(avain, tulos);
@@ -477,6 +676,15 @@ export async function GET(req: Request, ctx: { params: Promise<{ polku: string[]
       : { data: null };
     const q = data as unknown as { title: string; display_title: string | null } | null;
     if (q || m) kortti = { eyebrow: "Megavisa", otsikko: q?.display_title ?? q?.title ?? m?.tag ?? avain, accent: KULTA, tausta: await kuvaUri(m?.img ?? "/20/megavisa.webp", W, H) };
+  } else if (tyyppi === "kuvavisa" && avain && parseTulos(url.searchParams.get("tulos"))) {
+    /* Kuvavisan haastetunnus (/h/<koodi>): postikortti, ?k=<kuvan id> → kysymyskortti (vaihe E). */
+    const tulos = parseTulos(url.searchParams.get("tulos"))!;
+    const kId = url.searchParams.get("k");
+    const nimiParam = url.searchParams.get("nimi");
+    const kk = kId ? await kuvavisanKysymyskortti(avain, tulos, kId, nimiParam) : null;
+    if (kk) return piirraKysymyskortti(kk);
+    const pk = await kuvavisaPostikortti(avain, tulos, nimiParam);
+    if (pk) return piirraPostikortti(pk);
   } else if (tyyppi === "kuvavisa" && avain) {
     const kat = KATEGORIAT.find((k) => k.type === avain || (avain === "vaakuna" && k.type === "vaakunat"));
     const otsikko = avain === "viikko" ? "Viikkovisa" : avain === "kaupungit" ? "Suomen kaupungit" : kat?.otsikko;

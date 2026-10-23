@@ -7,6 +7,7 @@
 
 import { JsonLd, breadcrumbLd, abs } from "@/lib/jsonLd";
 import { korttinimi, tasonimiTuloksesta } from "@/lib/korttinimi";
+import { mahtuuKorttiin } from "@/lib/kysymyskortti";
 import { haeRistiinnostot, type RelatedRow } from "@/lib/related";
 import { henkiloHref } from "@/lib/henkiloSlug";
 import { visaHref } from "@/lib/visaHref";
@@ -130,9 +131,9 @@ export async function generateMetadata(
         ...(lasten.julkaistu ? {} : { robots: { index: false, follow: false } }),
       };
     }
-    let q = sb.from("quizzes").select("title, display_title, teaser, description, slug, seo_title, seo_description, collection, korttinimi, fanitasot").eq("status", "published");
+    let q = sb.from("quizzes").select("id, title, display_title, teaser, description, slug, seo_title, seo_description, collection, korttinimi, fanitasot").eq("status", "published");
     q = quizId ? q.eq("id", quizId) : q.eq("slug", slug!);
-    const { data } = await q.maybeSingle<{ title: string; display_title: string | null; teaser: string | null; description: string | null; slug: string | null; seo_title: string | null; seo_description: string | null; collection: string | null; korttinimi: string | null; fanitasot: unknown }>();
+    const { data } = await q.maybeSingle<{ id: string; title: string; display_title: string | null; teaser: string | null; description: string | null; slug: string | null; seo_title: string | null; seo_description: string | null; collection: string | null; korttinimi: string | null; fanitasot: unknown }>();
     if (!data) return { title: `Visaa ei löytynyt${suffix}` };
     const name = data.display_title ?? data.title;
     /* Kanoninen osoite on /visa/<slug> (julkaisu 31.8.2026) — myös silloin kun
@@ -166,7 +167,18 @@ export async function generateMetadata(
     if (jaettu) {
       const kn = korttinimi({ korttinimi: data.korttinimi, title: name });
       const taso = tasonimiTuloksesta(data.fanitasot, jaettu.n, jaettu.kaikki);
-      const ogOtsikko = `${kn} – ${jaettu.n === jaettu.kaikki ? "pystytkö samaan?" : "pystytkö parempaan?"}`;
+      const haaste = jaettu.n === jaettu.kaikki ? "Pystytkö samaan?" : "Pystytkö parempaan?";
+      /* Vaihe E: &k=<id> → kysymyskortti, og:title = kysymys. k kelpaa vain, jos kysymys kuuluu visaan ja mahtuu korttiin. */
+      const kParam = str("k");
+      if (kParam && data.slug) {
+        const { data: kq } = await sb.from("questions").select("question_text, answers, audio").eq("id", kParam).eq("quiz_id", data.id).maybeSingle<{ question_text: string; answers: unknown; audio: unknown }>();
+        const vaihtoehdot = Array.isArray(kq?.answers) ? (kq!.answers as Array<{ text: string }>).slice(0, 4).map((a) => a.text) : [];
+        if (kq && mahtuuKorttiin({ question: kq.question_text, options: vaihtoehdot, audio: kq.audio != null })) {
+          const kKuva = `/og/visa/${encodeURIComponent(data.slug)}?tulos=${tulos}&k=${encodeURIComponent(kParam)}`;
+          return { title: hakuOtsikko, description: visaDesc, ...og(kq.question_text, `Sain ${jaettu.n}/${jaettu.kaikki} visassa ${kn}${taso ? `: ${taso}` : ""}. ${haaste}`, kKuva, visaPolku), ...canonical };
+        }
+      }
+      const ogOtsikko = `${kn} – ${haaste.toLowerCase()}`;
       const ogKuvaus = `Sain ${jaettu.n}/${jaettu.kaikki} Tietoniekassa${taso ? `: ${taso}` : ""}.`;
       return { title: hakuOtsikko, description: visaDesc, ...og(ogOtsikko, ogKuvaus, ogKuva, visaPolku), ...canonical };
     }
@@ -543,7 +555,10 @@ export default async function Peli20({
     /* Haastelinkissä (ids) pooli haetaan erikseen, jotta harhauttimet tulevat koko Suomen poolista. */
     const aluePooli = alue ? (wantedIds.length > 0 ? await getKuvavisat(kuvavisa, 500, { tagsSisaltaa: [alue.tag] }) : allRows) : [];
     const arvottu = wantedIds.length > 0 ? allRows : sekoita(allRows);
-    const rows = wantedIds.length > 0 ? arvottu : arvottu.slice(0, 10);
+    const rows0 = wantedIds.length > 0 ? arvottu : arvottu.slice(0, 10);
+    /* Vaihe E: haastetunnuksen kysymyskortista (/h/<koodi>?k=<id>) sarja alkaa kaverin kuvalla. */
+    const kKuva = haaste && typeof params.k === "string" ? rows0.findIndex((r) => r.id === params.k) : -1;
+    const rows = kKuva >= 0 ? [rows0[kKuva], ...rows0.filter((_, i) => i !== kKuva)] : rows0;
     const spareRows = wantedIds.length > 0 ? [] : arvottu.slice(10, 12);
     if (rows.length === 0) notFound();
 
@@ -566,6 +581,7 @@ export default async function Peli20({
     /* Vaihtoehtojen järjestys sekoitetaan per kysymys: aiemmin oikea vastaus oli
        joka pelissä samalla paikalla, koska options tuli kannasta vakiojärjestyksessä. */
     const toQ = (r: (typeof rows)[number]) => ({
+      id: r.id,
       question: r.question,
       // Rajatussa visassa harhauttimet samasta poolista (ei Pumaa Suomen eläimissä).
       options: alue
@@ -630,7 +646,10 @@ export default async function Peli20({
       taso: taso ?? null,
       maanosa: maanosa?.key ?? null,
       haaste: haaste
-        ? { oikein: haaste.oikein, kysymyksia: haaste.kysymyksia, pisteet: haaste.pisteet }
+        ? {
+            oikein: haaste.oikein, kysymyksia: haaste.kysymyksia, pisteet: haaste.pisteet,
+            kompastus: kKuva >= 0 ? (haaste.oikein === haaste.kysymyksia ? "vaikein" : "vaarin") : undefined,
+          }
         : undefined,
       /* Viikkovisan haaste: jakoteksti "Viikkovisa 38 · Kuvat 12/15" kuten
          alkuperäisessä viikkovisassa. */
@@ -664,7 +683,7 @@ export default async function Peli20({
   const [{ data: qs }, genreRes, relatedRes, celebRes, mukana] = await Promise.all([
     sb
       .from("questions")
-      .select("sort_order, question_text, explanation, answers")
+      .select("id, sort_order, question_text, explanation, answers, audio")
       .eq("quiz_id", quiz.id)
       .order("sort_order", { ascending: true }),
     quiz.genre
@@ -807,6 +826,8 @@ export default async function Peli20({
       const answers = (row.answers as Array<{ text: string; is_correct: boolean }>) ?? [];
       const correct = answers.find((a) => a.is_correct)?.text ?? answers[0]?.text ?? "";
       return {
+        id: row.id,
+        audio: row.audio != null,
         question: row.question_text,
         options: answers.slice(0, 4).map((a) => a.text),
         correct,
@@ -834,6 +855,14 @@ export default async function Peli20({
   if (tulosHaaste) {
     const oikein = Number(tulosHaaste[1]), kysymyksia = Number(tulosHaaste[2]);
     if (kysymyksia > 0 && oikein <= kysymyksia) game.haaste = { oikein, kysymyksia, pisteet: 0 };
+  }
+  /* Vaihe E: kysymyskortista (&k=<id>) visa alkaa kaverin kysymyksellä, muut perässä normaalisti. k hyväksytään vain,
+     jos kysymys kuuluu visaan; muuten parametri ohitetaan. */
+  const kParam = typeof params.k === "string" ? params.k : null;
+  const kIndeksi = kParam && game.haaste ? game.questions.findIndex((q) => q.id === kParam) : -1;
+  if (game.haaste && kIndeksi >= 0) {
+    game.questions = [game.questions[kIndeksi], ...game.questions.filter((_, i) => i !== kIndeksi)];
+    game.haaste.kompastus = game.haaste.oikein === game.haaste.kysymyksia ? "vaikein" : "vaarin";
   }
 
   const collectionLabel = resolved.label;

@@ -464,3 +464,12 @@ export async function kuvavisanKansi(type: string | undefined, arvotut: Set<stri
   const i = arvotut.has(rivit[0].id) && rivit[1] && !arvotut.has(rivit[1].id) ? 1 : 0;
   return { src: esikatselukopio(type, i), lahde: rivit[i]?.source_credit ?? null, sovitus: meta.sovitus };
 }
+
+/** Yksi kuvakysymys kysymyskorttiin (vaihe E): kysymys, vaihtoehdot, kuva ja lähde. */
+export async function haeKuvakysymys(id: string): Promise<{ id: string; type: string; question: string; options: string[]; image: string; lahde: string | null } | null> {
+  const sb = getSupabase();
+  if (!sb || !/^[0-9a-f-]{20,}$/i.test(id)) return null;
+  const { data } = await sb.from("kuvavisas").select("id, type, question, options, image_url, source_credit").eq("id", id).eq("active", true).maybeSingle();
+  const r = data as { id: string; type: string; question: string; options: string[] | null; image_url: string; source_credit: string | null } | null;
+  return r ? { id: r.id, type: r.type, question: r.question, options: (r.options ?? []).slice(0, 4), image: r.image_url, lahde: r.source_credit } : null;
+}
