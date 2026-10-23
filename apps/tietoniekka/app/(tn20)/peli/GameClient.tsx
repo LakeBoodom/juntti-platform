@@ -946,7 +946,7 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
     ? vastahaasteteksti(jakoNimi, right, total, quiz.haaste)
     : jakoteksti(jakoNimi, right, total, fanitaso);
   /* Megavisan pelikehys: oma "Haasta kaveri" -nappi, sama jaon logiikka kuin Jakoalueessa. */
-  const jako = useJako({ teksti: shareText, url: jakoUrl, otsikko: `Tietoniekka · ${quiz.title}`, onJaettu: (k) => void markShared(k) });
+  const jako = useJako({ teksti: shareText, url: jakoUrl, otsikko: `Tietoniekka · ${quiz.title}`, onJaettu: (k) => markShared(k) });
 
   const openReview = (i: number, opener?: HTMLElement | null) => {
     if (review == null) openerRef.current = opener ?? (document.activeElement as HTMLElement | null);
@@ -1179,7 +1179,7 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
               haaste={h}
               vastaukset={hist.map((v) => (v === "ok" || v === "bad" || v === "skipped" ? v : undefined))}
               avaaVastaukset={(i, el) => openReview(i, el)}
-              jako={{ teksti: shareText, url: jakoUrl, fbUrl, natiiviOtsikko: `Tietoniekka · ${quiz.title}`, onJaettu: (k) => void markShared(k) }}
+              jako={{ teksti: shareText, url: jakoUrl, fbUrl, natiiviOtsikko: `Tietoniekka · ${quiz.title}`, onJaettu: (k) => markShared(k) }}
               seuraavat={quiz.related.map((r, i) => ({
                 id: r.id,
                 title: r.title,

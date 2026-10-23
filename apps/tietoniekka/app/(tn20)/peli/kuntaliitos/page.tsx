@@ -6,7 +6,7 @@
 // Reitti ja sen alueen kartta arvotaan palvelimella (lib/kuntaliitos/reitti.ts).
 
 import { JsonLd, peliLd } from "@/lib/jsonLd";
-import { jakoMeta } from "@/lib/jakoMeta";
+import { jakoMeta, jakoOsoite } from "@/lib/jakoMeta";
 import type { Metadata } from "next";
 import { helsinginPaiva } from "@/lib/aika";
 import { arvoReitti, KL_LAHDE, KL_MAAKUNNAT, maakuntaTunnuksella } from "@/lib/kuntaliitos/reitti";
@@ -15,19 +15,22 @@ import "./kuntaliitos.css";
 
 export const dynamic = "force-dynamic";
 
-export const metadata: Metadata = {
-  title: "Kuntaliitos – rakenna reitti naapurikuntien kautta | Tietoniekka",
-  description:
-    "Järjestä kahdeksan kuntaa reitiksi niin, että jokaisella vierekkäisellä parilla on yhteinen raja. Uusi päivän reitti joka päivä – tunnetko Suomen kuntakartan?",
-  // Reittiparametrit (?reitti=) ovat saman sivun muunnelmia
-  alternates: { canonical: "/peli/kuntaliitos" },
-  ...jakoMeta({
-    title: "Kuntaliitos – rakenna reitti naapurikuntien kautta",
-    description: "Järjestä kahdeksan kuntaa reitiksi niin, että jokaisella vierekkäisellä parilla on yhteinen raja. Uusi päivän reitti joka päivä.",
-    url: "/peli/kuntaliitos",
-    kuva: "/og/sivu/kuntaliitos",
-  }),
-};
+/* og:url = jaettu haastelinkki parametreineen (Heikki 23.10.2026); canonical pysyy parametrittomana. */
+export async function generateMetadata({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }): Promise<Metadata> {
+  return {
+    title: "Kuntaliitos – rakenna reitti naapurikuntien kautta | Tietoniekka",
+    description:
+      "Järjestä kahdeksan kuntaa reitiksi niin, että jokaisella vierekkäisellä parilla on yhteinen raja. Uusi päivän reitti joka päivä – tunnetko Suomen kuntakartan?",
+    // Reittiparametrit (?reitti=) ovat saman sivun muunnelmia
+    alternates: { canonical: "/peli/kuntaliitos" },
+    ...jakoMeta({
+      title: "Kuntaliitos – rakenna reitti naapurikuntien kautta",
+      description: "Järjestä kahdeksan kuntaa reitiksi niin, että jokaisella vierekkäisellä parilla on yhteinen raja. Uusi päivän reitti joka päivä.",
+      url: jakoOsoite("/peli/kuntaliitos", await searchParams, ["maakunta", "reitti"]),
+      kuva: "/og/sivu/kuntaliitos",
+    }),
+  };
+}
 
 const SIEMEN = /^[a-z0-9-]{3,40}$/;
 

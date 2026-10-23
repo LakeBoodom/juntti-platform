@@ -7,6 +7,7 @@
 
 import { JsonLd, breadcrumbLd, abs } from "@/lib/jsonLd";
 import { korttinimi, tasonimiTuloksesta } from "@/lib/korttinimi";
+import { jakoOsoite } from "@/lib/jakoMeta";
 import { mahtuuKorttiin } from "@/lib/kysymyskortti";
 import { haeRistiinnostot, type RelatedRow } from "@/lib/related";
 import { henkiloHref } from "@/lib/henkiloSlug";
@@ -98,7 +99,8 @@ export async function generateMetadata(
     return {
       title: `${t} – tunnista kuvasta${suffix}`,
       description: kuvaDesc,
-      ...og(`${t} – tunnista kuvasta`, kuvaDesc, `/og/kuvavisa/${encodeURIComponent(kuvavisa)}`, `/kuvavisa/${encodeURIComponent(kuvavisa)}`),
+      /* og:url = jaettu osoite: haasteen ?ids= (sama kuvasarja kaverille) ja variaatio mukana. */
+      ...og(`${t} – tunnista kuvasta`, kuvaDesc, `/og/kuvavisa/${encodeURIComponent(kuvavisa)}`, jakoOsoite(`/kuvavisa/${encodeURIComponent(kuvavisa)}`, p, ["taso", "maanosa", "alue", "ids"])),
       /* T6: kanoninen osoite on kortiston perusvisa — variaatiot eivät kilpaile
          samasta hakutuloksesta keskenään. SEO-erä A6: polkumuoto /kuvavisa/<kortisto>. */
       alternates: { canonical: `/kuvavisa/${encodeURIComponent(kuvavisa)}` },
@@ -175,12 +177,14 @@ export async function generateMetadata(
         const vaihtoehdot = Array.isArray(kq?.answers) ? (kq!.answers as Array<{ text: string }>).slice(0, 4).map((a) => a.text) : [];
         if (kq && mahtuuKorttiin({ question: kq.question_text, options: vaihtoehdot, audio: kq.audio != null })) {
           const kKuva = `/og/visa/${encodeURIComponent(data.slug)}?tulos=${tulos}&k=${encodeURIComponent(kParam)}`;
-          return { title: hakuOtsikko, description: visaDesc, ...og(kq.question_text, `Sain ${jaettu.n}/${jaettu.kaikki} visassa ${kn}${taso ? `: ${taso}` : ""}. ${haaste}`, kKuva, visaPolku), ...canonical };
+          const kOsoite = `${visaPolku}?tulos=${tulos}&k=${encodeURIComponent(kParam)}`;
+          return { title: hakuOtsikko, description: visaDesc, ...og(kq.question_text, `Sain ${jaettu.n}/${jaettu.kaikki} visassa ${kn}${taso ? `: ${taso}` : ""}. ${haaste}`, kKuva, kOsoite), ...canonical };
         }
       }
       const ogOtsikko = `${kn} – ${haaste.toLowerCase()}`;
       const ogKuvaus = `Sain ${jaettu.n}/${jaettu.kaikki} Tietoniekassa${taso ? `: ${taso}` : ""}.`;
-      return { title: hakuOtsikko, description: visaDesc, ...og(ogOtsikko, ogKuvaus, ogKuva, visaPolku), ...canonical };
+      /* og:url = jaettu tuloslinkki (ei canonical), jotta Facebook ei korvaa postikorttia visakortilla. */
+      return { title: hakuOtsikko, description: visaDesc, ...og(ogOtsikko, ogKuvaus, ogKuva, `${visaPolku}?tulos=${tulos}`), ...canonical };
     }
     return { title: hakuOtsikko, description: visaDesc, ...og(name, visaDesc, ogKuva, visaPolku), ...canonical };
   }

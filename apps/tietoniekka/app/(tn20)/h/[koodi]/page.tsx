@@ -43,11 +43,13 @@ export async function generateMetadata(
   const haaste = h.oikein === h.kysymyksia ? "Pystytkö samaan?" : "Pystytkö parempaan?";
   const kuvaParam = new URLSearchParams({ tulos: `${h.oikein}-${h.kysymyksia}`, nimi });
   let ogOtsikko = `${nimi} – ${haaste.toLowerCase()}`;
+  let ogOsoite = `/h/${koodi}`;
   let ogKuvaus = `Sain ${h.oikein}/${h.kysymyksia} Tietoniekassa.`;
   if (typeof k === "string" && h.kuvaIdt.includes(k)) {
     const kysymys = await haeKuvakysymys(k);
     if (kysymys && mahtuuKorttiin({ question: kysymys.question, options: kysymys.options })) {
       kuvaParam.set("k", k);
+      ogOsoite = `/h/${koodi}?k=${encodeURIComponent(k)}`;
       ogOtsikko = kysymys.question;
       ogKuvaus = `Sain ${h.oikein}/${h.kysymyksia} visassa ${nimi}. ${haaste}`;
     }
@@ -55,7 +57,7 @@ export async function generateMetadata(
   return {
     title: `${title} | Tietoniekka`,
     description,
-    ...jakoMeta({ title: ogOtsikko, description: ogKuvaus, url: `/h/${koodi}`, kuva: `/og/kuvavisa/${encodeURIComponent(h.kuvavisa)}?${kuvaParam}` }),
+    ...jakoMeta({ title: ogOtsikko, description: ogKuvaus, url: ogOsoite, kuva: `/og/kuvavisa/${encodeURIComponent(h.kuvavisa)}?${kuvaParam}` }),
     /* Haastelinkkejä on yksi per peli — ne eivät kuulu hakukoneisiin, ja
        kanoninen osoite on kortiston perusvisa (SEO-erä A6: /kuvavisa/<kortisto>). */
     robots: { index: false, follow: true },

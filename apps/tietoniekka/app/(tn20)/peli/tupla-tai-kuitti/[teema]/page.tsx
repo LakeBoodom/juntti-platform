@@ -5,7 +5,7 @@
 // Esikatseluvaiheessa ei linkitetä mistään eikä indeksoida.
 
 import { JsonLd, peliLd } from "@/lib/jsonLd";
-import { jakoMeta } from "@/lib/jakoMeta";
+import { jakoMeta, jakoOsoite } from "@/lib/jakoMeta";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getSupabase } from "@/lib/supabase";
@@ -21,8 +21,10 @@ type Props = {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 };
 
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
+export async function generateMetadata({ params, searchParams }: Props): Promise<Metadata> {
   const t = haeTeema((await params).teema);
+  /* og:url = jaettu haastelinkki (?sarja=), jotta kaveri saa saman sarjan (Heikki 23.10.2026). */
+  const sp = await searchParams;
   return {
     title: t ? `Tupla tai kuitti – ${t.nimi} | Tietoniekka` : "Tupla tai kuitti | Tietoniekka",
     description: t?.kuvaus,
@@ -31,7 +33,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     ...jakoMeta({
       title: t ? `Tupla tai kuitti – ${t.nimi}` : "Tupla tai kuitti",
       description: t?.kuvaus,
-      url: t ? `/peli/tupla-tai-kuitti/${t.slug}` : "/peli/tupla-tai-kuitti",
+      url: t ? jakoOsoite(`/peli/tupla-tai-kuitti/${t.slug}`, sp, ["sarja"]) : "/peli/tupla-tai-kuitti",
       kuva: "/og/sivu/tupla-tai-kuitti",
     }),
   };

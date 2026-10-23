@@ -4,7 +4,7 @@
 // Ilman autostartia sivu avaa pelikehyksen K2-aloituksen (aihevalinta) clientillä.
 
 import { JsonLd, peliLd } from "@/lib/jsonLd";
-import { jakoMeta } from "@/lib/jakoMeta";
+import { jakoMeta, jakoOsoite } from "@/lib/jakoMeta";
 import type { Metadata } from "next";
 import { getChainRound, getChainRoundByIds } from "@/lib/ikajarjestys";
 import { henkiloKuva } from "@/lib/henkilokuvat";
@@ -12,19 +12,22 @@ import IkajarjestysClient from "./IkajarjestysClient";
 
 export const dynamic = "force-dynamic";
 
-export const metadata: Metadata = {
-  title: "Tietoketju: Ikäjärjestys – aseta henkilöt syntymävuoden mukaan | Tietoniekka",
-  description:
-    "Aseta kymmenen tunnettua suomalaista syntymävuoden mukaiseen järjestykseen. Nopeatempoinen uusi tietopeli Tietoniekassa — ei kirjautumista.",
-  /* SEO-erä A2/A7: canonical (?category= ja ?autostart= ovat saman sivun muunnelmia) + jakokuva. */
-  alternates: { canonical: "/peli/ikajarjestys" },
-  ...jakoMeta({
-    title: "Tietoketju: Ikäjärjestys",
-    description: "Aseta kymmenen tunnettua suomalaista syntymävuoden mukaiseen järjestykseen.",
-    url: "/peli/ikajarjestys",
-    kuva: "/og/sivu/ikajarjestys",
-  }),
-};
+/* og:url = jaettu haastelinkki parametreineen (Heikki 23.10.2026); canonical pysyy parametrittomana. */
+export async function generateMetadata({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }): Promise<Metadata> {
+  return {
+    title: "Tietoketju: Ikäjärjestys – aseta henkilöt syntymävuoden mukaan | Tietoniekka",
+    description:
+      "Aseta kymmenen tunnettua suomalaista syntymävuoden mukaiseen järjestykseen. Nopeatempoinen uusi tietopeli Tietoniekassa — ei kirjautumista.",
+    /* SEO-erä A2/A7: canonical (?category= ja ?autostart= ovat saman sivun muunnelmia) + jakokuva. */
+    alternates: { canonical: "/peli/ikajarjestys" },
+    ...jakoMeta({
+      title: "Tietoketju: Ikäjärjestys",
+      description: "Aseta kymmenen tunnettua suomalaista syntymävuoden mukaiseen järjestykseen.",
+      url: jakoOsoite("/peli/ikajarjestys", await searchParams, ["category", "henkilot"]),
+      kuva: "/og/sivu/ikajarjestys",
+    }),
+  };
+}
 
 export default async function IkajarjestysPage({
   searchParams,

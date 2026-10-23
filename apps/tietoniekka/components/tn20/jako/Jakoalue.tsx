@@ -17,7 +17,7 @@ export function useJako({ teksti, url, otsikko, onJaettu }: {
   url: string | null;
   /** navigator.sharen otsikko. */
   otsikko?: string;
-  onJaettu?: (kanava: Jakokanava) => void;
+  onJaettu?: (kanava: Jakokanava) => void | Promise<unknown>;
 }) {
   const [tila, setTila] = useState<"kopioitu" | "virhe" | "jakovirhe" | null>(null);
   const [voiJakaa, setVoiJakaa] = useState(false);
@@ -66,7 +66,8 @@ export default function Jakoalue(p: {
   /** Facebookin jakama osoite (vaihe E: …&k=<id>). Oletus url; null → ei Facebook-nappia. */
   fbUrl?: string | null;
   natiiviOtsikko?: string;
-  onJaettu?: (kanava: Jakokanava) => void;
+  /** Kanavan kirjaus; lupaus odotetaan (≤ 0,7 s) ennen kuin sivu vaihtuu samassa välilehdessä. */
+  onJaettu?: (kanava: Jakokanava) => void | Promise<unknown>;
   /** Otsikon id (aria-labelledby); sama sivu voi sisältää vain yhden oletus-id:n. */
   id?: string;
   className?: string;
@@ -100,7 +101,21 @@ export default function Jakoalue(p: {
             href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(fb)}`}
             target="_blank"
             rel="noopener"
-            onClick={() => p.onJaettu?.("facebook")}
+            onClick={(e) => {
+              const kirjaus = Promise.resolve(p.onJaettu?.("facebook"));
+              /* Mobiili (Heikki 23.10.2026): sharer.php avaa Facebook-sovelluksen, joka pudottaa linkin → tyhjä
+                 jakoikkuna. Kosketuslaitteilla jaetaan järjestelmän jakovalikolla pelkkä Facebook-osoite (sama kuin
+                 sharerissa, myös &k=); ilman navigator.sharea sharer.php samassa välilehdessä. Desktop: sharer.php. */
+              if (!kosketus) return;
+              e.preventDefault();
+              const sharer = e.currentTarget.href;
+              if (typeof navigator.share === "function") {
+                navigator.share({ url: fb }).catch((err: { name?: string }) => { if (err?.name !== "AbortError") void kirjaus.then(() => { location.href = sharer; }); });
+              } else {
+                /* Sama välilehti katkaisisi kirjauspyynnön → odotetaan se ensin (enintään 0,7 s). */
+                void Promise.race([kirjaus, new Promise((r) => setTimeout(r, 700))]).then(() => { location.href = sharer; });
+              }
+            }}
           >
             <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="11" fill="#1877F2" /><path d="M13.4 19v-6h2l.3-2.4h-2.3V9.1c0-.7.2-1.2 1.2-1.2h1.2V5.8c-.2 0-1-.1-1.8-.1-1.8 0-3 1.1-3 3.1v1.8h-2V13h2v6h2.4z" fill="#fff" /></svg>
             Facebook

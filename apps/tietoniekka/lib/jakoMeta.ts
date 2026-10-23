@@ -14,3 +14,18 @@ export function jakoMeta(o: { title: string; description?: string | null; url: s
     twitter: { card: "summary_large_image", title: o.title, description, images: [o.kuva] },
   };
 }
+
+/* og:url = täsmälleen jaettu osoite parametreineen (Heikki 23.10.2026): Facebook seuraa og:url-osoitetta ja hakee
+   sen jakokuvan ja -tekstit. Kun og:url oli parametriton canonical, Facebook näytti tuloslinkistä vanhan visakortin ja
+   vei kaverin eri kierrokselle. <link rel="canonical"> pysyy parametrittomana (SEO). Vain sallitut parametrit
+   mukaan. */
+export function jakoOsoite(polku: string, sp: Record<string, string | string[] | undefined>, sallitut: string[]): string {
+  /* Järjestys kuten saapuneessa osoitteessa; pilkut (?ids=a,b) jätetään koodaamatta, jotta osoite on sama kuin jaettu. */
+  const osat = Object.keys(sp)
+    .filter((k) => sallitut.includes(k))
+    .flatMap((k) => {
+      const v = sp[k];
+      return typeof v === "string" && v.length > 0 && v.length <= 800 ? [`${encodeURIComponent(k)}=${encodeURIComponent(v).replace(/%2C/gi, ",")}`] : [];
+    });
+  return osat.length ? `${polku}?${osat.join("&")}` : polku;
+}

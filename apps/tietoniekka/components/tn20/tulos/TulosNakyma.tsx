@@ -29,7 +29,7 @@ export default function TulosNakyma(p: {
   vastaukset: TulosVastaus[];
   avaaVastaukset: (i: number, el: HTMLElement) => void;
   /** Jakoalue (components/tn20/jako/Jakoalue.tsx): teksti ilman osoitetta, url null = ei vielä valmis. */
-  jako: { teksti: string; url: string | null; fbUrl?: string | null; natiiviOtsikko?: string; onJaettu?: (k: Jakokanava) => void };
+  jako: { teksti: string; url: string | null; fbUrl?: string | null; natiiviOtsikko?: string; onJaettu?: (k: Jakokanava) => void | Promise<unknown> };
   seuraavat: TulosSeuraava[];
   pelaaUudelleen: (() => void) | null;
   kaikki: { href: string; teksti: string };
