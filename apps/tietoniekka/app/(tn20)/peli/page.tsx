@@ -648,7 +648,7 @@ export default async function Peli20({
       haaste: haaste
         ? {
             oikein: haaste.oikein, kysymyksia: haaste.kysymyksia, pisteet: haaste.pisteet,
-            kompastus: kKuva >= 0 ? (haaste.oikein === haaste.kysymyksia ? "vaikein" : "vaarin") : undefined,
+            kompastus: kKuva >= 0 ? (haaste.oikein === haaste.kysymyksia ? "taydet" : "vaarin") : undefined,
           }
         : undefined,
       /* Viikkovisan haaste: jakoteksti "Viikkovisa 38 · Kuvat 12/15" kuten
@@ -862,7 +862,7 @@ export default async function Peli20({
   const kIndeksi = kParam && game.haaste ? game.questions.findIndex((q) => q.id === kParam) : -1;
   if (game.haaste && kIndeksi >= 0) {
     game.questions = [game.questions[kIndeksi], ...game.questions.filter((_, i) => i !== kIndeksi)];
-    game.haaste.kompastus = game.haaste.oikein === game.haaste.kysymyksia ? "vaikein" : "vaarin";
+    game.haaste.kompastus = game.haaste.oikein === game.haaste.kysymyksia ? "taydet" : "vaarin";
   }
 
   const collectionLabel = resolved.label;

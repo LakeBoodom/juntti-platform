@@ -487,7 +487,7 @@ async function piirraKysymyskortti(k: Kysymyskortti) {
             <div style={{ display: "flex", fontSize: 22, fontWeight: 800, letterSpacing: 3.5, textTransform: "uppercase", color: k.accent, whiteSpace: "nowrap" }}>{k.kategoria}</div>
           </div>
           <div style={{ display: "flex", flexGrow: 1, minHeight: 16 }} />
-          <div style={{ display: "flex", marginBottom: 12, fontSize: pitka ? 24 : 28, fontWeight: 700, lineHeight: 1.1, color: "#CFC7B6" }}>{taydet ? "Visan vaikein kysymys:" : "Tähän kompastuin:"}</div>
+          <div style={{ display: "flex", marginBottom: 12, fontSize: pitka ? 24 : 28, fontWeight: 700, lineHeight: 1.1, color: "#CFC7B6" }}>{taydet ? "Tiedätkö tämän?" : "Tähän kompastuin:"}</div>
           <div style={{ display: "flex", fontFamily: "Archivo SemiCondensed", fontWeight: 800, fontSize: qKoko, lineHeight: 1.08, letterSpacing: -0.01 * qKoko }}>{k.kysymys}</div>
           <div style={{ display: "flex", flexWrap: "wrap", gap: pitka ? 8 : 10, marginTop: pitka ? 18 : 24 }}>
             {k.vaihtoehdot.map((o, i) => (

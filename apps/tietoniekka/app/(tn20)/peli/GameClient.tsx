@@ -129,8 +129,8 @@ export type GameQuiz = {
   haaste?: {
     oikein: number; kysymyksia: number; pisteet: number;
     /** Vaihe E: kysymyskortista (&k=) tultaessa kaverin kysymys on ensimmäisenä. vaarin = kaveri kompastui siihen,
-        vaikein = kaverilla täydet ja kortissa visan vaikein kysymys. */
-    kompastus?: "vaarin" | "vaikein";
+        taydet = kaverilla täydet (Heikki 23.10.: ei "visan vaikein", koska vaikeutta ei mitata). */
+    kompastus?: "vaarin" | "taydet";
   };
   /** Viikkovisa (kierros 4, 18.9.2026): palvelimella lasketut viikkotiedot +
       aloitusnäkymän kollaasi. Kun annettu, peli on yhden yrityksen viikkovisa:
@@ -936,7 +936,7 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
   /* Haastebannerin loppu (vaiheet A ja E): kysymyskortista tultaessa kaverin kysymys on visan ensimmäinen. */
   const haasteLoppu = !quiz.haaste ? ""
     : quiz.haaste.kompastus === "vaarin" ? " ja kompastui tähän. Tiedätkö sinä?"
-    : quiz.haaste.kompastus === "vaikein" ? ". Tiedätkö sinä visan vaikeimman?"
+    : quiz.haaste.kompastus === "taydet" ? ". Tiedätkö sinä tämän?"
     : quiz.haaste.oikein === quiz.haaste.kysymyksia ? " – pystytkö samaan?" : " – pystytkö parempaan?";
   /* Vaihe E: Facebook jakaa kysymyskortin (&k=<id>), jos visassa on rajoihin mahtuva kysymys; muuten postikortin.
      Kortti on vain visan omalle osoitteelle (/visa/…?tulos=) ja kuvavisan haastetunnukselle (/h/…). */

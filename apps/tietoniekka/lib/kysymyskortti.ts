@@ -1,7 +1,7 @@
 // Facebookin kysymyskortti (Tulosnäkymä ja jakaminen, vaihe E; CD-arkki 2a–2d, osio 4A).
 // Rajat: kysymys ≤ 90 merkkiä ja jokainen vaihtoehto ≤ 28 merkkiä; äänikysymykset ohitetaan.
-// Valinta tehdään laitteella: 1) ensimmäinen väärin vastattu rajoihin mahtuva, 2) täysillä visan vaikein — kysymys-
-// kohtaista oikein-%:ia ei vielä kerätä, joten ensimmäinen rajoihin mahtuva. 3) Jos sopivaa ei ole, Facebook-jako
+// Valinta tehdään laitteella: 1) ensimmäinen väärin vastattu rajoihin mahtuva, 2) täysillä ensimmäinen rajoihin
+// mahtuva, kortissa "Tiedätkö tämän?" (Heikki 23.10.2026: ei "visan vaikein", koska kysymyskohtaista oikein-%:ia ei kerätä). 3) Jos sopivaa ei ole, Facebook-jako
 // käyttää postikorttia (ei &k).
 export const KYSYMYS_MAX = 90;
 export const VAIHTOEHTO_MAX = 28;
