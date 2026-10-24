@@ -2,6 +2,7 @@ import { getSupabaseAdmin, supabaseFromCookies } from "@/lib/supabase-server";
 import { Nav } from "@/components/nav";
 import { SynttaritDayEditor } from "./day-editor";
 import { NewSynttaritButton } from "./new-button";
+import { SynttaritTabs } from "./tabs";
 
 export const dynamic = "force-dynamic";
 
@@ -29,7 +30,7 @@ export default async function SynttaritPage({
   const { data: rawCelebrities } = await (admin as any)
     .from("celebrities")
     .select(
-      "id, name, birth_date, death_date, role, bio_short, image_url, wikipedia_url, priority, is_hero, platform, site_id"
+      "id, name, birth_date, death_date, role, bio_short, bio_intro, facts, tiesitko, image_url, image_credit, image_license, wikipedia_url, priority, is_hero, platform, site_id"
     )
     .in("platform", ["synttarit", "both"])
     .order("priority", { ascending: true })
@@ -82,6 +83,8 @@ export default async function SynttaritPage({
           </div>
           <NewSynttaritButton />
         </div>
+
+        <SynttaritTabs active="sankarit" />
 
         <SynttaritDayEditor
           selectedDate={selectedDate}
