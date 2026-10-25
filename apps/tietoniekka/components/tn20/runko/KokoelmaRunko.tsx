@@ -120,9 +120,6 @@ export default function KokoelmaRunko({ d, tunnusosa, v3Lisa, heroLisa, sisalto 
             {k.highlight && <span>{katko(k.highlight, true)}</span>}
           </h1>
           <p className="rk-ingress">{k.ingress}</p>
-          <span className="rk-tilasto">
-            {d.visoja} visaa · {osiot.length} {osiot.length === 1 ? "osio" : "osiota"}
-          </span>
           {heroLisa}
           {d.suosituin && <RunkoHeroCta suosituin={d.suosituin} jarjestys={d.jarjestys} tila={k.cta} selite={k.ctaSelite} />}
         </div>
@@ -142,12 +139,12 @@ export default function KokoelmaRunko({ d, tunnusosa, v3Lisa, heroLisa, sisalto 
         {v3Lisa}
         {naytaV3 && (
           <nav id="osiot" className="rk-v3" aria-label={k.osiotNimi}>
-            <span className="rk-v3-otsikko">{k.osiotNimi}</span>
             <div className="rk-chipit">
               {osiot.map((o) => (
                 <a key={o.slug} className="rk-chip" href={`#osio-${o.slug}`} data-osio={o.slug}>
                   {o.chip ?? o.title}
-                  <span data-osio-maara={o.maara}>{o.maara}</span>
+                  {/* Heikki 25.10.2026: ei määriä eikä "Aihepiirit"-otsikkoa; palaavalle pelaajalle "2/8" (RunkoMetapeli). */}
+                  <span data-osio-maara={o.maara} />
                 </a>
               ))}
             </div>
@@ -164,15 +161,11 @@ export default function KokoelmaRunko({ d, tunnusosa, v3Lisa, heroLisa, sisalto 
         const c = o.kortit.filter((x) => x.muoto === "C");
         return (
           <section key={o.slug} id={`osio-${o.slug}`} className="rk-osio" data-osio={o.slug} data-eka={oi === 0 || undefined} aria-labelledby={`osio-${o.slug}-h`}>
-            {o.eyebrow && (
-              <div className="rk-osio-eyebrow">
-                <span>{o.eyebrow}</span>
-                <i aria-hidden="true" />
-              </div>
-            )}
+            {/* Heikki 25.10.2026: ei eyebrow-yläotsikkoa ("Kuvataide ja muotoilu") eikä "N visaa" -määrää —
+                osion nimi riittää. Määrärivi täyttyy vain palaavalle pelaajalle ("2/8 pelattu", RunkoMetapeli). */}
             <div className="rk-osio-otsake">
               <h2 id={`osio-${o.slug}-h`} className="rk-h2">{katko(o.title, true)}</h2>
-              <span className="rk-osio-maara" data-osio-maara={o.maara}>{o.maara} visaa</span>
+              <span className="rk-osio-maara" data-osio-maara={o.maara} />
             </div>
             {(o.b || a.length > 0) && (
               <div className="rk-ruudukko" data-a={a.length}>

@@ -57,7 +57,6 @@
 .tn20 .rk-h1[data-lyhyt] { --rk-katto: 64px; }
 .tn20 .rk-h1 span { color: var(--rk-acc); }
 .tn20 .rk-ingress { margin: 0; max-width: 46ch; font-size: 16px; line-height: 1.5; color: var(--rk-soft); text-wrap: pretty; }
-.tn20 .rk-tilasto { font-size: 14px; font-weight: 600; color: var(--rk-muted); }
 /* Heron napin selite (Heikki 19.10.2026): "Suosituin tässä kokoelmassa" / "Seuraavaksi sinulle" / "Arvottu visa".
    21.10.2026: selite napin oikealle puolelle pystysuunnassa keskitettynä (ei erillisenä rivinä napin yläpuolella);
    kapeassa näkymässä rivittyy napin alle. */
@@ -80,7 +79,6 @@
   .tn20 .rk-h1 { --rk-katto: 64px; letter-spacing: -.01em; }
   .tn20 .rk-h1[data-lyhyt] { --rk-katto: 96px; }
   .tn20 .rk-ingress { font-size: 17px; }
-  .tn20 .rk-tilasto { font-size: 15px; }
   .tn20 .rk-cta { min-height: 56px; padding: 10px 30px; font-size: 20px; }
 }
 
@@ -108,7 +106,6 @@
 .tn20 .rk-v2-palkki i { display: block; height: 100%; background: var(--rk-acc); transform-origin: left; }
 
 .tn20 .rk-v3 { display: flex; flex-direction: column; gap: 10px; min-width: 0; scroll-margin-top: 76px; }
-.tn20 .rk-v3-otsikko { font-size: 12px; font-weight: 800; letter-spacing: .16em; text-transform: uppercase; color: #8e8676; }
 .tn20 .rk-chipit { display: flex; flex-wrap: wrap; gap: 8px; }
 .tn20 .rk-chip {
   display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 16px; border-radius: 999px;
@@ -125,6 +122,7 @@
   .tn20 .rk-chip { flex: none; }
 }
 .tn20 .rk-chip span { font-size: 13px; font-weight: 600; color: var(--rk-muted); }
+.tn20 .rk-chip span:empty { display: none; }
 
 /* Kuvakrediitti (CC BY / CC BY-SA -valokuvat) V6:n jälkeen, ennen V7:ää — erillinen rivi, ei kuvan päällä. */
 .tn20 .rk-krediitti { max-width: var(--rk-max); margin: 0 auto; padding: 28px var(--rk-x) 0; box-sizing: border-box; font-size: 12px; line-height: 1.5; color: var(--rk-muted); }
@@ -145,9 +143,6 @@
 /* Ensimmäinen osio lähemmäs heroa ja chippejä (Heikki 21.10.2026: visat näkyviin ilman vieritystä). */
 .tn20 .rk-osio[data-eka] { padding-top: 24px; }
 @media (min-width: 900px) { .tn20 .rk-osio[data-eka] { padding-top: 32px; } }
-.tn20 .rk-osio-eyebrow { display: flex; align-items: center; gap: 12px; }
-.tn20 .rk-osio-eyebrow span { font-family: var(--rk-cond); font-weight: 700; font-size: 14px; letter-spacing: .18em; text-transform: uppercase; color: var(--rk-acc); white-space: nowrap; }
-.tn20 .rk-osio-eyebrow i { flex: 1; height: 1px; background: var(--rk-line); }
 .tn20 .rk-osio-otsake { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 6px 16px; }
 .tn20 .rk-h2 {
   margin: 0; font-family: var(--rk-cond); font-weight: 800; line-height: .92; text-transform: uppercase;
@@ -155,6 +150,7 @@
 }
 .tn20 .rk-h2--pieni { font-size: clamp(26px, 2.6cqi, 40px); line-height: .95; }
 .tn20 .rk-osio-maara { font-size: 14px; font-weight: 600; color: var(--rk-muted); }
+.tn20 .rk-osio-maara:empty { display: none; }
 
 .tn20 .rk-ruudukko { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
 @media (min-width: 600px) { .tn20 .rk-ruudukko { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
