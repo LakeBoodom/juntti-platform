@@ -215,7 +215,8 @@ export async function haeHenkiloSivu(slug: string): Promise<HenkiloSivu | { ohja
     otsikko: lajiRiittaa && lajiNimi ? `Muut ${lajiNimi}` : `Muut: ${ryhma(r).nimi.toLowerCase()}`,
     laatat: joukko.slice(0, 8).map((x) => laatta(x, nyt)),
     kaikki: joukko.length + 1,
-    kaikkiHref: lajiRiittaa && c.laji ? `/henkilot/${r}/${c.laji}` : `/henkilot/${r}`,
+    // Ryhmä- ja lajisivut poistuivat 25.10.2026 → kokoelman pääsivun ryhmäosio.
+    kaikkiHref: `/kokoelma/tunnetut-henkilot#osio-henkilot-${r}`,
   };
 
   const s = parsePvm(c.birth_date);

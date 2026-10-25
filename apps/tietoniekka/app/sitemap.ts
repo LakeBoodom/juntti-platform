@@ -17,7 +17,7 @@ import { NAV_COLLECTIONS } from "@/lib/nav";
 import { KATEGORIAT } from "@/lib/kuvavisat2026";
 import { getPublishedQuizSlugs } from "@/lib/queries";
 import { haeHakemisto } from "@/lib/henkilot";
-import { KUUKAUDET, RYHMAT, kuukausiSlug } from "@/lib/henkiloRyhmat";
+import { KUUKAUDET, kuukausiSlug } from "@/lib/henkiloRyhmat";
 import { LAPSET_SIVU, lapsetNakyvissa } from "@/lib/lapset/data";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://tietoniekka.fi";
@@ -62,13 +62,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     .filter((q) => q.slug && q.game_mode !== "mega")
     .map((q) => u(`/visa/${q.slug}`, "monthly", 0.7, q.updated_at ? new Date(q.updated_at) : now));
 
-  // Erä B3: henkilöhakemisto, ryhmät, lajit, synttärikuukaudet ja henkilösivut.
+  // Erä B3: henkilöhakemisto, synttärikuukaudet ja henkilösivut (ryhmä- ja lajisivut poistuivat 25.10.2026).
   const henkilot = await haeHakemisto();
-  const lajit = [...new Set(henkilot.filter((h) => h.laji).map((h) => `${h.ryhma}/${h.laji}`))];
   const henkiloPages: MetadataRoute.Sitemap = [
     u("/henkilot", "weekly", 0.8),
-    ...RYHMAT.map((r) => u(`/henkilot/${r.key}`, "weekly", 0.6)),
-    ...lajit.map((l) => u(`/henkilot/${l}`, "weekly", 0.5)),
     ...KUUKAUDET.map((_, i) => u(`/henkilot/kuukausi/${kuukausiSlug(i)}`, "monthly", 0.5)),
     ...henkilot.map((h) => u(h.href, "weekly", 0.6)),
   ];

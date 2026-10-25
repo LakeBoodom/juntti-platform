@@ -54,6 +54,17 @@ export function middleware(req: NextRequest) {
     return pelivariantti(r);
   }
 
+  /* Henkilöhakemiston ryhmä- ja lajisivut (Heikki 25.10.2026): ei omia listasivuja, vaan kokoelman pääsivun osio
+     kuvakortteineen. /henkilot (A–Ö) ja /henkilot/kuukausi/<kk> jäävät. */
+  const hr = url.pathname.match(/^\/henkilot\/(urheilijat|muusikot|nayttelijat|poliitikot|media|kirjailijat|vaikuttajat)(?:\/[^/]+)?\/?$/);
+  if (hr) {
+    const r = url.clone();
+    r.pathname = "/kokoelma/tunnetut-henkilot";
+    r.search = "";
+    r.hash = `osio-henkilot-${hr[1]}`;
+    return NextResponse.redirect(r, 308);
+  }
+
   /* Rungolle siirtyneet kokoelmat: vanha suodatinlinkki → osion ankkuri (ei dynaamista reittiä). */
   const runko = url.pathname.match(/^\/kokoelma\/(kulttuuri|jalkapallo|luonto|kuvavisat|tunnetut-henkilot)\/?$/);
   if (runko) {
@@ -78,4 +89,4 @@ export function middleware(req: NextRequest) {
   return NextResponse.next();
 }
 
-export const config = { matcher: ["/visa/:path*", "/peli", "/kokoelma/:path*"] };
+export const config = { matcher: ["/visa/:path*", "/peli", "/kokoelma/:path*", "/henkilot/:path*"] };

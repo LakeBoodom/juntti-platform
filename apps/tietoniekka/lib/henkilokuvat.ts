@@ -389,6 +389,16 @@ export const HENKILOKUVAT: Record<string, string> = {
   "Zoe Kravitz 2020 dvna studio.jpg": "/20/henkilot/k/zoe-kravitz-2020-dvna-studio-590fa7.webp",
   "Вилле Хаапасало.png": "/20/henkilot/k/kuva-bf3a43.webp",
   "Саули Ниинистё (52074997569).jpg": "/20/henkilot/k/52074997569-82379d.webp",
+  "Ari Koivunen 2009.jpg": "/20/henkilot/k/ari-koivunen-2009-87a22d.webp",
+  "Eero Heinäluoma Pori 2026.jpg": "/20/henkilot/k/eero-hein-luoma-pori-2026-f9b48b.webp",
+  "Outdoor portraits of Henna Virkkunen, Executive Vice-President of the EC for Tech Sovereignty, Security and Democracy (P-064862-00-14).jpg": "/20/henkilot/k/outdoor-portraits-of-henna-virkkunen-exe-97d0c9.webp",
+  "Juha Sipilä Resignation 02.jpg": "/20/henkilot/k/juha-sipil-resignation-02-ad7733.webp",
+  "Katri Kulmuni.jpg": "/20/henkilot/k/katri-kulmuni-b6491a.webp",
+  "Li Andersson (Li Andersson3) (cropped).jpg": "/20/henkilot/k/li-andersson-li-andersson3-cropped-91380e.webp",
+  "Pekka Haavisto (pekka-haavisto-6598) (cropped).jpg": "/20/henkilot/k/pekka-haavisto-pekka-haavisto-6598-cropp-27471d.webp",
+  "Rishi Sunak Official Cabinet Portrait, September 2021 (cropped).jpg": "/20/henkilot/k/rishi-sunak-official-cabinet-portrait-se-c592c5.webp",
+  "Ville Niinisto Grona forbundet (grona) Finland. Nordiska radets session 2010.jpg": "/20/henkilot/k/ville-niinisto-grona-forbundet-grona-fin-6fca42.webp",
+  "2023 Prince of Wales (cropped)02.JPG": "/20/henkilot/k/2023-prince-of-wales-cropped-02-585f46.webp",
 };
 
 /** Commons-tiedoston nimi URL:sta (thumb- tai alkuperäinen polku), välilyönnein. */

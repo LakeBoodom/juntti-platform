@@ -4,7 +4,7 @@ import type { Metadata } from "next";
 import Crumbs from "@/components/tn20/Crumbs";
 import { jakoMeta } from "@/lib/jakoMeta";
 import { haeHakemisto } from "@/lib/henkilot";
-import { KUUKAUDET, RYHMAT, kuukausiSlug, lajiNimi } from "@/lib/henkiloRyhmat";
+import { KUUKAUDET, RYHMAT, kuukausiSlug } from "@/lib/henkiloRyhmat";
 import { tanaan } from "@/lib/henkilo";
 import Hakemisto, { type AzRivi } from "./Hakemisto";
 
@@ -30,15 +30,12 @@ export default async function HenkilotPage() {
 
   const ryhmat = RYHMAT.map((g) => {
     const jasenet = kaikki.filter((r) => r.ryhma === g.key);
-    const lajit = new Map<string, number>();
-    for (const r of jasenet) if (r.laji) lajit.set(r.laji, (lajit.get(r.laji) ?? 0) + 1);
     return {
       nimi: g.nimi,
-      href: `/henkilot/${g.key}`,
+      /* 25.10.2026: ryhmä- ja lajisivut poistuivat → kokoelman pääsivun ryhmäosio (kuvakortit). */
+      href: `/kokoelma/tunnetut-henkilot#osio-henkilot-${g.key}`,
       n: jasenet.length,
-      lajit: [...lajit.entries()]
-        .sort((a, b) => b[1] - a[1])
-        .map(([l, n]) => ({ nimi: lajiNimi(l), href: `/henkilot/${g.key}/${l}`, n })),
+      lajit: [],
     };
   }).filter((g) => g.n > 0);
 

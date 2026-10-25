@@ -142,12 +142,12 @@ function kokoa(k: Kokoelma, kohteet: UlkoinenKohde[], maarat: Record<string, num
       if (fi > 0) vs = [vs[fi], ...vs.slice(0, fi), ...vs.slice(fi + 1)];
       /* S1: ensimmäinen (tai nostettu) on osion ensimmäinen kortti (b), jos sillä on kuva. Piirretään samana A-korttina
          kuin muut (21.10.2026, leveä B-kortti poistettu). */
-      const b = vs[0]?.kuva ? vs[0] : null;
+      const b = vs[0]?.kuva || (vs[0] && k.korttiIlmanKuvaa) ? vs[0] : null;
       const loput = b ? vs.slice(1) : vs;
       /* S1 (Heikki 21.10.2026): jokainen kuvallinen visa on kortti (A), myös 9. visasta alkaen ja vaikka kuvallisia
          olisi vain kaksi (Pohjois-Suomi: Oulu ja Rovaniemi vierekkäin) — "Näytä kaikki" avaa kokonaiset kortit.
          C-rivi vain kuvattomalle visalle. */
-      const kortit: RunkoKortti[] = loput.map((v, i) => ({ ...v, muoto: v.kuva ? "A" : "C", nro: i + 1 }));
+      const kortit: RunkoKortti[] = loput.map((v, i) => ({ ...v, muoto: v.kuva || k.korttiIlmanKuvaa ? "A" : "C", nro: i + 1 }));
       return {
         ...s,
         b,

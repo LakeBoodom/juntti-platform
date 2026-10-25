@@ -35,8 +35,12 @@ function KorttiA({ v, eka }: { v: RunkoKortti; eka?: boolean }) {
   return (
     <a className={["rk-a", yli(v)].filter(Boolean).join(" ")} data-visa-id={v.id} href={v.href} style={{ "--lw": pisinSana(v.nimi) } as CSSProperties}>
       <span className="rk-a-kuva">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={v.kuva!} alt="" loading={eka ? undefined : "lazy"} fetchPriority={eka ? "low" : undefined} data-sovitus={v.kuvaSovitus} style={v.kuvaPos ? { objectPosition: v.kuvaPos } : undefined} />
+        {v.kuva ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={v.kuva} alt="" loading={eka ? undefined : "lazy"} fetchPriority={eka ? "low" : undefined} data-sovitus={v.kuvaSovitus} style={v.kuvaPos ? { objectPosition: v.kuvaPos } : undefined} />
+        ) : (
+          <span className="rk-a-ini" aria-hidden="true">{v.nimi.split(/\s+/).map((w) => w[0]).join("").slice(0, 2)}</span>
+        )}
         <span className="rk-pelattu" aria-hidden="true">✓</span>
       </span>
       <span className="rk-a-teksti">
