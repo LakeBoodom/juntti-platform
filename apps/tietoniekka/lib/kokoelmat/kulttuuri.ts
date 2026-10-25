@@ -15,7 +15,7 @@ export const KULTTUURI: Kokoelma = {
   highlight: "klassikot",
   ingress: "Taide, design, kirjallisuus, musiikki ja suomalaiset ilmiöt saunasta murteisiin.",
   accent: kokoelmaKortti("kulttuuri")!.mastery.color,
-  hero: { image: KULTTUURI_HERO, focalX: 0.55, focalY: 0.45, alt: "Kollaasi suomalaisesta kulttuurista: kirja, lasiesineet, maalaus ja Jean Sibelius" },
+  hero: { image: KULTTUURI_HERO, focalX: 0.5, focalY: 0.4, alt: "Ateneumin taidemuseon julkisivu, Helsinki. Kuva: Htm / Wikimedia Commons, CC BY-SA 3.0" },
   cta: "suosituin",
   osiotNimi: "Aihepiirit",
   sections: [
@@ -28,5 +28,6 @@ export const KULTTUURI: Kokoelma = {
   mastery: { name: kokoelmaKortti("kulttuuri")!.mastery.name, icon: "kulttuuri" },
   haku: { collection: "kulttuuri" },
   korttikuva: kulttuuriImgKortti,
+  kuvakrediitti: "Valokuvat ja maalaukset: Wikimedia Commons, CC BY / CC BY-SA / public domain",
 };
 
