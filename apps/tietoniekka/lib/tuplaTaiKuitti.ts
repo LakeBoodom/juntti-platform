@@ -383,16 +383,3 @@ export function arvoSarja(rivit: KysymysRivi[], visaNimet: Map<string, string>, 
 
 /** Lyhyt satunnainen siemen "Arvo uusi" -napille ja haastelinkkiin. */
 export const uusiSiemen = () => Math.random().toString(36).slice(2, 8);
-
-/** Jakolinkin tasonimi (og:description, Heikki 23.10.2026): lopetuksen ensimmäisen lauseen alku ("Turva piti").
- *  Pelin oma lause arvotaan selaimessa, joten jakolinkki kantaa vain lopetuksen syyn ja saaliin; tämä palauttaa
- *  syylle aina saman nimen, eikä osoitteen vapaa teksti päädy og-kenttiin. */
-export function loppuNimi(t: TuplaTeema, syy: string, saalis: number): string | null {
-  const L = t.lauseet ?? LAUSEET_OLETUS;
-  const lista = syy === "taydet" ? L.taydet : syy === "jaahy" ? (saalis > 0 ? L.turva : L.nolla) : syy === "kuittasi" ? (saalis <= 4 ? L.pieni : L.kuitattu) : null;
-  for (const l of lista ?? []) {
-    const eka = l.split(/[.!]/)[0].trim();
-    if (eka && !eka.includes("{")) return eka;
-  }
-  return null;
-}

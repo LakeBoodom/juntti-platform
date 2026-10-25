@@ -10,7 +10,8 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getSupabase } from "@/lib/supabase";
 import { helsinginPaiva } from "@/lib/aika";
-import { arvoSarja, teema as haeTeema, maara, loppuNimi, type KysymysRivi } from "@/lib/tuplaTaiKuitti";
+import { arvoSarja, teema as haeTeema, maara, type KysymysRivi } from "@/lib/tuplaTaiKuitti";
+import { tuplaTaso } from "@/lib/pelitasot";
 import TuplaClient from "./TuplaClient";
 import "../tupla.css";
 
@@ -36,7 +37,7 @@ export async function generateMetadata({ params, searchParams }: Props): Promise
     alternates: t ? { canonical: `/peli/tupla-tai-kuitti/${t.slug}` } : undefined,
     ...jakoMeta({
       ...(t && jaettu
-        ? { title: JAKO_OG_OTSIKKO, description: jakoKuvaus(maara(jaettu.saalis, t.palkinto), loppuNimi(t, jaettu.syy, jaettu.saalis), jaettu.syy === "taydet") }
+        ? { title: JAKO_OG_OTSIKKO, description: jakoKuvaus(maara(jaettu.saalis, t.palkinto), tuplaTaso(jaettu.syy, jaettu.saalis), jaettu.syy === "taydet") }
         : { title: t ? `Tupla tai kuitti – ${t.nimi}` : "Tupla tai kuitti", description: t?.kuvaus }),
       url: t ? jakoOsoite(`/peli/tupla-tai-kuitti/${t.slug}`, sp, ["sarja", "tulos", "syy"]) : "/peli/tupla-tai-kuitti",
       kuva: "/og/sivu/tupla-tai-kuitti",

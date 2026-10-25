@@ -34,7 +34,7 @@ import { igAvaus, igValmis } from "../../../lib/igMittaus";
 import "../peli2026.css";
 import { lyhennettyNimi, jakoteksti, vastahaasteteksti } from "@/lib/korttinimi";
 import { valitseKorttikysymys, kysymysLinkki } from "@/lib/kysymyskortti";
-import { useJako, type Jakokanava } from "@/components/tn20/jako/Jakoalue";
+import type { Jakokanava } from "@/components/tn20/jako/Jakoalue";
 import TulosNakyma from "@/components/tn20/tulos/TulosNakyma";
 import Pelipalkki from "@/components/tn20/pelikehys/Pelipalkki";
 import PeliKehys from "@/components/tn20/pelikehys/PeliKehys";
@@ -948,8 +948,6 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
   const shareText = quiz.haaste && done
     ? vastahaasteteksti(jakoNimi, right, total, quiz.haaste)
     : jakoteksti(jakoNimi, right, total, fanitaso);
-  /* Megavisan pelikehys: oma "Haasta kaveri" -nappi, sama jaon logiikka kuin Jakoalueessa. */
-  const jako = useJako({ teksti: shareText, url: jakoUrl, otsikko: `Tietoniekka · ${quiz.title}`, onJaettu: (k) => markShared(k) });
 
   const openReview = (i: number, opener?: HTMLElement | null) => {
     if (review == null) openerRef.current = opener ?? (document.activeElement as HTMLElement | null);
@@ -1112,11 +1110,14 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
     return (
       <PeliKehys iho="tumma">
         <div ref={pageRef}>
-        <Pelipalkki iho="tumma" peli={kehys.peli} koti={kehys.koti} />
+        <Pelipalkki iho="tumma" peli={kehys.peli} muunnelma={lyhennettyNimi(quiz.title)} koti={kehys.koti} />
         <main>
+          {/* K4 v2 (pelimuotojen kehys 25.10.2026): tulos → läpikäynti → jako (Jakoalue) → seuraava peli → linkit. */}
           <PeliTulos
-            iso={`${right}/${total} oikein`}
-            ala={`${score} pistettä · ${tier.title}`}
+            luku={`${right}/${total}`}
+            yksikko="oikein"
+            tasonimi={fanitaso ?? tier.title}
+            lause={`${tier.body} ${score} pistettä.`}
             lisa={
               /* K4: läpikäynti tuloksen alla, oletuksena kiinni (Heikki 20.10.2026: kysymyksiä on paljon). */
               <details className="pk-lapikaynti">
@@ -1127,32 +1128,14 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
                 {vastaukset}
               </details>
             }
-            paatoiminto={
-              uusi ? (
-                <a className="pk-nappi" href={uusi.href}>
-                  Pelaa uusi megavisa
-                </a>
-              ) : (
-                <button type="button" className="pk-nappi" onClick={restart}>
-                  Pelaa uudelleen
-                </button>
-              )
-            }
-            harjoitus={
-              uusi ? (
-                <button type="button" className="pk-linkki" onClick={restart}>
-                  Pelaa sama mega uudelleen
-                </button>
-              ) : undefined
-            }
-            haasta={
-              <button type="button" className="pk-haasta" onClick={() => (jako.jaa ? jako.jaa() : jako.kopioi())}>
-                {jako.kopioitu ? "Linkki kopioitu" : "Haasta kaveri"}
-              </button>
+            jako={{ teksti: shareText, url: jakoUrl, natiiviOtsikko: `Tietoniekka · ${quiz.title}`, onJaettu: (k) => markShared(k) }}
+            toiminnot={
+              uusi
+                ? [{ teksti: "Pelaa uusi megavisa", href: uusi.href ?? `/peli?quiz_id=${uusi.id}` }, { teksti: "Pelaa sama mega uudelleen", onClick: restart }]
+                : [{ teksti: "Pelaa uudelleen", onClick: restart }]
             }
             seuraavat={kehys.seuraavat}
           />
-          <p className="tng-sr" role="status" aria-live="polite">{jako.tila}</p>
         </main>
         </div>
         {tarkastelu}

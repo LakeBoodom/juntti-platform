@@ -13,10 +13,14 @@ export default function Pelipalkki({
   peli,
   koti,
   iho = "tumma",
+  muunnelma,
   tila,
   pelissa = false,
 }: {
   peli: string;
+  /** Pelin muunnelma: pakka, aihe tai teema ("Presidentit"). Desktopilla "Peli: muunnelma", mobiilissa omalla
+      pienemmällä rivillään (pelimuotojen kehys 25.10.2026: muunnelman nimi yläpalkkiin, ei tuloksen yläotsikoksi). */
+  muunnelma?: string;
   koti: PeliKoti;
   iho?: PeliIho;
   /** Pelin oma tila (role=status): "Kysymys 4/10", "Ketjussa 3/6". */
@@ -31,7 +35,15 @@ export default function Pelipalkki({
           <span>TIETO</span>NIEKKA
         </a>
         <span className="pk-erotin" aria-hidden="true" />
-        <span className="pk-peli">{peli}</span>
+        <span className="pk-peli">
+          <span>{peli}</span>
+          {muunnelma && (
+            <span className="pk-muunnelma">
+              <span className="pk-kaksoispiste">: </span>
+              {muunnelma}
+            </span>
+          )}
+        </span>
         {tila != null && (
           <span className="pk-tila" role="status" aria-live="polite">
             {tila}

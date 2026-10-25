@@ -7,6 +7,7 @@
 
 import { JsonLd, peliLd } from "@/lib/jsonLd";
 import { jakoMeta, jakoOsoite, pelituloksenOg } from "@/lib/jakoMeta";
+import { reittiTaso } from "@/lib/pelitasot";
 import type { Metadata } from "next";
 import { helsinginPaiva } from "@/lib/aika";
 import { arvoReitti, RN_LAHDE, RN_MAANOSAT, maanosaTunnuksella } from "@/lib/rajanaapurit/reitti";
@@ -24,7 +25,7 @@ export async function generateMetadata({ searchParams }: { searchParams: Promise
       "Järjestä kahdeksan valtiota reitiksi niin, että jokaisella vierekkäisellä parilla on yhteinen maaraja. Uusi päivän reitti joka päivä.",
     alternates: { canonical: "/peli/rajanaapurit" },
     ...jakoMeta({
-      ...(pelituloksenOg(sp, "yhteyttä") ?? {
+      ...(pelituloksenOg(sp, "yhteyttä", reittiTaso) ?? {
         title: "Rajanaapurit – rakenna reitti naapurivaltioiden kautta",
         description: "Järjestä kahdeksan valtiota reitiksi niin, että jokaisella vierekkäisellä parilla on yhteinen maaraja. Uusi päivän reitti joka päivä.",
       }),

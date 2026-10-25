@@ -19,6 +19,8 @@ import { useEffect, useMemo, useRef, useState, type CSSProperties, type Keyboard
 import { getSupabase } from "@/lib/supabase";
 import Pelipalkki from "@/components/tn20/pelikehys/Pelipalkki";
 import { SeuraavaPeli } from "@/components/tn20/pelikehys/PeliTulos";
+import Jakoalue from "@/components/tn20/jako/Jakoalue";
+import { vpkTaso } from "@/lib/pelitasot";
 import { runkoCond } from "@/components/tn20/runko/runkoFontti";
 import { seuraavatPelit } from "@/lib/pelimuodot";
 import {
@@ -172,7 +174,6 @@ export default function VpkClient({
   const [nakyma, setNakyma] = useState<"oma" | "oikea">("oma");
   const [veto, setVeto] = useState<{ id: string; dx: number; dy: number; liikkui: boolean } | null>(null);
   const [yli, setYli] = useState<number | null>(null);
-  const [jaettu, setJaettu] = useState(false);
   const ajastin = useRef<ReturnType<typeof setInterval> | null>(null);
   const irrota = useRef<(() => void) | null>(null);
   const juuri = useRef<HTMLDivElement>(null);
@@ -317,21 +318,14 @@ export default function VpkClient({
   // Arvotaan vasta painettaessa: renderissä arvottu siemen erottaisi palvelimen ja selaimen HTML:n.
   const uusiKetju = () => location.assign(`${VPK_SIVU}?ketju=${uusiKetjuSiemen()}`);
 
-  /** Jaetaan aina päivän ketjun tulos (myös harjoitusketjun tulosnäkymästä). */
-  async function jaa() {
-    if (!paivanTulos) return;
-    const teksti = jakoteksti(paivanTulos.numero, paivanTulos.kortit);
-    /* Tulos linkkiin (?tulos=n-total), jotta Facebookin og-kuvaus kertoo sen (23.10.2026). */
-    const oikein = paivanTulos.kortit.filter(Boolean).length;
-    const url = `${location.origin}${VPK_SIVU}?tulos=${oikein}-${VPK_JARJESTETTAVIA}`;
-    try {
-      if (navigator.share) await navigator.share({ title: `${VPK_NIMI} #${paivanTulos.numero}`, text: teksti, url });
-      else await navigator.clipboard.writeText(`${teksti} ${url}`);
-      setJaettu(true);
-    } catch {
-      // jako peruttu
-    }
-  }
+  /** Jaetaan aina päivän ketjun tulos (myös harjoitusketjun tulosnäkymästä). Jakoalue (K4 v2, 25.10.2026); tulos
+      linkkiin (?tulos=n-total), jotta Facebookin og-kuvaus kertoo sen. Tulos piirretään vain selaimessa. */
+  const jako = paivanTulos && typeof location !== "undefined"
+    ? {
+        teksti: jakoteksti(paivanTulos.numero, paivanTulos.kortit),
+        url: `${location.origin}${VPK_SIVU}?tulos=${paivanTulos.kortit.filter(Boolean).length}-${VPK_JARJESTETTAVIA}`,
+      }
+    : null;
 
   // ── Yläpalkin tilanne ──
   const meta = pelissa
@@ -518,8 +512,7 @@ export default function VpkClient({
             nakyma={nakyma}
             setNakyma={setNakyma}
             uusiKetju={uusiKetju}
-            jaa={paivanTulos ? jaa : null}
-            jaettu={jaettu}
+            jako={jako}
           />
         )
       )}
@@ -552,8 +545,7 @@ function Tulos(p: {
   nakyma: "oma" | "oikea";
   setNakyma: (n: "oma" | "oikea") => void;
   uusiKetju: () => void;
-  jaa: (() => void) | null;
-  jaettu: boolean;
+  jako: { teksti: string; url: string } | null;
 }) {
   const { k, tulos, koko, edustajat, paljastettu, valmis } = p;
   const vp = koko.map((id) => edustajat.get(id)!.vp);
@@ -623,26 +615,30 @@ function Tulos(p: {
             ))}
           </span>
         </div>
+        {valmis && <h2 className="vpk-taso">{vpkTaso(tulos.oikein, VPK_JARJESTETTAVIA)}</h2>}
         <p className="vpk-tuomio">{tuomio}</p>
-        {valmis && (
-          <div className="vpk-napit">
-            {/* K4 (pelikehys): tulos → Pelaa uusi → harjoitusselite pienellä → Haasta kaveri → seuraava peli */}
-            <button type="button" className="vpk-jaa" onClick={p.uusiKetju}>
-              Pelaa uusi ketju
-            </button>
-            <p className="pk-harjoitus">Uusi ketju on harjoitus eikä vaikuta päivän tulokseen.</p>
-            {p.jaa ? (
-              <button type="button" className="vpk-toissija" onClick={p.jaa}>
-                {p.jaettu ? "Haaste jaettu" : "Haasta kaveri"}
-              </button>
-            ) : (
-              <a className="vpk-toissija" href={VPK_SIVU}>
-                Pelaa päivän ketju #{k.numero}
-              </a>
-            )}
-          </div>
-        )}
       </div>
+
+      {/* K4 v2 (pelimuotojen kehys 25.10.2026): jako Jakoalueella, uusi ketju toissijaisena linkkinä (ei lime-nappia). */}
+      {valmis && (
+        <div className="vpk-k4">
+          {p.jako && (
+            <Jakoalue
+              className="vpk-jako"
+              id="vpk-jako-h"
+              otsikko="Haasta kaveri"
+              waNappi="Jaa WhatsAppissa"
+              teksti={p.jako.teksti}
+              url={p.jako.url}
+              natiiviOtsikko={`${VPK_NIMI} #${k.numero}`}
+            />
+          )}
+          <nav className="pk-tulos-linkit" aria-label="Muut toiminnot">
+            <button type="button" onClick={p.uusiKetju}>Pelaa uusi ketju</button>
+            {!p.jako && <a href={VPK_SIVU}>Pelaa päivän ketju #{k.numero}</a>}
+          </nav>
+        </div>
+      )}
 
       <div className="vpk-tulos-grid">
         <div className="vpk-oma">

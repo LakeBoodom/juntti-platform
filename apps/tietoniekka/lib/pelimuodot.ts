@@ -35,6 +35,10 @@ const TUPLA_KOKOELMA: Record<string, string> = {
   maantieto: "matkakohteet",
 };
 
+/** Laita järjestykseen -pakat, joilla on oma korttikuva public/20/vaalit/pakat/<slug>.webp. Henkilöpakkojen kuvat
+ *  (presidentit … eduskunta-pisimpaan, 25.10.2026) on koottu kolmesta omasta kasvokopiosta public/20/vaalit/kasvot. */
+const PAKKAKUVAT = new Set(["eduskuntaryhmat", "puolueet-ika", "vaalipiirit-paikat", "presidentit", "paaministerit", "paaministerit-kesto", "eduskunta-pisimpaan"]);
+
 export const PELIMUODOT: Pelimuoto[] = [
   ...TEEMAT.map((t) => ({
     slug: `tupla-${t.slug}`,
@@ -44,15 +48,16 @@ export const PELIMUODOT: Pelimuoto[] = [
     href: `${TUPLA_SIVU}/${t.slug}`,
     tila: "pelattava" as const,
     serves: [TUPLA_KOKOELMA[t.slug] ?? (t.painos ? "juhlat" : "")].filter(Boolean),
-    kuva: TUPLA_KOKOELMA[t.slug] === "luonto" ? { src: t.kuva, contain: true } : undefined,
+    /* Pelin oma kuva kaikissa korteissa (pelimuotojen kehys, Heikki 25.10.2026): teeman 3D-palkintoikoni. */
+    kuva: { src: t.kuva, contain: true },
   })),
-  { slug: "kuntaliitos", nimi: "Kuntaliitos", ikoni: "ketju", kuvaus: "Rakenna reitti naapurikuntien kautta.", href: "/peli/kuntaliitos", tila: "pelattava", serves: ["kaupungit", "matkakohteet"] },
-  { slug: "rajanaapurit", nimi: "Rajanaapurit", ikoni: "ketju", kuvaus: "Ketjuta maat yhteisen rajan kautta.", href: "/peli/rajanaapurit", tila: "pelattava", serves: ["matkakohteet"] },
-  { slug: "vaalipiiriketju", nimi: "Vaalipiiriketju", ikoni: "ketju", kuvaus: "Kulje vaalipiiristä toiseen kansanedustajien kautta.", href: "/peli/vaalipiiriketju", tila: "pelattava", serves: ["vaalit"] },
-  { slug: "ikajarjestys", nimi: "Ikäjärjestys", ikoni: "ika", kuvaus: "Järjestä tunnetut henkilöt iän mukaan.", href: "/peli/ikajarjestys", tila: "pelattava", serves: ["tunnetut-henkilot"] },
+  { slug: "kuntaliitos", nimi: "Kuntaliitos", ikoni: "ketju", kuvaus: "Rakenna reitti naapurikuntien kautta.", href: "/peli/kuntaliitos", tila: "pelattava", serves: ["kaupungit", "matkakohteet"], kuva: { src: "/20/kuntaliitos/palapeli.webp" } },
+  { slug: "rajanaapurit", nimi: "Rajanaapurit", ikoni: "ketju", kuvaus: "Ketjuta maat yhteisen rajan kautta.", href: "/peli/rajanaapurit", tila: "pelattava", serves: ["matkakohteet"], kuva: { src: "/20/rajanaapurit/banneri-kartta.webp" } },
+  { slug: "vaalipiiriketju", nimi: "Vaalipiiriketju", ikoni: "ketju", kuvaus: "Kulje vaalipiiristä toiseen kansanedustajien kautta.", href: "/peli/vaalipiiriketju", tila: "pelattava", serves: ["vaalit"], kuva: { src: "/20/vaalit/vaalipiiriketju-kortti.webp" } },
+  { slug: "ikajarjestys", nimi: "Ikäjärjestys", ikoni: "ika", kuvaus: "Järjestä tunnetut henkilöt iän mukaan.", href: "/peli/ikajarjestys", tila: "pelattava", serves: ["tunnetut-henkilot"], kuva: { src: "/20/pelit/k/ikajarjestys.webp" } },
   /* Viikon kuvavisa (15 kuvaa, vaihtuu maanantaisin) — entinen "Tämän viikon visa" -kaista Kuvavisat-sivulla. */
-  { slug: "kuvavisa-viikko", nimi: "Viikon kuvavisa", ikoni: "kuva", kuvaus: "15 kuvaa, uusi visa joka maanantai.", href: "/kuvavisa/viikko", tila: "pelattava", serves: ["kuvavisat"] },
-  { slug: "kuvavisat", nimi: "Kuvavisat", ikoni: "kuva", kuvaus: "Tunnista liput, vaakunat, eläimet ja maalaukset kuvasta.", href: "/kokoelma/kuvavisat", tila: "pelattava", serves: ["matkakohteet"] },
+  { slug: "kuvavisa-viikko", nimi: "Viikon kuvavisa", ikoni: "kuva", kuvaus: "15 kuvaa, uusi visa joka maanantai.", href: "/kuvavisa/viikko", tila: "pelattava", serves: ["kuvavisat"], kuva: { src: "/20/pelit/k/kuvavisat.webp" } },
+  { slug: "kuvavisat", nimi: "Kuvavisat", ikoni: "kuva", kuvaus: "Tunnista liput, vaakunat, eläimet ja maalaukset kuvasta.", href: "/kokoelma/kuvavisat", tila: "pelattava", serves: ["matkakohteet"], kuva: { src: "/20/pelit/k/kuvavisat.webp" } },
   { slug: "aanivisat", nimi: "Äänivisa: Suomen linnut", ikoni: "aani", kuvaus: "Tunnista lintu laulusta.", href: "/aanivisa/suomen-linnut", tila: "pelattava", serves: ["luonto"], kuva: { src: "/20/pelit/k/aanivisat.webp" } },
   /* Luonnon kuvavisat omina peleinään (runko vaihe 3, 20.10.2026: Luonto-sivun "Valitse pelimuoto" -kortit → V6). */
   { slug: "kuvavisa-linnut", nimi: "Kuvavisa: Suomen linnut", ikoni: "kuva", kuvaus: "Siivet, nokat ja höyhenpuvut lähikuvassa.", href: "/kuvavisa/linnut", tila: "pelattava", serves: ["luonto"], kuva: { src: "/20/pelit/k/kuvavisa-linnut.webp" } },
@@ -60,7 +65,7 @@ export const PELIMUODOT: Pelimuoto[] = [
   { slug: "kuvavisa-kasvit", nimi: "Kuvavisa: Suomen kasvit ja puut", ikoni: "kuva", kuvaus: "Lehti, kukka ja kaarna tunnistettavina.", href: "/kuvavisa/kasvit", tila: "pelattava", serves: ["luonto"], kuva: { src: "/20/pelit/k/kuvavisa-kasvit.webp" } },
   /* Suomen kaupungit -megavisa — entisen Kaupungit-sivun nosto (runko vaihe 3, 20.10.2026). Rekisteri on staattinen,
      joten kuvauksissa ei ole kysymysmääriä (Heikki 20.10.: luvut datasta) — määrä näkyy megan omalla sivulla. */
-  { slug: "mega-suomen-kaupungit", nimi: "Megavisa: Suomen kaupungit", ikoni: "jarjestys", kuvaus: "Kaikki 20 kaupunkia yhdessä istunnossa.", href: "/peli?mega=suomen-kaupungit-mega", tila: "pelattava", serves: ["kaupungit"] },
+  { slug: "mega-suomen-kaupungit", nimi: "Megavisa: Suomen kaupungit", ikoni: "jarjestys", kuvaus: "Kaikki 20 kaupunkia yhdessä istunnossa.", href: "/peli?mega=suomen-kaupungit-mega", tila: "pelattava", serves: ["kaupungit"], kuva: { src: "/20/pelit/k/megavisat.webp" } },
   /* Laita järjestykseen -pakat (julkaistut, lib/jarjesta/pakat.ts) palvelevat oman kokoelmansa sivua
      (runko vaihe 3, 20.10.2026: Vaalit-hubin pakkakortit → V6). */
   ...JULKAISTUT.map((p) => ({
@@ -71,8 +76,10 @@ export const PELIMUODOT: Pelimuoto[] = [
     href: pakkaHref(p),
     tila: "pelattava" as const,
     serves: [p.collection.slug],
+    /* Pakan oma korttikuva, muuten Vaalit-hubin kuva (kevyet kopiot, lähteet kuvalahteet.ts). */
+    kuva: { src: PAKKAKUVAT.has(p.slug) ? `/20/vaalit/pakat/${p.slug}.webp` : "/20/vaalit/hero-kortti.webp" },
   })),
-  { slug: "megavisat", nimi: "Megavisat", ikoni: "jarjestys", kuvaus: "Pitkät visat yhdellä istumalla.", href: "/megavisat", tila: "pelattava", serves: [] },
+  { slug: "megavisat", nimi: "Megavisat", ikoni: "jarjestys", kuvaus: "Pitkät visat yhdellä istumalla.", href: "/megavisat", tila: "pelattava", serves: [], kuva: { src: "/20/pelit/k/megavisat.webp" } },
 ];
 
 /** Kokoelman pelit: pelattavat ensin, sitten tulossa olevat. */

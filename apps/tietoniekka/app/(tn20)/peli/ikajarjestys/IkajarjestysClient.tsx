@@ -12,6 +12,7 @@
 // sulkeutuessa eikä mitään kirjoiteta kantaan pelin aikana.
 
 import { pelijakoteksti } from "@/lib/korttinimi";
+import { ikajarjestysTaso } from "@/lib/pelitasot";
 import { useMemo, useState, type CSSProperties } from "react";
 import { getChainRound } from "@/lib/ikajarjestys";
 import {
@@ -86,27 +87,18 @@ export default function IkajarjestysClient({
   const [phase, setPhase] = useState<Phase>(initialRound && initialRound.length > 0 ? "ordering" : "start");
   const [emptyNotice, setEmptyNotice] = useState<string | null>(null);
   const [partialRoundNotice, setPartialRoundNotice] = useState<string | null>(null);
-  const [jaettu, setJaettu] = useState(false);
 
   const correctOrder = useMemo(() => (round ? sortForDirection(round, DEFAULT_DIRECTION) : []), [round]);
 
   /** Haasta kaveri: sama kymmenikkö linkkinä (?henkilot=, sama kuin henkilösivun nosto). */
-  async function haasta() {
-    if (!round || !scoreResult) return;
-    /* Tulos linkkiin (?tulos=n-total), jotta Facebookin og-kuvaus kertoo sen (23.10.2026). */
-    const url = `${location.origin}/peli/ikajarjestys?henkilot=${round.map((p) => p.id).join(",")}&tulos=${scoreResult.correctCount}-${scoreResult.totalCount}`;
-    const teksti = pelijakoteksti(PELI, `${scoreResult.correctCount}/${scoreResult.totalCount}`, scoreResult.correctCount === scoreResult.totalCount);
-    try {
-      if (navigator.share) await navigator.share({ title: PELI, text: teksti, url });
-      else await navigator.clipboard.writeText(`${teksti} ${url}`);
-      setJaettu(true);
-    } catch {
-      // jako peruttu
-    }
-  }
+  /* Jako (K4 v2, 25.10.2026): Jakoalue-komponentti; tulos linkkiin (?tulos=n-total) jotta kaveri saa saman kierroksen
+     ja Facebookin og-kuvaus kertoo tuloksen; tasonimi kuten tulosnäkymässä. Tulosvaihe piirretään vain selaimessa. */
+  const jakoTiedot = () => ({
+    url: `${location.origin}/peli/ikajarjestys?henkilot=${(round ?? []).map((p) => p.id).join(",")}&tulos=${scoreResult?.correctCount ?? 0}-${scoreResult?.totalCount ?? 0}`,
+    teksti: pelijakoteksti(`${PELI}: ${LYHYT.get(category) ?? "Kaikki"}`, `${scoreResult?.correctCount ?? 0}/${scoreResult?.totalCount ?? 0} oikein`, !!scoreResult && scoreResult.correctCount === scoreResult.totalCount, scoreResult ? ikajarjestysTaso(scoreResult.correctCount, scoreResult.totalCount) : null),
+  });
 
   async function startRound(chosenCategory: string) {
-    setJaettu(false);
     setPhase("loading");
     setEmptyNotice(null);
     setPartialRoundNotice(null);
@@ -231,38 +223,19 @@ export default function IkajarjestysClient({
   if (phase === "revealing" && scoreResult) {
     return (
       <PeliKehys iho="tumma">
-        <Pelipalkki iho="tumma" peli={PELI} koti={KOTI} />
+        <Pelipalkki iho="tumma" peli={PELI} muunnelma={LYHYT.get(category) ?? "Kaikki"} koti={KOTI} />
         <main className="tk-page">
           <RevealSequencer
             items={revealItems}
             tulos={
-              /* K4 (pelikehys, 20.10.2026): tulos → Pelaa uusi → Haasta kaveri → seuraava peli. */
+              /* K4 v2 (pelimuotojen kehys 25.10.2026): tulos → jako → seuraava peli → toissijaiset linkit. */
               <PeliTulos
-                eyebrow={`${PELI} · ${LYHYT.get(category) ?? "Kaikki"}`}
-                iso={`${scoreResult.correctCount}/${scoreResult.totalCount} oikein`}
-                ala={`${scoreResult.score} pistettä · pisin oikea ketju ${scoreResult.longestCorrectChain}`}
-                paatoiminto={
-                  <button type="button" className="pk-nappi" onClick={() => startRound(category)}>
-                    Pelaa uusi kierros
-                  </button>
-                }
-                harjoitus={
-                  <button
-                    type="button"
-                    className="pk-linkki"
-                    onClick={() => {
-                      setPickerCategory(category);
-                      setPhase("start");
-                    }}
-                  >
-                    Vaihda aihetta
-                  </button>
-                }
-                haasta={
-                  <button type="button" className="pk-haasta" onClick={haasta}>
-                    {jaettu ? "Haaste jaettu" : "Haasta kaveri"}
-                  </button>
-                }
+                luku={`${scoreResult.correctCount}/${scoreResult.totalCount}`}
+                yksikko="oikein"
+                tasonimi={ikajarjestysTaso(scoreResult.correctCount, scoreResult.totalCount)}
+                lause={`${scoreResult.score} pistettä. Pisin oikea ketju: ${scoreResult.longestCorrectChain}.`}
+                jako={{ ...jakoTiedot(), natiiviOtsikko: PELI }}
+                toiminnot={[{ teksti: "Pelaa uusi kierros", onClick: () => startRound(category) }, { teksti: "Vaihda aihetta", onClick: () => { setPickerCategory(category); setPhase("start"); } }]}
                 seuraavat={seuraavatPelit("ikajarjestys", "tunnetut-henkilot")}
               />
             }
@@ -275,7 +248,7 @@ export default function IkajarjestysClient({
   // phase === "ordering"
   return (
     <PeliKehys iho="tumma">
-      <Pelipalkki iho="tumma" peli={PELI} koti={KOTI} tila={`${order.length} henkilöä`} pelissa />
+      <Pelipalkki iho="tumma" peli={PELI} muunnelma={LYHYT.get(category) ?? "Kaikki"} koti={KOTI} tila={`${order.length} henkilöä`} pelissa />
       <main className="tk-page">
         <header className="tk-order-head">
           <SuuntaindikaattoriBadge direction={DEFAULT_DIRECTION} />

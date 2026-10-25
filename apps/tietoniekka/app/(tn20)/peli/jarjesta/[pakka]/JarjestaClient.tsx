@@ -5,6 +5,7 @@
 // Toistonesto kuten Ikäjärjestyksessä: edellisen kierroksen id:t sessionStorageen.
 
 import { pelijakoteksti } from "@/lib/korttinimi";
+import { jarjestaTaso } from "@/lib/pelitasot";
 import { useMemo, useState } from "react";
 import { haeJarjestysKierros } from "@/lib/jarjesta/kierros";
 import {
@@ -63,7 +64,6 @@ export default function JarjestaClient({
   const [order, setOrder] = useState<JarjestysKohde[]>([]);
   const [phase, setPhase] = useState<Phase>("start");
   const [notice, setNotice] = useState<string | null>(null);
-  const [jaettu, setJaettu] = useState(false);
   // Pelikehys K1: paluu pakan kotikokoelmaan.
   const koti = { href: `/kokoelma/${pakka.collection.slug}`, nimi: pakka.collection.nimi };
   // KORTTISÄÄNTÖ: otsikko on uppercase eikä sanoja katkaista → koko pisimmän sanan mukaan (CSS).
@@ -85,22 +85,14 @@ export default function JarjestaClient({
     [arviot, round],
   );
 
-  async function haasta() {
-    if (!scoreResult) return;
-    /* Tulos linkkiin (?tulos=n-total), jotta Facebookin og-kuvaus kertoo sen (23.10.2026). */
-    const url = `${location.origin}${location.pathname}?tulos=${scoreResult.correctCount}-${scoreResult.totalCount}`;
-    const teksti = pelijakoteksti(`${PELI}: ${pakka.kortti.otsikko}`, `${scoreResult.correctCount}/${scoreResult.totalCount}`, scoreResult.correctCount === scoreResult.totalCount);
-    try {
-      if (navigator.share) await navigator.share({ title: PELI, text: teksti, url });
-      else await navigator.clipboard.writeText(`${teksti} ${url}`);
-      setJaettu(true);
-    } catch {
-      // jako peruttu
-    }
-  }
+  /* Jako (K4 v2, 25.10.2026): Jakoalue-komponentti; tulos linkkiin (?tulos=n-total) jotta kaveri saa saman kierroksen
+     ja Facebookin og-kuvaus kertoo tuloksen; tasonimi kuten tulosnäkymässä. Tulosvaihe piirretään vain selaimessa. */
+  const jakoTiedot = () => ({
+    url: `${location.origin}${location.pathname}?tulos=${scoreResult?.correctCount ?? 0}-${scoreResult?.totalCount ?? 0}`,
+    teksti: pelijakoteksti(`${PELI}: ${pakka.kortti.otsikko}`, `${scoreResult?.correctCount ?? 0}/${scoreResult?.totalCount ?? 0} oikein`, !!scoreResult && scoreResult.correctCount === scoreResult.totalCount, scoreResult ? jarjestaTaso(scoreResult.correctCount, scoreResult.totalCount, pakka.collection.slug) : null),
+  });
 
   async function aloita() {
-    setJaettu(false);
     setPhase("loading");
     setNotice(null);
     const next = await haeJarjestysKierros(
@@ -156,7 +148,7 @@ export default function JarjestaClient({
   if (phase === "start" || phase === "loading") {
     return (
       <PeliKehys iho="tumma">
-        <Pelipalkki iho="tumma" peli={PELI} koti={koti} />
+        <Pelipalkki iho="tumma" peli={PELI} muunnelma={pakka.kortti.otsikko} koti={koti} />
         <main>
           {/* K2 (pelikehys, 20.10.2026): h1 → lause → suunta → Aloita → ohjeet avattavina. */}
           <PeliAloitus
@@ -206,26 +198,19 @@ export default function JarjestaClient({
   if (phase === "revealing" && scoreResult) {
     return (
       <PeliKehys iho="tumma">
-        <Pelipalkki iho="tumma" peli={PELI} koti={koti} />
+        <Pelipalkki iho="tumma" peli={PELI} muunnelma={pakka.kortti.otsikko} koti={koti} />
         <main className="tk-page">
           <RevealSequencer
             items={revealItems}
             tulos={
-              /* K4 (pelikehys, 20.10.2026): tulos → Pelaa uusi → Haasta kaveri → seuraava peli. */
+              /* K4 v2 (pelimuotojen kehys 25.10.2026): tulos → jako → seuraava peli → toissijaiset linkit. */
               <PeliTulos
-                eyebrow={`${PELI} · ${iso(pakka.otsikko)}`}
-                iso={`${scoreResult.correctCount}/${scoreResult.totalCount} oikein`}
-                ala={`${scoreResult.score} pistettä · pisin oikea ketju ${scoreResult.longestCorrectChain}`}
-                paatoiminto={
-                  <button type="button" className="pk-nappi" onClick={aloita}>
-                    Pelaa uusi kierros
-                  </button>
-                }
-                haasta={
-                  <button type="button" className="pk-haasta" onClick={haasta}>
-                    {jaettu ? "Haaste jaettu" : "Haasta kaveri"}
-                  </button>
-                }
+                luku={`${scoreResult.correctCount}/${scoreResult.totalCount}`}
+                yksikko="oikein"
+                tasonimi={jarjestaTaso(scoreResult.correctCount, scoreResult.totalCount, pakka.collection.slug)}
+                lause={`${scoreResult.score} pistettä. Pisin oikea ketju: ${scoreResult.longestCorrectChain}.`}
+                jako={{ ...jakoTiedot(), natiiviOtsikko: PELI }}
+                toiminnot={[{ teksti: "Pelaa uusi kierros", onClick: aloita }]}
                 seuraavat={seuraavatPelit(`jarjesta-${pakka.slug}`, pakka.collection.slug)}
               />
             }
@@ -241,7 +226,7 @@ export default function JarjestaClient({
 
   return (
     <PeliKehys iho="tumma">
-      <Pelipalkki iho="tumma" peli={PELI} koti={koti} tila={`${order.length} korttia`} pelissa />
+      <Pelipalkki iho="tumma" peli={PELI} muunnelma={pakka.kortti.otsikko} koti={koti} tila={`${order.length} korttia`} pelissa />
       <main className="tk-page">
         <header className="tk-order-head tk-jarj-cq" style={lwTyyli}>
           <SuuntaindikaattoriBadge label={pakka.suunta.toUpperCase()} />

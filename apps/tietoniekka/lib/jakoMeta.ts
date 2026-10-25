@@ -50,7 +50,11 @@ export function jaettuTulos(raw: string | string[] | undefined | null): { n: num
 }
 
 /** Pelimuodon jaettu tulos ?tulos=n-total → og-otsikko ja -kuvaus ("Sain 6/7 rajaa. Pystytkö parempaan?"); muuten null. */
-export function pelituloksenOg(sp: Record<string, string | string[] | undefined>, yksikko: string): { title: string; description: string } | null {
+export function pelituloksenOg(
+  sp: Record<string, string | string[] | undefined>,
+  yksikko: string,
+  taso?: (oikein: number, kaikki: number) => string | null,
+): { title: string; description: string } | null {
   const t = jaettuTulos(sp.tulos);
-  return t ? { title: JAKO_OG_OTSIKKO, description: jakoKuvaus(`${t.n}/${t.kaikki} ${yksikko}`, null, t.n === t.kaikki) } : null;
+  return t ? { title: JAKO_OG_OTSIKKO, description: jakoKuvaus(`${t.n}/${t.kaikki} ${yksikko}`, taso?.(t.n, t.kaikki) ?? null, t.n === t.kaikki) } : null;
 }

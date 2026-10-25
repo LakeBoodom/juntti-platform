@@ -1,50 +1,84 @@
-// K4 TULOS (§4, CD 5d–5k). Järjestys aina: 1 tulos → 2 metapelilohko (METAPELI-lipun takana; paikka varattu) →
-// 3 päätoiminto "Pelaa uusi …" (karttaketjupeleissä harjoitusselite pienenä tekstinä napin alla, ei nappi) →
-// 4 "Haasta kaveri" → 5 seuraava peli: 2–3 korttia pelimuotorekisteristä, saman kokoelman pelit ensin.
-// Pelikohtainen tulosgrafiikka (tikapuut, reitti) tulee lisa-propsina tuloksen alle.
+// K4 v2 TULOS (pelimuotojen kehys ja jako, Heikki 25.10.2026; CD "TN Pelimuodot – kehys ja jako" 2a–2r).
+// Järjestys: 1 tulos (iso luku + yksikkö, tasonimi, yksi lause) → pelin oma tulosvisuaali → (2 metapeli, lipun takana)
+// → 3 jakoalue (sama Jakoalue kuin tietovisassa; kermaisella iholla vaalea) → 4 seuraava peli → 5 toissijaiset linkit.
+// Tulosnäkymässä ei ole lime-painiketta: päätoiminto on WhatsApp-jako, uusi kierros on toissijainen linkki.
+// Desktopilla (≥ 1024 px) tulos ja visuaali vasemmalla, jako oikealla; seuraava peli ja linkit koko leveydellä.
+// Pelin ja muunnelman nimi on pelipalkissa ("Laita järjestykseen: Presidentit"), ei yläotsikkona (UI-sääntö 9).
 import type { CSSProperties, ReactNode } from "react";
 import type { Pelimuoto } from "@/lib/pelimuodot";
 import { PeliIkoniSvg } from "@/components/tn20/runko/PeliIkoni";
+import Jakoalue, { type Jakokanava } from "@/components/tn20/jako/Jakoalue";
+
+export type PeliToiminto = { teksti: string; onClick?: () => void; href?: string };
 
 export default function PeliTulos({
-  eyebrow,
-  iso,
-  ala,
+  luku,
+  yksikko,
+  tasonimi,
+  lause,
   lisa,
-  paatoiminto,
-  harjoitus,
-  haasta,
+  jako,
   seuraavat,
+  toiminnot,
 }: {
-  /** Megavisa ei käytä (23.10.2026, UI-sääntö 9: nimi on yläpalkissa). */
-  eyebrow?: ReactNode;
-  /** Iso tulos: "5 tuplausta", "6/6 rajaa". */
-  iso: ReactNode;
-  ala?: ReactNode;
-  /** Pelin oma tulosgrafiikka (tikapuut, reitti, ennätys). */
+  /** Iso luku: "32", "6/7", "41/50". */
+  luku: ReactNode;
+  /** Yksikkö luvun perässä: "kiekkoa", "yhteyttä", "oikein". */
+  yksikko?: string;
+  /** Tasonimi otsikkona (lib/pelitasot.ts). */
+  tasonimi: string;
+  /** Yksi lause tuloksesta. */
+  lause?: ReactNode;
+  /** Pelin oma tulosvisuaali (tikapuut, reitti kartalla, ketju, vastausten läpikäynti). */
   lisa?: ReactNode;
-  paatoiminto: ReactNode;
-  /** Pieni selite päätoiminnon alla (karttaketjupelien harjoitusketju). */
-  harjoitus?: ReactNode;
-  haasta: ReactNode;
+  /** Jakoteksti ilman osoitetta + jaettava osoite (null = ei vielä valmis). */
+  jako: { teksti: string; url: string | null; onJaettu?: (k: Jakokanava) => void | Promise<unknown>; natiiviOtsikko?: string };
   seuraavat: Pelimuoto[];
+  /** Toissijaiset toiminnot linkkeinä: "Pelaa uusi kierros", "Pelaa sama sarja uudelleen". */
+  toiminnot: PeliToiminto[];
 }) {
   return (
-    <section className="pk-tulos" aria-labelledby="pk-tulos-h">
-      <div className="pk-tulos-yla">
-        {eyebrow && <span className="pk-tulos-eyebrow">{eyebrow}</span>}
-        <h1 id="pk-tulos-h" className="pk-tulos-iso">{iso}</h1>
-        {ala && <p className="pk-tulos-ala">{ala}</p>}
-        {lisa}
+    /* Ulompi kääre on container: kaksipalstaisuus seuraa pelin oman sisältöalueen leveyttä (Tupla ~500 px,
+       Laita järjestykseen ~600 px), ei ikkunan leveyttä. */
+    <div className="pk-tulos-ulko">
+    <div className="pk-tulos">
+      <div className="pk-tulos-vasen">
+        <section className="pk-tulos-tulos" aria-labelledby="pk-tulos-h">
+          <div className="pk-tulos-luku" aria-hidden="true">
+            <b>{luku}</b>
+            {yksikko && <span>{yksikko}</span>}
+          </div>
+          <span className="pk-sr">{luku} {yksikko}.</span>
+          <h1 id="pk-tulos-h" className="pk-tulos-taso">{tasonimi}</h1>
+          {lause && <p className="pk-tulos-ala">{lause}</p>}
+        </section>
+        {lisa && <div className="pk-tulos-lisa">{lisa}</div>}
+        {/* 2 · Metapelilohko: METAPELI_ENABLED-lipun takana (ei vielä toteutettu, ei jätä aukkoa). */}
       </div>
-      {/* 2 · Metapelilohko: METAPELI_ENABLED-lipun takana (ei vielä toteutettu, ei jätä aukkoa). */}
-      <div className="pk-tulos-toiminnot">
-        {paatoiminto}
-        {harjoitus && <p className="pk-harjoitus">{harjoitus}</p>}
-        {haasta}
-      </div>
+      <Jakoalue
+        className="pk-tulos-jako"
+        id="pk-jako-h"
+        otsikko="Haasta kaveri"
+        waNappi="Jaa WhatsAppissa"
+        teksti={jako.teksti}
+        url={jako.url}
+        natiiviOtsikko={jako.natiiviOtsikko}
+        onJaettu={jako.onJaettu}
+      />
       <SeuraavaPeli seuraavat={seuraavat} />
-    </section>
+      {toiminnot.length > 0 && (
+        <nav className="pk-tulos-linkit" aria-label="Muut toiminnot">
+          {toiminnot.map((t) =>
+            t.href ? (
+              <a key={t.teksti} href={t.href}>{t.teksti}</a>
+            ) : (
+              <button key={t.teksti} type="button" onClick={t.onClick}>{t.teksti}</button>
+            ),
+          )}
+        </nav>
+      )}
+    </div>
+    </div>
   );
 }
 
@@ -67,7 +101,16 @@ export function Pelikortit({ pelit }: { pelit: Pelimuoto[] }) {
     <div className="pk-seuraava-rivi">
       {pelit.map((p) => (
         <a key={p.slug} className="pk-pelikortti" href={p.href}>
-          <span className="pk-pelikortti-ikoni" aria-hidden="true"><PeliIkoniSvg ikoni={p.ikoni} /></span>
+          {/* Pelin oma kuva kortin yläosassa (pelimuotojen kehys, Heikki 25.10.2026); ilman kuvaa kuvake. Ei valinnan syy
+              -labelia (UI-sääntö 9). */}
+          {p.kuva ? (
+            <span className="pk-pelikortti-kuva" data-contain={p.kuva.contain || undefined} aria-hidden="true">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={p.kuva.src} alt="" loading="lazy" />
+            </span>
+          ) : (
+            <span className="pk-pelikortti-ikoni" aria-hidden="true"><PeliIkoniSvg ikoni={p.ikoni} /></span>
+          )}
           <span className="pk-pelikortti-nimi" style={{ "--pk-lw": Math.max(...p.nimi.split(/[\s-]+/).map((w) => w.length)) } as CSSProperties}>{p.nimi}</span>
           <span className="pk-pelikortti-kuvaus">{p.kuvaus}</span>
           <span className="pk-pelikortti-cta">Pelaa →</span>
