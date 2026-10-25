@@ -175,11 +175,19 @@ export default async function HenkiloPage({ params }: { params: Promise<{ slug: 
     ...(h.visa ? { subjectOf: { "@type": "Quiz", name: h.visa.otsikko, url: abs(h.visa.href) } } : {}),
   };
 
+  // CD "TN Henkilösivu pelinostot" 5a (25.10.2026): henkilövisa ensin (nosto, lime-CTA), Ikäjärjestys toiseksi.
+  // Otsikon genetiivi johdetaan käsin syötetystä elatiivista (Jipusta → Jipun; sama vartalo), ei nimestä.
   const hyllyPelit: HyllyPeli[] = [];
-  if (h.nosto) hyllyPelit.push({ tyyppi: "jarjestys", ...h.nosto });
   // "Aloita visa" vie suoraan 1. kysymykseen (Heikki 4.10.): henkilösivu on jo visan esittely.
   const aloitaHref = h.visa ? `${h.visa.href}${h.visa.href.includes("?") ? "&" : "?"}aloita=1` : "";
-  if (h.visa) hyllyPelit.push({ tyyppi: "visa", id: h.visa.id, otsikko: h.visa.otsikko, href: aloitaHref, fanitasot: h.visa.fanitasot });
+  const genetiivi = h.elatiivi && /st[aä]$/.test(h.elatiivi) ? h.elatiivi.replace(/st[aä]$/, "n") : null;
+  if (h.visa)
+    hyllyPelit.push({
+      tyyppi: "visa", id: h.visa.id, href: aloitaHref, fanitasot: h.visa.fanitasot,
+      otsikko: genetiivi ? `Kuinka hyvin tunnet ${genetiivi}?` : h.visa.otsikko,
+      kuva: h.image_url, kuvaPos: `${h.focal.x * 100}% ${h.focal.y * 100}%`,
+    });
+  if (h.nosto) hyllyPelit.push({ tyyppi: "jarjestys", ...h.nosto });
   const ini = h.name
     .split(/\s+/)
     .map((w) => w[0])

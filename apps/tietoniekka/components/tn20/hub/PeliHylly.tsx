@@ -1,6 +1,8 @@
 "use client";
 import { henkiloKuva } from "@/lib/henkilokuvat";
-// Aihesivujen pelihylly (erä B4, design v0.3 4a/4b). Hyllyn sääntö (CD):
+// Aihesivujen pelihylly (erä B4, design v0.3 4a/4b). 25.10.2026 CD "TN Henkilösivu pelinostot" 5a/5c:
+// henkilövisa nostona (kuva + "Kuinka hyvin tunnet X?" + täysleveä lime-CTA), Ikäjärjestys tiivis rivi alla.
+// Hyllyn sääntö (CD):
 //   - ensimmäinen peli on aina nosto (lime CTA — ainoa täytetty painike)
 //   - pelityypillä oma aksentti: Ikäjärjestys violetti, henkilövisa meripihka
 //   - 2 peliä: nosto + täysleveä rivi · 3–4: nosto + muut rinnakkain · 5+: kolmen sarake + "Kaikki"-linkki
@@ -24,7 +26,11 @@ export type HyllyPeli =
       akseli: [string, string];
       tilastot: string | null;
     }
-  | { tyyppi: "visa"; id: string; otsikko: string; href: string; fanitasot?: string[] | null }
+  | {
+      tyyppi: "visa"; id: string; otsikko: string; href: string; fanitasot?: string[] | null;
+      /** Henkilön kuva visanostoon (5a) ja sen rajaus (object-position). */
+      kuva?: string | null; kuvaPos?: string;
+    }
   | { tyyppi: "muu"; eyebrow: string; otsikko: string; href: string; aksentti: string };
 
 export type HyllyLinkki = { otsikko: string; href: string; meta?: string };
@@ -41,7 +47,8 @@ function lueTulos(id: string): Tulos | null {
   }
 }
 
-const pisin = (t: string) => Math.max(...t.split(/\s+/).map((w) => w.length), 6);
+/* Pisin katkeamaton osa: yhdysmerkki on rivinvaihtokohta ("Louis-|Dreyfusin?"), joten se jakaa sanan (25.10.2026). */
+const pisin = (t: string) => Math.max(...t.split(/\s+/).flatMap((w) => w.split(/(?<=-)/)).map((w) => w.length), 6);
 const lw = (t: string) => ({ "--hub-lw": pisin(t) }) as React.CSSProperties;
 
 function VisaTila({ peli, children }: { peli: Extract<HyllyPeli, { tyyppi: "visa" }>; children: (t: Tulos | null, taso: string | null) => React.ReactNode }) {
@@ -131,11 +138,21 @@ function Nosto({ peli }: { peli: HyllyPeli }) {
     return (
       <VisaTila peli={peli}>
         {(tulos, taso) => (
-          <a className="hub-nosto hub-nosto--visa" href={peli.href} style={lw(peli.otsikko)}>
-            <span className="hub-tyyppi hub-tyyppi--visa">Henkilövisa</span>
-            <span className="hub-nosto-otsikko">{peli.otsikko}</span>
-            {tulos && <TulosRivi tulos={tulos} taso={taso} />}
-            <span className="hub-cta-lime">{tulos ? "Pelaa uudelleen" : "Aloita visa"} <span aria-hidden="true">→</span></span>
+          <a className="hub-nosto hub-nosto--visa" href={peli.href} style={lw(peli.otsikko)} data-kuva={peli.kuva ? "" : undefined}>
+            <span className="hub-visa-paa">
+              {peli.kuva && (
+                <span className="hub-visa-kuva">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={henkiloKuva(peli.kuva) ?? peli.kuva} alt="" loading="lazy" style={peli.kuvaPos ? { objectPosition: peli.kuvaPos } : undefined} />
+                </span>
+              )}
+              <span className="hub-visa-teksti">
+                <span className="hub-tyyppi hub-tyyppi--visa">Henkilövisa</span>
+                <span className="hub-nosto-otsikko">{peli.otsikko}</span>
+                {tulos && <TulosRivi tulos={tulos} taso={taso} />}
+              </span>
+            </span>
+            <span className="hub-cta-lime hub-cta-lime--levea">{tulos ? "Pelaa uudelleen" : "Aloita visa"} <span aria-hidden="true">→</span></span>
           </a>
         )}
       </VisaTila>
@@ -177,6 +194,31 @@ function Rivi({ peli, kortti }: { peli: HyllyPeli; kortti: boolean }) {
       </VisaTila>
     );
   }
+  /* 5a: Ikäjärjestys visan alla tiiviinä rivinä — kolme kasvoa, merkki, otsikko, kysymys, violetti ääriviiva-CTA. */
+  if (peli.tyyppi === "jarjestys" && !kortti) {
+    return (
+      <a className="hub-rivi hub-rivi--ika" href={peli.href} style={lw(peli.otsikko)}>
+        <span className="hub-rivi-kasvot" aria-hidden="true">
+          {peli.laatat.slice(0, 3).map((l) => (
+            <span key={l.name} className="hub-rivi-kasvo">
+              {henkiloKuva(l.image_url) ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={henkiloKuva(l.image_url)!} alt="" loading="lazy" />
+              ) : (
+                <span className="hub-laatta-ini">{l.name.split(/\s+/).map((w) => w[0]).join("").slice(0, 2)}</span>
+              )}
+            </span>
+          ))}
+        </span>
+        <span className="hub-rivi-teksti">
+          <span className="hub-rivi-eyebrow">{peli.merkki}</span>
+          <span className="hub-rivi-nimi">{peli.otsikko}</span>
+          <span className="hub-rivi-ala">{peli.kysymys}</span>
+        </span>
+        <span className="hub-rivi-cta">Pelaa <span aria-hidden="true">→</span></span>
+      </a>
+    );
+  }
   const eyebrow = peli.tyyppi === "jarjestys" ? peli.merkki : peli.eyebrow;
   const acc = peli.tyyppi === "jarjestys" ? "#C79BFF" : peli.aksentti;
   return (
@@ -213,10 +255,12 @@ export default function PeliHylly({
   if (!pelit.length && !muista.length) return null;
   const [nosto, ...muut] = pelit;
   const nakyvat = muut.length >= 4 ? muut.slice(0, 3) : muut;
+  /* Pelit ja "Liittyvät visat" ovat erilliset osiot: mobiilissa (5c) pelit nousevat heti ikärivin alle,
+     lista jää esittelyn ja Lyhyesti-lohkon jälkeen (henkilo.css, order). */
   return (
-    <section className="hub-hylly" aria-label={otsikko}>
+    <>
       {pelit.length > 0 && (
-        <>
+        <section className="hub-hylly" aria-label={otsikko}>
           <Nosto peli={nosto} />
           {nakyvat.length === 1 && <Rivi peli={nakyvat[0]} kortti={false} />}
           {nakyvat.length > 1 && (
@@ -231,10 +275,10 @@ export default function PeliHylly({
               {kaikki.teksti} →
             </a>
           )}
-        </>
+        </section>
       )}
       {muista.length > 0 && (
-        <div className="hub-muista">
+        <section className="hub-muista" aria-label={muistaOtsikko}>
           <span className="hub-muista-otsikko">{muistaOtsikko}</span>
           <ul>
             {muista.map((m) => (
@@ -246,8 +290,8 @@ export default function PeliHylly({
               </li>
             ))}
           </ul>
-        </div>
+        </section>
       )}
-    </section>
+    </>
   );
 }
