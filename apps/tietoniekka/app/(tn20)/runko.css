@@ -145,9 +145,6 @@
 /* Ensimmäinen osio lähemmäs heroa ja chippejä (Heikki 21.10.2026: visat näkyviin ilman vieritystä). */
 .tn20 .rk-osio[data-eka] { padding-top: 24px; }
 @media (min-width: 900px) { .tn20 .rk-osio[data-eka] { padding-top: 32px; } }
-.tn20 .rk-osio-eyebrow { display: flex; align-items: center; gap: 12px; }
-.tn20 .rk-osio-eyebrow span { font-family: var(--rk-cond); font-weight: 700; font-size: 14px; letter-spacing: .18em; text-transform: uppercase; color: var(--rk-acc); white-space: nowrap; }
-.tn20 .rk-osio-eyebrow i { flex: 1; height: 1px; background: var(--rk-line); }
 .tn20 .rk-osio-otsake { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 6px 16px; }
 .tn20 .rk-h2 {
   margin: 0; font-family: var(--rk-cond); font-weight: 800; line-height: .92; text-transform: uppercase;
@@ -155,6 +152,7 @@
 }
 .tn20 .rk-h2--pieni { font-size: clamp(26px, 2.6cqi, 40px); line-height: .95; }
 .tn20 .rk-osio-maara { font-size: 14px; font-weight: 600; color: var(--rk-muted); }
+.tn20 .rk-osio-maara:empty { display: none; }
 
 .tn20 .rk-ruudukko { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
 @media (min-width: 600px) { .tn20 .rk-ruudukko { grid-template-columns: repeat(3, minmax(0, 1fr)); } }

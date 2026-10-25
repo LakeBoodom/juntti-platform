@@ -40,7 +40,7 @@ export default function RunkoMetapeli({
         const idt = new Set([...osio.querySelectorAll<HTMLElement>("[data-visa-id]")].map((e) => e.dataset.visaId));
         const p = [...idt].filter((id) => id && ps.has(id)).length;
         const n = idt.size;
-        osio.querySelectorAll<HTMLElement>(".rk-osio-maara").forEach((m) => (m.textContent = `${n} visaa · ${p} pelattu`));
+        osio.querySelectorAll<HTMLElement>(".rk-osio-maara").forEach((m) => (m.textContent = `${p}/${n} pelattu`));
         const chip = document.querySelector<HTMLElement>(`.rk-chip[data-osio="${osio.dataset.osio}"] span`);
         if (chip) chip.textContent = `${p}/${n}`;
         /* Aikajana ja juhlakello (V4): "x/n pelattu" ja täysi kausi teemavärillä (CD 2). */
