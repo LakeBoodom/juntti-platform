@@ -27,6 +27,7 @@ export const HENKILOT: Kokoelma = {
   related: ["tv", "musiikki", "urheilu"],
   mastery: { name: kokoelmaKortti("tunnetut-henkilot")!.mastery.name, icon: "henkilo" },
   haku: {},
+  korttiIlmanKuvaa: true,
 };
 
 export type Synttari = { nimi: string; href: string; kuva: string | null; paiva: string; ika: number; vari: string };
