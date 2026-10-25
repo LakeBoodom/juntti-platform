@@ -19,6 +19,7 @@ import { KokoelmaLd } from "@/components/tn20/KokoelmaLd";
 import { jakoMeta } from "@/lib/jakoMeta";
 import "../megavisat.css";
 import type { Metadata } from "next";
+import { cache } from "react";
 import { getSupabase } from "@/lib/supabase";
 import Crumbs from "@/components/tn20/Crumbs";
 import { MobiiliSankari } from "@/components/tn20/MobiiliSankari";
@@ -28,13 +29,23 @@ export const revalidate = 300; // SEO-erä A4 (2.10.2026): ISR 5 min
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://tietoniekka.fi";
 
+/* SEO 25.10.2026 (Search Console): "megavisa"-haut sijalla 5–7, mutta 357 näytöstä 1 klikki —
+   title ja kuvaus eivät kertoneet, mitä megavisa on. Luvut ja aiheet kannasta (haeMegat). */
 export async function generateMetadata(): Promise<Metadata> {
-  const title = "Megavisat — pitkät tietovisat ilman taukoja | Tietoniekka";
-  const description =
-    "Megavisa on yksi istunto ilman taukoja: valitse aihe ja pelaa loppuun asti. Ei selityksiä — vain pisteet ja putki.";
+  const megat = await haeMegat();
+  const vali = megat ? maaraVali(megat.kaikkiMaarat) : null;
+  const n = megat?.kaikkiMaarat.length ?? 0;
+  const title = n && vali
+    ? `Megavisat – ${n} pitkää tietovisaa, ${vali} kysymystä | Tietoniekka`
+    : "Megavisat – pitkät tietovisat | Tietoniekka";
+  const aiheet = megat?.aiheet.slice(0, 3) ?? [];
+  const aiheista = aiheet.length === 3 ? ` aiheista ${aiheet[0]}, ${aiheet[1]} ja ${aiheet[2]}` : "";
+  const description = vali
+    ? `Pitkät tietovisat yhdeltä istumalta: ${vali} kysymystä${aiheista}. Ilmainen, ei kirjautumista.`
+    : "Pitkät tietovisat yhdeltä istumalta. Ilmainen, ei kirjautumista.";
   const canonical = `${SITE_URL}/megavisat`;
   return {
-    title, description,
+    title: { absolute: title }, description,
     alternates: { canonical },
     ...jakoMeta({ title, description, url: canonical, kuva: "/og/sivu/megavisat" }),
   };
@@ -42,10 +53,10 @@ export async function generateMetadata(): Promise<Metadata> {
 
 type MegaRow = { slug: string; title: string; teaser: string | null };
 
-export default async function MegavisatLanding() {
+/** Sivun megat näyttöjärjestyksessä (nosto + ruudukko) pelattavine kysymysmäärineen; metadata ja sivu jakavat haun. */
+const haeMegat = cache(async () => {
   const sb = getSupabase();
-  if (!sb) return <main style={{ padding: 32 }}>Ei tietokantayhteyttä.</main>;
-
+  if (!sb) return null;
   const allSlugs = [MEGA_FEATURED.slug, ...MEGA_GRID.map((c) => c.slug)];
 
   const { data: quizRows } = await sb
@@ -66,9 +77,17 @@ export default async function MegavisatLanding() {
   const gridItems = MEGA_GRID
     .map((c) => ({ card: c, quiz: bySlug.get(c.slug), count: countBySlug.get(c.slug) ?? 0 }))
     .filter((g) => g.quiz && g.count > 0);
+  const kaikkiMaarat = [...(featuredQuiz && featuredCount > 0 ? [featuredCount] : []), ...gridItems.map((g) => g.count)];
+  const aiheet = [...(featuredQuiz && featuredCount > 0 ? [MEGA_FEATURED.aihe] : []), ...gridItems.map((g) => g.card.aihe)];
+  return { featuredQuiz, featuredCount, gridItems, kaikkiMaarat, aiheet };
+});
+
+export default async function MegavisatLanding() {
+  const megat = await haeMegat();
+  if (!megat) return <main style={{ padding: 32 }}>Ei tietokantayhteyttä.</main>;
+  const { featuredQuiz, featuredCount, gridItems, kaikkiMaarat } = megat;
 
   const totalMegas = (featuredQuiz && featuredCount > 0 ? 1 : 0) + gridItems.length;
-  const kaikkiMaarat = [...(featuredQuiz && featuredCount > 0 ? [featuredCount] : []), ...gridItems.map((g) => g.count)];
   const totalQuestions = kaikkiMaarat.reduce((sum, n) => sum + n, 0);
   const vali = maaraVali(kaikkiMaarat);
   const lyhin = kaikkiMaarat.length ? Math.min(...kaikkiMaarat) : 0;
@@ -85,8 +104,8 @@ export default async function MegavisatLanding() {
         tint="#0D0B05"
         image={{ src: "/20/megavisat/mikko-hero-mob.webp", position: "center 4%", alt: "Mikko Megavisa-studiossa" }}
         accent="#E8A320"
-        eyebrow="Megavisat"
-        title={["Pitkä", "peli"]}
+        eyebrow="Pitkä peli"
+        title={["Megavisat"]}
         lead="Megavisa on yksi istunto ilman taukoja: valitse aihe ja pelaa loppuun asti. Ei selityksiä — vain pisteet ja putki."
         stats={totalMegas > 0 ? [{ n: totalMegas, label: "megavisaa" }, ...(vali ? [{ n: vali, label: "kysymystä per mega" }] : [])] : []}
       />
@@ -107,8 +126,8 @@ export default async function MegavisatLanding() {
         />
         <div className="tn-shell tnm2-hero">
           <div className="tnm2-hero-left">
-            <span className="tnm2-pill">Megavisat</span>
-            <h1 className="tnm2-h1">Pitkä<br />peli</h1>
+            <span className="tnm2-pill">Pitkä peli</span>
+            <h1 className="tnm2-h1">Megavisat</h1>
             <p className="tnm2-lede">
               Megavisa on yksi istunto ilman taukoja: valitse aihe ja pelaa loppuun asti.{" "}
               <b>Ei selityksiä</b> — vain pisteet ja putki.

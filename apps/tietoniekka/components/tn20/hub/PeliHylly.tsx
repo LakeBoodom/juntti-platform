@@ -201,6 +201,7 @@ export default function PeliHylly({
   muistaOtsikko = "Muista kokoelmista",
   kaikki,
 }: {
+  /** Hyllyn nimi ruudunlukijalle (aria-label). Näkyvä otsikko + "N peliä" poistettu (Heikki 25.10.2026: pelit näkyvät itse). */
   otsikko: string;
   pelit: HyllyPeli[];
   muista?: HyllyLinkki[];
@@ -216,10 +217,6 @@ export default function PeliHylly({
     <section className="hub-hylly" aria-label={otsikko}>
       {pelit.length > 0 && (
         <>
-          <div className="hub-hylly-head">
-            <h2 className="hub-hylly-otsikko">{otsikko}</h2>
-            <span className="hub-hylly-n">{pelit.length === 1 ? "1 peli" : `${pelit.length} peliä`}</span>
-          </div>
           <Nosto peli={nosto} />
           {nakyvat.length === 1 && <Rivi peli={nakyvat[0]} kortti={false} />}
           {nakyvat.length > 1 && (

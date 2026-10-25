@@ -24,6 +24,8 @@ export type MegaCard = {
   img: string;
   /** background-position (CSS object-position-arvona). */
   pos: string;
+  /** Aihe perusmuodossa /megavisat-sivun meta descriptioniin ("aiheista X, Y ja Z"). */
+  aihe: string;
 };
 
 export const MEGA_FEATURED: MegaCard = {
@@ -32,6 +34,7 @@ export const MEGA_FEATURED: MegaCard = {
   desc: "Sekoitus jokaisesta kokoelmasta — kysymykset kaikilta tuotteen alueilta samassa istunnossa.",
   img: "/20/megavisat/mega-yleistieto.webp",
   pos: "center 42%",
+  aihe: "yleistieto",
 };
 
 export const MEGA_GRID: MegaCard[] = [
@@ -41,6 +44,7 @@ export const MEGA_GRID: MegaCard[] = [
     desc: "Mestaruudet, legendat ja ulkomaalaisvahvistukset liigan historiassa.",
     img: "/20/megavisat/mega-smliiga.webp",
     pos: "center 22%",
+    aihe: "SM-liiga",
   },
   {
     slug: "valioliiga-megavisa",
@@ -48,6 +52,7 @@ export const MEGA_GRID: MegaCard[] = [
     desc: "Maalikuninkaat, siirrot ja mestaruudet kaudesta 1992 alkaen.",
     img: "/20/megavisat/mega-valioliiga.webp",
     pos: "center 40%",
+    aihe: "Valioliiga",
   },
   {
     slug: "tv-ja-suoratoisto-mega",
@@ -55,6 +60,7 @@ export const MEGA_GRID: MegaCard[] = [
     desc: "Suosituimmat sarjat Suomesta ja maailmalta — sohvaperunoiden loppukoe.",
     img: "/20/megavisat/mega-tv.webp",
     pos: "center 40%",
+    aihe: "TV-sarjat",
   },
   {
     slug: "kaikki-suomesta-mega",
@@ -62,6 +68,7 @@ export const MEGA_GRID: MegaCard[] = [
     desc: "Historia, kulttuuri ja luonto: kuinka hyvin tunnet Suomen?",
     img: "/20/megavisat/mega-suomi.webp",
     pos: "center 55%",
+    aihe: "Suomi",
   },
   {
     slug: "viihdemaailman-megavisa",
@@ -69,6 +76,7 @@ export const MEGA_GRID: MegaCard[] = [
     desc: "Julkkikset, elokuvat ja musiikki samassa istunnossa.",
     img: "/20/megavisat/mega-viihde.webp",
     pos: "center 42%",
+    aihe: "viihde",
   },
   {
     slug: "suomen-kaupungit-mega",
@@ -76,6 +84,7 @@ export const MEGA_GRID: MegaCard[] = [
     desc: "Kiertomatka 20 kaupunkiin: vaakunat, kuuluisat asukkaat ja lempinimet.",
     img: "/20/kaupungit/hero-laura-mikko.webp",
     pos: "center 30%",
+    aihe: "Suomen kaupungit",
   },
   {
     slug: "maailman-kolkat-mega",
@@ -83,6 +92,7 @@ export const MEGA_GRID: MegaCard[] = [
     desc: "Syrjäisimmät saaret, ääripäät ja paikat kartan reunoilla.",
     img: "/20/megavisat/mega-maailmankolkat.webp",
     pos: "center 50%",
+    aihe: "maailman kolkat",
   },
 ];
 

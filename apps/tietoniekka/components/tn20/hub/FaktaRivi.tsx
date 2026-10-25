@@ -2,11 +2,10 @@
 // Henkilöllä iso luku = ikä tai elinvuodet; aihesivulla esim. rakennusvuosi. Ei lue kantaa.
 import type { ReactNode } from "react";
 
-export type FaktaChip = { teksti: string; tyyli: "kulta" | "neutraali" };
-
 export default function FaktaRivi({
   suuri,
   yksikko,
+  suuriTeksti,
   suuriAla,
   rivit,
   korostus = false,
@@ -16,6 +15,8 @@ export default function FaktaRivi({
   suuri: string;
   /** Pieni kultainen pääte isoon lukuun ("v"). */
   yksikko?: string;
+  /** Iso luku kokonaisena lauseena ruudunlukijalle ("Jippu on 41-vuotias"); näkyvä "41 v" piilotetaan siltä. */
+  suuriTeksti?: string;
   /** Pieni kultainen rivi ison luvun alla ("71 vuotta"). */
   suuriAla?: string;
   rivit: ReactNode[];
@@ -29,7 +30,8 @@ export default function FaktaRivi({
     <div className={korostus ? "hub-fakta hub-fakta--synttarit" : "hub-fakta"}>
       {merkki && <div className="hub-fakta-merkki">{merkki}</div>}
       <div className="hub-fakta-suuri">
-        <div className={vali ? "hub-fakta-luku hub-fakta-luku--vali" : "hub-fakta-luku"}>
+        {suuriTeksti && <span className="sr-only">{suuriTeksti}</span>}
+        <div className={vali ? "hub-fakta-luku hub-fakta-luku--vali" : "hub-fakta-luku"} aria-hidden={suuriTeksti ? true : undefined}>
           {vali ? (
             <>
               {suuri.split("–")[0]}–<br />
@@ -49,8 +51,4 @@ export default function FaktaRivi({
       </div>
     </div>
   );
-}
-
-export function Chip({ chip }: { chip: FaktaChip }) {
-  return <span className={`hub-chip hub-chip--${chip.tyyli}`}>{chip.teksti}</span>;
 }

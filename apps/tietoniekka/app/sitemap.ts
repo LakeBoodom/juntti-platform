@@ -5,8 +5,8 @@
 //
 // SEO-erä A5 (2.10.2026): hubit johdetaan samasta lähteestä kuin /kokoelmat ja navigaatio
 // (NAV_COLLECTIONS) + kuvavisat; lisätty Ikäjärjestys, kuvavisat (/kuvavisa/<kortisto>),
-// Viikkovisa, megavisat omina osoitteinaan (/peli?mega=) ja /kuvien-lahteet. Megat eivät enää
-// päädy /visa/-osoitteina (ne antoivat 404).
+// Viikkovisa ja /kuvien-lahteet. Megat eivät päädy /visa/-osoitteina (ne antoivat 404);
+// 25.10.2026 alkaen ne eivät ole sitemapissa lainkaan (/peli?mega= = noindex).
 import type { MetadataRoute } from "next";
 import { TEEMAT, TUPLA_SIVU } from "@/lib/tuplaTaiKuitti";
 import { KL_SIVU } from "@/lib/kuntaliitos";
@@ -56,14 +56,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const kuvavisaPages = [...KATEGORIAT.map((k) => k.type), "kaupungit"].map((k) => u(`/kuvavisa/${k}`, "weekly", 0.7));
 
   const quizzes = await getPublishedQuizSlugs();
+  /* SEO 25.10.2026: megavisat pois (/peli?mega= on noindex, ks. middleware.ts) — /megavisat on
+     niiden ainoa indeksoitava sivu. Sitemapissa ei ole yhtään /peli?…-osoitetta. */
   const quizPages: MetadataRoute.Sitemap = quizzes
-    .filter((q) => q.slug)
-    .map((q) => {
-      const mod = q.updated_at ? new Date(q.updated_at) : now;
-      return q.game_mode === "mega"
-        ? u(`/peli?mega=${encodeURIComponent(q.slug)}`, "monthly", 0.7, mod)
-        : u(`/visa/${q.slug}`, "monthly", 0.7, mod);
-    });
+    .filter((q) => q.slug && q.game_mode !== "mega")
+    .map((q) => u(`/visa/${q.slug}`, "monthly", 0.7, q.updated_at ? new Date(q.updated_at) : now));
 
   // Erä B3: henkilöhakemisto, ryhmät, lajit, synttärikuukaudet ja henkilösivut.
   const henkilot = await haeHakemisto();

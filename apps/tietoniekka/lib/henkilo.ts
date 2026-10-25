@@ -44,10 +44,6 @@ export function paiviaSynttariin(s: Pvm, nyt: Pvm): number {
   return Math.round((utc(seur) - utc(nyt)) / 86400000);
 }
 
-export function paivaaTeksti(n: number): string {
-  return n === 0 ? "tänään" : n === 1 ? "huomenna" : `${n} päivän päästä`;
-}
-
 /** Laatan alarivi: "46 v" tai "1930–2001". */
 export function ikaRivi(birth: string | null, death: string | null, nyt = tanaan()): string {
   const s = parsePvm(birth);
@@ -99,6 +95,8 @@ export type HenkiloSivu = {
   faktat: Fakta[];
   wikipedia_url: string | null;
   visa: { id: string; href: string; otsikko: string; fanitasot: string[] | null } | null;
+  /** Oman visan kysymystekstit sort_order-järjestyksessä (meta descriptionin koukkukysymys, SEO 25.10.2026). */
+  visanKysymykset: string[];
   nosto: JarjestysNosto | null;
   /** "Liittyvät visat" (8.10.2026): celebrity_related_quizzes (score > 0, score desc, enintään 4),
    *  täydennettynä saman lajin / ryhmän henkilövisoilla. */
@@ -202,7 +200,7 @@ export async function haeHenkiloSivu(slug: string): Promise<HenkiloSivu | { ohja
           .maybeSingle()
       : Promise.resolve({ data: null }),
     c.trivia_quiz_id
-      ? sb.from("questions").select("question_text, answers").eq("quiz_id", c.trivia_quiz_id)
+      ? sb.from("questions").select("question_text, answers, sort_order").eq("quiz_id", c.trivia_quiz_id).order("sort_order")
       : Promise.resolve({ data: [] }),
   ]);
   const kaikki = kaikkiRivit.filter((x) => x.id !== c.id);
@@ -405,6 +403,7 @@ export async function haeHenkiloSivu(slug: string): Promise<HenkiloSivu | { ohja
     faktat: hyvaksytty ? lueFaktat(c.facts) : [],
     wikipedia_url: c.wikipedia_url,
     visa,
+    visanKysymykset: visa ? kysymykset.map((k) => k.question_text.trim()).filter(Boolean) : [],
     nosto,
     aiheet,
     muut,
