@@ -8,7 +8,7 @@ import "../../henkilo.css";
 import type { Metadata } from "next";
 import { notFound, permanentRedirect } from "next/navigation";
 import Crumbs from "@/components/tn20/Crumbs";
-import FaktaRivi, { Chip } from "@/components/tn20/hub/FaktaRivi";
+import FaktaRivi from "@/components/tn20/hub/FaktaRivi";
 import Lyhyesti from "@/components/tn20/hub/Lyhyesti";
 import PeliHylly, { type HyllyPeli } from "@/components/tn20/hub/PeliHylly";
 import SukulaisLaatat from "@/components/tn20/hub/SukulaisLaatat";
@@ -16,7 +16,7 @@ import LahdeRivi from "@/components/tn20/hub/LahdeRivi";
 import { JsonLd, abs } from "@/lib/jsonLd";
 import { jakoMeta } from "@/lib/jakoMeta";
 import { ryhma } from "@/lib/henkiloRyhmat";
-import { fiPvm, haeHenkiloSivu, paiviaSynttariin, paivaaTeksti, tanaan, vuodet, type HenkiloSivu } from "@/lib/henkilo";
+import { fiPvm, haeHenkiloSivu, paiviaSynttariin, tanaan, vuodet, type HenkiloSivu } from "@/lib/henkilo";
 
 export const revalidate = 3600;
 
@@ -110,8 +110,9 @@ export default async function HenkiloPage({ params }: { params: Promise<{ slug: 
   const R = ryhma(h.ryhma);
   const rooli = [h.role, h.nickname ? `”${h.nickname}”` : null].filter(Boolean).join(" · ");
 
-  // Faktalohko: elossa iso ikä + lause "X on N-vuotias" + "Täyttää N · X päivän päästä"; edesmennyt
-  // vuosiväli + "N vuotta" + neutraali chip. Päivämäärät <time datetime>-elementteinä (ikähaut 8.10.2026).
+  // Faktalohko: elossa iso ikä + syntymärivi; edesmennyt vuosiväli + "N vuotta" + syntymä- ja kuolinrivi.
+  // Päivämäärät <time datetime>-elementteinä (ikähaut 8.10.2026). Heikki 25.10.2026: ikä vain kerran (iso luku,
+  // ruudunlukijalle lauseena), pois "Täyttää N · X päivän päästä" ja "Olisi nyt N v · syntymäpäivä" — toistoa.
   let fakta: React.ReactNode = null;
   let synttarit = false;
   if (h.birth) {
@@ -138,7 +139,6 @@ export default async function HenkiloPage({ params }: { params: Promise<{ slug: 
               </strong>
               {h.death_place ? ` ${h.death_place}` : ""}
             </>,
-            <Chip key="c" chip={{ tyyli: "neutraali", teksti: `Olisi nyt ${vuodet(h.birth, nyt)} v · syntymäpäivä ${h.birth.d}.${h.birth.m}.` }} />,
           ]}
         />
       );
@@ -146,34 +146,14 @@ export default async function HenkiloPage({ params }: { params: Promise<{ slug: 
       const ika = vuodet(h.birth, nyt);
       const p = paiviaSynttariin(h.birth, nyt);
       synttarit = p === 0;
-      // Iso "53 v" on visuaalinen; sama tieto kokonaisena lauseena tietoriveillä (ei piilotekstiä).
-      fakta = synttarit ? (
+      fakta = (
         <FaktaRivi
           suuri={String(ika)}
           yksikko="v"
-          korostus
-          merkki={<span className="hub-synttarit-merkki">Synttärit tänään</span>}
-          rivit={[
-            <span key="l" className="hub-fakta-lause">
-              {h.name} täyttää tänään <strong>{ika}</strong> vuotta
-            </span>,
-            syntRivi,
-          ]}
-        />
-      ) : (
-        <FaktaRivi
-          suuri={String(ika)}
-          yksikko="v"
-          rivit={[
-            <span key="l" className="hub-fakta-lause">
-              {h.name} on <strong>{ika}</strong>-vuotias
-            </span>,
-            syntRivi,
-            <span key="t" className="hub-fakta-tayttaa">
-              <span>Täyttää {ika + 1}</span>
-              <Chip chip={{ tyyli: "kulta", teksti: paivaaTeksti(p) }} />
-            </span>,
-          ]}
+          suuriTeksti={synttarit ? `${h.name} täyttää tänään ${ika} vuotta` : `${h.name} on ${ika}-vuotias`}
+          korostus={synttarit}
+          merkki={synttarit ? <span className="hub-synttarit-merkki">Synttärit tänään</span> : undefined}
+          rivit={[syntRivi]}
         />
       );
     }

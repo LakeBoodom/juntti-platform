@@ -44,10 +44,6 @@ export function paiviaSynttariin(s: Pvm, nyt: Pvm): number {
   return Math.round((utc(seur) - utc(nyt)) / 86400000);
 }
 
-export function paivaaTeksti(n: number): string {
-  return n === 0 ? "tänään" : n === 1 ? "huomenna" : `${n} päivän päästä`;
-}
-
 /** Laatan alarivi: "46 v" tai "1930–2001". */
 export function ikaRivi(birth: string | null, death: string | null, nyt = tanaan()): string {
   const s = parsePvm(birth);
