@@ -1,8 +1,7 @@
 // KULTTUURI — kuvat (Heikki 6.8.2026, CD "Tietoniekka - Kulttuuri"). Sivu on rungolla 19.10.2026
 // alkaen (lib/kokoelmat/kulttuuri.ts); osiot tulevat section_tags-tagista.
 // Jokaisella kulttuurivisalla on oma kuva (public/20/kulttuuri/<slug>.webp). 25.10.2026: AI-kuvat vaihdettu
-// oikeisiin valokuviin ja PD-maalauksiin (Wikimedia Commons, tekijät lib/kuvalahteet.ts); AI-kuvina jäivät
-// Alvar Aalto, Suomen museot ja Suomalainen sauna (paremmat valokuvat haussa).
+// oikeisiin valokuviin ja PD-maalauksiin (Wikimedia Commons, tekijät lib/kuvalahteet.ts, Heikin valinnat).
 // Kuvaa käytetään landingin korteissa JA pelinäkymässä — tietoinen poikkeus
 // SVG-korttisääntöön (PAATOKSET.md 2026-08-06). Uusi visa ilman kuvaa toimii
 // silti: kulttuuriImg palauttaa null → pelikuori käyttää kokoelman herokuvaa.
