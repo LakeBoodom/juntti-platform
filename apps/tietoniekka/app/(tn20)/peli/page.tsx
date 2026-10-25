@@ -47,12 +47,22 @@ function sekoita<T>(arr: T[]): T[] {
   return a;
 }
 
+/* SEO 25.10.2026 (Search Console): /peli?visa=, ?quiz_id=, ?mega= ym. keräsivät näyttöjä
+   kanonisen /visa/<slug>:n ohi. Middleware merkitsee jokaisen parametrillisen pelipyynnön
+   sisäisellä ?_noindex=1:llä → noindex, follow (canonical ennallaan). /visa/[slug]- ja
+   /kuvavisa/[kortisto]-kääreet kutsuvat tätä ilman merkkiä, joten ne pysyvät indeksoitavina. */
+type MetaArgs = { searchParams: Promise<Record<string, string | string[] | undefined>> };
+export async function generateMetadata({ searchParams }: MetaArgs): Promise<Metadata> {
+  const p = await searchParams;
+  const meta = await pelinMetadata(p);
+  if (p._noindex !== "1") return meta;
+  const noindex = { index: false, follow: true };
+  return { ...meta, robots: meta.robots ?? { ...noindex, googleBot: noindex } };
+}
+
 /* ── Sivukohtainen title/description (QA-006, 29.8.2026): aiemmin kaikki
    371 pelisivua perivät layoutin "esikatselu"-otsikon. ── */
-export async function generateMetadata(
-  { searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }
-): Promise<Metadata> {
-  const p = await searchParams;
+async function pelinMetadata(p: Record<string, string | string[] | undefined>): Promise<Metadata> {
   const sb = getSupabase();
   const str = (k: string) => (typeof p[k] === "string" ? (p[k] as string) : null);
   const kuvavisa = str("kuvavisa"), mega = str("mega"), slug = str("visa"), quizId = str("quiz_id");

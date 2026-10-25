@@ -26,7 +26,45 @@ export function generateStaticParams() {
 
 const henkiloHref = (slug: string) => `/henkilo/${encodeURIComponent(slug)}`;
 
+/* Roolin alun erisnimet (genetiivit ja lyhenteet), joita ei pienennetä: "Ranskan presidentti", "SDP:n …". */
+const ERISNIMIALKU = new Set([
+  "Britannian", "Euroopan", "Helsingin", "Keskustan", "Kokoomuksen", "Kristillisdemokraattien", "Liike", "Naton",
+  "Norjan", "Perussuomalaisten", "Ranskan", "Ruotsin", "Saksan", "Suomen", "Ukrainan", "Vasemmistoliiton",
+  "Venäjän", "Vihreiden", "Yhdysvaltain", "Ylen",
+]);
+function rooliLauseeseen(rooli: string): string {
+  const eka = rooli.split(" ")[0];
+  return ERISNIMIALKU.has(eka) || /\p{Lu}.*\p{Lu}/u.test(eka) ? rooli : rooli.charAt(0).toLowerCase() + rooli.slice(1);
+}
+
+const KUVAUS_MAX = 160;
+
+/** Meta description henkilöille, joilla on oma visa (SEO 25.10.2026, Search Console: henkilösivuilla 65 %
+ *  näytöistä mutta CTR 0,24 % — ikä näkyy jo hakutuloksessa, eikä vanha kuvaus antanut syytä klikata).
+ *  Koukku = visan lyhin kysymys (tasapelissä pienin sort_order), jos koko kuvaus mahtuu 160 merkkiin;
+ *  muuten koukku jää pois. Vastausta ei näytetä. Deterministinen: sama sivu → sama kuvaus. */
+function visaKuvaus(h: HenkiloSivu, nyt = tanaan()): string | null {
+  if (!h.visa || !h.role) return null;
+  const rooli = rooliLauseeseen(h.role);
+  // Vuosiväliin päättyvä rooli ("pääministeri 2019–2023") ei taivu ikä-adjektiivin perään luontevasti.
+  const vuosirooli = /\d[–-]?\d*$|–$/.test(rooli);
+  const alku = h.death
+    ? h.birth ? `${h.name} (${h.birth.y}–${h.death.y}) oli ${rooli}.` : `${h.name} oli ${rooli}.`
+    : !h.birth ? `${h.name} on ${rooli}.`
+    : vuosirooli ? `${h.name} on ${vuodet(h.birth, nyt)}-vuotias (s. ${fiPvm(h.birth)}), ${rooli}.`
+    : `${h.name} on ${vuodet(h.birth, nyt)}-vuotias ${rooli} (${fiPvm(h.birth)}).`;
+  const n = h.visanKysymykset.length;
+  const loppu = n ? `Testaa itsesi ${n} kysymyksen visassa.` : "Testaa itsesi visassa.";
+  const koukku = h.visanKysymykset
+    .map((k, i) => ({ k, i }))
+    .sort((a, b) => a.k.length - b.k.length || a.i - b.i)[0]?.k;
+  const koko = koukku ? `${alku} ${koukku} ${loppu}` : "";
+  return koko && koko.length <= KUVAUS_MAX ? koko : `${alku} ${loppu}`;
+}
+
 function kuvaus(h: HenkiloSivu): string {
+  const uusi = visaKuvaus(h);
+  if (uusi) return uusi;
   const osat: string[] = [];
   if (h.role) osat.push(`${h.name} – ${h.role.charAt(0).toLowerCase() + h.role.slice(1)}.`);
   if (h.birth) {
