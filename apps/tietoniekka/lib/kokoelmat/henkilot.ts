@@ -15,7 +15,7 @@ import { kokoelmaKortti } from "./rekisteri";
 export const HENKILOT: Kokoelma = {
   slug: "tunnetut-henkilot",
   nimi: "Tunnetut henkilöt",
-  eyebrow: "Teemakokoelma",
+  eyebrow: "",
   title: "Tunnetut ",
   highlight: "henkilöt",
   ingress: "Näyttelijät, artistit, urheilijat ja muut tutut kasvot — kuinka hyvin tunnet heidät?",

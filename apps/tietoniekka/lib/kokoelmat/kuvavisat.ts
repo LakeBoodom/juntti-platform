@@ -11,7 +11,7 @@ import { kokoelmaKortti } from "./rekisteri";
 export const KUVAVISAT: Kokoelma = {
   slug: "kuvavisat",
   nimi: "Kuvavisat",
-  eyebrow: "Teemakokoelma",
+  eyebrow: "",
   title: "Kuva",
   highlight: "visat",
   ingress: "Tunnista liput, vaakunat, linnut, eläimet, maalaukset, rakennukset ja kasvit kuvasta.",

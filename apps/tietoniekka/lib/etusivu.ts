@@ -14,7 +14,8 @@ import { NAV_COLLECTIONS, NAV_MODES } from "./nav";
     riittävä tarkkuus — ei lasketa kannasta). */
 /* UI-laatu 14.10.2026: etusivun kortit käyttävät *-kortti.webp-versioita (720 px, q76): kortti on enintään
    ~400 px leveä, alkuperäiset (960–1600 px) jäävät kokoelmasivujen heroiksi. */
-export const SITE_TAGLINE = "Suomalainen tietovisasivusto · 500+ visaa";
+/* C10 (26.10.2026): varateksti ilman lukua — luku tulee aina palvelimelta (layout: getSiteStats), ei kahdesta paikasta. */
+export const SITE_TAGLINE = "Suomalainen tietovisasivusto";
 
 export type HeaderPromo = { key: "uusin" | "suosittu"; kicker: string; label: string; href: string };
 
@@ -93,7 +94,7 @@ export const HOSTS: Host[] = [
     img: "/20/etusivu/host-mikko.webp",
     accent: "lime",
     cards: [
-      { key: "megavisat", alt: "Valaistu tietovisastudio", title: "Megavisat", desc: "Pitkät visat todellisille tietoniekoille", href: "/megavisat", img: "/20/etusivu/coll-megavisat-kortti.webp", pos: "center 50%" },
+      { key: "megavisat", alt: "Valaistu tietovisastudio", title: "Megavisat", desc: "20–50 kysymystä putkeen", href: "/megavisat", img: "/20/etusivu/coll-megavisat-kortti.webp", pos: "center 50%" },
       { key: "urheilu", alt: "Formula 1 -auto kilparadalla", title: "Urheilu", desc: "Lajit, legendat ja ennätykset", href: "/kokoelma/urheilu", img: "/20/urheilulajit/f1-kaikki-kortti.webp", pos: "center 50%" },
     ],
   },

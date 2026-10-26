@@ -13,7 +13,7 @@
 // otsikko, voimassaolo, nappi ja suuri viikkonumero.
 //
 // Pelattu tila (Heikin linjaus 4.6): oma tulos näkyviin, Aloita-napin tilalla
-// "Tarkastele vastauksia". Ei uudelleenpeluunappia.
+// "Katso vastaukset". Ei uudelleenpeluunappia.
 //
 // Värisääntö (design): etusivulla promo on näkymän pääkutsu → lime täytetty
 // nappi. Kokoelmasivulla lime kuuluu herolle, joten nappi on syaani
@@ -61,14 +61,14 @@ export function ViikkovisaPromo({ data, sijainti }: { data: ViikkoPromoData; sij
             <p className="vv-promo-p">Yksi yritys viikossa. Uusi viikkovisa maanantaina.</p>
           </>
         ) : (
-          <Otsikko className="vv-promo-h">Sama {kuvia} kuvaa kaikille koko viikon</Otsikko>
+          <Otsikko className="vv-promo-h">Samat {kuvia} kuvaa kaikille koko viikon</Otsikko>
         )}
         <div className="vv-promo-row">
           {tulos ? (
             <>
-              <a className={nappi} href={TARKASTELE}>Tarkastele vastauksia</a>
+              <a className={nappi} href={TARKASTELE}>Katso vastaukset</a>
               {!kokoelma && (
-                <a className="vv-link" href={KORTISTOT}>Takaisin kortistoihin <span aria-hidden="true">→</span></a>
+                <a className="vv-link" href={KORTISTOT}>Lisää kuvavisoja <span aria-hidden="true">→</span></a>
               )}
             </>
           ) : (

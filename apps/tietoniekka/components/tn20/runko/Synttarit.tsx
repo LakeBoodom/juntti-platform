@@ -11,8 +11,7 @@ export default function Synttarit({ lista }: { lista: Synttari[] }) {
   return (
     <section className="rk-v4" aria-labelledby="rk-v4-h">
       <div className="rk-v4-in">
-        <span className="rk-v4-eyebrow">Synttärisankarit</span>
-        <h2 id="rk-v4-h" className="rk-h2">Tänään ja tulevat synttärit</h2>
+        <h2 id="rk-v4-h" className="rk-h2">Synttärisankarit</h2>
         <ol className="rk-synt">
           {lista.map((s, i) => (
             <li key={s.href}>

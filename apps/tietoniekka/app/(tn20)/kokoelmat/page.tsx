@@ -36,8 +36,7 @@ export default async function KokoelmatPage() {
           Kaikki <span>kokoelmat</span>
         </h1>
         <p className="tn-colx-lede">
-          Valitse aihe, josta tiedät eniten — tai se, josta haluat oppia lisää. Jokainen kokoelma
-          kasvaa jatkuvasti.
+          Valitse aihe, josta tiedät eniten — tai se, josta haluat oppia lisää.
         </p>
       </header>
 

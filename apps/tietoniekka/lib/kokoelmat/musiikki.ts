@@ -11,7 +11,7 @@ const KORTTI_RAJATUT = new Set(["kari-tapio-visa-iskelmalegenda"]);
 export const MUSIIKKI: Kokoelma = {
   slug: "musiikki",
   nimi: "Musiikki",
-  eyebrow: "Teemakokoelma",
+  eyebrow: "",
   title: "Musiikki ja ",
   highlight: "artistit",
   ingress: "Suomirapin kingit, stadionien supertähdet ja biisit, jotka jäivät soimaan päähän.",

@@ -13,7 +13,7 @@ import { kokoelmaKortti } from "./rekisteri";
 export const VAALIT: Kokoelma = {
   slug: "vaalit",
   nimi: "Vaalit ja politiikka",
-  eyebrow: "Teemakokoelma",
+  eyebrow: "",
   title: "Vaalit ja ",
   highlight: "politiikka",
   ingress: "Tunnetko eduskunnan? 200 kansanedustajaa, 13 vaalipiiriä ja Suomen politiikan pitkä linja.",

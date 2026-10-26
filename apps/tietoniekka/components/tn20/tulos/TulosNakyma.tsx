@@ -59,7 +59,7 @@ export default function TulosNakyma(p: {
               <h1 id="tn-tulos-h" className="tn-tulos-tuomio" data-tuomio={tuomio}>
                 {tuomio === "voitto" ? "Voitit kaverisi" : tuomio === "havio" ? "Kaverisi voitti" : "Tasapeli"}
               </h1>
-              <p className="tn-tulos-lause">{p.lause}</p>
+              {p.lause && <p className="tn-tulos-lause">{p.lause}</p>}
             </>
           ) : (
             <>
@@ -73,7 +73,7 @@ export default function TulosNakyma(p: {
                   <span className="tn-tulos-pisteet">{p.score} pistettä</span>
                 </div>
               </div>
-              <p className="tn-tulos-lause">{p.lause}</p>
+              {p.lause && <p className="tn-tulos-lause">{p.lause}</p>}
             </>
           )}
           {p.lisaLinkki && (
@@ -107,7 +107,7 @@ export default function TulosNakyma(p: {
 
         {p.seuraavat.length > 0 && (
           <nav className="tn-tulos-seuraava" aria-labelledby="tn-tulos-seuraava-h">
-            <h2 id="tn-tulos-seuraava-h" className="tn-tulos-pikku">Seuraava visa</h2>
+            <h2 id="tn-tulos-seuraava-h" className="tn-tulos-pikku">Pelaa seuraavaksi</h2>
             <div className="tn-tulos-kortit">
               {p.seuraavat.slice(0, 2).map((s) => (
                 <a key={s.id} className="tn-tulos-kortti" href={s.href}>

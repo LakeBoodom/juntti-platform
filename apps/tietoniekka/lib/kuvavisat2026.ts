@@ -110,7 +110,7 @@ export const KATEGORIAT: KategoriaMeta[] = [
   {
     type: "maalaukset",
     otsikko: "Maalaukset",
-    kuvaus: "Klassikot ja tekijät tunnistettavana.",
+    kuvaus: "Tunnista klassikko ja taiteilija.",
     yksikko: (n) => `${n} maalausta`,
     monikko: "maalaukset",
     accent: "#E85D9E",
@@ -138,7 +138,7 @@ export const KATEGORIAT: KategoriaMeta[] = [
   {
     type: "kasvit",
     otsikko: "Suomen kasvit ja puut",
-    kuvaus: "Lehti, kukka ja kaarna tunnistettavana.",
+    kuvaus: "Tunnista lehdestä, kukasta ja kaarnasta.",
     yksikko: (n) => `${n} kasvia`,
     monikko: "kasvit",
     accent: "#B6FF3C",

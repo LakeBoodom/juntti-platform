@@ -53,12 +53,14 @@ type Rivi = {
 /*  Vain yhdyssanan sisällä (kirjain ennen viivaa): "Uuno Turhapuro -elokuvat" ei saa jättää viivaa rivin loppuun. */
 /*  Yli TAVUTUSRAJA-kirjaimiset sanat saavat tavuviivamahdollisuudet (U+00AD, tavuta) — muuten koko kutistui
     alle 11 px:n ("ulkomaalaisvahvistukset" 320 px:n kortissa, 19.10.2026). */
-/*  versaali: otsikko on CSS:llä versaalia (text-transform) → tavutettava sana kirjoitetaan valmiiksi isoilla
-    kirjaimilla, jotta tavutuskohdan valinta mitataan samoilla glyyfeillä, jotka piirretään. */
+/*  UI-tekstit B10 (26.10.2026): sanaa ei enää kirjoiteta DOMiin isoilla kirjaimilla (versaali tulee CSS:stä).
+    Isot kirjaimet näkyivät ruudunlukijalle, hakukoneelle ja kopioidussa tekstissä ("SUURIRUHTINASKUNNAN vuosisata");
+    tavutuskohdat eivät riipu kirjainkoosta. versaali-parametri jää kutsujien yhteensopivuuden vuoksi. */
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export const katko = (t: string, versaali = false) =>
   t
     .replace(/(?<=\p{L})-(?=\p{L})/gu, "-\u200B")
-    .replace(new RegExp(`\\p{L}{${TAVUTUSRAJA + 1},}`, "gu"), (w) => tavuta(versaali ? w.toLocaleUpperCase("fi") : w));
+    .replace(new RegExp(`\\p{L}{${TAVUTUSRAJA + 1},}`, "gu"), (w) => tavuta(w));
 
 /** Sanat, joita pidemmät tavutetaan; KORTTISÄÄNTÖ-koko lasketaan enintään tämän mittaisesta sanasta. */
 export const TAVUTUSRAJA = 14;

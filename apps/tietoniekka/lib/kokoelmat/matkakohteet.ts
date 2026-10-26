@@ -9,7 +9,7 @@ import { kokoelmaKortti } from "./rekisteri";
 export const MATKAKOHTEET: Kokoelma = {
   slug: "matkakohteet",
   nimi: "Maantieto",
-  eyebrow: "Teemakokoelma · Maantieto",
+  eyebrow: "",
   title: "Maailman ääriltä ",
   highlight: "kotia kohti",
   ingress: "Vuoret, joet, saaret ja kaupungit — myös ne, jotka luulet tuntevasi.",

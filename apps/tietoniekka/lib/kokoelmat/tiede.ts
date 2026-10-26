@@ -9,7 +9,7 @@ import { kokoelmaKortti } from "./rekisteri";
 export const TIEDE: Kokoelma = {
   slug: "tiede",
   nimi: "Tiede & teknologia",
-  eyebrow: "Teemakokoelma",
+  eyebrow: "",
   title: "Tiede & ",
   highlight: "teknologia",
   ingress: "Maailma on kummallisempi kuin luulet. Kehosta avaruuteen ja keksintöjen syntytarinoihin.",

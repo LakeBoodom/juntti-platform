@@ -22,10 +22,10 @@ export function juhlatKokoelma(kalenteri: Esiintyma[], nosto: Esiintyma | null):
   return {
     slug: "juhlat",
     nimi: "Juhlat ja pyhät",
-    eyebrow: "Teemakokoelma",
+    eyebrow: "",
     title: "",
     highlight: "Juhlat",
-    ingress: "Visat vuoden juhliin ja perinteisiin. Ajankohtainen juhla on aina ylimpänä.",
+    ingress: "Visat vuoden juhliin ja perinteisiin.",
     accent: kokoelmaKortti("juhlat")!.mastery.color,
     hero: nosto?.kuva
       ? { image: nosto.kuva, focalX: 0.5, focalY: 0.45, alt: nosto.nimi }

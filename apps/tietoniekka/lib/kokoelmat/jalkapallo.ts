@@ -10,7 +10,7 @@ import { kokoelmaKortti } from "./rekisteri";
 export const JALKAPALLO: Kokoelma = {
   slug: "jalkapallo",
   nimi: "Jalkapallo",
-  eyebrow: "Teemakokoelma · Jalkapallo",
+  eyebrow: "",
   title: "Kaikki ",
   highlight: "jalkapallosta",
   ingress: "Valioliiga, Euroopan suurseurat ja Mestarien liigan ikuiset illat.",

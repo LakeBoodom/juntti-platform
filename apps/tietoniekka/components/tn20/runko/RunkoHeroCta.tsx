@@ -14,7 +14,7 @@ type Visa = { id: string; nimi: string; href: string };
 /** Napissa visan lyhyt nimi: ajatusviivaa (– tai —) edeltävä osa (Heikki 20.10.2026: "Pelaa: Suomen esihistoria"). */
 const lyhyt = (nimi: string) => nimi.split(/\s[–—]\s/)[0].trim();
 
-const SELITE = { suosituin: "Suosituin tässä kokoelmassa", seuraava: "Seuraavaksi sinulle", arvo: "Arvottu visa" } as const;
+const SELITE = { suosituin: "Moni aloittaa tästä", seuraava: "Seuraavaksi tämä", arvo: "Kokeile tätä" } as const;
 
 export default function RunkoHeroCta({ suosituin, jarjestys, tila, selite: oletusSelite }: { suosituin: Visa; jarjestys: Visa[]; tila: "suosituin" | "seuraava" | "arvo"; selite?: string }) {
   const [kohde, setKohde] = useState(suosituin);
