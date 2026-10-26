@@ -9,7 +9,7 @@ import { kokoelmaKortti } from "./rekisteri";
 export const ELOKUVAT: Kokoelma = {
   slug: "elokuvat",
   nimi: "Elokuvat",
-  eyebrow: "Teemakokoelma",
+  eyebrow: "",
   title: "Elo",
   highlight: "kuvat",
   ingress: "Blockbusterit, kotimaiset klassikot ja ne elokuvat, joita ei myönnetä katsotuiksi.",

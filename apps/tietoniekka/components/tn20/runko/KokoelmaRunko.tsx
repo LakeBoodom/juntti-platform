@@ -112,7 +112,8 @@ export default function KokoelmaRunko({ d, tunnusosa, v3Lisa, heroLisa, sisalto 
           )}
         </div>
         <div className="rk-hero-teksti">
-          <span className="rk-eyebrow">{k.eyebrow}</span>
+          {/* UI-tekstit B1 (26.10.2026): "Teemakokoelma"-yläotsikko pois — murupolku ja otsikko kertovat jo. */}
+          {k.eyebrow && <span className="rk-eyebrow">{k.eyebrow}</span>}
           {/* KORTTISÄÄNTÖ: koko pisimmästä sanasta (Barlow Condensed 800 ≈ 0,52 em/merkki, CD 1A) */}
           <h1
             id="rk-h1"
@@ -200,10 +201,10 @@ export default function KokoelmaRunko({ d, tunnusosa, v3Lisa, heroLisa, sisalto 
       {d.pelit.length > 0 && (
         <section id="pelit" className="rk-pelit" aria-labelledby="rk-pelit-h" data-monta={monta || undefined}>
           <div className="rk-osio-otsake">
-            <h2 id="rk-pelit-h" className="rk-h2 rk-h2--pieni">Pelit tässä kokoelmassa</h2>
+            <h2 id="rk-pelit-h" className="rk-h2 rk-h2--pieni">Pelaa myös näitä</h2>
             {monta && (
               <a className="rk-kaikki-pelit" href="/kokoelmat#pelimuodot">
-                Kaikki pelit ({d.pelit.length}) →
+                Kaikki pelit →
               </a>
             )}
           </div>
@@ -238,7 +239,7 @@ export default function KokoelmaRunko({ d, tunnusosa, v3Lisa, heroLisa, sisalto 
       {/* ─── V7 Lisää kokoelmia (asetuksesta tai automaattisesti, S6) ─── */}
       {d.lisaa.length > 0 && (
         <section className="rk-lisaa" aria-labelledby="rk-lisaa-h">
-          <h2 id="rk-lisaa-h" className="rk-h2 rk-h2--pieni">Lisää kokoelmia</h2>
+          <h2 id="rk-lisaa-h" className="rk-h2 rk-h2--pieni">Pelaa vielä nämä</h2>
           <div className="rk-lisaa-rivi">
             {d.lisaa.map((m) => (
               <a key={m.slug} className="rk-kokoelma" href={m.href}>

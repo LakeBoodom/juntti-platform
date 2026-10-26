@@ -69,7 +69,7 @@ export const NAV_MODES: NavMode[] = [
   { href: "/peli/ikajarjestys", label: "Ikäjärjestys", desc: "Järjestä tunnetut henkilöt syntymäpäivän mukaan", color: "#C79BFF" },
   // Rajanaapurit (Heikki 27.9.2026): Kuntaliitoksen sisarpeli valtioilla ja lipuilla
   { href: "/peli/rajanaapurit", label: "Rajanaapurit", desc: "Rakenna reitti naapurivaltioiden kautta", color: "#F2B233" },
-  { href: "/megavisat", label: "Megavisat", desc: "20–50 kysymystä — pitkä peli", color: "#E8A320" },
+  { href: "/megavisat", label: "Megavisat", desc: "20–50 kysymystä putkeen", color: "#E8A320" },
   { href: "/kokoelma/kuvavisat", label: "Kuvavisat", desc: "Tunnista kuvasta — liput, vaakunat, linnut", color: "#4C9AFF" },
   /* Äänivisat (Heikki 11.10.2026): toistaiseksi Luonto-kokoelman äänivisasuodatin; oma sivu, kun äänivisoja tulee lisää. */
   { href: "/kokoelma/luonto?suodata=aanivisat#kaikki", label: "Äänivisat", desc: "Tunnista lintu äänestä", color: "#4ADE80" },

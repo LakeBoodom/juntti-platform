@@ -9,7 +9,7 @@ import { kokoelmaKortti } from "./rekisteri";
 export const LUONTO: Kokoelma = {
   slug: "luonto",
   nimi: "Luonto",
-  eyebrow: "Teemakokoelma",
+  eyebrow: "",
   title: "Suomen ",
   highlight: "luonto",
   ingress: "Suurpedoista lintuihin, soista revontuliin. Tunnetko lähimetsäsi?",

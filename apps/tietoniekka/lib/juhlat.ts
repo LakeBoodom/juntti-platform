@@ -104,7 +104,7 @@ export const JUHLAT: Juhla[] = [
     koukku: {
       visa: "halloween-historia-ja-symbolit",
       kysymys: "Mistä Halloween-lyhdyt veistettiin ennen kurpitsaa?", korostus: "kurpitsaa?",
-      ala: "Vastaus yllättää. Testaa tietosi!", cta: "Selvitä vastaus",
+      ala: "", cta: "Selvitä vastaus",
     },
   },
   {

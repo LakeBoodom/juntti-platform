@@ -8,7 +8,6 @@ export default function Aikajana({ d }: { d: RunkoData }) {
   return (
     <section id="osiot" className="rk-v4" aria-labelledby="rk-v4-h">
       <div className="rk-v4-in">
-        <span className="rk-v4-eyebrow">{k.tunnusosaTeksti?.eyebrow ?? "Aikajana"}</span>
         <h2 id="rk-v4-h" className="rk-h2">{k.tunnusosaTeksti?.otsikko ?? `${osiot.length} aikakautta`}</h2>
         <ol className="rk-aika">
           {osiot.map((o) => (
@@ -16,7 +15,7 @@ export default function Aikajana({ d }: { d: RunkoData }) {
               <a href={`#osio-${o.slug}`} data-osio={o.slug}>
                 {o.vuodet && <span className="rk-aika-vuodet">{o.vuodet}</span>}
                 <span className="rk-aika-nimi">{katko(o.chip ?? o.title, true)}</span>
-                <span className="rk-aika-maara">{o.maara} visaa</span>
+                <span className="rk-aika-maara">{o.maara === 1 ? "1 visa" : `${o.maara} visaa`}</span>
               </a>
             </li>
           ))}

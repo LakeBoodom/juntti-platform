@@ -480,7 +480,10 @@ export default async function Peli20({
             kohdat: [
               { t: "Yksi istunto, ei taukoja", d: "Mega ei tallenna välitilaa. Poistuminen kesken päättää kierroksen." },
               { t: "Putki ratkaisee", d: "Peräkkäiset oikeat kasvattavat kerrointa. Yksi väärä nollaa sen." },
-              { t: "Kysymykset kaikista kokoelmista", d: "Jokaisen kysymyksen yllä näkyy, mistä visasta se on." },
+              /* C9 (26.10.2026): yhden kokoelman megassa (Suomen kaupungit) ei "kaikista kokoelmista". */
+              mega === "suomen-kaupungit-mega"
+                ? { t: "Kysymykset kaikista kaupunkivisoista", d: "Jokaisen kysymyksen yllä näkyy, mistä visasta se on." }
+                : { t: "Kysymykset kaikista kokoelmista", d: "Jokaisen kysymyksen yllä näkyy, mistä visasta se on." },
             ],
           },
         ],
@@ -930,7 +933,7 @@ export default async function Peli20({
       {relatedRows.length > 0 && (
         <section className="tn-seo-related tn-seo-ssr">
           <div className="tn-seo-in">
-            <h2>Lisää {collectionLabel.toLowerCase()}-visoja</h2>
+            <h2>Pelaa myös näitä</h2>
             <ul>
               {relatedRows.map((r) => (
                 <li key={r.id}>
@@ -940,7 +943,7 @@ export default async function Peli20({
               ))}
             </ul>
             <a className="tn-seo-hub" href={hubHref}>
-              Kaikki {collectionLabel.toLowerCase()}-visat →
+              {collectionLabel} →
             </a>
           </div>
         </section>

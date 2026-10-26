@@ -10,7 +10,7 @@ import { kokoelmaKortti } from "./rekisteri";
 export const KULTTUURI: Kokoelma = {
   slug: "kulttuuri",
   nimi: "Kulttuuri",
-  eyebrow: "Teemakokoelma · Kulttuuri",
+  eyebrow: "",
   title: "Suomen tarinat, tekijät ja ",
   highlight: "klassikot",
   ingress: "Taide, design, kirjallisuus, musiikki ja suomalaiset ilmiöt saunasta murteisiin.",

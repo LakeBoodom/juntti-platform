@@ -12,7 +12,7 @@ const MAA: Record<string, string> = { kotimaiset: "Kotimainen", ulkomaiset: "Ulk
 export const TV: Kokoelma = {
   slug: "tv",
   nimi: "TV & suoratoisto",
-  eyebrow: "Teemakokoelma",
+  eyebrow: "",
   title: "TV & ",
   highlight: "suoratoisto",
   ingress: "Kotimaiset klassikot, maailman puhutuimmat sarjat ja tosi-tv:n suurimmat hetket.",

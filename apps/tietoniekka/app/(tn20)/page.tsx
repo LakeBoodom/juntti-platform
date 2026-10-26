@@ -266,7 +266,6 @@ export default async function Etusivu20({
         <section aria-labelledby="suositut">
           <div className="tn-es-head">
             <h2 className="tn-es-h2" id="suositut">Suositut kokoelmat</h2>
-            <p className="tn-es-sub">Valitse aihe ja löydä seuraava visasi.</p>
           </div>
           <div className="tn-es-grid">
             {POPULAR_COLLECTIONS.map((c) => (
@@ -302,7 +301,6 @@ export default async function Etusivu20({
         {/* ─── Laura ja Mikko ─── */}
         <section className="tn-es-hosts" aria-labelledby="juontajat">
           <h2 className="tn-es-h2" id="juontajat">{HOSTS_INTRO.title}</h2>
-          <p className="tn-es-hosts-lede">{HOSTS_INTRO.lede}</p>
           <div className="tn-es-hosts-grid">
             {HOSTS.map((h) => (
               <div key={h.key} className="tn-es-host" data-accent={h.accent}>

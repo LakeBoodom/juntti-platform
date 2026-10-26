@@ -54,11 +54,9 @@ export default async function VaalitLanding() {
       <KasvoketjuBanneri
         id="vl-jarj-h"
         luokka="eb--jarj"
-        tagi="Pelimuoto"
-        meta={`${pakat.length} pakkaa`}
         otsikko={["Laita", "järjestykseen"]}
         subKapea={<>Kahdeksan nimeä, yksi oikea järjestys<span className="eb-vain-mob"> · 2&nbsp;min</span></>}
-        subDesk={<>Kahdeksan nimeä, yksi oikea järjestys.<br />Pakat pelihyllyssä alempana · 2&nbsp;min</>}
+        subDesk={<>Kahdeksan nimeä, yksi oikea järjestys · 2&nbsp;min</>}
         href={pakkaHref(aloitus)}
         cta="Aloita presidenteistä"
         henkilot={KETJU}

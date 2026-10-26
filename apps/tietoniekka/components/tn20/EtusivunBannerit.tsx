@@ -152,7 +152,7 @@ export function KasvoketjuBanneri({
   luokka,
 }: {
   id: string;
-  tagi: string;
+  tagi?: string;
   meta?: string;
   otsikko: [string, string];
   taso?: "h2" | "h3";
@@ -189,10 +189,12 @@ export function KasvoketjuBanneri({
     <section className={luokka ? `eb eb--ika ${luokka}` : "eb eb--ika"} aria-labelledby={id}>
       <div className="eb-in">
       <div className="eb-text">
-        <div className="eb-tags">
-          <span className="eb-tag eb-tag--violet">{tagi}</span>
-          {meta && <span className="eb-meta eb-vain-desk">{meta}</span>}
-        </div>
+        {(tagi || meta) && (
+          <div className="eb-tags">
+            {tagi && <span className="eb-tag eb-tag--violet">{tagi}</span>}
+            {meta && <span className="eb-meta eb-vain-desk">{meta}</span>}
+          </div>
+        )}
         <Otsikko className="eb-h" id={id}>
           {otsikko[0]} <span className="eb-rivi">{otsikko[1]}</span>
         </Otsikko>
