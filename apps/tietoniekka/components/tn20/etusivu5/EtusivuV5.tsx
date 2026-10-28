@@ -5,6 +5,7 @@
 import type { CSSProperties } from "react";
 import type { EtusivuData } from "@/lib/etusivu5";
 import PelattuTanaan from "./PelattuTanaan";
+import PaivanVisaV5 from "./PaivanVisaV5";
 
 type D = NonNullable<EtusivuData>;
 
@@ -41,20 +42,7 @@ function PaivanPelit({ d }: { d: D }) {
         )}
       </div>
       <div className="tn-es-pp-ruudukko">
-        {visa && (
-          <a className="tn-es-pv" href={visa.playHref} data-tn-entry="etusivu:paivan-visa">
-            <Kuva src={visa.imageUrl} pos={visa.imagePos} luokka="tn-es-pv-kuva" eager />
-            <span className="tn-es-pv-varjo" aria-hidden="true" />
-            <span className="tn-es-pv-sisus">
-              <span className="tn-es-tagit">
-                <span className="tn-es-tag tn-es-tag--kulta">Päivän visa</span>
-                <span className="tn-es-tag">{visa.badge.label}</span>
-              </span>
-              <span className="tn-es-pv-h" style={lw(visa.title)}>{visa.title}</span>
-              <span className="tn-es-cta tn-cta-lime">Pelaa päivän visa</span>
-            </span>
-          </a>
-        )}
+        {visa && <PaivanVisaV5 visa={visa} lw={pisin(visa.title)} />}
         <div className="tn-es-pp-sivu">
           {slotti && (
             <a className="tn-es-slot" href={slotti.href} data-paivan-peli="slotti" data-tn-entry="etusivu:paivan-slotti" style={{ "--acc": slotti.aksentti } as CSSProperties}>

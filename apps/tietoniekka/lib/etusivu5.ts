@@ -47,7 +47,7 @@ function sitaatti(k: Kortti): string | null {
 /** Deterministinen valinta siemenestä (sama kaikille samana päivänä/viikkona). */
 const poimi = <T,>(lista: T[], n: number): T | null => (lista.length ? lista[((n % lista.length) + lista.length) % lista.length] : null);
 
-export async function haeEtusivu(opts: { sankariPaiva?: string | null } = {}) {
+export async function haeEtusivu(opts: { sankariPaiva?: string | null; pvMalli?: { headline: string | null; text: string | null } | null } = {}) {
   const sb = getSupabase();
   if (!sb) return null;
   const today = helsinginPaiva();
@@ -64,18 +64,24 @@ export async function haeEtusivu(opts: { sankariPaiva?: string | null } = {}) {
   const siteId = (siteRes.data as { id: string } | null)?.id ?? null;
 
   /* ── 1 Päivän pelit ── */
-  let pv: { quiz_id: string } | null = null;
+  type PvRivi = { quiz_id: string; intro_headline: string | null; intro_text: string | null };
+  let pv: PvRivi | null = null;
   let sankariRivi: SankariRivi | null = null;
   if (siteId) {
     const [pvRes, sRes] = await Promise.all([
       sb.rpc("paivan_visa_tanaan" as never, { p_site: siteId } as never),
       sb.rpc("paivan_sankari" as never, { p_site: siteId, p_date: opts.sankariPaiva ?? today.iso } as never),
     ]);
-    pv = ((pvRes.data ?? []) as Array<{ quiz_id: string }>)[0] ?? null;
+    pv = ((pvRes.data ?? []) as PvRivi[])[0] ?? null;
     sankariRivi = ((sRes.data ?? []) as SankariRivi[])[0] ?? null;
   }
   const visa = pv?.quiz_id
-    ? await rakennaPaivanVisa(sb, { quizId: pv.quiz_id, paiva: today.iso, intro: null, questionCount: null })
+    ? await rakennaPaivanVisa(sb, {
+        quizId: pv.quiz_id, paiva: today.iso,
+        // Ajankohtaisuusteksti (toimituksen koukku) näkyy aina, kun se on kirjoitettu (Heikki 28.10.).
+        intro: opts.pvMalli ?? { headline: pv.intro_headline, text: pv.intro_text },
+        questionCount: (cards.find((c) => c.id === pv!.quiz_id) as { question_count?: number | null } | undefined)?.question_count ?? null,
+      })
     : null;
   const sankari = sankariRivi ? muotoileSankari(sankariRivi) : null;
   const slotti = await paivanSlotti({ iso: today.iso, nro: paivaNro });

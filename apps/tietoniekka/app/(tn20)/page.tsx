@@ -14,8 +14,13 @@ import "./etusivu-v5.css";
 /* ISR 5 min. Keskiyön vaihto: PaivaVahti (app/api/etusivu-paiva). */
 export const revalidate = 300;
 
-/* Esikatselu (ei tuotannossa): ?sankari=YYYY-MM-DD näyttää toisen päivän synttärisankarin. */
+/* Esikatselu (ei tuotannossa): ?sankari=YYYY-MM-DD näyttää toisen päivän synttärisankarin,
+   ?pv=A|B|C Päivän visan koukkutilan suurimmalla sallitulla tekstillä (80 + 240 merkkiä). */
 const ESIKATSELU = process.env.VERCEL_ENV !== "production";
+const MALLI_INTRO = {
+  headline: "Kahdeksankymmentä merkkiä pitkä koukkuotsikko täyttää rivin aivan reunaan asti",
+  text: "Kahdensadanneljänkymmenen merkin mittainen koukkuteksti vie laatasta kolme riviä työpöydällä ja näyttää tarkalleen kuinka korkeaksi laatta kasvaa silloin kun toimitus käyttää koko sallitun tilan viimeistä merkkiä myöten loppuun.",
+};
 
 export default async function Etusivu20({
   searchParams,
@@ -24,7 +29,9 @@ export default async function Etusivu20({
 }) {
   const sp = ESIKATSELU ? await searchParams : {};
   const sankari = ESIKATSELU && typeof sp.sankari === "string" && /^\d{4}-\d{2}-\d{2}$/.test(sp.sankari) ? sp.sankari : null;
-  const d = await haeEtusivu({ sankariPaiva: sankari });
+  const pvMalli = !ESIKATSELU ? undefined
+    : sp.pv === "A" ? MALLI_INTRO : sp.pv === "C" ? { headline: null, text: MALLI_INTRO.text } : sp.pv === "B" ? null : undefined;
+  const d = await haeEtusivu({ sankariPaiva: sankari, pvMalli });
   if (!d) return <main style={{ padding: 32 }}>Ei tietokantayhteyttä.</main>;
 
   return (
