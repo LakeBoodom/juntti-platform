@@ -9,7 +9,11 @@ import PelattuTanaan from "./PelattuTanaan";
 type D = NonNullable<EtusivuData>;
 
 /** Pisimmän sanan pituus otsikon kokokaavaan (KORTTISÄÄNTÖ): --lw. Yhdysmerkki on katkaisukohta. */
-const lw = (t: string) => ({ "--lw": Math.max(...t.split(/\s+/).flatMap((w) => w.split(/(?<=-)/)).map((w) => w.length), 4) }) as CSSProperties;
+const pisin = (t: string) => Math.max(...t.split(/[\s\u00AD]+/).flatMap((w) => w.split(/(?<=-)/)).map((w) => w.length), 4);
+const lw = (t: string) => ({ "--lw": pisin(t) }) as CSSProperties;
+/** Mobiilin pelitiilen nimi: yhdyssanarajoilla tavuviivakohdat (U+00AD, config `tavut`) — 2 sarakkeen tiilessä
+ *  nimelle jää 68–95 px. --lw-t = pisin osa, --lw = koko sana (desktopin kortti, ei katkea). */
+const tavutettu = (m: { nimi: string; tavut?: string }) => (m.tavut ?? m.nimi).replace(/\|/g, "\u00AD");
 
 function Kuva({ src, pos, luokka, eager }: { src: string | null; pos?: string; luokka: string; eager?: boolean }) {
   if (!src) return <span className={luokka} aria-hidden="true" />;
@@ -60,7 +64,7 @@ function PaivanPelit({ d }: { d: D }) {
               <span className="tn-es-slot-teksti">
                 <span className="tn-es-laji">
                   <i aria-hidden="true" />
-                  <span>Päivän peli<span className="tn-es-vain-desk"> · {slotti.pelimuoto}</span></span>
+                  <span>{slotti.kicker}{slotti.tarkenne && <span className="tn-es-vain-desk"> · {slotti.tarkenne}</span>}</span>
                 </span>
                 <span className="tn-es-slot-h" style={lw(slotti.otsikko)}>{slotti.otsikko}</span>
                 <span className="tn-es-slot-rivi">{slotti.rivi}</span>
@@ -100,7 +104,7 @@ function Tiesitko({ t }: { t: NonNullable<D["tiesitko"]> }) {
           <span className="tn-es-tag tn-es-tag--syaani">Tiesitkö?</span>
           <span className="tn-es-tt-kicker tn-es-vain-desk">{t.kicker}</span>
         </span>
-        <span className="tn-es-tt-h">
+        <span className="tn-es-tt-h" style={{ "--lw": Math.max(pisin(t.kysymys.replace(/[?.,!:;”"]/g, "")), t.korostus.length + 2) } as CSSProperties}>
           {alku}
           {i >= 0 && <mark>{t.korostus}</mark>}
           {loppu}
@@ -151,9 +155,11 @@ function Pelit({ p }: { p: D["pelit"] }) {
                   <span className="tn-es-peli-teksti">
                     <span className="tn-es-laji" style={{ "--acc": m.aksentti } as CSSProperties}>
                       <i aria-hidden="true" />
-                      {m.laji}
+                      <span className="tn-es-laji-teksti">{m.laji}</span>
                     </span>
-                    <span className="tn-es-peli-h" lang="fi" style={lw(m.nimi)}>{m.nimi}</span>
+                    <span className="tn-es-peli-h" lang="fi" style={{ ...lw(m.nimi), "--lw-t": pisin(tavutettu(m)) } as CSSProperties}>
+                      {tavutettu(m)}
+                    </span>
                     <span className="tn-es-peli-rivi">{m.etusivu_rivi}</span>
                   </span>
                 </>

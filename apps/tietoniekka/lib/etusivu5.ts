@@ -10,8 +10,8 @@ import { muotoileSankari, type SankariRivi } from "@/lib/paivanSankari";
 import { getSiteStats } from "@/lib/siteStats";
 import { KOKOELMA_KORTIT } from "@/lib/kokoelmat/rekisteri";
 import { visanKorttikuva } from "@/lib/kokoelmat/visanKorttikuva";
-import { ETUSIVU_RYHMAT, ETUSIVUN_PELIMUODOT, nakyyEtusivulla } from "@/lib/pelimuodot";
-import { paivanSlotti, type SlottiPeli } from "@/lib/paivanPelit";
+import { ETUSIVU_RYHMAT, ETUSIVUN_PELIMUODOT, nakyyEtusivulla, ryhmanNimi } from "@/lib/pelimuodot";
+import { paivanSlotti } from "@/lib/paivanPelit";
 import { JUONTAJIEN_SUOSITUKSET, PROMO2_OOTKO, VISAPAKETIT } from "@/lib/etusivu";
 import { JUHLAT_KOKOELMA, pvm, juhlaKalenteri, paavisa, paiviaValissa, type Esiintyma } from "@/lib/juhlat";
 import { LAPSET_SIVU, lapsetNakyvissa } from "@/lib/lapset/data";
@@ -25,13 +25,25 @@ const COUNTDOWN_PAIVAA = 14;
 type Kortti = {
   id: string; slug: string | null; custom_slug: string | null; title: string; display_title: string | null;
   collection: string | null; play_count: number | null; published_at: string | null; game_mode?: string | null;
-  teaser?: string | null; hero_image?: string | null; hero_focal_x?: number | null; hero_focal_y?: number | null;
+  teaser?: string | null; description?: string | null; hero_image?: string | null; hero_focal_x?: number | null; hero_focal_y?: number | null;
 };
 
 export type EtusivuData = Awaited<ReturnType<typeof haeEtusivu>>;
 
 const nimi = (k: Kortti) => k.display_title ?? k.title;
 const kokoelmaNimi = (c: string | null) => (c ? KOKOELMA_KORTIT.find((k) => k.slug === c)?.nimi ?? COLLECTION_LABEL[c] ?? null : null);
+/** Tiesitkö?-korostukseen kelpaamattomat sanat. */
+const HEIKOT = new Set(["mukaan", "aikana", "lisäksi", "jälkeen", "kanssa", "mikä", "mitä", "miksi", "missä", "mistä", "millä", "sitä", "siitä"]);
+/** Juontajan sitaatti (Heikki 28.10.): teaserin tai kuvauksen ensimmäinen virke, enintään SITAATTI_MAX merkkiä. */
+const SITAATTI_MAX = 110;
+function sitaatti(k: Kortti): string | null {
+  const lahde = (k.teaser?.trim() || k.description?.trim() || "").replace(/\s+/g, " ");
+  if (!lahde) return null;
+  const virke = lahde.split(/(?<=[.!?…])\s+(?=[A-ZÅÄÖ0-9"”«])/u)[0].trim();
+  if (virke.length <= SITAATTI_MAX) return virke;
+  const katkaistu = virke.slice(0, SITAATTI_MAX - 1);
+  return `${katkaistu.slice(0, katkaistu.lastIndexOf(" ")).replace(/[,;:–-]+$/, "")}…`;
+}
 /** Deterministinen valinta siemenestä (sama kaikille samana päivänä/viikkona). */
 const poimi = <T,>(lista: T[], n: number): T | null => (lista.length ? lista[((n % lista.length) + lista.length) % lista.length] : null);
 
@@ -66,7 +78,7 @@ export async function haeEtusivu(opts: { sankariPaiva?: string | null } = {}) {
     ? await rakennaPaivanVisa(sb, { quizId: pv.quiz_id, paiva: today.iso, intro: null, questionCount: null })
     : null;
   const sankari = sankariRivi ? muotoileSankari(sankariRivi) : null;
-  const slotti: SlottiPeli | null = paivanSlotti(paivaNro);
+  const slotti = await paivanSlotti({ iso: today.iso, nro: paivaNro });
 
   /* ── 2 Tiesitkö? ── questions.hook-pooli, päiväsiemen. Sarakkeen puuttuminen (migraatio ajamatta) → ei osiota. */
   let tiesitko: { kysymys: string; korostus: string; kicker: string; href: string; kuva: string | null; kuvaPos?: string } | null = null;
@@ -83,9 +95,11 @@ export async function haeEtusivu(opts: { sankariPaiva?: string | null } = {}) {
     const k = r ? cards.find((c) => c.id === r.quiz_id)! : null;
     if (r && k) {
       const teksti = r.question_text.trim();
-      const sanat = teksti.replace(/\?$/, "").split(/\s+/);
-      const korostus = sanat[sanat.length - 1];
-      const kk = visanKorttikuva(k);
+      // Korostus: viimeinen sisältösana (ei "mukaan", "on", "se"…) ilman välimerkkejä.
+      const sanat = teksti.split(/\s+/).map((w) => w.replace(/^[”"«(]+|[?.,!:;”"»)]+$/g, ""));
+      const korostus = [...sanat].reverse().find((w) => w.length >= 4 && !HEIKOT.has(w.toLowerCase())) ?? sanat[sanat.length - 1];
+      // Visalla ei omaa kuvaa (esim. historian visat) → kokoelman korttikuva.
+      const kk = visanKorttikuva(k).kuva ? visanKorttikuva(k) : { kuva: KOKOELMA_KORTIT.find((x) => x.slug === k.collection)?.img ?? null, kuvaPos: undefined };
       tiesitko = {
         kysymys: teksti, korostus,
         kicker: [kokoelmaNimi(k.collection), nimi(k)].filter(Boolean).join(" · "),
@@ -101,12 +115,12 @@ export async function haeEtusivu(opts: { sankariPaiva?: string | null } = {}) {
 
   /* ── 4 Valitse peli ── */
   const visat = `${stats.quizzesFloor}+`;
-  const ryhmat = ETUSIVU_RYHMAT.map((g) => ({
-    ...g,
-    kortit: ETUSIVUN_PELIMUODOT.filter((p) => p.ryhma === g.avain && nakyyEtusivulla(p, today.iso)).map((p) => ({
+  const ryhmat = ETUSIVU_RYHMAT.map((g) => {
+    const kortit = ETUSIVUN_PELIMUODOT.filter((p) => p.ryhma === g.avain && nakyyEtusivulla(p, today.iso)).map((p) => ({
       ...p, etusivu_rivi: p.etusivu_rivi.replace("{visat}", visat),
-    })),
-  })).filter((g) => g.kortit.some((k) => k.tila === "pelattava"));
+    }));
+    return { ...g, nimi: ryhmanNimi(kortit, g.nimi), kortit };
+  }).filter((g) => g.kortit.some((k) => k.tila === "pelattava"));
   const pelimuotoja = ryhmat.reduce((n, g) => n + g.kortit.length, 0);
 
   /* ── 5 Promo 1 ── countdown (lähin juhla ≤ 14 pv, jolla on julkaistu visa) tai rotaatio */
@@ -149,13 +163,13 @@ export async function haeEtusivu(opts: { sankariPaiva?: string | null } = {}) {
     if (valittu) promo1 = { tila: "rotaatio", ...valittu };
   }
 
-  /* ── 6 Laura ja Mikko suosittelevat ── viikoittain juontajan kokoelmista, vain teaserilliset */
+  /* ── 6 Laura ja Mikko suosittelevat ── viikoittain juontajan kokoelmista; sitaatti yksi virke (teaser, muuten kuvaus) */
   const juontajat = JUONTAJIEN_SUOSITUKSET.map((j, i) => {
     const ehd = cards
-      .filter((c) => c.collection && (j.kokoelmat as readonly string[]).includes(c.collection) && c.teaser && c.game_mode !== "mega")
+      .filter((c) => c.collection && (j.kokoelmat as readonly string[]).includes(c.collection) && sitaatti(c) && c.game_mode !== "mega")
       .sort((a, b) => (a.id < b.id ? -1 : 1));
     const k = poimi(ehd, viikkoNro + i * 7);
-    return k ? { key: j.key, nimi: j.nimi, kuva: j.kuva, aksentti: j.aksentti, visa: nimi(k), teaser: k.teaser!, href: visaHref(k) } : null;
+    return k ? { key: j.key, nimi: j.nimi, kuva: j.kuva, aksentti: j.aksentti, visa: nimi(k), teaser: sitaatti(k)!, href: visaHref(k) } : null;
   }).filter((x): x is NonNullable<typeof x> => !!x);
 
   /* ── 9 Visapaketit ── Tulossa-sääntö */

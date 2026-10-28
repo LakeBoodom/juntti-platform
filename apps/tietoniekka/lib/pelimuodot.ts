@@ -102,12 +102,27 @@ export const ETUSIVU_RYHMAT: Array<{ avain: EtusivuRyhma; nimi: string }> = [
   { avain: "kartta", nimi: "Karttapelit" },
   { avain: "jarjesta", nimi: "Järjestä ja Kumpi?" },
 ];
+/** Ryhmän nimi näkyvien korttien lajeista (Heikki 28.10.: "Järjestä ja Kumpi?" ilman Kumpi?-korttia → "Järjestä").
+ *  Kaksi "-visat"-osaa yhdistetään: Kuvavisat + Äänivisat → "Kuva- ja äänivisat". */
+const LAJI_RYHMASSA: Record<string, string> = {
+  Tietovisa: "Tietovisat", Kuvavisa: "Kuvavisat", "Äänivisa": "Äänivisat", Karttapeli: "Karttapelit", "Järjestä": "Järjestä", "Kumpi?": "Kumpi?",
+};
+export function ryhmanNimi(kortit: Array<Pick<EtusivunPelimuoto, "laji">>, oletus: string): string {
+  const osat = [...new Set(kortit.map((k) => LAJI_RYHMASSA[k.laji] ?? k.laji))];
+  if (!osat.length) return oletus;
+  if (osat.length === 1) return osat[0];
+  const [a, b] = [osat.slice(0, -1).join(", "), osat[osat.length - 1]];
+  if (osat.length === 2 && a.endsWith("visat") && b.endsWith("visat")) return `${a.slice(0, -5)}- ja ${b.toLowerCase()}`;
+  return `${a} ja ${b}`;
+}
 export type EtusivunPelimuoto = {
   slug: string;
   ryhma: EtusivuRyhma;
   /** Pieni yläotsikko kortissa ("Tietovisa", "Karttapeli"). */
   laji: string;
   nimi: string;
+  /** Mobiilitiilen katkaisukohdat yhdyssanarajoille ("Kunta|liitos" → U+00AD). Vain yli 9-kirjaimisille sanoille. */
+  tavut?: string;
   /** Yksi rivi kuvausta (etusivu_rivi). {visat} korvataan sivuston visamäärällä ("800+"). */
   etusivu_rivi: string;
   href: string;
@@ -129,12 +144,12 @@ export const ETUSIVUN_PELIMUODOT: EtusivunPelimuoto[] = [
   { slug: "kuvavisat", ryhma: "kuva-aani", laji: "Kuvavisa", nimi: "Kuvavisat", etusivu_rivi: "Tunnista lippu, vaakuna tai lintu", href: "/kokoelma/kuvavisat", kuva: "/20/kuvavisat/hero-800.webp", aksentti: KUVA, tila: "pelattava", julkaisu: null },
   { slug: "kuvavisa-viikko", ryhma: "kuva-aani", laji: "Kuvavisa", nimi: "Viikon kuvavisa", etusivu_rivi: "Uusi setti joka maanantai", href: "/kuvavisa/viikko", kuva: "/20/etusivu/banneri-kuvavisat-liput.webp", aksentti: KUVA, tila: "pelattava", julkaisu: null },
   { slug: "aanivisat", ryhma: "kuva-aani", laji: "Äänivisa", nimi: "Äänivisat", etusivu_rivi: "Tunnista lintu laulusta", href: "/aanivisa/suomen-linnut", kuva: "/20/pelit/k/aanivisat.webp", aksentti: KUVA, tila: "pelattava", julkaisu: null },
-  { slug: "kuntaliitos", ryhma: "kartta", laji: "Karttapeli", nimi: "Kuntaliitos", etusivu_rivi: "Rakenna reitti kunnasta toiseen", href: "/peli/kuntaliitos", kuva: "/20/kuntaliitos/palapeli.webp", aksentti: KARTTA, tila: "pelattava", julkaisu: null },
-  { slug: "rajanaapurit", ryhma: "kartta", laji: "Karttapeli", nimi: "Rajanaapurit", etusivu_rivi: "Kulje maasta toiseen rajojen yli", href: "/peli/rajanaapurit", kuva: "/20/rajanaapurit/banneri-kartta.webp", aksentti: KARTTA, tila: "pelattava", julkaisu: null },
-  { slug: "vaalipiiriketju", ryhma: "kartta", laji: "Karttapeli", nimi: "Vaalipiiriketju", etusivu_rivi: "Ketjuta vaalipiirit rajojen yli", href: "/peli/vaalipiiriketju", kuva: "/20/vaalit/vaalipiiriketju.webp", aksentti: KARTTA, tila: "pelattava", julkaisu: null },
-  { slug: "mika-maa", ryhma: "kartta", laji: "Karttapeli", nimi: "Mikä maa?", etusivu_rivi: "Tunnista maa vihjeistä ja siluetista", href: "", kuva: null, aksentti: MAA, tila: "tulossa", julkaisu: null },
-  { slug: "ikajarjestys", ryhma: "jarjesta", laji: "Järjestä", nimi: "Ikäjärjestys", etusivu_rivi: "Laita tunnetut ikäjärjestykseen", href: "/peli/ikajarjestys", kuva: "/20/teema-tunnetut-henkilot-800.webp", aksentti: JARJ, tila: "pelattava", julkaisu: null },
-  { slug: "laita-jarjestykseen", ryhma: "jarjesta", laji: "Järjestä", nimi: "Laita järjestykseen", etusivu_rivi: "Kahdeksan nimeä, yksi oikea järjestys", href: "/peli/jarjesta/presidentit", kuva: "/20/vaalit/hero-kortti.webp", aksentti: JARJ, tila: "pelattava", julkaisu: null },
+  { slug: "kuntaliitos", ryhma: "kartta", laji: "Karttapeli", nimi: "Kuntaliitos", tavut: "Kunta|liitos", etusivu_rivi: "Rakenna reitti kunnasta toiseen", href: "/peli/kuntaliitos", kuva: "/20/kuntaliitos/palapeli.webp", aksentti: KARTTA, tila: "pelattava", julkaisu: null },
+  { slug: "rajanaapurit", ryhma: "kartta", laji: "Karttapeli", nimi: "Rajanaapurit", tavut: "Raja|naapurit", etusivu_rivi: "Kulje maasta toiseen rajojen yli", href: "/peli/rajanaapurit", kuva: "/20/rajanaapurit/banneri-kartta.webp", aksentti: KARTTA, tila: "pelattava", julkaisu: null },
+  { slug: "vaalipiiriketju", ryhma: "kartta", laji: "Karttapeli", nimi: "Vaalipiiriketju", tavut: "Vaali|piiri|ketju", etusivu_rivi: "Ketjuta vaalipiirit rajojen yli", href: "/peli/vaalipiiriketju", kuva: "/20/vaalit/vaalipiiriketju.webp", aksentti: KARTTA, tila: "pelattava", julkaisu: null },
+  { slug: "mika-maa", ryhma: "kartta", laji: "Karttapeli", nimi: "Mikä maa?", etusivu_rivi: "Tunnista maa vihjeistä ja siluetista", href: "", kuva: null, aksentti: MAA, tila: "tulossa", julkaisu: "2026-11-30" },
+  { slug: "ikajarjestys", ryhma: "jarjesta", laji: "Järjestä", nimi: "Ikäjärjestys", tavut: "Ikä|järjestys", etusivu_rivi: "Laita tunnetut ikäjärjestykseen", href: "/peli/ikajarjestys", kuva: "/20/teema-tunnetut-henkilot-800.webp", aksentti: JARJ, tila: "pelattava", julkaisu: null },
+  { slug: "laita-jarjestykseen", ryhma: "jarjesta", laji: "Järjestä", nimi: "Laita järjestykseen", tavut: "Laita järjes|tykseen", etusivu_rivi: "Kahdeksan nimeä, yksi oikea järjestys", href: "/peli/jarjesta/presidentit", kuva: "/20/vaalit/hero-kortti.webp", aksentti: JARJ, tila: "pelattava", julkaisu: null },
   { slug: "kumpi", ryhma: "jarjesta", laji: "Kumpi?", nimi: "Kumpi?", etusivu_rivi: "Vanhempi, suurempi, korkeampi – valitse parista", href: "", kuva: null, aksentti: JARJ, tila: "tulossa", julkaisu: null },
 ];
 
