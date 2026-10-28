@@ -18,6 +18,7 @@ import "./viikkovisa.css";
 import "./mobiilisankari.css";
 import TopBar from "@/components/tn20/TopBar";
 import SiteFooter from "@/components/tn20/SiteFooter";
+import Seuranta from "@/components/tn20/Seuranta";
 
 /* QA-006 (29.8.2026): oletusotsikko ja -kuvaus etusivulle; alasivut
    (kokoelmat, pelisivut) antavat omansa. noindex poistettu julkaisussa
@@ -46,6 +47,7 @@ export default async function Tn20Layout({ children }: { children: React.ReactNo
       <a href="#main" className="skip-link">Siirry sisältöön</a>
       {/* Navigaatiojärjestelmä (lukittu 17.8.2026) — piiloutuu itse pelinäkymässä */}
       <TopBar tagline={tagline} />
+      <Seuranta />
       <span id="main" tabIndex={-1} />
       {children}
       {/* Yhteinen alatunniste kaikille sivuille (QA-005, 29.8.2026) */}

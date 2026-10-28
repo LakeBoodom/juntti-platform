@@ -52,7 +52,7 @@ export default function PeliTulos({
 export function SeuraavaPeli({ seuraavat }: { seuraavat: Pelimuoto[] }) {
   if (!seuraavat.length) return null;
   return (
-    <nav className="pk-seuraava" aria-labelledby="pk-seuraava-h">
+    <nav className="pk-seuraava" aria-labelledby="pk-seuraava-h" data-tn-entry="tulos:seuraava">
       <h2 id="pk-seuraava-h" className="pk-seuraava-h">Pelaa seuraavaksi</h2>
       <Pelikortit pelit={seuraavat} />
     </nav>

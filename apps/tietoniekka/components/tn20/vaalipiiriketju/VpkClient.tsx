@@ -15,6 +15,7 @@
 // julkaistulle visalle (§4, data), seuraava peli rekisteristä (pelikehys K4, 20.10.2026),
 // yhteinen numerointi (§6), oikea reitti = päivän generoitu reitti (§7).
 
+import { lisaaPelirivi } from "@/lib/seuranta";
 import { useEffect, useMemo, useRef, useState, type CSSProperties, type KeyboardEvent, type PointerEvent as RPointerEvent } from "react";
 import { getSupabase } from "@/lib/supabase";
 import Pelipalkki from "@/components/tn20/pelikehys/Pelipalkki";
@@ -67,9 +68,9 @@ async function tallenna(r: { siemen: string; paivanReitti: boolean; yritys: numb
   try {
     const sb = getSupabase();
     if (!sb) return;
-    await sb.from("vaalipiiriketju_pelit" as never).insert({
+    await lisaaPelirivi(sb, "vaalipiiriketju_pelit", {
       siemen: r.siemen, paivan_reitti: r.paivanReitti, yritys: r.yritys, oikein: r.oikein, edustajat: r.edustajat, session_id: istunto(),
-    } as never);
+    });
   } catch {
     // tilasto jää saamatta — peli jatkuu normaalisti
   }

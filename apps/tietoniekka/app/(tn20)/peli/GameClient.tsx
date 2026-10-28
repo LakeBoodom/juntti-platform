@@ -1,4 +1,6 @@
 "use client";
+import { lisaaPelirivi } from "@/lib/seuranta";
+import { kirjaaPelattuTanaan } from "@/components/tn20/etusivu5/PelattuTanaan";
 import { henkiloKuva } from "@/lib/henkilokuvat";
 // TIETONIEKKA 2.0 — PELINÄKYMÄ 2026 PROD (design_handoff_peli_2026_prod +
 // design_handoff_kuvavisa_2026_prod, toteutettu 28.–29.8.2026). Korvasi pelikuoren
@@ -649,11 +651,12 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
     if (recorded.current || !quiz.id) return; // kuvavisat: ei quizzes-riviä → ei tallennusta
     recorded.current = true;
     igValmis(quiz.id);
+    kirjaaPelattuTanaan(quiz.id); // etusivun "n/3 pelattu tänään"
     try {
       const sb = getSupabase();
       if (!sb) return;
       const playId = crypto.randomUUID();
-      const { error } = await sb.from("quiz_plays").insert({
+      const error = await lisaaPelirivi(sb, "quiz_plays", {
         id: playId, quiz_id: quiz.id, platform: "tietoniekka", score: finalScore, total: maxScore,
         session_id: getOrCreateSessionId(), shared: false,
       });
@@ -1344,7 +1347,7 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
               </div>
 
                 {quiz.related.length > 0 && (
-                <div className="tng-heromore">
+                <div className="tng-heromore" data-tn-entry="visasivu:ristiinnosto">
                   <div className="tng-heromore-head">
                     <span className="tng-heromore-t">Pelaa myös näitä</span>
                     <a className="tng-heromore-all" href={quiz.hubHref}>{quiz.collectionLabel} →</a>

@@ -106,7 +106,7 @@ export default function TulosNakyma(p: {
         {/* Metapelilohko: METAPELI_ENABLED-lipun takana (ei vielä toteutettu, ei jätä aukkoa). */}
 
         {p.seuraavat.length > 0 && (
-          <nav className="tn-tulos-seuraava" aria-labelledby="tn-tulos-seuraava-h">
+          <nav className="tn-tulos-seuraava" aria-labelledby="tn-tulos-seuraava-h" data-tn-entry="tulos:seuraava">
             <h2 id="tn-tulos-seuraava-h" className="tn-tulos-pikku">Pelaa seuraavaksi</h2>
             <div className="tn-tulos-kortit">
               {p.seuraavat.slice(0, 2).map((s) => (

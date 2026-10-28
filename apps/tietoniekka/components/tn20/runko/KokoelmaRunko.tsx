@@ -93,7 +93,7 @@ export default function KokoelmaRunko({ d, tunnusosa, v3Lisa, heroLisa, sisalto 
   }
 
   return (
-    <main className={`rk ${runkoCond.variable}`} data-runko style={{ "--rk-acc": k.accent } as CSSProperties}>
+    <main className={`rk ${runkoCond.variable}`} data-runko data-tn-entry="kokoelma" style={{ "--rk-acc": k.accent } as CSSProperties}>
       <KokoelmaLd avain={k.slug} nimi={k.nimi} polku={`/kokoelma/${k.slug}`} />
       <Crumbs items={[{ label: "Kokoelmat", href: "/kokoelmat" }, { label: k.nimi }]} />
 

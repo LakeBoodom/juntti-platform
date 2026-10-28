@@ -19,6 +19,7 @@
 //   * Ääni pois: kuplat ilmestyvät heti ilman puhetilaa. Valinta muistetaan laitteella.
 // Väärä vastaus: ei punaista eikä rastia (koskee vain lasten visoja). Valittu himmenee katkoviivaksi,
 // oikea korostuu kultaisena ⭐:llä.
+import { lisaaPelirivi } from "@/lib/seuranta";
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { LastenKortti, LastenKysymys, LastenVisa } from "@/lib/lapset/data";
 import { arvoKlippi, valijuontoUrl, VALIJUONNOT, type Juontaja } from "@/lib/lapset/valijuonnot";
@@ -271,7 +272,7 @@ export default function LastenPeli({ visa, muut, takaisin }: { visa: LastenVisa;
     try {
       const sb = getSupabase();
       if (!sb) return;
-      await sb.from("quiz_plays").insert({
+      await lisaaPelirivi(sb, "quiz_plays", {
         id: crypto.randomUUID(), quiz_id: visa.id, platform: "tietoniekka", score: oikein, total: N,
         session_id: sessionId(), shared: false,
       });

@@ -90,3 +90,58 @@ export function seuraavatPelit(nykyinen: string, koti?: string, n = 3): Pelimuot
   for (const p of jarj) if (valitut.length < n && !valitut.includes(p)) valitut.push(p);
   return valitut;
 }
+
+/* ── ETUSIVUN "VALITSE PELI" (etusivu v5, 28.10.2026) ─────────────────────────────────────────────────────
+   Pelimuodot ryhmittäin. Tulossa-sääntö: tila "tulossa" näkyy vain, jos julkaisu on enintään
+   TULOSSA_PAIVAA päivän päässä; ryhmä, jossa on pelkkiä Tulossa-kortteja, piilotetaan. Uusi pelimuoto
+   syttyy vaihtamalla tila = "pelattava" — etusivua ei muuteta. Kicker-määrä lasketaan näkyvistä korteista. */
+export type EtusivuRyhma = "tietovisat" | "kuva-aani" | "kartta" | "jarjesta";
+export const ETUSIVU_RYHMAT: Array<{ avain: EtusivuRyhma; nimi: string }> = [
+  { avain: "tietovisat", nimi: "Tietovisat" },
+  { avain: "kuva-aani", nimi: "Kuva- ja äänivisat" },
+  { avain: "kartta", nimi: "Karttapelit" },
+  { avain: "jarjesta", nimi: "Järjestä ja Kumpi?" },
+];
+export type EtusivunPelimuoto = {
+  slug: string;
+  ryhma: EtusivuRyhma;
+  /** Pieni yläotsikko kortissa ("Tietovisa", "Karttapeli"). */
+  laji: string;
+  nimi: string;
+  /** Yksi rivi kuvausta (etusivu_rivi). {visat} korvataan sivuston visamäärällä ("800+"). */
+  etusivu_rivi: string;
+  href: string;
+  kuva: string | null;
+  kuvaPos?: string;
+  /** Lajin väri (piste kortissa). */
+  aksentti: string;
+  tila: "pelattava" | "tulossa";
+  /** Julkaisupäivä (YYYY-MM-DD) Tulossa-kortille; null = ei näytetä ennen julkaisua. */
+  julkaisu: string | null;
+};
+export const TULOSSA_PAIVAA = 35;
+const TIETO = "#F0A24B", KUVA = "#22D3EE", KARTTA = "#4ADE80", JARJ = "#C4A1FF", MAA = "#B4532A";
+export const ETUSIVUN_PELIMUODOT: EtusivunPelimuoto[] = [
+  { slug: "klassinen", ryhma: "tietovisat", laji: "Tietovisa", nimi: "Klassinen visa", etusivu_rivi: "{visat} visaa kaikista aiheista", href: "/kokoelmat", kuva: "/20/hero-mikko-laura.webp", kuvaPos: "center 30%", aksentti: TIETO, tila: "pelattava", julkaisu: null },
+  { slug: "tupla", ryhma: "tietovisat", laji: "Tietovisa", nimi: "Tupla tai kuitti", etusivu_rivi: "Tuplaa pisteet tai pidä ne", href: "/peli/tupla-tai-kuitti", kuva: "/20/tupla/banneri-desk.webp", aksentti: TIETO, tila: "pelattava", julkaisu: null },
+  { slug: "megavisat", ryhma: "tietovisat", laji: "Tietovisa", nimi: "Megavisat", etusivu_rivi: "Laajat teemavisat yhdellä istumalla", href: "/megavisat", kuva: "/20/megavisat/mikko-hero-900.webp", kuvaPos: "center 20%", aksentti: TIETO, tila: "pelattava", julkaisu: null },
+  { slug: "pikapeli", ryhma: "tietovisat", laji: "Tietovisa", nimi: "Pikapeli", etusivu_rivi: "Vastaa ennen kuin aika loppuu", href: "", kuva: null, aksentti: TIETO, tila: "tulossa", julkaisu: null },
+  { slug: "kuvavisat", ryhma: "kuva-aani", laji: "Kuvavisa", nimi: "Kuvavisat", etusivu_rivi: "Tunnista lippu, vaakuna tai lintu", href: "/kokoelma/kuvavisat", kuva: "/20/kuvavisat/hero-800.webp", aksentti: KUVA, tila: "pelattava", julkaisu: null },
+  { slug: "kuvavisa-viikko", ryhma: "kuva-aani", laji: "Kuvavisa", nimi: "Viikon kuvavisa", etusivu_rivi: "Uusi setti joka maanantai", href: "/kuvavisa/viikko", kuva: "/20/etusivu/banneri-kuvavisat-liput.webp", aksentti: KUVA, tila: "pelattava", julkaisu: null },
+  { slug: "aanivisat", ryhma: "kuva-aani", laji: "Äänivisa", nimi: "Äänivisat", etusivu_rivi: "Tunnista lintu laulusta", href: "/aanivisa/suomen-linnut", kuva: "/20/pelit/k/aanivisat.webp", aksentti: KUVA, tila: "pelattava", julkaisu: null },
+  { slug: "kuntaliitos", ryhma: "kartta", laji: "Karttapeli", nimi: "Kuntaliitos", etusivu_rivi: "Rakenna reitti kunnasta toiseen", href: "/peli/kuntaliitos", kuva: "/20/kuntaliitos/palapeli.webp", aksentti: KARTTA, tila: "pelattava", julkaisu: null },
+  { slug: "rajanaapurit", ryhma: "kartta", laji: "Karttapeli", nimi: "Rajanaapurit", etusivu_rivi: "Kulje maasta toiseen rajojen yli", href: "/peli/rajanaapurit", kuva: "/20/rajanaapurit/banneri-kartta.webp", aksentti: KARTTA, tila: "pelattava", julkaisu: null },
+  { slug: "vaalipiiriketju", ryhma: "kartta", laji: "Karttapeli", nimi: "Vaalipiiriketju", etusivu_rivi: "Ketjuta vaalipiirit rajojen yli", href: "/peli/vaalipiiriketju", kuva: "/20/vaalit/vaalipiiriketju.webp", aksentti: KARTTA, tila: "pelattava", julkaisu: null },
+  { slug: "mika-maa", ryhma: "kartta", laji: "Karttapeli", nimi: "Mikä maa?", etusivu_rivi: "Tunnista maa vihjeistä ja siluetista", href: "", kuva: null, aksentti: MAA, tila: "tulossa", julkaisu: null },
+  { slug: "ikajarjestys", ryhma: "jarjesta", laji: "Järjestä", nimi: "Ikäjärjestys", etusivu_rivi: "Laita tunnetut ikäjärjestykseen", href: "/peli/ikajarjestys", kuva: "/20/teema-tunnetut-henkilot-800.webp", aksentti: JARJ, tila: "pelattava", julkaisu: null },
+  { slug: "laita-jarjestykseen", ryhma: "jarjesta", laji: "Järjestä", nimi: "Laita järjestykseen", etusivu_rivi: "Kahdeksan nimeä, yksi oikea järjestys", href: "/peli/jarjesta/presidentit", kuva: "/20/vaalit/hero-kortti.webp", aksentti: JARJ, tila: "pelattava", julkaisu: null },
+  { slug: "kumpi", ryhma: "jarjesta", laji: "Kumpi?", nimi: "Kumpi?", etusivu_rivi: "Vanhempi, suurempi, korkeampi – valitse parista", href: "", kuva: null, aksentti: JARJ, tila: "tulossa", julkaisu: null },
+];
+
+/** Näkyykö pelimuoto etusivulla tänään (Tulossa-sääntö). tanaan = YYYY-MM-DD. */
+export function nakyyEtusivulla(p: EtusivunPelimuoto, tanaan: string): boolean {
+  if (p.tila === "pelattava") return true;
+  if (!p.julkaisu) return false;
+  const ero = (Date.parse(p.julkaisu) - Date.parse(tanaan)) / 864e5;
+  return ero >= 0 && ero <= TULOSSA_PAIVAA;
+}
