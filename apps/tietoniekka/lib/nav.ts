@@ -87,4 +87,7 @@ export const isGameRoute = (pathname: string) =>
   // Pelikehys (vaihe 4, 20.10.2026): myös Tupla tai kuitin aihesivu on pelin K2-aloitus omalla pelipalkillaan.
   // /kuvavisa/<kortisto> (SEO-erä A6) on sama GameClient omalla palkillaan → ei toista navipalkkia (pikakorjaus 22.10.2026;
   // sivuston palkki myös vieritti sivua sivuttain WebKitissä 768 → 390 px:n koonmuutoksessa).
-  (pathname.startsWith("/peli") || pathname.startsWith("/visa") || pathname.startsWith("/h/") || pathname.startsWith("/kuvavisa/"));
+  // Visapaketit (28.10.2026): "/visa" ilman kauttaviivaa osui myös /visapaketit-sivuihin, joilla navigaatio kuuluu
+  // näkyä. Paketin televisionäkymä, tuloste ja juontajan näkymä ovat koko ruudun näkymiä ilman sivuston palkkia ja alatunnistetta.
+  (pathname.startsWith("/peli") || pathname === "/visa" || pathname.startsWith("/visa/") || pathname.startsWith("/h/") || pathname.startsWith("/kuvavisa/") ||
+    /^\/visapaketti\/.+\/(ruutu|tulosta|vetaja)\/?$/.test(pathname));

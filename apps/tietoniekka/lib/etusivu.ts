@@ -115,6 +115,8 @@ export const FOOTER_MODES = [
   ...NAV_MODES.map((m) => ({ label: m.label, href: m.href })),
   { label: "Päivän visa", href: "/#paivan-visa" },
   { label: "Henkilövisat", href: "/kokoelma/tunnetut-henkilot" },
+  /* Visapaketit (28.10.2026): footerin listaan; ylä- ja alanavigaatio ennallaan tässä vaiheessa. */
+  { label: "Visapaketit", href: "/visapaketit" },
 ];
 
 /* Tietoniekka-sarake: samat linkit kuin nykyisellä tietoniekka.fi:llä (Heikki

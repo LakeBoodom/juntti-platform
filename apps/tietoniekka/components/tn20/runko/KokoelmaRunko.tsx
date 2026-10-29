@@ -10,6 +10,7 @@ import { preload } from "react-dom";
 import Crumbs from "@/components/tn20/Crumbs";
 import { KokoelmaLd } from "@/components/tn20/KokoelmaLd";
 import { KATKAISU, katko, pisinSana, type RunkoData, type RunkoKortti } from "@/lib/kokoelmat/data";
+import { korttiHref, metarivi, sarjaNimi } from "@/lib/visapaketit";
 import type { RunkoVisa } from "@/lib/kokoelmat/tyypit";
 import RunkoHeroCta from "./RunkoHeroCta";
 import RunkoNaytaKaikki from "./RunkoNaytaKaikki";
@@ -129,6 +130,18 @@ export default function KokoelmaRunko({ d, tunnusosa, v3Lisa, heroLisa, sisalto 
           {d.suosituin && <RunkoHeroCta suosituin={d.suosituin} jarjestys={d.jarjestys} tila={k.cta} selite={k.ctaSelite} />}
         </div>
       </section>
+
+      {/* Visapaketti (28.10.2026): pieni linkkikortti, ei banneria. Teema = kokoelman nimi; kausipaketti vain kaudella. */}
+      {d.paketti && (
+        <div className="rk-vp">
+          <a className="rk-vp-kortti" href={korttiHref(d.paketti)}>
+            <span className="rk-vp-kicker">Visapaketti</span>
+            <span className="rk-vp-nimi">{d.paketti.sarja ? sarjaNimi(d.paketti.sarja) : d.paketti.otsikko}</span>
+            <span className="tn-card-meta">{metarivi(d.paketti, d.paketti.kierroksia).join(" · ")}</span>
+            <span className="tn-card-cta">Pelaa →</span>
+          </a>
+        </div>
+      )}
 
       {sisalto ?? (
  <>
