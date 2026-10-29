@@ -1,6 +1,7 @@
 // VISAPAKETIN TULOSTE (V-B; design-kangas taulu 4): HTML + oma @media print. Joka kierros omalle sivulleen
 // ("Joukkue: ____", kysymykset numeroituina, vastausviiva), lopuksi vastaussivu vetäjälle. Selaimen
 // "Tallenna PDF:nä" riittää, erillistä PDF-generointia ei ole. Ruudulla sama sisältö arkkeina + Tulosta-nappi.
+// Arkin yläosa (Heikki 29.10.): sanamerkki + kierros ylärivillä, paketin nimi + "Joukkue" alarivillä.
 import "@/app/(tn20)/visapaketit.css";
 import { runkoCond } from "@/components/tn20/runko/runkoFontti";
 import {
@@ -30,10 +31,9 @@ export default function TulostaSivu({ sivu, taso, esikatselu }: { sivu: Sivu; ta
       {kierrokset.map((k) => (
         <section key={k.nro} className="tn-vp-arkki" aria-labelledby={`t-k${k.nro}`}>
           <header className="tn-vp-arkki-yla">
-            <div className="tn-vp-arkki-tunnus">
-              <span className="tn-vp-arkki-kicker">Kierros {k.nro} / {kierrokset.length}</span>
-              <span className="tn-vp-arkki-paketti">{nimi}</span>
-            </div>
+            <Logo />
+            <span className="tn-vp-arkki-kicker">Kierros {k.nro} / {kierrokset.length}</span>
+            <span className="tn-vp-arkki-paketti">{nimi}</span>
             <span className="tn-vp-joukkue">Joukkue: <span className="tn-vp-viiva" aria-hidden="true" /></span>
           </header>
           <h2 id={`t-k${k.nro}`} className="tn-vp-arkki-h">{k.nimi}</h2>
@@ -45,16 +45,20 @@ export default function TulostaSivu({ sivu, taso, esikatselu }: { sivu: Sivu; ta
 
       <section className="tn-vp-arkki tn-vp-arkki--vastaukset" aria-labelledby="t-vastaukset">
         <header className="tn-vp-arkki-yla">
-          <div className="tn-vp-arkki-tunnus">
-            <span className="tn-vp-arkki-kicker">Vetäjälle</span>
-            <span className="tn-vp-arkki-paketti">{nimi}</span>
-          </div>
+          <Logo />
+          <span className="tn-vp-arkki-kicker">Vetäjälle</span>
+          <span className="tn-vp-arkki-paketti">{nimi}</span>
         </header>
         <h2 id="t-vastaukset" className="tn-vp-arkki-h">Vastaukset</h2>
         {kierrokset.map((k) => <Vastaukset key={k.nro} k={k} />)}
       </section>
     </main>
   );
+}
+
+/** Sivuston sanamerkki (sama kuin yläpalkissa ja televisionäkymässä), paperilla tummemmalla kullalla. */
+function Logo() {
+  return <span className="tn-vp-arkki-logo" aria-hidden="true"><b>TIETO</b>NIEKKA</span>;
 }
 
 function TulosteKysymys({ q }: { q: PakettiKysymys }) {
