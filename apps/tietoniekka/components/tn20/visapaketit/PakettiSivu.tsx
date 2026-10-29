@@ -170,7 +170,7 @@ function KysymysRivi({ q }: { q: PakettiKysymys }) {
       {kuvaOnKysymys(q) && (
         <figure className="tn-vp-kuva">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={kevytKuva(q.image_url!)} alt="" loading="lazy" decoding="async" width={1536} height={1024}
+          <img src={kevytKuva(q.image_url!)} alt="" loading="lazy" decoding="async" fetchPriority="low" width={1536} height={1024}
             style={q.image_position ? { objectPosition: q.image_position } : undefined} />
           {q.image_credit && <figcaption className="tn-vp-krediitti">{q.image_credit}</figcaption>}
         </figure>
