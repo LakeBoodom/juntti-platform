@@ -34,6 +34,18 @@ import StreakButton from "./StreakButton";
 
 type MenuId = "kokoelmat" | "pelimuodot";
 
+/* Puhelimissa (< 400 px) taglinesta näkyy vain loppuosa ("700+ visaa") — ei ellipsiä (korttisääntö, 29.10.2026). */
+function taglineOsat(t: string) {
+  const i = t.lastIndexOf(" · ");
+  if (i < 0) return t;
+  return (
+    <>
+      <span className="tn-tagline-alku">{t.slice(0, i + 3)}</span>
+      {t.slice(i + 3)}
+    </>
+  );
+}
+
 export default function TopBar({ tagline }: { tagline?: string } = {}) {
   const pathname = usePathname() ?? "";
   const [open, setOpen] = useState<MenuId | null>(null);
@@ -124,7 +136,7 @@ export default function TopBar({ tagline }: { tagline?: string } = {}) {
               <b>TIETO</b>
               <span>NIEKKA</span>
             </a>
-            <span className="tn-tagline">{tagline ?? SITE_TAGLINE}</span>
+            <span className="tn-tagline">{taglineOsat(tagline ?? SITE_TAGLINE)}</span>
           </div>
 
           {/* Työpöytävalikot */}

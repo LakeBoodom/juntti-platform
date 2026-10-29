@@ -67,7 +67,8 @@ export async function haeEtusivu(opts: {
   const cards = (cardsRes.data ?? []) as unknown as Kortti[];
   const siteId = (siteRes.data as { id: string } | null)?.id ?? null;
 
-  /* ── 1 Päivän pelit ── */
+  /* ── 1 Päivän pelit ── Linjaus (Heikki 29.10.): tähän osioon ei koskaan Tulossa-kortteja, vain pelattavat päiväpelit.
+     Tulossa-sääntö koskee vain Valitse peli -osiota (4). */
   type PvRivi = { quiz_id: string; intro_headline: string | null; intro_text: string | null };
   let pv: PvRivi | null = null;
   let sankariRivi: SankariRivi | null = null;
@@ -122,10 +123,11 @@ export async function haeEtusivu(opts: {
     }
   }
 
-  /* ── 3 Selaa aiheittain ── kokoelmarekisteri (avoimet, ei Kuvavisoja — ne ovat pelimuoto) */
+  /* ── 3 Selaa aiheittain ── kokoelmarekisteri (avoimet, ei Kuvavisoja — ne ovat pelimuoto), suomen aakkosjärjestyksessä
+     (Heikki 29.10.; vain tässä osiossa — rekisterin oma järjestys navigaatiossa ja Kokoelmat-sivulla ennallaan). */
   const aiheet = KOKOELMA_KORTIT.filter((k) => k.avoin !== false && k.slug !== "kuvavisat").map((k) => ({
     slug: k.slug, nimi: k.nimi, href: k.href, kuva: k.img, kuvaPos: k.pos,
-  }));
+  })).sort((a, b) => a.nimi.localeCompare(b.nimi, "fi"));
 
   /* ── 4 Valitse peli ── */
   const visat = `${stats.quizzesFloor}+`;
