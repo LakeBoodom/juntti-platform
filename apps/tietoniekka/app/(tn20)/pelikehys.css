@@ -129,6 +129,8 @@
   .tn20 .pk-tulos { display: grid; grid-template-columns: minmax(0, 1fr) minmax(360px, 440px); column-gap: 48px; row-gap: 32px; align-items: start; padding: 40px clamp(24px, 4vw, 72px) 40px; }
   .tn20 .pk-tulos-vasen { grid-column: 1; grid-row: 1; }
   .tn20 .pk-tulos > .tn-jako { grid-column: 2; grid-row: 1; position: sticky; top: 20px; padding: 24px; }
+  .tn20 .pk-tulos > .pk-tulos-lisa--alle { grid-column: 1; grid-row: 2; }
+  .tn20 .pk-tulos:has(> .pk-tulos-lisa--alle) > .tn-jako { grid-row: 1 / span 2; }
   .tn20 .pk-tulos > .pk-seuraava, .tn20 .pk-tulos > .pk-tulos-linkit { grid-column: 1 / -1; }
   .tn20 .pk-tulos-luku b { font-size: 120px; }
   .tn20 .pk-tulos-luku span { font-size: 44px; }

@@ -629,6 +629,7 @@ export default function ReittipeliClient({
                 <div className="kl-k4-kartta">{kartta}</div>
               </>
             }
+            lisaJaonJalkeen
             jako={{ ...jakoTiedot(), natiiviOtsikko: peli.nimi }}
             toiminnot={[
               { teksti: "Rakenna uusi reitti", onClick: arvoUusi },
