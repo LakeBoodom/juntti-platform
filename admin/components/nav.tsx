@@ -22,6 +22,12 @@ export function Nav({ email }: { email?: string | null }) {
             Visat
           </Link>
           <Link
+            href="/visapaketit"
+            className="text-sm text-muted-foreground hover:text-foreground"
+          >
+            Visapaketit
+          </Link>
+          <Link
             href="/kuvavisat"
             className="text-sm text-muted-foreground hover:text-foreground"
           >

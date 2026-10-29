@@ -11,6 +11,7 @@
 //   /og/sivu/<avain>               pelimuodot ja muut sivut (tupla-tai-kuitti, kuntaliitos …)
 //   /og/henkilo/<slug>             henkilösivu (erä B3): nimi + rooli, henkilökuva 3:4-korttina
 //   /og/jarjesta/<pakka>           Laita järjestykseen -pakka (lib/jarjesta/pakat.ts)
+//   /og/visapaketti/<slug>         visapaketti (julkaistu; quiz_packs), sarjan pääsivulla uusin painos
 //
 // Satori (ImageResponse) ei osaa WebP:tä, joten kuvat muunnetaan sharpilla JPEG:ksi. Omat kuvat
 // (/20/…) haetaan saman julkaisun osoitteesta HTTP:llä (Vercelin tilankäyttö 11.10.2026: aiemmin koko
@@ -34,6 +35,7 @@ import { MEGA_FEATURED, MEGA_GRID } from "@/lib/megavisat";
 import { NAV_COLLECTIONS } from "@/lib/nav";
 import { korttinimi, tasonimiTuloksesta } from "@/lib/korttinimi";
 import { visanKorttikuva } from "@/lib/kokoelmat/visanKorttikuva";
+import { haeSivu, kierrosmaarat, metarivi, sarjaNimi } from "@/lib/visapaketit";
 
 export const runtime = "nodejs";
 
@@ -634,6 +636,7 @@ const SIVUT: Record<string, { eyebrow: string; otsikko: string; kuva: string; ac
   kokoelmat: { eyebrow: "Tietoniekka", otsikko: "Kaikki kokoelmat", kuva: "/20/hero-mikko-laura.webp", accent: KULTA },
   viikkovisa: { eyebrow: "Kuvavisa", otsikko: "Viikkovisa", kuva: "/20/kuvavisat/hero.webp", accent: "#22D3EE" },
   "kuvien-lahteet": { eyebrow: "Tietoniekka", otsikko: "Kuvien lähteet", kuva: "/20/hero-mikko-laura.webp", accent: KULTA },
+  visapaketit: { eyebrow: "Tietoniekka", otsikko: "Visapaketit", kuva: "/20/hero-mikko-laura.webp", accent: KULTA },
 };
 
 async function kokoelmaKortti(avain: string): Promise<Kortti | null> {
@@ -709,6 +712,16 @@ export async function GET(req: Request, ctx: { params: Promise<{ polku: string[]
     const p = haePakka(avain)!;
     const otsikko = p.otsikko.charAt(0).toUpperCase() + p.otsikko.slice(1);
     kortti = { eyebrow: "Laita järjestykseen", otsikko, accent: "#E8A320", tausta: await kuvaUri(p.kuva, W, H) };
+  } else if (tyyppi === "visapaketti" && avain) {
+    const sivu = await haeSivu(avain, null);
+    if (sivu) {
+      const p = sivu.vp.paketti;
+      kortti = {
+        eyebrow: "Visapaketti", otsikko: sivu.painokset && p.sarja ? sarjaNimi(p.sarja) : p.otsikko, accent: p.aksentti ?? KULTA,
+        tausta: await kuvaUri(p.hero_image ?? "/20/hero-mikko-laura.webp", W, H),
+        alarivi: metarivi(p, kierrosmaarat(sivu.vp)).join(" · "),
+      };
+    }
   } else if (tyyppi === "sivu" && SIVUT[avain]) {
     const s = SIVUT[avain];
     kortti = { eyebrow: s.eyebrow, otsikko: s.otsikko, accent: s.accent, tausta: await kuvaUri(s.kuva, W, H) };

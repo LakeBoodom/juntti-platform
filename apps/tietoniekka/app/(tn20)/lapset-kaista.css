@@ -20,7 +20,7 @@
   overflow-wrap: normal; word-break: keep-all;
 }
 .tn20 .lk-p { margin: 0; font-size: 16px; line-height: 1.45; font-weight: 600; text-wrap: pretty; }
-.tn20 .lk-p--desktop, .tn20 .lk-cta { display: none; }
+.tn20 .lk-vain-desk, .tn20 .lk-cta { display: none; }
 /* Kuvan ylin 21.7 % on läpinäkyvää → tausta nostetaan (250 px leveänä 68 px). */
 .tn20 .lk-duo { height: 178px; background-size: 250px auto; background-position: center -68px; background-repeat: no-repeat; }
 .tn20 .lk-iat { background: var(--lk-navy); border-top: 5px solid var(--lk-kulta); padding: 12px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
@@ -51,8 +51,9 @@
   .tn20 .lk-pilleri { height: 32px; padding: 0 13px; font-size: 16px; }
   /* CD 84 px. Tekstisarake = 100cqw − 766 px; "LASTEN VISAT" yhdellä rivillä ≈ 5.5 em → kaava /5.8. */
   .tn20 .lk-h { font-size: clamp(52px, calc((100cqw - 766px) / 5.8), 84px); line-height: .84; }
-  .tn20 .lk-p--mobiili { display: none; }
-  .tn20 .lk-p--desktop { display: block; max-width: 30ch; font-size: 19px; }
+  .tn20 .lk-vain-mob { display: none; }
+  .tn20 .lk-vain-desk { display: inline; }
+  .tn20 .lk-p { max-width: 30ch; font-size: 19px; }
   .tn20 .lk-cta {
     align-self: flex-start; display: flex; align-items: center; gap: 10px; min-height: 52px; padding: 0 24px;
     font-family: var(--lk-cond); font-weight: 900; font-size: 21px; text-transform: uppercase;

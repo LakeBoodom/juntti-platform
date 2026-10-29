@@ -9,7 +9,7 @@ import { kokoelmaKortti } from "./rekisteri";
 export const JAAKIEKKO: Kokoelma = {
   slug: "jaakiekko",
   nimi: "Jääkiekko",
-  eyebrow: "Teemakokoelma · Jääkiekko",
+  eyebrow: "",
   title: "Kaikki ",
   highlight: "jääkiekosta",
   ingress: "Liigaseurat, Leijonien kultavuodet ja suomalaiset NHL:ssä.",

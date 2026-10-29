@@ -17,8 +17,11 @@ export function LapsetKaista({ juhla, duo }: { juhla: string | null; duo: string
         <a className="lk-teksti" href={LAPSET_SIVU}>
           <span className="lk-pilleri">Tietoniekka lapsille</span>
           <h2 className="lk-h" id="lk-h">Lasten visat</h2>
-          <p className="lk-p lk-p--mobiili">Laura ja Mikko lukevat kysymykset ääneen.{nyt ? ` Nyt ${nyt}!` : ""}</p>
-          <p className="lk-p lk-p--desktop">Pelatkaa yhdessä tai pelaa itse. Laura ja Mikko lukevat kysymykset ääneen.</p>
+          {/* C6 (26.10.2026): yksi kappale — aiemmin mobiili- ja työpöytäversio olivat kahtena kappaleena samassa HTML:ssä. */}
+          <p className="lk-p">
+            <span className="lk-vain-desk">Pelatkaa yhdessä tai pelaa itse. </span>Laura ja Mikko lukevat kysymykset ääneen.
+            {nyt && <span className="lk-vain-mob"> Nyt {nyt}!</span>}
+          </p>
           <span className="lk-cta tn-cta-lime">Lasten visoihin <span aria-hidden>→</span></span>
         </a>
         <div className="lk-duo" style={{ backgroundImage: `url(${duo})` }} aria-hidden />

@@ -8,7 +8,7 @@ import "../../henkilo.css";
 import type { Metadata } from "next";
 import { notFound, permanentRedirect } from "next/navigation";
 import Crumbs from "@/components/tn20/Crumbs";
-import FaktaRivi, { Chip } from "@/components/tn20/hub/FaktaRivi";
+import FaktaRivi from "@/components/tn20/hub/FaktaRivi";
 import Lyhyesti from "@/components/tn20/hub/Lyhyesti";
 import PeliHylly, { type HyllyPeli } from "@/components/tn20/hub/PeliHylly";
 import SukulaisLaatat from "@/components/tn20/hub/SukulaisLaatat";
@@ -16,7 +16,7 @@ import LahdeRivi from "@/components/tn20/hub/LahdeRivi";
 import { JsonLd, abs } from "@/lib/jsonLd";
 import { jakoMeta } from "@/lib/jakoMeta";
 import { ryhma } from "@/lib/henkiloRyhmat";
-import { fiPvm, haeHenkiloSivu, paiviaSynttariin, paivaaTeksti, tanaan, vuodet, type HenkiloSivu } from "@/lib/henkilo";
+import { fiPvm, haeHenkiloSivu, paiviaSynttariin, tanaan, vuodet, type HenkiloSivu } from "@/lib/henkilo";
 
 export const revalidate = 3600;
 
@@ -26,7 +26,45 @@ export function generateStaticParams() {
 
 const henkiloHref = (slug: string) => `/henkilo/${encodeURIComponent(slug)}`;
 
+/* Roolin alun erisnimet (genetiivit ja lyhenteet), joita ei pienennetä: "Ranskan presidentti", "SDP:n …". */
+const ERISNIMIALKU = new Set([
+  "Britannian", "Euroopan", "Helsingin", "Keskustan", "Kokoomuksen", "Kristillisdemokraattien", "Liike", "Naton",
+  "Norjan", "Perussuomalaisten", "Ranskan", "Ruotsin", "Saksan", "Suomen", "Ukrainan", "Vasemmistoliiton",
+  "Venäjän", "Vihreiden", "Yhdysvaltain", "Ylen",
+]);
+function rooliLauseeseen(rooli: string): string {
+  const eka = rooli.split(" ")[0];
+  return ERISNIMIALKU.has(eka) || /\p{Lu}.*\p{Lu}/u.test(eka) ? rooli : rooli.charAt(0).toLowerCase() + rooli.slice(1);
+}
+
+const KUVAUS_MAX = 160;
+
+/** Meta description henkilöille, joilla on oma visa (SEO 25.10.2026, Search Console: henkilösivuilla 65 %
+ *  näytöistä mutta CTR 0,24 % — ikä näkyy jo hakutuloksessa, eikä vanha kuvaus antanut syytä klikata).
+ *  Koukku = visan lyhin kysymys (tasapelissä pienin sort_order), jos koko kuvaus mahtuu 160 merkkiin;
+ *  muuten koukku jää pois. Vastausta ei näytetä. Deterministinen: sama sivu → sama kuvaus. */
+function visaKuvaus(h: HenkiloSivu, nyt = tanaan()): string | null {
+  if (!h.visa || !h.role) return null;
+  const rooli = rooliLauseeseen(h.role);
+  // Vuosiväliin päättyvä rooli ("pääministeri 2019–2023") ei taivu ikä-adjektiivin perään luontevasti.
+  const vuosirooli = /\d[–-]?\d*$|–$/.test(rooli);
+  const alku = h.death
+    ? h.birth ? `${h.name} (${h.birth.y}–${h.death.y}) oli ${rooli}.` : `${h.name} oli ${rooli}.`
+    : !h.birth ? `${h.name} on ${rooli}.`
+    : vuosirooli ? `${h.name} on ${vuodet(h.birth, nyt)}-vuotias (s. ${fiPvm(h.birth)}), ${rooli}.`
+    : `${h.name} on ${vuodet(h.birth, nyt)}-vuotias ${rooli} (${fiPvm(h.birth)}).`;
+  const n = h.visanKysymykset.length;
+  const loppu = n ? `Testaa itsesi ${n} kysymyksen visassa.` : "Testaa itsesi visassa.";
+  const koukku = h.visanKysymykset
+    .map((k, i) => ({ k, i }))
+    .sort((a, b) => a.k.length - b.k.length || a.i - b.i)[0]?.k;
+  const koko = koukku ? `${alku} ${koukku} ${loppu}` : "";
+  return koko && koko.length <= KUVAUS_MAX ? koko : `${alku} ${loppu}`;
+}
+
 function kuvaus(h: HenkiloSivu): string {
+  const uusi = visaKuvaus(h);
+  if (uusi) return uusi;
   const osat: string[] = [];
   if (h.role) osat.push(`${h.name} – ${h.role.charAt(0).toLowerCase() + h.role.slice(1)}.`);
   if (h.birth) {
@@ -72,8 +110,9 @@ export default async function HenkiloPage({ params }: { params: Promise<{ slug: 
   const R = ryhma(h.ryhma);
   const rooli = [h.role, h.nickname ? `”${h.nickname}”` : null].filter(Boolean).join(" · ");
 
-  // Faktalohko: elossa iso ikä + lause "X on N-vuotias" + "Täyttää N · X päivän päästä"; edesmennyt
-  // vuosiväli + "N vuotta" + neutraali chip. Päivämäärät <time datetime>-elementteinä (ikähaut 8.10.2026).
+  // Faktalohko: elossa iso ikä + syntymärivi; edesmennyt vuosiväli + "N vuotta" + syntymä- ja kuolinrivi.
+  // Päivämäärät <time datetime>-elementteinä (ikähaut 8.10.2026). Heikki 25.10.2026: ikä vain kerran (iso luku,
+  // ruudunlukijalle lauseena), pois "Täyttää N · X päivän päästä" ja "Olisi nyt N v · syntymäpäivä" — toistoa.
   let fakta: React.ReactNode = null;
   let synttarit = false;
   if (h.birth) {
@@ -100,7 +139,6 @@ export default async function HenkiloPage({ params }: { params: Promise<{ slug: 
               </strong>
               {h.death_place ? ` ${h.death_place}` : ""}
             </>,
-            <Chip key="c" chip={{ tyyli: "neutraali", teksti: `Olisi nyt ${vuodet(h.birth, nyt)} v · syntymäpäivä ${h.birth.d}.${h.birth.m}.` }} />,
           ]}
         />
       );
@@ -108,34 +146,14 @@ export default async function HenkiloPage({ params }: { params: Promise<{ slug: 
       const ika = vuodet(h.birth, nyt);
       const p = paiviaSynttariin(h.birth, nyt);
       synttarit = p === 0;
-      // Iso "53 v" on visuaalinen; sama tieto kokonaisena lauseena tietoriveillä (ei piilotekstiä).
-      fakta = synttarit ? (
+      fakta = (
         <FaktaRivi
           suuri={String(ika)}
           yksikko="v"
-          korostus
-          merkki={<span className="hub-synttarit-merkki">Synttärit tänään</span>}
-          rivit={[
-            <span key="l" className="hub-fakta-lause">
-              {h.name} täyttää tänään <strong>{ika}</strong> vuotta
-            </span>,
-            syntRivi,
-          ]}
-        />
-      ) : (
-        <FaktaRivi
-          suuri={String(ika)}
-          yksikko="v"
-          rivit={[
-            <span key="l" className="hub-fakta-lause">
-              {h.name} on <strong>{ika}</strong>-vuotias
-            </span>,
-            syntRivi,
-            <span key="t" className="hub-fakta-tayttaa">
-              <span>Täyttää {ika + 1}</span>
-              <Chip chip={{ tyyli: "kulta", teksti: paivaaTeksti(p) }} />
-            </span>,
-          ]}
+          suuriTeksti={synttarit ? `${h.name} täyttää tänään ${ika} vuotta` : `${h.name} on ${ika}-vuotias`}
+          korostus={synttarit}
+          merkki={synttarit ? <span className="hub-synttarit-merkki">Synttärit tänään</span> : undefined}
+          rivit={[syntRivi]}
         />
       );
     }
@@ -157,11 +175,19 @@ export default async function HenkiloPage({ params }: { params: Promise<{ slug: 
     ...(h.visa ? { subjectOf: { "@type": "Quiz", name: h.visa.otsikko, url: abs(h.visa.href) } } : {}),
   };
 
+  // CD "TN Henkilösivu pelinostot" 5a (25.10.2026): henkilövisa ensin (nosto, lime-CTA), Ikäjärjestys toiseksi.
+  // Otsikon genetiivi johdetaan käsin syötetystä elatiivista (Jipusta → Jipun; sama vartalo), ei nimestä.
   const hyllyPelit: HyllyPeli[] = [];
-  if (h.nosto) hyllyPelit.push({ tyyppi: "jarjestys", ...h.nosto });
   // "Aloita visa" vie suoraan 1. kysymykseen (Heikki 4.10.): henkilösivu on jo visan esittely.
   const aloitaHref = h.visa ? `${h.visa.href}${h.visa.href.includes("?") ? "&" : "?"}aloita=1` : "";
-  if (h.visa) hyllyPelit.push({ tyyppi: "visa", id: h.visa.id, otsikko: h.visa.otsikko, href: aloitaHref, fanitasot: h.visa.fanitasot });
+  const genetiivi = h.elatiivi && /st[aä]$/.test(h.elatiivi) ? h.elatiivi.replace(/st[aä]$/, "n") : null;
+  if (h.visa)
+    hyllyPelit.push({
+      tyyppi: "visa", id: h.visa.id, href: aloitaHref, fanitasot: h.visa.fanitasot,
+      otsikko: genetiivi ? `Kuinka hyvin tunnet ${genetiivi}?` : h.visa.otsikko,
+      kuva: h.image_url, kuvaPos: `${h.focal.x * 100}% ${h.focal.y * 100}%`,
+    });
+  if (h.nosto) hyllyPelit.push({ tyyppi: "jarjestys", ...h.nosto });
   const ini = h.name
     .split(/\s+/)
     .map((w) => w[0])
@@ -174,7 +200,7 @@ export default async function HenkiloPage({ params }: { params: Promise<{ slug: 
       <Crumbs
         items={[
           { label: "Tunnetut henkilöt", href: "/kokoelma/tunnetut-henkilot" },
-          { label: R.lyhyt, href: `/henkilot/${h.ryhma}` },
+          { label: R.lyhyt, href: `/kokoelma/tunnetut-henkilot#osio-henkilot-${h.ryhma}` },
           { label: h.name },
         ]}
       />

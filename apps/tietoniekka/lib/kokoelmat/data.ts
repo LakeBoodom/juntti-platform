@@ -6,6 +6,7 @@ import { getCounts } from "@/lib/kokoelmaMaarat";
 import { kokoelmanPelimuodot, type Pelimuoto } from "@/lib/pelimuodot";
 import { naapurit, type KokoelmaKortti } from "./rekisteri";
 import { lapsetNakyvissa } from "@/lib/lapset/data";
+import { kokoelmanPaketti, type PakettiRivi } from "@/lib/visapaketit";
 import type { Kokoelma, KokoelmaOsio, RunkoVisa } from "./tyypit";
 
 /** S2: ennen "Näytä kaikki" -nappia näkyy osion ensimmäinen kortti + tämä määrä (21.10.2026: kaikki kortit samaa
@@ -38,6 +39,8 @@ export type RunkoData = {
   jarjestys: Array<{ id: string; nimi: string; href: string }>;
   pelit: Pelimuoto[];
   lisaa: Array<KokoelmaKortti & { maara: number }>;
+  /** Visapaketti, jonka teema on kokoelman nimi (Juhlat → joulupaketti kauden aikana); linkkikortti heron alle. */
+  paketti?: PakettiRivi | null;
 };
 
 type Rivi = {
@@ -53,12 +56,14 @@ type Rivi = {
 /*  Vain yhdyssanan sisällä (kirjain ennen viivaa): "Uuno Turhapuro -elokuvat" ei saa jättää viivaa rivin loppuun. */
 /*  Yli TAVUTUSRAJA-kirjaimiset sanat saavat tavuviivamahdollisuudet (U+00AD, tavuta) — muuten koko kutistui
     alle 11 px:n ("ulkomaalaisvahvistukset" 320 px:n kortissa, 19.10.2026). */
-/*  versaali: otsikko on CSS:llä versaalia (text-transform) → tavutettava sana kirjoitetaan valmiiksi isoilla
-    kirjaimilla, jotta tavutuskohdan valinta mitataan samoilla glyyfeillä, jotka piirretään. */
+/*  UI-tekstit B10 (26.10.2026): sanaa ei enää kirjoiteta DOMiin isoilla kirjaimilla (versaali tulee CSS:stä).
+    Isot kirjaimet näkyivät ruudunlukijalle, hakukoneelle ja kopioidussa tekstissä ("SUURIRUHTINASKUNNAN vuosisata");
+    tavutuskohdat eivät riipu kirjainkoosta. versaali-parametri jää kutsujien yhteensopivuuden vuoksi. */
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export const katko = (t: string, versaali = false) =>
   t
     .replace(/(?<=\p{L})-(?=\p{L})/gu, "-\u200B")
-    .replace(new RegExp(`\\p{L}{${TAVUTUSRAJA + 1},}`, "gu"), (w) => tavuta(versaali ? w.toLocaleUpperCase("fi") : w));
+    .replace(new RegExp(`\\p{L}{${TAVUTUSRAJA + 1},}`, "gu"), (w) => tavuta(w));
 
 /** Sanat, joita pidemmät tavutetaan; KORTTISÄÄNTÖ-koko lasketaan enintään tämän mittaisesta sanasta. */
 export const TAVUTUSRAJA = 14;
@@ -85,14 +90,17 @@ export type UlkoinenKohde = { tagit: string[]; visa: RunkoVisa };
 export async function haeRunkoData(k: Kokoelma, ulkoiset?: UlkoinenKohde[]): Promise<RunkoData | null> {
   const sb = getSupabase();
   if (!sb) return null;
-  if (ulkoiset) return kokoa(k, ulkoiset, await getCounts());
+  if (ulkoiset) {
+    const [maarat, paketti] = await Promise.all([getCounts(), kokoelmanPaketti(k)]);
+    return { ...kokoa(k, ulkoiset, maarat), paketti };
+  }
   let q = sb
     .from("quiz_cards" as never)
     .select("id, slug, custom_slug, game_mode, title, display_title, genre, subcollection, category, play_count, question_count, section_tags, hero_image, hero_focal_x, hero_focal_y, target_age, published_at");
   if (k.haku.collection) q = q.eq("collection", k.haku.collection);
   if (k.haku.category) q = q.eq("category", k.haku.category);
   if (k.haku.sectionTags) q = q.overlaps("section_tags", k.sections.map((s) => s.slug));
-  const [{ data }, maarat] = await Promise.all([q, getCounts()]);
+  const [{ data }, maarat, paketti] = await Promise.all([q, getCounts(), kokoelmanPaketti(k)]);
   const lapsetMukaan = k.lapset && lapsetNakyvissa();
   const rivit = ((data ?? []) as unknown as Rivi[]).filter((r) => lapsetMukaan || (r.target_age !== "4-7" && r.target_age !== "8-12"));
 
@@ -120,7 +128,7 @@ export async function haeRunkoData(k: Kokoelma, ulkoiset?: UlkoinenKohde[]): Pro
     };
   };
 
-  return kokoa(k, rivit.map((r) => ({ tagit: r.section_tags ?? [], visa: visa(r) })), maarat);
+  return { ...kokoa(k, rivit.map((r) => ({ tagit: r.section_tags ?? [], visa: visa(r) })), maarat), paketti };
 }
 
 /** Osiot, korttianatomia (S1), katkaisu (S2) ja hero/V6/V7-data kohteista. */
@@ -142,12 +150,12 @@ function kokoa(k: Kokoelma, kohteet: UlkoinenKohde[], maarat: Record<string, num
       if (fi > 0) vs = [vs[fi], ...vs.slice(0, fi), ...vs.slice(fi + 1)];
       /* S1: ensimmäinen (tai nostettu) on osion ensimmäinen kortti (b), jos sillä on kuva. Piirretään samana A-korttina
          kuin muut (21.10.2026, leveä B-kortti poistettu). */
-      const b = vs[0]?.kuva ? vs[0] : null;
+      const b = vs[0]?.kuva || (vs[0] && k.korttiIlmanKuvaa) ? vs[0] : null;
       const loput = b ? vs.slice(1) : vs;
       /* S1 (Heikki 21.10.2026): jokainen kuvallinen visa on kortti (A), myös 9. visasta alkaen ja vaikka kuvallisia
          olisi vain kaksi (Pohjois-Suomi: Oulu ja Rovaniemi vierekkäin) — "Näytä kaikki" avaa kokonaiset kortit.
          C-rivi vain kuvattomalle visalle. */
-      const kortit: RunkoKortti[] = loput.map((v, i) => ({ ...v, muoto: v.kuva ? "A" : "C", nro: i + 1 }));
+      const kortit: RunkoKortti[] = loput.map((v, i) => ({ ...v, muoto: v.kuva || k.korttiIlmanKuvaa ? "A" : "C", nro: i + 1 }));
       return {
         ...s,
         b,

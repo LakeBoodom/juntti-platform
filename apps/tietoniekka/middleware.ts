@@ -3,7 +3,11 @@
 //   • /visa/<slug> ilman merkityksellisiä parametreja → ISR-sivu (ei lue parametreja)
 //   • /visa/<slug>?tulos=… / ?paivan_visa=1 / ?hero=… → kirjoitetaan sisäisesti /peli?visa=<slug>&…
 //     (dynaaminen; esim. tulosvariantin jakokuva og:image tarvitsee ?tulos=)
-//   • /peli?visa=<slug> (ei muita parametreja) → kirjoitetaan sisäisesti /visa/<slug> (ISR)
+//   • /peli?visa=<slug> (ei muita parametreja) → 308 /visa/<slug> (SEO 25.10.2026; aiemmin sisäinen
+//     uudelleenkirjoitus, jolloin /peli?visa= keräsi Googlessa omia näyttöjään kanonisen ohi)
+//   • parametrilliset pelisivut (/peli?… ja /visa/<slug>?…) → noindex, follow (SEO 25.10.2026):
+//     X-Robots-Tag-otsake + sisäinen merkki ?_noindex=1, jolla /peli lisää robots-metan HTML:ään.
+//     Kanoninen osoite pysyy ennallaan. Ei robots.txt-estoa — Google ei silloin näkisi noindexiä.
 //   • rungolle siirtyneiden kokoelmien vanhat parametrit → 308 osion ankkuriin (runko 19.10.2026):
 //     kulttuuri?suodata=<alakokoelma> → #osio-<alakokoelma>, jalkapallo?seura=… → #osio-valioliigan-seurat,
 //     luonto?suodata=<aihe> → #osio-<aihe>, luonto?suodata=kuvavisat|aanivisat → #pelit,
@@ -30,6 +34,12 @@ const RUNKO_PARAMIT: Record<string, (p: URLSearchParams) => string | null> = {
 
 const SEURANTA = /^(fbclid|gclid|msclkid|igshid|ref|utm_.+)$/i;
 
+/** Parametrillinen pelisivu: sisäinen rewrite /peli?…&_noindex=1 + X-Robots-Tag. */
+function pelivariantti(r: NextRequest["nextUrl"]) {
+  r.searchParams.set("_noindex", "1");
+  return NextResponse.rewrite(r, { headers: { "X-Robots-Tag": "noindex, follow" } });
+}
+
 export function middleware(req: NextRequest) {
   const url = req.nextUrl;
   const avaimet = [...url.searchParams.keys()].filter((k) => !SEURANTA.test(k));
@@ -41,7 +51,18 @@ export function middleware(req: NextRequest) {
     const r = url.clone();
     r.pathname = "/peli";
     r.searchParams.set("visa", slug);
-    return NextResponse.rewrite(r);
+    return pelivariantti(r);
+  }
+
+  /* Henkilöhakemiston ryhmä- ja lajisivut (Heikki 25.10.2026): ei omia listasivuja, vaan kokoelman pääsivun osio
+     kuvakortteineen. /henkilot (A–Ö) ja /henkilot/kuukausi/<kk> jäävät. */
+  const hr = url.pathname.match(/^\/henkilot\/(urheilijat|muusikot|nayttelijat|poliitikot|media|kirjailijat|vaikuttajat)(?:\/[^/]+)?\/?$/);
+  if (hr) {
+    const r = url.clone();
+    r.pathname = "/kokoelma/tunnetut-henkilot";
+    r.search = "";
+    r.hash = `osio-henkilot-${hr[1]}`;
+    return NextResponse.redirect(r, 308);
   }
 
   /* Rungolle siirtyneet kokoelmat: vanha suodatinlinkki → osion ankkuri (ei dynaamista reittiä). */
@@ -62,9 +83,10 @@ export function middleware(req: NextRequest) {
     const r = url.clone();
     r.pathname = `/visa/${encodeURIComponent(slug)}`;
     r.search = "";
-    return NextResponse.rewrite(r);
+    return NextResponse.redirect(r, 308);
   }
+  if (url.pathname === "/peli" && avaimet.length > 0) return pelivariantti(url.clone());
   return NextResponse.next();
 }
 
-export const config = { matcher: ["/visa/:path*", "/peli", "/kokoelma/:path*"] };
+export const config = { matcher: ["/visa/:path*", "/peli", "/kokoelma/:path*", "/henkilot/:path*"] };

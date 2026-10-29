@@ -158,12 +158,12 @@ export type GameQuiz = {
 };
 
 /** "Visassa mukana": oikeat <a href> -linkit henkilösivuille (SSR-renderöity aloitusnäkymä). */
-/** Haastevertailun lause (vaihe A): "Yksi oikein enemmän", "Kaksi oikein vähemmän", "Sama määrä oikeita". */
+/** Haastevertailun lause: "Yksi oikea enemmän", "Kolme oikeaa vähemmän", "Yhtä monta oikein" (A10, 26.10.2026). */
 const LUVUT = ["", "Yksi", "Kaksi", "Kolme", "Neljä", "Viisi", "Kuusi", "Seitsemän", "Kahdeksan", "Yhdeksän", "Kymmenen"];
 function erotusLause(ero: number): string {
-  if (ero === 0) return "Sama määrä oikeita";
+  if (ero === 0) return "Yhtä monta oikein";
   const n = Math.abs(ero);
-  return `${LUVUT[n] ?? n} oikein ${ero > 0 ? "enemmän" : "vähemmän"}`;
+  return `${LUVUT[n] ?? n} ${n === 1 ? "oikea" : "oikeaa"} ${ero > 0 ? "enemmän" : "vähemmän"}`;
 }
 
 function VisassaMukana({ hlot }: { hlot?: GameQuiz["mukana"] }) {
@@ -260,25 +260,16 @@ function getOrCreateSessionId(): string {
   }
 }
 
-/* Tulostasot (design): kaikki kannustukset positiivisia, myös 0/10. */
+/* Tulostasot. UI-tekstit 26.10.2026 (A1–A3): kaverin kieltä, ei todistuksen; kuvauslauseet pois (haaste ja
+   vastausten katsominen ovat omina nappeinaan). Viikkovisassa yksi yhteinen rivi: milloin kannattaa palata. */
 const TIERS = [
-  { min: 100, title: "Täydet pisteet!", body: "Virheetön suoritus. Haasta kaveri ja katso, kuka pysyy perässä." },
-  { min: 80, title: "Erinomainen tulos", body: "Tämä on niekan tasoa. Kaverin on vaikea päihittää sinua." },
-  { min: 60, title: "Hyvä tulos", body: "Vahva suoritus — muutama tarkennus, ja tulos on huippuluokkaa." },
-  { min: 40, title: "Keskitasoinen tulos", body: "Hyvä pohja. Käy vastaukset läpi ja yritä heti uudelleen." },
-  { min: 0, title: "Harjoiteltavaa jäi", body: "Tästä on hyvä lähteä. Katso oikeat vastaukset ja pelaa uusiksi — tulos nousee nopeasti." },
+  { min: 100, title: "Täydet pisteet!", body: "" },
+  { min: 80, title: "Melkein täydet!", body: "" },
+  { min: 60, title: "Hyvin meni!", body: "" },
+  { min: 40, title: "Ei hassumpi", body: "" },
+  { min: 0, title: "Tämä oli kinkkinen", body: "" },
 ];
-
-/* Viikkovisan tulostasot (kierros 5, V2): uusintaa ei ole, joten kehotus
-   "pelaa uusiksi" olisi väärä lupaus. Tilalla "katso oikeat vastaukset" ja
-   "uusi visa maanantaina". Otsikot samat kuin kortistovisoissa. */
-const TIERS_VIIKKO = [
-  { min: 100, title: "Täydet pisteet!", body: "Virheetön viikko. Haasta kaveri samaan sarjaan — uusi visa maanantaina." },
-  { min: 80, title: "Erinomainen tulos", body: "Tämä on niekan tasoa. Haasta kaveri samaan sarjaan — uusi visa maanantaina." },
-  { min: 60, title: "Hyvä tulos", body: "Vahva suoritus. Katso oikeat vastaukset ja haasta kaveri — uusi visa maanantaina." },
-  { min: 40, title: "Keskitasoinen tulos", body: "Hyvä pohja. Katso oikeat vastaukset — uusi visa maanantaina." },
-  { min: 0, title: "Harjoiteltavaa jäi", body: "Tästä on hyvä lähteä. Katso oikeat vastaukset — uusi visa maanantaina." },
-];
+const TIERS_VIIKKO = TIERS.map((t) => ({ ...t, body: "Uusi visa maanantaina." }));
 
 function hexToRgb(hex: string): [number, number, number] {
   const h = hex.replace("#", "");
@@ -1004,17 +995,17 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
       <div className="tng-sumhead">
         <span className="tng-sumlabel">Vastauksesi</span>
         <span className="tng-sumtext">
-          {right} oikein, {Math.max(0, total - right - skipped)} väärin{skipped ? `, ${skipped} tekninen ohitus` : ""}
+          {right} oikein, {Math.max(0, total - right - skipped)} väärin{skipped ? `, ${skipped} ohitettu` : ""}
         </span>
         <button type="button" className="tng-ghost tng-ghost--right" onClick={(e) => openReview(0, e.currentTarget)}>
           <svg width="17" height="17" viewBox="0 0 18 18" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M1.4 9S3.9 4 9 4s7.6 5 7.6 5-2.5 5-7.6 5S1.4 9 1.4 9z" /><circle cx="9" cy="9" r="2.1" /></svg>
-          Tarkastele vastauksia
+          Katso vastaukset
         </button>
       </div>
       <div className="tng-sumgrid" role="list">
         {questions.map((_, i) => {
           const st = hist[i] === "bad" ? "bad" : hist[i] === "ok" ? "ok" : hist[i] === "skipped" ? "skip" : "todo";
-          const label = st === "ok" ? "oikein" : st === "bad" ? "väärin" : st === "skip" ? "tekninen ohitus" : "ei vastattu";
+          const label = st === "ok" ? "oikein" : st === "bad" ? "väärin" : st === "skip" ? "ohitettu" : "ei vastattu";
           return (
             <button key={i} type="button" role="listitem" className="tng-sum" data-state={st} aria-label={`Kysymys ${i + 1}, ${label} — avaa vastaus`} onClick={(e) => openReview(i, e.currentTarget)}>
               <i aria-hidden>{st === "ok" ? "✓" : st === "bad" ? "✕" : st === "skip" ? "⤼" : "–"}</i>{i + 1}
@@ -1032,7 +1023,7 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
           <span className="tng-dlg-num">Kysymys {review + 1} / {total}</span>
           <span className="tng-rvstate" data-kind={rvKind}>
             <span aria-hidden>{rvKind === "ok" ? "✓" : rvKind === "bad" ? "✕" : rvKind === "tech" ? "⤼" : "–"}</span>
-            {rvKind === "ok" ? "Oikein" : rvKind === "bad" ? "Väärin" : rvKind === "tech" ? "Tekninen ohitus" : "Ei vastattu"}
+            {rvKind === "ok" ? "Oikein" : rvKind === "bad" ? "Väärin" : rvKind === "tech" ? "Ohitettu" : "Ei vastattu"}
           </span>
           <button type="button" className="tng-iconbtn tng-iconbtn--right" aria-label="Sulje" onClick={() => setReview(null)}>
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" aria-hidden="true"><path d="M3.5 3.5l9 9M12.5 3.5l-9 9" /></svg>
@@ -1050,7 +1041,7 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
           <div className="tng-rvrows">
             <div className="tng-rvrow" data-kind={rvKind}>
               <span className="tng-rvrow-l">Sinun vastauksesi</span>
-              <span className="tng-rvrow-v">{rp == null ? (rvKind === "tech" ? "Ohitettu teknisen virheen vuoksi — ei laskettu vääräksi" : "Ei vastattu") : rq.options[rp]}</span>
+              <span className="tng-rvrow-v">{rp == null ? (rvKind === "tech" ? "Kuva ei latautunut, ei vaikuta tulokseen" : "Ei vastattu") : rq.options[rp]}</span>
             </div>
             <div className="tng-rvrow tng-rvrow--correct">
               <span className="tng-rvrow-l">Oikea vastaus</span>
@@ -1117,7 +1108,7 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
             luku={`${right}/${total}`}
             yksikko="oikein"
             tasonimi={fanitaso ?? tier.title}
-            lause={`${tier.body} ${score} pistettä.`}
+            lause={[tier.body, `${score} pistettä.`].filter(Boolean).join(" ")}
             lisa={
               /* K4: läpikäynti tuloksen alla, oletuksena kiinni (Heikki 20.10.2026: kysymyksiä on paljon). */
               <details className="pk-lapikaynti">
@@ -1131,7 +1122,7 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
             jako={{ teksti: shareText, url: jakoUrl, natiiviOtsikko: `Tietoniekka · ${quiz.title}`, onJaettu: (k) => markShared(k) }}
             toiminnot={
               uusi
-                ? [{ teksti: "Pelaa uusi megavisa", href: uusi.href ?? `/peli?quiz_id=${uusi.id}` }, { teksti: "Pelaa sama mega uudelleen", onClick: restart }]
+                ? [{ teksti: "Pelaa uusi megavisa", href: uusi.href ?? `/peli?quiz_id=${uusi.id}` }, { teksti: "Pelaa tämä uudestaan", onClick: restart }]
                 : [{ teksti: "Pelaa uudelleen", onClick: restart }]
             }
             seuraavat={kehys.seuraavat}
@@ -1170,10 +1161,10 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
                 href: r.href ?? `/peli?quiz_id=${r.id}`,
                 kuva: r.kuva ?? null,
                 kuvaPos: r.kuvaPos,
-                ala: i === 0 ? "Seuraava tässä kokoelmassa" : r.kokoelma ?? r.meta,
+                ala: i === 0 ? "Samasta aiheesta" : r.kokoelma ?? r.meta,
               }))}
               pelaaUudelleen={vk ? null : restart}
-              kaikki={vk ? { href: quiz.hubHref || "/kokoelma/kuvavisat", teksti: "Takaisin kortistoihin" } : { href: quiz.hubHref || "/kokoelmat", teksti: "Kaikki visat" }}
+              kaikki={vk ? { href: quiz.hubHref || "/kokoelma/kuvavisat", teksti: "Lisää kuvavisoja" } : { href: quiz.hubHref || "/kokoelmat", teksti: quiz.hubHref ? category : "Kokoelmat" }}
             />
           </main>
         </div>
@@ -1338,8 +1329,8 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
                 {quiz.related.length > 0 && (
                 <div className="tng-heromore">
                   <div className="tng-heromore-head">
-                    <span className="tng-heromore-t">Lisää {quiz.collectionLabel.toLowerCase()}-visoja</span>
-                    <a className="tng-heromore-all" href={quiz.hubHref}>Kaikki {quiz.collectionLabel.toLowerCase()}-visat →</a>
+                    <span className="tng-heromore-t">Pelaa myös näitä</span>
+                    <a className="tng-heromore-all" href={quiz.hubHref}>{quiz.collectionLabel} →</a>
                   </div>
                   <div className="tng-heromore-grid">
                     {quiz.related.slice(0, 3).map((r) => (
@@ -1388,8 +1379,8 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
                       <span className="vv-start-tulos-p">Yksi yritys viikossa. Uusi viikkovisa maanantaina.</span>
                     </div>
                     <div className="vv-start-row">
-                      <button type="button" className="vv-btn" onClick={(e) => openReview(0, e.currentTarget)}>Tarkastele vastauksia</button>
-                      <a className="vv-link" href={quiz.hubHref}>Takaisin kortistoihin <span aria-hidden>→</span></a>
+                      <button type="button" className="vv-btn" onClick={(e) => openReview(0, e.currentTarget)}>Katso vastaukset</button>
+                      <a className="vv-link" href={quiz.hubHref}>Lisää kuvavisoja <span aria-hidden>→</span></a>
                     </div>
                   </>
                 ) : (

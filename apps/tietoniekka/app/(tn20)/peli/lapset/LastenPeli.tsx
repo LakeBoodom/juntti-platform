@@ -516,8 +516,8 @@ export default function LastenPeli({ visa, muut, takaisin }: { visa: LastenVisa;
             <button type="button" className="lp-toissijainen" onClick={jaa}>{jaettu ?? "Jaa perheelle"}</button>
           </div>
           {muut.length > 0 && (
-            <nav className="lp-lisaa" aria-label="Lisää lasten visoja">
-              <h2>Lisää lasten visoja</h2>
+            <nav className="lp-lisaa" aria-label="Pelataanko vielä?">
+              <h2>Pelataanko vielä?</h2>
               <div className="lp-lisaa-rivi">
                 {muut.map((m) => {
                   const ma = m.aihe ? LASTEN_AIHEET[m.aihe] : null;

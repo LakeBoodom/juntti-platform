@@ -10,7 +10,7 @@ import { kokoelmaKortti } from "./rekisteri";
 export const URHEILU: Kokoelma = {
   slug: "urheilu",
   nimi: "Urheilu",
-  eyebrow: "Teemakokoelma · Urheilu",
+  eyebrow: "",
   title: "Kaasua, mailoja ja ",
   highlight: "mitaleita",
   ingress: "Formula 1, ralli, golf, tennis ja suomalaisen urheilun suuret hetket.",

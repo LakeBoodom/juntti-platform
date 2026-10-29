@@ -17,7 +17,7 @@ export default function Vaalilaskuri() {
           <span className="rk-laskuri-teksti">
             {paivia === 1 ? "päivä" : "päivää"} eduskuntavaaleihin
             <span className="rk-laskuri-pvm">
-              su {VAALIPAIVA.d}.{VAALIPAIVA.m}.{VAALIPAIVA.y}
+              {`su ${VAALIPAIVA.d}.${VAALIPAIVA.m}.${VAALIPAIVA.y}`}
             </span>
           </span>
         </>

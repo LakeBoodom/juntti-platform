@@ -9,7 +9,7 @@ import { kokoelmaKortti } from "./rekisteri";
 export const KAUPUNGIT_KOKOELMA: Kokoelma = {
   slug: "kaupungit",
   nimi: "Suomen kaupungit",
-  eyebrow: "Teemakokoelma · Suomen kaupungit",
+  eyebrow: "",
   title: "Matkusta halki ",
   highlight: "Suomen",
   ingress: "Jokaisella kaupungilla on oma visansa — Helsingistä Rovaniemelle.",

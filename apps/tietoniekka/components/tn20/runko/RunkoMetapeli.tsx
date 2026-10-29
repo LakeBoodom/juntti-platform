@@ -9,6 +9,9 @@ import { useEffect, useState } from "react";
 
 const PORTAAT = [3, 10, 25];
 
+/** Numerosääntö: 1–10 kirjaimin (UI-tekstit B7, 26.10.2026). */
+const LUKUSANAT: Record<number, string> = { 1: "yksi", 2: "kaksi", 3: "kolme", 4: "neljä", 5: "viisi", 6: "kuusi", 7: "seitsemän", 8: "kahdeksan", 9: "yhdeksän", 10: "kymmenen" };
+
 export default function RunkoMetapeli({
   paalla,
   esikatselu,
@@ -40,7 +43,7 @@ export default function RunkoMetapeli({
         const idt = new Set([...osio.querySelectorAll<HTMLElement>("[data-visa-id]")].map((e) => e.dataset.visaId));
         const p = [...idt].filter((id) => id && ps.has(id)).length;
         const n = idt.size;
-        osio.querySelectorAll<HTMLElement>(".rk-osio-maara").forEach((m) => (m.textContent = `${n} visaa · ${p} pelattu`));
+        osio.querySelectorAll<HTMLElement>(".rk-osio-maara").forEach((m) => (m.textContent = `${p}/${n} pelattu`));
         const chip = document.querySelector<HTMLElement>(`.rk-chip[data-osio="${osio.dataset.osio}"] span`);
         if (chip) chip.textContent = `${p}/${n}`;
         /* Aikajana ja juhlakello (V4): "x/n pelattu" ja täysi kausi teemavärillä (CD 2). */
@@ -78,8 +81,8 @@ export default function RunkoMetapeli({
         </span>
         <span className="rk-v2-ala">
           {tila.pelattu === 0
-            ? `Pelaa ${tavoite} visaa tästä kokoelmasta ja ansaitse ensimmäinen merkki.`
-            : `${Math.min(tila.pelattu, tavoite)}/${tavoite} visaa portaaseen ${roomalainen}`}
+            ? `Pelaa ${LUKUSANAT[tavoite] ?? tavoite} visaa, niin saat ensimmäisen merkin.`
+            : `${Math.min(tila.pelattu, tavoite)}/${tavoite} visaa seuraavaan merkkiin`}
         </span>
         <span className="rk-v2-palkki" aria-hidden="true">
           <i style={{ transform: `scaleX(${Math.max(0, Math.min(1, osuus))})` }} />

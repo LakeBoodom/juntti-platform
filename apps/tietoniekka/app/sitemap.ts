@@ -5,8 +5,8 @@
 //
 // SEO-erä A5 (2.10.2026): hubit johdetaan samasta lähteestä kuin /kokoelmat ja navigaatio
 // (NAV_COLLECTIONS) + kuvavisat; lisätty Ikäjärjestys, kuvavisat (/kuvavisa/<kortisto>),
-// Viikkovisa, megavisat omina osoitteinaan (/peli?mega=) ja /kuvien-lahteet. Megat eivät enää
-// päädy /visa/-osoitteina (ne antoivat 404).
+// Viikkovisa ja /kuvien-lahteet. Megat eivät päädy /visa/-osoitteina (ne antoivat 404);
+// 25.10.2026 alkaen ne eivät ole sitemapissa lainkaan (/peli?mega= = noindex).
 import type { MetadataRoute } from "next";
 import { TEEMAT, TUPLA_SIVU } from "@/lib/tuplaTaiKuitti";
 import { KL_SIVU } from "@/lib/kuntaliitos";
@@ -17,8 +17,9 @@ import { NAV_COLLECTIONS } from "@/lib/nav";
 import { KATEGORIAT } from "@/lib/kuvavisat2026";
 import { getPublishedQuizSlugs } from "@/lib/queries";
 import { haeHakemisto } from "@/lib/henkilot";
-import { KUUKAUDET, RYHMAT, kuukausiSlug } from "@/lib/henkiloRyhmat";
+import { KUUKAUDET, kuukausiSlug } from "@/lib/henkiloRyhmat";
 import { LAPSET_SIVU, lapsetNakyvissa } from "@/lib/lapset/data";
+import { VP_LANDING, listaaVisapaketit, pakettiHref, sarjaHref } from "@/lib/visapaketit";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://tietoniekka.fi";
 
@@ -56,25 +57,30 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const kuvavisaPages = [...KATEGORIAT.map((k) => k.type), "kaupungit"].map((k) => u(`/kuvavisa/${k}`, "weekly", 0.7));
 
   const quizzes = await getPublishedQuizSlugs();
+  /* SEO 25.10.2026: megavisat pois (/peli?mega= on noindex, ks. middleware.ts) — /megavisat on
+     niiden ainoa indeksoitava sivu. Sitemapissa ei ole yhtään /peli?…-osoitetta. */
   const quizPages: MetadataRoute.Sitemap = quizzes
-    .filter((q) => q.slug)
-    .map((q) => {
-      const mod = q.updated_at ? new Date(q.updated_at) : now;
-      return q.game_mode === "mega"
-        ? u(`/peli?mega=${encodeURIComponent(q.slug)}`, "monthly", 0.7, mod)
-        : u(`/visa/${q.slug}`, "monthly", 0.7, mod);
-    });
+    .filter((q) => q.slug && q.game_mode !== "mega")
+    .map((q) => u(`/visa/${q.slug}`, "monthly", 0.7, q.updated_at ? new Date(q.updated_at) : now));
 
-  // Erä B3: henkilöhakemisto, ryhmät, lajit, synttärikuukaudet ja henkilösivut.
+  // Erä B3: henkilöhakemisto, synttärikuukaudet ja henkilösivut (ryhmä- ja lajisivut poistuivat 25.10.2026).
   const henkilot = await haeHakemisto();
-  const lajit = [...new Set(henkilot.filter((h) => h.laji).map((h) => `${h.ryhma}/${h.laji}`))];
   const henkiloPages: MetadataRoute.Sitemap = [
     u("/henkilot", "weekly", 0.8),
-    ...RYHMAT.map((r) => u(`/henkilot/${r.key}`, "weekly", 0.6)),
-    ...lajit.map((l) => u(`/henkilot/${l}`, "weekly", 0.5)),
     ...KUUKAUDET.map((_, i) => u(`/henkilot/kuukausi/${kuukausiSlug(i)}`, "monthly", 0.5)),
     ...henkilot.map((h) => u(h.href, "weekly", 0.6)),
   ];
 
-  return [...staticPages, ...collectionPages, ...kuvavisaPages, ...henkiloPages, ...quizPages];
+  // Visapaketit (28.10.2026): landing, paketit, sarjojen pääsivut ja painokset. Ruutu- ja tulostenäkymät ovat noindex.
+  const paketit = await listaaVisapaketit();
+  const sarjat = [...new Set(paketit.flatMap((p) => (p.sarja ? [p.sarja] : [])))];
+  const pakettiPages: MetadataRoute.Sitemap = paketit.length
+    ? [
+        u(VP_LANDING, "weekly", 0.8),
+        ...sarjat.map((s) => u(sarjaHref(s), "weekly", 0.8)),
+        ...paketit.map((p) => u(pakettiHref(p), p.sarja ? "monthly" : "weekly", p.sarja ? 0.6 : 0.8, p.published_at ? new Date(p.published_at) : now)),
+      ]
+    : [];
+
+  return [...staticPages, ...collectionPages, ...kuvavisaPages, ...pakettiPages, ...henkiloPages, ...quizPages];
 }

@@ -71,7 +71,7 @@ export async function GET() {
   lines.push("## Tunnetut henkilöt");
   lines.push("");
   lines.push(
-    `Jokaisella tunnetulla henkilöllä on oma sivunsa osoitteessa /henkilo/<nimi>: ikä, syntymäpäivä ja -paikka, lyhyt esittely sekä henkilön tietovisa ja Ikäjärjestys-peli. Hakemisto: [Tunnetut henkilöt A–Ö](${SITE_URL}/henkilot), ryhmittäin (/henkilot/<ryhmä>) ja syntymäkuukauden mukaan (/henkilot/kuukausi/<kuukausi>).`,
+    `Jokaisella tunnetulla henkilöllä on oma sivunsa osoitteessa /henkilo/<nimi>: ikä, syntymäpäivä ja -paikka, lyhyt esittely sekä henkilön tietovisa ja Ikäjärjestys-peli. Hakemisto: [Tunnetut henkilöt A–Ö](${SITE_URL}/henkilot), ryhmittäin [Tunnetut henkilöt -kokoelmassa](${SITE_URL}/kokoelma/tunnetut-henkilot) ja syntymäkuukauden mukaan (/henkilot/kuukausi/<kuukausi>).`,
   );
   lines.push("");
   lines.push("## Visat");

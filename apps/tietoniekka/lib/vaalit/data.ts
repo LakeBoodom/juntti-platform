@@ -123,7 +123,8 @@ export async function haeVaalitHub(): Promise<VaalitHub> {
     if (!Number.isFinite(alku)) return c.role;
     const paivat = a?.pm_days?.num;
     const loppu = Number.isFinite(paivat) ? vuosi((alku as number) + (paivat as number) * 86400) : null;
-    return `Pääministeri ${vuosi(alku)}–${loppu ?? ""}`;
+    // Saman vuoden kausi yhtenä vuotena (Jäätteenmäki 2003, Rinne 2019) — UI-tekstit B12.
+    return loppu === vuosi(alku) ? `Pääministeri ${loppu}` : `Pääministeri ${vuosi(alku)}–${loppu ?? ""}`;
   };
   const kasvot: KasvoRivi[] = [
     {

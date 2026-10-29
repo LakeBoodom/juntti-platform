@@ -69,10 +69,10 @@
 .tn20 .tnm2-h1 {
   margin: 0 0 clamp(14px,1.7cqw,22px); font-family: var(--tn-font-display);
   font-weight: 900; font-variation-settings: "wdth" 70;
-  /* CD: 104px. "PELI" ei koskaan ylivuoda kapeana sanana — max pidetty
-     lähellä CD:tä (98px), min nostettu 38→42px luettavuuden vuoksi.
-     Mitattu 320–2560px: 0 ylivuotoa (rivit "Pitkä" / "peli" lyhyitä). */
-  font-size: clamp(42px, 7.2cqw, 98px); line-height: .84; letter-spacing: -.02em;
+  /* CD: 104px ("Pitkä / peli"). SEO 25.10.2026: H1 = "Megavisat" (yksi 9 merkin sana).
+     Mitattu: rivi = 6,36 × font-size; heron vasen palsta max 524px (58ch) → mahtuu ≤ 82px.
+     Max 78px (≈ 0,95 × 82, marginaali 5 %). Vanha 98px ylivuoti 1440px:stä ylöspäin (624 > 524). */
+  font-size: clamp(42px, 7.2cqw, 78px); line-height: .84; letter-spacing: -.02em;
   text-transform: uppercase; color: #F5F0E6;
   overflow-wrap: normal; word-break: keep-all;
 }

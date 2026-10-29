@@ -27,7 +27,7 @@ export function JuhlatBanneri({ nosto, tanaan }: { nosto: Esiintyma; tanaan: num
   const k = nosto.koukku && nosto.koukku.visa === visa ? nosto.koukku : null;
   const kysymys = k?.kysymys ?? `Kuinka hyvin tunnet juhlan: ${nosto.nimi}?`;
   const korostus = k?.korostus ?? kysymys.split(" ").pop()!;
-  const ala = k?.ala ?? "Testaa tietosi!";
+  const ala = k ? k.ala : "";
   const cta = k?.cta ?? "Pelaa visa";
   const kuva = k?.kuva ?? nosto.kuva;
   const kaynnissa = tanaan >= nosto.alku;
@@ -79,7 +79,7 @@ export function JuhlatBanneri({ nosto, tanaan }: { nosto: Esiintyma; tanaan: num
         })}
       </span>
       <span className="jub-ala">
-        <span className="jub-s">{ala}</span>
+        {ala && <span className="jub-s">{ala}</span>}
         <span className="jub-cta tn-cta-lime">{cta} <span aria-hidden>→</span></span>
       </span>
       <span className="jub-cd">

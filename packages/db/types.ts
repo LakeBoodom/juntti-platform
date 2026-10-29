@@ -3314,6 +3314,408 @@ export type Database = {
         }
         Relationships: []
       }
+      _kat3_q_backup_20261025: {
+        Row: {
+          animal_sound: Json | null
+          answers: Json | null
+          audio: Json | null
+          created_at: string | null
+          explanation: string | null
+          id: string | null
+          image_credit: string | null
+          image_license_note: string | null
+          image_position: string | null
+          image_url: string | null
+          question_text: string | null
+          question_type: string | null
+          quiz_id: string | null
+          sort_order: number | null
+          taso: number | null
+          vihje_laura: string | null
+          vihje_mikko: string | null
+        }
+        Insert: {
+          animal_sound?: Json | null
+          answers?: Json | null
+          audio?: Json | null
+          created_at?: string | null
+          explanation?: string | null
+          id?: string | null
+          image_credit?: string | null
+          image_license_note?: string | null
+          image_position?: string | null
+          image_url?: string | null
+          question_text?: string | null
+          question_type?: string | null
+          quiz_id?: string | null
+          sort_order?: number | null
+          taso?: number | null
+          vihje_laura?: string | null
+          vihje_mikko?: string | null
+        }
+        Update: {
+          animal_sound?: Json | null
+          answers?: Json | null
+          audio?: Json | null
+          created_at?: string | null
+          explanation?: string | null
+          id?: string | null
+          image_credit?: string | null
+          image_license_note?: string | null
+          image_position?: string | null
+          image_url?: string | null
+          question_text?: string | null
+          question_type?: string | null
+          quiz_id?: string | null
+          sort_order?: number | null
+          taso?: number | null
+          vihje_laura?: string | null
+          vihje_mikko?: string | null
+        }
+        Relationships: []
+      }
+      _kat3_quiz_backup_20261025: {
+        Row: {
+          category: string | null
+          collection: string | null
+          created_at: string | null
+          created_by: string | null
+          custom_slug: string | null
+          description: string | null
+          difficulty: string | null
+          display_title: string | null
+          emoji_hint: string | null
+          era: string | null
+          fanitasot: Json | null
+          featured_in_category: boolean | null
+          game_mode: string | null
+          genre: string | null
+          hero_alt: string | null
+          hero_focal_x: number | null
+          hero_focal_y: number | null
+          hero_image: string | null
+          hero_side: string | null
+          id: string | null
+          ig_tilit: string[] | null
+          image_url: string | null
+          is_daily: boolean | null
+          korttinimi: string | null
+          lasten_aihe: string | null
+          learn: Json | null
+          lukija: string | null
+          platform: string | null
+          play_count: number | null
+          published_at: string | null
+          scheduled_for: string | null
+          section_tags: string[] | null
+          seo_description: string | null
+          seo_title: string | null
+          site_id: string | null
+          slug: string | null
+          status: string | null
+          subcollection: string | null
+          tags: string[] | null
+          target_age: string | null
+          teaser: string | null
+          title: string | null
+          tone: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          category?: string | null
+          collection?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          custom_slug?: string | null
+          description?: string | null
+          difficulty?: string | null
+          display_title?: string | null
+          emoji_hint?: string | null
+          era?: string | null
+          fanitasot?: Json | null
+          featured_in_category?: boolean | null
+          game_mode?: string | null
+          genre?: string | null
+          hero_alt?: string | null
+          hero_focal_x?: number | null
+          hero_focal_y?: number | null
+          hero_image?: string | null
+          hero_side?: string | null
+          id?: string | null
+          ig_tilit?: string[] | null
+          image_url?: string | null
+          is_daily?: boolean | null
+          korttinimi?: string | null
+          lasten_aihe?: string | null
+          learn?: Json | null
+          lukija?: string | null
+          platform?: string | null
+          play_count?: number | null
+          published_at?: string | null
+          scheduled_for?: string | null
+          section_tags?: string[] | null
+          seo_description?: string | null
+          seo_title?: string | null
+          site_id?: string | null
+          slug?: string | null
+          status?: string | null
+          subcollection?: string | null
+          tags?: string[] | null
+          target_age?: string | null
+          teaser?: string | null
+          title?: string | null
+          tone?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          category?: string | null
+          collection?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          custom_slug?: string | null
+          description?: string | null
+          difficulty?: string | null
+          display_title?: string | null
+          emoji_hint?: string | null
+          era?: string | null
+          fanitasot?: Json | null
+          featured_in_category?: boolean | null
+          game_mode?: string | null
+          genre?: string | null
+          hero_alt?: string | null
+          hero_focal_x?: number | null
+          hero_focal_y?: number | null
+          hero_image?: string | null
+          hero_side?: string | null
+          id?: string | null
+          ig_tilit?: string[] | null
+          image_url?: string | null
+          is_daily?: boolean | null
+          korttinimi?: string | null
+          lasten_aihe?: string | null
+          learn?: Json | null
+          lukija?: string | null
+          platform?: string | null
+          play_count?: number | null
+          published_at?: string | null
+          scheduled_for?: string | null
+          section_tags?: string[] | null
+          seo_description?: string | null
+          seo_title?: string | null
+          site_id?: string | null
+          slug?: string | null
+          status?: string | null
+          subcollection?: string | null
+          tags?: string[] | null
+          target_age?: string | null
+          teaser?: string | null
+          title?: string | null
+          tone?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      _kat4_q_backup_20261025: {
+        Row: {
+          animal_sound: Json | null
+          answers: Json | null
+          audio: Json | null
+          created_at: string | null
+          explanation: string | null
+          id: string | null
+          image_credit: string | null
+          image_license_note: string | null
+          image_position: string | null
+          image_url: string | null
+          question_text: string | null
+          question_type: string | null
+          quiz_id: string | null
+          sort_order: number | null
+          taso: number | null
+          vihje_laura: string | null
+          vihje_mikko: string | null
+        }
+        Insert: {
+          animal_sound?: Json | null
+          answers?: Json | null
+          audio?: Json | null
+          created_at?: string | null
+          explanation?: string | null
+          id?: string | null
+          image_credit?: string | null
+          image_license_note?: string | null
+          image_position?: string | null
+          image_url?: string | null
+          question_text?: string | null
+          question_type?: string | null
+          quiz_id?: string | null
+          sort_order?: number | null
+          taso?: number | null
+          vihje_laura?: string | null
+          vihje_mikko?: string | null
+        }
+        Update: {
+          animal_sound?: Json | null
+          answers?: Json | null
+          audio?: Json | null
+          created_at?: string | null
+          explanation?: string | null
+          id?: string | null
+          image_credit?: string | null
+          image_license_note?: string | null
+          image_position?: string | null
+          image_url?: string | null
+          question_text?: string | null
+          question_type?: string | null
+          quiz_id?: string | null
+          sort_order?: number | null
+          taso?: number | null
+          vihje_laura?: string | null
+          vihje_mikko?: string | null
+        }
+        Relationships: []
+      }
+      _kat4_quiz_backup_20261025: {
+        Row: {
+          category: string | null
+          collection: string | null
+          created_at: string | null
+          created_by: string | null
+          custom_slug: string | null
+          description: string | null
+          difficulty: string | null
+          display_title: string | null
+          emoji_hint: string | null
+          era: string | null
+          fanitasot: Json | null
+          featured_in_category: boolean | null
+          game_mode: string | null
+          genre: string | null
+          hero_alt: string | null
+          hero_focal_x: number | null
+          hero_focal_y: number | null
+          hero_image: string | null
+          hero_side: string | null
+          id: string | null
+          ig_tilit: string[] | null
+          image_url: string | null
+          is_daily: boolean | null
+          korttinimi: string | null
+          lasten_aihe: string | null
+          learn: Json | null
+          lukija: string | null
+          platform: string | null
+          play_count: number | null
+          published_at: string | null
+          scheduled_for: string | null
+          section_tags: string[] | null
+          seo_description: string | null
+          seo_title: string | null
+          site_id: string | null
+          slug: string | null
+          status: string | null
+          subcollection: string | null
+          tags: string[] | null
+          target_age: string | null
+          teaser: string | null
+          title: string | null
+          tone: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          category?: string | null
+          collection?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          custom_slug?: string | null
+          description?: string | null
+          difficulty?: string | null
+          display_title?: string | null
+          emoji_hint?: string | null
+          era?: string | null
+          fanitasot?: Json | null
+          featured_in_category?: boolean | null
+          game_mode?: string | null
+          genre?: string | null
+          hero_alt?: string | null
+          hero_focal_x?: number | null
+          hero_focal_y?: number | null
+          hero_image?: string | null
+          hero_side?: string | null
+          id?: string | null
+          ig_tilit?: string[] | null
+          image_url?: string | null
+          is_daily?: boolean | null
+          korttinimi?: string | null
+          lasten_aihe?: string | null
+          learn?: Json | null
+          lukija?: string | null
+          platform?: string | null
+          play_count?: number | null
+          published_at?: string | null
+          scheduled_for?: string | null
+          section_tags?: string[] | null
+          seo_description?: string | null
+          seo_title?: string | null
+          site_id?: string | null
+          slug?: string | null
+          status?: string | null
+          subcollection?: string | null
+          tags?: string[] | null
+          target_age?: string | null
+          teaser?: string | null
+          title?: string | null
+          tone?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          category?: string | null
+          collection?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          custom_slug?: string | null
+          description?: string | null
+          difficulty?: string | null
+          display_title?: string | null
+          emoji_hint?: string | null
+          era?: string | null
+          fanitasot?: Json | null
+          featured_in_category?: boolean | null
+          game_mode?: string | null
+          genre?: string | null
+          hero_alt?: string | null
+          hero_focal_x?: number | null
+          hero_focal_y?: number | null
+          hero_image?: string | null
+          hero_side?: string | null
+          id?: string | null
+          ig_tilit?: string[] | null
+          image_url?: string | null
+          is_daily?: boolean | null
+          korttinimi?: string | null
+          lasten_aihe?: string | null
+          learn?: Json | null
+          lukija?: string | null
+          platform?: string | null
+          play_count?: number | null
+          published_at?: string | null
+          scheduled_for?: string | null
+          section_tags?: string[] | null
+          seo_description?: string | null
+          seo_title?: string | null
+          site_id?: string | null
+          slug?: string | null
+          status?: string | null
+          subcollection?: string | null
+          tags?: string[] | null
+          target_age?: string | null
+          teaser?: string | null
+          title?: string | null
+          tone?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       _kaupungit_q_backup_20260923: {
         Row: {
           answers: Json | null
@@ -4808,6 +5210,186 @@ export type Database = {
         }
         Relationships: []
       }
+      _luonto_era1_backup_20261023: {
+        Row: {
+          animal_sound: Json | null
+          answers: Json | null
+          audio: Json | null
+          created_at: string | null
+          explanation: string | null
+          id: string | null
+          image_credit: string | null
+          image_license_note: string | null
+          image_position: string | null
+          image_url: string | null
+          question_text: string | null
+          question_type: string | null
+          quiz_id: string | null
+          sort_order: number | null
+          taso: number | null
+          vihje_laura: string | null
+          vihje_mikko: string | null
+        }
+        Insert: {
+          animal_sound?: Json | null
+          answers?: Json | null
+          audio?: Json | null
+          created_at?: string | null
+          explanation?: string | null
+          id?: string | null
+          image_credit?: string | null
+          image_license_note?: string | null
+          image_position?: string | null
+          image_url?: string | null
+          question_text?: string | null
+          question_type?: string | null
+          quiz_id?: string | null
+          sort_order?: number | null
+          taso?: number | null
+          vihje_laura?: string | null
+          vihje_mikko?: string | null
+        }
+        Update: {
+          animal_sound?: Json | null
+          answers?: Json | null
+          audio?: Json | null
+          created_at?: string | null
+          explanation?: string | null
+          id?: string | null
+          image_credit?: string | null
+          image_license_note?: string | null
+          image_position?: string | null
+          image_url?: string | null
+          question_text?: string | null
+          question_type?: string | null
+          quiz_id?: string | null
+          sort_order?: number | null
+          taso?: number | null
+          vihje_laura?: string | null
+          vihje_mikko?: string | null
+        }
+        Relationships: []
+      }
+      _luonto_era2_backup_20261023: {
+        Row: {
+          animal_sound: Json | null
+          answers: Json | null
+          audio: Json | null
+          created_at: string | null
+          explanation: string | null
+          id: string | null
+          image_credit: string | null
+          image_license_note: string | null
+          image_position: string | null
+          image_url: string | null
+          question_text: string | null
+          question_type: string | null
+          quiz_id: string | null
+          sort_order: number | null
+          taso: number | null
+          vihje_laura: string | null
+          vihje_mikko: string | null
+        }
+        Insert: {
+          animal_sound?: Json | null
+          answers?: Json | null
+          audio?: Json | null
+          created_at?: string | null
+          explanation?: string | null
+          id?: string | null
+          image_credit?: string | null
+          image_license_note?: string | null
+          image_position?: string | null
+          image_url?: string | null
+          question_text?: string | null
+          question_type?: string | null
+          quiz_id?: string | null
+          sort_order?: number | null
+          taso?: number | null
+          vihje_laura?: string | null
+          vihje_mikko?: string | null
+        }
+        Update: {
+          animal_sound?: Json | null
+          answers?: Json | null
+          audio?: Json | null
+          created_at?: string | null
+          explanation?: string | null
+          id?: string | null
+          image_credit?: string | null
+          image_license_note?: string | null
+          image_position?: string | null
+          image_url?: string | null
+          question_text?: string | null
+          question_type?: string | null
+          quiz_id?: string | null
+          sort_order?: number | null
+          taso?: number | null
+          vihje_laura?: string | null
+          vihje_mikko?: string | null
+        }
+        Relationships: []
+      }
+      _luonto_era3_backup_20261023: {
+        Row: {
+          animal_sound: Json | null
+          answers: Json | null
+          audio: Json | null
+          created_at: string | null
+          explanation: string | null
+          id: string | null
+          image_credit: string | null
+          image_license_note: string | null
+          image_position: string | null
+          image_url: string | null
+          question_text: string | null
+          question_type: string | null
+          quiz_id: string | null
+          sort_order: number | null
+          taso: number | null
+          vihje_laura: string | null
+          vihje_mikko: string | null
+        }
+        Insert: {
+          animal_sound?: Json | null
+          answers?: Json | null
+          audio?: Json | null
+          created_at?: string | null
+          explanation?: string | null
+          id?: string | null
+          image_credit?: string | null
+          image_license_note?: string | null
+          image_position?: string | null
+          image_url?: string | null
+          question_text?: string | null
+          question_type?: string | null
+          quiz_id?: string | null
+          sort_order?: number | null
+          taso?: number | null
+          vihje_laura?: string | null
+          vihje_mikko?: string | null
+        }
+        Update: {
+          animal_sound?: Json | null
+          answers?: Json | null
+          audio?: Json | null
+          created_at?: string | null
+          explanation?: string | null
+          id?: string | null
+          image_credit?: string | null
+          image_license_note?: string | null
+          image_position?: string | null
+          image_url?: string | null
+          question_text?: string | null
+          question_type?: string | null
+          quiz_id?: string | null
+          sort_order?: number | null
+          taso?: number | null
+          vihje_laura?: string | null
+          vihje_mikko?: string | null
+        }
+        Relationships: []
+      }
       _luonto_learn_backup_20260924: {
         Row: {
           id: string | null
@@ -4823,6 +5405,66 @@ export type Database = {
           id?: string | null
           learn?: Json | null
           title?: string | null
+        }
+        Relationships: []
+      }
+      _luonto_mk_sp_backup_20261023: {
+        Row: {
+          animal_sound: Json | null
+          answers: Json | null
+          audio: Json | null
+          created_at: string | null
+          explanation: string | null
+          id: string | null
+          image_credit: string | null
+          image_license_note: string | null
+          image_position: string | null
+          image_url: string | null
+          question_text: string | null
+          question_type: string | null
+          quiz_id: string | null
+          sort_order: number | null
+          taso: number | null
+          vihje_laura: string | null
+          vihje_mikko: string | null
+        }
+        Insert: {
+          animal_sound?: Json | null
+          answers?: Json | null
+          audio?: Json | null
+          created_at?: string | null
+          explanation?: string | null
+          id?: string | null
+          image_credit?: string | null
+          image_license_note?: string | null
+          image_position?: string | null
+          image_url?: string | null
+          question_text?: string | null
+          question_type?: string | null
+          quiz_id?: string | null
+          sort_order?: number | null
+          taso?: number | null
+          vihje_laura?: string | null
+          vihje_mikko?: string | null
+        }
+        Update: {
+          animal_sound?: Json | null
+          answers?: Json | null
+          audio?: Json | null
+          created_at?: string | null
+          explanation?: string | null
+          id?: string | null
+          image_credit?: string | null
+          image_license_note?: string | null
+          image_position?: string | null
+          image_url?: string | null
+          question_text?: string | null
+          question_type?: string | null
+          quiz_id?: string | null
+          sort_order?: number | null
+          taso?: number | null
+          vihje_laura?: string | null
+          vihje_mikko?: string | null
         }
         Relationships: []
       }
@@ -4967,6 +5609,207 @@ export type Database = {
           play_count?: number | null
           published_at?: string | null
           scheduled_for?: string | null
+          seo_description?: string | null
+          seo_title?: string | null
+          site_id?: string | null
+          slug?: string | null
+          status?: string | null
+          subcollection?: string | null
+          tags?: string[] | null
+          target_age?: string | null
+          teaser?: string | null
+          title?: string | null
+          tone?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      _maantieto2_q_backup_20261027: {
+        Row: {
+          animal_sound: Json | null
+          answers: Json | null
+          audio: Json | null
+          created_at: string | null
+          explanation: string | null
+          id: string | null
+          image_credit: string | null
+          image_license_note: string | null
+          image_position: string | null
+          image_url: string | null
+          question_text: string | null
+          question_type: string | null
+          quiz_id: string | null
+          sort_order: number | null
+          taso: number | null
+          vihje_laura: string | null
+          vihje_mikko: string | null
+        }
+        Insert: {
+          animal_sound?: Json | null
+          answers?: Json | null
+          audio?: Json | null
+          created_at?: string | null
+          explanation?: string | null
+          id?: string | null
+          image_credit?: string | null
+          image_license_note?: string | null
+          image_position?: string | null
+          image_url?: string | null
+          question_text?: string | null
+          question_type?: string | null
+          quiz_id?: string | null
+          sort_order?: number | null
+          taso?: number | null
+          vihje_laura?: string | null
+          vihje_mikko?: string | null
+        }
+        Update: {
+          animal_sound?: Json | null
+          answers?: Json | null
+          audio?: Json | null
+          created_at?: string | null
+          explanation?: string | null
+          id?: string | null
+          image_credit?: string | null
+          image_license_note?: string | null
+          image_position?: string | null
+          image_url?: string | null
+          question_text?: string | null
+          question_type?: string | null
+          quiz_id?: string | null
+          sort_order?: number | null
+          taso?: number | null
+          vihje_laura?: string | null
+          vihje_mikko?: string | null
+        }
+        Relationships: []
+      }
+      _maantieto2_quiz_backup_20261027: {
+        Row: {
+          category: string | null
+          collection: string | null
+          created_at: string | null
+          created_by: string | null
+          custom_slug: string | null
+          description: string | null
+          difficulty: string | null
+          display_title: string | null
+          emoji_hint: string | null
+          era: string | null
+          fanitasot: Json | null
+          featured_in_category: boolean | null
+          game_mode: string | null
+          genre: string | null
+          hero_alt: string | null
+          hero_focal_x: number | null
+          hero_focal_y: number | null
+          hero_image: string | null
+          hero_side: string | null
+          id: string | null
+          ig_tilit: string[] | null
+          image_url: string | null
+          is_daily: boolean | null
+          korttinimi: string | null
+          lasten_aihe: string | null
+          learn: Json | null
+          lukija: string | null
+          platform: string | null
+          play_count: number | null
+          published_at: string | null
+          scheduled_for: string | null
+          section_tags: string[] | null
+          seo_description: string | null
+          seo_title: string | null
+          site_id: string | null
+          slug: string | null
+          status: string | null
+          subcollection: string | null
+          tags: string[] | null
+          target_age: string | null
+          teaser: string | null
+          title: string | null
+          tone: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          category?: string | null
+          collection?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          custom_slug?: string | null
+          description?: string | null
+          difficulty?: string | null
+          display_title?: string | null
+          emoji_hint?: string | null
+          era?: string | null
+          fanitasot?: Json | null
+          featured_in_category?: boolean | null
+          game_mode?: string | null
+          genre?: string | null
+          hero_alt?: string | null
+          hero_focal_x?: number | null
+          hero_focal_y?: number | null
+          hero_image?: string | null
+          hero_side?: string | null
+          id?: string | null
+          ig_tilit?: string[] | null
+          image_url?: string | null
+          is_daily?: boolean | null
+          korttinimi?: string | null
+          lasten_aihe?: string | null
+          learn?: Json | null
+          lukija?: string | null
+          platform?: string | null
+          play_count?: number | null
+          published_at?: string | null
+          scheduled_for?: string | null
+          section_tags?: string[] | null
+          seo_description?: string | null
+          seo_title?: string | null
+          site_id?: string | null
+          slug?: string | null
+          status?: string | null
+          subcollection?: string | null
+          tags?: string[] | null
+          target_age?: string | null
+          teaser?: string | null
+          title?: string | null
+          tone?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          category?: string | null
+          collection?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          custom_slug?: string | null
+          description?: string | null
+          difficulty?: string | null
+          display_title?: string | null
+          emoji_hint?: string | null
+          era?: string | null
+          fanitasot?: Json | null
+          featured_in_category?: boolean | null
+          game_mode?: string | null
+          genre?: string | null
+          hero_alt?: string | null
+          hero_focal_x?: number | null
+          hero_focal_y?: number | null
+          hero_image?: string | null
+          hero_side?: string | null
+          id?: string | null
+          ig_tilit?: string[] | null
+          image_url?: string | null
+          is_daily?: boolean | null
+          korttinimi?: string | null
+          lasten_aihe?: string | null
+          learn?: Json | null
+          lukija?: string | null
+          platform?: string | null
+          play_count?: number | null
+          published_at?: string | null
+          scheduled_for?: string | null
+          section_tags?: string[] | null
           seo_description?: string | null
           seo_title?: string | null
           site_id?: string | null
@@ -5702,6 +6545,207 @@ export type Database = {
         }
         Relationships: []
       }
+      _myrsky_q_backup_20261026: {
+        Row: {
+          animal_sound: Json | null
+          answers: Json | null
+          audio: Json | null
+          created_at: string | null
+          explanation: string | null
+          id: string | null
+          image_credit: string | null
+          image_license_note: string | null
+          image_position: string | null
+          image_url: string | null
+          question_text: string | null
+          question_type: string | null
+          quiz_id: string | null
+          sort_order: number | null
+          taso: number | null
+          vihje_laura: string | null
+          vihje_mikko: string | null
+        }
+        Insert: {
+          animal_sound?: Json | null
+          answers?: Json | null
+          audio?: Json | null
+          created_at?: string | null
+          explanation?: string | null
+          id?: string | null
+          image_credit?: string | null
+          image_license_note?: string | null
+          image_position?: string | null
+          image_url?: string | null
+          question_text?: string | null
+          question_type?: string | null
+          quiz_id?: string | null
+          sort_order?: number | null
+          taso?: number | null
+          vihje_laura?: string | null
+          vihje_mikko?: string | null
+        }
+        Update: {
+          animal_sound?: Json | null
+          answers?: Json | null
+          audio?: Json | null
+          created_at?: string | null
+          explanation?: string | null
+          id?: string | null
+          image_credit?: string | null
+          image_license_note?: string | null
+          image_position?: string | null
+          image_url?: string | null
+          question_text?: string | null
+          question_type?: string | null
+          quiz_id?: string | null
+          sort_order?: number | null
+          taso?: number | null
+          vihje_laura?: string | null
+          vihje_mikko?: string | null
+        }
+        Relationships: []
+      }
+      _myrsky_quiz_backup_20261026: {
+        Row: {
+          category: string | null
+          collection: string | null
+          created_at: string | null
+          created_by: string | null
+          custom_slug: string | null
+          description: string | null
+          difficulty: string | null
+          display_title: string | null
+          emoji_hint: string | null
+          era: string | null
+          fanitasot: Json | null
+          featured_in_category: boolean | null
+          game_mode: string | null
+          genre: string | null
+          hero_alt: string | null
+          hero_focal_x: number | null
+          hero_focal_y: number | null
+          hero_image: string | null
+          hero_side: string | null
+          id: string | null
+          ig_tilit: string[] | null
+          image_url: string | null
+          is_daily: boolean | null
+          korttinimi: string | null
+          lasten_aihe: string | null
+          learn: Json | null
+          lukija: string | null
+          platform: string | null
+          play_count: number | null
+          published_at: string | null
+          scheduled_for: string | null
+          section_tags: string[] | null
+          seo_description: string | null
+          seo_title: string | null
+          site_id: string | null
+          slug: string | null
+          status: string | null
+          subcollection: string | null
+          tags: string[] | null
+          target_age: string | null
+          teaser: string | null
+          title: string | null
+          tone: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          category?: string | null
+          collection?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          custom_slug?: string | null
+          description?: string | null
+          difficulty?: string | null
+          display_title?: string | null
+          emoji_hint?: string | null
+          era?: string | null
+          fanitasot?: Json | null
+          featured_in_category?: boolean | null
+          game_mode?: string | null
+          genre?: string | null
+          hero_alt?: string | null
+          hero_focal_x?: number | null
+          hero_focal_y?: number | null
+          hero_image?: string | null
+          hero_side?: string | null
+          id?: string | null
+          ig_tilit?: string[] | null
+          image_url?: string | null
+          is_daily?: boolean | null
+          korttinimi?: string | null
+          lasten_aihe?: string | null
+          learn?: Json | null
+          lukija?: string | null
+          platform?: string | null
+          play_count?: number | null
+          published_at?: string | null
+          scheduled_for?: string | null
+          section_tags?: string[] | null
+          seo_description?: string | null
+          seo_title?: string | null
+          site_id?: string | null
+          slug?: string | null
+          status?: string | null
+          subcollection?: string | null
+          tags?: string[] | null
+          target_age?: string | null
+          teaser?: string | null
+          title?: string | null
+          tone?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          category?: string | null
+          collection?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          custom_slug?: string | null
+          description?: string | null
+          difficulty?: string | null
+          display_title?: string | null
+          emoji_hint?: string | null
+          era?: string | null
+          fanitasot?: Json | null
+          featured_in_category?: boolean | null
+          game_mode?: string | null
+          genre?: string | null
+          hero_alt?: string | null
+          hero_focal_x?: number | null
+          hero_focal_y?: number | null
+          hero_image?: string | null
+          hero_side?: string | null
+          id?: string | null
+          ig_tilit?: string[] | null
+          image_url?: string | null
+          is_daily?: boolean | null
+          korttinimi?: string | null
+          lasten_aihe?: string | null
+          learn?: Json | null
+          lukija?: string | null
+          platform?: string | null
+          play_count?: number | null
+          published_at?: string | null
+          scheduled_for?: string | null
+          section_tags?: string[] | null
+          seo_description?: string | null
+          seo_title?: string | null
+          site_id?: string | null
+          slug?: string | null
+          status?: string | null
+          subcollection?: string | null
+          tags?: string[] | null
+          target_age?: string | null
+          teaser?: string | null
+          title?: string | null
+          tone?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       _nylonbeat_backup_20260919: {
         Row: {
           answers: Json | null
@@ -6269,6 +7313,69 @@ export type Database = {
           id?: string | null
           quiz_id?: string | null
           sort_order?: number | null
+        }
+        Relationships: []
+      }
+      _selko_yleistieto_q_backup_20261029: {
+        Row: {
+          animal_sound: Json | null
+          answers: Json | null
+          audio: Json | null
+          created_at: string | null
+          explanation: string | null
+          hook: boolean | null
+          id: string | null
+          image_credit: string | null
+          image_license_note: string | null
+          image_position: string | null
+          image_url: string | null
+          question_text: string | null
+          question_type: string | null
+          quiz_id: string | null
+          sort_order: number | null
+          taso: number | null
+          vihje_laura: string | null
+          vihje_mikko: string | null
+        }
+        Insert: {
+          animal_sound?: Json | null
+          answers?: Json | null
+          audio?: Json | null
+          created_at?: string | null
+          explanation?: string | null
+          hook?: boolean | null
+          id?: string | null
+          image_credit?: string | null
+          image_license_note?: string | null
+          image_position?: string | null
+          image_url?: string | null
+          question_text?: string | null
+          question_type?: string | null
+          quiz_id?: string | null
+          sort_order?: number | null
+          taso?: number | null
+          vihje_laura?: string | null
+          vihje_mikko?: string | null
+        }
+        Update: {
+          animal_sound?: Json | null
+          answers?: Json | null
+          audio?: Json | null
+          created_at?: string | null
+          explanation?: string | null
+          hook?: boolean | null
+          id?: string | null
+          image_credit?: string | null
+          image_license_note?: string | null
+          image_position?: string | null
+          image_url?: string | null
+          question_text?: string | null
+          question_type?: string | null
+          quiz_id?: string | null
+          sort_order?: number | null
+          taso?: number | null
+          vihje_laura?: string | null
+          vihje_mikko?: string | null
         }
         Relationships: []
       }
@@ -7442,6 +8549,8 @@ export type Database = {
           percent_labels: Json | null
           publish_at: string | null
           result_mode: string
+          season_end_md: string | null
+          season_start_md: string | null
           slug: string
           source_ootko_slug: string | null
           status: string
@@ -7470,6 +8579,8 @@ export type Database = {
           percent_labels?: Json | null
           publish_at?: string | null
           result_mode?: string
+          season_end_md?: string | null
+          season_start_md?: string | null
           slug: string
           source_ootko_slug?: string | null
           status?: string
@@ -7498,6 +8609,8 @@ export type Database = {
           percent_labels?: Json | null
           publish_at?: string | null
           result_mode?: string
+          season_end_md?: string | null
+          season_start_md?: string | null
           slug?: string
           source_ootko_slug?: string | null
           status?: string
@@ -8502,6 +9615,51 @@ export type Database = {
           },
         ]
       }
+      etusivu_promot: {
+        Row: {
+          aktiivinen: boolean
+          alku: string | null
+          created_at: string
+          cta: string | null
+          href: string
+          id: string
+          kicker: string | null
+          kuva: string | null
+          loppu: string | null
+          otsikko: string
+          paikka: string
+          paino: number
+        }
+        Insert: {
+          aktiivinen?: boolean
+          alku?: string | null
+          created_at?: string
+          cta?: string | null
+          href: string
+          id?: string
+          kicker?: string | null
+          kuva?: string | null
+          loppu?: string | null
+          otsikko: string
+          paikka: string
+          paino?: number
+        }
+        Update: {
+          aktiivinen?: boolean
+          alku?: string | null
+          created_at?: string
+          cta?: string | null
+          href?: string
+          id?: string
+          kicker?: string | null
+          kuva?: string | null
+          loppu?: string | null
+          otsikko?: string
+          paikka?: string
+          paino?: number
+        }
+        Relationships: []
+      }
       fact_attribute_defs: {
         Row: {
           attr_key: string
@@ -9048,7 +10206,7 @@ export type Database = {
           code: string
           created_at: string
           freshwarea_km2: number | null
-          geom: unknown
+          geom_geojson: Json | null
           landarea_km2: number | null
           maakunta: string
           name_fi: string
@@ -9064,7 +10222,7 @@ export type Database = {
           code: string
           created_at?: string
           freshwarea_km2?: number | null
-          geom: unknown
+          geom_geojson?: Json | null
           landarea_km2?: number | null
           maakunta: string
           name_fi: string
@@ -9080,7 +10238,7 @@ export type Database = {
           code?: string
           created_at?: string
           freshwarea_km2?: number | null
-          geom?: unknown
+          geom_geojson?: Json | null
           landarea_km2?: number | null
           maakunta?: string
           name_fi?: string
@@ -9096,34 +10254,43 @@ export type Database = {
       }
       kuntaliitos_pelit: {
         Row: {
+          entry: string | null
           id: string
           kunnat: string[]
+          landing_path: string | null
           maakunta: string | null
           oikein: number
           paivan_reitti: boolean
           played_at: string
+          referrer_host: string | null
           session_id: string | null
           siemen: string
           yritys: number
         }
         Insert: {
+          entry?: string | null
           id?: string
           kunnat: string[]
+          landing_path?: string | null
           maakunta?: string | null
           oikein: number
           paivan_reitti?: boolean
           played_at?: string
+          referrer_host?: string | null
           session_id?: string | null
           siemen: string
           yritys: number
         }
         Update: {
+          entry?: string | null
           id?: string
           kunnat?: string[]
+          landing_path?: string | null
           maakunta?: string | null
           oikein?: number
           paivan_reitti?: boolean
           played_at?: string
+          referrer_host?: string | null
           session_id?: string | null
           siemen?: string
           yritys?: number
@@ -9749,37 +10916,67 @@ export type Database = {
       }
       ootko_stats_daily: {
         Row: {
+          arrivals_copy: number
+          arrivals_facebook: number
+          arrivals_native: number
+          arrivals_whatsapp: number
           completes: number
           copies: number
           day: string
           retakes: number
+          shared_arrivals: number
+          shared_completes: number
+          shared_starts: number
           shares_fb: number
           shares_sms: number
           shares_wa: number
           starts: number
           test_id: string
+          test_shares_copy: number
+          test_shares_native: number
+          test_shares_whatsapp: number
         }
         Insert: {
+          arrivals_copy?: number
+          arrivals_facebook?: number
+          arrivals_native?: number
+          arrivals_whatsapp?: number
           completes?: number
           copies?: number
           day?: string
           retakes?: number
+          shared_arrivals?: number
+          shared_completes?: number
+          shared_starts?: number
           shares_fb?: number
           shares_sms?: number
           shares_wa?: number
           starts?: number
           test_id: string
+          test_shares_copy?: number
+          test_shares_native?: number
+          test_shares_whatsapp?: number
         }
         Update: {
+          arrivals_copy?: number
+          arrivals_facebook?: number
+          arrivals_native?: number
+          arrivals_whatsapp?: number
           completes?: number
           copies?: number
           day?: string
           retakes?: number
+          shared_arrivals?: number
+          shared_completes?: number
+          shared_starts?: number
           shares_fb?: number
           shares_sms?: number
           shares_wa?: number
           starts?: number
           test_id?: string
+          test_shares_copy?: number
+          test_shares_native?: number
+          test_shares_whatsapp?: number
         }
         Relationships: [
           {
@@ -9804,10 +11001,12 @@ export type Database = {
           id: string
           intro_md: string
           meta_description: string
+          nosto: number | null
           percent_dimension: string | null
           percent_labels: Json | null
           publish_at: string | null
           result_mode: string
+          seo: Json | null
           slug: string
           status: string
           theme_id: string
@@ -9827,10 +11026,12 @@ export type Database = {
           id?: string
           intro_md?: string
           meta_description: string
+          nosto?: number | null
           percent_dimension?: string | null
           percent_labels?: Json | null
           publish_at?: string | null
           result_mode?: string
+          seo?: Json | null
           slug: string
           status?: string
           theme_id: string
@@ -9850,10 +11051,12 @@ export type Database = {
           id?: string
           intro_md?: string
           meta_description?: string
+          nosto?: number | null
           percent_dimension?: string | null
           percent_labels?: Json | null
           publish_at?: string | null
           result_mode?: string
+          seo?: Json | null
           slug?: string
           status?: string
           theme_id?: string
@@ -10013,6 +11216,7 @@ export type Database = {
           audio: Json | null
           created_at: string | null
           explanation: string | null
+          hook: boolean
           id: string
           image_credit: string | null
           image_license_note: string | null
@@ -10032,6 +11236,7 @@ export type Database = {
           audio?: Json | null
           created_at?: string | null
           explanation?: string | null
+          hook?: boolean
           id?: string
           image_credit?: string | null
           image_license_note?: string | null
@@ -10051,6 +11256,7 @@ export type Database = {
           audio?: Json | null
           created_at?: string | null
           explanation?: string | null
+          hook?: boolean
           id?: string
           image_credit?: string | null
           image_license_note?: string | null
@@ -10081,13 +11287,216 @@ export type Database = {
           },
         ]
       }
+      quiz_pack_esikatselu: {
+        Row: {
+          avain: string
+          pack_id: string
+        }
+        Insert: {
+          avain?: string
+          pack_id: string
+        }
+        Update: {
+          avain?: string
+          pack_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "quiz_pack_esikatselu_pack_id_fkey"
+            columns: ["pack_id"]
+            isOneToOne: true
+            referencedRelation: "quiz_packs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      quiz_pack_events: {
+        Row: {
+          created_at: string
+          id: number
+          pack_id: string
+          session_id: string | null
+          tapahtuma: string
+        }
+        Insert: {
+          created_at?: string
+          id?: never
+          pack_id: string
+          session_id?: string | null
+          tapahtuma: string
+        }
+        Update: {
+          created_at?: string
+          id?: never
+          pack_id?: string
+          session_id?: string | null
+          tapahtuma?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "quiz_pack_events_pack_id_fkey"
+            columns: ["pack_id"]
+            isOneToOne: false
+            referencedRelation: "quiz_packs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      quiz_pack_items: {
+        Row: {
+          question_id: string
+          round_id: string
+          sort: number
+        }
+        Insert: {
+          question_id: string
+          round_id: string
+          sort: number
+        }
+        Update: {
+          question_id?: string
+          round_id?: string
+          sort?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "quiz_pack_items_question_id_fkey"
+            columns: ["question_id"]
+            isOneToOne: false
+            referencedRelation: "questions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "quiz_pack_items_round_id_fkey"
+            columns: ["round_id"]
+            isOneToOne: false
+            referencedRelation: "quiz_pack_rounds"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      quiz_pack_rounds: {
+        Row: {
+          id: string
+          kohderyhma: string
+          nimi: string
+          nro: number
+          pack_id: string
+        }
+        Insert: {
+          id?: string
+          kohderyhma?: string
+          nimi: string
+          nro: number
+          pack_id: string
+        }
+        Update: {
+          id?: string
+          kohderyhma?: string
+          nimi?: string
+          nro?: number
+          pack_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "quiz_pack_rounds_pack_id_fkey"
+            columns: ["pack_id"]
+            isOneToOne: false
+            referencedRelation: "quiz_packs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      quiz_packs: {
+        Row: {
+          aksentti: string | null
+          created_at: string
+          hero_alt: string | null
+          hero_image: string | null
+          id: string
+          jarjestys: number
+          kausi_alku: string | null
+          kausi_loppu: string | null
+          kesto_min: number | null
+          kohderyhma: string
+          otsikko: string
+          painos_nimi: string | null
+          published_at: string | null
+          sarja: string | null
+          seo_description: string | null
+          seo_title: string | null
+          site_id: string
+          slug: string
+          status: string
+          teema: string | null
+          updated_at: string
+        }
+        Insert: {
+          aksentti?: string | null
+          created_at?: string
+          hero_alt?: string | null
+          hero_image?: string | null
+          id?: string
+          jarjestys?: number
+          kausi_alku?: string | null
+          kausi_loppu?: string | null
+          kesto_min?: number | null
+          kohderyhma?: string
+          otsikko: string
+          painos_nimi?: string | null
+          published_at?: string | null
+          sarja?: string | null
+          seo_description?: string | null
+          seo_title?: string | null
+          site_id: string
+          slug: string
+          status?: string
+          teema?: string | null
+          updated_at?: string
+        }
+        Update: {
+          aksentti?: string | null
+          created_at?: string
+          hero_alt?: string | null
+          hero_image?: string | null
+          id?: string
+          jarjestys?: number
+          kausi_alku?: string | null
+          kausi_loppu?: string | null
+          kesto_min?: number | null
+          kohderyhma?: string
+          otsikko?: string
+          painos_nimi?: string | null
+          published_at?: string | null
+          sarja?: string | null
+          seo_description?: string | null
+          seo_title?: string | null
+          site_id?: string
+          slug?: string
+          status?: string
+          teema?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "quiz_packs_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: false
+            referencedRelation: "sites"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       quiz_plays: {
         Row: {
+          entry: string | null
           feedback: number | null
           id: string
+          landing_path: string | null
           platform: string
           played_at: string | null
           quiz_id: string | null
+          referrer_host: string | null
           score: number | null
           session_id: string | null
           share_channel: string | null
@@ -10095,11 +11504,14 @@ export type Database = {
           total: number | null
         }
         Insert: {
+          entry?: string | null
           feedback?: number | null
           id?: string
+          landing_path?: string | null
           platform: string
           played_at?: string | null
           quiz_id?: string | null
+          referrer_host?: string | null
           score?: number | null
           session_id?: string | null
           share_channel?: string | null
@@ -10107,11 +11519,14 @@ export type Database = {
           total?: number | null
         }
         Update: {
+          entry?: string | null
           feedback?: number | null
           id?: string
+          landing_path?: string | null
           platform?: string
           played_at?: string | null
           quiz_id?: string | null
+          referrer_host?: string | null
           score?: number | null
           session_id?: string | null
           share_channel?: string | null
@@ -10286,34 +11701,43 @@ export type Database = {
       }
       rajanaapurit_pelit: {
         Row: {
+          entry: string | null
           id: string
+          landing_path: string | null
           maanosa: string | null
           maat: string[]
           oikein: number
           paivan_reitti: boolean
           played_at: string
+          referrer_host: string | null
           session_id: string | null
           siemen: string
           yritys: number
         }
         Insert: {
+          entry?: string | null
           id?: string
+          landing_path?: string | null
           maanosa?: string | null
           maat: string[]
           oikein: number
           paivan_reitti?: boolean
           played_at?: string
+          referrer_host?: string | null
           session_id?: string | null
           siemen: string
           yritys: number
         }
         Update: {
+          entry?: string | null
           id?: string
+          landing_path?: string | null
           maanosa?: string | null
           maat?: string[]
           oikein?: number
           paivan_reitti?: boolean
           played_at?: string
+          referrer_host?: string | null
           session_id?: string | null
           siemen?: string
           yritys?: number
@@ -10581,30 +12005,6 @@ export type Database = {
           },
         ]
       }
-      spatial_ref_sys: {
-        Row: {
-          auth_name: string | null
-          auth_srid: number | null
-          proj4text: string | null
-          srid: number
-          srtext: string | null
-        }
-        Insert: {
-          auth_name?: string | null
-          auth_srid?: number | null
-          proj4text?: string | null
-          srid: number
-          srtext?: string | null
-        }
-        Update: {
-          auth_name?: string | null
-          auth_srid?: number | null
-          proj4text?: string | null
-          srid?: number
-          srtext?: string | null
-        }
-        Relationships: []
-      }
       synttarit_greetings: {
         Row: {
           age: number | null
@@ -10724,11 +12124,14 @@ export type Database = {
       }
       tupla_pelit: {
         Row: {
+          entry: string | null
           id: string
           kysymykset: string[]
+          landing_path: string | null
           oikein: number
           paivan_sarja: boolean
           played_at: string
+          referrer_host: string | null
           saalis: number
           session_id: string | null
           siemen: string
@@ -10736,11 +12139,14 @@ export type Database = {
           teema: string
         }
         Insert: {
+          entry?: string | null
           id?: string
           kysymykset?: string[]
+          landing_path?: string | null
           oikein: number
           paivan_sarja?: boolean
           played_at?: string
+          referrer_host?: string | null
           saalis: number
           session_id?: string | null
           siemen: string
@@ -10748,11 +12154,14 @@ export type Database = {
           teema: string
         }
         Update: {
+          entry?: string | null
           id?: string
           kysymykset?: string[]
+          landing_path?: string | null
           oikein?: number
           paivan_sarja?: boolean
           played_at?: string
+          referrer_host?: string | null
           saalis?: number
           session_id?: string | null
           siemen?: string
@@ -10812,30 +12221,39 @@ export type Database = {
       vaalipiiriketju_pelit: {
         Row: {
           edustajat: string[]
+          entry: string | null
           id: string
+          landing_path: string | null
           oikein: number
           paivan_reitti: boolean
           played_at: string
+          referrer_host: string | null
           session_id: string | null
           siemen: string
           yritys: number
         }
         Insert: {
           edustajat: string[]
+          entry?: string | null
           id?: string
+          landing_path?: string | null
           oikein: number
           paivan_reitti?: boolean
           played_at?: string
+          referrer_host?: string | null
           session_id?: string | null
           siemen: string
           yritys: number
         }
         Update: {
           edustajat?: string[]
+          entry?: string | null
           id?: string
+          landing_path?: string | null
           oikein?: number
           paivan_reitti?: boolean
           played_at?: string
+          referrer_host?: string | null
           session_id?: string | null
           siemen?: string
           yritys?: number
@@ -10944,48 +12362,6 @@ export type Database = {
           },
         ]
       }
-      geography_columns: {
-        Row: {
-          coord_dimension: number | null
-          f_geography_column: unknown
-          f_table_catalog: unknown
-          f_table_name: unknown
-          f_table_schema: unknown
-          srid: number | null
-          type: string | null
-        }
-        Relationships: []
-      }
-      geometry_columns: {
-        Row: {
-          coord_dimension: number | null
-          f_geometry_column: unknown
-          f_table_catalog: string | null
-          f_table_name: unknown
-          f_table_schema: unknown
-          srid: number | null
-          type: string | null
-        }
-        Insert: {
-          coord_dimension?: number | null
-          f_geometry_column?: unknown
-          f_table_catalog?: string | null
-          f_table_name?: unknown
-          f_table_schema?: unknown
-          srid?: number | null
-          type?: string | null
-        }
-        Update: {
-          coord_dimension?: number | null
-          f_geometry_column?: unknown
-          f_table_catalog?: string | null
-          f_table_name?: unknown
-          f_table_schema?: unknown
-          srid?: number | null
-          type?: string | null
-        }
-        Relationships: []
-      }
       quiz_cards: {
         Row: {
           badge: string | null
@@ -11075,6 +12451,18 @@ export type Database = {
           },
         ]
       }
+      v_pelilahteet: {
+        Row: {
+          entry: string | null
+          landing_path: string | null
+          paiva: string | null
+          pelit: number | null
+          referrer_host: string | null
+          sessiot: number | null
+          taulu: string | null
+        }
+        Relationships: []
+      }
       v_today_picks: {
         Row: {
           content_id: string | null
@@ -11115,95 +12503,6 @@ export type Database = {
       }
     }
     Functions: {
-      _postgis_deprecate: {
-        Args: { newname: string; oldname: string; version: string }
-        Returns: undefined
-      }
-      _postgis_index_extent: {
-        Args: { col: string; tbl: unknown }
-        Returns: unknown
-      }
-      _postgis_pgsql_version: { Args: never; Returns: string }
-      _postgis_scripts_pgsql_version: { Args: never; Returns: string }
-      _postgis_selectivity: {
-        Args: { att_name: string; geom: unknown; mode?: string; tbl: unknown }
-        Returns: number
-      }
-      _postgis_stats: {
-        Args: { ""?: string; att_name: string; tbl: unknown }
-        Returns: string
-      }
-      _st_3dintersects: {
-        Args: { geom1: unknown; geom2: unknown }
-        Returns: boolean
-      }
-      _st_contains: {
-        Args: { geom1: unknown; geom2: unknown }
-        Returns: boolean
-      }
-      _st_containsproperly: {
-        Args: { geom1: unknown; geom2: unknown }
-        Returns: boolean
-      }
-      _st_coveredby:
-        | { Args: { geog1: unknown; geog2: unknown }; Returns: boolean }
-        | { Args: { geom1: unknown; geom2: unknown }; Returns: boolean }
-      _st_covers:
-        | { Args: { geog1: unknown; geog2: unknown }; Returns: boolean }
-        | { Args: { geom1: unknown; geom2: unknown }; Returns: boolean }
-      _st_crosses: {
-        Args: { geom1: unknown; geom2: unknown }
-        Returns: boolean
-      }
-      _st_dwithin: {
-        Args: {
-          geog1: unknown
-          geog2: unknown
-          tolerance: number
-          use_spheroid?: boolean
-        }
-        Returns: boolean
-      }
-      _st_equals: { Args: { geom1: unknown; geom2: unknown }; Returns: boolean }
-      _st_intersects: {
-        Args: { geom1: unknown; geom2: unknown }
-        Returns: boolean
-      }
-      _st_linecrossingdirection: {
-        Args: { line1: unknown; line2: unknown }
-        Returns: number
-      }
-      _st_longestline: {
-        Args: { geom1: unknown; geom2: unknown }
-        Returns: unknown
-      }
-      _st_maxdistance: {
-        Args: { geom1: unknown; geom2: unknown }
-        Returns: number
-      }
-      _st_orderingequals: {
-        Args: { geom1: unknown; geom2: unknown }
-        Returns: boolean
-      }
-      _st_overlaps: {
-        Args: { geom1: unknown; geom2: unknown }
-        Returns: boolean
-      }
-      _st_sortablehash: { Args: { geom: unknown }; Returns: number }
-      _st_touches: {
-        Args: { geom1: unknown; geom2: unknown }
-        Returns: boolean
-      }
-      _st_voronoi: {
-        Args: {
-          clip?: unknown
-          g1: unknown
-          return_polygons?: boolean
-          tolerance?: number
-        }
-        Returns: unknown
-      }
-      _st_within: { Args: { geom1: unknown; geom2: unknown }; Returns: boolean }
       aanivisa_arvo_setti: {
         Args: {
           p_edelliset: string[]
@@ -11226,44 +12525,6 @@ export type Database = {
           vuosi: number
         }[]
       }
-      addauth: { Args: { "": string }; Returns: boolean }
-      addgeometrycolumn:
-        | {
-            Args: {
-              catalog_name: string
-              column_name: string
-              new_dim: number
-              new_srid_in: number
-              new_type: string
-              schema_name: string
-              table_name: string
-              use_typmod?: boolean
-            }
-            Returns: string
-          }
-        | {
-            Args: {
-              column_name: string
-              new_dim: number
-              new_srid: number
-              new_type: string
-              schema_name: string
-              table_name: string
-              use_typmod?: boolean
-            }
-            Returns: string
-          }
-        | {
-            Args: {
-              column_name: string
-              new_dim: number
-              new_srid: number
-              new_type: string
-              table_name: string
-              use_typmod?: boolean
-            }
-            Returns: string
-          }
       admin_visa_tilastot: {
         Args: { p_site: string }
         Returns: {
@@ -11284,9 +12545,17 @@ export type Database = {
         Returns: boolean
       }
       areyoou_key_ok: { Args: { p_key: string }; Returns: boolean }
+      areyoou_md_in: {
+        Args: { p_day: string; p_end: string; p_start: string }
+        Returns: boolean
+      }
       areyoou_save_draft: {
         Args: { p_key: string; p_test: Json }
         Returns: string
+      }
+      areyoou_test_in_season: {
+        Args: { p_day: string; p_test: string }
+        Returns: boolean
       }
       areyoou_test_preview: {
         Args: { p_edition: string; p_key: string; p_slug: string }
@@ -11302,138 +12571,6 @@ export type Database = {
         }
         Returns: undefined
       }
-      disablelongtransactions: { Args: never; Returns: string }
-      dropgeometrycolumn:
-        | {
-            Args: {
-              catalog_name: string
-              column_name: string
-              schema_name: string
-              table_name: string
-            }
-            Returns: string
-          }
-        | {
-            Args: {
-              column_name: string
-              schema_name: string
-              table_name: string
-            }
-            Returns: string
-          }
-        | { Args: { column_name: string; table_name: string }; Returns: string }
-      dropgeometrytable:
-        | {
-            Args: {
-              catalog_name: string
-              schema_name: string
-              table_name: string
-            }
-            Returns: string
-          }
-        | { Args: { schema_name: string; table_name: string }; Returns: string }
-        | { Args: { table_name: string }; Returns: string }
-      enablelongtransactions: { Args: never; Returns: string }
-      equals: { Args: { geom1: unknown; geom2: unknown }; Returns: boolean }
-      geometry: { Args: { "": string }; Returns: unknown }
-      geometry_above: {
-        Args: { geom1: unknown; geom2: unknown }
-        Returns: boolean
-      }
-      geometry_below: {
-        Args: { geom1: unknown; geom2: unknown }
-        Returns: boolean
-      }
-      geometry_cmp: {
-        Args: { geom1: unknown; geom2: unknown }
-        Returns: number
-      }
-      geometry_contained_3d: {
-        Args: { geom1: unknown; geom2: unknown }
-        Returns: boolean
-      }
-      geometry_contains: {
-        Args: { geom1: unknown; geom2: unknown }
-        Returns: boolean
-      }
-      geometry_contains_3d: {
-        Args: { geom1: unknown; geom2: unknown }
-        Returns: boolean
-      }
-      geometry_distance_box: {
-        Args: { geom1: unknown; geom2: unknown }
-        Returns: number
-      }
-      geometry_distance_centroid: {
-        Args: { geom1: unknown; geom2: unknown }
-        Returns: number
-      }
-      geometry_eq: {
-        Args: { geom1: unknown; geom2: unknown }
-        Returns: boolean
-      }
-      geometry_ge: {
-        Args: { geom1: unknown; geom2: unknown }
-        Returns: boolean
-      }
-      geometry_gt: {
-        Args: { geom1: unknown; geom2: unknown }
-        Returns: boolean
-      }
-      geometry_le: {
-        Args: { geom1: unknown; geom2: unknown }
-        Returns: boolean
-      }
-      geometry_left: {
-        Args: { geom1: unknown; geom2: unknown }
-        Returns: boolean
-      }
-      geometry_lt: {
-        Args: { geom1: unknown; geom2: unknown }
-        Returns: boolean
-      }
-      geometry_overabove: {
-        Args: { geom1: unknown; geom2: unknown }
-        Returns: boolean
-      }
-      geometry_overbelow: {
-        Args: { geom1: unknown; geom2: unknown }
-        Returns: boolean
-      }
-      geometry_overlaps: {
-        Args: { geom1: unknown; geom2: unknown }
-        Returns: boolean
-      }
-      geometry_overlaps_3d: {
-        Args: { geom1: unknown; geom2: unknown }
-        Returns: boolean
-      }
-      geometry_overleft: {
-        Args: { geom1: unknown; geom2: unknown }
-        Returns: boolean
-      }
-      geometry_overright: {
-        Args: { geom1: unknown; geom2: unknown }
-        Returns: boolean
-      }
-      geometry_right: {
-        Args: { geom1: unknown; geom2: unknown }
-        Returns: boolean
-      }
-      geometry_same: {
-        Args: { geom1: unknown; geom2: unknown }
-        Returns: boolean
-      }
-      geometry_same_3d: {
-        Args: { geom1: unknown; geom2: unknown }
-        Returns: boolean
-      }
-      geometry_within: {
-        Args: { geom1: unknown; geom2: unknown }
-        Returns: boolean
-      }
-      geomfromewkt: { Args: { "": string }; Returns: unknown }
-      gettransactionid: { Args: never; Returns: unknown }
       helsinki_tanaan: { Args: never; Returns: string }
       ig_bio: {
         Args: { p_site: string }
@@ -11484,7 +12621,6 @@ export type Database = {
           vuosi: number
         }[]
       }
-      longtransactionsenabled: { Args: never; Returns: boolean }
       ootko_etusivu: { Args: { p_key?: string }; Returns: Json }
       ootko_is_live: {
         Args: { p_publish_at: string; p_status: string }
@@ -11559,628 +12695,7 @@ export type Database = {
         Args: { p_date: string; p_site: string }
         Returns: string
       }
-      populate_geometry_columns:
-        | { Args: { tbl_oid: unknown; use_typmod?: boolean }; Returns: number }
-        | { Args: { use_typmod?: boolean }; Returns: string }
-      postgis_constraint_dims: {
-        Args: { geomcolumn: string; geomschema: string; geomtable: string }
-        Returns: number
-      }
-      postgis_constraint_srid: {
-        Args: { geomcolumn: string; geomschema: string; geomtable: string }
-        Returns: number
-      }
-      postgis_constraint_type: {
-        Args: { geomcolumn: string; geomschema: string; geomtable: string }
-        Returns: string
-      }
-      postgis_extensions_upgrade: { Args: never; Returns: string }
-      postgis_full_version: { Args: never; Returns: string }
-      postgis_geos_version: { Args: never; Returns: string }
-      postgis_lib_build_date: { Args: never; Returns: string }
-      postgis_lib_revision: { Args: never; Returns: string }
-      postgis_lib_version: { Args: never; Returns: string }
-      postgis_libjson_version: { Args: never; Returns: string }
-      postgis_liblwgeom_version: { Args: never; Returns: string }
-      postgis_libprotobuf_version: { Args: never; Returns: string }
-      postgis_libxml_version: { Args: never; Returns: string }
-      postgis_proj_version: { Args: never; Returns: string }
-      postgis_scripts_build_date: { Args: never; Returns: string }
-      postgis_scripts_installed: { Args: never; Returns: string }
-      postgis_scripts_released: { Args: never; Returns: string }
-      postgis_svn_version: { Args: never; Returns: string }
-      postgis_type_name: {
-        Args: {
-          coord_dimension: number
-          geomname: string
-          use_new_name?: boolean
-        }
-        Returns: string
-      }
-      postgis_version: { Args: never; Returns: string }
-      postgis_wagyu_version: { Args: never; Returns: string }
       slugify_name: { Args: { src: string }; Returns: string }
-      st_3dclosestpoint: {
-        Args: { geom1: unknown; geom2: unknown }
-        Returns: unknown
-      }
-      st_3ddistance: {
-        Args: { geom1: unknown; geom2: unknown }
-        Returns: number
-      }
-      st_3dintersects: {
-        Args: { geom1: unknown; geom2: unknown }
-        Returns: boolean
-      }
-      st_3dlongestline: {
-        Args: { geom1: unknown; geom2: unknown }
-        Returns: unknown
-      }
-      st_3dmakebox: {
-        Args: { geom1: unknown; geom2: unknown }
-        Returns: unknown
-      }
-      st_3dmaxdistance: {
-        Args: { geom1: unknown; geom2: unknown }
-        Returns: number
-      }
-      st_3dshortestline: {
-        Args: { geom1: unknown; geom2: unknown }
-        Returns: unknown
-      }
-      st_addpoint: {
-        Args: { geom1: unknown; geom2: unknown }
-        Returns: unknown
-      }
-      st_angle:
-        | { Args: { line1: unknown; line2: unknown }; Returns: number }
-        | {
-            Args: { pt1: unknown; pt2: unknown; pt3: unknown; pt4?: unknown }
-            Returns: number
-          }
-      st_area:
-        | { Args: { geog: unknown; use_spheroid?: boolean }; Returns: number }
-        | { Args: { "": string }; Returns: number }
-      st_asencodedpolyline: {
-        Args: { geom: unknown; nprecision?: number }
-        Returns: string
-      }
-      st_asewkt: { Args: { "": string }; Returns: string }
-      st_asgeojson:
-        | {
-            Args: { geog: unknown; maxdecimaldigits?: number; options?: number }
-            Returns: string
-          }
-        | {
-            Args: { geom: unknown; maxdecimaldigits?: number; options?: number }
-            Returns: string
-          }
-        | {
-            Args: {
-              geom_column?: string
-              maxdecimaldigits?: number
-              pretty_bool?: boolean
-              r: Record<string, unknown>
-            }
-            Returns: string
-          }
-        | { Args: { "": string }; Returns: string }
-      st_asgml:
-        | {
-            Args: {
-              geog: unknown
-              id?: string
-              maxdecimaldigits?: number
-              nprefix?: string
-              options?: number
-            }
-            Returns: string
-          }
-        | {
-            Args: { geom: unknown; maxdecimaldigits?: number; options?: number }
-            Returns: string
-          }
-        | { Args: { "": string }; Returns: string }
-        | {
-            Args: {
-              geog: unknown
-              id?: string
-              maxdecimaldigits?: number
-              nprefix?: string
-              options?: number
-              version: number
-            }
-            Returns: string
-          }
-        | {
-            Args: {
-              geom: unknown
-              id?: string
-              maxdecimaldigits?: number
-              nprefix?: string
-              options?: number
-              version: number
-            }
-            Returns: string
-          }
-      st_askml:
-        | {
-            Args: { geog: unknown; maxdecimaldigits?: number; nprefix?: string }
-            Returns: string
-          }
-        | {
-            Args: { geom: unknown; maxdecimaldigits?: number; nprefix?: string }
-            Returns: string
-          }
-        | { Args: { "": string }; Returns: string }
-      st_aslatlontext: {
-        Args: { geom: unknown; tmpl?: string }
-        Returns: string
-      }
-      st_asmarc21: { Args: { format?: string; geom: unknown }; Returns: string }
-      st_asmvtgeom: {
-        Args: {
-          bounds: unknown
-          buffer?: number
-          clip_geom?: boolean
-          extent?: number
-          geom: unknown
-        }
-        Returns: unknown
-      }
-      st_assvg:
-        | {
-            Args: { geog: unknown; maxdecimaldigits?: number; rel?: number }
-            Returns: string
-          }
-        | {
-            Args: { geom: unknown; maxdecimaldigits?: number; rel?: number }
-            Returns: string
-          }
-        | { Args: { "": string }; Returns: string }
-      st_astext: { Args: { "": string }; Returns: string }
-      st_astwkb:
-        | {
-            Args: {
-              geom: unknown
-              prec?: number
-              prec_m?: number
-              prec_z?: number
-              with_boxes?: boolean
-              with_sizes?: boolean
-            }
-            Returns: string
-          }
-        | {
-            Args: {
-              geom: unknown[]
-              ids: number[]
-              prec?: number
-              prec_m?: number
-              prec_z?: number
-              with_boxes?: boolean
-              with_sizes?: boolean
-            }
-            Returns: string
-          }
-      st_asx3d: {
-        Args: { geom: unknown; maxdecimaldigits?: number; options?: number }
-        Returns: string
-      }
-      st_azimuth:
-        | { Args: { geog1: unknown; geog2: unknown }; Returns: number }
-        | { Args: { geom1: unknown; geom2: unknown }; Returns: number }
-      st_boundingdiagonal: {
-        Args: { fits?: boolean; geom: unknown }
-        Returns: unknown
-      }
-      st_buffer:
-        | {
-            Args: { geom: unknown; options?: string; radius: number }
-            Returns: unknown
-          }
-        | {
-            Args: { geom: unknown; quadsegs: number; radius: number }
-            Returns: unknown
-          }
-      st_centroid: { Args: { "": string }; Returns: unknown }
-      st_clipbybox2d: {
-        Args: { box: unknown; geom: unknown }
-        Returns: unknown
-      }
-      st_closestpoint: {
-        Args: { geom1: unknown; geom2: unknown }
-        Returns: unknown
-      }
-      st_collect: { Args: { geom1: unknown; geom2: unknown }; Returns: unknown }
-      st_concavehull: {
-        Args: {
-          param_allow_holes?: boolean
-          param_geom: unknown
-          param_pctconvex: number
-        }
-        Returns: unknown
-      }
-      st_contains: {
-        Args: { geom1: unknown; geom2: unknown }
-        Returns: boolean
-      }
-      st_containsproperly: {
-        Args: { geom1: unknown; geom2: unknown }
-        Returns: boolean
-      }
-      st_coorddim: { Args: { geometry: unknown }; Returns: number }
-      st_coveredby:
-        | { Args: { geog1: unknown; geog2: unknown }; Returns: boolean }
-        | { Args: { geom1: unknown; geom2: unknown }; Returns: boolean }
-      st_covers:
-        | { Args: { geog1: unknown; geog2: unknown }; Returns: boolean }
-        | { Args: { geom1: unknown; geom2: unknown }; Returns: boolean }
-      st_crosses: { Args: { geom1: unknown; geom2: unknown }; Returns: boolean }
-      st_curvetoline: {
-        Args: { flags?: number; geom: unknown; tol?: number; toltype?: number }
-        Returns: unknown
-      }
-      st_delaunaytriangles: {
-        Args: { flags?: number; g1: unknown; tolerance?: number }
-        Returns: unknown
-      }
-      st_difference: {
-        Args: { geom1: unknown; geom2: unknown; gridsize?: number }
-        Returns: unknown
-      }
-      st_disjoint: {
-        Args: { geom1: unknown; geom2: unknown }
-        Returns: boolean
-      }
-      st_distance:
-        | {
-            Args: { geog1: unknown; geog2: unknown; use_spheroid?: boolean }
-            Returns: number
-          }
-        | { Args: { geom1: unknown; geom2: unknown }; Returns: number }
-      st_distancesphere:
-        | { Args: { geom1: unknown; geom2: unknown }; Returns: number }
-        | {
-            Args: { geom1: unknown; geom2: unknown; radius: number }
-            Returns: number
-          }
-      st_distancespheroid: {
-        Args: { geom1: unknown; geom2: unknown }
-        Returns: number
-      }
-      st_dwithin: {
-        Args: {
-          geog1: unknown
-          geog2: unknown
-          tolerance: number
-          use_spheroid?: boolean
-        }
-        Returns: boolean
-      }
-      st_equals: { Args: { geom1: unknown; geom2: unknown }; Returns: boolean }
-      st_expand:
-        | { Args: { box: unknown; dx: number; dy: number }; Returns: unknown }
-        | {
-            Args: { box: unknown; dx: number; dy: number; dz?: number }
-            Returns: unknown
-          }
-        | {
-            Args: {
-              dm?: number
-              dx: number
-              dy: number
-              dz?: number
-              geom: unknown
-            }
-            Returns: unknown
-          }
-      st_force3d: { Args: { geom: unknown; zvalue?: number }; Returns: unknown }
-      st_force3dm: {
-        Args: { geom: unknown; mvalue?: number }
-        Returns: unknown
-      }
-      st_force3dz: {
-        Args: { geom: unknown; zvalue?: number }
-        Returns: unknown
-      }
-      st_force4d: {
-        Args: { geom: unknown; mvalue?: number; zvalue?: number }
-        Returns: unknown
-      }
-      st_generatepoints:
-        | { Args: { area: unknown; npoints: number }; Returns: unknown }
-        | {
-            Args: { area: unknown; npoints: number; seed: number }
-            Returns: unknown
-          }
-      st_geogfromtext: { Args: { "": string }; Returns: unknown }
-      st_geographyfromtext: { Args: { "": string }; Returns: unknown }
-      st_geohash:
-        | { Args: { geog: unknown; maxchars?: number }; Returns: string }
-        | { Args: { geom: unknown; maxchars?: number }; Returns: string }
-      st_geomcollfromtext: { Args: { "": string }; Returns: unknown }
-      st_geometricmedian: {
-        Args: {
-          fail_if_not_converged?: boolean
-          g: unknown
-          max_iter?: number
-          tolerance?: number
-        }
-        Returns: unknown
-      }
-      st_geometryfromtext: { Args: { "": string }; Returns: unknown }
-      st_geomfromewkt: { Args: { "": string }; Returns: unknown }
-      st_geomfromgeojson:
-        | { Args: { "": Json }; Returns: unknown }
-        | { Args: { "": Json }; Returns: unknown }
-        | { Args: { "": string }; Returns: unknown }
-      st_geomfromgml: { Args: { "": string }; Returns: unknown }
-      st_geomfromkml: { Args: { "": string }; Returns: unknown }
-      st_geomfrommarc21: { Args: { marc21xml: string }; Returns: unknown }
-      st_geomfromtext: { Args: { "": string }; Returns: unknown }
-      st_gmltosql: { Args: { "": string }; Returns: unknown }
-      st_hasarc: { Args: { geometry: unknown }; Returns: boolean }
-      st_hausdorffdistance: {
-        Args: { geom1: unknown; geom2: unknown }
-        Returns: number
-      }
-      st_hexagon: {
-        Args: { cell_i: number; cell_j: number; origin?: unknown; size: number }
-        Returns: unknown
-      }
-      st_hexagongrid: {
-        Args: { bounds: unknown; size: number }
-        Returns: Record<string, unknown>[]
-      }
-      st_interpolatepoint: {
-        Args: { line: unknown; point: unknown }
-        Returns: number
-      }
-      st_intersection: {
-        Args: { geom1: unknown; geom2: unknown; gridsize?: number }
-        Returns: unknown
-      }
-      st_intersects:
-        | { Args: { geog1: unknown; geog2: unknown }; Returns: boolean }
-        | { Args: { geom1: unknown; geom2: unknown }; Returns: boolean }
-      st_isvaliddetail: {
-        Args: { flags?: number; geom: unknown }
-        Returns: Database["public"]["CompositeTypes"]["valid_detail"]
-        SetofOptions: {
-          from: "*"
-          to: "valid_detail"
-          isOneToOne: true
-          isSetofReturn: false
-        }
-      }
-      st_length:
-        | { Args: { geog: unknown; use_spheroid?: boolean }; Returns: number }
-        | { Args: { "": string }; Returns: number }
-      st_letters: { Args: { font?: Json; letters: string }; Returns: unknown }
-      st_linecrossingdirection: {
-        Args: { line1: unknown; line2: unknown }
-        Returns: number
-      }
-      st_linefromencodedpolyline: {
-        Args: { nprecision?: number; txtin: string }
-        Returns: unknown
-      }
-      st_linefromtext: { Args: { "": string }; Returns: unknown }
-      st_linelocatepoint: {
-        Args: { geom1: unknown; geom2: unknown }
-        Returns: number
-      }
-      st_linetocurve: { Args: { geometry: unknown }; Returns: unknown }
-      st_locatealong: {
-        Args: { geometry: unknown; leftrightoffset?: number; measure: number }
-        Returns: unknown
-      }
-      st_locatebetween: {
-        Args: {
-          frommeasure: number
-          geometry: unknown
-          leftrightoffset?: number
-          tomeasure: number
-        }
-        Returns: unknown
-      }
-      st_locatebetweenelevations: {
-        Args: { fromelevation: number; geometry: unknown; toelevation: number }
-        Returns: unknown
-      }
-      st_longestline: {
-        Args: { geom1: unknown; geom2: unknown }
-        Returns: unknown
-      }
-      st_makebox2d: {
-        Args: { geom1: unknown; geom2: unknown }
-        Returns: unknown
-      }
-      st_makeline: {
-        Args: { geom1: unknown; geom2: unknown }
-        Returns: unknown
-      }
-      st_makevalid: {
-        Args: { geom: unknown; params: string }
-        Returns: unknown
-      }
-      st_maxdistance: {
-        Args: { geom1: unknown; geom2: unknown }
-        Returns: number
-      }
-      st_minimumboundingcircle: {
-        Args: { inputgeom: unknown; segs_per_quarter?: number }
-        Returns: unknown
-      }
-      st_mlinefromtext: { Args: { "": string }; Returns: unknown }
-      st_mpointfromtext: { Args: { "": string }; Returns: unknown }
-      st_mpolyfromtext: { Args: { "": string }; Returns: unknown }
-      st_multilinestringfromtext: { Args: { "": string }; Returns: unknown }
-      st_multipointfromtext: { Args: { "": string }; Returns: unknown }
-      st_multipolygonfromtext: { Args: { "": string }; Returns: unknown }
-      st_node: { Args: { g: unknown }; Returns: unknown }
-      st_normalize: { Args: { geom: unknown }; Returns: unknown }
-      st_offsetcurve: {
-        Args: { distance: number; line: unknown; params?: string }
-        Returns: unknown
-      }
-      st_orderingequals: {
-        Args: { geom1: unknown; geom2: unknown }
-        Returns: boolean
-      }
-      st_overlaps: {
-        Args: { geom1: unknown; geom2: unknown }
-        Returns: boolean
-      }
-      st_perimeter: {
-        Args: { geog: unknown; use_spheroid?: boolean }
-        Returns: number
-      }
-      st_pointfromtext: { Args: { "": string }; Returns: unknown }
-      st_pointm: {
-        Args: {
-          mcoordinate: number
-          srid?: number
-          xcoordinate: number
-          ycoordinate: number
-        }
-        Returns: unknown
-      }
-      st_pointz: {
-        Args: {
-          srid?: number
-          xcoordinate: number
-          ycoordinate: number
-          zcoordinate: number
-        }
-        Returns: unknown
-      }
-      st_pointzm: {
-        Args: {
-          mcoordinate: number
-          srid?: number
-          xcoordinate: number
-          ycoordinate: number
-          zcoordinate: number
-        }
-        Returns: unknown
-      }
-      st_polyfromtext: { Args: { "": string }; Returns: unknown }
-      st_polygonfromtext: { Args: { "": string }; Returns: unknown }
-      st_project: {
-        Args: { azimuth: number; distance: number; geog: unknown }
-        Returns: unknown
-      }
-      st_quantizecoordinates: {
-        Args: {
-          g: unknown
-          prec_m?: number
-          prec_x: number
-          prec_y?: number
-          prec_z?: number
-        }
-        Returns: unknown
-      }
-      st_reduceprecision: {
-        Args: { geom: unknown; gridsize: number }
-        Returns: unknown
-      }
-      st_relate: { Args: { geom1: unknown; geom2: unknown }; Returns: string }
-      st_removerepeatedpoints: {
-        Args: { geom: unknown; tolerance?: number }
-        Returns: unknown
-      }
-      st_segmentize: {
-        Args: { geog: unknown; max_segment_length: number }
-        Returns: unknown
-      }
-      st_setsrid:
-        | { Args: { geog: unknown; srid: number }; Returns: unknown }
-        | { Args: { geom: unknown; srid: number }; Returns: unknown }
-      st_sharedpaths: {
-        Args: { geom1: unknown; geom2: unknown }
-        Returns: unknown
-      }
-      st_shortestline: {
-        Args: { geom1: unknown; geom2: unknown }
-        Returns: unknown
-      }
-      st_simplifypolygonhull: {
-        Args: { geom: unknown; is_outer?: boolean; vertex_fraction: number }
-        Returns: unknown
-      }
-      st_split: { Args: { geom1: unknown; geom2: unknown }; Returns: unknown }
-      st_square: {
-        Args: { cell_i: number; cell_j: number; origin?: unknown; size: number }
-        Returns: unknown
-      }
-      st_squaregrid: {
-        Args: { bounds: unknown; size: number }
-        Returns: Record<string, unknown>[]
-      }
-      st_srid:
-        | { Args: { geog: unknown }; Returns: number }
-        | { Args: { geom: unknown }; Returns: number }
-      st_subdivide: {
-        Args: { geom: unknown; gridsize?: number; maxvertices?: number }
-        Returns: unknown[]
-      }
-      st_swapordinates: {
-        Args: { geom: unknown; ords: unknown }
-        Returns: unknown
-      }
-      st_symdifference: {
-        Args: { geom1: unknown; geom2: unknown; gridsize?: number }
-        Returns: unknown
-      }
-      st_symmetricdifference: {
-        Args: { geom1: unknown; geom2: unknown }
-        Returns: unknown
-      }
-      st_tileenvelope: {
-        Args: {
-          bounds?: unknown
-          margin?: number
-          x: number
-          y: number
-          zoom: number
-        }
-        Returns: unknown
-      }
-      st_touches: { Args: { geom1: unknown; geom2: unknown }; Returns: boolean }
-      st_transform:
-        | {
-            Args: { from_proj: string; geom: unknown; to_proj: string }
-            Returns: unknown
-          }
-        | {
-            Args: { from_proj: string; geom: unknown; to_srid: number }
-            Returns: unknown
-          }
-        | { Args: { geom: unknown; to_proj: string }; Returns: unknown }
-      st_triangulatepolygon: { Args: { g1: unknown }; Returns: unknown }
-      st_union:
-        | { Args: { geom1: unknown; geom2: unknown }; Returns: unknown }
-        | {
-            Args: { geom1: unknown; geom2: unknown; gridsize: number }
-            Returns: unknown
-          }
-      st_voronoilines: {
-        Args: { extend_to?: unknown; g1: unknown; tolerance?: number }
-        Returns: unknown
-      }
-      st_voronoipolygons: {
-        Args: { extend_to?: unknown; g1: unknown; tolerance?: number }
-        Returns: unknown
-      }
-      st_within: { Args: { geom1: unknown; geom2: unknown }; Returns: boolean }
-      st_wkbtosql: { Args: { wkb: string }; Returns: unknown }
-      st_wkttosql: { Args: { "": string }; Returns: unknown }
-      st_wrapx: {
-        Args: { geom: unknown; move: number; wrap: number }
-        Returns: unknown
-      }
       todays_celebrities: {
         Args: { p_site_id: string }
         Returns: {
@@ -12229,31 +12744,13 @@ export type Database = {
         Args: { self_id: string; src: string }
         Returns: string
       }
-      unlockrows: { Args: { "": string }; Returns: number }
-      updategeometrysrid: {
-        Args: {
-          catalogn_name: string
-          column_name: string
-          new_srid_in: number
-          schema_name: string
-          table_name: string
-        }
-        Returns: string
-      }
+      visapaketti: { Args: { p_avain?: string; p_slug: string }; Returns: Json }
     }
     Enums: {
       [_ in never]: never
     }
     CompositeTypes: {
-      geometry_dump: {
-        path: number[] | null
-        geom: unknown
-      }
-      valid_detail: {
-        valid: boolean | null
-        reason: string | null
-        location: unknown
-      }
+      [_ in never]: never
     }
   }
 }

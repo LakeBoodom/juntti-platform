@@ -22,7 +22,18 @@
 
 /* ── Yläosa: mobiili ──────────────────────────────────────────────── */
 .tn20 .hs-grid, .tn20 .hs-vasen { display: flex; flex-direction: column; gap: 22px; min-width: 0; }
-.tn20 .hs-oikea { min-width: 0; margin-top: 12px; }
+.tn20 .hs-oikea { min-width: 0; margin-top: 12px; display: flex; flex-direction: column; gap: 18px; }
+/* Mobiili (CD 5c, 25.10.2026): pelit heti ikärivin alle, esittely ja Lyhyesti niiden jälkeen, Liittyvät visat viimeisenä.
+   Sarakkeet puretaan (display: contents), jotta järjestys voidaan asettaa ilman kaksoisrenderöintiä. */
+@media (max-width: 1099px) {
+  .tn20 .hs-vasen, .tn20 .hs-oikea { display: contents; }
+  .tn20 .hs-paa { order: 1; }
+  .tn20 .hub-fakta { order: 2; }
+  .tn20 .hub-hylly { order: 3; }
+  .tn20 .hs-esittely { order: 4; }
+  .tn20 .hub-lyhyesti { order: 5; }
+  .tn20 .hub-muista { order: 6; }
+}
 .tn20 .hs-paa { display: grid; grid-template-columns: 112px minmax(0, 1fr); gap: 16px; align-items: end; }
 .tn20 .hs-muotokuva { margin: 0; display: flex; flex-direction: column; gap: 6px; }
 .tn20 .hs-passe { padding: 4px; border: 1px solid rgba(201, 169, 106, 0.55); border-radius: 4px; background: #1a160d; box-shadow: 0 18px 40px rgba(0, 0, 0, 0.45); }
@@ -74,11 +85,7 @@
 .tn20 .hub-fakta-ala { font-size: 13px; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; color: var(--hs-gold, #c9a96a); }
 .tn20 .hub-fakta-rivit { display: flex; flex-direction: column; gap: 7px; font-size: 15px; line-height: 1.35; color: var(--hs-text-2, #dcd4c4); min-width: 0; }
 .tn20 .hub-fakta-rivit strong { color: var(--tn-text); }
-.tn20 .hub-fakta-tayttaa { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
 @media (min-width: 1100px) { .tn20 .hub-fakta-rivit { font-size: 16px; gap: 8px; } }
-
-/* Ikä kokonaisena lauseena (ikähaut 8.10.2026): iso "53 v" on visuaalinen, lause on tietorivien ensimmäinen. */
-.tn20 .hub-fakta-lause { font-weight: 600; color: var(--tn-text); }
 /* Syntymäpäivä (8.10.2026): kultainen merkki + korostettu ikälohko, Päivän sankarin synttärihengessä. */
 .tn20 .hub-fakta.hub-fakta--synttarit {
   border: 1px solid rgba(240, 196, 107, 0.55); border-radius: 16px; padding: 16px 16px;
@@ -98,9 +105,6 @@
 .tn20 .hub-synttarit-merkki::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: #1a1408; }
 @media (min-width: 1100px) { .tn20 .hub-fakta.hub-fakta--synttarit { padding: 18px 20px; } }
 
-.tn20 .hub-chip { align-self: flex-start; display: inline-block; padding: 3px 9px; border-radius: 999px; font-size: 13px; line-height: 1.3; }
-.tn20 .hub-chip--kulta { background: rgba(201, 169, 106, 0.16); border: 1px solid rgba(201, 169, 106, 0.5); font-weight: 800; color: var(--hs-gold-2, #e4c98e); }
-.tn20 .hub-chip--neutraali { border: 1px solid #4a3f2c; font-weight: 700; color: #c8bfae; }
 
 /* ── Lyhyesti (hub) ───────────────────────────────────────────────── */
 .tn20 .hub-lyhyesti-otsikko {
@@ -126,12 +130,6 @@
 
 /* ── Pelihylly (hub, design 4a/4b) ────────────────────────────────── */
 .tn20 .hub-hylly { display: flex; flex-direction: column; gap: 18px; container-type: inline-size; }
-.tn20 .hub-hylly-head { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; padding-bottom: 12px; border-bottom: 1px solid var(--hs-line-2, #3a3122); }
-.tn20 .hub-hylly-otsikko {
-  margin: 0; font-family: var(--tn-font-display); font-weight: 900; text-transform: uppercase; letter-spacing: -0.01em;
-  font-size: clamp(22px, 6vw, 28px); line-height: 1.05; color: var(--tn-text); overflow-wrap: normal; word-break: keep-all; min-width: 0;
-}
-.tn20 .hub-hylly-n { flex: none; font-size: 12px; font-weight: 800; letter-spacing: 0.16em; text-transform: uppercase; color: var(--hs-muted, #8e8676); }
 .tn20 .hub-eyebrow { display: block; font-size: 12px; font-weight: 800; letter-spacing: 0.2em; text-transform: uppercase; color: var(--hs-gold, #c9a96a); }
 .tn20 .hub-tyyppi {
   align-self: flex-start; height: 24px; display: inline-flex; align-items: center; padding: 0 10px; border-radius: 6px;
@@ -203,6 +201,50 @@
 }
 @container (min-width: 480px) {
   .tn20 .hub-nosto { padding: 24px; gap: 16px; }
+}
+
+/* Henkilövisa nostona (CD 5a/5c 25.10.2026): kuva + merkki + "Kuinka hyvin tunnet X?" + täysleveä lime-CTA.
+   KORTTISÄÄNTÖ: otsikon koko tekstisarakkeen leveydestä (container) ja pisimmästä sanasta (--hub-lw);
+   Archivo 900 versaalina ≈ 0,67 em/merkki → kerroin 0,72 (marginaali ~7 %). CD:n 38/26 px ovat ylärajat. */
+.tn20 .hub-nosto.hub-nosto--visa {
+  gap: 22px; padding: 28px; border-color: #6b4a1e;
+  background: linear-gradient(160deg, #2a1e0e 0%, #17120a 70%);
+}
+.tn20 .hub-visa-paa { display: grid; grid-template-columns: 120px minmax(0, 1fr); gap: 22px; align-items: center; }
+.tn20 .hub-nosto--visa:not([data-kuva]) .hub-visa-paa { grid-template-columns: minmax(0, 1fr); }
+.tn20 .hub-visa-kuva { display: block; width: 120px; aspect-ratio: 4 / 5; border-radius: 12px; overflow: hidden; border: 2px solid var(--hub-amber, #f0a24b); background: #2a1e0e; }
+.tn20 .hub-visa-kuva img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.tn20 .hub-visa-teksti { display: flex; flex-direction: column; gap: 10px; min-width: 0; container-type: inline-size; }
+.tn20 .hub-nosto--visa .hub-nosto-otsikko { font-size: min(38px, calc(100cqw / (var(--hub-lw, 10) * 0.72))); line-height: 0.95; text-wrap: balance; }
+.tn20 .hub-cta-lime--levea { align-self: stretch; justify-content: center; height: auto; min-height: 60px; border-radius: 15px; font-size: 20px; }
+@container (max-width: 479px) {
+  .tn20 .hub-nosto.hub-nosto--visa { gap: 16px; padding: 20px; }
+  .tn20 .hub-visa-paa { grid-template-columns: 76px minmax(0, 1fr); gap: 16px; }
+  .tn20 .hub-visa-kuva { width: 76px; border-radius: 10px; }
+  .tn20 .hub-nosto--visa .hub-nosto-otsikko { font-size: min(26px, calc(100cqw / (var(--hub-lw, 10) * 0.72))); }
+  .tn20 .hub-cta-lime--levea { min-height: 54px; font-size: 17px; }
+}
+
+/* Ikäjärjestys visan alla tiiviinä rivinä (CD 5a): kolme kasvoa, merkki, otsikko, kysymys, violetti ääriviiva-CTA. */
+.tn20 .hub-rivi.hub-rivi--ika {
+  display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 18px; align-items: center;
+  padding: 18px 20px; border-radius: 16px; border: 1px solid #4a3a6b; background: #1c1626;
+}
+.tn20 .hub-rivi-kasvot { display: flex; }
+.tn20 .hub-rivi-kasvo { display: block; width: 44px; height: 56px; border-radius: 8px; overflow: hidden; border: 1.5px solid #8b6fc9; background: #2a1d45; }
+.tn20 .hub-rivi-kasvo + .hub-rivi-kasvo { margin-left: -12px; }
+.tn20 .hub-rivi-kasvo img { display: block; width: 100%; height: 100%; object-fit: cover; filter: grayscale(1); }
+.tn20 .hub-rivi-kasvo .hub-laatta-ini { display: flex; width: 100%; height: 100%; align-items: center; justify-content: center; font-size: 13px; }
+.tn20 .hub-rivi--ika .hub-rivi-eyebrow { color: #c9a8ff; }
+/* Varattu: kasvot 108 + välit 36 + CTA ~110 + padding 40 ≈ 300 px. */
+.tn20 .hub-rivi--ika .hub-rivi-nimi { font-size: min(21px, calc((100cqw - 300px) / (var(--hub-lw, 10) * 0.84))); }
+.tn20 .hub-rivi-ala { font-size: 14px; color: #b9aec9; }
+.tn20 .hub-rivi--ika .hub-rivi-cta { width: auto; gap: 6px; height: 46px; padding: 0 20px; border-radius: 12px; border: 1.5px solid #c9a8ff; color: #e6d8ff; font-size: 15px; }
+@container (max-width: 479px) {
+  .tn20 .hub-rivi.hub-rivi--ika { grid-template-columns: minmax(0, 1fr) auto; gap: 14px; padding: 16px; }
+  .tn20 .hub-rivi--ika .hub-rivi-kasvot, .tn20 .hub-rivi--ika .hub-rivi-ala { display: none; }
+  .tn20 .hub-rivi--ika .hub-rivi-nimi { font-size: min(17px, calc((100cqw - 150px) / (var(--hub-lw, 10) * 0.84))); line-height: 1.05; }
+  .tn20 .hub-rivi--ika .hub-rivi-cta { height: 44px; padding: 0 16px; font-size: 14px; }
 }
 
 /* Nostoa seuraavat: rivi (1) tai kortit (2–3) */
