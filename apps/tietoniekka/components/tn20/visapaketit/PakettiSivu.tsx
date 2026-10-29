@@ -51,7 +51,7 @@ export default function PakettiSivu({ sivu, taso, esikatselu }: { sivu: Sivu; ta
             </p>
           )}
           <h1 className="tn-vp-h1" style={{ "--lw": pisinSana(otsikko) } as CSSProperties}>{katko(otsikko, true)}</h1>
-          <p className="tn-vp-meta tn-card-meta">
+          <p className="tn-vp-meta">
             {meta.join(" · ")}
             {pvm && <> · <time dateTime={p.published_at ?? undefined}>{pvm}</time></>}
           </p>
