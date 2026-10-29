@@ -263,10 +263,12 @@ export const kuvaOnKysymys = (q: Pick<PakettiKysymys, "question_type" | "image_u
 
 /** Kuvakysymyksen kevyt versio pakettisivulle, juontajalle ja tulosteeseen (esikatselutesti 29.10.: lasten paketti
  *  latasi 2,6 Mt, osa Storagen alkuperäisistä 500–650 kt). Storagen kuvat Supabasen kuvamuunnoksen kautta 640 px
- *  leveinä (selain saa WebP:n), omat kuvat 720 px:n kopioina (pieniKuva). Televisionäkymä käyttää alkuperäisiä. */
+ *  leveinä (selain saa WebP:n), omat kuvat 720 px:n kopioina (pieniKuva). Televisionäkymä käyttää alkuperäisiä.
+ *  resize=contain on pakollinen: pelkällä leveydellä Supabase säilyttää alkuperäisen korkeuden ja rajaa kuvan keskeltä
+ *  (900 × 675 → 640 × 675, Heikin puhelintesti 29.10.). */
 export function kevytKuva(url: string): string {
   const m = url.match(/^(https:\/\/[^/]+\/storage\/v1)\/object\/public\/(.+)$/);
-  return m ? `${m[1]}/render/image/public/${m[2]}?width=640&quality=70` : pieniKuva(url);
+  return m ? `${m[1]}/render/image/public/${m[2]}?width=640&quality=70&resize=contain` : pieniKuva(url);
 }
 
 /* ─── Reitit ───────────────────────────────────────────────────── */
