@@ -163,11 +163,17 @@
   width: 100%; max-width: 794px; box-sizing: border-box; padding: clamp(20px, 6vw, 56px) clamp(18px, 7vw, 64px);
   background: #fff; color: #131109; border-radius: 4px; font-family: var(--tn-font-body); font-size: 16px; line-height: 1.45;
 }
-.tn20 .tn-vp-arkki-yla { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 12px 24px; padding-bottom: 12px; border-bottom: 3px solid #131109; }
-.tn20 .tn-vp-arkki-tunnus { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
-.tn20 .tn-vp-arkki-kicker { font-size: 12px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; color: #5b4300; }
+/* Yläosa kahtena rivinä: [sanamerkki ··· kierros] ja [paketin nimi ··· Joukkue: ____]. */
+.tn20 .tn-vp-arkki-yla {
+  display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: end; gap: 8px 24px;
+  padding-bottom: 12px; border-bottom: 3px solid #131109;
+}
+.tn20 .tn-vp-arkki-logo { font-family: var(--tn-font-display); font-weight: 900; font-size: 20px; line-height: 1; letter-spacing: .02em; color: #131109; }
+.tn20 .tn-vp-arkki-logo b { font-weight: 900; color: #c98a0e; }
+.tn20 .tn-vp-arkki-kicker { justify-self: end; font-size: 12px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; color: #5b4300; }
 .tn20 .tn-vp-arkki-paketti { font-family: var(--vp-cond); font-weight: 800; font-size: 24px; line-height: 1.05; text-transform: uppercase; overflow-wrap: anywhere; }
-.tn20 .tn-vp-joukkue { display: inline-flex; align-items: flex-end; gap: 6px; font-size: 15px; font-weight: 700; }
+.tn20 .tn-vp-joukkue { justify-self: end; display: inline-flex; align-items: flex-end; gap: 6px; font-size: 15px; font-weight: 700; }
+@media (max-width: 560px) { .tn20 .tn-vp-joukkue { grid-column: 1 / -1; justify-self: start; } }
 .tn20 .tn-vp-viiva { display: inline-block; width: 52mm; max-width: 50vw; border-bottom: 1px solid #131109; height: 1.1em; }
 .tn20 .tn-vp-arkki-h { margin: 16px 0 12px; font-family: var(--vp-cond); font-weight: 800; font-size: 22px; text-transform: uppercase; }
 .tn20 .tn-vp-arkki-kysymykset { margin: 0; padding-left: 28px; display: flex; flex-direction: column; gap: 14px; }
@@ -187,8 +193,10 @@
 .tn20 .tn-vp-arkki-selitys { color: #3d3a33; }
 
 @page { size: A4; margin: 14mm 16mm 18mm; }
+/* Alalaidan osoite joka sivulle keskelle www-muodossa (Heikki 29.10.: paperilla tunnistettava osoitteeksi), sivunumero oikealle.
+   Sivun reunalaatikot (@bottom-*) tulostuvat Chromessa ja Edgessä; Safari ja Firefox jättävät ne pois → arkin logo kantaa brändin. */
 @page {
-  @bottom-left { content: "tietoniekka.fi"; font: 9pt "Barlow", sans-serif; color: #555; }
+  @bottom-center { content: "www.tietoniekka.fi"; font: 600 10pt "Barlow", sans-serif; color: #131109; }
   @bottom-right { content: counter(page) " / " counter(pages); font: 9pt "Barlow", sans-serif; color: #555; }
 }
 
@@ -199,7 +207,10 @@
   .tn20 .tn-vp-tuloste { display: block; padding: 0; min-height: 0; background: #fff; }
   .tn20 .tn-vp-arkki { max-width: none; padding: 0; border-radius: 0; font-size: 12pt; color: #000; }
   .tn20 .tn-vp-arkki + .tn-vp-arkki { break-before: page; }
-  .tn20 .tn-vp-arkki-yla { border-bottom-width: 2pt; }
+  /* Sanamerkki toi yläosaan rivin lisää: välit tiiviimmiksi, jotta 7 kuvakysymyksen kierros mahtuu yhdelle sivulle. */
+  .tn20 .tn-vp-arkki-yla { border-bottom-width: 2pt; gap: 4px 24px; padding-bottom: 8px; }
+  .tn20 .tn-vp-arkki-h { margin: 10px 0 8px; }
+  .tn20 .tn-vp-arkki-kysymykset { gap: 10px; }
   .tn20 .tn-vp-arkki-kicker { color: #000; }
   .tn20 .tn-vp-arkki-vastaukset { font-size: 12pt; }
   .tn20 .tn-vp-arkki-selitys { color: #222; }
