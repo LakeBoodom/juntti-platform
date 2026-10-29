@@ -6,6 +6,7 @@ import type { CSSProperties } from "react";
 import type { EtusivuData } from "@/lib/etusivu5";
 import PelattuTanaan from "./PelattuTanaan";
 import PaivanVisaV5 from "./PaivanVisaV5";
+import { kuvanSrcSet } from "@/lib/kuvaVariantit";
 
 type D = NonNullable<EtusivuData>;
 
@@ -16,11 +17,15 @@ const lw = (t: string) => ({ "--lw": pisin(t) }) as CSSProperties;
  *  nimelle jää 68–95 px. --lw-t = pisin osa, --lw = koko sana (desktopin kortti, ei katkea). */
 const tavutettu = (m: { nimi: string; tavut?: string }) => (m.tavut ?? m.nimi).replace(/\|/g, "\u00AD");
 
-function Kuva({ src, pos, luokka, eager }: { src: string | null; pos?: string; luokka: string; eager?: boolean }) {
+/** Kuva: srcset omien kopioiden kokoversioista (lib/kuvaVariantit) — sizes = kuvan leveys näkymässä. */
+function Kuva({ src, pos, luokka, eager, sizes = "(min-width: 1100px) 600px, 100vw" }: {
+  src: string | null; pos?: string; luokka: string; eager?: boolean; sizes?: string;
+}) {
   if (!src) return <span className={luokka} aria-hidden="true" />;
+  const srcSet = kuvanSrcSet(src);
   return (
     // eslint-disable-next-line @next/next/no-img-element
-    <img className={luokka} src={src} alt="" loading={eager ? "eager" : "lazy"} fetchPriority={eager ? "high" : undefined} style={pos ? { objectPosition: pos } : undefined} />
+    <img className={luokka} src={src} srcSet={srcSet} sizes={srcSet ? sizes : undefined} alt="" loading={eager ? "eager" : "lazy"} fetchPriority={eager ? "high" : undefined} style={pos ? { objectPosition: pos } : undefined} />
   );
 }
 
@@ -100,7 +105,7 @@ function Tiesitko({ t }: { t: NonNullable<D["tiesitko"]> }) {
   return (
     <a className="tn-es-tt" href={t.href} data-tn-entry="etusivu:tiesitko">
       <span className="tn-es-tt-kuva">
-        <Kuva src={t.kuva} pos={t.kuvaPos} luokka="tn-es-tt-img" />
+        <Kuva src={t.kuva} pos={t.kuvaPos} luokka="tn-es-tt-img" eager />
       </span>
       <span className="tn-es-tt-teksti">
         <span className="tn-es-tt-yla">
@@ -128,7 +133,7 @@ function Aiheet({ a }: { a: D["aiheet"] }) {
       <div className="tn-es-aiheet">
         {a.tiilet.map((x) => (
           <a key={x.slug} className="tn-es-aihe" href={x.href}>
-            <Kuva src={x.kuva} pos={x.kuvaPos} luokka="tn-es-aihe-img" />
+            <Kuva src={x.kuva} pos={x.kuvaPos} luokka="tn-es-aihe-img" sizes="(min-width: 1100px) 280px, 50vw" />
             <span className="tn-es-aihe-nimi" lang="fi" style={lw(x.nimi)}>{x.nimi}</span>
           </a>
         ))}
@@ -152,7 +157,7 @@ function Pelit({ p }: { p: D["pelit"] }) {
               const sisus = (
                 <>
                   <span className="tn-es-peli-kuva">
-                    <Kuva src={m.kuva} pos={m.kuvaPos} luokka="tn-es-peli-img" />
+                    <Kuva src={m.kuva} pos={m.kuvaPos} luokka="tn-es-peli-img" sizes="(min-width: 768px) 320px, 56px" />
                   </span>
                   {m.tila === "tulossa" && <span className="tn-es-leima">Tulossa</span>}
                   <span className="tn-es-peli-teksti">
@@ -185,7 +190,7 @@ function Promo1({ p }: { p: NonNullable<D["promo1"]> }) {
     <div className="tn-es-promo-paikka" data-tn-entry="etusivu:promo1">
       <a className="tn-es-promo tn-es-promo--1" href={p.href}>
         <span className="tn-es-promo-kuva">
-          <Kuva src={p.kuva} pos={p.kuvaPos} luokka="tn-es-promo-img" />
+          <Kuva src={p.kuva} pos={p.kuvaPos} luokka="tn-es-promo-img" sizes="(min-width: 1100px) 970px, 100vw" />
         </span>
         <span className="tn-es-promo-teksti">
           <span className="tn-es-promo-yla">
