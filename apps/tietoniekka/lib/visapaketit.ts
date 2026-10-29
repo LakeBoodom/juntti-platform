@@ -7,6 +7,7 @@ import { getSupabase } from "./supabase";
 import { getSiteId } from "./queries";
 import { helsinginPaiva } from "./aika";
 import { visaHref } from "./visaHref";
+import { pieniKuva } from "./pienetKuvat";
 
 export const VP_LANDING = "/visapaketit";
 export const VP_SARJA_PUBIVISA = "pubivisa";
@@ -259,6 +260,14 @@ export const viittaaVaihtoehtoihin = (q: Pick<PakettiKysymys, "question_text">) 
 /** Kuva on osa kysymystä vain kuvakysymyksissä. Lasten tekstikysymysten kuvitus näkyy televisionäkymässä. */
 export const kuvaOnKysymys = (q: Pick<PakettiKysymys, "question_type" | "image_url">) =>
   q.question_type === "kuva" && !!q.image_url;
+
+/** Kuvakysymyksen kevyt versio pakettisivulle, juontajalle ja tulosteeseen (esikatselutesti 29.10.: lasten paketti
+ *  latasi 2,6 Mt, osa Storagen alkuperäisistä 500–650 kt). Storagen kuvat Supabasen kuvamuunnoksen kautta 640 px
+ *  leveinä (selain saa WebP:n), omat kuvat 720 px:n kopioina (pieniKuva). Televisionäkymä käyttää alkuperäisiä. */
+export function kevytKuva(url: string): string {
+  const m = url.match(/^(https:\/\/[^/]+\/storage\/v1)\/object\/public\/(.+)$/);
+  return m ? `${m[1]}/render/image/public/${m[2]}?width=640&quality=70` : pieniKuva(url);
+}
 
 /* ─── Reitit ───────────────────────────────────────────────────── */
 

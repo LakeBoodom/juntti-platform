@@ -3,6 +3,7 @@
 // kansiossa public/20/pienet/<sama polku>. pieniKuva(src) palauttaa pienen kopion, jos sellainen on.
 const PIENET = new Set<string>([
   "/20/kuvavisat/elaimet/leijona.webp",
+  "/20/kuvavisat/elaimet/liito-orava-2.webp",
   "/20/lapset/aihe-elaimet.webp",
   "/20/lapset/aihe-joulu.webp",
   "/20/lapset/aihe-kirjat.webp",
@@ -19,6 +20,7 @@ const PIENET = new Set<string>([
   "/20/lapset/nosto-lasten-jouluvisat.webp",
   "/20/lapset/tulossa-lasten-kirjat.webp",
   "/20/lapset/tulossa-maailman-elaimet.webp",
+  "/20/lapset/v5-k04-riekko.webp",
 ]);
 
 export const pieniKuva = (src: string): string => (PIENET.has(src) ? src.replace(/^\/20\//, "/20/pienet/") : src);

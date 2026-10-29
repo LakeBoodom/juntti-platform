@@ -5,7 +5,7 @@
 // kohta tallennetaan localStorageen (paketti + taso). Lasten kierroksilla Kuuntele-nappi, ei automaattista soittoa.
 import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties, type TouchEvent } from "react";
 import { kirjaaVp } from "@/lib/vpTapahtuma";
-import { kuvaOnKysymys, kysymysTeksti, oikeaVastaus, viittaaVaihtoehtoihin, type Kierros, type PakettiKysymys } from "@/lib/visapaketit";
+import { kevytKuva, kuvaOnKysymys, kysymysTeksti, oikeaVastaus, viittaaVaihtoehtoihin, type Kierros, type PakettiKysymys } from "@/lib/visapaketit";
 
 type Vaihe = { t: "kysymys"; k: Kierros; q: PakettiKysymys; i: number } | { t: "loppu" };
 
@@ -139,7 +139,7 @@ export default function VetajaNakyma({ packId, otsikko, kierrokset, paluu, avain
             )}
             {kuvaOnKysymys(v.q) && v.q.image_url && (
               // eslint-disable-next-line @next/next/no-img-element
-              <img className="tn-vp-vetaja-kuva" src={v.q.image_url} alt="" width={1536} height={1024}
+              <img className="tn-vp-vetaja-kuva" src={kevytKuva(v.q.image_url)} alt="" width={1536} height={1024}
                 style={v.q.image_position ? ({ objectPosition: v.q.image_position } as CSSProperties) : undefined} />
             )}
             {lapsi && (v.q.audio?.kysymys || v.q.animal_sound?.url) && (

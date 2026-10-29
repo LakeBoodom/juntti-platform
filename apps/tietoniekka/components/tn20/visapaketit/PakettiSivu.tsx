@@ -11,7 +11,7 @@ import { katko, pisinSana } from "@/lib/kokoelmat/data";
 import { pieniKuva } from "@/lib/pienetKuvat";
 import {
   VP_LANDING, type Kierros, type PakettiKysymys, type Sivu, type Taso,
-  hakuosa, julkaisuPvm, sarjaNimi, kierrosmaarat, kuvaOnKysymys, kysymysTeksti, lahdevisat, metarivi, oikeaVastaus, pakettiHref,
+  hakuosa, julkaisuPvm, kevytKuva, sarjaNimi, kierrosmaarat, kuvaOnKysymys, kysymysTeksti, lahdevisat, metarivi, oikeaVastaus, pakettiHref,
   tasonKierrokset, valitsinNakyy, viittaaVaihtoehtoihin,
 } from "@/lib/visapaketit";
 import VpAsiakas from "./VpAsiakas";
@@ -170,7 +170,7 @@ function KysymysRivi({ q }: { q: PakettiKysymys }) {
       {kuvaOnKysymys(q) && (
         <figure className="tn-vp-kuva">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={q.image_url!} alt="" loading="lazy" width={1536} height={1024}
+          <img src={kevytKuva(q.image_url!)} alt="" loading="lazy" decoding="async" width={1536} height={1024}
             style={q.image_position ? { objectPosition: q.image_position } : undefined} />
           {q.image_credit && <figcaption className="tn-vp-krediitti">{q.image_credit}</figcaption>}
         </figure>

@@ -5,7 +5,7 @@ import "@/app/(tn20)/visapaketit.css";
 import { runkoCond } from "@/components/tn20/runko/runkoFontti";
 import {
   type Kierros, type PakettiKysymys, type Sivu, type Taso,
-  hakuosa, kuvaOnKysymys, kysymysTeksti, oikeaVastaus, tasonKierrokset, viittaaVaihtoehtoihin,
+  hakuosa, kevytKuva, kuvaOnKysymys, kysymysTeksti, oikeaVastaus, tasonKierrokset, viittaaVaihtoehtoihin,
 } from "@/lib/visapaketit";
 import TulostaNappi from "./TulostaNappi";
 
@@ -62,7 +62,7 @@ function TulosteKysymys({ q }: { q: PakettiKysymys }) {
     <li>
       {kuvaOnKysymys(q) && (
         // eslint-disable-next-line @next/next/no-img-element
-        <img className="tn-vp-arkki-kuva" src={q.image_url!} alt="" width={1536} height={1024} />
+        <img className="tn-vp-arkki-kuva" src={kevytKuva(q.image_url!)} alt="" width={1536} height={1024} />
       )}
       <p className="tn-vp-arkki-k">{kysymysTeksti(q)}</p>
       {viittaaVaihtoehtoihin(q) && q.answers && (
