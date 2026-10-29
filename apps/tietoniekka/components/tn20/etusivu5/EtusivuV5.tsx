@@ -25,8 +25,11 @@ function Kuva({ src, pos, luokka, eager }: { src: string | null; pos?: string; l
 }
 
 function PaivanPelit({ d }: { d: D }) {
-  const { pvm, visa, slotti, sankari } = d.paivanPelit;
-  const maara = [visa, slotti, sankari].filter(Boolean).length;
+  const { pvm, visa, mikaMaa, sankari } = d.paivanPelit;
+  const mmPelattava = mikaMaa?.tila === "pelattava";
+  /* "n/3 pelattu tänään" vasta kun päiväpelejä (Päivän visa, Mikä maa?) on ≥ 2 pelattavana; Synttärit ei ole päiväpeli. */
+  const paivapeleja = [visa, mmPelattava].filter(Boolean).length;
+  const maara = [visa, mmPelattava, sankari].filter(Boolean).length;
   return (
     <section className="tn-es-pp" aria-labelledby="tn-es-pp-h" data-tn-entry="etusivu:paivan-pelit">
       <div className="tn-es-pp-paa">
@@ -37,29 +40,13 @@ function PaivanPelit({ d }: { d: D }) {
           </span>
           <h2 id="tn-es-pp-h" className="tn-es-h2 tn-es-h2--iso">Päivän pelit</h2>
         </div>
-        {maara > 0 && (
-          <PelattuTanaan visaId={visa?.quizId ?? null} sankariId={sankari?.quizId ?? null} slotti={slotti?.avain ?? null} tanaan={d.today.iso} maara={maara} />
+        {paivapeleja >= 2 && (
+          <PelattuTanaan visaId={visa?.quizId ?? null} sankariId={sankari?.quizId ?? null} slotti={mmPelattava ? "mika-maa" : null} tanaan={d.today.iso} maara={maara} />
         )}
       </div>
       <div className="tn-es-pp-ruudukko">
-        {visa && <PaivanVisaV5 visa={visa} lw={pisin(visa.title)} />}
-        <div className="tn-es-pp-sivu">
-          {slotti && (
-            <a className="tn-es-slot" href={slotti.href} data-paivan-peli="slotti" data-tn-entry="etusivu:paivan-slotti" style={{ "--acc": slotti.aksentti } as CSSProperties}>
-              <span className="tn-es-slot-kuva">
-                <Kuva src={slotti.kuva} pos={slotti.kuvaPos} luokka="tn-es-slot-img" />
-              </span>
-              <span className="tn-es-slot-teksti">
-                <span className="tn-es-laji">
-                  <i aria-hidden="true" />
-                  <span>{slotti.kicker}{slotti.tarkenne && <span className="tn-es-vain-desk"> · {slotti.tarkenne}</span>}</span>
-                </span>
-                <span className="tn-es-slot-h" style={lw(slotti.otsikko)}>{slotti.otsikko}</span>
-                <span className="tn-es-slot-rivi">{slotti.rivi}</span>
-                <span className="tn-es-nappi tn-es-nappi--acc">{slotti.cta}</span>
-              </span>
-            </a>
-          )}
+        {visa && <PaivanVisaV5 k={visa} />}
+        <div className="tn-es-pp-sivu" data-yksi={!mikaMaa || undefined}>
           {sankari && (
             <a className="tn-es-synt" href={sankari.playHref} data-tn-entry="etusivu:synttarit">
               <span className="tn-es-synt-kuva">
@@ -72,9 +59,37 @@ function PaivanPelit({ d }: { d: D }) {
               </span>
             </a>
           )}
+          {mikaMaa && <MikaMaa m={mikaMaa} />}
         </div>
       </div>
     </section>
+  );
+}
+
+/** Päivän pelit, kolmas paikka: Mikä maa? (kompassinpunainen). Tulossa-kortti ei ole klikattava. */
+function MikaMaa({ m }: { m: NonNullable<D["paivanPelit"]["mikaMaa"]> }) {
+  const tulossa = m.tila === "tulossa";
+  const [, kk, pv] = (m.julkaisu ?? "").split("-").map(Number);
+  const sisus = (
+    <>
+      <span className="tn-es-mm-merkki" aria-hidden="true">
+        <i /><i /><i /><i /><i /><i />
+      </span>
+      <span className="tn-es-slot-teksti">
+        <span className="tn-es-laji"><i aria-hidden="true" /><span>{m.nimi}</span></span>
+        <span className="tn-es-slot-h" style={lw("Päivän maa")}>Päivän maa</span>
+        <span className="tn-es-slot-rivi">{m.etusivu_rivi}</span>
+        {tulossa
+          ? <span className="tn-es-mm-leima">Tulossa{m.julkaisu ? ` ${pv}.${kk}.` : ""}</span>
+          : <span className="tn-es-nappi tn-es-nappi--acc">Arvaa</span>}
+      </span>
+    </>
+  );
+  const tyyli = { "--acc": m.aksentti } as CSSProperties;
+  return tulossa ? (
+    <div className="tn-es-slot tn-es-mm" data-tulossa aria-disabled="true" style={tyyli}>{sisus}</div>
+  ) : (
+    <a className="tn-es-slot tn-es-mm" href={m.href} data-paivan-peli="slotti" data-tn-entry="etusivu:mika-maa" style={tyyli}>{sisus}</a>
   );
 }
 

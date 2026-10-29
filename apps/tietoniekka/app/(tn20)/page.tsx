@@ -15,7 +15,8 @@ import "./etusivu-v5.css";
 export const revalidate = 300;
 
 /* Esikatselu (ei tuotannossa): ?sankari=YYYY-MM-DD näyttää toisen päivän synttärisankarin,
-   ?pv=A|B|C Päivän visan koukkutilan suurimmalla sallitulla tekstillä (80 + 240 merkkiä). */
+   ?pv=A|B|C Päivän visan koukkutilan suurimmalla sallitulla tekstillä (80 + 240 merkkiä),
+   ?pv=uusi uuden Päivän visan kentät (Nro 1000, Tänään-chip, rytmirivi) korttisääntömittausta varten. */
 const ESIKATSELU = process.env.VERCEL_ENV !== "production";
 const MALLI_INTRO = {
   headline: "Kahdeksankymmentä merkkiä pitkä koukkuotsikko täyttää rivin aivan reunaan asti",
@@ -31,7 +32,7 @@ export default async function Etusivu20({
   const sankari = ESIKATSELU && typeof sp.sankari === "string" && /^\d{4}-\d{2}-\d{2}$/.test(sp.sankari) ? sp.sankari : null;
   const pvMalli = !ESIKATSELU ? undefined
     : sp.pv === "A" ? MALLI_INTRO : sp.pv === "C" ? { headline: null, text: MALLI_INTRO.text } : sp.pv === "B" ? null : undefined;
-  const d = await haeEtusivu({ sankariPaiva: sankari, pvMalli });
+  const d = await haeEtusivu({ sankariPaiva: sankari, pvMalli, pvUusi: ESIKATSELU && sp.pv === "uusi" });
   if (!d) return <main style={{ padding: 32 }}>Ei tietokantayhteyttä.</main>;
 
   return (

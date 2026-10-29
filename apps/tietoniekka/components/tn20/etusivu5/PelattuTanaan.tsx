@@ -2,7 +2,8 @@
 // "n/3 pelattu tänään" (etusivu v5, Päivän pelit). Luetaan localStoragesta:
 //   Päivän visa: PAIVAN_VISA_KEY (pelattu ?paivan_visa=1 -linkistä) tai tn_pelattu_pvm[visaId] = tänään
 //   Synttärit:   tn_pelattu_pvm[sankarin visan id] = tänään (GameClient kirjaa jokaisen pelatun visan päivän)
-//   Slotti:      tn_paivan_slotti = "<tänään>|<avain>" — kirjataan, kun slottikorttia klikataan
+//   Mikä maa?:   tn_paivan_slotti = "<tänään>|mika-maa" — kirjataan, kun korttia klikataan (laskuri näkyy vasta, kun
+//                päiväpelejä on ≥ 2 — EtusivuV5)
 // Palvelin renderöi 0/3; päivitys selaimessa ei siirrä mitään (kiinteä leveys).
 import { useEffect, useState } from "react";
 import { PAIVAN_VISA_KEY, localDateKey } from "@/components/tn20/PaivanVisaCard";

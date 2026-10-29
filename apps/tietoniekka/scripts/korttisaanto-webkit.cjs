@@ -10,7 +10,7 @@ const BASE = process.argv[2];
 const SIVUT = (process.argv[3] || "tv,elokuvat,musiikki,matkakohteet,kulttuuri,euroviisut,urheilu,jaakiekko,jalkapallo,tiede,historia,juhlat,kaupungit,luonto,kuvavisat,tunnetut-henkilot,vaalit").split(",");
 const LEVEYDET = [320, 375, 390, 430];
 const SEL = ".rk-h1,.rk-h2,.rk-a-nimi,.rk-c-nimi,.rk-peli-nimi,.rk-kokoelma-nimi,.rk-chip,.rk-cta,.rk-cta-selite,.rk-ingress,.rk-eyebrow,.tn-card-cta,.tn-card-meta,.rk-aika-nimi,.rk-aika-vuodet,.rk-aika-maara,.rk-synt-nimi,.rk-laskuri-luku,.rk-haku-kaikki,.rk-krediitti,.ju-cd-n,.ju-cd-u,.rk-v4-eyebrow" +
-  ",.tn-es-h2,.tn-es-kicker,.tn-es-pv-h,.tn-es-slot-h,.tn-es-synt-h,.tn-es-tt-h,.tn-es-aihe-nimi,.tn-es-ryhma-h,.tn-es-peli-h,.tn-es-promo-h,.tn-es-juontaja-h,.tn-es-ootko-h,.tn-es-lp-h,.tn-es-tag,.tn-es-laji,.tn-es-nappi,.tn-cta-lime,.tn-es-leima,.tn-es-juontaja-sitaatti,.tn-es-pv-leima,.tn-es-pv-koukku-h,.tn-es-pv-koukku-t";
+  ",.tn-es-h2,.tn-es-kicker,.tn-es-pv-nimio,.tn-es-pv-pvm,.tn-es-pv-nro,.tn-es-pv-chip,.tn-es-pv-tulos-n,.tn-es-pv-tulos-t,.tn-es-mm-leima,.tn-es-slot-rivi,.tn-es-slot-h,.tn-es-synt-h,.tn-es-tt-h,.tn-es-aihe-nimi,.tn-es-ryhma-h,.tn-es-peli-h,.tn-es-promo-h,.tn-es-juontaja-h,.tn-es-ootko-h,.tn-es-lp-h,.tn-es-tag,.tn-es-laji,.tn-es-nappi,.tn-cta-lime,.tn-es-leima,.tn-es-juontaja-sitaatti,.tn-es-pv-koukku-h,.tn-es-pv-koukku-t";
 (async () => {
   const b = await webkit.launch();
   let virheita = 0;

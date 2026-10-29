@@ -5,13 +5,12 @@
 import { getSupabase, SITE_SLUG } from "@/lib/supabase";
 import { helsinginPaiva } from "@/lib/aika";
 import { visaHref } from "@/lib/visaHref";
-import { rakennaPaivanVisa } from "@/lib/paivanVisaData";
+import { getPaivanVisaKortti } from "@/lib/paivanVisaKortti";
 import { muotoileSankari, type SankariRivi } from "@/lib/paivanSankari";
 import { getSiteStats } from "@/lib/siteStats";
 import { KOKOELMA_KORTIT } from "@/lib/kokoelmat/rekisteri";
 import { visanKorttikuva } from "@/lib/kokoelmat/visanKorttikuva";
 import { ETUSIVU_RYHMAT, ETUSIVUN_PELIMUODOT, nakyyEtusivulla, ryhmanNimi } from "@/lib/pelimuodot";
-import { paivanSlotti } from "@/lib/paivanPelit";
 import { JUONTAJIEN_SUOSITUKSET, PROMO2_OOTKO, VISAPAKETIT } from "@/lib/etusivu";
 import { JUHLAT_KOKOELMA, pvm, juhlaKalenteri, paavisa, paiviaValissa, type Esiintyma } from "@/lib/juhlat";
 import { LAPSET_SIVU, lapsetNakyvissa } from "@/lib/lapset/data";
@@ -47,7 +46,12 @@ function sitaatti(k: Kortti): string | null {
 /** Deterministinen valinta siemenestä (sama kaikille samana päivänä/viikkona). */
 const poimi = <T,>(lista: T[], n: number): T | null => (lista.length ? lista[((n % lista.length) + lista.length) % lista.length] : null);
 
-export async function haeEtusivu(opts: { sankariPaiva?: string | null; pvMalli?: { headline: string | null; text: string | null } | null } = {}) {
+export async function haeEtusivu(opts: {
+  sankariPaiva?: string | null;
+  pvMalli?: { headline: string | null; text: string | null } | null;
+  /** Esikatselu: uuden Päivän visan kentät (nro, Tänään-chip, rytmirivi) mallidatalla. */
+  pvUusi?: boolean;
+} = {}) {
   const sb = getSupabase();
   if (!sb) return null;
   const today = helsinginPaiva();
@@ -76,15 +80,17 @@ export async function haeEtusivu(opts: { sankariPaiva?: string | null; pvMalli?:
     sankariRivi = ((sRes.data ?? []) as SankariRivi[])[0] ?? null;
   }
   const visa = pv?.quiz_id
-    ? await rakennaPaivanVisa(sb, {
-        quizId: pv.quiz_id, paiva: today.iso,
+    ? await getPaivanVisaKortti(sb, {
+        quizId: pv.quiz_id, iso: today.iso, uusiMalli: opts.pvUusi,
         // Ajankohtaisuusteksti (toimituksen koukku) näkyy aina, kun se on kirjoitettu (Heikki 28.10.).
         intro: opts.pvMalli ?? { headline: pv.intro_headline, text: pv.intro_text },
         questionCount: (cards.find((c) => c.id === pv!.quiz_id) as { question_count?: number | null } | undefined)?.question_count ?? null,
       })
     : null;
   const sankari = sankariRivi ? muotoileSankari(sankariRivi) : null;
-  const slotti = await paivanSlotti({ iso: today.iso, nro: paivaNro });
+  /* Kolmas paikka on kiinteästi Mikä maa? (päivitys 29.10.: ei pelimuotojen rotaatiota). Tulossa-sääntö kuten pelimuodoissa. */
+  const mmConf = ETUSIVUN_PELIMUODOT.find((p) => p.slug === "mika-maa");
+  const mikaMaa = mmConf && nakyyEtusivulla(mmConf, today.iso) ? mmConf : null;
 
   /* ── 2 Tiesitkö? ── questions.hook-pooli, päiväsiemen. Sarakkeen puuttuminen (migraatio ajamatta) → ei osiota. */
   let tiesitko: { kysymys: string; korostus: string; kicker: string; href: string; kuva: string | null; kuvaPos?: string } | null = null;
@@ -190,7 +196,7 @@ export async function haeEtusivu(opts: { sankariPaiva?: string | null; pvMalli?:
     paivanPelit: {
       pvm: { pitka: `${VIIKONPAIVAT[vp]} ${today.pv}.${today.kk}.`, lyhyt: `${VP_LYHYT[vp]} ${today.pv}.${today.kk}.` },
       visa,
-      slotti,
+      mikaMaa,
       sankari,
     },
     tiesitko,
