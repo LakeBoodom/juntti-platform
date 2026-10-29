@@ -1,5 +1,5 @@
 // Visapakettien reittien yhteinen logiikka: /visapaketti/<slug>, /visapaketti/<sarja>/<painos> ja niiden
-// /ruutu- ja /tulosta-näkymät. Paketti haetaan kerran per pyyntö (cache), metatiedot ja sivu jakavat haun.
+// /ruutu-, /tulosta- ja /vetaja-näkymät. Paketti haetaan kerran per pyyntö (cache), metatiedot ja sivu jakavat haun.
 import type { Metadata } from "next";
 import { notFound, permanentRedirect } from "next/navigation";
 import { cache } from "react";
@@ -9,7 +9,7 @@ import { haeSivu, tasoParametrista, type Sivu, type Taso } from "@/lib/visapaket
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://tietoniekka.fi";
 
 export type Haku = Record<string, string | string[] | undefined>;
-export type Nakyma = "sivu" | "ruutu" | "tulosta";
+export type Nakyma = "sivu" | "ruutu" | "tulosta" | "vetaja";
 
 const hae = cache((slug: string, painos: string | null, esikatselu: string | null) => haeSivu(slug, painos, esikatselu));
 
@@ -20,14 +20,14 @@ export async function pakettiMetadata(slug: string, painos: string | null, sp: H
   if (!sivu) return { robots: { index: false } };
   const p = sivu.vp.paketti;
   const nimi = p.seo_title ?? (p.painos_nimi ? `${p.otsikko} – ${p.painos_nimi}` : p.otsikko);
-  const title = nakyma === "sivu" ? `${nimi} | Tietoniekka` : `${p.otsikko} – ${nakyma === "ruutu" ? "näytä ruudulla" : "tulosta"} | Tietoniekka`;
+  const title = nakyma === "sivu" ? `${nimi} | Tietoniekka` : `${p.otsikko} – ${{ ruutu: "näytä ruudulla", tulosta: "tulosta", vetaja: "juontajalle" }[nakyma]} | Tietoniekka`;
   const description = p.seo_description ?? undefined;
   const canonical = `${SITE_URL}${sivu.polku}`;
   return {
     title: { absolute: title },
     description,
     alternates: { canonical },
-    // Televisionäkymä ja tuloste: sisältö on jo pakettisivulla. Esikatselu (luonnos) ei koskaan indeksiin.
+    // Televisionäkymä, tuloste ja juontajan näkymä: sisältö on jo pakettisivulla. Esikatselu (luonnos) ei koskaan indeksiin.
     ...(nakyma !== "sivu" || sivu.vp.esikatselu ? { robots: { index: false, follow: nakyma !== "sivu" } } : {}),
     ...jakoMeta({ title: nimi, description, url: canonical, kuva: `/og/visapaketti/${p.slug}` }),
   };

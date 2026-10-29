@@ -65,6 +65,10 @@ export default function PakettiSivu({ sivu, taso, esikatselu }: { sivu: Sivu; ta
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M6 9V3h12v6" /><rect x="3" y="9" width="18" height="8" rx="2" /><path d="M6 14h12v7H6z" /></svg>
               Tulosta
             </a>
+            <a className="tn-vp-nappi" href={`${polku}/vetaja${haku}`} data-vp-tasolinkki="">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><rect x="6" y="2" width="12" height="20" rx="2.5" /><path d="M11 18h2" /></svg>
+              Juontajalle
+            </a>
           </div>
         </div>
         {p.hero_image && (

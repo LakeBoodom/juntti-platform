@@ -3,7 +3,7 @@
 // luonnoksen esikatselusta ei synny rivejä.
 import { getSupabase } from "./supabase";
 
-export type VpTapahtuma = "nayta" | "ruutu_aloitus" | "ruutu_loppu" | "tulosta" | "vastaus_auki" | "pelaa";
+export type VpTapahtuma = "nayta" | "ruutu_aloitus" | "ruutu_loppu" | "tulosta" | "vastaus_auki" | "pelaa" | "vetaja_aloitus" | "vetaja_loppu";
 
 function istunto(): string | null {
   try {

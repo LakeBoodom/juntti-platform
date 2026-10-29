@@ -88,6 +88,6 @@ export const isGameRoute = (pathname: string) =>
   // /kuvavisa/<kortisto> (SEO-erä A6) on sama GameClient omalla palkillaan → ei toista navipalkkia (pikakorjaus 22.10.2026;
   // sivuston palkki myös vieritti sivua sivuttain WebKitissä 768 → 390 px:n koonmuutoksessa).
   // Visapaketit (28.10.2026): "/visa" ilman kauttaviivaa osui myös /visapaketit-sivuihin, joilla navigaatio kuuluu
-  // näkyä. Paketin televisionäkymä ja tuloste ovat koko ruudun näkymiä ilman sivuston palkkia ja alatunnistetta.
+  // näkyä. Paketin televisionäkymä, tuloste ja juontajan näkymä ovat koko ruudun näkymiä ilman sivuston palkkia ja alatunnistetta.
   (pathname.startsWith("/peli") || pathname === "/visa" || pathname.startsWith("/visa/") || pathname.startsWith("/h/") || pathname.startsWith("/kuvavisa/") ||
-    /^\/visapaketti\/.+\/(ruutu|tulosta)\/?$/.test(pathname));
+    /^\/visapaketti\/.+\/(ruutu|tulosta|vetaja)\/?$/.test(pathname));

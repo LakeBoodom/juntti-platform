@@ -3,7 +3,7 @@
 // kierroksen väliruutu → kysymykset (vastaus paljastetaan napista) → kierroksen vastaukset → seuraava kierros.
 // Näppäimet: → / välilyönti = seuraava vaihe (ensin vastaus, sitten seuraava kysymys), ← = edellinen, F = koko näyttö.
 // Lasten kierroksilla Lauran ja Mikon kysymysääni (questions.audio.kysymys) soi kysymyksen tullessa ruudulle;
-// eläinääni soi napista kuten lasten pelissä. Ääni pois -valinta on sama kuin lasten pelissä (tn_lapset_aani).
+// eläinääni soi napista kuten lasten pelissä. Aloitusruudussa linkki juontajan näkymään (V-F). Ääni pois -valinta on sama kuin lasten pelissä (tn_lapset_aani).
 import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import { kirjaaVp } from "@/lib/vpTapahtuma";
 import { kuvaOnKysymys, kysymysTeksti, oikeaVastaus, viittaaVaihtoehtoihin, type Kierros, type PakettiKysymys } from "@/lib/visapaketit";
@@ -19,8 +19,8 @@ type Ruutu =
 /** Kysymystekstin pituusluokka televisiokokoa varten (KORTTISÄÄNTÖ-kalibrointi, visapaketit.css). */
 const pituus = (t: string) => (t.length <= 70 ? "lyhyt" : t.length <= 120 ? "keski" : "pitka");
 
-export default function RuutuNakyma({ packId, otsikko, kierrokset, paluu, mittaa }: {
-  packId: string; otsikko: string; kierrokset: Kierros[]; paluu: string; mittaa: boolean;
+export default function RuutuNakyma({ packId, otsikko, kierrokset, paluu, vetaja, mittaa }: {
+  packId: string; otsikko: string; kierrokset: Kierros[]; paluu: string; vetaja: string; mittaa: boolean;
 }) {
   const ruudut = useMemo<Ruutu[]>(() => [
     ...kierrokset.flatMap((k): Ruutu[] => [
@@ -140,6 +140,7 @@ export default function RuutuNakyma({ packId, otsikko, kierrokset, paluu, mittaa
             <span className="tn-vp-ruutu-vali-nro">Kierros {r.k.nro}</span>
             <h1 className="tn-vp-ruutu-vali-nimi">{r.k.nimi}</h1>
             {r.k.nro === 1 && <span className="tn-vp-ruutu-vali-paketti">{otsikko}</span>}
+            {n === 0 && <a className="tn-vp-ruutu-puhelin" href={vetaja}>Vastaukset puhelimeen</a>}
           </div>
         )}
 

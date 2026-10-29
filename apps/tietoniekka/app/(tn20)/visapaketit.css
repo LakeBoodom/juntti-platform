@@ -371,3 +371,100 @@
   .tn20 .tn-vp-kortti-h { font-size: min(30px, calc(100cqi / (var(--lw, 10) * 0.52 * 1.04))); }
   .tn20 .tn-vp-pikat { margin: auto 0 0; }
 }
+
+/* Televisionäkymän aloitusruutu → juontajan näkymä (V-F). */
+.tn20 .tn-vp-ruutu-puhelin {
+  display: inline-flex; align-items: center; min-height: 44px; margin-top: clamp(8px, 2vh, 32px);
+  font-size: clamp(14px, 1.1vw, 26px); font-weight: 700; color: var(--tn-lime); text-underline-offset: .2em;
+}
+
+/* ══ JUONTAJAN NÄKYMÄ /vetaja (V-F) ═════════════════════════════════
+   Puhelimeen: kysymys ja vastaus yhtä aikaa, kiinteä alapalkki peukalon ulottuville. Leveämmällä näytöllä
+   sama palsta keskellä (max 640 px). KORTTISÄÄNTÖ: vastaus Barlow Condensed 800 versaalina, koko pisimmästä
+   sanasta (--lw, 0,52 em/merkki) katolla 34 px; kysymys Barlow 700 tavallisena tekstinä, mitattu 320–430 px. */
+.tn20 .tn-vp-vetaja {
+  --vp-cond: var(--rk-cond-font, "Barlow Condensed"), "Barlow Condensed", sans-serif;
+  --vp-x: 16px;
+  --vp-ala: calc(76px + env(safe-area-inset-bottom));
+  display: flex; flex-direction: column; min-height: 100vh; min-height: 100dvh; box-sizing: border-box;
+  padding-bottom: var(--vp-ala); background: var(--tn-bg); color: var(--tn-text); border-top: 4px solid var(--tn-gold);
+}
+.tn20 .tn-vp-vetaja :is(a, button):focus-visible { outline: 2px solid var(--tn-lime); outline-offset: 2px; }
+.tn20 .tn-vp-vetaja-yla {
+  position: sticky; top: 0; z-index: 2; display: flex; align-items: center; gap: 4px;
+  padding: 6px var(--vp-x) 6px 4px; background: var(--tn-bg); border-bottom: 1px solid var(--tn-line);
+}
+.tn20 .tn-vp-vetaja-paluu { display: inline-flex; align-items: center; justify-content: center; flex: none; width: 44px; height: 44px; color: var(--tn-text-soft); }
+.tn20 .tn-vp-vetaja-kierros {
+  display: inline-flex; align-items: center; gap: 6px; min-width: 0; min-height: 44px; padding: 0 8px; border: 0; border-radius: 10px;
+  background: none; color: var(--tn-gold); cursor: pointer; font: inherit; font-size: 13px; font-weight: 800; line-height: 1.25; letter-spacing: .1em; text-transform: uppercase; text-align: left;
+}
+.tn20 .tn-vp-vetaja-kierros-t { min-width: 0; text-wrap: balance; }
+.tn20 .tn-vp-vetaja-kierros svg { flex: none; }
+.tn20 .tn-vp-vetaja-eteneminen { margin-left: auto; flex: none; font-family: var(--vp-cond); font-weight: 800; font-size: 20px; color: var(--tn-text-soft); font-variant-numeric: tabular-nums; }
+
+.tn20 .tn-vp-vetaja-sisalto {
+  flex: 1; container-type: inline-size; width: 100%; max-width: 640px; margin: 0 auto; box-sizing: border-box; padding: 20px var(--vp-x) 24px;
+  animation: tn-vp-tulo var(--dur-base) var(--ease-emphasized);
+}
+.tn20 .tn-vp-vetaja-kortti { display: flex; flex-direction: column; gap: 16px; }
+.tn20 .tn-vp-vetaja-k { margin: 0; font-family: var(--tn-font-body); font-weight: 700; font-size: 22px; line-height: 1.3; text-wrap: pretty; }
+.tn20 .tn-vp-vetaja-nro {
+  display: inline-flex; align-items: center; justify-content: center; min-width: 1.6em; height: 1.6em; margin-right: .45em; padding: 0 .3em;
+  box-sizing: border-box; border-radius: 999px; background: var(--tn-gold); color: var(--tn-bg);
+  font-family: var(--vp-cond); font-weight: 800; font-size: .82em; vertical-align: .12em; font-variant-numeric: tabular-nums;
+}
+.tn20 .tn-vp-vetaja-vaihtoehdot { margin: 0; padding-left: 1.5em; display: grid; gap: 4px; font-size: 17px; font-weight: 600; color: var(--tn-text-soft); }
+.tn20 .tn-vp-vetaja-kuva { display: block; width: 100%; max-height: 24vh; aspect-ratio: 3 / 2; object-fit: cover; border-radius: 12px; background: var(--tn-surface-2); }
+.tn20 .tn-vp-vetaja-aanet { display: flex; flex-wrap: wrap; gap: 10px; }
+.tn20 .tn-vp-vetaja-vastaus {
+  display: flex; flex-direction: column; gap: 10px; padding: 16px 18px;
+  border-radius: 14px; border: 2px solid var(--tn-lime); background: rgb(182 255 60 / .08);
+}
+.tn20 .tn-vp-vetaja-vastaus-t {
+  margin: 0; font-family: var(--vp-cond); font-weight: 800; line-height: 1.04; text-transform: uppercase; color: var(--tn-lime);
+  font-size: min(34px, calc((100cqi - 40px) / (var(--lw, 10) * 0.52 * 1.04)));
+  word-break: normal; overflow-wrap: normal;
+}
+.tn20 .tn-vp-vetaja-selitys { margin: 0; font-size: 16px; line-height: 1.5; color: var(--tn-text-soft); text-wrap: pretty; }
+
+.tn20 .tn-vp-vetaja-loppu { display: flex; flex-direction: column; gap: 10px; padding-top: 12vh; }
+.tn20 .tn-vp-vetaja-loppu-h { margin: 0; font-family: var(--vp-cond); font-weight: 800; font-size: 44px; line-height: 1; text-transform: uppercase; }
+.tn20 .tn-vp-vetaja-loppu-p { margin: 0; font-size: 17px; font-weight: 600; color: var(--tn-text-soft); }
+
+.tn20 .tn-vp-vetaja-ala {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 2; display: flex; gap: 10px;
+  padding: 12px max(var(--vp-x), calc((100% - 640px) / 2 + var(--vp-x))) max(12px, env(safe-area-inset-bottom));
+  background: var(--tn-bg); border-top: 1px solid var(--tn-line);
+}
+.tn20 .tn-vp-vetaja-nappi {
+  display: inline-flex; align-items: center; justify-content: center; min-height: 52px; padding: 0 18px; box-sizing: border-box;
+  border-radius: 999px; border: 1px solid var(--vp-line2, #3a3120); background: transparent; color: var(--tn-text); cursor: pointer;
+  font-family: var(--vp-cond); font-weight: 800; font-size: 17px; letter-spacing: .03em; text-transform: uppercase;
+  transition: border-color var(--dur-fast) var(--ease-standard);
+}
+.tn20 .tn-vp-vetaja-nappi:hover:not(:disabled) { border-color: var(--tn-text-muted); }
+.tn20 .tn-vp-vetaja-nappi:disabled { opacity: .4; cursor: default; }
+.tn20 .tn-vp-vetaja-nappi[aria-pressed="true"] { border-color: var(--tn-lime); color: var(--tn-lime); }
+.tn20 .tn-vp-vetaja-ala .tn-vp-vetaja-nappi { flex: 1 1 0; }
+.tn20 .tn-vp-vetaja-cta {
+  flex: 1.4 1 0; display: inline-flex; align-items: center; justify-content: center; min-height: 52px; padding: 0 18px; border: 0; cursor: pointer;
+  font-family: var(--vp-cond); font-weight: 800; font-size: 18px; letter-spacing: .03em;
+}
+
+.tn20 .tn-vp-vetaja-lista {
+  width: min(100% - 32px, 480px); max-height: min(80dvh, 640px); padding: 0; border: 1px solid var(--tn-line); border-radius: 18px;
+  background: var(--tn-surface); color: var(--tn-text);
+}
+.tn20 .tn-vp-vetaja-lista::backdrop { background: rgb(0 0 0 / .6); }
+.tn20 .tn-vp-vetaja-lista-sisa { display: flex; flex-direction: column; gap: 12px; padding: 20px; }
+.tn20 .tn-vp-vetaja-lista-h { margin: 0; font-family: var(--vp-cond); font-weight: 800; font-size: 26px; text-transform: uppercase; }
+.tn20 .tn-vp-vetaja-lista-ol { margin: 0; padding: 0; list-style: none; display: grid; gap: 8px; }
+.tn20 .tn-vp-vetaja-lista-k {
+  display: flex; align-items: center; gap: 12px; width: 100%; min-height: 52px; padding: 8px 14px; box-sizing: border-box; text-align: left;
+  border-radius: 12px; border: 1px solid var(--tn-line); background: var(--tn-bg); color: var(--tn-text); cursor: pointer; font: inherit; font-size: 17px; font-weight: 700;
+}
+.tn20 .tn-vp-vetaja-lista-k[aria-current] { border-color: var(--tn-gold); }
+.tn20 .tn-vp-vetaja-lista-nro { flex: none; font-family: var(--vp-cond); font-weight: 800; font-size: 22px; color: var(--tn-gold); min-width: 1ch; }
+.tn20 .tn-vp-vetaja-lista :is(a, button):focus-visible { outline: 2px solid var(--tn-lime); outline-offset: 2px; }
+.tn20 .tn-vp-vetaja-sulje { align-self: flex-end; }
