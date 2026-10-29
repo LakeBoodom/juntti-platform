@@ -60,11 +60,11 @@ export default function TulostaSivu({ sivu, taso, esikatselu }: { sivu: Sivu; ta
 function TulosteKysymys({ q }: { q: PakettiKysymys }) {
   return (
     <li>
-      <p className="tn-vp-arkki-k">{kysymysTeksti(q)}</p>
       {kuvaOnKysymys(q) && (
         // eslint-disable-next-line @next/next/no-img-element
         <img className="tn-vp-arkki-kuva" src={q.image_url!} alt="" width={1536} height={1024} />
       )}
+      <p className="tn-vp-arkki-k">{kysymysTeksti(q)}</p>
       {viittaaVaihtoehtoihin(q) && q.answers && (
         <ol className="tn-vp-arkki-vaihtoehdot" type="A">
           {q.answers.map((a) => <li key={a.text}>{a.text}</li>)}

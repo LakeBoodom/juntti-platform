@@ -170,9 +170,10 @@
 .tn20 .tn-vp-arkki-kysymykset > li::marker { font-weight: 800; }
 .tn20 .tn-vp-arkki-k { margin: 0; }
 .tn20 .tn-vp-arkki-kuva { display: block; max-height: 45mm; width: auto; max-width: 70mm; margin-top: 6px; border: 1px solid #ccc; }
-/* Kuvakysymys: kuva tekstin oikealle puolelle, jotta kymmenen kuvakysymyksen kierros mahtuu noin kahdelle sivulle. */
-.tn20 .tn-vp-arkki-kysymykset > li:has(.tn-vp-arkki-kuva) { display: grid; grid-template-columns: minmax(0, 1fr) 42mm; column-gap: 6mm; align-items: end; }
-.tn20 .tn-vp-arkki-kysymykset > li:has(.tn-vp-arkki-kuva) .tn-vp-arkki-kuva { grid-column: 2; grid-row: 1 / span 3; max-height: 28mm; max-width: 42mm; margin: 0; justify-self: end; }
+/* Kuvakysymys: kuva tekstin oikealle puolelle (float, jotta li pysyy list-itemina ja numero näkyy; grid poisti numeron),
+   joten kymmenen kuvakysymyksen kierros mahtuu noin kahdelle sivulle. */
+.tn20 .tn-vp-arkki-kysymykset > li::after { content: ""; display: block; clear: both; }
+.tn20 .tn-vp-arkki-kysymykset .tn-vp-arkki-kuva { float: right; max-height: 28mm; max-width: 42mm; margin: 0 0 2mm 6mm; }
 .tn20 .tn-vp-arkki-vaihtoehdot { margin: 4px 0 0; padding-left: 22px; display: flex; flex-wrap: wrap; gap: 2px 24px; }
 .tn20 .tn-vp-vastausviiva { display: block; height: 9mm; border-bottom: 1px solid #8a8a8a; }
 .tn20 .tn-vp-arkki-vastauskierros { break-inside: avoid; margin-top: 16px; }
