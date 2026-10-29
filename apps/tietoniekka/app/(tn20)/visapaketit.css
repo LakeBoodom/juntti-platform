@@ -33,7 +33,12 @@
   font-size: min(var(--vp-katto), calc(100cqi / (var(--lw, 10) * 0.52 * 1.04)));
   word-break: normal; overflow-wrap: normal; text-wrap: balance;
 }
-.tn20 .tn-vp-meta { margin: 0; font-size: 15px; font-weight: 600; color: var(--tn-text-soft); }
+/* Metarivin varafontti Barlow'n mitoilla (esikatselutesti 29.10.: pubivisan metarivi rivittyi varafontilla kahdelle
+   riville ja Barlow'lla yhdelle → kysymysosio hyppäsi 16 px, CLS 0,28). Barlow 600 on 0,907 × Arial/Helvetica Bold
+   (400: 0,949), mitattu Chromella 15 px:n tekstistä. */
+@font-face { font-family: "Barlow vara"; src: local("Arial"), local("Helvetica"), local("Roboto"); font-weight: 400 500; size-adjust: 94.9%; }
+@font-face { font-family: "Barlow vara"; src: local("Arial Bold"), local("Arial-BoldMT"), local("Helvetica Bold"), local("Helvetica-Bold"), local("Roboto Bold"), local("Roboto-Bold"); font-weight: 600 700; size-adjust: 90.7%; }
+.tn20 .tn-vp-meta { margin: 0; font-family: Barlow, "Barlow vara", sans-serif; font-size: 15px; line-height: 1.25; font-weight: 600; color: var(--tn-text-soft); }
 .tn20 .tn-vp-toiminnot { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 6px; }
 .tn20 .tn-vp-cta {
   display: inline-flex; align-items: center; justify-content: center; min-height: 52px; padding: 0 26px; border: 0; cursor: pointer;
