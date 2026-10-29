@@ -6,6 +6,7 @@ import { getCounts } from "@/lib/kokoelmaMaarat";
 import { kokoelmanPelimuodot, type Pelimuoto } from "@/lib/pelimuodot";
 import { naapurit, type KokoelmaKortti } from "./rekisteri";
 import { lapsetNakyvissa } from "@/lib/lapset/data";
+import { kokoelmanPaketti, type PakettiRivi } from "@/lib/visapaketit";
 import type { Kokoelma, KokoelmaOsio, RunkoVisa } from "./tyypit";
 
 /** S2: ennen "Näytä kaikki" -nappia näkyy osion ensimmäinen kortti + tämä määrä (21.10.2026: kaikki kortit samaa
@@ -38,6 +39,8 @@ export type RunkoData = {
   jarjestys: Array<{ id: string; nimi: string; href: string }>;
   pelit: Pelimuoto[];
   lisaa: Array<KokoelmaKortti & { maara: number }>;
+  /** Visapaketti, jonka teema on kokoelman nimi (Juhlat → joulupaketti kauden aikana); linkkikortti heron alle. */
+  paketti?: PakettiRivi | null;
 };
 
 type Rivi = {
@@ -87,14 +90,17 @@ export type UlkoinenKohde = { tagit: string[]; visa: RunkoVisa };
 export async function haeRunkoData(k: Kokoelma, ulkoiset?: UlkoinenKohde[]): Promise<RunkoData | null> {
   const sb = getSupabase();
   if (!sb) return null;
-  if (ulkoiset) return kokoa(k, ulkoiset, await getCounts());
+  if (ulkoiset) {
+    const [maarat, paketti] = await Promise.all([getCounts(), kokoelmanPaketti(k)]);
+    return { ...kokoa(k, ulkoiset, maarat), paketti };
+  }
   let q = sb
     .from("quiz_cards" as never)
     .select("id, slug, custom_slug, game_mode, title, display_title, genre, subcollection, category, play_count, question_count, section_tags, hero_image, hero_focal_x, hero_focal_y, target_age, published_at");
   if (k.haku.collection) q = q.eq("collection", k.haku.collection);
   if (k.haku.category) q = q.eq("category", k.haku.category);
   if (k.haku.sectionTags) q = q.overlaps("section_tags", k.sections.map((s) => s.slug));
-  const [{ data }, maarat] = await Promise.all([q, getCounts()]);
+  const [{ data }, maarat, paketti] = await Promise.all([q, getCounts(), kokoelmanPaketti(k)]);
   const lapsetMukaan = k.lapset && lapsetNakyvissa();
   const rivit = ((data ?? []) as unknown as Rivi[]).filter((r) => lapsetMukaan || (r.target_age !== "4-7" && r.target_age !== "8-12"));
 
@@ -122,7 +128,7 @@ export async function haeRunkoData(k: Kokoelma, ulkoiset?: UlkoinenKohde[]): Pro
     };
   };
 
-  return kokoa(k, rivit.map((r) => ({ tagit: r.section_tags ?? [], visa: visa(r) })), maarat);
+  return { ...kokoa(k, rivit.map((r) => ({ tagit: r.section_tags ?? [], visa: visa(r) })), maarat), paketti };
 }
 
 /** Osiot, korttianatomia (S1), katkaisu (S2) ja hero/V6/V7-data kohteista. */

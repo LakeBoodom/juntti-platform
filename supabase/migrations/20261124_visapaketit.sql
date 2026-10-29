@@ -147,3 +147,6 @@ language sql stable security definer set search_path = public as $$
 $$;
 revoke all on function public.visapaketti(text, uuid) from public;
 grant execute on function public.visapaketti(text, uuid) to anon, authenticated, service_role;
+
+-- Landingin kortin kicker (brief: "kicker (teema)"), esim. 'Juhlat', 'Lapset', 'Sekalaiset'. Lisätty V-C:ssä.
+alter table public.quiz_packs add column teema text;

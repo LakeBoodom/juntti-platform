@@ -339,3 +339,17 @@
 .tn20 .rk-nauha li[data-karki] .rk-nauha-palkki { background: var(--rk-acc); opacity: 1; }
 /* Kuvaton hero (kuva tulossa): raidallinen paikka. */
 .tn20 .rk-hero-kuva[data-tyhja] { background: repeating-linear-gradient(135deg, color-mix(in srgb, var(--rk-acc) 14%, #1a170f) 0 12px, #17140d 12px 24px); }
+
+/* Visapaketin linkkikortti heron alla (visapaketit 28.10.2026): pieni kortti, ei banneria. */
+.tn20 .rk-vp { max-width: var(--rk-max); margin: 0 auto; padding: 20px var(--rk-x) 0; box-sizing: border-box; }
+.tn20 .rk-vp-kortti {
+  display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "kicker cta" "nimi cta" "meta cta"; align-items: center; gap: 2px 16px;
+  max-width: 560px; padding: 14px 18px; border-radius: 14px; border: 1px solid var(--rk-line2); background: var(--rk-card);
+  color: var(--rk-ink); text-decoration: none; transition: border-color var(--dur-fast) var(--ease-standard);
+}
+.tn20 .rk-vp-kortti:hover { border-color: var(--rk-acc); }
+.tn20 .rk-vp-kortti:focus-visible { outline: 2px solid var(--tn-lime); outline-offset: 3px; }
+.tn20 .rk-vp-kicker { grid-area: kicker; font-size: 11px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; color: var(--rk-acc); }
+.tn20 .rk-vp-nimi { grid-area: nimi; font-family: var(--rk-cond); font-weight: 800; font-size: 22px; line-height: 1.05; text-transform: uppercase; overflow-wrap: anywhere; }
+.tn20 .rk-vp-kortti .tn-card-meta { grid-area: meta; }
+.tn20 .rk-vp-kortti .tn-card-cta { grid-area: cta; }

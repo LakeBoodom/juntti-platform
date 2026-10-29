@@ -7316,6 +7316,69 @@ export type Database = {
         }
         Relationships: []
       }
+      _selko_yleistieto_q_backup_20261029: {
+        Row: {
+          animal_sound: Json | null
+          answers: Json | null
+          audio: Json | null
+          created_at: string | null
+          explanation: string | null
+          hook: boolean | null
+          id: string | null
+          image_credit: string | null
+          image_license_note: string | null
+          image_position: string | null
+          image_url: string | null
+          question_text: string | null
+          question_type: string | null
+          quiz_id: string | null
+          sort_order: number | null
+          taso: number | null
+          vihje_laura: string | null
+          vihje_mikko: string | null
+        }
+        Insert: {
+          animal_sound?: Json | null
+          answers?: Json | null
+          audio?: Json | null
+          created_at?: string | null
+          explanation?: string | null
+          hook?: boolean | null
+          id?: string | null
+          image_credit?: string | null
+          image_license_note?: string | null
+          image_position?: string | null
+          image_url?: string | null
+          question_text?: string | null
+          question_type?: string | null
+          quiz_id?: string | null
+          sort_order?: number | null
+          taso?: number | null
+          vihje_laura?: string | null
+          vihje_mikko?: string | null
+        }
+        Update: {
+          animal_sound?: Json | null
+          answers?: Json | null
+          audio?: Json | null
+          created_at?: string | null
+          explanation?: string | null
+          hook?: boolean | null
+          id?: string | null
+          image_credit?: string | null
+          image_license_note?: string | null
+          image_position?: string | null
+          image_url?: string | null
+          question_text?: string | null
+          question_type?: string | null
+          quiz_id?: string | null
+          sort_order?: number | null
+          taso?: number | null
+          vihje_laura?: string | null
+          vihje_mikko?: string | null
+        }
+        Relationships: []
+      }
       _ti_q_backup_20260926: {
         Row: {
           answers: Json | null
@@ -11365,6 +11428,7 @@ export type Database = {
           site_id: string
           slug: string
           status: string
+          teema: string | null
           updated_at: string
         }
         Insert: {
@@ -11387,6 +11451,7 @@ export type Database = {
           site_id: string
           slug: string
           status?: string
+          teema?: string | null
           updated_at?: string
         }
         Update: {
@@ -11409,6 +11474,7 @@ export type Database = {
           site_id?: string
           slug?: string
           status?: string
+          teema?: string | null
           updated_at?: string
         }
         Relationships: [

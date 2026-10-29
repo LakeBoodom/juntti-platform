@@ -29,6 +29,8 @@ export type Paketti = {
   hero_image: string | null;
   hero_alt: string | null;
   aksentti: string | null;
+  /** Landingin kortin kicker, esim. "Juhlat". */
+  teema: string | null;
   jarjestys: number;
   status: "draft" | "published";
   published_at: string | null;
@@ -93,7 +95,7 @@ export async function listaaVisapaketit(): Promise<PakettiRivi[]> {
   if (!sb || !siteId) return [];
   const { data, error } = await sb
     .from("quiz_packs")
-    .select("id, slug, sarja, painos_nimi, otsikko, seo_title, seo_description, kohderyhma, kausi_alku, kausi_loppu, kesto_min, hero_image, hero_alt, aksentti, jarjestys, status, published_at, quiz_pack_rounds(kohderyhma)")
+    .select("id, slug, sarja, painos_nimi, otsikko, seo_title, seo_description, kohderyhma, kausi_alku, kausi_loppu, kesto_min, hero_image, hero_alt, aksentti, teema, jarjestys, status, published_at, quiz_pack_rounds(kohderyhma)")
     .eq("site_id", siteId)
     .eq("status", "published")
     .order("jarjestys", { ascending: true })
@@ -138,6 +140,17 @@ export function landinginPaketit(rivit: PakettiRivi[]): PakettiRivi[] {
   return out;
 }
 
+/** Sarjan näyttönimi slugista: 'pubivisa' → 'Pubivisa' (sarjan pääsivun h1). */
+export const sarjaNimi = (sarja: string) => sarja.charAt(0).toUpperCase() + sarja.slice(1);
+
+/** ?taso=lapset&esikatselu=… pakettisivun, televisionäkymän ja tulosteen välisiin linkkeihin. */
+export function hakuosa(taso: Taso | null, esikatselu: string | null): string {
+  const u = new URLSearchParams();
+  if (taso === "lapset") u.set("taso", "lapset");
+  if (esikatselu) u.set("esikatselu", esikatselu);
+  return u.size ? `?${u}` : "";
+}
+
 /** Kortin ja noston linkki: sarjan painos → sarjan pääsivu. */
 export const korttiHref = (p: Pick<Paketti, "slug" | "sarja">) => (p.sarja ? sarjaHref(p.sarja) : pakettiHref(p));
 
@@ -171,7 +184,22 @@ export function ajankohtainen(rivit: PakettiRivi[], nyt: Date = new Date()): Pak
   return sarjanPainokset(rivit, VP_SARJA_PUBIVISA)[0] ?? null;
 }
 
+/** Kokoelmasivun linkkikortti: julkaistu paketti, jonka teema on kokoelman slug tai nimi ("Juhlat" ↔ juhlat).
+ *  Kausipaketti vain kauden aikana (lähin kauden loppu ensin), ajaton aina. Sarjoista vain uusin painos. */
+export async function kokoelmanPaketti(kokoelma: { slug: string; nimi: string }, nyt: Date = new Date()): Promise<PakettiRivi | null> {
+  const avaimet = [kokoelma.slug, kokoelma.nimi].map((x) => x.toLocaleLowerCase("fi"));
+  const omat = landinginPaketit(await listaaVisapaketit()).filter((p) => p.teema && avaimet.includes(p.teema.toLocaleLowerCase("fi")));
+  const kaudella = omat
+    .map((p) => ({ p, j: kauttaJaljella(p, nyt) }))
+    .filter((x): x is { p: PakettiRivi; j: number } => x.j !== null)
+    .sort((a, b) => a.j - b.j);
+  return kaudella[0]?.p ?? omat.find((p) => !p.kausi_alku) ?? null;
+}
+
 /* ─── Kysymykset ja tasot ───────────────────────────────────────── */
+
+/** Kysymysteksti paketissa: lähdevisan "BONUS:"-etuliite ei merkitse paketissa mitään (lasten visojen viimeinen kysymys). */
+export const kysymysTeksti = (q: Pick<PakettiKysymys, "question_text">) => q.question_text.replace(/^\s*BONUS:\s*/i, "");
 
 export const oikeaVastaus = (q: Pick<PakettiKysymys, "answers">): string =>
   (q.answers ?? []).find((a) => a.is_correct)?.text ?? "";
@@ -221,4 +249,39 @@ export function julkaisuPvm(iso: string | null): string | null {
   if (!iso) return null;
   const t = helsinginPaiva(new Date(iso));
   return `${t.pv}.${t.kk}.${t.vuosi}`;
+}
+
+/** Kysymys viittaa vaihtoehtoihin ("Mikä seuraavista…"): vaihtoehdot näytetään, muuten kysymykseen ei voi vastata.
+ *  Muut kysymykset esitetään avoimina kuten visaillassa (design: kysymys + vastaus, ei vaihtoehtoja). */
+export const viittaaVaihtoehtoihin = (q: Pick<PakettiKysymys, "question_text">) =>
+  /seuraavista|vaihtoehdo|näistä/i.test(q.question_text);
+
+/** Kuva on osa kysymystä vain kuvakysymyksissä. Lasten tekstikysymysten kuvitus näkyy televisionäkymässä. */
+export const kuvaOnKysymys = (q: Pick<PakettiKysymys, "question_type" | "image_url">) =>
+  q.question_type === "kuva" && !!q.image_url;
+
+/* ─── Reitit ───────────────────────────────────────────────────── */
+
+export type Sivu = {
+  vp: Visapaketti;
+  /** Sivun oma osoite ilman parametreja (canonical). */
+  polku: string;
+  /** Sarjan pääsivu: sarjan muut painokset ("Aiemmat painokset"). */
+  painokset: PakettiRivi[] | null;
+};
+
+/** /visapaketti/<slug>[/<painos>] → paketti. Sarjan nimi ilman painosta = uusin julkaistu painos. */
+export async function haeSivu(slug: string, painos: string | null, esikatselu?: string | null): Promise<Sivu | null> {
+  if (painos) {
+    const vp = await haeVisapaketti(`${slug}-${painos}`, esikatselu);
+    if (!vp || vp.paketti.sarja !== slug) return null;
+    return { vp, polku: pakettiHref(vp.paketti), painokset: null };
+  }
+  const suora = await haeVisapaketti(slug, esikatselu);
+  if (suora) return { vp: suora, polku: pakettiHref(suora.paketti), painokset: null };
+  const painokset = sarjanPainokset(await listaaVisapaketit(), slug);
+  if (!painokset.length) return null;
+  const vp = await haeVisapaketti(painokset[0].slug);
+  if (!vp) return null;
+  return { vp, polku: sarjaHref(slug), painokset };
 }

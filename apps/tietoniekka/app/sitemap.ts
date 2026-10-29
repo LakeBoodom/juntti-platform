@@ -19,6 +19,7 @@ import { getPublishedQuizSlugs } from "@/lib/queries";
 import { haeHakemisto } from "@/lib/henkilot";
 import { KUUKAUDET, kuukausiSlug } from "@/lib/henkiloRyhmat";
 import { LAPSET_SIVU, lapsetNakyvissa } from "@/lib/lapset/data";
+import { VP_LANDING, listaaVisapaketit, pakettiHref, sarjaHref } from "@/lib/visapaketit";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://tietoniekka.fi";
 
@@ -70,5 +71,16 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...henkilot.map((h) => u(h.href, "weekly", 0.6)),
   ];
 
-  return [...staticPages, ...collectionPages, ...kuvavisaPages, ...henkiloPages, ...quizPages];
+  // Visapaketit (28.10.2026): landing, paketit, sarjojen pääsivut ja painokset. Ruutu- ja tulostenäkymät ovat noindex.
+  const paketit = await listaaVisapaketit();
+  const sarjat = [...new Set(paketit.flatMap((p) => (p.sarja ? [p.sarja] : [])))];
+  const pakettiPages: MetadataRoute.Sitemap = paketit.length
+    ? [
+        u(VP_LANDING, "weekly", 0.8),
+        ...sarjat.map((s) => u(sarjaHref(s), "weekly", 0.8)),
+        ...paketit.map((p) => u(pakettiHref(p), p.sarja ? "monthly" : "weekly", p.sarja ? 0.6 : 0.8, p.published_at ? new Date(p.published_at) : now)),
+      ]
+    : [];
+
+  return [...staticPages, ...collectionPages, ...kuvavisaPages, ...pakettiPages, ...henkiloPages, ...quizPages];
 }
