@@ -193,8 +193,10 @@
 .tn20 .tn-vp-arkki-selitys { color: #3d3a33; }
 
 @page { size: A4; margin: 14mm 16mm 18mm; }
+/* Alalaidan osoite joka sivulle keskelle www-muodossa (Heikki 29.10.: paperilla tunnistettava osoitteeksi), sivunumero oikealle.
+   Sivun reunalaatikot (@bottom-*) tulostuvat Chromessa ja Edgessä; Safari ja Firefox jättävät ne pois → arkin logo kantaa brändin. */
 @page {
-  @bottom-left { content: "tietoniekka.fi"; font: 9pt "Barlow", sans-serif; color: #555; }
+  @bottom-center { content: "www.tietoniekka.fi"; font: 600 10pt "Barlow", sans-serif; color: #131109; }
   @bottom-right { content: counter(page) " / " counter(pages); font: 9pt "Barlow", sans-serif; color: #555; }
 }
 
