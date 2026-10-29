@@ -3,6 +3,7 @@
 // Seuranta: jokainen osio kantaa data-tn-entry="etusivu:<osio>" (lib/seuranta.ts).
 // Ei aputekstejä: otsikko, kortti, nappi. Osio-otsikon yläpuolella vain kicker-määrä.
 import type { CSSProperties } from "react";
+import { preload } from "react-dom";
 import type { EtusivuData } from "@/lib/etusivu5";
 import PelattuTanaan from "./PelattuTanaan";
 import PaivanVisaV5 from "./PaivanVisaV5";
@@ -18,7 +19,9 @@ const lw = (t: string) => ({ "--lw": pisin(t) }) as CSSProperties;
 const tavutettu = (m: { nimi: string; tavut?: string }) => (m.tavut ?? m.nimi).replace(/\|/g, "\u00AD");
 
 /** Kuva: srcset omien kopioiden kokoversioista (lib/kuvaVariantit) — sizes = kuvan leveys näkymässä. */
-function Kuva({ src, pos, luokka, eager, sizes = "(min-width: 1100px) 600px, 100vw" }: {
+const KUVA_SIZES = "(min-width: 1100px) 600px, 100vw";
+
+function Kuva({ src, pos, luokka, eager, sizes = KUVA_SIZES }: {
   src: string | null; pos?: string; luokka: string; eager?: boolean; sizes?: string;
 }) {
   if (!src) return <span className={luokka} aria-hidden="true" />;
@@ -99,6 +102,9 @@ function MikaMaa({ m }: { m: NonNullable<D["paivanPelit"]["mikaMaa"]> }) {
 }
 
 function Tiesitko({ t }: { t: NonNullable<D["tiesitko"]> }) {
+  /* Mobiilin LCP (Lighthouse 29.10.): Päivän visa -kortissa ei ole kuvaa, joten ensimmäisen näytön suurin elementti on
+     tämä kuva — esilataus <head>iin, ettei haku odota CSS:ää (simuloitu latausviive oli 2,5 s). */
+  if (t.kuva) preload(t.kuva, { as: "image", fetchPriority: "high", imageSrcSet: kuvanSrcSet(t.kuva), imageSizes: KUVA_SIZES });
   const i = t.kysymys.lastIndexOf(t.korostus);
   const alku = i >= 0 ? t.kysymys.slice(0, i) : t.kysymys;
   const loppu = i >= 0 ? t.kysymys.slice(i + t.korostus.length) : "";
