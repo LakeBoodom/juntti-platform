@@ -88,9 +88,11 @@ export async function haeEtusivu(opts: {
       })
     : null;
   const sankari = sankariRivi ? muotoileSankari(sankariRivi) : null;
-  /* Kolmas paikka on kiinteästi Mikä maa? (päivitys 29.10.: ei pelimuotojen rotaatiota). Tulossa-sääntö kuten pelimuodoissa. */
+  /* Kolmas paikka on kiinteästi Mikä maa? (päivitys 29.10.: ei pelimuotojen rotaatiota).
+     Päivän peleissä näytetään vain pelattavaa (Heikki 29.10. ilta): Tulossa-kortti ei vie
+     etusivun arvokkainta tilaa — Tulossa-sääntö pätee vain Valitse peli -osiossa. */
   const mmConf = ETUSIVUN_PELIMUODOT.find((p) => p.slug === "mika-maa");
-  const mikaMaa = mmConf && nakyyEtusivulla(mmConf, today.iso) ? mmConf : null;
+  const mikaMaa = mmConf && mmConf.tila === "pelattava" && nakyyEtusivulla(mmConf, today.iso) ? mmConf : null;
 
   /* ── 2 Tiesitkö? ── questions.hook-pooli, päiväsiemen. Sarakkeen puuttuminen (migraatio ajamatta) → ei osiota. */
   let tiesitko: { kysymys: string; korostus: string; kicker: string; href: string; kuva: string | null; kuvaPos?: string } | null = null;
