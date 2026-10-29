@@ -88,7 +88,7 @@ export default async function PakettiPage({ params, searchParams }: Props) {
           {kentta("sarja", "Sarja", "pubivisa")}
           {kentta("painos_nimi", "Painoksen nimi", "Loka–joulukuu 2026")}
           {kentta("jarjestys", "Järjestys landingilla")}
-          {kentta("hero_image", "Herokuva (oma kopio /20/…)")}
+          {kentta("hero_image", "Herokuva (oma kopio /20/…, n. 1200 px, ≤ 120 kt)")}
           {kentta("hero_alt", "Herokuvan alt-teksti")}
           {kentta("aksentti", "Aksenttiväri (#RRGGBB)", "#E2483D")}
           <div className="md:col-span-3"><Button type="submit" size="sm">Tallenna</Button></div>
