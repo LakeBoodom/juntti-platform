@@ -2,6 +2,7 @@
 // Laadullinen järjestyspakka (brief 4.10.2026): Ikäjärjestyksen järjestämis- ja paljastuskomponentit,
 // pisteytys yhteinen pakkapelien kanssa (lib/jarjesta/pisteytys.ts: 10/5, tasatulokset "tasan").
 import { pelijakoteksti } from "@/lib/korttinimi";
+import { jarjestaTaso } from "@/lib/pelitasot";
 import { useMemo, useState } from "react";
 import { ReorderableChainList } from "@/components/tn20/ReorderableChainList";
 import { SuuntaindikaattoriBadge } from "@/components/tn20/SuuntaindikaattoriBadge";
@@ -42,11 +43,9 @@ export default function OmaJarjestysClient({
 }) {
   const [order, setOrder] = useState<OmaKohde[]>(kohteet);
   const [paljastettu, setPaljastettu] = useState(false);
-  const [jaettu, setJaettu] = useState(false);
   const uudelleen = () => {
     setOrder(sekoita(kohteet));
     setPaljastettu(false);
-    setJaettu(false);
     window.scrollTo({ top: 0 });
   };
   const oikea = useMemo(() => [...kohteet].sort((a, b) => (direction === "desc" ? b.value - a.value : a.value - b.value)), [kohteet, direction]);
@@ -68,45 +67,30 @@ export default function OmaJarjestysClient({
     };
   });
 
-  async function haasta() {
-    /* Tulos linkkiin (?tulos=n-total), jotta Facebookin og-kuvaus kertoo sen (23.10.2026). */
-    const u = new URL(location.href);
-    u.searchParams.set("tulos", `${tulos.correctCount}-${tulos.totalCount}`);
-    const url = u.toString();
-    const teksti = pelijakoteksti(otsikko, `${tulos.correctCount}/${tulos.totalCount}`, tulos.correctCount === tulos.totalCount);
-    try {
-      if (navigator.share) await navigator.share({ title: PELI, text: teksti, url });
-      else await navigator.clipboard.writeText(`${teksti} ${url}`);
-      setJaettu(true);
-    } catch {
-      // jako peruttu
-    }
-  }
+  /* Jako (K4 v2, 25.10.2026): Jakoalue-komponentti; tulos linkkiin (?tulos=n-total) jotta kaveri saa saman kierroksen
+     ja Facebookin og-kuvaus kertoo tuloksen; tasonimi kuten tulosnäkymässä. Tulosvaihe piirretään vain selaimessa. */
+  const jakoTiedot = () => ({
+    url: (() => { const u = new URL(location.href); u.searchParams.set("tulos", `${tulos.correctCount}-${tulos.totalCount}`); return u.toString(); })(),
+    teksti: pelijakoteksti(otsikko, `${tulos.correctCount}/${tulos.totalCount} oikein`, tulos.correctCount === tulos.totalCount, jarjestaTaso(tulos.correctCount, tulos.totalCount)),
+  });
 
   // Pelikehys K1 (20.10.2026): paluu henkilösivulle, jolta pakka avattiin.
   if (paljastettu) {
     return (
       <PeliKehys iho="tumma">
-        <Pelipalkki iho="tumma" peli={PELI} koti={takaisin} />
+        <Pelipalkki iho="tumma" peli={PELI} muunnelma={otsikko} koti={takaisin} />
         <main className="tk-page">
           <RevealSequencer
             items={revealItems}
             tulos={
-              /* K4 (pelikehys, 20.10.2026): tulos → Pelaa uudelleen → Haasta kaveri → seuraava peli. */
+              /* K4 v2 (pelimuotojen kehys 25.10.2026): tulos → jako → seuraava peli → toissijaiset linkit. */
               <PeliTulos
-                eyebrow={`${PELI} · ${otsikko}`}
-                iso={`${tulos.correctCount}/${tulos.totalCount} oikein`}
-                ala={`${tulos.score} pistettä · pisin oikea ketju ${tulos.longestCorrectChain}`}
-                paatoiminto={
-                  <button type="button" className="pk-nappi" onClick={uudelleen}>
-                    Pelaa uudelleen
-                  </button>
-                }
-                haasta={
-                  <button type="button" className="pk-haasta" onClick={haasta}>
-                    {jaettu ? "Haaste jaettu" : "Haasta kaveri"}
-                  </button>
-                }
+                luku={`${tulos.correctCount}/${tulos.totalCount}`}
+                yksikko="oikein"
+                tasonimi={jarjestaTaso(tulos.correctCount, tulos.totalCount)}
+                lause={`${tulos.score} pistettä. Pisin oikea ketju: ${tulos.longestCorrectChain}.`}
+                jako={{ ...jakoTiedot(), natiiviOtsikko: PELI }}
+                toiminnot={[{ teksti: "Pelaa uudelleen", onClick: uudelleen }]}
                 seuraavat={seuraavatPelit("", "tunnetut-henkilot")}
               />
             }
@@ -121,7 +105,7 @@ export default function OmaJarjestysClient({
 
   return (
     <PeliKehys iho="tumma">
-      <Pelipalkki iho="tumma" peli={PELI} koti={takaisin} tila={`${order.length} korttia`} pelissa />
+      <Pelipalkki iho="tumma" peli={PELI} muunnelma={otsikko} koti={takaisin} tila={`${order.length} korttia`} pelissa />
       <main className="tk-page">
         <header className="tk-order-head">
           <SuuntaindikaattoriBadge label={suunta.toUpperCase()} />

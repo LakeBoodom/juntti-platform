@@ -6,6 +6,7 @@
 // Ei kantaan kirjoittamista vielä; paras tulos muistetaan selaimessa sarjakohtaisesti.
 
 import { pelijakoteksti } from "@/lib/korttinimi";
+import { tuplaTaso } from "@/lib/pelitasot";
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 import {
   LAUSEET_OLETUS,
@@ -148,7 +149,8 @@ function Tikapuut({ oikein, tila, napsahtaa }: { oikein: number; tila: LadTila; 
 function Ylapalkki({ t, tila }: { t: TuplaTeema; tila?: string }) {
   return (
     <Pelipalkki
-      peli={t.painos ? t.painos.nimi : `Tupla tai kuitti · ${t.nimi}`}
+      peli={t.painos ? t.painos.nimi : "Tupla tai kuitti"}
+      muunnelma={t.painos ? undefined : t.nimi}
       koti={{ href: "/kokoelmat", nimi: "Kokoelmat" }}
       tila={tila}
       pelissa={!!tila}
@@ -190,7 +192,6 @@ export default function TuplaClient({ teema: t, sarja, siemen, paivanSarja, paiv
   const [valinta, setValinta] = useState<string | null>(null);
   const [loppu, setLoppu] = useState<Loppu | null>(null);
   const [paras, setParas] = useState<number | null>(null);
-  const [jaettu, setJaettu] = useState(false);
   const p = t.palkinto;
   const L = t.lauseet ?? LAUSEET_OLETUS;
   const avain = `tk-tupla-${t.slug}-${siemen}`;
@@ -249,7 +250,6 @@ export default function TuplaClient({ teema: t, sarja, siemen, paivanSarja, paiv
     setI(0);
     setValinta(null);
     setLoppu(null);
-    setJaettu(false);
     setVaihe("kysymys");
     window.scrollTo({ top: 0 });
   }
@@ -257,18 +257,14 @@ export default function TuplaClient({ teema: t, sarja, siemen, paivanSarja, paiv
   // Arvotaan vasta painettaessa: renderissä arvottu siemen erottaisi palvelimen ja selaimen HTML:n.
   const arvoUusi = () => location.assign(`?sarja=${uusiSiemen()}`);
 
-  async function haasta() {
-    /* Tulos (saalis + lopetuksen syy) linkkiin, jotta Facebookin og-kuvaus kertoo sen (23.10.2026). */
-    const url = `${location.origin}/peli/tupla-tai-kuitti/${t.slug}?sarja=${encodeURIComponent(siemen)}${loppu ? `&tulos=${loppu.saalis}&syy=${loppu.syy}` : ""}`;
-    const teksti = loppu ? pelijakoteksti(`Tupla tai kuitti: ${t.nimi}`, maara(loppu.saalis, p)) : `Tupla tai kuitti: ${t.nimi}`;
-    try {
-      if (navigator.share) await navigator.share({ title: "Tupla tai kuitti", text: teksti, url });
-      else await navigator.clipboard.writeText(`${teksti} ${url}`);
-      setJaettu(true);
-    } catch {
-      // jako peruttu
-    }
-  }
+  /* Jako (K4 v2, 25.10.2026): Jakoalue-komponentti. Tulos (saalis + lopetuksen syy) linkkiin, jotta kaveri saa saman
+     sarjan ja Facebookin og-kuvaus kertoo tuloksen. Tulos piirretään vain pelin jälkeen selaimessa (ei SSR). */
+  const jako = loppu
+    ? {
+        url: `${typeof location !== "undefined" ? location.origin : "https://tietoniekka.fi"}/peli/tupla-tai-kuitti/${t.slug}?sarja=${encodeURIComponent(siemen)}&tulos=${loppu.saalis}&syy=${loppu.syy}`,
+        teksti: pelijakoteksti(`Tupla tai kuitti: ${t.nimi}`, maara(loppu.saalis, p), loppu.syy === "taydet", tuplaTaso(loppu.syy, loppu.saalis)),
+      }
+    : null;
 
   // Päätöspaneeli saa fokuksen (ruudunlukija ja näppäimistö) — sivua ei vieritetä.
   const paneeli = useRef<HTMLDivElement>(null);
@@ -311,7 +307,7 @@ export default function TuplaClient({ teema: t, sarja, siemen, paivanSarja, paiv
 
   /* ── Tulos ────────────────────────────────────────────────────────── */
   if (vaihe === "loppu" && loppu) {
-    return <Tulos t={t} loppu={loppu} paras={paras} jaettu={jaettu} haasta={haasta} alusta={alusta} arvoUusi={arvoUusi} tyyli={tyyli} />;
+    return <Tulos t={t} loppu={loppu} paras={paras} jako={jako!} alusta={alusta} arvoUusi={arvoUusi} tyyli={tyyli} />;
   }
 
   /* ── Kysymys + palaute ───────────────────────────────────────────── */
@@ -473,9 +469,9 @@ export default function TuplaClient({ teema: t, sarja, siemen, paivanSarja, paiv
   );
 }
 
-function Tulos({ t, loppu, paras, jaettu, haasta, alusta, arvoUusi, tyyli }: {
-  t: TuplaTeema; loppu: Loppu; paras: number | null; jaettu: boolean;
-  haasta: () => void; alusta: () => void; arvoUusi: () => void; tyyli: CSSProperties;
+function Tulos({ t, loppu, paras, jako, alusta, arvoUusi, tyyli }: {
+  t: TuplaTeema; loppu: Loppu; paras: number | null; jako: { url: string; teksti: string };
+  alusta: () => void; arvoUusi: () => void; tyyli: CSSProperties;
 }) {
   const p = t.palkinto;
   const { syy, saalis, oikein } = loppu;
@@ -501,18 +497,10 @@ function Tulos({ t, loppu, paras, jaettu, haasta, alusta, arvoUusi, tyyli }: {
       <Ylapalkki t={t} />
       <div data-iho="tumma" className="pk-sisalto">
         <PeliTulos
-          eyebrow={otsikko}
-          iso={
-            <>
-              <span className={syy === "jaahy" && saalis ? "kulta" : undefined}>{luku}</span> {saalis === 1 ? p.yksi : p.monta}
-            </>
-          }
-          ala={
-            <>
-              {l1}
-              {loppu.l2 && <> {loppu.l2}</>}
-            </>
-          }
+          luku={luku}
+          yksikko={saalis === 1 ? p.yksi : p.monta}
+          tasonimi={tuplaTaso(syy, saalis) ?? otsikko}
+          lause={l1}
           lisa={
             <div className="ttk-res-lisa">
               <span className="ttk-res-kasa">
@@ -536,22 +524,11 @@ function Tulos({ t, loppu, paras, jaettu, haasta, alusta, arvoUusi, tyyli }: {
               )}
             </div>
           }
-          paatoiminto={
-            <button type="button" className="pk-nappi" onClick={arvoUusi}>
-              Pelaa uusi kierros
-            </button>
-          }
-          harjoitus={
-            <button type="button" className="pk-linkki" onClick={alusta}>
-              Pelaa sama sarja uudelleen
-            </button>
-          }
-          haasta={
-            <button type="button" className="pk-haasta" onClick={haasta}>
-              <svg viewBox="0 0 20 20" width="18" height="18" aria-hidden="true"><path d="M10 13V3M6 6.5L10 2.5l4 4M4 11v5.5h12V11" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" /></svg>
-              {jaettu ? "Linkki jaettu ✓" : "Haasta kaveri"}
-            </button>
-          }
+          jako={{ ...jako, natiiviOtsikko: `Tupla tai kuitti: ${t.nimi}` }}
+          toiminnot={[
+            { teksti: "Pelaa uusi kierros", onClick: arvoUusi },
+            { teksti: "Pelaa sama sarja uudelleen", onClick: alusta },
+          ]}
           seuraavat={seuraavatPelit(peliSlug, koti)}
         />
       </div>

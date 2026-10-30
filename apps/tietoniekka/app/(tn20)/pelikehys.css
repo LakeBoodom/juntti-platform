@@ -31,6 +31,13 @@
 .tn20 .pk-erotin { flex: none; width: 1px; height: 18px; background: var(--pk-line); }
 /* Pelin nimi saa rivittyä kahdelle riville (56 px:n palkkiin mahtuu 2 × 16 px), ei katkaisua (KORTTISÄÄNTÖ). */
 .tn20 .pk-peli { flex: 1; min-width: 0; font-family: var(--rk-cond), "Barlow Condensed", sans-serif; font-weight: 800; font-size: clamp(15px, 4.6vw, 18px); line-height: 1; text-transform: uppercase; color: var(--pk-peli); overflow-wrap: normal; word-break: normal; }
+/* Muunnelma (pakka/aihe): desktopilla samalla rivillä kaksoispisteen jälkeen, kapealla omalla rivillään pienempänä. */
+.tn20 .pk-muunnelma { color: inherit; }
+@media (max-width: 599px) {
+  .tn20 .pk-peli:has(.pk-muunnelma) { display: flex; flex-direction: column; gap: 2px; }
+  .tn20 .pk-muunnelma { font-size: 13px; letter-spacing: .04em; color: var(--pk-paluu); }
+  .tn20 .pk-kaksoispiste { display: none; }
+}
 .tn20 .pk-tila { flex: none; display: flex; align-items: center; height: 32px; padding: 0 12px; border-radius: 999px; background: var(--pk-chip); font-size: 14px; font-weight: 700; color: var(--pk-ink); white-space: nowrap; font-variant-numeric: tabular-nums; }
 .tn20 .pk-paluu { display: flex; align-items: center; gap: 6px; min-height: 44px; padding: 0 clamp(16px, 4vw, 48px); max-width: 1296px; width: 100%; margin: 0 auto; box-sizing: border-box; border-top: 1px solid var(--pk-line); font-size: 14px; font-weight: 700; color: var(--pk-paluu); text-decoration: none; }
 .tn20 .pk-paluu:hover { text-decoration: underline; text-underline-offset: 3px; }
@@ -97,13 +104,39 @@
   background-position: calc(100% - 22px) 50%, calc(100% - 16px) 50%; background-size: 6px 6px; background-repeat: no-repeat; border-radius: 12px; border: 1.5px solid var(--pk-line); background-color: var(--pk-kortti); color: var(--pk-ink); font: inherit; font-size: 16px; font-weight: 700; }
 .tn20 .pk-valikko:focus-visible { outline: 2px solid var(--pk-acc); outline-offset: 2px; }
 
-/* ── K4 Tulos ──────────────────────────────────────────────────────────────────────── */
-.tn20 .pk-tulos { display: flex; flex-direction: column; gap: 24px; max-width: 720px; margin: 0 auto; padding: 24px clamp(20px, 4vw, 48px) 40px; box-sizing: border-box; color: var(--pk-ink); }
-.tn20 .pk-tulos-yla { display: flex; flex-direction: column; gap: 8px; }
-.tn20 .pk-tulos-eyebrow { font-family: var(--rk-cond), "Barlow Condensed", sans-serif; font-weight: 700; font-size: 14px; letter-spacing: .18em; text-transform: uppercase; color: var(--pk-acc); }
-.tn20 .pk-tulos-iso { margin: 0; font-family: var(--rk-cond), "Barlow Condensed", sans-serif; font-weight: 800; font-size: clamp(48px, 14vw, 88px); line-height: .88; text-transform: uppercase; }
-.tn20 .pk-tulos-ala { margin: 0; max-width: 46ch; font-size: 16px; line-height: 1.5; color: var(--pk-dim); }
-.tn20 .pk-tulos-toiminnot { display: flex; flex-direction: column; align-items: flex-start; gap: 12px; }
+/* ── K4 v2 Tulos (pelimuotojen kehys ja jako, Heikki 25.10.2026; CD "TN Pelimuodot – kehys ja jako" 2a–2r) ──────
+   Mobiili: tulos → pelin visuaali → jakoalue → seuraava peli → toissijaiset linkit. Desktop (≥ 1024 px): tulos ja
+   visuaali vasemmalla, jakoalue oikealla (sticky); seuraava peli ja linkit koko leveydellä. Ei lime-painiketta.
+   Palstoitus seuraa pelin sisältöalueen leveyttä (@container ≥ 900 px), ei ikkunaa. */
+.tn20 .pk-tulos-ulko { container-type: inline-size; width: 100%; }
+.tn20 .pk-tulos { display: flex; flex-direction: column; gap: 24px; max-width: 1240px; margin: 0 auto; padding: 20px clamp(16px, 4vw, 48px) 32px; box-sizing: border-box; color: var(--pk-ink); }
+.tn20 .pk-tulos-vasen { display: flex; flex-direction: column; gap: 18px; min-width: 0; }
+.tn20 .pk-tulos-tulos { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.tn20 .pk-tulos-luku { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 12px; font-family: var(--rk-cond), "Barlow Condensed", sans-serif; font-weight: 800; text-transform: uppercase; }
+.tn20 .pk-tulos-luku b { font-weight: 800; font-size: 80px; line-height: .86; letter-spacing: -.02em; color: var(--pk-ink); }
+.tn20 .pk-tulos-luku span { font-size: 30px; line-height: 1; color: var(--pk-ink); }
+.tn20 .pk-tulos-taso { margin: 0; font-family: var(--rk-cond), "Barlow Condensed", sans-serif; font-weight: 800; font-size: 26px; line-height: 1.05; text-transform: uppercase; color: var(--pk-acc); overflow-wrap: normal; word-break: normal; }
+.tn20 .pk-tulos-ala { margin: 0; max-width: 52ch; font-size: 16px; line-height: 1.5; color: var(--pk-dim); text-wrap: pretty; }
+.tn20 .pk-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.tn20 .pk-tulos-lisa { min-width: 0; }
+.tn20 .pk-tulos-linkit { display: flex; flex-wrap: wrap; align-items: center; gap: 0 24px; }
+.tn20 [data-iho] .pk-tulos-linkit :is(a, button) { display: inline-flex; align-items: center; min-height: 44px; padding: 0; border: 0; background: none; font: inherit; font-size: 15px; font-weight: 700; color: var(--pk-ink); text-decoration: underline; text-underline-offset: 4px; text-decoration-color: var(--pk-line); cursor: pointer; }
+.tn20 [data-iho] .pk-tulos-linkit :is(a, button):focus-visible { outline: 2px solid var(--tn-lime, #b6ff3c); outline-offset: 2px; }
+/* Jakoalue pelikehyksen ihon väreillä; kermaisella iholla vaalea kortti (designin kysymys 2, Heikki 25.10.2026). */
+.tn20 [data-iho] .pk-tulos .tn-jako { --tj-ink: var(--pk-ink); --tj-soft: var(--pk-dim); --tj-muted: var(--pk-dim); --tj-line: var(--pk-line); --tj-card: var(--pk-kortti); --tj-raja: var(--pk-line); --tj-acc: var(--pk-acc); }
+.tn20 [data-iho="kerma"] .pk-tulos .tn-jako-linkki { border: 1.5px solid var(--pk-line); }
+@container (min-width: 900px) {
+  .tn20 .pk-tulos { display: grid; grid-template-columns: minmax(0, 1fr) minmax(360px, 440px); column-gap: 48px; row-gap: 32px; align-items: start; padding: 40px clamp(24px, 4vw, 72px) 40px; }
+  .tn20 .pk-tulos-vasen { grid-column: 1; grid-row: 1; }
+  .tn20 .pk-tulos > .tn-jako { grid-column: 2; grid-row: 1; position: sticky; top: 20px; padding: 24px; }
+  .tn20 .pk-tulos > .pk-tulos-lisa--alle { grid-column: 1; grid-row: 2; }
+  .tn20 .pk-tulos:has(> .pk-tulos-lisa--alle) > .tn-jako { grid-row: 1 / span 2; }
+  .tn20 .pk-tulos > .pk-seuraava, .tn20 .pk-tulos > .pk-tulos-linkit { grid-column: 1 / -1; }
+  .tn20 .pk-tulos-luku b { font-size: 120px; }
+  .tn20 .pk-tulos-luku span { font-size: 44px; }
+  .tn20 .pk-tulos-taso { font-size: 34px; }
+}
+@media (max-width: 359px) { .tn20 .pk-tulos-luku b { font-size: 68px; } .tn20 .pk-tulos-luku span { font-size: 26px; } }
 .tn20 .pk-ketju { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0 0; padding: 0; list-style: none; }
 .tn20 .pk-ketju li { display: inline-flex; align-items: center; min-height: 32px; padding: 0 12px; border-radius: 999px; background: var(--pk-kortti); border: 1px solid var(--pk-line); font-size: 14px; font-weight: 700; }
 /* K4 vastausten läpikäynti (Megavisat, 20.10.2026): oletuksena kiinni, sisältönä tavallisen visan Vastauksesi-ruudukko. */
@@ -113,10 +146,6 @@
 .tn20 .pk-lapikaynti summary span { color: var(--pk-dim); }
 .tn20 .pk-lapikaynti summary:focus-visible { outline: 2px solid var(--tn-lime, #b6ff3c); outline-offset: 2px; }
 .tn20 .pk-lapikaynti .tng-sumwrap { padding-bottom: 16px; }
-.tn20 .pk-harjoitus { margin: -4px 0 0; font-size: 13px; color: var(--pk-dim); }
-.tn20 [data-iho] .pk-haasta { display: inline-flex; align-items: center; gap: 8px; min-height: 48px; padding: 0 20px; border-radius: 999px; border: 1.5px solid var(--pk-line); background: transparent; color: var(--pk-ink); font: inherit; font-size: 15px; font-weight: 700; cursor: pointer; }
-.tn20 [data-iho] .pk-haasta:hover { border-color: var(--pk-acc); }
-.tn20 [data-iho] .pk-haasta:focus-visible { outline: 2px solid var(--tn-lime, #b6ff3c); outline-offset: 2px; }
 .tn20 .pk-seuraava { display: flex; flex-direction: column; gap: 12px; padding-top: 8px; border-top: 1px solid var(--pk-line); }
 .tn20 .pk-seuraava-h { margin: 16px 0 0; font-family: var(--rk-cond), "Barlow Condensed", sans-serif; font-weight: 800; font-size: 26px; line-height: 1; text-transform: uppercase; }
 /* Pelikortit (pikakorjaus 22.10.2026, Heikki): vanhassa vaakakortissa kuvake ja "Pelaa →" söivät desktopin
@@ -130,10 +159,14 @@
 .tn20 .pk-pelikortti:focus-visible { outline: 2px solid var(--tn-lime, #b6ff3c); outline-offset: 2px; }
 .tn20 .pk-pelikortti-ikoni { flex: none; width: 40px; height: 40px; border-radius: 10px; border: 1.5px solid var(--pk-acc); display: grid; place-items: center; color: var(--pk-acc); box-sizing: border-box; }
 .tn20 .pk-pelikortti-ikoni svg { width: 22px; height: 22px; }
+/* Pelin oma kuva kortin yläosassa koko kortin levyisenä, 120 px korkea (allekkaiset kortit pysyvät matalina mobiilissa;
+   Heikki 25.10.2026); grafiikka (Tuplan palkintoikoni) kokonaisena. */
+.tn20 .pk-pelikortti-kuva { display: block; width: calc(100% + 32px); margin: -16px -16px 4px; height: 120px; overflow: hidden; border-radius: 13px 13px 0 0; background: var(--pk-chip); }
+.tn20 .pk-pelikortti-kuva img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.tn20 .pk-pelikortti-kuva[data-contain] img { object-fit: contain; padding: 14px; box-sizing: border-box; }
 /* KORTTISÄÄNTÖ: 100cqi = kortin sisäleveys; .6 ≈ Barlow Condensed 800 uppercase -merkin leveys (em). Alaraja 16 px:
    kapein kortti (176 px − 32 px) mahduttaa 16 px:llä 15–16 merkin sanan, pisin rekisterissä 15 (VAALIPIIRIKETJU). */
 .tn20 .pk-pelikortti-nimi { font-family: var(--rk-cond), "Barlow Condensed", sans-serif; font-weight: 800; font-size: clamp(16px, calc(100cqi / (var(--pk-lw, 1) * .6)), 20px); line-height: 1.08; text-transform: uppercase; overflow-wrap: normal; word-break: normal; hyphens: manual; text-wrap: balance; }
 .tn20 .pk-pelikortti-kuvaus { font-size: 14px; line-height: 1.4; color: var(--pk-dim); display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; line-clamp: 2; overflow: hidden; }
 .tn20 .pk-pelikortti-cta { margin-top: auto; padding-top: 2px; font-size: 14px; font-weight: 700; color: var(--pk-acc); white-space: nowrap; }
-@media (min-width: 900px) { .tn20 .pk-tulos { max-width: 1000px; } }
 @media (prefers-reduced-motion: reduce) { .tn20 :is(.pk-ohje, .pk-lapikaynti)[open] summary span::before { transform: none; } }

@@ -280,3 +280,8 @@
 .tn20 .vpk-info h2 { font-family: var(--vpk-display); font-weight: 900; font-variation-settings: "wdth" 76; font-size: 20px; text-transform: uppercase; }
 .tn20 .vpk-info ol { padding-left: 18px; display: flex; flex-direction: column; gap: 8px; max-width: 70ch; font-size: 14px; line-height: 1.5; color: #cfc7b6; }
 .tn20 .vpk-info b { color: var(--vpk-teksti); }
+
+/* K4 v2 (pelimuotojen kehys 25.10.2026): tasonimi bannerissa, Jakoalue violetilla iholla ja linkit bannerin alla. */
+.tn20 .vpk-taso { margin: 4px 0 0; font-family: var(--rk-cond), "Barlow Condensed", sans-serif; font-weight: 800; font-size: 28px; line-height: 1.05; text-transform: uppercase; color: var(--pk-acc, #b4a5ff); }
+.tn20 .vpk-k4 { display: flex; flex-direction: column; gap: 12px; max-width: 560px; }
+.tn20 [data-iho] .vpk-jako { --tj-ink: var(--pk-ink); --tj-soft: var(--pk-dim); --tj-muted: var(--pk-dim); --tj-line: var(--pk-line); --tj-card: var(--pk-kortti); --tj-raja: var(--pk-line); --tj-acc: var(--pk-acc); }

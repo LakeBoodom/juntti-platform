@@ -216,7 +216,11 @@ export const KUVALAHTEET: Kuvalahde[] = [
   { slug: "vaasa", kokoelma: "kaupungit", kuvaus: "Vapaudenpatsas Vaasan torilla", tiedosto: "Statue of Liberty Vaasa Finland July 2022.jpg", tekija: "Amirmojiry", lisenssi: "CC BY-SA 4.0", lisenssiUrl: CC("by-sa/4.0"), vuosi: "2022" },
   { slug: "vantaa", kokoelma: "kaupungit", kuvaus: "Tiedekeskus Heureka ja Tiedepuisto Galilei, Vantaa", tiedosto: "Heureka, Tiedepuisto Galilei.jpg", tekija: "Abc10", lisenssi: "CC BY-SA 4.0", lisenssiUrl: CC("by-sa/4.0"), vuosi: "2016" },
   /* Vaalit-hubin Pelit-osio (Heikki 18.10.2026): Laita järjestykseen -noston kasvoketju ja pakkakorttien
-     kasvot public/20/vaalit/kasvot/<slug>.webp, pakkakorttien ja Vaalipiiriketjun valokuvat public/20/vaalit/. */
+     kasvot public/20/vaalit/kasvot/<slug>.webp, pakkakorttien ja Vaalipiiriketjun valokuvat public/20/vaalit/.
+     Henkilöpakkojen korttikuvat pakat/{presidentit,paaministerit,paaministerit-kesto,eduskunta-pisimpaan}.webp
+     (25.10.2026) on koottu kolmesta alla olevasta kasvokuvasta, joten niillä ei ole omaa riviä:
+     presidentit = Kekkonen, Halonen, Niinistö; paaministerit = Holkeri, Lipponen, Marin;
+     paaministerit-kesto = Aho, Vanhanen, Stubb; eduskunta-pisimpaan = Zyskowicz, Tuomioja, Räsänen. */
   { slug: "kasvot/stahlberg", kokoelma: "vaalit", kuvaus: "K. J. Ståhlberg", tiedosto: "Kaarlo Juho Ståhlberg.jpg", tekija: "Tuntematon", lisenssi: "Public domain", lisenssiUrl: "", vuosi: "1919", muokkaus: "rajattu 3:4 (240×320), näytetään mustavalkoisena violetilla sävyllä" },
   { slug: "kasvot/kekkonen", kokoelma: "vaalit", kuvaus: "Urho Kekkonen 1975", tiedosto: "Urho-Kekkonen-1975 (cropped).jpg", tekija: "Kuvasiskot", lisenssi: "CC BY 4.0", lisenssiUrl: CC("by/4.0"), vuosi: "1975", muokkaus: "rajattu 3:4 (240×320), näytetään mustavalkoisena violetilla sävyllä" },
   { slug: "kasvot/halonen", kokoelma: "vaalit", kuvaus: "Tarja Halonen 2011", tiedosto: "Tarja Halonen 1c389 8827-2.jpg", tekija: "Janwikifoto (muokkaus: Bff)", lisenssi: "CC BY-SA 3.0", lisenssiUrl: CC("by-sa/3.0"), vuosi: "2011", muokkaus: "rajattu 3:4 (240×320), näytetään mustavalkoisena violetilla sävyllä" },

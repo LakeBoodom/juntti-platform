@@ -16,6 +16,7 @@
 // kortin ja toinen napautus vaihtaa paikat. Näppäimistö: välilyönti valitsee, nuolet siirtävät.
 
 import { pelijakoteksti } from "@/lib/korttinimi";
+import { reittiTaso } from "@/lib/pelitasot";
 import { useEffect, useMemo, useRef, useState, type CSSProperties, type PointerEvent as RPointerEvent, type KeyboardEvent } from "react";
 import { getSupabase } from "@/lib/supabase";
 import { KL_PISTEET, KL_SIVU, KL_YHTEYKSIA, pariAvain, uusiReittiSiemen, type KlKunta, type KlReitti } from "@/lib/kuntaliitos";
@@ -516,12 +517,17 @@ export default function ReittipeliClient({
   // Arvotaan vasta painettaessa: renderissä arvottu siemen erottaisi palvelimen ja selaimen HTML:n.
   const arvoUusi = () => location.assign(osoite(uusiReittiSiemen()));
 
-  async function haasta() {
-    /* Tulos linkkiin (?tulos=n-total), jotta Facebookin og-kuvaus kertoo sen (23.10.2026). */
+  /* Jako: tulos linkkiin (?tulos=n-total), jotta kaveri saa saman reitin ja Facebookin og-kuvaus kertoo tuloksen
+     (23.10.2026); tasonimi kuten tulosnäkymässä (25.10.2026). Lasketaan vain tulosvaiheessa selaimessa. */
+  const jakoTiedot = () => {
     const polku = osoite(siemen);
     const url = `${location.origin}${polku}${polku.includes("?") ? "&" : "?"}tulos=${oikein}-${KL_YHTEYKSIA}`;
-    const nimi = (paivanReitti ? `${peli.nimi} · päivän reitti ${paivays}` : peli.nimi) + (maakuntaNimi ? ` (${maakuntaNimi})` : "");
-    const teksti = pelijakoteksti(nimi, `${oikein}/${KL_YHTEYKSIA}`, oikein === KL_YHTEYKSIA);
+    const nimi = (paivanReitti ? `${peli.nimi}: päivän reitti ${paivays}` : peli.nimi) + (maakuntaNimi ? ` (${maakuntaNimi})` : "");
+    const teksti = pelijakoteksti(nimi, `${oikein}/${KL_YHTEYKSIA} yhteyttä`, oikein === KL_YHTEYKSIA, reittiTaso(oikein, KL_YHTEYKSIA));
+    return { url, teksti };
+  };
+  async function haasta() {
+    const { url, teksti } = jakoTiedot();
     try {
       if (navigator.share) await navigator.share({ title: peli.nimi, text: teksti, url });
       else await navigator.clipboard.writeText(`${teksti} ${url}`);
@@ -611,9 +617,10 @@ export default function ReittipeliClient({
         {palkki}
         <main>
           <PeliTulos
-            eyebrow="Reitti valmis"
-            iso={`${oikein}/${KL_YHTEYKSIA} yhteyttä`}
-            ala={`${eka} → ${vika} ${peli.rajoja} pitkin, ${yritys <= 1 ? "ensimmäisellä tarkistuksella" : `${yritys}. yrityksellä`}. ${oikein * KL_PISTEET} pistettä.`}
+            luku={`${oikein}/${KL_YHTEYKSIA}`}
+            yksikko="yhteyttä"
+            tasonimi={reittiTaso(oikein, KL_YHTEYKSIA)}
+            lause={`${eka} → ${vika} ${peli.rajoja} pitkin, ${yritys <= 1 ? "ensimmäisellä tarkistuksella" : `${yritys}. yrityksellä`}. ${oikein * KL_PISTEET} pistettä.`}
             lisa={
               <>
                 <ol className="pk-ketju" aria-label={peli.ketju}>
@@ -622,13 +629,12 @@ export default function ReittipeliClient({
                 <div className="kl-k4-kartta">{kartta}</div>
               </>
             }
-            paatoiminto={<button type="button" className="pk-nappi" onClick={arvoUusi}>Rakenna uusi reitti</button>}
-            harjoitus={paivanReitti ? "Uusi reitti on harjoitus eikä vaikuta päivän tulokseen." : undefined}
-            haasta={
-              <button type="button" className="pk-haasta" onClick={haasta}>
-                {jaettu ? "Linkki jaettu ✓" : "Haasta kaveri"}
-              </button>
-            }
+            lisaJaonJalkeen
+            jako={{ ...jakoTiedot(), natiiviOtsikko: peli.nimi }}
+            toiminnot={[
+              { teksti: "Rakenna uusi reitti", onClick: arvoUusi },
+              ...(!paivanReitti ? [{ teksti: `Päivän reitti ${paivays}`, href: osoite() }] : []),
+            ]}
             seuraavat={seuraavatPelit(peli.slug, kotiKokoelma)}
           />
         </main>

@@ -9,6 +9,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { JsonLd, peliLd } from "@/lib/jsonLd";
 import { jakoMeta, jakoOsoite, pelituloksenOg } from "@/lib/jakoMeta";
+import { jarjestaTaso } from "@/lib/pelitasot";
 import { JULKAISTUT, haePakka, pakkaHref } from "@/lib/jarjesta/pakat";
 import JarjestaClient from "./JarjestaClient";
 
@@ -29,7 +30,7 @@ export async function generateMetadata({ params, searchParams }: { params: Promi
     title: `${p.seoTitle} | Tietoniekka`,
     description: `${p.kuvaus} ${p.rajaus}`,
     alternates: { canonical: url },
-    ...jakoMeta({ ...(pelituloksenOg(sp, "oikein") ?? { title: p.seoTitle, description: p.kuvaus }), url: jakoOsoite(url, sp, ["tulos"]), kuva: `/og/jarjesta/${p.slug}` }),
+    ...jakoMeta({ ...(pelituloksenOg(sp, "oikein", (o, k) => jarjestaTaso(o, k, p.collection.slug)) ?? { title: p.seoTitle, description: p.kuvaus }), url: jakoOsoite(url, sp, ["tulos"]), kuva: `/og/jarjesta/${p.slug}` }),
   };
 }
 

@@ -5,6 +5,7 @@
 
 import { JsonLd, peliLd } from "@/lib/jsonLd";
 import { jakoMeta, jakoOsoite, pelituloksenOg } from "@/lib/jakoMeta";
+import { ikajarjestysTaso } from "@/lib/pelitasot";
 import type { Metadata } from "next";
 import { getChainRound, getChainRoundByIds } from "@/lib/ikajarjestys";
 import { henkiloKuva } from "@/lib/henkilokuvat";
@@ -22,7 +23,7 @@ export async function generateMetadata({ searchParams }: { searchParams: Promise
     /* SEO-erä A2/A7: canonical (?category= ja ?autostart= ovat saman sivun muunnelmia) + jakokuva. */
     alternates: { canonical: "/peli/ikajarjestys" },
     ...jakoMeta({
-      ...(pelituloksenOg(sp, "oikein") ?? {
+      ...(pelituloksenOg(sp, "oikein", ikajarjestysTaso) ?? {
         title: "Tietoketju: Ikäjärjestys",
         description: "Aseta kymmenen tunnettua suomalaista syntymävuoden mukaiseen järjestykseen.",
       }),

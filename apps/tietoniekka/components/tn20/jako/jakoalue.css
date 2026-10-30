@@ -23,20 +23,24 @@
   border: 1px solid var(--tj-raja); border-radius: 999px; background: transparent; color: var(--tj-ink); font: inherit; font-size: 15px; font-weight: 700; text-decoration: none; cursor: pointer; white-space: nowrap;
 }
 .tn20 .tn-jako-kanava:hover { border-color: #8e8676; color: var(--tj-ink); }
+/* Pelien omat linkkivärit (esim. Vaalipiiriketjun .tn20 .vpk a lila) eivät saa värittää jakonappeja. */
+.tn20 .tn-jako a.tn-jako-wa, .tn20 .tn-jako a.tn-jako-wa:hover { color: #0b1f12; }
+.tn20 .tn-jako a.tn-jako-kanava, .tn20 .tn-jako a.tn-jako-kanava:hover { color: var(--tj-ink); }
 .tn20 .tn-jako-kanava:focus-visible { outline: 2px solid var(--tn-lime, #b6ff3c); outline-offset: 2px; }
 .tn20 .tn-jako-kanava:disabled { opacity: .5; cursor: default; }
 
 .tn20 .tn-jako-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 @media (max-width: 359px) { .tn20 .tn-jako-wa { font-size: 18px; } }
-/* "Jaa linkkinä" (Ootko-malli, Heikki 23.10.2026): sama muoto kuin WhatsApp-painikkeella, valkoinen tausta. */
-.tn20 .tn-jako-linkki {
+/* "Jaa linkkinä" (Ootko-malli, Heikki 23.10.2026): sama muoto kuin WhatsApp-painikkeella, valkoinen tausta.
+   .tn-jako-tarkkuus, jotta pelien nappinollaukset (Tuplan .ttk :where(button) { font: inherit; color: inherit }) eivät voita. */
+.tn20 .tn-jako .tn-jako-linkki {
   align-items: center; justify-content: center; gap: 10px; min-height: 56px; padding: 0 18px; border-radius: 999px; border: 0;
   background: #fff; color: #131109; cursor: pointer;
   font-family: var(--rk-cond, "Barlow Condensed"), "Barlow Condensed", sans-serif; font-weight: 800; font-size: 20px; letter-spacing: .02em; text-transform: uppercase;
 }
 .tn20 .tn-jako-linkki:focus-visible { outline: 2px solid var(--tn-lime, #b6ff3c); outline-offset: 3px; }
 .tn20 .tn-jako-linkki:disabled { opacity: .5; cursor: default; }
-@media (max-width: 359px) { .tn20 .tn-jako-linkki { font-size: 18px; } }
+@media (max-width: 359px) { .tn20 .tn-jako .tn-jako-linkki { font-size: 18px; } }
 /* Kosketuslaitteilla vain WhatsApp + "Jaa linkkinä"; hiirellä Facebook + Kopioi (Heikki 23.10.2026). */
 .tn20 .tn-jako-kosketus { display: none; }
 @media (pointer: coarse) {

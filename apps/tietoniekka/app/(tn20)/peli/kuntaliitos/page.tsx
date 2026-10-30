@@ -7,6 +7,7 @@
 
 import { JsonLd, peliLd } from "@/lib/jsonLd";
 import { jakoMeta, jakoOsoite, pelituloksenOg } from "@/lib/jakoMeta";
+import { reittiTaso } from "@/lib/pelitasot";
 import type { Metadata } from "next";
 import { helsinginPaiva } from "@/lib/aika";
 import { arvoReitti, KL_LAHDE, KL_MAAKUNNAT, maakuntaTunnuksella } from "@/lib/kuntaliitos/reitti";
@@ -25,7 +26,7 @@ export async function generateMetadata({ searchParams }: { searchParams: Promise
     // Reittiparametrit (?reitti=) ovat saman sivun muunnelmia
     alternates: { canonical: "/peli/kuntaliitos" },
     ...jakoMeta({
-      ...(pelituloksenOg(sp, "yhteyttä") ?? {
+      ...(pelituloksenOg(sp, "yhteyttä", reittiTaso) ?? {
         title: "Kuntaliitos – rakenna reitti naapurikuntien kautta",
         description: "Järjestä kahdeksan kuntaa reitiksi niin, että jokaisella vierekkäisellä parilla on yhteinen raja. Uusi päivän reitti joka päivä.",
       }),
