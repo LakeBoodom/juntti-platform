@@ -1,4 +1,7 @@
 // ETUSIVU v5 — näkymä (design Tietoniekka_Etusivu_v5: 5a desktop 1440, 5b mobiili 390, 5c promopaikka; Heikki 28.10.2026).
+// v7 (CD "TN Etusivu mobiili v7", Heikki 30.10.2026): Päivän visa kuvakorttina, Synttärit A (iso ikä), aiheet 16:10-kuvina
+// kolmeen sarakkeeseen, pelikortit karusellina (< 768 px), juhlabanneri (Promo 1), Lapsille C (kuva pelistä), visapaketti.
+// Desktop johdettu mobiilista (ei erillistä CD-mallia).
 // Data: lib/etusivu5.ts. CSS: app/(tn20)/etusivu-v5.css (luokat .tn-es-*, mobile-first).
 // Seuranta: jokainen osio kantaa data-tn-entry="etusivu:<osio>" (lib/seuranta.ts).
 // Ei aputekstejä: otsikko, kortti, nappi. Osio-otsikon yläpuolella vain kicker-määrä.
@@ -7,6 +10,7 @@ import { preload } from "react-dom";
 import type { EtusivuData } from "@/lib/etusivu5";
 import PelattuTanaan from "./PelattuTanaan";
 import PaivanVisaV5 from "./PaivanVisaV5";
+import Juhlabanneri from "./Juhlabanneri";
 import { kuvanSrcSet } from "@/lib/kuvaVariantit";
 
 type D = NonNullable<EtusivuData>;
@@ -14,9 +18,6 @@ type D = NonNullable<EtusivuData>;
 /** Pisimmän sanan pituus otsikon kokokaavaan (KORTTISÄÄNTÖ): --lw. Yhdysmerkki on katkaisukohta. */
 const pisin = (t: string) => Math.max(...t.split(/[\s\u00AD]+/).flatMap((w) => w.split(/(?<=-)/)).map((w) => w.length), 4);
 const lw = (t: string) => ({ "--lw": pisin(t) }) as CSSProperties;
-/** Mobiilin pelitiilen nimi: yhdyssanarajoilla tavuviivakohdat (U+00AD, config `tavut`) — 2 sarakkeen tiilessä
- *  nimelle jää 68–95 px. --lw-t = pisin osa, --lw = koko sana (desktopin kortti, ei katkea). */
-const tavutettu = (m: { nimi: string; tavut?: string }) => (m.tavut ?? m.nimi).replace(/\|/g, "\u00AD");
 
 /** Kuva: srcset omien kopioiden kokoversioista (lib/kuvaVariantit) — sizes = kuvan leveys näkymässä. */
 const KUVA_SIZES = "(min-width: 1100px) 600px, 100vw";
@@ -40,14 +41,10 @@ function PaivanPelit({ d }: { d: D }) {
   const maara = [visa, mmPelattava, sankari].filter(Boolean).length;
   return (
     <section className="tn-es-pp" aria-labelledby="tn-es-pp-h" data-tn-entry="etusivu:paivan-pelit">
+      {/* v7: otsikko ja päivämäärä samalla rivillä (päivämäärä ei enää kickerinä otsikon yläpuolella). */}
       <div className="tn-es-pp-paa">
-        <div className="tn-es-otsake">
-          <span className="tn-es-kicker tn-es-kicker--kulta">
-            <span className="tn-es-vain-desk">{pvm.pitka}</span>
-            <span className="tn-es-vain-mob">{pvm.lyhyt}</span>
-          </span>
-          <h2 id="tn-es-pp-h" className="tn-es-h2 tn-es-h2--iso">Päivän pelit</h2>
-        </div>
+        <h2 id="tn-es-pp-h" className="tn-es-h2 tn-es-h2--iso">Päivän pelit</h2>
+        <span className="tn-es-pp-pvm">{pvm.pitka}</span>
         {paivapeleja >= 2 && (
           <PelattuTanaan visaId={visa?.quizId ?? null} sankariId={sankari?.quizId ?? null} slotti={mmPelattava ? "mika-maa" : null} tanaan={d.today.iso} maara={maara} />
         )}
@@ -55,15 +52,24 @@ function PaivanPelit({ d }: { d: D }) {
       <div className="tn-es-pp-ruudukko">
         {visa && <PaivanVisaV5 k={visa} />}
         <div className="tn-es-pp-sivu" data-yksi={!mikaMaa || undefined}>
+          {/* Synttärit A (v7 1b): iso ikä täyttää oikean puolen. Muistopäivänä "vuotta syntymästä". */}
           {sankari && (
             <a className="tn-es-synt" href={sankari.playHref} data-tn-entry="etusivu:synttarit">
               <span className="tn-es-synt-kuva">
-                <Kuva src={sankari.kuva} pos={sankari.kuvaPos} luokka="tn-es-synt-img" />
+                <Kuva src={sankari.kuva} pos={sankari.kuvaPos} luokka="tn-es-synt-img" sizes="(min-width: 1100px) 180px, 132px" />
               </span>
               <span className="tn-es-synt-teksti">
-                <span className="tn-es-kicker tn-es-kicker--oranssi">{sankari.kicker.mobile}</span>
-                <span className="tn-es-synt-h" style={lw(sankari.nimi)}>{sankari.nimi}</span>
-                <span className="tn-es-nappi">Pelaa visa</span>
+                <span className="tn-es-synt-yla">
+                  <span className="tn-es-kicker tn-es-kicker--oranssi">
+                    {sankari.tapaus === "muisto" ? "Muistopäivä" : sankari.tapaus === "pyorea" ? "Pyöreät synttärit" : "Synttärit tänään"}
+                  </span>
+                  <span className="tn-es-synt-ika">
+                    <b>{sankari.ika}</b>
+                    <span>{sankari.tapaus === "muisto" ? "vuotta syntymästä" : "vuotta"}</span>
+                  </span>
+                  <span className="tn-es-synt-h" style={lw(sankari.nimi)}>{sankari.nimi}</span>
+                </span>
+                <span className="tn-es-nappi tn-es-synt-nappi">Pelaa visa</span>
               </span>
             </a>
           )}
@@ -101,29 +107,29 @@ function MikaMaa({ m }: { m: NonNullable<D["paivanPelit"]["mikaMaa"]> }) {
   );
 }
 
-function Tiesitko({ t }: { t: NonNullable<D["tiesitko"]> }) {
-  /* Mobiilin LCP (Lighthouse 29.10.): Päivän visa -kortissa ei ole kuvaa, joten ensimmäisen näytön suurin elementti on
-     tämä kuva — esilataus <head>iin, ettei haku odota CSS:ää (simuloitu latausviive oli 2,5 s). */
-  if (t.kuva) preload(t.kuva, { as: "image", fetchPriority: "high", imageSrcSet: kuvanSrcSet(t.kuva), imageSizes: KUVA_SIZES });
+function Tiesitko({ t, lcp }: { t: NonNullable<D["tiesitko"]>; lcp: boolean }) {
+  /* Mobiilin LCP (Lighthouse 29.10.): esilataus vain, jos Päivän visa -kortissa ei ole kuvaa (v7: kuvakortti on LCP). */
+  if (lcp && t.kuva) preload(t.kuva, { as: "image", fetchPriority: "high", imageSrcSet: kuvanSrcSet(t.kuva), imageSizes: KUVA_SIZES });
   const i = t.kysymys.lastIndexOf(t.korostus);
   const alku = i >= 0 ? t.kysymys.slice(0, i) : t.kysymys;
   const loppu = i >= 0 ? t.kysymys.slice(i + t.korostus.length) : "";
   return (
     <a className="tn-es-tt" href={t.href} data-tn-entry="etusivu:tiesitko">
       <span className="tn-es-tt-kuva">
-        <Kuva src={t.kuva} pos={t.kuvaPos} luokka="tn-es-tt-img" eager />
+        <Kuva src={t.kuva} pos={t.kuvaPos} luokka="tn-es-tt-img" eager={lcp} />
       </span>
       <span className="tn-es-tt-teksti">
         <span className="tn-es-tt-yla">
           <span className="tn-es-tag tn-es-tag--syaani">Tiesitkö?</span>
-          <span className="tn-es-tt-kicker tn-es-vain-desk">{t.kicker}</span>
+          <span className="tn-es-tt-kicker">{t.kicker}</span>
         </span>
         <span className="tn-es-tt-h" style={{ "--lw": Math.max(pisin(t.kysymys.replace(/[?.,!:;”"]/g, "")), t.korostus.length + 2) } as CSSProperties}>
           {alku}
           {i >= 0 && <mark>{t.korostus}</mark>}
           {loppu}
         </span>
-        <span className="tn-es-cta tn-cta-lime">Ota selvää</span>
+        {/* v7: ääriviivanappi syaanina — lime on varattu Päivän visalle ja juhlabannerille. */}
+        <span className="tn-es-nappi tn-es-tt-nappi">Ota selvää</span>
       </span>
     </a>
   );
@@ -139,8 +145,10 @@ function Aiheet({ a }: { a: D["aiheet"] }) {
       <div className="tn-es-aiheet">
         {a.tiilet.map((x) => (
           <a key={x.slug} className="tn-es-aihe" href={x.href}>
-            <Kuva src={x.kuva} pos={x.kuvaPos} luokka="tn-es-aihe-img" sizes="(min-width: 1100px) 280px, 50vw" />
-            <span className="tn-es-aihe-nimi" lang="fi" style={lw(x.nimi)}>{x.nimi}</span>
+            <span className="tn-es-aihe-kuva">
+              <Kuva src={x.kuva} pos={x.kuvaPos} luokka="tn-es-aihe-img" sizes="(min-width: 1100px) 220px, (min-width: 700px) 25vw, 33vw" />
+            </span>
+            <span className="tn-es-aihe-nimi" lang="fi">{x.nimi}</span>
           </a>
         ))}
       </div>
@@ -158,13 +166,14 @@ function Pelit({ p }: { p: D["pelit"] }) {
       {p.ryhmat.map((g) => (
         <div key={g.avain} className="tn-es-ryhma">
           <h3 className="tn-es-ryhma-h"><span>{g.nimi}</span></h3>
-          {/* Sarakkeet korttimäärästä (analyysi 30.10.): 3 korttia = 3 saraketta; kuvan sizes palstan maksimista 1120 px. */}
+          {/* < 768 px karuselli (v7: kortti 242 px, seuraava näkyy reunassa); ≥ 768 px ruudukko, sarakkeet korttimäärästä
+              (analyysi 30.10.): 3 korttia = 3 saraketta; kuvan sizes palstan maksimista 1120 px. */}
           <div className="tn-es-rivi" data-ryhma={g.avain} style={{ "--sar": Math.min(g.kortit.length, 4) } as CSSProperties}>
             {g.kortit.map((m) => {
               const sisus = (
                 <>
                   <span className="tn-es-peli-kuva">
-                    <Kuva src={m.kuva} pos={m.kuvaPos} luokka="tn-es-peli-img" sizes={`(min-width: 768px) ${Math.round(1120 / Math.min(g.kortit.length, 4))}px, 56px`} />
+                    <Kuva src={m.kuva} pos={m.kuvaPos} luokka="tn-es-peli-img" sizes={`(min-width: 768px) ${Math.round(1120 / Math.min(g.kortit.length, 4))}px, 242px`} />
                   </span>
                   {m.tila === "tulossa" && <span className="tn-es-leima">Tulossa</span>}
                   <span className="tn-es-peli-teksti">
@@ -172,9 +181,7 @@ function Pelit({ p }: { p: D["pelit"] }) {
                       <i aria-hidden="true" />
                       <span className="tn-es-laji-teksti">{m.laji}</span>
                     </span>
-                    <span className="tn-es-peli-h" lang="fi" style={{ ...lw(m.nimi), "--lw-t": pisin(tavutettu(m)) } as CSSProperties}>
-                      {tavutettu(m)}
-                    </span>
+                    <span className="tn-es-peli-h" lang="fi" style={lw(m.nimi)}>{m.nimi}</span>
                     <span className="tn-es-peli-rivi">{m.etusivu_rivi}</span>
                   </span>
                 </>
@@ -193,6 +200,7 @@ function Pelit({ p }: { p: D["pelit"] }) {
 }
 
 function Promo1({ p }: { p: NonNullable<D["promo1"]> }) {
+  if (p.tila === "countdown") return <Juhlabanneri b={p} />;
   return (
     <div className="tn-es-promo-paikka" data-tn-entry="etusivu:promo1">
       <a className="tn-es-promo tn-es-promo--1" href={p.href}>
@@ -202,16 +210,6 @@ function Promo1({ p }: { p: NonNullable<D["promo1"]> }) {
         <span className="tn-es-promo-teksti">
           <span className="tn-es-promo-yla">
             <span className="tn-es-kicker tn-es-kicker--oranssi">{p.kicker}</span>
-            {p.tila === "countdown" && (
-              <span className="tn-es-promo-laskuri">
-                {p.paivia === 0 ? "Tänään" : (
-                  <>
-                    <b>{p.paivia}</b> <span className="tn-es-vain-desk">{p.paivia === 1 ? "päivä" : "päivää"}</span>
-                    <span className="tn-es-vain-mob">pv</span>
-                  </>
-                )}
-              </span>
-            )}
           </span>
           <span className="tn-es-promo-ala">
             <span className="tn-es-promo-h" style={lw(p.otsikko)}>{p.otsikko}</span>
@@ -236,7 +234,6 @@ function Juontajat({ j }: { j: D["juontajat"] }) {
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img className="tn-es-juontaja-img" src={h.kuva} alt={h.nimi} loading="lazy" />
             <span className="tn-es-juontaja-teksti">
-              <span className="tn-es-kicker" style={{ color: h.aksentti }}>{h.nimi} suosittelee</span>
               <span className="tn-es-juontaja-h" style={lw(h.visa)}>{h.visa}</span>
               <span className="tn-es-juontaja-sitaatti">”{h.teaser}”</span>
               <span className="tn-es-nappi">Pelaa</span>
@@ -271,27 +268,38 @@ function LapsetJaPaketit({ l, paketit }: { l: D["lapset"]; paketit: D["paketit"]
     <div className="tn-es-lp" data-tn-entry="etusivu:lapset">
       {l && (
         <div className="tn-es-lapset">
-          <a className="tn-es-lapset-paa" href={l.href}>
-            <span className="tn-es-kicker tn-es-kicker--vihrea">Lapsille</span>
-            <span className="tn-es-lp-h">Tietoniekka lapsille</span>
+          {/* Lapsille C (v7 1i): kuva pelistä, otsikko, ikäryhmät — ei aputekstiä eikä kausikuvaa. */}
+          <a className="tn-es-lapset-kuva" href={l.href} tabIndex={-1} aria-hidden="true">
+            <Kuva src="/20/lapset/etusivu-peli.webp" luokka="tn-es-lapset-img" sizes="(min-width: 1100px) 200px, 132px" />
           </a>
-          <div className="tn-es-lapset-iat">
-            <a className="tn-es-nappi" href={`${l.href}?ika=4-7`}>4–7 v</a>
-            <a className="tn-es-nappi" href={`${l.href}?ika=8-12`}>8–12 v</a>
+          <div className="tn-es-lapset-teksti">
+            <a className="tn-es-lp-h" href={l.href}>Tietoniekka lapsille</a>
+            <div className="tn-es-lapset-iat">
+              <a className="tn-es-nappi" href={`${l.href}?ika=4-7`}>4–7 v</a>
+              <a className="tn-es-nappi" href={`${l.href}?ika=8-12`}>8–12 v</a>
+            </div>
           </div>
-          <Kuva src="/20/lapset/hero-v1.webp" luokka="tn-es-lp-kuva" />
         </div>
       )}
-      {paketit.map((p) => (
-        <div key={p.avain} className="tn-es-paketti" data-tulossa={p.tila === "tulossa" || undefined} aria-disabled={p.tila === "tulossa" || undefined}>
-          <span className="tn-es-paketti-teksti">
-            <span className="tn-es-kicker tn-es-kicker--kulta2">{p.kicker}</span>
-            <span className="tn-es-lp-h">{p.otsikko}</span>
-            <span className="tn-es-paketti-rivi tn-es-vain-desk">{p.rivi}</span>
-          </span>
-          <Kuva src={p.kuva} luokka="tn-es-lp-kuva" />
-        </div>
-      ))}
+      {/* Visapaketti (v7 kohta 8): mitä paketissa on ja mihin se sopii + "Katso paketti". */}
+      {paketit.map((p) => {
+        const sisus = (
+          <>
+            <span className="tn-es-paketti-kuva"><Kuva src={p.kuva} luokka="tn-es-paketti-img" sizes="(min-width: 1100px) 220px, 112px" /></span>
+            <span className="tn-es-paketti-teksti">
+              <span className="tn-es-kicker tn-es-kicker--kulta2">{p.kicker}</span>
+              <span className="tn-es-paketti-h">{p.otsikko}</span>
+              <span className="tn-es-paketti-rivi">{p.rivi}</span>
+              {p.tila === "pelattava" && <span className="tn-es-nappi tn-es-paketti-nappi">Katso paketti</span>}
+            </span>
+          </>
+        );
+        return p.tila === "pelattava" && p.href ? (
+          <a key={p.avain} className="tn-es-paketti" href={p.href} data-tn-entry="etusivu:visapaketti">{sisus}</a>
+        ) : (
+          <div key={p.avain} className="tn-es-paketti" data-tulossa aria-disabled="true">{sisus}</div>
+        );
+      })}
     </div>
   );
 }
@@ -300,7 +308,7 @@ export default function EtusivuV5({ d }: { d: D }) {
   return (
     <div className="tn-es5" data-tn-entry="etusivu:muu">
       <PaivanPelit d={d} />
-      {d.tiesitko && <Tiesitko t={d.tiesitko} />}
+      {d.tiesitko && <Tiesitko t={d.tiesitko} lcp={!d.paivanPelit.visa?.kuva} />}
       <Aiheet a={d.aiheet} />
       <Pelit p={d.pelit} />
       {d.promo1 && <Promo1 p={d.promo1} />}

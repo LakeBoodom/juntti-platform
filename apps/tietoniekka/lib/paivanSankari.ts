@@ -36,6 +36,8 @@ export type SankariTapaus = "vakio" | "pyorea" | "muisto";
 
 export type PaivanSankariData = {
   tapaus: SankariTapaus;
+  /** Ikä tänään (muistopäivänä vuosia syntymästä) — etusivun synttärikortin iso luku. */
+  ika: number;
   /** Mittaus (luku 9) */
   quizId: string;
   nimi: string;
@@ -103,6 +105,7 @@ export function muotoileSankari(s: SankariRivi): PaivanSankariData {
 
   return {
     tapaus,
+    ika: s.ika,
     quizId: s.quiz_id,
     nimi: s.name,
     elinvuodet,

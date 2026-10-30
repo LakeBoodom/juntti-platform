@@ -149,5 +149,7 @@ export const PROMO2_OOTKO = {
 
 /** Visapaketit (osio 9). Tulossa-sääntö kuten pelimuodoilla: näkyy, kun julkaisuun on enintään 35 päivää. */
 export const VISAPAKETIT = [
-  { avain: "joulu", kicker: "Visapaketit · joulukuussa", otsikko: "Joulun visapaketti", rivi: "Pelaa ruudulta tai tulosta pikkujouluihin.", href: "", kuva: "/20/lapset/aihe-joulu.webp", julkaisu: "2026-12-01", tila: "tulossa" as "tulossa" | "pelattava" },
+  /* Etusivu v7 (30.10.2026): paketti julkaistu (quiz_packs joulu, kausi 15.10.–26.12.) → linkki pakettisivulle.
+     Sisältö = pakettisivun oikea sisältö: televisionäkymä + tulostettavat kysymykset ja vastaukset (ei pelaajien lomakkeita). */
+  { avain: "joulu", kicker: "Visapaketti · pikkujouluihin", otsikko: "Joulun visapaketti", rivi: "Valmis visailta: jouluvisat ruudulle, tulostettavat kysymykset ja oikeat vastaukset juontajalle.", href: "/visapaketti/joulu", kuva: "/20/lapset/aihe-joulu.webp", julkaisu: "2026-10-15", loppu: "2026-12-26", tila: "pelattava" as "tulossa" | "pelattava" },
 ];

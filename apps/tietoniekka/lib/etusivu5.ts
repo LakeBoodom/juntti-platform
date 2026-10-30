@@ -12,7 +12,7 @@ import { KOKOELMA_KORTIT } from "@/lib/kokoelmat/rekisteri";
 import { visanKorttikuva } from "@/lib/kokoelmat/visanKorttikuva";
 import { ETUSIVU_RYHMAT, ETUSIVUN_PELIMUODOT, nakyyEtusivulla, ryhmanNimi } from "@/lib/pelimuodot";
 import { JUONTAJIEN_SUOSITUKSET, PROMO2_OOTKO, VISAPAKETIT } from "@/lib/etusivu";
-import { JUHLAT_KOKOELMA, pvm, juhlaKalenteri, paavisa, paiviaValissa, type Esiintyma } from "@/lib/juhlat";
+import { JUHLAT_KOKOELMA, pvm, juhlaKalenteri, paavisa, paiviaValissa, vpLyhyt, type Esiintyma } from "@/lib/juhlat";
 import { LAPSET_SIVU, lapsetNakyvissa } from "@/lib/lapset/data";
 import { COLLECTION_LABEL } from "@/lib/visanKokoelma";
 
@@ -20,6 +20,14 @@ const VIIKONPAIVAT = ["Sunnuntai", "Maanantai", "Tiistai", "Keskiviikko", "Torst
 const VP_LYHYT = ["Su", "Ma", "Ti", "Ke", "To", "Pe", "La"];
 /** Promo 1: countdown-tila, kun seuraavaan juhlaan on enintään tämän verran päiviä. */
 const COUNTDOWN_PAIVAA = 14;
+/** Luonnoskoukut (Koukku.luonnos) näkyvät vain esikatselussa, kunnes Heikki hyväksyy ne (etusivu v7, 30.10.2026). */
+const TUOTANTO = process.env.VERCEL_ENV === "production";
+/** Aihetiilien 16:10-rajaus (CD etusivu v7 1h, 30.10.2026). Puuttuva → rekisterin pos tai keskitetty. */
+const AIHE_POS: Record<string, string> = {
+  elokuvat: "50% 40%", historia: "50% 55%", jalkapallo: "50% 40%", juhlat: "55% 50%", jaakiekko: "50% 35%",
+  kulttuuri: "50% 40%", luonto: "50% 50%", matkakohteet: "50% 50%", musiikki: "78% 28%", kaupungit: "50% 50%",
+  tiede: "50% 50%", "tunnetut-henkilot": "50% 28%", tv: "50% 35%", urheilu: "50% 50%", vaalit: "50% 40%",
+};
 
 type Kortti = {
   id: string; slug: string | null; custom_slug: string | null; title: string; display_title: string | null;
@@ -88,6 +96,10 @@ export async function haeEtusivu(opts: {
         questionCount: (cards.find((c) => c.id === pv!.quiz_id) as { question_count?: number | null } | undefined)?.question_count ?? null,
       })
     : null;
+  /* v7 (30.10.): Päivän visa on kuvakortti — visan kansikuva (kokoelman korttikuva tai hero_image kohdepisteineen). */
+  const pvKortti = visa ? cards.find((c) => c.id === visa.quizId) : undefined;
+  const pvKuva = pvKortti ? visanKorttikuva(pvKortti) : { kuva: null };
+  const visaKuvalla = visa ? { ...visa, kuva: pvKuva.kuva, kuvaPos: pvKuva.kuvaPos } : null;
   const sankari = sankariRivi ? muotoileSankari(sankariRivi) : null;
   /* Kolmas paikka on kiinteästi Mikä maa? (päivitys 29.10.: ei pelimuotojen rotaatiota).
      Päivän peleissä näytetään vain pelattavaa (Heikki 29.10. ilta): Tulossa-kortti ei vie
@@ -96,9 +108,9 @@ export async function haeEtusivu(opts: {
   const mikaMaa = mmConf && mmConf.tila === "pelattava" && nakyyEtusivulla(mmConf, today.iso) ? mmConf : null;
 
   /* ── 2 Tiesitkö? ── questions.hook-pooli, päiväsiemen. Sarakkeen puuttuminen (migraatio ajamatta) → ei osiota.
-     AVOIN (Heikki 30.10.2026, ratkaistaan myöhemmin): kierron pitää huomioida ajankohtaisuus. Nyt sesonkiaiheet
-     tulevat milloin tahansa (30.10. nousi joululahjakysymys). Ehdotus: Juhlat-kokoelman koukut vain, kun niiden
-     juhla on lähin (juhlaKalenteri, kuten Promo 1), ja muut sesonkiaiheet kuukausirajauksella. */
+     Ajankohtaisuus (Heikki 30.10.2026, v7): Juhlat-kokoelman koukut eivät tule kiertoon lainkaan — juhlat nostaa
+     juhlabanneri (Promo 1) lähimmän juhlan koukulla, eikä Tiesitkö saa toistaa samaa juhlaa. AVOIN: kalenteri-
+     tapahtumien (±7 pv, esim. talviaika) koukut vaativat oman sisältölähteen. */
   let tiesitko: { kysymys: string; korostus: string; kicker: string; href: string; kuva: string | null; kuvaPos?: string } | null = null;
   {
     const { data, error } = await sb
@@ -108,7 +120,7 @@ export async function haeEtusivu(opts: {
       .order("id")
       .limit(500);
     const rivit = !error ? ((data ?? []) as Array<{ id: string; question_text: string; quiz_id: string }>) : [];
-    const julkaistut = rivit.filter((r) => cards.some((c) => c.id === r.quiz_id));
+    const julkaistut = rivit.filter((r) => cards.some((c) => c.id === r.quiz_id && c.collection !== JUHLAT_KOKOELMA));
     const r = poimi(julkaistut, paivaNro);
     const k = r ? cards.find((c) => c.id === r.quiz_id)! : null;
     if (r && k) {
@@ -129,7 +141,7 @@ export async function haeEtusivu(opts: {
   /* ── 3 Pelaa aiheittain ── kokoelmarekisteri (avoimet, ei Kuvavisoja — ne ovat pelimuoto), suomen aakkosjärjestyksessä
      (Heikki 29.10.; vain tässä osiossa — rekisterin oma järjestys navigaatiossa ja Kokoelmat-sivulla ennallaan). */
   const aiheet = KOKOELMA_KORTIT.filter((k) => k.avoin !== false && k.slug !== "kuvavisat").map((k) => ({
-    slug: k.slug, nimi: k.nimi, href: k.href, kuva: k.img, kuvaPos: k.pos,
+    slug: k.slug, nimi: k.nimi, href: k.href, kuva: k.img, kuvaPos: AIHE_POS[k.slug] ?? k.pos,
   })).sort((a, b) => a.nimi.localeCompare(b.nimi, "fi"));
 
   /* ── 4 Valitse peli ── */
@@ -146,16 +158,29 @@ export async function haeEtusivu(opts: {
   const tanaanPv = pvm(today.vuosi, today.kk, today.pv);
   const juhlaVisat = new Set(cards.filter((c) => c.collection === JUHLAT_KOKOELMA && c.slug).map((c) => c.slug!));
   const lahin: Esiintyma | undefined = juhlaKalenteri(tanaanPv, juhlaVisat).find((j) => j.julkaistut.length > 0);
+  /* v7 (30.10.): countdown-tila on juhlabanneri — juhlan koukku (kysymys visasta, korostus, alarivi) ja "Selvitä vastaus".
+     Koukku vain, jos sen visa on julkaistu; luonnoskoukku vain esikatselussa. Ilman koukkua otsikkona visan nimi. */
+  type Juhlabanneri = {
+    tila: "countdown"; kicker: string; juhla: string; pvm: string; aksentti: string; paivia: number; yksikko: string;
+    otsikko: string; korostus: string | null; ala: string | null; cta: string; href: string; kuva: string | null; kuvaPos?: string;
+  };
   let promo1:
-    | { tila: "countdown"; kicker: string; paivia: number; otsikko: string; href: string; kuva: string | null; kuvaPos?: string }
+    | Juhlabanneri
     | { tila: "rotaatio"; kicker: string; otsikko: string; href: string; kuva: string | null; kuvaPos?: string }
     | null = null;
   if (lahin) {
     const paivia = Math.max(0, paiviaValissa(lahin.alku + (lahin.kohde ?? 0) * 864e5, tanaanPv));
     if (paivia <= COUNTDOWN_PAIVAA) {
-      const slug = paavisa(lahin);
-      const k = cards.find((c) => c.slug === slug);
-      if (k) promo1 = { tila: "countdown", kicker: `Juhlat · ${lahin.nimi}`, paivia, otsikko: nimi(k), href: visaHref(k), kuva: lahin.kuva ?? visanKorttikuva(k).kuva };
+      const kk = lahin.koukku && juhlaVisat.has(lahin.koukku.visa) && !(TUOTANTO && lahin.koukku.luonnos) ? lahin.koukku : null;
+      const k = cards.find((c) => c.slug === (kk?.visa ?? paavisa(lahin)));
+      if (k) promo1 = {
+        tila: "countdown", kicker: `Juhlat · ${lahin.nimi}`, juhla: lahin.nimi, pvm: vpLyhyt(lahin.alku).toLowerCase(),
+        aksentti: lahin.accent, paivia,
+        yksikko: paivia === 0 ? (lahin.tervehdys ?? `${lahin.nimi} tänään`) : `${paivia === 1 ? "päivä" : "päivää"} ${lahin.ill}`,
+        otsikko: kk?.kysymys ?? nimi(k), korostus: kk?.korostus ?? null, ala: kk?.ala?.trim() || null,
+        cta: kk ? "Selvitä vastaus" : "Pelaa", href: visaHref(k),
+        kuva: kk?.kuva ?? lahin.kuva ?? visanKorttikuva(k).kuva,
+      };
     }
   }
   if (!promo1) {
@@ -191,9 +216,9 @@ export async function haeEtusivu(opts: {
     return k ? { key: j.key, nimi: j.nimi, kuva: j.kuva, aksentti: j.aksentti, visa: nimi(k), teaser: sitaatti(k)!, href: visaHref(k) } : null;
   }).filter((x): x is NonNullable<typeof x> => !!x);
 
-  /* ── 9 Visapaketit ── Tulossa-sääntö */
+  /* ── 9 Visapaketit ── Tulossa-sääntö; julkaistu paketti näkyy kautensa loppuun (loppu). */
   const paketit = VISAPAKETIT.filter((p) => {
-    if (p.tila === "pelattava") return true;
+    if (p.tila === "pelattava") return p.julkaisu <= today.iso && (!p.loppu || today.iso <= p.loppu);
     const ero = (Date.parse(p.julkaisu) - Date.parse(today.iso)) / 864e5;
     return ero >= 0 && ero <= 35;
   });
@@ -202,7 +227,7 @@ export async function haeEtusivu(opts: {
     today,
     paivanPelit: {
       pvm: { pitka: `${VIIKONPAIVAT[vp]} ${today.pv}.${today.kk}.`, lyhyt: `${VP_LYHYT[vp]} ${today.pv}.${today.kk}.` },
-      visa,
+      visa: visaKuvalla,
       mikaMaa,
       sankari,
     },

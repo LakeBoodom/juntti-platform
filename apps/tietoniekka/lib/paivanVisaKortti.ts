@@ -31,6 +31,9 @@ export type PaivanVisaKortti = {
   /** 10 merkkiä; null = rivi jätetään pois (nykyinen visa ei noudata kaavaa). */
   rytmi: RytmiMerkki[] | null;
   href: string;
+  /** Kortin taustakuva (etusivu v7): visan kansikuva, lisätään lib/etusivu5:ssä. null → tumma pohja tunnusvärillä. */
+  kuva?: string | null;
+  kuvaPos?: string;
   /** "Katso vastaukset" (GameClient palauttaa tallennetun tuloksen). */
   vastauksetHref: string;
   pelattuAvain: string;

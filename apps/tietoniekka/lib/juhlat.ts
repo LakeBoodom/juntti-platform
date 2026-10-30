@@ -24,6 +24,10 @@ export type Koukku = {
   visa: string; kysymys: string; korostus: string; ala: string; cta: string;
   /** Bannerin kuva, jos koukun visa kaipaa eri kuvaa kuin juhlan pääkuva */
   kuva?: string;
+  /** Visan kysymys, johon koukku vastaa (questions.id) — tarkistusta varten. */
+  kysymysId?: string;
+  /** Luonnos (etusivu v7, 30.10.2026): näkyy vain esikatselussa, kunnes Heikki hyväksyy. */
+  luonnos?: boolean;
 };
 
 export type Juhla = {
@@ -46,6 +50,8 @@ export type Juhla = {
   laskuri?: string;
   /** Bannerin laskurin illatiivi ("päivää halloweeniin") */
   ill: string;
+  /** Juhlapäivän tervehdys bannerin laskurissa ("Hyvää halloweenia"); puuttuessa "<nimi> tänään". */
+  tervehdys?: string;
   visat: string[];
   faktat?: Fakta[] | ((vuosi: number) => Fakta[]);
   koukku?: Koukku;
@@ -88,7 +94,7 @@ export const kuukausi = (t: number) => KUUKAUSI[new Date(t).getUTCMonth()];
    joulurauha-faktat vaihdettiin, koska ne olivat visojen oikeita vastauksia). */
 export const JUHLAT: Juhla[] = [
   {
-    slug: "halloween", nimi: "Halloween", iso: true, accent: "#FF7A1A", kuva: I + "halloween.webp",
+    slug: "halloween", tervehdys: "Hyvää halloweenia", nimi: "Halloween", iso: true, accent: "#FF7A1A", kuva: I + "halloween.webp",
     paiva: (y) => pvm(y, 10, 31), laskuri: "Halloweeniin", ill: "halloweeniin",
     visat: ["halloween-historia-ja-symbolit"],
     faktat: (y) => {
@@ -110,9 +116,10 @@ export const JUHLAT: Juhla[] = [
   {
     slug: "pyhainpaiva", nimi: "Pyhäinpäivä", iso: false, accent: "#C9B89A", kuva: I + "pyhainpaiva.webp",
     paiva: pyhainpaiva, ill: "pyhäinpäivään", visat: ["kekrista-pyhainpaivaan-visa"],
+    koukku: { visa: "kekrista-pyhainpaivaan-visa", kysymys: "Miksi vainajia kestittiin kekrinä lämpimällä saunalla?", korostus: "saunalla?", ala: "", cta: "Selvitä vastaus", kysymysId: "2788583a-fcd6-4dcc-a850-68d47fbce9db", luonnos: true },
   },
   {
-    slug: "isanpaiva", nimi: "Isänpäivä", iso: true, accent: "#7FB2E5", kuva: I + "isanpaiva.webp",
+    slug: "isanpaiva", tervehdys: "Hyvää isänpäivää", nimi: "Isänpäivä", iso: true, accent: "#7FB2E5", kuva: I + "isanpaiva.webp",
     paiva: (y) => nsVp(y, 11, 0, 2), laskuri: "Isänpäivään", ill: "isänpäivään",
     visat: ["isanpaiva-ja-aitienpaiva-visa"],
     koukku: {
@@ -122,11 +129,12 @@ export const JUHLAT: Juhla[] = [
     },
   },
   {
-    slug: "kiitospaiva", nimi: "Kiitospäivä", iso: false, accent: "#D98A4A", kuva: I + "kiitospaiva.webp",
+    slug: "kiitospaiva", tervehdys: "Hyvää kiitospäivää", nimi: "Kiitospäivä", iso: false, accent: "#D98A4A", kuva: I + "kiitospaiva.webp",
     paiva: (y) => nsVp(y, 11, 4, 4), ill: "kiitospäivään", visat: ["kiitospaiva-thanksgiving-visa"],
+    koukku: { visa: "kiitospaiva-thanksgiving-visa", kysymys: "Mitä Yhdysvaltain presidentti tekee kalkkunalle ennen kiitospäivää?", korostus: "kalkkunalle", ala: "", cta: "Selvitä vastaus", kysymysId: "1beece26-3ecb-4a20-9fc4-66baeeee22e3", luonnos: true },
   },
   {
-    slug: "itsenaisyyspaiva", nimi: "Itsenäisyyspäivä", rivit: ["Itsenäisyys-", "päivä"], iso: true, accent: "#6FA8FF",
+    slug: "itsenaisyyspaiva", tervehdys: "Hyvää itsenäisyyspäivää", nimi: "Itsenäisyyspäivä", rivit: ["Itsenäisyys-", "päivä"], iso: true, accent: "#6FA8FF",
     kuva: I + "itsenaisyyspaiva.webp", paiva: (y) => pvm(y, 12, 6), laskuri: "Itsenäisyyspäivään", ill: "itsenäisyyspäivään",
     visat: ["itsenaisyyspaivan-vietto-visa"],
     faktat: [
@@ -142,9 +150,10 @@ export const JUHLAT: Juhla[] = [
   {
     slug: "lucia", nimi: "Lucian päivä", iso: false, accent: "#F4E3B0", kuva: I + "lucia.webp",
     paiva: (y) => pvm(y, 12, 13), ill: "Lucian päivään", visat: ["lucian-paiva-visa"],
+    koukku: { visa: "lucian-paiva-visa", kysymys: "Kuka legendan mukaan ilmiantoi Lucian viranomaisille?", korostus: "ilmiantoi", ala: "", cta: "Selvitä vastaus", kysymysId: "d1db8193-605c-4042-a458-b3b547f7abc3", luonnos: true },
   },
   {
-    slug: "joulu", nimi: "Joulu", iso: true, accent: "#E8453C", kuva: I + "joulupoyta.webp",
+    slug: "joulu", tervehdys: "Hyvää joulua", nimi: "Joulu", iso: true, accent: "#E8453C", kuva: I + "joulupoyta.webp",
     paiva: (y) => pvm(y, 12, 24), loppu: 2, laskuri: "Jouluaattoon", ill: "jouluaattoon",
     visat: [
       "adventista-jouluaattoon-visa", "joulun-oudoimmat-tarinat-visa", "joulupukki-visa", "joulupoydan-antimet-visa", "joulu-maailmalla-visa",
@@ -162,7 +171,7 @@ export const JUHLAT: Juhla[] = [
     },
   },
   {
-    slug: "uusivuosi", nimi: "Uusivuosi", iso: true, accent: "#FFD23F", kuva: I + "uusivuosi.webp",
+    slug: "uusivuosi", tervehdys: "Hyvää uutta vuotta", nimi: "Uusivuosi", iso: true, accent: "#FFD23F", kuva: I + "uusivuosi.webp",
     paiva: (y) => pvm(y, 12, 31), loppu: 1, kohde: 1, laskuri: "Vuoden vaihtumiseen", ill: "vuoden vaihtumiseen",
     visat: ["uudenvuoden-taiat-ja-lupaukset-visa"],
     faktat: [
@@ -176,7 +185,7 @@ export const JUHLAT: Juhla[] = [
     },
   },
   {
-    slug: "loppiainen", nimi: "Loppiainen", iso: true, accent: "#9FC7E8", kuva: I + "loppiainen.webp",
+    slug: "loppiainen", tervehdys: "Hyvää loppiaista", nimi: "Loppiainen", iso: true, accent: "#9FC7E8", kuva: I + "loppiainen.webp",
     paiva: (y) => pvm(y, 1, 6), laskuri: "Loppiaiseen", ill: "loppiaiseen",
     visat: ["loppiainen-ja-nuutinpaiva-visa"],
     faktat: [{ label: "Nuutinpäivä", k: "13.1.", t: "Nuutinpäivänä joulu on perinteisesti ajettu ulos talosta." }],
@@ -187,7 +196,7 @@ export const JUHLAT: Juhla[] = [
     },
   },
   {
-    slug: "laskiainen", nimi: "Laskiainen", iso: true, accent: "#BFE3FF", kuva: I + "laskiainen.webp",
+    slug: "laskiainen", tervehdys: "Hyvää laskiaista", nimi: "Laskiainen", iso: true, accent: "#BFE3FF", kuva: I + "laskiainen.webp",
     paiva: (y) => lisaa(paasiainen(y), -47), laskuri: "Laskiaiseen", ill: "laskiaiseen",
     visat: ["laskiainen-perinteet-ja-herkut-visa"],
     koukku: {
@@ -197,7 +206,7 @@ export const JUHLAT: Juhla[] = [
     },
   },
   {
-    slug: "ystavanpaiva", nimi: "Ystävänpäivä", iso: true, accent: "#FF5C8A", kuva: I + "ystavanpaiva.webp",
+    slug: "ystavanpaiva", tervehdys: "Hyvää ystävänpäivää", nimi: "Ystävänpäivä", iso: true, accent: "#FF5C8A", kuva: I + "ystavanpaiva.webp",
     paiva: (y) => pvm(y, 2, 14), laskuri: "Ystävänpäivään", ill: "ystävänpäivään",
     visat: ["ystavanpaiva-suomessa-ja-maailmalla-visa"],
     koukku: {
@@ -211,7 +220,7 @@ export const JUHLAT: Juhla[] = [
     paiva: (y) => pvm(y, 2, 28), ill: "Kalevalan päivään", visat: [],
   },
   {
-    slug: "paasiainen", nimi: "Pääsiäinen", iso: true, accent: "#F2D64B", kuva: I + "paasiainen.webp",
+    slug: "paasiainen", tervehdys: "Hyvää pääsiäistä", nimi: "Pääsiäinen", iso: true, accent: "#F2D64B", kuva: I + "paasiainen.webp",
     paiva: paasiainen, laskuri: "Pääsiäiseen", ill: "pääsiäiseen",
     visat: ["paasiainen-perinteet-ja-herkut-visa"],
     koukku: {
@@ -221,7 +230,7 @@ export const JUHLAT: Juhla[] = [
     },
   },
   {
-    slug: "vappu", nimi: "Vappu", iso: true, accent: "#FFD23F", kuva: I + "vappu.webp",
+    slug: "vappu", tervehdys: "Hyvää vappua", nimi: "Vappu", iso: true, accent: "#FFD23F", kuva: I + "vappu.webp",
     paiva: (y) => pvm(y, 5, 1), laskuri: "Vappuun", ill: "vappuun",
     visat: ["vappu-perinteet-historia-suomi"],
     koukku: {
@@ -231,7 +240,7 @@ export const JUHLAT: Juhla[] = [
     },
   },
   {
-    slug: "aitienpaiva", nimi: "Äitienpäivä", iso: true, accent: "#F28BB0", kuva: I + "aitienpaiva.webp",
+    slug: "aitienpaiva", tervehdys: "Hyvää äitienpäivää", nimi: "Äitienpäivä", iso: true, accent: "#F28BB0", kuva: I + "aitienpaiva.webp",
     paiva: (y) => nsVp(y, 5, 0, 2), laskuri: "Äitienpäivään", ill: "äitienpäivään",
     visat: ["isanpaiva-ja-aitienpaiva-visa"],
     koukku: {
@@ -241,7 +250,7 @@ export const JUHLAT: Juhla[] = [
     },
   },
   {
-    slug: "juhannus", nimi: "Juhannus", iso: true, accent: "#7FD67A",
+    slug: "juhannus", tervehdys: "Hyvää juhannusta", nimi: "Juhannus", iso: true, accent: "#7FD67A",
     paiva: (y) => seuraavaVp(pvm(y, 6, 19), 5), loppu: 1, laskuri: "Juhannukseen", ill: "juhannukseen", visat: [],
   },
 ];
