@@ -12,6 +12,7 @@ import Pelipalkki from "@/components/tn20/pelikehys/Pelipalkki";
 import PeliKehys from "@/components/tn20/pelikehys/PeliKehys";
 import PeliTulos from "@/components/tn20/pelikehys/PeliTulos";
 import { seuraavatPelit } from "@/lib/pelimuodot";
+import { kirjaaPelimuotoPeli } from "@/lib/pelimuotoPelit";
 
 const PELI = "Laita järjestykseen";
 
@@ -27,6 +28,7 @@ function sekoita<T>(a: T[]): T[] {
 }
 
 export default function OmaJarjestysClient({
+  attr,
   otsikko,
   suunta,
   direction,
@@ -34,6 +36,8 @@ export default function OmaJarjestysClient({
   tilastot,
   takaisin,
 }: {
+  /** Laatuattribuutin avain (?a=) — pelikertatilaston avain. */
+  attr: string;
   otsikko: string;
   suunta: string;
   direction: "asc" | "desc";
@@ -113,7 +117,11 @@ export default function OmaJarjestysClient({
           <p className="tk-order-desc">Raahaa tai napauta korteista järjestääksesi ne. Kun järjestys tuntuu oikealta, paljasta tulos.</p>
         </header>
         <ReorderableChainList items={order} onReorder={setOrder} />
-        <button type="button" className="tk-btn-primary tk-order-cta" onClick={() => setPaljastettu(true)}>
+        <button type="button" className="tk-btn-primary tk-order-cta" onClick={() => {
+            /* Pelikerta tilastoihin (pelimuoto_pelit); avain = laatuattribuutti (?a=). */
+            void kirjaaPelimuotoPeli({ pelimuoto: "jarjesta_oma", avain: attr, oikein: tulos.correctCount, yhteensa: tulos.totalCount, pisteet: tulos.score });
+            setPaljastettu(true);
+          }}>
           Paljasta järjestys
         </button>
         {tilastot && <p className="tk-jarj-lahde">{tilastot}</p>}

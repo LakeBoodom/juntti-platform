@@ -18,6 +18,7 @@ import {
   KYTKIN_AVAIN, PERUSPISTEET, PUTKIBONUS, arvio, lueTulos, tulosAvain,
   type AaniKysymys, type AaniTallenne, type AaniViikko, type KuvaKuplat,
 } from "@/lib/aanivisat";
+import { kirjaaPelimuotoPeli } from "@/lib/pelimuotoPelit";
 
 type Linkki = { otsikko: string; href: string };
 type Vaihe = "intro" | "peli" | "tulos";
@@ -278,6 +279,7 @@ export default function AanivisaClient({ viikko, jatka, sivu }: { viikko: AaniVi
     const vastaukset = kysymykset.map((q, i) => valinnat[i] === q.laji);
     const tallenne: AaniTallenne = { oikein: vastaukset.filter(Boolean).length, kaikki: N, vastaukset };
     try { localStorage.setItem(tulosAvain(ryhma.key, viikko.vuosi, viikko.viikko), JSON.stringify(tallenne)); } catch { /* ei tallennusta */ }
+    void kirjaaPelimuotoPeli({ pelimuoto: "aanivisa", avain: ryhma.key, taso: `${viikko.vuosi}-${viikko.viikko}`, oikein: tallenne.oikein, yhteensa: N, pisteet });
     setAiempi(tallenne);
     setVaihe("tulos");
     window.scrollTo({ top: 0 });

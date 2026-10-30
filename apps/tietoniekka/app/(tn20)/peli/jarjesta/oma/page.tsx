@@ -66,6 +66,7 @@ export default async function OmaJarjestysPage({ searchParams }: { searchParams:
   const oma = p ? [...henkilot.values()].find((c) => henkiloSlug(c.name) === p) : null;
   return (
     <OmaJarjestysClient
+      attr={a}
       otsikko={def.otsikko.charAt(0).toUpperCase() + def.otsikko.slice(1)}
       suunta={`${def.akseli[0]} ylimmäksi`}
       direction={def.winner === "high" ? "desc" : "asc"}

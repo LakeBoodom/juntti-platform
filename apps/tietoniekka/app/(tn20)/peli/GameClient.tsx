@@ -1,5 +1,6 @@
 "use client";
 import { lisaaPelirivi } from "@/lib/seuranta";
+import { kirjaaPelimuotoPeli } from "@/lib/pelimuotoPelit";
 import { kirjaaPelattuTanaan } from "@/components/tn20/etusivu5/PelattuTanaan";
 import { henkiloKuva } from "@/lib/henkilokuvat";
 // TIETONIEKKA 2.0 — PELINÄKYMÄ 2026 PROD (design_handoff_peli_2026_prod +
@@ -674,7 +675,15 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
   }, [questions]);
 
   async function recordPlay(finalScore: number) {
-    if (recorded.current || !quiz.id) return; // kuvavisat: ei quizzes-riviä → ei tallennusta
+    if (recorded.current) return;
+    /* Kuvavisoilla ei ole quizzes-riviä → pelikerta pelimuoto_pelit-tauluun (avain = kortisto, taso = variaatio
+       tai viikkoavain). */
+    if (!quiz.id) {
+      if (!isKuva || !quiz.kuvavisaSlug) return;
+      recorded.current = true;
+      void kirjaaPelimuotoPeli({ pelimuoto: "kuvavisa", avain: quiz.kuvavisaSlug, taso: [quiz.taso, quiz.maanosa].filter(Boolean).join("/") || null, oikein: right, yhteensa: total, pisteet: finalScore });
+      return;
+    }
     recorded.current = true;
     igValmis(quiz.id);
     kirjaaPelattuTanaan(quiz.id); // etusivun "n/3 pelattu tänään"

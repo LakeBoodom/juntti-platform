@@ -25,6 +25,7 @@ import PeliKehys from "@/components/tn20/pelikehys/PeliKehys";
 import PeliAloitus from "@/components/tn20/pelikehys/PeliAloitus";
 import PeliTulos, { Pelikortit } from "@/components/tn20/pelikehys/PeliTulos";
 import { seuraavatPelit, type Pelimuoto } from "@/lib/pelimuodot";
+import { kirjaaPelimuotoPeli } from "@/lib/pelimuotoPelit";
 
 const PELI = "Laita järjestykseen";
 
@@ -236,7 +237,11 @@ export default function JarjestaClient({
           </p>
         </header>
         <ReorderableChainList items={order} onReorder={setOrder} />
-        <button type="button" className="tk-btn-primary tk-order-cta" onClick={() => setPhase("revealing")}>
+        <button type="button" className="tk-btn-primary tk-order-cta" onClick={() => {
+            /* Pelikerta tilastoihin (pelimuoto_pelit) tarkistushetkellä: järjestys on silloin lopullinen. */
+            if (scoreResult) void kirjaaPelimuotoPeli({ pelimuoto: "jarjesta", avain: pakka.slug, oikein: scoreResult.correctCount, yhteensa: scoreResult.totalCount, pisteet: scoreResult.score });
+            setPhase("revealing");
+          }}>
           Paljasta järjestys
         </button>
       </main>

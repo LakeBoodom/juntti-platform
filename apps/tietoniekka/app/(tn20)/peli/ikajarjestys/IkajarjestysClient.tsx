@@ -31,6 +31,7 @@ import PeliKehys from "@/components/tn20/pelikehys/PeliKehys";
 import PeliAloitus from "@/components/tn20/pelikehys/PeliAloitus";
 import PeliTulos from "@/components/tn20/pelikehys/PeliTulos";
 import { seuraavatPelit } from "@/lib/pelimuodot";
+import { kirjaaPelimuotoPeli } from "@/lib/pelimuotoPelit";
 import { CHAIN_CATEGORIES } from "@/lib/personCategories";
 import { RYHMAT } from "@/lib/henkiloRyhmat";
 
@@ -263,7 +264,11 @@ export default function IkajarjestysClient({
           )}
         </header>
         <ReorderableChainList items={order} onReorder={setOrder} />
-        <button type="button" className="tk-btn-primary tk-order-cta" onClick={() => setPhase("revealing")}>
+        <button type="button" className="tk-btn-primary tk-order-cta" onClick={() => {
+            /* Pelikerta tilastoihin (pelimuoto_pelit) tarkistushetkellä: järjestys on silloin lopullinen. */
+            if (scoreResult) void kirjaaPelimuotoPeli({ pelimuoto: "ikajarjestys", avain: category || "kaikki", oikein: scoreResult.correctCount, yhteensa: scoreResult.totalCount, pisteet: scoreResult.score });
+            setPhase("revealing");
+          }}>
           Paljasta järjestys
         </button>
       </main>
