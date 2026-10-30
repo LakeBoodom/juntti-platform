@@ -4,7 +4,7 @@
 // Desktop johdettu mobiilista (ei erillistä CD-mallia).
 // Data: lib/etusivu5.ts. CSS: app/(tn20)/etusivu-v5.css (luokat .tn-es-*, mobile-first).
 // Seuranta: jokainen osio kantaa data-tn-entry="etusivu:<osio>" (lib/seuranta.ts).
-// Ei aputekstejä: otsikko, kortti, nappi. Osio-otsikon yläpuolella vain kicker-määrä.
+// Ei aputekstejä: otsikko, kortti, nappi (poikkeus: Lapsille-esittely, Heikki 30.10. v9). Osio-otsikon yläpuolella vain kicker-määrä.
 import type { CSSProperties } from "react";
 import { preload } from "react-dom";
 import type { EtusivuData } from "@/lib/etusivu5";
@@ -238,8 +238,12 @@ function Juontajat({ j }: { j: D["juontajat"] }) {
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img className="tn-es-juontaja-img" src={h.kuva} alt={h.nimi} loading="lazy" />
             <span className="tn-es-juontaja-teksti">
-              <span className="tn-es-juontaja-h" style={lw(h.visa)}>{h.visa}</span>
-              <span className="tn-es-juontaja-sitaatti">”{h.teaser}”</span>
+              {/* v9: yläotsikko "Tietovisa" + visan nimi; koukkukysymys visasta (ei sitaattimerkkejä). */}
+              <span className="tn-es-juontaja-otsake">
+                <span className="tn-es-juontaja-laji">Tietovisa</span>
+                <span className="tn-es-juontaja-h" style={lw(h.visa)}>{h.visa}</span>
+              </span>
+              <span className="tn-es-juontaja-koukku">{h.koukku ? h.teaser : `”${h.teaser}”`}</span>
               <span className="tn-es-nappi">Pelaa</span>
             </span>
           </a>
@@ -277,7 +281,11 @@ function LapsetJaPaketit({ l, paketit }: { l: D["lapset"]; paketit: D["paketit"]
             <Kuva src="/20/lapset/etusivu-peli.webp" luokka="tn-es-lapset-img" sizes="(min-width: 1100px) 200px, 132px" />
           </a>
           <div className="tn-es-lapset-teksti">
-            <a className="tn-es-lp-h" href={l.href}>Tietoniekka lapsille</a>
+            {/* v9 (Heikki 30.10.): lyhyt esittelyteksti otsikon alla. */}
+            <span className="tn-es-lapset-otsake">
+              <a className="tn-es-lp-h" href={l.href}>Tietoniekka lapsille</a>
+              <span className="tn-es-lapset-rivi">Kuva- ja äänivisoja 4–12-vuotiaille. Vinkit auttavat, jos vastaus ei heti löydy.</span>
+            </span>
             <div className="tn-es-lapset-iat">
               <a className="tn-es-nappi" href={`${l.href}?ika=4-7`}>4–7 v</a>
               <a className="tn-es-nappi" href={`${l.href}?ika=8-12`}>8–12 v</a>

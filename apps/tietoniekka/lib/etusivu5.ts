@@ -207,14 +207,33 @@ export async function haeEtusivu(opts: {
     if (valittu) promo1 = { tila: "rotaatio", ...valittu };
   }
 
-  /* ── 6 Laura ja Mikko suosittelevat ── viikoittain juontajan kokoelmista; sitaatti yksi virke (teaser, muuten kuvaus) */
-  const juontajat = JUONTAJIEN_SUOSITUKSET.map((j, i) => {
+  /* ── 6 Laura ja Mikko suosittelevat ── viikoittain juontajan kokoelmista. v9 (Heikki 30.10.): faktan tilalla koukku =
+     visan oma kysymys, joka ei paljasta vastausta (oikea vastaus ei esiinny kysymyksessä, ei kuvakysymyksiä eikä
+     vaihtoehtoihin viittaavia "näistä"/"seuraavista", ≤ 100 merkkiä);
+     ensimmäinen kelpaava järjestyksessä. Ei kelpaavaa → teaserin ensimmäinen virke kuten ennen. */
+  const valitut = JUONTAJIEN_SUOSITUKSET.map((j, i) => {
     const ehd = cards
       .filter((c) => c.collection && (j.kokoelmat as readonly string[]).includes(c.collection) && sitaatti(c) && c.game_mode !== "mega")
       .sort((a, b) => (a.id < b.id ? -1 : 1));
-    const k = poimi(ehd, viikkoNro + i * 7);
-    return k ? { key: j.key, nimi: j.nimi, kuva: j.kuva, aksentti: j.aksentti, visa: nimi(k), teaser: sitaatti(k)!, href: visaHref(k) } : null;
-  }).filter((x): x is NonNullable<typeof x> => !!x);
+    return { j, k: poimi(ehd, viikkoNro + i * 7) };
+  });
+  const koukut = new Map<string, string>();
+  {
+    const ids = valitut.map((v) => v.k?.id).filter((x): x is string => !!x);
+    const { data } = ids.length
+      ? await sb.from("questions").select("quiz_id, question_text, answers, sort_order").in("quiz_id", ids).order("sort_order")
+      : { data: [] };
+    for (const q of (data ?? []) as Array<{ quiz_id: string; question_text: string; answers: Array<{ text: string; is_correct?: boolean }> | null }>) {
+      if (koukut.has(q.quiz_id)) continue;
+      const t = q.question_text?.trim() ?? "";
+      const oikea = (q.answers ?? []).find((a) => a.is_correct)?.text?.trim().toLowerCase();
+      if (!t.endsWith("?") || t.length > 100 || /kuva(ssa|n|an)\s|(^|\s)(näistä|seuraavista|alla olevista)\s/i.test(t) || !oikea || t.toLowerCase().includes(oikea)) continue;
+      koukut.set(q.quiz_id, t);
+    }
+  }
+  const juontajat = valitut.map(({ j, k }) =>
+    k ? { key: j.key, nimi: j.nimi, kuva: j.kuva, aksentti: j.aksentti, visa: nimi(k), teaser: koukut.get(k.id) ?? sitaatti(k)!, koukku: koukut.has(k.id), href: visaHref(k) } : null,
+  ).filter((x): x is NonNullable<typeof x> => !!x);
 
   /* ── 9 Visapaketit ── Tulossa-sääntö; julkaistu paketti näkyy kautensa loppuun (loppu). */
   const paketit = VISAPAKETIT.filter((p) => {

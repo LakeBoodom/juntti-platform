@@ -433,7 +433,10 @@
   font-family: var(--es-display); font-weight: 900; font-variation-settings: "wdth" 76; letter-spacing: -.02em; line-height: .95; text-transform: uppercase;
   font-size: min(21px, calc(100cqw / (var(--lw) * .64))); overflow-wrap: normal; word-break: keep-all; text-wrap: balance;
 }
-.tn20 .tn-es-juontaja-sitaatti { font-size: 13px; line-height: 1.4; color: var(--es-teksti2); font-style: italic; text-wrap: pretty; }
+.tn20 .tn-es-juontaja-otsake { display: flex; flex-direction: column; gap: 4px; }
+.tn20 .tn-es-juontaja-laji { font-size: 11px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; color: var(--es-kulta); }
+/* v9: koukkukysymys (ei sitaatti): 14 px 600, vaalea. */
+.tn20 .tn-es-juontaja-koukku { font-size: 14px; font-weight: 600; line-height: 1.35; color: var(--es-teksti); text-wrap: pretty; }
 
 /* ── 8 Lapsille C (v7 1i): kuva pelistä vasemmalla, otsikko ja ikäryhmät oikealla. ── */
 .tn20 .tn-es-lp { display: flex; flex-direction: column; gap: 10px; }
@@ -449,6 +452,8 @@
   font-family: var(--es-display); font-weight: 900; font-variation-settings: "wdth" 74; line-height: .9; text-transform: uppercase;
   font-size: min(28px, calc(100cqw / 6.6)); overflow-wrap: normal; word-break: keep-all;
 }
+.tn20 .tn-es-lapset-otsake { display: flex; flex-direction: column; gap: 8px; }
+.tn20 .tn-es-lapset-rivi { font-size: 13.5px; line-height: 1.4; color: var(--es-teksti2); text-wrap: pretty; }
 .tn20 .tn-es-lapset-iat { display: flex; flex-direction: column; gap: 8px; }
 .tn20 .tn-es-lapset-iat .tn-es-nappi { align-self: stretch; min-height: 46px; font-size: 15px; border: 1.5px solid var(--es-vihrea); }
 
@@ -581,7 +586,9 @@
   .tn20 .tn-es-juontaja { grid-template-columns: 180px minmax(0, 1fr); min-height: 220px; border-radius: 22px; }
   .tn20 .tn-es-juontaja-teksti { gap: 12px; padding: 26px 28px; }
   .tn20 .tn-es-juontaja-h { font-size: min(32px, calc(100cqw / (var(--lw) * .64))); }
-  .tn20 .tn-es-juontaja-sitaatti { font-size: 15px; }
+  .tn20 .tn-es-juontaja-koukku { font-size: 16px; }
+  .tn20 .tn-es-juontaja-laji { font-size: 12px; }
+  .tn20 .tn-es-lapset-rivi { font-size: 15px; }
 
   .tn20 .tn-es-lp { gap: 22px; }
   .tn20 .tn-es-lapset { grid-template-columns: 190px minmax(0, 1fr); gap: 26px; padding: 18px; border-radius: 22px; }
