@@ -244,7 +244,7 @@ function Juontajat({ j }: { j: D["juontajat"] }) {
                 <span className="tn-es-juontaja-h" style={lw(h.visa)}>{h.visa}</span>
               </span>
               <span className="tn-es-juontaja-koukku">{h.koukku ? h.teaser : `”${h.teaser}”`}</span>
-              <span className="tn-es-nappi">Pelaa</span>
+              <span className="tn-es-nappi tn-es-nappi--lime">Pelaa</span>
             </span>
           </a>
         ))}
@@ -270,13 +270,14 @@ function Promo2({ p }: { p: NonNullable<D["promo2"]> }) {
   );
 }
 
-function LapsetJaPaketit({ l, paketit }: { l: D["lapset"]; paketit: D["paketit"] }) {
-  if (!l && !paketit.length) return null;
+function LapsetJaPaketit({ l, vp }: { l: D["lapset"]; vp: D["visapaketit"] }) {
+  const paketteja = (vp.iso ? 1 : 0) + vp.rivit.length;
+  if (!l && !paketteja) return null;
   return (
-    <div className="tn-es-lp" data-tn-entry="etusivu:lapset">
+    <div className="tn-es-lp">
       {l && (
-        <div className="tn-es-lapset">
-          {/* Lapsille C (v7 1i): kuva pelistä, otsikko, ikäryhmät — ei aputekstiä eikä kausikuvaa. */}
+        <div className="tn-es-lapset" data-tn-entry="etusivu:lapset">
+          {/* Lapsille C (v7 1i): kuva pelistä, otsikko, ikäryhmät — ei kausikuvaa. */}
           <a className="tn-es-lapset-kuva" href={l.href} tabIndex={-1} aria-hidden="true">
             <Kuva src="/20/lapset/etusivu-peli.webp" luokka="tn-es-lapset-img" sizes="(min-width: 1100px) 200px, 132px" />
           </a>
@@ -287,31 +288,46 @@ function LapsetJaPaketit({ l, paketit }: { l: D["lapset"]; paketit: D["paketit"]
               <span className="tn-es-lapset-rivi">Kuva- ja äänivisoja <span className="tn-es-ehja">4–12-vuotiaille</span>. Vinkit auttavat, jos vastaus ei heti löydy.</span>
             </span>
             <div className="tn-es-lapset-iat">
-              <a className="tn-es-nappi" href={`${l.href}?ika=4-7`}>4–7 v</a>
-              <a className="tn-es-nappi" href={`${l.href}?ika=8-12`}>8–12 v</a>
+              <a className="tn-es-nappi tn-es-nappi--lime" href={`${l.href}?ika=4-7`}>4–7 v</a>
+              <a className="tn-es-nappi tn-es-nappi--lime" href={`${l.href}?ika=8-12`}>8–12 v</a>
             </div>
           </div>
         </div>
       )}
-      {/* Visapaketti (v7 kohta 8): mitä paketissa on ja mihin se sopii + "Katso paketti". */}
-      {paketit.map((p) => {
-        const sisus = (
-          <>
-            <span className="tn-es-paketti-kuva"><Kuva src={p.kuva} luokka="tn-es-paketti-img" sizes="(min-width: 1100px) 220px, 112px" /></span>
-            <span className="tn-es-paketti-teksti">
-              <span className="tn-es-kicker tn-es-kicker--kulta2">{p.kicker}</span>
-              <span className="tn-es-paketti-h">{p.otsikko}</span>
-              <span className="tn-es-paketti-rivi">{p.rivi}</span>
-              {p.tila === "pelattava" && <span className="tn-es-nappi tn-es-paketti-nappi">Katso paketti</span>}
-            </span>
-          </>
-        );
-        return p.tila === "pelattava" && p.href ? (
-          <a key={p.avain} className="tn-es-paketti" href={p.href} data-tn-entry="etusivu:visapaketti">{sisus}</a>
-        ) : (
-          <div key={p.avain} className="tn-es-paketti" data-tulossa aria-disabled="true">{sisus}</div>
-        );
-      })}
+      {/* Visapaketit "Visailta valmiina" (CD v10): kauden paketti isona, muut riveinä. */}
+      {paketteja > 0 && (
+        <section className="tn-es-osio tn-es-vp" aria-labelledby="tn-es-vp-h" data-tn-entry="etusivu:visapaketit">
+          <div className="tn-es-otsake">
+            <span className="tn-es-kicker">Visapaketit · ilmainen</span>
+            <h2 id="tn-es-vp-h" className="tn-es-h2">Visailta valmiina</h2>
+            <p className="tn-es-vp-ingressi">Valmiit kierrokset vastauksineen. Pelaa yhdessä, näytä ruudulta tai tulosta joukkueille.</p>
+          </div>
+          {vp.iso && (
+            <a className="tn-es-vp-iso" href={vp.iso.href}>
+              <span className="tn-es-vp-iso-kuva"><Kuva src={vp.iso.kuva} luokka="tn-es-vp-iso-img" pos="50% 55%" sizes="(min-width: 1100px) 540px, 100vw" /></span>
+              <span className="tn-es-vp-iso-teksti">
+                <span className="tn-es-vp-iso-h">{vp.iso.otsikko}</span>
+                <span className="tn-es-nappi tn-es-vp-nappi">Katso paketti</span>
+              </span>
+            </a>
+          )}
+          {vp.rivit.length > 0 && (
+            <div className="tn-es-vp-rivit">
+              {vp.rivit.map((p) => (
+                <a key={p.avain} className="tn-es-vp-rivi" href={p.href}>
+                  <Kuva src={p.kuva} luokka="tn-es-vp-rivi-img" pos="30% 40%" sizes="64px" />
+                  <span className="tn-es-vp-rivi-teksti">
+                    <span className="tn-es-vp-rivi-h">{p.otsikko}</span>
+                    {p.alarivi && <span className="tn-es-vp-rivi-ala">{p.alarivi}</span>}
+                  </span>
+                  <span className="tn-es-vp-nuoli" aria-hidden="true">→</span>
+                </a>
+              ))}
+            </div>
+          )}
+          {vp.kaikki && <a className="tn-es-nappi" href="/visapaketit">Kaikki visapaketit</a>}
+        </section>
+      )}
     </div>
   );
 }
@@ -326,7 +342,7 @@ export default function EtusivuV5({ d }: { d: D }) {
       {d.promo1 && <Promo1 p={d.promo1} />}
       {d.juontajat.length > 0 && <Juontajat j={d.juontajat} />}
       {d.promo2 && <Promo2 p={d.promo2} />}
-      <LapsetJaPaketit l={d.lapset} paketit={d.paketit} />
+      <LapsetJaPaketit l={d.lapset} vp={d.visapaketit} />
     </div>
   );
 }

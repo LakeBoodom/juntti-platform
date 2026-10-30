@@ -11,7 +11,8 @@ import { getSiteStats } from "@/lib/siteStats";
 import { KOKOELMA_KORTIT } from "@/lib/kokoelmat/rekisteri";
 import { visanKorttikuva } from "@/lib/kokoelmat/visanKorttikuva";
 import { ETUSIVU_RYHMAT, ETUSIVUN_PELIMUODOT, nakyyEtusivulla, ryhmanNimi } from "@/lib/pelimuodot";
-import { JUONTAJIEN_SUOSITUKSET, PROMO2_OOTKO, VISAPAKETIT } from "@/lib/etusivu";
+import { JUONTAJIEN_SUOSITUKSET, PROMO2_OOTKO } from "@/lib/etusivu";
+import { listaaVisapaketit, landinginPaketit, ajankohtainen, kauttaJaljella, korttiHref } from "@/lib/visapaketit";
 import { JUHLAT_KOKOELMA, pvm, juhlaKalenteri, paavisa, paiviaValissa, vpLyhyt, type Esiintyma } from "@/lib/juhlat";
 import { LAPSET_SIVU, lapsetNakyvissa } from "@/lib/lapset/data";
 import { COLLECTION_LABEL } from "@/lib/visanKokoelma";
@@ -235,12 +236,23 @@ export async function haeEtusivu(opts: {
     k ? { key: j.key, nimi: j.nimi, kuva: j.kuva, aksentti: j.aksentti, visa: nimi(k), teaser: koukut.get(k.id) ?? sitaatti(k)!, koukku: koukut.has(k.id), href: visaHref(k) } : null,
   ).filter((x): x is NonNullable<typeof x> => !!x);
 
-  /* ── 9 Visapaketit ── Tulossa-sääntö; julkaistu paketti näkyy kautensa loppuun (loppu). */
-  const paketit = VISAPAKETIT.filter((p) => {
-    if (p.tila === "pelattava") return p.julkaisu <= today.iso && (!p.loppu || today.iso <= p.loppu);
-    const ero = (Date.parse(p.julkaisu) - Date.parse(today.iso)) / 864e5;
-    return ero >= 0 && ero <= 35;
+  /* ── 9 Visapaketit "Visailta valmiina" (CD v10, Heikki 30.10.2026): julkaistut paketit kannasta (quiz_packs).
+     Kauden paketti (kausi käynnissä, lähin loppu ensin) isona kuvakorttina, muut tiiviinä riveinä; sarjasta uusin painos.
+     Ei Kaikki visapaketit -linkkiä, kun paketteja on enintään kolme. Pubivisalla ei kuvaa kannassa → juontajien visakuva. */
+  const PAKETTI_KUVA_VARA = "/20/hero-mikko-laura.webp";
+  const kaikkiPaketit = landinginPaketit(await listaaVisapaketit());
+  const kaudenPaketti = ajankohtainen(kaikkiPaketit);
+  const isoPaketti = kaudenPaketti && kauttaJaljella(kaudenPaketti) !== null ? kaudenPaketti : null;
+  const pakettiKortti = (p: (typeof kaikkiPaketit)[number]) => ({
+    avain: p.slug, otsikko: p.otsikko, alarivi: p.painos_nimi, href: korttiHref(p),
+    kuva: p.hero_image ?? PAKETTI_KUVA_VARA, kuvaAlt: p.hero_alt ?? "",
   });
+  const visapaketit = {
+    iso: isoPaketti ? pakettiKortti(isoPaketti) : null,
+    /* CD v10: sarjat (Pubivisa) ennen erillisiä paketteja. */
+    rivit: kaikkiPaketit.filter((p) => p !== isoPaketti).sort((a, b) => Number(!a.sarja) - Number(!b.sarja)).map(pakettiKortti),
+    kaikki: kaikkiPaketit.length > 3,
+  };
 
   return {
     today,
@@ -257,6 +269,6 @@ export async function haeEtusivu(opts: {
     juontajat,
     promo2: PROMO2_OOTKO.nakyvissa ? PROMO2_OOTKO : null,
     lapset: lapsetNakyvissa() ? { href: LAPSET_SIVU } : null,
-    paketit,
+    visapaketit,
   };
 }

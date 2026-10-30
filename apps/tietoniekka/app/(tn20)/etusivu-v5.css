@@ -55,15 +55,19 @@
   font-family: var(--es-display); font-weight: 900; font-variation-settings: "wdth" 86; font-size: 14px; text-transform: uppercase; white-space: nowrap;
 }
 .tn20 .tn-es-nappi--acc { border: 1.5px solid var(--acc); }
+/* v10 (Heikki 30.10.2026): korttien napit täytettyinä kortin omalla värillä — Laura ja Mikko sekä Lapsille lime kuten
+   "Pelaa päivän visa", synttärit oranssi, Tiesitkö vaaleansininen, visapaketti kulta. Poikkeaa UI-laatusäännöstä 5
+   ("kortin väri ei napissa") Heikin päätöksellä. Teksti aina tumma (#131109). */
+.tn20 .tn-es5 .tn-es-nappi.tn-es-nappi--lime { background: var(--es-lime); border-color: var(--es-lime); color: #131109; }
 .tn20 .tn-es-cta {
   display: flex; align-items: center; justify-content: center; min-height: 56px; padding: 0 28px; border-radius: 999px;
   font-family: var(--es-display); font-weight: 900; font-variation-settings: "wdth" 86; font-size: 17px; text-transform: uppercase;
 }
-.tn20 :is(.tn-es-pv, .tn-es-slot, .tn-es-synt, .tn-es-aihe-kuva, .tn-es-peli, .tn-es-juontaja, .tn-es-promo, .tn-jb, .tn-es-paketti) {
+.tn20 :is(.tn-es-pv, .tn-es-slot, .tn-es-synt, .tn-es-aihe-kuva, .tn-es-peli, .tn-es-juontaja, .tn-es-promo, .tn-jb, .tn-es-vp-iso, .tn-es-vp-rivi) {
   transition: border-color var(--dur-fast, 120ms) var(--ease-standard, ease), transform var(--dur-fast, 120ms) var(--ease-standard, ease);
 }
 @media (hover: hover) {
-  .tn20 a:is(.tn-es-slot, .tn-es-synt, .tn-es-peli, .tn-es-juontaja, .tn-es-paketti):hover { border-color: var(--es-viiva2); transform: translateY(-2px); }
+  .tn20 a:is(.tn-es-slot, .tn-es-synt, .tn-es-peli, .tn-es-juontaja, .tn-es-vp-iso, .tn-es-vp-rivi):hover { border-color: var(--es-viiva2); transform: translateY(-2px); }
   .tn20 a.tn-es-aihe:hover .tn-es-aihe-kuva, .tn20 a.tn-jb:hover { border-color: var(--es-viiva2); }
 }
 
@@ -153,7 +157,7 @@
   font-family: var(--es-display); font-weight: 900; font-variation-settings: "wdth" 76; line-height: .94; text-transform: uppercase;
   font-size: min(22px, calc(100cqw / (var(--lw) * .64))); overflow-wrap: normal; word-break: keep-all; text-wrap: balance;
 }
-.tn20 .tn-es-synt-nappi { align-self: stretch; padding: 0 12px; border: 1.5px solid var(--es-oranssi); }
+.tn20 .tn-es-synt-nappi { align-self: stretch; padding: 0 12px; border: 1.5px solid var(--es-oranssi); background: var(--es-oranssi); color: #131109; }
 /* 320 px: tekstipalsta 114 px, "PELAA VISA" + reunus 116 px → kuva 132 → 112 px. */
 @media (max-width: 359px) { .tn20 .tn-es-synt { grid-template-columns: 112px minmax(0, 1fr); } }
 
@@ -199,7 +203,7 @@
 }
 .tn20 .tn-es-tt-h mark { background: var(--es-syaani); color: #131109; padding: 0 6px; border-radius: 4px; -webkit-box-decoration-break: clone; box-decoration-break: clone; }
 /* v7: ääriviivanappi syaanina (lime varattu Päivän visalle ja juhlabannerille). */
-.tn20 .tn-es-tt-nappi { align-self: stretch; min-height: 48px; border: 1.5px solid var(--es-syaani); font-size: 15px; }
+.tn20 .tn-es-tt-nappi { align-self: stretch; min-height: 48px; border: 1.5px solid var(--es-syaani); background: var(--es-syaani); color: #131109; font-size: 15px; }
 
 /* ── 3 Pelaa aiheittain (v7): 16:10-kuva ja nimi alla, 3 saraketta. ── */
 .tn20 .tn-es-aiheet { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px 8px; }
@@ -439,7 +443,7 @@
 .tn20 .tn-es-juontaja-koukku { font-size: 14px; font-weight: 600; line-height: 1.35; color: var(--es-teksti); text-wrap: pretty; }
 
 /* ── 8 Lapsille C (v7 1i): kuva pelistä vasemmalla, otsikko ja ikäryhmät oikealla. ── */
-.tn20 .tn-es-lp { display: flex; flex-direction: column; gap: 10px; }
+.tn20 .tn-es-lp { display: flex; flex-direction: column; gap: 44px; }
 .tn20 .tn-es-lapset {
   display: grid; grid-template-columns: 132px minmax(0, 1fr); gap: 16px; padding: 14px; border-radius: 18px; border: 1px solid var(--es-viiva);
   background: radial-gradient(90% 100% at 100% 100%, rgba(74,222,128,.13), transparent 70%), var(--es-kortti);
@@ -456,30 +460,38 @@
 .tn20 .tn-es-lapset-rivi { font-size: 13.5px; line-height: 1.4; color: var(--es-teksti2); text-wrap: pretty; }
 .tn20 .tn-es-ehja { white-space: nowrap; }
 .tn20 .tn-es-lapset-iat { display: flex; flex-direction: column; gap: 8px; }
-.tn20 .tn-es-lapset-iat .tn-es-nappi { align-self: stretch; min-height: 46px; font-size: 15px; border: 1.5px solid var(--es-vihrea); }
+.tn20 .tn-es-lapset-iat .tn-es-nappi { align-self: stretch; min-height: 46px; font-size: 15px; }
 
-/* ── 9 Visapaketti (v7 kohta 8) ── */
-.tn20 .tn-es-paketti {
-  display: grid; grid-template-columns: 112px minmax(0, 1fr); border-radius: 18px; border: 1px solid var(--es-viiva); overflow: hidden;
-  background: radial-gradient(90% 100% at 100% 100%, rgba(232,163,32,.13), transparent 70%), var(--es-kortti);
-}
-.tn20 .tn-es-paketti[data-tulossa] { border-style: dashed; border-color: var(--es-viiva2); }
-.tn20 .tn-es-paketti-kuva { position: relative; display: block; background: #1A110B; }
-.tn20 .tn-es-paketti-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
-.tn20 .tn-es-paketti-teksti { display: flex; flex-direction: column; gap: 9px; padding: 16px; min-width: 0; container-type: inline-size; }
-.tn20 .tn-es-paketti-h {
-  font-family: var(--es-display); font-weight: 900; font-variation-settings: "wdth" 74; font-size: min(24px, calc(100cqw / 6)); line-height: .92;
+/* ── 9 Visapaketit "Visailta valmiina" (CD v10) ── */
+.tn20 .tn-es-vp { gap: 14px; }
+.tn20 .tn-es-vp-ingressi { margin: 0; font-size: 14.5px; line-height: 1.45; color: var(--es-teksti2); text-wrap: pretty; }
+.tn20 .tn-es-vp-iso { display: flex; flex-direction: column; border-radius: 18px; border: 1px solid var(--es-viiva); background: var(--es-kortti); overflow: hidden; }
+.tn20 .tn-es-vp-iso-kuva { position: relative; display: block; height: 150px; }
+.tn20 .tn-es-vp-iso-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.tn20 .tn-es-vp-iso-kuva::after { content: ""; position: absolute; inset: 0; background: linear-gradient(0deg, var(--es-kortti) 0%, rgba(23,20,13,0) 60%); }
+.tn20 .tn-es-vp-iso-teksti { display: flex; flex-direction: column; gap: 12px; padding: 4px 18px 18px; container-type: inline-size; }
+.tn20 .tn-es-vp-iso-h {
+  font-family: var(--es-display); font-weight: 900; font-variation-settings: "wdth" 74; font-size: min(26px, calc(100cqw / 6)); line-height: .92;
   text-transform: uppercase; overflow-wrap: normal; word-break: keep-all;
 }
-.tn20 .tn-es-paketti-rivi { font-size: 13.5px; line-height: 1.4; color: var(--es-teksti2); text-wrap: pretty; }
-.tn20 .tn-es-paketti-nappi { border: 1.5px solid var(--es-kulta); }
+.tn20 .tn-es-vp-nappi { align-self: stretch; min-height: 48px; font-size: 15px; border-color: var(--es-kulta); background: var(--es-kulta); color: #131109; }
+.tn20 .tn-es-vp-rivit { display: flex; flex-direction: column; gap: 8px; }
+.tn20 .tn-es-vp-rivi {
+  display: grid; grid-template-columns: 64px minmax(0, 1fr) auto; align-items: center; gap: 14px; min-height: 64px; padding: 8px 14px 8px 8px;
+  border-radius: 14px; border: 1px solid var(--es-viiva); background: var(--es-kortti);
+}
+.tn20 .tn-es-vp-rivi-img { display: block; width: 64px; height: 64px; border-radius: 10px; object-fit: cover; background: #1A110B; }
+.tn20 .tn-es-vp-rivi-teksti { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.tn20 .tn-es-vp-rivi-h { font-family: var(--es-display); font-weight: 900; font-variation-settings: "wdth" 78; font-size: 17px; line-height: 1; text-transform: uppercase; overflow-wrap: normal; word-break: keep-all; }
+.tn20 .tn-es-vp-rivi-ala { font-size: 13px; font-weight: 600; color: var(--es-himmea); }
+.tn20 .tn-es-vp-nuoli { font-family: var(--es-display); font-weight: 900; font-size: 18px; color: var(--es-kulta); }
 
 /* ── Tabletti ≥ 700 ── */
 @media (min-width: 700px) {
   .tn20 .tn-es5 { --es-reuna: 40px; padding: 32px var(--es-reuna) 56px; gap: 56px; }
   .tn20 .tn-es-aiheet { grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 16px 12px; }
   .tn20 .tn-es-juontajat { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .tn20 .tn-es-lp { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .tn20 .tn-es-lp { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start; gap: 22px; }
 }
 
 /* ── Desktop ≥ 1100 ── */
@@ -598,10 +610,12 @@
   .tn20 .tn-es-lp-h { font-size: min(40px, calc(100cqw / 6.6)); }
   .tn20 .tn-es-lapset-iat { flex-direction: row; }
   .tn20 .tn-es-lapset-iat .tn-es-nappi { flex: 1; min-height: 52px; }
-  .tn20 .tn-es-paketti { grid-template-columns: 220px minmax(0, 1fr); border-radius: 22px; }
-  .tn20 .tn-es-paketti-teksti { justify-content: center; gap: 14px; padding: 28px 30px; }
-  .tn20 .tn-es-paketti-h { font-size: min(36px, calc(100cqw / 6)); }
-  .tn20 .tn-es-paketti-rivi { font-size: 15px; }
+  .tn20 .tn-es-vp-iso { border-radius: 22px; }
+  .tn20 .tn-es-vp-iso-kuva { height: 220px; }
+  .tn20 .tn-es-vp-iso-teksti { flex-direction: row; align-items: center; justify-content: space-between; gap: 16px; padding: 6px 24px 24px; }
+  .tn20 .tn-es-vp-iso-h { font-size: min(34px, calc((100cqw - 200px) / 6)); }
+  .tn20 .tn-es-vp-nappi { align-self: center; padding: 0 26px; }
+  .tn20 .tn-es-vp-ingressi { font-size: 16px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
