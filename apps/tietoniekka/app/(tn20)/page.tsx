@@ -1,5 +1,5 @@
 // TIETONIEKKA 2.0 — ETUSIVU v5 (brief "Etusivun uusi rakenne", hyväksytty 28.10.2026; design Tietoniekka_Etusivu_v5).
-// Osiot: Päivän pelit → Tiesitkö? → Selaa aiheittain → Valitse peli → Promo 1 → Laura ja Mikko → Promo 2 →
+// Osiot: Päivän pelit → Tiesitkö? → Pelaa aiheittain → Valitse peli → Promo 1 → Laura ja Mikko → Promo 2 →
 // Tietoniekka lapsille → Visapaketit. Kaikki datasta (lib/etusivu5.ts), näkymä components/tn20/etusivu5/EtusivuV5.tsx.
 // Korvasi 28.8.–27.10.2026 bannerisarjan (Juhlat, Tupla, Rajanaapurit, Kuvavisat, Luonto/Äänivisa, Suositut kokoelmat,
 // Kuka on vanhin?, Päivän sankari, Kuntaliitos, juontajat, Uusimmat visat).

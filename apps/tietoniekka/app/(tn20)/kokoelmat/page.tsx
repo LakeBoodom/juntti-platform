@@ -11,7 +11,7 @@ import { NAV_COLLECTIONS, NAV_MODES, navHref } from "@/lib/nav";
 
 export const metadata: Metadata = {
   title: "Kaikki kokoelmat – tietovisat aiheittain | Tietoniekka",
-  description: "Valitse aihe: TV & suoratoisto, urheilu, jääkiekko, jalkapallo, elokuvat, musiikki, maantieto, Suomen kaupungit, tunnetut henkilöt, kulttuuri, historia, luonto, tiede & teknologia, juhlat sekä vaalit ja politiikka.",
+  description: "Valitse aihe: TV ja suoratoisto, urheilu, jääkiekko, jalkapallo, elokuvat, musiikki, maantieto, Suomen kaupungit, tunnetut henkilöt, kulttuuri, historia, luonto, tiede ja teknologia, juhlat sekä vaalit ja politiikka.",
   alternates: { canonical: "/kokoelmat" },
   ...jakoMeta({
     title: "Kaikki kokoelmat – tietovisat aiheittain",

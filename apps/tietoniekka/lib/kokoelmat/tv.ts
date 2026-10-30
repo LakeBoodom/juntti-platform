@@ -1,4 +1,4 @@
-// TV & SUORATOISTO rungolla (runko vaihe 1, 19.10.2026). Ensimmäinen kokoelma, joka siirtyi
+// TV JA SUORATOISTO rungolla (runko vaihe 1, 19.10.2026). Ensimmäinen kokoelma, joka siirtyi
 // yhteiselle rungolle (components/tn20/runko). Osiot ovat samat viisi genreä kuin ennen
 // (lib/tv.ts TV_SECTIONS); visat tulevat osioihin quizzes.section_tags-tagista (migraatio
 // 20261108_quiz_section_tags). Osion B-kortti = entinen "Tietoniekka suosittelee" -nosto,
@@ -11,9 +11,9 @@ const MAA: Record<string, string> = { kotimaiset: "Kotimainen", ulkomaiset: "Ulk
 
 export const TV: Kokoelma = {
   slug: "tv",
-  nimi: "TV & suoratoisto",
+  nimi: "TV ja suoratoisto",
   eyebrow: "",
-  title: "TV & ",
+  title: "TV ja ",
   highlight: "suoratoisto",
   ingress: "Kotimaiset klassikot, maailman puhutuimmat sarjat ja tosi-tv:n suurimmat hetket.",
   accent: "#FF3D9E",

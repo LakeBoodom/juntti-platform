@@ -1,4 +1,4 @@
-// TV & SUORATOISTO — kuvat. Sivu on 19.10.2026 alkaen kokoelmarungolla (lib/kokoelmat/tv.ts); vanhan
+// TV JA SUORATOISTO — kuvat. Sivu on 19.10.2026 alkaen kokoelmarungolla (lib/kokoelmat/tv.ts); vanhan
 // sivun kuratointi (TV_FEATURED, TV_SECTIONS) siirtyi osioiksi ja quizzes.section_tags-tageiksi.
 // Alkuperäinen: CD "TN TV ja Suoratoisto -teemasivu" 19.8.2026, design_handoff_tv_suoratoisto/README.md.
 // Rakenteellisesti Elokuvat-sivun (lib/elokuvat.ts) sisarus, kolme

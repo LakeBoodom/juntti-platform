@@ -82,7 +82,7 @@ export const HOSTS: Host[] = [
     img: "/20/etusivu/host-laura.webp",
     accent: "gold",
     cards: [
-      { key: "tv", alt: "Naamioitunut laulaja tv-studion lavalla", title: "TV & suoratoisto", desc: "Sarjat, tähdet ja suoratoistohitit", href: "/kokoelma/tv", img: "/20/etusivu/l-tv-masked-singer-kortti.webp", pos: "center 35%" },
+      { key: "tv", alt: "Naamioitunut laulaja tv-studion lavalla", title: "TV ja suoratoisto", desc: "Sarjat, tähdet ja suoratoistohitit", href: "/kokoelma/tv", img: "/20/etusivu/l-tv-masked-singer-kortti.webp", pos: "center 35%" },
       { key: "jalkapallo", alt: "Jalkapalloilija täydellä stadionilla", title: "Jalkapallo", desc: "Seurat, pelaajat ja arvokisat", href: "/kokoelma/jalkapallo", img: "/20/etusivu/l-jalkapallo-kortti.webp", pos: "center 38%" },
     ],
   },

@@ -13,7 +13,7 @@ export type NavCollection = {
 };
 
 export const NAV_COLLECTIONS: NavCollection[] = [
-  { slug: "tv", label: "TV & suoratoisto", color: "#FF3D9E" },
+  { slug: "tv", label: "TV ja suoratoisto", color: "#FF3D9E" },
   { slug: "urheilu", label: "Urheilu", color: "#B6FF3C" },
   /* Jääkiekko ja Jalkapallo (Heikki 25.8.2026): omat teemakokoelmat, jotka
      nostetaan navigaatioon omina kohtinaan heti Urheilun perään, vaikka
@@ -36,11 +36,11 @@ export const NAV_COLLECTIONS: NavCollection[] = [
      'politiikka', lisäksi ristiinlistatut historiavisat (lib/vaalit/data.ts). */
   { slug: "vaalit", label: "Vaalit ja politiikka", color: "#B4A5FF" },
   { slug: "luonto", label: "Luonto", color: "#3FBF7F" },
-  /* Tiede & teknologia (Heikki 20.9.2026): oma teemakokoelma, jonka visat ovat
+  /* Tiede ja teknologia (Heikki 20.9.2026): oma teemakokoelma, jonka visat ovat
      kannassa yleistieto-kokoelmaa category='tiede-teknologia' — sama
      nosto-periaate kuin Suomen kaupungeilla. Visamäärä lasketaan kategoriasta
      (ks. kokoelmat/page.tsx). */
-  { slug: "tiede", label: "Tiede & teknologia", color: "#5BE1FF" },
+  { slug: "tiede", label: "Tiede ja teknologia", color: "#5BE1FF" },
   /* Juhlat (Heikki 28.9.2026): vuoden juhlat ja perinteet, kannassa collection='juhlat'. */
   { slug: "juhlat", label: "Juhlat", color: "#E8A320" },
   /* Lasten visat (Heikki 11.10.2026): oma kokoelmasivu /lapset (target_age 4-7 / 8-12). */

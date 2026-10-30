@@ -10,14 +10,14 @@ const KOKOELMAT: Record<string, string> = {
   matkakohteet: "Maantieto",
   musiikki: "Musiikki",
   "tunnetut-henkilot": "Tunnetut henkilöt",
-  tv: "TV & suoratoisto",
+  tv: "TV ja suoratoisto",
   urheilu: "Urheilu",
   yleistieto: "Yleistieto",
 };
 
 export function kokoelmaNimi(v: { collection: string | null; category: string | null }): string {
   if (v.category === "mega") return "Megavisat";
-  if (v.category === "tiede-teknologia") return "Tiede & teknologia";
+  if (v.category === "tiede-teknologia") return "Tiede ja teknologia";
   if (v.category === "kaupungit") return "Suomen kaupungit";
   if (v.category === "jaakiekko") return "Jääkiekko";
   return (v.collection && KOKOELMAT[v.collection]) || "Muut";

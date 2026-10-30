@@ -179,7 +179,7 @@
 }
 .tn20 .tn-es-tt-h mark { background: var(--es-kulta2); color: #131109; padding: 0 6px; border-radius: 4px; -webkit-box-decoration-break: clone; box-decoration-break: clone; }
 
-/* ── 3 Selaa aiheittain ── */
+/* ── 3 Pelaa aiheittain ── */
 .tn20 .tn-es-aiheet { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
 .tn20 .tn-es-aihe {
   display: grid; grid-template-columns: 56px minmax(0, 1fr); align-items: center; gap: 10px; min-height: 64px; padding-right: 10px;
@@ -196,7 +196,7 @@
 .tn20 .tn-es-ryhma { display: flex; flex-direction: column; gap: 8px; }
 .tn20 .tn-es-ryhma-h { margin: 0; display: flex; align-items: center; gap: 14px; font-size: 12px; font-weight: 800; letter-spacing: .16em; text-transform: uppercase; color: var(--es-teksti2); }
 .tn20 .tn-es-ryhma-h::after { content: ""; flex: 1; height: 1px; background: var(--es-viiva); }
-/* Mobiili < 768 (korjauskierros 1, Heikki 28.10.): pelimuodot samoina tiilinä kuin Selaa aiheittain — kuva vasemmalla,
+/* Mobiili < 768 (korjauskierros 1, Heikki 28.10.): pelimuodot samoina tiilinä kuin Pelaa aiheittain — kuva vasemmalla,
    lajin väripiste + nimi oikealla, 2 saraketta, ei kuvausriviä. Vaakarivit (62 % kortit) poistettu: osio oli ~1 800 px
    ja toisen kortin nimi katkesi ("RAJANAAPU"). Tavoite osio ≤ 700 px 390 px:ssä. */
 .tn20 .tn-es-rivi { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }

@@ -134,7 +134,7 @@ function Aiheet({ a }: { a: D["aiheet"] }) {
     <section className="tn-es-osio" aria-labelledby="tn-es-aiheet-h" data-tn-entry="etusivu:kokoelmat">
       <div className="tn-es-otsake">
         <span className="tn-es-kicker">{a.kicker}</span>
-        <h2 id="tn-es-aiheet-h" className="tn-es-h2">Selaa aiheittain</h2>
+        <h2 id="tn-es-aiheet-h" className="tn-es-h2">Pelaa aiheittain</h2>
       </div>
       <div className="tn-es-aiheet">
         {a.tiilet.map((x) => (

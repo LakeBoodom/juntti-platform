@@ -1,5 +1,5 @@
 // ETUSIVUN KOUKKUBANNERI — Luonto / ruutana (CD "TN Luonto ruutana -banneri" 5a, 6.10.2026).
-// Korvasi Tiede & teknologia -bannerin (Heikki 6.10.2026). Vie suoraan visaan Järvien kätketyt ihmeet;
+// Korvasi Tiede ja teknologia -bannerin (Heikki 6.10.2026). Vie suoraan visaan Järvien kätketyt ihmeet;
 // vastaus (ruutana) ei näy, kala on kuvassa vain siluettina.
 // Kolme asettelua yhdestä DOMista kontin leveyden mukaan (ruutana-banneri.css): desktop ≥ 860
 // (1160 × 268), tabletti 520–859 (760 × 240), mobiili < 520 (pystykuva, 380 × 600).

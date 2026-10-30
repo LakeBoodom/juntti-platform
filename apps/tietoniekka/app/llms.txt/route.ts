@@ -16,7 +16,7 @@ const COLLECTIONS: Array<[string, string, string]> = [
   ["jaakiekko", "Jääkiekko", "Liiga, Leijonat ja NHL"],
   ["jalkapallo", "Jalkapallo", "Valioliiga, Euroopan suurseurat ja Mestarien liiga"],
   ["elokuvat", "Elokuvat", "Kotimaiset ja kansainväliset elokuvat"],
-  ["tv", "TV & suoratoisto", "TV-sarjat kotimaasta ja maailmalta"],
+  ["tv", "TV ja suoratoisto", "TV-sarjat kotimaasta ja maailmalta"],
   ["musiikki", "Musiikki", "Suomipop, iskelmä ja kansainväliset artistit"],
   ["historia", "Historia", "Suomen ja maailman historia"],
   ["luonto", "Luonto", "Eläimet, kasvit ja luonnonilmiöt"],
@@ -24,7 +24,7 @@ const COLLECTIONS: Array<[string, string, string]> = [
   ["kulttuuri", "Kulttuuri", "Taide, kirjallisuus ja design"],
   ["kaupungit", "Suomen kaupungit", "Kaupunkivisat ympäri Suomen"],
   ["tunnetut-henkilot", "Tunnetut henkilöt", "Visa jokaisesta henkilöstä: urheilijat, muusikot, näyttelijät, poliitikot"],
-  ["tiede", "Tiede & teknologia", "Keho, avaruus, keksinnöt ja tiedemyytit"],
+  ["tiede", "Tiede ja teknologia", "Keho, avaruus, keksinnöt ja tiedemyytit"],
   ["juhlat", "Juhlat", "Vuoden juhlat ja perinteet: joulu, vappu, juhannus, halloween"],
   ["kuvavisat", "Kuvavisat", "Tunnista kuvasta: liput, vaakunat, linnut, kasvit, eläimet, maalaukset, rakennukset"],
 ];

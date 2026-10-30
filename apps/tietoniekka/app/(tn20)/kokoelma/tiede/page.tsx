@@ -1,4 +1,4 @@
-// TIEDE & TEKNOLOGIA yhteisellä rungolla (TOTEUTUSBRIEF "Kokoelmasivun runko ja pelikehys", vaihe 3,
+// TIEDE JA TEKNOLOGIA yhteisellä rungolla (TOTEUTUSBRIEF "Kokoelmasivun runko ja pelikehys", vaihe 3,
 // 19.10.2026). Sisältö ja ilme tulevat asetuksesta lib/kokoelmat/tiede.ts, visat osioihin
 // quizzes.section_tags-tagista. Vanha sivukohtainen toteutus (CD 20.9.2026) poistettu.
 import "../../runko.css";

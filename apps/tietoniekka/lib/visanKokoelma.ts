@@ -59,11 +59,11 @@ export function resolveCollection(q: { collection: string | null; category: stri
      ei muuta pelinäkymää. */
   if (cat === "mega") return { key: "megavisat", label: "Megavisat", hub: "/megavisat", bg: "/20/megavisa.webp", accent: "#E8A320" };
   if (cat === "kaupungit") return { key: "kaupungit", label: "Suomen kaupungit", hub: "/kokoelma/kaupungit", bg: KAUPUNGIT_HERO_IMG, accent: "#E8A320" };
-  /* Tiede & teknologia (20.9.2026): visat ovat kannassa yleistietoa, kokoelma
+  /* Tiede ja teknologia (20.9.2026): visat ovat kannassa yleistietoa, kokoelma
      tunnistetaan kategoriasta — sama periaate kuin kaupunkivisoilla. */
   /* Vaalit ja politiikka (5.10.2026): eduskuntavaalivisat ovat category='politiikka'. */
   if (cat === "politiikka") return { key: "vaalit", label: "Vaalit ja politiikka", hub: "/kokoelma/vaalit", bg: "/20/vaalit/hero.webp", accent: "#B4A5FF" };
-  if (cat === "tiede-teknologia") return { key: "tiede", label: "Tiede & teknologia", hub: "/kokoelma/tiede", bg: TIEDE_HERO.img, accent: TIEDE_ACCENT };
+  if (cat === "tiede-teknologia") return { key: "tiede", label: "Tiede ja teknologia", hub: "/kokoelma/tiede", bg: TIEDE_HERO.img, accent: TIEDE_ACCENT };
   if (cat === "jaakiekko" || genre === "jaakiekko") return { key: "jaakiekko", label: "Jääkiekko", hub: "/kokoelma/jaakiekko", bg: JK_HERO.img, accent: JK_ACCENT };
   if (genre === "jalkapallo") return { key: "jalkapallo", label: "Jalkapallo", hub: "/kokoelma/jalkapallo", bg: JP_HERO.img, accent: "#B6FF3C" };
   if (collection === "yleistieto") return { key: "yleistieto", label: "Yleistieto", hub: "/kokoelmat", bg: "/20/hero-mikko-laura.webp", accent: "#E8A320" };
@@ -90,7 +90,7 @@ export const COLLECTION_BG: Record<string, string> = {
   vaalit: "/20/vaalit/hero.webp",
 };
 export const COLLECTION_LABEL: Record<string, string> = {
-  tv: "TV & Suoratoisto",
+  tv: "TV ja suoratoisto",
   urheilu: "Urheilu",
   elokuvat: "Elokuvat",
   musiikki: "Musiikki",

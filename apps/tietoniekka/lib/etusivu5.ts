@@ -1,6 +1,6 @@
 // ETUSIVU v5 — data (brief "Etusivun uusi rakenne", hyväksytty 28.10.2026; design Tietoniekka_Etusivu_v5).
 // Jokainen osio renderöityy configista tai kannasta: ei kovakoodattuja päivämääriä, laskureita eikä visojen nimiä.
-// Osiot: 1 Päivän pelit · 2 Tiesitkö? · 3 Selaa aiheittain · 4 Valitse peli · 5 Promo 1 · 6 Laura ja Mikko ·
+// Osiot: 1 Päivän pelit · 2 Tiesitkö? · 3 Pelaa aiheittain · 4 Valitse peli · 5 Promo 1 · 6 Laura ja Mikko ·
 // 7 Promo 2 · 8 Lapsille · 9 Visapaketit.
 import { getSupabase, SITE_SLUG } from "@/lib/supabase";
 import { helsinginPaiva } from "@/lib/aika";
@@ -95,7 +95,10 @@ export async function haeEtusivu(opts: {
   const mmConf = ETUSIVUN_PELIMUODOT.find((p) => p.slug === "mika-maa");
   const mikaMaa = mmConf && mmConf.tila === "pelattava" && nakyyEtusivulla(mmConf, today.iso) ? mmConf : null;
 
-  /* ── 2 Tiesitkö? ── questions.hook-pooli, päiväsiemen. Sarakkeen puuttuminen (migraatio ajamatta) → ei osiota. */
+  /* ── 2 Tiesitkö? ── questions.hook-pooli, päiväsiemen. Sarakkeen puuttuminen (migraatio ajamatta) → ei osiota.
+     AVOIN (Heikki 30.10.2026, ratkaistaan myöhemmin): kierron pitää huomioida ajankohtaisuus. Nyt sesonkiaiheet
+     tulevat milloin tahansa (30.10. nousi joululahjakysymys). Ehdotus: Juhlat-kokoelman koukut vain, kun niiden
+     juhla on lähin (juhlaKalenteri, kuten Promo 1), ja muut sesonkiaiheet kuukausirajauksella. */
   let tiesitko: { kysymys: string; korostus: string; kicker: string; href: string; kuva: string | null; kuvaPos?: string } | null = null;
   {
     const { data, error } = await sb
@@ -123,7 +126,7 @@ export async function haeEtusivu(opts: {
     }
   }
 
-  /* ── 3 Selaa aiheittain ── kokoelmarekisteri (avoimet, ei Kuvavisoja — ne ovat pelimuoto), suomen aakkosjärjestyksessä
+  /* ── 3 Pelaa aiheittain ── kokoelmarekisteri (avoimet, ei Kuvavisoja — ne ovat pelimuoto), suomen aakkosjärjestyksessä
      (Heikki 29.10.; vain tässä osiossa — rekisterin oma järjestys navigaatiossa ja Kokoelmat-sivulla ennallaan). */
   const aiheet = KOKOELMA_KORTIT.filter((k) => k.avoin !== false && k.slug !== "kuvavisat").map((k) => ({
     slug: k.slug, nimi: k.nimi, href: k.href, kuva: k.img, kuvaPos: k.pos,

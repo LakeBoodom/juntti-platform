@@ -1,4 +1,4 @@
-// TIEDE & TEKNOLOGIA — kuvat ja etusivun banneri (CD "Tietoniekka – Tiede ja teknologia -teemasivu",
+// TIEDE JA TEKNOLOGIA — kuvat ja etusivun banneri (CD "Tietoniekka – Tiede ja teknologia -teemasivu",
 // 20.9.2026). Kokoelmasivu on rungolla 19.10.2026 alkaen (lib/kokoelmat/tiede.ts); aihepiirit tulevat
 // section_tags-tagista (= subcollection).
 //
@@ -43,7 +43,7 @@ export const TIEDE_HERO = {
   /** Kollaasin painopiste (design: object-position 22% center) */
   pos: "22% center",
   kicker: "Teemakokoelma",
-  titleLines: ["Tiede &", "teknologia"] as const,
+  titleLines: ["Tiede ja", "teknologia"] as const,
   lead: "Maailma on kummallisempi kuin luulet.",
   intro:
     "Kehosta avaruuteen, mikrobeista matematiikkaan ja sattumalta syntyneistä keksinnöistä tieteen suuriin läpimurtoihin.",
@@ -55,7 +55,7 @@ export const TIEDE_HERO = {
 /** Etusivun mainosbanneri (design: "Etusivun mainosbanneri"). */
 export const TIEDE_BANNERI = {
   kicker: "Uusi kokoelma",
-  title: "Tiede & teknologia",
+  title: "Tiede ja teknologia",
   text: "Maailma on kummallisempi kuin luulet. 20 uutta visaa kehosta avaruuteen.",
   cta: "Aloita tutkimusmatka",
   meta: "20 visaa",

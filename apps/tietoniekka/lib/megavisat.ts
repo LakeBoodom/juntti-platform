@@ -56,7 +56,7 @@ export const MEGA_GRID: MegaCard[] = [
   },
   {
     slug: "tv-ja-suoratoisto-mega",
-    tag: "TV & suoratoisto",
+    tag: "TV ja suoratoisto",
     desc: "Suosituimmat sarjat Suomesta ja maailmalta — sohvaperunoiden loppukoe.",
     img: "/20/megavisat/mega-tv.webp",
     pos: "center 40%",

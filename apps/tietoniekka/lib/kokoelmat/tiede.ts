@@ -1,4 +1,4 @@
-// TIEDE & TEKNOLOGIA rungolla (runko vaihe 3 ryhmä 2, 19.10.2026). Osiot ovat entisen sivun neljä aihepiiriä
+// TIEDE JA TEKNOLOGIA rungolla (runko vaihe 3 ryhmä 2, 19.10.2026). Osiot ovat entisen sivun neljä aihepiiriä
 // (CD 20.9.2026); visat osioihin quizzes.section_tags-tagista (= subcollection, migraatio 20261117_tiede_tagit).
 // Entiset "Tietoniekka suosittelee" -poiminnat ja nostettu visa (Tiedemyytit) osioidensa B-kortteina.
 // Visat ovat kannassa collection='yleistieto', category='tiede-teknologia'.
@@ -8,9 +8,9 @@ import { kokoelmaKortti } from "./rekisteri";
 
 export const TIEDE: Kokoelma = {
   slug: "tiede",
-  nimi: "Tiede & teknologia",
+  nimi: "Tiede ja teknologia",
   eyebrow: "",
-  title: "Tiede & ",
+  title: "Tiede ja ",
   highlight: "teknologia",
   ingress: "Maailma on kummallisempi kuin luulet. Kehosta avaruuteen ja keksintöjen syntytarinoihin.",
   accent: kokoelmaKortti("tiede")!.mastery.color,

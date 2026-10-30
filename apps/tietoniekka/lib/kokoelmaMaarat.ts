@@ -36,7 +36,7 @@ export async function getCounts(): Promise<Record<string, number>> {
       if (r.slug && JP_SLUGS.has(r.slug)) counts.jalkapallo = (counts.jalkapallo ?? 0) + 1;
       if (r.slug && JK_SLUGS.has(r.slug)) counts.jaakiekko = (counts.jaakiekko ?? 0) + 1;
       if (r.slug && KAUPUNGIT_SLUGS.has(r.slug)) counts.kaupungit = (counts.kaupungit ?? 0) + 1;
-      /* Tiede & teknologia (20.9.2026): visat ovat yleistietoa, kokoelma
+      /* Tiede ja teknologia (20.9.2026): visat ovat yleistietoa, kokoelma
          tunnistetaan kategoriasta. */
       if (r.category === "tiede-teknologia") counts.tiede = (counts.tiede ?? 0) + 1;
       /* Vaalit ja politiikka (5.10.2026): omat visat category=politiikka + ristiinlistatut. */

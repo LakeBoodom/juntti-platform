@@ -395,7 +395,7 @@ export default async function Peli20({
       ? await sb.from("quizzes").select("id, title, display_title, collection").in("id", sourceIds)
       : { data: [] };
     /* Konteksti tarvitsee myös LAJIN (Heikki 4.8.2026): pelkkä "Erikoisjoukot"
-       ei kerro että kyse on tv-sarjasta → "TV & Suoratoisto · Erikoisjoukot" */
+       ei kerro että kyse on tv-sarjasta → "TV ja suoratoisto · Erikoisjoukot" */
     const srcName = new Map(
       ((sources ?? []) as unknown as Array<{ id: string; title: string; display_title: string | null; collection: string | null }>)
         .map((s) => {

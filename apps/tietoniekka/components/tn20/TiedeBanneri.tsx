@@ -1,4 +1,4 @@
-// ETUSIVUN MAINOSBANNERI — Tiede & teknologia (CD "Etusivun mainosbanneri",
+// ETUSIVUN MAINOSBANNERI — Tiede ja teknologia (CD "Etusivun mainosbanneri",
 // 20.9.2026). Sijainti: Kuvavisat-bannerin alla ennen Suosittuja kokoelmia
 // (Heikki 20.9.2026). Sama komponentti kaventuu mobiilissa pystysuuntaiseksi.
 

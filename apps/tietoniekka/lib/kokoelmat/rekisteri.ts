@@ -24,7 +24,7 @@ export type KokoelmaKortti = {
 export const KOKOELMA_KORTIT: KokoelmaKortti[] = [
   { slug: "tunnetut-henkilot", nimi: "Tunnetut henkilöt", href: "/kokoelma/tunnetut-henkilot", img: "/20/kokoelmakortit/tunnetut-henkilot.webp", teema: "viihde", suosio: 1, mastery: { name: "Henkilöniekka", icon: "henkilo", color: "#C9A96A" } },
   { slug: "urheilu", nimi: "Urheilu", href: "/kokoelma/urheilu", img: "/20/urheilulajit/f1-kaikki-kortti.webp", teema: "urheilu", suosio: 2, mastery: { name: "Urheiluniekka", icon: "urheilu", color: "#B6FF3C" } },
-  { slug: "tv", nimi: "TV & suoratoisto", href: "/kokoelma/tv", img: "/20/etusivu/l-tv-masked-singer-kortti.webp", pos: "center 35%", teema: "viihde", suosio: 3, mastery: { name: "Sarjaniekka", icon: "tv", color: "#FF3D9E" } },
+  { slug: "tv", nimi: "TV ja suoratoisto", href: "/kokoelma/tv", img: "/20/etusivu/l-tv-masked-singer-kortti.webp", pos: "center 35%", teema: "viihde", suosio: 3, mastery: { name: "Sarjaniekka", icon: "tv", color: "#FF3D9E" } },
   { slug: "elokuvat", nimi: "Elokuvat", href: "/kokoelma/elokuvat", img: "/20/kokoelmakortit/elokuvat.webp", teema: "viihde", suosio: 4, mastery: { name: "Elokuvaniekka", icon: "elokuva", color: "#FF5C3D" } },
   { slug: "musiikki", nimi: "Musiikki", href: "/kokoelma/musiikki", img: "/20/kokoelmakortit/musiikki.webp", teema: "viihde", suosio: 5, mastery: { name: "Musiikkiniekka", icon: "musiikki", color: "#A855F7" } },
   { slug: "historia", nimi: "Historia", href: "/kokoelma/historia", img: "/20/etusivu/sp-turun-linna-kortti.webp", pos: "center 45%", teema: "tieto", suosio: 6, mastery: { name: "Historianiekka", icon: "historia", color: "#E8A320" } },
@@ -35,7 +35,7 @@ export const KOKOELMA_KORTIT: KokoelmaKortti[] = [
   { slug: "luonto", nimi: "Luonto", href: "/kokoelma/luonto", img: "/20/etusivu/sp-revontulet.webp", pos: "center 40%", teema: "tieto", suosio: 11, mastery: { name: "Luontoniekka", icon: "luonto", color: "#3FBF7F" } },
   { slug: "kulttuuri", nimi: "Kulttuuri", href: "/kokoelma/kulttuuri", img: "/20/kokoelmakortit/kulttuuri.webp", teema: "viihde", suosio: 12, mastery: { name: "Kulttuuriniekka", icon: "kulttuuri", color: "#E8A320" } },
   { slug: "vaalit", nimi: "Vaalit ja politiikka", href: "/kokoelma/vaalit", img: "/20/vaalit/hero-kortti.webp", pos: "center 45%", teema: "tieto", suosio: 13, mastery: { name: "Vaaliniekka", icon: "vaalit", color: "#B4A5FF" } },
-  { slug: "tiede", nimi: "Tiede & teknologia", href: "/kokoelma/tiede", img: "/20/kokoelmakortit/tiede.webp", teema: "tieto", suosio: 14, mastery: { name: "Tiedeniekka", icon: "tiede", color: "#4FD1FF" } },
+  { slug: "tiede", nimi: "Tiede ja teknologia", href: "/kokoelma/tiede", img: "/20/kokoelmakortit/tiede.webp", teema: "tieto", suosio: 14, mastery: { name: "Tiedeniekka", icon: "tiede", color: "#4FD1FF" } },
   { slug: "juhlat", nimi: "Juhlat ja pyhät", href: "/kokoelma/juhlat", img: "/20/kokoelmakortit/juhlat.webp", teema: "viihde", suosio: 15, mastery: { name: "Juhlaniekka", icon: "juhla", color: "#E8A320" } },
   { slug: "kuvavisat", nimi: "Kuvavisat", href: "/kokoelma/kuvavisat", img: "/20/kokoelmakortit/kuvavisat.webp", teema: "tieto", suosio: 16, mastery: { name: "Kuvaniekka", icon: "kuva", color: "#4C9AFF" } },
   /* Euroviisut (runko vaihe 2, 19.10.2026): ensimmäinen pelkästä asetuksesta syntynyt kokoelma. Kortti-
