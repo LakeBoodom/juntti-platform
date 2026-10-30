@@ -158,12 +158,13 @@ function Pelit({ p }: { p: D["pelit"] }) {
       {p.ryhmat.map((g) => (
         <div key={g.avain} className="tn-es-ryhma">
           <h3 className="tn-es-ryhma-h"><span>{g.nimi}</span></h3>
-          <div className="tn-es-rivi" data-ryhma={g.avain}>
+          {/* Sarakkeet korttimäärästä (analyysi 30.10.): 3 korttia = 3 saraketta; kuvan sizes palstan maksimista 1120 px. */}
+          <div className="tn-es-rivi" data-ryhma={g.avain} style={{ "--sar": Math.min(g.kortit.length, 4) } as CSSProperties}>
             {g.kortit.map((m) => {
               const sisus = (
                 <>
                   <span className="tn-es-peli-kuva">
-                    <Kuva src={m.kuva} pos={m.kuvaPos} luokka="tn-es-peli-img" sizes="(min-width: 768px) 320px, 56px" />
+                    <Kuva src={m.kuva} pos={m.kuvaPos} luokka="tn-es-peli-img" sizes={`(min-width: 768px) ${Math.round(1120 / Math.min(g.kortit.length, 4))}px, 56px`} />
                   </span>
                   {m.tila === "tulossa" && <span className="tn-es-leima">Tulossa</span>}
                   <span className="tn-es-peli-teksti">

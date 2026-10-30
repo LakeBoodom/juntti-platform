@@ -181,15 +181,20 @@
 
 /* ── 3 Pelaa aiheittain ── */
 .tn20 .tn-es-aiheet { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+/* --ak = kuvan leveys, --av = sarakeväli; nimen tila = 100cqw (sisältöalue, oikea reuna jo pois) − --ak − --av. */
 .tn20 .tn-es-aihe {
-  display: grid; grid-template-columns: 56px minmax(0, 1fr); align-items: center; gap: 10px; min-height: 64px; padding-right: 10px;
+  --ak: 56px; --av: 10px; container-type: inline-size;
+  display: grid; grid-template-columns: var(--ak) minmax(0, 1fr); align-items: center; gap: 10px; min-height: 64px; padding-right: 10px;
   border-radius: 12px; border: 1px solid var(--es-viiva); background: var(--es-kortti); overflow: hidden;
 }
-.tn20 .tn-es-aihe-img { display: block; width: 56px; height: 64px; object-fit: cover; background: #0F0D07; }
-/* Tiilen nimi: design 14 / 18 px. "Juhlat ja pyhät", "Tunnetut henkilöt" — pisin sana ≤ 10 (henkilöt 8). Tavutus sallittu (hyphens). */
+.tn20 .tn-es-aihe-img { display: block; width: var(--ak); height: 64px; object-fit: cover; background: #0F0D07; }
+/* Tiilen nimi: design 14 / 18 px. Ei tavutusta (analyysi 30.10. kohta 4): hyphens: auto katkoi 320 px:ssä "MUSIIK-KI" ja
+   Safarissa ahneesti kaikilla leveyksillä ("JUHLAT JA PY-HÄT"). Koko tiilen leveydestä niin, että pisin sana mahtuu ehjänä:
+   SUORATOISTO 11 merkkiä × .594 em (Range-mitattu, Archivo versaalina) × 1,05 marginaali = 6,86 em. Alaraja 12 px. */
 .tn20 .tn-es-aihe-nimi {
-  min-width: 0; font-family: var(--es-display); font-weight: 900; font-variation-settings: "wdth" 78; font-size: 14px; line-height: 1;
-  text-transform: uppercase; hyphens: auto; overflow-wrap: anywhere;
+  min-width: 0; font-family: var(--es-display); font-weight: 900; font-variation-settings: "wdth" 78; line-height: 1;
+  font-size: clamp(12px, calc((100cqw - var(--ak) - var(--av)) / 6.86), 14px);
+  text-transform: uppercase; overflow-wrap: normal; word-break: keep-all; -webkit-hyphens: manual; hyphens: manual;
 }
 
 /* ── 4 Valitse peli ── */
@@ -219,6 +224,8 @@
   font-size: clamp(12px, calc(100cqw / (var(--lw-t) * .6)), 15px); overflow-wrap: normal; word-break: normal; -webkit-hyphens: manual; hyphens: manual;
 }
 @media (max-width: 359px) {
+  /* Aihetiili 320 px:ssä: 56 px kuvalla nimelle jäi 60 px, SUORATOISTO tarvitsee 12 px:llä 78 px → kuva 36 px (tila 84 px). */
+  .tn20 .tn-es-aihe { --ak: 36px; --av: 8px; gap: 8px; padding-right: 8px; }
   .tn20 .tn-es-peli { grid-template-columns: 48px minmax(0, 1fr); column-gap: 8px; }
   .tn20 .tn-es-peli-teksti { padding-right: 8px; }
 }
@@ -234,7 +241,9 @@
 
 /* Tabletti ja desktop ≥ 768: isot kortit 4 sarakkeessa (5a). */
 @media (min-width: 768px) {
-  .tn20 .tn-es-rivi { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+  /* Sarakkeet ryhmän korttimäärästä (--sar = min(kortit, 4), EtusivuV5): 3 kortin ryhmä täyttää rivin eikä jätä
+     tyhjää neljännestä (etusivuanalyysi 30.10. kohta 2). auto-fit + minmax(260px) olisi antanut 768–1100 px:ssä 2+1. */
+  .tn20 .tn-es-rivi { grid-template-columns: repeat(var(--sar, 4), minmax(0, 1fr)); gap: 12px; }
   .tn20 .tn-es-peli { display: flex; flex-direction: column; border-radius: 18px; }
   .tn20 .tn-es-peli-kuva { height: 96px; }
   .tn20 .tn-es-peli-teksti { flex-direction: column; align-items: stretch; align-self: auto; gap: 8px; padding: 12px 14px 16px; }
@@ -326,18 +335,18 @@
   .tn20 .tn-es-pp-ruudukko { display: grid; grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr); gap: 22px; }
   .tn20 .tn-es-pp-sivu { display: grid; grid-template-rows: 1fr 1fr; gap: 22px; }
   .tn20 .tn-es-pp-sivu[data-yksi] { grid-template-rows: 1fr; }
-  .tn20 .tn-es-pv { min-height: 440px; border-radius: 24px; }
+  /* Etusivuanalyysi 30.10. (kohdat 1 ja 6): ei kiinteää min-heightia (440 px jätti lyhyellä koukulla ⅓ tyhjää), ja
+     nauha on yksi nimiörivi kuten mobiilissa. CD 4b:n 60 px päivämäärä toisti otsikon "PERJANTAI 30.10." -rivin ja oli
+     kortin suurin elementti → nyt suurin on koukku. Korkeus tulee sisällöstä; sivupalsta venyy samaan korkeuteen. */
+  .tn20 .tn-es-pv { border-radius: 24px; }
   .tn20 .tn-es-pv-nauha {
-    display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "nimi nro" "viiva viiva" "pvm pvm";
-    align-items: baseline; gap: 12px 16px; padding: 24px 32px 22px;
+    display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "nimi nro" "viiva viiva";
+    align-items: baseline; gap: 12px 16px; padding: 22px 32px 18px;
   }
-  .tn20 .tn-es-pv-nimio { display: contents; }
-  .tn20 .tn-es-pv-erotin { display: none; }
-  .tn20 .tn-es-pv-nimi { grid-area: nimi; font-family: var(--tn-font-body); font-size: 12px; font-weight: 800; letter-spacing: .2em; font-variation-settings: normal; }
+  /* Nimiö: 22 px, sama kaava kuin mobiilissa (.46 em/merkki, Range-mitattu 375 px), varaus nauhan padding 64 + "NRO 1000" 90 px. */
+  .tn20 .tn-es-pv-nimio { grid-area: nimi; font-size: min(22px, calc((100cqw - 64px - var(--nro, 0) * 90px) / (var(--n) * .46))); }
   .tn20 .tn-es-pv-nro { grid-area: nro; font-size: 15px; }
   .tn20 .tn-es-pv-viiva { grid-area: viiva; display: block; height: 5px; border-top: 2px solid currentColor; border-bottom: 1px solid currentColor; }
-  /* Päivämäärä: design 60 px, "KE 30.12." 9 merkkiä — mahtuu aina (palsta ≥ 560 px). */
-  .tn20 .tn-es-pv-pvm { grid-area: pvm; font-variation-settings: "wdth" 64; font-size: 60px; line-height: .86; letter-spacing: -.02em; }
   .tn20 .tn-es-pv-sisus { flex: 1; justify-content: space-between; gap: 24px; padding: 30px 32px 32px; }
   .tn20 .tn-es-pv-koukku { gap: 16px; max-width: 640px; }
   .tn20 .tn-es-pv-chip { height: 26px; padding: 0 11px; }
@@ -376,9 +385,10 @@
   .tn20 .tn-es-tt .tn-es-cta { align-self: flex-start; min-height: 52px; font-size: 16px; }
 
   .tn20 .tn-es-aiheet { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
-  .tn20 .tn-es-aihe { grid-template-columns: 88px minmax(0, 1fr); gap: 16px; min-height: 88px; padding-right: 16px; border-radius: 14px; }
-  .tn20 .tn-es-aihe-img { width: 88px; height: 88px; }
-  .tn20 .tn-es-aihe-nimi { font-size: 18px; font-variation-settings: "wdth" 80; }
+  .tn20 .tn-es-aihe { --ak: 88px; --av: 16px; gap: 16px; min-height: 88px; padding-right: 16px; border-radius: 14px; }
+  .tn20 .tn-es-aihe-img { height: 88px; }
+  /* 1100 px:ssä tiili 236 px → nimelle 116 px; 18 px SUORATOISTO = 118 px → koko kaavasta, katto 18 px. */
+  .tn20 .tn-es-aihe-nimi { font-size: clamp(12px, calc((100cqw - var(--ak) - var(--av)) / 6.86), 18px); font-variation-settings: "wdth" 80; }
 
   .tn20 .tn-es-ryhma { gap: 14px; }
   .tn20 .tn-es-ryhma-h { font-size: 13px; }
