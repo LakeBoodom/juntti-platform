@@ -284,7 +284,7 @@ function LapsetJaPaketit({ l, paketit }: { l: D["lapset"]; paketit: D["paketit"]
             {/* v9 (Heikki 30.10.): lyhyt esittelyteksti otsikon alla. */}
             <span className="tn-es-lapset-otsake">
               <a className="tn-es-lp-h" href={l.href}>Tietoniekka lapsille</a>
-              <span className="tn-es-lapset-rivi">Kuva- ja äänivisoja 4–12-vuotiaille. Vinkit auttavat, jos vastaus ei heti löydy.</span>
+              <span className="tn-es-lapset-rivi">Kuva- ja äänivisoja <span className="tn-es-ehja">4–12-vuotiaille</span>. Vinkit auttavat, jos vastaus ei heti löydy.</span>
             </span>
             <div className="tn-es-lapset-iat">
               <a className="tn-es-nappi" href={`${l.href}?ika=4-7`}>4–7 v</a>

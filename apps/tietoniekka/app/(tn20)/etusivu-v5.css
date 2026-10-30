@@ -454,6 +454,7 @@
 }
 .tn20 .tn-es-lapset-otsake { display: flex; flex-direction: column; gap: 8px; }
 .tn20 .tn-es-lapset-rivi { font-size: 13.5px; line-height: 1.4; color: var(--es-teksti2); text-wrap: pretty; }
+.tn20 .tn-es-ehja { white-space: nowrap; }
 .tn20 .tn-es-lapset-iat { display: flex; flex-direction: column; gap: 8px; }
 .tn20 .tn-es-lapset-iat .tn-es-nappi { align-self: stretch; min-height: 46px; font-size: 15px; border: 1.5px solid var(--es-vihrea); }
 
