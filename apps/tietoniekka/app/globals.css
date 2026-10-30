@@ -32,6 +32,17 @@
   --color-text-muted-light: rgba(255, 255, 255, 0.6);
   --color-text-muted-dark: rgba(15, 21, 32, 0.55);
 
+  /* ─── Päivän visan tunnusvärit viikonpäivän mukaan (CD "Päivän visa oma ilme v2", 29.10.2026) ───
+     Vain Päivän visa -kortissa ja -pelinäkymässä. Teksti nauhan päällä aina --pv-muste. */
+  --pv-ma: #B3C7FF; /* sini */
+  --pv-ti: #F3BCC8; /* ruusu */
+  --pv-ke: #A8DCD9; /* meri */
+  --pv-to: #D2C1F7; /* laventeli */
+  --pv-pe: #F6C7A4; /* persikka */
+  --pv-la: #E6D59A; /* olki */
+  --pv-su: #C7D0DA; /* huurre */
+  --pv-muste: #131109;
+
   /* ─── Kategoria-alipaletti (9 kategoriaa) ───────────────────────── */
   --color-cat-urheilu:     #1e3a5f;  /* sininen, cool */
   --color-cat-maantieto:   #1a3a45;  /* tumma teal, kartta/valtameri */

@@ -128,3 +128,26 @@ export const FOOTER_SITE = [
 ];
 
 export const FOOTER_INSTAGRAM = "https://www.instagram.com/tietoniekka/";
+
+/* ── ETUSIVU v5 (28.10.2026) ──────────────────────────────────────────────────────────────────────────── */
+
+/** Laura ja Mikko suosittelevat: visa arvotaan viikoittain juontajan kokoelmista (vain visat, joilla on teaser). */
+export const JUONTAJIEN_SUOSITUKSET = [
+  { key: "laura", nimi: "Laura", kuva: "/20/etusivu/host-laura.webp", aksentti: "#E8A320", kokoelmat: ["tv", "musiikki", "elokuvat", "jalkapallo"] },
+  { key: "mikko", nimi: "Mikko", kuva: "/20/etusivu/host-mikko.webp", aksentti: "#8FEAB0", kokoelmat: ["urheilu", "jaakiekko", "historia", "matkakohteet"] },
+] as const;
+
+/** Promo 2: sisarsivu Ootko.fi. nakyvissa = false, kunnes ootko.fi on julkaistu (28.10.2026 domain ei vielä vastaa). */
+export const PROMO2_OOTKO = {
+  nakyvissa: false,
+  kicker: "Ootko.fi",
+  otsikko: "Mikä suomalainen eläin olet?",
+  cta: "Testaa Ootko.fi:ssä",
+  href: "https://ootko.fi",
+  kuva: null as string | null,
+};
+
+/** Visapaketit (osio 9). Tulossa-sääntö kuten pelimuodoilla: näkyy, kun julkaisuun on enintään 35 päivää. */
+export const VISAPAKETIT = [
+  { avain: "joulu", kicker: "Visapaketit · joulukuussa", otsikko: "Joulun visapaketti", rivi: "Pelaa ruudulta tai tulosta pikkujouluihin.", href: "", kuva: "/20/lapset/aihe-joulu.webp", julkaisu: "2026-12-01", tila: "tulossa" as "tulossa" | "pelattava" },
+];

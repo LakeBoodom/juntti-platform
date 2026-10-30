@@ -49,8 +49,11 @@
   color: #b9af9b;
   white-space: nowrap;
   overflow: hidden;
-  text-overflow: ellipsis; /* < ~340px: tagline lyhenee, ei vaakavieritystä */
+  text-overflow: ellipsis; /* varmistus: ei vaakavieritystä (mitattu 29.10.: 320–430 px ei ellipsiä) */
 }
+/* Koko tagline tarvitsee 196 px; mitattu tila (Range, 29.10.): 320 → 141, 360 → 182, 375 → 190, 390 → 196 (0 marginaalia),
+   768 → 201 → alle 400 px vain "700+ visaa" (TopBar taglineOsat). */
+@media (max-width: 399px) { .tn20 .tn-tagline-alku { display: none; } }
 .tn20 .tn-topbar-right { margin-left: auto; display: flex; align-items: center; gap: 0; min-width: 0; }
 
 /* ── Nostot (Uusin kokoelma ≥ 1560 px · Suosittu nyt ≥ 700 px) ────────────

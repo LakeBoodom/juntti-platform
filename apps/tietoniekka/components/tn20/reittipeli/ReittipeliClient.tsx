@@ -15,6 +15,7 @@
 // sivua, kosketuksella raahaus alkaa pitkästä painalluksesta, kahvasta heti. Napautus valitsee
 // kortin ja toinen napautus vaihtaa paikat. Näppäimistö: välilyönti valitsee, nuolet siirtävät.
 
+import { lisaaPelirivi } from "@/lib/seuranta";
 import { pelijakoteksti } from "@/lib/korttinimi";
 import { reittiTaso } from "@/lib/pelitasot";
 import { useEffect, useMemo, useRef, useState, type CSSProperties, type PointerEvent as RPointerEvent, type KeyboardEvent } from "react";
@@ -99,9 +100,9 @@ async function tallenna(peli: Peli, r: { siemen: string; ryhma: string | null; p
   try {
     const sb = getSupabase();
     if (!sb) return;
-    await sb.from(peli.taulu as never).insert({
+    await lisaaPelirivi(sb, peli.taulu, {
       siemen: r.siemen, [peli.param]: r.ryhma, paivan_reitti: r.paivanReitti, yritys: r.yritys, oikein: r.oikein, [peli.kentta]: r.alueet, session_id: istunto(),
-    } as never);
+    });
   } catch {
     // tilasto jää saamatta — peli jatkuu normaalisti
   }

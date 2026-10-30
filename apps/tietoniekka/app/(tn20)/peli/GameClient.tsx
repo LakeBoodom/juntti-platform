@@ -1,4 +1,6 @@
 "use client";
+import { lisaaPelirivi } from "@/lib/seuranta";
+import { kirjaaPelattuTanaan } from "@/components/tn20/etusivu5/PelattuTanaan";
 import { henkiloKuva } from "@/lib/henkilokuvat";
 // TIETONIEKKA 2.0 — PELINÄKYMÄ 2026 PROD (design_handoff_peli_2026_prod +
 // design_handoff_kuvavisa_2026_prod, toteutettu 28.–29.8.2026). Korvasi pelikuoren
@@ -27,6 +29,8 @@ import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react
 import { IkaMerkki } from "@/components/tn20/IkaMerkki";
 import { getSupabase, SITE_SLUG } from "../../../lib/supabase";
 import { PAIVAN_VISA_KEY, localDateKey } from "../../../components/tn20/PaivanVisaCard";
+import { paivanVisaAvain, type PaivanVisaTulos } from "../../../lib/paivanVisa";
+import { helsinginPaiva } from "../../../lib/aika";
 import { ViikkoSinetti, KuvatIkoni } from "../../../components/tn20/Viikkosinetti";
 import { lueViikkoTulos, tallennaViikkoTulos, type ViikkoInfo, type ViikkoTulos } from "../../../lib/viikkovisa";
 import type { KollaasiKuva } from "../../../lib/kuvavisat2026";
@@ -456,6 +460,30 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  /* Päivän visa, "Katso vastaukset" etusivun kortista (?paivan_visa=1&vastaukset=1): tämän päivän tallennettu tulos
+     palautetaan tulosnäkymään ja vastausten tarkastelu avataan. Ei uutta pelikirjausta (recorded). */
+  useEffect(() => {
+    if (!quiz.isSankari || !quiz.id) return;
+    try {
+      if (new URLSearchParams(window.location.search).get("vastaukset") !== "1") return;
+      const t = JSON.parse(window.localStorage.getItem(paivanVisaAvain(helsinginPaiva().iso)) ?? "null") as PaivanVisaTulos | null;
+      if (!t || t.quizId !== quiz.id) return;
+      const loyda = (qq: GameQuestion) => t.vastaukset.find((v) => (qq.id && v.id === qq.id) || v.k === qq.question);
+      recorded.current = true;
+      setRight(t.oikein);
+      setScore(t.pisteet);
+      setHist(quiz.questions.map((qq) => (loyda(qq)?.h ?? undefined) as Hist));
+      setPicks(quiz.questions.map((qq) => {
+        const v = loyda(qq)?.v;
+        const idx = v == null ? -1 : qq.options.indexOf(v);
+        return idx >= 0 ? idx : null;
+      }));
+      setPhase("end");
+      setReview(0);
+    } catch { /* no-op */ }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   /* SEO-aiheopas (SSR, pelin alla) piilotetaan pelin ajaksi ja tulosnäkymässä */
   useEffect(() => {
     document.body.classList.toggle("tn-game-playing", phase !== "start");
@@ -649,11 +677,12 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
     if (recorded.current || !quiz.id) return; // kuvavisat: ei quizzes-riviä → ei tallennusta
     recorded.current = true;
     igValmis(quiz.id);
+    kirjaaPelattuTanaan(quiz.id); // etusivun "n/3 pelattu tänään"
     try {
       const sb = getSupabase();
       if (!sb) return;
       const playId = crypto.randomUUID();
-      const { error } = await sb.from("quiz_plays").insert({
+      const error = await lisaaPelirivi(sb, "quiz_plays", {
         id: playId, quiz_id: quiz.id, platform: "tietoniekka", score: finalScore, total: maxScore,
         session_id: getOrCreateSessionId(), shared: false,
       });
@@ -740,7 +769,21 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
     }
     /* Putki jatkuu millä tahansa pelillä — myös viikkovisalla (linjaus 4.5). */
     updateDailyStreak();
-    if (quiz.isSankari) { try { window.localStorage.setItem(PAIVAN_VISA_KEY, localDateKey()); } catch { /* no-op */ } }
+    if (quiz.isSankari) {
+      try {
+        window.localStorage.setItem(PAIVAN_VISA_KEY, localDateKey());
+        /* Etusivun Päivän visa -kortin pelattu-tila (tulos) ja "Katso vastaukset" (?vastaukset=1). */
+        if (quiz.id) {
+          const t: PaivanVisaTulos = {
+            quizId: quiz.id, oikein: right, yhteensa: total, pisteet: finalScore,
+            vastaukset: questions.map((qq, i) => ({
+              id: qq.id ?? null, k: qq.question, v: picksNyt[i] != null ? qq.options[picksNyt[i] as number] ?? null : null, h: histNyt[i] ?? null,
+            })),
+          };
+          window.localStorage.setItem(paivanVisaAvain(helsinginPaiva().iso), JSON.stringify(t));
+        }
+      } catch { /* no-op */ }
+    }
     if (quiz.citySlug) stampCity(quiz.citySlug);
   }
 
@@ -1327,7 +1370,7 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
               </div>
 
                 {quiz.related.length > 0 && (
-                <div className="tng-heromore">
+                <div className="tng-heromore" data-tn-entry="visasivu:ristiinnosto">
                   <div className="tng-heromore-head">
                     <span className="tng-heromore-t">Pelaa myös näitä</span>
                     <a className="tng-heromore-all" href={quiz.hubHref}>{quiz.collectionLabel} →</a>

@@ -931,7 +931,7 @@ export default async function Peli20({
       />
 
       {relatedRows.length > 0 && (
-        <section className="tn-seo-related tn-seo-ssr">
+        <section className="tn-seo-related tn-seo-ssr" data-tn-entry="visasivu:ristiinnosto">
           <div className="tn-seo-in">
             <h2>Pelaa myös näitä</h2>
             <ul>

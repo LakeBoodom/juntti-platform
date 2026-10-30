@@ -1,162 +1,27 @@
-// TIETONIEKKA 2.0 — ETUSIVU 2026 PROD (design_handoff_etusivu_2026_prod, toteutettu
-// 28.8.2026 — korvasi 18.8. version kokonaan; Heikki: "uusi design korvaa nykyisen
-// 2.0 työhaaran"). Rakenne ylhäältä alas:
-//   ylätunniste (TopBar layoutista: tagline, nostot, Päivän putki) → kategoriarivi →
-//   Päivän visa (19.9.2026: sivun ensimmäinen osio) → Kuvavisat-banneri (18.9.2026,
-//   korvasi lippuvisa-heron ja viikkovisapromon) → Suositut kokoelmat (6) →
-//   Luonto–ruutana-banneri → Suositut kokoelmat (6) →
-//   Kuka on vanhin? -banneri → Päivän sankari → Laura ja Mikko (profiilit + 4
-//   korttia) → Uusimmat visat -ticker → footer.
-// Poistuneet: Laura & Mikko -duohero, upotettu ensimmäinen kysymys, putkinauha,
-// viisi täysleveää nostoa, historia-aikajana.
-// Kuori staattinen (lib/etusivu.ts), Päivän visa ja ticker dynaamisia kannasta.
-// Sivu käyttää container-kyselyitä (.tn20 on inline-size-container → cqw).
-
+// TIETONIEKKA 2.0 — ETUSIVU v5 (brief "Etusivun uusi rakenne", hyväksytty 28.10.2026; design Tietoniekka_Etusivu_v5).
+// Osiot: Päivän pelit → Tiesitkö? → Selaa aiheittain → Valitse peli → Promo 1 → Laura ja Mikko → Promo 2 →
+// Tietoniekka lapsille → Visapaketit. Kaikki datasta (lib/etusivu5.ts), näkymä components/tn20/etusivu5/EtusivuV5.tsx.
+// Korvasi 28.8.–27.10.2026 bannerisarjan (Juhlat, Tupla, Rajanaapurit, Kuvavisat, Luonto/Äänivisa, Suositut kokoelmat,
+// Kuka on vanhin?, Päivän sankari, Kuntaliitos, juontajat, Uusimmat visat).
 import { PaivaVahti } from "@/components/tn20/PaivaVahti";
-import { visaHref } from "@/lib/visaHref";
-import { getSupabase, SITE_SLUG } from "@/lib/supabase";
 import { brand } from "@/config/brand";
 import { JsonLd, abs } from "@/lib/jsonLd";
-import { helsinginPaiva } from "@/lib/aika";
-import PaivanVisaCard from "@/components/tn20/PaivanVisaCard";
-import { paivanVisaTila, type PaivanVisaData } from "@/lib/paivanVisa";
-import { rakennaPaivanVisa } from "@/lib/paivanVisaData";
-import PaivanSankari from "@/components/tn20/PaivanSankari";
-import { muotoileSankari, type SankariRivi } from "@/lib/paivanSankari";
-import { KuvavisatBanneri, IkajarjestysBanneri } from "@/components/tn20/EtusivunBannerit";
-import { RuutanaBanneri } from "@/components/tn20/RuutanaBanneri";
-import AaniBanneri from "@/components/tn20/aanivisa/AaniBanneri";
-import { haeAaniBanneri } from "@/lib/aanivisat/data";
-import { TuplaBanneri } from "@/components/tn20/TuplaBanneri";
-import { RajanaapuritBanneri } from "@/components/tn20/RajanaapuritBanneri";
-import { KuntaliitosBanneri } from "@/components/tn20/KuntaliitosBanneri";
-import { JuhlatBanneri, juhlaBanneriNosto } from "@/components/tn20/JuhlatBanneri";
-import { JUHLAT_KOKOELMA, pvm } from "@/lib/juhlat";
-import { getViikkovisa } from "@/lib/kuvavisat2026";
-import { getKuvavisaYhteenveto, getBanneriHenkilot } from "@/lib/etusivunBannerit";
-import { LapsetKaista } from "@/components/tn20/LapsetKaista";
-import { haeLastenVisat, lapsetNakyvissa } from "@/lib/lapset/data";
-import { ajankohtainenJuhla } from "@/lib/lapset/nosto";
-import { juontajaKuvat } from "@/lib/lapset/juontajat";
-import {
-  CATEGORY_CHIPS, POPULAR_COLLECTIONS, HOSTS, HOSTS_INTRO,
-} from "@/lib/etusivu";
+import { haeEtusivu } from "@/lib/etusivu5";
+import EtusivuV5 from "@/components/tn20/etusivu5/EtusivuV5";
 import "./etusivu.css";
-import "./etusivun-bannerit.css";
-import "./tiede.css";
-import "./tupla-banneri.css";
-import "./kuntaliitos-banneri.css";
-import "./rajanaapurit-banneri.css";
-import "./juhlat-banneri.css";
-import "./ruutana-banneri.css";
-import "./aanivisa-banneri.css";
-import "./lapset-kaista.css";
+import "./etusivu-v5.css";
 
-/* SEO-erä A4 (2.10.2026): ISR 5 min. Esikatseluparametreja (?pv, ?sankari, ?juhlapvm) ei lueta
-   tuotannossa, jotta sivu voidaan välimuistittaa; keskiyön vaihto: PaivaVahti. */
+/* ISR 5 min. Keskiyön vaihto: PaivaVahti (app/api/etusivu-paiva). */
 export const revalidate = 300;
 
-type Card = {
-  id: string; slug: string; custom_slug: string | null; title: string;
-  display_title: string | null; collection: string | null; play_count: number;
-  published_at: string | null; game_mode?: string | null; teaser?: string | null;
-  question_count?: number | null; category?: string | null; genre?: string | null;
-};
-
-/** paivan_visa_tanaan()-funktion rivi (supabase/migrations/20260919_paivan_visa_funktiot.sql) */
-type PaivanVisaRivi = {
-  rule_id: string; quiz_id: string; paiva: string;
-  intro_headline: string | null; intro_text: string | null;
-  auto_filled: boolean; vaihdettu: boolean;
-};
-
-/* Esikatselu (vain preview/kehitys, ei tuotannossa): ?pv=A|B|C näyttää
-   Päivän visan kyseisessä tilassa mallitekstillä ja ?sankari=YYYY-MM-DD
-   päivän sankarin toiselta päivältä (esim. 2027-06-23 = muistopäivä). */
+/* Esikatselu (ei tuotannossa): ?sankari=YYYY-MM-DD näyttää toisen päivän synttärisankarin,
+   ?pv=A|B|C Päivän visan koukkutilan suurimmalla sallitulla tekstillä (80 + 240 merkkiä),
+   ?pv=uusi uuden Päivän visan kentät (Nro 1000, Tänään-chip, rytmirivi) korttisääntömittausta varten. */
 const ESIKATSELU = process.env.VERCEL_ENV !== "production";
 const MALLI_INTRO = {
   headline: "Kahdeksankymmentä merkkiä pitkä koukkuotsikko täyttää rivin aivan reunaan asti",
   text: "Kahdensadanneljänkymmenen merkin mittainen koukkuteksti vie laatasta kolme riviä työpöydällä ja näyttää tarkalleen kuinka korkeaksi laatta kasvaa silloin kun toimitus käyttää koko sallitun tilan viimeistä merkkiä myöten loppuun.",
 };
-
-async function getData(opts: { pvTila: string | null; sankariPaiva: string | null; juhlaPaiva: string | null }) {
-  const sb = getSupabase();
-  if (!sb) return null;
-
-  const [cardsRes, siteRes] = await Promise.all([
-    sb.from("quiz_cards" as never).select("*"),
-    sb.from("sites").select("id").eq("slug", SITE_SLUG).maybeSingle(),
-  ]);
-  const cards = (cardsRes.data ?? []) as Card[];
-  const siteId = (siteRes.data as { id: string } | null)?.id ?? null;
-  /* Kaikki "tänään"-logiikka Suomen aikaan (lib/aika.ts, kanta: helsinki_tanaan()). */
-  const today = helsinginPaiva();
-
-  /* ── Päivän visa + Päivän sankari (toteutusohje 19.9.2026) ──
-     Molemmat ratkaistaan kannassa: paivan_visa_tanaan() palauttaa päivän
-     ajastetun rivin tai täyttää sen automaattisesti (idempotentti, sama visa
-     kaikille); paivan_sankari() johtaa sankarin syntymäpäivästä. Sama visa ei
-     näy kahdesti — funktio vaihtaa Päivän visan, jos se osuisi sankarin visaan. */
-  let pv: PaivanVisaRivi | null = null;
-  let sankari: SankariRivi | null = null;
-  if (siteId) {
-    const [pvRes, sRes] = await Promise.all([
-      sb.rpc("paivan_visa_tanaan" as never, { p_site: siteId } as never),
-      sb.rpc("paivan_sankari" as never, { p_site: siteId, p_date: opts.sankariPaiva ?? today.iso } as never),
-    ]);
-    pv = ((pvRes.data ?? []) as PaivanVisaRivi[])[0] ?? null;
-    sankari = ((sRes.data ?? []) as SankariRivi[])[0] ?? null;
-  }
-
-  let daily: PaivanVisaData | null = null;
-  if (pv?.quiz_id) {
-    const tila = ESIKATSELU ? opts.pvTila : null;
-    const intro =
-      tila === "A" ? MALLI_INTRO
-      : tila === "C" ? { headline: null, text: MALLI_INTRO.text }
-      : tila === "B" ? null
-      : { headline: pv.intro_headline, text: pv.intro_text };
-    daily = await rakennaPaivanVisa(sb, {
-      quizId: pv.quiz_id,
-      paiva: today.iso,
-      intro,
-      questionCount: cards.find((c) => c.id === pv!.quiz_id)?.question_count ?? null,
-    });
-  }
-
-  /* Ticker: uusimmat visat julkaisujärjestyksessä. Henkilövisat pois
-     (Heikki 11.8.2026: tehdään varastoon). Pelimuototunnus vain Megalle. */
-  /* QA-001 (29.8.2026): megat linkitetään ?mega=<slug> (kysymykset
-     mega_questions-taulussa, ?quiz_id antoi tyhjän sivun). Yleistieto ei ole
-     2.0:ssa omana kokoelmana (Heikki 3) → sen visoista mukana vain
-     kaupunkivisat ja megat. */
-  const latest = cards
-    .filter((c) => c.collection && c.collection !== "tunnetut-henkilot" && c.published_at)
-    /* Juhlavisat (28.9.2026) eivät tickeriin: niillä on oma banneri, eikä joulua nosteta syyskuussa. */
-    .filter((c) => c.collection !== JUHLAT_KOKOELMA)
-    .filter((c) => c.collection !== "yleistieto" || c.category === "kaupungit" || c.category === "tiede-teknologia" || c.game_mode === "mega")
-    .sort((a, b) => (b.published_at! > a.published_at! ? 1 : -1))
-    .slice(0, 12)
-    .map((c) => ({
-      id: c.id,
-      name: (c.display_title ?? c.title) as string,
-      mode: c.game_mode === "mega" ? "Megavisa" : undefined,
-      href: visaHref(c),
-    }));
-
-  /* Juhlat-banneri: lähin iso juhla, jolla on julkaistu visa (lib/juhlat.ts). */
-  const jp = opts.juhlaPaiva?.split("-").map(Number);
-  const tanaanPv = jp ? pvm(jp[0], jp[1], jp[2]) : pvm(today.vuosi, today.kk, today.pv);
-  const juhla = juhlaBanneriNosto(tanaanPv, new Set(cards.filter((c) => c.collection === JUHLAT_KOKOELMA).map((c) => c.slug)));
-
-  return {
-    daily,
-    juhla: juhla ? { nosto: juhla, tanaan: tanaanPv } : null,
-    sankari: sankari ? muotoileSankari(sankari) : null,
-    today,
-    latest,
-  };
-}
 
 export default async function Etusivu20({
   searchParams,
@@ -164,42 +29,15 @@ export default async function Etusivu20({
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
   const sp = ESIKATSELU ? await searchParams : {};
-  const one = (k: string) => (typeof sp[k] === "string" ? (sp[k] as string) : null);
-  const sankariParam = ESIKATSELU ? one("sankari") : null;
-  const [data, vv, kvYhteenveto, henkilot, aaniBanneri, lastenVisat] = await Promise.all([
-    getData({
-      pvTila: one("pv"),
-      sankariPaiva: sankariParam && /^\d{4}-\d{2}-\d{2}$/.test(sankariParam) ? sankariParam : null,
-      /* ?juhlapvm=YYYY-MM-DD: Juhlat-banneri toisena päivänä (vain esikatselu) */
-      juhlaPaiva: ESIKATSELU && /^\d{4}-\d{2}-\d{2}$/.test(one("juhlapvm") ?? "") ? one("juhlapvm") : null,
-    }),
-    getViikkovisa(), getKuvavisaYhteenveto(), getBanneriHenkilot(), haeAaniBanneri(),
-    /* Lasten visat -kaista (vaihe 5): piilossa tuotannossa, kunnes LAPSET_ENABLED=1 */
-    lapsetNakyvissa() ? haeLastenVisat() : Promise.resolve([]),
-  ]);
-  if (!data) return <main style={{ padding: 32 }}>Ei tietokantayhteyttä.</main>;
-  /* Viikkovisa näkyy nyt Kuvavisat-bannerin merkkinä (kierros 12);
-     null (ei aktiivisia kuvia) → merkki jää pois. */
-  const viikko = vv ? { viikko: vv.viikko, kuvia: vv.kuvaIdt.length } : null;
-  const { daily, juhla, sankari, today, latest } = data;
-  /* Lasten kaistan juhla (esim. joulu 8 vk ennen): sama ?juhlapvm-esikatselu kuin Juhlat-bannerilla */
-  const lastenPaiva = ESIKATSELU && /^\d{4}-\d{2}-\d{2}$/.test(one("juhlapvm") ?? "") ? one("juhlapvm")!.split("-").map(Number) : null;
-  const lastenJuhla = lastenVisat.length
-    ? ajankohtainenJuhla(
-        new Set(lastenVisat.map((v) => v.aihe).filter((a): a is string => !!a)),
-        lastenPaiva ? pvm(lastenPaiva[0], lastenPaiva[1], lastenPaiva[2]) : pvm(today.vuosi, today.kk, today.pv),
-      )
-    : null;
-
-
-  /* Ticker duplikoidaan kertaalleen saumattomaan looppiin (design). */
-  /* UI-laatu 14.10.2026: ticker ei enää pyöri → ei tuplattua listaa, vaan vieritettävä rivi. */
-  const tickerItems = latest;
+  const sankari = ESIKATSELU && typeof sp.sankari === "string" && /^\d{4}-\d{2}-\d{2}$/.test(sp.sankari) ? sp.sankari : null;
+  const pvMalli = !ESIKATSELU ? undefined
+    : sp.pv === "A" ? MALLI_INTRO : sp.pv === "C" ? { headline: null, text: MALLI_INTRO.text } : sp.pv === "B" ? null : undefined;
+  const d = await haeEtusivu({ sankariPaiva: sankari, pvMalli, pvUusi: ESIKATSELU && sp.pv === "uusi" });
+  if (!d) return <main style={{ padding: 32 }}>Ei tietokantayhteyttä.</main>;
 
   return (
     <main className="tn-es-page">
-      {/* SEO 16.10.2026: etusivun WebPage, pääkuvana brändin jakokuva. Ohjaa Googlen hakutuloksen
-          pikkukuvan pois koristebannereista (ne ovat CSS-taustoja). */}
+      {/* SEO 16.10.2026: etusivun WebPage, pääkuvana brändin jakokuva. */}
       <JsonLd
         data={{
           "@context": "https://schema.org",
@@ -214,147 +52,10 @@ export default async function Etusivu20({
           image: abs("/og-image.png"),
         }}
       />
-      {/* ─── Kategoriarivi ─── */}
-      <div className="tn-es-catbar">
-        <nav className="tn-es-cats" aria-label="Kategoriat">
-          {CATEGORY_CHIPS.map((c) => (
-            <a key={c.label} className="tn-es-cat" href={c.href}>{c.label}</a>
-          ))}
-        </nav>
-      </div>
-
-      <div className="tn-es-main">
-        {/* Etusivun h1 (19.9.2026): näkymätön, ruudunlukijoille ja hakukoneille.
-            Siirretty Kuvavisat-bannerista, kun Päivän visa nousi ensimmäiseksi. */}
-        <h1 className="tn-es-sr-only">{brand.name} – suomalainen tietovisasivusto</h1>
-        {/* ─── Juhlat-banneri (CD v0.2 4a): ykkösnosto ennen Päivän visaa (Heikki 28.9.2026) ─── */}
-        {juhla && <JuhlatBanneri nosto={juhla.nosto} tanaan={juhla.tanaan} />}
-        {/* ─── Päivän visa — sivun ensimmäinen osio (Heikki 19.9.2026) ─── */}
-        <section id="paivan-visa" aria-labelledby="paivan-visa-h">
-          <div className="tn-es-head tn-es-head--row">
-            <h2 className="tn-es-h2 tn-es-h2--nowrap" id="paivan-visa-h">Päivän visa</h2>
-            {/* Tilassa B päiväleima on otsikkorivillä; A/C:ssä koukkulaatassa. */}
-            {(!daily || paivanVisaTila(daily) === "B") && (
-              <span className="tn-es-date">Tänään {today.pv}.{today.kk}.</span>
-            )}
-            <PaivaVahti pvm={today.iso} />
-          </div>
-          {daily ? <PaivanVisaCard data={daily} lcp={!juhla} /> : <div className="tn-es-pv tn-es-pv--empty">Päivän visa palaa huomenna.</div>}
-        </section>
-
-        {/* ─── Tupla tai kuitti -banneri (CD v0.2 3B): heti Päivän visan alla (Heikki 26.9.2026) ─── */}
-        <TuplaBanneri />
-        {/* Rajanaapurit Tuplan alla (CD v0.2 3f, 27.9.2026). Kuntaliitoksen banneri on erillään
-            Päivän sankarin alla, jotta kaksi vaaleaa karttabanneria ei ole peräkkäin (CD 3f-b). */}
-        <RajanaapuritBanneri />
-
-
-        {/* ─── Kuvavisat-banneri (Design kierros 12A, 18.9.2026) ───
-            Korvasi lippuvisa-heron ja sen alla olleen viikkovisapromon.
-            Bannerin otsikko on etusivun h1. */}
-        <KuvavisatBanneri yhteenveto={kvYhteenveto} viikko={viikko} />
-
-        {/* ─── Luonto–ruutana-koukkubanneri (CD 5a, Heikki 6.10.2026; korvasi Tiede & teknologia
-            -bannerin): Kuvavisat-bannerin alla ennen Suosittuja kokoelmia ─── */}
-        {/* Äänivisabanneri (8.10.2026, kuvitettu versio 14.10.2026) vuorottelee ruutana-bannerin kanssa samalla Luonto-paikalla:
-            parillisina päivinä äänivisa, kun jokin ääniryhmä on julkaistu (esikatselu: ?banneri=aani). */}
-        {aaniBanneri && (one("banneri") === "aani" || (one("banneri") !== "ruutana" && Math.floor(Date.UTC(today.vuosi, today.kk - 1, today.pv) / 86400000) % 2 === 0))
-          ? <AaniBanneri b={aaniBanneri} />
-          : <RuutanaBanneri />}
-
-        {/* ─── Suositut kokoelmat ─── */}
-        <section aria-labelledby="suositut">
-          <div className="tn-es-head">
-            <h2 className="tn-es-h2" id="suositut">Suositut kokoelmat</h2>
-          </div>
-          <div className="tn-es-grid">
-            {POPULAR_COLLECTIONS.map((c) => (
-              <a key={c.key} className="tn-es-card" href={c.href}>
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img className="tn-es-card-img" src={c.img} alt={c.alt ?? ""} loading="lazy" style={{ objectPosition: c.pos }} />
-                <span className="tn-es-card-shade" aria-hidden />
-                <span className="tn-es-card-foot">
-                  <span className="tn-es-card-text">
-                    <span className="tn-es-card-title">{c.title}</span>
-                    {c.desc && <span className="tn-es-card-desc">{c.desc}</span>}
-                  </span>
-                  <span className="tn-es-arrow" aria-hidden>→</span>
-                </span>
-              </a>
-            ))}
-          </div>
-        </section>
-
-        {/* ─── Lasten visat -kaista (design v0.2 3e/3f): heti Suosittujen kokoelmien jälkeen ─── */}
-        {lastenVisat.length > 0 && <LapsetKaista juhla={lastenJuhla} duo={juontajaKuvat(null).duo.innoissaan.replace(/\.webp$/, "-800.webp")} />}
-
-        {/* ─── Kuka on vanhin? -banneri (Design kierros 12B) — ennen juontajia ─── */}
-        <IkajarjestysBanneri henkilot={henkilot} />
-
-        {/* ─── Päivän sankari — Kuka on vanhin? -bannerin alla, ennen juontajia
-            (Heikki 19.9.2026). Ei sankaria → ei lohkoa eikä varattua tilaa. ─── */}
-        {sankari && <PaivanSankari data={sankari} />}
-
-        {/* ─── Kuntaliitos-banneri (CD 13a): Päivän sankarin alla (Heikki 27.9.2026) ─── */}
-        <KuntaliitosBanneri />
-
-        {/* ─── Laura ja Mikko ─── */}
-        <section className="tn-es-hosts" aria-labelledby="juontajat">
-          <h2 className="tn-es-h2" id="juontajat">{HOSTS_INTRO.title}</h2>
-          <div className="tn-es-hosts-grid">
-            {HOSTS.map((h) => (
-              <div key={h.key} className="tn-es-host" data-accent={h.accent}>
-                <div className="tn-es-host-profile">
-                  <div className="tn-es-host-img" role="img" aria-label={h.name} style={{ backgroundImage: `url(${h.img})` }} />
-                  <div className="tn-es-host-text">
-                    <div className="tn-es-host-name">{h.heading}</div>
-                    <div className="tn-es-host-role">{h.role}</div>
-                  </div>
-                </div>
-                <div className="tn-es-host-cards">
-                  {h.cards.map((c) => (
-                    <a key={c.key} className="tn-es-hcard" href={c.href}>
-                      <span className="tn-es-card-bg" aria-hidden style={{ backgroundImage: `url(${c.img})`, backgroundPosition: c.pos }} />
-                      <span className="tn-es-card-shade tn-es-card-shade--h" aria-hidden />
-                      <span className="tn-es-card-foot tn-es-card-foot--h">
-                        <span className="tn-es-hcard-text">
-                          <span className="tn-es-card-title">{c.title}</span>
-                          <span className="tn-es-hcard-desc">{c.desc}</span>
-                        </span>
-                        <span className="tn-es-arrow" aria-hidden>→</span>
-                      </span>
-                    </a>
-                  ))}
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        {/* ─── Uusimmat visat ─── */}
-        <section aria-labelledby="uusimmat">
-          <div className="tn-es-head">
-            <h2 className="tn-es-h2" id="uusimmat">Uusimmat visat</h2>
-          </div>
-          <div className="tn-es-ticker" data-ticker>
-            <div className="tn-es-ticker-track" data-ticker-track>
-              {tickerItems.map((t, i) => (
-                <a
-                  key={`${t.id}-${i}`}
-                  className="tn-es-chip"
-                  href={t.href}
-                >
-                  <i aria-hidden />
-                  {t.name}
-                  {t.mode && <span className="tn-es-chip-mode">{t.mode}</span>}
-                </a>
-              ))}
-            </div>
-          </div>
-        </section>
-      </div>
-
-      {/* ─── Footer ─── */}
+      {/* H1 = sivuston nimi, näkymätön (design: logo navigaatiossa); "Päivän pelit" on H2. */}
+      <h1 className="tn-es-sr-only">{brand.name} – suomalainen tietovisasivusto</h1>
+      <PaivaVahti pvm={d.today.iso} />
+      <EtusivuV5 d={d} />
     </main>
   );
 }

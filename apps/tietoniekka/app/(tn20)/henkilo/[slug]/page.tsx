@@ -235,7 +235,7 @@ export default async function HenkiloPage({ params }: { params: Promise<{ slug: 
               {h.esittely && <p className="hs-esittely">{h.esittely}</p>}
               <Lyhyesti rivit={h.faktat} />
             </div>
-            <div className="hs-oikea">
+            <div className="hs-oikea" data-tn-entry="henkilosivu">
               <PeliHylly
                 otsikko={h.elatiivi ? `Pelaa ${h.elatiivi}` : `Pelaa: ${h.name}`}
                 pelit={hyllyPelit}

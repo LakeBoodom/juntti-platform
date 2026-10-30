@@ -29,3 +29,12 @@ export function paivanVisaTila(d: Pick<PaivanVisaData, "intro">): "A" | "B" | "C
   if (d.intro?.text) return "C";
   return "B";
 }
+
+/** Päivän visan tulos selaimessa (localStorage): GameClient kirjoittaa ?paivan_visa=1 -pelin lopussa, etusivun kortti
+ *  lukee pelattu-tilan ja "Katso vastaukset" (?vastaukset=1) palauttaa tulosnäkymän. iso = Helsingin päivä YYYY-MM-DD. */
+export const paivanVisaAvain = (iso: string) => `tn_paivan_visa_${iso}`;
+export type PaivanVisaTulos = {
+  quizId: string; oikein: number; yhteensa: number; pisteet: number;
+  /** Valinnat teksteinä: vaihtoehtojen järjestys arvotaan joka latauksella. */
+  vastaukset: Array<{ id: string | null; k: string; v: string | null; h: "ok" | "bad" | "skipped" | null }>;
+};

@@ -5,6 +5,7 @@
 // päätoiminnolle (Aloita, Katso tulos, Haasta kaveri), yksi per näkymä.
 // Ei kantaan kirjoittamista vielä; paras tulos muistetaan selaimessa sarjakohtaisesti.
 
+import { lisaaPelirivi } from "@/lib/seuranta";
 import { pelijakoteksti } from "@/lib/korttinimi";
 import { tuplaTaso } from "@/lib/pelitasot";
 import { useEffect, useRef, useState, type CSSProperties } from "react";
@@ -83,10 +84,10 @@ async function tallennaPeli(r: { teema: string; siemen: string; paivanSarja: boo
   try {
     const sb = getSupabase();
     if (!sb) return;
-    await sb.from("tupla_pelit" as never).insert({
+    await lisaaPelirivi(sb, "tupla_pelit", {
       teema: r.teema, siemen: r.siemen, paivan_sarja: r.paivanSarja, syy: r.syy, saalis: r.saalis, oikein: r.oikein,
       kysymykset: r.kysymykset, session_id: istunto(),
-    } as never);
+    });
   } catch {
     // tilasto jää saamatta — peli jatkuu normaalisti
   }
