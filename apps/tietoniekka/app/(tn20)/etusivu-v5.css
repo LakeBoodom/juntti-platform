@@ -55,9 +55,8 @@
   font-family: var(--es-display); font-weight: 900; font-variation-settings: "wdth" 86; font-size: 14px; text-transform: uppercase; white-space: nowrap;
 }
 .tn20 .tn-es-nappi--acc { border: 1.5px solid var(--acc); }
-/* v10 (Heikki 30.10.2026): korttien napit täytettyinä kortin omalla värillä — Laura ja Mikko sekä Lapsille lime kuten
-   "Pelaa päivän visa", synttärit oranssi, Tiesitkö vaaleansininen, visapaketti kulta. Poikkeaa UI-laatusäännöstä 5
-   ("kortin väri ei napissa") Heikin päätöksellä. Teksti aina tumma (#131109). */
+/* v10 (Heikki 30.10.2026): täytetyt napit vain Laura ja Mikko (lime kuten "Pelaa päivän visa") ja visapaketti (kulta).
+   Synttärit, Tiesitkö ja Lapsille pidetään ääriviivanappeina (Heikki 30.10. ilta). Teksti täytetyssä aina tumma. */
 .tn20 .tn-es5 .tn-es-nappi.tn-es-nappi--lime { background: var(--es-lime); border-color: var(--es-lime); color: #131109; }
 .tn20 .tn-es-cta {
   display: flex; align-items: center; justify-content: center; min-height: 56px; padding: 0 28px; border-radius: 999px;
@@ -157,7 +156,7 @@
   font-family: var(--es-display); font-weight: 900; font-variation-settings: "wdth" 76; line-height: .94; text-transform: uppercase;
   font-size: min(22px, calc(100cqw / (var(--lw) * .64))); overflow-wrap: normal; word-break: keep-all; text-wrap: balance;
 }
-.tn20 .tn-es-synt-nappi { align-self: stretch; padding: 0 12px; border: 1.5px solid var(--es-oranssi); background: var(--es-oranssi); color: #131109; }
+.tn20 .tn-es-synt-nappi { align-self: stretch; padding: 0 12px; border: 1.5px solid var(--es-oranssi); }
 /* 320 px: tekstipalsta 114 px, "PELAA VISA" + reunus 116 px → kuva 132 → 112 px. */
 @media (max-width: 359px) { .tn20 .tn-es-synt { grid-template-columns: 112px minmax(0, 1fr); } }
 
@@ -203,7 +202,7 @@
 }
 .tn20 .tn-es-tt-h mark { background: var(--es-syaani); color: #131109; padding: 0 6px; border-radius: 4px; -webkit-box-decoration-break: clone; box-decoration-break: clone; }
 /* v7: ääriviivanappi syaanina (lime varattu Päivän visalle ja juhlabannerille). */
-.tn20 .tn-es-tt-nappi { align-self: stretch; min-height: 48px; border: 1.5px solid var(--es-syaani); background: var(--es-syaani); color: #131109; font-size: 15px; }
+.tn20 .tn-es-tt-nappi { align-self: stretch; min-height: 48px; border: 1.5px solid var(--es-syaani); font-size: 15px; }
 
 /* ── 3 Pelaa aiheittain (v7): 16:10-kuva ja nimi alla, 3 saraketta. ── */
 .tn20 .tn-es-aiheet { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px 8px; }
@@ -460,7 +459,7 @@
 .tn20 .tn-es-lapset-rivi { font-size: 13.5px; line-height: 1.4; color: var(--es-teksti2); text-wrap: pretty; }
 .tn20 .tn-es-ehja { white-space: nowrap; }
 .tn20 .tn-es-lapset-iat { display: flex; flex-direction: column; gap: 8px; }
-.tn20 .tn-es-lapset-iat .tn-es-nappi { align-self: stretch; min-height: 46px; font-size: 15px; }
+.tn20 .tn-es-lapset-iat .tn-es-nappi { align-self: stretch; min-height: 46px; font-size: 15px; border: 1.5px solid var(--es-vihrea); }
 
 /* ── 9 Visapaketit "Visailta valmiina" (CD v10) ── */
 .tn20 .tn-es-vp { gap: 14px; }

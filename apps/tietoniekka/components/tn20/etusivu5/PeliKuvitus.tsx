@@ -63,7 +63,8 @@ export default function PeliKuvitus({ slug }: { slug: string }) {
         </span>
       );
     case "ikajarjestys":
-      /* Sekoitettu järjestys (CD v8): Selänne 1970, Halonen 1943, Cheek 1981 — ei valmiiksi oikein. */
+      /* Lähes samanikäiset, järjestys ei itsestään selvä (Heikki 30.10.): Stubb 1.4.1968, Häkkinen 28.9.1968,
+         Selänne 3.7.1970. Näytetään sekoitettuna (Selänne, Stubb, Häkkinen) — ei valmiiksi oikein. */
       return (
         <span className="tn-pk tn-pk--ika" aria-hidden="true">
           <span className="tn-pk-kehys tn-pk-sarake">
@@ -71,9 +72,9 @@ export default function PeliKuvitus({ slug }: { slug: string }) {
             <span className="tn-pk-henkilot">
               <span className="tn-pk-henkilo"><img src="/20/henkilot/k/teemu-selanne-on-the-ice-november-2010-8f51e8.webp" alt="" /><i>1</i></span>
               <span className="tn-pk-nuoli">›</span>
-              <span className="tn-pk-henkilo"><img src="/20/henkilot/k/tarja-halonen-1c389-8827-2-61f0b8.webp" alt="" /><i>2</i></span>
+              <span className="tn-pk-henkilo"><img src="/20/henkilot/k/alexander-stubb-in-2026-03-26-3n8a4037-cropped-23a9b2.webp" alt="" /><i>2</i></span>
               <span className="tn-pk-nuoli">›</span>
-              <span className="tn-pk-henkilo tn-pk-henkilo--auki"><img src="/20/henkilot/k/cheek-ilosaarirock-2016-16-cropped-69a391.webp" alt="" /><i>?</i></span>
+              <span className="tn-pk-henkilo tn-pk-henkilo--auki"><img src="/20/henkilot/k/mika-hakkinen-champions-for-charity-2016-07-27-37084f.webp" alt="" /><i>?</i></span>
             </span>
           </span>
         </span>
