@@ -15,7 +15,7 @@ import { JUONTAJIEN_SUOSITUKSET, PROMO2_OOTKO } from "@/lib/etusivu";
 import { listaaVisapaketit, landinginPaketit, ajankohtainen, kauttaJaljella, korttiHref } from "@/lib/visapaketit";
 import { JUHLAT_KOKOELMA, pvm, juhlaKalenteri, paavisa, paiviaValissa, vpLyhyt, type Esiintyma } from "@/lib/juhlat";
 import { LAPSET_SIVU, lapsetNakyvissa } from "@/lib/lapset/data";
-import { COLLECTION_LABEL } from "@/lib/visanKokoelma";
+import { COLLECTION_LABEL, resolveCollection } from "@/lib/visanKokoelma";
 
 const VIIKONPAIVAT = ["Sunnuntai", "Maanantai", "Tiistai", "Keskiviikko", "Torstai", "Perjantai", "Lauantai"];
 const VP_LYHYT = ["Su", "Ma", "Ti", "Ke", "To", "Pe", "La"];
@@ -34,6 +34,7 @@ type Kortti = {
   id: string; slug: string | null; custom_slug: string | null; title: string; display_title: string | null;
   collection: string | null; play_count: number | null; published_at: string | null; game_mode?: string | null;
   teaser?: string | null; description?: string | null; hero_image?: string | null; hero_focal_x?: number | null; hero_focal_y?: number | null;
+  category?: string | null; genre?: string | null;
 };
 
 export type EtusivuData = Awaited<ReturnType<typeof haeEtusivu>>;
@@ -133,7 +134,10 @@ export async function haeEtusivu(opts: {
       const kk = visanKorttikuva(k).kuva ? visanKorttikuva(k) : { kuva: KOKOELMA_KORTIT.find((x) => x.slug === k.collection)?.img ?? null, kuvaPos: undefined };
       tiesitko = {
         kysymys: teksti, korostus,
-        kicker: [kokoelmaNimi(k.collection), nimi(k)].filter(Boolean).join(" · "),
+        /* Kokoelma kategoriasta kuten pelisivulla (resolveCollection): kaupunkivisat ovat kannassa yleistietoa,
+           mutta kuuluvat Suomen kaupunkeihin (Heikki 30.10.). Yleistieto ei ole 2.0:ssa kokoelma → pelkkä visan nimi. */
+        kicker: (() => { const r = resolveCollection({ collection: k.collection, category: k.category ?? null, genre: k.genre ?? null });
+          return [r.key === "yleistieto" ? null : r.label, nimi(k)].filter(Boolean).join(" · "); })(),
         href: visaHref(k), kuva: kk.kuva, kuvaPos: kk.kuvaPos,
       };
     }
@@ -238,8 +242,8 @@ export async function haeEtusivu(opts: {
 
   /* ── 9 Visapaketit "Visailta valmiina" (CD v10, Heikki 30.10.2026): julkaistut paketit kannasta (quiz_packs).
      Kauden paketti (kausi käynnissä, lähin loppu ensin) isona kuvakorttina, muut tiiviinä riveinä; sarjasta uusin painos.
-     Ei Kaikki visapaketit -linkkiä, kun paketteja on enintään kolme. Pubivisalla ei kuvaa kannassa → juontajien visakuva. */
-  const PAKETTI_KUVA_VARA = "/20/hero-mikko-laura.webp";
+     Ei Kaikki visapaketit -linkkiä, kun paketteja on enintään kolme. Paketti ilman kuvaa → visailtakuva (public/20/visapaketit/pubivisa.webp, Heikki 30.10.). */
+  const PAKETTI_KUVA_VARA = "/20/visapaketit/pubivisa.webp";
   const kaikkiPaketit = landinginPaketit(await listaaVisapaketit());
   const kaudenPaketti = ajankohtainen(kaikkiPaketit);
   const isoPaketti = kaudenPaketti && kauttaJaljella(kaudenPaketti) !== null ? kaudenPaketti : null;

@@ -41,14 +41,15 @@ export default function PeliKuvitus({ slug }: { slug: string }) {
         </span>
       );
     case "vaalipiiriketju":
+      /* Oikeat istuvat kansanedustajat (Heikki 30.10.): Halla-aho (Helsinki) → Purra (Uusimaa) → ? (Häme). */
       return (
         <span className="tn-pk tn-pk--vaali" aria-hidden="true">
           <span className="tn-pk-kehys tn-pk-rivi">
-            <span className="tn-pk-kortti tn-pk-kortti--kork tn-pk-kallis"><span className="tn-pk-nimikirjaimet">AK</span><b>Helsinki</b><i className="tn-pk-puolue" /></span>
+            <span className="tn-pk-kortti tn-pk-kortti--kork tn-pk-kallis"><img className="tn-pk-kasvo" src="/20/henkilot/k/jussi-halla-aho-9-5-2023-072081.webp" alt="" /><b>Halla-aho</b><small>Helsinki</small></span>
             <span className="tn-pk-viiva" />
-            <span className="tn-pk-kortti tn-pk-kortti--kork tn-pk-nosto"><span className="tn-pk-nimikirjaimet">ML</span><b>Uusimaa</b><i className="tn-pk-puolue" /></span>
+            <span className="tn-pk-kortti tn-pk-kortti--kork tn-pk-nosto"><img className="tn-pk-kasvo" src="/20/henkilot/k/riikka-purra-2026-cropped-da8106.webp" alt="" /><b>Purra</b><small>Uusimaa</small></span>
             <span className="tn-pk-viiva tn-pk-viiva--pisteet" />
-            <span className="tn-pk-tyhja tn-pk-tyhja--kork">?<b>Häme</b></span>
+            <span className="tn-pk-tyhja tn-pk-tyhja--kork">?<small>Häme</small></span>
           </span>
         </span>
       );
