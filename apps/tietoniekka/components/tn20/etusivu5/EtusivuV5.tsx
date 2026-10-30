@@ -11,6 +11,7 @@ import type { EtusivuData } from "@/lib/etusivu5";
 import PelattuTanaan from "./PelattuTanaan";
 import PaivanVisaV5 from "./PaivanVisaV5";
 import Juhlabanneri from "./Juhlabanneri";
+import PeliKuvitus, { KUVITETUT } from "./PeliKuvitus";
 import { kuvanSrcSet } from "@/lib/kuvaVariantit";
 
 type D = NonNullable<EtusivuData>;
@@ -168,12 +169,15 @@ function Pelit({ p }: { p: D["pelit"] }) {
           <h3 className="tn-es-ryhma-h"><span>{g.nimi}</span></h3>
           {/* < 768 px karuselli (v7: kortti 242 px, seuraava näkyy reunassa); ≥ 768 px ruudukko, sarakkeet korttimäärästä
               (analyysi 30.10.): 3 korttia = 3 saraketta; kuvan sizes palstan maksimista 1120 px. */}
-          <div className="tn-es-rivi" data-ryhma={g.avain} style={{ "--sar": Math.min(g.kortit.length, 4) } as CSSProperties}>
+          <div className="tn-es-rivi" data-ryhma={g.avain} data-sar={Math.min(g.kortit.length, 4)} style={{ "--sar": Math.min(g.kortit.length, 4) } as CSSProperties}>
             {g.kortit.map((m) => {
               const sisus = (
                 <>
                   <span className="tn-es-peli-kuva">
-                    <Kuva src={m.kuva} pos={m.kuvaPos} luokka="tn-es-peli-img" sizes={`(min-width: 768px) ${Math.round(1120 / Math.min(g.kortit.length, 4))}px, 242px`} />
+                    {/* v8: kuvitus (pieni näkymä pelistä) niille peleille, joilla se on; muuten valokuva. */}
+                    {KUVITETUT.has(m.slug)
+                      ? <PeliKuvitus slug={m.slug} />
+                      : <Kuva src={m.kuva} pos={m.kuvaPos} luokka="tn-es-peli-img" sizes={`(min-width: 768px) ${Math.round(1120 / Math.min(g.kortit.length, 4))}px, 242px`} />}
                   </span>
                   {m.tila === "tulossa" && <span className="tn-es-leima">Tulossa</span>}
                   <span className="tn-es-peli-teksti">

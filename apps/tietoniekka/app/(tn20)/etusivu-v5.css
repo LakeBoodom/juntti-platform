@@ -250,12 +250,105 @@
   border-radius: 999px; background: var(--es-bg); border: 1px solid #6E6656; font-size: 11px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase;
 }
 
+/* Pelikorttien kuvitukset (CD v8, PeliKuvitus.tsx): koostettu 242 × 151 px:n kehykseen, joka keskitetään korttiin;
+   taustaväri täyttää leveämmän kortin reunat. Koriste (aria-hidden) → pikkutekstit 11 px (UI-laatusääntö 3 poikkeus). */
+.tn20 .tn-pk { position: absolute; inset: 0; overflow: hidden; font-family: var(--es-display); font-weight: 900; color: #0F3B5F; }
+.tn20 .tn-pk img { display: block; }
+.tn20 .tn-pk-kehys { position: absolute; left: 50%; top: 50%; width: 242px; height: 151px; transform: translate(-50%, -50%); }
+.tn20 .tn-pk-rivi { display: flex; align-items: center; justify-content: center; }
+.tn20 .tn-pk--kunta { background: radial-gradient(70% 110% at 100% 50%, #8FC9BF 0%, rgba(143,201,191,.35) 45%, transparent 75%), #F1ECE0; --pk: #2BA39A; }
+.tn20 .tn-pk--raja { background: radial-gradient(60% 70% at 20% 30%, #A9BFB4 0%, transparent 70%), radial-gradient(60% 80% at 85% 75%, #B9C2BC 0%, transparent 70%), #CDD5CC; --pk: #D99A1E; }
+.tn20 .tn-pk--vaali { background: radial-gradient(70% 110% at 0% 50%, rgba(217,72,95,.2) 0%, transparent 70%), #F1ECE0; --pk: #D9485F; }
+.tn20 .tn-pk-kortti {
+  flex: none; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; width: 62px; height: 74px;
+  border-radius: 10px; background: #FFFFFF; box-shadow: 0 2px 0 #E2D9C6, 0 6px 14px rgba(19,17,9,.18);
+}
+.tn20 .tn-pk-kortti img { width: 34px; height: 38px; object-fit: contain; }
+.tn20 .tn-pk-kortti b, .tn20 .tn-pk-tyhja b { font-size: 11px; font-weight: 900; color: #0F3B5F; }
+.tn20 .tn-pk-kortti--kork { height: 80px; gap: 5px; }
+.tn20 .tn-pk-kallis { transform: rotate(-3deg); }
+.tn20 .tn-pk-nosto { transform: translateY(-6px); }
+.tn20 .tn-pk-viiva { flex: none; width: 14px; height: 3px; background: var(--pk); }
+.tn20 .tn-pk-viiva--pisteet { height: 0; background: none; border-top: 3px dotted var(--pk); }
+.tn20 .tn-pk-tyhja {
+  flex: none; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; width: 56px; height: 70px;
+  border-radius: 10px; border: 2px dashed #0F3B5F; background: rgba(255,255,255,.55); font-size: 32px; line-height: 1; color: var(--pk);
+}
+.tn20 .tn-pk-tyhja--kork { width: 58px; height: 76px; font-size: 28px; }
+.tn20 .tn-pk-lippu { display: flex; flex-direction: column; width: 42px; height: 28px; border-radius: 3px; overflow: hidden; box-shadow: inset 0 0 0 1px #EEE; }
+.tn20 .tn-pk-lippu i { flex: 1; }
+.tn20 .tn-pk-nimikirjaimet { display: flex; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: 999px; background: #0F3B5F; color: #F1ECE0; font-size: 12px; }
+.tn20 .tn-pk-puolue { width: 22px; height: 3px; border-radius: 2px; background: var(--pk); }
+/* Kuvavisat: kolme kuvakehystä viuhkana (lippu, vaakuna, eläin). */
+.tn20 .tn-pk--kuva { background: #F4EFE4; }
+.tn20 .tn-pk-pino { display: flex; align-items: center; justify-content: center; }
+.tn20 .tn-pk-kehysk { position: relative; flex: none; width: 70px; height: 84px; padding: 6px; border-radius: 10px; background: #FFFFFF; box-shadow: 0 6px 14px rgba(19,17,9,.18); box-sizing: border-box; }
+.tn20 .tn-pk-kehysk img { width: 100%; height: 100%; object-fit: contain; }
+.tn20 .tn-pk-kehysk--vasen { transform: rotate(-9deg) translate(10px, 6px); }
+.tn20 .tn-pk-kehysk--keski { z-index: 2; width: 76px; height: 92px; box-shadow: 0 8px 18px rgba(19,17,9,.24); }
+.tn20 .tn-pk-kehysk--oikea { padding: 4px; transform: rotate(9deg) translate(-10px, 6px); }
+.tn20 .tn-pk-kehysk--oikea img { object-fit: cover; border-radius: 7px; }
+.tn20 .tn-pk-merkki { position: absolute; top: -10px; right: -10px; display: flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 999px; background: #22D3EE; color: #131109; font-size: 17px; }
+/* Järjestyspelit */
+.tn20 .tn-pk--ika { background: radial-gradient(80% 80% at 50% 100%, rgba(240,162,75,.22), transparent 70%), #F4EFE4; }
+.tn20 .tn-pk--jarj { background: radial-gradient(80% 80% at 100% 0%, rgba(240,162,75,.2), transparent 70%), #F4EFE4; }
+.tn20 .tn-pk-sarake { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; }
+.tn20 .tn-pk-otsake { font-family: var(--tn-font-body, sans-serif); font-size: 11px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; color: #6B5A3E; }
+.tn20 .tn-pk-henkilot { display: flex; align-items: center; gap: 8px; }
+.tn20 .tn-pk-henkilo { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+.tn20 .tn-pk-henkilo img { width: 54px; height: 54px; border-radius: 999px; object-fit: cover; object-position: 50% 20%; border: 2px solid #FFFFFF; box-shadow: 0 4px 10px rgba(19,17,9,.2); box-sizing: border-box; }
+.tn20 .tn-pk-henkilo i { display: flex; align-items: center; justify-content: center; width: 22px; height: 22px; border-radius: 999px; background: #F0A24B; color: #131109; font-style: normal; font-size: 12px; box-sizing: border-box; }
+.tn20 .tn-pk-henkilo--auki img { border-style: dashed; border-color: #F0A24B; }
+.tn20 .tn-pk-henkilo--auki i { background: none; border: 2px dashed #F0A24B; color: #6B5A3E; }
+.tn20 .tn-pk-nuoli { margin-bottom: 28px; font-size: 16px; color: #C9A77A; }
+.tn20 .tn-pk-lista { display: flex; flex-direction: column; justify-content: center; gap: 6px; padding: 0 34px; box-sizing: border-box; }
+.tn20 .tn-pk-lista-rivi { display: flex; align-items: center; gap: 9px; height: 28px; padding: 0 10px 0 4px; border-radius: 8px; background: #FFFFFF; box-shadow: 0 2px 6px rgba(19,17,9,.12); }
+.tn20 .tn-pk-lista-rivi[data-nosto] { box-shadow: 0 10px 18px rgba(19,17,9,.22); transform: translateX(14px) rotate(-2.5deg); }
+.tn20 .tn-pk-lista-rivi i { display: flex; align-items: center; justify-content: center; width: 20px; height: 20px; border-radius: 6px; border: 2px dashed #F0A24B; color: #6B5A3E; font-style: normal; font-size: 11px; box-sizing: border-box; }
+.tn20 .tn-pk-lista-rivi b { flex: 1; font-size: 12px; color: #131109; }
+.tn20 .tn-pk-lista-rivi span { font-size: 12px; font-weight: 800; color: #B8AE9A; letter-spacing: -.1em; }
+/* Äänivisa: lintukuva puhekuplineen; tekstit kuvan kuplien päälle (koordinaatit kehyksessä). */
+.tn20 .tn-pk--aani { background: #1B2A1C; }
+.tn20 .tn-pk--aani .tn-pk-kehys { top: 0; transform: translateX(-50%); }
+.tn20 .tn-pk-aani-kuva { position: absolute; left: -196px; top: 0; width: 493px; height: 211px; max-width: none; }
+.tn20 .tn-pk-kupla {
+  position: absolute; height: 28px; transform: translate(-50%, -50%); display: flex; align-items: center; justify-content: center;
+  font-variation-settings: "wdth" 74; font-size: 11.5px; line-height: 1; text-transform: uppercase; color: #131109;
+}
+.tn20 .tn-pk-soitin { position: absolute; display: flex; align-items: center; gap: 2px; height: 22px; transform: translate(-50%, -50%); }
+.tn20 .tn-pk-soitin i { position: relative; width: 20px; height: 20px; border-radius: 999px; background: #2E8A4E; }
+.tn20 .tn-pk-soitin i::after { content: ""; position: absolute; left: 8px; top: 5.5px; border-left: 7px solid #F5F0E6; border-top: 4.5px solid transparent; border-bottom: 4.5px solid transparent; }
+.tn20 .tn-pk-soitin b { width: 2px; height: 6px; border-radius: 1px; background: #2E8A4E; }
+.tn20 .tn-pk-soitin b:nth-of-type(2) { height: 11px; }
+.tn20 .tn-pk-soitin b:nth-of-type(3) { height: 7px; }
+.tn20 .tn-pk--aani::after { content: ""; position: absolute; inset: auto 0 0; height: 40px; background: linear-gradient(0deg, rgba(23,20,13,.55), transparent); }
+/* Mikä maa?: sumennettu karttakuva + vihjeet, kolmas lukittuna. */
+.tn20 .tn-pk--maa { background: radial-gradient(70% 90% at 100% 100%, rgba(201,138,94,.25), transparent 70%), #F1ECE0; }
+.tn20 .tn-pk-maa { display: grid; grid-template-columns: 84px minmax(0, 1fr); align-items: center; gap: 12px; padding: 0 18px; box-sizing: border-box; }
+.tn20 .tn-pk-maa-kuva { position: relative; width: 84px; height: 96px; border-radius: 12px; overflow: hidden; background: #9FB3AE; box-shadow: 0 6px 14px rgba(19,17,9,.2); }
+.tn20 .tn-pk-maa-kuva img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 30% 60%; filter: blur(3px) saturate(.8); transform: scale(1.15); }
+.tn20 .tn-pk-maa-kuva b { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 38px; color: #FFFFFF; text-shadow: 0 2px 8px rgba(15,59,95,.55); }
+.tn20 .tn-pk-vihjeet { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.tn20 .tn-pk-vihjeet span {
+  display: flex; align-items: center; gap: 6px; height: 26px; padding: 0 9px; border-radius: 7px; background: #FFFFFF; box-shadow: 0 2px 6px rgba(19,17,9,.12);
+  font-family: var(--tn-font-body, sans-serif); font-size: 11px; font-weight: 700; color: #131109; white-space: nowrap;
+}
+.tn20 .tn-pk-vihjeet span[data-lukittu] { background: none; box-shadow: none; border: 1.5px dashed #C9B79A; color: #6B5A3E; }
+.tn20 .tn-pk-vihjeet b { font-family: var(--es-display); font-weight: 900; color: #C98A5E; }
+.tn20 .tn-pk-vihjeet span[data-lukittu] b { color: inherit; }
+/* Tulossa-kortissa (Mikä maa?) kuvitus himmennetään kuten valokuva. */
+.tn20 .tn-es-peli[data-tulossa] .tn-es-peli-kuva:has(.tn-pk) { filter: grayscale(.4); opacity: .7; }
+
 /* Tabletti ja desktop ≥ 768: ruudukko, sarakkeet ryhmän korttimäärästä (--sar = min(kortit, 4), EtusivuV5): 3 kortin ryhmä
    täyttää rivin eikä jätä tyhjää neljännestä (etusivuanalyysi 30.10. kohta 2). Kaikki kortit mahtuvat → ei nuolia. */
 @media (min-width: 768px) {
   .tn20 .tn-es-rivi { display: grid; grid-template-columns: repeat(var(--sar, 4), minmax(0, 1fr)); gap: 12px; overflow: visible; margin: 0; padding: 0; }
   .tn20 .tn-es-peli { width: auto; }
-  .tn20 .tn-es-peli-kuva { height: 120px; }
+  .tn20 .tn-es-peli-kuva { height: 151px; }
+}
+/* 4 kortin ryhmä 768–1199 px: kortti jäisi alle kuvituksen 242 px:n → 2 × 2 (v8). */
+@media (min-width: 768px) and (max-width: 1199px) {
+  .tn20 .tn-es-rivi[data-sar="4"] { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 
 /* ── 5 Juhlabanneri (Promo 1 countdown, v7 kohta 2, Juhlabanneri.tsx) ── */
