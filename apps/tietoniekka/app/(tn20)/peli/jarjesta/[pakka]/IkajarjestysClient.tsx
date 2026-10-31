@@ -83,14 +83,17 @@ export default function IkajarjestysClient({
   const [emptyNotice, setEmptyNotice] = useState<string | null>(null);
   const [partialRoundNotice, setPartialRoundNotice] = useState<string | null>(null);
 
+  // Henkilösivun nosto voi sisältää ulkomaisia henkilöitä → silloin ei "Tunnetut suomalaiset".
+  const nimi = round?.some((h) => h.suomalainen === false) ? "Tunnetut henkilöt" : pakka.nimi;
+
   const correctOrder = useMemo(() => (round ? sortForDirection(round, DEFAULT_DIRECTION) : []), [round]);
 
   /** Haasta kaveri: sama kymmenikkö linkkinä (?henkilot=, sama kuin henkilösivun nosto). */
   /* Jako (K4 v2, 25.10.2026): Jakoalue-komponentti; tulos linkkiin (?tulos=n-total) jotta kaveri saa saman kierroksen
      ja Facebookin og-kuvaus kertoo tuloksen; tasonimi kuten tulosnäkymässä. Tulosvaihe piirretään vain selaimessa. */
   const jakoTiedot = () => ({
-    url: `${location.origin}${pakka.href}?henkilot=${(round ?? []).map((p) => p.id).join(",")}&tulos=${scoreResult?.correctCount ?? 0}-${scoreResult?.totalCount ?? 0}`,
-    teksti: pelijakoteksti(`${PELI}: ${pakka.nimi}`, `${scoreResult?.correctCount ?? 0}/${scoreResult?.totalCount ?? 0} oikein`, !!scoreResult && scoreResult.correctCount === scoreResult.totalCount, scoreResult ? ikajarjestysTaso(scoreResult.correctCount, scoreResult.totalCount) : null),
+    url: `${location.origin}${pakka.href}?henkilot=${(round ?? []).map((p) => p.id).join(",")}&rivi=1&tulos=${scoreResult?.correctCount ?? 0}-${scoreResult?.totalCount ?? 0}`,
+    teksti: pelijakoteksti(`${PELI}: ${nimi}`, `${scoreResult?.correctCount ?? 0}/${scoreResult?.totalCount ?? 0} oikein`, !!scoreResult && scoreResult.correctCount === scoreResult.totalCount, scoreResult ? ikajarjestysTaso(scoreResult.correctCount, scoreResult.totalCount) : null),
   });
 
   async function startRound() {
@@ -139,7 +142,7 @@ export default function IkajarjestysClient({
   if (phase === "start" || phase === "loading") {
     return (
       <PeliKehys iho="tumma">
-        <Pelipalkki iho="tumma" peli={HUB.nimi} muunnelma={pakka.nimi} koti={HUB} />
+        <Pelipalkki iho="tumma" peli={HUB.nimi} muunnelma={nimi} koti={HUB} />
         <main>
           {/* K2 (pelikehys, 20.10.2026): h1 → lause → kasvoketju → Aloita. Osa C: ei aihevalintaa eikä ohjeita. */}
           <PeliAloitus
@@ -186,7 +189,7 @@ export default function IkajarjestysClient({
   if (phase === "revealing" && scoreResult) {
     return (
       <PeliKehys iho="tumma">
-        <Pelipalkki iho="tumma" peli={HUB.nimi} muunnelma={pakka.nimi} koti={HUB} />
+        <Pelipalkki iho="tumma" peli={HUB.nimi} muunnelma={nimi} koti={HUB} />
         <main className="tk-page">
           <RevealSequencer
             items={revealItems}
@@ -212,7 +215,7 @@ export default function IkajarjestysClient({
   // phase === "ordering"
   return (
     <PeliKehys iho="tumma">
-      <Pelipalkki iho="tumma" peli={HUB.nimi} muunnelma={pakka.nimi} koti={HUB} tila={`${order.length} henkilöä`} pelissa />
+      <Pelipalkki iho="tumma" peli={HUB.nimi} muunnelma={nimi} koti={HUB} tila={`${order.length} henkilöä`} pelissa />
       <main className="tk-page">
         <header className="tk-order-head">
           <SuuntaindikaattoriBadge direction={DEFAULT_DIRECTION} />

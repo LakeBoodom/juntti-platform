@@ -59,10 +59,10 @@ export type Pakka = {
   /** Hubin pakkakortti. `kuvat`: kolme kasvoa (public/, 240×320) rinnakkain tai yksi valokuva (16:10).
    *  Ilman kuvia kortti näyttää puolikaarimotiivin. Krediitit lib/kuvalahteet.ts. */
   kortti: { otsikko: string; meta: string; kuvat?: string[] };
-  /** Järjestä-hubin teema (h2), osa C 31.10.2026. Teemat tulevat pakoista, eivät kiinteästä listasta. */
-  teema: string;
   /** Hubin ja "Seuraava pakka" -kortin kuva (public/, n. 720 px leveä). */
   korttikuva: string;
+  /** Järjestä-hubin päivän rivin lause (CD kierros 5a, 31.10.2026): viisi kohdetta, peruste ja suunta. */
+  paivanLause: string;
   /** Jakokuvan taustakuva (public/). */
   kuva: string;
 };
@@ -93,8 +93,8 @@ export const PAKAT: Pakka[] = [
     collection: VAALIT,
     kortti: { otsikko: "Presidentit", meta: "Virkaanastuminen", kuvat: ["/20/vaalit/kasvot/paasikivi.webp", "/20/vaalit/kasvot/koivisto.webp", "/20/vaalit/kasvot/niinisto.webp"] },
     kuva: VAALIT_KUVA,
-    teema: "Politiikka",
     korttikuva: "/20/vaalit/pakat/presidentit.webp",
+    paivanLause: "Viisi presidenttiä virkaanastumisen mukaan, ensimmäinen ensin.",
   },
   {
     slug: "paaministerit",
@@ -115,8 +115,8 @@ export const PAKAT: Pakka[] = [
     collection: VAALIT,
     kortti: { otsikko: "Pääministerit", meta: "Aikajärjestys", kuvat: ["/20/vaalit/kasvot/holkeri.webp", "/20/vaalit/kasvot/aho.webp", "/20/vaalit/kasvot/marin.webp"] },
     kuva: VAALIT_KUVA,
-    teema: "Politiikka",
     korttikuva: "/20/vaalit/pakat/paaministerit.webp",
+    paivanLause: "Viisi pääministeriä ensimmäisen kauden mukaan, varhaisin ensin.",
   },
   {
     slug: "paaministerit-kesto",
@@ -136,8 +136,8 @@ export const PAKAT: Pakka[] = [
     collection: VAALIT,
     kortti: { otsikko: "Pääministerikaudet", meta: "Päivinä", kuvat: ["/20/vaalit/kasvot/kallio.webp", "/20/vaalit/kasvot/lipponen.webp", "/20/vaalit/kasvot/vanhanen.webp"] },
     kuva: VAALIT_KUVA,
-    teema: "Politiikka",
     korttikuva: "/20/vaalit/pakat/paaministerit-kesto.webp",
+    paivanLause: "Viisi pääministeriä kausien yhteispituuden mukaan, pisin ensin.",
   },
   {
     slug: "eduskunta-pisimpaan",
@@ -160,8 +160,8 @@ export const PAKAT: Pakka[] = [
     collection: VAALIT,
     kortti: { otsikko: "Eduskuntavuodet", meta: "Istuvat kansanedustajat", kuvat: ["/20/vaalit/kasvot/zyskowicz.webp", "/20/vaalit/kasvot/tuomioja.webp", "/20/vaalit/kasvot/rasanen.webp"] },
     kuva: VAALIT_KUVA,
-    teema: "Politiikka",
     korttikuva: "/20/vaalit/pakat/eduskunta-pisimpaan.webp",
+    paivanLause: "Viisi kansanedustajaa eduskuntavuosien mukaan, pisimpään ollut ensin.",
   },
   {
     slug: "eduskuntaryhmat",
@@ -182,8 +182,8 @@ export const PAKAT: Pakka[] = [
     collection: VAALIT,
     kortti: { otsikko: "Eduskuntaryhmät", meta: "Koon mukaan", kuvat: ["/20/vaalit/pakat/eduskuntaryhmat.webp"] },
     kuva: VAALIT_KUVA,
-    teema: "Politiikka",
     korttikuva: "/20/vaalit/pakat/eduskuntaryhmat.webp",
+    paivanLause: "Viisi eduskuntaryhmää koon mukaan, suurin ensin.",
   },
   {
     slug: "puolueet-ika",
@@ -205,8 +205,8 @@ export const PAKAT: Pakka[] = [
     collection: VAALIT,
     kortti: { otsikko: "Puolueiden ikä", meta: "Perustamisvuosi", kuvat: ["/20/vaalit/pakat/puolueet-ika.webp"] },
     kuva: VAALIT_KUVA,
-    teema: "Politiikka",
     korttikuva: "/20/vaalit/pakat/puolueet-ika.webp",
+    paivanLause: "Viisi puoluetta perustamisvuoden mukaan, vanhin ensin.",
   },
   {
     slug: "vaalipiirit-paikat",
@@ -228,8 +228,8 @@ export const PAKAT: Pakka[] = [
     collection: VAALIT,
     kortti: { otsikko: "Vaalipiirit", meta: "Paikkamäärän mukaan", kuvat: ["/20/vaalit/pakat/vaalipiirit-paikat.webp"] },
     kuva: VAALIT_KUVA,
-    teema: "Politiikka",
     korttikuva: "/20/vaalit/pakat/vaalipiirit-paikat.webp",
+    paivanLause: "Viisi vaalipiiriä paikkamäärän mukaan, eniten paikkoja ensin.",
   },
 
   // ── Ensimmäiset pakat (3.10.2026), odottavat omaa hyväksyntäänsä (CD-kuvat, park_landscape) ──
@@ -253,8 +253,8 @@ export const PAKAT: Pakka[] = [
     collection: { slug: "luonto", nimi: "Luonto" },
     kortti: { otsikko: "Kansallispuistot", meta: "Pinta-alan mukaan" },
     kuva: "/20/teema-luonto.webp",
-    teema: "Luonto",
     korttikuva: "/20/teema-luonto.webp",
+    paivanLause: "Viisi kansallispuistoa pinta-alan mukaan, suurin ensin.",
   },
   {
     slug: "leijonat-maaottelut",
@@ -275,8 +275,8 @@ export const PAKAT: Pakka[] = [
     collection: { slug: "jaakiekko", nimi: "Jääkiekko" },
     kortti: { otsikko: "Leijonat", meta: "Maaottelut" },
     kuva: "/20/jaakiekko/jk-leijonat-mm2019-kuva.webp",
-    teema: "Urheilu",
     korttikuva: "/20/jaakiekko/jk-leijonat-mm2019-kuva.webp",
+    paivanLause: "Viisi leijonaa maaottelujen mukaan, eniten pelannut ensin.",
   },
   {
     slug: "tappara-pisteet",
@@ -297,8 +297,8 @@ export const PAKAT: Pakka[] = [
     collection: { slug: "jaakiekko", nimi: "Jääkiekko" },
     kortti: { otsikko: "Tappara", meta: "Pistepörssi" },
     kuva: "/20/jaakiekko/jk-tappara-kuva.webp",
-    teema: "Urheilu",
     korttikuva: "/20/jaakiekko/jk-tappara-kuva.webp",
+    paivanLause: "Viisi tapparalaista pisteiden mukaan, eniten tehnyt ensin.",
   },
 ];
 

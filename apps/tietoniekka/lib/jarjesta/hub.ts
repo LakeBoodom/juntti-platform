@@ -1,18 +1,16 @@
-// JÄRJESTÄ-HUB (pelimuotosivujen yhtenäistäminen, osa C, Heikki 31.10.2026).
+// JÄRJESTÄ-HUB (pelimuotosivujen yhtenäistäminen, osa C, Heikki 31.10.2026; CD kierros 5a 31.10.2026).
 //
-// Ikäjärjestys ja Laita järjestykseen ovat yksi pelimuoto: kaikki pakat yhdellä sivulla /peli/jarjesta teemoittain.
-// Ikäjärjestyksen aiheet (Kaikki + seitsemän henkilöryhmää) ovat pakkoja osoitteessa /peli/jarjesta/ikajarjestys-<aihe>;
-// muut pakat tulevat pakat.ts:stä (julkaistut). Tavallinen moduuli: käytetään sekä palvelimella että clientillä.
+// Ikäjärjestys ja Laita järjestykseen ovat yksi pelimuoto /peli/jarjesta. Hubissa: päivän rivi (pakka vaihtuu
+// keskiyöllä), aina toisena henkilörivi (Tunnetut suomalaiset) ja muut pakat "Lisää rivejä" -osiossa.
+// Ammattikohtaiset ikäjärjestyspakat poistuivat (CD 5a); niiden osoitteet ohjataan henkilöpakkaan (next.config.mjs).
+// Tavallinen moduuli: käytetään sekä palvelimella että clientillä.
 
 import { CHAIN_CATEGORIES } from "@/lib/personCategories";
-import { RYHMAT } from "@/lib/henkiloRyhmat";
-import { JULKAISTUT, pakkaHref } from "./pakat";
+import { JULKAISTUT, pakkaHref, type Pakka } from "./pakat";
+import { paivaAvain, paivaNumero } from "./siemen";
 
 export const HUB_HREF = "/peli/jarjesta";
 export const HUB = { href: HUB_HREF, nimi: "Järjestä" };
-
-/** Ikäjärjestyspakan slugin etuliite: /peli/jarjesta/ikajarjestys-urheilijat. */
-export const IKA_ETULIITE = "ikajarjestys-";
 
 export type HubPakka = {
   slug: string;
@@ -21,69 +19,61 @@ export type HubPakka = {
   meta: string;
   kuva: string;
   href: string;
-  teema: string;
 };
 
-const LYHYT = new Map<string, string>(RYHMAT.map((r) => [r.key as string, r.lyhyt]));
+export type IkaPakka = HubPakka & { kategoria: string; paivanLause: string };
 
-export type IkaPakka = HubPakka & { kategoria: string };
-
-export const IKA_PAKAT: IkaPakka[] = CHAIN_CATEGORIES.map((c) => ({
-  slug: `${IKA_ETULIITE}${c.key}`,
-  kategoria: c.key,
-  nimi: c.key === "kaikki" ? "Kaikki henkilöt" : (LYHYT.get(c.key) ?? c.label),
+/** Henkilöpakka: suomalaiset (celebrities.suomalainen), ikäjärjestys syntymäpäivän mukaan. */
+export const HENKILOPAKKA: IkaPakka = {
+  slug: "tunnetut-suomalaiset",
+  kategoria: "suomalaiset",
+  nimi: "Tunnetut suomalaiset",
   meta: "Syntymävuosi",
-  kuva: `/20/jarjesta/ikajarjestys-${c.key}.webp`,
-  href: `${HUB_HREF}/${IKA_ETULIITE}${c.key}`,
-  teema: "Henkilöt",
-}));
+  kuva: "/20/jarjesta/tunnetut-suomalaiset.webp",
+  href: `${HUB_HREF}/tunnetut-suomalaiset`,
+  paivanLause: "Viisi suomalaista syntymävuoden mukaan, vanhin ensin.",
+};
+
+export const IKA_PAKAT: IkaPakka[] = [HENKILOPAKKA];
 
 export const haeIkaPakka = (slug: string) => IKA_PAKAT.find((p) => p.slug === slug) ?? null;
 
-/** Vanhan /peli/ikajarjestys?category= -arvon pakka (vanhat avaimet artistit/muut kuten getChainRound). */
-export function ikaPakkaKategoriasta(kategoria: string | undefined): IkaPakka {
-  const k = kategoria === "artistit" ? "muusikot" : kategoria === "muut" ? "kaikki" : kategoria;
-  return IKA_PAKAT.find((p) => p.kategoria === k) ?? IKA_PAKAT[0];
-}
+/** Osan C ensimmäisen version ammattipakat (/peli/jarjesta/ikajarjestys-<aihe>) → henkilöpakka (next.config.mjs). */
+export const VANHAT_IKA_SLUGIT = CHAIN_CATEGORIES.map((c) => `ikajarjestys-${c.key}`);
 
 /** Pitkät pakkanimet tavutettuina kapeisiin kortteihin (näkyvä teksti on sama kuin pakat.ts:n kortti.otsikko). */
 const TAVUT: Record<string, string> = {
+  "Pääministerit": "Päämi­nisterit",
   "Pääministerikaudet": "Pääministeri­kaudet",
   "Eduskuntavuodet": "Eduskunta­vuodet",
   "Eduskuntaryhmät": "Eduskunta­ryhmät",
   "Kansallispuistot": "Kansallis­puistot",
 };
 
-export const HUB_PAKAT: HubPakka[] = [
-  ...IKA_PAKAT,
-  ...JULKAISTUT.map((p) => ({
-    slug: p.slug,
-    nimi: TAVUT[p.kortti.otsikko] ?? p.kortti.otsikko,
-    meta: p.kortti.meta,
-    kuva: p.korttikuva,
-    href: pakkaHref(p),
-    teema: p.teema,
-  })),
-];
+export const hubPakka = (p: Pakka): HubPakka => ({
+  slug: p.slug,
+  nimi: TAVUT[p.kortti.otsikko] ?? p.kortti.otsikko,
+  meta: p.kortti.meta,
+  kuva: p.korttikuva,
+  href: pakkaHref(p),
+});
 
-/** Teemat ensiesiintymisjärjestyksessä (Henkilöt, Politiikka, …), kukin pakkoineen. */
-export function hubTeemat(): Array<{ teema: string; pakat: HubPakka[] }> {
-  const t = new Map<string, HubPakka[]>();
-  for (const p of HUB_PAKAT) t.set(p.teema, [...(t.get(p.teema) ?? []), p]);
-  return [...t].map(([teema, pakat]) => ({ teema, pakat }));
-}
+/** Kaikki pelattavat pakat ("Seuraava pakka", sivukartta): henkilöpakka + julkaistut. */
+export const HUB_PAKAT: HubPakka[] = [HENKILOPAKKA, ...JULKAISTUT.map(hubPakka)];
 
 /** Hubin kortti vie suoraan peliin: ensimmäinen kierros arvotaan jo palvelimella. */
 export const aloitaHref = (p: HubPakka) => `${p.href}?aloita=1`;
 
-/** Päivän pakka: sama kaikille koko päivän (Suomen aika), vaihtuu keskiyöllä. */
-export function paivanPakka(nyt = new Date()): HubPakka {
-  const pvm = new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Helsinki" }).format(nyt);
-  const paiva = Math.floor(Date.parse(`${pvm}T00:00:00Z`) / 86_400_000);
-  return HUB_PAKAT[paiva % HUB_PAKAT.length];
+/** Kierron ensimmäinen päivä: silloin heron pakka on Presidentit (CD 5a), sen jälkeen pakat vuorotellen. */
+const KIERRON_ALKU = "2026-10-31";
+
+/** Päivän pakka heroon: sama kaikille koko päivän (Suomen aika), vaihtuu keskiyöllä. Henkilöpakka ei kierrä. */
+export function paivanPakka(paiva = paivaAvain()): Pakka {
+  const i = paivaNumero(paiva) - paivaNumero(KIERRON_ALKU);
+  return JULKAISTUT[((i % JULKAISTUT.length) + JULKAISTUT.length) % JULKAISTUT.length];
 }
 
-/** "Seuraava pakka" tulosnäkymässä: saman teeman seuraava, teeman lopusta seuraavan teeman ensimmäinen. */
+/** "Seuraava pakka" tulosnäkymässä: listan seuraava, lopusta alkuun. */
 export function seuraavaPakka(slug: string): HubPakka {
   const i = HUB_PAKAT.findIndex((p) => p.slug === slug);
   return HUB_PAKAT[(i + 1) % HUB_PAKAT.length];

@@ -98,7 +98,7 @@ export default function JarjestaClient({
   /* Jako (K4 v2, 25.10.2026): Jakoalue-komponentti; tulos linkkiin (?tulos=n-total) jotta kaveri saa saman kierroksen
      ja Facebookin og-kuvaus kertoo tuloksen; tasonimi kuten tulosnäkymässä. Tulosvaihe piirretään vain selaimessa. */
   const jakoTiedot = () => ({
-    url: `${location.origin}${location.pathname}?tulos=${scoreResult?.correctCount ?? 0}-${scoreResult?.totalCount ?? 0}`,
+    url: `${location.origin}${location.pathname}?kohteet=${(round ?? []).map((k) => k.id).join(",")}&tulos=${scoreResult?.correctCount ?? 0}-${scoreResult?.totalCount ?? 0}`,
     teksti: pelijakoteksti(`${PELI}: ${pakka.kortti.otsikko}`, `${scoreResult?.correctCount ?? 0}/${scoreResult?.totalCount ?? 0} oikein`, !!scoreResult && scoreResult.correctCount === scoreResult.totalCount, scoreResult ? jarjestaTaso(scoreResult.correctCount, scoreResult.totalCount, pakka.collection.slug) : null),
   });
 

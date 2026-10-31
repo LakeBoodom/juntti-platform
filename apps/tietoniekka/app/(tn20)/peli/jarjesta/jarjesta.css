@@ -1,48 +1,106 @@
-/* JÄRJESTÄ-HUB /peli/jarjesta (osa C, 31.10.2026). Tumma pelikehys (pelikehys.css: --pk-*), otsikot Archivo (Heikki 30.10.).
-   Kortit kuten etusivun Pelaa aiheittain: kuva ylhäällä, nimi ja alarivi alla. Puhelimella 2 saraketta, desktopilla 4. */
+/* JÄRJESTÄ-HUB /peli/jarjesta (osa C, CD "Tietoniekka Jarjesta hub v2" kierros 5a, 31.10.2026).
+   Tumma pelikehys (pelikehys.css: --pk-*), otsikot Archivo. Mobiilissa rivit tekstipaloina pystyssä, desktopilla
+   (≥ 900 px) viisi saraketta ja kuvat, jos kaikilla rivin kohteilla on oma kuvakopio.
+   KORTTISÄÄNTÖ: CD:n koot on mitoitettu variaabelilla Archivolla (wdth 70–80); tuotannon staattinen Archivo on
+   leveämpi → nimien koko lasketaan pisimmästä tavusta (--jh-lw, Archivo 900 isoilla ≈ 0,76 em/merkki). */
 
-.tn20 .jh { max-width: 1100px; margin: 0 auto; padding: 20px clamp(16px, 4vw, 48px) 56px; box-sizing: border-box; color: var(--pk-ink); }
-
-.tn20 .jh-yla { display: grid; gap: 20px; }
-@media (min-width: 900px) {
-  .tn20 .jh-yla { grid-template-columns: 1fr 1.2fr; align-items: center; gap: 40px; }
+.tn20 .jh {
+  --jh-pala: #17140d; --jh-reuna: #3a3120; --jh-leipa: var(--pk-paluu, #cfc7b6); --jh-himmea: #8e8676;
+  max-width: 1120px; margin: 0 auto; padding: 32px 20px 56px; box-sizing: border-box; color: var(--pk-ink);
+  display: flex; flex-direction: column; gap: 44px;
 }
 
-.tn20 .jh-kicker { margin: 0 0 6px; font-size: 12px; font-weight: 700; line-height: 1.2; letter-spacing: .14em; text-transform: uppercase; color: var(--pk-acc); }
-/* KORTTISÄÄNTÖ: "JÄRJESTÄ" (8) Archivo 900 43 px ≈ 250 px → mahtuu 320 px:n sisältöleveyteen (288 px). */
-.tn20 .jh-h1 { margin: 0; font-family: "Archivo Variable", "Archivo", sans-serif; font-weight: 900; font-size: clamp(32px, 11vw, 43px); line-height: 1; text-transform: uppercase; letter-spacing: -.01em; overflow-wrap: normal; word-break: keep-all; }
-.tn20 .jh-fakta { margin: 8px 0 0; font-size: 14px; color: var(--pk-dim); }
+.tn20 .jh-kicker { margin: 0 0 12px; font-size: 12px; font-weight: 800; line-height: 1.2; letter-spacing: .16em; text-transform: uppercase; color: var(--pk-acc); }
+/* "TÄMÄ RIVI ON VÄÄRIN": pisin sana 6 merkkiä → ei katkeamisriskiä; CD 48 px (wdth 70) → 44 px staattisena, rivittyy. */
+.tn20 .jh-h1 { margin: 0; font-family: "Archivo Variable", "Archivo", sans-serif; font-weight: 900; font-size: clamp(36px, 11.5vw, 44px); line-height: .92; letter-spacing: -.02em; text-transform: uppercase; overflow-wrap: normal; word-break: keep-all; text-wrap: balance; }
+.tn20 .jh-h2 { margin: 0; font-family: "Archivo Variable", "Archivo", sans-serif; font-weight: 900; font-size: clamp(28px, 8.5vw, 32px); line-height: .94; letter-spacing: -.02em; text-transform: uppercase; overflow-wrap: normal; word-break: keep-all; text-wrap: balance; }
+.tn20 .jh-lause { margin: 0; font-size: 17px; line-height: 1.45; color: var(--jh-leipa); text-wrap: pretty; }
 
-.tn20 .jh-paiva { overflow: hidden; border: 1px solid var(--pk-line); border-radius: 16px; background: var(--pk-kortti); }
-.tn20 .jh-paiva-kuva { display: block; width: 100%; height: auto; aspect-ratio: 9 / 4; object-fit: cover; }
-.tn20 .jh-paiva-teksti { container-type: inline-size; padding: 14px 16px 18px; }
-/* KORTTISÄÄNTÖ: 24 px tai pisimmän tavun mukaan (Archivo 900 isoilla ≈ 0,76 em/merkki); tavuviivat → word-break: normal. */
-.tn20 .jh-paiva-nimi { margin: 0; font-family: "Archivo Variable", "Archivo", sans-serif; font-weight: 900; font-size: min(24px, calc(100cqi / (var(--jh-lw, 10) * .76))); line-height: 1.05; text-transform: uppercase; overflow-wrap: normal; word-break: normal; hyphens: manual; }
-.tn20 .jh-paiva-meta { margin: 4px 0 0; font-size: 14px; color: var(--pk-dim); }
-.tn20 .jh-paiva-cta { display: flex; align-items: center; justify-content: center; min-height: 52px; margin-top: 16px; padding: 0 28px; font-family: "Archivo Variable", "Archivo", sans-serif; font-weight: 800; font-size: 15px; letter-spacing: .03em; text-decoration: none; }
-.tn20 .jh-paiva-cta:focus-visible { outline: 2px solid var(--pk-ink); outline-offset: 3px; }
+.tn20 .jh-hero, .tn20 .jh-henkilot { display: grid; grid-template-columns: minmax(0, 1fr); gap: 18px; }
+.tn20 .jh-henkilot { padding-top: 28px; border-top: 1px solid var(--pk-line); }
+.tn20 .jh-otsikko { margin-bottom: -6px; }
+
+/* Rivi: numero (suunta) + pala. Kallistus on staattinen (CD), ei liikettä. */
+.tn20 .jh-rivi { display: flex; flex-direction: column; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.tn20 .jh-pala { display: grid; grid-template-columns: 32px minmax(0, 1fr); align-items: center; gap: 10px; }
+.tn20 .jh-nro { font-family: "Archivo Variable", "Archivo", sans-serif; font-weight: 900; font-size: 24px; line-height: 1; color: var(--pk-acc); text-align: center; font-variant-numeric: tabular-nums; }
+.tn20 .jh-henkilot .jh-nro { font-size: 20px; color: var(--jh-himmea); }
+.tn20 .jh-laatta { container-type: inline-size; display: flex; align-items: center; min-height: 56px; padding: 6px 18px; box-sizing: border-box; overflow: hidden; border: 1px solid var(--jh-reuna); border-radius: 14px; background: var(--jh-pala); transform: rotate(var(--jh-kallistus, 0deg)); }
+.tn20 .jh-henkilot .jh-laatta { min-height: 46px; padding: 5px 16px; border-radius: 12px; }
+.tn20 .jh-laatta-kuva { display: none; }
+/* KORTTISÄÄNTÖ: 22 px (CD) tai pisimmän tavun mukaan: (100cqi − 36 px sisennys) / (lw × 0,76). */
+.tn20 .jh-laatta-nimi { font-family: "Archivo Variable", "Archivo", sans-serif; font-weight: 900; font-size: min(22px, calc((100cqi - 36px) / (var(--jh-lw, 10) * .76))); line-height: 1.05; text-transform: uppercase; overflow-wrap: normal; word-break: normal; hyphens: manual; }
+.tn20 .jh-henkilot .jh-laatta-nimi { font-size: min(18px, calc((100cqi - 32px) / (var(--jh-lw, 10) * .76))); }
+
+.tn20 .jh-cta { display: flex; align-items: center; justify-content: center; min-height: 56px; padding: 0 30px; box-sizing: border-box; font-family: "Archivo Variable", "Archivo", sans-serif; font-weight: 900; font-size: 17px; letter-spacing: .02em; text-transform: uppercase; text-decoration: none; }
+.tn20 .jh-cta:focus-visible { outline: 2px solid var(--pk-ink); outline-offset: 3px; }
+.tn20 .jh-cta--toinen { min-height: 52px; font-size: 16px; border: 1px solid var(--jh-reuna); border-radius: 999px; color: var(--pk-ink); transition: border-color var(--dur-fast) var(--ease-standard); }
+.tn20 .jh-cta--toinen:hover { border-color: var(--pk-acc); }
+
+/* Lisää rivejä: pyöreät pakkaikonit. */
+.tn20 .jh-lisaa-h { margin: 0 0 14px; padding-bottom: 10px; border-bottom: 1px solid #241e13; font-family: "Archivo Variable", "Archivo", sans-serif; font-weight: 900; font-size: 24px; line-height: 1; text-transform: uppercase; }
+.tn20 .jh-ikonit { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px 8px; margin: 0; padding: 0; list-style: none; }
+.tn20 .jh-ikoni { display: flex; flex-direction: column; align-items: center; gap: 8px; min-width: 0; text-align: center; color: var(--pk-ink); text-decoration: none; border-radius: 12px; transition: transform var(--dur-fast) var(--ease-standard); }
+.tn20 .jh-ikoni:hover { transform: translateY(-2px); }
+.tn20 .jh-ikoni:focus-visible { outline: 2px solid var(--pk-ink); outline-offset: 4px; }
+.tn20 .jh-ikoni-kuva { display: block; width: 72px; height: 72px; border-radius: 999px; object-fit: cover; border: 1px solid var(--jh-reuna); background: #0f0d07; }
+/* KORTTISÄÄNTÖ: 13 px Barlow 700; pitkät yhdyssanat tavuviivalla (hub.ts TAVUT). */
+.tn20 .jh-ikoni-nimi { font-size: 13px; font-weight: 700; line-height: 1.2; overflow-wrap: normal; word-break: normal; hyphens: manual; }
+.tn20 .jh-ikoni-meta { margin-top: -5px; font-size: 12px; font-weight: 500; line-height: 1.25; color: var(--jh-himmea); }
+
 @media (min-width: 900px) {
-  .tn20 .jh-paiva-cta { display: inline-flex; }
+  /* CD: 1280 px kehys, 80 px reunat → sisältö 1120 px. */
+  .tn20 .jh { max-width: 1280px; padding: 64px clamp(32px, 6vw, 80px) 72px; gap: 72px; }
+  .tn20 .jh-kicker { font-size: 13px; margin-bottom: 16px; }
+  /* "TÄMÄ RIVI" (9) ≈ 0,72 em/merkki → 1280 px:llä 72 px ≈ 470 px < vasen sarake ≈ 500 px: kaksi riviä kuten CD (96 px wdth 70). */
+  .tn20 .jh-h1 { font-size: clamp(56px, 5.6vw, 80px); line-height: .88; }
+  .tn20 .jh-h2 { font-size: clamp(40px, 4.4vw, 52px); }
+  .tn20 .jh-lause { font-size: 19px; }
+
+  /* Hero: otsikko vasemmalla, lause ja nappi oikealla, rivi koko leveydeltä alla. */
+  .tn20 .jh-hero { grid-template-columns: minmax(0, 1fr) minmax(0, 380px); grid-template-areas: "otsikko lause" "otsikko cta" "rivi rivi"; column-gap: 64px; row-gap: 20px; align-items: end; }
+  .tn20 .jh-hero .jh-otsikko { grid-area: otsikko; margin: 0; }
+  .tn20 .jh-hero .jh-lause { grid-area: lause; }
+  .tn20 .jh-hero .jh-cta { grid-area: cta; justify-self: start; margin-bottom: 6px; }
+  .tn20 .jh-hero .jh-rivi { grid-area: rivi; margin-top: 28px; }
+
+  /* Henkilörivi 900–1199 px: kuten hero (rivi koko leveydeltä), jotta kortit pysyvät ≥ 12 px:n nimille riittävän leveinä. */
+  .tn20 .jh-henkilot { padding-top: 48px; grid-template-columns: minmax(0, 1fr) minmax(0, 380px); grid-template-areas: "otsikko lause" "otsikko cta" "rivi rivi"; column-gap: 64px; row-gap: 14px; align-items: end; }
+  .tn20 .jh-henkilot .jh-otsikko { grid-area: otsikko; margin: 0; }
+  .tn20 .jh-henkilot .jh-lause { grid-area: lause; font-size: 18px; }
+  .tn20 .jh-henkilot .jh-cta { grid-area: cta; justify-self: start; margin-top: 6px; }
+  .tn20 .jh-henkilot .jh-rivi { grid-area: rivi; margin-top: 20px; }
+
+  .tn20 .jh-rivi { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 14px; }
+  .tn20 .jh-henkilot .jh-rivi { gap: 10px; }
+  .tn20 .jh-pala { grid-template-columns: minmax(0, 1fr); justify-items: center; gap: 14px; }
+  .tn20 .jh-nro { font-size: 40px; }
+  .tn20 .jh-henkilot .jh-nro { font-size: 26px; }
+  .tn20 .jh-laatta { width: 100%; height: 120px; justify-content: center; padding: 8px 12px; border-radius: 18px; text-align: center; }
+  .tn20 .jh-henkilot .jh-laatta { border-radius: 14px; }
+  .tn20 .jh-laatta-nimi { font-size: min(28px, calc((100cqi - 24px) / (var(--jh-lw, 10) * .76))); }
+  .tn20 .jh-henkilot .jh-laatta-nimi { font-size: min(18px, calc((100cqi - 16px) / (var(--jh-lw, 10) * .76))); line-height: 1; }
+
+  /* Kuvalliset rivit: kuva ylhäällä, nimi alla (CD: henkilökuvasääntö 50 % 15 %). */
+  .tn20 .jh-rivi--kuvat .jh-laatta { height: auto; flex-direction: column; padding: 0; }
+  .tn20 .jh-rivi--kuvat .jh-laatta-kuva { display: block; width: 100%; height: auto; aspect-ratio: 4 / 5; object-fit: cover; object-position: 50% 15%; background: #0f0d07; }
+  .tn20 .jh-henkilot .jh-rivi--kuvat .jh-laatta-kuva { aspect-ratio: 3 / 4; }
+  .tn20 .jh-rivi--kuvat .jh-laatta-nimi { display: flex; align-items: center; justify-content: center; min-height: 64px; padding: 6px 8px; box-sizing: border-box; }
+  .tn20 .jh-henkilot .jh-rivi--kuvat .jh-laatta-nimi { min-height: 52px; }
+
+  .tn20 .jh-lisaa-h { margin-bottom: 20px; padding-bottom: 12px; font-size: 34px; }
+  .tn20 .jh-ikonit { grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 24px 16px; }
+  .tn20 .jh-ikoni { gap: 10px; }
+  .tn20 .jh-ikoni-kuva { width: 96px; height: 96px; }
+  .tn20 .jh-ikoni-nimi { font-size: 15px; }
+  .tn20 .jh-ikoni-meta { font-size: 13px; }
 }
 
-.tn20 .jh-teema { margin-top: 32px; }
-.tn20 .jh-teema-yla { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid var(--pk-line); }
-.tn20 .jh-teema-h { margin: 0; font-family: "Archivo Variable", "Archivo", sans-serif; font-weight: 900; font-size: 22px; line-height: 1.1; text-transform: uppercase; }
-.tn20 .jh-teema-maara { font-size: 13px; font-weight: 700; color: var(--pk-dim); font-variant-numeric: tabular-nums; }
-
-.tn20 .jh-ruudukko { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin: 0; padding: 0; list-style: none; }
-@media (min-width: 700px) { .tn20 .jh-ruudukko { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; } }
-@media (min-width: 1000px) { .tn20 .jh-ruudukko { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; } }
-
-.tn20 .jh-kortti { container-type: inline-size; display: flex; flex-direction: column; height: 100%; overflow: hidden; border: 1px solid var(--pk-line); border-radius: 12px; background: var(--pk-kortti); color: var(--pk-ink); text-decoration: none; transition: transform var(--dur-fast) var(--ease-standard); }
-.tn20 .jh-kortti:hover { transform: translateY(-2px); }
-.tn20 .jh-kortti:focus-visible { outline: 2px solid var(--pk-ink); outline-offset: 2px; }
-.tn20 .jh-kortti-kuva { display: block; width: 100%; height: auto; aspect-ratio: 9 / 4; object-fit: cover; background: var(--pk-line); }
-.tn20 .jh-kortti-teksti { display: flex; flex-direction: column; gap: 3px; padding: 10px 12px 12px; }
-/* KORTTISÄÄNTÖ: koko pisimmän tavun mukaan (--jh-lw merkkiä, U+00AD jakaa): Archivo 800 isoilla ≈ 0,72 em/merkki.
-   320 px:llä kortti 139 px → "PÄÄMINISTERI" (12) ≈ 13 px; leveämmillä enintään 15 px. Tavuviivat → word-break: normal. */
-.tn20 .jh-kortti-nimi { font-family: "Archivo Variable", "Archivo", sans-serif; font-weight: 800; font-size: min(15px, calc((100cqi - 24px) / (var(--jh-lw, 10) * .72))); line-height: 1.12; text-transform: uppercase; overflow-wrap: normal; word-break: normal; hyphens: manual; }
-.tn20 .jh-kortti-meta { font-size: 12px; line-height: 1.3; color: var(--pk-dim); }
+/* ≥ 1200 px: henkilörivi CD:n mukaan teksti vasemmalla (4fr), rivi oikealla (7fr); kortti ≥ 125 px. */
+@media (min-width: 1200px) {
+  .tn20 .jh-henkilot { grid-template-columns: minmax(0, 4fr) minmax(0, 7fr); grid-template-areas: "otsikko rivi" "lause rivi" "cta rivi" ". rivi"; column-gap: 56px; align-items: start; }
+  .tn20 .jh-henkilot .jh-rivi { align-self: center; margin-top: 0; }
+}
 
 /* "Seuraava pakka" pakan tulosnäkymässä (korvaa Muut järjestyspelit -osion). */
 .tn20 .jh-seuraava { margin-top: 8px; }
