@@ -135,12 +135,15 @@ async function haePool(p: Pakka): Promise<Ehdokas[]> {
     return !b || new Date(b.num * 1000).getUTCFullYear() >= minVuosi;
   };
   const ehtoOk = (id: string) => !p.pool?.ehto || ehto?.get(id)?.num === p.pool.ehto.num;
+  const vain = p.pool?.vainNimet ? new Set(p.pool.vainNimet) : null;
+  const pois = new Set(p.pool?.poisNimet ?? []);
+  const nimiOk = (nimi: string) => (!vain || vain.has(nimi)) && !pois.has(nimi);
 
   const maxProm = p.pool?.maxProminence;
   const tunn = p.pool?.tunnettuja;
   return (data as Rivi[])
     .filter((r) => r.fact_entities && (!maxProm || (r.fact_entities.prominence ?? 1) <= maxProm))
-    .filter((r) => vuosiOk(r.fact_entities!.id) && ehtoOk(r.fact_entities!.id))
+    .filter((r) => vuosiOk(r.fact_entities!.id) && ehtoOk(r.fact_entities!.id) && nimiOk(r.fact_entities!.name))
     .map((r) => {
       const e = r.fact_entities!;
       const value = Number(r.num_value);

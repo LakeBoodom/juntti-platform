@@ -118,11 +118,11 @@ export function IkajarjestysBanneri({ henkilot }: { henkilot: BanneriHenkilo[] }
     <KasvoketjuBanneri
       id="eb-ika-h"
       tagi="Uusi pelimuoto"
-      meta="Tunnetut henkilöt"
+      meta="Tunnetut suomalaiset"
       otsikko={["Kuka on", "vanhin?"]}
       subKapea={<>Järjestä {ROUND_SIZE} tunnettua kasvoa syntymäpäivän mukaan<span className="eb-vain-mob"> · 2&nbsp;min</span></>}
       subDesk={<>Järjestä {ROUND_SIZE} tunnettua kasvoa<br />syntymäpäivän mukaan · 2&nbsp;min</>}
-      href="/peli/ikajarjestys?category=kaikki&autostart=1"
+      href="/peli/jarjesta/tunnetut-suomalaiset?aloita=1"
       cta="Arvo kierros"
       henkilot={henkilot}
       kierros={ROUND_SIZE}

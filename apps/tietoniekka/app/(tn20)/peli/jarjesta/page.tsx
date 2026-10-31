@@ -10,18 +10,18 @@ import PeliKehys from "@/components/tn20/pelikehys/PeliKehys";
 import { JsonLd, peliLd } from "@/lib/jsonLd";
 import { jakoMeta } from "@/lib/jakoMeta";
 import { henkiloKuva } from "@/lib/henkilokuvat";
-import { JULKAISTUT, pakkaHref } from "@/lib/jarjesta/pakat";
+import { pakkaHref } from "@/lib/jarjesta/pakat";
 import { haePaivanRivi } from "@/lib/jarjesta/kierros";
 import { getPaivanHenkilot } from "@/lib/ikajarjestys";
 import { paivaAvain } from "@/lib/jarjesta/siemen";
-import { HENKILOPAKKA, HUB_HREF, aloitaHref, hubPakka, paivanPakka } from "@/lib/jarjesta/hub";
+import { HENKILOPAKKA, HUB_HREF, KIERRON_PAKAT, aloitaHref, hubPakka, paivanPakka } from "@/lib/jarjesta/hub";
 import "./jarjesta.css";
 
 /* Päivän rivi vaihtuu keskiyöllä → sivu uusitaan tunnin välein. Linkki kantaa rivin id:t, joten välimuistin
    eilinen rivi pelataan silti sellaisena kuin se näkyy. */
 export const revalidate = 3600;
 
-const KUVAUS = "Järjestä presidentit, pääministerit, puolueet ja tunnetut suomalaiset oikeaan järjestykseen. Uusi rivi joka päivä.";
+const KUVAUS = "Järjestä presidentit, puolueet, tunturit, järvet, kaupungit ja tunnetut suomalaiset oikeaan järjestykseen. Uusi rivi joka päivä.";
 
 export const metadata: Metadata = {
   title: "Järjestä – järjestyspelit ja ikäjärjestys | Tietoniekka",
@@ -33,19 +33,48 @@ export const metadata: Metadata = {
 /** CD 5a: palat hieman vinossa (staattinen, ei animaatiota). */
 const KALLISTUS = ["-1.2deg", ".9deg", "-.5deg", "1.3deg", "-.9deg"];
 
+/** CD 5a (31.10.2026): "VÄÄRIN" korallina, kirjaimet sekaisin; sisääntulo kerran (transform, porrastettu). */
+const SEKAISIN: Array<[string, string]> = [
+  ["V", "translate(0, -.05em) rotate(-7deg)"],
+  ["Ä", "translate(.02em, .09em) rotate(6deg)"],
+  ["Ä", "translate(-.01em, -.11em) rotate(-4deg)"],
+  ["R", "translate(.03em, .06em) rotate(10deg)"],
+  ["I", "translate(0, -.07em) rotate(-12deg)"],
+  ["N", "translate(.05em, .11em) rotate(5deg)"],
+];
+
+function Vaarin() {
+  return (
+    <span className="jh-vaarin">
+      <span className="jh-sr">väärin</span>
+      {SEKAISIN.map(([k, t], i) => (
+        <span key={i} className="jh-vaarin-k" aria-hidden="true" style={{ "--jh-t": t, "--jh-i": i } as React.CSSProperties}>
+          {k}
+        </span>
+      ))}
+    </span>
+  );
+}
+
 /** Hubin rivissä nimi ilman tarkennetta: "Redrama (Lasse Mellberg)" → "Redrama". */
 const lyhytNimi = (nimi: string) => nimi.replace(/\s*\([^)]*\)/g, "").trim();
 
-/** KORTTISÄÄNTÖ: pitkät puoluenimet tavutettuina (U+00AD), muuten kapea desktop-pala pienentäisi nimen alle 12 px:n. */
-const TAVUTA: Record<string, string> = {
+/** KORTTISÄÄNTÖ: yli 13 merkin sanat tavutettuina (U+00AD), muuten kapea desktop-pala (1024 px) pienentäisi nimen
+ *  alle 12 px:n. Sanatasolla: "Urho Kekkosen kansallispuisto" → "…kansallis­puisto". */
+const TAVUT: Record<string, string> = {
   Kristillisdemokraatit: "Kristillis­demokraatit",
   Perussuomalaiset: "Perus­suomalaiset",
   Vasemmistoliitto: "Vasemmisto­liitto",
   Sosialidemokraatit: "Sosiali­demokraatit",
+  Kristiinankaupunki: "Kristiinan­kaupunki",
+  kansallispuisto: "kansallis­puisto",
+  Kangchendzönga: "Kangchen­dzönga",
+  Aakenustunturi: "Aakenus­tunturi",
 };
+const tavuta = (nimi: string) => nimi.replace(/[^\s\-–]+/g, (w) => TAVUT[w] ?? w);
 
 /** KORTTISÄÄNTÖ: pisin rivitettävä osa (välilyönti, yhdysmerkki tai tavuviiva U+00AD jakaa) → nimen koko CSS:ssä. */
-const pisinTavu = (nimi: string) => Math.max(...nimi.split(/[\s\-­]+/).map((w) => w.length));
+const pisinTavu = (nimi: string) => Math.max(...nimi.split(/[\s\-–­]+/).map((w) => w.length));
 
 type Pala = { id: string; nimi: string; kuva: string | null };
 
@@ -74,11 +103,11 @@ export default async function JarjestaHub() {
   const rivi = await haePaivanRivi(pakka.slug, paiva);
   const henkilot = await getPaivanHenkilot(paiva, rivi.map((k) => k.name));
 
-  const rivinPalat: Pala[] = rivi.map((k) => ({ id: k.id, nimi: TAVUTA[k.name] ?? k.name, kuva: henkiloKuva(k.image_url) }));
+  const rivinPalat: Pala[] = rivi.map((k) => ({ id: k.id, nimi: tavuta(k.name), kuva: henkiloKuva(k.image_url) }));
   const rivinKuvat = rivinPalat.length > 0 && rivinPalat.every((p) => p.kuva);
   const heroHref = rivi.length ? `${pakkaHref(pakka)}?kohteet=${rivi.map((k) => k.id).join(",")}` : aloitaHref(hubPakka(pakka));
   const henkHref = henkilot.length ? `${HENKILOPAKKA.href}?henkilot=${henkilot.map((h) => h.id).join(",")}&rivi=1` : aloitaHref(HENKILOPAKKA);
-  const lisaa = JULKAISTUT.filter((p) => p.slug !== pakka.slug).map(hubPakka);
+  const lisaa = KIERRON_PAKAT.filter((p) => p.slug !== pakka.slug).map(hubPakka);
 
   return (
     <PeliKehys iho="tumma">
@@ -88,7 +117,7 @@ export default async function JarjestaHub() {
         <section className="jh-hero" aria-labelledby="jh-h1">
           <header className="jh-otsikko">
             <p className="jh-kicker">Järjestä · {pakka.kortti.otsikko}</p>
-            <h1 id="jh-h1" className="jh-h1">Tämä rivi on väärin</h1>
+            <h1 id="jh-h1" className="jh-h1">Tämä rivi on <Vaarin /></h1>
           </header>
           <p className="jh-lause">{pakka.paivanLause}</p>
           {rivinPalat.length > 0 && <Rivi palat={rivinPalat} kuvat={rivinKuvat} />}

@@ -711,7 +711,7 @@ export async function GET(req: Request, ctx: { params: Promise<{ polku: string[]
   } else if (tyyppi === "jarjesta" && haePakka(avain)) {
     const p = haePakka(avain)!;
     const otsikko = p.otsikko.charAt(0).toUpperCase() + p.otsikko.slice(1);
-    kortti = { eyebrow: "Laita järjestykseen", otsikko, accent: "#E8A320", tausta: await kuvaUri(p.kuva, W, H) };
+    kortti = { eyebrow: "Järjestä", otsikko, accent: "#E8A320", tausta: await kuvaUri(p.kuva, W, H) };
   } else if (tyyppi === "visapaketti" && avain) {
     const sivu = await haeSivu(avain, null);
     if (sivu) {

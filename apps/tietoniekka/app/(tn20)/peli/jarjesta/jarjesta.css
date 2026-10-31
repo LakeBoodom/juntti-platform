@@ -13,6 +13,16 @@
 .tn20 .jh-kicker { margin: 0 0 12px; font-size: 12px; font-weight: 800; line-height: 1.2; letter-spacing: .16em; text-transform: uppercase; color: var(--pk-acc); }
 /* "TÄMÄ RIVI ON VÄÄRIN": pisin sana 6 merkkiä → ei katkeamisriskiä; CD 48 px (wdth 70) → 44 px staattisena, rivittyy. */
 .tn20 .jh-h1 { margin: 0; font-family: "Archivo Variable", "Archivo", sans-serif; font-weight: 900; font-size: clamp(36px, 11.5vw, 44px); line-height: .92; letter-spacing: -.02em; text-transform: uppercase; overflow-wrap: normal; word-break: keep-all; text-wrap: balance; }
+/* "VÄÄRIN" (CD 5a): koralli #ff6b4a tummalla ≈ 6,9:1. Kirjaimet vinossa (--jh-t); sisääntulo kerran: suorasta
+   sekaisin pienellä ylityksellä, porrastus 45 ms. Vain transform; reduced-motion-portti (globals.css) lyhentää. */
+.tn20 .jh-vaarin { display: inline-flex; white-space: nowrap; color: #ff6b4a; }
+.tn20 .jh-vaarin-k { display: inline-block; transform: var(--jh-t); animation: jh-sekoita var(--dur-slow) var(--ease-emphasized) calc(350ms + var(--jh-i) * 45ms) both; }
+@keyframes jh-sekoita {
+  0% { transform: none; }
+  55% { transform: var(--jh-t) scale(1.12); }
+  100% { transform: var(--jh-t); }
+}
+.tn20 .jh-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 .tn20 .jh-h2 { margin: 0; font-family: "Archivo Variable", "Archivo", sans-serif; font-weight: 900; font-size: clamp(28px, 8.5vw, 32px); line-height: .94; letter-spacing: -.02em; text-transform: uppercase; overflow-wrap: normal; word-break: keep-all; text-wrap: balance; }
 .tn20 .jh-lause { margin: 0; font-size: 17px; line-height: 1.45; color: var(--jh-leipa); text-wrap: pretty; }
 
@@ -79,13 +89,13 @@
   .tn20 .jh-laatta { width: 100%; height: 120px; justify-content: center; padding: 8px 12px; border-radius: 18px; text-align: center; }
   .tn20 .jh-henkilot .jh-laatta { border-radius: 14px; }
   .tn20 .jh-laatta-nimi { font-size: min(28px, calc((100cqi - 24px) / (var(--jh-lw, 10) * .76))); }
-  .tn20 .jh-henkilot .jh-laatta-nimi { font-size: min(18px, calc((100cqi - 16px) / (var(--jh-lw, 10) * .76))); line-height: 1; }
+  .tn20 .jh-henkilot .jh-laatta-nimi { font-size: min(18px, calc((100cqi - 12px) / (var(--jh-lw, 10) * .76))); line-height: 1; }
 
   /* Kuvalliset rivit: kuva ylhäällä, nimi alla (CD: henkilökuvasääntö 50 % 15 %). */
   .tn20 .jh-rivi--kuvat .jh-laatta { height: auto; flex-direction: column; padding: 0; }
   .tn20 .jh-rivi--kuvat .jh-laatta-kuva { display: block; width: 100%; height: auto; aspect-ratio: 4 / 5; object-fit: cover; object-position: 50% 15%; background: #0f0d07; }
   .tn20 .jh-henkilot .jh-rivi--kuvat .jh-laatta-kuva { aspect-ratio: 3 / 4; }
-  .tn20 .jh-rivi--kuvat .jh-laatta-nimi { display: flex; align-items: center; justify-content: center; min-height: 64px; padding: 6px 8px; box-sizing: border-box; }
+  .tn20 .jh-rivi--kuvat .jh-laatta-nimi { display: flex; align-items: center; justify-content: center; min-height: 64px; padding: 6px; box-sizing: border-box; }
   .tn20 .jh-henkilot .jh-rivi--kuvat .jh-laatta-nimi { min-height: 52px; }
 
   .tn20 .jh-lisaa-h { margin-bottom: 20px; padding-bottom: 12px; font-size: 34px; }
@@ -96,9 +106,10 @@
   .tn20 .jh-ikoni-meta { font-size: 13px; }
 }
 
-/* ≥ 1200 px: henkilörivi CD:n mukaan teksti vasemmalla (4fr), rivi oikealla (7fr); kortti ≥ 125 px. */
+/* ≥ 1200 px: henkilörivi CD:n mukaan teksti vasemmalla, rivi oikealla (CD 4fr/7fr → 1fr/2fr, jotta kortti ≥ 130 px ja
+   12-merkkinen sukunimi, esim. JÄÄTTEENMÄKI, pysyy ≥ 12 px:ssä). */
 @media (min-width: 1200px) {
-  .tn20 .jh-henkilot { grid-template-columns: minmax(0, 4fr) minmax(0, 7fr); grid-template-areas: "otsikko rivi" "lause rivi" "cta rivi" ". rivi"; column-gap: 56px; align-items: start; }
+  .tn20 .jh-henkilot { grid-template-columns: minmax(0, 1fr) minmax(0, 2fr); grid-template-areas: "otsikko rivi" "lause rivi" "cta rivi" ". rivi"; column-gap: 56px; align-items: start; }
   .tn20 .jh-henkilot .jh-rivi { align-self: center; margin-top: 0; }
 }
 

@@ -58,8 +58,18 @@ export const hubPakka = (p: Pakka): HubPakka => ({
   href: pakkaHref(p),
 });
 
-/** Kaikki pelattavat pakat ("Seuraava pakka", sivukartta): henkilöpakka + julkaistut. */
-export const HUB_PAKAT: HubPakka[] = [HENKILOPAKKA, ...JULKAISTUT.map(hubPakka)];
+/** Kierto (Heikki 31.10.2026): Presidentit ensin, sitten politiikka ja luonto/maantieto vuorotellen, jotta peräkkäiset
+ *  päivät eivät ole samaa aihetta. Myöhemmin julkaistut pakat tulevat loppuun. Sama järjestys "Lisää rivejä" -osiossa. */
+const KIERTO = [
+  "presidentit", "tunturit-korkeus", "paaministerit", "kaupungit-asukasluku", "eduskuntaryhmat", "vuoret-korkeus",
+  "puolueet-ika", "jarvet-pinta-ala", "paaministerit-kesto", "maakunnat-pinta-ala", "vaalipiirit-paikat",
+  "kansallispuistot-pinta-ala", "eduskunta-pisimpaan",
+];
+const kiertoIndeksi = (p: Pakka) => (KIERTO.includes(p.slug) ? KIERTO.indexOf(p.slug) : KIERTO.length);
+export const KIERRON_PAKAT: Pakka[] = [...JULKAISTUT].sort((a, b) => kiertoIndeksi(a) - kiertoIndeksi(b));
+
+/** Kaikki pelattavat pakat ("Seuraava pakka", sivukartta): henkilöpakka + julkaistut kierron järjestyksessä. */
+export const HUB_PAKAT: HubPakka[] = [HENKILOPAKKA, ...KIERRON_PAKAT.map(hubPakka)];
 
 /** Hubin kortti vie suoraan peliin: ensimmäinen kierros arvotaan jo palvelimella. */
 export const aloitaHref = (p: HubPakka) => `${p.href}?aloita=1`;
@@ -70,7 +80,8 @@ const KIERRON_ALKU = "2026-10-31";
 /** Päivän pakka heroon: sama kaikille koko päivän (Suomen aika), vaihtuu keskiyöllä. Henkilöpakka ei kierrä. */
 export function paivanPakka(paiva = paivaAvain()): Pakka {
   const i = paivaNumero(paiva) - paivaNumero(KIERRON_ALKU);
-  return JULKAISTUT[((i % JULKAISTUT.length) + JULKAISTUT.length) % JULKAISTUT.length];
+  const n = KIERRON_PAKAT.length;
+  return KIERRON_PAKAT[((i % n) + n) % n];
 }
 
 /** "Seuraava pakka" tulosnäkymässä: listan seuraava, lopusta alkuun. */
