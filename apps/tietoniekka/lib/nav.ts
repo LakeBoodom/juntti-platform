@@ -55,7 +55,7 @@ export const NAV_COLLECTIONS: NavCollection[] = aakkosin([
 export type NavMode = {
   href: string;
   label: string;
-  desc: string;   // lyhyt kuvaus valikkoriville (copy-passi voi päivittää)
+  desc: string;   // kuvaus valikkoriville = etusivun pelikortin rivi (ETUSIVUN_PELIMUODOT.etusivu_rivi, Heikki 31.10.2026)
   color: string;
 };
 
@@ -63,21 +63,21 @@ export type NavMode = {
    Rakenne kestää uudet rivit sellaisenaan → Kumpi? ja Järjestä lisätään 2.5:ssä. */
 export const NAV_MODES: NavMode[] = aakkosin([
   // Tupla tai kuitti (Heikki 26.9.2026): uusi pelimuoto ensimmäisenä
-  { href: "/peli/tupla-tai-kuitti", label: "Tupla tai kuitti", desc: "Tuplaa potti tai kuittaa ajoissa", color: "#E8A320" },
+  { href: "/peli/tupla-tai-kuitti", label: "Tupla tai kuitti", desc: "Tuplaa pisteet tai pidä ne", color: "#E8A320" },
   // Kuntaliitos (Heikki 26.9.2026): karttapelien ensimmäinen, päivän reitti + satunnaiset
-  { href: "/peli/kuntaliitos", label: "Kuntaliitos", desc: "Rakenna reitti naapurikuntien kautta", color: "#159A9C" },
+  { href: "/peli/kuntaliitos", label: "Kuntaliitos", desc: "Järjestä kunnat ketjuksi, jossa jokainen kunta rajautuu seuraavaan", color: "#159A9C" },
   // Vaalipiiriketju (Heikki 5.10.2026): Kuntaliitoksen viereen, päivän peli vaalipiireistä
-  { href: "/peli/vaalipiiriketju", label: "Vaalipiiriketju", desc: "Ketjuta kansanedustajat vaalipiiristä toiseen", color: "#B4A5FF" },
+  { href: "/peli/vaalipiiriketju", label: "Vaalipiiriketju", desc: "Ketjuta kansanedustajat vaalipiireittäin", color: "#B4A5FF" },
   // Ikäjärjestys (Heikki 18.10.2026): jäi vahingossa pois valikosta. Ilman autostartia → pelaaja näkee aihevalinnan.
   // Kun Järjestä-pelimuoto julkaistaan, tämä rivi korvataan "Laita järjestykseen" → /peli/jarjesta -rivillä
   // (Ikäjärjestys siirtyy pakaksi /peli/jarjesta/ikajarjestys, vanha osoite 301).
-  { href: "/peli/ikajarjestys", label: "Ikäjärjestys", desc: "Järjestä tunnetut henkilöt syntymäpäivän mukaan", color: "#C79BFF" },
+  { href: "/peli/ikajarjestys", label: "Ikäjärjestys", desc: "Järjestä tunnetut henkilöt vanhimmasta nuorimpaan", color: "#C79BFF" },
   // Rajanaapurit (Heikki 27.9.2026): Kuntaliitoksen sisarpeli valtioilla ja lipuilla
-  { href: "/peli/rajanaapurit", label: "Rajanaapurit", desc: "Rakenna reitti naapurivaltioiden kautta", color: "#F2B233" },
-  { href: "/megavisat", label: "Megavisat", desc: "20–50 kysymystä putkeen", color: "#E8A320" },
-  { href: "/kokoelma/kuvavisat", label: "Kuvavisat", desc: "Tunnista kuvasta — liput, vaakunat, linnut", color: "#4C9AFF" },
+  { href: "/peli/rajanaapurit", label: "Rajanaapurit", desc: "Järjestä maat ketjuksi, jossa jokainen maa rajautuu seuraavaan", color: "#F2B233" },
+  { href: "/megavisat", label: "Megavisat", desc: "Laajat teemavisat yhdellä istumalla", color: "#E8A320" },
+  { href: "/kokoelma/kuvavisat", label: "Kuvavisat", desc: "Tunnista kuvista maiden liput, maakuntien vaakunat, eläimiä, lintuja ja monta muuta aihetta", color: "#4C9AFF" },
   /* Äänivisat (Heikki 11.10.2026): toistaiseksi Luonto-kokoelman äänivisasuodatin; oma sivu, kun äänivisoja tulee lisää. */
-  { href: "/kokoelma/luonto?suodata=aanivisat#kaikki", label: "Äänivisat", desc: "Tunnista lintu äänestä", color: "#4ADE80" },
+  { href: "/kokoelma/luonto?suodata=aanivisat#kaikki", label: "Äänivisat", desc: "Tunnista lintu laulusta", color: "#4ADE80" },
   /* Visapaketit (Heikki 31.10.2026): pelaamisen tapa (visailta porukalla), ei aihe → Pelimuodot-valikkoon. */
   { href: "/visapaketit", label: "Visapaketit", desc: "Valmis visailta ruudulle tai tulosteeksi", color: "#F0C020" },
 ]);
