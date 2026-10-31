@@ -17,7 +17,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const pc = await getPageContent("kaupungit");
   const title = pc?.seo_title ?? "Suomen kaupungit — matkusta halki Suomen tietovisoina";
   const description =
-    pc?.seo_description ?? "20 kaupunkia, 20 visaa Helsingistä Rovaniemelle. Kuinka hyvin tunnet Suomen kaupungit?";
+    pc?.seo_description ?? "Oma visa joka kaupungille Helsingistä Rovaniemelle ja Leviltä Vuokattiin. Kuinka hyvin tunnet Suomen kaupungit?";
   const canonical = `${SITE_URL}/kokoelma/kaupungit`;
   return { title, description, alternates: { canonical }, ...jakoMeta({ title, description, url: canonical, kuva: "/og/kokoelma/kaupungit" }) };
 }
