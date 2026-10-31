@@ -116,7 +116,7 @@ export const JUHLAT: Juhla[] = [
   {
     slug: "pyhainpaiva", nimi: "Pyhäinpäivä", iso: false, accent: "#C9B89A", kuva: I + "pyhainpaiva.webp",
     paiva: pyhainpaiva, ill: "pyhäinpäivään", visat: ["kekrista-pyhainpaivaan-visa"],
-    koukku: { visa: "kekrista-pyhainpaivaan-visa", kysymys: "Miksi vainajia kestittiin kekrinä lämpimällä saunalla?", korostus: "saunalla?", ala: "", cta: "Selvitä vastaus", kysymysId: "2788583a-fcd6-4dcc-a850-68d47fbce9db", luonnos: true },
+    koukku: { visa: "kekrista-pyhainpaivaan-visa", kysymys: "Miksi vainajia kestittiin kekrinä lämpimällä saunalla?", korostus: "saunalla?", ala: "", cta: "Selvitä vastaus", kysymysId: "2788583a-fcd6-4dcc-a850-68d47fbce9db" },
   },
   {
     slug: "isanpaiva", tervehdys: "Hyvää isänpäivää", nimi: "Isänpäivä", iso: true, accent: "#7FB2E5", kuva: I + "isanpaiva.webp",
@@ -131,7 +131,7 @@ export const JUHLAT: Juhla[] = [
   {
     slug: "kiitospaiva", tervehdys: "Hyvää kiitospäivää", nimi: "Kiitospäivä", iso: false, accent: "#D98A4A", kuva: I + "kiitospaiva.webp",
     paiva: (y) => nsVp(y, 11, 4, 4), ill: "kiitospäivään", visat: ["kiitospaiva-thanksgiving-visa"],
-    koukku: { visa: "kiitospaiva-thanksgiving-visa", kysymys: "Mitä Yhdysvaltain presidentti tekee kalkkunalle ennen kiitospäivää?", korostus: "kalkkunalle", ala: "", cta: "Selvitä vastaus", kysymysId: "1beece26-3ecb-4a20-9fc4-66baeeee22e3", luonnos: true },
+    koukku: { visa: "kiitospaiva-thanksgiving-visa", kysymys: "Mitä Yhdysvaltain presidentti tekee kalkkunalle ennen kiitospäivää?", korostus: "kalkkunalle", ala: "", cta: "Selvitä vastaus", kysymysId: "1beece26-3ecb-4a20-9fc4-66baeeee22e3" },
   },
   {
     slug: "itsenaisyyspaiva", tervehdys: "Hyvää itsenäisyyspäivää", nimi: "Itsenäisyyspäivä", rivit: ["Itsenäisyys-", "päivä"], iso: true, accent: "#6FA8FF",
@@ -150,7 +150,7 @@ export const JUHLAT: Juhla[] = [
   {
     slug: "lucia", nimi: "Lucian päivä", iso: false, accent: "#F4E3B0", kuva: I + "lucia.webp",
     paiva: (y) => pvm(y, 12, 13), ill: "Lucian päivään", visat: ["lucian-paiva-visa"],
-    koukku: { visa: "lucian-paiva-visa", kysymys: "Kuka legendan mukaan ilmiantoi Lucian viranomaisille?", korostus: "ilmiantoi", ala: "", cta: "Selvitä vastaus", kysymysId: "d1db8193-605c-4042-a458-b3b547f7abc3", luonnos: true },
+    koukku: { visa: "lucian-paiva-visa", kysymys: "Kuka legendan mukaan ilmiantoi Lucian viranomaisille?", korostus: "ilmiantoi", ala: "", cta: "Selvitä vastaus", kysymysId: "d1db8193-605c-4042-a458-b3b547f7abc3" },
   },
   {
     slug: "joulu", tervehdys: "Hyvää joulua", nimi: "Joulu", iso: true, accent: "#E8453C", kuva: I + "joulupoyta.webp",
