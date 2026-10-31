@@ -54,6 +54,11 @@ function sitaatti(k: Kortti): string | null {
   return `${katkaistu.slice(0, katkaistu.lastIndexOf(" ")).replace(/[,;:–-]+$/, "")}…`;
 }
 /** Deterministinen valinta siemenestä (sama kaikille samana päivänä/viikkona). */
+export type TiesitkoKohde = {
+  id: string; quizId: string; teema: boolean;
+  kysymys: string; korostus: string; kicker: string; href: string; kuva: string | null; kuvaPos?: string;
+};
+
 const poimi = <T,>(lista: T[], n: number): T | null => (lista.length ? lista[((n % lista.length) + lista.length) % lista.length] : null);
 
 export async function haeEtusivu(opts: {
@@ -109,39 +114,47 @@ export async function haeEtusivu(opts: {
   const mmConf = ETUSIVUN_PELIMUODOT.find((p) => p.slug === "mika-maa");
   const mikaMaa = mmConf && mmConf.tila === "pelattava" && nakyyEtusivulla(mmConf, today.iso) ? mmConf : null;
 
-  /* ── 2 Tiesitkö? ── questions.hook-pooli, päiväsiemen. Sarakkeen puuttuminen (migraatio ajamatta) → ei osiota.
-     Ajankohtaisuus (Heikki 30.10.2026, v7): Juhlat-kokoelman koukut eivät tule kiertoon lainkaan — juhlat nostaa
-     juhlabanneri (Promo 1) lähimmän juhlan koukulla, eikä Tiesitkö saa toistaa samaa juhlaa. AVOIN: kalenteri-
-     tapahtumien (±7 pv, esim. talviaika) koukut vaativat oman sisältölähteen. */
-  let tiesitko: { kysymys: string; korostus: string; kicker: string; href: string; kuva: string | null; kuvaPos?: string } | null = null;
+  /* ── 2 Tiesitkö? ── questions.hook-pooli. Kierto (Heikki 31.10.2026): palvelin antaa koko poolin, selain arpoo
+     koukun joka käynnillä ennen piirtoa (EtusivuV5 → TiesitkoKierto). oletus = päiväsiemenen koukku (ilman JS:ää,
+     hakukoneet). Teemakoukut (hook_teema + hook_alkaa..hook_paattyy) vain voimassaoloaikana; silloin 70 % teemasta.
+     Ajankohtaisuus (v7, 30.10.): Juhlat-kokoelman koukut eivät tule kiertoon — juhlat nostaa juhlabanneri. */
+  let tiesitko: { kohteet: TiesitkoKohde[]; oletus: number } | null = null;
   {
     const { data, error } = await sb
       .from("questions")
-      .select("id, question_text, quiz_id")
+      .select("id, question_text, quiz_id, hook_teema, hook_alkaa, hook_paattyy" as "id")
       .eq("hook" as never, true as never)
       .order("id")
       .limit(500);
-    const rivit = !error ? ((data ?? []) as Array<{ id: string; question_text: string; quiz_id: string }>) : [];
-    const julkaistut = rivit.filter((r) => cards.some((c) => c.id === r.quiz_id && c.collection !== JUHLAT_KOKOELMA));
-    const r = poimi(julkaistut, paivaNro);
-    const k = r ? cards.find((c) => c.id === r.quiz_id)! : null;
-    if (r && k) {
+    type Rivi = { id: string; question_text: string; quiz_id: string; hook_teema: string | null; hook_alkaa: string | null; hook_paattyy: string | null };
+    const rivit = !error ? ((data ?? []) as unknown as Rivi[]) : [];
+    const voimassa = (r: Rivi) => !r.hook_teema || ((!r.hook_alkaa || r.hook_alkaa <= today.iso) && (!r.hook_paattyy || today.iso <= r.hook_paattyy));
+    const julkaistut = rivit.filter((r) => voimassa(r) && cards.some((c) => c.id === r.quiz_id && c.collection !== JUHLAT_KOKOELMA));
+    const kohteet = julkaistut.map((r): TiesitkoKohde => {
+      const k = cards.find((c) => c.id === r.quiz_id)!;
       const teksti = r.question_text.trim();
       // Korostus: viimeinen sisältösana (ei "mukaan", "on", "se"…) ilman välimerkkejä.
       const sanat = teksti.split(/\s+/).map((w) => w.replace(/^[”"«(]+|[?.,!:;”"»)]+$/g, ""));
       const korostus = [...sanat].reverse().find((w) => w.length >= 4 && !HEIKOT.has(w.toLowerCase())) ?? sanat[sanat.length - 1];
       // Visalla ei omaa kuvaa (esim. historian visat) → kokoelman korttikuva.
       const kk = visanKorttikuva(k).kuva ? visanKorttikuva(k) : { kuva: KOKOELMA_KORTIT.find((x) => x.slug === k.collection)?.img ?? null, kuvaPos: undefined };
-      tiesitko = {
+      return {
+        id: r.id, quizId: k.id, teema: !!r.hook_teema,
         kysymys: teksti, korostus,
         /* Kokoelma kategoriasta kuten pelisivulla (resolveCollection): kaupunkivisat ovat kannassa yleistietoa,
            mutta kuuluvat Suomen kaupunkeihin (Heikki 30.10.). Yleistieto ei ole 2.0:ssa kokoelma → pelkkä visan nimi. */
-        kicker: (() => { const r = resolveCollection({ collection: k.collection, category: k.category ?? null, genre: k.genre ?? null });
-          return [r.key === "yleistieto" ? null : r.label, nimi(k)].filter(Boolean).join(" · "); })(),
+        kicker: (() => { const rc = resolveCollection({ collection: k.collection, category: k.category ?? null, genre: k.genre ?? null });
+          return [rc.key === "yleistieto" ? null : rc.label, nimi(k)].filter(Boolean).join(" · "); })(),
         href: visaHref(k), kuva: kk.kuva, kuvaPos: kk.kuvaPos,
       };
+    });
+    if (kohteet.length) {
+      // Oletus: päiväsiemen yleispoolista (teemakaudella teemasta), kuten ennen kiertoa.
+      const ensisijaiset = kohteet.some((x) => x.teema) ? kohteet.filter((x) => x.teema) : kohteet;
+      tiesitko = { kohteet, oletus: kohteet.indexOf(poimi(ensisijaiset, paivaNro)!) };
     }
   }
+
 
   /* ── 3 Pelaa aiheittain ── kokoelmarekisteri (avoimet, ei Kuvavisoja — ne ovat pelimuoto), suomen aakkosjärjestyksessä
      (Heikki 29.10.; vain tässä osiossa — rekisterin oma järjestys navigaatiossa ja Kokoelmat-sivulla ennallaan). */

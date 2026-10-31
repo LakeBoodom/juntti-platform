@@ -7,10 +7,11 @@
 // Ei aputekstejä: otsikko, kortti, nappi (poikkeus: Lapsille-esittely, Heikki 30.10. v9). Osio-otsikon yläpuolella vain kicker-määrä.
 import type { CSSProperties } from "react";
 import { preload } from "react-dom";
-import type { EtusivuData } from "@/lib/etusivu5";
+import type { EtusivuData, TiesitkoKohde } from "@/lib/etusivu5";
 import PelattuTanaan from "./PelattuTanaan";
 import PaivanVisaV5 from "./PaivanVisaV5";
 import Juhlabanneri from "./Juhlabanneri";
+import IkaLaskuri from "./IkaLaskuri";
 import PeliKuvitus, { KUVITETUT } from "./PeliKuvitus";
 import { kuvanSrcSet } from "@/lib/kuvaVariantit";
 
@@ -66,7 +67,7 @@ function PaivanPelit({ d }: { d: D }) {
                     {sankari.tapaus === "muisto" ? "Muistopäivä" : sankari.tapaus === "pyorea" ? "Pyöreät synttärit" : "Synttärit tänään"}
                   </span>
                   <span className="tn-es-synt-ika">
-                    <b>{sankari.ika}</b>
+                    <IkaLaskuri ika={sankari.ika} />
                     <span>{sankari.tapaus === "muisto" ? "vuotta syntymästä" : "vuotta"}</span>
                   </span>
                   <span className="tn-es-synt-h" style={lw(sankari.nimi)}>{sankari.nimi}</span>
@@ -109,14 +110,36 @@ function MikaMaa({ m }: { m: NonNullable<D["paivanPelit"]["mikaMaa"]> }) {
   );
 }
 
-function Tiesitko({ t, lcp }: { t: NonNullable<D["tiesitko"]>; lcp: boolean }) {
-  /* Mobiilin LCP (Lighthouse 29.10.): esilataus vain, jos Päivän visa -kortissa ei ole kuvaa (v7: kuvakortti on LCP). */
-  if (lcp && t.kuva) preload(t.kuva, { as: "image", fetchPriority: "high", imageSrcSet: kuvanSrcSet(t.kuva), imageSizes: KUVA_SIZES });
+/* Tiesitkö?-kierto (Heikki 31.10.2026): kaikki koukut ovat HTML:ssä, oletus näkyvissä ja muut hidden. Heti korttien
+   perässä ajettava skripti arpoo näytettävän ennen piirtoa (ei välähdystä): kävijän näkemättömät ensin (localStorage
+   tn_tt_nahty), teemakaudella 70 % teemasta ja 30 % yleispoolista. Kortit ovat staattisia palvelinkomponentteja, joten
+   React ei palauta hidden-attribuuttia hydraatiossa (suppressHydrationWarning). Piilotettujen korttien lazy-kuvia ei
+   ladata. Mittaus: näyttö (≥ 50 % näkyvissä, kerran) ja klikkaus → kirjaa_nosto, slotti "tiesitko". */
+const TT_KIERTO = `(function(){try{
+var a=[].slice.call(document.querySelectorAll("a[data-tt]"));if(!a.length)return;
+var K="tn_tt_nahty",n=[];try{n=JSON.parse(localStorage.getItem(K)||"[]")}catch(e){}
+var id=function(x){return x.getAttribute("data-id")},uusi=function(x){return n.indexOf(id(x))<0};
+var t=a.filter(function(x){return x.hasAttribute("data-teema")}),y=a.filter(function(x){return!x.hasAttribute("data-teema")});
+var tu=t.filter(uusi),yu=y.filter(uusi);
+if(!tu.length&&!yu.length){var v0=n[n.length-1];n=[];var eri=function(x){return a.length<2||id(x)!==v0};tu=t.filter(eri);yu=y.filter(eri)}
+var p=tu.length&&(!yu.length||Math.random()<0.7)?tu:yu;var v=p[Math.floor(Math.random()*p.length)];
+a.forEach(function(x){x.hidden=x!==v});
+n.push(id(v));if(n.length>300)n=n.slice(-300);try{localStorage.setItem(K,JSON.stringify(n))}catch(e){}
+var U=__U__,A=__A__;if(!U||!A)return;
+var k=function(e){try{fetch(U+"/rest/v1/rpc/kirjaa_nosto",{method:"POST",keepalive:true,headers:{"Content-Type":"application/json",apikey:A,Authorization:"Bearer "+A},body:JSON.stringify({p_slotti:"tiesitko",p_tapahtuma:e,p_quiz:v.getAttribute("data-quiz"),p_kategoria:id(v)})}).catch(function(){})}catch(e){}};
+v.addEventListener("click",function(){k("klikkaus")});
+if("IntersectionObserver"in window){var o=new IntersectionObserver(function(e){if(e[0].isIntersecting){o.disconnect();k("naytto")}},{threshold:.5});o.observe(v)}
+}catch(e){}})();`
+  .replace("__U__", JSON.stringify(process.env.NEXT_PUBLIC_SUPABASE_URL ?? ""))
+  .replace("__A__", JSON.stringify(process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? ""));
+
+function TiesitkoKortti({ t, nakyy, lcp }: { t: TiesitkoKohde; nakyy: boolean; lcp: boolean }) {
   const i = t.kysymys.lastIndexOf(t.korostus);
   const alku = i >= 0 ? t.kysymys.slice(0, i) : t.kysymys;
   const loppu = i >= 0 ? t.kysymys.slice(i + t.korostus.length) : "";
   return (
-    <a className="tn-es-tt" href={t.href} data-tn-entry="etusivu:tiesitko">
+    <a className="tn-es-tt" href={t.href} data-tn-entry="etusivu:tiesitko" data-tt="" data-id={t.id} data-quiz={t.quizId}
+      data-teema={t.teema ? "" : undefined} hidden={!nakyy} suppressHydrationWarning>
       <span className="tn-es-tt-kuva">
         <Kuva src={t.kuva} pos={t.kuvaPos} luokka="tn-es-tt-img" eager={lcp} />
       </span>
@@ -134,6 +157,19 @@ function Tiesitko({ t, lcp }: { t: NonNullable<D["tiesitko"]>; lcp: boolean }) {
         <span className="tn-es-nappi tn-es-tt-nappi">Ota selvää</span>
       </span>
     </a>
+  );
+}
+
+function Tiesitko({ t, lcp }: { t: NonNullable<D["tiesitko"]>; lcp: boolean }) {
+  const oletus = t.kohteet[t.oletus];
+  /* Mobiilin LCP (Lighthouse 29.10.): esilataus vain, jos Päivän visa -kortissa ei ole kuvaa (v7: kuvakortti on LCP).
+     Kierron takia esiladataan vain oletus; arvottu kortti lataa kuvansa heti näkyviin tultuaan. */
+  if (lcp && oletus.kuva) preload(oletus.kuva, { as: "image", fetchPriority: "high", imageSrcSet: kuvanSrcSet(oletus.kuva), imageSizes: KUVA_SIZES });
+  return (
+    <>
+      {t.kohteet.map((k, i) => <TiesitkoKortti key={k.id} t={k} nakyy={i === t.oletus} lcp={lcp && i === t.oletus} />)}
+      <script dangerouslySetInnerHTML={{ __html: TT_KIERTO }} />
+    </>
   );
 }
 
