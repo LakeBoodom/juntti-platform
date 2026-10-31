@@ -3,6 +3,8 @@
 // HUOM: Liput EI ole tässä listassa (Heikki 17.8.: lippuvisat ovat osa Kuvavisoja,
 // joiden navigaatio kulkee Pelimuodot-valikon kautta). Visamäärät tulevat AINA
 // kannasta (layout laskee quiz_cards-näkymästä) — ei kovakoodattuja lukuja.
+// Järjestys (Heikki 31.10.2026): kokoelmat ja pelimuodot aakkosjärjestyksessä (suomen lajittelu, aakkosin()) kaikissa
+// valikoissa, mobiilipaneelissa, /kokoelmat-sivulla ja alatunnisteessa — listojen kirjoitusjärjestyksellä ei ole väliä.
 
 export type NavCollection = {
   slug: string;   // quiz_cards.collection-arvo JA hub-URL:n segmentti
@@ -12,7 +14,10 @@ export type NavCollection = {
   href?: string;
 };
 
-export const NAV_COLLECTIONS: NavCollection[] = [
+/** Suomen aakkosjärjestys nimen mukaan (Ä ja Ö lopussa). */
+export const aakkosin = <T extends { label: string }>(lista: T[]): T[] => [...lista].sort((a, b) => a.label.localeCompare(b.label, "fi"));
+
+export const NAV_COLLECTIONS: NavCollection[] = aakkosin([
   { slug: "tv", label: "TV ja suoratoisto", color: "#FF3D9E" },
   { slug: "urheilu", label: "Urheilu", color: "#B6FF3C" },
   /* Jääkiekko ja Jalkapallo (Heikki 25.8.2026): omat teemakokoelmat, jotka
@@ -45,7 +50,7 @@ export const NAV_COLLECTIONS: NavCollection[] = [
   { slug: "juhlat", label: "Juhlat", color: "#E8A320" },
   /* Lasten visat (Heikki 11.10.2026): oma kokoelmasivu /lapset (target_age 4-7 / 8-12). */
   { slug: "lapset", label: "Lasten visat", color: "#F5BC45", href: "/lapset" },
-];
+]);
 
 export type NavMode = {
   href: string;
@@ -56,7 +61,7 @@ export type NavMode = {
 
 /* Klassista ei nosteta navigaatioon (CD:n sääntö: se on visojen oletusmuoto).
    Rakenne kestää uudet rivit sellaisenaan → Kumpi? ja Järjestä lisätään 2.5:ssä. */
-export const NAV_MODES: NavMode[] = [
+export const NAV_MODES: NavMode[] = aakkosin([
   // Tupla tai kuitti (Heikki 26.9.2026): uusi pelimuoto ensimmäisenä
   { href: "/peli/tupla-tai-kuitti", label: "Tupla tai kuitti", desc: "Tuplaa potti tai kuittaa ajoissa", color: "#E8A320" },
   // Kuntaliitos (Heikki 26.9.2026): karttapelien ensimmäinen, päivän reitti + satunnaiset
@@ -73,7 +78,9 @@ export const NAV_MODES: NavMode[] = [
   { href: "/kokoelma/kuvavisat", label: "Kuvavisat", desc: "Tunnista kuvasta — liput, vaakunat, linnut", color: "#4C9AFF" },
   /* Äänivisat (Heikki 11.10.2026): toistaiseksi Luonto-kokoelman äänivisasuodatin; oma sivu, kun äänivisoja tulee lisää. */
   { href: "/kokoelma/luonto?suodata=aanivisat#kaikki", label: "Äänivisat", desc: "Tunnista lintu äänestä", color: "#4ADE80" },
-];
+  /* Visapaketit (Heikki 31.10.2026): pelaamisen tapa (visailta porukalla), ei aihe → Pelimuodot-valikkoon. */
+  { href: "/visapaketit", label: "Visapaketit", desc: "Valmis visailta ruudulle tai tulosteeksi", color: "#F0C020" },
+]);
 
 export const hubHref = (slug: string) => `/kokoelma/${slug}`;
 /** Kokoelman osoite navigaatiossa: oma href (Lasten visat) tai /kokoelma/<slug>. */

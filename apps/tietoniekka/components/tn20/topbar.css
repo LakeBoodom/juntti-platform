@@ -56,7 +56,7 @@
 @media (max-width: 399px) { .tn20 .tn-tagline-alku { display: none; } }
 .tn20 .tn-topbar-right { margin-left: auto; display: flex; align-items: center; gap: 0; min-width: 0; }
 
-/* ── Nostot (Uusin kokoelma ≥ 1560 px · Suosittu nyt ≥ 700 px) ────────────
+/* ── Nostot (Pelaa yhdessä ≥ 1440 px · Suosittu nyt ≥ 700 px) ────────────
    QA-002 (29.8.2026): mitattu putki päällä ("1 päivän putki · Tänään pelattu ✓")
    rivi vuoti 1100 px: +254, 1200: +161, 1280: +86, 1366: +47, 1440: +13 px →
    vaakavieritys. "Uusin kokoelma" näytetään vasta leveällä näytöllä ja
@@ -82,7 +82,10 @@
 .tn20 .tn-promo[data-promo="suosittu"] .tn-promo-dot { background: var(--tn-lime); }
 .tn20 .tn-promo[data-promo="suosittu"] .tn-promo-kicker { color: var(--tn-lime); }
 @media (min-width: 700px) { .tn20 .tn-promo[data-promo="suosittu"] { display: flex; } }
-@media (min-width: 1560px) { .tn20 .tn-promo[data-promo="uusin"] { display: flex; } }
+/* "Pelaa yhdessä · Visapaketit" (31.10.2026) on 216 px (vanha nosto 267 px). Mitattu pahin tapaus (putki
+   "123 päivän putki · Tänään pelattu ✓", Chromium + WebKit): rivi mahtuu ≥ 1422 px → raja 1440 px (3-numeroisella
+   putkella 9 px marginaali, tavallisella 1–2-numeroisella ≥ 17 px). */
+@media (min-width: 1440px) { .tn20 .tn-promo[data-promo="yhdessa"] { display: flex; } }
 
 /* ── Päivän putki -nappi + popover (StreakButton) ────────────────────────── */
 .tn20 .tn-putki { position: relative; flex: none; margin-left: clamp(10px, 1.2vw, 20px); }

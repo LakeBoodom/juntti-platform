@@ -16,8 +16,8 @@
 // - Mobiili (<760 px): yksi 56 px:n palkki + Selaa-alapaneeli (Pelimuodot ja
 //   Kokoelmat ryhminä, kosketuskohteet ≥48 px, sulku kahvasta/X:stä/Escistä/taustasta).
 // - ETUSIVU 2026 PROD (design_handoff_etusivu_2026_prod, 28.8.2026): logon alle
-//   tagline "Suomalainen tietovisasivusto · 500+ visaa", nostot "Uusin kokoelma"
-//   (piiloon < 1100 px) ja "Suosittu nyt" (piiloon < 700 px), Päivän putki -nappi
+//   tagline "Suomalainen tietovisasivusto · 500+ visaa", nostot "Pelaa yhdessä" (31.10.2026, ent. "Uusin kokoelma";
+//   piiloon < 1440 px) ja "Suosittu nyt" (piiloon < 700 px), Päivän putki -nappi
 //   popoverilla (StreakButton) ja hampurilaisvalikko < 1100 px (aiemmin 760).
 //   Palkki on nyt sticky NORMAALIVIRRASSA (ei fixed + spacer) — korkeus elää
 //   taglinen mukana. Nostojen sisältö lib/etusivu.ts HEADER_PROMOS (kausivaihto
@@ -113,7 +113,7 @@ export default function TopBar({ tagline }: { tagline?: string } = {}) {
   const isKuvavisat = pathname.startsWith("/kokoelma/kuvavisat");
   const activeKokoelmat =
     (pathname.startsWith("/kokoelma") && !isKuvavisat) || pathname.startsWith("/kokoelmat") || pathname.startsWith("/lapset");
-  const activePelimuodot = pathname.startsWith("/megavisat") || isKuvavisat || pathname.startsWith("/peli/tupla-tai-kuitti");
+  const activePelimuodot = pathname.startsWith("/megavisat") || isKuvavisat || pathname.startsWith("/peli/tupla-tai-kuitti") || pathname.startsWith("/visapaketti");
 
   /* Nuolinäppäimet valikon riveillä — eivät vieritä sivua */
   const onMenuKeyDown = (e: React.KeyboardEvent) => {
@@ -209,7 +209,7 @@ export default function TopBar({ tagline }: { tagline?: string } = {}) {
           </nav>
 
           <div className="tn-topbar-right">
-            {/* Nostot: Uusin kokoelma (≥1560 px) · Suosittu nyt (≥700 px) */}
+            {/* Nostot: Pelaa yhdessä (≥1440 px) · Suosittu nyt (≥700 px) */}
             {HEADER_PROMOS.map((p) => (
               <a key={p.key} className="tn-promo" data-promo={p.key} href={p.href}>
                 <span className="tn-promo-dot" aria-hidden />

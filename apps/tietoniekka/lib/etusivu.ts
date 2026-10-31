@@ -8,7 +8,7 @@
 // 960 px, hero 1600 px, juontajat 300 px neliö). `pos` = designin
 // background-position per kuva (README: "kuvien rajaukset — älä arvaa").
 
-import { NAV_COLLECTIONS, NAV_MODES } from "./nav";
+import { NAV_COLLECTIONS, NAV_MODES, aakkosin } from "./nav";
 
 /** Ylätunnisteen tagline (design: "500+ visaa" = enemmän kuin 500, Heikki 28.8.:
     riittävä tarkkuus — ei lasketa kannasta). */
@@ -17,12 +17,12 @@ import { NAV_COLLECTIONS, NAV_MODES } from "./nav";
 /* C10 (26.10.2026): varateksti ilman lukua — luku tulee aina palvelimelta (layout: getSiteStats), ei kahdesta paikasta. */
 export const SITE_TAGLINE = "Suomalainen tietovisasivusto";
 
-export type HeaderPromo = { key: "uusin" | "suosittu"; kicker: string; label: string; href: string };
+export type HeaderPromo = { key: "yhdessa" | "suosittu"; kicker: string; label: string; href: string };
 
-/* Ylätunnisteen nostot: "Uusin kokoelma" näkyy ≥ 1560 px, "Suosittu nyt" ≥ 700 px
-   (mitattu raja, ks. topbar.css). */
+/* Ylätunnisteen nostot: "Pelaa yhdessä" (Visapaketit, Heikki 31.10.2026 — korvasi "Uusin kokoelma: Vaalit ja
+   politiikka") ja "Suosittu nyt" ≥ 700 px. Näkyvyysrajat mitattu, ks. topbar.css. */
 export const HEADER_PROMOS: HeaderPromo[] = [
-  { key: "uusin", kicker: "Uusin kokoelma", label: "Vaalit ja politiikka", href: "/kokoelma/vaalit" },
+  { key: "yhdessa", kicker: "Pelaa yhdessä", label: "Visapaketit", href: "/visapaketit" },
   { key: "suosittu", kicker: "Suosittu nyt", label: "Suomen kaupungit", href: "/kokoelma/kaupungit" },
 ];
 
@@ -110,14 +110,13 @@ export const HOSTS_INTRO = {
    Vaalit, Tiede, Juhlat ja reittipelit puuttuivat käsin ylläpidetystä listasta). */
 export const FOOTER_COLLECTIONS = NAV_COLLECTIONS.map((c) => ({ label: c.label, href: c.href ?? `/kokoelma/${c.slug}` }));
 
-/* Pelimuodot = navigaation pelimuodot + etusivun omat nostot (Päivän visa, Henkilövisat). */
-export const FOOTER_MODES = [
+/* Pelimuodot = navigaation pelimuodot (Visapaketit mukana 31.10.) + etusivun omat nostot (Päivän visa, Henkilövisat),
+   aakkosjärjestyksessä kuten valikoissa. */
+export const FOOTER_MODES = aakkosin([
   ...NAV_MODES.map((m) => ({ label: m.label, href: m.href })),
   { label: "Päivän visa", href: "/#paivan-visa" },
   { label: "Henkilövisat", href: "/kokoelma/tunnetut-henkilot" },
-  /* Visapaketit (28.10.2026): footerin listaan; ylä- ja alanavigaatio ennallaan tässä vaiheessa. */
-  { label: "Visapaketit", href: "/visapaketit" },
-];
+]);
 
 /* Tietoniekka-sarake: samat linkit kuin nykyisellä tietoniekka.fi:llä (Heikki
    28.8.2026 — Tietoa/Yhteystiedot/Käyttöehdot/Saavutettavuus/Evästeet lisätään
