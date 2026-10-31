@@ -13,7 +13,22 @@ const STORAGE = "https://pkfsdzqwfxqczirjddue.supabase.co/storage/v1/object/publ
 const VAAKUNA = `${STORAGE}/kuntavaakunat`;
 
 /** Pelit, joilla on kuvitus (slug → kuvitus). Muut pelikortit käyttävät valokuvaa. */
-export const KUVITETUT = new Set(["kuvavisat", "aanivisat", "kuntaliitos", "rajanaapurit", "vaalipiiriketju", "mika-maa", "ikajarjestys", "laita-jarjestykseen"]);
+export const KUVITETUT = new Set(["kuvavisat", "aanivisat", "kuntaliitos", "rajanaapurit", "vaalipiiriketju", "mika-maa", "jarjesta"]);
+
+/** Järjestä-kortti: VÄÄRIN-kirjainten kierrot ja siirrot (sama kuin hubin otsikossa). */
+const VAARIN: Array<[string, string]> = [
+  ["V", "translate(0, -.05em) rotate(-7deg)"], ["Ä", "translate(.02em, .09em) rotate(6deg)"], ["Ä", "translate(-.01em, -.11em) rotate(-4deg)"],
+  ["R", "translate(.03em, .06em) rotate(10deg)"], ["I", "translate(0, -.07em) rotate(-12deg)"], ["N", "translate(.05em, .11em) rotate(5deg)"],
+];
+/** Presidentit väärässä järjestyksessä (CD): nimi, oma kuvakopio, kallistus. */
+const JARJESTA_PALAT: Array<[string, string, string]> = [
+  ["Mannerheim", "/20/henkilot/k/carl-gustaf-emil-mannerheim-a511a2.webp", "rotate(-3deg)"],
+  ["Ryti", "/20/henkilot/k/presidentti-risto-ryti-6c1ffc.webp", "rotate(2deg) translateY(4px)"],
+  ["Kallio", "/20/vaalit/kasvot/kallio.webp", "rotate(-1.5deg) translateY(-2px)"],
+  ["Koivisto", "/20/vaalit/kasvot/koivisto.webp", "rotate(3deg)"],
+  ["Paasikivi", "/20/vaalit/kasvot/paasikivi.webp", "rotate(-2deg) translateY(3px)"],
+  ["Kekkonen", "/20/vaalit/kasvot/kekkonen.webp", "rotate(1.5deg)"],
+];
 
 /* eslint-disable @next/next/no-img-element */
 /** Lippu vaakaraidoin ylhäältä alas; paino = raidan suhteellinen korkeus (Latvia 2:1:2). */
@@ -129,41 +144,25 @@ export default function PeliKuvitus({ slug }: { slug: string }) {
           </span>
         </span>
       );
-    case "ikajarjestys":
-      /* Lähes samanikäiset, järjestys ei itsestään selvä (Heikki 30.10.): Stubb 1.4.1968, Häkkinen 28.9.1968,
-         Selänne 3.7.1970. Sekoitettuna (Selänne, Stubb, Häkkinen), kaikilla "?" — CD 31.10.: numerot 1, 2 vihjasivat
-         väärään järjestykseen. Keskimmäinen nostettu raahaukseen. C: otsake vasemmalle, nimet kasvojen alle. */
+    case "jarjesta":
+      /* CD "TN Etusivu Järjestä-kortti" (31.10.2026): hubin tunnus VÄÄRIN (koralli, kirjaimet sekaisin, staattinen — etusivulla
+         ei toistuvaa animaatiota), kysymys ja presidentit väärässä järjestyksessä. Paloja 3 (A, B), 4 (leveä B), 5–6 (C);
+         jokainen alkuosa on väärässä järjestyksessä (oikea: Kallio, Ryti, Mannerheim, Paasikivi, Kekkonen, Koivisto). */
       return (
-        <span className="tn-pk tn-pk--ika" aria-hidden="true">
-          <span className="tn-pk-kehys tn-pk-sarake">
-            <span className="tn-pk-iso-otsake" data-koko="c"><span>Vanhin</span><span>→ nuorin</span></span>
-            <span className="tn-pk-otsake" data-koko="ab">Vanhin → nuorin</span>
-            <span className="tn-pk-henkilot">
-              {[
-                ["teemu-selanne-on-the-ice-november-2010-8f51e8", "Selänne"],
-                ["alexander-stubb-in-2026-03-26-3n8a4037-cropped-23a9b2", "Stubb"],
-                ["mika-hakkinen-champions-for-charity-2016-07-27-37084f", "Häkkinen"],
-              ].map(([kuva, nimi], i) => (
-                <span key={nimi} className="tn-pk-henkilo" data-nosto={i === 1 || undefined}>
-                  <span className="tn-pk-henkilo-kuva"><img src={`/20/henkilot/k/${kuva}.webp`} alt="" /><i>?</i></span>
-                  <b data-koko="c">{nimi}</b>
-                </span>
-              ))}
+        <span className="tn-pk tn-pk--jarjesta" aria-hidden="true">
+          <span className="tn-pk-kehys tn-pk-jv">
+            <span className="tn-pk-jv-otsake">
+              <span className="tn-pk-vaarin">
+                {VAARIN.map(([k, t], i) => <span key={i} style={{ transform: t }}>{k}</span>)}
+              </span>
+              <span className="tn-pk-jv-kysymys">Osaatko laittaa oikeaan järjestykseen?</span>
             </span>
-          </span>
-        </span>
-      );
-    case "laita-jarjestykseen":
-      /* Tunturit väärässä järjestyksessä (oikea: Halti, Saana, Pallas); yhtään riviä ei ole numeroitu.
-         C: ohje isona otsakkeena vasemmalle, rivit oikealle. */
-      return (
-        <span className="tn-pk tn-pk--jarj" aria-hidden="true">
-          <span className="tn-pk-kehys tn-pk-jarj">
-            <span className="tn-pk-iso-otsake" data-koko="c"><span>Korkein</span><span>→ matalin</span></span>
-            <span className="tn-pk-lista">
-              <span className="tn-pk-otsake" data-koko="ab">Korkein → matalin</span>
-              {["Pallas", "Saana", "Halti"].map((t, i) => (
-                <span key={t} className="tn-pk-lista-rivi" data-nosto={i === 1 || undefined}><i>?</i><b>{t}</b><span>⋮⋮</span></span>
+            <span className="tn-pk-jv-palat">
+              {JARJESTA_PALAT.map(([nimi, kuva, t], i) => (
+                <span key={nimi} className="tn-pk-jv-pala" data-n={i + 1} style={{ transform: t }}>
+                  <img src={kuva} alt="" loading="lazy" />
+                  <b>{nimi}</b>
+                </span>
               ))}
             </span>
           </span>
