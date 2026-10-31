@@ -548,8 +548,9 @@
   .tn20 .tn-es-pv-tulos-t { font-size: 24px; }
   .tn20 .tn-es-pv-nappi { align-self: flex-start; min-height: 56px; padding: 0 30px; }
 
-  /* Synttärit desktop: sivupalsta (≈ 430 px), kuva 168 px. */
-  .tn20 .tn-es-synt { grid-template-columns: 168px minmax(0, 1fr); border-radius: 22px; }
+  /* Synttärit desktop: sivupalsta 430–640 px ja kortti Päivän visan korkuinen (≈ 480 px). 168 px:n kuvasarake rajasi
+     pystykuvasta kapean kaistaleen ja kasvot leikkautuivat (Heikki 31.10.2026) → kuva 44 % kortin leveydestä. */
+  .tn20 .tn-es-synt { grid-template-columns: minmax(0, 44fr) minmax(0, 56fr); border-radius: 22px; }
   .tn20 .tn-es-synt-teksti { gap: 18px; padding: 24px 24px 24px 26px; }
   .tn20 .tn-es-synt-ika b { font-size: min(110px, calc(100cqw / 1.9)); }
   .tn20 .tn-es-synt-ika span { font-size: 15px; }
