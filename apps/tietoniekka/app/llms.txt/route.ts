@@ -33,7 +33,7 @@ const PELIMUODOT: Array<[string, string, string]> = [
   ["/peli/tupla-tai-kuitti", "Tupla tai kuitti", "Kymmenen yhä vaikeampaa kysymystä; jokainen oikea vastaus tuplaa potin"],
   ["/peli/kuntaliitos", "Kuntaliitos", "Järjestä kahdeksan kuntaa reitiksi naapurikuntien kautta; uusi reitti joka päivä"],
   ["/peli/rajanaapurit", "Rajanaapurit", "Sama reittipeli valtioilla ja maarajoilla"],
-  ["/peli/ikajarjestys", "Tietoketju: Ikäjärjestys", "Aseta kymmenen tunnettua suomalaista syntymävuoden mukaan"],
+  ["/peli/jarjesta", "Järjestä", "Järjestyspelit: presidentit, pääministerit, puolueet ja tunnettujen henkilöiden ikäjärjestys; uusi päivän pakka joka päivä"],
   ["/kuvavisa/viikko", "Viikkovisa", "Viikoittain vaihtuva kuvavisa, sama kaikille koko viikon"],
   ["/megavisat", "Megavisat", "Pitkät visat yhteen istuntoon"],
 ];

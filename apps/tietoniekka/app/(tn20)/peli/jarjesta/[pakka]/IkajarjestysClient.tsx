@@ -1,5 +1,6 @@
 "use client";
-// TIETOKETJU: IKÄJÄRJESTYS — pelinäkymän tilakone.
+// TIETOKETJU: IKÄJÄRJESTYS — pelinäkymän tilakone. Osa C (31.10.2026): Järjestä-hubin pakka
+// /peli/jarjesta/ikajarjestys-<aihe>; aihe tulee pakasta (ei aihevalintaa), paluu hubiin, tuloksessa Seuraava pakka.
 // Vaiheet: aloitus (pelikehys K2) → järjestäminen (ReorderableChainList)
 // → paljastus (RevealSequencer, sisältää nyt myös pisteet+jatkonapit samalla
 // sivulla, ks. RevealSequencer-kommentti "LIVE-QA-LÖYDÖS 2") → arvo uudet.
@@ -13,7 +14,7 @@
 
 import { pelijakoteksti } from "@/lib/korttinimi";
 import { ikajarjestysTaso } from "@/lib/pelitasot";
-import { useMemo, useState, type CSSProperties } from "react";
+import { useMemo, useState } from "react";
 import { getChainRound } from "@/lib/ikajarjestys";
 import {
   DEFAULT_DIRECTION,
@@ -30,17 +31,11 @@ import Pelipalkki from "@/components/tn20/pelikehys/Pelipalkki";
 import PeliKehys from "@/components/tn20/pelikehys/PeliKehys";
 import PeliAloitus from "@/components/tn20/pelikehys/PeliAloitus";
 import PeliTulos from "@/components/tn20/pelikehys/PeliTulos";
-import { seuraavatPelit } from "@/lib/pelimuodot";
 import { kirjaaPelimuotoPeli } from "@/lib/pelimuotoPelit";
-import { CHAIN_CATEGORIES } from "@/lib/personCategories";
-import { RYHMAT } from "@/lib/henkiloRyhmat";
+import { HUB, HUB_HREF, type IkaPakka } from "@/lib/jarjesta/hub";
+import SeuraavaPakka from "@/components/tn20/jarjesta/SeuraavaPakka";
 
-// Pelikehys K1 (20.10.2026): paluu kotikokoelmaan Tunnetut henkilöt.
-const KOTI = { href: "/kokoelma/tunnetut-henkilot", nimi: "Tunnetut henkilöt" };
 const PELI = "Ikäjärjestys";
-/** K2-valinnassa ryhmien lyhyet nimet, jotta kahdeksan vaihtoehtoa mahtuu 390 × 844:ään napin kanssa. */
-const LYHYT = new Map<string, string>([["kaikki", "Kaikki"], ...RYHMAT.map((r) => [r.key as string, r.lyhyt] as [string, string])]);
-const VARI = new Map<string, string>(RYHMAT.map((r) => [r.key as string, r.vari]));
 
 const LAST_SEEN_KEY = "tk-ikajarjestys-viimeksi-nahdyt";
 
@@ -65,17 +60,16 @@ function writeLastSeen(ids: string[]) {
 type Phase = "start" | "loading" | "ordering" | "revealing";
 
 export default function IkajarjestysClient({
-  initialCategory,
+  pakka,
   initialRound,
   kasvot = [],
 }: {
-  initialCategory: string;
+  pakka: IkaPakka;
   initialRound: ChainPerson[] | null;
   /** Aloituksen kasvoketju (P3, 21.10.2026): enintään 10 kuvallista henkilöä syntymäjärjestyksessä. */
   kasvot?: Array<{ id: string; name: string; kuva: string }>;
 }) {
-  const [category, setCategory] = useState(initialCategory);
-  const [pickerCategory, setPickerCategory] = useState(initialCategory);
+  const category = pakka.kategoria;
   const [round, setRound] = useState<ChainPerson[] | null>(initialRound);
   // HUOM (korjattu hydraatiovirhe): getChainRound palauttaa henkilöt jo
   // satunnaisessa järjestyksessä (arpoo poolin ennen valintaa palvelimella),
@@ -95,17 +89,16 @@ export default function IkajarjestysClient({
   /* Jako (K4 v2, 25.10.2026): Jakoalue-komponentti; tulos linkkiin (?tulos=n-total) jotta kaveri saa saman kierroksen
      ja Facebookin og-kuvaus kertoo tuloksen; tasonimi kuten tulosnäkymässä. Tulosvaihe piirretään vain selaimessa. */
   const jakoTiedot = () => ({
-    url: `${location.origin}/peli/ikajarjestys?henkilot=${(round ?? []).map((p) => p.id).join(",")}&tulos=${scoreResult?.correctCount ?? 0}-${scoreResult?.totalCount ?? 0}`,
-    teksti: pelijakoteksti(`${PELI}: ${LYHYT.get(category) ?? "Kaikki"}`, `${scoreResult?.correctCount ?? 0}/${scoreResult?.totalCount ?? 0} oikein`, !!scoreResult && scoreResult.correctCount === scoreResult.totalCount, scoreResult ? ikajarjestysTaso(scoreResult.correctCount, scoreResult.totalCount) : null),
+    url: `${location.origin}${pakka.href}?henkilot=${(round ?? []).map((p) => p.id).join(",")}&tulos=${scoreResult?.correctCount ?? 0}-${scoreResult?.totalCount ?? 0}`,
+    teksti: pelijakoteksti(`${PELI}: ${pakka.nimi}`, `${scoreResult?.correctCount ?? 0}/${scoreResult?.totalCount ?? 0} oikein`, !!scoreResult && scoreResult.correctCount === scoreResult.totalCount, scoreResult ? ikajarjestysTaso(scoreResult.correctCount, scoreResult.totalCount) : null),
   });
 
-  async function startRound(chosenCategory: string) {
+  async function startRound() {
     setPhase("loading");
     setEmptyNotice(null);
     setPartialRoundNotice(null);
     const lastSeen = readLastSeen();
-    const next = await getChainRound(chosenCategory, lastSeen);
-    setCategory(chosenCategory);
+    const next = await getChainRound(category, lastSeen);
     setRound(next);
     setOrder(next); // jo satunnaisessa järjestyksessä, ks. huomio yllä
     if (next.length > 0) {
@@ -119,7 +112,7 @@ export default function IkajarjestysClient({
       }
       setPhase("ordering");
     } else {
-      setEmptyNotice("Tästä kategoriasta ei löytynyt tarpeeksi pelattavia henkilöitä juuri nyt. Kokeile toista kategoriaa.");
+      setEmptyNotice("Kierroksen arvonta ei onnistunut juuri nyt. Yritä hetken päästä uudelleen.");
       setPhase("start");
     }
   }
@@ -144,20 +137,18 @@ export default function IkajarjestysClient({
   const scoreResult = useMemo(() => (round ? calculateChainScore(order, correctOrder) : null), [order, round, correctOrder]);
 
   if (phase === "start" || phase === "loading") {
-    const aihe = LYHYT.get(pickerCategory) ?? "Kaikki";
     return (
       <PeliKehys iho="tumma">
-        <Pelipalkki iho="tumma" peli={PELI} koti={KOTI} />
+        <Pelipalkki iho="tumma" peli={HUB.nimi} muunnelma={pakka.nimi} koti={HUB} />
         <main>
-          {/* K2 (pelikehys, 20.10.2026): h1 → lause → aihe → Aloita → ohjeet avattavina. */}
+          {/* K2 (pelikehys, 20.10.2026): h1 → lause → kasvoketju → Aloita. Osa C: ei aihevalintaa eikä ohjeita. */}
           <PeliAloitus
             otsikko={PELI}
-            lause="Aseta kymmenen tunnettua suomalaista syntymävuoden mukaan vanhimmasta nuorimpaan."
+            lause="Aseta kymmenen tunnettua henkilöä syntymävuoden mukaan vanhimmasta nuorimpaan."
             valinta={
-              <>
-              {kasvot.length >= 5 && (
+              kasvot.length >= 5 ? (
                 <figure className="ika-kasvot">
-                  <ol aria-label="Esimerkki: tunnettuja suomalaisia syntymävuoden mukaan">
+                  <ol aria-label="Esimerkki: tunnettuja henkilöitä syntymävuoden mukaan">
                     {kasvot.map((h) => (
                       <li key={h.id}>
                         {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -171,24 +162,11 @@ export default function IkajarjestysClient({
                     <span>Nuorin</span>
                   </figcaption>
                 </figure>
-              )}
-              <fieldset className="pk-valinta">
-                <legend>Valitse aihe</legend>
-                <div className="pk-vaihtoehdot">
-                  {CHAIN_CATEGORIES.map((c) => (
-                    <label key={c.key} className="pk-vaihtoehto" style={VARI.has(c.key) ? ({ "--va": VARI.get(c.key) } as CSSProperties) : undefined}>
-                      <input type="radio" name="ika-aihe" value={c.key} checked={pickerCategory === c.key} onChange={() => setPickerCategory(c.key)} />
-                      <span className="pk-vaihtoehto-piste" aria-hidden="true" />
-                      {LYHYT.get(c.key) ?? c.label}
-                    </label>
-                  ))}
-                </div>
-              </fieldset>
-              </>
+              ) : undefined
             }
             toiminto={
-              <button type="button" className="pk-nappi" disabled={phase === "loading"} onClick={() => startRound(pickerCategory)}>
-                {phase === "loading" ? "Arvotaan…" : `Aloita · ${aihe}`}
+              <button type="button" className="pk-nappi" disabled={phase === "loading"} onClick={() => startRound()}>
+                {phase === "loading" ? "Arvotaan…" : "Aloita kierros"}
               </button>
             }
             alarivi={
@@ -198,23 +176,7 @@ export default function IkajarjestysClient({
                 <span role="status">Arvotaan kierrosta…</span>
               ) : undefined
             }
-            ohjeet={[
-              {
-                otsikko: "Näin pelaat",
-                sisalto: (
-                  <>
-                    <ol>
-                      <li><b>Valitse aihe</b> – tai pelaa kaikilla henkilöillä.</li>
-                      <li><b>Järjestä kymmenen henkilöä</b> syntymävuoden mukaan vanhimmasta nuorimpaan – raahaa tai napauta kahta korttia vaihtaaksesi niiden paikat.</li>
-                      <li><b>Paljasta järjestys.</b> Oikeat paikat paljastuvat yksi kerrallaan, ja näet jokaisen syntymäajan.</li>
-                    </ol>
-                    <p>
-                      Henkilöt ovat <a href={KOTI.href}>tunnettujen henkilöiden</a> joukosta – jokaisesta on myös oma tietovisansa.
-                    </p>
-                  </>
-                ),
-              },
-            ]}
+            ohjeet={[]}
           />
         </main>
       </PeliKehys>
@@ -224,7 +186,7 @@ export default function IkajarjestysClient({
   if (phase === "revealing" && scoreResult) {
     return (
       <PeliKehys iho="tumma">
-        <Pelipalkki iho="tumma" peli={PELI} muunnelma={LYHYT.get(category) ?? "Kaikki"} koti={KOTI} />
+        <Pelipalkki iho="tumma" peli={HUB.nimi} muunnelma={pakka.nimi} koti={HUB} />
         <main className="tk-page">
           <RevealSequencer
             items={revealItems}
@@ -236,8 +198,9 @@ export default function IkajarjestysClient({
                 tasonimi={ikajarjestysTaso(scoreResult.correctCount, scoreResult.totalCount)}
                 lause={`${scoreResult.score} pistettä. Pisin oikea ketju: ${scoreResult.longestCorrectChain}.`}
                 jako={{ ...jakoTiedot(), natiiviOtsikko: PELI }}
-                toiminnot={[{ teksti: "Pelaa uusi kierros", onClick: () => startRound(category) }, { teksti: "Vaihda aihetta", onClick: () => { setPickerCategory(category); setPhase("start"); } }]}
-                seuraavat={seuraavatPelit("ikajarjestys", "tunnetut-henkilot")}
+                toiminnot={[{ teksti: "Pelaa uusi kierros", onClick: () => startRound() }, { teksti: "Kaikki pakat", href: HUB_HREF }]}
+                seuraavat={[]}
+                seuraavaOsio={<SeuraavaPakka slug={pakka.slug} />}
               />
             }
           />
@@ -249,7 +212,7 @@ export default function IkajarjestysClient({
   // phase === "ordering"
   return (
     <PeliKehys iho="tumma">
-      <Pelipalkki iho="tumma" peli={PELI} muunnelma={LYHYT.get(category) ?? "Kaikki"} koti={KOTI} tila={`${order.length} henkilöä`} pelissa />
+      <Pelipalkki iho="tumma" peli={HUB.nimi} muunnelma={pakka.nimi} koti={HUB} tila={`${order.length} henkilöä`} pelissa />
       <main className="tk-page">
         <header className="tk-order-head">
           <SuuntaindikaattoriBadge direction={DEFAULT_DIRECTION} />

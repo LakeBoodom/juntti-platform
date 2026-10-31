@@ -1,70 +1,20 @@
-// TIETOKETJU: IKÄJÄRJESTYS — pelisivun server-loader.
-// Kun tullaan promo-linkistä (?category=...&autostart=1), ensimmäinen
-// kierros arvotaan jo palvelimella (ei tyhjää välähdystä ennen peliä).
-// Ilman autostartia sivu avaa pelikehyksen K2-aloituksen (aihevalinta) clientillä.
+// IKÄJÄRJESTYS → JÄRJESTÄ (osa C, 31.10.2026): Ikäjärjestys on nyt Järjestä-hubin pakkoja.
+// Vanhat osoitteet ohjataan pysyvästi (308): ?category= tai ?henkilot= (jaetut linkit, henkilösivun nosto,
+// etusivun banneri ?autostart=1) suoraan oikeaan pakkaan parametreineen, pelkkä /peli/ikajarjestys hubin Henkilöt-osioon.
 
-import { JsonLd, peliLd } from "@/lib/jsonLd";
-import { jakoMeta, jakoOsoite, pelituloksenOg } from "@/lib/jakoMeta";
-import { ikajarjestysTaso } from "@/lib/pelitasot";
-import type { Metadata } from "next";
-import { getChainRound, getChainRoundByIds } from "@/lib/ikajarjestys";
-import { henkiloKuva } from "@/lib/henkilokuvat";
-import IkajarjestysClient from "./IkajarjestysClient";
+import { permanentRedirect } from "next/navigation";
+import { HUB_HREF, ikaPakkaKategoriasta } from "@/lib/jarjesta/hub";
 
-export const dynamic = "force-dynamic";
-
-/* og:url = jaettu haastelinkki parametreineen (Heikki 23.10.2026); canonical pysyy parametrittomana. */
-export async function generateMetadata({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }): Promise<Metadata> {
+export default async function IkajarjestysOhjaus({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
   const sp = await searchParams;
-  return {
-    title: "Tietoketju: Ikäjärjestys – aseta henkilöt syntymävuoden mukaan | Tietoniekka",
-    description:
-      "Aseta kymmenen tunnettua suomalaista syntymävuoden mukaiseen järjestykseen. Nopeatempoinen uusi tietopeli Tietoniekassa — ei kirjautumista.",
-    /* SEO-erä A2/A7: canonical (?category= ja ?autostart= ovat saman sivun muunnelmia) + jakokuva. */
-    alternates: { canonical: "/peli/ikajarjestys" },
-    ...jakoMeta({
-      ...(pelituloksenOg(sp, "oikein", ikajarjestysTaso) ?? {
-        title: "Tietoketju: Ikäjärjestys",
-        description: "Aseta kymmenen tunnettua suomalaista syntymävuoden mukaiseen järjestykseen.",
-      }),
-      url: jakoOsoite("/peli/ikajarjestys", sp, ["category", "henkilot", "tulos"]),
-      kuva: "/og/sivu/ikajarjestys",
-    }),
-  };
-}
-
-export default async function IkajarjestysPage({
-  searchParams,
-}: {
-  searchParams: Promise<Record<string, string | string[] | undefined>>;
-}) {
-  const sp = await searchParams;
-  const category = typeof sp.category === "string" ? sp.category : "kaikki";
-  const autostart = sp.autostart === "1";
-
-  // Henkilösivun nosto: ?henkilot=id,id,id,id → täsmälleen nämä (design v0.3, 4a).
-  const henkilot = typeof sp.henkilot === "string" ? sp.henkilot.split(",") : null;
-  const initialRound = henkilot ? await getChainRoundByIds(henkilot) : autostart ? await getChainRound(category) : null;
-
-  // P3 (Heikki 21.10.2026): aloitukseen kasvoketju — kymmenen kasvoa vanhimmasta nuorimpaan selittää pelin yhdellä
-  // silmäyksellä. Vain omat kuvakopiot (henkiloKuva); kaksi arvontaa, jotta kymmenen kuvallista löytyy.
-  let kasvot: Array<{ id: string; name: string; kuva: string; birthDate: string }> = [];
-  if (!initialRound) {
-    const ehdokkaat = [...(await getChainRound("kaikki")), ...(await getChainRound("kaikki"))];
-    const nahty = new Set<string>();
-    for (const p of ehdokkaat) {
-      const kuva = henkiloKuva(p.image_url);
-      if (!kuva || nahty.has(p.id) || kasvot.length >= 10) continue;
-      nahty.add(p.id);
-      kasvot.push({ id: p.id, name: p.name, kuva, birthDate: p.birthDate });
-    }
-    kasvot = kasvot.sort((a, b) => a.birthDate.localeCompare(b.birthDate));
+  const arvo = (k: string) => (typeof sp[k] === "string" ? (sp[k] as string) : undefined);
+  if (!arvo("category") && !arvo("henkilot")) permanentRedirect(`${HUB_HREF}#henkilot`);
+  const pakka = ikaPakkaKategoriasta(arvo("category"));
+  const q = new URLSearchParams();
+  for (const k of ["henkilot", "tulos", "autostart"]) {
+    const v = arvo(k);
+    if (v) q.set(k, v);
   }
-
-  return (
-    <>
-      <JsonLd data={peliLd({ name: "Tietoketju: Ikäjärjestys", url: "/peli/ikajarjestys", description: "Aseta kymmenen tunnettua suomalaista syntymävuoden mukaiseen järjestykseen." })} />
-      <IkajarjestysClient initialCategory={category} initialRound={initialRound} kasvot={kasvot} />
-    </>
-  );
+  const haku = q.toString();
+  permanentRedirect(haku ? `${pakka.href}?${haku}` : pakka.href);
 }

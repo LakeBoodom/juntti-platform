@@ -3,10 +3,12 @@
 // (ReorderableChainList → RevealSequencer + pisteet samalla sivulla), mutta kohteet ja
 // suunta tulevat pakasta. Vaiheet: aloitus → järjestäminen → paljastus.
 // Toistonesto kuten Ikäjärjestyksessä: edellisen kierroksen id:t sessionStorageen.
+// Osa C (31.10.2026): Järjestä-hubin pakka — paluu hubiin, ei ohjeita eikä Muut järjestyspelit -osiota,
+// hubista tultaessa (?aloita=1) ensimmäinen kierros tulee valmiina palvelimelta, tuloksessa Seuraava pakka.
 
 import { pelijakoteksti } from "@/lib/korttinimi";
 import { jarjestaTaso } from "@/lib/pelitasot";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { haeJarjestysKierros } from "@/lib/jarjesta/kierros";
 import {
   oikeaJarjestys,
@@ -23,11 +25,12 @@ import {
 import Pelipalkki from "@/components/tn20/pelikehys/Pelipalkki";
 import PeliKehys from "@/components/tn20/pelikehys/PeliKehys";
 import PeliAloitus from "@/components/tn20/pelikehys/PeliAloitus";
-import PeliTulos, { Pelikortit } from "@/components/tn20/pelikehys/PeliTulos";
-import { seuraavatPelit, type Pelimuoto } from "@/lib/pelimuodot";
+import PeliTulos from "@/components/tn20/pelikehys/PeliTulos";
 import { kirjaaPelimuotoPeli } from "@/lib/pelimuotoPelit";
+import { HUB, HUB_HREF } from "@/lib/jarjesta/hub";
+import SeuraavaPakka from "@/components/tn20/jarjesta/SeuraavaPakka";
 
-const PELI = "Laita järjestykseen";
+const PELI = "Järjestä";
 
 type Phase = "start" | "loading" | "ordering" | "revealing";
 
@@ -56,17 +59,23 @@ function tallennaEdelliset(slug: string, ids: string[]) {
 
 export default function JarjestaClient({
   pakka,
-  muut,
+  initialRound = null,
 }: {
   pakka: Pakka;
-  muut: Pelimuoto[];
+  /** Hubista (?aloita=1): palvelimella arvottu ensimmäinen kierros, jo sekoitettuna. */
+  initialRound?: JarjestysKohde[] | null;
 }) {
-  const [round, setRound] = useState<JarjestysKohde[] | null>(null);
-  const [order, setOrder] = useState<JarjestysKohde[]>([]);
-  const [phase, setPhase] = useState<Phase>("start");
+  const alussa = !!initialRound && initialRound.length >= 3;
+  const [round, setRound] = useState<JarjestysKohde[] | null>(alussa ? initialRound : null);
+  const [order, setOrder] = useState<JarjestysKohde[]>(alussa ? initialRound! : []);
+  const [phase, setPhase] = useState<Phase>(alussa ? "ordering" : "start");
   const [notice, setNotice] = useState<string | null>(null);
-  // Pelikehys K1: paluu pakan kotikokoelmaan.
-  const koti = { href: `/kokoelma/${pakka.collection.slug}`, nimi: pakka.collection.nimi };
+  // Osa C: paluu Järjestä-hubiin (ei kokoelmaan).
+  const koti = HUB;
+  // Palvelimen arpoma ensimmäinen kierros toistonestoon kuten clientillä arvottu.
+  useEffect(() => {
+    if (alussa) tallennaEdelliset(pakka.slug, initialRound!.map((k) => k.id));
+  }, [alussa, initialRound, pakka.slug]);
   // KORTTISÄÄNTÖ: otsikko on uppercase eikä sanoja katkaista → koko pisimmän sanan mukaan (CSS).
   const lwTyyli = {
     "--tk-lw": Math.max(...pakka.otsikko.split(/\s+/).map((w) => w.length), 8),
@@ -162,34 +171,7 @@ export default function JarjestaClient({
               </button>
             }
             alarivi={notice ? <span role="alert">{notice}</span> : pakka.rajaus}
-            ohjeet={[
-              {
-                otsikko: "Näin pelaat",
-                sisalto: (
-                  <ol>
-                    <li>
-                      <b>Järjestä {pakka.pick} korttia</b> – {pakka.suunta.toLowerCase()}. Raahaa korttia tai napauta kahta korttia vaihtaaksesi niiden paikat.
-                    </li>
-                    <li>
-                      <b>Paljasta järjestys.</b> Näet jokaisen oikean arvon ja sen, mitkä kortit osuivat oikealle paikalle.
-                    </li>
-                    <li>
-                      <b>Pisteet:</b> oikea paikka 10 p, yhden sijan päässä 5 p. Jos kahdella kortilla on sama arvo, kumpi tahansa järjestys on oikein.
-                    </li>
-                  </ol>
-                ),
-              },
-              ...(muut.length > 0
-                ? [
-                    {
-                      otsikko: "Muut järjestyspelit",
-                      sisalto: (
-                        <Pelikortit pelit={muut} />
-                      ),
-                    },
-                  ]
-                : []),
-            ]}
+            ohjeet={[]}
           />
         </main>
       </PeliKehys>
@@ -211,8 +193,9 @@ export default function JarjestaClient({
                 tasonimi={jarjestaTaso(scoreResult.correctCount, scoreResult.totalCount, pakka.collection.slug)}
                 lause={`${scoreResult.score} pistettä. Pisin oikea ketju: ${scoreResult.longestCorrectChain}.`}
                 jako={{ ...jakoTiedot(), natiiviOtsikko: PELI }}
-                toiminnot={[{ teksti: "Pelaa uusi kierros", onClick: aloita }]}
-                seuraavat={seuraavatPelit(`jarjesta-${pakka.slug}`, pakka.collection.slug)}
+                toiminnot={[{ teksti: "Pelaa uusi kierros", onClick: aloita }, { teksti: "Kaikki pakat", href: HUB_HREF }]}
+                seuraavat={[]}
+                seuraavaOsio={<SeuraavaPakka slug={pakka.slug} />}
               />
             }
           />

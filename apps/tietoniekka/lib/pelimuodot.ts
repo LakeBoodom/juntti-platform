@@ -35,10 +35,6 @@ const TUPLA_KOKOELMA: Record<string, string> = {
   maantieto: "matkakohteet",
 };
 
-/** Laita järjestykseen -pakat, joilla on oma korttikuva public/20/vaalit/pakat/<slug>.webp. Henkilöpakkojen kuvat
- *  (presidentit … eduskunta-pisimpaan, 25.10.2026) on koottu kolmesta omasta kasvokopiosta public/20/vaalit/kasvot. */
-const PAKKAKUVAT = new Set(["eduskuntaryhmat", "puolueet-ika", "vaalipiirit-paikat", "presidentit", "paaministerit", "paaministerit-kesto", "eduskunta-pisimpaan"]);
-
 export const PELIMUODOT: Pelimuoto[] = [
   ...TEEMAT.map((t) => ({
     slug: `tupla-${t.slug}`,
@@ -76,8 +72,8 @@ export const PELIMUODOT: Pelimuoto[] = [
     href: pakkaHref(p),
     tila: "pelattava" as const,
     serves: [p.collection.slug],
-    /* Pakan oma korttikuva, muuten Vaalit-hubin kuva (kevyet kopiot, lähteet kuvalahteet.ts). */
-    kuva: { src: PAKKAKUVAT.has(p.slug) ? `/20/vaalit/pakat/${p.slug}.webp` : "/20/vaalit/hero-kortti.webp" },
+    /* Pakan oma korttikuva (pakat.ts korttikuva; kevyet kopiot, lähteet kuvalahteet.ts). */
+    kuva: { src: p.korttikuva },
   })),
   { slug: "megavisat", nimi: "Megavisat", ikoni: "jarjestys", kuvaus: "Pitkät visat yhdellä istumalla.", href: "/megavisat", tila: "pelattava", serves: [], kuva: { src: "/20/pelit/k/megavisat.webp" } },
 ];

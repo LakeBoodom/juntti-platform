@@ -323,8 +323,8 @@ export async function haeHenkiloSivu(slug: string): Promise<HenkiloSivu | { ohja
         kysymys: "Kuka on vanhin?",
         otsikko,
         kuvaus: `Järjestä ${c.name} ja ${lukuSana(valitut.length)} muuta syntymäpäivän mukaan.`,
-        // category: "Arvo 10 uutta" jatkaa saman ryhmän kierroksilla.
-        href: `/peli/ikajarjestys?henkilot=${jasenet.map((x) => x.id).join(",")}&category=${r}`,
+        // Ryhmän Ikäjärjestys-pakka (osa C 31.10.2026): "Pelaa uusi kierros" jatkaa saman ryhmän kierroksilla.
+        href: `/peli/jarjesta/ikajarjestys-${r}?henkilot=${jasenet.map((x) => x.id).join(",")}`,
         laatat: nostoLaatat(jasenet),
         lisaa: Math.max(0, jasenet.length - 4),
         akseli: ["Vanhin", "Nuorin"],
