@@ -1,7 +1,10 @@
 // Etusivu — pelikorttien kuvitukset (CD "TN Etusivu mobiili v8", Heikki 30.10.2026): valokuvan sijaan pieni näkymä pelistä.
 // Koostettu 242 × 151 px:n kehykseen (mobiilikortti); leveämmässä kortissa kehys keskitetään ja tausta täyttää reunat.
 // Kaikki kuvat omia kopioita (UI-laatusääntö 6): kuntavaakunat ja liput Supabase-storagessa, muut public/20/.
+// Reittipelit (Rajanaapurit, Kuntaliitos, Vaalipiiriketju): CD v11 — Lähtö, Maali ja irtopalat, ks. Reitti().
 // Koriste: aria-hidden (kortin nimi ja kuvaus kertovat pelin). Järjestyspeleissä ei näytetä oikeaa järjestystä.
+
+import type { ReactNode } from "react";
 
 const STORAGE = "https://pkfsdzqwfxqczirjddue.supabase.co/storage/v1/object/public/kuvavisa-images/tietoniekka";
 const VAAKUNA = `${STORAGE}/kuntavaakunat`;
@@ -10,48 +13,91 @@ const VAAKUNA = `${STORAGE}/kuntavaakunat`;
 export const KUVITETUT = new Set(["kuvavisat", "aanivisat", "kuntaliitos", "rajanaapurit", "vaalipiiriketju", "mika-maa", "ikajarjestys", "laita-jarjestykseen"]);
 
 /* eslint-disable @next/next/no-img-element */
-function Lippu({ raidat }: { raidat: [string, string, string] }) {
-  return <span className="tn-pk-lippu">{raidat.map((c, i) => <i key={i} style={{ background: c }} />)}</span>;
+/** Lippu vaakaraidoin ylhäältä alas; paino = raidan suhteellinen korkeus (Latvia 2:1:2). */
+function Lippu({ raidat, pieni }: { raidat: Array<string | [string, number]>; pieni?: boolean }) {
+  return (
+    <span className="tn-pk-lippu" data-pieni={pieni || undefined}>
+      {raidat.map((r, i) => {
+        const [c, w] = typeof r === "string" ? [r, 1] : r;
+        return <i key={i} style={{ background: c, flexGrow: w }} />;
+      })}
+    </span>
+  );
 }
+
+type Pala = { nimi: string; kuva: ReactNode; pieniKuva: ReactNode };
+
+/** Reittipelin kuvitus (CD "TN Etusivu mobiili v11", Heikki 31.10.2026): lukittu Lähtö ja Maali, välissä yksi oikein
+ *  asetettu pala ja tyhjä paikka, alla kaksi irtopalaa — vasenta raahataan paikalleen, oikea on harhautin.
+ *  Rajanaapuruudet tarkistettu kannasta (kuntien_rajat, vaalipiirien_rajat): harhautin ei rajaudu edelliseen palaan. */
+function Reitti({ luokka, lahto, toka, maali, oikea, harhautin }: { luokka: string; lahto: Pala; toka: Pala; maali: Pala; oikea: Pala; harhautin: Pala }) {
+  const solmu = (p: Pala | null, paa?: "Lähtö" | "Maali") => (
+    <span className="tn-pk-solmu">
+      <span className="tn-pk-paa" data-tyhja={!paa || undefined}>{paa}</span>
+      {p ? (
+        <span className="tn-pk-pala" data-lukittu={paa ? "" : undefined}>{p.kuva}<b>{p.nimi}</b></span>
+      ) : (
+        <span className="tn-pk-aukko">?</span>
+      )}
+    </span>
+  );
+  return (
+    <span className={`tn-pk ${luokka}`} aria-hidden="true">
+      <span className="tn-pk-kehys tn-pk-reitti">
+        <span className="tn-pk-ketju">
+          {solmu(lahto, "Lähtö")}
+          <span className="tn-pk-liitos" />
+          {solmu(toka)}
+          <span className="tn-pk-liitos tn-pk-liitos--pisteet" />
+          {solmu(null)}
+          <span className="tn-pk-liitos tn-pk-liitos--pisteet" />
+          {solmu(maali, "Maali")}
+        </span>
+        <span className="tn-pk-irrot">
+          <span className="tn-pk-irto" data-veto="">{oikea.pieniKuva}<b>{oikea.nimi}</b></span>
+          <span className="tn-pk-irto">{harhautin.pieniKuva}<b>{harhautin.nimi}</b></span>
+        </span>
+      </span>
+    </span>
+  );
+}
+
+const vaakuna = (koodi: string, nimi: string): Pala => ({
+  nimi,
+  kuva: <img className="tn-pk-vaakuna" src={`${VAAKUNA}/${koodi}.png`} alt="" />,
+  pieniKuva: <img className="tn-pk-vaakuna tn-pk-vaakuna--pieni" src={`${VAAKUNA}/${koodi}.png`} alt="" />,
+});
+const maa = (nimi: string, raidat: Array<string | [string, number]>): Pala => ({
+  nimi, kuva: <Lippu raidat={raidat} />, pieniKuva: <Lippu raidat={raidat} pieni />,
+});
+const edustaja = (piiri: string, kuva: string): Pala => ({
+  nimi: piiri,
+  kuva: <img className="tn-pk-kasvo" src={`/20/henkilot/k/${kuva}.webp`} alt="" />,
+  pieniKuva: <img className="tn-pk-kasvo tn-pk-kasvo--pieni" src={`/20/henkilot/k/${kuva}.webp`} alt="" />,
+});
 
 export default function PeliKuvitus({ slug }: { slug: string }) {
   switch (slug) {
     case "kuntaliitos":
+      /* Kotka–Kouvola–[Mäntyharju]–Mikkeli; Hamina rajautuu Kouvolaan mutta ei Mikkeliin. */
       return (
-        <span className="tn-pk tn-pk--kunta" aria-hidden="true">
-          <span className="tn-pk-kehys tn-pk-rivi">
-            <span className="tn-pk-kortti tn-pk-kallis"><img src={`${VAAKUNA}/285.png`} alt="" /><b>Kotka</b></span>
-            <span className="tn-pk-viiva" />
-            <span className="tn-pk-kortti tn-pk-nosto"><img src={`${VAAKUNA}/286.png`} alt="" /><b>Kouvola</b></span>
-            <span className="tn-pk-viiva tn-pk-viiva--pisteet" />
-            <span className="tn-pk-tyhja">?</span>
-          </span>
-        </span>
+        <Reitti luokka="tn-pk--kunta" lahto={vaakuna("285", "Kotka")} toka={vaakuna("286", "Kouvola")} maali={vaakuna("491", "Mikkeli")}
+          oikea={vaakuna("507", "Mäntyharju")} harhautin={vaakuna("075", "Hamina")} />
       );
     case "rajanaapurit":
+      /* Viro–Latvia–[Liettua]–Puola; Saksa rajautuu Puolaan mutta ei Latviaan. */
       return (
-        <span className="tn-pk tn-pk--raja" aria-hidden="true">
-          <span className="tn-pk-kehys tn-pk-rivi">
-            <span className="tn-pk-kortti tn-pk-kallis"><Lippu raidat={["#C8102E", "#FFFFFF", "#C8102E"]} /><b>Itävalta</b></span>
-            <span className="tn-pk-viiva" />
-            <span className="tn-pk-kortti tn-pk-nosto"><Lippu raidat={["#CE2939", "#FFFFFF", "#477050"]} /><b>Unkari</b></span>
-            <span className="tn-pk-viiva tn-pk-viiva--pisteet" />
-            <span className="tn-pk-tyhja">?</span>
-          </span>
-        </span>
+        <Reitti luokka="tn-pk--raja" lahto={maa("Viro", ["#0072CE", "#000000", "#FFFFFF"])} toka={maa("Latvia", [["#9E3039", 2], ["#FFFFFF", 1], ["#9E3039", 2]])}
+          maali={maa("Puola", ["#FFFFFF", "#DC143C"])} oikea={maa("Liettua", ["#FDB913", "#006A44", "#C1272D"])} harhautin={maa("Saksa", ["#000000", "#DD0000", "#FFCE00"])} />
       );
     case "vaalipiiriketju":
-      /* Oikeat istuvat kansanedustajat (Heikki 30.10.): Halla-aho (Helsinki) → Purra (Uusimaa) → ? (Häme). */
+      /* Istuvat kansanedustajat vaalipiirinsä kasvoina: Halla-aho (Helsinki) → Purra (Uusimaa) → [Grahn-Laasonen (Häme)]
+         → Pauli Kiuru (Pirkanmaa); harhautin Krista Kiuru (Satakunta), joka ei rajaudu Uuteenmaahan. */
       return (
-        <span className="tn-pk tn-pk--vaali" aria-hidden="true">
-          <span className="tn-pk-kehys tn-pk-rivi">
-            <span className="tn-pk-kortti tn-pk-kortti--kork tn-pk-kallis"><img className="tn-pk-kasvo" src="/20/henkilot/k/jussi-halla-aho-9-5-2023-072081.webp" alt="" /><b>Halla-aho</b><small>Helsinki</small></span>
-            <span className="tn-pk-viiva" />
-            <span className="tn-pk-kortti tn-pk-kortti--kork tn-pk-nosto"><img className="tn-pk-kasvo" src="/20/henkilot/k/riikka-purra-2026-cropped-da8106.webp" alt="" /><b>Purra</b><small>Uusimaa</small></span>
-            <span className="tn-pk-viiva tn-pk-viiva--pisteet" />
-            <span className="tn-pk-tyhja tn-pk-tyhja--kork">?<small>Häme</small></span>
-          </span>
-        </span>
+        <Reitti luokka="tn-pk--vaali"
+          lahto={edustaja("Helsinki", "jussi-halla-aho-9-5-2023-072081")} toka={edustaja("Uusimaa", "riikka-purra-2026-cropped-da8106")}
+          maali={edustaja("Pirkanmaa", "pauli-kiuru-2018-aa3698")} oikea={edustaja("Häme", "sanni-grahn-laasonen-01-cropped-8a0766")}
+          harhautin={edustaja("Satakunta", "krista-kiuru-2019-cropped-be2bd6")} />
       );
     case "kuvavisat":
       return (

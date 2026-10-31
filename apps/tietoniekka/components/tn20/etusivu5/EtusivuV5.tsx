@@ -53,7 +53,8 @@ function PaivanPelit({ d }: { d: D }) {
       <div className="tn-es-pp-ruudukko">
         {visa && <PaivanVisaV5 k={visa} />}
         <div className="tn-es-pp-sivu" data-yksi={!mikaMaa || undefined}>
-          {/* Synttärit A (v7 1b): iso ikä täyttää oikean puolen. Muistopäivänä "vuotta syntymästä". */}
+          {/* Synttärit A (v7 1b): iso ikä täyttää oikean puolen. Muistopäivänä "vuotta syntymästä".
+              Nappi nimeää visan (31.10.); U+200B yhdysmerkin jälkeen, koska Safari ei katkaise siitä keep-all-tilassa. */}
           {sankari && (
             <a className="tn-es-synt" href={sankari.playHref} data-tn-entry="etusivu:synttarit">
               <span className="tn-es-synt-kuva">
@@ -70,7 +71,7 @@ function PaivanPelit({ d }: { d: D }) {
                   </span>
                   <span className="tn-es-synt-h" style={lw(sankari.nimi)}>{sankari.nimi}</span>
                 </span>
-                <span className="tn-es-nappi tn-es-synt-nappi">Pelaa visa</span>
+                <span className="tn-es-nappi tn-es-synt-nappi">Pelaa {sankari.nimi.replace(/(?<=\p{L})-(?=\p{L})/gu, "-\u200B")} -visa</span>
               </span>
             </a>
           )}
