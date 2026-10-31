@@ -38,17 +38,16 @@ export type BanneriHenkilo = { id: string; name: string; image: string };
    suurin resurssi, 199 kt). Designin neljällä henkilöllä on omat 240×320-kopiot (krediitit
    lib/kuvalahteet.ts, kokoelma "ikajarjestys"); varalle tulevat henkilöt näytetään nimikirjaimin. */
 const OMAT_KASVOT: Record<string, string> = {
-  "Leonardo DiCaprio": "/20/ikajarjestys/kasvot/leonardo-dicaprio.webp",
   "Kimi Räikkönen": "/20/ikajarjestys/kasvot/kimi-raikkonen.webp",
-  "Taylor Swift": "/20/ikajarjestys/kasvot/taylor-swift.webp",
   "Sanna Marin": "/20/ikajarjestys/kasvot/sanna-marin.webp",
 };
 
 /* Designin henkilöt (paikanpitäjinä designissa, oikeat kuvat kannasta).
    Tunnettuja eri aloilta ja eri vuosikymmeniltä, jotta "vanhin → nuorin"
    -akseli lukee heti. Jos joku puuttuu kannasta, tilalle otetaan muita
-   kuvallisia henkilöitä — banneri ei saa jäädä vajaaksi. */
-const BANNERIN_HENKILOT = ["Leonardo DiCaprio", "Kimi Räikkönen", "Sanna Marin", "Taylor Swift"];
+   kuvallisia henkilöitä — banneri ei saa jäädä vajaaksi.
+   31.10.2026 (Heikki): banneri vie Järjestän Tunnetut suomalaiset -pakkaan → vain suomalaisia. */
+const BANNERIN_HENKILOT = ["Vesa-Matti Loiri", "Kimi Räikkönen", "Sanna Marin", "Käärijä"];
 
 export async function getBanneriHenkilot(): Promise<BanneriHenkilo[]> {
   const sb = getSupabase();
@@ -70,6 +69,7 @@ export async function getBanneriHenkilot(): Promise<BanneriHenkilo[]> {
       .eq("site_id", siteId)
       .not("image_url", "is", null)
       .not("birth_date", "is", null)
+      .eq("suomalainen", true)
       .order("name")
       .limit(12);
     const jo = new Set(rivit.map((r) => r.id));

@@ -46,6 +46,10 @@ export type Pakka = {
     ehto?: { attrKey: string; num: number };
     /** Kierroksessa vähintään `maara` tunnettua: henkilöllä celebrity_id tai pakan arvo ≥ `arvoVahintaan`. */
     tunnettuja?: { maara: number; arvoVahintaan: number };
+    /** Vain nämä entiteetit nimen mukaan (esim. Suomen järvet maailman järvien joukosta). */
+    vainNimet?: string[];
+    /** Nämä pois (esim. Ukko-Koli on vaara, ei tunturi). */
+    poisNimet?: string[];
   };
   /** Tekstikortit: ei kuvapaikkaa koskaan. Muuten kuvat näytetään vain, jos kaikilla on kuva. */
   piilotaKuva?: boolean;
@@ -59,6 +63,10 @@ export type Pakka = {
   /** Hubin pakkakortti. `kuvat`: kolme kasvoa (public/, 240×320) rinnakkain tai yksi valokuva (16:10).
    *  Ilman kuvia kortti näyttää puolikaarimotiivin. Krediitit lib/kuvalahteet.ts. */
   kortti: { otsikko: string; meta: string; kuvat?: string[] };
+  /** Hubin ja "Seuraava pakka" -kortin kuva (public/, n. 720 px leveä). */
+  korttikuva: string;
+  /** Järjestä-hubin päivän rivin lause (CD kierros 5a, 31.10.2026): viisi kohdetta, peruste ja suunta. */
+  paivanLause: string;
   /** Jakokuvan taustakuva (public/). */
   kuva: string;
 };
@@ -87,8 +95,10 @@ export const PAKAT: Pakka[] = [
     etuliite: "presidentiksi",
     pick: 8,
     collection: VAALIT,
-    kortti: { otsikko: "Presidentit", meta: "Virkaanastumisjärjestys", kuvat: ["/20/vaalit/kasvot/paasikivi.webp", "/20/vaalit/kasvot/koivisto.webp", "/20/vaalit/kasvot/niinisto.webp"] },
+    kortti: { otsikko: "Presidentit", meta: "Virkaanastuminen", kuvat: ["/20/vaalit/kasvot/paasikivi.webp", "/20/vaalit/kasvot/koivisto.webp", "/20/vaalit/kasvot/niinisto.webp"] },
     kuva: VAALIT_KUVA,
+    korttikuva: "/20/vaalit/pakat/presidentit.webp",
+    paivanLause: "Viisi presidenttiä virkaanastumisen mukaan, ensimmäinen ensin.",
   },
   {
     slug: "paaministerit",
@@ -109,6 +119,8 @@ export const PAKAT: Pakka[] = [
     collection: VAALIT,
     kortti: { otsikko: "Pääministerit", meta: "Aikajärjestys", kuvat: ["/20/vaalit/kasvot/holkeri.webp", "/20/vaalit/kasvot/aho.webp", "/20/vaalit/kasvot/marin.webp"] },
     kuva: VAALIT_KUVA,
+    korttikuva: "/20/vaalit/pakat/paaministerit.webp",
+    paivanLause: "Viisi pääministeriä ensimmäisen kauden mukaan, varhaisin ensin.",
   },
   {
     slug: "paaministerit-kesto",
@@ -126,8 +138,10 @@ export const PAKAT: Pakka[] = [
     yksikko: "päivää",
     pick: 8,
     collection: VAALIT,
-    kortti: { otsikko: "Pääministerikausien pituus", meta: "Päivinä", kuvat: ["/20/vaalit/kasvot/kallio.webp", "/20/vaalit/kasvot/lipponen.webp", "/20/vaalit/kasvot/vanhanen.webp"] },
+    kortti: { otsikko: "Pääministerikaudet", meta: "Päivinä", kuvat: ["/20/vaalit/kasvot/kallio.webp", "/20/vaalit/kasvot/lipponen.webp", "/20/vaalit/kasvot/vanhanen.webp"] },
     kuva: VAALIT_KUVA,
+    korttikuva: "/20/vaalit/pakat/paaministerit-kesto.webp",
+    paivanLause: "Viisi pääministeriä kausien yhteispituuden mukaan, pisin ensin.",
   },
   {
     slug: "eduskunta-pisimpaan",
@@ -148,8 +162,10 @@ export const PAKAT: Pakka[] = [
     piilotaKuva: true,
     rooliAttr: "mp_party",
     collection: VAALIT,
-    kortti: { otsikko: "Pisimpään eduskunnassa", meta: "Istuvat kansanedustajat", kuvat: ["/20/vaalit/kasvot/zyskowicz.webp", "/20/vaalit/kasvot/tuomioja.webp", "/20/vaalit/kasvot/rasanen.webp"] },
+    kortti: { otsikko: "Eduskuntavuodet", meta: "Istuvat kansanedustajat", kuvat: ["/20/vaalit/kasvot/zyskowicz.webp", "/20/vaalit/kasvot/tuomioja.webp", "/20/vaalit/kasvot/rasanen.webp"] },
     kuva: VAALIT_KUVA,
+    korttikuva: "/20/vaalit/pakat/eduskunta-pisimpaan.webp",
+    paivanLause: "Viisi kansanedustajaa eduskuntavuosien mukaan, pisimpään ollut ensin.",
   },
   {
     slug: "eduskuntaryhmat",
@@ -170,6 +186,8 @@ export const PAKAT: Pakka[] = [
     collection: VAALIT,
     kortti: { otsikko: "Eduskuntaryhmät", meta: "Koon mukaan", kuvat: ["/20/vaalit/pakat/eduskuntaryhmat.webp"] },
     kuva: VAALIT_KUVA,
+    korttikuva: "/20/vaalit/pakat/eduskuntaryhmat.webp",
+    paivanLause: "Viisi eduskuntaryhmää koon mukaan, suurin ensin.",
   },
   {
     slug: "puolueet-ika",
@@ -191,6 +209,8 @@ export const PAKAT: Pakka[] = [
     collection: VAALIT,
     kortti: { otsikko: "Puolueiden ikä", meta: "Perustamisvuosi", kuvat: ["/20/vaalit/pakat/puolueet-ika.webp"] },
     kuva: VAALIT_KUVA,
+    korttikuva: "/20/vaalit/pakat/puolueet-ika.webp",
+    paivanLause: "Viisi puoluetta perustamisvuoden mukaan, vanhin ensin.",
   },
   {
     slug: "vaalipiirit-paikat",
@@ -212,15 +232,132 @@ export const PAKAT: Pakka[] = [
     collection: VAALIT,
     kortti: { otsikko: "Vaalipiirit", meta: "Paikkamäärän mukaan", kuvat: ["/20/vaalit/pakat/vaalipiirit-paikat.webp"] },
     kuva: VAALIT_KUVA,
+    korttikuva: "/20/vaalit/pakat/vaalipiirit-paikat.webp",
+    paivanLause: "Viisi vaalipiiriä paikkamäärän mukaan, eniten paikkoja ensin.",
   },
 
-  // ── Ensimmäiset pakat (3.10.2026), odottavat omaa hyväksyntäänsä (CD-kuvat, park_landscape) ──
+  // ── Luonto ja maantieto (Heikki 31.10.2026: "ei ihmisiä – tuntureita ja niiden korkeus jne.") ──
+  {
+    slug: "tunturit-korkeus",
+    julkaistu: true,
+    otsikko: "tunturit korkeuden mukaan",
+    seoTitle: "Järjestä: Suomen tunturit korkeuden mukaan",
+    kuvaus: "Järjestä kahdeksan Suomen tunturia korkeuden mukaan korkeimmasta matalimpaan.",
+    rajaus: "Suomen tunnetuimmat tunturit, korkein huippu metreinä merenpinnasta (Wikidata).",
+    suunta: "Korkein ylimmäksi",
+    kind: "fell",
+    attrKey: "height_m",
+    scope: "",
+    direction: "desc",
+    /* Alle 10 m:n erot (Halti 1 324 / Ridnitšohkka 1 317, Pyhä 540 / Kiilopää 546) eivät samaan kierrokseen. */
+    vali: { tapa: "absoluuttinen", min: 10 },
+    yksikko: "m",
+    pick: 8,
+    pool: { poisNimet: ["Ukko-Koli"] },
+    piilotaKuva: true,
+    collection: { slug: "luonto", nimi: "Luonto" },
+    kortti: { otsikko: "Tunturit", meta: "Korkeus" },
+    kuva: "/20/luonto/tunturin-salainen-elama-lappi-visa.webp",
+    korttikuva: "/20/luonto/k/tunturin-salainen-elama-lappi-visa.webp",
+    paivanLause: "Viisi tunturia korkeuden mukaan, korkein ensin.",
+  },
+  {
+    slug: "vuoret-korkeus",
+    julkaistu: true,
+    otsikko: "maailman vuoret korkeuden mukaan",
+    seoTitle: "Järjestä: maailman vuoret korkeuden mukaan",
+    kuvaus: "Järjestä kahdeksan maailman tunnettua vuorta korkeuden mukaan korkeimmasta matalimpaan.",
+    rajaus: "Tunnettuja vuoria eri mantereilta, korkeus metreinä merenpinnasta (Wikidata).",
+    suunta: "Korkein ylimmäksi",
+    kind: "mountain",
+    attrKey: "mountain_height",
+    scope: "",
+    direction: "desc",
+    vali: { tapa: "suhteellinen", min: 0.03 },
+    yksikko: "m",
+    pick: 8,
+    piilotaKuva: true,
+    collection: { slug: "matkakohteet", nimi: "Maantieto" },
+    kortti: { otsikko: "Vuoret", meta: "Korkeus" },
+    kuva: "/20/maantieto/maailman-korkeimmat-vuoret-visa.webp",
+    korttikuva: "/20/maantieto/k/maailman-korkeimmat-vuoret-visa.webp",
+    paivanLause: "Viisi vuorta korkeuden mukaan, korkein ensin.",
+  },
+  {
+    slug: "jarvet-pinta-ala",
+    julkaistu: true,
+    otsikko: "Suomen järvet pinta-alan mukaan",
+    seoTitle: "Järjestä: Suomen järvet pinta-alan mukaan",
+    kuvaus: "Järjestä kahdeksan Suomen järveä pinta-alan mukaan suurimmasta pienimpään.",
+    rajaus: "Suomen tunnettuja järviä, pinta-ala neliökilometreinä (km²).",
+    suunta: "Suurin ylimmäksi",
+    kind: "lake",
+    attrKey: "area_km2",
+    scope: "",
+    direction: "desc",
+    /* Lähteet eroavat muutamalla prosentilla (Inarijärvi 1 040–1 082 km²) → vähintään 8 %:n ero. */
+    vali: { tapa: "suhteellinen", min: 0.08 },
+    yksikko: "km²",
+    pick: 8,
+    /* Kilpisjärvi pois: lähteiden pinta-alat eroavat (15 / 37 km²). */
+    pool: { vainNimet: ["Saimaa", "Päijänne", "Inarijärvi", "Pielinen", "Oulujärvi", "Pihlajavesi", "Orivesi", "Haukivesi", "Keitele", "Kallavesi", "Puruvesi", "Puula", "Lokan tekojärvi", "Höytiäinen", "Näsijärvi", "Lappajärvi", "Vesijärvi", "Vanajavesi", "Keurusselkä", "Tuusulanjärvi", "Bodominjärvi"] },
+    piilotaKuva: true,
+    collection: { slug: "luonto", nimi: "Luonto" },
+    kortti: { otsikko: "Järvet", meta: "Pinta-ala" },
+    kuva: "/20/luonto/jarvien-katketyt-ihmeet-visa.webp",
+    korttikuva: "/20/luonto/k/jarvien-katketyt-ihmeet-visa.webp",
+    paivanLause: "Viisi järveä pinta-alan mukaan, suurin ensin.",
+  },
+  {
+    slug: "kaupungit-asukasluku",
+    julkaistu: true,
+    otsikko: "kaupungit asukasluvun mukaan",
+    seoTitle: "Järjestä: Suomen kaupungit asukasluvun mukaan",
+    kuvaus: "Järjestä kahdeksan Suomen kaupunkia asukasluvun mukaan suurimmasta pienimpään.",
+    rajaus: "Suomen kaupungit, asukasluku Tilastokeskuksen mukaan 31.12.2025.",
+    suunta: "Suurin ylimmäksi",
+    kind: "city",
+    attrKey: "population",
+    scope: "",
+    direction: "desc",
+    vali: { tapa: "suhteellinen", min: 0.05 },
+    yksikko: "asukasta",
+    pick: 8,
+    piilotaKuva: true,
+    collection: { slug: "kaupungit", nimi: "Suomen kaupungit" },
+    kortti: { otsikko: "Kaupungit", meta: "Asukasluku" },
+    kuva: "/20/kaupungit/helsinki.webp",
+    korttikuva: "/20/kaupungit/k/helsinki.webp",
+    paivanLause: "Viisi kaupunkia asukasluvun mukaan, suurin ensin.",
+  },
+  {
+    slug: "maakunnat-pinta-ala",
+    julkaistu: true,
+    otsikko: "maakunnat pinta-alan mukaan",
+    seoTitle: "Järjestä: Suomen maakunnat pinta-alan mukaan",
+    kuvaus: "Järjestä kahdeksan Suomen maakuntaa maa-alan mukaan suurimmasta pienimpään.",
+    rajaus: "Suomen 19 maakuntaa, maa-ala neliökilometreinä Maanmittauslaitoksen mukaan.",
+    suunta: "Suurin ylimmäksi",
+    kind: "region",
+    attrKey: "region_area",
+    scope: "",
+    direction: "desc",
+    vali: { tapa: "suhteellinen", min: 0.04 },
+    yksikko: "km²",
+    pick: 8,
+    collection: { slug: "kaupungit", nimi: "Suomen kaupungit" },
+    kortti: { otsikko: "Maakunnat", meta: "Pinta-ala" },
+    kuva: "/20/jarjesta/maakunnat.webp",
+    korttikuva: "/20/jarjesta/maakunnat.webp",
+    paivanLause: "Viisi maakuntaa pinta-alan mukaan, suurin ensin.",
+  },
+  // ── Ensimmäiset pakat (3.10.2026): Kansallispuistot julkaistu 31.10.2026 (Järjestä-hub), Leijonat ja Tappara odottavat hyväksyntää ──
   {
     slug: "kansallispuistot-pinta-ala",
-    julkaistu: false,
+    julkaistu: true,
     otsikko: "kansallispuistot pinta-alan mukaan",
     seoTitle: "Laita järjestykseen: Suomen kansallispuistot pinta-alan mukaan",
-    kuvaus: "Järjestä kymmenen Suomen kansallispuistoa pinta-alan mukaan suurimmasta pienimpään.",
+    kuvaus: "Järjestä kahdeksan Suomen kansallispuistoa pinta-alan mukaan suurimmasta pienimpään.",
     rajaus: "Kaikki Suomen 41 kansallispuistoa, pinta-ala neliökilometreinä (km²).",
     suunta: "Suurin pinta-ala ensin",
     kind: "park",
@@ -229,12 +366,14 @@ export const PAKAT: Pakka[] = [
     direction: "desc",
     vali: { tapa: "suhteellinen", min: 0.05 },
     yksikko: "km²",
-    pick: 10,
+    pick: 8,
     piilotaKuva: true,
     naytaRooli: true,
     collection: { slug: "luonto", nimi: "Luonto" },
-    kortti: { otsikko: "Kansallispuistot", meta: "Pinta-alan mukaan" },
-    kuva: "/20/teema-luonto.webp",
+    kortti: { otsikko: "Kansallispuistot", meta: "Pinta-ala" },
+    kuva: "/20/luonto/suomen-kansallispuistot-visa.webp",
+    korttikuva: "/20/luonto/k/suomen-kansallispuistot-visa.webp",
+    paivanLause: "Viisi kansallispuistoa pinta-alan mukaan, suurin ensin.",
   },
   {
     slug: "leijonat-maaottelut",
@@ -255,6 +394,8 @@ export const PAKAT: Pakka[] = [
     collection: { slug: "jaakiekko", nimi: "Jääkiekko" },
     kortti: { otsikko: "Leijonat", meta: "Maaottelut" },
     kuva: "/20/jaakiekko/jk-leijonat-mm2019-kuva.webp",
+    korttikuva: "/20/jaakiekko/jk-leijonat-mm2019-kuva.webp",
+    paivanLause: "Viisi leijonaa maaottelujen mukaan, eniten pelannut ensin.",
   },
   {
     slug: "tappara-pisteet",
@@ -275,6 +416,8 @@ export const PAKAT: Pakka[] = [
     collection: { slug: "jaakiekko", nimi: "Jääkiekko" },
     kortti: { otsikko: "Tappara", meta: "Pistepörssi" },
     kuva: "/20/jaakiekko/jk-tappara-kuva.webp",
+    korttikuva: "/20/jaakiekko/jk-tappara-kuva.webp",
+    paivanLause: "Viisi tapparalaista pisteiden mukaan, eniten tehnyt ensin.",
   },
 ];
 

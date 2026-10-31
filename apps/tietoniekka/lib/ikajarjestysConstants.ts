@@ -27,6 +27,8 @@ export type ChainPerson = {
   image_url: string | null;
   /** ISO-päivämäärä (YYYY-MM-DD) suoraan kannasta — muotoillaan näyttöön vasta paljastuksessa. */
   birthDate: string;
+  /** celebrities.suomalainen (31.10.2026): Tunnetut suomalaiset -pakan nimi vain, jos kierros on kokonaan suomalaisia. */
+  suomalainen?: boolean;
 };
 
 /** Palauttaa henkilöt oikeassa kronologisessa järjestyksessä valitun suunnan mukaan. */

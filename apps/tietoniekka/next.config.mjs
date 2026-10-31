@@ -31,6 +31,8 @@ const nextConfig = {
   },
   async redirects() {
     return [
+      /* Järjestä (CD 5a, 31.10.2026): ammattikohtaiset ikäjärjestyspakat → henkilöpakka; kysely (?henkilot=, ?tulos=) säilyy. */
+      { source: "/peli/jarjesta/ikajarjestys-:aihe", destination: "/peli/jarjesta/tunnetut-suomalaiset", permanent: true },
       /* Haaran esikatseluosoitteet → juuri */
       { source: "/2-0", destination: "/", permanent: true },
       { source: "/2-0/:path*", destination: "/:path*", permanent: true },

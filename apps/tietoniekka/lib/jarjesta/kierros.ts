@@ -9,7 +9,8 @@
 
 import { getSupabase } from "../supabase";
 import { puolueNimi } from "../vaalit/puolue";
-import { haePakka, type JarjestysKohde, type Pakka } from "./pakat";
+import { haePakka, oikeaJarjestys, type JarjestysKohde, type Pakka } from "./pakat";
+import { RIVIN_PITUUS, siemen, vaaraJarjestys } from "./siemen";
 
 type Rivi = {
   num_value: number | string | null;
@@ -34,10 +35,10 @@ function riittavaVali(vali: Pakka["vali"], a: number, b: number): boolean {
   return ero >= vali.min;
 }
 
-function sekoita<T>(arr: T[]): T[] {
+function sekoita<T>(arr: T[], rng: () => number = Math.random): T[] {
   const out = arr.slice();
   for (let i = out.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
+    const j = Math.floor(rng() * (i + 1));
     [out[i], out[j]] = [out[j], out[i]];
   }
   return out;
@@ -45,16 +46,16 @@ function sekoita<T>(arr: T[]): T[] {
 
 /** Ahne poiminta satunnaisjärjestyksestä; muutama yritys, paras talteen. Tunnettuja-vaatimus:
  *  ehdokasjonon alkuun `maara` satunnaista tunnettua, jolloin ne pääsevät kierrokseen ensin. */
-function poimi(p: Pakka, pool: Ehdokas[], vali: Pakka["vali"]): Ehdokas[] {
+function poimi(p: Pakka, pool: Ehdokas[], vali: Pakka["vali"], rng: () => number = Math.random, pick = p.pick): Ehdokas[] {
   const tarve = p.pool?.tunnettuja?.maara ?? 0;
   const tunnettuja = (k: Ehdokas[]) => k.filter((x) => x.tunnettu).length;
   let paras: Ehdokas[] = [];
   for (let yritys = 0; yritys < 24; yritys++) {
-    const sekaisin = sekoita(pool);
+    const sekaisin = sekoita(pool, rng);
     const jono = tarve ? [...sekaisin.filter((k) => k.tunnettu).slice(0, tarve), ...sekaisin] : sekaisin;
     const valitut: Ehdokas[] = [];
     for (const k of jono) {
-      if (valitut.length >= p.pick) break;
+      if (valitut.length >= pick) break;
       if (valitut.some((v) => v.id === k.id)) continue;
       if (valitut.every((v) => riittavaVali(vali, v.value, k.value))) valitut.push(k);
     }
@@ -62,7 +63,7 @@ function poimi(p: Pakka, pool: Ehdokas[], vali: Pakka["vali"]): Ehdokas[] {
       valitut.length > paras.length ||
       (valitut.length === paras.length && tunnettuja(valitut) > tunnettuja(paras));
     if (parempi) paras = valitut;
-    if (paras.length >= p.pick && tunnettuja(paras) >= tarve) break;
+    if (paras.length >= pick && tunnettuja(paras) >= Math.min(tarve, pick)) break;
   }
   return paras;
 }
@@ -103,10 +104,10 @@ async function attrKartta(sb: NonNullable<ReturnType<typeof getSupabase>>, kind:
   return m;
 }
 
-export async function haeJarjestysKierros(slug: string, excludeIds: string[] = []): Promise<JarjestysKohde[]> {
-  const p = haePakka(slug);
+/** Pakan koko pelattava joukko (julkaistut kohteet, pakan rajaukset). */
+async function haePool(p: Pakka): Promise<Ehdokas[]> {
   const sb = getSupabase();
-  if (!p || !sb) return [];
+  if (!sb) return [];
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { data, error } = await (sb as any)
@@ -118,7 +119,7 @@ export async function haeJarjestysKierros(slug: string, excludeIds: string[] = [
     .eq("fact_entities.status", "published")
     .not("num_value", "is", null);
   if (error || !data) {
-    console.error("haeJarjestysKierros:", error);
+    console.error("haePool:", error);
     return [];
   }
 
@@ -134,12 +135,15 @@ export async function haeJarjestysKierros(slug: string, excludeIds: string[] = [
     return !b || new Date(b.num * 1000).getUTCFullYear() >= minVuosi;
   };
   const ehtoOk = (id: string) => !p.pool?.ehto || ehto?.get(id)?.num === p.pool.ehto.num;
+  const vain = p.pool?.vainNimet ? new Set(p.pool.vainNimet) : null;
+  const pois = new Set(p.pool?.poisNimet ?? []);
+  const nimiOk = (nimi: string) => (!vain || vain.has(nimi)) && !pois.has(nimi);
 
   const maxProm = p.pool?.maxProminence;
   const tunn = p.pool?.tunnettuja;
-  const pool: Ehdokas[] = (data as Rivi[])
+  return (data as Rivi[])
     .filter((r) => r.fact_entities && (!maxProm || (r.fact_entities.prominence ?? 1) <= maxProm))
-    .filter((r) => vuosiOk(r.fact_entities!.id) && ehtoOk(r.fact_entities!.id))
+    .filter((r) => vuosiOk(r.fact_entities!.id) && ehtoOk(r.fact_entities!.id) && nimiOk(r.fact_entities!.name))
     .map((r) => {
       const e = r.fact_entities!;
       const value = Number(r.num_value);
@@ -158,6 +162,18 @@ export async function haeJarjestysKierros(slug: string, excludeIds: string[] = [
       };
     })
     .filter((k) => Number.isFinite(k.value));
+}
+
+/** Kuvat kaikille tai ei kenellekään (brief §2): yksikin puuttuva → tekstikortit. */
+function kuvatKaikille(valitut: Ehdokas[]): JarjestysKohde[] {
+  const kuvat = valitut.every((k) => k.image_url);
+  return valitut.map(({ tunnettu: _t, ...k }) => (kuvat ? k : { ...k, image_url: null, hideThumb: true }));
+}
+
+export async function haeJarjestysKierros(slug: string, excludeIds: string[] = []): Promise<JarjestysKohde[]> {
+  const p = haePakka(slug);
+  if (!p) return [];
+  const pool = await haePool(p);
 
   const arvo = (lahde: Ehdokas[]) => {
     const tiukka = poimi(p, lahde, p.vali);
@@ -167,7 +183,32 @@ export async function haeJarjestysKierros(slug: string, excludeIds: string[] = [
   let valitut = excludeIds.length ? arvo(pool.filter((k) => !excludeIds.includes(k.id))) : [];
   if (valitut.length < p.pick) valitut = arvo(pool);
 
-  // Kuvat kaikille tai ei kenellekään (brief §2): yksikin puuttuva → tekstikortit.
-  const kuvat = valitut.every((k) => k.image_url);
-  return sekoita(valitut).map(({ tunnettu: _t, ...k }) => (kuvat ? k : { ...k, image_url: null, hideThumb: true }));
+  return kuvatKaikille(sekoita(valitut));
+}
+
+/** Päivän rivi (CD kierros 5a, 31.10.2026): RIVIN_PITUUS kohdetta väärässä järjestyksessä, sama kaikille
+ *  koko päivän (siemen = päivä + pakka). Hub näyttää rivin ja "Korjaa rivi" pelaa sen ?kohteet=-linkillä. */
+export async function haePaivanRivi(slug: string, paiva: string): Promise<JarjestysKohde[]> {
+  const p = haePakka(slug);
+  if (!p) return [];
+  const pool = await haePool(p);
+  const rng = siemen(`${paiva}:${slug}`);
+  /* Päivän rivissä mieluiten tunnettuja: pakan tunnettuja-ehto (esim. eduskuntavuodet) koskee koko riviä. */
+  const tunnetut = p.pool?.tunnettuja ? pool.filter((k) => k.tunnettu) : pool;
+  const lahde = tunnetut.length >= RIVIN_PITUUS * 2 ? tunnetut : pool;
+  let valitut = poimi(p, lahde, p.vali, rng, RIVIN_PITUUS);
+  if (valitut.length < RIVIN_PITUUS) valitut = poimi(p, lahde, { tapa: "absoluuttinen", min: 0 }, rng, RIVIN_PITUUS);
+  if (valitut.length < 3) return [];
+  return kuvatKaikille(vaaraJarjestys(oikeaJarjestys(valitut as JarjestysKohde[], p.direction) as Ehdokas[], rng));
+}
+
+/** Täsmälleen nämä kohteet annetussa järjestyksessä (?kohteet=id,id,… : päivän rivi ja jaettu kierros). */
+export async function haeJarjestysKohteet(slug: string, ids: string[]): Promise<JarjestysKohde[]> {
+  const p = haePakka(slug);
+  const puhtaat = [...new Set(ids)].filter((x) => /^[0-9a-f-]{36}$/i.test(x)).slice(0, 12);
+  if (!p || puhtaat.length < 3) return [];
+  const pool = await haePool(p);
+  const kartta = new Map(pool.map((k) => [k.id, k]));
+  const valitut = puhtaat.map((id) => kartta.get(id)).filter((k): k is Ehdokas => !!k);
+  return valitut.length >= 3 ? kuvatKaikille(valitut) : [];
 }

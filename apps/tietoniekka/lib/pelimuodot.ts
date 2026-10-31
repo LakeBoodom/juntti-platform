@@ -35,10 +35,6 @@ const TUPLA_KOKOELMA: Record<string, string> = {
   maantieto: "matkakohteet",
 };
 
-/** Laita järjestykseen -pakat, joilla on oma korttikuva public/20/vaalit/pakat/<slug>.webp. Henkilöpakkojen kuvat
- *  (presidentit … eduskunta-pisimpaan, 25.10.2026) on koottu kolmesta omasta kasvokopiosta public/20/vaalit/kasvot. */
-const PAKKAKUVAT = new Set(["eduskuntaryhmat", "puolueet-ika", "vaalipiirit-paikat", "presidentit", "paaministerit", "paaministerit-kesto", "eduskunta-pisimpaan"]);
-
 export const PELIMUODOT: Pelimuoto[] = [
   ...TEEMAT.map((t) => ({
     slug: `tupla-${t.slug}`,
@@ -54,7 +50,7 @@ export const PELIMUODOT: Pelimuoto[] = [
   { slug: "kuntaliitos", nimi: "Kuntaliitos", ikoni: "ketju", kuvaus: "Rakenna reitti naapurikuntien kautta.", href: "/peli/kuntaliitos", tila: "pelattava", serves: ["kaupungit", "matkakohteet"], kuva: { src: "/20/kuntaliitos/palapeli.webp" } },
   { slug: "rajanaapurit", nimi: "Rajanaapurit", ikoni: "ketju", kuvaus: "Ketjuta maat yhteisen rajan kautta.", href: "/peli/rajanaapurit", tila: "pelattava", serves: ["matkakohteet"], kuva: { src: "/20/rajanaapurit/banneri-kartta.webp" } },
   { slug: "vaalipiiriketju", nimi: "Vaalipiiriketju", ikoni: "ketju", kuvaus: "Kulje vaalipiiristä toiseen kansanedustajien kautta.", href: "/peli/vaalipiiriketju", tila: "pelattava", serves: ["vaalit"], kuva: { src: "/20/vaalit/vaalipiiriketju-kortti.webp" } },
-  { slug: "ikajarjestys", nimi: "Ikäjärjestys", ikoni: "ika", kuvaus: "Järjestä tunnetut henkilöt iän mukaan.", href: "/peli/ikajarjestys", tila: "pelattava", serves: ["tunnetut-henkilot"], kuva: { src: "/20/pelit/k/ikajarjestys.webp" } },
+  { slug: "ikajarjestys", nimi: "Ikäjärjestys", ikoni: "ika", kuvaus: "Järjestä tunnetut suomalaiset iän mukaan.", href: "/peli/jarjesta/tunnetut-suomalaiset", tila: "pelattava", serves: ["tunnetut-henkilot"], kuva: { src: "/20/pelit/k/ikajarjestys.webp" } },
   /* Viikon kuvavisa (15 kuvaa, vaihtuu maanantaisin) — entinen "Tämän viikon visa" -kaista Kuvavisat-sivulla. */
   { slug: "kuvavisa-viikko", nimi: "Viikon kuvavisa", ikoni: "kuva", kuvaus: "15 kuvaa, uusi visa joka maanantai.", href: "/kuvavisa/viikko", tila: "pelattava", serves: ["kuvavisat"], kuva: { src: "/20/pelit/k/kuvavisat.webp" } },
   { slug: "kuvavisat", nimi: "Kuvavisat", ikoni: "kuva", kuvaus: "Tunnista liput, vaakunat, eläimet ja maalaukset kuvasta.", href: "/kokoelma/kuvavisat", tila: "pelattava", serves: ["matkakohteet"], kuva: { src: "/20/pelit/k/kuvavisat.webp" } },
@@ -76,8 +72,8 @@ export const PELIMUODOT: Pelimuoto[] = [
     href: pakkaHref(p),
     tila: "pelattava" as const,
     serves: [p.collection.slug],
-    /* Pakan oma korttikuva, muuten Vaalit-hubin kuva (kevyet kopiot, lähteet kuvalahteet.ts). */
-    kuva: { src: PAKKAKUVAT.has(p.slug) ? `/20/vaalit/pakat/${p.slug}.webp` : "/20/vaalit/hero-kortti.webp" },
+    /* Pakan oma korttikuva (pakat.ts korttikuva; kevyet kopiot, lähteet kuvalahteet.ts). */
+    kuva: { src: p.korttikuva },
   })),
   { slug: "megavisat", nimi: "Megavisat", ikoni: "jarjestys", kuvaus: "Pitkät visat yhdellä istumalla.", href: "/megavisat", tila: "pelattava", serves: [], kuva: { src: "/20/pelit/k/megavisat.webp" } },
 ];
@@ -157,8 +153,8 @@ export const ETUSIVUN_PELIMUODOT: EtusivunPelimuoto[] = [
   { slug: "vaalipiiriketju", ryhma: "kartta", laji: "Karttapeli", nimi: "Vaalipiiriketju", tavut: "Vaali|piiri|ketju", etusivu_rivi: "Ketjuta kansanedustajat vaalipiireittäin", href: "/peli/vaalipiiriketju", kuva: "/20/vaalit/vaalipiiriketju.webp", aksentti: KARTTA, tila: "pelattava", julkaisu: null },
   { slug: "mika-maa", ryhma: "kartta", laji: "Karttapeli", nimi: "Mikä maa?", etusivu_rivi: "Tunnista maa vihjeistä ja siluetista", href: "", kuva: null, aksentti: MAA, tila: "tulossa", julkaisu: "2026-11-30" },
   /* v8: Laita järjestykseen ensin. */
-  { slug: "laita-jarjestykseen", ryhma: "jarjesta", laji: "Järjestä", nimi: "Laita järjestykseen", tavut: "Laita järjes|tykseen", etusivu_rivi: "Järjestä asiat suuruuden, pituuden tai ajan mukaan", href: "/peli/jarjesta/presidentit", kuva: "/20/vaalit/hero-kortti.webp", kuvaPos: "50% 40%", aksentti: JARJ, tila: "pelattava", julkaisu: null },
-  { slug: "ikajarjestys", ryhma: "jarjesta", laji: "Järjestä", nimi: "Ikäjärjestys", tavut: "Ikä|järjestys", etusivu_rivi: "Järjestä tunnetut henkilöt vanhimmasta nuorimpaan", href: "/peli/ikajarjestys", kuva: "/20/teema-tunnetut-henkilot-800.webp", kuvaPos: "50% 30%", aksentti: JARJ, tila: "pelattava", julkaisu: null },
+  { slug: "laita-jarjestykseen", ryhma: "jarjesta", laji: "Järjestä", nimi: "Laita järjestykseen", tavut: "Laita järjes|tykseen", etusivu_rivi: "Järjestä asiat suuruuden, pituuden tai ajan mukaan", href: "/peli/jarjesta/tunturit-korkeus?aloita=1", kuva: "/20/vaalit/hero-kortti.webp", kuvaPos: "50% 40%", aksentti: JARJ, tila: "pelattava", julkaisu: null },
+  { slug: "ikajarjestys", ryhma: "jarjesta", laji: "Järjestä", nimi: "Ikäjärjestys", tavut: "Ikä|järjestys", etusivu_rivi: "Järjestä tunnetut suomalaiset vanhimmasta nuorimpaan", href: "/peli/jarjesta/tunnetut-suomalaiset?aloita=1", kuva: "/20/teema-tunnetut-henkilot-800.webp", kuvaPos: "50% 30%", aksentti: JARJ, tila: "pelattava", julkaisu: null },
   { slug: "kumpi", ryhma: "jarjesta", laji: "Kumpi?", nimi: "Kumpi?", etusivu_rivi: "Vanhempi, suurempi, korkeampi – valitse parista", href: "", kuva: null, aksentti: JARJ, tila: "tulossa", julkaisu: null },
 ];
 
