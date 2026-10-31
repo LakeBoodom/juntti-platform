@@ -258,6 +258,7 @@
   font-size: min(19px, calc(100cqw / (var(--lw) * .64))); overflow-wrap: normal; word-break: keep-all; -webkit-hyphens: none; hyphens: none;
 }
 .tn20 .tn-es-peli-rivi { display: block; font-size: 13px; line-height: 1.4; color: var(--es-teksti2); text-wrap: pretty; }
+.tn20 .tn-es-peli-nuoli { display: none; align-self: flex-end; font-size: 26px; line-height: 1; color: #A79E8C; }
 .tn20 .tn-es-peli[data-tulossa] { border-style: dashed; border-color: var(--es-viiva2); background: #141109; cursor: default; }
 .tn20 .tn-es-peli[data-tulossa] .tn-es-peli-kuva { opacity: .4; filter: grayscale(1); }
 .tn20 .tn-es-peli[data-tulossa] .tn-es-peli-teksti { opacity: .6; }
@@ -362,53 +363,51 @@
     font-family: var(--tn-font-body, sans-serif); font-size: 10.5px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: #6B5A3E;
   }
 }
-/* Järjestyspelit. Iso otsake (C): "Korkein / → matalin", "Vanhin / → nuorin". */
-.tn20 .tn-pk--ika { background: radial-gradient(80% 80% at 50% 100%, rgba(240,162,75,.22), transparent 70%), #F4EFE4; }
-.tn20 .tn-pk--jarj { background: radial-gradient(80% 80% at 100% 0%, rgba(240,162,75,.2), transparent 70%), #F4EFE4; }
-.tn20 .tn-pk-sarake { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; }
-.tn20 .tn-pk-otsake { font-family: var(--tn-font-body, sans-serif); font-size: 11px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; color: #6B5A3E; }
-.tn20 .tn-pk-iso-otsake { flex-direction: column; gap: 4px; font-size: 24px; font-variation-settings: "wdth" 78; line-height: 1; letter-spacing: -.01em; color: #131109; white-space: nowrap; }
-.tn20 .tn-pk-iso-otsake span + span { color: #C9752A; }
-/* Ikäjärjestys: kaikilla "?", keskimmäinen nostettu raahaukseen (ei numeroita → järjestys ei vihjaannu). */
-.tn20 .tn-pk-henkilot { display: flex; align-items: flex-end; gap: 14px; }
-.tn20 .tn-pk-henkilo { display: flex; flex-direction: column; align-items: center; gap: 7px; }
-.tn20 .tn-pk-henkilo[data-nosto] { transform: translateY(-6px) rotate(-4deg); }
-.tn20 .tn-pk-henkilo-kuva { position: relative; display: block; }
-.tn20 .tn-pk-henkilo img { width: 54px; height: 54px; border-radius: 999px; object-fit: cover; object-position: 50% 20%; border: 2px solid #FFFFFF; box-shadow: 0 4px 10px rgba(19,17,9,.2); box-sizing: border-box; }
-.tn20 .tn-pk-henkilo[data-nosto] img { border-color: #F0A24B; box-shadow: 0 12px 20px rgba(19,17,9,.3); }
-.tn20 .tn-pk-henkilo i {
-  position: absolute; right: -4px; bottom: -2px; display: flex; align-items: center; justify-content: center; width: 22px; height: 22px; border-radius: 999px;
-  background: #FFFFFF; border: 2px dashed #F0A24B; color: #6B5A3E; font-style: normal; font-size: 12px; box-sizing: border-box;
+/* Järjestä (CD "TN Etusivu Järjestä-kortti", 31.10.2026): VÄÄRIN korallina, kirjaimet sekaisin (staattinen), kysymys ja
+   presidenttipalat. A/B: VÄÄRIN ylhäällä, palat alla (3, leveässä B:ssä 4). C: VÄÄRIN vasemmalla, palat oikealla (5, ≥ 540 px 6).
+   Koralli #E8452A kermalla ≈ 3,6:1 (iso teksti ≥ 3:1). Kysymys 12 px #5E5040 ≈ 6,9:1. */
+.tn20 .tn-pk--jarjesta { background: radial-gradient(80% 90% at 100% 100%, rgba(240,162,75,.24), transparent 70%), #F4EFE4; }
+.tn20 .tn-pk-jv { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; padding: 0 16px; box-sizing: border-box; }
+.tn20 .tn-pk-jv-otsake { display: flex; flex-direction: column; align-items: center; gap: 6px; flex: none; }
+.tn20 .tn-pk-vaarin { display: inline-flex; font-size: 30px; font-variation-settings: "wdth" 74; line-height: 1; color: #E8452A; text-transform: uppercase; }
+.tn20 .tn-pk-vaarin span { display: inline-block; }
+.tn20 .tn-pk-jv-kysymys {
+  max-width: 210px; font-family: var(--tn-font-body, sans-serif); font-size: 12px; font-weight: 700; line-height: 1.25; color: #5E5040;
+  text-align: center; text-wrap: balance;
 }
-.tn20 .tn-pk-henkilo b { font-size: 11px; font-weight: 800; font-variation-settings: "wdth" 80; line-height: 1; color: #131109; white-space: nowrap; }
+.tn20 .tn-pk-jv-palat { display: flex; flex-wrap: wrap; justify-content: center; gap: 7px; max-width: 210px; }
+.tn20 .tn-pk-jv-pala {
+  display: flex; align-items: center; gap: 7px; height: 30px; padding: 0 10px 0 4px; border-radius: 8px; box-sizing: border-box;
+  background: #FFFFFF; box-shadow: 0 3px 8px rgba(19,17,9,.14);
+}
+.tn20 .tn-pk-jv-pala[data-n="4"], .tn20 .tn-pk-jv-pala[data-n="5"], .tn20 .tn-pk-jv-pala[data-n="6"] { display: none; }
+.tn20 .tn-pk-jv-pala img { width: 22px; height: 22px; border-radius: 999px; object-fit: cover; object-position: 50% 25%; background: #EFE8DA; }
+.tn20 .tn-pk-jv-pala b { font-size: 12px; font-variation-settings: "wdth" 76; line-height: 1; color: #131109; white-space: nowrap; }
 @container pk (min-width: 250px) {
-  .tn20 .tn-pk-sarake { gap: 12px; }
-  .tn20 .tn-pk-henkilot { gap: 18px; }
-  .tn20 .tn-pk-henkilo img { width: 60px; height: 60px; }
+  .tn20 .tn-pk-jv-kysymys { max-width: 220px; }
+  .tn20 .tn-pk-jv-palat { max-width: 220px; }
+}
+@container pk (min-width: 400px) {
+  .tn20 .tn-pk-jv { gap: 10px; }
+  .tn20 .tn-pk-vaarin { font-size: 32px; }
+  .tn20 .tn-pk-jv-kysymys { max-width: 380px; }
+  .tn20 .tn-pk-jv-palat { max-width: 400px; }
+  .tn20 .tn-pk-jv-pala[data-n="4"] { display: flex; }
 }
 @container pk (min-width: 440px) {
-  .tn20 .tn-pk-sarake { flex-direction: row; gap: 40px; padding: 0 28px; box-sizing: border-box; }
-  .tn20 .tn-pk-henkilot { gap: 20px; }
-  .tn20 .tn-pk-henkilo img { width: 70px; height: 70px; }
+  .tn20 .tn-pk-jv { flex-direction: row; gap: 18px; }
+  .tn20 .tn-pk-jv-otsake { align-items: flex-start; }
+  .tn20 .tn-pk-vaarin { font-size: 38px; }
+  .tn20 .tn-pk-jv-kysymys { max-width: 150px; text-align: left; }
+  .tn20 .tn-pk-jv-palat { max-width: 230px; }
+  .tn20 .tn-pk-jv-pala[data-n="5"] { display: flex; }
 }
-/* Laita järjestykseen: A lista 242-kehyksessä, B lista ≤ 250 px keskellä, C otsake vasemmalle + rivit ≤ 300 px. */
-.tn20 .tn-pk-jarj { display: flex; align-items: center; justify-content: center; }
-.tn20 .tn-pk-lista { display: flex; flex-direction: column; justify-content: center; gap: 6px; width: min(100%, 100cqw); padding: 0 34px; box-sizing: border-box; }
-.tn20 .tn-pk-lista-rivi { display: flex; align-items: center; gap: 9px; height: 28px; padding: 0 10px 0 4px; border-radius: 8px; background: #FFFFFF; box-shadow: 0 2px 6px rgba(19,17,9,.12); }
-.tn20 .tn-pk-lista-rivi[data-nosto] { box-shadow: 0 10px 18px rgba(19,17,9,.22); transform: translateX(14px) rotate(-2.5deg); }
-.tn20 .tn-pk-lista-rivi i { display: flex; align-items: center; justify-content: center; width: 20px; height: 20px; border-radius: 6px; border: 2px dashed #F0A24B; color: #6B5A3E; font-style: normal; font-size: 11px; box-sizing: border-box; }
-.tn20 .tn-pk-lista-rivi b { flex: 1; font-size: 12px; color: #131109; }
-.tn20 .tn-pk-lista-rivi span { font-size: 12px; font-weight: 800; color: #B8AE9A; letter-spacing: -.1em; }
-@container pk (min-width: 250px) {
-  .tn20 .tn-pk-lista { width: min(100% - 56px, 250px); padding: 0; }
-  .tn20 .tn-pk-lista-rivi { padding-left: 5px; }
-  .tn20 .tn-pk-lista-rivi[data-nosto] { transform: translateX(16px) rotate(-2deg); }
-}
-@container pk (min-width: 440px) {
-  .tn20 .tn-pk-jarj { display: grid; grid-template-columns: auto minmax(0, 300px); justify-content: center; gap: 36px; padding: 0 28px; box-sizing: border-box; }
-  .tn20 .tn-pk-lista { width: auto; gap: 7px; }
-  .tn20 .tn-pk-lista-rivi { height: 30px; }
-  .tn20 .tn-pk-lista-rivi b { font-size: 13px; }
+@container pk (min-width: 540px) {
+  .tn20 .tn-pk-jv { gap: 24px; padding: 0 22px; }
+  .tn20 .tn-pk-vaarin { font-size: 44px; }
+  .tn20 .tn-pk-jv-kysymys { max-width: 180px; }
+  .tn20 .tn-pk-jv-palat { max-width: 300px; gap: 8px; }
+  .tn20 .tn-pk-jv-pala[data-n="6"] { display: flex; }
 }
 /* Äänivisa: lintukuva 493 × 211 puhekuplineen; kuplat kuvan koordinaateissa. A/B: lintujen keskikohta (x 315) kortin
    keskelle. C: kuva oikeaan reunaan (huhkaja + Huhuu näkyvät), vasemmalla iso toistonappi ja ääniaalto. */
@@ -471,6 +470,16 @@
   .tn20 .tn-es-rivi { display: grid; grid-template-columns: repeat(var(--sar, 4), minmax(0, 1fr)); gap: 12px; overflow: visible; margin: 0; padding: 0; }
   .tn20 .tn-es-peli { width: auto; }
   .tn20 .tn-es-peli-kuva { height: 151px; }
+}
+/* Yhden kortin ryhmä (Järjestä, CD "TN Etusivu Järjestä-kortti" D2, 31.10.2026): ei venytetä koko riville. Vaakakortti
+   kahden kortin levyisenä (2/3 rivistä): kuvitus vasemmalla, otsikko ja nuoli oikealla 180 px:n palstassa. */
+@media (min-width: 768px) {
+  .tn20 .tn-es-rivi[data-sar="1"] { grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); }
+  .tn20 .tn-es-rivi[data-sar="1"] .tn-es-peli { display: grid; grid-template-columns: minmax(0, 1fr) 180px; }
+  .tn20 .tn-es-rivi[data-sar="1"] .tn-es-peli-kuva { height: 180px; }
+  .tn20 .tn-es-rivi[data-sar="1"] .tn-es-peli-teksti { justify-content: space-between; padding: 20px; }
+  .tn20 .tn-es-rivi[data-sar="1"] .tn-es-peli-h { font-size: min(30px, calc(100cqw / (var(--lw) * .64))); }
+  .tn20 .tn-es-rivi[data-sar="1"] .tn-es-peli-nuoli { display: block; }
 }
 /* 4 kortin ryhmä 768–1199 px: kortti jäisi alle kuvituksen 242 px:n → 2 × 2 (v8). */
 @media (min-width: 768px) and (max-width: 1199px) {

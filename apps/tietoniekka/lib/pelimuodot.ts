@@ -152,9 +152,9 @@ export const ETUSIVUN_PELIMUODOT: EtusivunPelimuoto[] = [
   { slug: "kuntaliitos", ryhma: "kartta", laji: "Karttapeli", nimi: "Kuntaliitos", tavut: "Kunta|liitos", etusivu_rivi: "Järjestä kunnat ketjuksi, jossa jokainen kunta rajautuu seuraavaan", href: "/peli/kuntaliitos", kuva: "/20/kuntaliitos/palapeli.webp", aksentti: KARTTA, tila: "pelattava", julkaisu: null },
   { slug: "vaalipiiriketju", ryhma: "kartta", laji: "Karttapeli", nimi: "Vaalipiiriketju", tavut: "Vaali|piiri|ketju", etusivu_rivi: "Ketjuta kansanedustajat vaalipiireittäin", href: "/peli/vaalipiiriketju", kuva: "/20/vaalit/vaalipiiriketju.webp", aksentti: KARTTA, tila: "pelattava", julkaisu: null },
   { slug: "mika-maa", ryhma: "kartta", laji: "Karttapeli", nimi: "Mikä maa?", etusivu_rivi: "Tunnista maa vihjeistä ja siluetista", href: "", kuva: null, aksentti: MAA, tila: "tulossa", julkaisu: "2026-11-30" },
-  /* v8: Laita järjestykseen ensin. */
-  { slug: "laita-jarjestykseen", ryhma: "jarjesta", laji: "Järjestä", nimi: "Laita järjestykseen", tavut: "Laita järjes|tykseen", etusivu_rivi: "Järjestä asiat suuruuden, pituuden tai ajan mukaan", href: "/peli/jarjesta/tunturit-korkeus?aloita=1", kuva: "/20/vaalit/hero-kortti.webp", kuvaPos: "50% 40%", aksentti: JARJ, tila: "pelattava", julkaisu: null },
-  { slug: "ikajarjestys", ryhma: "jarjesta", laji: "Järjestä", nimi: "Ikäjärjestys", tavut: "Ikä|järjestys", etusivu_rivi: "Järjestä tunnetut suomalaiset vanhimmasta nuorimpaan", href: "/peli/jarjesta/tunnetut-suomalaiset?aloita=1", kuva: "/20/teema-tunnetut-henkilot-800.webp", kuvaPos: "50% 30%", aksentti: JARJ, tila: "pelattava", julkaisu: null },
+  /* CD "TN Etusivu Järjestä-kortti" (Heikki 31.10.2026): Laita järjestykseen ja Ikäjärjestys yhdeksi Järjestä-kortiksi → hub.
+     Vain otsikko, ei kuvausta; kuvitus PeliKuvitus "jarjesta". */
+  { slug: "jarjesta", ryhma: "jarjesta", laji: "Järjestä", nimi: "Järjestä", etusivu_rivi: "", href: "/peli/jarjesta", kuva: null, aksentti: "#F0A24B", tila: "pelattava", julkaisu: null },
   { slug: "kumpi", ryhma: "jarjesta", laji: "Kumpi?", nimi: "Kumpi?", etusivu_rivi: "Vanhempi, suurempi, korkeampi – valitse parista", href: "", kuva: null, aksentti: JARJ, tila: "tulossa", julkaisu: null },
 ];
 

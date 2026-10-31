@@ -218,12 +218,16 @@ function Pelit({ p }: { p: D["pelit"] }) {
                   </span>
                   {m.tila === "tulossa" && <span className="tn-es-leima">Tulossa</span>}
                   <span className="tn-es-peli-teksti">
-                    <span className="tn-es-laji" style={{ "--acc": m.aksentti } as CSSProperties}>
-                      <i aria-hidden="true" />
-                      <span className="tn-es-laji-teksti">{m.laji}</span>
-                    </span>
+                    {/* Järjestä-kortti (CD 31.10.2026): vain otsikko — laji = nimi ja kuvaus tyhjä jätetään pois. */}
+                    {m.laji !== m.nimi && (
+                      <span className="tn-es-laji" style={{ "--acc": m.aksentti } as CSSProperties}>
+                        <i aria-hidden="true" />
+                        <span className="tn-es-laji-teksti">{m.laji}</span>
+                      </span>
+                    )}
                     <span className="tn-es-peli-h" lang="fi" style={lw(m.nimi)}>{m.nimi}</span>
-                    <span className="tn-es-peli-rivi">{m.etusivu_rivi}</span>
+                    {m.etusivu_rivi && <span className="tn-es-peli-rivi">{m.etusivu_rivi}</span>}
+                    <span className="tn-es-peli-nuoli" aria-hidden="true">›</span>
                   </span>
                 </>
               );
