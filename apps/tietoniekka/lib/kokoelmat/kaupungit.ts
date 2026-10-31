@@ -12,7 +12,7 @@ export const KAUPUNGIT_KOKOELMA: Kokoelma = {
   eyebrow: "",
   title: "Matkusta halki ",
   highlight: "Suomen",
-  ingress: "Jokaisella kaupungilla on oma visansa — Helsingistä Rovaniemelle.",
+  ingress: "Jokaisella kaupungilla on oma visansa — Hangosta Lapin tuntureille.",
   accent: kokoelmaKortti("kaupungit")!.mastery.color,
   hero: { image: KAUPUNGIT_HERO_IMG, focalX: 0.75, focalY: 0.3, alt: "Laura ja Mikko matkalla" },
   cta: "suosituin",
