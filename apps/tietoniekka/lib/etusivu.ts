@@ -110,11 +110,10 @@ export const HOSTS_INTRO = {
    Vaalit, Tiede, Juhlat ja reittipelit puuttuivat käsin ylläpidetystä listasta). */
 export const FOOTER_COLLECTIONS = NAV_COLLECTIONS.map((c) => ({ label: c.label, href: c.href ?? `/kokoelma/${c.slug}` }));
 
-/* Pelimuodot = navigaation pelimuodot (Visapaketit mukana 31.10.) + etusivun omat nostot (Päivän visa, Henkilövisat),
-   aakkosjärjestyksessä kuten valikoissa. */
+/* Pelimuodot = navigaation pelimuodot (Visapaketit mukana 31.10.) + Henkilövisat, aakkosjärjestyksessä kuten
+   valikoissa. Päivän visa poistettu (Heikki 31.10.2026): ei oma pelimuoto, ja ankkuri /#paivan-visa ei toiminut. */
 export const FOOTER_MODES = aakkosin([
   ...NAV_MODES.map((m) => ({ label: m.label, href: m.href })),
-  { label: "Päivän visa", href: "/#paivan-visa" },
   { label: "Henkilövisat", href: "/kokoelma/tunnetut-henkilot" },
 ]);
 
