@@ -18,13 +18,18 @@ export const KAUPUNGIT_KOKOELMA: Kokoelma = {
   cta: "suosituin",
   osiotNimi: "Alueet",
   sections: [
-    // 31.10.2026: Pääkaupunkiseutu-osio poistettu (Helsinki, Espoo ja Vantaa kannassa kaupungit-etela), tunturit viimeisenä.
-    { slug: "kaupungit-etela", eyebrow: "Etappi 1", title: "Etelä-Suomi", featured: "helsinki-stadin-kovat-pahkinat" },
-    { slug: "kaupungit-lounais", eyebrow: "Etappi 2", title: "Lounais-Suomi" },
-    { slug: "kaupungit-lansi", eyebrow: "Etappi 3", title: "Länsi-Suomi" },
-    { slug: "kaupungit-ita", eyebrow: "Etappi 4", title: "Itä-Suomi" },
-    { slug: "kaupungit-pohjoinen", eyebrow: "Etappi 5", title: "Pohjois-Suomi" },
-    { slug: "kaupungit-tunturit", eyebrow: "Etappi 6", title: "Tunturit ja hiihtokeskukset" },
+    // 31.10.2026 (Heikki): maakuntapohjaiset osiot. Yhden visan maakunnat on yhdistetty naapuriin, kunnes niihin tulee
+    // lisää visoja — silloin jokainen maakunta voi saada oman osion. Pääkaupunkiseutu erotettu Uudestamaasta.
+    { slug: "kaupungit-paakaupunkiseutu", eyebrow: "Etappi 1", title: "Pääkaupunkiseutu", featured: "helsinki-stadin-kovat-pahkinat" },
+    { slug: "kaupungit-uusimaa", eyebrow: "Etappi 2", title: "Uusimaa" },
+    { slug: "kaupungit-varsinais-suomi-ahvenanmaa", eyebrow: "Etappi 3", title: "Varsinais-Suomi ja Ahvenanmaa" },
+    { slug: "kaupungit-satakunta-pirkanmaa", eyebrow: "Etappi 4", title: "Satakunta ja Pirkanmaa" },
+    { slug: "kaupungit-hame", eyebrow: "Etappi 5", title: "Häme" },
+    { slug: "kaupungit-kymenlaakso-etela-karjala", eyebrow: "Etappi 6", title: "Kymenlaakso ja Etelä-Karjala" },
+    { slug: "kaupungit-savo-karjala", eyebrow: "Etappi 7", title: "Savo ja Karjala" },
+    { slug: "kaupungit-keski-suomi-pohjanmaa", eyebrow: "Etappi 8", title: "Keski-Suomi ja Pohjanmaa" },
+    { slug: "kaupungit-pohjois-pohjanmaa-kainuu-lappi", eyebrow: "Etappi 9", title: "Pohjois-Pohjanmaa, Kainuu ja Lappi" },
+    { slug: "kaupungit-tunturit", eyebrow: "Etappi 10", title: "Tunturit ja hiihtokeskukset" },
   ],
   related: ["matkakohteet", "historia", "luonto"],
   mastery: { name: kokoelmaKortti("kaupungit")!.mastery.name, icon: "kaupunki" },
