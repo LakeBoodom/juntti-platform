@@ -21,7 +21,7 @@ import { pelijakoteksti } from "@/lib/korttinimi";
 import { reittiTaso } from "@/lib/pelitasot";
 import { useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type PointerEvent as RPointerEvent, type KeyboardEvent } from "react";
 import { getSupabase } from "@/lib/supabase";
-import { KL_PISTEET, KL_SIVU, KL_YHTEYKSIA, pariAvain, uusiReittiSiemen, type KlKunta, type KlReitti } from "@/lib/kuntaliitos";
+import { KL_PISTEET, KL_SIVU, KL_YHTEYKSIA, pariAvain, uusiReittiSiemen, type KlKartta, type KlKunta, type KlReitti } from "@/lib/kuntaliitos";
 import { RN_SIVU, RN_USA_SIVU } from "@/lib/rajanaapurit";
 import Pelipalkki from "@/components/tn20/pelikehys/Pelipalkki";
 import PeliTulos from "@/components/tn20/pelikehys/PeliTulos";
@@ -195,39 +195,91 @@ function kayra(b: KlKunta, c: KlKunta, a: KlKunta = b, d: KlKunta = c) {
   return `M${r(b.x)} ${r(b.y)}C${r(b.x + (c.x - a.x) / 6)} ${r(b.y + (c.y - a.y) / 6)} ${r(c.x - (d.x - b.x) / 6)} ${r(c.y - (d.y - b.y) / 6)} ${r(c.x)} ${r(c.y)}`;
 }
 
-/** Päätepisteen merkki: piste + tunnus ja "Lähtö · nimi", jottei lappu peitä reittiä:
-    pystysuuntaisella reitillä (Torniosta Utsjoelle) lappu pisteen sivulle kartan keskustaa kohti, muuten
-    poispäin toisesta päätepisteestä ylä- tai alapuolelle (reunan lähellä aina kartan sisään). Myös heron kartassa. */
-function Merkki({ kunta, laji, muoto, toinen }: { kunta: KlKunta; laji: "lahto" | "maali"; muoto: "kilpi" | "lippu"; toinen: KlKunta }) {
-  const pysty = Math.abs(toinen.y - kunta.y) > Math.abs(toinen.x - kunta.x) * 1.3 && (kunta.x < 45 || kunta.x > 55);
-  const ala = kunta.y < 26 || (kunta.y <= 74 && toinen.y < kunta.y);
-  const paikka = pysty
-    ? (kunta.x < 45 ? " kl-merkki--oikealle" : " kl-merkki--vasemmalle")
-    : `${ala ? " kl-merkki--ala" : ""}${kunta.x > 74 ? " kl-merkki--oik" : kunta.x < 26 ? " kl-merkki--vas" : ""}`;
-  // Pitkä nimi kapealla kartalla (320 px: "Lähtö · Pennsylvania"): lappu siirretään vaakasuunnassa kartan sisään.
-  const lappu = useRef<HTMLSpanElement>(null);
+/** Maa-alueet karkeana ruudukkona: kertoo nimilapuille, missä on merta (Heikki 1.11.2026: lappu ei saa peittää
+    osavaltioita, joita pelaaja yrittää hahmottaa). Ilman canvasia null → lapuille jää suuntajärjestys. */
+function maaRuudukko(k: KlKartta, w: number, h: number) {
+  try {
+    const c = document.createElement("canvas");
+    c.width = w; c.height = h;
+    const g = c.getContext("2d", { willReadFrequently: true });
+    if (!g) return null;
+    const [vx, vy, vw, vh] = k.viewBox.split(" ").map(Number);
+    g.scale(w / vw, h / vh);
+    g.translate(-vx, -vy);
+    for (const a of k.alueet) g.fill(new Path2D(a.d));
+    return g.getImageData(0, 0, w, h).data;
+  } catch {
+    return null;
+  }
+}
+
+type Laatta = { x: number; y: number; w: number; h: number };
+const leikkaa = (a: Laatta, b: Laatta) => a.x < b.x + b.w && b.x < a.x + a.w && a.y < b.y + b.h && b.y < a.y + a.h;
+
+/** Päätepisteiden merkit: piste + lappu (tunnus ja "Lähtö · nimi"). Lappu sijoitetaan pisteen viereen sinne, missä se
+    peittää vähiten maata ja reitin pisteitä (meri kelpaa aina). Sama mitoitus pelin ja heron kartoissa. */
+function Merkit({ reitti, muoto, paat }: { reitti: KlReitti; muoto: "kilpi" | "lippu"; paat: Array<{ kunta: KlKunta; laji: "lahto" | "maali" }> }) {
+  const juuri = useRef<HTMLDivElement>(null);
   useLayoutEffect(() => {
-    const l = lappu.current, alue = l?.closest(".kl-kartta-alue, .rh-kartta");
-    if (!l || !alue) return;
-    const sovita = () => {
-      l.style.removeProperty("--kl-siirto");
-      const lb = l.getBoundingClientRect(), ab = alue.getBoundingClientRect();
-      const s = lb.left < ab.left + 4 ? ab.left + 4 - lb.left : lb.right > ab.right - 4 ? ab.right - 4 - lb.right : 0;
-      if (s) l.style.setProperty("--kl-siirto", `${Math.round(s)}px`);
+    const el = juuri.current, alue = el?.parentElement;
+    if (!el || !alue) return;
+    const RW = 120;
+    let ruudukko: Uint8ClampedArray | null | undefined;
+    const sijoita = () => {
+      const W = alue.clientWidth, H = alue.clientHeight;
+      if (!W || !H) return; // piilotettu kartta (mobiili/desktop): lasketaan, kun se tulee näkyviin
+      const RH = Math.max(1, Math.round((RW * H) / W));
+      if (ruudukko === undefined) ruudukko = maaRuudukko(reitti.kartta, RW, RH);
+      const maata = (r: Laatta) => {
+        if (!ruudukko) return 0;
+        const x0 = Math.max(0, Math.floor((r.x / W) * RW)), x1 = Math.min(RW - 1, Math.ceil(((r.x + r.w) / W) * RW));
+        const y0 = Math.max(0, Math.floor((r.y / H) * RH)), y1 = Math.min(RH - 1, Math.ceil(((r.y + r.h) / H) * RH));
+        let n = 0, m = 0;
+        for (let y = y0; y <= y1; y++) for (let x = x0; x <= x1; x++) { n++; if (ruudukko[(y * RW + x) * 4 + 3] > 0) m++; }
+        return n ? m / n : 0;
+      };
+      const pisteet = reitti.ratkaisu.map((k) => ({ x: (k.x / 100) * W, y: (k.y / 100) * H }));
+      const varatut: Laatta[] = [];
+      el.querySelectorAll<HTMLElement>(".kl-merkki-lappu").forEach((l, i) => {
+        const X = (paat[i].kunta.x / 100) * W, Y = (paat[i].kunta.y / 100) * H;
+        const w = l.offsetWidth, h = l.offsetHeight, d = 14;
+        const ehdokkaat = [
+          { x: X - w / 2, y: Y - d - h }, { x: X - w / 2, y: Y + d },
+          { x: X - d - w, y: Y - h / 2 }, { x: X + d, y: Y - h / 2 },
+          { x: X - w + d, y: Y - d - h }, { x: X - d, y: Y - d - h },
+          { x: X - w + d, y: Y + d }, { x: X - d, y: Y + d },
+        ];
+        let paras: Laatta | null = null, pienin = Infinity;
+        ehdokkaat.forEach((e, j) => {
+          const r = { x: Math.min(Math.max(e.x, 4), Math.max(4, W - w - 4)), y: Math.min(Math.max(e.y, 4), Math.max(4, H - h - 4)), w, h };
+          const reitilla = pisteet.filter((p) => p.x > r.x - 6 && p.x < r.x + r.w + 6 && p.y > r.y - 6 && p.y < r.y + r.h + 6).length;
+          const pisteen = X > r.x - 9 && X < r.x + r.w + 9 && Y > r.y - 9 && Y < r.y + r.h + 9;
+          const hinta = maata(r) + reitilla * 0.5 + (pisteen ? 3 : 0) + (varatut.some((v) => leikkaa(v, r)) ? 5 : 0) + j * 0.002;
+          if (hinta < pienin) { pienin = hinta; paras = r; }
+        });
+        const r = paras as Laatta | null;
+        if (!r) return;
+        l.style.left = `${Math.round(r.x)}px`;
+        l.style.top = `${Math.round(r.y)}px`;
+        l.style.transform = "none";
+        varatut.push(r);
+      });
     };
-    sovita();
-    const ro = new ResizeObserver(sovita);
+    sijoita();
+    const ro = new ResizeObserver(sijoita);
     ro.observe(alue);
     return () => ro.disconnect();
-  }, [kunta.k, paikka]);
+  }, [reitti, paat]);
   return (
-    <span className={`kl-merkki${paikka}`} style={{ left: `${kunta.x}%`, top: `${kunta.y}%` }}>
-      <span className="kl-merkki-piste" />
-      <span className="kl-merkki-lappu" ref={lappu}>
-        <Kilpi kunta={kunta} muoto={muoto} />
-        <span className="kl-merkki-nimi">{laji === "lahto" ? "Lähtö" : "Maali"} · {kunta.n}</span>
-      </span>
-    </span>
+    <div className="kl-merkit" ref={juuri}>
+      {paat.map(({ kunta }) => <span key={kunta.k} className="kl-merkki-piste" style={{ left: `${kunta.x}%`, top: `${kunta.y}%` }} />)}
+      {paat.map(({ kunta, laji }) => (
+        <span key={kunta.k} className="kl-merkki-lappu" style={{ left: `${kunta.x}%`, top: `${kunta.y}%` }}>
+          <Kilpi kunta={kunta} muoto={muoto} />
+          <span className="kl-merkki-nimi">{laji === "lahto" ? "Lähtö" : "Maali"} · {kunta.n}</span>
+        </span>
+      ))}
+    </div>
   );
 }
 
@@ -242,6 +294,8 @@ function Kartta(p: {
   otsikko: string;
   huomio: string;
   aktiivinen: boolean;
+  /** Lähtö ja maali (pysyvät samoina koko pelin: merkit eivät liiku kesken pelin). */
+  paat: Array<{ kunta: KlKunta; laji: "lahto" | "maali" }>;
 }) {
   const vb = p.reitti.kartta.viewBox;
   const paat = new Set([p.reitti.ratkaisu[0]?.k, p.reitti.ratkaisu.at(-1)?.k]);
@@ -301,10 +355,7 @@ function Kartta(p: {
         {p.nastat.filter((n) => n.laji === "solmu").map((n) => (
           <span key={n.kunta.k} className={`kl-piste${n.tila === "bad" ? " kl-piste--bad" : ""}`} style={{ left: `${n.kunta.x}%`, top: `${n.kunta.y}%` }} />
         ))}
-        {p.nastat.filter((n) => n.laji !== "solmu").map((n) => (
-          <Merkki key={n.kunta.k} kunta={n.kunta} laji={n.laji === "lahto" ? "lahto" : "maali"} muoto={p.peli.tunnus}
-            toinen={p.nastat.find((m) => m.laji !== "solmu" && m !== n)?.kunta ?? n.kunta} />
-        ))}
+        <Merkit reitti={p.reitti} muoto={p.peli.tunnus} paat={p.paat} />
       </div>
 
       {p.huomio && <p className="kl-kartta-huomio">{p.huomio}</p>}
@@ -364,6 +415,10 @@ export default function ReittipeliClient({
   const napautusEsto = useRef(false);
 
   const kunnat = useMemo(() => new Map((reitti?.ratkaisu ?? []).map((k) => [k.k, k])), [reitti]);
+  const paat = useMemo(() => {
+    const r = reitti?.ratkaisu ?? [];
+    return r.length ? [{ kunta: r[0], laji: "lahto" as const }, { kunta: r[r.length - 1], laji: "maali" as const }] : [];
+  }, [reitti]);
   const rajat = useMemo(() => new Set(reitti?.rajat ?? []), [reitti]);
   const ratkaisu = reitti?.ratkaisu ?? [];
   const alkuK = ratkaisu[0]?.k;
@@ -632,6 +687,7 @@ export default function ReittipeliClient({
       korostetut={korostetut}
       pari={pari}
       aktiivinen={vaihe === "tarkistus"}
+      paat={paat}
       otsikko={pelissa ? "Reitin päätepisteet" : taydet ? "Valmis reitti" : "Rakennettu reitti"}
       huomio={pelissa ? "Reitti piirtyy kartalle vasta, kun rakennat sen." : ratkaisuNakyy ? "Katkoviiva näyttää oikean reitin." : ""}
     />
@@ -990,18 +1046,20 @@ function Intro({ peli, reitti, otsikko, luvut, pelattu, aloita, alueet, osoite }
 }
 
 function HeroKartta({ peli, reitti }: { peli: Peli; reitti: KlReitti }) {
-  const r = reitti.ratkaisu;
-  const paat = [r[0], r[r.length - 1]];
+  const paat = useMemo(() => {
+    const r = reitti.ratkaisu;
+    return [{ kunta: r[0], laji: "lahto" as const }, { kunta: r[r.length - 1], laji: "maali" as const }];
+  }, [reitti]);
   const [, , w, h] = reitti.kartta.viewBox.split(" ").map(Number);
   // Vaalea kartta myös tummassa herossa (malli 6c: kartta on se vaalea elementti).
   return (
     <div className="rh-kartta" style={{ aspectRatio: `${w} / ${h}` }} aria-hidden="true">
       <svg viewBox={reitti.kartta.viewBox} preserveAspectRatio="xMidYMid slice">
         {reitti.kartta.alueet.map((a) => (
-          <path key={a.k} d={a.d} className={`kl-alue${a.t ? " kl-alue--tausta" : ""}${paat.some((k) => k.k === a.k) ? " kl-alue--paate" : ""}`} />
+          <path key={a.k} d={a.d} className={`kl-alue${a.t ? " kl-alue--tausta" : ""}${paat.some((k) => k.kunta.k === a.k) ? " kl-alue--paate" : ""}`} />
         ))}
       </svg>
-      {paat.map((k, i) => <Merkki key={k.k} kunta={k} laji={i ? "maali" : "lahto"} muoto={peli.tunnus} toinen={paat[1 - i]} />)}
+      <Merkit reitti={reitti} muoto={peli.tunnus} paat={paat} />
     </div>
   );
 }

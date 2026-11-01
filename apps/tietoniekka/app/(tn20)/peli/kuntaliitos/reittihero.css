@@ -86,12 +86,12 @@
 .tn20 .rh-pillerit a:focus-visible, .tn20 .rh .rv-nappi:focus-visible { outline: 2px solid var(--rh-kulta); outline-offset: 2px; }
 
 /* Desktopin kartta: pelin oma kartta vaaleana (malli 6c, 1.11.2026: kartta on se vaalea elementti tummallakin
-   sivulla), vain lähtö ja maali. Alueiden ja merkkien tyylit kuntaliitos.css:stä (.kl-alue, .kl-merkki). */
+   sivulla), vain lähtö ja maali. Alueiden ja merkkien tyylit kuntaliitos.css:stä (.kl-alue, .kl-merkit). */
 .tn20 .rh-kartta { display: none; }
 .tn20 .rh-kartta svg { position: absolute; inset: 0; width: 100%; height: 100%; }
-.tn20 .rh-kartta .kl-merkki-nimi { max-width: 260px; padding: 5px 12px; border-radius: 13px; font-size: 13px; }
-.tn20 .rh-kartta .kl-merkki .kl-lippu { width: 48px; }
-.tn20 .rh-kartta .kl-merkki .kl-kilpi { width: 36px; }
+.tn20 .rh-kartta .kl-merkki-nimi { max-width: 240px; padding: 5px 11px; border-radius: 13px; font-size: 13px; }
+.tn20 .rh-kartta .kl-merkki-lappu .kl-lippu { width: 38px; }
+.tn20 .rh-kartta .kl-merkki-lappu .kl-kilpi { width: 30px; }
 
 @container kl (min-width: 900px) {
   .tn20 .rh-sisus {

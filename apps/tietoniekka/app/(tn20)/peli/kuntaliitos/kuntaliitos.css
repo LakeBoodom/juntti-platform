@@ -227,32 +227,27 @@
   transform: translate(-50%, -50%); pointer-events: none; animation: kl-pomppu .34s cubic-bezier(.34, 1.4, .5, 1) both;
 }
 .tn20 .kl-piste--bad { background: var(--kl-puna); }
-/* Päätepisteen merkki: piste koordinaatissa, tunnus + pilleri sen yläpuolella (--ala: alapuolella). */
-.tn20 .kl-merkki { position: absolute; width: 0; height: 0; pointer-events: none; z-index: 2; }
+/* Päätepisteen merkki: piste koordinaatissa, lappu (tunnus + pilleri vierekkäin, peittää vähiten) sinne, missä se
+   peittää vähiten maata (Merkit, ReittipeliClient). Ennen mittausta lappu pisteen yläpuolella. */
+.tn20 .kl-merkit { position: absolute; inset: 0; pointer-events: none; z-index: 2; }
 .tn20 .kl-merkki-piste {
-  position: absolute; left: -9px; top: -9px; width: 18px; height: 18px; border-radius: 50%; background: #0e3657; box-shadow: 0 0 0 3px #fff;
+  position: absolute; width: 18px; height: 18px; border-radius: 50%; background: #0e3657; box-shadow: 0 0 0 3px #fff; transform: translate(-50%, -50%);
 }
 .tn20 .kl-merkki-lappu {
-  position: absolute; left: 0; bottom: 14px; transform: translateX(-50%);
-  display: flex; flex-direction: column; align-items: center; gap: 4px; translate: var(--kl-siirto, 0) 0;
+  position: absolute; width: max-content; transform: translate(-50%, calc(-100% - 14px));
+  display: flex; align-items: center; gap: 5px;
 }
-.tn20 .kl-merkki--ala .kl-merkki-lappu { bottom: auto; top: 14px; flex-direction: column-reverse; }
-.tn20 .kl-merkki--oik .kl-merkki-lappu { left: auto; right: -14px; transform: none; align-items: flex-end; }
-.tn20 .kl-merkki--vas .kl-merkki-lappu { left: -14px; transform: none; align-items: flex-start; }
-.tn20 .kl-merkki--oikealle .kl-merkki-lappu, .tn20 .kl-merkki--vasemmalle .kl-merkki-lappu { bottom: auto; top: 0; transform: translateY(-50%); flex-direction: row; gap: 6px; }
-.tn20 .kl-merkki--oikealle .kl-merkki-lappu { left: 14px; }
-.tn20 .kl-merkki--vasemmalle .kl-merkki-lappu { left: auto; right: 14px; flex-direction: row-reverse; }
 .tn20 .kl-merkki-nimi {
-  display: block; width: max-content; max-width: min(240px, 58cqi); padding: 4px 9px; border-radius: 11px; background: #0e3657; color: #faf7f0;
-  font-size: 11px; font-weight: 800; line-height: 1.25; letter-spacing: .1em; text-transform: uppercase; text-align: center; text-wrap: balance;
+  display: block; width: max-content; max-width: min(200px, 48cqi); padding: 4px 9px; border-radius: 11px; background: #0e3657; color: #faf7f0;
+  font-size: 11px; font-weight: 800; line-height: 1.25; letter-spacing: .08em; text-transform: uppercase; text-align: center; text-wrap: balance;
 }
-.tn20 .kl-merkki .kl-lippu { width: 30px; border-radius: 4px; box-shadow: 0 0 0 2px #f5f0e6, 0 2px 6px rgba(14, 54, 87, .28); }
-.tn20 .kl-merkki .kl-lippu::after { border-radius: 4px; }
-.tn20 .kl-merkki .kl-kilpi { width: 24px; filter: drop-shadow(0 2px 4px rgba(14, 54, 87, .3)); }
+.tn20 .kl-merkki-lappu .kl-lippu { width: 26px; border-radius: 3px; box-shadow: 0 0 0 2px #f5f0e6, 0 2px 5px rgba(14, 54, 87, .28); }
+.tn20 .kl-merkki-lappu .kl-lippu::after { border-radius: 3px; }
+.tn20 .kl-merkki-lappu .kl-kilpi { width: 22px; filter: drop-shadow(0 2px 4px rgba(14, 54, 87, .3)); }
 @container (min-width: 480px) {
   .tn20 .kl-merkki-nimi { font-size: 12px; }
-  .tn20 .kl-merkki .kl-lippu { width: 36px; }
-  .tn20 .kl-merkki .kl-kilpi { width: 28px; }
+  .tn20 .kl-merkki-lappu .kl-lippu { width: 32px; }
+  .tn20 .kl-merkki-lappu .kl-kilpi { width: 26px; }
 }
 .tn20 .kl-kartta-huomio { margin: 10px 0 0; font-size: 12px; line-height: 1.4; color: var(--kl-ruskea); text-align: center; }
 
