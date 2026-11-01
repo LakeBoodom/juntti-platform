@@ -57,7 +57,11 @@ function sessionId(): string {
   }
 }
 
-export default function LastenPeli({ visa, muut, takaisin }: { visa: LastenVisa; muut: LastenKortti[]; takaisin: string }) {
+export default function LastenPeli({ visa, muut, takaisin, paketti = null }: {
+  visa: LastenVisa; muut: LastenKortti[]; takaisin: string;
+  /** Tulosnäkymän tekstilinkki visapakettiin (lasten jouluvisat → /visapaketti/joulu/lapset, 1.11.2026). */
+  paketti?: { href: string; teksti: string } | null;
+}) {
   const { kysymykset, lukija } = visa;
   const N = kysymykset.length;
   const pienet = visa.ika === "4-7";
@@ -516,6 +520,11 @@ export default function LastenPeli({ visa, muut, takaisin }: { visa: LastenVisa;
             <button type="button" className="lp-cta lp-cta--pieni" onClick={aloitaVisa}>Pelaa uudestaan</button>
             <button type="button" className="lp-toissijainen" onClick={jaa}>{jaettu ?? "Jaa perheelle"}</button>
           </div>
+          {paketti && (
+            <a className="lp-tulos-paketti" href={paketti.href}>
+              {paketti.teksti}{"\u00a0"}<span aria-hidden="true">→</span>
+            </a>
+          )}
           {muut.length > 0 && (
             <nav className="lp-lisaa" aria-label="Pelataanko vielä?">
               <h2>Pelataanko vielä?</h2>

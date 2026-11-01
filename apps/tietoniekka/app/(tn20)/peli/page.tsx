@@ -683,9 +683,10 @@ export default async function Peli20({
      Previewssä myös luonnokset, tuotannossa vain julkaistut. */
   const lasten = await haeLastenVisa({ slug, quizId });
   if (lasten) {
-    const muut = await haeMuutLastenVisat(lasten);
+    /* Visapakettien SEO-brief 1.11.2026: lasten jouluvisasta linkki joulun visapaketin lastenversioon (aihe = osiotagi). */
+    const [muut, paketti] = await Promise.all([haeMuutLastenVisat(lasten), tulosPakettiLinkki(lasten.aihe ? [lasten.aihe] : [], "lapset")]);
     /* Vaihe 5: sulje-nappi vie /lapset-sivulle, kun se on näkyvissä (LAPSET_ENABLED / preview). */
-    return <LastenPeli visa={lasten} muut={muut} takaisin={lapsetNakyvissa() ? LAPSET_SIVU : lasten.kokoelma ? `/kokoelma/${lasten.kokoelma}` : "/"} />;
+    return <LastenPeli visa={lasten} muut={muut} paketti={paketti} takaisin={lapsetNakyvissa() ? LAPSET_SIVU : lasten.kokoelma ? `/kokoelma/${lasten.kokoelma}` : "/"} />;
   }
 
   let q = sb

@@ -217,12 +217,18 @@ const TAGIN_PAKETTI: Record<string, { slug: string; alku: string }> = {
   joulu: { slug: "joulu", alku: "Pidätkö pikkujoulut? " },
 };
 
-/** Tulosnäkymän tekstilinkki: "Pidätkö pikkujoulut? Valmis joulun tietovisa 40 kysymyksellä". Kysymysmäärä kannasta. */
-export async function tulosPakettiLinkki(tagit: string[] | null): Promise<{ href: string; teksti: string } | null> {
+/** Tulosnäkymän tekstilinkki: "Pidätkö pikkujoulut? Valmis joulun tietovisa 40 kysymyksellä". Kysymysmäärä kannasta.
+ *  Lasten visalla (taso lapset) linkki vie 'molemmat'-paketin lastenversioon: "Valmis joulun tietovisa lapsille 18 kysymyksellä". */
+export async function tulosPakettiLinkki(tagit: string[] | null, taso: Taso = "aikuiset"): Promise<{ href: string; teksti: string } | null> {
   const osuma = (tagit ?? []).map((t) => TAGIN_PAKETTI[t]).find(Boolean);
   if (!osuma) return null;
   const p = (await listaaVisapaketit()).find((r) => r.slug === osuma.slug);
   if (!p) return null;
+  if (taso === "lapset") {
+    if (!valitsinNakyy(p) || !p.kysymyksia.lapset) return null;
+    const nimi = p.lasten_otsikko ?? `${p.otsikko} lapsille`;
+    return { href: lapsetHref(p), teksti: `Valmis ${nimi.toLocaleLowerCase("fi")} ${p.kysymyksia.lapset} kysymyksellä` };
+  }
   const n = p.kysymyksia.aikuiset || p.kysymyksia.lapset;
   return { href: korttiHref(p), teksti: `${osuma.alku}Valmis ${p.otsikko.toLocaleLowerCase("fi")} ${n} kysymyksellä` };
 }
