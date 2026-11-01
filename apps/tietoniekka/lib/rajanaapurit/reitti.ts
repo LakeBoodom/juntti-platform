@@ -28,3 +28,5 @@ export const arvoReitti = moottori.arvoReitti;
 export const RN_MAANOSAT = moottori.valikko;
 export const maanosaTunnuksella = moottori.ryhmaTunnuksella;
 export const RN_LAHDE = moottori.lahde;
+export const reittiAlueista = moottori.reittiAlueista;
+export const PELATTAVIA = moottori.pelattavia;

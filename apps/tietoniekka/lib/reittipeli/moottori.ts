@@ -190,6 +190,18 @@ export function luoReittimoottori(data: RpData, a: RpAsetukset) {
       if (!reitti || omia(ehdokas) > omia(reitti)) reitti = ehdokas;
     }
     if (!reitti) return null;
+    return rakenna(reitti, siemen, valittu, r);
+  }
+
+  /** Kiinteä reitti (viikon reitti, lib/reittipeli/viikonReitit.ts): alueet oikeassa järjestyksessä.
+      Hylätään, jos jokin pari ei rajaudu tai välialueille on useampi kuin yksi oikea järjestys. */
+  function reittiAlueista(ids: string[], siemen: string): KlReitti | null {
+    if (ids.length !== KL_KUNTIA || ids.some((k) => !PER.has(k))) return null;
+    if (ids.slice(1).some((k, i) => !rajaa(ids[i], k)) || ratkaisuja(ids) !== 1) return null;
+    return rakenna(ids, siemen, null, satunnainen(`${a.nimi}:kiintea:${siemen}`));
+  }
+
+  function rakenna(reitti: string[], siemen: string, valittu: string | null, r: () => number): KlReitti {
     const alueet = reitti.map((k) => PER.get(k)!);
 
     // Lähtöjärjestys: välialueet sekaisin niin, että oikeita pareja on korkeintaan kaksi.
@@ -215,8 +227,13 @@ export function luoReittimoottori(data: RpData, a: RpAsetukset) {
     return { siemen, maakunta: valittu, ratkaisu, alku, rajat, kartta: { viewBox: viewBox.join(" "), alueet: karttaAlueet, ...(renkaat.length ? { renkaat } : {}) } };
   }
 
+  /** Reiteille pääsevät alueet (pitkä maaraja naapuriin, ei valikon ulkopuolisesta ryhmästä): hero-luku. */
+  const PELATTAVIA = ALOITUS.filter((k) => !ryhmat(PER.get(k)!).some((m) => a.eiValikkoon?.includes(m))).length;
+
   return {
     arvoReitti,
+    reittiAlueista,
+    pelattavia: PELATTAVIA,
     valikko,
     ryhmaTunnuksella: (t: string | null | undefined) => valikko.find((m) => m.tunnus === t) ?? null,
     lahde: data.lahde,

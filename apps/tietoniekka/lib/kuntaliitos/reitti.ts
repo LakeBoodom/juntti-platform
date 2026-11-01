@@ -27,3 +27,5 @@ export const arvoReitti = moottori.arvoReitti;
 export const KL_MAAKUNNAT = moottori.valikko;
 export const maakuntaTunnuksella = moottori.ryhmaTunnuksella;
 export const KL_LAHDE = moottori.lahde;
+export const reittiAlueista = moottori.reittiAlueista;
+export const PELATTAVIA = moottori.pelattavia;
