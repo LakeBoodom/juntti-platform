@@ -203,7 +203,7 @@ function Pelit({ p }: { p: D["pelit"] }) {
       </div>
       {p.ryhmat.map((g) => (
         <div key={g.avain} className="tn-es-ryhma">
-          <h3 className="tn-es-ryhma-h"><span>{g.nimi}</span></h3>
+          <h3 className="tn-es-ryhma-h"><span>{g.nimi}</span>{g.kaikki && <a className="tn-es-ryhma-kaikki" href={g.kaikki.href}>{g.kaikki.teksti} →</a>}</h3>
           {/* < 768 px karuselli (v7: kortti 242 px, seuraava näkyy reunassa); ≥ 768 px ruudukko, sarakkeet korttimäärästä
               (analyysi 30.10.): 3 korttia = 3 saraketta; kuvan sizes palstan maksimista 1120 px. */}
           <div className="tn-es-rivi" data-ryhma={g.avain} data-sar={Math.min(g.kortit.length, 4)} style={{ "--sar": Math.min(g.kortit.length, 4) } as CSSProperties}>
