@@ -8,7 +8,7 @@
 
 export type ViikonReitti = { alkaa: string; otsikko: string; reitti: string[] };
 
-export const VIIKON_REITIT: Record<"rajanaapurit" | "kuntaliitos", ViikonReitti[]> = {
+export const VIIKON_REITIT: Record<"rajanaapurit" | "kuntaliitos" | "osavaltiot", ViikonReitti[]> = {
   rajanaapurit: [
     // Kanada → Yhdysvallat → Meksiko → Guatemala → Honduras → Nicaragua → Costa Rica → Panama
     { alkaa: "2026-10-26", otsikko: "Kanadasta Panamaan", reitti: ["CAN", "USA", "MEX", "GTM", "HND", "NIC", "CRI", "PAN"] },
@@ -120,6 +120,63 @@ export const VIIKON_REITIT: Record<"rajanaapurit" | "kuntaliitos", ViikonReitti[
     { alkaa: "2027-04-19", otsikko: "Kokemäeltä Pirkkalaan", reitti: ["271", "886", "609", "214", "143", "980", "536", "604"] },
     // Kirkkonummi → Vihti → Nurmijärvi → Tuusula → Mäntsälä → Pornainen → Porvoo → Loviisa
     { alkaa: "2027-04-26", otsikko: "Kirkkonummelta Loviisaan", reitti: ["257", "927", "543", "858", "505", "611", "638", "434"] },
+  ],
+  // Rajanaapurit: Yhdysvallat (CD-handoff 1.11.2026). Elatiivi + illatiivi kuten Kotus: Tennesseehen, Mainesta.
+  osavaltiot: [
+    // Kalifornia – Arizona – Uusi-Meksiko – Texas – Louisiana – Mississippi – Alabama – Florida
+    { alkaa: "2026-10-26", otsikko: "Kaliforniasta Floridaan", reitti: ["CA", "AZ", "NM", "TX", "LA", "MS", "AL", "FL"] },
+    // New York – Pennsylvania – Länsi-Virginia – Virginia – Tennessee – Mississippi – Louisiana – Texas
+    { alkaa: "2026-11-02", otsikko: "New Yorkista Texasiin", reitti: ["NY", "PA", "WV", "VA", "TN", "MS", "LA", "TX"] },
+    // Washington – Oregon – Kalifornia – Arizona – Uusi-Meksiko – Oklahoma – Missouri – Tennessee
+    { alkaa: "2026-11-09", otsikko: "Washingtonista Tennesseehen", reitti: ["WA", "OR", "CA", "AZ", "NM", "OK", "MO", "TN"] },
+    // Michigan – Wisconsin – Iowa – Etelä-Dakota – Montana – Idaho – Nevada – Arizona
+    { alkaa: "2026-11-16", otsikko: "Michiganista Arizonaan", reitti: ["MI", "WI", "IA", "SD", "MT", "ID", "NV", "AZ"] },
+    // Louisiana – Mississippi – Alabama – Georgia – Pohjois-Carolina – Virginia – Länsi-Virginia – Ohio
+    { alkaa: "2026-11-23", otsikko: "Louisianasta Ohioon", reitti: ["LA", "MS", "AL", "GA", "NC", "VA", "WV", "OH"] },
+    // Montana – Etelä-Dakota – Iowa – Illinois – Kentucky – Tennessee – Arkansas – Texas
+    { alkaa: "2026-11-30", otsikko: "Montanasta Texasiin", reitti: ["MT", "SD", "IA", "IL", "KY", "TN", "AR", "TX"] },
+    // Utah – Arizona – Uusi-Meksiko – Texas – Arkansas – Mississippi – Alabama – Florida
+    { alkaa: "2026-12-07", otsikko: "Utahista Floridaan", reitti: ["UT", "AZ", "NM", "TX", "AR", "MS", "AL", "FL"] },
+    // Minnesota – Etelä-Dakota – Nebraska – Colorado – Uusi-Meksiko – Arizona – Kalifornia – Oregon
+    { alkaa: "2026-12-14", otsikko: "Minnesotasta Oregoniin", reitti: ["MN", "SD", "NE", "CO", "NM", "AZ", "CA", "OR"] },
+    // Maine – New Hampshire – Massachusetts – New York – Pennsylvania – Länsi-Virginia – Virginia – Pohjois-Carolina
+    { alkaa: "2026-12-21", otsikko: "Mainesta Pohjois-Carolinaan", reitti: ["ME", "NH", "MA", "NY", "PA", "WV", "VA", "NC"] },
+    // Nevada – Idaho – Montana – Pohjois-Dakota – Minnesota – Wisconsin – Michigan – Ohio
+    { alkaa: "2026-12-28", otsikko: "Nevadasta Ohioon", reitti: ["NV", "ID", "MT", "ND", "MN", "WI", "MI", "OH"] },
+    // Georgia – Alabama – Mississippi – Arkansas – Oklahoma – Uusi-Meksiko – Arizona – Utah
+    { alkaa: "2027-01-04", otsikko: "Georgiasta Utahiin", reitti: ["GA", "AL", "MS", "AR", "OK", "NM", "AZ", "UT"] },
+    // Pennsylvania – Ohio – Indiana – Illinois – Iowa – Minnesota – Pohjois-Dakota – Montana
+    { alkaa: "2027-01-11", otsikko: "Pennsylvaniasta Montanaan", reitti: ["PA", "OH", "IN", "IL", "IA", "MN", "ND", "MT"] },
+    // Kalifornia – Nevada – Utah – Wyoming – Nebraska – Missouri – Arkansas – Louisiana
+    { alkaa: "2027-01-18", otsikko: "Kaliforniasta Louisianaan", reitti: ["CA", "NV", "UT", "WY", "NE", "MO", "AR", "LA"] },
+    // Virginia – Länsi-Virginia – Ohio – Indiana – Illinois – Missouri – Kansas – Colorado
+    { alkaa: "2027-01-25", otsikko: "Virginiasta Coloradoon", reitti: ["VA", "WV", "OH", "IN", "IL", "MO", "KS", "CO"] },
+    // Texas – Uusi-Meksiko – Arizona – Utah – Idaho – Montana – Pohjois-Dakota – Minnesota
+    { alkaa: "2027-02-01", otsikko: "Texasista Minnesotaan", reitti: ["TX", "NM", "AZ", "UT", "ID", "MT", "ND", "MN"] },
+    // Florida – Alabama – Tennessee – Virginia – Maryland – Pennsylvania – Ohio – Michigan
+    { alkaa: "2027-02-08", otsikko: "Floridasta Michiganiin", reitti: ["FL", "AL", "TN", "VA", "MD", "PA", "OH", "MI"] },
+    // Oregon – Idaho – Wyoming – Etelä-Dakota – Iowa – Missouri – Oklahoma – Texas
+    { alkaa: "2027-02-15", otsikko: "Oregonista Texasiin", reitti: ["OR", "ID", "WY", "SD", "IA", "MO", "OK", "TX"] },
+    // Pohjois-Carolina – Georgia – Alabama – Mississippi – Louisiana – Texas – Oklahoma – Colorado
+    { alkaa: "2027-02-22", otsikko: "Pohjois-Carolinasta Coloradoon", reitti: ["NC", "GA", "AL", "MS", "LA", "TX", "OK", "CO"] },
+    // Washington – Oregon – Nevada – Utah – Wyoming – Montana – Pohjois-Dakota – Minnesota
+    { alkaa: "2027-03-01", otsikko: "Washingtonista Minnesotaan", reitti: ["WA", "OR", "NV", "UT", "WY", "MT", "ND", "MN"] },
+    // New York – Pennsylvania – Maryland – Virginia – Kentucky – Missouri – Nebraska – Colorado
+    { alkaa: "2027-03-08", otsikko: "New Yorkista Coloradoon", reitti: ["NY", "PA", "MD", "VA", "KY", "MO", "NE", "CO"] },
+    // Arizona – Uusi-Meksiko – Oklahoma – Arkansas – Tennessee – Virginia – Länsi-Virginia – Pennsylvania
+    { alkaa: "2027-03-15", otsikko: "Arizonasta Pennsylvaniaan", reitti: ["AZ", "NM", "OK", "AR", "TN", "VA", "WV", "PA"] },
+    // Tennessee – Missouri – Nebraska – Etelä-Dakota – Montana – Idaho – Nevada – Kalifornia
+    { alkaa: "2027-03-22", otsikko: "Tennesseestä Kaliforniaan", reitti: ["TN", "MO", "NE", "SD", "MT", "ID", "NV", "CA"] },
+    // Ohio – Michigan – Wisconsin – Iowa – Etelä-Dakota – Montana – Idaho – Washington
+    { alkaa: "2027-03-29", otsikko: "Ohiosta Washingtoniin", reitti: ["OH", "MI", "WI", "IA", "SD", "MT", "ID", "WA"] },
+    // Georgia – Pohjois-Carolina – Virginia – Kentucky – Indiana – Michigan – Wisconsin – Minnesota
+    { alkaa: "2027-04-05", otsikko: "Georgiasta Minnesotaan", reitti: ["GA", "NC", "VA", "KY", "IN", "MI", "WI", "MN"] },
+    // Nevada – Idaho – Montana – Etelä-Dakota – Iowa – Missouri – Kentucky – Virginia
+    { alkaa: "2027-04-12", otsikko: "Nevadasta Virginiaan", reitti: ["NV", "ID", "MT", "SD", "IA", "MO", "KY", "VA"] },
+    // Indiana – Illinois – Wisconsin – Minnesota – Pohjois-Dakota – Montana – Idaho – Oregon
+    { alkaa: "2027-04-19", otsikko: "Indianasta Oregoniin", reitti: ["IN", "IL", "WI", "MN", "ND", "MT", "ID", "OR"] },
+    // Alabama – Mississippi – Arkansas – Missouri – Iowa – Minnesota – Pohjois-Dakota – Montana
+    { alkaa: "2027-04-26", otsikko: "Alabamasta Montanaan", reitti: ["AL", "MS", "AR", "MO", "IA", "MN", "ND", "MT"] },
   ],
 };
 

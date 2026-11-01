@@ -85,30 +85,13 @@
 .tn20 .rh-pillerit a:hover { border-color: var(--rh-kulta); color: var(--rh-kulta); }
 .tn20 .rh-pillerit a:focus-visible, .tn20 .rh .rv-nappi:focus-visible { outline: 2px solid var(--rh-kulta); outline-offset: 2px; }
 
-/* Desktopin kartta: pelin oma kartta tummana, vain lähtö ja maali. */
+/* Desktopin kartta: pelin oma kartta vaaleana (malli 6c, 1.11.2026: kartta on se vaalea elementti tummallakin
+   sivulla), vain lähtö ja maali. Alueiden ja merkkien tyylit kuntaliitos.css:stä (.kl-alue, .kl-merkki). */
 .tn20 .rh-kartta { display: none; }
 .tn20 .rh-kartta svg { position: absolute; inset: 0; width: 100%; height: 100%; }
-.tn20 .rh-kartta .rh-maa { stroke: #131109; stroke-width: .8px; vector-effect: non-scaling-stroke; stroke-linejoin: round; }
-.tn20 .rh-savy0 { fill: #2b2519; }
-.tn20 .rh-savy1 { fill: #332c1d; }
-.tn20 .rh-savy2 { fill: #2f2a20; }
-.tn20 .rh-savy3 { fill: #3a3121; }
-.tn20 .rh-savy4 { fill: #282318; }
-.tn20 .rh-kartta .rh-maa--tausta { fill: #221d13; }
-.tn20 .rh-kartta .rh-maa--paate { fill: #6b4c12; }
-.tn20 .rh-nasta {
-  position: absolute; display: flex; flex-direction: column; align-items: center; gap: 4px;
-  transform: translate(-50%, -18px); pointer-events: none;
-}
-.tn20 .rh-nasta--oik { align-items: flex-end; transform: translate(calc(-100% + 22px), -18px); }
-.tn20 .rh-nasta--vas { align-items: flex-start; transform: translate(-22px, -18px); }
-.tn20 .rh-nasta .kl-lippu { width: 44px; border-radius: 4px; box-shadow: 0 0 0 2px var(--rh-teksti); }
-.tn20 .rh-nasta .kl-kilpi { --kl-reuna: var(--rh-teksti); width: 34px; }
-.tn20 .rh-nasta > span:last-child {
-  display: flex; align-items: center; min-height: 24px; padding: 0 10px; border-radius: 999px; white-space: nowrap;
-  background: var(--rh-pohja); border: 1px solid var(--rh-kulta); color: var(--rh-kulta-v);
-  font-size: 12px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase;
-}
+.tn20 .rh-kartta .kl-merkki-nimi { max-width: 260px; padding: 5px 12px; border-radius: 13px; font-size: 13px; }
+.tn20 .rh-kartta .kl-merkki .kl-lippu { width: 48px; }
+.tn20 .rh-kartta .kl-merkki .kl-kilpi { width: 36px; }
 
 @container kl (min-width: 900px) {
   .tn20 .rh-sisus {
@@ -130,7 +113,7 @@
   .tn20 .rh-cta { justify-self: start; }
   .tn20 .rh-kartta {
     display: block; position: relative; width: 100%; max-height: 640px; margin: 0 auto;
-    border-radius: 22px; border: 1px solid var(--rh-viiva-2); overflow: hidden; background: #0f0d07;
+    border-radius: 22px; border: 1px solid var(--rh-viiva-2); overflow: hidden; background: #fff;
   }
 }
 

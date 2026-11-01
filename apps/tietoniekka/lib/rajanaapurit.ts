@@ -2,3 +2,5 @@
 // sama moottori (lib/reittipeli/moottori.ts) ja näkymä (components/tn20/reittipeli).
 // Tämä tiedosto kelpaa selaimeen; aineisto ja arvonta ovat palvelimella (lib/rajanaapurit/reitti.ts).
 export const RN_SIVU = "/peli/rajanaapurit";
+/** Rajanaapurit: Yhdysvallat (CD-handoff 1.11.2026): variantti omassa osoitteessaan. */
+export const RN_USA_SIVU = "/peli/rajanaapurit/osavaltiot";

@@ -13,6 +13,7 @@ import { helsinginPaiva } from "@/lib/aika";
 import { arvoReitti, reittiAlueista, PELATTAVIA, KL_LAHDE, KL_MAAKUNNAT, maakuntaTunnuksella } from "@/lib/kuntaliitos/reitti";
 import { sivunReitti, viikonAikavali } from "@/lib/reittipeli/viikonReitit";
 import ReittipeliClient from "@/components/tn20/reittipeli/ReittipeliClient";
+import { reittiJakokuva } from "@/lib/reittipeli/kuvat";
 import "./kuntaliitos.css";
 import "./reittihero.css";
 
@@ -33,7 +34,7 @@ export async function generateMetadata({ searchParams }: { searchParams: Promise
         description: "Järjestä kahdeksan kuntaa reitiksi niin, että jokaisella vierekkäisellä parilla on yhteinen raja. Uusi viikon reitti joka maanantai.",
       }),
       url: jakoOsoite("/peli/kuntaliitos", sp, ["maakunta", "reitti", "tulos"]),
-      kuva: "/og/sivu/kuntaliitos",
+      kuva: reittiJakokuva("kuntaliitos", sp, "/og/sivu/kuntaliitos"),
     }),
   };
 }
@@ -63,6 +64,7 @@ export default async function KuntaliitosSivu({ searchParams }: Props) {
         intro={valinta.intro}
         luvut={[`${PELATTAVIA} kuntaa`, `${KL_MAAKUNNAT.length} maakuntaa`]}
         lahde={KL_LAHDE}
+        viikko={valinta.kuluva}
       />
     </>
   );

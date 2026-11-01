@@ -4,6 +4,8 @@
 // Uusi pelimuoto tai Tupla tai kuitin aihe ilmestyy oikeille sivuille itsestään.
 import { TEEMAT, TUPLA_SIVU } from "./tuplaTaiKuitti";
 import { JULKAISTUT, pakkaHref } from "./jarjesta/pakat";
+import { helsinginPaiva } from "./aika";
+import { VIIKON_REITIT, maanantai, viikonReitti, viikonSiemen } from "./reittipeli/viikonReitit";
 
 export type PeliIkoni = "kuva" | "aani" | "ika" | "jarjestys" | "kartta" | "tupla" | "kumpi" | "ketju";
 
@@ -20,7 +22,10 @@ export type Pelimuoto = {
   serves: string[];
   /** Pelin oma kuva kokoelmasivun pelikorttiin ikonin tilalle (P6, Heikki 21.10.2026; toistaiseksi Luonnon pelit).
    *  contain = kuvitus läpinäkyvällä taustalla kokonaisena (Tupla tai kuitin aiheikonit). */
-  kuva?: { src: string; contain?: boolean };
+  kuva?: { src: string; contain?: boolean; /** Neliömäinen versio kokoelmasivun 64–80 px:n kuvaan (reittipelit). */ ruutu?: string };
+  /** Saman pelimuodon variantit (Rajanaapurit: Maailma / Yhdysvallat, CD-handoff 1.11.2026 7a): Maantieto-kortissa
+   *  kahtia jaettu kuva ja varianttirivit. Kuva ja liput täydentyvät viikon reitistä (viikonKuvat). */
+  variantit?: Array<{ slug: keyof typeof VIIKON_REITIT; nimi: string; href: string; kuva?: string; liput?: [string, string] | null }>;
 };
 
 /** Tupla tai kuitin aihe → kokoelma. Kausipainokset (Halloween, joulu) palvelevat Juhlia. */
@@ -47,8 +52,13 @@ export const PELIMUODOT: Pelimuoto[] = [
     /* Pelin oma kuva kaikissa korteissa (pelimuotojen kehys, Heikki 25.10.2026): teeman 3D-palkintoikoni. */
     kuva: { src: t.kuva, contain: true },
   })),
-  { slug: "kuntaliitos", nimi: "Kuntaliitos", ikoni: "ketju", kuvaus: "Rakenna reitti naapurikuntien kautta.", href: "/peli/kuntaliitos", tila: "pelattava", serves: ["kaupungit", "matkakohteet"], kuva: { src: "/20/kuntaliitos/palapeli.webp" } },
-  { slug: "rajanaapurit", nimi: "Rajanaapurit", ikoni: "ketju", kuvaus: "Ketjuta maat yhteisen rajan kautta.", href: "/peli/rajanaapurit", tila: "pelattava", serves: ["matkakohteet"], kuva: { src: "/20/rajanaapurit/banneri-kartta.webp" } },
+  /* Reittipelien kuvat: viikon reitin lähtö ja maali vaalealla kartalla (malli 6c, app/og/reitti), viikko lisätään viikonKuvat-apurissa. */
+  { slug: "kuntaliitos", nimi: "Kuntaliitos", ikoni: "ketju", kuvaus: "Rakenna reitti naapurikuntien kautta.", href: "/peli/kuntaliitos", tila: "pelattava", serves: ["kaupungit", "matkakohteet"], kuva: { src: "/og/reitti/kuntaliitos/kortti" } },
+  { slug: "rajanaapurit", nimi: "Rajanaapurit", ikoni: "ketju", kuvaus: "Rakenna reitti rajanaapureiden kautta.", href: "/peli/rajanaapurit", tila: "pelattava", serves: ["matkakohteet"], kuva: { src: "/og/reitti/rajanaapurit/kortti" },
+    variantit: [
+      { slug: "rajanaapurit", nimi: "Maailma", href: "/peli/rajanaapurit" },
+      { slug: "osavaltiot", nimi: "Yhdysvallat", href: "/peli/rajanaapurit/osavaltiot" },
+    ] },
   { slug: "vaalipiiriketju", nimi: "Vaalipiiriketju", ikoni: "ketju", kuvaus: "Kulje vaalipiiristä toiseen kansanedustajien kautta.", href: "/peli/vaalipiiriketju", tila: "pelattava", serves: ["vaalit"], kuva: { src: "/20/vaalit/vaalipiiriketju-kortti.webp" } },
   { slug: "ikajarjestys", nimi: "Ikäjärjestys", ikoni: "ika", kuvaus: "Järjestä tunnetut suomalaiset iän mukaan.", href: "/peli/jarjesta/tunnetut-suomalaiset", tila: "pelattava", serves: ["tunnetut-henkilot"], kuva: { src: "/20/pelit/k/ikajarjestys.webp" } },
   /* Viikon kuvavisa (15 kuvaa, vaihtuu maanantaisin) — entinen "Tämän viikon visa" -kaista Kuvavisat-sivulla. */
@@ -79,8 +89,25 @@ export const PELIMUODOT: Pelimuoto[] = [
 ];
 
 /** Kokoelman pelit: pelattavat ensin, sitten tulossa olevat. */
+/** Reittipelien kuvat ja liput viikon reitistä: /og/reitti/<peli>/kortti → ?reitti=viikko-<ma> (CDN-välimuisti vaihtuu
+ *  maanantaina), varianttirivien liput = viikon reitin lähtö ja maali (7a). Muut pelit sellaisenaan. */
+const LIPPU = (peli: keyof typeof VIIKON_REITIT, k: string) => `/20/rajanaapurit/liput/${peli === "osavaltiot" ? "us-" : ""}${k.toLowerCase()}.webp`;
+export function viikonKuvat(p: Pelimuoto, paivaIso = helsinginPaiva().iso): Pelimuoto {
+  if (!p.kuva?.src.startsWith("/og/reitti/")) return p;
+  const viikko = maanantai(paivaIso);
+  const q = `?reitti=${viikonSiemen(viikko)}`;
+  return {
+    ...p,
+    kuva: { ...p.kuva, src: p.kuva.src + q, ruutu: p.kuva.src.replace(/\/kortti$/, "/puolikas") + q },
+    variantit: p.variantit?.map((v) => {
+      const r = viikonReitti(v.slug, viikko)?.reitti;
+      return { ...v, kuva: `/og/reitti/${v.slug}/puolikas${q}`, liput: r ? [LIPPU(v.slug, r[0]), LIPPU(v.slug, r[r.length - 1])] : null };
+    }),
+  };
+}
+
 export const kokoelmanPelimuodot = (kokoelma: string) =>
-  PELIMUODOT.filter((p) => p.serves.includes(kokoelma)).sort((a, b) => Number(a.tila === "tulossa") - Number(b.tila === "tulossa"));
+  PELIMUODOT.filter((p) => p.serves.includes(kokoelma)).sort((a, b) => Number(a.tila === "tulossa") - Number(b.tila === "tulossa")).map((p) => viikonKuvat(p));
 
 /** K4 "Seuraava peli" (§4): 2–3 peliä rekisteristä, saman kokoelman pelit ensin, nykyinen peli pois.
  *  Ensin eri pelimuodot (yksi per ikoni), sitten täydennys. */
@@ -91,7 +118,7 @@ export function seuraavatPelit(nykyinen: string, koti?: string, n = 3): Pelimuot
   const valitut: Pelimuoto[] = [];
   for (const p of jarj) if (valitut.length < n && !valitut.some((v) => v.ikoni === p.ikoni)) valitut.push(p);
   for (const p of jarj) if (valitut.length < n && !valitut.includes(p)) valitut.push(p);
-  return valitut;
+  return valitut.map((p) => viikonKuvat(p));
 }
 
 /* ── ETUSIVUN "VALITSE PELI" (etusivu v5, 28.10.2026) ─────────────────────────────────────────────────────

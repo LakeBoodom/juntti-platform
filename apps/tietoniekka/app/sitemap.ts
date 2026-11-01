@@ -13,7 +13,7 @@ import { KL_SIVU } from "@/lib/kuntaliitos";
 import { JULKAISTUT, pakkaHref } from "@/lib/jarjesta/pakat";
 import { HUB_HREF, IKA_PAKAT } from "@/lib/jarjesta/hub";
 import { VPK_SIVU } from "@/lib/vaalipiiriketju";
-import { RN_SIVU } from "@/lib/rajanaapurit";
+import { RN_SIVU, RN_USA_SIVU } from "@/lib/rajanaapurit";
 import { NAV_COLLECTIONS } from "@/lib/nav";
 import { KATEGORIAT } from "@/lib/kuvavisat2026";
 import { getPublishedQuizSlugs } from "@/lib/queries";
@@ -46,6 +46,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...TEEMAT.map((t) => u(`${TUPLA_SIVU}/${t.slug}`, "daily", 0.6)),
     u(KL_SIVU, "daily", 0.7),
     u(RN_SIVU, "daily", 0.7),
+    u(RN_USA_SIVU, "weekly", 0.6),
     /* Järjestä-hub ja kaikki pakat (osa C 31.10.2026: Ikäjärjestyksen aiheet pakkoina, /peli/ikajarjestys ohjaa). */
     u(HUB_HREF, "daily", 0.7),
     ...IKA_PAKAT.map((p) => u(p.href, "weekly", 0.6)),

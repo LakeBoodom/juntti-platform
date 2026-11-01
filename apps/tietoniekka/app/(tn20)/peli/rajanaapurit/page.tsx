@@ -3,7 +3,7 @@
 // Kartta- ja liitoskokoelma). Julkaistu 27.9.2026 Pelimuodot-valikkoon ja etusivun banneriin.
 //   /peli/rajanaapurit                  viikon reitti + hero (koko maailma, lib/reittipeli/viikonReitit.ts)
 //   /peli/rajanaapurit?maanosa=eurooppa päivän reitti Euroopasta
-//   /peli/rajanaapurit?reitti=x7k2      tietty reitti (Arvo uusi reitti, haastelinkki)
+//   /peli/rajanaapurit?reitti=x7k2      tietty reitti (Arvo uusi reitti, haastelinkki); ?reitti=uusi arpoo uuden
 
 import { JsonLd, peliLd } from "@/lib/jsonLd";
 import { jakoMeta, jakoOsoite, pelituloksenOg } from "@/lib/jakoMeta";
@@ -13,6 +13,9 @@ import { helsinginPaiva } from "@/lib/aika";
 import { arvoReitti, reittiAlueista, PELATTAVIA, RN_LAHDE, RN_MAANOSAT, maanosaTunnuksella } from "@/lib/rajanaapurit/reitti";
 import { sivunReitti, viikonAikavali } from "@/lib/reittipeli/viikonReitit";
 import ReittipeliClient from "@/components/tn20/reittipeli/ReittipeliClient";
+import { reittiJakokuva } from "@/lib/reittipeli/kuvat";
+import { uusiReittiSiemen } from "@/lib/kuntaliitos";
+import { redirect } from "next/navigation";
 import "../kuntaliitos/kuntaliitos.css";
 import "../kuntaliitos/reittihero.css";
 
@@ -32,7 +35,7 @@ export async function generateMetadata({ searchParams }: { searchParams: Promise
         description: "Järjestä kahdeksan valtiota reitiksi niin, että jokaisella vierekkäisellä parilla on yhteinen maaraja. Uusi viikon reitti joka maanantai.",
       }),
       url: jakoOsoite("/peli/rajanaapurit", sp, ["maanosa", "reitti", "tulos"]),
-      kuva: "/og/sivu/rajanaapurit",
+      kuva: reittiJakokuva("rajanaapurit", sp, "/og/sivu/rajanaapurit"),
     }),
   };
 }
@@ -43,6 +46,8 @@ type Props = { searchParams: Promise<Record<string, string | string[] | undefine
 
 export default async function RajanaapuritSivu({ searchParams }: Props) {
   const sp = await searchParams;
+  // Seuraava peli -kortti "Arvo uusi reitti" (7d): siemen arvotaan palvelimella.
+  if (sp.reitti === "uusi") redirect(`/peli/rajanaapurit?reitti=${uusiReittiSiemen()}`);
   const pyydetty = typeof sp.reitti === "string" && SIEMEN.test(sp.reitti) ? sp.reitti : null;
   const paiva = helsinginPaiva();
   const maanosa = maanosaTunnuksella(typeof sp.maanosa === "string" ? sp.maanosa : null);
@@ -62,6 +67,7 @@ export default async function RajanaapuritSivu({ searchParams }: Props) {
         intro={valinta.intro}
         luvut={[`${PELATTAVIA} maata`, `${RN_MAANOSAT.length} maanosaa`]}
         lahde={RN_LAHDE}
+        viikko={valinta.kuluva}
       />
     </>
   );

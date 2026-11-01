@@ -112,6 +112,18 @@ export function luoReittimoottori(data: RpData, a: RpAsetukset) {
   })();
   const savy = (k: RpAlue) => k.s ?? SAVY.get(k.m) ?? 0;
 
+  /** Koko aineiston rajat: kartan näkymä pidetään niiden sisällä (ei tyhjää merta, kun reitti on reunalla). */
+  const RAJAT: Laatikko = (() => {
+    const b = [...ALUEET, ...TAUSTA].map((k) => k.b);
+    return [Math.min(...b.map((x) => x[0])), Math.min(...b.map((x) => x[1])), Math.max(...b.map((x) => x[2])), Math.max(...b.map((x) => x[3]))];
+  })();
+  /** Näkymän keskipiste yhdellä akselilla: aineiston sisällä, jos mahtuu (muuten aineiston keskellä), mutta
+      reitin pisteet (r0–r1) jäävät aina näkyviin. */
+  const sovita = (c: number, koko: number, lo: number, hi: number, r0: number, r1: number) => {
+    const k = koko >= hi - lo ? (lo + hi) / 2 : Math.min(Math.max(c, lo + koko / 2), hi - koko / 2);
+    return Math.min(Math.max(k, r1 - koko / 2), r0 + koko / 2);
+  };
+
   /** Montako järjestystä välialueille muodostaa katkeamattoman ketjun (päätepisteet kiinni). */
   function ratkaisuja(reitti: string[]): number {
     const alku = reitti[0], loppu = reitti.at(-1)!;
@@ -147,16 +159,20 @@ export function luoReittimoottori(data: RpData, a: RpAsetukset) {
     return reitti;
   }
 
-  function kartta(reitti: RpAlue[], valittu: string | null) {
+  /** o: jakokuvan ja korttikuvien oma kuvasuhde ja vähimmäiskoko (app/og/reitti). */
+  function kartta(reitti: RpAlue[], valittu: string | null, o: { suhde?: number; minLeveys?: number } = {}) {
+    const suhde = o.suhde ?? SUHDE, minLeveys = o.minLeveys ?? a.minLeveys, minKorkeus = o.minLeveys ? o.minLeveys / suhde : a.minKorkeus;
     const xs = reitti.map((k) => k.p[0]), ys = reitti.map((k) => k.p[1]);
     let [x0, y0, x1, y1] = [Math.min(...xs), Math.min(...ys), Math.max(...xs), Math.max(...ys)];
-    // Reunoille tilaa nastoille (tunnus + nimilappu)
+    // Reunoille tilaa päätepisteiden merkeille (tunnus + "Lähtö · nimi", 6c: ylä- tai alapuolella)
     const pad = Math.max(a.minPad, 0.2 * Math.max(x1 - x0, y1 - y0));
-    [x0, y0, x1, y1] = [x0 - pad, y0 - pad * 0.9, x1 + pad, y1 + pad * 1.2];
-    let w = Math.max(x1 - x0, a.minLeveys), h = Math.max(y1 - y0, a.minKorkeus);
-    if (w / h > SUHDE) h = w / SUHDE;
-    else w = h * SUHDE;
-    const cx = (x0 + x1) / 2, cy = (y0 + y1) / 2;
+    const [rx0, ry0, rx1, ry1] = [x0 - pad * 0.6, y0 - pad * 0.6, x1 + pad * 0.6, y1 + pad * 0.6];
+    [x0, y0, x1, y1] = [x0 - pad, y0 - pad, x1 + pad, y1 + pad];
+    let w = Math.max(x1 - x0, minLeveys), h = Math.max(y1 - y0, minKorkeus);
+    if (w / h > suhde) h = w / suhde;
+    else w = h * suhde;
+    const cx = sovita((x0 + x1) / 2, w, RAJAT[0], RAJAT[2], rx0, rx1);
+    const cy = sovita((y0 + y1) / 2, h, RAJAT[1], RAJAT[3], ry0, ry1);
     const vb: Laatikko = [Math.round(cx - w / 2), Math.round(cy - h / 2), Math.round(w), Math.round(h)];
     // Iso alue karkeistetaan näytön tarkkuuteen: ~700 ruutua kartan korkeudella.
     const g = Math.max(a.ruutu, Math.round(vb[3] / (a.solut ?? 700)));
@@ -227,12 +243,25 @@ export function luoReittimoottori(data: RpData, a: RpAsetukset) {
     return { siemen, maakunta: valittu, ratkaisu, alku, rajat, kartta: { viewBox: viewBox.join(" "), alueet: karttaAlueet, ...(renkaat.length ? { renkaat } : {}) } };
   }
 
+  /** Reitin kartta kuvaksi (jakokortti 7b, Seuraava peli -kortit 7d): reitin alueet oikeassa järjestyksessä,
+      oma kuvasuhde; pisteet prosentteina kuten pelissä. */
+  function kuvakartta(ids: string[], ryhma: string | null, o: { suhde: number; minLeveys?: number }) {
+    const alueet = ids.map((k) => PER.get(k)!);
+    const k = kartta(alueet, ryhma, o);
+    const [vx, vy, vw, vh] = k.viewBox;
+    return {
+      viewBox: k.viewBox, alueet: k.alueet,
+      pisteet: alueet.map((x) => ({ k: x.k, n: x.n, v: x.v, x: ((x.p[0] - vx) / vw) * 100, y: ((x.p[1] - vy) / vh) * 100 })),
+    };
+  }
+
   /** Reiteille pääsevät alueet (pitkä maaraja naapuriin, ei valikon ulkopuolisesta ryhmästä): hero-luku. */
   const PELATTAVIA = ALOITUS.filter((k) => !ryhmat(PER.get(k)!).some((m) => a.eiValikkoon?.includes(m))).length;
 
   return {
     arvoReitti,
     reittiAlueista,
+    kuvakartta,
     pelattavia: PELATTAVIA,
     valikko,
     ryhmaTunnuksella: (t: string | null | undefined) => valikko.find((m) => m.tunnus === t) ?? null,
