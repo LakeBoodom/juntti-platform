@@ -11703,10 +11703,15 @@ export type Database = {
           hero_image: string | null
           id: string
           jarjestys: number
+          johdanto: string | null
           kausi_alku: string | null
           kausi_loppu: string | null
           kesto_min: number | null
           kohderyhma: string
+          lasten_johdanto: string | null
+          lasten_otsikko: string | null
+          lasten_seo_description: string | null
+          lasten_seo_title: string | null
           otsikko: string
           painos_nimi: string | null
           published_at: string | null
@@ -11726,10 +11731,15 @@ export type Database = {
           hero_image?: string | null
           id?: string
           jarjestys?: number
+          johdanto?: string | null
           kausi_alku?: string | null
           kausi_loppu?: string | null
           kesto_min?: number | null
           kohderyhma?: string
+          lasten_johdanto?: string | null
+          lasten_otsikko?: string | null
+          lasten_seo_description?: string | null
+          lasten_seo_title?: string | null
           otsikko: string
           painos_nimi?: string | null
           published_at?: string | null
@@ -11749,10 +11759,15 @@ export type Database = {
           hero_image?: string | null
           id?: string
           jarjestys?: number
+          johdanto?: string | null
           kausi_alku?: string | null
           kausi_loppu?: string | null
           kesto_min?: number | null
           kohderyhma?: string
+          lasten_johdanto?: string | null
+          lasten_otsikko?: string | null
+          lasten_seo_description?: string | null
+          lasten_seo_title?: string | null
           otsikko?: string
           painos_nimi?: string | null
           published_at?: string | null

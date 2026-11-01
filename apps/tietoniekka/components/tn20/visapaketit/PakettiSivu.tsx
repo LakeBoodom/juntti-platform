@@ -2,17 +2,22 @@
 // Hero (murupolku, h1, metarivi, Pelaa itse / Näytä ruudulla / Tulosta) → Aikuiset/Lapset-valitsin (vain
 // 'molemmat') → kierrokset, joissa jokaisen kysymyksen vastaus <details>-elementissä → Pelaa visoina.
 // Vastaukset ovat aina HTML:ssä (SSR), jotta hakukone näkee ne: se on sivun hakunäkyvyyden ydin.
+// SEO-brief 1.11.2026: johdanto H1:n alla (kannasta, luvut paikkamerkeistä), "Päivitetty"-päivämäärä metarivissä,
+// 'molemmat'-paketin lastenversio omassa osoitteessa (/visapaketti/<slug>/lapset): sivulla on vain oman tason
+// kierrokset, ja valitsin on tavallinen linkkipari. Arkistoituneesta sarjan painoksesta linkki uusimpaan.
 // Ei FAQ-tekstiä, ei vetäjän ohjelaatikkoa eikä selitysosioita (UI-sääntö 9, linjaus 2.10.).
 import type { CSSProperties } from "react";
 import "@/app/(tn20)/visapaketit.css";
 import Crumbs from "@/components/tn20/Crumbs";
 import { runkoCond } from "@/components/tn20/runko/runkoFontti";
 import { katko, pisinSana } from "@/lib/kokoelmat/data";
+import { JsonLd, abs } from "@/lib/jsonLd";
 import { pieniKuva } from "@/lib/pienetKuvat";
 import {
   VP_LANDING, type Kierros, type PakettiKysymys, type Sivu, type Taso,
-  hakuosa, julkaisuPvm, kevytKuva, sarjaNimi, kierrosmaarat, kuvaOnKysymys, kysymysTeksti, lahdevisat, metarivi, oikeaVastaus, pakettiHref,
-  tasonKierrokset, valitsinNakyy, viittaaVaihtoehtoihin,
+  hakuosa, julkaisuPvm, kevytKuva, sarjaNimi, kierrosmaarat, kysymysmaarat, kuvaOnKysymys, kysymysTeksti, lahdevisat, lapsetHref,
+  metarivi, muokattu, oikeaVastaus, pakettiHref, sarjaHref, sivunHakuotsikko, sivunNimi, sivunTekstit, tasonKierrokset, valitsinNakyy,
+  viittaaVaihtoehtoihin,
 } from "@/lib/visapaketit";
 import VpAsiakas from "./VpAsiakas";
 
@@ -21,19 +26,26 @@ const TASOT: { taso: Taso; nimi: string }[] = [{ taso: "aikuiset", nimi: "Aikuis
 export default function PakettiSivu({ sivu, taso, esikatselu }: { sivu: Sivu; taso: Taso; esikatselu: string | null }) {
   const { vp, polku, painokset } = sivu;
   const p = vp.paketti;
-  const sarjanPaasivu = !!painokset;
-  const otsikko = sarjanPaasivu && p.sarja ? sarjaNimi(p.sarja) : p.otsikko;
+  const otsikko = sivunNimi(sivu);
   const molemmat = valitsinNakyy(p);
-  const tasot: Taso[] = molemmat ? ["aikuiset", "lapset"] : [taso];
-  const kaikki = tasot.flatMap((t) => tasonKierrokset(vp, t));
+  const lapsille = sivu.taso === "lapset";
+  const kierrokset = tasonKierrokset(vp, taso);
   const meta = [
     ...(p.painos_nimi ? [p.painos_nimi] : []),
-    ...metarivi(p, kierrosmaarat(vp)),
+    ...metarivi(p, kierrosmaarat(vp), kysymysmaarat(vp), taso),
   ];
-  const pvm = p.sarja ? julkaisuPvm(p.published_at) : null;
-  const haku = hakuosa(molemmat && taso === "lapset" ? "lapset" : null, esikatselu);
-  const visat = lahdevisat(kaikki);
+  const paivitetty = muokattu(p);
+  const { johdanto } = sivunTekstit(sivu);
+  const haku = hakuosa(esikatselu);
+  const visat = lahdevisat(kierrokset);
   const aiemmat = (painokset ?? []).filter((r) => r.slug !== p.slug);
+  const aikuistenHref = pakettiHref(p);
+  /* Murupolku: lastenversio aikuisten paketin alle, arkistopainos sarjan pääsivun alle. */
+  const murut = lapsille
+    ? [{ label: "Visapaketit", href: VP_LANDING }, { label: p.otsikko, href: aikuistenHref + haku }, { label: "Lapsille" }]
+    : sivu.arkisto && p.sarja
+      ? [{ label: "Visapaketit", href: VP_LANDING }, { label: sarjaNimi(p.sarja), href: sarjaHref(p.sarja) }, { label: p.painos_nimi ?? p.otsikko }]
+      : [{ label: "Visapaketit", href: VP_LANDING }, { label: otsikko }];
 
   return (
     <main
@@ -41,7 +53,21 @@ export default function PakettiSivu({ sivu, taso, esikatselu }: { sivu: Sivu; ta
       data-vp
       style={(p.aksentti ? { "--vp-acc": p.aksentti } : undefined) as CSSProperties | undefined}
     >
-      <Crumbs items={[{ label: "Visapaketit", href: VP_LANDING }, { label: otsikko }]} />
+      <Crumbs items={murut} />
+      {!vp.esikatselu && (
+        <JsonLd data={{
+          "@context": "https://schema.org",
+          "@type": "WebPage",
+          name: sivunHakuotsikko(sivu),
+          url: abs(sivu.kanoninen),
+          inLanguage: "fi",
+          ...(sivunTekstit(sivu).kuvaus ? { description: sivunTekstit(sivu).kuvaus } : {}),
+          ...(p.published_at ? { datePublished: p.published_at } : {}),
+          ...(paivitetty ? { dateModified: paivitetty } : {}),
+          ...(p.hero_image ? { primaryImageOfPage: abs(p.hero_image) } : {}),
+          isPartOf: { "@type": "WebSite", name: "Tietoniekka", url: abs("/") },
+        }} />
+      )}
 
       <section className="tn-vp-hero" data-kuva={p.hero_image ? "" : undefined}>
         <div className="tn-vp-hero-teksti">
@@ -51,21 +77,30 @@ export default function PakettiSivu({ sivu, taso, esikatselu }: { sivu: Sivu; ta
             </p>
           )}
           <h1 className="tn-vp-h1" style={{ "--lw": pisinSana(otsikko) } as CSSProperties}>{katko(otsikko, true)}</h1>
+          {johdanto && <p className="tn-vp-johdanto">{johdanto}</p>}
           <p className="tn-vp-meta">
             {meta.join(" · ")}
-            {pvm && <> · <time dateTime={p.published_at ?? undefined}>{pvm}</time></>}
+            {paivitetty && <> · Päivitetty <time dateTime={paivitetty}>{julkaisuPvm(paivitetty)}</time></>}
           </p>
+          {molemmat && (
+            lapsille
+              ? <a className="tn-vp-tasolinkki" href={aikuistenHref + haku}>Aikuisille: {p.otsikko} →</a>
+              : <a className="tn-vp-tasolinkki" href={lapsetHref(p) + haku}>Lapsille: {p.lasten_otsikko ?? `${p.otsikko} lapsille`} →</a>
+          )}
+          {sivu.arkisto && p.sarja && (
+            <a className="tn-vp-tasolinkki" href={sarjaHref(p.sarja)}>Uusin {p.otsikko.toLocaleLowerCase("fi")} →</a>
+          )}
           <div className="tn-vp-toiminnot">
             <a className="tn-cta-lime tn-vp-cta" href="#pelaa">Pelaa itse</a>
-            <a className="tn-vp-nappi" href={`${polku}/ruutu${haku}`} data-vp-tasolinkki="">
+            <a className="tn-vp-nappi" href={`${polku}/ruutu${haku}`}>
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><rect x="2" y="4" width="20" height="13" rx="2" /><path d="M8 21h8M12 17v4" /></svg>
               Näytä ruudulla
             </a>
-            <a className="tn-vp-nappi" href={`${polku}/tulosta${haku}`} data-vp-tasolinkki="">
+            <a className="tn-vp-nappi" href={`${polku}/tulosta${haku}`}>
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M6 9V3h12v6" /><rect x="3" y="9" width="18" height="8" rx="2" /><path d="M6 14h12v7H6z" /></svg>
               Tulosta
             </a>
-            <a className="tn-vp-nappi" href={`${polku}/vetaja${haku}`} data-vp-tasolinkki="">
+            <a className="tn-vp-nappi" href={`${polku}/vetaja${haku}`}>
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><rect x="6" y="2" width="12" height="20" rx="2.5" /><path d="M11 18h2" /></svg>
               Juontajalle
             </a>
@@ -83,21 +118,19 @@ export default function PakettiSivu({ sivu, taso, esikatselu }: { sivu: Sivu; ta
         <div className="tn-vp-osio-otsake">
           <h2 id="vp-kysymykset" className="tn-vp-h2">Kysymykset ja vastaukset</h2>
           {molemmat && (
-            <div className="tn-vp-valitsin" role="group" aria-label="Taso">
+            <nav className="tn-vp-valitsin" aria-label="Taso">
               {TASOT.map((t) => (
-                <a key={t.taso} href={`${polku}${hakuosa(t.taso, esikatselu)}`}
-                  data-vp-taso={t.taso} aria-current={t.taso === taso ? "true" : undefined}>
+                <a key={t.taso} href={(t.taso === "lapset" ? lapsetHref(p) : aikuistenHref) + haku}
+                  aria-current={t.taso === taso ? "page" : undefined}>
                   {t.nimi}
                 </a>
               ))}
-            </div>
+            </nav>
           )}
         </div>
-        {tasot.map((t) => (
-          <div key={t} data-vp-kierrokset={t} hidden={t !== taso} className="tn-vp-kierrokset">
-            {tasonKierrokset(vp, t).map((k) => <KierrosLista key={k.nro} k={k} />)}
-          </div>
-        ))}
+        <div className="tn-vp-kierrokset">
+          {kierrokset.map((k) => <KierrosLista key={k.nro} k={k} />)}
+        </div>
       </section>
 
       {visat.length > 0 && (

@@ -40,9 +40,12 @@ function tallennaIka(ika: LastenIka | null) {
   } catch {}
 }
 
+/** Lasten visapaketti (1.11.2026): lasten paketti ja 'molemmat'-pakettien lastenversiot (/visapaketti/joulu/lapset). */
+export type SivuPaketti = { href: string; nimi: string; meta: string };
+
 export default function LapsetSivu({
-  visat, aiheet, nosto, tulossa, duo,
-}: { visat: LastenListaKortti[]; aiheet: SivuAihe[]; nosto: SivuNosto | null; tulossa: TulossaKortti[]; duo: string }) {
+  visat, aiheet, nosto, tulossa, duo, paketit = [],
+}: { visat: LastenListaKortti[]; aiheet: SivuAihe[]; nosto: SivuNosto | null; tulossa: TulossaKortti[]; duo: string; paketit?: SivuPaketti[] }) {
   const [ika, setIka] = useState<LastenIka | null>(null);
   const [aihe, setAihe] = useState<string | null>(null);
   const [sivu, setSivu] = useState(8);
@@ -244,6 +247,24 @@ export default function LapsetSivu({
             <button type="button" className="lps-lisaa" onClick={() => setSivu((s) => s + kerralla)}>Näytä lisää visoja</button>
           )}
         </section>
+
+        {/* ─── Visapaketit (SEO-brief 1.11.2026): valmiit lasten tietovisat vastauksineen ─── */}
+        {paketit.length > 0 && (
+          <section className="lps-osio" aria-labelledby="lps-paketit-h">
+            <h2 className="lps-h2" id="lps-paketit-h">Visapaketit</h2>
+            <div className="lps-paketit">
+              {paketit.map((p) => (
+                <a key={p.href} className="lps-paketti" href={p.href}>
+                  <span className="lps-paketti-teksti">
+                    <span className="lps-paketti-nimi">{p.nimi}</span>
+                    <span className="lps-paketti-meta">{p.meta}</span>
+                  </span>
+                  <span className="lps-nuoli" aria-hidden>→</span>
+                </a>
+              ))}
+            </div>
+          </section>
+        )}
 
         {/* ─── Tulossa ─── */}
         {tulossaNakyvat.length > 0 && (

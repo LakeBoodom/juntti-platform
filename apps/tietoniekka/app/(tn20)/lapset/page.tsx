@@ -12,7 +12,8 @@ import { LAPSET_SIVU, LASTEN_IAT, esikatselu, haeLastenVisat, lapsetNakyvissa, t
 import { AIHEJARJESTYS, LASTEN_AIHEET, juontajaKuvat } from "@/lib/lapset/juontajat";
 import { ajankohtainen } from "@/lib/lapset/nosto";
 import { TULOSSA, TULOSSA_AIHEET } from "@/lib/lapset/tulossa";
-import LapsetSivu, { type SivuAihe, type SivuNosto } from "./LapsetSivu";
+import { lapsetHref, listaaVisapaketit, metarivi, pakettiHref } from "@/lib/visapaketit";
+import LapsetSivu, { type SivuAihe, type SivuNosto, type SivuPaketti } from "./LapsetSivu";
 import "../lapset-sivu.css";
 
 export const revalidate = 300;
@@ -40,7 +41,17 @@ export default async function LapsetPage({ searchParams }: { searchParams: Promi
   const hp = helsinginPaiva();
   const tanaan = sim ? pvm(sim[0], sim[1], sim[2]) : pvm(hp.vuosi, hp.kk, hp.pv);
 
-  const visat = await haeLastenVisat();
+  const [visat, kaikkiPaketit] = await Promise.all([haeLastenVisat(), listaaVisapaketit()]);
+  /* Visapaketit (1.11.2026): 'molemmat'-pakettien lastenversiot (kausipaketti ensin, jarjestys) ja lasten paketit. */
+  const paketit: SivuPaketti[] = kaikkiPaketit.flatMap((p) =>
+    p.sarja || p.kohderyhma === "aikuiset"
+      ? []
+      : [{
+          href: p.kohderyhma === "molemmat" ? lapsetHref(p) : pakettiHref(p),
+          nimi: p.kohderyhma === "molemmat" ? p.lasten_otsikko ?? `${p.otsikko} lapsille` : p.otsikko,
+          meta: metarivi(p, p.kierroksia, p.kysymyksia, "lapset").join(" · "),
+        }],
+  );
   const nyt = ajankohtainen(visat, tanaan);
 
   const aiheet: SivuAihe[] = AIHEJARJESTYS.flatMap((avain) => {
@@ -64,7 +75,7 @@ export default async function LapsetPage({ searchParams }: { searchParams: Promi
   return (
     <main className="lps">
       <Crumbs items={[{ label: "Lasten visat" }]} />
-      <LapsetSivu visat={visat} aiheet={aiheet} nosto={nosto} tulossa={TULOSSA} duo={juontajaKuvat(null).duo.innoissaan} />
+      <LapsetSivu visat={visat} aiheet={aiheet} nosto={nosto} tulossa={TULOSSA} duo={juontajaKuvat(null).duo.innoissaan} paketit={paketit} />
     </main>
   );
 }

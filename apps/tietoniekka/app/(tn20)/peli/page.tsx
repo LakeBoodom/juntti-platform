@@ -22,6 +22,7 @@ import { luontoImg } from "@/lib/luonto";
 import { urheiluImg } from "@/lib/urheilu";
 import { maantietoImg } from "@/lib/maantieto";
 import { KAUPUNGIT } from "@/lib/kaupungit";
+import { tulosPakettiLinkki } from "@/lib/visapaketit";
 import { resolveCollection, COLLECTION_LABEL } from "@/lib/visanKokoelma";
 import { type Learn } from "@/lib/learn";
 import { visanKorttikuva } from "@/lib/kokoelmat/visanKorttikuva";
@@ -237,6 +238,7 @@ const TEAM_COLORS: Array<[RegExp, string]> = [
 type QuizRow = {
   id: string; slug: string | null; title: string; display_title: string | null;
   teaser: string | null; description: string | null; category: string; collection: string | null; genre: string | null;
+  section_tags: string[] | null;
   learn: Learn | null;
   /* Hero-kuvan data (migraatio 20260914_quiz_hero_fields) — visan OMA kuva ja
      sen rajaus; aiemmin kuva tuli kokoelman oletuksesta, jolloin esim.
@@ -688,7 +690,7 @@ export default async function Peli20({
 
   let q = sb
     .from("quizzes")
-    .select("id, slug, title, display_title, teaser, description, category, collection, genre, learn, hero_image, hero_focal_x, hero_focal_y, hero_side, hero_alt, fanitasot, korttinimi, updated_at")
+    .select("id, slug, title, display_title, teaser, description, category, collection, genre, section_tags, learn, hero_image, hero_focal_x, hero_focal_y, hero_side, hero_alt, fanitasot, korttinimi, updated_at")
     .eq("status", "published");
   q = quizId ? q.eq("id", quizId) : q.eq("slug", slug!);
   const { data: quiz } = await q.maybeSingle<QuizRow>();
@@ -696,6 +698,7 @@ export default async function Peli20({
 
   const resolved = resolveCollection(quiz);
   /* Ristiinnostot (SEO-erä A3): portaittainen, satunnaistettu haku — ks. lib/related.ts. */
+  const pakettiLinkki = tulosPakettiLinkki(quiz.section_tags);
   const [{ data: qs }, genreRes, relatedRes, celebRes, mukana] = await Promise.all([
     sb
       .from("questions")
@@ -832,6 +835,8 @@ export default async function Peli20({
       isPerson && celeb
         ? { href: henkiloHref(celeb.name), linkki: celeb.nimi_elatiivi?.trim() ? `Lue lisää ${celeb.nimi_elatiivi.trim()}` : `Lue lisää: ${celeb.name}` }
         : null,
+    /* Visapakettien SEO-brief 1.11.2026: jouluvisan tulosnäkymästä tekstilinkki joulun visapakettiin. */
+    paketti: await pakettiLinkki,
     citySlug: KAUPUNGIT.find((c) => c.quizSlug === quiz.slug)?.id ?? null,
     jakoNimi: korttinimi({ korttinimi: quiz.korttinimi, title: quiz.display_title ?? quiz.title }),
     fanitasot:

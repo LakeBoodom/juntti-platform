@@ -39,6 +39,13 @@
 @font-face { font-family: "Barlow vara"; src: local("Arial"), local("Helvetica"), local("Roboto"); font-weight: 400 500; size-adjust: 94.9%; }
 @font-face { font-family: "Barlow vara"; src: local("Arial Bold"), local("Arial-BoldMT"), local("Helvetica Bold"), local("Helvetica-Bold"), local("Roboto Bold"), local("Roboto-Bold"); font-weight: 600 700; size-adjust: 90.7%; }
 .tn20 .tn-vp-meta { margin: 0; font-family: Barlow, "Barlow vara", sans-serif; font-size: 15px; line-height: 1.25; font-weight: 600; color: var(--tn-text-soft); }
+/* SEO-brief 1.11.2026: johdanto H1:n alla (kannasta) ja tekstilinkki aikuisten/lasten version tai uusimman painoksen välillä. */
+.tn20 .tn-vp-johdanto { margin: 0; max-width: 62ch; font-size: 17px; line-height: 1.5; color: var(--tn-text-soft); }
+.tn20 .tn-vp-tasolinkki {
+  align-self: flex-start; display: inline-flex; align-items: center; min-height: 44px;
+  font-size: 16px; font-weight: 700; color: var(--tn-gold); text-decoration: underline; text-underline-offset: 3px;
+}
+.tn20 .tn-vp-tasolinkki:hover { color: var(--tn-text); }
 .tn20 .tn-vp-toiminnot { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 6px; }
 .tn20 .tn-vp-cta {
   display: inline-flex; align-items: center; justify-content: center; min-height: 52px; padding: 0 26px; border: 0; cursor: pointer;
@@ -336,6 +343,16 @@
   font-family: var(--vp-cond); font-weight: 800; line-height: 1.04; text-transform: uppercase; text-wrap: balance;
   font-size: min(var(--vp-katto), calc(100cqi / (var(--lw, 10) * 0.52 * 1.04))); word-break: normal; overflow-wrap: normal;
 }
+/* 1.11.2026: nosto on article (ei yksi iso linkki), jotta siinä voi olla pikatoiminnot ja lastenversion linkki.
+   Otsikkolinkin ::after kattaa kortin; pikat ja tasolinkki ovat sen päällä. */
+.tn20 .tn-vp-nosto { position: relative; }
+.tn20 .tn-vp-nosto-h { margin: 0; }
+.tn20 .tn-vp-nosto-h a { color: inherit; text-decoration: none; }
+.tn20 .tn-vp-nosto-h a::after { content: ""; position: absolute; inset: 0; border-radius: 18px; }
+.tn20 .tn-vp-nosto-h a:focus-visible { outline: none; }
+.tn20 .tn-vp-nosto-h a:focus-visible::after { outline: 2px solid var(--tn-lime); outline-offset: 3px; }
+.tn20 .tn-vp-nosto :is(.tn-vp-tasolinkki, .tn-vp-pikat) { position: relative; z-index: 1; }
+.tn20 .tn-vp-nosto .tn-vp-pikat { margin: 0; border: 1px solid var(--vp-line); border-radius: 14px; overflow: hidden; background: var(--vp-card); }
 .tn20 .tn-vp-nosto-meta { font-size: 15px; font-weight: 600; color: var(--tn-text-soft); }
 .tn20 .tn-vp-nosto .tn-vp-cta { align-self: stretch; margin-top: 4px; }
 .tn20 .tn-vp-nosto-kuva { display: block; aspect-ratio: 16 / 9; max-height: 220px; background: var(--tn-surface-2); }

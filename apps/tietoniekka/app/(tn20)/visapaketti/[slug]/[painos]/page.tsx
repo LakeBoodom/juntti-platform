@@ -1,4 +1,5 @@
-// /visapaketti/<sarja>/<painos> — sarjan yksittäinen painos (sama pakettisivupohja, oma canonical).
+// /visapaketti/<sarja>/<painos> — sarjan yksittäinen painos (sama pakettisivupohja; voimassa olevan painoksen canonical
+// on sarjan pääsivu, arkistoituneen oma). Myös /visapaketti/<slug>/lapset: 'molemmat'-paketin lastenversio (haeSivu).
 import PakettiSivu from "@/components/tn20/visapaketit/PakettiSivu";
 import { pakettiMetadata, pakettiReitti, type Haku } from "@/components/tn20/visapaketit/reitit";
 

@@ -20,7 +20,9 @@ import { getPublishedQuizSlugs } from "@/lib/queries";
 import { haeHakemisto } from "@/lib/henkilot";
 import { KUUKAUDET, kuukausiSlug } from "@/lib/henkiloRyhmat";
 import { LAPSET_SIVU, lapsetNakyvissa } from "@/lib/lapset/data";
-import { VP_LANDING, listaaVisapaketit, pakettiHref, sarjaHref } from "@/lib/visapaketit";
+import {
+  VP_LANDING, type PakettiRivi, lapsetHref, listaaVisapaketit, muokattu, pakettiHref, sarjaHref, sarjanPainokset, valitsinNakyy,
+} from "@/lib/visapaketit";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://tietoniekka.fi";
 
@@ -74,14 +76,24 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...henkilot.map((h) => u(h.href, "weekly", 0.6)),
   ];
 
-  // Visapaketit (28.10.2026): landing, paketit, sarjojen pääsivut ja painokset. Ruutu- ja tulostenäkymät ovat noindex.
+  // Visapaketit (28.10.2026): landing, paketit ja sarjojen pääsivut. Ruutu- ja tulostenäkymät ovat noindex.
+  // SEO-brief 1.11.2026: sarjan voimassa oleva painos ei ole sitemapissa (kanoninen = sarjan pääsivu), arkistoituneet
+  // painokset ovat; 'molemmat'-paketin lastenversio omalla osoitteellaan (/visapaketti/<slug>/lapset).
   const paketit = await listaaVisapaketit();
   const sarjat = [...new Set(paketit.flatMap((p) => (p.sarja ? [p.sarja] : [])))];
+  const voimassa = new Set(sarjat.map((s) => sarjanPainokset(paketit, s)[0]?.slug));
+  const pvm = (p: PakettiRivi) => { const m = muokattu(p); return m ? new Date(m) : now; };
   const pakettiPages: MetadataRoute.Sitemap = paketit.length
     ? [
         u(VP_LANDING, "weekly", 0.8),
-        ...sarjat.map((s) => u(sarjaHref(s), "weekly", 0.8)),
-        ...paketit.map((p) => u(pakettiHref(p), p.sarja ? "monthly" : "weekly", p.sarja ? 0.6 : 0.8, p.published_at ? new Date(p.published_at) : now)),
+        ...sarjat.map((s) => u(sarjaHref(s), "weekly", 0.8, pvm(sarjanPainokset(paketit, s)[0]))),
+        ...paketit.flatMap((p) => {
+          if (p.sarja) return voimassa.has(p.slug) ? [] : [u(pakettiHref(p), "monthly", 0.5, pvm(p))];
+          return [
+            u(pakettiHref(p), "weekly", 0.8, pvm(p)),
+            ...(valitsinNakyy(p) ? [u(lapsetHref(p), "weekly", 0.8, pvm(p))] : []),
+          ];
+        }),
       ]
     : [];
 

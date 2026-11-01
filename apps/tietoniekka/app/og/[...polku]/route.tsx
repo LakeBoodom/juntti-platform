@@ -35,7 +35,7 @@ import { MEGA_FEATURED, MEGA_GRID } from "@/lib/megavisat";
 import { NAV_COLLECTIONS } from "@/lib/nav";
 import { korttinimi, tasonimiTuloksesta } from "@/lib/korttinimi";
 import { visanKorttikuva } from "@/lib/kokoelmat/visanKorttikuva";
-import { haeSivu, kierrosmaarat, metarivi, sarjaNimi } from "@/lib/visapaketit";
+import { haeSivu, kierrosmaarat, kysymysmaarat, metarivi, sarjaNimi } from "@/lib/visapaketit";
 
 export const runtime = "nodejs";
 
@@ -719,7 +719,7 @@ export async function GET(req: Request, ctx: { params: Promise<{ polku: string[]
       kortti = {
         eyebrow: "Visapaketti", otsikko: sivu.painokset && p.sarja ? sarjaNimi(p.sarja) : p.otsikko, accent: p.aksentti ?? KULTA,
         tausta: await kuvaUri(p.hero_image ?? "/20/hero-mikko-laura.webp", W, H),
-        alarivi: metarivi(p, kierrosmaarat(sivu.vp)).join(" · "),
+        alarivi: metarivi(p, kierrosmaarat(sivu.vp), kysymysmaarat(sivu.vp)).join(" · "),
       };
     }
   } else if (tyyppi === "sivu" && SIVUT[avain]) {

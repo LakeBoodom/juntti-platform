@@ -35,6 +35,14 @@ export type Paketti = {
   jarjestys: number;
   status: "draft" | "published";
   published_at: string | null;
+  updated_at: string | null;
+  /** Näkyvä johdanto H1:n alla (SEO-brief 1.11.2026). Paikkamerkit täytetään kannan luvuista (tayta). */
+  johdanto: string | null;
+  /** 'molemmat'-paketin lastenversio omassa osoitteessa /visapaketti/<slug>/lapset. */
+  lasten_otsikko: string | null;
+  lasten_seo_title: string | null;
+  lasten_seo_description: string | null;
+  lasten_johdanto: string | null;
 };
 
 export type PakettiVisa = {
@@ -87,8 +95,11 @@ export async function haeVisapaketti(slug: string, esikatselu?: string | null): 
   return data as Visapaketti;
 }
 
-/** Landingin, sarjasivun ja sitemapin rivi: paketti + kierrosmäärät tasoittain. */
-export type PakettiRivi = Paketti & { kierroksia: { aikuiset: number; lapset: number } };
+/** Tasoittaiset määrät (kierrokset tai kysymykset). */
+export type Maarat = { aikuiset: number; lapset: number };
+
+/** Landingin, sarjasivun ja sitemapin rivi: paketti + kierros- ja kysymysmäärät tasoittain. */
+export type PakettiRivi = Paketti & { kierroksia: Maarat; kysymyksia: Maarat };
 
 export async function listaaVisapaketit(): Promise<PakettiRivi[]> {
   const sb = getSupabase();
@@ -96,17 +107,22 @@ export async function listaaVisapaketit(): Promise<PakettiRivi[]> {
   if (!sb || !siteId) return [];
   const { data, error } = await sb
     .from("quiz_packs")
-    .select("id, slug, sarja, painos_nimi, otsikko, seo_title, seo_description, kohderyhma, kausi_alku, kausi_loppu, kesto_min, hero_image, hero_alt, aksentti, teema, jarjestys, status, published_at, quiz_pack_rounds(kohderyhma)")
+    .select("id, slug, sarja, painos_nimi, otsikko, seo_title, seo_description, kohderyhma, kausi_alku, kausi_loppu, kesto_min, hero_image, hero_alt, aksentti, teema, jarjestys, status, published_at, updated_at, johdanto, lasten_otsikko, lasten_seo_title, lasten_seo_description, lasten_johdanto, quiz_pack_rounds(kohderyhma, quiz_pack_items(count))")
     .eq("site_id", siteId)
     .eq("status", "published")
     .order("jarjestys", { ascending: true })
     .order("published_at", { ascending: false });
   if (error || !data) return [];
   return data.map(({ quiz_pack_rounds, ...p }) => {
-    const kr = (quiz_pack_rounds ?? []) as { kohderyhma: string }[];
+    // Kysymysmäärä viittauksista (RPC jättää pois julkaisemattomien visojen kysymykset; julkaistussa paketissa niitä ei ole).
+    const kr = ((quiz_pack_rounds ?? []) as { kohderyhma: string; quiz_pack_items: { count: number }[] }[])
+      .map((r) => ({ lapset: r.kohderyhma === "lapset", n: r.quiz_pack_items?.[0]?.count ?? 0 }))
+      .filter((r) => r.n > 0);
+    const summa = (lapset: boolean) => kr.filter((r) => r.lapset === lapset).reduce((a, r) => a + r.n, 0);
     return {
       ...(p as Paketti),
-      kierroksia: { aikuiset: kr.filter((r) => r.kohderyhma !== "lapset").length, lapset: kr.filter((r) => r.kohderyhma === "lapset").length },
+      kierroksia: { aikuiset: kr.filter((r) => !r.lapset).length, lapset: kr.filter((r) => r.lapset).length },
+      kysymyksia: { aikuiset: summa(false), lapset: summa(true) },
     };
   });
 }
@@ -144,13 +160,12 @@ export function landinginPaketit(rivit: PakettiRivi[]): PakettiRivi[] {
 /** Sarjan näyttönimi slugista: 'pubivisa' → 'Pubivisa' (sarjan pääsivun h1). */
 export const sarjaNimi = (sarja: string) => sarja.charAt(0).toUpperCase() + sarja.slice(1);
 
-/** ?taso=lapset&esikatselu=… pakettisivun, televisionäkymän ja tulosteen välisiin linkkeihin. */
-export function hakuosa(taso: Taso | null, esikatselu: string | null): string {
-  const u = new URLSearchParams();
-  if (taso === "lapset") u.set("taso", "lapset");
-  if (esikatselu) u.set("esikatselu", esikatselu);
-  return u.size ? `?${u}` : "";
-}
+/** ?esikatselu=… pakettisivun, televisionäkymän ja tulosteen välisiin linkkeihin. Taso on osoitteessa
+ *  (/visapaketti/<slug>/lapset, 1.11.2026), ei enää ?taso-parametrissa. */
+export const hakuosa = (esikatselu: string | null) => (esikatselu ? `?${new URLSearchParams({ esikatselu })}` : "");
+
+/** 'molemmat'-paketin lastenversion osoite. */
+export const lapsetHref = (p: Pick<Paketti, "slug" | "sarja">) => `${pakettiHref(p)}/lapset`;
 
 /** Kortin ja noston linkki: sarjan painos → sarjan pääsivu. */
 export const korttiHref = (p: Pick<Paketti, "slug" | "sarja">) => (p.sarja ? sarjaHref(p.sarja) : pakettiHref(p));
@@ -197,6 +212,21 @@ export async function kokoelmanPaketti(kokoelma: { slug: string; nimi: string },
   return kaudella[0]?.p ?? omat.find((p) => !p.kausi_alku) ?? null;
 }
 
+/** Visan osiotagi → visapaketti, johon tulosnäkymä linkittää (SEO-brief 1.11.2026: jouluvisojen tulossivut). */
+const TAGIN_PAKETTI: Record<string, { slug: string; alku: string }> = {
+  joulu: { slug: "joulu", alku: "Pidätkö pikkujoulut? " },
+};
+
+/** Tulosnäkymän tekstilinkki: "Pidätkö pikkujoulut? Valmis joulun tietovisa 40 kysymyksellä". Kysymysmäärä kannasta. */
+export async function tulosPakettiLinkki(tagit: string[] | null): Promise<{ href: string; teksti: string } | null> {
+  const osuma = (tagit ?? []).map((t) => TAGIN_PAKETTI[t]).find(Boolean);
+  if (!osuma) return null;
+  const p = (await listaaVisapaketit()).find((r) => r.slug === osuma.slug);
+  if (!p) return null;
+  const n = p.kysymyksia.aikuiset || p.kysymyksia.lapset;
+  return { href: korttiHref(p), teksti: `${osuma.alku}Valmis ${p.otsikko.toLocaleLowerCase("fi")} ${n} kysymyksellä` };
+}
+
 /* ─── Kysymykset ja tasot ───────────────────────────────────────── */
 
 /** Kysymysteksti paketissa: lähdevisan "BONUS:"-etuliite ei merkitse paketissa mitään (lasten visojen viimeinen kysymys). */
@@ -220,20 +250,41 @@ export function tasonKierrokset(vp: Visapaketti, taso: Taso): Kierros[] {
   return omat.filter((k) => k.kysymykset.length > 0).map((k, i) => ({ ...k, nro: i + 1 }));
 }
 
-/** Metarivi datasta: "4 kierrosta · noin 45 min" (+ "aikuiset ja lapset" molemmille).
- *  'molemmat'-paketissa kierrosmäärä on aikuisten (valitsimen oletus); lasten kierrokset ovat vaihtoehto. */
-export function metarivi(p: Pick<Paketti, "kohderyhma" | "kesto_min">, kierroksia: { aikuiset: number; lapset: number }): string[] {
-  const n = p.kohderyhma === "lapset" ? kierroksia.lapset || kierroksia.aikuiset : kierroksia.aikuiset || kierroksia.lapset;
-  const osat = [`${n} ${n === 1 ? "kierros" : "kierrosta"}`];
-  if (p.kesto_min) osat.push(`noin ${p.kesto_min} min`);
-  if (p.kohderyhma === "molemmat") osat.push("aikuiset ja lapset");
+/** Metarivi datasta: "40 kysymystä · 4 kierrosta · noin 45 min" (SEO-brief 1.11.2026: kysymysmäärä ensin).
+ *  Ilman tasoa (kortit): 'molemmat'-paketista aikuisten luvut + "aikuiset ja lapset". Tason kanssa (pakettisivu):
+ *  sen tason luvut; lastenversiolla ei kestoa, koska kesto_min on aikuisten kierrosten arvio. */
+export function metarivi(p: Pick<Paketti, "kohderyhma" | "kesto_min">, kierroksia: Maarat, kysymyksia: Maarat, taso?: Taso): string[] {
+  const t: Taso = taso ?? (p.kohderyhma === "lapset" ? "lapset" : "aikuiset");
+  const valitse = (m: Maarat) => (p.kohderyhma === "molemmat" ? m[t] : m[t] || m.aikuiset || m.lapset);
+  const n = valitse(kysymyksia), k = valitse(kierroksia);
+  const osat = [`${n} kysymystä`, `${k} ${k === 1 ? "kierros" : "kierrosta"}`];
+  if (p.kesto_min && !(p.kohderyhma === "molemmat" && t === "lapset")) osat.push(`noin ${p.kesto_min} min`);
+  if (p.kohderyhma === "molemmat" && !taso) osat.push("aikuiset ja lapset");
   return osat;
 }
 
-export const kierrosmaarat = (vp: Visapaketti) => ({
+export const kierrosmaarat = (vp: Visapaketti): Maarat => ({
   aikuiset: vp.kierrokset.filter((k) => k.kohderyhma !== "lapset" && k.kysymykset.length).length,
   lapset: vp.kierrokset.filter((k) => k.kohderyhma === "lapset" && k.kysymykset.length).length,
 });
+
+export const kysymysmaarat = (vp: Visapaketti): Maarat => {
+  const summa = (lapset: boolean) =>
+    vp.kierrokset.filter((k) => (k.kohderyhma === "lapset") === lapset).reduce((a, k) => a + k.kysymykset.length, 0);
+  return { aikuiset: summa(false), lapset: summa(true) };
+};
+
+const INESSIIVI = ["", "yhdessä", "kahdessa", "kolmessa", "neljässä", "viidessä", "kuudessa", "seitsemässä", "kahdeksassa", "yhdeksässä", "kymmenessä"];
+
+/** Tekstin paikkamerkit kannan luvuista: {n} = 40, {kysymykset} = "40 kysymystä",
+ *  {kierroksissa} = "neljässä kierroksessa" (johdanto, hakuotsikko ja -kuvaus; luvut eivät vanhene käsin kirjoitettuina). */
+export function tayta(teksti: string, kysymyksia: number, kierroksia: number): string {
+  const kierr = `${INESSIIVI[kierroksia] ?? kierroksia} kierroksessa`;
+  return teksti
+    .replaceAll("{n}", String(kysymyksia))
+    .replaceAll("{kysymykset}", `${kysymyksia} ${kysymyksia === 1 ? "kysymys" : "kysymystä"}`)
+    .replaceAll("{kierroksissa}", kierr);
+}
 
 /** Paketin lähdevisat ("Pelaa visoina"), ensiesiintymisjärjestyksessä. */
 export function lahdevisat(kierrokset: Kierros[]): (PakettiVisa & { href: string })[] {
@@ -250,6 +301,13 @@ export function julkaisuPvm(iso: string | null): string | null {
   if (!iso) return null;
   const t = helsinginPaiva(new Date(iso));
   return `${t.pv}.${t.kk}.${t.vuosi}`;
+}
+
+/** Paketin viimeisin muutos (dateModified, "Päivitetty"): updated_at tai julkaisu, kumpi on myöhempi.
+ *  Kierrosten ja kysymysviittausten muutokset päivittävät updated_at-kentän (triggeri 1.11.2026). */
+export function muokattu(p: Pick<Paketti, "published_at" | "updated_at">): string | null {
+  const t = [p.published_at, p.updated_at].filter((x): x is string => !!x).sort((a, b) => Date.parse(b) - Date.parse(a));
+  return t[0] ?? null;
 }
 
 /** Kysymys viittaa vaihtoehtoihin ("Mikä seuraavista…"): vaihtoehdot näytetään, muuten kysymykseen ei voi vastata.
@@ -275,24 +333,91 @@ export function kevytKuva(url: string): string {
 
 export type Sivu = {
   vp: Visapaketti;
-  /** Sivun oma osoite ilman parametreja (canonical). */
+  /** Sivun oma osoite ilman parametreja (näkymälinkkien pohja). */
   polku: string;
+  /** Kanoninen osoite. Sarjan voimassa oleva painos → sarjan pääsivu (sama sisältö), muuten polku. */
+  kanoninen: string;
   /** Sarjan pääsivu: sarjan muut painokset ("Aiemmat painokset"). */
   painokset: PakettiRivi[] | null;
+  /** Osoitteen kiinnittämä taso: /visapaketti/<slug>/lapset = lapset, muuten null (paketin oletustaso). */
+  taso: Taso | null;
+  /** Sarjan arkistoitunut painos (ei uusin): oma otsikko, oma kanoninen osoite, sitemapissa, linkki uusimpaan. */
+  arkisto: boolean;
 };
 
-/** /visapaketti/<slug>[/<painos>] → paketti. Sarjan nimi ilman painosta = uusin julkaistu painos. */
+/** Lastenversion osoitteen viimeinen osa: /visapaketti/<slug>/lapset. */
+export const LAPSET_OSA = "lapset";
+
+/** /visapaketti/<slug>[/<painos>|/lapset] → paketti. Sarjan nimi ilman painosta = uusin julkaistu painos.
+ *  SEO-brief 1.11.2026 — sarjan painosten sääntö (toimii automaattisesti joka neljännes):
+ *  - voimassa oleva painos (= sarjan uusin julkaistu, jonka /visapaketti/<sarja> näyttää): kanoninen osoite on
+ *    sarjan pääsivu, eikä painososoite ole sitemapissa;
+ *  - kun uudempi painos julkaistaan, edellinen muuttuu arkistoksi: oma kanoninen osoite, oma otsikko
+ *    ("Pubivisa loka–joulukuu 2026 – 40 kysymystä vastauksineen"), sitemapiin ja linkki "Uusin pubivisa →". */
 export async function haeSivu(slug: string, painos: string | null, esikatselu?: string | null): Promise<Sivu | null> {
+  if (painos === LAPSET_OSA) {
+    const vp = await haeVisapaketti(slug, esikatselu);
+    if (vp && vp.paketti.kohderyhma === "molemmat" && !vp.paketti.sarja) {
+      const polku = lapsetHref(vp.paketti);
+      return { vp, polku, kanoninen: polku, painokset: null, taso: "lapset", arkisto: false };
+    }
+  }
   if (painos) {
     const vp = await haeVisapaketti(`${slug}-${painos}`, esikatselu);
     if (!vp || vp.paketti.sarja !== slug) return null;
-    return { vp, polku: pakettiHref(vp.paketti), painokset: null };
+    const polku = pakettiHref(vp.paketti);
+    const uusin = sarjanPainokset(await listaaVisapaketit(), slug)[0];
+    // Luonnoksen esikatselu ei ole arkisto, vaikka julkaistu uusin on toinen painos.
+    const voimassa = !uusin || uusin.slug === vp.paketti.slug || vp.paketti.status !== "published";
+    return { vp, polku, kanoninen: voimassa ? sarjaHref(slug) : polku, painokset: null, taso: null, arkisto: !voimassa };
   }
   const suora = await haeVisapaketti(slug, esikatselu);
-  if (suora) return { vp: suora, polku: pakettiHref(suora.paketti), painokset: null };
+  if (suora) {
+    const polku = pakettiHref(suora.paketti);
+    return { vp: suora, polku, kanoninen: polku, painokset: null, taso: null, arkisto: false };
+  }
   const painokset = sarjanPainokset(await listaaVisapaketit(), slug);
   if (!painokset.length) return null;
   const vp = await haeVisapaketti(painokset[0].slug);
   if (!vp) return null;
-  return { vp, polku: sarjaHref(slug), painokset };
+  const polku = sarjaHref(slug);
+  return { vp, polku, kanoninen: polku, painokset, taso: null, arkisto: false };
+}
+
+/** Sivun näkyvä nimi (H1): sarjan pääsivulla sarjan nimi, lastenversiolla lasten_otsikko. */
+export function sivunNimi(sivu: Sivu): string {
+  const p = sivu.vp.paketti;
+  if (sivu.taso === "lapset") return p.lasten_otsikko ?? `${p.otsikko} lapsille`;
+  return sivu.painokset && p.sarja ? sarjaNimi(p.sarja) : p.otsikko;
+}
+
+/** Sivun taso: osoitteen kiinnittämä tai paketin oma (molemmat → aikuiset). */
+export const sivunTaso = (sivu: Sivu): Taso => sivu.taso ?? tasoParametrista(sivu.vp.paketti, null);
+
+/** Sivun tason kysymys- ja kierrosmäärä. */
+const sivunLuvut = (sivu: Sivu) => {
+  const taso = sivunTaso(sivu);
+  return { n: kysymysmaarat(sivu.vp)[taso], k: kierrosmaarat(sivu.vp)[taso] };
+};
+
+/** Hakuotsikko ilman " | Tietoniekka" -päätettä. */
+export function sivunHakuotsikko(sivu: Sivu): string {
+  const p = sivu.vp.paketti;
+  const { n, k } = sivunLuvut(sivu);
+  if (sivu.taso === "lapset") return tayta(p.lasten_seo_title ?? `${sivunNimi(sivu)} – {kysymykset} vastauksineen`, n, k);
+  if (sivu.arkisto) {
+    const painos = p.painos_nimi ? ` ${p.painos_nimi.charAt(0).toLocaleLowerCase("fi")}${p.painos_nimi.slice(1)}` : "";
+    return `${p.otsikko}${painos} – ${n} kysymystä vastauksineen`;
+  }
+  return tayta(p.seo_title ?? (p.painos_nimi ? `${p.otsikko} – ${p.painos_nimi}` : p.otsikko), n, k);
+}
+
+/** Hakukuvaus ja johdanto sivun tason luvuilla. */
+export function sivunTekstit(sivu: Sivu): { kuvaus: string | null; johdanto: string | null } {
+  const p = sivu.vp.paketti;
+  const { n, k } = sivunLuvut(sivu);
+  const lapsille = sivu.taso === "lapset";
+  const kuvaus = lapsille ? p.lasten_seo_description : p.seo_description;
+  const johdanto = lapsille ? p.lasten_johdanto : p.johdanto;
+  return { kuvaus: kuvaus ? tayta(kuvaus, n, k) : null, johdanto: johdanto ? tayta(johdanto, n, k) : null };
 }

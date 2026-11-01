@@ -76,6 +76,23 @@ export default async function PakettiPage({ params, searchParams }: Props) {
             <label className="text-xs text-muted-foreground" htmlFor="f-seo_description">Hakukuvaus</label>
             <Input id="f-seo_description" name="seo_description" defaultValue={p.seo_description ?? ""} />
           </div>
+          {/* SEO-brief 1.11.2026: näkyvä johdanto + 'molemmat'-paketin lastenversio (/visapaketti/<slug>/lapset).
+              Paikkamerkit täytetään kannan luvuista: {n} = 40, {kysymykset} = "40 kysymystä", {kierroksissa} = "neljässä kierroksessa". */}
+          <div className="grid gap-1 md:col-span-3">
+            <label className="text-xs text-muted-foreground" htmlFor="f-johdanto">Johdanto (näkyy otsikon alla; {"{kysymykset}"}, {"{kierroksissa}"}, {"{n}"})</label>
+            <textarea id="f-johdanto" name="johdanto" rows={3} defaultValue={p.johdanto ?? ""} className="rounded-md border bg-background px-3 py-2 text-sm" />
+          </div>
+          {p.kohderyhma === "molemmat" && (
+            <>
+              {kentta("lasten_otsikko", "Lastenversion otsikko", "Joulun tietovisa lapsille")}
+              {kentta("lasten_seo_title", "Lastenversion hakuotsikko", "Joulun tietovisa lapsille – {kysymykset} vastauksineen")}
+              {kentta("lasten_seo_description", "Lastenversion hakukuvaus")}
+              <div className="grid gap-1 md:col-span-3">
+                <label className="text-xs text-muted-foreground" htmlFor="f-lasten_johdanto">Lastenversion johdanto</label>
+                <textarea id="f-lasten_johdanto" name="lasten_johdanto" rows={3} defaultValue={p.lasten_johdanto ?? ""} className="rounded-md border bg-background px-3 py-2 text-sm" />
+              </div>
+            </>
+          )}
           <div className="grid gap-1">
             <label className="text-xs text-muted-foreground" htmlFor="f-kohderyhma">Kohderyhmä</label>
             <select id="f-kohderyhma" name="kohderyhma" defaultValue={p.kohderyhma} className="h-9 rounded-md border bg-background px-3 text-sm">

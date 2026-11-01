@@ -120,6 +120,8 @@ export type GameQuiz = {
   } | null;
   /** Erä B6: henkilövisan henkilösivu — aloitusnäkymän yläotsikko ja tulosnäkymän "Lue lisää …" -linkki. */
   henkilo?: { href: string; linkki: string } | null;
+  /** Tulosnäkymän tekstilinkki visapakettiin (jouluvisat → joulun visapaketti, 1.11.2026). */
+  paketti?: { href: string; teksti: string } | null;
   /** K2: "Pelaa uudelleen" lataa sivun uudelleen uuden arvonnan vuoksi (kuvavisat). */
   reloadOnRestart?: boolean;
   /** K2: ohita aloitusnäkymä (?aloita=1 uudelleenlatauksen jälkeen). */
@@ -1202,7 +1204,7 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
               score={score}
               tasonimi={fanitaso ?? tier.title}
               lause={h ? `${erotusLause(right - h.oikein)} · ${score} pistettä` : tier.body}
-              lisaLinkki={quiz.henkilo ? { href: quiz.henkilo.href, teksti: quiz.henkilo.linkki } : null}
+              lisaLinkki={quiz.henkilo ? { href: quiz.henkilo.href, teksti: quiz.henkilo.linkki } : quiz.paketti ?? null}
               haaste={h}
               vastaukset={hist.map((v) => (v === "ok" || v === "bad" || v === "skipped" ? v : undefined))}
               avaaVastaukset={(i, el) => openReview(i, el)}

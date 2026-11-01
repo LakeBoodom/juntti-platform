@@ -10,6 +10,8 @@ export type PakettiAdmin = {
   kausi_alku: string | null; kausi_loppu: string | null; kesto_min: number | null;
   hero_image: string | null; hero_alt: string | null; aksentti: string | null; jarjestys: number;
   status: string; published_at: string | null;
+  johdanto: string | null; lasten_otsikko: string | null; lasten_seo_title: string | null;
+  lasten_seo_description: string | null; lasten_johdanto: string | null;
 };
 
 export type KysymysAdmin = {
@@ -19,7 +21,7 @@ export type KysymysAdmin = {
 
 export type KierrosAdmin = { id: string; nro: number; nimi: string; kohderyhma: string; kysymykset: KysymysAdmin[] };
 
-const PAKETTI = "id, slug, sarja, painos_nimi, otsikko, seo_title, seo_description, kohderyhma, teema, kausi_alku, kausi_loppu, kesto_min, hero_image, hero_alt, aksentti, jarjestys, status, published_at";
+const PAKETTI = "id, slug, sarja, painos_nimi, otsikko, seo_title, seo_description, kohderyhma, teema, kausi_alku, kausi_loppu, kesto_min, hero_image, hero_alt, aksentti, jarjestys, status, published_at, johdanto, lasten_otsikko, lasten_seo_title, lasten_seo_description, lasten_johdanto";
 
 /** Paketin julkinen osoite (sarjan painos /visapaketti/<sarja>/<painos>) + esikatseluavain. */
 export function esikatseluUrl(p: Pick<PakettiAdmin, "slug" | "sarja"> & { avain?: string | null }): string {

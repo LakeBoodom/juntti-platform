@@ -137,7 +137,7 @@ export default function KokoelmaRunko({ d, tunnusosa, v3Lisa, heroLisa, sisalto 
           <a className="rk-vp-kortti" href={korttiHref(d.paketti)}>
             <span className="rk-vp-kicker">Visapaketti</span>
             <span className="rk-vp-nimi">{d.paketti.sarja ? sarjaNimi(d.paketti.sarja) : d.paketti.otsikko}</span>
-            <span className="tn-card-meta">{metarivi(d.paketti, d.paketti.kierroksia).join(" · ")}</span>
+            <span className="tn-card-meta">{metarivi(d.paketti, d.paketti.kierroksia, d.paketti.kysymyksia).join(" · ")}</span>
             <span className="tn-card-cta">Pelaa →</span>
           </a>
         </div>

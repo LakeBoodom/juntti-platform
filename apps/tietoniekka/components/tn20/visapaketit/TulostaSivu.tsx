@@ -6,16 +6,16 @@ import "@/app/(tn20)/visapaketit.css";
 import { runkoCond } from "@/components/tn20/runko/runkoFontti";
 import {
   type Kierros, type PakettiKysymys, type Sivu, type Taso,
-  hakuosa, kevytKuva, kuvaOnKysymys, kysymysTeksti, oikeaVastaus, tasonKierrokset, viittaaVaihtoehtoihin,
+  hakuosa, kevytKuva, sivunNimi, kuvaOnKysymys, kysymysTeksti, oikeaVastaus, tasonKierrokset, viittaaVaihtoehtoihin,
 } from "@/lib/visapaketit";
 import TulostaNappi from "./TulostaNappi";
 
 export default function TulostaSivu({ sivu, taso, esikatselu }: { sivu: Sivu; taso: Taso; esikatselu: string | null }) {
   const { vp, polku } = sivu;
   const p = vp.paketti;
-  const nimi = p.painos_nimi ? `${p.otsikko} · ${p.painos_nimi}` : p.otsikko;
+  const nimi = sivu.taso ? sivunNimi(sivu) : p.painos_nimi ? `${p.otsikko} · ${p.painos_nimi}` : p.otsikko;
   const kierrokset = tasonKierrokset(vp, taso);
-  const takaisin = polku + hakuosa(p.kohderyhma === "molemmat" && taso === "lapset" ? "lapset" : null, esikatselu);
+  const takaisin = polku + hakuosa(esikatselu);
 
   return (
     <main className={`tn-vp-tuloste ${runkoCond.variable}`}>
