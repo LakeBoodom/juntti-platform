@@ -3,6 +3,8 @@
 //   /og/reitti/<peli>?reitti=<siemen>&tulos=7-7   jakokortti 1200 × 630 (7b): tumma vasen puoli, vaalea kartta oikealla
 //   /og/reitti/<peli>                             sivun jakokuva: sama kortti viikon reitillä ilman tulosta
 //   /og/reitti/<peli>/kortti?reitti=<siemen>      Seuraava peli -kortin kuva (7d; nykyisen pelikortin 120 px:n kuvaan 640 × 225)
+//   /og/reitti/<peli>/hub?reitti=<siemen>         Karttapelit-sivun kortti 4:3 (4a)
+//   /og/reitti/<peli>/ruutu?reitti=<siemen>       neliö pieniin kuviin (etusivun kortti, kokoelmasivun peli), vain tunnus
 //   /og/reitti/<peli>/puolikas?reitti=<siemen>    Maantieto-kortin puolikas (7a): pystyrajaus, päätepisteissä vain tunnus
 //
 // <peli> = rajanaapurit | osavaltiot | kuntaliitos (lib/reittipeli/kuvat.ts). Kartta piirretään pelin omasta
@@ -58,6 +60,8 @@ const MUODOT = {
   // 7b: kuvapaneeli 640 × 630; designin mitat 1200 px:n kuvalle (pilleri 40, fontti 20, lippu 64 × 42)
   paneeli: { w: 640, h: 630, viiva: 4, piste: 11, fontti: 17, pilleri: 36, lippu: [56, 37] },
   kortti: { w: 640, h: 225, viiva: 3, piste: 7, fontti: 12, pilleri: 24, lippu: [30, 20] },
+  hub: { w: 640, h: 480, viiva: 4, piste: 11, fontti: 19, pilleri: 38, lippu: [52, 35] },
+  ruutu: { w: 400, h: 400, viiva: 3, piste: 8, fontti: 0, pilleri: 0, lippu: [44, 29], vainTunnus: true },
   puolikas: { w: 388, h: 438, viiva: 3, piste: 8, fontti: 0, pilleri: 0, lippu: [44, 29], vainTunnus: true },
 } satisfies Record<string, Muoto>;
 
@@ -188,7 +192,7 @@ export async function GET(req: Request, ctx: { params: Promise<{ polku: string[]
   const [peli, muoto] = polku;
   const url = new URL(req.url);
   origin = url.origin;
-  if (!peli || !onReittipeli(peli) || (muoto && muoto !== "kortti" && muoto !== "puolikas")) return new Response(null, { status: 404 });
+  if (!peli || !onReittipeli(peli) || (muoto && !["kortti", "hub", "ruutu", "puolikas"].includes(muoto))) return new Response(null, { status: 404 });
   const g = REITTIPELIT[peli];
   const pyydetty = url.searchParams.get("reitti");
   const siemen = pyydetty && /^[a-z0-9-]{3,40}$/.test(pyydetty) ? pyydetty : viikonSiemen(maanantai(helsinginPaiva().iso));
@@ -198,7 +202,7 @@ export async function GET(req: Request, ctx: { params: Promise<{ polku: string[]
   const valimuisti = pyydetty ? "public, max-age=86400, s-maxage=2592000" : "public, max-age=3600, s-maxage=21600";
 
   if (muoto) {
-    const kuva = await kartta(peli, r.ids, r.ryhma, MUODOT[muoto as "kortti" | "puolikas"]);
+    const kuva = await kartta(peli, r.ids, r.ryhma, MUODOT[muoto as "kortti" | "hub" | "ruutu" | "puolikas"]);
     const jpg = await sharp(Buffer.from(kuva.split(",")[1], "base64")).jpeg({ quality: 84, mozjpeg: true }).toBuffer();
     return new Response(new Uint8Array(jpg), { headers: { "Content-Type": "image/jpeg", "Cache-Control": valimuisti } });
   }

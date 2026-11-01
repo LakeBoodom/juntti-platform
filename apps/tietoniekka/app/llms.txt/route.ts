@@ -31,6 +31,7 @@ const COLLECTIONS: Array<[string, string, string]> = [
 
 const PELIMUODOT: Array<[string, string, string]> = [
   ["/peli/tupla-tai-kuitti", "Tupla tai kuitti", "Kymmenen yhä vaikeampaa kysymystä; jokainen oikea vastaus tuplaa potin"],
+  ["/peli/karttapelit", "Karttapelit", "Kaikki karttapelit: reitti naapurista naapuriin maailmankartalla, Suomen kunnissa ja Yhdysvaltain osavaltioissa"],
   ["/peli/kuntaliitos", "Kuntaliitos", "Järjestä kahdeksan kuntaa reitiksi naapurikuntien kautta; uusi reitti joka päivä"],
   ["/peli/rajanaapurit", "Rajanaapurit", "Sama reittipeli valtioilla ja maarajoilla; uusi viikon reitti joka maanantai"],
   ["/peli/rajanaapurit/osavaltiot", "Rajanaapurit: Yhdysvallat", "Rajanaapurit Yhdysvaltain 48 manner-osavaltiolla; uusi viikon reitti joka maanantai"],

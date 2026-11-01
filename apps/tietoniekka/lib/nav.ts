@@ -64,16 +64,12 @@ export type NavMode = {
 export const NAV_MODES: NavMode[] = aakkosin([
   // Tupla tai kuitti (Heikki 26.9.2026): uusi pelimuoto ensimmäisenä
   { href: "/peli/tupla-tai-kuitti", label: "Tupla tai kuitti", desc: "Tuplaa pisteet tai pidä ne", color: "#E8A320" },
-  // Kuntaliitos (Heikki 26.9.2026): karttapelien ensimmäinen, päivän reitti + satunnaiset
-  { href: "/peli/kuntaliitos", label: "Kuntaliitos", desc: "Järjestä kunnat ketjuksi, jossa jokainen kunta rajautuu seuraavaan", color: "#159A9C" },
-  // Vaalipiiriketju (Heikki 5.10.2026): Kuntaliitoksen viereen, päivän peli vaalipiireistä
+  // Karttapelit (Heikki 1.11.2026): Rajanaapurit, Kuntaliitos ja Yhdysvallat yhdellä sivulla
+  { href: "/peli/karttapelit", label: "Karttapelit", desc: "Järjestä maat, kunnat ja osavaltiot reitiksi naapurista naapuriin", color: "#4ADE80" },
+  // Vaalipiiriketju (Heikki 5.10.2026): päivän peli vaalipiireistä
   { href: "/peli/vaalipiiriketju", label: "Vaalipiiriketju", desc: "Ketjuta kansanedustajat vaalipiireittäin", color: "#B4A5FF" },
-  // Ikäjärjestys (Heikki 18.10.2026): jäi vahingossa pois valikosta. Ilman autostartia → pelaaja näkee aihevalinnan.
-  // Kun Järjestä-pelimuoto julkaistaan, tämä rivi korvataan "Laita järjestykseen" → /peli/jarjesta -rivillä
-  // (Ikäjärjestys siirtyy pakaksi /peli/jarjesta/ikajarjestys, vanha osoite 301).
-  { href: "/peli/ikajarjestys", label: "Ikäjärjestys", desc: "Järjestä tunnetut henkilöt vanhimmasta nuorimpaan", color: "#C79BFF" },
-  // Rajanaapurit (Heikki 27.9.2026): Kuntaliitoksen sisarpeli valtioilla ja lipuilla
-  { href: "/peli/rajanaapurit", label: "Rajanaapurit", desc: "Järjestä maat ketjuksi, jossa jokainen maa rajautuu seuraavaan", color: "#F2B233" },
+  // Järjestä (Heikki 1.11.2026): hub korvaa entisen Ikäjärjestys-rivin; ikäjärjestys on hubin henkilöpakka.
+  { href: "/peli/jarjesta", label: "Järjestä", desc: "Laita presidentit, tunturit, järvet ja tunnetut suomalaiset oikeaan järjestykseen", color: "#C79BFF" },
   { href: "/megavisat", label: "Megavisat", desc: "Laajat teemavisat yhdellä istumalla", color: "#E8A320" },
   { href: "/kokoelma/kuvavisat", label: "Kuvavisat", desc: "Tunnista kuvista maiden liput, maakuntien vaakunat, eläimiä, lintuja ja monta muuta aihetta", color: "#4C9AFF" },
   /* Äänivisat (Heikki 11.10.2026): toistaiseksi Luonto-kokoelman äänivisasuodatin; oma sivu, kun äänivisoja tulee lisää. */
@@ -90,7 +86,11 @@ export const navHref = (c: Pick<NavCollection, "slug" | "href">) => c.href ?? hu
    alatunniste jäävät pois. /h/<koodi> on haastelinkki, joka renderöi saman
    pelisivun — B1 (18.9.2026): se puuttui listalta, ja haasteen aloitus- ja
    tulosnäkymässä näkyi kaksi yläpalkkia päällekkäin. */
+/** Pelimuotojen kokoavat sivut ovat sivuston sivuja: ylänavigaatio, murupolku ja alatunniste (Heikki 1.11.2026).
+    Pelinäkymät niiden alla pysyvät omalla pelipalkillaan. */
+const PELIMUOTOHUBIT = new Set(["/peli/karttapelit", "/peli/jarjesta", "/peli/tupla-tai-kuitti"]);
 export const isGameRoute = (pathname: string) =>
+  !PELIMUOTOHUBIT.has(pathname.replace(/\/$/, "")) &&
   // Pelikehys (vaihe 4, 20.10.2026): myös Tupla tai kuitin aihesivu on pelin K2-aloitus omalla pelipalkillaan.
   // /kuvavisa/<kortisto> (SEO-erä A6) on sama GameClient omalla palkillaan → ei toista navipalkkia (pikakorjaus 22.10.2026;
   // sivuston palkki myös vieritti sivua sivuttain WebKitissä 768 → 390 px:n koonmuutoksessa).

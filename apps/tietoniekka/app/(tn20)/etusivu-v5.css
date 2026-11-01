@@ -283,6 +283,10 @@
   .tn20 .tn-pk span[data-koko="c"], .tn20 .tn-pk b[data-koko="c"] { display: flex; }
 }
 .tn20 .tn-pk img { display: block; }
+/* Karttapelit: kartat vierekkäin, 2 px erotin (kuten Maantieto-kortti, CD-handoff 7a); kartta pysyy vaaleana. */
+.tn20 .tn-pk--kartat { display: flex; gap: 2px; background: #e0d8c6; }
+.tn20 .tn-pk--kartat img { flex: 1 1 0; min-width: 0; height: 100%; object-fit: contain; background: #fff; }
+@container pk (min-width: 440px) { .tn20 .tn-pk--kartat img[data-koko="c"] { display: block; } }
 .tn20 .tn-pk-kehys { position: absolute; left: 50%; top: 50%; width: 242px; height: 151px; transform: translate(-50%, -50%); }
 .tn20 .tn-pk-rivi { display: flex; align-items: center; justify-content: center; }
 /* Reittipelit (CD v11, 31.10.2026): 4 palaa × 50 px + 3 liitosta × 7 px = 221 px ≤ 242 px kehys. Teksti 10 px: koriste (aria-hidden). */

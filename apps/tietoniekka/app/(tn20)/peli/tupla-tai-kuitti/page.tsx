@@ -9,7 +9,7 @@ import type { Metadata } from "next";
 import { TEEMAT, TUPLA_SIVU } from "@/lib/tuplaTaiKuitti";
 import { TuplaSaannot, TuplaTausta } from "./ohjeet";
 import PeliKehys from "@/components/tn20/pelikehys/PeliKehys";
-import Pelipalkki from "@/components/tn20/pelikehys/Pelipalkki";
+import Crumbs from "@/components/tn20/Crumbs";
 import TuplaAloitus from "./TuplaAloitus";
 
 export const revalidate = 300; // SEO-erä A4
@@ -33,7 +33,7 @@ export default function TuplaTaiKuittiSivu() {
   return (
     <PeliKehys iho="tumma">
       <JsonLd data={peliLd({ name: "Tupla tai kuitti", url: TUPLA_SIVU, description: "Kymmenen yhä vaikeampaa kysymystä; jokainen oikea vastaus tuplaa potin – kuittaa ajoissa tai pelaa kaikesta." })} />
-      <Pelipalkki peli="Tupla tai kuitti" koti={{ href: "/kokoelmat", nimi: "Kokoelmat" }} />
+      <Crumbs items={[{ label: "Tupla tai kuitti" }]} />
       <main>
         <TuplaAloitus
           aiheet={aiheet}
