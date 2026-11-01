@@ -8,12 +8,14 @@
 // Koriste: aria-hidden (kortin nimi ja kuvaus kertovat pelin). Järjestyspeleissä ei näytetä oikeaa järjestystä.
 
 import type { ReactNode } from "react";
+import { helsinginPaiva } from "@/lib/aika";
+import { maanantai, viikonSiemen } from "@/lib/reittipeli/viikonReitit";
 
 const STORAGE = "https://pkfsdzqwfxqczirjddue.supabase.co/storage/v1/object/public/kuvavisa-images/tietoniekka";
 const VAAKUNA = `${STORAGE}/kuntavaakunat`;
 
 /** Pelit, joilla on kuvitus (slug → kuvitus). Muut pelikortit käyttävät valokuvaa. */
-export const KUVITETUT = new Set(["kuvavisat", "aanivisat", "kuntaliitos", "rajanaapurit", "vaalipiiriketju", "mika-maa", "jarjesta"]);
+export const KUVITETUT = new Set(["kuvavisat", "aanivisat", "karttapelit", "vaalipiiriketju", "mika-maa", "jarjesta"]);
 
 /** Järjestä-kortti: VÄÄRIN-kirjainten kierrot ja siirrot (sama kuin hubin otsikossa). */
 const VAARIN: Array<[string, string]> = [
@@ -106,21 +108,22 @@ const edustaja = (piiri: string, kuva: string): Pala => ({
 
 export default function PeliKuvitus({ slug }: { slug: string }) {
   switch (slug) {
-    case "kuntaliitos":
-      /* Kotka–Kouvola–[Mäntyharju]–Mikkeli; C jatkuu –[Juva]–Rantasalmi. Hamina rajautuu Kouvolaan mutta ei Mikkeliin
-         eikä Rantasalmeen. (CD ehdotti Maaliksi Savonlinnaa, mutta Juva ei rajaudu siihen → Rantasalmi.) */
+    case "karttapelit": {
+      /* Kortti Karttapelit-sivulle (CD-handoff 1.11.2026): viikon reitit kartoilla vierekkäin, vain lähtö ja maali (app/og/reitti).
+         A ja B: Maailma ja Yhdysvallat kuten Maantieto-kortissa; C: myös Suomi. */
+      const q = viikonSiemen(maanantai(helsinginPaiva().iso));
+      const kuva = (p: string) => `/og/reitti/${p}/ruutu?reitti=${q}`;
       return (
-        <Reitti luokka="tn-pk--kunta" lahto={vaakuna("285", "Kotka")} toka={vaakuna("286", "Kouvola")} maali={vaakuna("491", "Mikkeli")}
-          oikea={vaakuna("507", "Mäntyharju")} harhautin={vaakuna("075", "Hamina")}
-          jatko={{ maali: vaakuna("681", "Rantasalmi"), oikea: vaakuna("178", "Juva") }} />
+        <span className="tn-pk tn-pk--kartat" aria-hidden="true">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={kuva("rajanaapurit")} alt="" loading="lazy" />
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={kuva("kuntaliitos")} alt="" loading="lazy" data-koko="c" />
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={kuva("osavaltiot")} alt="" loading="lazy" />
+        </span>
       );
-    case "rajanaapurit":
-      /* Viro–Latvia–[Liettua]–Puola; C jatkuu –[Slovakia]–Unkari. Saksa rajautuu Puolaan mutta ei Latviaan eikä Unkariin. */
-      return (
-        <Reitti luokka="tn-pk--raja" lahto={maa("Viro", ["#0072CE", "#000000", "#FFFFFF"])} toka={maa("Latvia", [["#9E3039", 2], ["#FFFFFF", 1], ["#9E3039", 2]])}
-          maali={maa("Puola", ["#FFFFFF", "#DC143C"])} oikea={maa("Liettua", ["#FDB913", "#006A44", "#C1272D"])} harhautin={maa("Saksa", ["#000000", "#DD0000", "#FFCE00"])}
-          jatko={{ maali: maa("Unkari", ["#CE2939", "#FFFFFF", "#477050"]), oikea: maa("Slovakia", ["#FFFFFF", "#0B4EA2", "#EE1C25"]) }} />
-      );
+    }
     case "vaalipiiriketju":
       /* Istuvat kansanedustajat vaalipiirinsä kasvoina: Halla-aho (Helsinki) → Purra (Uusimaa) → [Grahn-Laasonen (Häme)]
          → Pauli Kiuru (Pirkanmaa); C jatkuu → [Wallinheimo (Keski-Suomi)] → Tuppurainen (Oulu). Harhautin Krista Kiuru

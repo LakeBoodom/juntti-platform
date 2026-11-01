@@ -64,16 +64,14 @@ export type NavMode = {
 export const NAV_MODES: NavMode[] = aakkosin([
   // Tupla tai kuitti (Heikki 26.9.2026): uusi pelimuoto ensimmäisenä
   { href: "/peli/tupla-tai-kuitti", label: "Tupla tai kuitti", desc: "Tuplaa pisteet tai pidä ne", color: "#E8A320" },
-  // Kuntaliitos (Heikki 26.9.2026): karttapelien ensimmäinen, päivän reitti + satunnaiset
-  { href: "/peli/kuntaliitos", label: "Kuntaliitos", desc: "Järjestä kunnat ketjuksi, jossa jokainen kunta rajautuu seuraavaan", color: "#159A9C" },
-  // Vaalipiiriketju (Heikki 5.10.2026): Kuntaliitoksen viereen, päivän peli vaalipiireistä
+  // Karttapelit (Heikki 1.11.2026): Rajanaapurit, Kuntaliitos ja Yhdysvallat yhdellä sivulla
+  { href: "/peli/karttapelit", label: "Karttapelit", desc: "Järjestä maat, kunnat ja osavaltiot reitiksi naapurista naapuriin", color: "#4ADE80" },
+  // Vaalipiiriketju (Heikki 5.10.2026): päivän peli vaalipiireistä
   { href: "/peli/vaalipiiriketju", label: "Vaalipiiriketju", desc: "Ketjuta kansanedustajat vaalipiireittäin", color: "#B4A5FF" },
   // Ikäjärjestys (Heikki 18.10.2026): jäi vahingossa pois valikosta. Ilman autostartia → pelaaja näkee aihevalinnan.
   // Kun Järjestä-pelimuoto julkaistaan, tämä rivi korvataan "Laita järjestykseen" → /peli/jarjesta -rivillä
   // (Ikäjärjestys siirtyy pakaksi /peli/jarjesta/ikajarjestys, vanha osoite 301).
   { href: "/peli/ikajarjestys", label: "Ikäjärjestys", desc: "Järjestä tunnetut henkilöt vanhimmasta nuorimpaan", color: "#C79BFF" },
-  // Rajanaapurit (Heikki 27.9.2026): Kuntaliitoksen sisarpeli valtioilla ja lipuilla
-  { href: "/peli/rajanaapurit", label: "Rajanaapurit", desc: "Järjestä maat ketjuksi, jossa jokainen maa rajautuu seuraavaan", color: "#F2B233" },
   { href: "/megavisat", label: "Megavisat", desc: "Laajat teemavisat yhdellä istumalla", color: "#E8A320" },
   { href: "/kokoelma/kuvavisat", label: "Kuvavisat", desc: "Tunnista kuvista maiden liput, maakuntien vaakunat, eläimiä, lintuja ja monta muuta aihetta", color: "#4C9AFF" },
   /* Äänivisat (Heikki 11.10.2026): toistaiseksi Luonto-kokoelman äänivisasuodatin; oma sivu, kun äänivisoja tulee lisää. */

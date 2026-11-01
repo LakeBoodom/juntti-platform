@@ -1,0 +1,78 @@
+// KARTTAPELIT /peli/karttapelit (CD-handoff "Rajanaapurit: Yhdysvallat", hub 4a; Heikki 1.11.2026). Kortit karttojen
+// mukaan: Maailma, Suomi, Yhdysvallat. Kuva on viikon reitin lähtö ja maali vaalealla kartalla (6c, ei ratkaisua), koukku
+// viikon reitin otsikko. Mobiilissa koko kortti on linkki pelin omalle sivulle; desktopilla kortissa myös aluevalinta ja
+// Pelaa. Poikkeamat CD:stä: ei ingressiä eikä "Löydätkö reitin?" -lausetta (UI-sääntö 9), kartat vaaleina (6c).
+
+import type { CSSProperties } from "react";
+import type { Metadata } from "next";
+import Pelipalkki from "@/components/tn20/pelikehys/Pelipalkki";
+import PeliKehys from "@/components/tn20/pelikehys/PeliKehys";
+import { AlueLinkit } from "@/components/tn20/reittipeli/AlueValinta";
+import { helsinginPaiva } from "@/lib/aika";
+import { JsonLd, peliLd } from "@/lib/jsonLd";
+import { jakoMeta } from "@/lib/jakoMeta";
+import { KARTTAPELIT, KARTTAPELIT_SIVU, karttapelinKoukku, karttapelinKuva } from "@/lib/karttapelit";
+import { KL_MAAKUNNAT } from "@/lib/kuntaliitos/reitti";
+import { RN_MAANOSAT } from "@/lib/rajanaapurit/reitti";
+import { maanantai } from "@/lib/reittipeli/viikonReitit";
+import "../kuntaliitos/reittihero.css";
+import "./karttapelit.css";
+
+/* Viikon reitti vaihtuu maanantaina → sivu uusitaan tunnin välein. */
+export const revalidate = 3600;
+
+const KUVAUS = "Rakenna reitti naapurista naapuriin maailmankartalla, Suomen kunnissa ja Yhdysvaltain osavaltioissa. Uusi viikon reitti joka maanantai.";
+
+export const metadata: Metadata = {
+  title: "Karttapelit – Rajanaapurit ja Kuntaliitos | Tietoniekka",
+  description: KUVAUS,
+  alternates: { canonical: KARTTAPELIT_SIVU },
+  ...jakoMeta({ title: "Karttapelit", description: KUVAUS, url: KARTTAPELIT_SIVU, kuva: "/og/sivu/karttapelit" }),
+};
+
+const pisinSana = (t: string) => Math.max(...t.split(/[\s-]+/).map((w) => w.length));
+
+export default function KarttapelitSivu() {
+  const viikko = maanantai(helsinginPaiva().iso);
+  return (
+    <PeliKehys iho="tumma">
+      <JsonLd data={peliLd({ name: "Karttapelit", url: KARTTAPELIT_SIVU, description: KUVAUS })} />
+      <Pelipalkki peli="Karttapelit" koti={{ href: "/", nimi: "Etusivu" }} />
+      <main className="kh">
+        <h1 className="kh-h1">Tunnetko maat, kunnat <span>ja osavaltiot?</span></h1>
+        <ul className="kh-kortit">
+          {KARTTAPELIT.map((k) => {
+            const koukku = karttapelinKoukku(k, viikko);
+            return (
+              <li key={k.peli} className="kh-kortti">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img className="kh-kuva" src={karttapelinKuva(k, viikko)} alt="" width={640} height={480} loading="lazy" />
+                <div className="kh-teksti">
+                  <p className="kh-laji">{k.laji}</p>
+                  <h2 className="kh-nimi" style={{ "--kh-lw": pisinSana(k.nimi) } as CSSProperties}>
+                    {/* Koko kortti on linkki (::after); aluevalinta on sen päällä. */}
+                    <a href={k.href} data-tn-entry={`karttapelit:${k.peli}`}>{k.nimi}</a>
+                  </h2>
+                  {koukku && <p className="kh-koukku" lang="fi">{koukku.replace(/-/g, "-​")}</p>}
+                  <div className="kh-toiminnot">
+                    {k.peli === "rajanaapurit" && (
+                      <nav className="kh-alueet" aria-label="Valitse maanosa">
+                        {RN_MAANOSAT.map((m) => <a key={m.tunnus} href={`${k.href}?${k.param}=${m.tunnus}`}>{m.nimi}</a>)}
+                      </nav>
+                    )}
+                    {k.peli === "kuntaliitos" && (
+                      <div className="kh-alueet">
+                        <AlueLinkit sivu={k.href} param="maakunta" kaikki="Koko Suomi" alueet={KL_MAAKUNNAT} nappi="Valitse maakunta" />
+                      </div>
+                    )}
+                    <span className="kh-cta tn-cta-lime" aria-hidden="true">Pelaa</span>
+                  </div>
+                </div>
+              </li>
+            );
+          })}
+        </ul>
+      </main>
+    </PeliKehys>
+  );
+}

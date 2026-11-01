@@ -98,7 +98,7 @@ export function viikonKuvat(p: Pelimuoto, paivaIso = helsinginPaiva().iso): Peli
   const q = `?reitti=${viikonSiemen(viikko)}`;
   return {
     ...p,
-    kuva: { ...p.kuva, src: p.kuva.src + q, ruutu: p.kuva.src.replace(/\/kortti$/, "/puolikas") + q },
+    kuva: { ...p.kuva, src: p.kuva.src + q, ruutu: p.kuva.src.replace(/\/kortti$/, "/ruutu") + q },
     variantit: p.variantit?.map((v) => {
       const r = viikonReitti(v.slug, viikko)?.reitti;
       return { ...v, kuva: `/og/reitti/${v.slug}/puolikas${q}`, liput: r ? [LIPPU(v.slug, r[0]), LIPPU(v.slug, r[r.length - 1])] : null };
@@ -174,9 +174,8 @@ export const ETUSIVUN_PELIMUODOT: EtusivunPelimuoto[] = [
   { slug: "kuvavisat", ryhma: "kuva-aani", laji: "Kuvavisa", nimi: "Kuvavisat", etusivu_rivi: "Tunnista kuvista maiden liput, maakuntien vaakunat, eläimiä, lintuja ja monta muuta aihetta", href: "/kokoelma/kuvavisat", kuva: "/20/kuvavisat/hero-800.webp", aksentti: KUVA, tila: "pelattava", julkaisu: null },
   /* Viikon kuvavisa pois etusivulta (CD v8, 30.10.2026): Kuvavisat-kortti kattaa sen. */
   { slug: "aanivisat", ryhma: "kuva-aani", laji: "Äänivisa", nimi: "Äänivisat", etusivu_rivi: "Tunnista lintu laulusta", href: "/aanivisa/suomen-linnut", kuva: "/20/pelit/k/aanivisat.webp", aksentti: KUVA, tila: "pelattava", julkaisu: null },
-  /* v8: Rajanaapurit ensin. */
-  { slug: "rajanaapurit", ryhma: "kartta", laji: "Karttapeli", nimi: "Rajanaapurit", tavut: "Raja|naapurit", etusivu_rivi: "Järjestä maat ketjuksi, jossa jokainen maa rajautuu seuraavaan", href: "/peli/rajanaapurit", kuva: "/20/rajanaapurit/banneri-kartta.webp", aksentti: KARTTA, tila: "pelattava", julkaisu: null },
-  { slug: "kuntaliitos", ryhma: "kartta", laji: "Karttapeli", nimi: "Kuntaliitos", tavut: "Kunta|liitos", etusivu_rivi: "Järjestä kunnat ketjuksi, jossa jokainen kunta rajautuu seuraavaan", href: "/peli/kuntaliitos", kuva: "/20/kuntaliitos/palapeli.webp", aksentti: KARTTA, tila: "pelattava", julkaisu: null },
+  /* Karttapelit (CD-handoff 1.11.2026, Heikki): Rajanaapurit, Kuntaliitos ja Yhdysvallat yhdellä kortilla → Karttapelit-sivu. Kuvitus PeliKuvitus "karttapelit". */
+  { slug: "karttapelit", ryhma: "kartta", laji: "Karttapeli", nimi: "Karttapelit", tavut: "Kartta|pelit", etusivu_rivi: "Järjestä maat, kunnat ja osavaltiot reitiksi naapurista naapuriin", href: "/peli/karttapelit", kuva: "/20/rajanaapurit/banneri-kartta.webp", aksentti: KARTTA, tila: "pelattava", julkaisu: null },
   { slug: "vaalipiiriketju", ryhma: "kartta", laji: "Karttapeli", nimi: "Vaalipiiriketju", tavut: "Vaali|piiri|ketju", etusivu_rivi: "Ketjuta kansanedustajat vaalipiireittäin", href: "/peli/vaalipiiriketju", kuva: "/20/vaalit/vaalipiiriketju.webp", aksentti: KARTTA, tila: "pelattava", julkaisu: null },
   { slug: "mika-maa", ryhma: "kartta", laji: "Karttapeli", nimi: "Mikä maa?", etusivu_rivi: "Tunnista maa vihjeistä ja siluetista", href: "", kuva: null, aksentti: MAA, tila: "tulossa", julkaisu: "2026-11-30" },
   /* CD "TN Etusivu Järjestä-kortti" (Heikki 31.10.2026): Laita järjestykseen ja Ikäjärjestys yhdeksi Järjestä-kortiksi → hub.

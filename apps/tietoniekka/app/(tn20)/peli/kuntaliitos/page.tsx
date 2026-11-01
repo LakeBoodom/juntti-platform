@@ -14,6 +14,8 @@ import { arvoReitti, reittiAlueista, PELATTAVIA, KL_LAHDE, KL_MAAKUNNAT, maakunt
 import { sivunReitti, viikonAikavali } from "@/lib/reittipeli/viikonReitit";
 import ReittipeliClient from "@/components/tn20/reittipeli/ReittipeliClient";
 import { reittiJakokuva } from "@/lib/reittipeli/kuvat";
+import { uusiReittiSiemen } from "@/lib/kuntaliitos";
+import { redirect } from "next/navigation";
 import "./kuntaliitos.css";
 import "./reittihero.css";
 
@@ -45,6 +47,8 @@ type Props = { searchParams: Promise<Record<string, string | string[] | undefine
 
 export default async function KuntaliitosSivu({ searchParams }: Props) {
   const sp = await searchParams;
+  // Seuraava peli -kortti "Arvo uusi reitti" (7d): siemen arvotaan palvelimella.
+  if (sp.reitti === "uusi") redirect(`/peli/kuntaliitos?reitti=${uusiReittiSiemen()}`);
   const pyydetty = typeof sp.reitti === "string" && SIEMEN.test(sp.reitti) ? sp.reitti : null;
   const paiva = helsinginPaiva();
   const maakunta = maakuntaTunnuksella(typeof sp.maakunta === "string" ? sp.maakunta : null);
