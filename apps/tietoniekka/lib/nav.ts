@@ -72,8 +72,8 @@ export const NAV_MODES: NavMode[] = aakkosin([
   { href: "/peli/jarjesta", label: "Järjestä", desc: "Laita presidentit, tunturit, järvet ja tunnetut suomalaiset oikeaan järjestykseen", color: "#C79BFF" },
   { href: "/megavisat", label: "Megavisat", desc: "Laajat teemavisat yhdellä istumalla", color: "#E8A320" },
   { href: "/kokoelma/kuvavisat", label: "Kuvavisat", desc: "Tunnista kuvista maiden liput, maakuntien vaakunat, eläimiä, lintuja ja monta muuta aihetta", color: "#4C9AFF" },
-  /* Äänivisat (Heikki 11.10.2026): toistaiseksi Luonto-kokoelman äänivisasuodatin; oma sivu, kun äänivisoja tulee lisää. */
-  { href: "/kokoelma/luonto?suodata=aanivisat#kaikki", label: "Äänivisat", desc: "Tunnista lintu laulusta", color: "#4ADE80" },
+  /* Äänivisat (Heikki 1.11.2026): suoraan äänivisan sivulle. Ainoa ryhmä on Suomen linnut; kokoava sivu, kun ryhmiä tulee lisää. */
+  { href: "/aanivisa/suomen-linnut", label: "Äänivisat", desc: "Tunnista lintu laulusta", color: "#4ADE80" },
   /* Visapaketit (Heikki 31.10.2026): pelaamisen tapa (visailta porukalla), ei aihe → Pelimuodot-valikkoon. */
   { href: "/visapaketit", label: "Visapaketit", desc: "Valmis visailta ruudulle tai tulosteeksi", color: "#F0C020" },
 ]);
