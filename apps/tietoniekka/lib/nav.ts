@@ -68,10 +68,8 @@ export const NAV_MODES: NavMode[] = aakkosin([
   { href: "/peli/karttapelit", label: "Karttapelit", desc: "Järjestä maat, kunnat ja osavaltiot reitiksi naapurista naapuriin", color: "#4ADE80" },
   // Vaalipiiriketju (Heikki 5.10.2026): päivän peli vaalipiireistä
   { href: "/peli/vaalipiiriketju", label: "Vaalipiiriketju", desc: "Ketjuta kansanedustajat vaalipiireittäin", color: "#B4A5FF" },
-  // Ikäjärjestys (Heikki 18.10.2026): jäi vahingossa pois valikosta. Ilman autostartia → pelaaja näkee aihevalinnan.
-  // Kun Järjestä-pelimuoto julkaistaan, tämä rivi korvataan "Laita järjestykseen" → /peli/jarjesta -rivillä
-  // (Ikäjärjestys siirtyy pakaksi /peli/jarjesta/ikajarjestys, vanha osoite 301).
-  { href: "/peli/ikajarjestys", label: "Ikäjärjestys", desc: "Järjestä tunnetut henkilöt vanhimmasta nuorimpaan", color: "#C79BFF" },
+  // Järjestä (Heikki 1.11.2026): hub korvaa entisen Ikäjärjestys-rivin; ikäjärjestys on hubin henkilöpakka.
+  { href: "/peli/jarjesta", label: "Järjestä", desc: "Laita presidentit, tunturit, järvet ja tunnetut suomalaiset oikeaan järjestykseen", color: "#C79BFF" },
   { href: "/megavisat", label: "Megavisat", desc: "Laajat teemavisat yhdellä istumalla", color: "#E8A320" },
   { href: "/kokoelma/kuvavisat", label: "Kuvavisat", desc: "Tunnista kuvista maiden liput, maakuntien vaakunat, eläimiä, lintuja ja monta muuta aihetta", color: "#4C9AFF" },
   /* Äänivisat (Heikki 11.10.2026): toistaiseksi Luonto-kokoelman äänivisasuodatin; oma sivu, kun äänivisoja tulee lisää. */
