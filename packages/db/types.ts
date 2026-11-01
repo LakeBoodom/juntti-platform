@@ -12004,6 +12004,7 @@ export type Database = {
       }
       rajanaapurit_pelit: {
         Row: {
+          aihe: string
           entry: string | null
           id: string
           landing_path: string | null
@@ -12018,6 +12019,7 @@ export type Database = {
           yritys: number
         }
         Insert: {
+          aihe?: string
           entry?: string | null
           id?: string
           landing_path?: string | null
@@ -12032,6 +12034,7 @@ export type Database = {
           yritys: number
         }
         Update: {
+          aihe?: string
           entry?: string | null
           id?: string
           landing_path?: string | null
