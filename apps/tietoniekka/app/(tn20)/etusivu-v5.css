@@ -236,6 +236,9 @@
 .tn20 .tn-es-ryhma { display: flex; flex-direction: column; gap: 10px; }
 .tn20 .tn-es-ryhma-h { margin: 0; display: flex; align-items: center; gap: 14px; font-size: 12px; font-weight: 800; letter-spacing: .16em; text-transform: uppercase; color: var(--es-teksti2); }
 .tn20 .tn-es-ryhma-h::after { content: ""; flex: 1; height: 1px; background: var(--es-viiva); }
+/* Ryhmän koontilinkki viivan oikealla puolella (Kaikki karttapelit); osuma-alue 44 px, rivi ei kasva. */
+.tn20 .tn-es-ryhma-kaikki { order: 1; padding-block: 15px; margin-block: -15px; font-size: 13px; font-weight: 700; letter-spacing: 0; text-transform: none; white-space: nowrap; color: var(--es-teksti2); text-decoration: none; }
+.tn20 .tn-es-ryhma-kaikki:hover { color: var(--es-teksti, #f5f0e6); }
 /* Mobiili < 768 (v7, Heikki 30.10.): karuselli ryhmittäin, kortti 242 px (16:10-kuva 151 px), jotta seuraava kortti näkyy
    reunassa. Kumoaa 28.10. 2 sarakkeen tiilet. Karuselli ulottuu sivun reunaan (--es-reuna). */
 .tn20 .tn-es-rivi {
@@ -283,10 +286,30 @@
   .tn20 .tn-pk span[data-koko="c"], .tn20 .tn-pk b[data-koko="c"] { display: flex; }
 }
 .tn20 .tn-pk img { display: block; }
-/* Karttapelit: kartat vierekkäin, 2 px erotin (kuten Maantieto-kortti, CD-handoff 7a); kartta pysyy vaaleana. */
-.tn20 .tn-pk--kartat { display: flex; gap: 2px; background: #e0d8c6; }
-.tn20 .tn-pk--kartat img { flex: 1 1 0; min-width: 0; height: 100%; object-fit: contain; background: #fff; }
-@container pk (min-width: 440px) { .tn20 .tn-pk--kartat img[data-koko="c"] { display: block; } }
+/* Rajanaapurit: Yhdysvallat (CD "Rajanaapurit Yhdysvallat etusivun bannerit" 8b): mitat 370 × 155 px:n kortille; kapeammassa
+   kortissa koko rivi pienennetään (mobiili 242 px). Teksti koriste (aria-hidden). */
+.tn20 .tn-pk--usa { background: radial-gradient(80% 110% at 55% 50%, rgba(194, 73, 47, .13), rgba(244, 239, 228, 0) 70%), url("/20/rajanaapurit/etusivu-usa.svg") center / cover no-repeat, #f4efe4; display: flex; align-items: center; justify-content: center; }
+.tn20 .tn-pk-usa-rivi { display: flex; align-items: center; padding-top: 8px; transform: scale(.74); }
+@container pk (max-width: 235px) { .tn20 .tn-pk-usa-rivi { transform: scale(.66); } }
+@container pk (min-width: 300px) { .tn20 .tn-pk-usa-rivi { transform: scale(.9); } }
+@container pk (min-width: 345px) { .tn20 .tn-pk-usa-rivi { transform: none; } }
+.tn20 .tn-pk-usa-pala {
+  position: relative; display: flex; flex-direction: column; align-items: center; gap: 5px; width: 70px; padding: 12px 3px 7px; box-sizing: border-box; flex: none;
+  border: 1px solid #e0d8c6; border-radius: 11px; background: #fff; box-shadow: 0 3px 0 #e3daca, 0 12px 20px -12px rgba(14, 58, 92, .35);
+}
+.tn20 .tn-pk-usa-pala[data-lukittu] { border: 2px solid #0e3a5c; }
+.tn20 .tn-pk-usa-paa {
+  position: absolute; top: -9px; left: 50%; translate: -50%; display: flex; align-items: center; height: 16px; padding: 0 6px; border-radius: 5px; background: #0e3a5c; color: #fff;
+  font-family: var(--tn-font-body, sans-serif); font-size: 8px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; line-height: 1;
+}
+.tn20 .tn-pk .tn-pk-usa-pala img { width: 40px; aspect-ratio: 4 / 3; object-fit: cover; border-radius: 3px; box-shadow: 0 0 0 1px rgba(10, 44, 71, .24); }
+.tn20 .tn-pk-usa-pala b { font-size: 12px; font-weight: 900; font-variation-settings: "wdth" 74; line-height: 1; color: #0e3a5c; }
+.tn20 .tn-pk-usa-liitos { flex: none; width: 13px; height: 3px; border-radius: 3px; background: #c2492f; }
+.tn20 .tn-pk-usa-liitos--pisteet { border-radius: 0; background: repeating-linear-gradient(90deg, #c9a89c 0, #c9a89c 4px, transparent 4px, transparent 7px); }
+.tn20 .tn-pk-usa-aukko {
+  flex: none; display: flex; align-items: center; justify-content: center; width: 60px; height: 78px; box-sizing: border-box; border: 2px dashed #c2492f; border-radius: 11px;
+  background: rgba(255, 253, 247, .86); font-size: 40px; font-variation-settings: "wdth" 74; line-height: .9; color: #c2492f;
+}
 .tn20 .tn-pk-kehys { position: absolute; left: 50%; top: 50%; width: 242px; height: 151px; transform: translate(-50%, -50%); }
 .tn20 .tn-pk-rivi { display: flex; align-items: center; justify-content: center; }
 /* Reittipelit (CD v11, 31.10.2026): 4 palaa × 50 px + 3 liitosta × 7 px = 221 px ≤ 242 px kehys. Teksti 10 px: koriste (aria-hidden). */

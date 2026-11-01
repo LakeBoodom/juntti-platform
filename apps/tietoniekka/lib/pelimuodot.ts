@@ -126,10 +126,10 @@ export function seuraavatPelit(nykyinen: string, koti?: string, n = 3): Pelimuot
    TULOSSA_PAIVAA päivän päässä; ryhmä, jossa on pelkkiä Tulossa-kortteja, piilotetaan. Uusi pelimuoto
    syttyy vaihtamalla tila = "pelattava" — etusivua ei muuteta. Kicker-määrä lasketaan näkyvistä korteista. */
 export type EtusivuRyhma = "tietovisat" | "kuva-aani" | "kartta" | "jarjesta";
-export const ETUSIVU_RYHMAT: Array<{ avain: EtusivuRyhma; nimi: string }> = [
+export const ETUSIVU_RYHMAT: Array<{ avain: EtusivuRyhma; nimi: string; kaikki?: { href: string; teksti: string } }> = [
   { avain: "tietovisat", nimi: "Tietovisat" },
   { avain: "kuva-aani", nimi: "Kuva- ja äänivisat" },
-  { avain: "kartta", nimi: "Karttapelit" },
+  { avain: "kartta", nimi: "Karttapelit", kaikki: { href: "/peli/karttapelit", teksti: "Kaikki karttapelit" } },
   { avain: "jarjesta", nimi: "Järjestä ja Kumpi?" },
 ];
 /** Ryhmän nimi näkyvien korttien lajeista (Heikki 28.10.: "Järjestä ja Kumpi?" ilman Kumpi?-korttia → "Järjestä").
@@ -170,17 +170,20 @@ export const ETUSIVUN_PELIMUODOT: EtusivunPelimuoto[] = [
   { slug: "klassinen", ryhma: "tietovisat", laji: "Tietovisa", nimi: "Klassinen visa", etusivu_rivi: "{visat} visaa kaikista aiheista", href: "/kokoelmat", kuva: "/20/hero-mikko-laura.webp", kuvaPos: "70% 24%", aksentti: TIETO, tila: "pelattava", julkaisu: null },
   { slug: "tupla", ryhma: "tietovisat", laji: "Tietovisa", nimi: "Tupla tai kuitti", etusivu_rivi: "Tuplaa pisteet tai pidä ne", href: "/peli/tupla-tai-kuitti", kuva: "/20/tupla/banneri-desk.webp", kuvaPos: "64% 38%", aksentti: TIETO, tila: "pelattava", julkaisu: null },
   { slug: "megavisat", ryhma: "tietovisat", laji: "Tietovisa", nimi: "Megavisat", etusivu_rivi: "Laajat teemavisat yhdellä istumalla", href: "/megavisat", kuva: "/20/megavisat/mikko-hero-900.webp", kuvaPos: "50% 22%", aksentti: TIETO, tila: "pelattava", julkaisu: null },
+  { slug: "mika-maa", ryhma: "tietovisat", laji: "Tietovisa", nimi: "Mikä maa?", etusivu_rivi: "Tunnista maa vihjeistä ja siluetista", href: "", kuva: null, aksentti: MAA, tila: "tulossa", julkaisu: "2026-11-30" },
   { slug: "pikapeli", ryhma: "tietovisat", laji: "Tietovisa", nimi: "Pikapeli", etusivu_rivi: "Vastaa ennen kuin aika loppuu", href: "", kuva: null, aksentti: TIETO, tila: "tulossa", julkaisu: null },
   { slug: "kuvavisat", ryhma: "kuva-aani", laji: "Kuvavisa", nimi: "Kuvavisat", etusivu_rivi: "Tunnista kuvista maiden liput, maakuntien vaakunat, eläimiä, lintuja ja monta muuta aihetta", href: "/kokoelma/kuvavisat", kuva: "/20/kuvavisat/hero-800.webp", aksentti: KUVA, tila: "pelattava", julkaisu: null },
   /* Viikon kuvavisa pois etusivulta (CD v8, 30.10.2026): Kuvavisat-kortti kattaa sen. */
   { slug: "aanivisat", ryhma: "kuva-aani", laji: "Äänivisa", nimi: "Äänivisat", etusivu_rivi: "Tunnista lintu laulusta", href: "/aanivisa/suomen-linnut", kuva: "/20/pelit/k/aanivisat.webp", aksentti: KUVA, tila: "pelattava", julkaisu: null },
-  /* Karttapelit (CD-handoff 1.11.2026, Heikki): Rajanaapurit, Kuntaliitos ja Yhdysvallat yhdellä kortilla → Karttapelit-sivu. Kuvitus PeliKuvitus "karttapelit". */
-  { slug: "karttapelit", ryhma: "kartta", laji: "Karttapeli", nimi: "Karttapelit", tavut: "Kartta|pelit", etusivu_rivi: "Järjestä maat, kunnat ja osavaltiot reitiksi naapurista naapuriin", href: "/peli/karttapelit", kuva: "/20/rajanaapurit/banneri-kartta.webp", aksentti: KARTTA, tila: "pelattava", julkaisu: null },
-  { slug: "vaalipiiriketju", ryhma: "kartta", laji: "Karttapeli", nimi: "Vaalipiiriketju", tavut: "Vaali|piiri|ketju", etusivu_rivi: "Ketjuta kansanedustajat vaalipiireittäin", href: "/peli/vaalipiiriketju", kuva: "/20/vaalit/vaalipiiriketju.webp", aksentti: KARTTA, tila: "pelattava", julkaisu: null },
-  { slug: "mika-maa", ryhma: "kartta", laji: "Karttapeli", nimi: "Mikä maa?", etusivu_rivi: "Tunnista maa vihjeistä ja siluetista", href: "", kuva: null, aksentti: MAA, tila: "tulossa", julkaisu: "2026-11-30" },
+  /* Karttapelit omina kortteinaan (Heikki 1.11.2026): yksi kortti jätti tilaa käyttämättä; koonti ryhmän otsikon linkissä. */
+  { slug: "rajanaapurit", ryhma: "kartta", laji: "Karttapeli", nimi: "Rajanaapurit", tavut: "Raja|naapurit", etusivu_rivi: "Järjestä maat ketjuksi, jossa jokainen maa rajautuu seuraavaan", href: "/peli/rajanaapurit", kuva: "/20/rajanaapurit/banneri-kartta.webp", aksentti: KARTTA, tila: "pelattava", julkaisu: null },
+  { slug: "kuntaliitos", ryhma: "kartta", laji: "Karttapeli", nimi: "Kuntaliitos", tavut: "Kunta|liitos", etusivu_rivi: "Järjestä kunnat ketjuksi, jossa jokainen kunta rajautuu seuraavaan", href: "/peli/kuntaliitos", kuva: "/20/kuntaliitos/palapeli.webp", aksentti: KARTTA, tila: "pelattava", julkaisu: null },
+  /* Yhdysvallat (CD "Rajanaapurit Yhdysvallat etusivun bannerit" 8b): kuvitus PeliKuvitus, kuva jakokuville. */
+  { slug: "rajanaapurit-yhdysvallat", ryhma: "kartta", laji: "Karttapeli", nimi: "Rajanaapurit: Yhdysvallat", etusivu_rivi: "Rakenna reitti lähdöstä maaliin osavaltio kerrallaan", href: "/peli/rajanaapurit/osavaltiot", kuva: "/20/rajanaapurit/banneri-kartta.webp", aksentti: KARTTA, tila: "pelattava", julkaisu: null },
   /* CD "TN Etusivu Järjestä-kortti" (Heikki 31.10.2026): Laita järjestykseen ja Ikäjärjestys yhdeksi Järjestä-kortiksi → hub.
      Vain otsikko, ei kuvausta; kuvitus PeliKuvitus "jarjesta". */
   { slug: "jarjesta", ryhma: "jarjesta", laji: "Järjestä", nimi: "Järjestä", etusivu_rivi: "", href: "/peli/jarjesta", kuva: null, aksentti: "#F0A24B", tila: "pelattava", julkaisu: null },
+  { slug: "vaalipiiriketju", ryhma: "jarjesta", laji: "Järjestä", nimi: "Vaalipiiriketju", tavut: "Vaali|piiri|ketju", etusivu_rivi: "Ketjuta kansanedustajat vaalipiireittäin", href: "/peli/vaalipiiriketju", kuva: "/20/vaalit/vaalipiiriketju.webp", aksentti: JARJ, tila: "pelattava", julkaisu: null },
   { slug: "kumpi", ryhma: "jarjesta", laji: "Kumpi?", nimi: "Kumpi?", etusivu_rivi: "Vanhempi, suurempi, korkeampi – valitse parista", href: "", kuva: null, aksentti: JARJ, tila: "tulossa", julkaisu: null },
 ];
 
