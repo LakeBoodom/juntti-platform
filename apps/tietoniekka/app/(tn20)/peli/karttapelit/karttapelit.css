@@ -14,6 +14,10 @@
   line-height: .88; letter-spacing: -.02em; text-transform: uppercase; text-wrap: balance; overflow-wrap: normal; word-break: keep-all;
 }
 .tn20 .kh-h1 span { color: var(--kh-kulta); }
+.tn20 .kh-yla { display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px; }
+.tn20 .kh-intro { display: flex; flex-direction: column; gap: 6px; font-size: 17px; line-height: 1.45; color: var(--kh-leipa); text-wrap: pretty; }
+.tn20 .kh-intro p { margin: 0; }
+.tn20 .kh-intro .kh-lead { font-family: var(--kh-display); font-weight: 900; font-variation-settings: "wdth" 76; font-size: 22px; line-height: 1.05; text-transform: uppercase; color: var(--pk-ink); text-wrap: balance; }
 .tn20 .kh-kortit { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px; }
 .tn20 .kh-kortti {
   position: relative; display: flex; flex-direction: column; min-width: 0; overflow: hidden; border-radius: 20px; border: 1px solid var(--kh-reuna); background: var(--kh-pinta);
@@ -34,6 +38,7 @@
   margin: 0; font-family: var(--kh-display); font-weight: 900; font-variation-settings: "wdth" 76; font-size: 18px; line-height: 1.05;
   text-transform: uppercase; color: var(--kh-kulta); text-wrap: balance; overflow-wrap: normal; word-break: keep-all;
 }
+.tn20 .kh-kuvaus { margin: 0; font-size: 15px; line-height: 1.4; color: var(--kh-leipa); text-wrap: pretty; }
 /* Mobiilissa koko kortti on linkki ja aluevalinta tehdään pelin sivulla (CD 4a). */
 .tn20 .kh-toiminnot { display: none; }
 .tn20 .kh-alueet { position: relative; z-index: 1; display: flex; flex-wrap: wrap; gap: 8px; }
@@ -52,16 +57,32 @@
 }
 .tn20 .kh-kortti:hover .kh-cta { background: #cbff6e; }
 
+.tn20 .kh-ohje { padding-top: 28px; border-top: 1px solid var(--kh-reuna); }
+.tn20 .kh-ohje h2 { margin: 0 0 14px; font-family: var(--kh-display); font-weight: 900; font-variation-settings: "wdth" 76; font-size: 24px; line-height: 1; text-transform: uppercase; }
+.tn20 .kh-ohje ol { list-style: none; margin: 0; padding: 0; counter-reset: kh; display: grid; grid-template-columns: minmax(0, 1fr); gap: 14px; }
+.tn20 .kh-ohje li { counter-increment: kh; position: relative; padding-left: 40px; font-size: 15px; line-height: 1.45; color: var(--kh-leipa); }
+.tn20 .kh-ohje li::before { content: counter(kh); position: absolute; left: 0; top: 0; font-family: var(--kh-display); font-weight: 900; font-size: 28px; line-height: 1; color: var(--kh-kulta); }
+.tn20 .kh-ohje b { display: block; font-weight: 800; color: var(--pk-ink); }
+
 @container kh (min-width: 720px) {
+  .tn20 .kh-ohje ol { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; }
   .tn20 .kh-kortit { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(14px, 2cqi, 24px); }
 }
 @media (min-width: 768px) {
-  .tn20 .kh { padding: 56px clamp(24px, 6vw, 80px) 72px; gap: 44px; }
+  /* Sama vasen reuna kuin yläpalkilla ja murupolulla (.tn-shell, kuten kokoelmasivut). */
+  .tn20 .kh { padding: 48px clamp(20px, 4vw, 48px) 72px; gap: 44px; }
   .tn20 .kh-h1 { font-size: min(88px, calc(100cqi / (11 * .6))); line-height: .86; max-width: 11em; }
   .tn20 .kh-kortti { border-radius: 22px; }
   .tn20 .kh-teksti { gap: 12px; padding: clamp(16px, 2cqi, 22px); }
   .tn20 .kh-nimi { font-size: min(44px, calc(100cqi / (var(--kh-lw, 10) * .64))); line-height: .88; }
   .tn20 .kh-koukku { font-size: clamp(17px, 7.5cqi, 20px); }
+}
+/* Otsikko 7/12, intro 5/12 (CD 4a). Otsikon koko palstan leveydestä: 58 % säiliöstä / (11 merkkiä × 0,6). */
+@container kh (min-width: 1000px) {
+  .tn20 .kh-yla { grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: 64px; align-items: end; }
+  .tn20 .kh-yla .kh-h1 { font-size: min(88px, calc(58cqi / (11 * .6))); }
+  .tn20 .kh-intro { font-size: 20px; padding-bottom: 8px; }
+  .tn20 .kh-intro .kh-lead { font-size: 26px; }
 }
 @media (min-width: 900px) {
   .tn20 .kh-toiminnot { flex: 1; display: flex; flex-direction: column; justify-content: flex-end; gap: 14px; margin-top: 4px; }

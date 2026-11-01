@@ -5,7 +5,7 @@
 // rivin lause on pelin kysymys (peruste ja suunta).
 
 import type { Metadata } from "next";
-import Pelipalkki from "@/components/tn20/pelikehys/Pelipalkki";
+import Crumbs from "@/components/tn20/Crumbs";
 import PeliKehys from "@/components/tn20/pelikehys/PeliKehys";
 import { JsonLd, peliLd } from "@/lib/jsonLd";
 import { jakoMeta } from "@/lib/jakoMeta";
@@ -112,7 +112,7 @@ export default async function JarjestaHub() {
   return (
     <PeliKehys iho="tumma">
       <JsonLd data={peliLd({ name: "Järjestä", url: HUB_HREF, description: KUVAUS })} />
-      <Pelipalkki peli="Järjestä" koti={{ href: "/", nimi: "Etusivu" }} />
+      <Crumbs items={[{ label: "Järjestä" }]} />
       <main className="jh">
         <section className="jh-hero" aria-labelledby="jh-h1">
           <header className="jh-otsikko">

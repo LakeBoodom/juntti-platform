@@ -1,11 +1,12 @@
 // KARTTAPELIT /peli/karttapelit (CD-handoff "Rajanaapurit: Yhdysvallat", hub 4a; Heikki 1.11.2026). Kortit karttojen
 // mukaan: Maailma, Suomi, Yhdysvallat. Kuva on viikon reitin lähtö ja maali vaalealla kartalla (6c, ei ratkaisua), koukku
 // viikon reitin otsikko. Mobiilissa koko kortti on linkki pelin omalle sivulle; desktopilla kortissa myös aluevalinta ja
-// Pelaa. Poikkeamat CD:stä: ei ingressiä eikä "Löydätkö reitin?" -lausetta (UI-sääntö 9), kartat vaaleina (6c).
+// Pelaa. Kokoava sivu, joten ylänavigaatio ja murupolku (lib/nav.ts PELIMUOTOHUBIT). Intro, korttien lauseet ja Näin pelaat
+// Heikin pyynnöstä 1.11.2026 (poikkeus UI-sääntöön 9: pelimuoto ei ole kaikille tuttu). Kartat vaaleina (6c).
 
 import type { CSSProperties } from "react";
 import type { Metadata } from "next";
-import Pelipalkki from "@/components/tn20/pelikehys/Pelipalkki";
+import Crumbs from "@/components/tn20/Crumbs";
 import PeliKehys from "@/components/tn20/pelikehys/PeliKehys";
 import { AlueLinkit } from "@/components/tn20/reittipeli/AlueValinta";
 import { helsinginPaiva } from "@/lib/aika";
@@ -37,9 +38,15 @@ export default function KarttapelitSivu() {
   return (
     <PeliKehys iho="tumma">
       <JsonLd data={peliLd({ name: "Karttapelit", url: KARTTAPELIT_SIVU, description: KUVAUS })} />
-      <Pelipalkki peli="Karttapelit" koti={{ href: "/", nimi: "Etusivu" }} />
+      <Crumbs items={[{ label: "Karttapelit" }]} />
       <main className="kh">
-        <h1 className="kh-h1">Tunnetko maat, kunnat <span>ja osavaltiot?</span></h1>
+        <header className="kh-yla">
+          <h1 className="kh-h1">Tunnetko maat, kunnat <span>ja osavaltiot?</span></h1>
+          <div className="kh-intro">
+            <p className="kh-lead">Pääsetkö perille karttaa pitkin?</p>
+            <p>Rakenna reitti kahden paikan välille niin, että jokainen pala rajautuu seuraavaan.</p>
+          </div>
+        </header>
         <ul className="kh-kortit">
           {KARTTAPELIT.map((k) => {
             const koukku = karttapelinKoukku(k, viikko);
@@ -54,6 +61,7 @@ export default function KarttapelitSivu() {
                     <a href={k.href} data-tn-entry={`karttapelit:${k.peli}`}>{k.nimi}</a>
                   </h2>
                   {koukku && <p className="kh-koukku" lang="fi">{koukku.replace(/-/g, "-​")}</p>}
+                  <p className="kh-kuvaus">{k.kuvaus}</p>
                   <div className="kh-toiminnot">
                     {k.peli === "rajanaapurit" && (
                       <nav className="kh-alueet" aria-label="Valitse maanosa">
@@ -72,6 +80,14 @@ export default function KarttapelitSivu() {
             );
           })}
         </ul>
+        <section className="kh-ohje" aria-labelledby="kh-ohje-h">
+          <h2 id="kh-ohje-h">Näin pelaat</h2>
+          <ol>
+            <li><b>Aloita</b>Saat lähdön, maalin ja kuusi palaa sekaisin.</li>
+            <li><b>Järjestä</b>Raahaa palat niin, että jokainen rajautuu seuraavaan.</li>
+            <li><b>Rakenna</b>Kartta piirtää reitin ja näyttää, mihin se katkeaa. Voit korjata ja yrittää uudelleen.</li>
+          </ol>
+        </section>
       </main>
     </PeliKehys>
   );

@@ -15,17 +15,19 @@ export type Karttapeli = {
   href: string;
   /** Koukun loppu viikon reitin otsikon perässä. */
   loppu: string;
+  /** Kortin yksi lause: mitä pelissä tehdään ja mikä sääntö puree. */
+  kuvaus: string;
   /** Aluevalinnan parametri; null = ei aluevalintaa. */
   param: string | null;
 };
 
 export const KARTTAPELIT: Karttapeli[] = [
-  { peli: "rajanaapurit", laji: "Rajanaapurit", nimi: "Maailma", href: RN_SIVU, loppu: "maitse", param: "maanosa" },
-  { peli: "kuntaliitos", laji: "Kuntaliitos", nimi: "Suomi", href: KL_SIVU, loppu: "kunta kerrallaan", param: "maakunta" },
-  { peli: "osavaltiot", laji: "Rajanaapurit", nimi: "Yhdysvallat", href: RN_USA_SIVU, loppu: "osavaltio kerrallaan", param: null },
+  { peli: "rajanaapurit", laji: "Rajanaapurit", nimi: "Maailma", href: RN_SIVU, loppu: "maa kerrallaan", kuvaus: "Järjestä maat reitiksi. Vain maarajat kelpaavat.", param: "maanosa" },
+  { peli: "kuntaliitos", laji: "Kuntaliitos", nimi: "Suomi", href: KL_SIVU, loppu: "kunta kerrallaan", kuvaus: "Järjestä kunnat reitiksi. Vain rajanaapurit kelpaavat.", param: "maakunta" },
+  { peli: "osavaltiot", laji: "Rajanaapurit", nimi: "Yhdysvallat", href: RN_USA_SIVU, loppu: "osavaltio kerrallaan", kuvaus: "Järjestä osavaltiot reitiksi. Pelkkä nurkka ei riitä.", param: null },
 ];
 
-/** "Kanadasta Panamaan maitse"; kun lista on lopussa, pelkkä kartan nimi jää kortille. */
+/** "Kanadasta Panamaan maa kerrallaan"; kun lista on lopussa, pelkkä kartan nimi jää kortille. */
 export function karttapelinKoukku(k: Karttapeli, viikko: string): string | null {
   const o = viikonReitti(k.peli, viikko)?.otsikko;
   return o ? `${o} ${k.loppu}` : null;

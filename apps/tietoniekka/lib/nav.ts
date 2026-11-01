@@ -88,7 +88,11 @@ export const navHref = (c: Pick<NavCollection, "slug" | "href">) => c.href ?? hu
    alatunniste jäävät pois. /h/<koodi> on haastelinkki, joka renderöi saman
    pelisivun — B1 (18.9.2026): se puuttui listalta, ja haasteen aloitus- ja
    tulosnäkymässä näkyi kaksi yläpalkkia päällekkäin. */
+/** Pelimuotojen kokoavat sivut ovat sivuston sivuja: ylänavigaatio, murupolku ja alatunniste (Heikki 1.11.2026).
+    Pelinäkymät niiden alla pysyvät omalla pelipalkillaan. */
+const PELIMUOTOHUBIT = new Set(["/peli/karttapelit", "/peli/jarjesta", "/peli/tupla-tai-kuitti"]);
 export const isGameRoute = (pathname: string) =>
+  !PELIMUOTOHUBIT.has(pathname.replace(/\/$/, "")) &&
   // Pelikehys (vaihe 4, 20.10.2026): myös Tupla tai kuitin aihesivu on pelin K2-aloitus omalla pelipalkillaan.
   // /kuvavisa/<kortisto> (SEO-erä A6) on sama GameClient omalla palkillaan → ei toista navipalkkia (pikakorjaus 22.10.2026;
   // sivuston palkki myös vieritti sivua sivuttain WebKitissä 768 → 390 px:n koonmuutoksessa).
