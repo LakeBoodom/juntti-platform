@@ -171,7 +171,7 @@
 /* ── Kartta ────────────────────────────────────────────── */
 .tn20 .kl-kartta {
   container-type: inline-size; min-width: 0; padding: clamp(12px, 3cqi, 18px);
-  border: 1px solid var(--kl-viiva); border-radius: 20px; background: var(--kl-pinta); box-shadow: 0 3px 0 #e3daca;
+  border: 1.5px solid #ddd3c0; border-radius: 20px; background: #faf7f0; box-shadow: 0 3px 0 #e3daca;
   transition: border-color .2s;
 }
 .tn20 .kl-kartta--akt { border-color: var(--kl-teal); }
@@ -189,50 +189,71 @@
 .tn20 .kl-pari--bad .kl-pari-t span { color: var(--kl-puna-t); }
 
 /* Kartan kuvasuhde 4:5 = KL_KARTTA_SUHDE (lib/kuntaliitos/reitti.ts). Mobiilissa kartta
-   ei saa viedä koko näyttöä: leveys rajataan näkymän korkeuden mukaan. */
-.tn20 .kl-kartta-alue { position: relative; width: 100%; aspect-ratio: 4 / 5; margin: 0 auto; border-radius: 12px; overflow: hidden; background: #dfe8e5; }
+   ei saa viedä koko näyttöä: leveys rajataan näkymän korkeuden mukaan.
+   MALLI 6c (CD-handoff "Rajanaapurit: Yhdysvallat" 1.11.2026, Heikki: kaikkiin reittipeleihin): vaalea kartta
+   näkyy kunnolla. Meri #FFF, alue #DCE6E8 valkoisin rajoin, rakennetun reitin alueet #9ED9D1, päätepisteet
+   #1B7F7F, reittiviiva #0E3657 käyränä, välipisteet navy-ympyröinä valkoisella reunalla. Designin mitat on
+   annettu 1200 px:n kuvalle; kartta on täällä 300–560 px, joten viiva 3,5 px ja pisteet 12/18 px. */
+.tn20 .kl-kartta-alue { position: relative; width: 100%; aspect-ratio: 4 / 5; margin: 0 auto; border-radius: 14px; overflow: hidden; background: #fff; box-shadow: inset 0 0 0 1px #e4ddcf; }
 .tn20 .kl-mkartta .kl-kartta-alue { width: min(100%, 52svh * .8); }
 .tn20 .kl-mkartta--ala .kl-kartta-alue { width: min(100%, 40svh * .8); }
 .tn20 .kl-maa, .tn20 .kl-viivat { position: absolute; inset: 0; width: 100%; height: 100%; }
 .tn20 .kl-viivat { overflow: visible; }
-.tn20 .kl-alue { stroke: rgba(251, 248, 241, .34); stroke-width: .7px; vector-effect: non-scaling-stroke; stroke-linejoin: round; transition: fill .35s; }
-.tn20 .kl-savy0 { fill: #0e3a5c; }
-.tn20 .kl-savy1 { fill: #145f73; }
-.tn20 .kl-savy2 { fill: #1c4d78; }
-.tn20 .kl-savy3 { fill: #0f525a; }
-.tn20 .kl-savy4 { fill: #28537a; }
-.tn20 .kl-alue--reitti { fill: #7dc2bd; }
-/* Valitun maakunnan ulkopuoliset kunnat himmeämpinä: oma maakunta erottuu kartalta */
-.tn20 .kl-alue--ulko { fill-opacity: .55; }
-/* Pelin ulkopuoliset alueet (saarivaltiot, kiistanalaiset) hillitysti */
-.tn20 .kl-alue--tausta { fill: #8e9da3; fill-opacity: .45; }
-.tn20 .kl-alue--ulko.kl-alue--reitti { fill-opacity: 1; }
-.tn20 .kl-viiva, .tn20 .kl-viiva-alla, .tn20 .kl-haamu { vector-effect: non-scaling-stroke; stroke-linecap: round; fill: none; }
-.tn20 .kl-viiva-alla { stroke: #fbf8f1; stroke-width: 7px; animation: kl-hiipuu .35s ease-out both; }
+.tn20 .kl-alue { fill: #dce6e8; stroke: #fff; stroke-width: 1px; vector-effect: non-scaling-stroke; stroke-linejoin: round; transition: fill .35s; }
+.tn20 .kl-alue--reitti { fill: #9ed9d1; }
+.tn20 .kl-alue--paate { fill: #1b7f7f; }
+/* Valitun maakunnan / maanosan ulkopuoliset alueet vaaleampina: oma alue erottuu kartalta */
+.tn20 .kl-alue--ulko { fill: #edf2f3; }
+.tn20 .kl-alue--ulko.kl-alue--reitti { fill: #9ed9d1; }
+.tn20 .kl-alue--ulko.kl-alue--paate { fill: #1b7f7f; }
+/* Pelin ulkopuoliset alueet (saarivaltiot, kiistanalaiset): paperinvaalea, ohut ruskea reuna */
+.tn20 .kl-alue.kl-alue--tausta { fill: #f3efe6; stroke: #d8cfbd; stroke-width: .6px; }
+.tn20 .kl-selite-ok { background: #0e3657; }
+.tn20 .kl-selite-ulko { width: 11px !important; height: 11px !important; border-radius: 3px !important; background: #f3efe6; border: 1px solid #d8cfbd; }
+.tn20 .kl-viiva, .tn20 .kl-haamu { vector-effect: non-scaling-stroke; stroke-linecap: round; stroke-linejoin: round; fill: none; }
 .tn20 .kl-viiva { stroke-width: 3.5px; animation: kl-hiipuu .35s ease-out both; }
-.tn20 .kl-viiva--ok { stroke: var(--kl-teal); }
+.tn20 .kl-viiva--ok { stroke: #0e3657; }
 .tn20 .kl-viiva--bad { stroke: var(--kl-puna); }
-.tn20 .kl-haamu { stroke: #fbf8f1; stroke-width: 2.2px; stroke-dasharray: 3 5; opacity: .95; }
-.tn20 .kl-haamu-alla { display: none; }
+.tn20 .kl-haamu { stroke: #0e3657; stroke-width: 2.2px; stroke-dasharray: 2 5; opacity: .75; }
 .tn20 .kl-risti {
   position: absolute; transform: translate(-50%, -50%); width: 18px; height: 18px; border-radius: 999px; background: #fff; border: 2px solid var(--kl-puna);
-  display: flex; align-items: center; justify-content: center; color: #b0301a; animation: kl-pomppu .3s ease-out both;
+  display: flex; align-items: center; justify-content: center; color: #b0301a; animation: kl-pomppu .3s ease-out both; z-index: 1;
 }
 .tn20 .kl-risti svg { width: 10px; height: 10px; }
-.tn20 .kl-nasta { position: absolute; transform: translate(-50%, -62%); display: flex; flex-direction: column; align-items: center; gap: 2px; pointer-events: none; animation: kl-pomppu .34s cubic-bezier(.34, 1.4, .5, 1) both; }
-.tn20 .kl-nasta-kilpi { position: relative; filter: drop-shadow(0 3px 6px rgba(10, 44, 71, .45)); }
-.tn20 .kl-nasta { --kl-pw: clamp(20px, 7cqi, 30px); }
-.tn20 .kl-nasta--paate { --kl-pw: clamp(26px, 9cqi, 36px); }
-.tn20 .kl-nasta .kl-kilpi { width: var(--kl-pw); }
-.tn20 .kl-nasta-num {
-  position: absolute; top: -6px; right: -7px; min-width: 16px; height: 16px; padding: 0 3px; border-radius: 999px; color: #fff;
-  font-family: var(--kl-display); font-weight: 900; font-variation-settings: "wdth" 82; font-size: 10px; line-height: 16px; text-align: center;
+.tn20 .kl-rengas { position: absolute; width: 15px; height: 15px; border-radius: 50%; border: 1.5px dashed #0e3657; transform: translate(-50%, -50%); pointer-events: none; }
+.tn20 .kl-rengas--u { border-color: #8aa0aa; }
+.tn20 .kl-piste {
+  position: absolute; width: 12px; height: 12px; border-radius: 50%; background: #0e3657; box-shadow: 0 0 0 2.5px #fff;
+  transform: translate(-50%, -50%); pointer-events: none; animation: kl-pomppu .34s cubic-bezier(.34, 1.4, .5, 1) both;
 }
-.tn20 .kl-nasta-lappu { padding: 1px 7px; border-radius: 999px; color: #fff; font-family: var(--kl-display); font-weight: 900; font-variation-settings: "wdth" 82; font-size: 11px; letter-spacing: .04em; /* T3 18.10.: 10 → 11 px */ white-space: nowrap; }
-.tn20 .kl-nasta-nimi { padding: 0 5px; border-radius: 4px; background: rgba(251, 248, 241, .92); color: var(--kl-navy); font-size: 11px; font-weight: 700; line-height: 1.5; white-space: nowrap; } /* T3 18.10.: 10 → 11 px */
-/* Reunan lähellä nimilappu kartan sisäpuolelle, ettei se leikkaudu (Bosnia ja Hertsegovina) */
-.tn20 .kl-nasta--oik { align-items: flex-end; transform: translate(calc(-100% + var(--kl-pw) / 2), -62%); }
-.tn20 .kl-nasta--vas { align-items: flex-start; transform: translate(calc(var(--kl-pw) / -2), -62%); }
+.tn20 .kl-piste--bad { background: var(--kl-puna); }
+/* Päätepisteen merkki: piste koordinaatissa, tunnus + pilleri sen yläpuolella (--ala: alapuolella). */
+.tn20 .kl-merkki { position: absolute; width: 0; height: 0; pointer-events: none; z-index: 2; }
+.tn20 .kl-merkki-piste {
+  position: absolute; left: -9px; top: -9px; width: 18px; height: 18px; border-radius: 50%; background: #0e3657; box-shadow: 0 0 0 3px #fff;
+}
+.tn20 .kl-merkki-lappu {
+  position: absolute; left: 0; bottom: 14px; transform: translateX(-50%);
+  display: flex; flex-direction: column; align-items: center; gap: 4px; translate: var(--kl-siirto, 0) 0;
+}
+.tn20 .kl-merkki--ala .kl-merkki-lappu { bottom: auto; top: 14px; flex-direction: column-reverse; }
+.tn20 .kl-merkki--oik .kl-merkki-lappu { left: auto; right: -14px; transform: none; align-items: flex-end; }
+.tn20 .kl-merkki--vas .kl-merkki-lappu { left: -14px; transform: none; align-items: flex-start; }
+.tn20 .kl-merkki--oikealle .kl-merkki-lappu, .tn20 .kl-merkki--vasemmalle .kl-merkki-lappu { bottom: auto; top: 0; transform: translateY(-50%); flex-direction: row; gap: 6px; }
+.tn20 .kl-merkki--oikealle .kl-merkki-lappu { left: 14px; }
+.tn20 .kl-merkki--vasemmalle .kl-merkki-lappu { left: auto; right: 14px; flex-direction: row-reverse; }
+.tn20 .kl-merkki-nimi {
+  display: block; width: max-content; max-width: min(240px, 58cqi); padding: 4px 9px; border-radius: 11px; background: #0e3657; color: #faf7f0;
+  font-size: 11px; font-weight: 800; line-height: 1.25; letter-spacing: .1em; text-transform: uppercase; text-align: center; text-wrap: balance;
+}
+.tn20 .kl-merkki .kl-lippu { width: 30px; border-radius: 4px; box-shadow: 0 0 0 2px #f5f0e6, 0 2px 6px rgba(14, 54, 87, .28); }
+.tn20 .kl-merkki .kl-lippu::after { border-radius: 4px; }
+.tn20 .kl-merkki .kl-kilpi { width: 24px; filter: drop-shadow(0 2px 4px rgba(14, 54, 87, .3)); }
+@container (min-width: 480px) {
+  .tn20 .kl-merkki-nimi { font-size: 12px; }
+  .tn20 .kl-merkki .kl-lippu { width: 36px; }
+  .tn20 .kl-merkki .kl-kilpi { width: 28px; }
+}
 .tn20 .kl-kartta-huomio { margin: 10px 0 0; font-size: 12px; line-height: 1.4; color: var(--kl-ruskea); text-align: center; }
 
 /* ── Tulos, ratkaisu, toiminnot ────────────────────────── */
@@ -382,52 +403,14 @@
 .tn20 .kl--rajanaapurit .kl-liitos[data-tila="ok"] .kl-kisko { background: var(--kl-kulta-2); }
 .tn20 .kl--rajanaapurit .kl-liitos[data-tila="ok"] .kl-pilleri { border-color: var(--kl-kulta-3); background: #fbf1da; color: #7a5200; }
 
-/* Maailmankartta (3c): meri harmaansininen, valittu maanosa 5 syvää sävyä, muut himmennettyinä,
-   pelin ulkopuoliset paperinvaaleina. Kartta on vaakamuotoinen (5:4 = moottorin suhde). */
-.tn20 .kl--rajanaapurit .kl-kartta-alue { aspect-ratio: 5 / 4; background: #d5e1e0; }
+/* Maailmankartta (3c): vaakamuotoinen (5:4 = moottorin suhde). Värit kuten muissa reittipeleissä (6c). */
+.tn20 .kl--rajanaapurit .kl-kartta-alue { aspect-ratio: 5 / 4; }
 .tn20 .kl--rajanaapurit .kl-mkartta .kl-kartta-alue { width: 100%; }
 .tn20 .kl--rajanaapurit .kl-kartta--akt { border-color: var(--kl-kulta-3); }
-.tn20 .kl--rajanaapurit .kl-alue { stroke: #efe9dc; stroke-width: .8px; fill-opacity: 1; }
-.tn20 .kl--rajanaapurit .kl-savy0 { fill: #0e3a5c; }
-.tn20 .kl--rajanaapurit .kl-savy1 { fill: #1a5b80; }
-.tn20 .kl--rajanaapurit .kl-savy2 { fill: #0f6a74; }
-.tn20 .kl--rajanaapurit .kl-savy3 { fill: #1c8487; }
-.tn20 .kl--rajanaapurit .kl-savy4 { fill: #2f6e96; }
-.tn20 .kl--rajanaapurit .kl-alue--ulko { stroke: #e6ecec; }
-.tn20 .kl--rajanaapurit .kl-alue--ulko.kl-savy0 { fill: #9db2bd; }
-.tn20 .kl--rajanaapurit .kl-alue--ulko.kl-savy1 { fill: #aec0c7; }
-.tn20 .kl--rajanaapurit .kl-alue--ulko.kl-savy2 { fill: #a3bab8; }
-.tn20 .kl--rajanaapurit .kl-alue--ulko.kl-savy3 { fill: #b7c6cb; }
-.tn20 .kl--rajanaapurit .kl-alue--ulko.kl-savy4 { fill: #a6b6c3; }
-.tn20 .kl--rajanaapurit .kl-alue.kl-alue--tausta { fill: #eae4d6; stroke: #cfc4ac; stroke-width: .6px; }
-.tn20 .kl-selite-ulko { width: 11px !important; height: 11px !important; border-radius: 3px !important; background: #eae4d6; border: 1px solid #cfc4ac; }
-.tn20 .kl--rajanaapurit .kl-selite-ok { background: var(--kl-kulta); box-shadow: 0 0 0 1px #0a2c47; }
-.tn20 .kl--rajanaapurit .kl-viiva-alla { stroke: #0a2c47; stroke-width: 6.5px; opacity: .85; }
-.tn20 .kl--rajanaapurit .kl-viiva--ok { stroke: var(--kl-kulta); }
-.tn20 .kl--rajanaapurit .kl-haamu-alla { display: inline; stroke: #0a2c47; stroke-width: 5px; opacity: .55; vector-effect: non-scaling-stroke; stroke-linecap: round; }
-.tn20 .kl--rajanaapurit .kl-haamu { stroke: #fffdf7; stroke-width: 2.2px; stroke-dasharray: 2 5; opacity: 1; }
-.tn20 .kl-rengas { position: absolute; width: 13px; height: 13px; border-radius: 50%; border: 1.4px dashed #0e3a5c; transform: translate(-50%, -50%); pointer-events: none; }
-.tn20 .kl-rengas--u { border-color: #6e858f; }
 .tn20 .kl--rajanaapurit .kl-pari { border-color: #ebcb86; background: #fbf1da; }
 .tn20 .kl--rajanaapurit .kl-pari-t span { color: #7a5200; }
 .tn20 .kl--rajanaapurit .kl-pari--bad { border-color: #f0cfc5; background: #fbe7e1; }
 .tn20 .kl--rajanaapurit .kl-pari--bad .kl-pari-t span { color: var(--kl-puna-t); }
-
-/* Lippunasta (3b): lippu valkoisessa 2 px passepartoutissa, 2 px tilarengas + tumma varjo.
-   Päätepiste 32 px, välinasta 24 px (kartta alle 560 px leveä). */
-.tn20 .kl--rajanaapurit .kl-nasta { --kl-pw: 24px; transform: translate(-50%, -50%); gap: 4px; }
-.tn20 .kl--rajanaapurit .kl-nasta--paate { --kl-pw: 32px; z-index: 1; }
-.tn20 .kl--rajanaapurit .kl-nasta--oik { transform: translate(calc(-100% + var(--kl-pw) / 2), -50%); }
-.tn20 .kl--rajanaapurit .kl-nasta--vas { transform: translate(calc(var(--kl-pw) / -2), -50%); }
-.tn20 .kl--rajanaapurit .kl-nasta-kilpi { filter: none; }
-.tn20 .kl-nasta .kl-lippu {
-  width: var(--kl-pw); padding: 2px; border-radius: 4px; background: #fff;
-  box-shadow: 0 0 0 2px var(--kl-reuna, #f2b233), 0 4px 10px rgba(7, 24, 38, .5);
-}
-.tn20 .kl-nasta .kl-lippu img { border-radius: 2px; }
-.tn20 .kl-nasta .kl-lippu::after { display: none; }
-.tn20 .kl--rajanaapurit .kl-nasta-num { top: -9px; right: -10px; min-width: 17px; height: 17px; line-height: 17px; padding: 0 4px; box-shadow: 0 0 0 1.5px #fff; }
-.tn20 .kl--rajanaapurit .kl-nasta-lappu { box-shadow: 0 0 0 1.5px #fff; }
 
 /* Tulos ja paljastus kullalla (päätoiminto pysyy navyna: valkoinen kullalla ei täytä kontrastia) */
 .tn20 .kl--rajanaapurit .kl-tulos--ok { border-color: var(--kl-kulta-3); background: linear-gradient(180deg, #fbf1da, #fff); box-shadow: 0 4px 0 #ebcb86; }

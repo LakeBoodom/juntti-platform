@@ -222,12 +222,48 @@ export default function KokoelmaRunko({ d, tunnusosa, v3Lisa, heroLisa, sisalto 
             )}
           </div>
           <div className="rk-pelit-rivi">
-            {d.pelit.map((p, i) => (
+            {d.pelit.map((p, i) => p.variantit ? (
+              /* Rajanaapurit (CD-handoff 1.11.2026, 7a): kahtia jaettu reittikuva ja varianttirivit. Kuva ja teksti vievät
+                 maapeliin, rivit varianttiin (ei sisäkkäisiä linkkejä). */
+              <div key={p.slug} className="rk-peli rk-peli--variantit" data-yli={i >= 3 || undefined}>
+                <a className="rk-peli-kansi" href={p.href}>
+                  <span className="rk-peli-jako" aria-hidden="true">
+                    {p.variantit.map((v) => (
+                      /* eslint-disable-next-line @next/next/no-img-element */
+                      <img key={v.slug} src={v.kuva} alt="" loading="lazy" width={194} height={219} />
+                    ))}
+                  </span>
+                  <span className="rk-peli-teksti">
+                    <span className="rk-peli-nimi" style={{ "--lw": pisinSana(p.nimi) } as CSSProperties}>{katko(p.nimi, true)}</span>
+                    <span className="rk-peli-kuvaus">{p.kuvaus}</span>
+                  </span>
+                </a>
+                <ul className="rk-variantit">
+                  {p.variantit.map((v) => (
+                    <li key={v.slug}>
+                      <a href={v.href} aria-label={`${p.nimi}: ${v.nimi}`}>
+                        {v.liput && (
+                          <span className="rk-variantti-liput" aria-hidden="true">
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                            <img src={v.liput[0]} alt="" loading="lazy" width={30} height={20} />
+                            <i />
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                            <img src={v.liput[1]} alt="" loading="lazy" width={30} height={20} />
+                          </span>
+                        )}
+                        <span className="rk-variantti-nimi">{v.nimi}</span>
+                        <span className="rk-variantti-nuoli" aria-hidden="true">→</span>
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ) : (
               <a key={p.slug} className="rk-peli" href={p.href} data-yli={i >= 3 || undefined} data-tulossa={p.tila === "tulossa" || undefined}>
                 {p.kuva ? (
                   <span className="rk-peli-kuva" data-contain={p.kuva.contain || undefined} aria-hidden="true">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={p.kuva.src} alt="" loading="lazy" width={240} height={240} />
+                    <img src={p.kuva.ruutu ?? p.kuva.src} alt="" loading="lazy" width={240} height={240} />
                   </span>
                 ) : (
                   <span className="rk-peli-ikoni" aria-hidden="true"><PeliIkoniSvg ikoni={p.ikoni} /></span>
