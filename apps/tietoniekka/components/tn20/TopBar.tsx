@@ -113,7 +113,7 @@ export default function TopBar({ tagline }: { tagline?: string } = {}) {
   const isKuvavisat = pathname.startsWith("/kokoelma/kuvavisat");
   const activeKokoelmat =
     (pathname.startsWith("/kokoelma") && !isKuvavisat) || pathname.startsWith("/kokoelmat") || pathname.startsWith("/lapset");
-  const activePelimuodot = pathname.startsWith("/megavisat") || isKuvavisat || pathname.startsWith("/peli/") || pathname.startsWith("/visapaketti");
+  const activePelimuodot = pathname.startsWith("/megavisat") || isKuvavisat || pathname.startsWith("/peli/") || pathname.startsWith("/aanivisa") || pathname.startsWith("/visapaketti");
 
   /* Nuolinäppäimet valikon riveillä — eivät vieritä sivua */
   const onMenuKeyDown = (e: React.KeyboardEvent) => {

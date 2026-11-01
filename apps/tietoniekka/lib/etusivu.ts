@@ -8,7 +8,7 @@
 // 960 px, hero 1600 px, juontajat 300 px neliö). `pos` = designin
 // background-position per kuva (README: "kuvien rajaukset — älä arvaa").
 
-import { NAV_COLLECTIONS, NAV_MODES, aakkosin } from "./nav";
+import { NAV_COLLECTIONS, NAV_MODES } from "./nav";
 
 /** Ylätunnisteen tagline (design: "500+ visaa" = enemmän kuin 500, Heikki 28.8.:
     riittävä tarkkuus — ei lasketa kannasta). */
@@ -110,12 +110,10 @@ export const HOSTS_INTRO = {
    Vaalit, Tiede, Juhlat ja reittipelit puuttuivat käsin ylläpidetystä listasta). */
 export const FOOTER_COLLECTIONS = NAV_COLLECTIONS.map((c) => ({ label: c.label, href: c.href ?? `/kokoelma/${c.slug}` }));
 
-/* Pelimuodot = navigaation pelimuodot (Visapaketit mukana 31.10.) + Henkilövisat, aakkosjärjestyksessä kuten
-   valikoissa. Päivän visa poistettu (Heikki 31.10.2026): ei oma pelimuoto, ja ankkuri /#paivan-visa ei toiminut. */
-export const FOOTER_MODES = aakkosin([
-  ...NAV_MODES.map((m) => ({ label: m.label, href: m.href })),
-  { label: "Henkilövisat", href: "/kokoelma/tunnetut-henkilot" },
-]);
+/* Pelimuodot = navigaation pelimuodot (Visapaketit mukana 31.10.), aakkosjärjestyksessä kuten valikoissa. Päivän visa
+   poistettu (Heikki 31.10.2026): ei oma pelimuoto, ja ankkuri /#paivan-visa ei toiminut. Henkilövisat poistettu
+   (Heikki 1.11.2026): sama kuin Tunnetut henkilöt Kokoelmat-sarakkeessa. */
+export const FOOTER_MODES = NAV_MODES.map((m) => ({ label: m.label, href: m.href }));
 
 /* Tietoniekka-sarake: samat linkit kuin nykyisellä tietoniekka.fi:llä (Heikki
    28.8.2026 — Tietoa/Yhteystiedot/Käyttöehdot/Saavutettavuus/Evästeet lisätään
