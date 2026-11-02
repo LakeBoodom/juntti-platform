@@ -1,5 +1,5 @@
-// Laita järjestykseen -pisteytys (CD "TN Laita jarjestykseen.html"): oikea paikka 10 p, yhden sijan
-// päässä 5 p. Tasatulokset: kumpi tahansa järjestys on oikein, ja paljastus kertoo "tasan".
+// Laita järjestykseen -pisteytys (CD "TN Laita jarjestykseen.html"): oikea paikka 10 p, yhden sijan päässä 5 p; pisteet
+// vain tilastoihin (CD "Järjestä yhtenäinen UX": ei näytetä). Tasatulokset: kumpi tahansa järjestys on oikein.
 // Yhteinen pakkapeleille (/peli/jarjesta/<pakka>) ja henkilösivun laadullisille pakoille (/oma).
 import type { ChainScoreResult } from "@/components/tn20/ChainResultSummary";
 
@@ -26,10 +26,3 @@ export function pisteet(arviot: Arvio[]): ChainScoreResult {
   });
   return { score, correctCount: arviot.filter((a) => a.oikein).length, totalCount: arviot.length, longestCorrectChain: pisin };
 }
-
-/** Paljastusrivin lisäteksti: "tasan" ja/tai "oikea sija N.". */
-export function arvoLisat(a: Arvio): string {
-  return [a.tasan ? "tasan" : null, a.oikein ? null : `oikea sija ${a.lahin + 1}.`].filter(Boolean).join(" · ");
-}
-
-export const PISTEOHJE = "Oikea paikka 10 p · yhden sijan päässä 5 p";

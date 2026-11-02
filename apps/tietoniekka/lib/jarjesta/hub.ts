@@ -14,6 +14,10 @@ export const HUB = { href: HUB_HREF, nimi: "Järjestä" };
 
 export type HubPakka = {
   slug: string;
+  /** Hubin "Lisää järjestettävää" -ryhmä. */
+  ryhma?: Pakka["ryhma"];
+  /** Kuvana kokonainen tunnus (vaakuna), ei rajausta. */
+  tunnus?: boolean;
   /** Kortin nimi; U+00AD-tavuviivat sallittu (KORTTISÄÄNTÖ: pitkät yhdyssanat kapeassa kortissa). */
   nimi: string;
   meta: string;
@@ -21,7 +25,7 @@ export type HubPakka = {
   href: string;
 };
 
-export type IkaPakka = HubPakka & { kategoria: string; paivanLause: string };
+export type IkaPakka = HubPakka & { kategoria: string; paivanLause: string; pelilause: string };
 
 /** Henkilöpakka: suomalaiset (celebrities.suomalainen), ikäjärjestys syntymäpäivän mukaan. */
 export const HENKILOPAKKA: IkaPakka = {
@@ -32,6 +36,7 @@ export const HENKILOPAKKA: IkaPakka = {
   kuva: "/20/jarjesta/tunnetut-suomalaiset.webp",
   href: `${HUB_HREF}/tunnetut-suomalaiset`,
   paivanLause: "Viisi suomalaista syntymävuoden mukaan, vanhin ensin.",
+  pelilause: "Suomalaiset syntymävuoden mukaan, vanhin ensin.",
 };
 
 export const IKA_PAKAT: IkaPakka[] = [HENKILOPAKKA];
@@ -52,9 +57,11 @@ const TAVUT: Record<string, string> = {
 
 export const hubPakka = (p: Pakka): HubPakka => ({
   slug: p.slug,
+  ryhma: p.ryhma,
+  tunnus: p.tunnus,
   nimi: TAVUT[p.kortti.otsikko] ?? p.kortti.otsikko,
-  meta: p.kortti.meta,
-  kuva: p.korttikuva,
+  meta: p.kortti.meta.replace("Virkaanastuminen", "Virkaan\u00ADastuminen"), // KORTTISÄÄNTÖ: 320 px
+  kuva: p.hubKuva ?? p.korttikuva,
   href: pakkaHref(p),
 });
 

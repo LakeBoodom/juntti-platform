@@ -1,60 +1,46 @@
-// TIETOKETJU: IKÄJÄRJESTYS — RankingCard.
-// Kompakti vaakakortti: järjestysnumero + kuva-thumbnail + nimi/ammatti +
-// vetokahva. Käytetään kolmessa yhteydessä: interaktiivisena rivinä
-// (ReorderableChainList), staattisena esikatseluna (CollectionPageGamePromo,
-// readOnly) ja paljastettuna korttina (RevealSequencer, state+revealedDate).
+// JÄRJESTÄ — rivikortti (CD "Järjestä yhtenäinen UX" 3e, Heikki 2.11.2026): sama kortti hubissa (vino, ilman kahvaa),
+// pelissä (suora, kahva, ReorderableChainList) ja tuloksessa (RevealSequencer: väärät jäävät vinoon). Numero on kortin
+// ulkopuolella. Kolme muotoa: kuvallinen (henkilöt), tunnus (vaakunat, kokonaisena) ja kuvaton (paikat ja asiat).
+// Kuvan puuttuessa rivi on kuvaton, henkilösiluettia ei käytetä koskaan.
 //
-// KORTTISÄÄNTÖ (CLAUDE.md, ehdoton): nimikentässä EI kiinteää korkeutta eikä
-// line-clampia missään muodossa — kortti kasvaa sisällön mukana. Kaikki
-// tekstit overflow-wrap: normal; word-break: keep-all (ei tavuta suomea
-// keskeltä). Fonttikoot kalibroitu varovaisiksi lähtöarvoiksi (KORTTISÄÄNTÖ
-// kohta 8) — mitattu Range-menetelmällä 320–2560px, ks. tietoketju.css.
+// KORTTISÄÄNTÖ (CLAUDE.md, ehdoton): nimikentässä EI kiinteää korkeutta eikä line-clampia — kortti kasvaa sisällön
+// mukana. Nimen koko lasketaan pisimmästä tavusta (--tk-lw, tietoketju.css); pitkät yhdyssanat tavutetaan (rivi.ts).
 
 import { henkiloKuva } from "@/lib/henkilokuvat";
+import { kallistus, pisinTavu, tavuta } from "@/lib/jarjesta/rivi";
 import { forwardRef } from "react";
-import { PersonSilhouette } from "./motifs";
 
 export type RankingCardPerson = {
   id: string;
   name: string;
   role: string;
   image_url: string | null;
-  /** Laita järjestykseen -pakat, joiden kohteilla ei ole kuvia (kansallispuistot): ei kuvapaikkaa. */
+  /** Pakat, joiden kohteilla ei ole kuvia: ei kuvapaikkaa. */
   hideThumb?: boolean;
+  /** Kuva on tunnus (vaakuna): kokonaisena, ei rajausta. */
+  tunnus?: boolean;
 };
 
-export type RankingCardState = "idle" | "selected" | "target" | "dragging" | "correct" | "wrong";
+export type RankingCardState = "idle" | "selected" | "dragging" | "correct" | "wrong";
 
 export interface RankingCardProps {
   person: RankingCardPerson;
-  /** Järjestysnumero (1-pohjainen). null/undefined = ei näytetä (esikatselu). */
+  /** Järjestysnumero (1-pohjainen). null = ei numeroa (nostettu kortti). */
   position?: number | null;
   state?: RankingCardState;
-  /** Muotoiltu syntymäaika ("12.4.1985") — annetaan vain paljastusvaiheessa. */
-  revealedDate?: string | null;
-  /** Laita järjestykseen: paljastettu arvo ("2 858 km²") omalla rivillään. */
-  revealedValue?: string | null;
-  /** Ei kahvaa, ei interaktiota (peek-esikatselu promo-korteissa, aave-kortti raahauksessa, paljastuskortti). */
+  /** Tulos: "Kuuluu paikalle 3." nimen alla. */
+  note?: string | null;
+  /** Tulos: arvo oikealla (vuosi, m, km²). */
+  value?: string | null;
+  /** Hub: kortti vinossa. */
+  vino?: boolean;
+  /** Ei kahvaa, ei interaktiota (hub, nostettu kortti, tulos). */
   readOnly?: boolean;
-  /** Koristeellinen peek-esikatselu (CollectionPageGamePromo): piilottaa nimi/ammatti-tekstin
-      kokonaan, näyttää vain kuvan. Katselmointilöydös (kriittinen, 2026-09-16): kiinteän
-      kapean peek-kortin leveydellä (clamp 140–190px) mikään fonttikoko ei mahduta oikeaa
-      nimeä+ammattia leikkautumatta — teksti on koriste-esikatselussa aria-hidden eikä
-      pelin oikea kortti, joten sen poistaminen ei riko KORTTISÄÄNTÖÄ. */
-  peek?: boolean;
   /** Vetokahvan pointer/keyboard-käsittelijät (ReorderableChainList antaa nämä). */
   handleProps?: React.ButtonHTMLAttributes<HTMLButtonElement>;
-  /** Koko kortin juureen levitettävät käsittelijät (pointer-raahaus mistä tahansa kortin
-      kohdasta). LIVE-QA-LÖYDÖS (kriittinen, 2026-09-16, Heikki): raahaus oli sidottu
-      pelkkään 40×40px kahvaan oikeassa reunassa, ja koska .tk-rcard esti selaimen oman
-      vierityksen (touch-action: none) jo koko kortin alueelta, kortin muualta tartuttu
-      kosketus ei tehnyt mitään EIKÄ vierittänyt sivua — mobiilissa tämä tuntui tahmealta
-      ja rikkinäiseltä. Nyt ReorderableChainList antaa tästä samat pointer-käsittelijät
-      koko kortille; kahva jää näkyväksi affordanssiksi ja näppäimistökäyttöön.
-      Levitetään juuren omien proppien JÄLKEEN, jotta lista voi tarvittaessa korvata
-      myös onClickin (napautus käsitellään pointerupissa, ks. ReorderableChainList). */
+  /** Koko kortin juureen levitettävät käsittelijät (raahaus mistä tahansa kortin kohdasta, ks. ReorderableChainList). */
   dragProps?: React.HTMLAttributes<HTMLDivElement>;
-  /** Koko kortin napautus — tap-to-place-kohteen valinta ReorderableChainListissä. */
+  /** Koko kortin napautus. */
   onActivate?: () => void;
   grabbed?: boolean;
   className?: string;
@@ -62,24 +48,19 @@ export interface RankingCardProps {
   ariaLabel?: string;
 }
 
-const RESULT_ICON: Record<string, React.ReactElement | null> = {
-  correct: (
-    <svg viewBox="0 0 20 20" width="14" height="14" aria-hidden focusable="false">
-      <path d="M4 10.5 8 14.5 16 5.5" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  ),
-  wrong: (
-    <svg viewBox="0 0 20 20" width="14" height="14" aria-hidden focusable="false">
-      <path d="M5 5 15 15 M15 5 5 15" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" />
-    </svg>
-  ),
-};
+const Kahva = () => (
+  <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden focusable="false">
+    <path d="M9 6h.01M15 6h.01M9 12h.01M15 12h.01M9 18h.01M15 18h.01" stroke="currentColor" strokeWidth="2.8" fill="none" strokeLinecap="round" />
+  </svg>
+);
 
 export const RankingCard = forwardRef<HTMLDivElement, RankingCardProps>(function RankingCard(
-  { person, position, state = "idle", revealedDate, revealedValue, readOnly, peek, handleProps, dragProps, onActivate, grabbed, className, style, ariaLabel },
+  { person, position, state = "idle", note, value, vino, readOnly, handleProps, dragProps, onActivate, grabbed, className, style, ariaLabel },
   ref,
 ) {
-  const resultIcon = state === "correct" || state === "wrong" ? RESULT_ICON[state] : null;
+  const kuva = person.hideThumb ? null : henkiloKuva(person.image_url);
+  const muoto = !kuva ? "kuvaton" : person.tunnus ? "tunnus" : "kuva";
+  const nimi = tavuta(person.name);
 
   return (
     <div
@@ -87,17 +68,16 @@ export const RankingCard = forwardRef<HTMLDivElement, RankingCardProps>(function
       className={[
         "tk-rcard",
         `tk-rcard--${state}`,
-        readOnly ? "tk-rcard--readonly" : "",
-        peek ? "tk-rcard--peek" : "",
-        // Raahattava koko kortti: erillinen luokka, jotta kursori/touch-action/
-        // user-select osuvat vain oikeisiin kortteihin (ei readOnly-esikatseluihin).
+        `tk-rcard--${muoto}`,
+        vino ? "tk-rcard--vino" : "",
+        // Raahattava koko kortti: erillinen luokka, jotta kursori/touch-action/user-select osuvat vain pelin kortteihin.
         dragProps && !readOnly ? "tk-rcard--draggable" : "",
         className ?? "",
       ]
         .join(" ")
         .replace(/\s+/g, " ")
         .trim()}
-      style={style}
+      style={{ "--tk-kallistus": kallistus((position ?? 1) - 1), "--tk-lw": pisinTavu(nimi), ...style } as React.CSSProperties}
       data-id={person.id}
       role={readOnly || !onActivate ? undefined : "button"}
       tabIndex={readOnly || !onActivate ? undefined : -1}
@@ -105,61 +85,40 @@ export const RankingCard = forwardRef<HTMLDivElement, RankingCardProps>(function
       onClick={readOnly ? undefined : onActivate}
       {...dragProps}
     >
-      {typeof position === "number" && <div className="tk-rcard-pos" aria-hidden="true">{position}</div>}
+      {typeof position === "number" && <span className="tk-rcard-pos" aria-hidden="true">{position}</span>}
 
-      {!person.hideThumb && (
-      <div className="tk-rcard-thumb">
-        {henkiloKuva(person.image_url) ? (
-          // draggable={false}: ilman tätä hiiriraahaus kortin kuvasta käynnistäisi
-          // selaimen oman kuvanraahauksen ja keskeyttäisi kortin siirron.
+      <div className="tk-rcard-kortti">
+        {kuva && (
+          // draggable={false}: ilman tätä hiiriraahaus kortin kuvasta käynnistäisi selaimen oman kuvanraahauksen.
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={henkiloKuva(person.image_url)!} alt="" loading="lazy" draggable={false} />
-        ) : (
-          <div className="tk-rcard-silhouette">
-            <PersonSilhouette />
-          </div>
+          <img className="tk-rcard-kuva" src={kuva} alt="" loading="lazy" decoding="async" width={44} height={44} draggable={false} />
         )}
-        <div className="tk-rcard-duotone" aria-hidden="true" />
-      </div>
-      )}
 
-      {!peek && (
         <div className="tk-rcard-body">
-          <div className="tk-rcard-name">{person.name}</div>
-          {(person.role || revealedDate) && (
-            <div className="tk-rcard-role">
-              {person.role}
-              {revealedDate && <span className="tk-rcard-date"> · s. {revealedDate}</span>}
-            </div>
-          )}
-          {revealedValue && <div className="tk-rcard-value">{revealedValue}</div>}
+          <span className="tk-rcard-nimi">{nimi}</span>
+          {note ? <span className="tk-rcard-note">{note}</span> : person.role ? <span className="tk-rcard-role">{person.role}</span> : null}
         </div>
-      )}
 
-      {resultIcon && (
-        <div className={`tk-rcard-result tk-rcard-result--${state}`} aria-hidden="true">
-          {resultIcon}
-        </div>
-      )}
+        {value && (
+          <span className="tk-rcard-value">
+            {state === "correct" && <span className="tk-rcard-ok" aria-label="Oikealla paikalla">✓</span>}
+            {value}
+          </span>
+        )}
 
-      {!readOnly && handleProps && (
-        <button
-          type="button"
-          className="tk-rcard-handle"
-          aria-label={`Siirrä ${person.name} — raahaa korttia mistä tahansa kohdasta, tai napauta valitaksesi`}
-          aria-grabbed={grabbed ? "true" : "false"}
-          {...handleProps}
-        >
-          <svg viewBox="0 0 20 20" width="18" height="18" aria-hidden focusable="false">
-            <circle cx="6" cy="5" r="1.5" fill="currentColor" />
-            <circle cx="14" cy="5" r="1.5" fill="currentColor" />
-            <circle cx="6" cy="10" r="1.5" fill="currentColor" />
-            <circle cx="14" cy="10" r="1.5" fill="currentColor" />
-            <circle cx="6" cy="15" r="1.5" fill="currentColor" />
-            <circle cx="14" cy="15" r="1.5" fill="currentColor" />
-          </svg>
-        </button>
-      )}
+        {!readOnly && handleProps && (
+          <button
+            type="button"
+            className="tk-rcard-handle"
+            aria-label={`Siirrä ${person.name}: raahaa korttia tai napauta kahta korttia vaihtaaksesi, nuolinäppäimillä yksi paikka kerrallaan`}
+            aria-grabbed={grabbed ? "true" : "false"}
+            {...handleProps}
+          >
+            <Kahva />
+          </button>
+        )}
+        {readOnly && state === "dragging" && <span className="tk-rcard-handle" aria-hidden="true"><Kahva /></span>}
+      </div>
     </div>
   );
 });

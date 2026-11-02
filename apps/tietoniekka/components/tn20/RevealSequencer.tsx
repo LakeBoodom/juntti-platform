@@ -1,33 +1,9 @@
 "use client";
-// TIETOKETJU: IKÄJÄRJESTYS — RevealSequencer.
-// Paljastusanimaatio: nopea hallittu sarja (ei kortti kerrallaan pysähtyen),
-// lukitsee pelaajan asettaman järjestyksen paikalleen (EI järjestä uudelleen
-// oikeaan järjestykseen — jokainen paikka vain merkitään oikeaksi/vääräksi),
-// näyttää oikeat/väärät paikat ohuina reunoina/ikoneina (EI täyttöpintoina —
-// ainoa semanttinen lime-käyttö tässä näkymässä on "oikein"-tila, joka on
-// design-tokenina sama arvo kuin --tk-lime). Syntymäajat paljastuvat vasta nyt.
-//
-// Liikeajat (speksi): enter 320ms, state-muutos 220ms,
-// easing cubic-bezier(.2,.8,.2,1). prefers-reduced-motion: sama lopputulos,
-// ei porrastettua animaatiota — kaikki paljastuu kerralla lyhyen viiveen jälkeen.
-//
-// LIVE-QA-LÖYDÖS (kriittinen, 2026-09-16, Heikki): paljastettu järjestys näkyi
-// vain ~1,4 s (BASE_DELAY + 10 × STAGGER + 320 ms), koska sarjan päätyttyä
-// onComplete() kutsuttiin ajastimesta ja peli hyppäsi itse tulosnäkymään.
-// Pelaaja ei ehtinyt katsoa mikä meni oikein ja mikä väärin. Korjattu:
-// ajastimet vain paljastavat kortit, eivät koskaan vaihda näkymää.
-//
-// LIVE-QA-LÖYDÖS 2 (2026-09-16, Heikki): erillinen "Näytä tulos" -näkymä
-// (entinen kolmas vaihe, ChainResultSummary omalla sivullaan) poistettu
-// kokonaan. Heikin huomio: pelaaja näkee paljastuksessa jo koko tuloksen
-// (oikein/väärin per kortti), joten "Näytä tulos" -sanamuoto oli harhaanjohtava
-// eikä erillinen näkymä tuonut mitään — pisteet ja jatkonapit ("Arvo 10 uutta"/
-// "Vaihda aihetta") renderöidään nyt SUORAAN tämän listan alla heti kun kaikki
-// kortit on paljastettu, samalla sivulla. Mobiilissa tämä vaatii scrollausta
-// (10 korttia + pistelaatikko ei mahdu yhteen ruutuun), mikä on hyväksytty
-// kompromissi — Heikin oma arvio: "mobiilissa tietää kyllä scrollausta".
-// onReveal-callback on siis pelkkä ilmoitus ("kaikki paljastettu, laske
-// pisteet nyt") — ei enää näkymänvaihto.
+// JÄRJESTÄ — tulos (CD "Järjestä yhtenäinen UX" 2d/3a, Heikki 2.11.2026): iso x/n ylhäällä (lime kun kaikki oikein,
+// muuten amber), rivit pelaajan järjestyksessä, väärät vinossa ja "Kuuluu paikalle N.", arvo oikealla. Ei titteleitä,
+// pisteitä eikä ketjua. Paljastus on nopea hallittu sarja: rivi kerrallaan, luku ja jatko sen jälkeen. Ajastimet vain
+// paljastavat kortit, eivät koskaan vaihda näkymää (LIVE-QA 16.9.2026: pelaajan on ehdittävä katsoa).
+// prefers-reduced-motion: sama lopputulos ilman porrastusta.
 
 import { useEffect, useState, type ReactNode } from "react";
 import { RankingCard, type RankingCardState } from "./RankingCard";
@@ -36,17 +12,15 @@ import { usePrefersReducedMotion } from "@/lib/usePrefersReducedMotion";
 export type RevealItem = {
   id: string;
   name: string;
-  role: string;
   image_url: string | null;
   hideThumb?: boolean;
-  /** Pelaajan asettama paikka (1-pohjainen) — tässä järjestyksessä kortit pysyvät koko paljastuksen ajan. */
+  tunnus?: boolean;
+  /** Pelaajan asettama paikka (1-pohjainen): tässä järjestyksessä kortit pysyvät koko paljastuksen ajan. */
   placedPosition: number;
-  /** Oikea kronologinen paikka (1-pohjainen) — verrataan placedPositioniin. */
+  /** Oikea paikka (1-pohjainen), tasatuloksissa lähin. */
   correctPosition: number;
-  /** Ikäjärjestys: syntymäaika ("s. 12.4.1985"). */
-  birthDateLabel?: string;
-  /** Laita järjestykseen: arvo ("2 858 km²") — käytetään syntymäajan sijaan. */
-  valueLabel?: string;
+  /** Arvo oikealla ("1917", "1 317 m"). */
+  valueLabel: string;
 };
 
 const STAGGER_MS = 90;
@@ -54,11 +28,13 @@ const BASE_DELAY_MS = 220;
 
 export function RevealSequencer({
   items,
-  tulos,
+  jatko,
+  alaviite,
 }: {
   items: RevealItem[];
-  /** Pelikehyksen K4-tulos (PeliTulos, 20.10.2026), näytetään korttilistan alla kun kaikki on paljastettu. */
-  tulos: ReactNode;
+  /** Seuraava rivi, jako ja muut toiminnot: näkyvät, kun kaikki on paljastettu. */
+  jatko: ReactNode;
+  alaviite?: ReactNode;
 }) {
   const ordered = [...items].sort((a, b) => a.placedPosition - b.placedPosition);
   const reducedMotion = usePrefersReducedMotion();
@@ -66,51 +42,45 @@ export function RevealSequencer({
 
   const total = ordered.length;
   const allRevealed = total > 0 && revealedCount >= total;
+  const oikein = ordered.filter((k) => k.placedPosition === k.correctPosition).length;
 
   useEffect(() => {
+    window.scrollTo({ top: 0 });
     setRevealedCount(0);
     const timers: ReturnType<typeof setTimeout>[] = [];
-
     if (reducedMotion) {
-      // Sama lopputulos ilman porrastettua liikettä — yksi lyhyt viive, sitten kaikki kerralla.
       timers.push(setTimeout(() => setRevealedCount(total), 200));
     } else {
       ordered.forEach((_, i) => {
-        timers.push(
-          setTimeout(() => {
-            setRevealedCount((c) => Math.max(c, i + 1));
-          }, BASE_DELAY_MS + i * STAGGER_MS),
-        );
+        timers.push(setTimeout(() => setRevealedCount((c) => Math.max(c, i + 1)), BASE_DELAY_MS + i * STAGGER_MS));
       });
     }
-
     return () => timers.forEach(clearTimeout);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [items, reducedMotion]);
 
-  /** Ohita porrastus: näytä kaikki kortit heti. */
-  function revealAllNow() {
-    setRevealedCount(total);
-  }
-
   return (
-    <div className="tk-reveal">
-      <div className="tk-reveal-list">
+    <div className="jr-tulos" style={{ "--tk-n": total } as React.CSSProperties}>
+      <h1 className="jr-luku" data-valmis={allRevealed || undefined}>
+        <span className="jr-luku-n">
+          <span data-kaikki={oikein === total || undefined}>{oikein}</span>/{total}
+        </span>
+        <span className="jr-luku-sana">oikealla paikalla</span>
+      </h1>
+
+      <div className="jr-tulos-rivit">
         {ordered.map((item, i) => {
           const isRevealed = i < revealedCount;
-          const state: RankingCardState = isRevealed ? (item.placedPosition === item.correctPosition ? "correct" : "wrong") : "idle";
+          const ok = item.placedPosition === item.correctPosition;
+          const state: RankingCardState = isRevealed ? (ok ? "correct" : "wrong") : "idle";
           return (
-            <div
-              key={item.id}
-              className={`tk-reveal-row${isRevealed ? " tk-reveal-row--revealed" : ""}`}
-              style={reducedMotion ? undefined : { transitionDelay: `${i * STAGGER_MS}ms` }}
-            >
+            <div key={item.id} className={`tk-reveal-row${isRevealed ? " tk-reveal-row--revealed" : ""}`}>
               <RankingCard
-                person={item}
+                person={{ id: item.id, name: item.name, role: "", image_url: item.image_url, hideThumb: item.hideThumb, tunnus: item.tunnus }}
                 position={item.placedPosition}
                 state={state}
-                revealedDate={isRevealed ? item.birthDateLabel ?? null : null}
-                revealedValue={isRevealed ? item.valueLabel ?? null : null}
+                note={isRevealed && !ok ? `Kuuluu paikalle ${item.correctPosition}.` : null}
+                value={isRevealed ? item.valueLabel : null}
                 readOnly
               />
             </div>
@@ -118,13 +88,8 @@ export function RevealSequencer({
         })}
       </div>
 
-      {allRevealed ? (
-        tulos
-      ) : (
-        <button type="button" className="tk-reveal-skip" onClick={revealAllNow}>
-          Näytä heti →
-        </button>
-      )}
+      {allRevealed && <div className="jr-jatko">{jatko}</div>}
+      {allRevealed && alaviite && <p className="jr-alaviite">{alaviite}</p>}
     </div>
   );
 }

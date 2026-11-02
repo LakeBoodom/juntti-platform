@@ -1,13 +1,11 @@
 "use client";
-// LAITA JÄRJESTYKSEEN — pelinäkymä. Sama mekaniikka ja komponentit kuin Ikäjärjestyksessä
-// (ReorderableChainList → RevealSequencer + pisteet samalla sivulla), mutta kohteet ja
-// suunta tulevat pakasta. Vaiheet: aloitus → järjestäminen → paljastus.
+// LAITA JÄRJESTYKSEEN — pelinäkymä. Sama lauta ja tulos kuin Ikäjärjestyksessä (Korjausrivi → RevealSequencer),
+// mutta kohteet ja suunta tulevat pakasta. Vaiheet: aloitus → järjestäminen → paljastus.
 // Toistonesto kuten Ikäjärjestyksessä: edellisen kierroksen id:t sessionStorageen.
-// Osa C (31.10.2026): Järjestä-hubin pakka — paluu hubiin, ei ohjeita eikä Muut järjestyspelit -osiota,
-// hubista tultaessa (?aloita=1) ensimmäinen kierros tulee valmiina palvelimelta, tuloksessa Seuraava pakka.
+// Osa C (31.10.2026): Järjestä-hubin pakka; hubista tultaessa (?aloita=1) ensimmäinen kierros tulee valmiina palvelimelta.
+// CD "Järjestä yhtenäinen UX" (Heikki 2.11.2026): yksi rivi paluulinkkinä, Korjaa rivi → Tarkista rivi → Seuraava rivi.
 
 import { pelijakoteksti } from "@/lib/korttinimi";
-import { jarjestaTaso } from "@/lib/pelitasot";
 import { useEffect, useMemo, useState } from "react";
 import { haeJarjestysKierros } from "@/lib/jarjesta/kierros";
 import {
@@ -15,8 +13,8 @@ import {
   type JarjestysKohde,
   type Pakka,
 } from "@/lib/jarjesta/pakat";
-import { arvioi, arvoLisat, pisteet, PISTEOHJE } from "@/lib/jarjesta/pisteytys";
-import { ReorderableChainList } from "@/components/tn20/ReorderableChainList";
+import { arvioi, pisteet } from "@/lib/jarjesta/pisteytys";
+import { vuosiTaiPaiva } from "@/lib/jarjesta/rivi";
 import { SuuntaindikaattoriBadge } from "@/components/tn20/SuuntaindikaattoriBadge";
 import {
   RevealSequencer,
@@ -25,10 +23,10 @@ import {
 import Pelipalkki from "@/components/tn20/pelikehys/Pelipalkki";
 import PeliKehys from "@/components/tn20/pelikehys/PeliKehys";
 import PeliAloitus from "@/components/tn20/pelikehys/PeliAloitus";
-import PeliTulos from "@/components/tn20/pelikehys/PeliTulos";
+import Korjausrivi from "@/components/tn20/jarjesta/Korjausrivi";
+import RiviJatko from "@/components/tn20/jarjesta/RiviJatko";
 import { kirjaaPelimuotoPeli } from "@/lib/pelimuotoPelit";
-import { HUB, HUB_HREF } from "@/lib/jarjesta/hub";
-import SeuraavaPakka from "@/components/tn20/jarjesta/SeuraavaPakka";
+import { HUB, aloitaHref, seuraavaPakka } from "@/lib/jarjesta/hub";
 
 const PELI = "Järjestä";
 
@@ -70,17 +68,13 @@ export default function JarjestaClient({
   const [order, setOrder] = useState<JarjestysKohde[]>(alussa ? initialRound! : []);
   const [phase, setPhase] = useState<Phase>(alussa ? "ordering" : "start");
   const [notice, setNotice] = useState<string | null>(null);
+  const [uusiKesken, setUusiKesken] = useState(false);
   // Osa C: paluu Järjestä-hubiin (ei kokoelmaan).
   const koti = HUB;
   // Palvelimen arpoma ensimmäinen kierros toistonestoon kuten clientillä arvottu.
   useEffect(() => {
     if (alussa) tallennaEdelliset(pakka.slug, initialRound!.map((k) => k.id));
   }, [alussa, initialRound, pakka.slug]);
-  // KORTTISÄÄNTÖ: otsikko on uppercase eikä sanoja katkaista → koko pisimmän sanan mukaan (CSS).
-  const lwTyyli = {
-    "--tk-lw": Math.max(...pakka.otsikko.split(/\s+/).map((w) => w.length), 8),
-  } as React.CSSProperties;
-
   const correctOrder = useMemo(
     () => (round ? oikeaJarjestys(round, pakka.direction) : []),
     [round, pakka.direction],
@@ -96,19 +90,22 @@ export default function JarjestaClient({
   );
 
   /* Jako (K4 v2, 25.10.2026): Jakoalue-komponentti; tulos linkkiin (?tulos=n-total) jotta kaveri saa saman kierroksen
-     ja Facebookin og-kuvaus kertoo tuloksen; tasonimi kuten tulosnäkymässä. Tulosvaihe piirretään vain selaimessa. */
+     ja Facebookin og-kuvaus kertoo tuloksen. Tulosvaihe piirretään vain selaimessa. */
   const jakoTiedot = () => ({
     url: `${location.origin}${location.pathname}?kohteet=${(round ?? []).map((k) => k.id).join(",")}&tulos=${scoreResult?.correctCount ?? 0}-${scoreResult?.totalCount ?? 0}`,
-    teksti: pelijakoteksti(`${PELI}: ${pakka.kortti.otsikko}`, `${scoreResult?.correctCount ?? 0}/${scoreResult?.totalCount ?? 0} oikein`, !!scoreResult && scoreResult.correctCount === scoreResult.totalCount, scoreResult ? jarjestaTaso(scoreResult.correctCount, scoreResult.totalCount, pakka.collection.slug) : null),
+    teksti: pelijakoteksti(`${PELI}: ${pakka.kortti.otsikko}`, `${scoreResult?.correctCount ?? 0}/${scoreResult?.totalCount ?? 0} oikealla paikalla`, !!scoreResult && scoreResult.correctCount === scoreResult.totalCount),
   });
 
   async function aloita() {
-    setPhase("loading");
+    /* Tuloksesta "Uusi kierros": tulos pysyy näkyvissä, kunnes uusi rivi on arvottu. */
+    if (phase === "start") setPhase("loading");
+    else setUusiKesken(true);
     setNotice(null);
     const next = await haeJarjestysKierros(
       pakka.slug,
       lueEdelliset(pakka.slug),
     );
+    setUusiKesken(false);
     if (next.length < 3) {
       setNotice(
         "Kierroksen arvonta ei onnistunut juuri nyt. Yritä hetken päästä uudelleen.",
@@ -126,25 +123,22 @@ export default function JarjestaClient({
     window.scrollTo({ top: 0 });
   }
 
-  const revealItems: RevealItem[] = useMemo(
-    () =>
-      order.map((k, i) => {
-        const a = arviot[i];
-        const lisat = a ? arvoLisat(a) : "";
-        return {
-          id: k.id,
-          name: k.name,
-          role: k.role,
-          image_url: k.image_url,
-          hideThumb: k.hideThumb,
-          placedPosition: i + 1,
-          correctPosition: !a || a.oikein ? i + 1 : a.lahin + 1,
-          // Väärin sijoitetuille myös oikea sija → pelaaja näkee oikean järjestyksen arvoineen (brief §2).
-          valueLabel: lisat ? `${k.valueLabel} · ${lisat}` : k.valueLabel,
-        };
-      }),
-    [order, arviot],
-  );
+  const revealItems: RevealItem[] = useMemo(() => {
+    const arvot = vuosiTaiPaiva(order.map((k) => k.valueLabel));
+    return order.map((k, i) => {
+      const a = arviot[i];
+      return {
+        id: k.id,
+        name: k.name,
+        image_url: k.image_url,
+        hideThumb: k.hideThumb,
+        tunnus: k.tunnus,
+        placedPosition: i + 1,
+        correctPosition: !a || a.oikein ? i + 1 : a.lahin + 1,
+        valueLabel: arvot[i],
+      };
+    });
+  }, [order, arviot]);
 
   const lahteet = useMemo(
     () => [
@@ -181,28 +175,19 @@ export default function JarjestaClient({
   if (phase === "revealing" && scoreResult) {
     return (
       <PeliKehys iho="tumma">
-        <Pelipalkki iho="tumma" peli={PELI} muunnelma={pakka.kortti.otsikko} koti={koti} />
-        <main className="tk-page">
+        <Pelipalkki iho="tumma" peli={PELI} koti={koti} pelissa paluuNuoli />
+        <main>
           <RevealSequencer
             items={revealItems}
-            tulos={
-              /* K4 v2 (pelimuotojen kehys 25.10.2026): tulos → jako → seuraava peli → toissijaiset linkit. */
-              <PeliTulos
-                luku={`${scoreResult.correctCount}/${scoreResult.totalCount}`}
-                yksikko="oikein"
-                tasonimi={jarjestaTaso(scoreResult.correctCount, scoreResult.totalCount, pakka.collection.slug)}
-                lause={`${scoreResult.score} pistettä. Pisin oikea ketju: ${scoreResult.longestCorrectChain}.`}
+            jatko={
+              <RiviJatko
+                seuraava={aloitaHref(seuraavaPakka(pakka.slug))}
+                uusi={{ teksti: "Uusi kierros", onClick: aloita, kesken: uusiKesken }}
                 jako={{ ...jakoTiedot(), natiiviOtsikko: PELI }}
-                toiminnot={[{ teksti: "Pelaa uusi kierros", onClick: aloita }, { teksti: "Kaikki pakat", href: HUB_HREF }]}
-                seuraavat={[]}
-                seuraavaOsio={<SeuraavaPakka slug={pakka.slug} />}
               />
             }
+            alaviite={lahteet.length > 0 ? `Lähde: ${lahteet.join(", ")}` : null}
           />
-          <p className="tk-jarj-lahde">
-            {PISTEOHJE}
-            {lahteet.length > 0 ? ` · Lähde: ${lahteet.join(", ")}` : ""}
-          </p>
         </main>
       </PeliKehys>
     );
@@ -210,24 +195,19 @@ export default function JarjestaClient({
 
   return (
     <PeliKehys iho="tumma">
-      <Pelipalkki iho="tumma" peli={PELI} muunnelma={pakka.kortti.otsikko} koti={koti} tila={`${order.length} korttia`} pelissa />
-      <main className="tk-page">
-        <header className="tk-order-head tk-jarj-cq" style={lwTyyli}>
-          <SuuntaindikaattoriBadge label={pakka.suunta.toUpperCase()} />
-          <h1 className="tk-order-title tk-jarj-title">{iso(pakka.otsikko)}</h1>
-          <p className="tk-order-desc">
-            Raahaa tai napauta korteista järjestääksesi ne. Kun järjestys tuntuu oikealta, paljasta tulos.
-          </p>
-        </header>
-        <ReorderableChainList items={order} onReorder={setOrder} />
-        <button type="button" className="tk-btn-primary tk-order-cta" onClick={() => {
-            /* Pelikerta tilastoihin (pelimuoto_pelit) tarkistushetkellä: järjestys on silloin lopullinen. */
-            if (scoreResult) void kirjaaPelimuotoPeli({ pelimuoto: "jarjesta", avain: pakka.slug, oikein: scoreResult.correctCount, yhteensa: scoreResult.totalCount, pisteet: scoreResult.score });
-            setPhase("revealing");
-          }}>
-          Paljasta järjestys
-        </button>
-      </main>
+      <Pelipalkki iho="tumma" peli={PELI} koti={koti} pelissa paluuNuoli />
+      <Korjausrivi
+        lause={pakka.pelilause}
+        ylin={pakka.ylin}
+        alin={pakka.alin}
+        items={order}
+        onReorder={setOrder}
+        onTarkista={() => {
+          /* Pelikerta tilastoihin (pelimuoto_pelit) tarkistushetkellä: järjestys on silloin lopullinen. */
+          if (scoreResult) void kirjaaPelimuotoPeli({ pelimuoto: "jarjesta", avain: pakka.slug, oikein: scoreResult.correctCount, yhteensa: scoreResult.totalCount, pisteet: scoreResult.score });
+          setPhase("revealing");
+        }}
+      />
     </PeliKehys>
   );
 }

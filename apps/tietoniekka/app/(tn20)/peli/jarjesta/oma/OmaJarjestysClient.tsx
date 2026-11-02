@@ -1,16 +1,16 @@
 "use client";
-// Laadullinen järjestyspakka (brief 4.10.2026): Ikäjärjestyksen järjestämis- ja paljastuskomponentit,
-// pisteytys yhteinen pakkapelien kanssa (lib/jarjesta/pisteytys.ts: 10/5, tasatulokset "tasan").
+// Laadullinen järjestyspakka (brief 4.10.2026): sama lauta ja tulos kuin pakkapeleissä (Korjausrivi → RevealSequencer),
+// tasatulokset lib/jarjesta/pisteytys.ts. CD "Järjestä yhtenäinen UX" (Heikki 2.11.2026).
 import { pelijakoteksti } from "@/lib/korttinimi";
-import { jarjestaTaso } from "@/lib/pelitasot";
 import { useMemo, useState } from "react";
-import { ReorderableChainList } from "@/components/tn20/ReorderableChainList";
-import { SuuntaindikaattoriBadge } from "@/components/tn20/SuuntaindikaattoriBadge";
 import { RevealSequencer, type RevealItem } from "@/components/tn20/RevealSequencer";
-import { arvioi, arvoLisat, pisteet, PISTEOHJE } from "@/lib/jarjesta/pisteytys";
+import { arvioi, pisteet } from "@/lib/jarjesta/pisteytys";
+import { vuosiTaiPaiva } from "@/lib/jarjesta/rivi";
 import Pelipalkki from "@/components/tn20/pelikehys/Pelipalkki";
 import PeliKehys from "@/components/tn20/pelikehys/PeliKehys";
-import PeliTulos from "@/components/tn20/pelikehys/PeliTulos";
+import { SeuraavaPeli } from "@/components/tn20/pelikehys/PeliTulos";
+import Korjausrivi from "@/components/tn20/jarjesta/Korjausrivi";
+import RiviJatko from "@/components/tn20/jarjesta/RiviJatko";
 import { seuraavatPelit } from "@/lib/pelimuodot";
 import { kirjaaPelimuotoPeli } from "@/lib/pelimuotoPelit";
 
@@ -30,7 +30,8 @@ function sekoita<T>(a: T[]): T[] {
 export default function OmaJarjestysClient({
   attr,
   otsikko,
-  suunta,
+  ylin,
+  alin,
   direction,
   kohteet,
   tilastot,
@@ -39,7 +40,8 @@ export default function OmaJarjestysClient({
   /** Laatuattribuutin avain (?a=) — pelikertatilaston avain. */
   attr: string;
   otsikko: string;
-  suunta: string;
+  ylin: string;
+  alin: string;
   direction: "asc" | "desc";
   kohteet: OmaKohde[];
   tilastot: string | null;
@@ -57,51 +59,43 @@ export default function OmaJarjestysClient({
 
   const tulos = useMemo(() => pisteet(arviot), [arviot]);
 
+  const arvot = vuosiTaiPaiva(order.map((k) => k.valueLabel));
   const revealItems: RevealItem[] = order.map((k, i) => {
     const a = arviot[i];
-    const lisat = arvoLisat(a);
     return {
       id: k.id,
       name: k.name,
-      role: "",
       image_url: k.image_url,
       placedPosition: i + 1,
       correctPosition: a.oikein ? i + 1 : a.lahin + 1,
-      valueLabel: lisat ? `${k.valueLabel} · ${lisat}` : k.valueLabel,
+      valueLabel: arvot[i],
     };
   });
 
   /* Jako (K4 v2, 25.10.2026): Jakoalue-komponentti; tulos linkkiin (?tulos=n-total) jotta kaveri saa saman kierroksen
-     ja Facebookin og-kuvaus kertoo tuloksen; tasonimi kuten tulosnäkymässä. Tulosvaihe piirretään vain selaimessa. */
+     ja Facebookin og-kuvaus kertoo tuloksen. Tulosvaihe piirretään vain selaimessa. */
   const jakoTiedot = () => ({
     url: (() => { const u = new URL(location.href); u.searchParams.set("tulos", `${tulos.correctCount}-${tulos.totalCount}`); return u.toString(); })(),
-    teksti: pelijakoteksti(otsikko, `${tulos.correctCount}/${tulos.totalCount} oikein`, tulos.correctCount === tulos.totalCount, jarjestaTaso(tulos.correctCount, tulos.totalCount)),
+    teksti: pelijakoteksti(otsikko, `${tulos.correctCount}/${tulos.totalCount} oikealla paikalla`, tulos.correctCount === tulos.totalCount),
   });
 
   // Pelikehys K1 (20.10.2026): paluu henkilösivulle, jolta pakka avattiin.
   if (paljastettu) {
     return (
       <PeliKehys iho="tumma">
-        <Pelipalkki iho="tumma" peli={PELI} muunnelma={otsikko} koti={takaisin} />
-        <main className="tk-page">
+        <Pelipalkki iho="tumma" peli={PELI} koti={takaisin} pelissa paluuNuoli />
+        <main>
           <RevealSequencer
             items={revealItems}
-            tulos={
-              /* K4 v2 (pelimuotojen kehys 25.10.2026): tulos → jako → seuraava peli → toissijaiset linkit. */
-              <PeliTulos
-                luku={`${tulos.correctCount}/${tulos.totalCount}`}
-                yksikko="oikein"
-                tasonimi={jarjestaTaso(tulos.correctCount, tulos.totalCount)}
-                lause={`${tulos.score} pistettä. Pisin oikea ketju: ${tulos.longestCorrectChain}.`}
+            jatko={
+              <RiviJatko
+                uusi={{ teksti: "Yritä uudelleen", onClick: uudelleen }}
                 jako={{ ...jakoTiedot(), natiiviOtsikko: PELI }}
-                toiminnot={[{ teksti: "Pelaa uudelleen", onClick: uudelleen }]}
-                seuraavat={seuraavatPelit("", "tunnetut-henkilot")}
+                lisa={<SeuraavaPeli seuraavat={seuraavatPelit("", "tunnetut-henkilot")} />}
               />
             }
+            alaviite={tilastot}
           />
-          <p className="tk-jarj-lahde">
-            {PISTEOHJE}{tilastot ? ` · ${tilastot}` : ""}
-          </p>
         </main>
       </PeliKehys>
     );
@@ -109,23 +103,19 @@ export default function OmaJarjestysClient({
 
   return (
     <PeliKehys iho="tumma">
-      <Pelipalkki iho="tumma" peli={PELI} muunnelma={otsikko} koti={takaisin} tila={`${order.length} korttia`} pelissa />
-      <main className="tk-page">
-        <header className="tk-order-head">
-          <SuuntaindikaattoriBadge label={suunta.toUpperCase()} />
-          <h1 className="tk-order-title">{otsikko}</h1>
-          <p className="tk-order-desc">Raahaa tai napauta korteista järjestääksesi ne. Kun järjestys tuntuu oikealta, paljasta tulos.</p>
-        </header>
-        <ReorderableChainList items={order} onReorder={setOrder} />
-        <button type="button" className="tk-btn-primary tk-order-cta" onClick={() => {
-            /* Pelikerta tilastoihin (pelimuoto_pelit); avain = laatuattribuutti (?a=). */
-            void kirjaaPelimuotoPeli({ pelimuoto: "jarjesta_oma", avain: attr, oikein: tulos.correctCount, yhteensa: tulos.totalCount, pisteet: tulos.score });
-            setPaljastettu(true);
-          }}>
-          Paljasta järjestys
-        </button>
-        {tilastot && <p className="tk-jarj-lahde">{tilastot}</p>}
-      </main>
+      <Pelipalkki iho="tumma" peli={PELI} koti={takaisin} pelissa paluuNuoli />
+      <Korjausrivi
+        lause={`${otsikko}.`}
+        ylin={ylin}
+        alin={alin}
+        items={order}
+        onReorder={setOrder}
+        onTarkista={() => {
+          /* Pelikerta tilastoihin (pelimuoto_pelit); avain = laatuattribuutti (?a=). */
+          void kirjaaPelimuotoPeli({ pelimuoto: "jarjesta_oma", avain: attr, oikein: tulos.correctCount, yhteensa: tulos.totalCount, pisteet: tulos.score });
+          setPaljastettu(true);
+        }}
+      />
     </PeliKehys>
   );
 }

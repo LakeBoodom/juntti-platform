@@ -34,8 +34,6 @@ export type Pakka = {
   vali: { tapa: "suhteellinen" | "absoluuttinen"; min: number };
   /** Lisätään pelkän luvun perään ("101" → "101 maaottelua"). */
   yksikko: string;
-  /** Lisätään arvon eteen ("1899" → "perustettu 1899"). */
-  etuliite?: string;
   pick: number;
   pool?: {
     maxProminence?: 1 | 2 | 3;
@@ -63,8 +61,19 @@ export type Pakka = {
   /** Hubin pakkakortti. `kuvat`: kolme kasvoa (public/, 240×320) rinnakkain tai yksi valokuva (16:10).
    *  Ilman kuvia kortti näyttää puolikaarimotiivin. Krediitit lib/kuvalahteet.ts. */
   kortti: { otsikko: string; meta: string; kuvat?: string[] };
-  /** Hubin ja "Seuraava pakka" -kortin kuva (public/, n. 720 px leveä). */
+  /** Pelimuotokorttien kuva (public/, n. 720 px leveä). */
   korttikuva: string;
+  /** Hubin pyörylän kuva, jos eri kuin korttikuva: yksi kasvo tai kokonainen vaakuna (CD 2a, Heikki 2.11.2026). */
+  hubKuva?: string;
+  /** Kuvana tunnus (vaakuna): näytetään kokonaisena, ei rajausta (CD 3e). */
+  tunnus?: boolean;
+  /** Hubin "Lisää järjestettävää" -ryhmä. */
+  ryhma: "paikat" | "politiikka";
+  /** Pelin lause (CD 3d): peruste ja suunta. */
+  pelilause: string;
+  /** Listan ylä- ja alapään merkit ("↑ Korkein", "↓ Matalin"). */
+  ylin: string;
+  alin: string;
   /** Järjestä-hubin päivän rivin lause (CD kierros 5a, 31.10.2026): viisi kohdetta, peruste ja suunta. */
   paivanLause: string;
   /** Jakokuvan taustakuva (public/). */
@@ -92,13 +101,17 @@ export const PAKAT: Pakka[] = [
     direction: "asc",
     vali: ERI,
     yksikko: "",
-    etuliite: "presidentiksi",
     pick: 8,
     collection: VAALIT,
     kortti: { otsikko: "Presidentit", meta: "Virkaanastuminen", kuvat: ["/20/vaalit/kasvot/paasikivi.webp", "/20/vaalit/kasvot/koivisto.webp", "/20/vaalit/kasvot/niinisto.webp"] },
     kuva: VAALIT_KUVA,
     korttikuva: "/20/vaalit/pakat/presidentit.webp",
     paivanLause: "Viisi presidenttiä virkaanastumisen mukaan, ensimmäinen ensin.",
+    pelilause: "Presidentit virkaanastumisen mukaan, ensimmäinen ensin.",
+    ylin: "Ensimmäinen",
+    alin: "Viimeisin",
+    ryhma: "politiikka",
+    hubKuva: "/20/vaalit/kasvot/halonen.webp",
   },
   {
     slug: "paaministerit",
@@ -114,13 +127,17 @@ export const PAKAT: Pakka[] = [
     direction: "asc",
     vali: ERI,
     yksikko: "",
-    etuliite: "pääministeriksi",
     pick: 8,
     collection: VAALIT,
     kortti: { otsikko: "Pääministerit", meta: "Aikajärjestys", kuvat: ["/20/vaalit/kasvot/holkeri.webp", "/20/vaalit/kasvot/aho.webp", "/20/vaalit/kasvot/marin.webp"] },
     kuva: VAALIT_KUVA,
     korttikuva: "/20/vaalit/pakat/paaministerit.webp",
     paivanLause: "Viisi pääministeriä ensimmäisen kauden mukaan, varhaisin ensin.",
+    pelilause: "Pääministerit ensimmäisen kauden mukaan, varhaisin ensin.",
+    ylin: "Varhaisin",
+    alin: "Viimeisin",
+    ryhma: "politiikka",
+    hubKuva: "/20/vaalit/kasvot/holkeri.webp",
   },
   {
     slug: "paaministerit-kesto",
@@ -138,10 +155,15 @@ export const PAKAT: Pakka[] = [
     yksikko: "päivää",
     pick: 8,
     collection: VAALIT,
-    kortti: { otsikko: "Pääministerikaudet", meta: "Päivinä", kuvat: ["/20/vaalit/kasvot/kallio.webp", "/20/vaalit/kasvot/lipponen.webp", "/20/vaalit/kasvot/vanhanen.webp"] },
+    kortti: { otsikko: "Pääministerikaudet", meta: "Kauden pituus", kuvat: ["/20/vaalit/kasvot/kallio.webp", "/20/vaalit/kasvot/lipponen.webp", "/20/vaalit/kasvot/vanhanen.webp"] },
     kuva: VAALIT_KUVA,
     korttikuva: "/20/vaalit/pakat/paaministerit-kesto.webp",
     paivanLause: "Viisi pääministeriä kausien yhteispituuden mukaan, pisin ensin.",
+    pelilause: "Pääministerit kausien yhteispituuden mukaan, pisin ensin.",
+    ylin: "Pisin",
+    alin: "Lyhin",
+    ryhma: "politiikka",
+    hubKuva: "/20/vaalit/kasvot/vanhanen.webp",
   },
   {
     slug: "eduskunta-pisimpaan",
@@ -162,10 +184,15 @@ export const PAKAT: Pakka[] = [
     piilotaKuva: true,
     rooliAttr: "mp_party",
     collection: VAALIT,
-    kortti: { otsikko: "Eduskuntavuodet", meta: "Istuvat kansanedustajat", kuvat: ["/20/vaalit/kasvot/zyskowicz.webp", "/20/vaalit/kasvot/tuomioja.webp", "/20/vaalit/kasvot/rasanen.webp"] },
+    kortti: { otsikko: "Eduskuntavuodet", meta: "Vuosia talossa", kuvat: ["/20/vaalit/kasvot/zyskowicz.webp", "/20/vaalit/kasvot/tuomioja.webp", "/20/vaalit/kasvot/rasanen.webp"] },
     kuva: VAALIT_KUVA,
     korttikuva: "/20/vaalit/pakat/eduskunta-pisimpaan.webp",
     paivanLause: "Viisi kansanedustajaa eduskuntavuosien mukaan, pisimpään ollut ensin.",
+    pelilause: "Kansanedustajat eduskuntavuosien mukaan, pisimpään ollut ensin.",
+    ylin: "Eniten vuosia",
+    alin: "Vähiten vuosia",
+    ryhma: "politiikka",
+    hubKuva: "/20/vaalit/kasvot/tuomioja.webp",
   },
   {
     slug: "eduskuntaryhmat",
@@ -184,10 +211,14 @@ export const PAKAT: Pakka[] = [
     pick: 8,
     piilotaKuva: true,
     collection: VAALIT,
-    kortti: { otsikko: "Eduskuntaryhmät", meta: "Koon mukaan", kuvat: ["/20/vaalit/pakat/eduskuntaryhmat.webp"] },
+    kortti: { otsikko: "Eduskuntaryhmät", meta: "Paikkamäärä", kuvat: ["/20/vaalit/pakat/eduskuntaryhmat.webp"] },
     kuva: VAALIT_KUVA,
     korttikuva: "/20/vaalit/pakat/eduskuntaryhmat.webp",
     paivanLause: "Viisi eduskuntaryhmää koon mukaan, suurin ensin.",
+    pelilause: "Eduskuntaryhmät koon mukaan, suurin ensin.",
+    ylin: "Suurin",
+    alin: "Pienin",
+    ryhma: "politiikka",
   },
   {
     slug: "puolueet-ika",
@@ -203,7 +234,6 @@ export const PAKAT: Pakka[] = [
     direction: "asc",
     vali: ERI,
     yksikko: "",
-    etuliite: "perustettu",
     pick: 8,
     piilotaKuva: true,
     collection: VAALIT,
@@ -211,6 +241,10 @@ export const PAKAT: Pakka[] = [
     kuva: VAALIT_KUVA,
     korttikuva: "/20/vaalit/pakat/puolueet-ika.webp",
     paivanLause: "Viisi puoluetta perustamisvuoden mukaan, vanhin ensin.",
+    pelilause: "Puolueet perustamisvuoden mukaan, vanhin ensin.",
+    ylin: "Vanhin",
+    alin: "Nuorin",
+    ryhma: "politiikka",
   },
   {
     slug: "vaalipiirit-paikat",
@@ -230,10 +264,14 @@ export const PAKAT: Pakka[] = [
     piilotaKuva: true,
     nimiKentta: "role_label",
     collection: VAALIT,
-    kortti: { otsikko: "Vaalipiirit", meta: "Paikkamäärän mukaan", kuvat: ["/20/vaalit/pakat/vaalipiirit-paikat.webp"] },
+    kortti: { otsikko: "Vaalipiirit", meta: "Paikkamäärä", kuvat: ["/20/vaalit/pakat/vaalipiirit-paikat.webp"] },
     kuva: VAALIT_KUVA,
     korttikuva: "/20/vaalit/pakat/vaalipiirit-paikat.webp",
     paivanLause: "Viisi vaalipiiriä paikkamäärän mukaan, eniten paikkoja ensin.",
+    pelilause: "Vaalipiirit paikkamäärän mukaan, eniten paikkoja ensin.",
+    ylin: "Eniten paikkoja",
+    alin: "Vähiten paikkoja",
+    ryhma: "politiikka",
   },
 
   // ── Luonto ja maantieto (Heikki 31.10.2026: "ei ihmisiä – tuntureita ja niiden korkeus jne.") ──
@@ -255,11 +293,16 @@ export const PAKAT: Pakka[] = [
     pick: 8,
     pool: { poisNimet: ["Ukko-Koli"] },
     piilotaKuva: true,
+    rooliAttr: "fell_kunta",
     collection: { slug: "luonto", nimi: "Luonto" },
     kortti: { otsikko: "Tunturit", meta: "Korkeus" },
     kuva: "/20/luonto/tunturin-salainen-elama-lappi-visa.webp",
     korttikuva: "/20/luonto/k/tunturin-salainen-elama-lappi-visa.webp",
     paivanLause: "Viisi tunturia korkeuden mukaan, korkein ensin.",
+    pelilause: "Tunturit korkeuden mukaan, korkein ensin.",
+    ylin: "Korkein",
+    alin: "Matalin",
+    ryhma: "paikat",
   },
   {
     slug: "vuoret-korkeus",
@@ -282,6 +325,10 @@ export const PAKAT: Pakka[] = [
     kuva: "/20/maantieto/maailman-korkeimmat-vuoret-visa.webp",
     korttikuva: "/20/maantieto/k/maailman-korkeimmat-vuoret-visa.webp",
     paivanLause: "Viisi vuorta korkeuden mukaan, korkein ensin.",
+    pelilause: "Vuoret korkeuden mukaan, korkein ensin.",
+    ylin: "Korkein",
+    alin: "Matalin",
+    ryhma: "paikat",
   },
   {
     slug: "jarvet-pinta-ala",
@@ -307,6 +354,10 @@ export const PAKAT: Pakka[] = [
     kuva: "/20/luonto/jarvien-katketyt-ihmeet-visa.webp",
     korttikuva: "/20/luonto/k/jarvien-katketyt-ihmeet-visa.webp",
     paivanLause: "Viisi järveä pinta-alan mukaan, suurin ensin.",
+    pelilause: "Järvet pinta-alan mukaan, suurin ensin.",
+    ylin: "Suurin",
+    alin: "Pienin",
+    ryhma: "paikat",
   },
   {
     slug: "kaupungit-asukasluku",
@@ -324,11 +375,16 @@ export const PAKAT: Pakka[] = [
     yksikko: "asukasta",
     pick: 8,
     piilotaKuva: true,
+    naytaRooli: true,
     collection: { slug: "kaupungit", nimi: "Suomen kaupungit" },
     kortti: { otsikko: "Kaupungit", meta: "Asukasluku" },
     kuva: "/20/kaupungit/helsinki.webp",
     korttikuva: "/20/kaupungit/k/helsinki.webp",
     paivanLause: "Viisi kaupunkia asukasluvun mukaan, suurin ensin.",
+    pelilause: "Kaupungit asukasluvun mukaan, suurin ensin.",
+    ylin: "Suurin",
+    alin: "Pienin",
+    ryhma: "paikat",
   },
   {
     slug: "maakunnat-pinta-ala",
@@ -350,6 +406,12 @@ export const PAKAT: Pakka[] = [
     kuva: "/20/jarjesta/maakunnat.webp",
     korttikuva: "/20/jarjesta/maakunnat.webp",
     paivanLause: "Viisi maakuntaa pinta-alan mukaan, suurin ensin.",
+    pelilause: "Maakunnat pinta-alan mukaan, suurin ensin.",
+    ylin: "Suurin",
+    alin: "Pienin",
+    ryhma: "paikat",
+    hubKuva: "/20/jarjesta/vaakunat/uusimaa.webp",
+    tunnus: true,
   },
   // ── Ensimmäiset pakat (3.10.2026): Kansallispuistot julkaistu 31.10.2026 (Järjestä-hub), Leijonat ja Tappara odottavat hyväksyntää ──
   {
@@ -374,6 +436,10 @@ export const PAKAT: Pakka[] = [
     kuva: "/20/luonto/suomen-kansallispuistot-visa.webp",
     korttikuva: "/20/luonto/k/suomen-kansallispuistot-visa.webp",
     paivanLause: "Viisi kansallispuistoa pinta-alan mukaan, suurin ensin.",
+    pelilause: "Kansallispuistot pinta-alan mukaan, suurin ensin.",
+    ylin: "Suurin",
+    alin: "Pienin",
+    ryhma: "paikat",
   },
   {
     slug: "leijonat-maaottelut",
@@ -389,13 +455,17 @@ export const PAKAT: Pakka[] = [
     direction: "desc",
     vali: { tapa: "suhteellinen", min: 0.04 },
     yksikko: "maaottelua",
-    pick: 10,
+    pick: 8,
     pool: { syntynytVahintaan: 1960 },
     collection: { slug: "jaakiekko", nimi: "Jääkiekko" },
     kortti: { otsikko: "Leijonat", meta: "Maaottelut" },
     kuva: "/20/jaakiekko/jk-leijonat-mm2019-kuva.webp",
     korttikuva: "/20/jaakiekko/jk-leijonat-mm2019-kuva.webp",
     paivanLause: "Viisi leijonaa maaottelujen mukaan, eniten pelannut ensin.",
+    pelilause: "Leijonat maaottelujen mukaan, eniten pelannut ensin.",
+    ylin: "Eniten",
+    alin: "Vähiten",
+    ryhma: "paikat",
   },
   {
     slug: "tappara-pisteet",
@@ -411,13 +481,17 @@ export const PAKAT: Pakka[] = [
     direction: "desc",
     vali: { tapa: "suhteellinen", min: 0.04 },
     yksikko: "pistettä",
-    pick: 10,
+    pick: 8,
     pool: { syntynytVahintaan: 1960 },
     collection: { slug: "jaakiekko", nimi: "Jääkiekko" },
     kortti: { otsikko: "Tappara", meta: "Pistepörssi" },
     kuva: "/20/jaakiekko/jk-tappara-kuva.webp",
     korttikuva: "/20/jaakiekko/jk-tappara-kuva.webp",
     paivanLause: "Viisi tapparalaista pisteiden mukaan, eniten tehnyt ensin.",
+    pelilause: "Tapparalaiset pisteiden mukaan, eniten tehnyt ensin.",
+    ylin: "Eniten",
+    alin: "Vähiten",
+    ryhma: "paikat",
   },
 ];
 
@@ -434,6 +508,8 @@ export type JarjestysKohde = {
   role: string;
   image_url: string | null;
   hideThumb?: boolean;
+  /** Kuva on tunnus (vaakuna): kokonaisena, ei rajausta. */
+  tunnus?: boolean;
   value: number;
   /** Valmis näyttöteksti ("2 858 km²", "331 maaottelua"). */
   valueLabel: string;

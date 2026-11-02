@@ -11,7 +11,7 @@
 /** Kierroksen koko — pelimuodon oma, tarkoituksellinen vakio (ei sama asia
     kuin CLAUDE.md:n "ei kovakoodattua kysymysmäärää" -sääntö, joka koskee
     visojen kysymysmäärää). Ks. tarkempi perustelu lib/ikajarjestys.ts:ssä. */
-export const ROUND_SIZE = 10;
+export const ROUND_SIZE = 8; // CD "Järjestä yhtenäinen UX" 3e: enintään 8 korttia (Heikki 2.11.2026).
 
 export type ChainDirection = "vanhin-nuorin" | "nuorin-vanhin";
 

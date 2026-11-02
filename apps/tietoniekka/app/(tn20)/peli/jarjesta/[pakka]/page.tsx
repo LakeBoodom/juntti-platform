@@ -9,7 +9,6 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { JsonLd, peliLd } from "@/lib/jsonLd";
 import { jakoMeta, jakoOsoite, pelituloksenOg } from "@/lib/jakoMeta";
-import { ikajarjestysTaso, jarjestaTaso } from "@/lib/pelitasot";
 import { JULKAISTUT, haePakka, pakkaHref } from "@/lib/jarjesta/pakat";
 import { haeJarjestysKierros, haeJarjestysKohteet } from "@/lib/jarjesta/kierros";
 import { IKA_PAKAT, haeIkaPakka, type IkaPakka } from "@/lib/jarjesta/hub";
@@ -33,12 +32,12 @@ export async function generateMetadata({ params, searchParams }: { params: Promi
   const ika = haeIkaPakka(slug);
   if (ika) {
     const nimi = `Ikäjärjestys: ${ika.nimi}`;
-    const kuvaus = "Aseta kymmenen tunnettua henkilöä syntymävuoden mukaiseen järjestykseen vanhimmasta nuorimpaan.";
+    const kuvaus = "Aseta kahdeksan tunnettua henkilöä syntymävuoden mukaiseen järjestykseen vanhimmasta nuorimpaan.";
     return {
       title: `${nimi} – järjestä syntymävuoden mukaan | Tietoniekka`,
       description: kuvaus,
       alternates: { canonical: ika.href },
-      ...jakoMeta({ ...(pelituloksenOg(sp, "oikein", ikajarjestysTaso) ?? { title: nimi, description: kuvaus }), url: jakoOsoite(ika.href, sp, ["henkilot", "rivi", "tulos"]), kuva: "/og/sivu/ikajarjestys" }),
+      ...jakoMeta({ ...(pelituloksenOg(sp, "oikealla paikalla") ?? { title: nimi, description: kuvaus }), url: jakoOsoite(ika.href, sp, ["henkilot", "rivi", "tulos"]), kuva: "/og/sivu/ikajarjestys" }),
     };
   }
   const p = haePakka(slug);
@@ -48,7 +47,7 @@ export async function generateMetadata({ params, searchParams }: { params: Promi
     title: `${p.seoTitle} | Tietoniekka`,
     description: `${p.kuvaus} ${p.rajaus}`,
     alternates: { canonical: url },
-    ...jakoMeta({ ...(pelituloksenOg(sp, "oikein", (o, k) => jarjestaTaso(o, k, p.collection.slug)) ?? { title: p.seoTitle, description: p.kuvaus }), url: jakoOsoite(url, sp, ["kohteet", "tulos"]), kuva: `/og/jarjesta/${p.slug}` }),
+    ...jakoMeta({ ...(pelituloksenOg(sp, "oikealla paikalla") ?? { title: p.seoTitle, description: p.kuvaus }), url: jakoOsoite(url, sp, ["kohteet", "tulos"]), kuva: `/og/jarjesta/${p.slug}` }),
   };
 }
 
@@ -75,15 +74,15 @@ async function IkajarjestysSivu({ pakka, aloita, henkilot, rivi }: { pakka: IkaP
   // Henkilösivun nosto ja jaettu kierros: ?henkilot=id,id,… → täsmälleen nämä (design v0.3, 4a); hubin rivi järjestyksineen.
   const initialRound = henkilot ? await getChainRoundByIds(henkilot, rivi) : aloita ? await getChainRound(pakka.kategoria) : null;
 
-  // P3 (Heikki 21.10.2026): aloitukseen kasvoketju — kymmenen kasvoa vanhimmasta nuorimpaan selittää pelin yhdellä
-  // silmäyksellä. Vain omat kuvakopiot (henkiloKuva); kaksi arvontaa, jotta kymmenen kuvallista löytyy.
+  // P3 (Heikki 21.10.2026): aloitukseen kasvoketju — kahdeksan kasvoa vanhimmasta nuorimpaan selittää pelin yhdellä
+  // silmäyksellä. Vain omat kuvakopiot (henkiloKuva); kaksi arvontaa, jotta kahdeksan kuvallista löytyy.
   let kasvot: Array<{ id: string; name: string; kuva: string; birthDate: string }> = [];
   if (!initialRound?.length) {
     const ehdokkaat = [...(await getChainRound(pakka.kategoria)), ...(await getChainRound(pakka.kategoria))];
     const nahty = new Set<string>();
     for (const h of ehdokkaat) {
       const kuva = henkiloKuva(h.image_url);
-      if (!kuva || nahty.has(h.id) || kasvot.length >= 10) continue;
+      if (!kuva || nahty.has(h.id) || kasvot.length >= 8) continue;
       nahty.add(h.id);
       kasvot.push({ id: h.id, name: h.name, kuva, birthDate: h.birthDate });
     }
@@ -92,7 +91,7 @@ async function IkajarjestysSivu({ pakka, aloita, henkilot, rivi }: { pakka: IkaP
 
   return (
     <>
-      <JsonLd data={peliLd({ name: `Ikäjärjestys: ${pakka.nimi}`, url: pakka.href, description: "Aseta kymmenen tunnettua henkilöä syntymävuoden mukaiseen järjestykseen." })} />
+      <JsonLd data={peliLd({ name: `Ikäjärjestys: ${pakka.nimi}`, url: pakka.href, description: "Aseta kahdeksan tunnettua henkilöä syntymävuoden mukaiseen järjestykseen." })} />
       <IkajarjestysClient pakka={pakka} initialRound={initialRound?.length ? initialRound : null} kasvot={kasvot} />
     </>
   );

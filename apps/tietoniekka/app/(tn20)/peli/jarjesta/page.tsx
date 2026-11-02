@@ -1,6 +1,8 @@
 // JÄRJESTÄ-HUB /peli/jarjesta (pelimuotosivujen yhtenäistäminen, osa C; CD "Tietoniekka Jarjesta hub v2" kierros 5a,
 // Heikki 31.10.2026). Hero on päivän pakan rivi väärässä järjestyksessä ("Tämä rivi on väärin"), toisena aina
-// henkilörivi (Tunnetut suomalaiset), lopuksi muut pakat "Lisää rivejä". "Korjaa rivi" pelaa täsmälleen näkyvän rivin.
+// henkilörivi (Tunnetut suomalaiset), lopuksi muut pakat "Lisää järjestettävää". "Korjaa rivi" pelaa täsmälleen näkyvän
+// rivin. CD "Järjestä yhtenäinen UX" (Heikki 2.11.2026): sama rivikortti kuin pelissä, vinossa ja ilman kahvaa; pakat
+// ryhmissä Paikat ja luonto ensin, Politiikka sitten.
 // Rivit ovat samat kaikille koko päivän (lib/jarjesta/siemen.ts). Ei ohjeita eikä aputekstejä (UI-sääntö 9):
 // rivin lause on pelin kysymys (peruste ja suunta).
 
@@ -9,12 +11,12 @@ import Crumbs from "@/components/tn20/Crumbs";
 import PeliKehys from "@/components/tn20/pelikehys/PeliKehys";
 import { JsonLd, peliLd } from "@/lib/jsonLd";
 import { jakoMeta } from "@/lib/jakoMeta";
-import { henkiloKuva } from "@/lib/henkilokuvat";
+import { RankingCard, type RankingCardPerson } from "@/components/tn20/RankingCard";
 import { pakkaHref } from "@/lib/jarjesta/pakat";
 import { haePaivanRivi } from "@/lib/jarjesta/kierros";
 import { getPaivanHenkilot } from "@/lib/ikajarjestys";
 import { paivaAvain } from "@/lib/jarjesta/siemen";
-import { HENKILOPAKKA, HUB_HREF, KIERRON_PAKAT, aloitaHref, hubPakka, paivanPakka } from "@/lib/jarjesta/hub";
+import { HENKILOPAKKA, HUB_HREF, KIERRON_PAKAT, aloitaHref, hubPakka, paivanPakka, type HubPakka } from "@/lib/jarjesta/hub";
 import "./jarjesta.css";
 
 /* Päivän rivi vaihtuu keskiyöllä → sivu uusitaan tunnin välein. Linkki kantaa rivin id:t, joten välimuistin
@@ -29,9 +31,6 @@ export const metadata: Metadata = {
   alternates: { canonical: HUB_HREF },
   ...jakoMeta({ title: "Järjestä", description: KUVAUS, url: HUB_HREF, kuva: "/og/sivu/ikajarjestys" }),
 };
-
-/** CD 5a: palat hieman vinossa (staattinen, ei animaatiota). */
-const KALLISTUS = ["-1.2deg", ".9deg", "-.5deg", "1.3deg", "-.9deg"];
 
 /** CD 5a (31.10.2026): "VÄÄRIN" korallina, kirjaimet sekaisin; sisääntulo kerran (transform, porrastettu). */
 const SEKAISIN: Array<[string, string]> = [
@@ -59,43 +58,43 @@ function Vaarin() {
 /** Hubin rivissä nimi ilman tarkennetta: "Redrama (Lasse Mellberg)" → "Redrama". */
 const lyhytNimi = (nimi: string) => nimi.replace(/\s*\([^)]*\)/g, "").trim();
 
-/** KORTTISÄÄNTÖ: yli 13 merkin sanat tavutettuina (U+00AD), muuten kapea desktop-pala (1024 px) pienentäisi nimen
- *  alle 12 px:n. Sanatasolla: "Urho Kekkosen kansallispuisto" → "…kansallis­puisto". */
-const TAVUT: Record<string, string> = {
-  Kristillisdemokraatit: "Kristillis­demokraatit",
-  Perussuomalaiset: "Perus­suomalaiset",
-  Vasemmistoliitto: "Vasemmisto­liitto",
-  Sosialidemokraatit: "Sosiali­demokraatit",
-  Kristiinankaupunki: "Kristiinan­kaupunki",
-  kansallispuisto: "kansallis­puisto",
-  Kangchendzönga: "Kangchen­dzönga",
-  Aakenustunturi: "Aakenus­tunturi",
-};
-const tavuta = (nimi: string) => nimi.replace(/[^\s\-–]+/g, (w) => TAVUT[w] ?? w);
-
-/** KORTTISÄÄNTÖ: pisin rivitettävä osa (välilyönti, yhdysmerkki tai tavuviiva U+00AD jakaa) → nimen koko CSS:ssä. */
-const pisinTavu = (nimi: string) => Math.max(...nimi.split(/[\s\-–­]+/).map((w) => w.length));
-
-type Pala = { id: string; nimi: string; kuva: string | null };
-
-function Rivi({ palat, kuvat, siirto = 0 }: { palat: Pala[]; kuvat: boolean; siirto?: number }) {
+function Rivi({ palat }: { palat: RankingCardPerson[] }) {
   return (
-    <ol className={`jh-rivi${kuvat ? " jh-rivi--kuvat" : ""}`}>
+    <ol className="jh-rivi">
       {palat.map((p, i) => (
-        <li key={p.id} className="jh-pala">
-          <span className="jh-nro" aria-hidden="true">{i + 1}</span>
-          <span className="jh-laatta" style={{ "--jh-kallistus": KALLISTUS[(i + siirto) % KALLISTUS.length] } as React.CSSProperties}>
-            {kuvat && p.kuva && (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img className="jh-laatta-kuva" src={p.kuva} alt="" width={240} height={320} loading="lazy" decoding="async" />
-            )}
-            <span className="jh-laatta-nimi" style={{ "--jh-lw": pisinTavu(p.nimi) } as React.CSSProperties}>{p.nimi}</span>
-          </span>
+        <li key={p.id}>
+          <RankingCard person={p} position={i + 1} vino readOnly />
         </li>
       ))}
     </ol>
   );
 }
+
+function Ikonit({ pakat }: { pakat: HubPakka[] }) {
+  return (
+    <ul className="jh-ikonit" style={{ "--jh-n": pakat.length } as React.CSSProperties}>
+      {pakat.map((p) => (
+        <li key={p.slug}>
+          <a className="jh-ikoni" href={aloitaHref(p)} data-tn-entry={`jarjesta:${p.slug}`}>
+            <span className="jh-ikoni-kehys" data-tunnus={p.tunnus || undefined}>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={p.kuva} alt="" width={96} height={96} loading="lazy" decoding="async" />
+            </span>
+            <span className="jh-ikoni-nimi">{p.nimi}</span>
+            <span className="jh-ikoni-meta">{p.meta}</span>
+          </a>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+/* Paikat ja luonto ensin (Heikki 2.11.2026); pakat CD:n järjestyksessä, ei päivän kierron. */
+const RYHMAT = [
+  { ryhma: "paikat", nimi: "Paikat ja luonto", pakat: ["tunturit-korkeus", "vuoret-korkeus", "jarvet-pinta-ala", "kansallispuistot-pinta-ala", "kaupungit-asukasluku", "maakunnat-pinta-ala"] },
+  { ryhma: "politiikka", nimi: "Politiikka", pakat: ["presidentit", "paaministerit", "paaministerit-kesto", "puolueet-ika", "eduskuntaryhmat", "vaalipiirit-paikat", "eduskunta-pisimpaan"] },
+] as const;
+const jarjestys = (pakat: readonly string[], slug: string) => (pakat.includes(slug) ? pakat.indexOf(slug) : pakat.length);
 
 export default async function JarjestaHub() {
   const paiva = paivaAvain();
@@ -103,8 +102,6 @@ export default async function JarjestaHub() {
   const rivi = await haePaivanRivi(pakka.slug, paiva);
   const henkilot = await getPaivanHenkilot(paiva, rivi.map((k) => k.name));
 
-  const rivinPalat: Pala[] = rivi.map((k) => ({ id: k.id, nimi: tavuta(k.name), kuva: henkiloKuva(k.image_url) }));
-  const rivinKuvat = rivinPalat.length > 0 && rivinPalat.every((p) => p.kuva);
   const heroHref = rivi.length ? `${pakkaHref(pakka)}?kohteet=${rivi.map((k) => k.id).join(",")}` : aloitaHref(hubPakka(pakka));
   const henkHref = henkilot.length ? `${HENKILOPAKKA.href}?henkilot=${henkilot.map((h) => h.id).join(",")}&rivi=1` : aloitaHref(HENKILOPAKKA);
   const lisaa = KIERRON_PAKAT.filter((p) => p.slug !== pakka.slug).map(hubPakka);
@@ -120,7 +117,7 @@ export default async function JarjestaHub() {
             <h1 id="jh-h1" className="jh-h1">Tämä rivi on <Vaarin /></h1>
           </header>
           <p className="jh-lause">{pakka.paivanLause}</p>
-          {rivinPalat.length > 0 && <Rivi palat={rivinPalat} kuvat={rivinKuvat} />}
+          {rivi.length > 0 && <Rivi palat={rivi} />}
           <a className="tn-cta-lime jh-cta" href={heroHref} data-tn-entry={`jarjesta:paiva:${pakka.slug}`}>
             Korjaa rivi
           </a>
@@ -132,26 +129,23 @@ export default async function JarjestaHub() {
             <h2 id="jh-henkilot-h" className="jh-h2">Tämäkin on väärin</h2>
           </header>
           <p className="jh-lause">{HENKILOPAKKA.paivanLause}</p>
-          {henkilot.length > 0 && <Rivi palat={henkilot.map((h) => ({ id: h.id, nimi: lyhytNimi(h.name), kuva: h.kuva }))} kuvat siirto={2} />}
+          {henkilot.length > 0 && <Rivi palat={henkilot.map((h) => ({ id: h.id, name: lyhytNimi(h.name), role: h.role, image_url: h.kuva }))} />}
           <a className="jh-cta jh-cta--toinen" href={henkHref} data-tn-entry="jarjesta:paiva:henkilot">
             Korjaa rivi
           </a>
         </section>
 
         <section className="jh-lisaa" aria-labelledby="jh-lisaa-h">
-          <h2 id="jh-lisaa-h" className="jh-lisaa-h">Lisää rivejä</h2>
-          <ul className="jh-ikonit">
-            {lisaa.map((p) => (
-              <li key={p.slug}>
-                <a className="jh-ikoni" href={aloitaHref(p)} data-tn-entry={`jarjesta:${p.slug}`}>
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img className="jh-ikoni-kuva" src={p.kuva} alt="" width={96} height={96} loading="lazy" decoding="async" />
-                  <span className="jh-ikoni-nimi">{p.nimi}</span>
-                  <span className="jh-ikoni-meta">{p.meta}</span>
-                </a>
-              </li>
-            ))}
-          </ul>
+          <h2 id="jh-lisaa-h" className="jh-lisaa-h">Lisää järjestettävää</h2>
+          {RYHMAT.map((r) => {
+            const pakat = lisaa.filter((p) => p.ryhma === r.ryhma).sort((x, y) => jarjestys(r.pakat, x.slug) - jarjestys(r.pakat, y.slug));
+            return pakat.length > 0 ? (
+              <div key={r.ryhma} className="jh-ryhma">
+                <h3 className="jh-ryhma-h">{r.nimi}</h3>
+                <Ikonit pakat={pakat} />
+              </div>
+            ) : null;
+          })}
         </section>
       </main>
     </PeliKehys>

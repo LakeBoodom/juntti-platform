@@ -74,7 +74,9 @@ export async function getChainRound(
     }
   }
 
-  const shuffled = shuffleChain(pool);
+  // Rivillä ei ole siluetteja (CD 3e): vain henkilöt, joilla on oma kuvakopio, jos heitä riittää.
+  const kuvalliset = pool.filter((r) => henkiloKuva(r.image_url));
+  const shuffled = shuffleChain(kuvalliset.length >= ROUND_SIZE ? kuvalliset : pool);
   const picked: CelebRow[] = [];
   const seenDates = new Set<string>();
   for (const row of shuffled) {
