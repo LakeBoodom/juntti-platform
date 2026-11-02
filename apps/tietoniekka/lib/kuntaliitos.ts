@@ -9,13 +9,14 @@
 //   - Pari hyväksytään, jos kunnilla on yhteinen raja (myös merialueella) → sana
 //     "Yhteinen raja", ei "Maaraja". Arvonta käyttää vain selviä maarajoja (≥ 2 km).
 //   - Pisteet 10 / oikea yhteys.
-// Säännöt UX-uudistuksesta (Heikki 2.11.2026): 3 yritystä, vinkkinä vain väärien rajojen määrä. Jokainen lisäyritys vähentää
+// Säännöt UX-uudistuksesta (Heikki 2.11.2026): 3 tarkistusta (ensimmäinen + 2 uutta yritystä), vinkkinä vain väärien rajojen määrä. Jokainen lisäyritys vähentää
 // 10 pistettä; paljastus lasketaan kaikkien yritysten käytöksi, joten onnistuminen on aina enemmän kuin epäonnistuminen.
 
 export const KL_SIVU = "/peli/kuntaliitos";
 export const KL_KUNTIA = 8;
 export const KL_YHTEYKSIA = KL_KUNTIA - 1;
 export const KL_PISTEET = 10;
+/** Tarkistuksia yhteensä: ensimmäinen ja kaksi uutta yritystä. */
 export const KL_YRITYKSET = 3;
 /** Pisteet: oikeat rajat miinus lisäyritykset, alaraja 0. */
 export const reittiPisteet = (oikein: number, yrityksia: number) => Math.max(0, (oikein - (yrityksia - 1)) * KL_PISTEET);

@@ -88,7 +88,7 @@ export default function KarttapelitSivu() {
           <ol>
             <li><b>Aloita</b>Saat lähdön, maalin ja kuusi palaa sekaisin.</li>
             <li><b>Järjestä</b>Raahaa palat niin, että jokainen rajautuu seuraavaan.</li>
-            <li><b>Tarkista</b>Sinulla on 3 yritystä. Näet, montako rajaa on väärin, mutta et sitä, mitkä.</li>
+            <li><b>Tarkista</b>Näet, montako rajaa on väärin, mutta et sitä, mitkä. Saat kaksi uutta yritystä.</li>
           </ol>
         </section>
         <footer className="kh-huomautukset">

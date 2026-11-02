@@ -9,7 +9,7 @@ import { JsonLd, peliLd } from "@/lib/jsonLd";
 import { jakoMeta, jakoOsoite, pelituloksenOg } from "@/lib/jakoMeta";
 import type { Metadata } from "next";
 import { helsinginPaiva } from "@/lib/aika";
-import { arvoReitti, reittiAlueista, PELATTAVIA, KL_MAAKUNNAT, maakuntaTunnuksella } from "@/lib/kuntaliitos/reitti";
+import { arvoReitti, reittiAlueista, KL_MAAKUNNAT, maakuntaTunnuksella } from "@/lib/kuntaliitos/reitti";
 import { sivunReitti, viikonAikavali } from "@/lib/reittipeli/viikonReitit";
 import ReittipeliClient from "@/components/tn20/reittipeli/ReittipeliClient";
 import { reittiJakokuva } from "@/lib/reittipeli/kuvat";
@@ -65,7 +65,6 @@ export default async function KuntaliitosSivu({ searchParams }: Props) {
         reittiNimi={maakunta ? `Päivän reitti ${paiva.pv}.${paiva.kk}.` : `Viikon reitti ${viikonAikavali(valinta.kuluva)}`}
         otsikko={valinta.otsikko}
         intro={valinta.intro}
-        luvut={[`${PELATTAVIA} kuntaa`, `${KL_MAAKUNNAT.length} maakuntaa`]}
         viikko={valinta.kuluva}
       />
     </>

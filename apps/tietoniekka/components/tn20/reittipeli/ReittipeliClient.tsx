@@ -5,7 +5,9 @@
 //
 // UX-uudistus (CD "Rajanaapurit mobiili ja desktop UX", Heikin päätökset 2.11.2026):
 //   - Kartta ja lista näkyvät yhtä aikaa: mobiilissa kartta kiinni ylhäällä, desktopilla kaksi palstaa.
-//   - 3 yritystä, vinkkinä vain väärien rajojen määrä. Palat pysyvät siirrettävinä, samaa järjestystä ei voi tarkistaa kahdesti.
+//   - Ensimmäinen tarkistus ja kaksi uutta yritystä, vinkkinä vain väärien rajojen määrä (Korjattavaa). Palat pysyvät siirrettävinä;
+//     Yritä uudelleen tarkistaa uuden järjestyksen, eikä samaa järjestystä voi tarkistaa kahdesti. Laskuri näkyy vasta ensimmäisen
+//     virheen jälkeen napin vieressä (Heikki testasi 2.11.2026: palkissa sitä ei huomannut, ja "3 yritystä" alussa näytti neljältä).
 //   - Kartta piirtää reitin vasta lopussa (onnistui, yritykset loppuivat tai paljastus).
 //   - Tulos ilman tasonimeä: mallin näkymä ylimpänä, sen alla sama jakoalue kuin muissa peleissä ja Pelaa seuraavaksi.
 //   - Oikea reitti on aina yksikäsitteinen (arvonta takaa tasan yhden ratkaisun).
@@ -365,7 +367,6 @@ export default function ReittipeliClient({
   reittiNimi,
   otsikko,
   intro,
-  luvut,
   maakunnat,
   maakuntaTunnus,
   viikko,
@@ -382,8 +383,6 @@ export default function ReittipeliClient({
   otsikko: string | null;
   /** Näytetäänkö hero ennen peliä (viikon reitti ilman parametreja). */
   intro: boolean;
-  /** Heron luvut: ["152 maata", "4 maanosaa"]. */
-  luvut: string[];
   /** Kuluvan viikon maanantai (YYYY-MM-DD): Seuraava peli -korttien viikon reitit. */
   viikko: string;
 }) {
@@ -416,6 +415,8 @@ export default function ReittipeliClient({
 
   const oikeita = jarjestys.slice(1).filter((k, i) => rajat.has(pariAvain(jarjestys[i], k))).length;
   const samaJarjestys = tarkistettu?.jarjestys.join() === jarjestys.join();
+  /** Yritä uudelleen samalla järjestyksellä: yritys ei kulu, Korjattavaa pyytää siirtämään paloja. */
+  const [siirraEnsin, setSiirraEnsin] = useState(false);
 
   useEffect(() => () => { if (ajastin.current) clearInterval(ajastin.current); }, []);
   const pelattuAvain = `tn_${peliNimi}_viikko`;
@@ -578,7 +579,8 @@ export default function ReittipeliClient({
     piirra();
   };
   const tarkista = () => {
-    if (samaJarjestys) return;
+    if (samaJarjestys) { setSiirraEnsin(true); setIlmoitus("Siirrä ensin paloja."); return; }
+    setSiirraEnsin(false);
     const kerta = yritys + 1;
     setYritys(kerta);
     setTarkistettu({ jarjestys, oikein: oikeita });
@@ -598,25 +600,23 @@ export default function ReittipeliClient({
   // Arvotaan vasta painettaessa: renderissä arvottu siemen erottaisi palvelimen ja selaimen HTML:n.
   const arvoUusi = () => location.assign(osoite(uusiReittiSiemen()));
 
-  /* ── Pelikehys (vaihe 4, 20.10.2026): K1 palkki. Pelin aikana palkissa yritykset; väärien rajojen määrä ei vuoda sinne. ── */
+  /* ── Pelikehys (vaihe 4, 20.10.2026): K1 palkki. ── */
   const pelissa = vaihe === "peli";
   const jaljella = KL_YRITYKSET - yritys;
-  const kehysTila =
-    pelissa || vaihe === "tarkistus" ? (
-      <span className="kl-yritykset">
-        <span className="kl-yritykset-pisteet" aria-hidden="true">
-          {Array.from({ length: KL_YRITYKSET }, (_, i) => <i key={i} data-kaytetty={i < yritys || undefined} />)}
-        </span>
-        <span>{jaljella} {jaljella === 1 ? "yritys" : "yritystä"}<span className="kl-yritykset-loppu"> jäljellä</span></span>
-      </span>
-    ) : undefined;
-  const palkki = <Pelipalkki iho={vaihe === "intro" ? "tumma" : "kerma"} peli={peli.nimi} koti={KOTI} tila={kehysTila} pelissa={!!kehysTila} paluuNuoli />;
+  const palkki = <Pelipalkki iho={vaihe === "intro" ? "tumma" : "kerma"} peli={peli.nimi} koti={KOTI} pelissa={pelissa || vaihe === "tarkistus"} paluuNuoli />;
+  /* CD 2a/3b: Korjattavaa näkyy mobiilissa kartan yläpuolella ja desktopilla pelipalstan ylimpänä. */
+  const korjattava = (paikka: "m" | "d") => pelissa && tarkistettu && (
+    <div className={`kl-korjattava kl-korjattava--${paikka}`} key={yritys}>
+      <b>Korjattavaa</b>
+      <span>{siirraEnsin && samaJarjestys ? "Siirrä ensin paloja" : vaarinTeksti(KL_YHTEYKSIA - tarkistettu.oikein)}</span>
+    </div>
+  );
   const ohjeet = (
     <ol>
       <li><b>Päät ovat kiinni.</b> {peli.info[0]}</li>
       <li><b>{peli.info[1]}</b> {peli.info[2]}</li>
-      <li><b>Tarkista reitti.</b> Sinulla on {KL_YRITYKSET} yritystä. Jos reitti ei ole oikein, näet montako rajaa on väärin, mutta et sitä, mitkä.</li>
-      <li><b>Pisteet.</b> 10 p jokaisesta oikeasta rajasta. Jokainen lisäyritys vähentää 10 p.</li>
+      <li><b>Tarkista reitti.</b> Jos reitti ei ole oikein, näet montako rajaa on väärin, mutta et sitä, mitkä. Saat kaksi uutta yritystä.</li>
+      <li><b>Pisteet.</b> 10 p jokaisesta oikeasta rajasta. Jokainen uusi yritys vähentää 10 p.</li>
       <li><b>Näppäimistö:</b> välilyönti valitsee, nuolinäppäimet siirtävät.</li>
     </ol>
   );
@@ -631,7 +631,7 @@ export default function ReittipeliClient({
       <div className={`kl ${peli.luokka} kl--intro ${runkoCond.variable}`} data-iho="kerma">
         {palkki}
         <main>
-          <Intro peli={peli} reitti={reitti} otsikko={otsikko} luvut={luvut} pelattu={pelattu} aloita={aloita}
+          <Intro peli={peli} reitti={reitti} otsikko={otsikko} pelattu={pelattu} aloita={aloita}
             alueet={maakunnat} osoite={(t) => osoite(undefined, t)} />
         </main>
         <section className="kl-info" aria-labelledby="kl-info-h">
@@ -702,11 +702,13 @@ export default function ReittipeliClient({
 
       <div className="kl-main">
         <h1 className="kl-sr">{peli.nimi}</h1>
-        <div className="kl-karttapala" ref={karttaPala}>
+        <div className="kl-karttapala" ref={karttaPala} data-korjattava={(pelissa && !!tarkistettu) || undefined}>
+          {korjattava("m")}
           <Kartta peli={peli} reitti={reitti} piirretty={vaihe === "tarkistus" ? piirretty : 0} nimet={false} />
         </div>
 
         <div className="kl-peli">
+          {korjattava("d")}
           <div className="kl-lista" role="list" aria-label={peli.ketju}>
             {jarjestys.map((k, i) => {
               const kunta = kunnat.get(k)!;
@@ -762,12 +764,19 @@ export default function ReittipeliClient({
 
           <div className="kl-toiminto" ref={toiminto}>
             {pelissa && tarkistettu && (
-              <div className="kl-palaute" key={yritys}>
-                <b>{vaarinTeksti(KL_YHTEYKSIA - tarkistettu.oikein)}</b>
-                <button type="button" className="kl-linkki" onClick={() => lopeta("paljastus")}>Paljasta oikea reitti</button>
+              <div className="kl-yritykset">
+                <span className="kl-yritykset-pisteet" aria-hidden="true">
+                  {Array.from({ length: jaljella }, (_, i) => <i key={i} />)}
+                </span>
+                {jaljella} {jaljella === 1 ? "yritys" : "yritystä"} jäljellä
               </div>
             )}
-            {pelissa && <button type="button" className="kl-nappi" disabled={samaJarjestys} onClick={tarkista}>Tarkista reitti</button>}
+            {pelissa && (
+              <div className="kl-napit">
+                <button type="button" className="kl-nappi" onClick={tarkista}>{tarkistettu ? "Yritä uudelleen" : "Tarkista reitti"}</button>
+                {tarkistettu && <button type="button" className="kl-nappi kl-nappi--2" onClick={() => lopeta("paljastus")}>Paljasta oikea reitti</button>}
+              </div>
+            )}
             {vaihe === "tarkistus" && <div className="kl-rakentuu">Reittiä rakennetaan · {piirretty}/{KL_YHTEYKSIA}</div>}
           </div>
         </div>
@@ -823,7 +832,7 @@ function Virhe({ peli, uusi }: { peli: Peli; uusi: () => void }) {
 
 // ── Hero (CD "Reittipelit intro v0.2", kierros 3, 1.11.2026) ──────────────
 // Viikon reitti otsikkona ("Portugalista Viroon rajoja pitkin"), lähtö ja maali paloina, välipalat
-// sekaisin (pelin lähtöjärjestys), Aloita, luvut ja aluevalinta. Desktopilla oikealla kartta lähtö- ja
+// sekaisin (pelin lähtöjärjestys), Aloita ja aluevalinta. Desktopilla oikealla kartta lähtö- ja
 // maalimerkein; Aloita piilottaa heron, joten sama kartta ei näy kahteen kertaan. Ei ohjetekstiä (UI-sääntö 9).
 const KALLISTUS = ["-1.4deg", "1.1deg", ".6deg", "-.8deg", "1.3deg", "-1deg"];
 const MOBIILIPALOJA = 4;
@@ -833,8 +842,8 @@ const pisinSana = (t: string) => Math.max(...t.split(/[\s-]+/).map((w) => w.leng
 /** WebKit ei katkaise yhdysmerkistä keep-all-otsikossa (KORTTISÄÄNTÖ 4) → leveyttä vailla oleva katko perään. */
 const katko = (t: string) => t.replace(/-/g, "-\u200B");
 
-function Intro({ peli, reitti, otsikko, luvut, pelattu, aloita, alueet, osoite }: {
-  peli: Peli; reitti: KlReitti; otsikko: string | null; luvut: string[]; pelattu: boolean; aloita: () => void;
+function Intro({ peli, reitti, otsikko, pelattu, aloita, alueet, osoite }: {
+  peli: Peli; reitti: KlReitti; otsikko: string | null; pelattu: boolean; aloita: () => void;
   alueet: Array<{ nimi: string; tunnus: string }>; osoite: (tunnus: string | null) => string;
 }) {
   const r = reitti.ratkaisu;
@@ -869,7 +878,6 @@ function Intro({ peli, reitti, otsikko, luvut, pelattu, aloita, alueet, osoite }
             {paate(loppu)}
           </div>
           <button type="button" className="rh-cta tn-cta-lime" onClick={aloita}>{pelattu ? "Pelaa uudelleen" : "Aloita"}</button>
-          <p className="rh-luvut">{luvut.map((l) => <span key={l}>{l}</span>)}</p>
           {peli.valitsin !== "ei" && <div className="rh-alue">
             {peli.valitsin === "segmentit" ? (
               <nav className="rh-pillerit" aria-label={peli.valitse}>

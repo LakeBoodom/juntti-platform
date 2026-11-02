@@ -9,7 +9,7 @@ import { JsonLd, peliLd } from "@/lib/jsonLd";
 import { jakoMeta, jakoOsoite, pelituloksenOg } from "@/lib/jakoMeta";
 import type { Metadata } from "next";
 import { helsinginPaiva } from "@/lib/aika";
-import { arvoReitti, reittiAlueista, PELATTAVIA, RN_MAANOSAT, maanosaTunnuksella } from "@/lib/rajanaapurit/reitti";
+import { arvoReitti, reittiAlueista, RN_MAANOSAT, maanosaTunnuksella } from "@/lib/rajanaapurit/reitti";
 import { sivunReitti, viikonAikavali } from "@/lib/reittipeli/viikonReitit";
 import ReittipeliClient from "@/components/tn20/reittipeli/ReittipeliClient";
 import { reittiJakokuva } from "@/lib/reittipeli/kuvat";
@@ -64,7 +64,6 @@ export default async function RajanaapuritSivu({ searchParams }: Props) {
         reittiNimi={maanosa ? `Päivän reitti ${paiva.pv}.${paiva.kk}.` : `Viikon reitti ${viikonAikavali(valinta.kuluva)}`}
         otsikko={valinta.otsikko}
         intro={valinta.intro}
-        luvut={[`${PELATTAVIA} maata`, `${RN_MAANOSAT.length} maanosaa`]}
         viikko={valinta.kuluva}
       />
     </>

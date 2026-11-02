@@ -8,7 +8,7 @@ import { JsonLd, peliLd } from "@/lib/jsonLd";
 import { jakoMeta, jakoOsoite, pelituloksenOg } from "@/lib/jakoMeta";
 import type { Metadata } from "next";
 import { helsinginPaiva } from "@/lib/aika";
-import { arvoUsaReitti, usaReittiAlueista, USA_PELATTAVIA } from "@/lib/rajanaapurit/osavaltiot";
+import { arvoUsaReitti, usaReittiAlueista } from "@/lib/rajanaapurit/osavaltiot";
 import { RN_USA_SIVU } from "@/lib/rajanaapurit";
 import { sivunReitti, viikonAikavali } from "@/lib/reittipeli/viikonReitit";
 import ReittipeliClient from "@/components/tn20/reittipeli/ReittipeliClient";
@@ -60,7 +60,6 @@ export default async function OsavaltiotSivu({ searchParams }: Props) {
         reittiNimi={`Viikon reitti ${viikonAikavali(valinta.kuluva)}`}
         otsikko={valinta.otsikko}
         intro={valinta.intro}
-        luvut={[`${USA_PELATTAVIA} osavaltiota`]}
         viikko={valinta.kuluva}
       />
     </>

@@ -162,28 +162,32 @@
 .tn20 .kl-merkki-lappu[data-piilossa] { opacity: 0; }
 .tn20 .kl-merkki-lappu:not(:has(.kl-lippu, .kl-kilpi)) .kl-merkki-nimi { padding: 2px 7px; letter-spacing: .04em; }
 
-/* Toiminto kiinni alareunassa: palaute napin yläpuolella, joten lista ja kartta eivät hyppää. */
+/* Toiminto kiinni alareunassa: yritykset napin vieressä (CD 2a). */
 .tn20 .kl-toiminto {
   position: sticky; bottom: 0; z-index: 3; display: flex; flex-direction: column; gap: 2px; margin: 4px -12px 0; padding: 6px 12px 12px;
   background: var(--kl-bg); border-top: 1px solid var(--kl-viiva);
 }
-.tn20 .kl-palaute { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0 12px; animation: kl-nousu var(--dur-base) var(--ease-emphasized) both; }
-.tn20 .kl-palaute b { font-family: var(--kl-display); font-weight: 900; font-variation-settings: "wdth" 80; font-size: 17px; color: var(--kl-puna-t); }
 .tn20 .kl-nappi { min-height: 52px; padding: 0 24px; border: 0; border-radius: 14px; background: var(--kl-navy); box-shadow: 0 4px 0 var(--kl-navy-v); color: #fff; font-family: var(--kl-display); font-weight: 900; font-variation-settings: "wdth" 82; font-size: 16px; text-transform: uppercase; letter-spacing: .04em; cursor: pointer; }
-.tn20 .kl-toiminto > .kl-nappi { width: 100%; margin-bottom: 4px; }
+.tn20 .kl-napit { display: flex; gap: 8px; margin-bottom: 4px; }
+.tn20 .kl-napit .kl-nappi { flex: 1 1 0; min-width: 0; padding: 0 10px; line-height: 1.1; }
+.tn20 .kl-nappi--2 { border: 1px solid #c7d4dd; background: #fff; box-shadow: 0 4px 0 #e3daca; color: var(--kl-navy); font-size: 14px; }
 .tn20 .kl-nappi:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--kl-navy-v); }
-.tn20 .kl-nappi:disabled { background: #d5cbb4; box-shadow: none; color: #4a4436; cursor: default; transform: none; }
+.tn20 .kl-nappi--2:active { box-shadow: 0 1px 0 #e3daca; }
 .tn20 .kl-nappi:focus-visible, .tn20 .kl-linkki:focus-visible { outline: 3px solid var(--kl-navy); outline-offset: 3px; }
 .tn20 .kl-rakentuu { min-height: 52px; margin-bottom: 4px; display: flex; align-items: center; justify-content: center; border-radius: 14px; border: 1px solid #bfe3e1; background: #e4f4f3; color: var(--kl-teal-t); font-family: var(--kl-display); font-weight: 900; font-variation-settings: "wdth" 82; font-size: 16px; text-transform: uppercase; letter-spacing: .04em; }
 
-/* Yritykset pelipalkissa: käytetty täytetty, jäljellä oleva rengas (ei pelkkä väri). */
-.tn20 .kl .pk-tila { gap: 8px; }
-.tn20 .kl-yritykset { display: inline-flex; align-items: center; gap: 7px; font-size: 13px; }
-.tn20 .kl-yritykset-pisteet { display: inline-flex; gap: 3px; }
-.tn20 .kl-yritykset-pisteet i { width: 9px; height: 9px; border-radius: 50%; border: 1.5px solid var(--kl-navy); }
-.tn20 .kl-yritykset-pisteet i[data-kaytetty] { background: var(--kl-navy); }
-.tn20 .kl-yritykset-loppu { display: none; }
-@container kl (min-width: 720px) { .tn20 .kl-yritykset-loppu { display: inline; } }
+/* Yritykset napin yläpuolella: renkaat = jäljellä olevat yritykset. */
+.tn20 .kl-yritykset { display: flex; align-items: center; justify-content: center; gap: 7px; min-height: 22px; font-size: 13px; font-weight: 700; color: var(--kl-heikko); }
+.tn20 .kl-yritykset-pisteet { display: inline-flex; gap: 4px; }
+.tn20 .kl-yritykset-pisteet i { width: 10px; height: 10px; border-radius: 50%; border: 2px solid var(--kl-navy); }
+
+/* Korjattavaa (CD 2a/3b): mobiilissa kartan yläpuolella, desktopilla pelipalstan ylimpänä. Mobiilissa kartta madaltuu saman
+   verran, joten lista ei hyppää ensimmäisen virheen jälkeen. */
+.tn20 .kl-korjattava { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0 12px; min-height: 38px; margin-bottom: 8px; padding: 4px 12px; border: 1px solid #ebcb86; border-radius: 12px; background: #fbf1da; animation: kl-nousu var(--dur-base) var(--ease-emphasized) both; }
+.tn20 .kl-korjattava b { font-family: var(--kl-display); font-weight: 900; font-variation-settings: "wdth" 80; font-size: 18px; line-height: 1.1; text-transform: uppercase; color: #7a5200; }
+.tn20 .kl-korjattava span { font-size: 14px; font-weight: 700; color: var(--kl-teksti); }
+.tn20 .kl-korjattava--d { display: none; }
+.tn20 .kl-karttapala[data-korjattava] .kl-kartta-alue { height: max(96px, calc(clamp(132px, 28svh, 300px) - 46px)); }
 
 /* ── Tulos: mobiilissa banneri, kartta, ketjut, jako; desktopilla kartta vasemmalla ── */
 .tn20 .kl-lopetus { padding-top: 12px; gap: 12px; }
@@ -219,8 +223,11 @@
   .tn20 .kl-peli { min-height: min(56cqi, max(300px, calc(100svh - 124px))); }
   .tn20 .kl-lista { flex: 1; }
   .tn20 .kl-liitos { height: clamp(4px, calc((100svh - 620px) / 7), 10px); padding-left: 32px; }
-  .tn20 .kl-kortti { --kl-vw: 44px; --kl-nimi-max: 19px; min-height: clamp(44px, calc((100svh - 300px) / 8), 56px); padding-inline: 10px; }
+  .tn20 .kl-kortti { --kl-vw: 44px; --kl-nimi-max: 19px; min-height: clamp(44px, calc((100svh - 380px) / 8), 56px); padding-inline: 10px; }
   .tn20 .kl-toiminto { margin: 8px 0 0; padding: 4px 0 8px; border-top: 0; }
+  .tn20 .kl-korjattava--m { display: none; }
+  .tn20 .kl-korjattava--d { display: flex; }
+  .tn20 .kl-karttapala[data-korjattava] .kl-kartta-alue { height: min(56cqi, max(300px, calc(100svh - 124px))); }
   .tn20 .kl-info ol { grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px 28px; }
   .tn20 .kl-info li:last-child { grid-column: 1 / -1; }
   .tn20 .pk-tulos.kl-lopetus { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(340px, 1fr); column-gap: 24px; row-gap: 12px; align-items: start; padding: 16px clamp(14px, 2.2cqi, 28px) 32px; }
