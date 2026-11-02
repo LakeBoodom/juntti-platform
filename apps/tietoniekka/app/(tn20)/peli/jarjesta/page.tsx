@@ -55,9 +55,6 @@ function Vaarin() {
   );
 }
 
-/** Hubin rivissä nimi ilman tarkennetta: "Redrama (Lasse Mellberg)" → "Redrama". */
-const lyhytNimi = (nimi: string) => nimi.replace(/\s*\([^)]*\)/g, "").trim();
-
 function Rivi({ palat }: { palat: RankingCardPerson[] }) {
   return (
     <ol className="jh-rivi">
@@ -129,7 +126,7 @@ export default async function JarjestaHub() {
             <h2 id="jh-henkilot-h" className="jh-h2">Tämäkin on väärin</h2>
           </header>
           <p className="jh-lause">{HENKILOPAKKA.paivanLause}</p>
-          {henkilot.length > 0 && <Rivi palat={henkilot.map((h) => ({ id: h.id, name: lyhytNimi(h.name), role: h.role, image_url: h.kuva }))} />}
+          {henkilot.length > 0 && <Rivi palat={henkilot.map((h) => ({ id: h.id, name: h.name, role: h.role, image_url: h.kuva }))} />}
           <a className="jh-cta jh-cta--toinen" href={henkHref} data-tn-entry="jarjesta:paiva:henkilot">
             Korjaa rivi
           </a>

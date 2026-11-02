@@ -60,7 +60,8 @@ export const RankingCard = forwardRef<HTMLDivElement, RankingCardProps>(function
 ) {
   const kuva = person.hideThumb ? null : henkiloKuva(person.image_url);
   const muoto = !kuva ? "kuvaton" : person.tunnus ? "tunnus" : "kuva";
-  const nimi = tavuta(person.name);
+  /* Rivillä nimi ilman tarkennetta: "Redrama (Lasse Mellberg)" → "Redrama". */
+  const nimi = tavuta(person.name.replace(/\s*\([^)]*\)/g, "").trim());
 
   return (
     <div
