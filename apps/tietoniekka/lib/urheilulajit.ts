@@ -1,6 +1,6 @@
 // URHEILU — lajivisojen kuvat ja rajaukset (CD "TN Urheilu -teemasivu" 26.8.2026). Sivu on rungolla
 // 19.10.2026 alkaen (lib/kokoelmat/urheilu.ts); osiot tulevat section_tags-tagista (f1, ralli, golf,
-// tennis, urheiluhistoria). UL_LOHKOT säilyy kuvien ja rajausten lähteenä (kokoelmasivu, etusivun
+// tennis, palloilulajit, urheiluhistoria). UL_LOHKOT säilyy kuvien ja rajausten lähteenä (kokoelmasivu, etusivun
 // Päivän visa, pelinäkymä); lohkojen tekstikentät eivät enää näy sivulla.
 
 export const ulImg = (id: string) => `/20/urheilulajit/${id}.webp`;
@@ -98,10 +98,27 @@ export const UL_LOHKOT: UlLohko[] = [
   },
 ];
 
+/** Palloilulajit-osio (2.11.2026): tiedoston nimi on visan slug, krediitit lib/kuvalahteet.ts. Ei UL_LOHKOT-tekstikenttiä. */
+const PALLOILU_VISAT = [
+  "suomi-salibandyn-mm-kisoissa",
+  "salibandyn-tahdet-ja-legendat",
+  "f-liiga-salibandyn-paasarja",
+  "suomen-salibandynaiset",
+  "susijengin-arvokisatarina",
+  "korisliigan-historia-ja-mestarit",
+  "koripallon-suomalaislegendat",
+  "veljekset-lentopallomiehet",
+  "lentopallon-mestaruusliiga",
+  "lentopallon-legendat-suomessa",
+  "aktialiiga-kasipallon-paasarja",
+  "kasipallon-tahdet-ja-legendat",
+];
+
 /** Päivän visa -kortin kuvahaku (etusivu): lajivisan quiz-slug → kuva. */
-const QUIZ_IMG = new Map<string, string>(
-  UL_LOHKOT.flatMap((l) => l.visat.map((v) => [v.quizSlug, v.img] as const)),
-);
+const QUIZ_IMG = new Map<string, string>([
+  ...UL_LOHKOT.flatMap((l) => l.visat.map((v) => [v.quizSlug, v.img] as const)),
+  ...PALLOILU_VISAT.map((s) => [s, ulImg(s)] as const),
+]);
 const QUIZ_POS = new Map<string, string>(
   UL_LOHKOT.flatMap((l) => l.visat.map((v) => [v.quizSlug, v.pos] as const)),
 );

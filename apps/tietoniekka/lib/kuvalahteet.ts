@@ -24,7 +24,7 @@ export type Kuvalahde = {
   /** Visan slug = kuvatiedoston nimi kansiossa public/20/<kokoelma>/ */
   slug: string;
   /** Kokoelma, jonka kansiossa kuva on. */
-  kokoelma: "musiikki" | "kaupungit" | "jaakiekko" | "vaalit" | "historia" | "maantieto" | "luonto" | "ikajarjestys" | "henkilot" | "kulttuuri";
+  kokoelma: "musiikki" | "kaupungit" | "jaakiekko" | "vaalit" | "historia" | "maantieto" | "luonto" | "ikajarjestys" | "henkilot" | "kulttuuri" | "urheilulajit";
   /** Mitä kuvassa on — näytetään lähdesivulla. */
   kuvaus: string;
   /** Tiedoston nimi Wikimedia Commonsissa (ilman File:-etuliitettä). */
@@ -292,6 +292,18 @@ export const KUVALAHTEET: Kuvalahde[] = [
   { slug: "alvar-aalto-tiedatko-mestarin", kokoelma: "kulttuuri", kuvaus: "Alvar Aalto Finlandia-talon edessä 1970-luvulla", tiedosto: "Alvar Aalto utanför Finlandiahuset 1971-1976 SLSA 1150 foto 7972.jpg", tekija: "Göran Schildt / Svenska litteratursällskapet i Finland", lisenssi: "CC BY 4.0", lisenssiUrl: CC("by/4.0"), vuosi: "1971–1976", muokkaus: "koko kuva + sumennettu jatke" },
   { slug: "suomen-museot-tunnetko-kohteet", kokoelma: "kulttuuri", kuvaus: "Nykytaiteen museo Kiasman aula, Helsinki (arkkitehti Steven Holl)", tiedosto: "Kiasma 6.jpg", tekija: "Joel Rosenberg / Kansallisgalleria, Kuvataiteen keskusarkisto", lisenssi: "CC BY-SA 3.0", lisenssiUrl: CC("by-sa/3.0"), vuosi: "2001", muokkaus: "koko kuva + sumennettu jatke" },
   { slug: "loylyn-arvoitus-saunahistoria-visa", kokoelma: "kulttuuri", kuvaus: "Vastomista ja löylyä suomalaisessa saunassa", tiedosto: "Traditional Finnish sauna whisking and löyly.jpg", tekija: "Ville Kurki", lisenssi: "CC BY-SA 4.0", lisenssiUrl: CC("by-sa/4.0"), vuosi: "2023" },
+  { slug: "suomi-salibandyn-mm-kisoissa", kokoelma: "urheilulajit", kuvaus: "Suomen joukkue juhlii salibandyn MM-finaalissa 2018", tiedosto: "WFC2018 Final Finland vs Sweden Finland celebration.jpg", tekija: "Rolandhino1", lisenssi: "CC BY-SA 4.0", lisenssiUrl: CC("by-sa/4.0"), vuosi: "2018" },
+  { slug: "salibandyn-tahdet-ja-legendat", kokoelma: "urheilulajit", kuvaus: "Tatu Väänänen laukoo, salibandyn MM-kisat 2018", tiedosto: "WFC2018 Finland vs Germany Tatu Vaanaen shooting.jpg", tekija: "Rolandhino1", lisenssi: "CC BY-SA 4.0", lisenssiUrl: CC("by-sa/4.0"), vuosi: "2018" },
+  { slug: "f-liiga-salibandyn-paasarja", kokoelma: "urheilulajit", kuvaus: "TPS–Nokian KrP, salibandyn pääsarja 2008", tiedosto: "Tps-nokiankrp-30318.jpg", tekija: "Anssi Koskinen", lisenssi: "CC BY 2.0", lisenssiUrl: CC("by/2.0"), vuosi: "2008" },
+  { slug: "suomen-salibandynaiset", kokoelma: "urheilulajit", kuvaus: "Milja-Maria Saarikoski, Ruotsi–Suomi 2020", tiedosto: "Sweden-Finland Floorball Women 2020-02-01 Milja-Maria Saarikoski 2.jpg", tekija: "Rolandhino1", lisenssi: "CC BY-SA 4.0", lisenssiUrl: CC("by-sa/4.0"), vuosi: "2020" },
+  { slug: "susijengin-arvokisatarina", kokoelma: "urheilulajit", kuvaus: "Suomi–Puola, koripallon EM-kisat 2017 Helsingissä", tiedosto: "EuroBasket 2017 Finland vs Poland 39.jpg", tekija: "Tuomas Vitikainen", lisenssi: "CC BY-SA 4.0", lisenssiUrl: CC("by-sa/4.0"), vuosi: "2017" },
+  { slug: "korisliigan-historia-ja-mestarit", kokoelma: "urheilulajit", kuvaus: "Korihait–Topo, Korisliigan pudotuspelit 2010", tiedosto: "Korihait-Topo.jpg", tekija: "jamppa4720", lisenssi: "CC BY 2.0", lisenssiUrl: CC("by/2.0"), vuosi: "2010" },
+  { slug: "koripallon-suomalaislegendat", kokoelma: "urheilulajit", kuvaus: "Lauri Markkanen ja Petteri Koponen, koripallon EM-kisat 2017", tiedosto: "EuroBasket 2017 Finland vs Poland 68.jpg", tekija: "Tuomas Vitikainen", lisenssi: "CC BY-SA 4.0", lisenssiUrl: CC("by-sa/4.0"), vuosi: "2017" },
+  { slug: "veljekset-lentopallomiehet", kokoelma: "urheilulajit", kuvaus: "Italia–Suomi, lentopallon EM-kisat 2026 Torinossa", tiedosto: "2026 Men's European Volleyball Championship - Italy vs Finland - Torino, Palavela, 23.09.2026 - 113.jpg", tekija: "Dispe", lisenssi: "CC0", lisenssiUrl: "https://creativecommons.org/publicdomain/zero/1.0/", vuosi: "2026" },
+  { slug: "lentopallon-mestaruusliiga", kokoelma: "urheilulajit", kuvaus: "Vaasan Kiisto – Pielaveden Sampo, lentopallo 2025", tiedosto: "Vaasan Kiisto – Pielaveden Sampo (8.11.2025) 01.jpg", tekija: "Ville-Matias Parkkonen", lisenssi: "CC BY 4.0", lisenssiUrl: CC("by/4.0"), vuosi: "2025" },
+  { slug: "lentopallon-legendat-suomessa", kokoelma: "urheilulajit", kuvaus: "Mikko Esko torjumassa, CEV-cupin finaali 2014", tiedosto: "2014 CEV final t215631.jpg", tekija: "Marie-Lan Nguyen", lisenssi: "CC BY 3.0", lisenssiUrl: CC("by/3.0"), vuosi: "2014" },
+  { slug: "aktialiiga-kasipallon-paasarja", kokoelma: "urheilulajit", kuvaus: "Maalivahti Otto Pohjanheimo, Parainen", tiedosto: "Otto Johannes Pohjanheimo.jpg", tekija: "Ottojohannes", lisenssi: "CC BY-SA 4.0", lisenssiUrl: CC("by-sa/4.0"), vuosi: "2023" },
+  { slug: "kasipallon-tahdet-ja-legendat", kokoelma: "urheilulajit", kuvaus: "Bertrand Gille, käsipallon EM-kisat 2010", tiedosto: "CZE vs FRA (01) - 2010 European Men's Handball Championship.jpg", tekija: "Steindy", lisenssi: "CC BY-SA 3.0", lisenssiUrl: CC("by-sa/3.0"), vuosi: "2010" },
 ];
 
 /** Commons-tiedostosivun osoite — lisenssiehtojen vaatima linkki lähteeseen. */

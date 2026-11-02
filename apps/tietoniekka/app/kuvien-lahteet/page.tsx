@@ -25,7 +25,7 @@ export const metadata: Metadata = {
   }),
 };
 
-const PAIVITETTY = "25.10.2026";
+const PAIVITETTY = "2.11.2026";
 
 export default async function KuvienLahteetPage() {
   const [aanet, linnut, elaimet] = await Promise.all([
@@ -41,6 +41,7 @@ export default async function KuvienLahteetPage() {
   const maantieto = KUVALAHTEET.filter((k) => k.kokoelma === "maantieto");
   const luonto = KUVALAHTEET.filter((k) => k.kokoelma === "luonto");
   const kulttuuri = KUVALAHTEET.filter((k) => k.kokoelma === "kulttuuri");
+  const urheilu = KUVALAHTEET.filter((k) => k.kokoelma === "urheilulajit");
   const ikajarjestys = KUVALAHTEET.filter((k) => k.kokoelma === "ikajarjestys");
 
   return (
@@ -123,6 +124,8 @@ export default async function KuvienLahteetPage() {
         <Lista rivit={luonto} />
         <h2 style={{ fontSize: 22, margin: "34px 0 14px" }}>Kulttuuri-kokoelma</h2>
         <Lista rivit={kulttuuri} />
+        <h2 style={{ fontSize: 22, margin: "34px 0 14px" }}>Urheilu-kokoelma</h2>
+        <Lista rivit={urheilu} />
         <h2 style={{ fontSize: 22, margin: "34px 0 14px" }}>Etusivu: Kuka on vanhin?</h2>
         <Lista rivit={ikajarjestys} />
         <h2 style={{ fontSize: 22, margin: "34px 0 14px" }}>Henkilökuvat (henkilösivut, Tunnetut henkilöt, Päivän sankari, Ikäjärjestys)</h2>

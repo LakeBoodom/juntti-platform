@@ -60,8 +60,10 @@ type Rivi = {
     Isot kirjaimet näkyivät ruudunlukijalle, hakukoneelle ja kopioidussa tekstissä ("SUURIRUHTINASKUNNAN vuosisata");
     tavutuskohdat eivät riipu kirjainkoosta. versaali-parametri jää kutsujien yhteensopivuuden vuoksi. */
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
+/*  2.11.2026: sitova v\u00E4li ajatusviivan eteen, jottei viiva j\u00E4\u00E4 rivin alkuun ("Veljekset / \u2013 lentopallomiehet"). */
 export const katko = (t: string, versaali = false) =>
   t
+    .replace(/ ([\u2013\u2014]) /g, "\u00A0$1 ")
     .replace(/(?<=\p{L})-(?=\p{L})/gu, "-\u200B")
     .replace(new RegExp(`\\p{L}{${TAVUTUSRAJA + 1},}`, "gu"), (w) => tavuta(w));
 
