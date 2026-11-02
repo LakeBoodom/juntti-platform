@@ -28,7 +28,7 @@ export const KARTTAPELIT: Karttapeli[] = [
     huomautus: "Saarivaltiot, merentakaiset alueet sekä Vatikaani, San Marino ja Monaco eivät ole mukana." },
   { peli: "kuntaliitos", laji: "Kuntaliitos", nimi: "Suomi", href: KL_SIVU, loppu: "kunta kerrallaan", kuvaus: "Järjestä kunnat reitiksi. Vain rajanaapurit kelpaavat.", param: "maakunta",
     huomautus: "Yhteinen raja voi kulkea myös vesialueella, esimerkiksi Naantalin ja Turun välillä." },
-  { peli: "osavaltiot", laji: "Rajanaapurit", nimi: "Yhdysvallat", href: RN_USA_SIVU, loppu: "osavaltio kerrallaan", kuvaus: "Järjestä osavaltiot reitiksi. Pelkkä nurkka ei riitä.", param: null,
+  { peli: "osavaltiot", laji: "Rajanaapurit", nimi: "Yhdysvallat", href: RN_USA_SIVU, loppu: "osavaltio kerrallaan", kuvaus: "Järjestä osavaltiot reitiksi.", param: null,
     huomautus: "Mukana ovat 48 manner-osavaltiota: Alaska ja Havaiji eivät rajaudu muihin osavaltioihin, eikä Washington D.C. ole osavaltio. Nurkkapiste ei ole raja, joten Arizona ja Colorado eivät ole naapureita." },
 ];
 
