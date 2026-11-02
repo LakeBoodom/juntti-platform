@@ -7,10 +7,9 @@
 
 import { JsonLd, peliLd } from "@/lib/jsonLd";
 import { jakoMeta, jakoOsoite, pelituloksenOg } from "@/lib/jakoMeta";
-import { reittiTaso } from "@/lib/pelitasot";
 import type { Metadata } from "next";
 import { helsinginPaiva } from "@/lib/aika";
-import { arvoReitti, reittiAlueista, PELATTAVIA, KL_LAHDE, KL_MAAKUNNAT, maakuntaTunnuksella } from "@/lib/kuntaliitos/reitti";
+import { arvoReitti, reittiAlueista, KL_MAAKUNNAT, maakuntaTunnuksella } from "@/lib/kuntaliitos/reitti";
 import { sivunReitti, viikonAikavali } from "@/lib/reittipeli/viikonReitit";
 import ReittipeliClient from "@/components/tn20/reittipeli/ReittipeliClient";
 import { reittiJakokuva } from "@/lib/reittipeli/kuvat";
@@ -31,7 +30,7 @@ export async function generateMetadata({ searchParams }: { searchParams: Promise
     // Reittiparametrit (?reitti=) ovat saman sivun muunnelmia
     alternates: { canonical: "/peli/kuntaliitos" },
     ...jakoMeta({
-      ...(pelituloksenOg(sp, "yhteyttä", reittiTaso) ?? {
+      ...(pelituloksenOg(sp, "rajaa") ?? {
         title: "Kuntaliitos – rakenna reitti naapurikuntien kautta",
         description: "Järjestä kahdeksan kuntaa reitiksi niin, että jokaisella vierekkäisellä parilla on yhteinen raja. Uusi viikon reitti joka maanantai.",
       }),
@@ -66,8 +65,6 @@ export default async function KuntaliitosSivu({ searchParams }: Props) {
         reittiNimi={maakunta ? `Päivän reitti ${paiva.pv}.${paiva.kk}.` : `Viikon reitti ${viikonAikavali(valinta.kuluva)}`}
         otsikko={valinta.otsikko}
         intro={valinta.intro}
-        luvut={[`${PELATTAVIA} kuntaa`, `${KL_MAAKUNNAT.length} maakuntaa`]}
-        lahde={KL_LAHDE}
         viikko={valinta.kuluva}
       />
     </>

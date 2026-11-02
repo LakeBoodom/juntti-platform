@@ -40,6 +40,10 @@ export type RpAsetukset = {
 };
 
 
+/** Pelilaudan kartan kuvasuhteet, joille polut riittävät: leveä puhelin ja korkea desktop-palsta. */
+const PELIKARTTA_LEVEIN = 2.4;
+const PELIKARTTA_KORKEIN = 1;
+
 const tunnus = (m: string) => m.toLowerCase().replace(/ä/g, "a").replace(/ö/g, "o").replace(/å/g, "a").replace(/[^a-z]+/g, "-");
 
 function sekoita<T>(a: T[], r: () => number): T[] {
@@ -176,7 +180,18 @@ export function luoReittimoottori(data: RpData, a: RpAsetukset) {
     const vb: Laatikko = [Math.round(cx - w / 2), Math.round(cy - h / 2), Math.round(w), Math.round(h)];
     // Iso alue karkeistetaan näytön tarkkuuteen: ~700 ruutua kartan korkeudella.
     const g = Math.max(a.ruutu, Math.round(vb[3] / (a.solut ?? 700)));
-    const nakyy = (b: Laatikko) => b[2] >= vb[0] && b[0] <= vb[0] + vb[2] && b[3] >= vb[1] && b[1] <= vb[1] + vb[3];
+    /* Pelilaudan rajaus (UX 2.11.2026): kartan kuvasuhde vaihtuu näytön mukaan (puhelimella leveä, desktopilla korkea).
+       tiivis = reitti reunatiloineen ilman kuvasuhdetta, selain sovittaa sen näkyviin ja näyttää ympäriltä lisää karttaa.
+       Polut lähetetään siksi leveimmän ja korkeimman näkymän alueelta. Kuvat (o) käyttävät omaa rajaustaan. */
+    const minD = Math.min(a.minLeveys, a.minKorkeus);
+    const tw = Math.max(x1 - x0, minD), th = Math.max(y1 - y0, minD * 0.55);
+    const tcx = (x0 + x1) / 2, tcy = (y0 + y1) / 2;
+    const tiivis: Laatikko = [Math.round(tcx - tw / 2), Math.round(tcy - th / 2), Math.round(tw), Math.round(th)];
+    const uw = Math.max(tw, th * PELIKARTTA_LEVEIN), uh = Math.max(th, tw / PELIKARTTA_KORKEIN);
+    const ala: Laatikko = o.suhde
+      ? [vb[0], vb[1], vb[0] + vb[2], vb[1] + vb[3]]
+      : [Math.min(vb[0], tcx - uw / 2), Math.min(vb[1], tcy - uh / 2), Math.max(vb[0] + vb[2], tcx + uw / 2), Math.max(vb[1] + vb[3], tcy + uh / 2)];
+    const nakyy = (b: Laatikko) => b[2] >= ala[0] && b[0] <= ala[2] && b[3] >= ala[1] && b[1] <= ala[3];
     const polku = (d: string) => (g > a.ruutu ? karkeista(d, g) : d);
     const alueet: KlReitti["kartta"]["alueet"] = [
       ...TAUSTA.filter((t) => nakyy(t.b)).map((t) => ({ k: t.k, d: polku(t.d), s: t.s, t: true as const, ...(valittu ? { u: true } : {}) })),
@@ -185,10 +200,10 @@ export function luoReittimoottori(data: RpData, a: RpAsetukset) {
     // Pikkualueet (Liechtenstein, Andorra, Gambia) löytyvät kartalta katkoviivarenkaan avulla.
     const px = a.pikkuRengas ? a.pikkuRengas.karttaPx / vb[2] : 0;
     const renkaat = a.pikkuRengas
-      ? ALUEET.filter((k) => k.a != null && k.a < a.pikkuRengas!.maxAla && k.a * px * px < a.pikkuRengas!.rajaPx2 && k.p[0] > vb[0] && k.p[0] < vb[0] + vb[2] && k.p[1] > vb[1] && k.p[1] < vb[1] + vb[3])
+      ? ALUEET.filter((k) => k.a != null && k.a < a.pikkuRengas!.maxAla && k.a * px * px < a.pikkuRengas!.rajaPx2 && k.p[0] > ala[0] && k.p[0] < ala[2] && k.p[1] > ala[1] && k.p[1] < ala[3])
           .map((k) => ({ x: Math.round(((k.p[0] - vb[0]) / vb[2]) * 1000) / 10, y: Math.round(((k.p[1] - vb[1]) / vb[3]) * 1000) / 10, ...(valittu && !kuuluu(k.k, valittu) ? { u: true } : {}) }))
       : [];
-    return { viewBox: vb, alueet, renkaat };
+    return { viewBox: vb, tiivis, alueet, renkaat };
   }
 
   function arvoReitti(siemen: string, valittu: string | null = null): KlReitti | null {
@@ -233,14 +248,14 @@ export function luoReittimoottori(data: RpData, a: RpAsetukset) {
     const rajat: string[] = [];
     for (const x of reitti) for (const y of reitti) if (x < y && rajaa(x, y)) rajat.push(pariAvain(x, y));
 
-    const { viewBox, alueet: karttaAlueet, renkaat } = kartta(alueet, valittu);
+    const { viewBox, tiivis, alueet: karttaAlueet, renkaat } = kartta(alueet, valittu);
     const [vx, vy, vw, vh] = viewBox;
     const ratkaisu: KlKunta[] = alueet.map((k) => ({
       k: k.k, n: k.n, m: k.m, v: k.v,
       x: Math.round(((k.p[0] - vx) / vw) * 1000) / 10,
       y: Math.round(((k.p[1] - vy) / vh) * 1000) / 10,
     }));
-    return { siemen, maakunta: valittu, ratkaisu, alku, rajat, kartta: { viewBox: viewBox.join(" "), alueet: karttaAlueet, ...(renkaat.length ? { renkaat } : {}) } };
+    return { siemen, maakunta: valittu, ratkaisu, alku, rajat, kartta: { viewBox: viewBox.join(" "), tiivis: tiivis.join(" "), alueet: karttaAlueet, ...(renkaat.length ? { renkaat } : {}) } };
   }
 
   /** Reitin kartta kuvaksi (jakokortti 7b, Seuraava peli -kortit 7d): reitin alueet oikeassa järjestyksessä,

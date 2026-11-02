@@ -6,10 +6,9 @@
 
 import { JsonLd, peliLd } from "@/lib/jsonLd";
 import { jakoMeta, jakoOsoite, pelituloksenOg } from "@/lib/jakoMeta";
-import { reittiTaso } from "@/lib/pelitasot";
 import type { Metadata } from "next";
 import { helsinginPaiva } from "@/lib/aika";
-import { arvoUsaReitti, usaReittiAlueista, USA_PELATTAVIA, USA_LAHDE } from "@/lib/rajanaapurit/osavaltiot";
+import { arvoUsaReitti, usaReittiAlueista } from "@/lib/rajanaapurit/osavaltiot";
 import { RN_USA_SIVU } from "@/lib/rajanaapurit";
 import { sivunReitti, viikonAikavali } from "@/lib/reittipeli/viikonReitit";
 import ReittipeliClient from "@/components/tn20/reittipeli/ReittipeliClient";
@@ -31,7 +30,7 @@ export async function generateMetadata({ searchParams }: { searchParams: Promise
     description: KUVAUS,
     alternates: { canonical: RN_USA_SIVU },
     ...jakoMeta({
-      ...(pelituloksenOg(sp, "yhteyttä", reittiTaso) ?? { title: "Rajanaapurit: Yhdysvallat – rakenna reitti osavaltioiden kautta", description: KUVAUS }),
+      ...(pelituloksenOg(sp, "rajaa") ?? { title: "Rajanaapurit: Yhdysvallat – rakenna reitti osavaltioiden kautta", description: KUVAUS }),
       url: jakoOsoite(RN_USA_SIVU, sp, ["reitti", "tulos"]),
       kuva: reittiJakokuva("osavaltiot", sp, `/og/reitti/osavaltiot?reitti=${viikonSiemen(maanantai(helsinginPaiva().iso))}`),
     }),
@@ -61,8 +60,6 @@ export default async function OsavaltiotSivu({ searchParams }: Props) {
         reittiNimi={`Viikon reitti ${viikonAikavali(valinta.kuluva)}`}
         otsikko={valinta.otsikko}
         intro={valinta.intro}
-        luvut={[`${USA_PELATTAVIA} osavaltiota`]}
-        lahde={USA_LAHDE}
         viikko={valinta.kuluva}
       />
     </>
