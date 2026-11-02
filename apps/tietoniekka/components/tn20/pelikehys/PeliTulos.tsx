@@ -17,7 +17,6 @@ export default function PeliTulos({
   tasonimi,
   lause,
   lisa,
-  lisaJaonJalkeen = false,
   jako,
   seuraavat,
   seuraavaOsio,
@@ -33,9 +32,6 @@ export default function PeliTulos({
   lause?: ReactNode;
   /** Pelin oma tulosvisuaali (tikapuut, reitti kartalla, ketju, vastausten läpikäynti). */
   lisa?: ReactNode;
-  /** Visuaali jakoalueen jälkeen (reittipelien iso kartta, Heikki 30.10.2026): mobiilissa WhatsApp-nappi pysyy
-   *  näkyvissä ilman vieritystä. Desktopilla visuaali on silti vasemmassa palstassa tuloksen alla. */
-  lisaJaonJalkeen?: boolean;
   /** Jakoteksti ilman osoitetta + jaettava osoite (null = ei vielä valmis). */
   jako: { teksti: string; url: string | null; onJaettu?: (k: Jakokanava) => void | Promise<unknown>; natiiviOtsikko?: string };
   seuraavat: Pelimuoto[];
@@ -59,7 +55,7 @@ export default function PeliTulos({
           <h1 id="pk-tulos-h" className="pk-tulos-taso">{tasonimi}</h1>
           {lause && <p className="pk-tulos-ala">{lause}</p>}
         </section>
-        {lisa && !lisaJaonJalkeen && <div className="pk-tulos-lisa">{lisa}</div>}
+        {lisa && <div className="pk-tulos-lisa">{lisa}</div>}
         {/* 2 · Metapelilohko: METAPELI_ENABLED-lipun takana (ei vielä toteutettu, ei jätä aukkoa). */}
       </div>
       <Jakoalue
@@ -72,7 +68,6 @@ export default function PeliTulos({
         natiiviOtsikko={jako.natiiviOtsikko}
         onJaettu={jako.onJaettu}
       />
-      {lisa && lisaJaonJalkeen && <div className="pk-tulos-lisa pk-tulos-lisa--alle">{lisa}</div>}
       {seuraavaOsio ?? <SeuraavaPeli seuraavat={seuraavat} />}
       {toiminnot.length > 0 && (
         <nav className="pk-tulos-linkit" aria-label="Muut toiminnot">

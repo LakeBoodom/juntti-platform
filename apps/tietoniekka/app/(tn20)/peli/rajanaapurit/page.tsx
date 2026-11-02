@@ -7,10 +7,9 @@
 
 import { JsonLd, peliLd } from "@/lib/jsonLd";
 import { jakoMeta, jakoOsoite, pelituloksenOg } from "@/lib/jakoMeta";
-import { reittiTaso } from "@/lib/pelitasot";
 import type { Metadata } from "next";
 import { helsinginPaiva } from "@/lib/aika";
-import { arvoReitti, reittiAlueista, PELATTAVIA, RN_LAHDE, RN_MAANOSAT, maanosaTunnuksella } from "@/lib/rajanaapurit/reitti";
+import { arvoReitti, reittiAlueista, PELATTAVIA, RN_MAANOSAT, maanosaTunnuksella } from "@/lib/rajanaapurit/reitti";
 import { sivunReitti, viikonAikavali } from "@/lib/reittipeli/viikonReitit";
 import ReittipeliClient from "@/components/tn20/reittipeli/ReittipeliClient";
 import { reittiJakokuva } from "@/lib/reittipeli/kuvat";
@@ -30,7 +29,7 @@ export async function generateMetadata({ searchParams }: { searchParams: Promise
       "Järjestä kahdeksan valtiota reitiksi niin, että jokaisella vierekkäisellä parilla on yhteinen maaraja. Uusi viikon reitti joka maanantai.",
     alternates: { canonical: "/peli/rajanaapurit" },
     ...jakoMeta({
-      ...(pelituloksenOg(sp, "yhteyttä", reittiTaso) ?? {
+      ...(pelituloksenOg(sp, "rajaa") ?? {
         title: "Rajanaapurit – rakenna reitti naapurivaltioiden kautta",
         description: "Järjestä kahdeksan valtiota reitiksi niin, että jokaisella vierekkäisellä parilla on yhteinen maaraja. Uusi viikon reitti joka maanantai.",
       }),
@@ -66,7 +65,6 @@ export default async function RajanaapuritSivu({ searchParams }: Props) {
         otsikko={valinta.otsikko}
         intro={valinta.intro}
         luvut={[`${PELATTAVIA} maata`, `${RN_MAANOSAT.length} maanosaa`]}
-        lahde={RN_LAHDE}
         viikko={valinta.kuluva}
       />
     </>

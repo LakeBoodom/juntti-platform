@@ -13,8 +13,9 @@ import { helsinginPaiva } from "@/lib/aika";
 import { JsonLd, peliLd } from "@/lib/jsonLd";
 import { jakoMeta } from "@/lib/jakoMeta";
 import { KARTTAPELIT, KARTTAPELIT_SIVU, karttapelinKoukku, karttapelinKuva } from "@/lib/karttapelit";
-import { KL_MAAKUNNAT } from "@/lib/kuntaliitos/reitti";
-import { RN_MAANOSAT } from "@/lib/rajanaapurit/reitti";
+import { KL_LAHDE, KL_MAAKUNNAT } from "@/lib/kuntaliitos/reitti";
+import { RN_LAHDE, RN_MAANOSAT } from "@/lib/rajanaapurit/reitti";
+import { USA_LAHDE } from "@/lib/rajanaapurit/osavaltiot";
 import { maanantai } from "@/lib/reittipeli/viikonReitit";
 import "../kuntaliitos/reittihero.css";
 import "./karttapelit.css";
@@ -30,6 +31,8 @@ export const metadata: Metadata = {
   alternates: { canonical: KARTTAPELIT_SIVU },
   ...jakoMeta({ title: "Karttapelit", description: KUVAUS, url: KARTTAPELIT_SIVU, kuva: "/og/sivu/karttapelit" }),
 };
+
+const LAHTEET = { rajanaapurit: RN_LAHDE, kuntaliitos: KL_LAHDE, osavaltiot: USA_LAHDE };
 
 const pisinSana = (t: string) => Math.max(...t.split(/[\s-]+/).map((w) => w.length));
 
@@ -85,9 +88,15 @@ export default function KarttapelitSivu() {
           <ol>
             <li><b>Aloita</b>Saat lähdön, maalin ja kuusi palaa sekaisin.</li>
             <li><b>Järjestä</b>Raahaa palat niin, että jokainen rajautuu seuraavaan.</li>
-            <li><b>Rakenna</b>Kartta piirtää reitin ja näyttää, mihin se katkeaa. Voit korjata ja yrittää uudelleen.</li>
+            <li><b>Tarkista</b>Sinulla on 3 yritystä. Näet, montako rajaa on väärin, mutta et sitä, mitkä.</li>
           </ol>
         </section>
+        <footer className="kh-huomautukset">
+          <p>Uusi viikon reitti joka maanantai, päivän reitti jokaiselle maanosalle ja maakunnalle.</p>
+          {KARTTAPELIT.map((k) => (
+            <p key={k.peli}><b>{k.nimi}:</b> {k.huomautus} {LAHTEET[k.peli]}</p>
+          ))}
+        </footer>
       </main>
     </PeliKehys>
   );

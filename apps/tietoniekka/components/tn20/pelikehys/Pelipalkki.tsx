@@ -16,6 +16,7 @@ export default function Pelipalkki({
   muunnelma,
   tila,
   pelissa = false,
+  paluuNuoli = false,
 }: {
   peli: string;
   /** Pelin muunnelma: pakka, aihe tai teema ("Presidentit"). Desktopilla "Peli: muunnelma", mobiilissa omalla
@@ -27,10 +28,19 @@ export default function Pelipalkki({
   tila?: ReactNode;
   /** Pelin aikana: mobiilissa paluurivi piiloon, tila näkyviin. */
   pelissa?: boolean;
+  /** Kapealla pelin aikana, kun paluurivi on piilossa: paluu nuolena pelin nimen edessä (reittipelit, UX 2.11.2026). */
+  paluuNuoli?: boolean;
 }) {
   return (
     <header className="pk-palkki" data-iho={iho} data-pelissa={pelissa || undefined}>
       <div className="pk-palkki-rivi">
+        {paluuNuoli && (
+          <a className="pk-nuoli" href={koti.href} aria-label={koti.nimi}>
+            <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+              <path d="M15 6l-6 6 6 6" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </a>
+        )}
         <a className="pk-tunnus" href="/" aria-label="Tietoniekka etusivulle">
           <span>TIETO</span>NIEKKA
         </a>

@@ -21,11 +21,6 @@ export const ikajarjestysTaso = (oikein: number, kaikki: number) => rajattu(IKAJ
 export const jarjestaTaso = (oikein: number, kaikki: number, kokoelma?: string | null) =>
   rajattu(kokoelma === "vaalit" ? JARJESTA_VAALIT_TASOT : JARJESTA_TASOT, oikein, kaikki);
 
-/** Kuntaliitos ja Rajanaapurit (design 2c–2f): Ehjä reitti / Melkein perillä / Reitti katkesi. */
-export function reittiTaso(oikein: number, kaikki: number): string {
-  return oikein >= kaikki ? "Ehjä reitti" : oikein >= kaikki - 2 ? "Melkein perillä" : "Reitti katkesi";
-}
-
 /** Vaalipiiriketju (design 2g): Vaalikonkari / Melkein ehjä ketju / Ketju katkesi. */
 export function vpkTaso(oikein: number, kaikki: number): string {
   return oikein >= kaikki ? "Vaalikonkari" : oikein >= kaikki - 2 ? "Melkein ehjä ketju" : "Ketju katkesi";

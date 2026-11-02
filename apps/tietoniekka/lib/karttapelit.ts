@@ -19,12 +19,17 @@ export type Karttapeli = {
   kuvaus: string;
   /** Aluevalinnan parametri; null = ei aluevalintaa. */
   param: string | null;
+  /** Rajaukset ja lähteet hubin alalaitaan (pelaajalle toissijaista, Heikki 2.11.2026). */
+  huomautus: string;
 };
 
 export const KARTTAPELIT: Karttapeli[] = [
-  { peli: "rajanaapurit", laji: "Rajanaapurit", nimi: "Maailma", href: RN_SIVU, loppu: "maa kerrallaan", kuvaus: "Järjestä maat reitiksi. Vain maarajat kelpaavat.", param: "maanosa" },
-  { peli: "kuntaliitos", laji: "Kuntaliitos", nimi: "Suomi", href: KL_SIVU, loppu: "kunta kerrallaan", kuvaus: "Järjestä kunnat reitiksi. Vain rajanaapurit kelpaavat.", param: "maakunta" },
-  { peli: "osavaltiot", laji: "Rajanaapurit", nimi: "Yhdysvallat", href: RN_USA_SIVU, loppu: "osavaltio kerrallaan", kuvaus: "Järjestä osavaltiot reitiksi. Pelkkä nurkka ei riitä.", param: null },
+  { peli: "rajanaapurit", laji: "Rajanaapurit", nimi: "Maailma", href: RN_SIVU, loppu: "maa kerrallaan", kuvaus: "Järjestä maat reitiksi. Vain maarajat kelpaavat.", param: "maanosa",
+    huomautus: "Saarivaltiot, merentakaiset alueet sekä Vatikaani, San Marino ja Monaco eivät ole mukana." },
+  { peli: "kuntaliitos", laji: "Kuntaliitos", nimi: "Suomi", href: KL_SIVU, loppu: "kunta kerrallaan", kuvaus: "Järjestä kunnat reitiksi. Vain rajanaapurit kelpaavat.", param: "maakunta",
+    huomautus: "Yhteinen raja voi kulkea myös vesialueella, esimerkiksi Naantalin ja Turun välillä." },
+  { peli: "osavaltiot", laji: "Rajanaapurit", nimi: "Yhdysvallat", href: RN_USA_SIVU, loppu: "osavaltio kerrallaan", kuvaus: "Järjestä osavaltiot reitiksi. Pelkkä nurkka ei riitä.", param: null,
+    huomautus: "Mukana ovat 48 manner-osavaltiota: Alaska ja Havaiji eivät rajaudu muihin osavaltioihin, eikä Washington D.C. ole osavaltio. Nurkkapiste ei ole raja, joten Arizona ja Colorado eivät ole naapureita." },
 ];
 
 /** "Kanadasta Panamaan maa kerrallaan"; kun lista on lopussa, pelkkä kartan nimi jää kortille. */
