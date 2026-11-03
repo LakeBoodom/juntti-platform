@@ -1,5 +1,5 @@
--- LUONNOS, EI AJETTU. Vaatii Heikin hyväksynnän. (3.11.2026)
--- Pelikertojen oikeudet, vaihe 2/2. Aja vasta, kun vaihe 1 on ajettu JA markShared-koodimuutos on tuotannossa.
+-- Ajettu tuotantoon 3.11.2026 Heikin luvalla Supabase MCP:llä (quiz_plays_oikeudet_vaihe2).
+-- Pelikertojen oikeudet, vaihe 2/2. Vaihe 1 ajettu ja markShared-koodimuutos tuotannossa (71afd79).
 --
 -- Selaimelle jää vain uuden pelikerran lisäys ja merkitse_jaetuksi-funktio. Id:itä ei voi enää listata eikä
 -- olemassa olevia rivejä päivittää. Vanhassa välilehdessä auki oleva peli kirjaa pelikerran yhä, mutta sen
