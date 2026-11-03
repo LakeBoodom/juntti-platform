@@ -33,7 +33,8 @@ const nextConfig = {
     return [
       /* Rajanaapurit: Yhdysvallat (CD-handoff 1.11.2026): lyhyt osoite variantille. */
       { source: "/peli/osavaltiot", destination: "/peli/rajanaapurit/osavaltiot", permanent: true },
-      /* Järjestä (CD 5a, 31.10.2026): ammattikohtaiset ikäjärjestyspakat → henkilöpakka; kysely (?henkilot=, ?tulos=) säilyy. */
+      /* Järjestä (CD 5a, 31.10.2026; v0.2 3.11.2026): vanhat ikäjärjestyspakat → alan pakka tai henkilöpakka; kysely (?henkilot=, ?tulos=) säilyy. */
+      { source: "/peli/jarjesta/ikajarjestys-:ala(urheilijat|muusikot|nayttelijat|kirjailijat)", destination: "/peli/jarjesta/:ala", permanent: true },
       { source: "/peli/jarjesta/ikajarjestys-:aihe", destination: "/peli/jarjesta/tunnetut-suomalaiset", permanent: true },
       /* Haaran esikatseluosoitteet → juuri */
       { source: "/2-0", destination: "/", permanent: true },

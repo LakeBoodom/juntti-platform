@@ -191,7 +191,7 @@ export async function haeJarjestysKierros(slug: string, excludeIds: string[] = [
 }
 
 /** Päivän rivi (CD kierros 5a, 31.10.2026): RIVIN_PITUUS kohdetta väärässä järjestyksessä, sama kaikille
- *  koko päivän (siemen = päivä + pakka). Hub näyttää rivin ja "Korjaa rivi" pelaa sen ?kohteet=-linkillä. */
+ *  koko päivän (siemen = päivä + pakka). Pelataan hubissa, jaettu tulos avautuu ?kohteet=-linkillä. */
 export async function haePaivanRivi(slug: string, paiva: string): Promise<JarjestysKohde[]> {
   const p = haePakka(slug);
   if (!p) return [];

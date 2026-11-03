@@ -1,8 +1,8 @@
 "use client";
 // TIETOKETJU: IKÄJÄRJESTYS — pelinäkymän tilakone. Osa C (31.10.2026): Järjestä-hubin pakka
-// /peli/jarjesta/ikajarjestys-<aihe>; aihe tulee pakasta (ei aihevalintaa), paluu hubiin.
+// /peli/jarjesta/<pakka>; aihe tulee pakasta (ei aihevalintaa), paluu hubiin.
 // Vaiheet: aloitus (pelikehys K2) → järjestäminen (Korjausrivi) → tulos (RevealSequencer, samalla sivulla) → arvo uudet.
-// CD "Järjestä yhtenäinen UX" (Heikki 2.11.2026): Korjaa rivi → Tarkista rivi → Seuraava rivi.
+// CD "Järjestä yhtenäinen UX" (Heikki 2.11.2026): Korjaa rivi → Lukitse valintasi → Seuraava rivi.
 //
 // "Sama henkilö ei toistu peräkkäisillä kierroksilla" (tehtävänanto kohta 5):
 // kevyt client-puolen sessionStorage-tila muistaa edellisen kierroksen
@@ -143,7 +143,7 @@ export default function IkajarjestysClient({
           {/* K2 (pelikehys, 20.10.2026): h1 → lause → kasvoketju → Aloita. Osa C: ei aihevalintaa eikä ohjeita. */}
           <PeliAloitus
             otsikko={PELI}
-            lause="Aseta kahdeksan tunnettua henkilöä syntymävuoden mukaan vanhimmasta nuorimpaan."
+            lause={pakka.kuvaus}
             valinta={
               kasvot.length >= 5 ? (
                 <figure className="ika-kasvot">

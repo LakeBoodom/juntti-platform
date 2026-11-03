@@ -1,9 +1,9 @@
 // JÄRJESTÄ — pakan sivu /peli/jarjesta/<pakka> (brief §2 3.10.2026, vaalit-brief §2 5.10.2026, osa C 31.10.2026).
-// Kaksi pakkatyyppiä: Laita järjestykseen -pakat (pakat.ts, vain julkaistut) ja henkilöpakka Tunnetut suomalaiset
-// (Ikäjärjestys, lib/jarjesta/hub.ts). Muut osoitteet 404 (vanhat ikajarjestys-<aihe> ohjataan next.config.mjs:ssä).
+// Kaksi pakkatyyppiä: Laita järjestykseen -pakat (pakat.ts, vain julkaistut) ja henkilöpakat (Ikäjärjestys,
+// lib/jarjesta/hub.ts). Muut osoitteet 404 (vanhat ikajarjestys-<aihe> ohjataan next.config.mjs:ssä).
 // Ilman parametreja sivu on pelin aloitus. Hubin kortista (?aloita=1) ensimmäinen kierros arvotaan jo palvelimella,
-// jolloin pelaaja on heti pelilaudalla. Täsmälleen annettu kierros: ?kohteet=id,… (pakat: hubin päivän rivi ja jaettu
-// kierros) ja ?henkilot=id,… (henkilöpakka: jaettu tai henkilösivun kierros; &rivi=1 = hubin rivi järjestyksineen).
+// jolloin pelaaja on heti pelilaudalla. Täsmälleen annettu kierros: ?kohteet=id,… (pakat: jaettu kierros ja hubin
+// rivin jaettu tulos) ja ?henkilot=id,… (henkilöpakat: jaettu tai henkilösivun kierros; &rivi=1 = järjestys säilyy).
 
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
@@ -32,7 +32,7 @@ export async function generateMetadata({ params, searchParams }: { params: Promi
   const ika = haeIkaPakka(slug);
   if (ika) {
     const nimi = `Ikäjärjestys: ${ika.nimi}`;
-    const kuvaus = "Aseta kahdeksan tunnettua henkilöä syntymävuoden mukaiseen järjestykseen vanhimmasta nuorimpaan.";
+    const kuvaus = ika.kuvaus;
     return {
       title: `${nimi} – järjestä syntymävuoden mukaan | Tietoniekka`,
       description: kuvaus,
@@ -91,7 +91,7 @@ async function IkajarjestysSivu({ pakka, aloita, henkilot, rivi }: { pakka: IkaP
 
   return (
     <>
-      <JsonLd data={peliLd({ name: `Ikäjärjestys: ${pakka.nimi}`, url: pakka.href, description: "Aseta kahdeksan tunnettua henkilöä syntymävuoden mukaiseen järjestykseen." })} />
+      <JsonLd data={peliLd({ name: `Ikäjärjestys: ${pakka.nimi}`, url: pakka.href, description: pakka.kuvaus })} />
       <IkajarjestysClient pakka={pakka} initialRound={initialRound?.length ? initialRound : null} kasvot={kasvot} />
     </>
   );

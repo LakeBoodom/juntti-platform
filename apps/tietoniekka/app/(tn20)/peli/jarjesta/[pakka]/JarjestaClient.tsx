@@ -3,7 +3,7 @@
 // mutta kohteet ja suunta tulevat pakasta. Vaiheet: aloitus → järjestäminen → paljastus.
 // Toistonesto kuten Ikäjärjestyksessä: edellisen kierroksen id:t sessionStorageen.
 // Osa C (31.10.2026): Järjestä-hubin pakka; hubista tultaessa (?aloita=1) ensimmäinen kierros tulee valmiina palvelimelta.
-// CD "Järjestä yhtenäinen UX" (Heikki 2.11.2026): yksi rivi paluulinkkinä, Korjaa rivi → Tarkista rivi → Seuraava rivi.
+// CD "Järjestä yhtenäinen UX" (Heikki 2.11.2026): yksi rivi paluulinkkinä, Korjaa rivi → Lukitse valintasi → Seuraava rivi.
 
 import { pelijakoteksti } from "@/lib/korttinimi";
 import { useEffect, useMemo, useState } from "react";

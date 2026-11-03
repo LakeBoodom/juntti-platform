@@ -26,6 +26,26 @@ export type RevealItem = {
 const STAGGER_MS = 90;
 const BASE_DELAY_MS = 220;
 
+/** Montako riviä on paljastettu: rivi kerrallaan, kun `kaynnissa` on tosi. Sama sarja pelissä ja hubin rivillä. */
+export function useRiviPaljastus(total: number, kaynnissa: unknown) {
+  const reducedMotion = usePrefersReducedMotion();
+  const [revealedCount, setRevealedCount] = useState(0);
+  useEffect(() => {
+    setRevealedCount(0);
+    if (!kaynnissa) return;
+    const timers: ReturnType<typeof setTimeout>[] = [];
+    if (reducedMotion) {
+      timers.push(setTimeout(() => setRevealedCount(total), 200));
+    } else {
+      for (let i = 0; i < total; i++) {
+        timers.push(setTimeout(() => setRevealedCount((c) => Math.max(c, i + 1)), BASE_DELAY_MS + i * STAGGER_MS));
+      }
+    }
+    return () => timers.forEach(clearTimeout);
+  }, [total, kaynnissa, reducedMotion]);
+  return revealedCount;
+}
+
 export function RevealSequencer({
   items,
   jatko,
@@ -37,27 +57,14 @@ export function RevealSequencer({
   alaviite?: ReactNode;
 }) {
   const ordered = [...items].sort((a, b) => a.placedPosition - b.placedPosition);
-  const reducedMotion = usePrefersReducedMotion();
-  const [revealedCount, setRevealedCount] = useState(0);
-
   const total = ordered.length;
+  const revealedCount = useRiviPaljastus(total, items);
   const allRevealed = total > 0 && revealedCount >= total;
   const oikein = ordered.filter((k) => k.placedPosition === k.correctPosition).length;
 
   useEffect(() => {
     window.scrollTo({ top: 0 });
-    setRevealedCount(0);
-    const timers: ReturnType<typeof setTimeout>[] = [];
-    if (reducedMotion) {
-      timers.push(setTimeout(() => setRevealedCount(total), 200));
-    } else {
-      ordered.forEach((_, i) => {
-        timers.push(setTimeout(() => setRevealedCount((c) => Math.max(c, i + 1)), BASE_DELAY_MS + i * STAGGER_MS));
-      });
-    }
-    return () => timers.forEach(clearTimeout);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [items, reducedMotion]);
+  }, [items]);
 
   return (
     <div className="jr-tulos" style={{ "--tk-n": total } as React.CSSProperties}>

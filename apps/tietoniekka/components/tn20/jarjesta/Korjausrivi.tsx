@@ -1,6 +1,6 @@
 "use client";
 // JÄRJESTÄ — pelilauta (CD "Järjestä yhtenäinen UX" 1a/2b/3d, Heikki 2.11.2026): kaikki järjestyspelit näyttävät samalta.
-// "Korjaa rivi" → lause → ↑ yläpää, rivit, ↓ alapää → Tarkista rivi. Mobiilissa nappi pysyy alareunassa, desktopilla
+// "Korjaa rivi" → lause → ↑ yläpää, rivit, ↓ alapää → Lukitse valintasi. Mobiilissa nappi pysyy alareunassa, desktopilla
 // (≥ 900 px) otsikko ja nappi vasemmalla, rivit oikealla. Nappi himmenee raahauksen ajaksi (CSS: :has(.tk-rcard-ghost)).
 import type { ReactNode } from "react";
 import { ReorderableChainList } from "@/components/tn20/ReorderableChainList";
@@ -37,7 +37,7 @@ export default function Korjausrivi<T extends RankingCardPerson>({
         {alin && <span className="jr-merkki jr-merkki--ala"><span aria-hidden="true">↓ </span>{alin}</span>}
       </div>
       <div className="jr-tarkista">
-        <button type="button" className="jr-nappi" onClick={onTarkista}>Tarkista rivi</button>
+        <button type="button" className="jr-nappi" onClick={onTarkista}>Lukitse valintasi</button>
       </div>
     </main>
   );
