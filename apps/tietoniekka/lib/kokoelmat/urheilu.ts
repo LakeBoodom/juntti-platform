@@ -1,5 +1,5 @@
 // URHEILU rungolla (runko vaihe 3 ryhmä 2, 19.10.2026). Osiot ovat entiset viisi lajilohkoa
-// (CD "TN Urheilu -teemasivu" 26.8.2026) + neljä palloilulajia (3.11.2026); visat osioihin quizzes.section_tags-tagista
+// (CD "TN Urheilu -teemasivu" 26.8.2026) + viisi palloilulajia (3.11.2026); visat osioihin quizzes.section_tags-tagista
 // (migraatiot 20261114_urheilu_tagit, 20261129_palloilu_lajeittain). Jääkiekolla ja jalkapallolla on omat kokoelmansa — entiset porttikortit ovat
 // nyt V7-naapureita. Haku: collection 'urheilu' + tämän kokoelman tagit (sama collection sisältää myös
 // jalkapallo- ja jääkiekkovisat, jotka eivät kuulu tänne).
@@ -24,6 +24,7 @@ export const URHEILU: Kokoelma = {
     { slug: "lentopallo", eyebrow: "Palloilu", title: "Lentopallo" },
     { slug: "salibandy", eyebrow: "Palloilu", title: "Salibandy" },
     { slug: "kasipallo", eyebrow: "Palloilu", title: "Käsipallo" },
+    { slug: "jaapallo", eyebrow: "Palloilu", title: "Jääpallo", featured: "jaapallo-pakkasen-pallopeli" },
     { slug: "f1", eyebrow: "Autourheilu", title: "Formula 1", featured: "formula-1-tiedatko-f1n-perusteet" },
     { slug: "ralli", eyebrow: "Autourheilu", title: "Ralli" },
     { slug: "golf", eyebrow: "Mailapelit", title: "Golf" },
