@@ -1347,7 +1347,7 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
                   ) : (
                     <span className="tng-herocat"><i aria-hidden />{hero.roleLabel ? `${category} · ${hero.roleLabel}` : quiz.genreLabel && quiz.genreLabel.toLowerCase() !== category.toLowerCase() ? `${category} · ${quiz.genreLabel}` : category}</span>
                   )}
-                  <h1 ref={startH1Ref} className="tng-heroh1" data-len={heroLen} data-lwb={heroLw >= 18 ? "xl" : heroLw >= 14 ? "l" : undefined} style={{ ["--tng-lw" as string]: heroLw }}>{quiz.title}</h1>
+                  <h1 ref={startH1Ref} className="tng-heroh1" data-len={heroLen} data-lwb={heroLw >= 18 ? "xl" : heroLw >= 14 ? "l" : undefined} style={{ ["--tng-lw" as string]: heroLw }}>{/* Safari ei katkaise yhdysmerkistä keep-all-otsikossa (Kiekko-Vantaa 320 px, 3.11.2026). */}{quiz.title.replace(/(?<=\p{L})-(?=\p{L})/gu, "-\u200B")}</h1>
                   {/* Vaihe A (21.10.2026): haastebanneri myös herollisessa aloituksessa (/visa/<slug>?tulos=). */}
                   {quiz.haaste ? (
                     <p className="tng-start-chal tng-start-chal--hero">
