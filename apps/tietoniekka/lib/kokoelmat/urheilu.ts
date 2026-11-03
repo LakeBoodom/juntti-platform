@@ -13,7 +13,7 @@ export const URHEILU: Kokoelma = {
   eyebrow: "",
   title: "Kaasua, mailoja ja ",
   highlight: "mitaleita",
-  ingress: "Koripallo, lentopallo, salibandy, käsipallo, Formula 1, ralli, golf, tennis ja suomalaisen urheilun suuret hetket.",
+  ingress: "Koripallo, lentopallo, salibandy, käsipallo, jääpallo, Formula 1, ralli, golf, tennis ja suomalaisen urheilun suuret hetket.",
   accent: kokoelmaKortti("urheilu")!.mastery.color,
   hero: { image: UL_HERO.img, focalX: 0.5, focalY: 0.45, alt: "Ralliauto hyppää Jyväskylän MM-rallissa" },
   cta: "suosituin",

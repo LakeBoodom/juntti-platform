@@ -5,7 +5,7 @@
 // Heikin linjaukset 28.9.2026:
 //  - Nosto näyttää AINA lähimmän juhlan (designin 28 päivän ikkuna ohitetaan).
 //  - Nostoon pääsee vain iso juhla, jolla on vähintään yksi julkaistu visa. Pienet
-//    juhlat (pyhäinpäivä, kiitospäivä, Lucia, Kalevalan päivä) näkyvät vuosikellossa.
+//    juhlat (pyhäinpäivä, kiitospäivä, Lucia, Runebergin päivä, Kalevalan päivä) näkyvät vuosikellossa.
 //  - Visa julkaistaan vasta kun sillä on kuva (kuvat: public/20/juhlat/).
 //
 // Kaikki päivälaskenta tehdään kalenteripäivinä Suomen ajassa (lib/aika.ts). Päivät
@@ -158,6 +158,7 @@ export const JUHLAT: Juhla[] = [
     visat: [
       "adventista-jouluaattoon-visa", "joulun-oudoimmat-tarinat-visa", "joulupukki-visa", "joulupoydan-antimet-visa", "joulu-maailmalla-visa",
       "joulun-historia-ja-perinteet-visa", "suomalaisen-joulun-hiljaiset-tavat", "joulun-kulttuuri-ikonit-visa",
+      "lohjan-joulu-menneen-ajan-joulumarkkinat",
     ],
     faktat: [
       { label: "Rovaniemi", k: "100+ maata", t: "Joulupukin Pääposti saa kirjeitä yli sadasta maasta." },
@@ -194,6 +195,10 @@ export const JUHLAT: Juhla[] = [
       kysymys: "Kuka tuo italialaisille lapsille lahjat loppiaisena?", korostus: "loppiaisena?",
       ala: "Tietäjistä tiernapoikiin ja nuuttipukkeihin.", cta: "Selvitä vastaus",
     },
+  },
+  {
+    slug: "runebergin-paiva", nimi: "Runebergin päivä", iso: false, accent: "#E0A458", kuva: I + "runebergin-paiva.webp",
+    paiva: (y) => pvm(y, 2, 5), ill: "Runebergin päivään", visat: ["runebergin-paiva-ja-porvoo"],
   },
   {
     slug: "laskiainen", tervehdys: "Hyvää laskiaista", nimi: "Laskiainen", iso: true, accent: "#BFE3FF", kuva: I + "laskiainen.webp",

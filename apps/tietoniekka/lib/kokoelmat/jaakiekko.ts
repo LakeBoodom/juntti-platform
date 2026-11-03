@@ -19,6 +19,8 @@ export const JAAKIEKKO: Kokoelma = {
   osiotNimi: "Erät",
   sections: [
     { slug: "liigaseurat", eyebrow: "1. erä", title: "Liigaseurat", featured: "tappara-tampere-kirvesrinnat-tietovisa" },
+    // 3.11.2026 (Heikki): Mestis omana osionaan. Seuran noustessa tai pudotessa tagi vaihdetaan kannassa (mestis ↔ liigaseurat).
+    { slug: "mestis", eyebrow: "Mestis", title: "Mestis-seurat", chip: "Mestis" },
     { slug: "derbyt", eyebrow: "Paikallispelit", title: "Derbyvisat", chip: "Derbyt" },
     { slug: "liigan-kohokohdat", eyebrow: "Jatkoerä", title: "Liigan kohokohdat", chip: "Kohokohdat" },
     { slug: "leijonat", eyebrow: "2. erä", title: "Leijonien kultavisat", chip: "Leijonat" },
