@@ -57,7 +57,7 @@
 .tn20 .rk-h1[data-lyhyt] { --rk-katto: 64px; }
 .tn20 .rk-h1 span { color: var(--rk-acc); }
 .tn20 .rk-ingress { margin: 0; max-width: 46ch; font-size: 16px; line-height: 1.5; color: var(--rk-soft); text-wrap: pretty; }
-/* Heron napin selite (Heikki 19.10.2026): "Suosituin tässä kokoelmassa" / "Seuraavaksi sinulle" / "Arvottu visa".
+/* Heron napin selite (Heikki 19.10.2026): "Seuraavaksi tämä" / "Kokeile tätä" / Juhlien "Lähin juhla: …"; ensikävijällä ei selitettä.
    21.10.2026: selite napin oikealle puolelle pystysuunnassa keskitettynä (ei erillisenä rivinä napin yläpuolella);
    kapeassa näkymässä rivittyy napin alle. */
 .tn20 .rk-cta-ryhma { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; }

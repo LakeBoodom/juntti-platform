@@ -48,7 +48,7 @@ export type Kokoelma = {
   lapset?: boolean;
   /** Visa näytetään vain ensimmäisessä osiossa, johon se kuuluu (Juhlat: lähin juhla). */
   uniikitOsiot?: boolean;
-  /** Heron napin selite ensikävijälle (oletus "Suosituin tässä kokoelmassa"), esim. "Lähin juhla: Halloween 31.10.". */
+  /** Heron napin selite ensikävijälle (oletus ei selitettä), esim. "Lähin juhla: Halloween 31.10.". */
   ctaSelite?: string;
   /** Visojen järjestys osion sisällä: suosio (oletus) tai aika (julkaisujärjestys, Historian aikakaudet). */
   jarjestys?: "suosio" | "aika";
@@ -87,6 +87,7 @@ export type RunkoVisa = {
   meta: string;
   pelattu?: boolean;
   soon?: boolean;
+  /** Eri selaimet 90 päivältä (quiz_cards.suosio_90pv); järjestys käyttää sitä vasta rajan ylittyessä (lib/suosio.ts). */
   playCount: number;
   julkaistu?: string | null;
 };

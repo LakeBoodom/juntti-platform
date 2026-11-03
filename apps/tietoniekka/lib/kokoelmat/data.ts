@@ -7,6 +7,7 @@ import { kokoelmanPelimuodot, type Pelimuoto } from "@/lib/pelimuodot";
 import { naapurit, type KokoelmaKortti } from "./rekisteri";
 import { lapsetNakyvissa } from "@/lib/lapset/data";
 import { kokoelmanPaketti, type PakettiRivi } from "@/lib/visapaketit";
+import { suosio } from "@/lib/suosio";
 import type { Kokoelma, KokoelmaOsio, RunkoVisa } from "./tyypit";
 
 /** S2: ennen "Näytä kaikki" -nappia näkyy osion ensimmäinen kortti + tämä määrä (21.10.2026: kaikki kortit samaa
@@ -45,7 +46,7 @@ export type RunkoData = {
 
 type Rivi = {
   id: string; slug: string | null; custom_slug: string | null; game_mode: string | null; title: string; display_title: string | null;
-  genre: string | null; subcollection: string | null; category: string | null; play_count: number | null;
+  genre: string | null; subcollection: string | null; category: string | null; suosio_90pv: number | null;
   question_count: number | null; section_tags: string[] | null; hero_image: string | null;
   hero_focal_x: number | null; hero_focal_y: number | null; target_age: string | null; published_at: string | null;
 };
@@ -98,7 +99,7 @@ export async function haeRunkoData(k: Kokoelma, ulkoiset?: UlkoinenKohde[]): Pro
   }
   let q = sb
     .from("quiz_cards" as never)
-    .select("id, slug, custom_slug, game_mode, title, display_title, genre, subcollection, category, play_count, question_count, section_tags, hero_image, hero_focal_x, hero_focal_y, target_age, published_at");
+    .select("id, slug, custom_slug, game_mode, title, display_title, genre, subcollection, category, suosio_90pv, question_count, section_tags, hero_image, hero_focal_x, hero_focal_y, target_age, published_at");
   if (k.haku.collection) q = q.eq("collection", k.haku.collection);
   if (k.haku.category) q = q.eq("category", k.haku.category);
   if (k.haku.sectionTags) q = q.overlaps("section_tags", k.sections.map((s) => s.slug));
@@ -125,7 +126,7 @@ export async function haeRunkoData(k: Kokoelma, ulkoiset?: UlkoinenKohde[]): Pro
           ? `${Math.round(Number(r.hero_focal_x) * 100)}% ${Math.round(Number(r.hero_focal_y ?? 0.5) * 100)}%`
           : undefined,
       meta: metaOsat.filter(Boolean).join(" · "),
-      playCount: r.play_count ?? 0,
+      playCount: r.suosio_90pv ?? 0,
       julkaistu: r.published_at,
     };
   };
@@ -146,7 +147,7 @@ function kokoa(k: Kokoelma, kohteet: UlkoinenKohde[], maarat: Record<string, num
         .sort((a, b) =>
           k.jarjestys === "aika"
             ? (a.julkaistu ?? "").localeCompare(b.julkaistu ?? "")
-            : b.playCount - a.playCount || a.nimi.localeCompare(b.nimi, "fi"),
+            : suosio(b.playCount) - suosio(a.playCount) || a.nimi.localeCompare(b.nimi, "fi"),
         );
       const fi = s.featured ? vs.findIndex((v) => v.slug === s.featured) : -1;
       if (fi > 0) vs = [vs[fi], ...vs.slice(0, fi), ...vs.slice(fi + 1)];
@@ -172,7 +173,7 @@ function kokoa(k: Kokoelma, kohteet: UlkoinenKohde[], maarat: Record<string, num
 
   const kaikki = osiot.flatMap((o) => [...(o.b ? [o.b] : []), ...o.kortit]);
   const uniikit = [...new Map(kaikki.map((v) => [v.id, v])).values()];
-  const top = [...uniikit].sort((a, b) => b.playCount - a.playCount)[0] ?? null;
+  const top = [...uniikit].sort((a, b) => suosio(b.playCount) - suosio(a.playCount))[0] ?? null;
 
   return {
     k,

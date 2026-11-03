@@ -8,6 +8,7 @@ import { visaHref } from "@/lib/visaHref";
 import { getPaivanVisaKortti } from "@/lib/paivanVisaKortti";
 import { muotoileSankari, type SankariRivi } from "@/lib/paivanSankari";
 import { getSiteStats } from "@/lib/siteStats";
+import { suosio } from "@/lib/suosio";
 import { KOKOELMA_KORTIT } from "@/lib/kokoelmat/rekisteri";
 import { visanKorttikuva } from "@/lib/kokoelmat/visanKorttikuva";
 import { ETUSIVU_RYHMAT, ETUSIVUN_PELIMUODOT, nakyyEtusivulla, ryhmanNimi } from "@/lib/pelimuodot";
@@ -32,7 +33,7 @@ const AIHE_POS: Record<string, string> = {
 
 type Kortti = {
   id: string; slug: string | null; custom_slug: string | null; title: string; display_title: string | null;
-  collection: string | null; play_count: number | null; published_at: string | null; game_mode?: string | null;
+  collection: string | null; suosio_90pv: number | null; published_at: string | null; game_mode?: string | null;
   teaser?: string | null; description?: string | null; hero_image?: string | null; hero_focal_x?: number | null; hero_focal_y?: number | null;
   category?: string | null; genre?: string | null;
 };
@@ -204,7 +205,7 @@ export async function haeEtusivu(opts: {
   if (!promo1) {
     // Rotaatiopooli: admin-promot (etusivu_promot, paino) + pelatuimmat + uusimmat visat. Henkilö- ja juhlavisat pois.
     const pooli = cards.filter((c) => c.collection && c.collection !== "tunnetut-henkilot" && c.collection !== JUHLAT_KOKOELMA && c.game_mode !== "mega");
-    const pelatuimmat = [...pooli].sort((a, b) => (b.play_count ?? 0) - (a.play_count ?? 0)).slice(0, 5);
+    const pelatuimmat = pooli.filter((c) => suosio(c.suosio_90pv ?? 0) > 0).sort((a, b) => (b.suosio_90pv ?? 0) - (a.suosio_90pv ?? 0)).slice(0, 5);
     const uusimmat = [...pooli].filter((c) => c.published_at).sort((a, b) => (b.published_at! > a.published_at! ? 1 : -1)).slice(0, 5);
     const ehdokkaat: Array<{ kicker: string; otsikko: string; href: string; kuva: string | null; kuvaPos?: string }> = [];
     for (const k of [...pelatuimmat, ...uusimmat]) {

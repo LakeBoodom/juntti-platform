@@ -3,9 +3,9 @@
 // Palvelin renderöi suosituimman (ensikävijä); selain vaihtaa palaavalle pelaajalle seuraavaan
 // pelaamattomaan. Pelaajan tieto tulee anonyymista pelihistoriasta (localStorage tn_played_quizzes,
 // sama kuin pelinäkymä), ei metapelistä — näkyy myös ilman METAPELI_ENABLED-lippua.
-//   ensikävijä          → "Suosituin tässä kokoelmassa" + suosituin visa
-//   palaava (pelannut)  → "Seuraavaksi sinulle" + seuraava pelaamaton (sivun järjestyksessä)
-//   cta: "arvo"         → "Arvottu visa" + satunnainen pelaamaton
+//   ensikävijä          → ei selitettä (3.11.2026: "Moni aloittaa tästä" pois, UI-sääntö 9) + suosituin visa
+//   palaava (pelannut)  → "Seuraavaksi tämä" + seuraava pelaamaton (sivun järjestyksessä)
+//   cta: "arvo"         → "Kokeile tätä" + satunnainen pelaamaton
 //   asetuksen ctaSelite   → ensikävijän selite (Juhlat: "Lähin juhla: …" + lähimmän juhlan visa)
 import { useEffect, useState } from "react";
 
@@ -14,11 +14,11 @@ type Visa = { id: string; nimi: string; href: string };
 /** Napissa visan lyhyt nimi: ajatusviivaa (– tai —) edeltävä osa (Heikki 20.10.2026: "Pelaa: Suomen esihistoria"). */
 const lyhyt = (nimi: string) => nimi.split(/\s[–—]\s/)[0].trim();
 
-const SELITE = { suosituin: "Moni aloittaa tästä", seuraava: "Seuraavaksi tämä", arvo: "Kokeile tätä" } as const;
+const SELITE = { seuraava: "Seuraavaksi tämä", arvo: "Kokeile tätä" } as const;
 
 export default function RunkoHeroCta({ suosituin, jarjestys, tila, selite: oletusSelite }: { suosituin: Visa; jarjestys: Visa[]; tila: "suosituin" | "seuraava" | "arvo"; selite?: string }) {
   const [kohde, setKohde] = useState(suosituin);
-  const [selite, setSelite] = useState<string>(tila === "arvo" ? SELITE.arvo : oletusSelite ?? SELITE.suosituin);
+  const [selite, setSelite] = useState<string | undefined>(tila === "arvo" ? SELITE.arvo : oletusSelite);
   useEffect(() => {
     let pelatut: string[] = [];
     try {
@@ -38,7 +38,7 @@ export default function RunkoHeroCta({ suosituin, jarjestys, tila, selite: oletu
   }, [jarjestys, suosituin, tila]);
   return (
     <div className="rk-cta-ryhma">
-      <span className="rk-cta-selite">{selite}</span>
+      {selite && <span className="rk-cta-selite">{selite}</span>}
       <a className="rk-cta tn-cta-lime" href={kohde.href}>
         Pelaa: {lyhyt(kohde.nimi)}
       </a>

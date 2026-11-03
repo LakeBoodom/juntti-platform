@@ -56,9 +56,9 @@ export async function haeHenkilot(): Promise<{ kohteet: UlkoinenKohde[]; synttar
   const idt = [...new Set(kaikki.map((c) => c.trivia_quiz_id).filter(Boolean))] as string[];
   const erat: string[][] = [];
   for (let i = 0; i < idt.length; i += 100) erat.push(idt.slice(i, i + 100));
-  const tulokset = await Promise.all(erat.map((e) => db.from("quiz_cards").select("id, play_count").in("id", e)));
+  const tulokset = await Promise.all(erat.map((e) => db.from("quiz_cards").select("id, suosio_90pv").in("id", e)));
   const pelattu = new Map<string, number>(
-    tulokset.flatMap((r: any) => ((r.data ?? []) as Array<{ id: string; play_count: number | null }>).map((x) => [x.id, x.play_count ?? 0] as const)),
+    tulokset.flatMap((r: any) => ((r.data ?? []) as Array<{ id: string; suosio_90pv: number | null }>).map((x) => [x.id, x.suosio_90pv ?? 0] as const)),
   );
   const visalliset = kaikki.filter((c) => c.trivia_quiz_id && pelattu.has(c.trivia_quiz_id));
 

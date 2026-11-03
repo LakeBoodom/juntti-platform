@@ -18,13 +18,19 @@ export default async function MegatPage() {
 
   const { data } = await admin
     .from("quizzes")
-    .select("id, title, status, created_at, play_count" as never)
+    .select("id, title, status, created_at" as never)
     .eq("site_id", site.id)
     .eq("game_mode" as never, "mega" as never)
     .order("created_at", { ascending: false });
   const megas = (data ?? []) as unknown as Array<{
-    id: string; title: string; status: string; created_at: string; play_count: number;
+    id: string; title: string; status: string; created_at: string;
   }>;
+
+  // Pelikerrat quiz_plays-taulusta, kuten Visat-listalla (quizzes.play_count ei päivity).
+  const { data: tilastot } = await admin.rpc("admin_visa_tilastot" as never, { p_site: site.id } as never);
+  const pelit = new Map(
+    ((tilastot ?? []) as unknown as Array<{ quiz_id: string; pelit: number }>).map((t) => [t.quiz_id, Number(t.pelit)]),
+  );
 
   // Kysymysmäärät per Mega
   const counts = new Map<string, number>();
@@ -88,7 +94,7 @@ export default async function MegatPage() {
                         {m.status === "published" ? "Julkaistu" : "Draft"}
                       </span>
                     </TableCell>
-                    <TableCell className="text-right">{m.play_count ?? 0}</TableCell>
+                    <TableCell className="text-right">{pelit.get(m.id) ?? 0}</TableCell>
                   </TableRow>
                 ))}
               </TableBody>
