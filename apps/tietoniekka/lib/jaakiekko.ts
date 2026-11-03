@@ -154,6 +154,9 @@ export const JK_NHL: JkCard[] = [
   { quizSlug: "suomalaiset-nhl-kuriositeetit", tag: "Tilastotarinat", title: "Kuriositeetit ja tilastotarinat", desc: "Oudot luvut ja unohdetut suomalaissaavutukset NHL-historiassa.", img: IMG("jk-nhl-kuriositeetit-kuva"), pos: "30% top", accent: "#D5DCE2", bar: true },
 ];
 
+/** Mestis-seurat (3.11.2026): osio tulee section_tags-tagista "mestis". Kuvat ovat tekoälykuvia, tiedoston nimi on visan slug. */
+export const JK_MESTIS = ["imatran-kettera", "kiekko-vantaa", "rovaniemen-kiekko-roki", "turun-tuto-hockey"];
+
 /** Seurat, joilla on oikea valokuva (1.10.2026, Wikimedia Commons, tekijät lib/kuvalahteet.ts).
     Muilla on vielä AI-kuva jk-<id>.webp. Sama kuva on seuran visan pelinäkymän herona. */
 const JK_TEAM_KUVAT = new Set([
@@ -178,6 +181,7 @@ const QUIZ_IMG = new Map<string, string>([
   ...[...JK_DERBIES, ...JK_GENERAL, ...JK_LIONS, ...JK_NHL]
     .filter((c) => c.quizSlug)
     .map((c) => [c.quizSlug!, c.img] as const),
+  ...JK_MESTIS.map((s) => [s, IMG(s)] as const),
 ]);
 
 export function jaakiekkoQuizImg(slug: string | null | undefined): string | null {

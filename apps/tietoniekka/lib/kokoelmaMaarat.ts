@@ -2,7 +2,7 @@
 // (siirretty app/(tn20)/kokoelmat/page.tsx:stä 19.10.2026, runko vaihe 1). Logiikka ennallaan.
 import { getSupabase } from "@/lib/supabase";
 import { JP_CLUBS, JP_EURO, JP_PL_GENERAL, JP_CL, JP_FINNS } from "@/lib/jalkapallo";
-import { JK_TEAMS, JK_DERBIES, JK_GENERAL, JK_LIONS, JK_NHL } from "@/lib/jaakiekko";
+import { JK_TEAMS, JK_DERBIES, JK_GENERAL, JK_LIONS, JK_NHL, JK_MESTIS } from "@/lib/jaakiekko";
 import { KAUPUNGIT } from "@/lib/kaupungit";
 import { RISTIIN } from "@/lib/vaalit/data";
 
@@ -16,6 +16,7 @@ const JK_SLUGS = new Set(
   [
     ...JK_TEAMS.map((t) => t.quizSlug),
     ...[...JK_DERBIES, ...JK_GENERAL, ...JK_LIONS, ...JK_NHL].map((c) => c.quizSlug),
+    ...JK_MESTIS,
   ].filter((s): s is string => Boolean(s)),
 );
 /* Suomen kaupungit (28.8.2026): visat ovat kannassa yleistieto-kokoelmaa,

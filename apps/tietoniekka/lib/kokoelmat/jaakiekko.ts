@@ -31,5 +31,5 @@ export const JAAKIEKKO: Kokoelma = {
   haku: { category: "jaakiekko", sectionTags: true },
   korttikuva: jaakiekkoQuizImgKortti,
   korttikuvaPos: jaakiekkoKorttiPos,
-  kuvakrediitti: "Valokuvat: Wikimedia Commons, CC BY / CC BY-SA / public domain",
+  kuvakrediitti: "Valokuvat: Wikimedia Commons, CC BY / CC BY-SA / public domain. Mestis-seurojen kuvat on tehty tekoälyllä",
 };

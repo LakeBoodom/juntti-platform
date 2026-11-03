@@ -114,6 +114,14 @@ const PALLOILU_VISAT = [
   "kasipallon-tahdet-ja-legendat",
   "jaapallo-pakkasen-pallopeli",
   "porvoon-akilles",
+  "joensuun-kataja",
+  "salon-vilpas",
+  "kotkan-ktp-basket",
+  "kouvolan-kouvot",
+  "tapiolan-honka",
+  "seinajoen-peliveljet-spv",
+  "tampereen-classic",
+  "kokkolan-tiikerit",
 ];
 
 /** Päivän visa -kortin kuvahaku (etusivu): lajivisan quiz-slug → kuva. */
