@@ -44,6 +44,26 @@ export type Kuvalahde = {
 const CC = (t: string) => `https://creativecommons.org/licenses/${t}/`;
 
 export const KUVALAHTEET: Kuvalahde[] = [
+  /* Järjestä: Maakunnat (Heikki 2.11.2026): vaakunoiden omat kopiot public/20/jarjesta/vaakunat/. */
+  { slug: "vaakunat/ahvenanmaa", kokoelma: "ikajarjestys", kuvaus: "Ahvenanmaa, maakunnan vaakuna", tiedosto: "Coat of arms of Åland 3.svg", tekija: "Ålands landskapsregering", lisenssi: "Public domain", lisenssiUrl: "" },
+  { slug: "vaakunat/etela-karjala", kokoelma: "ikajarjestys", kuvaus: "Etelä-Karjala, maakunnan vaakuna", tiedosto: "Etelä-Karjala.vaakuna.svg", tekija: "Etelä-Karjalan liitto", lisenssi: "Public domain", lisenssiUrl: "" },
+  { slug: "vaakunat/etela-pohjanmaa", kokoelma: "ikajarjestys", kuvaus: "Etelä-Pohjanmaa, maakunnan vaakuna", tiedosto: "Etelä-Pohjanmaan maakunnan vaakuna.svg", tekija: "Wikimedia Commons", lisenssi: "Public domain", lisenssiUrl: "" },
+  { slug: "vaakunat/etela-savo", kokoelma: "ikajarjestys", kuvaus: "Etelä-Savo, maakunnan vaakuna", tiedosto: "Etelä-Savo.vaakuna.svg", tekija: "Jarkko Piiroinen", lisenssi: "Public domain", lisenssiUrl: "" },
+  { slug: "vaakunat/kainuu", kokoelma: "ikajarjestys", kuvaus: "Kainuu, maakunnan vaakuna", tiedosto: "Kainuu.vaakuna.svg", tekija: "Wikimedia Commons", lisenssi: "Public domain", lisenssiUrl: "" },
+  { slug: "vaakunat/kanta-hame", kokoelma: "ikajarjestys", kuvaus: "Kanta-Häme, maakunnan vaakuna", tiedosto: "Kanta-Häme.vaakuna.svg", tekija: "Wikimedia Commons", lisenssi: "Public domain", lisenssiUrl: "" },
+  { slug: "vaakunat/keski-pohjanmaa", kokoelma: "ikajarjestys", kuvaus: "Keski-Pohjanmaa, maakunnan vaakuna", tiedosto: "Keski-Pohjanmaa.vaakuna.svg", tekija: "Care", lisenssi: "Public domain", lisenssiUrl: "" },
+  { slug: "vaakunat/keski-suomi", kokoelma: "ikajarjestys", kuvaus: "Keski-Suomi, maakunnan vaakuna", tiedosto: "Keski-Suomi Coat of Arms.svg", tekija: "Lokal_Profil", lisenssi: "Public domain", lisenssiUrl: "" },
+  { slug: "vaakunat/kymenlaakso", kokoelma: "ikajarjestys", kuvaus: "Kymenlaakso, maakunnan vaakuna", tiedosto: "Kymenlaakson maakunnan vaakuna.svg", tekija: "Lokal_Profil, alkuperäinen Gustav von Numers", lisenssi: "Public domain", lisenssiUrl: "" },
+  { slug: "vaakunat/lappi", kokoelma: "ikajarjestys", kuvaus: "Lappi, maakunnan vaakuna", tiedosto: "Lapin maakunnan vaakuna.svg", tekija: "Wikimedia Commons", lisenssi: "Public domain", lisenssiUrl: "" },
+  { slug: "vaakunat/paijat-hame", kokoelma: "ikajarjestys", kuvaus: "Päijät-Häme, maakunnan vaakuna", tiedosto: "Päijät-Häme.vaakuna.svg", tekija: "Wikimedia Commons", lisenssi: "Public domain", lisenssiUrl: "" },
+  { slug: "vaakunat/pirkanmaa", kokoelma: "ikajarjestys", kuvaus: "Pirkanmaa, maakunnan vaakuna", tiedosto: "Pirkanmaa.vaakuna.svg", tekija: "Wikimedia Commons", lisenssi: "Public domain", lisenssiUrl: "" },
+  { slug: "vaakunat/pohjanmaa", kokoelma: "ikajarjestys", kuvaus: "Pohjanmaa, maakunnan vaakuna", tiedosto: "Pohjanmaan maakunnan vaakuna.svg", tekija: "Wikimedia Commons", lisenssi: "Public domain", lisenssiUrl: "" },
+  { slug: "vaakunat/pohjois-karjala", kokoelma: "ikajarjestys", kuvaus: "Pohjois-Karjala, maakunnan vaakuna", tiedosto: "Pohjois-Karjala.vaakuna.svg", tekija: "Pohjois-Karjalan maakuntaliitto", lisenssi: "Public domain", lisenssiUrl: "" },
+  { slug: "vaakunat/pohjois-pohjanmaa", kokoelma: "ikajarjestys", kuvaus: "Pohjois-Pohjanmaa, maakunnan vaakuna", tiedosto: "Pohjois-Pohjanmaan vaakuna.svg", tekija: "Tomia", lisenssi: "Public domain", lisenssiUrl: "" },
+  { slug: "vaakunat/pohjois-savo", kokoelma: "ikajarjestys", kuvaus: "Pohjois-Savo, maakunnan vaakuna", tiedosto: "Pohjois-Savo.vaakuna.svg", tekija: "Jarkko Piiroinen", lisenssi: "Public domain", lisenssiUrl: "" },
+  { slug: "vaakunat/satakunta", kokoelma: "ikajarjestys", kuvaus: "Satakunta, maakunnan vaakuna", tiedosto: "Satakunta.vaakuna.svg", tekija: "Wikimedia Commons", lisenssi: "Public domain", lisenssiUrl: "" },
+  { slug: "vaakunat/uusimaa", kokoelma: "ikajarjestys", kuvaus: "Uusimaa, maakunnan vaakuna", tiedosto: "Uusimaa.vaakuna.svg", tekija: "Wikimedia Commons", lisenssi: "Public domain", lisenssiUrl: "" },
+  { slug: "vaakunat/varsinais-suomi", kokoelma: "ikajarjestys", kuvaus: "Varsinais-Suomi, maakunnan vaakuna", tiedosto: "Varsinais-Suomen.vaakuna.svg", tekija: "Hapo", lisenssi: "Public domain", lisenssiUrl: "" },
   { slug: "antti-tuisku-visa-peto-on-irti", kokoelma: "musiikki", kuvaus: "Antti Tuisku, Ilosaarirock 2016", tiedosto: "Antti Tuisku - Ilosaarirock 2016 - 11.jpg", tekija: "Tuomas Vitikainen", lisenssi: "CC BY-SA 4.0", lisenssiUrl: CC("by-sa/4.0"), vuosi: "2016" },
   { slug: "apulanta-bandi-tietovisa", kokoelma: "musiikki", kuvaus: "Apulanta, Rakuuna Rock 2014", tiedosto: "Apulanta - Rakuuna Rock 2014 4.jpg", tekija: "Tuomas Vitikainen", lisenssi: "CC BY-SA 4.0", lisenssiUrl: CC("by-sa/4.0"), vuosi: "2014" },
   { slug: "ariana-grande-visa-tunnetko-poptahden", kokoelma: "musiikki", kuvaus: "Ariana Grande lavalla 2017", tiedosto: "Ariana Grande (33141791491).jpg", tekija: "Emma", lisenssi: "CC BY-SA 2.0", lisenssiUrl: CC("by-sa/2.0"), vuosi: "2017" },

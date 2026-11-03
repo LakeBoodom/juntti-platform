@@ -19,7 +19,6 @@ export default function PeliTulos({
   lisa,
   jako,
   seuraavat,
-  seuraavaOsio,
   toiminnot,
 }: {
   /** Iso luku: "32", "6/7", "41/50". */
@@ -35,8 +34,6 @@ export default function PeliTulos({
   /** Jakoteksti ilman osoitetta + jaettava osoite (null = ei vielä valmis). */
   jako: { teksti: string; url: string | null; onJaettu?: (k: Jakokanava) => void | Promise<unknown>; natiiviOtsikko?: string };
   seuraavat: Pelimuoto[];
-  /** Pelin oma jatko-osio "Pelaa seuraavaksi" -rivin tilalle (Järjestä: Seuraava pakka). */
-  seuraavaOsio?: ReactNode;
   /** Toissijaiset toiminnot linkkeinä: "Pelaa uusi kierros", "Pelaa sama sarja uudelleen". */
   toiminnot: PeliToiminto[];
 }) {
@@ -68,7 +65,7 @@ export default function PeliTulos({
         natiiviOtsikko={jako.natiiviOtsikko}
         onJaettu={jako.onJaettu}
       />
-      {seuraavaOsio ?? <SeuraavaPeli seuraavat={seuraavat} />}
+      <SeuraavaPeli seuraavat={seuraavat} />
       {toiminnot.length > 0 && (
         <nav className="pk-tulos-linkit" aria-label="Muut toiminnot">
           {toiminnot.map((t) =>

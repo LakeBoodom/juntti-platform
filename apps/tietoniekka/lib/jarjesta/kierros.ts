@@ -8,6 +8,8 @@
 // tahansa järjestyksen (lib/jarjesta/pisteytys.ts).
 
 import { getSupabase } from "../supabase";
+import { henkiloKuva } from "../henkilokuvat";
+import { vaakunaKuva } from "./vaakunat";
 import { puolueNimi } from "../vaalit/puolue";
 import { haePakka, oikeaJarjestys, type JarjestysKohde, type Pakka } from "./pakat";
 import { RIVIN_PITUUS, siemen, vaaraJarjestys } from "./siemen";
@@ -68,13 +70,13 @@ function poimi(p: Pakka, pool: Ehdokas[], vali: Pakka["vali"], rng: () => number
   return paras;
 }
 
-/** "2 858 km²" sellaisenaan; pelkkä luku saa yksikön; seuran nimi suluissa pois (pakka kertoo sen jo). */
+/** "2 858 km²" sellaisenaan; pelkkä luku saa yksikön; tarkenne suluissa pois (pakka kertoo sen jo). */
 function arvoTeksti(p: Pakka, r: Rivi, n: number): string {
   let t = (r.display_value ?? "").trim();
   if (p.scope) t = t.replace(new RegExp(`\\s*\\(${p.scope}\\)\\s*$`), "");
   if (!t) t = n.toLocaleString("fi-FI");
+  t = t.replace(/\s*\([^)]*\)\s*$/, ""); // "13 798 km² (maa-ala)" → pakan lause kertoo perusteen
   if (/^[\d\s .,]+$/.test(t) && p.yksikko) t = `${t} ${p.yksikko}`;
-  if (p.etuliite) t = `${p.etuliite} ${t}`;
   return t;
 }
 
@@ -153,8 +155,10 @@ async function haePool(p: Pakka): Promise<Ehdokas[]> {
         id: e.id,
         name: nimi,
         role: p.rooliAttr ? puolueNimi(roolinArvo) ?? "" : p.naytaRooli ? (e.role_label ?? "").replace(/^[^·]*·\s*/, "") : "",
-        image_url: p.piilotaKuva ? null : e.image_url,
+        /* Tunnus (maakunnat): vaakunan oma kopio nimen mukaan, kannan image_url on täysikokoinen alkuperäinen. */
+        image_url: p.piilotaKuva ? null : p.tunnus ? vaakunaKuva(e.name) : e.image_url,
         hideThumb: p.piilotaKuva || undefined,
+        tunnus: p.tunnus || undefined,
         value,
         valueLabel: arvoTeksti(p, r, value),
         lahde: lahdeDomain(r.source),
@@ -164,9 +168,9 @@ async function haePool(p: Pakka): Promise<Ehdokas[]> {
     .filter((k) => Number.isFinite(k.value));
 }
 
-/** Kuvat kaikille tai ei kenellekään (brief §2): yksikin puuttuva → tekstikortit. */
+/** Kuvat kaikille tai ei kenellekään (brief §2): yksikin puuttuva oma kopio → tekstikortit, ei koskaan siluettia. */
 function kuvatKaikille(valitut: Ehdokas[]): JarjestysKohde[] {
-  const kuvat = valitut.every((k) => k.image_url);
+  const kuvat = valitut.every((k) => henkiloKuva(k.image_url));
   return valitut.map(({ tunnettu: _t, ...k }) => (kuvat ? k : { ...k, image_url: null, hideThumb: true }));
 }
 
@@ -187,11 +191,13 @@ export async function haeJarjestysKierros(slug: string, excludeIds: string[] = [
 }
 
 /** Päivän rivi (CD kierros 5a, 31.10.2026): RIVIN_PITUUS kohdetta väärässä järjestyksessä, sama kaikille
- *  koko päivän (siemen = päivä + pakka). Hub näyttää rivin ja "Korjaa rivi" pelaa sen ?kohteet=-linkillä. */
-export async function haePaivanRivi(slug: string, paiva: string): Promise<JarjestysKohde[]> {
+ *  koko päivän (siemen = päivä + pakka). Pelataan hubissa, jaettu tulos avautuu ?kohteet=-linkillä.
+ *  `vainNimet` rajaa rivin arvonnan näihin kohteisiin (hubin haaste, pakka itse pysyy ennallaan). */
+export async function haePaivanRivi(slug: string, paiva: string, vainNimet?: readonly string[]): Promise<JarjestysKohde[]> {
   const p = haePakka(slug);
   if (!p) return [];
-  const pool = await haePool(p);
+  const kaikki = await haePool(p);
+  const pool = vainNimet ? kaikki.filter((k) => vainNimet.includes(k.name)) : kaikki;
   const rng = siemen(`${paiva}:${slug}`);
   /* Päivän rivissä mieluiten tunnettuja: pakan tunnettuja-ehto (esim. eduskuntavuodet) koskee koko riviä. */
   const tunnetut = p.pool?.tunnettuja ? pool.filter((k) => k.tunnettu) : pool;

@@ -5,12 +5,8 @@
 // tap-to-place, hallittu autoscroll reunoilla, näppäimistötuki (nuolet,
 // Home/End) ja ruudunlukijan live-region-ilmoitukset siirroista.
 //
-// TAP_TO_PLACE_MEKANISMI: valinta + kohdepaikan napautus (slot-highlight) —
-// kokeiluvaihe, voidaan vaihtaa (esim. numerovalintaan tai nuolivalintaan)
-// jos käyttäjätestaus osoittaa sen selkeämmäksi. Napauta korttia (tai sen
-// kahvaa lyhyesti, ilman raahausta) valitaksesi se; kaikki muut kortit
-// korostuvat kohdepaikkoina (slot-highlight); napauta kohdetta siirtääksesi
-// valitun kortin sille paikalle. Napauta valittua uudelleen perataksesi.
+// NAPAUTUS (CD "Järjestä yhtenäinen UX", Heikki 2.11.2026): napauta kahta korttia, niin ne vaihtavat paikkaa.
+// Napauta valittua uudelleen perataksesi. Raahaus siirtää kortin ja muut liukuvat tieltä.
 //
 // TARTUNTA-ALUE — LIVE-QA-LÖYDÖS (kriittinen, 2026-09-16, Heikki): raahaus
 // toimi vain oikean reunan 40×40px kahvasta, eikä kortin muusta osasta saanut
@@ -62,9 +58,12 @@ export interface ReorderableChainListProps<T extends RankingCardPerson> {
   items: T[];
   onReorder: (next: T[]) => void;
   disabled?: boolean;
-  /** Käytetään paljastus-/tulosnäkymässä RankingCardin tilan/päivämäärän välittämiseen id:n mukaan. */
-  cardState?: Map<string, RankingCardState>;
-  revealedDates?: Map<string, string>;
+}
+
+function arraySwap<T>(arr: T[], a: number, b: number): T[] {
+  const next = arr.slice();
+  [next[a], next[b]] = [next[b], next[a]];
+  return next;
 }
 
 function arrayMove<T>(arr: T[], from: number, to: number): T[] {
@@ -78,8 +77,6 @@ export function ReorderableChainList<T extends RankingCardPerson>({
   items,
   onReorder,
   disabled,
-  cardState,
-  revealedDates,
 }: ReorderableChainListProps<T>) {
   const listRef = useRef<HTMLDivElement>(null);
   const rowRefs = useRef<Map<string, HTMLDivElement>>(new Map());
@@ -132,7 +129,7 @@ export function ReorderableChainList<T extends RankingCardPerson>({
     return map;
   }
 
-  // FLIP: kun items-järjestys muuttuu, animoi ei-raahatut rivit uuteen kohtaansa.
+  // FLIP (CD 3b: muut liukuvat ~150 ms): kun items-järjestys muuttuu, animoi ei-raahatut rivit uuteen kohtaansa.
   useEffect(() => {
     const prev = prevRectsRef.current;
     prevRectsRef.current = null;
@@ -149,7 +146,7 @@ export function ReorderableChainList<T extends RankingCardPerson>({
       el.style.transform = `translateY(${delta}px)`;
       // Pakota reflow ennen transitionin asettamista, jotta selain ei yhdistä niitä.
       void el.getBoundingClientRect();
-      el.style.transition = "transform 220ms cubic-bezier(.2,.8,.2,1)";
+      el.style.transition = "transform 150ms cubic-bezier(.2,.8,.2,1)";
       el.style.transform = "";
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -170,7 +167,7 @@ export function ReorderableChainList<T extends RankingCardPerson>({
     if (selectedId === null) {
       setSelectedId(id);
       const person = items.find((p) => p.id === id);
-      if (person) setAnnouncement(`${person.name} valittu. Napauta kohdepaikkaa siirtääksesi, tai napauta uudelleen peruaksesi.`);
+      if (person) setAnnouncement(`${person.name} valittu. Napauta toista korttia vaihtaaksesi, tai napauta uudelleen peruaksesi.`);
       return;
     }
     if (selectedId === id) {
@@ -184,8 +181,7 @@ export function ReorderableChainList<T extends RankingCardPerson>({
       setSelectedId(null);
       return;
     }
-    const next = arrayMove(items, fromIndex, toIndex);
-    commitReorder(next, selectedId, toIndex);
+    commitReorder(arraySwap(items, fromIndex, toIndex), selectedId, toIndex);
     setSelectedId(null);
   }
 
@@ -304,7 +300,8 @@ export function ReorderableChainList<T extends RankingCardPerson>({
     if (dragRef.current) return;
     const row = rowRefs.current.get(id);
     if (!row) return;
-    const rect = row.getBoundingClientRect();
+    // Aave on pelkkä kortti: numero jää riville (CD 3b).
+    const rect = (row.querySelector(".tk-rcard-kortti") ?? row).getBoundingClientRect();
     const captureEl = e.currentTarget as HTMLElement;
     try {
       captureEl.setPointerCapture(e.pointerId);
@@ -383,14 +380,12 @@ export function ReorderableChainList<T extends RankingCardPerson>({
   const draggedIndex = draggedItem ? items.findIndex((p) => p.id === dragId) : -1;
 
   return (
-    <div className={`tk-chainlist${disabled ? " tk-chainlist--disabled" : ""}`} ref={listRef}>
+    <div className={`tk-chainlist${disabled ? " tk-chainlist--disabled" : ""}`} ref={listRef} style={{ "--tk-n": items.length } as React.CSSProperties}>
       <div aria-live="polite" className="tk-sr-only">{announcement}</div>
       {items.map((person, index) => {
         const isDragging = person.id === dragId;
         const isSelected = person.id === selectedId;
-        const isTarget = selectedId !== null && !isSelected;
-        const explicitState = cardState?.get(person.id);
-        const state: RankingCardState = explicitState ?? (isDragging ? "dragging" : isSelected ? "selected" : isTarget ? "target" : "idle");
+        const state: RankingCardState = isDragging ? "dragging" : isSelected ? "selected" : "idle";
         return (
           <RankingCard
             key={person.id}
@@ -398,7 +393,6 @@ export function ReorderableChainList<T extends RankingCardPerson>({
             person={person}
             position={index + 1}
             state={state}
-            revealedDate={revealedDates?.get(person.id) ?? null}
             grabbed={isSelected || isDragging}
             ariaLabel={`${person.name}, paikka ${index + 1} / ${items.length}`}
             onActivate={() => handleCardActivate(person.id)}
@@ -449,7 +443,7 @@ export function ReorderableChainList<T extends RankingCardPerson>({
             pointerEvents: "none",
           }}
         >
-          <RankingCard person={draggedItem} position={draggedIndex + 1} state="dragging" readOnly />
+          <RankingCard person={draggedItem} position={null} state="dragging" readOnly />
         </div>
       )}
     </div>
