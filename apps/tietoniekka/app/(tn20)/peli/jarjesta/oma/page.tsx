@@ -3,7 +3,6 @@
 // henkilösivun kortti näytti. Parametrisivu → ei indeksoida (henkilösivu on indeksoitava sisältö).
 import type { Metadata } from "next";
 import { jakoMeta, jakoOsoite, pelituloksenOg } from "@/lib/jakoMeta";
-import { jarjestaTaso } from "@/lib/pelitasot";
 import { getSupabase } from "@/lib/supabase";
 import { arvoTeksti, haeLaatuArvot, haeLaatuDefit } from "@/lib/laadullinen";
 import { fiPvm, parsePvm } from "@/lib/henkilo";
@@ -20,7 +19,7 @@ export async function generateMetadata({ searchParams }: { searchParams: Sp }): 
   return {
     title: "Laita järjestykseen | Tietoniekka",
     robots: { index: false, follow: true },
-    ...jakoMeta({ ...(pelituloksenOg(sp, "oikein", (o, k) => jarjestaTaso(o, k)) ?? { title: "Laita järjestykseen", description: "Järjestä kortit oikeaan järjestykseen – pystytkö parempaan?" }), url: jakoOsoite("/peli/jarjesta/oma", sp, ["a", "h", "p", "tulos"]), kuva: "/og/sivu/ikajarjestys" }),
+    ...jakoMeta({ ...(pelituloksenOg(sp, "oikealla paikalla") ?? { title: "Laita järjestykseen", description: "Järjestä kortit oikeaan järjestykseen – pystytkö parempaan?" }), url: jakoOsoite("/peli/jarjesta/oma", sp, ["a", "h", "p", "tulos"]), kuva: "/og/sivu/ikajarjestys" }),
   };
 }
 
@@ -68,7 +67,8 @@ export default async function OmaJarjestysPage({ searchParams }: { searchParams:
     <OmaJarjestysClient
       attr={a}
       otsikko={def.otsikko.charAt(0).toUpperCase() + def.otsikko.slice(1)}
-      suunta={`${def.akseli[0]} ylimmäksi`}
+      ylin={def.akseli[0]}
+      alin={def.akseli[1]}
       direction={def.winner === "high" ? "desc" : "asc"}
       kohteet={kohteet}
       tilastot={asOf ? `Tilastot: ${fiPvm(asOf)}` : null}

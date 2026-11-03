@@ -1,10 +1,8 @@
 "use client";
 // TIETOKETJU: IKÄJÄRJESTYS — pelinäkymän tilakone. Osa C (31.10.2026): Järjestä-hubin pakka
-// /peli/jarjesta/ikajarjestys-<aihe>; aihe tulee pakasta (ei aihevalintaa), paluu hubiin, tuloksessa Seuraava pakka.
-// Vaiheet: aloitus (pelikehys K2) → järjestäminen (ReorderableChainList)
-// → paljastus (RevealSequencer, sisältää nyt myös pisteet+jatkonapit samalla
-// sivulla, ks. RevealSequencer-kommentti "LIVE-QA-LÖYDÖS 2") → arvo uudet.
-// Erillinen kolmas "tulos"-vaihe on poistettu 2026-09-16 Heikin pyynnöstä.
+// /peli/jarjesta/<pakka>; aihe tulee pakasta (ei aihevalintaa), paluu hubiin.
+// Vaiheet: aloitus (pelikehys K2) → järjestäminen (Korjausrivi) → tulos (RevealSequencer, samalla sivulla) → arvo uudet.
+// CD "Järjestä yhtenäinen UX" (Heikki 2.11.2026): Korjaa rivi → Lukitse valintasi → Seuraava rivi.
 //
 // "Sama henkilö ei toistu peräkkäisillä kierroksilla" (tehtävänanto kohta 5):
 // kevyt client-puolen sessionStorage-tila muistaa edellisen kierroksen
@@ -13,7 +11,6 @@
 // sulkeutuessa eikä mitään kirjoiteta kantaan pelin aikana.
 
 import { pelijakoteksti } from "@/lib/korttinimi";
-import { ikajarjestysTaso } from "@/lib/pelitasot";
 import { useMemo, useState } from "react";
 import { getChainRound } from "@/lib/ikajarjestys";
 import {
@@ -23,17 +20,16 @@ import {
   sortForDirection,
   type ChainPerson,
 } from "@/lib/ikajarjestysConstants";
-import { ReorderableChainList } from "@/components/tn20/ReorderableChainList";
-import { SuuntaindikaattoriBadge } from "@/components/tn20/SuuntaindikaattoriBadge";
+import { vuosiTaiPaiva } from "@/lib/jarjesta/rivi";
 import { RevealSequencer, type RevealItem } from "@/components/tn20/RevealSequencer";
 import { calculateChainScore } from "@/components/tn20/ChainResultSummary";
 import Pelipalkki from "@/components/tn20/pelikehys/Pelipalkki";
 import PeliKehys from "@/components/tn20/pelikehys/PeliKehys";
 import PeliAloitus from "@/components/tn20/pelikehys/PeliAloitus";
-import PeliTulos from "@/components/tn20/pelikehys/PeliTulos";
+import Korjausrivi from "@/components/tn20/jarjesta/Korjausrivi";
+import RiviJatko from "@/components/tn20/jarjesta/RiviJatko";
 import { kirjaaPelimuotoPeli } from "@/lib/pelimuotoPelit";
-import { HUB, HUB_HREF, type IkaPakka } from "@/lib/jarjesta/hub";
-import SeuraavaPakka from "@/components/tn20/jarjesta/SeuraavaPakka";
+import { HUB, aloitaHref, seuraavaPakka, type IkaPakka } from "@/lib/jarjesta/hub";
 
 const PELI = "Ikäjärjestys";
 
@@ -66,7 +62,7 @@ export default function IkajarjestysClient({
 }: {
   pakka: IkaPakka;
   initialRound: ChainPerson[] | null;
-  /** Aloituksen kasvoketju (P3, 21.10.2026): enintään 10 kuvallista henkilöä syntymäjärjestyksessä. */
+  /** Aloituksen kasvoketju (P3, 21.10.2026): enintään 8 kuvallista henkilöä syntymäjärjestyksessä. */
   kasvot?: Array<{ id: string; name: string; kuva: string }>;
 }) {
   const category = pakka.kategoria;
@@ -82,34 +78,36 @@ export default function IkajarjestysClient({
   const [phase, setPhase] = useState<Phase>(initialRound && initialRound.length > 0 ? "ordering" : "start");
   const [emptyNotice, setEmptyNotice] = useState<string | null>(null);
   const [partialRoundNotice, setPartialRoundNotice] = useState<string | null>(null);
+  const [uusiKesken, setUusiKesken] = useState(false);
 
   // Henkilösivun nosto voi sisältää ulkomaisia henkilöitä → silloin ei "Tunnetut suomalaiset".
   const nimi = round?.some((h) => h.suomalainen === false) ? "Tunnetut henkilöt" : pakka.nimi;
 
   const correctOrder = useMemo(() => (round ? sortForDirection(round, DEFAULT_DIRECTION) : []), [round]);
 
-  /** Haasta kaveri: sama kymmenikkö linkkinä (?henkilot=, sama kuin henkilösivun nosto). */
-  /* Jako (K4 v2, 25.10.2026): Jakoalue-komponentti; tulos linkkiin (?tulos=n-total) jotta kaveri saa saman kierroksen
-     ja Facebookin og-kuvaus kertoo tuloksen; tasonimi kuten tulosnäkymässä. Tulosvaihe piirretään vain selaimessa. */
+  /* Jako (K4 v2, 25.10.2026): sama kierros linkkinä (?henkilot=, sama kuin henkilösivun nosto), tulos linkkiin
+     (?tulos=n-total), jotta Facebookin og-kuvaus kertoo tuloksen. Tulosvaihe piirretään vain selaimessa. */
   const jakoTiedot = () => ({
     url: `${location.origin}${pakka.href}?henkilot=${(round ?? []).map((p) => p.id).join(",")}&rivi=1&tulos=${scoreResult?.correctCount ?? 0}-${scoreResult?.totalCount ?? 0}`,
-    teksti: pelijakoteksti(`${PELI}: ${nimi}`, `${scoreResult?.correctCount ?? 0}/${scoreResult?.totalCount ?? 0} oikein`, !!scoreResult && scoreResult.correctCount === scoreResult.totalCount, scoreResult ? ikajarjestysTaso(scoreResult.correctCount, scoreResult.totalCount) : null),
+    teksti: pelijakoteksti(`${PELI}: ${nimi}`, `${scoreResult?.correctCount ?? 0}/${scoreResult?.totalCount ?? 0} oikealla paikalla`, !!scoreResult && scoreResult.correctCount === scoreResult.totalCount),
   });
 
   async function startRound() {
-    setPhase("loading");
+    /* Tuloksesta "Uusi kierros": tulos pysyy näkyvissä, kunnes uusi rivi on arvottu. */
+    if (phase === "start") setPhase("loading");
+    else setUusiKesken(true);
     setEmptyNotice(null);
     setPartialRoundNotice(null);
     const lastSeen = readLastSeen();
     const next = await getChainRound(category, lastSeen);
+    setUusiKesken(false);
     setRound(next);
     setOrder(next); // jo satunnaisessa järjestyksessä, ks. huomio yllä
     if (next.length > 0) {
       writeLastSeen(next.map((p) => p.id));
       // Pieni kategoria voi palauttaa alle ROUND_SIZE henkilöä (ks. JULKAISUTEKSTI
       // "Kierroksen koko") — kierros pelataan silti loppuun, mutta pelaajalle
-      // kerrotaan ettei tällä kertaa saatu täyttä kymmenikköä, koska muu UI
-      // (otsikko, "Arvo 10 uutta") muuten implikoi aina täyttä kierrosta.
+      // kerrotaan ettei tällä kertaa saatu täyttä kierrosta.
       if (next.length < ROUND_SIZE) {
         setPartialRoundNotice(`Tästä kategoriasta löytyi vain ${next.length} henkilöä tällä kierroksella.`);
       }
@@ -123,20 +121,18 @@ export default function IkajarjestysClient({
   const revealItems: RevealItem[] = useMemo(() => {
     if (!round) return [];
     const correctIndexById = new Map(correctOrder.map((p, i) => [p.id, i]));
+    const arvot = vuosiTaiPaiva(order.map((p) => formatBirthDate(p.birthDate)));
     return order.map((person, i) => ({
       id: person.id,
       name: person.name,
-      role: person.role,
       image_url: person.image_url,
       placedPosition: i + 1,
       correctPosition: (correctIndexById.get(person.id) ?? i) + 1,
-      birthDateLabel: formatBirthDate(person.birthDate),
+      valueLabel: arvot[i],
     }));
   }, [order, round, correctOrder]);
 
-  // Pisteet lasketaan suoraan renderissä (ei enää erillisen "paljastus valmis"
-  // -callbackin varassa) — RevealSequencer näyttää tuloksen korttilistan alla
-  // heti kun kaikki on paljastettu, samalla sivulla (ks. RevealSequencer-kommentti).
+  // Pisteitä ei näytetä (CD 3e), mutta ne kirjataan tilastoihin kuten ennen.
   const scoreResult = useMemo(() => (round ? calculateChainScore(order, correctOrder) : null), [order, round, correctOrder]);
 
   if (phase === "start" || phase === "loading") {
@@ -147,7 +143,7 @@ export default function IkajarjestysClient({
           {/* K2 (pelikehys, 20.10.2026): h1 → lause → kasvoketju → Aloita. Osa C: ei aihevalintaa eikä ohjeita. */}
           <PeliAloitus
             otsikko={PELI}
-            lause="Aseta kymmenen tunnettua henkilöä syntymävuoden mukaan vanhimmasta nuorimpaan."
+            lause={pakka.kuvaus}
             valinta={
               kasvot.length >= 5 ? (
                 <figure className="ika-kasvot">
@@ -189,21 +185,15 @@ export default function IkajarjestysClient({
   if (phase === "revealing" && scoreResult) {
     return (
       <PeliKehys iho="tumma">
-        <Pelipalkki iho="tumma" peli={HUB.nimi} muunnelma={nimi} koti={HUB} />
-        <main className="tk-page">
+        <Pelipalkki iho="tumma" peli={HUB.nimi} koti={HUB} pelissa paluuNuoli />
+        <main>
           <RevealSequencer
             items={revealItems}
-            tulos={
-              /* K4 v2 (pelimuotojen kehys 25.10.2026): tulos → jako → seuraava peli → toissijaiset linkit. */
-              <PeliTulos
-                luku={`${scoreResult.correctCount}/${scoreResult.totalCount}`}
-                yksikko="oikein"
-                tasonimi={ikajarjestysTaso(scoreResult.correctCount, scoreResult.totalCount)}
-                lause={`${scoreResult.score} pistettä. Pisin oikea ketju: ${scoreResult.longestCorrectChain}.`}
+            jatko={
+              <RiviJatko
+                seuraava={aloitaHref(seuraavaPakka(pakka.slug))}
+                uusi={{ teksti: "Uusi kierros", onClick: () => startRound(), kesken: uusiKesken }}
                 jako={{ ...jakoTiedot(), natiiviOtsikko: PELI }}
-                toiminnot={[{ teksti: "Pelaa uusi kierros", onClick: () => startRound() }, { teksti: "Kaikki pakat", href: HUB_HREF }]}
-                seuraavat={[]}
-                seuraavaOsio={<SeuraavaPakka slug={pakka.slug} />}
               />
             }
           />
@@ -215,29 +205,20 @@ export default function IkajarjestysClient({
   // phase === "ordering"
   return (
     <PeliKehys iho="tumma">
-      <Pelipalkki iho="tumma" peli={HUB.nimi} muunnelma={nimi} koti={HUB} tila={`${order.length} henkilöä`} pelissa />
-      <main className="tk-page">
-        <header className="tk-order-head">
-          <SuuntaindikaattoriBadge direction={DEFAULT_DIRECTION} />
-          <h1 className="tk-order-title">{PELI}</h1>
-          <p className="tk-order-desc">
-            Raahaa tai napauta korteista järjestääksesi ne. Kun järjestys tuntuu oikealta, paljasta tulos.
-          </p>
-          {partialRoundNotice && (
-            <p className="tk-loading" role="status">
-              {partialRoundNotice}
-            </p>
-          )}
-        </header>
-        <ReorderableChainList items={order} onReorder={setOrder} />
-        <button type="button" className="tk-btn-primary tk-order-cta" onClick={() => {
-            /* Pelikerta tilastoihin (pelimuoto_pelit) tarkistushetkellä: järjestys on silloin lopullinen. */
-            if (scoreResult) void kirjaaPelimuotoPeli({ pelimuoto: "ikajarjestys", avain: category || "kaikki", oikein: scoreResult.correctCount, yhteensa: scoreResult.totalCount, pisteet: scoreResult.score });
-            setPhase("revealing");
-          }}>
-          Paljasta järjestys
-        </button>
-      </main>
+      <Pelipalkki iho="tumma" peli={HUB.nimi} koti={HUB} pelissa paluuNuoli />
+      <Korjausrivi
+        lause={pakka.pelilause}
+        ylin="Vanhin"
+        alin="Nuorin"
+        items={order}
+        onReorder={setOrder}
+        huomautus={partialRoundNotice ? <p className="tk-loading" role="status">{partialRoundNotice}</p> : undefined}
+        onTarkista={() => {
+          /* Pelikerta tilastoihin (pelimuoto_pelit) tarkistushetkellä: järjestys on silloin lopullinen. */
+          if (scoreResult) void kirjaaPelimuotoPeli({ pelimuoto: "ikajarjestys", avain: category || "kaikki", oikein: scoreResult.correctCount, yhteensa: scoreResult.totalCount, pisteet: scoreResult.score });
+          setPhase("revealing");
+        }}
+      />
     </PeliKehys>
   );
 }

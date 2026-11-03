@@ -15,9 +15,8 @@
 import { getSupabase } from "./supabase";
 import { getSiteId } from "./queries";
 import { ryhmaOf } from "./henkiloRyhmat";
-import { ROUND_SIZE, shuffleChain, sortForDirection, DEFAULT_DIRECTION, type ChainPerson } from "./ikajarjestysConstants";
+import { ROUND_SIZE, shuffleChain, type ChainPerson } from "./ikajarjestysConstants";
 import { henkiloKuva } from "./henkilokuvat";
-import { RIVIN_PITUUS, siemen, sekoitaSiemenella, vaaraJarjestys } from "./jarjesta/siemen";
 
 type CelebRow = {
   id: string;
@@ -25,6 +24,8 @@ type CelebRow = {
   role: string;
   /** celebrities.ryhma (kategoria kannasta, 19.9.2026) */
   ryhma: string | null;
+  /** celebrities.laji: kirjailijaryhmässä on myös muita aloja (Aalto, Bosco), pakkaan vain kirjallisuus. */
+  laji?: string | null;
   image_url: string | null;
   birth_date: string;
   suomalainen: boolean | null;
@@ -52,7 +53,7 @@ export async function getChainRound(
 
   const { data, error } = await sb
     .from("celebrities")
-    .select("id, name, role, ryhma, image_url, birth_date, suomalainen")
+    .select("id, name, role, ryhma, laji, image_url, birth_date, suomalainen")
     .eq("site_id", siteId)
     .not("birth_date", "is", null)
     .not("name", "is", null);
@@ -61,9 +62,17 @@ export async function getChainRound(
   const rows = data as unknown as CelebRow[];
   // Vanhat avaimet (artistit, muut) promo- ja kirjanmerkkilinkeistä → uudet ryhmät (3.10.2026).
   const kat = category === "artistit" ? "muusikot" : category;
-  // "suomalaiset" = Järjestän Tunnetut suomalaiset -pakka (celebrities.suomalainen, 31.10.2026).
+  // "suomalaiset" = Järjestän Tunnetut suomalaiset -pakka (celebrities.suomalainen, 31.10.2026);
+  // "suomalaiset:<ryhmä>" = alan pakka, vain suomalaiset (CD v0.2, 3.11.2026).
+  const ala = kat.startsWith("suomalaiset:") ? kat.slice("suomalaiset:".length) : null;
   let pool =
-    kat === "kaikki" || kat === "muut" ? rows : kat === "suomalaiset" ? rows.filter((r) => r.suomalainen) : rows.filter((r) => ryhmaOf(r.ryhma, null) === kat);
+    kat === "kaikki" || kat === "muut"
+      ? rows
+      : kat === "suomalaiset"
+        ? rows.filter((r) => r.suomalainen)
+        : ala
+          ? rows.filter((r) => r.suomalainen && ryhmaOf(r.ryhma, null) === ala && (ala !== "kirjailijat" || r.laji === "kirjallisuus"))
+          : rows.filter((r) => ryhmaOf(r.ryhma, null) === kat);
 
   if (excludeIds.length > 0) {
     const withoutRecent = pool.filter((r) => !excludeIds.includes(r.id));
@@ -74,7 +83,9 @@ export async function getChainRound(
     }
   }
 
-  const shuffled = shuffleChain(pool);
+  // Rivillä ei ole siluetteja (CD 3e): vain henkilöt, joilla on oma kuvakopio, jos heitä riittää.
+  const kuvalliset = pool.filter((r) => henkiloKuva(r.image_url));
+  const shuffled = shuffleChain(kuvalliset.length >= ROUND_SIZE ? kuvalliset : pool);
   const picked: CelebRow[] = [];
   const seenDates = new Set<string>();
   for (const row of shuffled) {
@@ -124,37 +135,4 @@ export async function getChainRoundByIds(ids: string[], annettuJarjestys = false
     birthDate: r.birth_date,
     suomalainen: !!r.suomalainen,
   }));
-}
-
-/**
- * Järjestä-hubin päivän henkilörivi (CD kierros 5a, 31.10.2026): RIVIN_PITUUS tunnettua suomalaista,
- * joilla on oma kuvakopio (desktopin kuvakortit), eri syntymävuodet, väärässä järjestyksessä.
- * Sama kaikille koko päivän (siemen = päivä). Hub linkittää rivin ?henkilot=…&rivi=1.
- * `poissa` = heron rivin nimet: sama henkilö ei näy kahdessa rivissä (esim. presidentti).
- */
-export async function getPaivanHenkilot(paiva: string, poissa: string[] = []): Promise<Array<ChainPerson & { kuva: string }>> {
-  const siteId = await getSiteId();
-  const sb = getSupabase();
-  if (!siteId || !sb) return [];
-  const { data, error } = await sb
-    .from("celebrities")
-    .select("id, name, role, ryhma, image_url, birth_date, suomalainen")
-    .eq("site_id", siteId)
-    .eq("suomalainen", true)
-    .not("birth_date", "is", null)
-    .order("id");
-  if (error || !data) return [];
-  const rng = siemen(`${paiva}:henkilot`);
-  const valitut: Array<ChainPerson & { kuva: string }> = [];
-  const vuodet = new Set<string>();
-  for (const r of sekoitaSiemenella(data as unknown as CelebRow[], rng)) {
-    if (valitut.length >= RIVIN_PITUUS) break;
-    const kuva = henkiloKuva(r.image_url);
-    const vuosi = r.birth_date.slice(0, 4);
-    if (!kuva || vuodet.has(vuosi) || poissa.includes(r.name)) continue;
-    vuodet.add(vuosi);
-    valitut.push({ id: r.id, name: r.name, role: r.role, image_url: r.image_url, birthDate: r.birth_date, suomalainen: true, kuva });
-  }
-  if (valitut.length < 3) return [];
-  return vaaraJarjestys(sortForDirection(valitut, DEFAULT_DIRECTION) as typeof valitut, rng);
 }

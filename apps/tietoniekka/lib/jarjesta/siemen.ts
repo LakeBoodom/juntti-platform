@@ -2,14 +2,11 @@
 // Kaikilla on samana päivänä sama rivi ja sama väärä järjestys, joten tuloksia voi verrata.
 // Tavallinen moduuli: ei satunnaisuutta Math.randomista, vaan siemen päivästä ja pakasta.
 
-/** Rivin pituus: hubin rivi on täsmälleen se kierros, joka pelataan "Korjaa rivi" -napista. */
+/** Hubin pelattavan rivin pituus. */
 export const RIVIN_PITUUS = 5;
 
 /** Päivä Suomen ajassa (YYYY-MM-DD), vaihtuu keskiyöllä. */
 export const paivaAvain = (nyt = new Date()) => new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Helsinki" }).format(nyt);
-
-/** Päivän järjestysnumero (päiviä vuodesta 1970), kierron laskemiseen. */
-export const paivaNumero = (avain: string) => Math.floor(Date.parse(`${avain}T00:00:00Z`) / 86_400_000);
 
 /** mulberry32-generaattori merkkijonosiemenestä (FNV-1a-tiiviste). */
 export function siemen(teksti: string): () => number {
