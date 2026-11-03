@@ -191,11 +191,13 @@ export async function haeJarjestysKierros(slug: string, excludeIds: string[] = [
 }
 
 /** Päivän rivi (CD kierros 5a, 31.10.2026): RIVIN_PITUUS kohdetta väärässä järjestyksessä, sama kaikille
- *  koko päivän (siemen = päivä + pakka). Pelataan hubissa, jaettu tulos avautuu ?kohteet=-linkillä. */
-export async function haePaivanRivi(slug: string, paiva: string): Promise<JarjestysKohde[]> {
+ *  koko päivän (siemen = päivä + pakka). Pelataan hubissa, jaettu tulos avautuu ?kohteet=-linkillä.
+ *  `vainNimet` rajaa rivin arvonnan näihin kohteisiin (hubin haaste, pakka itse pysyy ennallaan). */
+export async function haePaivanRivi(slug: string, paiva: string, vainNimet?: readonly string[]): Promise<JarjestysKohde[]> {
   const p = haePakka(slug);
   if (!p) return [];
-  const pool = await haePool(p);
+  const kaikki = await haePool(p);
+  const pool = vainNimet ? kaikki.filter((k) => vainNimet.includes(k.name)) : kaikki;
   const rng = siemen(`${paiva}:${slug}`);
   /* Päivän rivissä mieluiten tunnettuja: pakan tunnettuja-ehto (esim. eduskuntavuodet) koskee koko riviä. */
   const tunnetut = p.pool?.tunnettuja ? pool.filter((k) => k.tunnettu) : pool;

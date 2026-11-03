@@ -1,7 +1,8 @@
 // JÄRJESTÄ-HUB /peli/jarjesta (pelimuotosivujen yhtenäistäminen, osa C; CD "Järjestä yhtenäinen UX" v0.2 kierros 4,
 // Heikki 3.11.2026). Esimerkki on itse peli: hero ja pelattava presidenttirivi (JarjestaHero), seuraava haaste ja
 // muut pakat ryhmissä Tunnetut suomalaiset, Paikat ja luonto, Politiikka.
-// Presidenttirivi vaihtuu päivittäin ja on sama kaikille koko päivän (lib/jarjesta/siemen.ts). Otsikon alla ei tekstiä
+// Presidenttirivi vaihtuu päivittäin ja on sama kaikille koko päivän (lib/jarjesta/siemen.ts): viisi seitsemästä
+// varhaisimmasta presidentistä (Heikki 3.11.2026), koska koko joukosta arvottu rivi oli liian helppo. Otsikon alla ei tekstiä
 // (UI-sääntö 9): Heikin poikkeus koskee vain heroa ja tehtävää.
 
 import type { Metadata } from "next";
@@ -29,6 +30,8 @@ export const metadata: Metadata = {
 };
 
 const ENSIMMAINEN = "presidentit";
+/* Kaudet ovat peräkkäin 1919–1956, joten vuosikymmenet eivät paljasta järjestystä. Nimet kuten fact_entities.name. */
+const ENSIMMAISEN_NIMET = ["K. J. Ståhlberg", "Lauri Kristian Relander", "P. E. Svinhufvud", "Kyösti Kallio", "Risto Ryti", "C. G. E. Mannerheim", "J. K. Paasikivi"];
 const SEURAAVA_NIMI = "Suomen tunturit";
 
 function Ikonit({ pakat }: { pakat: HubPakka[] }) {
@@ -68,7 +71,7 @@ const jarjestys = (pakat: readonly string[], slug: string) => (pakat.includes(sl
 
 export default async function JarjestaHub() {
   const pakka = haePakka(ENSIMMAINEN)!;
-  const rivi = await haePaivanRivi(ENSIMMAINEN, paivaAvain());
+  const rivi = await haePaivanRivi(ENSIMMAINEN, paivaAvain(), ENSIMMAISEN_NIMET);
   const seuraava = seuraavaPakka(ENSIMMAINEN);
   const lisaa = KIERRON_PAKAT.filter((p) => p.slug !== ENSIMMAINEN).map((p) => (p.slug === "paaministerit" ? { ...hubPakka(p), meta: "Ensimmäinen kausi" } : hubPakka(p)));
 
