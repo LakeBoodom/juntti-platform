@@ -26,7 +26,7 @@ export default async function MegatPage() {
     id: string; title: string; status: string; created_at: string;
   }>;
 
-  // Pelikerrat quiz_plays-taulusta, kuten Visat-listalla (quizzes.play_count ei päivity).
+  // Pelikerrat quiz_plays-taulusta (admin_visa_tilastot), kuten Visat-listalla; quizzes.play_count ei päivity.
   const { data: tilastot } = await admin.rpc("admin_visa_tilastot" as never, { p_site: site.id } as never);
   const pelit = new Map(
     ((tilastot ?? []) as unknown as Array<{ quiz_id: string; pelit: number }>).map((t) => [t.quiz_id, Number(t.pelit)]),
