@@ -23,7 +23,6 @@
   --tk-state-correct: #B6FF3C;
   --tk-state-wrong: #FF6B4A;
   --tk-state-wrong-border: #6B2418;
-  --tk-duotone-violet: rgba(124, 79, 201, 0.32); /* VAIN henkilökuvan päällä */
 }
 
 /* ---------- Jaetut painikkeet ---------- */
@@ -62,182 +61,182 @@
   overflow-wrap: normal; word-break: keep-all;
 }
 
-/* ---------- RankingCard ---------- */
+/* ---------- Rivikortti (RankingCard): CD "Järjestä yhtenäinen UX" 3e, Heikki 2.11.2026 ----------
+   Numero kortin ulkopuolella (amber). Kuvallinen 60 px (kuva 44 × 44, säde 10), tunnus 52 px (34 × 38, contain),
+   kuvaton 48 px. Korkeus joustaa alaspäin, jotta 8 kortin pakka napin kanssa mahtuu ruutuun (--tk-n = korttien määrä;
+   Safari 390 × 664: kuvaton 44 px ja lauta 650 px). 44 px on kosketuskohteen alaraja.
+   KORTTISÄÄNTÖ: CD:n koot on mitoitettu variaabelilla Archivolla (wdth 80), tuotannon staattinen on leveämpi → nimi
+   18 px (CD 18–20) ja koko pisimmän tavun mukaan: 100cqi / (--tk-lw × 0,76 em). Mitattu 320–2450 px + WebKit. */
 
 .tn20 .tk-rcard {
-  position: relative;
-  display: flex; align-items: center; gap: 12px;
-  min-height: 76px;
-  padding: 10px 12px;
-  border-radius: 22px;
-  border: 1px solid var(--tk-border);
-  background: var(--tk-surface);
-  box-shadow: none;
+  --tk-sarake: 24px; --tk-numero: 19px; --tk-r: clamp(44px, calc((100svh - 272px) / var(--tk-n, 5) - 6px), 48px); --tk-nimi: 18px;
+  position: relative; display: grid; grid-template-columns: var(--tk-sarake) minmax(0, 1fr); align-items: center; gap: 10px;
 }
+.tn20 .tk-rcard--tunnus { --tk-r: clamp(46px, calc((100svh - 272px) / var(--tk-n, 5) - 6px), 52px); }
+.tn20 .tk-rcard--kuva { --tk-sarake: 28px; --tk-numero: 22px; --tk-r: clamp(52px, calc((100svh - 272px) / var(--tk-n, 5) - 6px), 60px); }
 
-/* Raahattava kortti (ReorderableChainList antaa dragPropsin) — LIVE-QA-LÖYDÖS
-   (kriittinen, 2026-09-16, Heikki): aiemmin touch-action: none oli KAIKILLA
-   korteilla, mutta raahaus lähti vain 40×40px kahvasta. Kortin rungosta tehty
-   kosketus ei siis raahannut EIKÄ vierittänyt sivua — ele tuntui tahmealta ja
-   jumiutuneelta juuri siellä missä pelaaja luonnostaan tarttuu korttiin.
-   Nyt tartunta on koko kortissa ja touch-action on pan-y: lyhyt pyyhkäisy
-   vierittää sivua normaalisti (10 kortin lista ei mahdu näytölle, joten
-   vierityksen on pakko toimia kortinkin päältä), ja raahaus aktivoituu
-   kosketuksella pitkästä painalluksesta, jolloin JS estää vierityksen
-   ei-passiivisella touchmove-kuuntelijalla. Kahva pitää yhä oman
-   touch-action: none -arvonsa, joten sieltä raahaus lähtee heti. */
-.tn20 .tk-rcard--draggable {
-  cursor: grab;
-  touch-action: pan-y;
-  -webkit-user-select: none;
-  user-select: none;
-  -webkit-touch-callout: none; /* iOS: pitkä painallus ei avaa kuvan omaa valikkoa */
+.tn20 .tk-rcard-pos {
+  font-family: "Archivo Variable", "Archivo", sans-serif; font-weight: 900; font-size: var(--tk-numero); line-height: 1;
+  color: var(--tk-amber); text-align: center; font-variant-numeric: tabular-nums;
 }
+.tn20 .tk-rcard-kortti {
+  display: flex; align-items: center; gap: 10px; min-width: 0; min-height: var(--tk-r); padding: 3px 8px 3px 14px; box-sizing: border-box;
+  border: 1px solid var(--tk-border-2); border-radius: 12px; background: var(--tk-surface); color: var(--tk-text-primary);
+  transition: border-color var(--dur-fast) var(--ease-standard), background-color var(--dur-fast) var(--ease-standard), transform var(--dur-fast) var(--ease-standard);
+}
+.tn20 .tk-rcard--tunnus .tk-rcard-kortti { padding-left: 10px; }
+.tn20 .tk-rcard--kuva .tk-rcard-kortti { gap: 12px; padding: 3px 10px 3px 6px; border-radius: 14px; }
+/* Hub ja kokoelma: kortti vinossa. Väärä tuloskortti jää vinoon. */
+.tn20 .tk-rcard--vino .tk-rcard-kortti, .tn20 .tk-rcard--wrong .tk-rcard-kortti { transform: rotate(var(--tk-kallistus)); }
+.tn20 .tk-rcard--vino .tk-rcard-kortti { padding-right: 14px; }
+/* Pelissä sama rivi suoristuu kerran (CD: 450 ms jousi). Reduced-motion-portti (globals.css) lyhentää. */
+.tn20 .tk-chainlist > .tk-rcard .tk-rcard-kortti { animation: tk-suoristu 450ms cubic-bezier(.3, 1.4, .4, 1) both; }
+@keyframes tk-suoristu { from { transform: rotate(var(--tk-kallistus)); } to { transform: none; } }
+
+.tn20 .tk-rcard-kuva { flex: none; display: block; width: 44px; height: 44px; border-radius: 10px; object-fit: cover; object-position: 50% 15%; background: var(--tk-surface-2); }
+.tn20 .tk-rcard--tunnus .tk-rcard-kuva { width: 34px; height: 38px; border-radius: 0; object-fit: contain; object-position: center; background: none; }
+
+.tn20 .tk-rcard-body {
+  container-type: inline-size; flex: 1 1 0; min-width: 0;
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 1px 10px;
+}
+.tn20 .tk-rcard-nimi {
+  max-width: 100%;
+  font-family: "Archivo Variable", "Archivo", sans-serif; font-weight: 900; font-size: min(var(--tk-nimi), calc(100cqi / (var(--tk-lw, 10) * .76))); line-height: 1.05;
+  text-transform: uppercase; overflow-wrap: normal; word-break: normal; hyphens: manual;
+}
+/* Tarkenne: kuvattomassa oikealla (kunta, maakunta), kuvallisessa nimen alla (ammatti). Rivittyy alle, jos ei mahdu. */
+.tn20 .tk-rcard-role { font-size: 12px; font-weight: 500; line-height: 1.2; color: var(--tk-text-muted); overflow-wrap: normal; word-break: normal; }
+.tn20 .tk-rcard--kuva .tk-rcard-body { flex-direction: column; align-items: flex-start; justify-content: center; flex-wrap: nowrap; }
+.tn20 .tk-rcard-note { flex-basis: 100%; font-size: 12px; font-weight: 600; line-height: 1.2; color: #e0a092; }
+.tn20 .tk-rcard--kuva .tk-rcard-note { flex-basis: auto; }
+.tn20 .tk-rcard-value { flex: none; display: inline-flex; align-items: center; gap: 6px; padding-right: 6px; font-family: "Archivo Variable", "Archivo", sans-serif; font-weight: 900; font-size: 15px; line-height: 1.1; text-align: right; font-variant-numeric: tabular-nums; }
+.tn20 .tk-rcard-ok { color: var(--tk-state-correct); font-size: 14px; }
+
+.tn20 .tk-rcard-handle {
+  flex: none; display: flex; align-items: center; justify-content: center; width: 30px; height: 36px; margin-right: -4px; padding: 0;
+  border: 0; border-radius: 10px; background: transparent; color: #7c7462; cursor: grab; touch-action: none;
+}
+.tn20 .tk-rcard-handle:hover { color: var(--tk-text-secondary); }
+.tn20 .tk-rcard-handle:active { cursor: grabbing; }
+.tn20 .tk-rcard-handle:focus-visible { outline: 2px solid var(--tk-text-primary); outline-offset: -2px; }
+.tn20 .tk-rcard-handle:disabled { opacity: .4; cursor: default; }
+
+/* Raahattava kortti: LIVE-QA (kriittinen, 16.9.2026): ote lähtee mistä tahansa kortin kohdasta ja touch-action: pan-y
+   vierittää sivua lyhyellä pyyhkäisyllä; raahaus aktivoituu kosketuksella pitkästä painalluksesta (JS estää silloin
+   vierityksen). Kahvalla on oma touch-action: none, joten sieltä raahaus lähtee heti. */
+.tn20 .tk-rcard--draggable { cursor: grab; touch-action: pan-y; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
 .tn20 .tk-rcard--draggable:active { cursor: grabbing; }
 .tn20 .tk-rcard--draggable img { -webkit-user-drag: none; }
 
-.tn20 .tk-rcard--selected { border-color: var(--tk-text-tertiary); background: color-mix(in srgb, var(--tk-surface) 70%, var(--tk-border-2)); }
-.tn20 .tk-rcard--target { border-color: var(--tk-border-2); border-style: dashed; }
-.tn20 .tk-rcard--dragging { opacity: 0; } /* aave näkyy sen sijaan */
-.tn20 .tk-rcard-ghost { opacity: 0.98; }
-.tn20 .tk-rcard-ghost .tk-rcard { box-shadow: 0 12px 28px rgba(0, 0, 0, 0.45); border-color: var(--tk-text-tertiary); }
+/* Valittu (CD 3e): lime-reunus ja 8 % lime-tausta. */
+.tn20 .tk-rcard--selected .tk-rcard-kortti { border-color: var(--tk-lime); background: rgba(182, 255, 60, .08); transform: scale(1.02); }
+/* Nostettu (CD 3b): kortin paikalle jää katkoviivainen tyhjä paikka, numero lime; aave kallistuu ja suurenee. */
+.tn20 .tk-rcard--dragging .tk-rcard-pos { color: var(--tk-lime); }
+.tn20 .tk-rcard--ghost-source .tk-rcard-kortti { border: 1.5px dashed #5f594c; background: transparent; }
+.tn20 .tk-rcard--ghost-source .tk-rcard-kortti > * { visibility: hidden; }
+.tn20 .tk-rcard-ghost .tk-rcard { display: block; }
+.tn20 .tk-rcard-ghost .tk-rcard-kortti { border: 1.5px solid var(--tk-lime); background: #211c11; transform: rotate(-1.5deg) scale(1.04); box-shadow: 0 18px 30px rgba(0, 0, 0, .55); animation: none; }
+.tn20 .tk-rcard-ghost .tk-rcard-handle { color: var(--tk-lime); }
 
-.tn20 .tk-rcard--correct { border-color: var(--tk-state-correct); }
-.tn20 .tk-rcard--wrong { border-color: var(--tk-state-wrong-border); }
+/* Tulos (CD 3e): oikea suorassa, vihreä reunus, lime-numero; väärä vinossa, punainen reunus, koralli numero. */
+.tn20 .tk-rcard--correct .tk-rcard-kortti { border-color: #55702a; background: rgba(182, 255, 60, .06); }
+.tn20 .tk-rcard--correct .tk-rcard-pos { color: var(--tk-state-correct); }
+.tn20 .tk-rcard--wrong .tk-rcard-kortti { border-color: var(--tk-state-wrong-border); background: rgba(255, 107, 74, .06); }
+.tn20 .tk-rcard--wrong .tk-rcard-pos { color: var(--tk-state-wrong); }
+/* Tuloksessa rivit eivät jousta: selityksen on mahduttava. */
+.tn20 .jr-tulos .tk-rcard { --tk-r: 48px; }
+.tn20 .jr-tulos .tk-rcard--tunnus { --tk-r: 52px; }
+.tn20 .jr-tulos .tk-rcard--kuva { --tk-r: 56px; }
 
-.tn20 .tk-rcard-pos {
-  flex: 0 0 auto;
-  display: flex; align-items: center; justify-content: center;
-  width: 26px; height: 26px; border-radius: 999px;
-  background: var(--tk-surface-2); color: var(--tk-text-secondary);
-  font-family: var(--tn-font-display); font-weight: 900; font-size: 13px;
-}
-
-.tn20 .tk-rcard-thumb {
-  position: relative; flex: 0 0 auto;
-  width: 56px; height: 56px; border-radius: 14px; overflow: hidden;
-  background: var(--tk-surface-2);
-}
-.tn20 .tk-rcard-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
-.tn20 .tk-rcard-silhouette { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; color: var(--tk-border-2); }
-.tn20 .tk-rcard-silhouette svg { width: 70%; height: 70%; }
-.tn20 .tk-rcard-duotone {
-  position: absolute; inset: 0; background: var(--tk-duotone-violet); pointer-events: none;
-}
-
-.tn20 .tk-rcard-body {
-  flex: 1 1 auto; min-width: 0;
-}
-/* KORTTISÄÄNTÖ: EI kiinteää korkeutta, EI line-clampia. min-height-pohjainen,
-   kasvaa sisällön mukana. Lähtöarvo 16px (tehtävänanto kohta 8, "ei suurempaa") —
-   mitattu Range-menetelmällä 320–2560px, 0 ylivuotoa: pisinkin suomalainen
-   kaksoisnimi rivittyy sanakohtaisesti, ei koskaan leikkaudu. */
-.tn20 .tk-rcard-name {
-  font-family: var(--tn-font-display); font-weight: 700; font-size: 16px; line-height: 1.25;
-  color: var(--tk-text-primary);
-  overflow-wrap: normal; word-break: keep-all; white-space: normal;
-}
-.tn20 .tk-rcard-role {
-  margin-top: 2px;
-  font-family: var(--tn-font-body); font-weight: 500; font-size: 12.5px; line-height: 1.35;
-  color: var(--tk-text-tertiary);
-  overflow-wrap: normal; word-break: keep-all; white-space: normal;
-}
-.tn20 .tk-rcard-date { color: var(--tk-text-secondary); font-weight: 700; }
-
-/* Peek-variantti (CollectionPageGamePromo, koristeellinen aria-hidden esikatselu):
-   ei nimi/ammatti-tekstiä lainkaan (RankingCard jättää .tk-rcard-body pois DOM:sta
-   kun peek=true) — kortti kutistuu kuvan kokoiseksi. KATSELMOINTILÖYDÖS (kriittinen,
-   2026-09-16): kiinteä clamp(140–190px) -leveys jätti tekstille vain ~46–102px,
-   jolloin tavallinen kaksisanainen nimi+ammatti vuoti näkyvästi seuraavan kortin
-   päälle. Korjaus: tekstiä ei enää renderöidä peek-tilassa, joten kortin leveys
-   tulee suoraan kuvan koosta eikä ylivuotoa voi enää syntyä millään nimipituudella. */
-.tn20 .tk-rcard--peek {
-  padding: 8px;
-  min-height: 0;
-  gap: 0;
-}
-.tn20 .tk-rcard--peek .tk-rcard-thumb {
-  width: 64px;
-  height: 64px;
-}
-
-.tn20 .tk-rcard-result {
-  flex: 0 0 auto;
-  display: flex; align-items: center; justify-content: center;
-  width: 26px; height: 26px; border-radius: 999px;
-  border: 2px solid transparent;
-}
-.tn20 .tk-rcard-result--correct { color: var(--tk-state-correct); border-color: var(--tk-state-correct); }
-.tn20 .tk-rcard-result--wrong { color: var(--tk-state-wrong); border-color: var(--tk-state-wrong-border); }
-
-.tn20 .tk-rcard-handle {
-  flex: 0 0 auto;
-  display: flex; align-items: center; justify-content: center;
-  width: 40px; height: 40px; border-radius: 12px;
-  background: transparent; border: none; color: var(--tk-text-muted);
-  cursor: grab; touch-action: none;
-}
-.tn20 .tk-rcard-handle:hover { color: var(--tk-text-secondary); background: var(--tk-surface-2); }
-.tn20 .tk-rcard-handle:active { cursor: grabbing; }
-.tn20 .tk-rcard-handle:focus-visible { outline: 2px solid var(--tk-text-tertiary); outline-offset: 2px; }
-.tn20 .tk-rcard-handle:disabled { opacity: 0.4; cursor: default; }
-
-/* KATSELMOINTILÖYDÖS (merkittävä, 2026-09-16): täydessä (ei-peek) RankingCardissa
-   marginaali .tk-rcard-name:lle oli 320px-leveydellä paikoin 0–2px tavallisilla
-   kaksisanaisilla suomalaisilla nimillä (esim. "Tarja Halonen", "Urho Kekkonen"),
-   koska pos-badge + thumb + handle/tulos-ikoni vievät suuren osan 320px:stä ennen
-   tekstiä. Fonttikoon pienentämistä kokeiltiin ensin, mutta Range-mittaus (sweep
-   320–380px, 1px-askelin, 8 nimeä mukaan lukien ääritapaukset "Kristiina
-   Halkola-Virtanen" ja "Sirkka-Liisa Anttila-Jääskeläinen") osoitti sen olevan
-   EPÄLUOTETTAVA: sanan word-break: keep-all -rivitys hyppää 1-rivin ja 2-rivin
-   välillä epäjatkuvasti kun tila muuttuu, joten pienempi fontti paransi joitain
-   nimiä mutta huononsi toisia yhtä paljon (esim. marginaali putosi 39px:stä
-   1px:ään). Sen sijaan pos/thumb/handle-elementtejä pakattiin hieman — tämä
-   vapauttaa tekstille tilaa KOSKEMATTA fonttikokoon (joka on jo kalibroitu),
-   ja on mittausten mukaan vakaasti parempi: pahin löydetty marginaali koko
-   320–380px-sweepissä oli edelleen positiivinen (~0.2–1px, ei koskaan
-   negatiivinen/leikkautuva) sekä ennen että jälkeen, ja tyypillisten
-   kaksisanaisten nimien marginaali parani merkittävästi (esim. "Jari Litmanen"
-   0.2px → 28px 320px:llä). Ei koske >380px, jossa marginaali on jo reilusti
-   positiivinen ilman muutoksia. */
+/* KORTTISÄÄNTÖ, kapea tulos: arvo vie tilaa nimeltä → pienempi numerosarake, kuva ja arvo, jotta nimi pysyy ≥ 12 px:ssä. */
 @media (max-width: 380px) {
-  /* :not(.tk-rcard--peek) — sama selektorispesifisyys kuin .tk-rcard--peek-
-     säännöllä (rivi ~135): ilman tätä myöhempi sijainti tiedostossa voittaisi
-     tasapelin ja peek-kortin padding/gap-kutistus (jonka teksti-ylivuotokorjaus
-     nimenomaan vaatii) katoaisi juuri 320–380px:n kapeilla näytöillä. */
-  .tn20 .tk-rcard-thumb { width: 48px; height: 48px; }
-  .tn20 .tk-rcard:not(.tk-rcard--peek) { gap: 10px; padding: 10px 10px; }
-  .tn20 .tk-rcard-pos { width: 22px; height: 22px; font-size: 12px; }
-  .tn20 .tk-rcard-handle { width: 34px; height: 34px; }
+  .tn20 .jr-tulos { padding-inline: 12px; }
+  .tn20 .jr-tulos .tk-rcard { --tk-sarake: 18px; --tk-numero: 17px; gap: 6px; }
+  .tn20 .jr-tulos .tk-rcard-kortti { gap: 8px; padding-inline: 8px 4px; }
+  .tn20 .jr-tulos .tk-rcard--kuva .tk-rcard-kuva { width: 36px; height: 36px; }
+  .tn20 .jr-tulos .tk-rcard-value { gap: 3px; font-size: 13px; padding-right: 2px; }
 }
 
 /* ---------- ReorderableChainList ---------- */
 
-.tn20 .tk-chainlist {
-  display: flex; flex-direction: column; gap: 10px;
-  position: relative;
-}
-.tn20 .tk-chainlist--disabled .tk-rcard-handle { pointer-events: none; opacity: 0.35; }
+.tn20 .tk-chainlist { position: relative; display: flex; flex-direction: column; gap: 5px; }
+.tn20 .tk-chainlist--disabled .tk-rcard-handle { pointer-events: none; opacity: .35; }
 
-/* ---------- RevealSequencer ---------- */
+/* ---------- Pelilauta (Korjausrivi): CD 1a/2b/3d ---------- */
 
-.tn20 .tk-reveal { display: flex; flex-direction: column; gap: 14px; }
-.tn20 .tk-reveal-list { display: flex; flex-direction: column; gap: 10px; }
-.tn20 .tk-reveal-row {
-  opacity: 0; transform: translateY(6px) scale(0.98);
-  transition: opacity 320ms cubic-bezier(.2,.8,.2,1), transform 320ms cubic-bezier(.2,.8,.2,1);
+.tn20 .jr-lauta { display: flex; flex-direction: column; gap: 8px; max-width: 560px; margin: 0 auto; padding: 10px 16px 0; box-sizing: border-box; color: var(--tk-text-primary); }
+/* "KORJAA RIVI" (6 merkkiä pisin sana): 32 px mahtuu 320 px:iin; CD 32–36 px (wdth 70) → staattinen 32 px. */
+.tn20 .jr-h1 { margin: 0; font-family: "Archivo Variable", "Archivo", sans-serif; font-weight: 900; font-size: 32px; line-height: .95; letter-spacing: -.02em; text-transform: uppercase; }
+.tn20 .jr-lause { margin: 6px 0 0; font-size: 14px; line-height: 1.4; color: var(--tk-text-secondary); text-wrap: pretty; }
+.tn20 .jr-lauta-rivit { display: flex; flex-direction: column; gap: 5px; }
+.tn20 .jr-merkki { padding-left: 34px; font-size: 11px; font-weight: 800; line-height: 1.2; letter-spacing: .14em; text-transform: uppercase; color: var(--tk-amber); }
+.tn20 .jr-merkki--ala { color: #7c7462; }
+/* Nappi pysyy alareunassa mutta lepää listan alla, kun lista on loppu: se ei peitä viimeistä korttia. */
+.tn20 .jr-tarkista { position: sticky; bottom: 0; z-index: 2; margin: 0 -16px; padding: 10px 16px 10px; background: linear-gradient(to top, var(--tk-bg) 72%, rgba(19, 17, 9, 0)); transition: opacity var(--dur-fast) var(--ease-standard); }
+.tn20 .jr-lauta:has(.tk-rcard-ghost) .jr-tarkista { opacity: .4; pointer-events: none; }
+
+.tn20 .jr-nappi, .tn20 .jr-nappi2 {
+  display: flex; align-items: center; justify-content: center; width: 100%; min-height: 56px; padding: 0 28px; box-sizing: border-box; border-radius: 999px;
+  font-family: "Archivo Variable", "Archivo", sans-serif; font-weight: 900; font-size: 16px; letter-spacing: .02em; line-height: 1.1; text-transform: uppercase; text-decoration: none; cursor: pointer;
 }
+.tn20 .jr-nappi { border: 0; background: var(--tk-lime); color: var(--tk-bg); }
+.tn20 .jr-nappi:hover { filter: brightness(1.06); color: var(--tk-bg); }
+.tn20 .jr-nappi2 { min-height: 52px; font-size: 15px; border: 1px solid var(--tk-border-2); background: transparent; color: var(--tk-text-primary); }
+.tn20 .jr-nappi2:hover { border-color: var(--tk-text-muted); }
+.tn20 .jr-nappi2:disabled { opacity: .6; cursor: default; }
+.tn20 :is(.jr-nappi, .jr-nappi2):focus-visible { outline: 2px solid var(--tk-text-primary); outline-offset: 3px; }
+
+/* ---------- Tulos (RevealSequencer): CD 2d/3a ---------- */
+
+.tn20 .jr-tulos { display: grid; grid-template-columns: minmax(0, 1fr); gap: 14px; max-width: 560px; margin: 0 auto; padding: 16px 16px 40px; box-sizing: border-box; color: var(--tk-text-primary); }
+.tn20 .jr-luku { display: flex; align-items: flex-end; gap: 12px; margin: 0; font-family: "Archivo Variable", "Archivo", sans-serif; font-weight: 900; opacity: 0; transition: opacity var(--dur-base) var(--ease-standard); }
+.tn20 .jr-luku[data-valmis] { opacity: 1; }
+/* "8/8" ≈ 3 merkkiä: CD 76 px (wdth 70) → staattinen 68 px. */
+.tn20 .jr-luku-n { font-size: 68px; line-height: .8; letter-spacing: -.03em; font-variant-numeric: tabular-nums; }
+.tn20 .jr-luku-n > span { color: var(--tk-amber); }
+.tn20 .jr-luku-n > span[data-kaikki] { color: var(--tk-lime); }
+.tn20 .jr-luku-sana { max-width: 7em; padding-bottom: 2px; font-size: 20px; line-height: .95; text-transform: uppercase; }
+.tn20 .jr-tulos-rivit { display: flex; flex-direction: column; gap: 6px; }
+.tn20 .tk-reveal-row { opacity: 0; transform: translateY(6px); transition: opacity 320ms var(--ease-emphasized), transform 320ms var(--ease-emphasized); }
 .tn20 .tk-reveal-row--revealed { opacity: 1; transform: none; }
-.tn20 .tk-reveal-row .tk-rcard-result { transition: border-color 220ms cubic-bezier(.2,.8,.2,1), color 220ms cubic-bezier(.2,.8,.2,1); }
-@media (prefers-reduced-motion: reduce) {
-  .tn20 .tk-reveal-row { transition: opacity 1ms linear; transform: none; }
+.tn20 .jr-jatko { display: flex; flex-direction: column; gap: 12px; animation: jr-tulo var(--dur-base) var(--ease-emphasized) both; }
+@keyframes jr-tulo { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+.tn20 .jr-alaviite { margin: 0; font-size: 12px; line-height: 1.4; color: var(--tk-text-muted); }
+
+@media (min-width: 900px) {
+  .tn20 .tk-rcard { --tk-sarake: 34px; --tk-numero: 24px; --tk-nimi: 20px; --tk-r: clamp(46px, calc((100svh - 240px) / var(--tk-n, 5) - 8px), 54px); gap: 12px; }
+  .tn20 .tk-rcard--tunnus { --tk-r: clamp(48px, calc((100svh - 240px) / var(--tk-n, 5) - 8px), 58px); }
+  .tn20 .tk-rcard--kuva { --tk-sarake: 36px; --tk-numero: 28px; --tk-nimi: 21px; --tk-r: clamp(52px, calc((100svh - 240px) / var(--tk-n, 5) - 8px), 68px); }
+  .tn20 .tk-rcard-kortti { padding: 4px 12px 4px 18px; border-radius: 13px; }
+  .tn20 .tk-rcard--kuva .tk-rcard-kortti { padding: 4px 14px 4px 6px; border-radius: 16px; }
+  .tn20 .tk-rcard--kuva .tk-rcard-kuva { width: min(50px, calc(var(--tk-r) - 10px)); height: min(50px, calc(var(--tk-r) - 10px)); }
+  .tn20 .tk-rcard-role { font-size: 14px; }
+  /* Desktopilla ammatti oikealla (CD 3c). */
+  .tn20 .tk-rcard--kuva .tk-rcard-body { flex-direction: row; flex-wrap: wrap; align-items: center; justify-content: space-between; }
+  .tn20 .tk-rcard-note, .tn20 .tk-rcard--kuva .tk-rcard-note { flex-basis: 100%; font-size: 13px; }
+  .tn20 .tk-rcard-value { font-size: 20px; }
+
+  .tn20 .tk-chainlist, .tn20 .jr-tulos-rivit, .tn20 .jr-lauta-rivit { gap: 8px; }
+  .tn20 .jr-lauta { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 520px); grid-template-areas: "vasen rivit" "nappi rivit" ". rivit"; grid-template-rows: auto auto 1fr; column-gap: 64px; row-gap: 22px; align-items: start; max-width: 1200px; padding: 28px 40px 40px; }
+  .tn20 .jr-lauta-vasen { grid-area: vasen; }
+  .tn20 .jr-lauta-rivit { grid-area: rivit; }
+  /* "KORJAA RIVI" 88 px (wdth 70) → staattinen ≈ 0,72 em/merkki: 72 px ≈ 570 px < vasen sarake ≥ 280 px rivittyy kahdelle. */
+  .tn20 .jr-h1 { font-size: clamp(52px, 5.6vw, 72px); line-height: .88; }
+  .tn20 .jr-lause { margin-top: 20px; max-width: 40ch; font-size: 19px; line-height: 1.45; }
+  .tn20 .jr-merkki { padding-left: 46px; font-size: 12px; }
+  .tn20 .jr-tarkista { grid-area: nappi; position: static; margin: 0; padding: 0; background: none; }
+  .tn20 .jr-tarkista .jr-nappi { width: auto; padding: 0 34px; white-space: nowrap; }
+
+  .tn20 .jr-tulos { grid-template-columns: minmax(0, 1fr) minmax(0, 520px); grid-template-areas: "luku rivit" "jatko rivit" "viite rivit" ". rivit"; grid-template-rows: auto auto auto 1fr; column-gap: 64px; row-gap: 22px; align-items: start; max-width: 1200px; padding: 28px 40px 56px; }
+  .tn20 .jr-luku { grid-area: luku; }
+  .tn20 .jr-luku-n { font-size: clamp(88px, 8vw, 120px); }
+  .tn20 .jr-luku-sana { font-size: 28px; }
+  .tn20 .jr-tulos-rivit { grid-area: rivit; }
+  .tn20 .jr-jatko { grid-area: jatko; }
+  .tn20 .jr-alaviite { grid-area: viite; }
 }
-.tn20 .tk-reveal-skip {
-  align-self: center; background: none; border: none; color: var(--tk-text-tertiary);
-  font-family: var(--tn-font-body); font-weight: 700; font-size: 13px; text-decoration: underline;
-  cursor: pointer; padding: 8px;
-}
+
 .tn20 .tk-picker-direction { align-self: flex-start; }
 
 /* ---------- Pelisivun runko (app/(tn20)/peli/ikajarjestys) ---------- */
@@ -248,17 +247,6 @@
   display: flex; flex-direction: column; gap: 20px;
 }
 
-.tn20 .tk-order-head { display: flex; flex-direction: column; gap: 10px; align-items: flex-start; }
-.tn20 .tk-order-title {
-  font-family: var(--tn-font-display); font-weight: 900; color: var(--tk-text-primary);
-  font-size: clamp(26px, 6vw, 40px); line-height: 1.05; margin: 0;
-  text-transform: uppercase; letter-spacing: 0.01em;
-  overflow-wrap: normal; word-break: keep-all;
-}
-.tn20 .tk-order-desc { color: var(--tk-text-secondary); font-size: 14px; line-height: 1.5; margin: 0; max-width: 52ch; }
-.tn20 .tk-order-cta { position: sticky; bottom: 16px; }
-/* Pelikehyksen K4-tulos paljastuslistan alla: sivun oma reunus riittää (20.10.2026). */
-.tn20 .tk-page .pk-tulos { width: 100%; margin: 0; padding: 8px 0 0; } /* flex-sarakkeessa auto-marginaali kutisti tuloksen sisältönsä levyiseksi */
 .tn20 .tk-loading { color: var(--tk-text-tertiary); text-align: center; font-size: 14px; margin-top: 16px; }
 
 @media (prefers-reduced-motion: reduce) {
@@ -266,21 +254,6 @@
   .tn20 .tk-chainlist * { transition: none !important; }
 }
 
-/* ─── LAITA JÄRJESTYKSEEN (3.10.2026) ───────────────────────────────────────
-   Pakan otsikko on uppercase ja sanat eivät katkea (keep-all), joten koko rajataan
-   pisimmän sanan mukaan: --tk-lw (merkkiä) asetetaan clientissä, 100cqw = otsikon
-   sarakkeen leveys. Kerroin 0.82 em/merkki (Archivo 900 uppercase; mitattu 3.10. Range-menetelmällä
-   320–2450 px: 0.78 antoi MAAOTTELUENNÄTYKSET-sanalle 99 % leveydestä → 0.82 ≈ 6 % marginaali).
-   Yläraja = Ikäjärjestyksen alkuperäiset koot. */
-.tn20 .tk-jarj-cq { container-type: inline-size; }
-.tn20 .tk-order-head .tk-jarj-title { font-size: min(clamp(26px, 6vw, 40px), calc(100cqw / (var(--tk-lw, 10) * 0.82))); }
-/* Laita järjestykseen / laadulliset pakat (4.10.2026): paljastettu arvo omalla rivillään. */
-.tn20 .tk-rcard-value {
-  margin-top: 3px;
-  font-family: var(--tn-font-display); font-weight: 800; font-size: 14px; line-height: 1.25;
-  color: var(--tk-text-secondary);
-  overflow-wrap: normal; word-break: keep-all; white-space: normal;
-}
 .tn20 .tk-jarj-lahde { max-width: 560px; margin: 0 auto 40px; padding: 0 20px; font-size: 12.5px; color: var(--tk-text-muted); text-align: center; }
 
 /* Ikäjärjestyksen aloituksen kasvoketju (P3, Heikki 21.10.2026): kymmenen kasvoa vanhimmasta nuorimpaan

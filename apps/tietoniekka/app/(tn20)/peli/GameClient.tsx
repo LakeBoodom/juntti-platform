@@ -735,12 +735,14 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
     } catch { /* best-effort: pitkä osoite jää käyttöön */ }
   }
 
-  /* Vaihe C: jakokanava kirjataan samalla päivityksellä (quiz_plays.share_channel, viimeisin kanava riittää). */
+  /* Vaihe C: jakokanava kirjataan samalla päivityksellä (quiz_plays.share_channel, viimeisin kanava riittää).
+     Funktion kautta, koska selain ei saa päivittää quiz_plays-taulua suoraan. types.ts ei tunne funktiota. */
   async function markShared(kanava: Jakokanava) {
     try {
       const sb = getSupabase();
       if (!sb || !playIdRef.current) return;
-      await sb.from("quiz_plays").update({ shared: true, share_channel: kanava }).eq("id", playIdRef.current);
+      const sbAny = sb as unknown as { rpc: (fn: string, args: Record<string, unknown>) => Promise<unknown> };
+      await sbAny.rpc("merkitse_jaetuksi", { p_id: playIdRef.current, p_kanava: kanava });
     } catch { /* no-op */ }
   }
 
