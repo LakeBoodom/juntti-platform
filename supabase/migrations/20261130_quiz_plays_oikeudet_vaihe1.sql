@@ -1,4 +1,4 @@
--- LUONNOS, EI AJETTU. Vaatii Heikin hyväksynnän. (3.11.2026)
+-- Ajettu tuotantoon 3.11.2026 Heikin luvalla Supabase MCP:llä (quiz_plays_oikeudet_vaihe1).
 -- Pelikertojen ja visojen oikeudet, vaihe 1/2. Ei riko mitään: voidaan ajaa ennen koodimuutosta.
 --
 -- 1. quizzes: selain tarvitsee vain lukuoikeuden. Admin ja skriptit kirjoittavat service_rolella.
