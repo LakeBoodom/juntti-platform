@@ -11,7 +11,7 @@ import { getSiteStats } from "@/lib/siteStats";
 import { suosio } from "@/lib/suosio";
 import { KOKOELMA_KORTIT } from "@/lib/kokoelmat/rekisteri";
 import { visanKorttikuva } from "@/lib/kokoelmat/visanKorttikuva";
-import { ETUSIVU_RYHMAT, ETUSIVUN_PELIMUODOT, nakyyEtusivulla, ryhmanNimi } from "@/lib/pelimuodot";
+import { ETUSIVU_RYHMAT, ETUSIVUN_PELIMUODOT, nakyyEtusivulla, pelimuotoTanaan, ryhmanNimi } from "@/lib/pelimuodot";
 import { JUONTAJIEN_SUOSITUKSET, PROMO2_OOTKO } from "@/lib/etusivu";
 import { listaaVisapaketit, landinginPaketit, ajankohtainen, kauttaJaljella, korttiHref } from "@/lib/visapaketit";
 import { JUHLAT_KOKOELMA, pvm, juhlaKalenteri, paavisa, paiviaValissa, vpLyhyt, type Esiintyma } from "@/lib/juhlat";
@@ -112,7 +112,8 @@ export async function haeEtusivu(opts: {
   /* Kolmas paikka on kiinteästi Mikä maa? (päivitys 29.10.: ei pelimuotojen rotaatiota).
      Päivän peleissä näytetään vain pelattavaa (Heikki 29.10. ilta): Tulossa-kortti ei vie
      etusivun arvokkainta tilaa — Tulossa-sääntö pätee vain Valitse peli -osiossa. */
-  const mmConf = ETUSIVUN_PELIMUODOT.find((p) => p.slug === "mika-maa");
+  const pelimuodot = ETUSIVUN_PELIMUODOT.map((p) => pelimuotoTanaan(p, today.iso));
+  const mmConf = pelimuodot.find((p) => p.slug === "mika-maa");
   const mikaMaa = mmConf && mmConf.tila === "pelattava" && nakyyEtusivulla(mmConf, today.iso) ? mmConf : null;
 
   /* ── 2 Tiesitkö? ── questions.hook-pooli. Kierto (Heikki 31.10.2026): palvelin antaa koko poolin, selain arpoo
@@ -166,7 +167,7 @@ export async function haeEtusivu(opts: {
   /* ── 4 Valitse peli ── */
   const visat = `${stats.quizzesFloor}+`;
   const ryhmat = ETUSIVU_RYHMAT.map((g) => {
-    const kortit = ETUSIVUN_PELIMUODOT.filter((p) => p.ryhma === g.avain && nakyyEtusivulla(p, today.iso)).map((p) => ({
+    const kortit = pelimuodot.filter((p) => p.ryhma === g.avain && nakyyEtusivulla(p, today.iso)).map((p) => ({
       ...p, etusivu_rivi: p.etusivu_rivi.replace("{visat}", visat),
     }));
     return { ...g, nimi: ryhmanNimi(kortit, g.nimi), kortit };

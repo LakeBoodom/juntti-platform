@@ -170,7 +170,7 @@ export const ETUSIVUN_PELIMUODOT: EtusivunPelimuoto[] = [
   { slug: "klassinen", ryhma: "tietovisat", laji: "Tietovisa", nimi: "Klassinen visa", etusivu_rivi: "{visat} visaa kaikista aiheista", href: "/kokoelmat", kuva: "/20/hero-mikko-laura.webp", kuvaPos: "70% 24%", aksentti: TIETO, tila: "pelattava", julkaisu: null },
   { slug: "tupla", ryhma: "tietovisat", laji: "Tietovisa", nimi: "Tupla tai kuitti", etusivu_rivi: "Tuplaa pisteet tai pidä ne", href: "/peli/tupla-tai-kuitti", kuva: "/20/tupla/banneri-desk.webp", kuvaPos: "64% 38%", aksentti: TIETO, tila: "pelattava", julkaisu: null },
   { slug: "megavisat", ryhma: "tietovisat", laji: "Tietovisa", nimi: "Megavisat", etusivu_rivi: "Laajat teemavisat yhdellä istumalla", href: "/megavisat", kuva: "/20/megavisat/mikko-hero-900.webp", kuvaPos: "50% 22%", aksentti: TIETO, tila: "pelattava", julkaisu: null },
-  { slug: "mika-maa", ryhma: "tietovisat", laji: "Tietovisa", nimi: "Mikä maa?", etusivu_rivi: "Tunnista maa vihjeistä ja siluetista", href: "", kuva: null, aksentti: MAA, tila: "tulossa", julkaisu: "2026-11-30" },
+  { slug: "mika-maa", ryhma: "tietovisat", laji: "Tietovisa", nimi: "Mikä maa?", etusivu_rivi: "Tunnista maa vihjeistä ja siluetista", href: "/peli/mika-maa", kuva: null, aksentti: MAA, tila: "tulossa", julkaisu: "2026-11-30" },
   { slug: "pikapeli", ryhma: "tietovisat", laji: "Tietovisa", nimi: "Pikapeli", etusivu_rivi: "Vastaa ennen kuin aika loppuu", href: "", kuva: null, aksentti: TIETO, tila: "tulossa", julkaisu: null },
   { slug: "kuvavisat", ryhma: "kuva-aani", laji: "Kuvavisa", nimi: "Kuvavisat", etusivu_rivi: "Tunnista kuvista maiden liput, maakuntien vaakunat, eläimiä, lintuja ja monta muuta aihetta", href: "/kokoelma/kuvavisat", kuva: "/20/kuvavisat/hero-800.webp", aksentti: KUVA, tila: "pelattava", julkaisu: null },
   /* Viikon kuvavisa pois etusivulta (CD v8, 30.10.2026): Kuvavisat-kortti kattaa sen. */
@@ -186,6 +186,13 @@ export const ETUSIVUN_PELIMUODOT: EtusivunPelimuoto[] = [
   { slug: "vaalipiiriketju", ryhma: "jarjesta", laji: "Järjestä", nimi: "Vaalipiiriketju", tavut: "Vaali|piiri|ketju", etusivu_rivi: "Ketjuta kansanedustajat vaalipiireittäin", href: "/peli/vaalipiiriketju", kuva: "/20/vaalit/vaalipiiriketju.webp", aksentti: JARJ, tila: "pelattava", julkaisu: null },
   { slug: "kumpi", ryhma: "jarjesta", laji: "Kumpi?", nimi: "Kumpi?", etusivu_rivi: "Vanhempi, suurempi, korkeampi – valitse parista", href: "", kuva: null, aksentti: JARJ, tila: "tulossa", julkaisu: null },
 ];
+
+/** Pelimuoto tänään: Tulossa-kortti, jolla on osoite, syttyy pelattavaksi julkaisupäivänä ilman käsin vaihtoa
+ *  (Mikä maa? 30.11.2026). Esikatselussa ja paikallisesti julkaisupäivää ei odoteta, jotta kortin voi testata etukäteen. */
+export function pelimuotoTanaan(p: EtusivunPelimuoto, tanaan: string): EtusivunPelimuoto {
+  const esikatselu = typeof window === "undefined" && process.env.VERCEL_ENV !== "production";
+  return p.tila === "tulossa" && p.julkaisu && p.href && (tanaan >= p.julkaisu || esikatselu) ? { ...p, tila: "pelattava" } : p;
+}
 
 /** Näkyykö pelimuoto etusivulla tänään (Tulossa-sääntö). tanaan = YYYY-MM-DD. */
 export function nakyyEtusivulla(p: EtusivunPelimuoto, tanaan: string): boolean {

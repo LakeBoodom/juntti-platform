@@ -45,6 +45,8 @@ import { VPK_JAKONIMI } from "@/lib/vaalipiiriketju";
 import { visanKorttikuva } from "@/lib/kokoelmat/visanKorttikuva";
 import { onHenkilokuva } from "@/lib/jakokuvat";
 import { haeSivu, kierrosmaarat, kysymysmaarat, metarivi, sarjaNimi } from "@/lib/visapaketit";
+import { maaKierros } from "@/lib/vihjepeli/data";
+import { helsinginPaiva } from "@/lib/aika";
 
 export const runtime = "nodejs";
 
@@ -635,6 +637,12 @@ export async function GET(req: Request, ctx: { params: Promise<{ polku: string[]
         alarivi: metarivi(p, kierrosmaarat(sivu.vp), kysymysmaarat(sivu.vp)).join(" · "),
       };
     }
+  } else if (tyyppi === "sivu" && avain === "mika-maa") {
+    /* Mikä maa? (CD-paketti 7.11. §5): sama kortti pelille ja tulokselle; lause on päivän vihje 1, joten kortti vaihtuu
+       päivittäin (?p=YYYY-MM-DD välimuistin avaimena). Ei maata, lippua eikä tulosta. */
+    const p = url.searchParams.get("p");
+    const k = await maaKierros(p && /^\d{4}-\d{2}-\d{2}$/.test(p) ? p : helsinginPaiva().iso, null);
+    vastaus = await pelisivunEsikatselu({ nimi: "Mikä maa?", muoto: "vihjepeli", kuva: "/20/mika-maa/kompassi.webp", accent: "#B4532A", lause: k?.vihjeet[0] });
   } else if (tyyppi === "sivu" && PELISIVUT[avain]) {
     vastaus = await pelisivunEsikatselu(PELISIVUT[avain]);
   } else if (tyyppi === "sivu" && SIVUT[avain]) {

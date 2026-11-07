@@ -17,11 +17,15 @@ import { KL_LAHDE, KL_MAAKUNNAT } from "@/lib/kuntaliitos/reitti";
 import { RN_LAHDE, RN_MAANOSAT } from "@/lib/rajanaapurit/reitti";
 import { USA_LAHDE } from "@/lib/rajanaapurit/osavaltiot";
 import { maanantai } from "@/lib/reittipeli/viikonReitit";
+import MikaMaaKortti from "@/components/tn20/vihjepeli/MikaMaaKortti";
+import { maaKierros } from "@/lib/vihjepeli/data";
+import { MAA_JULKAISU } from "@/lib/vihjepeli/aiheet/maa";
+import { MM_SIVU } from "@/lib/vihjepeli/mikamaa";
 import "../kuntaliitos/reittihero.css";
 import "./karttapelit.css";
 
-/* Viikon reitti vaihtuu maanantaina → sivu uusitaan tunnin välein. */
-export const revalidate = 3600;
+/* Viikon reitti vaihtuu maanantaina ja Mikä maa? -kortin vihje 1 keskiyöllä → sivu uusitaan 10 minuutin välein. */
+export const revalidate = 600;
 
 const KUVAUS = "Rakenna reitti naapurista naapuriin maailmankartalla, Suomen kunnissa ja Yhdysvaltain osavaltioissa. Uusi viikon reitti joka maanantai.";
 
@@ -36,8 +40,11 @@ const LAHTEET = { rajanaapurit: RN_LAHDE, kuntaliitos: KL_LAHDE, osavaltiot: USA
 
 const pisinSana = (t: string) => Math.max(...t.split(/[\s-]+/).map((w) => w.length));
 
-export default function KarttapelitSivu() {
-  const viikko = maanantai(helsinginPaiva().iso);
+export default async function KarttapelitSivu() {
+  const iso = helsinginPaiva().iso;
+  const viikko = maanantai(iso);
+  /* Mikä maa? kokoelman ensimmäiseksi (CD-paketti 7.11.2026 §3, Heikki 7.11.): tuotannossa julkaisupäivästä 30.11. */
+  const mm = iso >= MAA_JULKAISU || process.env.VERCEL_ENV !== "production" ? await maaKierros(iso, null) : null;
   return (
     <PeliKehys iho="tumma">
       <JsonLd data={peliLd({ name: "Karttapelit", url: KARTTAPELIT_SIVU, description: KUVAUS })} />
@@ -47,10 +54,11 @@ export default function KarttapelitSivu() {
           <h1 className="kh-h1">Tunnetko maat, kunnat <span>ja osavaltiot?</span></h1>
           <div className="kh-intro">
             <p className="kh-lead">Pääsetkö perille karttaa pitkin?</p>
-            <p>Rakenna reitti kahden paikan välille niin, että jokainen pala rajautuu seuraavaan.</p>
+            <p>{mm ? "Arvaa päivän maa vihjeistä tai rakenna reitti kahden paikan välille niin, että jokainen pala rajautuu seuraavaan." : "Rakenna reitti kahden paikan välille niin, että jokainen pala rajautuu seuraavaan."}</p>
           </div>
         </header>
-        <ul className="kh-kortit">
+        <ul className="kh-kortit" data-mm={mm ? "" : undefined}>
+          {mm && <MikaMaaKortti href={MM_SIVU} paiva={mm.paiva} vihje={mm.vihjeet[0]} />}
           {KARTTAPELIT.map((k) => {
             const koukku = karttapelinKoukku(k, viikko);
             return (

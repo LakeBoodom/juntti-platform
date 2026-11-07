@@ -11,6 +11,7 @@ import { jakoMeta, jakoOsoite } from "@/lib/jakoMeta";
 import { esikatselu } from "@/lib/esikatselu";
 import { helsinginPaiva } from "@/lib/aika";
 import { maaKierros } from "@/lib/vihjepeli/data";
+import { MAA_JULKAISU } from "@/lib/vihjepeli/aiheet/maa";
 import { MM_KOTI, MM_NIMI, MM_SIVU } from "@/lib/vihjepeli/mikamaa";
 import VihjepeliClient from "@/components/tn20/vihjepeli/VihjepeliClient";
 import "./mikamaa.css";
@@ -24,13 +25,16 @@ type Props = { searchParams: Promise<Record<string, string | string[] | undefine
 
 export async function generateMetadata({ searchParams }: Props): Promise<Metadata> {
   const sp = await searchParams;
-  const k = await maaKierros(helsinginPaiva().iso, null);
+  const iso = helsinginPaiva().iso;
+  const k = await maaKierros(iso, null);
   return {
+    /* Ei hakukoneisiin ennen julkaisua (sivukartta lisää sivun samana päivänä). */
+    ...(iso < MAA_JULKAISU ? { robots: { index: false, follow: false } } : {}),
     title: "Mikä maa? – arvaa päivän maa vihjeistä | Tietoniekka",
     description: KUVAUS,
     alternates: { canonical: MM_SIVU },
-    /* Esikatselukortti (v4 §4, CD §5): koukku = päivän vihje 1, ei maata eikä tulosta. Oma jakokuva vaiheessa M-D. */
-    ...jakoMeta({ ...esikatselu({ nimi: MM_NIMI, muoto: "vihjepeli", koukku: k?.vihjeet[0] }), url: jakoOsoite(MM_SIVU, sp, ["tulos"]), kuva: "/og/sivu/karttapelit" }),
+    /* Esikatselukortti (v4 §4, CD §5): koukku = päivän vihje 1, ei maata eikä tulosta; kuva vaihtuu päivittäin (?p=). */
+    ...jakoMeta({ ...esikatselu({ nimi: MM_NIMI, muoto: "vihjepeli", koukku: k?.vihjeet[0] }), url: jakoOsoite(MM_SIVU, sp, ["tulos"]), kuva: `/og/sivu/mika-maa?p=${iso}` }),
   };
 }
 
