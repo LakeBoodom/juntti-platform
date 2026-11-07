@@ -34,7 +34,6 @@ export default function TulosNakyma(p: {
   pelaaUudelleen: (() => void) | null;
   kaikki: { href: string; teksti: string };
 }) {
-  const taydet = p.right === p.total;
   const ensimmainenVaarin = Math.max(0, p.vastaukset.findIndex((v) => v === "bad"));
   const h = p.haaste;
   const tuomio = h ? (p.right > h.oikein ? "voitto" : p.right < h.oikein ? "havio" : "tasan") : null;
@@ -139,7 +138,7 @@ export default function TulosNakyma(p: {
       </div>
 
       <Jakoalue
-        otsikko={h ? "Lähetä vastahaaste" : taydet ? "Pystyykö kaveri samaan?" : "Pystyykö kaveri parempaan?"}
+        otsikko={h ? "Lähetä vastahaaste" : "Haasta kaveri"}
         waNappi="Jaa WhatsAppissa"
         teksti={p.jako.teksti}
         url={p.jako.url}

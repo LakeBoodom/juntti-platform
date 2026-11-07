@@ -242,3 +242,10 @@
 @container kl (min-width: 1400px) {
   .tn20 .kl-kortti { --kl-vw: 48px; --kl-nimi-max: 22px; }
 }
+
+/* Haastetun polku (Jakotekstit v4 §5, vaihe 3): kaverin tulos laudan yläpuolella koko leveydeltä, tuloksessa vertailu. */
+.tn20 .kl-kaveri { margin: 8px 0 4px; }
+@container kl (min-width: 720px) { .tn20 .kl-kaveri { grid-column: 1 / -1; margin: 0; } }
+.tn20 .kl-tulos .kv-vertailu { flex: 1 1 100%; }
+.tn20 .kl-tulos .kv-tuomio { font-family: var(--rk-cond), "Barlow Condensed", sans-serif; font-variation-settings: normal; font-size: 30px; color: var(--kl-teal-t); }
+.tn20 .kl-tulos .kv-tuomio[data-tuomio="havio"] { color: #a8361c; }

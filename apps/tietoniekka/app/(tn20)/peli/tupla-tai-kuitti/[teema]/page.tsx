@@ -67,10 +67,12 @@ export default async function TuplaSivu({ params, searchParams }: Props) {
   if (sarja.length < 10) notFound();
 
   const [, kk, pv] = paiva.split("-").map(Number);
+  const kaverinOikein = pyydetty && typeof sp.oikein === "string" && /^(10|[0-9])$/.test(sp.oikein) ? Number(sp.oikein) : null;
   return (
     <>
       <JsonLd data={peliLd({ name: `Tupla tai kuitti – ${t.nimi}`, url: `/peli/tupla-tai-kuitti/${t.slug}`, description: t.kuvaus ?? "Tupla tai kuitti -pelimuoto Tietoniekassa." })} />
-      <TuplaClient teema={t} sarja={sarja} siemen={siemen} paivanSarja={!pyydetty} paivays={`${pv}.${kk}.`} />
+      {/* Haastetun polku (v4 §5): kaverin oikeat peräkkäin (?oikein=) vain saman sarjan linkissä. */}
+      <TuplaClient teema={t} sarja={sarja} siemen={siemen} paivanSarja={!pyydetty} paivays={`${pv}.${kk}.`} kaverinOikein={kaverinOikein} />
     </>
   );
 }

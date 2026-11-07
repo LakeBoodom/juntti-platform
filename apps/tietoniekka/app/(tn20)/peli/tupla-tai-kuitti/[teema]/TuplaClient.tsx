@@ -6,7 +6,8 @@
 // Ei kantaan kirjoittamista vielä; paras tulos muistetaan selaimessa sarjakohtaisesti.
 
 import { lisaaPelirivi } from "@/lib/seuranta";
-import { jaaPeliTeksti, tulosjakoteksti } from "@/lib/korttinimi";
+import { jaaPeliTeksti, tulosjakoteksti, vastahaasteteksti } from "@/lib/korttinimi";
+import { haasterivi, type KaverinTulos } from "@/lib/kaveri";
 import { tuplaTaso } from "@/lib/pelitasot";
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 import {
@@ -187,7 +188,11 @@ function Sanamerkki({ t }: { t: TuplaTeema }) {
   );
 }
 
-export default function TuplaClient({ teema: t, sarja, siemen, paivanSarja, paivays }: { teema: TuplaTeema; sarja: TuplaKysymys[]; siemen: string; paivanSarja: boolean; /** "26.9." */ paivays: string }) {
+export default function TuplaClient({ teema: t, sarja, siemen, paivanSarja, paivays, kaverinOikein }: {
+  teema: TuplaTeema; sarja: TuplaKysymys[]; siemen: string; paivanSarja: boolean; /** "26.9." */ paivays: string;
+  /** Haastetun polku: kaverin oikeat vastaukset peräkkäin samassa sarjassa (?oikein=), tai null. */
+  kaverinOikein?: number | null;
+}) {
   const [vaihe, setVaihe] = useState<Vaihe>("alku");
   const [i, setI] = useState(0);
   const [valinta, setValinta] = useState<string | null>(null);
@@ -258,13 +263,21 @@ export default function TuplaClient({ teema: t, sarja, siemen, paivanSarja, paiv
   // Arvotaan vasta painettaessa: renderissä arvottu siemen erottaisi palvelimen ja selaimen HTML:n.
   const arvoUusi = () => location.assign(`?sarja=${uusiSiemen()}`);
 
+  /* Haastetun polku (Jakotekstit v4 §5): "Kaverisi sai 4 oikein peräkkäin." ylimpänä, tuloksessa vertailu ja vastahaaste. */
+  const kaveri: KaverinTulos | null = kaverinOikein == null ? null : {
+    otsikko: `Kaverisi sai ${kaverinOikein} oikein peräkkäin.`,
+    rivi: haasterivi("Vastaa samoihin kysymyksiin", kaverinOikein >= sarja.length, "pääsetkö pidemmälle"),
+    luku: String(kaverinOikein), lyhyt: `${kaverinOikein} peräkkäin`, arvo: kaverinOikein,
+  };
   /* Jako (K4 v2, 25.10.2026): Jakoalue-komponentti. Tulos (saalis + lopetuksen syy) linkkiin, jotta kaveri saa saman
      sarjan ja Facebookin og-kuvaus kertoo tuloksen. Tulos piirretään vain pelin jälkeen selaimessa (ei SSR).
      Jakotekstit v4 (6.11.2026): oikeiden vastausten määrä, ei kiekkoja; nollalla jaetaan peli, ei tulosta. */
   const jako = loppu
     ? {
-        url: `${typeof location !== "undefined" ? location.origin : "https://tietoniekka.fi"}/peli/tupla-tai-kuitti/${t.slug}?sarja=${encodeURIComponent(siemen)}&tulos=${loppu.saalis}&syy=${loppu.syy}`,
-        teksti: loppu.oikein > 0 ? tulosjakoteksti(t.nimi, `sain ${loppu.oikein} oikein peräkkäin`) : jaaPeliTeksti(t.nimi),
+        url: `${typeof location !== "undefined" ? location.origin : "https://tietoniekka.fi"}/peli/tupla-tai-kuitti/${t.slug}?sarja=${encodeURIComponent(siemen)}&tulos=${loppu.saalis}&syy=${loppu.syy}&oikein=${loppu.oikein}`,
+        teksti: kaveri
+          ? vastahaasteteksti(`${loppu.oikein} peräkkäin`, kaveri.lyhyt)
+          : loppu.oikein > 0 ? tulosjakoteksti(t.nimi, `sain ${loppu.oikein} oikein peräkkäin`) : jaaPeliTeksti(t.nimi),
       }
     : null;
 
@@ -275,6 +288,8 @@ export default function TuplaClient({ teema: t, sarja, siemen, paivanSarja, paiv
   }, [vastattu]);
 
   const tyyli = { "--acc": t.accent, "--ttk-kuvio": t.kuvio } as CSSProperties;
+
+
 
   /* ── Aloitus ──────────────────────────────────────────────────────── */
   if (vaihe === "alku") {
@@ -290,6 +305,7 @@ export default function TuplaClient({ teema: t, sarja, siemen, paivanSarja, paiv
             aiheet={aiheet}
             valittu={t.slug}
             onAloita={alusta}
+            kaveri={kaveri}
             saannot={<TuplaSaannot />}
             tausta={<TuplaTausta />}
             alarivi={
@@ -309,7 +325,7 @@ export default function TuplaClient({ teema: t, sarja, siemen, paivanSarja, paiv
 
   /* ── Tulos ────────────────────────────────────────────────────────── */
   if (vaihe === "loppu" && loppu) {
-    return <Tulos t={t} loppu={loppu} paras={paras} jako={jako!} alusta={alusta} arvoUusi={arvoUusi} tyyli={tyyli} />;
+    return <Tulos t={t} loppu={loppu} paras={paras} jako={jako!} alusta={alusta} arvoUusi={arvoUusi} tyyli={tyyli} kaveri={kaveri} />;
   }
 
   /* ── Kysymys + palaute ───────────────────────────────────────────── */
@@ -471,9 +487,9 @@ export default function TuplaClient({ teema: t, sarja, siemen, paivanSarja, paiv
   );
 }
 
-function Tulos({ t, loppu, paras, jako, alusta, arvoUusi, tyyli }: {
+function Tulos({ t, loppu, paras, jako, alusta, arvoUusi, tyyli, kaveri }: {
   t: TuplaTeema; loppu: Loppu; paras: number | null; jako: { url: string; teksti: string };
-  alusta: () => void; arvoUusi: () => void; tyyli: CSSProperties;
+  alusta: () => void; arvoUusi: () => void; tyyli: CSSProperties; kaveri: KaverinTulos | null;
 }) {
   const p = t.palkinto;
   const { syy, saalis, oikein } = loppu;
@@ -526,6 +542,7 @@ function Tulos({ t, loppu, paras, jako, alusta, arvoUusi, tyyli }: {
               )}
             </div>
           }
+          vertailu={kaveri ? { oma: { luku: String(oikein), lyhyt: `${oikein} peräkkäin`, arvo: oikein }, kaveri } : null}
           jako={{ ...jako, natiiviOtsikko: `Tupla tai kuitti: ${t.nimi}` }}
           toiminnot={[
             { teksti: "Pelaa uusi kierros", onClick: arvoUusi },

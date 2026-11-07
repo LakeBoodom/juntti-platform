@@ -14,6 +14,7 @@ import { arvoReitti, reittiAlueista, RN_MAANOSAT, maanosaTunnuksella } from "@/l
 import { sivunReitti, viikonAikavali } from "@/lib/reittipeli/viikonReitit";
 import ReittipeliClient from "@/components/tn20/reittipeli/ReittipeliClient";
 import { reittiJakokuva, reittiKorttinimi } from "@/lib/reittipeli/kuvat";
+import { reittiKaveri } from "@/lib/kaveri";
 import { uusiReittiSiemen } from "@/lib/kuntaliitos";
 import { redirect } from "next/navigation";
 import "../kuntaliitos/kuntaliitos.css";
@@ -64,6 +65,7 @@ export default async function RajanaapuritSivu({ searchParams }: Props) {
         otsikko={valinta.otsikko}
         intro={valinta.intro}
         viikko={valinta.kuluva}
+        kaveri={pyydetty ? reittiKaveri(sp.tulos, sp.y) : null}
       />
     </>
   );

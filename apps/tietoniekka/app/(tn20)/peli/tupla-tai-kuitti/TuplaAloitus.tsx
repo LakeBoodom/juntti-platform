@@ -5,6 +5,8 @@
 // suoraan (onAloita); muuten siirrytään aiheen sivulle ?aloita=1 (peli alkaa heti).
 import { useState, type CSSProperties, type ReactNode } from "react";
 import PeliAloitus from "@/components/tn20/pelikehys/PeliAloitus";
+import { KaveriRivi } from "@/components/tn20/kaveri/Kaveri";
+import type { KaverinTulos } from "@/lib/kaveri";
 import "./tuplaaloitus.css";
 
 export type AiheValinta = { slug: string; nimi: string; accent: string };
@@ -16,6 +18,7 @@ export default function TuplaAloitus({
   alarivi,
   saannot,
   tausta,
+  kaveri,
 }: {
   aiheet: AiheValinta[];
   valittu: string;
@@ -24,6 +27,8 @@ export default function TuplaAloitus({
   alarivi?: ReactNode;
   saannot: ReactNode;
   tausta: ReactNode;
+  /** Haastetun polku (v4 §5): kaverin tulos ylimpänä, studiokuvan yläpuolella. */
+  kaveri?: KaverinTulos | null;
 }) {
   const [sel, setSel] = useState(valittu);
   const aihe = aiheet.find((a) => a.slug === sel) ?? aiheet[0];
@@ -35,6 +40,7 @@ export default function TuplaAloitus({
      aiheet edelleen ensimmäisessä näkymässä. Logo on sivun h1 (alt = pelin nimi). */
   return (
     <>
+    {kaveri && <KaveriRivi kaveri={kaveri} className="tks-kaveri" />}
     <div className="tks-kuva">
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
@@ -52,7 +58,8 @@ export default function TuplaAloitus({
         // eslint-disable-next-line @next/next/no-img-element
         <img className="tks-logo" src="/20/tupla/logo.webp" alt="Tupla tai kuitti" width={640} height={374} />
       }
-      lause="Valitse aihe, vastaa ja päätä joka kierroksella: tuplaatko vai otatko kuitin."
+      /* Haastelinkillä kaverin rivi kertoo, mitä tehdään: ohjelause pois, jotta Aloita mahtuu 390 × 844:ään. */
+      lause={kaveri ? null : "Valitse aihe, vastaa ja päätä joka kierroksella: tuplaatko vai otatko kuitin."}
       valinta={
         <fieldset className="pk-valinta">
           <legend>Valitse aihe</legend>

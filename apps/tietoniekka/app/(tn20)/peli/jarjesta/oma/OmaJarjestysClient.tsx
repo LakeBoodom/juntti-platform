@@ -1,7 +1,8 @@
 "use client";
 // Laadullinen järjestyspakka (brief 4.10.2026): sama lauta ja tulos kuin pakkapeleissä (Korjausrivi → RevealSequencer),
 // tasatulokset lib/jarjesta/pisteytys.ts. CD "Järjestä yhtenäinen UX" (Heikki 2.11.2026).
-import { tulosjakoteksti } from "@/lib/korttinimi";
+import { tulosjakoteksti, vastahaasteteksti } from "@/lib/korttinimi";
+import { jarjestaKaveri } from "@/lib/kaveri";
 import { useMemo, useState } from "react";
 import { RevealSequencer, type RevealItem } from "@/components/tn20/RevealSequencer";
 import { arvioi, pisteet } from "@/lib/jarjesta/pisteytys";
@@ -36,6 +37,7 @@ export default function OmaJarjestysClient({
   kohteet,
   tilastot,
   takaisin,
+  kaverinTulos = null,
 }: {
   /** Laatuattribuutin avain (?a=) — pelikertatilaston avain. */
   attr: string;
@@ -46,7 +48,10 @@ export default function OmaJarjestysClient({
   kohteet: OmaKohde[];
   tilastot: string | null;
   takaisin: { href: string; nimi: string };
+  /** Haastetun polku: kaverin tulos samalla rivillä (?tulos=n-total); "Yritä uudelleen" pitää saman rivin. */
+  kaverinTulos?: { n: number; kaikki: number } | null;
 }) {
+  const kaveri = kaverinTulos ? jarjestaKaveri(kaverinTulos) : null;
   const [order, setOrder] = useState<OmaKohde[]>(kohteet);
   const [paljastettu, setPaljastettu] = useState(false);
   const uudelleen = () => {
@@ -76,7 +81,9 @@ export default function OmaJarjestysClient({
      ja Facebookin og-kuvaus kertoo tuloksen. Tulosvaihe piirretään vain selaimessa. */
   const jakoTiedot = () => ({
     url: (() => { const u = new URL(location.href); u.searchParams.set("tulos", `${tulos.correctCount}-${tulos.totalCount}`); return u.toString(); })(),
-    teksti: tulosjakoteksti(otsikko, `sain ${tulos.correctCount}/${tulos.totalCount} oikeille paikoille`),
+    teksti: kaveri
+      ? vastahaasteteksti(`${tulos.correctCount}/${tulos.totalCount}`, kaveri.lyhyt)
+      : tulosjakoteksti(otsikko, `sain ${tulos.correctCount}/${tulos.totalCount} oikeille paikoille`),
   });
 
   // Pelikehys K1 (20.10.2026): paluu henkilösivulle, jolta pakka avattiin.
@@ -91,6 +98,7 @@ export default function OmaJarjestysClient({
               <RiviJatko
                 uusi={{ teksti: "Yritä uudelleen", onClick: uudelleen }}
                 jako={{ ...jakoTiedot(), natiiviOtsikko: PELI }}
+                vertailu={kaveri ? { oma: { luku: `${tulos.correctCount}/${tulos.totalCount}`, lyhyt: `${tulos.correctCount}/${tulos.totalCount}`, arvo: tulos.correctCount }, kaveri } : null}
                 lisa={<SeuraavaPeli seuraavat={seuraavatPelit("", "tunnetut-henkilot")} />}
               />
             }
@@ -105,6 +113,7 @@ export default function OmaJarjestysClient({
     <PeliKehys iho="tumma">
       <Pelipalkki iho="tumma" peli={PELI} koti={takaisin} pelissa paluuNuoli />
       <Korjausrivi
+        kaveri={kaveri}
         lause={`${otsikko}.`}
         ylin={ylin}
         alin={alin}

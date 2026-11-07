@@ -14,6 +14,7 @@ import { RN_USA_SIVU } from "@/lib/rajanaapurit";
 import { sivunReitti, viikonAikavali } from "@/lib/reittipeli/viikonReitit";
 import ReittipeliClient from "@/components/tn20/reittipeli/ReittipeliClient";
 import { reittiJakokuva, reittiKorttinimi } from "@/lib/reittipeli/kuvat";
+import { reittiKaveri } from "@/lib/kaveri";
 import { uusiReittiSiemen } from "@/lib/kuntaliitos";
 import { maanantai, viikonSiemen } from "@/lib/reittipeli/viikonReitit";
 import { redirect } from "next/navigation";
@@ -63,6 +64,7 @@ export default async function OsavaltiotSivu({ searchParams }: Props) {
         otsikko={valinta.otsikko}
         intro={valinta.intro}
         viikko={valinta.kuluva}
+        kaveri={pyydetty ? reittiKaveri(sp.tulos, sp.y) : null}
       />
     </>
   );
