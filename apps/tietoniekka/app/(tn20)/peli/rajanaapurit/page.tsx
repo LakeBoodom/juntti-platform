@@ -33,7 +33,7 @@ export async function generateMetadata({ searchParams }: { searchParams: Promise
     ...jakoMeta({
       /* Esikatselukortti (v4 §4): "{Lähtö} → {Maali} – karttapeli" jaetulla reitillä, muuten pelin nimi. */
       ...esikatselu({ nimi: reittiKorttinimi("rajanaapurit", sp) ?? "Rajanaapurit", muoto: "rajanaapurit", koukku: reittiKoukku("rajanaapurit", sp) }),
-      url: jakoOsoite("/peli/rajanaapurit", sp, ["maanosa", "reitti", "tulos"]),
+      url: jakoOsoite("/peli/rajanaapurit", sp, ["maanosa", "reitti", "tulos", "y"]),
       kuva: reittiJakokuva("rajanaapurit", sp, "/og/sivu/rajanaapurit"),
     }),
   };

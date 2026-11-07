@@ -34,7 +34,7 @@ export async function generateMetadata({ searchParams }: { searchParams: Promise
     ...jakoMeta({
       /* Esikatselukortti (v4 §4): "{Lähtö} → {Maali} – karttapeli" jaetulla reitillä, muuten pelin nimi. */
       ...esikatselu({ nimi: reittiKorttinimi("osavaltiot", sp) ?? "Rajanaapurit: Yhdysvallat", muoto: "osavaltiot", koukku: reittiKoukku("osavaltiot", sp) }),
-      url: jakoOsoite(RN_USA_SIVU, sp, ["reitti", "tulos"]),
+      url: jakoOsoite(RN_USA_SIVU, sp, ["reitti", "tulos", "y"]),
       kuva: reittiJakokuva("osavaltiot", sp, `/og/reitti/osavaltiot?reitti=${viikonSiemen(maanantai(helsinginPaiva().iso))}`),
     }),
   };
