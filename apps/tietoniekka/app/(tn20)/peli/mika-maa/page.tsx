@@ -3,7 +3,7 @@
 // kannasta (vihjepeli_vihjeet, vain tarkistetut), siluetti, maanosa ja pääkaupunki aineistosta (maat.json).
 //   /peli/mika-maa             päivän maa
 //   /peli/mika-maa?kohde=x7k2  harjoitusmaa ("Pelaa harjoitusmaa"), ei vaikuta päivän tulokseen
-// Julkaisu 30.11.2026: ennen sitä päivän maa arvotaan ilman historiaa (esikatselu), ks. arvonta.historia().
+// Julkaistu 7.11.2026 (MM_JULKAISU): päivän maan historia ja toistosuoja alkavat siitä, ks. arvonta.historia().
 
 import type { Metadata } from "next";
 import { JsonLd, peliLd } from "@/lib/jsonLd";

@@ -189,7 +189,7 @@ export const ETUSIVUN_PELIMUODOT: EtusivunPelimuoto[] = [
 ];
 
 /** Pelimuoto tänään: Tulossa-kortti, jolla on osoite, syttyy pelattavaksi julkaisupäivänä ilman käsin vaihtoa
- *  (Mikä maa? 30.11.2026). Esikatselussa ja paikallisesti julkaisupäivää ei odoteta, jotta kortin voi testata etukäteen. */
+ *  (Mikä maa? julkaistu 7.11.2026). Esikatselussa ja paikallisesti julkaisupäivää ei odoteta, jotta kortin voi testata etukäteen. */
 export function pelimuotoTanaan(p: EtusivunPelimuoto, tanaan: string): EtusivunPelimuoto {
   const esikatselu = typeof window === "undefined" && process.env.VERCEL_ENV !== "production";
   return p.tila === "tulossa" && p.julkaisu && p.href && (tanaan >= p.julkaisu || esikatselu) ? { ...p, tila: "pelattava" } : p;

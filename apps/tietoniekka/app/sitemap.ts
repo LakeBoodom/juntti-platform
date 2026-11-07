@@ -57,7 +57,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...IKA_PAKAT.map((p) => u(p.href, "weekly", 0.6)),
     ...JULKAISTUT.map((p) => u(pakkaHref(p), "monthly", 0.6)),
     u(VPK_SIVU, "daily", 0.7),
-    /* Mikä maa? vasta julkaisupäivästä (30.11.2026); sitä ennen sivu on noindex. */
+    /* Mikä maa? julkaisupäivästä (MM_JULKAISU, 7.11.2026) alkaen; sitä ennen sivu oli noindex. */
     ...(helsinginPaiva().iso >= MAA_JULKAISU ? [u(MM_SIVU, "daily", 0.7)] : []),
     u("/kuvavisa/viikko", "weekly", 0.7),
     /* Lasten visat (vaihe 5): /lapset vasta kun LAPSET_ENABLED; julkaistut lasten visat tulevat quizPagesista. */

@@ -43,7 +43,7 @@ const pisinSana = (t: string) => Math.max(...t.split(/[\s-]+/).map((w) => w.leng
 export default async function KarttapelitSivu() {
   const iso = helsinginPaiva().iso;
   const viikko = maanantai(iso);
-  /* Mikä maa? kokoelman ensimmäiseksi (CD-paketti 7.11.2026 §3, Heikki 7.11.): tuotannossa julkaisupäivästä 30.11. */
+  /* Mikä maa? kokoelman ensimmäiseksi (CD-paketti 7.11.2026 §3, Heikki 7.11.): tuotannossa julkaisupäivästä (MM_JULKAISU). */
   const mm = iso >= MAA_JULKAISU || process.env.VERCEL_ENV !== "production" ? await maaKierros(iso, null) : null;
   return (
     <PeliKehys iho="tumma">
