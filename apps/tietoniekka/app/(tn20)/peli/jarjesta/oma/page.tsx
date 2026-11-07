@@ -2,7 +2,7 @@
 // /peli/jarjesta/oma?a=<attr_key>&h=<celebrity-id:t>&p=<henkilön slug>. Täsmälleen ne henkilöt, jotka
 // henkilösivun kortti näytti. Parametrisivu → ei indeksoida (henkilösivu on indeksoitava sisältö).
 import type { Metadata } from "next";
-import { jakoMeta, jakoOsoite } from "@/lib/jakoMeta";
+import { jakoMeta, jakoOsoite, jaettuTulos } from "@/lib/jakoMeta";
 import { esikatselu } from "@/lib/esikatselu";
 import { getSupabase } from "@/lib/supabase";
 import { arvoTeksti, haeLaatuArvot, haeLaatuDefit } from "@/lib/laadullinen";
@@ -76,6 +76,7 @@ export default async function OmaJarjestysPage({ searchParams }: { searchParams:
       alin={def.akseli[1]}
       direction={def.winner === "high" ? "desc" : "asc"}
       kohteet={kohteet}
+      kaverinTulos={(() => { const t = jaettuTulos(sp.tulos); return t && t.kaikki === kohteet.length ? t : null; })()}
       tilastot={asOf ? `Tilastot: ${fiPvm(asOf)}` : null}
       takaisin={oma ? { href: `/henkilo/${p}`, nimi: oma.name } : { href: "/kokoelma/tunnetut-henkilot", nimi: "Tunnetut henkilöt" }}
     />

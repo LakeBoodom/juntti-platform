@@ -8,7 +8,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { JsonLd, peliLd } from "@/lib/jsonLd";
-import { jakoMeta, jakoOsoite } from "@/lib/jakoMeta";
+import { jakoMeta, jakoOsoite, jaettuTulos } from "@/lib/jakoMeta";
 import { esikatselu } from "@/lib/esikatselu";
 import { JULKAISTUT, haePakka, pakkaHref } from "@/lib/jarjesta/pakat";
 import { haeJarjestysKierros, haeJarjestysKohteet } from "@/lib/jarjesta/kierros";
@@ -17,6 +17,7 @@ import { getChainRound, getChainRoundByIds } from "@/lib/ikajarjestys";
 import { henkiloKuva } from "@/lib/henkilokuvat";
 import JarjestaClient from "./JarjestaClient";
 import IkajarjestysClient from "./IkajarjestysClient";
+import { koukkuTeksti } from "@/lib/koukku";
 
 export const dynamicParams = false;
 
@@ -39,7 +40,7 @@ export async function generateMetadata({ params, searchParams }: { params: Promi
       title: `${nimi} – järjestä syntymävuoden mukaan | Tietoniekka`,
       description: kuvaus,
       alternates: { canonical: ika.href },
-      ...jakoMeta({ ...esikatselu({ nimi: ika.nimi, muoto: "ikajarjestys", lause: ika.pelilause }), url: jakoOsoite(ika.href, sp, ["henkilot", "rivi", "tulos"]), kuva: `/og/jarjesta/${ika.slug}` }),
+      ...jakoMeta({ ...esikatselu({ nimi: ika.nimi, muoto: "ikajarjestys", lause: ika.pelilause, koukku: koukkuTeksti(ika.koukku) }), url: jakoOsoite(ika.href, sp, ["henkilot", "rivi", "tulos"]), kuva: `/og/jarjesta/${ika.slug}` }),
     };
   }
   const p = haePakka(slug);
@@ -49,8 +50,14 @@ export async function generateMetadata({ params, searchParams }: { params: Promi
     title: `${p.seoTitle} | Tietoniekka`,
     description: `${p.kuvaus} ${p.rajaus}`,
     alternates: { canonical: url },
-    ...jakoMeta({ ...esikatselu({ nimi: p.kortti.otsikko, muoto: "jarjesta", lause: p.pelilause }), url: jakoOsoite(url, sp, ["kohteet", "tulos"]), kuva: `/og/jarjesta/${p.slug}` }),
+    ...jakoMeta({ ...esikatselu({ nimi: p.kortti.otsikko, muoto: "jarjesta", lause: p.pelilause, koukku: koukkuTeksti(p.koukku) }), url: jakoOsoite(url, sp, ["kohteet", "tulos"]), kuva: `/og/jarjesta/${p.slug}` }),
   };
+}
+
+/** Haastetun polku (v4 §5): kaverin tulos (?tulos=n-total) vain, kun linkki kantaa saman rivin (total = rivin koko). */
+function kaverinTulos(raw: string | string[] | undefined, rivinKoko: number) {
+  const t = jaettuTulos(raw);
+  return t && rivinKoko > 0 && t.kaikki === rivinKoko ? t : null;
 }
 
 export default async function JarjestaPakkaPage({ params, searchParams }: { params: Promise<{ pakka: string }>; searchParams: Haku }) {
@@ -58,7 +65,7 @@ export default async function JarjestaPakkaPage({ params, searchParams }: { para
   const sp = await searchParams;
   const aloita = sp.aloita === "1" || sp.autostart === "1";
   const ika = haeIkaPakka(slug);
-  if (ika) return <IkajarjestysSivu pakka={ika} aloita={aloita} henkilot={typeof sp.henkilot === "string" ? sp.henkilot.split(",") : null} rivi={sp.rivi === "1"} />;
+  if (ika) return <IkajarjestysSivu pakka={ika} aloita={aloita} henkilot={typeof sp.henkilot === "string" ? sp.henkilot.split(",") : null} rivi={sp.rivi === "1"} tulos={sp.tulos} />;
   const p = haePakka(slug);
   if (!p) notFound();
   const kohteet = typeof sp.kohteet === "string" ? await haeJarjestysKohteet(p.slug, sp.kohteet.split(",")) : [];
@@ -66,13 +73,13 @@ export default async function JarjestaPakkaPage({ params, searchParams }: { para
   return (
     <>
       <JsonLd data={peliLd({ name: p.seoTitle, url: pakkaHref(p), description: p.kuvaus })} />
-      <JarjestaClient key={initialRound ? "aloitettu" : "aloitus"} pakka={p} initialRound={initialRound} />
+      <JarjestaClient key={initialRound ? "aloitettu" : "aloitus"} pakka={p} initialRound={initialRound} kaverinTulos={kaverinTulos(sp.tulos, kohteet.length)} />
     </>
   );
 }
 
 /** Ikäjärjestyksen pakka (entinen /peli/ikajarjestys?category=, siirretty osaan C 31.10.2026). */
-async function IkajarjestysSivu({ pakka, aloita, henkilot, rivi }: { pakka: IkaPakka; aloita: boolean; henkilot: string[] | null; rivi: boolean }) {
+async function IkajarjestysSivu({ pakka, aloita, henkilot, rivi, tulos }: { pakka: IkaPakka; aloita: boolean; henkilot: string[] | null; rivi: boolean; tulos: string | string[] | undefined }) {
   // Henkilösivun nosto ja jaettu kierros: ?henkilot=id,id,… → täsmälleen nämä (design v0.3, 4a); hubin rivi järjestyksineen.
   const initialRound = henkilot ? await getChainRoundByIds(henkilot, rivi) : aloita ? await getChainRound(pakka.kategoria) : null;
 
@@ -94,7 +101,7 @@ async function IkajarjestysSivu({ pakka, aloita, henkilot, rivi }: { pakka: IkaP
   return (
     <>
       <JsonLd data={peliLd({ name: `Ikäjärjestys: ${pakka.nimi}`, url: pakka.href, description: pakka.kuvaus })} />
-      <IkajarjestysClient pakka={pakka} initialRound={initialRound?.length ? initialRound : null} kasvot={kasvot} />
+      <IkajarjestysClient pakka={pakka} initialRound={initialRound?.length ? initialRound : null} kasvot={kasvot} kaverinTulos={henkilot ? kaverinTulos(tulos, initialRound?.length ?? 0) : null} />
     </>
   );
 }

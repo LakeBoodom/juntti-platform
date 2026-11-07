@@ -14,6 +14,7 @@ import { helsinginPaiva } from "@/lib/aika";
 import { arvoSarja, teema as haeTeema, type KysymysRivi } from "@/lib/tuplaTaiKuitti";
 import TuplaClient from "./TuplaClient";
 import "../tupla.css";
+import { haeKysymysKoukku } from "@/lib/koukku";
 
 export const dynamic = "force-dynamic";
 
@@ -33,8 +34,8 @@ export async function generateMetadata({ params, searchParams }: Props): Promise
     alternates: t ? { canonical: `/peli/tupla-tai-kuitti/${t.slug}` } : undefined,
     /* Esikatselukortti (v4 §4): "{teema} – kaikki tai ei mitään"; tulos on viestissä, ei kortissa. */
     ...jakoMeta({
-      ...(t ? esikatselu({ nimi: t.nimi, muoto: "tupla" }) : { title: "Tupla tai kuitti", description: tehtavalause("tupla") }),
-      url: t ? jakoOsoite(`/peli/tupla-tai-kuitti/${t.slug}`, sp, ["sarja", "tulos", "syy"]) : "/peli/tupla-tai-kuitti",
+      ...(t ? esikatselu({ nimi: t.nimi, muoto: "tupla", koukku: (await haeKysymysKoukku(t.koukku))?.kysymys }) : { title: "Tupla tai kuitti", description: tehtavalause("tupla") }),
+      url: t ? jakoOsoite(`/peli/tupla-tai-kuitti/${t.slug}`, sp, ["sarja", "tulos", "syy", "oikein"]) : "/peli/tupla-tai-kuitti",
       kuva: t ? `/og/tupla/${t.slug}` : "/og/sivu/tupla-tai-kuitti",
     }),
   };
@@ -67,10 +68,12 @@ export default async function TuplaSivu({ params, searchParams }: Props) {
   if (sarja.length < 10) notFound();
 
   const [, kk, pv] = paiva.split("-").map(Number);
+  const kaverinOikein = pyydetty && typeof sp.oikein === "string" && /^(10|[0-9])$/.test(sp.oikein) ? Number(sp.oikein) : null;
   return (
     <>
       <JsonLd data={peliLd({ name: `Tupla tai kuitti – ${t.nimi}`, url: `/peli/tupla-tai-kuitti/${t.slug}`, description: t.kuvaus ?? "Tupla tai kuitti -pelimuoto Tietoniekassa." })} />
-      <TuplaClient teema={t} sarja={sarja} siemen={siemen} paivanSarja={!pyydetty} paivays={`${pv}.${kk}.`} />
+      {/* Haastetun polku (v4 §5): kaverin oikeat peräkkäin (?oikein=) vain saman sarjan linkissä. */}
+      <TuplaClient teema={t} sarja={sarja} siemen={siemen} paivanSarja={!pyydetty} paivays={`${pv}.${kk}.`} kaverinOikein={kaverinOikein} />
     </>
   );
 }

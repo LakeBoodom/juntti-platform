@@ -19,7 +19,9 @@ export function jakoMeta(o: { title: string; description?: string | null; url: s
    sen jakokuvan ja -tekstit. Kun og:url oli parametriton canonical, Facebook näytti tuloslinkistä vanhan visakortin ja
    vei kaverin eri kierrokselle. <link rel="canonical"> pysyy parametrittomana (SEO). Vain sallitut parametrit
    mukaan. */
+/* Jakotunnus ?j= (lib/jakoseuranta.ts) kulkee aina mukana: Facebook vie klikkaajan og:url-osoitteeseen. */
 export function jakoOsoite(polku: string, sp: Record<string, string | string[] | undefined>, sallitut: string[]): string {
+  sallitut = [...sallitut, "j"];
   /* Järjestys kuten saapuneessa osoitteessa; pilkut (?ids=a,b) jätetään koodaamatta, jotta osoite on sama kuin jaettu. */
   const osat = Object.keys(sp)
     .filter((k) => sallitut.includes(k))

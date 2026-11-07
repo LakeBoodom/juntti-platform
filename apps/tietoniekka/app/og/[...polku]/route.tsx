@@ -37,11 +37,11 @@ import { MEGA_FEATURED, MEGA_GRID, megaMaarat } from "@/lib/megavisat";
 import { NAV_COLLECTIONS } from "@/lib/nav";
 import { korttinimi } from "@/lib/korttinimi";
 import { kuvalause, megaJatko, pelityyppi, type Pelimuoto } from "@/lib/esikatselu";
-import { visanKoukku, megaKoukku } from "@/lib/koukku";
+import { visanKoukku, megaKoukku, haeKysymysKoukku, type KasinKoukku, type Koukku } from "@/lib/koukku";
 import { haeIkaPakka } from "@/lib/jarjesta/hub";
 import { teema as haeTuplaTeema } from "@/lib/tuplaTaiKuitti";
 import { ryhmaPolusta, AANIVISA_KYSYMYKSIA } from "@/lib/aanivisat";
-import { VPK_JAKONIMI } from "@/lib/vaalipiiriketju";
+import { VPK_JAKONIMI, VPK_KOUKKU } from "@/lib/vaalipiiriketju";
 import { visanKorttikuva } from "@/lib/kokoelmat/visanKorttikuva";
 import { onHenkilokuva } from "@/lib/jakokuvat";
 import { haeSivu, kierrosmaarat, kysymysmaarat, metarivi, sarjaNimi } from "@/lib/visapaketit";
@@ -322,6 +322,8 @@ type Nimikortti = {
   kuva: string | null; // kehyksen kuva (data-URI, 462 × 344) tai null → teemaväri ja kuvio (1d)
   /** Alarivi: tehtävälauseen lyhyt muoto ("Kymmenen kysymystä"). */
   lause: string;
+  /** Tekstikoukku (v4 §4, vaihe 4) alarivin paikalla: lauseenaloitus säilyy (ei versaalia). */
+  koukku?: string | null;
   /** "Kuva: tekijä / lisenssi" (lib/kuvakrediitti.ts), vain nimeämistä vaativille lisensseille. */
   krediitti: string | null;
 };
@@ -375,7 +377,12 @@ async function piirraNimikortti(k: Nimikortti) {
             {k.tyyppi}
           </div>
           <div style={{ display: "flex", marginTop: 14, fontFamily: "Archivo Condensed", fontWeight: 900, fontSize: nimiKoko, lineHeight: 0.92, textTransform: "uppercase" }}>{k.nimi}</div>
-          <div style={{ display: "flex", marginTop: 24, fontFamily: "Barlow Condensed", fontWeight: 800, fontSize: lauseKoko(k.lause), lineHeight: 1.02, textTransform: "uppercase", color: "#B6FF3C" }}>{k.lause}</div>
+          {k.koukku ? (
+            /* Koukku ≤ 75 merkkiä: Barlow Condensed 800 40 px ≈ 17 px/merkki → enintään kolme riviä 540 px:n sarakkeessa. */
+            <div style={{ display: "flex", marginTop: 24, fontFamily: "Barlow Condensed", fontWeight: 800, fontSize: 40, lineHeight: 1.05, color: "#B6FF3C" }}>{k.koukku}</div>
+          ) : (
+            <div style={{ display: "flex", marginTop: 24, fontFamily: "Barlow Condensed", fontWeight: 800, fontSize: lauseKoko(k.lause), lineHeight: 1.02, textTransform: "uppercase", color: "#B6FF3C" }}>{k.lause}</div>
+          )}
           <div style={{ display: "flex", flexGrow: 1 }} />
           <div style={{ display: "flex", fontSize: 28, fontWeight: 800, color: KERMA }}>tietoniekka.fi</div>
         </div>
@@ -399,6 +406,9 @@ type Koukkukortti = {
   krediitti: string | null;
 };
 
+/** Luku ja yksikkö samalle riville ("+37,2 °C?" katkesi ennen asteita 7.11.2026). */
+const sitoYksikot = (t: string) => t.replace(/(\d) (°|%|km|m\b|kg|€)/g, "$1\u00a0$2");
+
 async function piirraKoukkukortti(k: Koukkukortti) {
   const pic = k.kuvavisa;
   const sarake = pic ? 600 : 680;
@@ -409,8 +419,10 @@ async function piirraKoukkukortti(k: Koukkukortti) {
   const pitka = k.vaihtoehdot.some((o) => o.length * 16 > tekstille);
   const qKoko = k.kysymys.length <= 45 ? 64 : pitka ? 44 : 52;
   const optW = pitka ? sarake : Math.floor((sarake - 10) / 2);
-  const optH = pitka ? 44 : 68;
-  const chip = pitka ? 34 : 46;
+  /* Kahden kohteen vertailussa (v4 kortti A) yksi sarake mahtuu isompana: 2 × 60 px. */
+  const kaksi = pitka && k.vaihtoehdot.length === 2;
+  const optH = kaksi ? 60 : pitka ? 44 : 68;
+  const chip = kaksi ? 42 : pitka ? 34 : 46;
   const kehys = pic ? { x: 712, y: 56, w: 430, h: 500 } : { x: 826, y: 84, w: 320, h: 400 };
   const sisa = { w: kehys.w - 24, h: kehys.h - 12 - 56 };
   return jpeg(new ImageResponse(
@@ -435,18 +447,20 @@ async function piirraKoukkukortti(k: Koukkukortti) {
             <div style={{ display: "flex", fontSize: 22, fontWeight: 800, letterSpacing: 3.5, textTransform: "uppercase", color: k.accent, whiteSpace: "nowrap" }}>{k.tyyppi}</div>
           </div>
           <div style={{ display: "flex", flexGrow: 1, minHeight: 16 }} />
-          <div style={{ display: "flex", fontFamily: "Archivo SemiCondensed", fontWeight: 800, fontSize: qKoko, lineHeight: 1.08, letterSpacing: -0.01 * qKoko }}>{k.kysymys}</div>
+          <div style={{ display: "flex", fontFamily: "Archivo SemiCondensed", fontWeight: 800, fontSize: qKoko, lineHeight: 1.08, letterSpacing: -0.01 * qKoko }}>{sitoYksikot(k.kysymys)}</div>
           <div style={{ display: "flex", flexWrap: "wrap", gap: pitka ? 8 : 10, marginTop: pitka ? 18 : 24 }}>
             {k.vaihtoehdot.map((o, i) => (
               <div key={i} style={{ display: "flex", alignItems: "center", width: optW, height: optH, padding: "0 18px 0 10px", borderRadius: 999, background: "#1F1B14", border: "2px solid #3A3120" }}>
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "center", width: chip, height: chip, marginRight: 14, borderRadius: chip / 2, background: "#2C2517", fontSize: pitka ? 20 : 24, fontWeight: 800, color: k.accent }}>{"ABCD"[i]}</div>
-                <div style={{ display: "flex", fontSize: pitka ? 25 : 30, fontWeight: 700, lineHeight: 1.1, whiteSpace: "nowrap", overflow: "hidden" }}>{o}</div>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "center", width: chip, height: chip, marginRight: 14, borderRadius: chip / 2, background: "#2C2517", fontSize: pitka && !kaksi ? 20 : 24, fontWeight: 800, color: k.accent }}>{"ABCD"[i]}</div>
+                <div style={{ display: "flex", fontSize: pitka && !kaksi ? 25 : 30, fontWeight: 700, lineHeight: 1.1, whiteSpace: "nowrap", overflow: "hidden" }}>{o}</div>
               </div>
             ))}
           </div>
           <div style={{ display: "flex", flexGrow: 1, minHeight: 16 }} />
           <div style={{ display: "flex", alignItems: "baseline" }}>
-            <div style={{ display: "flex", marginRight: 18, fontFamily: "Barlow Condensed", fontWeight: 800, fontSize: 40, lineHeight: 1, textTransform: "uppercase", color: "#B6FF3C", whiteSpace: "nowrap" }}>{k.lause}</div>
+            {/* Alarivi ja osoite samalla rivillä: tilaa (sarake − 200) px; Barlow Condensed 800 versaalina ≈ 0,47 em/merkki
+                ("LAITA KAHDEKSAN IKÄJÄRJESTYKSEEN" meni osoitteen päälle 7.11.2026). */}
+            <div style={{ display: "flex", marginRight: 18, fontFamily: "Barlow Condensed", fontWeight: 800, fontSize: Math.min(40, Math.floor((sarake - 200) / (k.lause.length * 0.47))), lineHeight: 1, textTransform: "uppercase", color: "#B6FF3C", whiteSpace: "nowrap" }}>{k.lause}</div>
             <div style={{ display: "flex", fontSize: 26, fontWeight: 800, color: KERMA, whiteSpace: "nowrap" }}>tietoniekka.fi</div>
           </div>
         </div>
@@ -548,19 +562,33 @@ const SIVUT: Record<string, { eyebrow: string; otsikko: string; kuva: string; ac
 };
 
 /* Pelimuotojen sivukortit (v4 §4): nimikortti. Muut /og/sivu/-avaimet (hubit) käyttävät yhä taustakuvakorttia. */
-type Pelisivu = { nimi: string; muoto: Pelimuoto; kuva: string | null; accent: string; sovita?: boolean; lause?: string };
+type Pelisivu = {
+  nimi: string; muoto: Pelimuoto; kuva: string | null; accent: string; sovita?: boolean; lause?: string;
+  /** v4 §4, vaihe 4: vertailu tai kysymys (vaihtoehdot) → koukkukortti; pelkkä teksti → nimikortin alarivi. */
+  koukku?: KasinKoukku | Koukku | string | null;
+};
 const PELISIVUT: Record<string, Pelisivu> = {
   /* Tuplan banneri on studiokuva ihmisistä → teeman palkintoikoni kokonaisena. */
   "tupla-tai-kuitti": { nimi: "Tupla tai kuitti", muoto: "tupla", kuva: "/20/tupla/ikoni-kolikko.webp", accent: "#B6FF3C", sovita: true },
   kuntaliitos: { nimi: "Kuntaliitos", muoto: "kuntaliitos", kuva: "/20/kuntaliitos/palapeli.webp", accent: "#E8A320" },
   rajanaapurit: { nimi: "Rajanaapurit", muoto: "rajanaapurit", kuva: "/20/rajanaapurit/banneri-kartta.webp", accent: "#4FD1F5" },
-  vaalipiiriketju: { nimi: VPK_JAKONIMI, muoto: "vaalipiiriketju", kuva: "/20/vaalit/hero.webp", accent: "#B4A5FF" },
+  vaalipiiriketju: { nimi: VPK_JAKONIMI, muoto: "vaalipiiriketju", kuva: "/20/vaalit/hero.webp", accent: "#B4A5FF", koukku: VPK_KOUKKU },
   /* Ikäjärjestyksen vanha kasvokooste on henkilökuva → kuvio. */
   ikajarjestys: { nimi: "Laita järjestykseen", muoto: "ikajarjestys", kuva: null, accent: "#C9A96A" },
 };
 
 async function pelisivunEsikatselu(o: Pelisivu) {
+  const k = o.koukku;
+  if (k && typeof k !== "string" && k.vaihtoehdot?.length) {
+    /* Vertailussa kaksi kohdetta aakkosjärjestyksessä (pakat.ts), kysymyksessä korttiVaihtoehdot järjestää. */
+    return piirraKoukkukortti({
+      kysymys: k.kysymys, vaihtoehdot: "id" in k ? korttiVaihtoehdot(k.vaihtoehdot) : [...k.vaihtoehdot], nimi: o.nimi,
+      tyyppi: isoAlku(pelityyppi(o.muoto)), accent: o.accent, kuva: o.kuva ? await kuvaUri(o.kuva, 296, 332, {}, false, o.sovita) : null,
+      kuvavisa: false, lause: o.lause ?? kuvalause(o.muoto), krediitti: o.kuva ? krediittiPolulle(o.kuva) : null,
+    });
+  }
   return piirraNimikortti({
+    koukku: typeof k === "string" ? k : null,
     nimi: o.nimi, tyyppi: isoAlku(pelityyppi(o.muoto)), kategoria: null, accent: o.accent,
     kuva: o.kuva ? await kuvaUri(o.kuva, 462, 344, {}, false, o.sovita) : null, lause: o.lause ?? kuvalause(o.muoto), krediitti: o.kuva ? krediittiPolulle(o.kuva) : null,
   });
@@ -600,10 +628,10 @@ export async function GET(req: Request, ctx: { params: Promise<{ polku: string[]
     vastaus = await kuvavisanEsikatselu(avain, url.searchParams.get("k"), url.searchParams.get("nimi"), n);
   } else if (tyyppi === "tupla" && haeTuplaTeema(avain)) {
     const t = haeTuplaTeema(avain)!;
-    vastaus = await pelisivunEsikatselu({ nimi: t.nimi, muoto: "tupla", kuva: `/20/tupla/ikoni-${t.palkinto.ikoni}.webp`, accent: t.accent, sovita: true });
+    vastaus = await pelisivunEsikatselu({ nimi: t.nimi, muoto: "tupla", kuva: `/20/tupla/ikoni-${t.palkinto.ikoni}.webp`, accent: t.accent, sovita: true, koukku: await haeKysymysKoukku(t.koukku) });
   } else if (tyyppi === "aanivisa" && ryhmaPolusta(avain)) {
     const r = ryhmaPolusta(avain)!;
-    vastaus = await pelisivunEsikatselu({ nimi: r.otsikko, muoto: "aanivisa", kuva: r.hero?.levea.pieni ?? "/20/teema-luonto.webp", accent: "#4ADE80", lause: kuvalause("aanivisa", AANIVISA_KYSYMYKSIA) });
+    vastaus = await pelisivunEsikatselu({ nimi: r.otsikko, muoto: "aanivisa", kuva: r.hero?.levea.pieni ?? "/20/teema-luonto.webp", accent: "#4ADE80", lause: kuvalause("aanivisa", AANIVISA_KYSYMYKSIA), koukku: r.koukku });
   } else if (tyyppi === "kokoelma" && avain) {
     kortti = await kokoelmaKortti(avain);
   } else if (tyyppi === "henkilo" && avain) {
@@ -623,10 +651,10 @@ export async function GET(req: Request, ctx: { params: Promise<{ polku: string[]
   } else if (tyyppi === "jarjesta" && haePakka(avain)) {
     /* Järjestyspakka: pakan nimi (pakan oma lause on og:descriptionissa); henkilöpakoissa ei kuvaa (ei henkilökuvia). */
     const p = haePakka(avain)!;
-    vastaus = await pelisivunEsikatselu({ nimi: p.kortti.otsikko, muoto: "jarjesta", kuva: p.kind === "person" || onHenkilokuva(p.slug, p.kuva) ? null : p.kuva, accent: "#E8A320" });
+    vastaus = await pelisivunEsikatselu({ nimi: p.kortti.otsikko, muoto: "jarjesta", kuva: p.kind === "person" || onHenkilokuva(p.slug, p.kuva) ? null : p.kuva, accent: "#E8A320", koukku: p.koukku });
   } else if (tyyppi === "jarjesta" && haeIkaPakka(avain)) {
     const p = haeIkaPakka(avain)!;
-    vastaus = await pelisivunEsikatselu({ nimi: p.nimi, muoto: "ikajarjestys", kuva: null, accent: "#C9A96A" });
+    vastaus = await pelisivunEsikatselu({ nimi: p.nimi, muoto: "ikajarjestys", kuva: null, accent: "#C9A96A", koukku: p.koukku });
   } else if (tyyppi === "visapaketti" && avain) {
     const sivu = await haeSivu(avain, null);
     if (sivu) {

@@ -81,3 +81,23 @@ export function reittiKorttinimi(peli: ReittipeliAvain, sp: Record<string, strin
   const a = pisteet[0]?.n, b = pisteet[pisteet.length - 1]?.n;
   return a && b ? `${a} → ${b}` : null;
 }
+
+/* Koukku (Jakotekstit v4 §4, vaihe 4: "rajanaapureissa ja kuntaliitoksessa lähtö ja maali"). Viikon reitillä on
+   käsin taivutettu otsikko ("Portugalista Viroon"), joten koukku voi nimetä päätepisteet; arvotulla reitillä nimet
+   ovat vain perusmuodossa (kortin otsikko "Portugali → Viro"), joten koukku viittaa niihin taivuttamatta. */
+const KAUTTA: Record<ReittipeliAvain, { kautta: string; valissa: string }> = {
+  rajanaapurit: { kautta: "naapurimaiden kautta", valissa: "Mitkä maat ovat välissä?" },
+  osavaltiot: { kautta: "naapuriosavaltioiden kautta", valissa: "Mitkä osavaltiot ovat välissä?" },
+  kuntaliitos: { kautta: "naapurikuntien kautta", valissa: "Mitkä kunnat ovat välissä?" },
+};
+
+/** Jaetun reitin koukku, tai null ilman jaettua reittiä. */
+export function reittiKoukku(peli: ReittipeliAvain, sp: Record<string, string | string[] | undefined>): string | null {
+  const j = jaettuReitti(peli, sp);
+  const r = j ? reittiSiemenesta(peli, j.siemen, j.ryhma) : null;
+  return r ? reitinKoukku(peli, r) : null;
+}
+
+/** Reitin koukku (sama kortissa ja og:descriptionissa). */
+export const reitinKoukku = (peli: ReittipeliAvain, r: { otsikko: string | null }) =>
+  r.otsikko ? `Pääsetkö ${r.otsikko} ${KAUTTA[peli].kautta}?` : KAUTTA[peli].valissa;

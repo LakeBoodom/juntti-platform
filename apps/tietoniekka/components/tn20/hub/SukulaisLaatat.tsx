@@ -16,10 +16,13 @@ export default function SukulaisLaatat({
   otsikko,
   laatat,
   kaikki,
+  cta,
 }: {
   otsikko: string;
   laatat: SukulaisLaatta[];
   kaikki?: { n: number; href: string | null };
+  /** Kortin kehote (kaupunkisivu 7.11.2026: "Pelaa →" — henkilösivulla on henkilön visa). */
+  cta?: string;
 }) {
   if (!laatat.length) return null;
   return (
@@ -56,6 +59,7 @@ export default function SukulaisLaatat({
               </span>
               <span className="hub-laatta-nimi">{l.name}</span>
               {l.ala && <span className="hub-laatta-ala">{l.ala}</span>}
+              {cta && <span className="tn-card-cta">{cta}</span>}
             </a>
           </li>
         ))}

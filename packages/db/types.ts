@@ -1175,6 +1175,150 @@ export type Database = {
         }
         Relationships: []
       }
+      _fani_q_backup_20261106: {
+        Row: {
+          animal_sound: Json | null
+          answers: Json | null
+          audio: Json | null
+          created_at: string | null
+          explanation: string | null
+          hook: boolean | null
+          hook_alkaa: string | null
+          hook_paattyy: string | null
+          hook_teema: string | null
+          id: string | null
+          image_credit: string | null
+          image_license_note: string | null
+          image_position: string | null
+          image_url: string | null
+          question_text: string | null
+          question_type: string | null
+          quiz_id: string | null
+          sort_order: number | null
+          taso: number | null
+          vihje_laura: string | null
+          vihje_mikko: string | null
+        }
+        Insert: {
+          animal_sound?: Json | null
+          answers?: Json | null
+          audio?: Json | null
+          created_at?: string | null
+          explanation?: string | null
+          hook?: boolean | null
+          hook_alkaa?: string | null
+          hook_paattyy?: string | null
+          hook_teema?: string | null
+          id?: string | null
+          image_credit?: string | null
+          image_license_note?: string | null
+          image_position?: string | null
+          image_url?: string | null
+          question_text?: string | null
+          question_type?: string | null
+          quiz_id?: string | null
+          sort_order?: number | null
+          taso?: number | null
+          vihje_laura?: string | null
+          vihje_mikko?: string | null
+        }
+        Update: {
+          animal_sound?: Json | null
+          answers?: Json | null
+          audio?: Json | null
+          created_at?: string | null
+          explanation?: string | null
+          hook?: boolean | null
+          hook_alkaa?: string | null
+          hook_paattyy?: string | null
+          hook_teema?: string | null
+          id?: string | null
+          image_credit?: string | null
+          image_license_note?: string | null
+          image_position?: string | null
+          image_url?: string | null
+          question_text?: string | null
+          question_type?: string | null
+          quiz_id?: string | null
+          sort_order?: number | null
+          taso?: number | null
+          vihje_laura?: string | null
+          vihje_mikko?: string | null
+        }
+        Relationships: []
+      }
+      _fani2_q_backup_20261107: {
+        Row: {
+          animal_sound: Json | null
+          answers: Json | null
+          audio: Json | null
+          created_at: string | null
+          explanation: string | null
+          hook: boolean | null
+          hook_alkaa: string | null
+          hook_paattyy: string | null
+          hook_teema: string | null
+          id: string | null
+          image_credit: string | null
+          image_license_note: string | null
+          image_position: string | null
+          image_url: string | null
+          question_text: string | null
+          question_type: string | null
+          quiz_id: string | null
+          sort_order: number | null
+          taso: number | null
+          vihje_laura: string | null
+          vihje_mikko: string | null
+        }
+        Insert: {
+          animal_sound?: Json | null
+          answers?: Json | null
+          audio?: Json | null
+          created_at?: string | null
+          explanation?: string | null
+          hook?: boolean | null
+          hook_alkaa?: string | null
+          hook_paattyy?: string | null
+          hook_teema?: string | null
+          id?: string | null
+          image_credit?: string | null
+          image_license_note?: string | null
+          image_position?: string | null
+          image_url?: string | null
+          question_text?: string | null
+          question_type?: string | null
+          quiz_id?: string | null
+          sort_order?: number | null
+          taso?: number | null
+          vihje_laura?: string | null
+          vihje_mikko?: string | null
+        }
+        Update: {
+          animal_sound?: Json | null
+          answers?: Json | null
+          audio?: Json | null
+          created_at?: string | null
+          explanation?: string | null
+          hook?: boolean | null
+          hook_alkaa?: string | null
+          hook_paattyy?: string | null
+          hook_teema?: string | null
+          id?: string | null
+          image_credit?: string | null
+          image_license_note?: string | null
+          image_position?: string | null
+          image_url?: string | null
+          question_text?: string | null
+          question_type?: string | null
+          quiz_id?: string | null
+          sort_order?: number | null
+          taso?: number | null
+          vihje_laura?: string | null
+          vihje_mikko?: string | null
+        }
+        Relationships: []
+      }
       _faq_page_content_backup_2026_09_16: {
         Row: {
           learn: Json | null
@@ -1352,6 +1496,21 @@ export type Database = {
           title?: string | null
           tone?: string | null
           updated_at?: string | null
+        }
+        Relationships: []
+      }
+      _funktio_oikeudet_backup_20261203: {
+        Row: {
+          acl: unknown[] | null
+          funktio: string | null
+        }
+        Insert: {
+          acl?: unknown[] | null
+          funktio?: string | null
+        }
+        Update: {
+          acl?: unknown[] | null
+          funktio?: string | null
         }
         Relationships: []
       }
@@ -2435,6 +2594,99 @@ export type Database = {
           quiz_id?: string | null
           sort_order?: number | null
           taso?: number | null
+        }
+        Relationships: []
+      }
+      _jarjestys_q_backup_20261103: {
+        Row: {
+          animal_sound: Json | null
+          answers: Json | null
+          audio: Json | null
+          created_at: string | null
+          explanation: string | null
+          hook: boolean | null
+          hook_alkaa: string | null
+          hook_paattyy: string | null
+          hook_teema: string | null
+          id: string | null
+          image_credit: string | null
+          image_license_note: string | null
+          image_position: string | null
+          image_url: string | null
+          question_text: string | null
+          question_type: string | null
+          quiz_id: string | null
+          sort_order: number | null
+          taso: number | null
+          vihje_laura: string | null
+          vihje_mikko: string | null
+        }
+        Insert: {
+          animal_sound?: Json | null
+          answers?: Json | null
+          audio?: Json | null
+          created_at?: string | null
+          explanation?: string | null
+          hook?: boolean | null
+          hook_alkaa?: string | null
+          hook_paattyy?: string | null
+          hook_teema?: string | null
+          id?: string | null
+          image_credit?: string | null
+          image_license_note?: string | null
+          image_position?: string | null
+          image_url?: string | null
+          question_text?: string | null
+          question_type?: string | null
+          quiz_id?: string | null
+          sort_order?: number | null
+          taso?: number | null
+          vihje_laura?: string | null
+          vihje_mikko?: string | null
+        }
+        Update: {
+          animal_sound?: Json | null
+          answers?: Json | null
+          audio?: Json | null
+          created_at?: string | null
+          explanation?: string | null
+          hook?: boolean | null
+          hook_alkaa?: string | null
+          hook_paattyy?: string | null
+          hook_teema?: string | null
+          id?: string | null
+          image_credit?: string | null
+          image_license_note?: string | null
+          image_position?: string | null
+          image_url?: string | null
+          question_text?: string | null
+          question_type?: string | null
+          quiz_id?: string | null
+          sort_order?: number | null
+          taso?: number | null
+          vihje_laura?: string | null
+          vihje_mikko?: string | null
+        }
+        Relationships: []
+      }
+      _jarjestys_uusi_20261103: {
+        Row: {
+          id: string | null
+          nw: number | null
+          sid: string | null
+          slug: string | null
+        }
+        Insert: {
+          id?: string | null
+          nw?: number | null
+          sid?: string | null
+          slug?: string | null
+        }
+        Update: {
+          id?: string | null
+          nw?: number | null
+          sid?: string | null
+          slug?: string | null
         }
         Relationships: []
       }
@@ -6986,6 +7238,27 @@ export type Database = {
         }
         Relationships: []
       }
+      _oikeudet_backup_20261202: {
+        Row: {
+          acl: unknown[] | null
+          laji: string | null
+          nimi: string | null
+          sarake: string | null
+        }
+        Insert: {
+          acl?: unknown[] | null
+          laji?: string | null
+          nimi?: string | null
+          sarake?: string | null
+        }
+        Update: {
+          acl?: unknown[] | null
+          laji?: string | null
+          nimi?: string | null
+          sarake?: string | null
+        }
+        Relationships: []
+      }
       _otsikko_a3_muutlajit_backup_2026_09_16: {
         Row: {
           display_title: string | null
@@ -7358,6 +7631,219 @@ export type Database = {
         }
         Relationships: []
       }
+      _pallo_q_backup_20261101: {
+        Row: {
+          animal_sound: Json | null
+          answers: Json | null
+          audio: Json | null
+          created_at: string | null
+          explanation: string | null
+          hook: boolean | null
+          hook_alkaa: string | null
+          hook_paattyy: string | null
+          hook_teema: string | null
+          id: string | null
+          image_credit: string | null
+          image_license_note: string | null
+          image_position: string | null
+          image_url: string | null
+          question_text: string | null
+          question_type: string | null
+          quiz_id: string | null
+          sort_order: number | null
+          taso: number | null
+          vihje_laura: string | null
+          vihje_mikko: string | null
+        }
+        Insert: {
+          animal_sound?: Json | null
+          answers?: Json | null
+          audio?: Json | null
+          created_at?: string | null
+          explanation?: string | null
+          hook?: boolean | null
+          hook_alkaa?: string | null
+          hook_paattyy?: string | null
+          hook_teema?: string | null
+          id?: string | null
+          image_credit?: string | null
+          image_license_note?: string | null
+          image_position?: string | null
+          image_url?: string | null
+          question_text?: string | null
+          question_type?: string | null
+          quiz_id?: string | null
+          sort_order?: number | null
+          taso?: number | null
+          vihje_laura?: string | null
+          vihje_mikko?: string | null
+        }
+        Update: {
+          animal_sound?: Json | null
+          answers?: Json | null
+          audio?: Json | null
+          created_at?: string | null
+          explanation?: string | null
+          hook?: boolean | null
+          hook_alkaa?: string | null
+          hook_paattyy?: string | null
+          hook_teema?: string | null
+          id?: string | null
+          image_credit?: string | null
+          image_license_note?: string | null
+          image_position?: string | null
+          image_url?: string | null
+          question_text?: string | null
+          question_type?: string | null
+          quiz_id?: string | null
+          sort_order?: number | null
+          taso?: number | null
+          vihje_laura?: string | null
+          vihje_mikko?: string | null
+        }
+        Relationships: []
+      }
+      _pallo_quiz_backup_20261101: {
+        Row: {
+          category: string | null
+          collection: string | null
+          created_at: string | null
+          created_by: string | null
+          custom_slug: string | null
+          description: string | null
+          difficulty: string | null
+          display_title: string | null
+          emoji_hint: string | null
+          era: string | null
+          fanitasot: Json | null
+          featured_in_category: boolean | null
+          game_mode: string | null
+          genre: string | null
+          hero_alt: string | null
+          hero_focal_x: number | null
+          hero_focal_y: number | null
+          hero_image: string | null
+          hero_side: string | null
+          id: string | null
+          ig_tilit: string[] | null
+          image_url: string | null
+          is_daily: boolean | null
+          korttinimi: string | null
+          lasten_aihe: string | null
+          learn: Json | null
+          lukija: string | null
+          platform: string | null
+          play_count: number | null
+          published_at: string | null
+          scheduled_for: string | null
+          section_tags: string[] | null
+          seo_description: string | null
+          seo_title: string | null
+          site_id: string | null
+          slug: string | null
+          status: string | null
+          subcollection: string | null
+          tags: string[] | null
+          target_age: string | null
+          teaser: string | null
+          title: string | null
+          tone: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          category?: string | null
+          collection?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          custom_slug?: string | null
+          description?: string | null
+          difficulty?: string | null
+          display_title?: string | null
+          emoji_hint?: string | null
+          era?: string | null
+          fanitasot?: Json | null
+          featured_in_category?: boolean | null
+          game_mode?: string | null
+          genre?: string | null
+          hero_alt?: string | null
+          hero_focal_x?: number | null
+          hero_focal_y?: number | null
+          hero_image?: string | null
+          hero_side?: string | null
+          id?: string | null
+          ig_tilit?: string[] | null
+          image_url?: string | null
+          is_daily?: boolean | null
+          korttinimi?: string | null
+          lasten_aihe?: string | null
+          learn?: Json | null
+          lukija?: string | null
+          platform?: string | null
+          play_count?: number | null
+          published_at?: string | null
+          scheduled_for?: string | null
+          section_tags?: string[] | null
+          seo_description?: string | null
+          seo_title?: string | null
+          site_id?: string | null
+          slug?: string | null
+          status?: string | null
+          subcollection?: string | null
+          tags?: string[] | null
+          target_age?: string | null
+          teaser?: string | null
+          title?: string | null
+          tone?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          category?: string | null
+          collection?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          custom_slug?: string | null
+          description?: string | null
+          difficulty?: string | null
+          display_title?: string | null
+          emoji_hint?: string | null
+          era?: string | null
+          fanitasot?: Json | null
+          featured_in_category?: boolean | null
+          game_mode?: string | null
+          genre?: string | null
+          hero_alt?: string | null
+          hero_focal_x?: number | null
+          hero_focal_y?: number | null
+          hero_image?: string | null
+          hero_side?: string | null
+          id?: string | null
+          ig_tilit?: string[] | null
+          image_url?: string | null
+          is_daily?: boolean | null
+          korttinimi?: string | null
+          lasten_aihe?: string | null
+          learn?: Json | null
+          lukija?: string | null
+          platform?: string | null
+          play_count?: number | null
+          published_at?: string | null
+          scheduled_for?: string | null
+          section_tags?: string[] | null
+          seo_description?: string | null
+          seo_title?: string | null
+          site_id?: string | null
+          slug?: string | null
+          status?: string | null
+          subcollection?: string | null
+          tags?: string[] | null
+          target_age?: string | null
+          teaser?: string | null
+          title?: string | null
+          tone?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       _pol_visat_q_backup_20261006: {
         Row: {
           answers: Json | null
@@ -7607,6 +8093,237 @@ export type Database = {
           taso?: number | null
           vihje_laura?: string | null
           vihje_mikko?: string | null
+        }
+        Relationships: []
+      }
+      _seura_q_backup_20261103: {
+        Row: {
+          animal_sound: Json | null
+          answers: Json | null
+          audio: Json | null
+          created_at: string | null
+          explanation: string | null
+          hook: boolean | null
+          hook_alkaa: string | null
+          hook_paattyy: string | null
+          hook_teema: string | null
+          id: string | null
+          image_credit: string | null
+          image_license_note: string | null
+          image_position: string | null
+          image_url: string | null
+          question_text: string | null
+          question_type: string | null
+          quiz_id: string | null
+          sort_order: number | null
+          taso: number | null
+          vihje_laura: string | null
+          vihje_mikko: string | null
+        }
+        Insert: {
+          animal_sound?: Json | null
+          answers?: Json | null
+          audio?: Json | null
+          created_at?: string | null
+          explanation?: string | null
+          hook?: boolean | null
+          hook_alkaa?: string | null
+          hook_paattyy?: string | null
+          hook_teema?: string | null
+          id?: string | null
+          image_credit?: string | null
+          image_license_note?: string | null
+          image_position?: string | null
+          image_url?: string | null
+          question_text?: string | null
+          question_type?: string | null
+          quiz_id?: string | null
+          sort_order?: number | null
+          taso?: number | null
+          vihje_laura?: string | null
+          vihje_mikko?: string | null
+        }
+        Update: {
+          animal_sound?: Json | null
+          answers?: Json | null
+          audio?: Json | null
+          created_at?: string | null
+          explanation?: string | null
+          hook?: boolean | null
+          hook_alkaa?: string | null
+          hook_paattyy?: string | null
+          hook_teema?: string | null
+          id?: string | null
+          image_credit?: string | null
+          image_license_note?: string | null
+          image_position?: string | null
+          image_url?: string | null
+          question_text?: string | null
+          question_type?: string | null
+          quiz_id?: string | null
+          sort_order?: number | null
+          taso?: number | null
+          vihje_laura?: string | null
+          vihje_mikko?: string | null
+        }
+        Relationships: []
+      }
+      _seura_quiz_backup_20261103: {
+        Row: {
+          category: string | null
+          collection: string | null
+          created_at: string | null
+          created_by: string | null
+          custom_slug: string | null
+          description: string | null
+          difficulty: string | null
+          display_title: string | null
+          emoji_hint: string | null
+          era: string | null
+          fanitasot: Json | null
+          featured_in_category: boolean | null
+          game_mode: string | null
+          genre: string | null
+          hero_alt: string | null
+          hero_focal_x: number | null
+          hero_focal_y: number | null
+          hero_image: string | null
+          hero_side: string | null
+          id: string | null
+          ig_tilit: string[] | null
+          image_url: string | null
+          is_daily: boolean | null
+          korttinimi: string | null
+          lasten_aihe: string | null
+          learn: Json | null
+          lukija: string | null
+          platform: string | null
+          play_count: number | null
+          published_at: string | null
+          scheduled_for: string | null
+          section_tags: string[] | null
+          seo_description: string | null
+          seo_title: string | null
+          site_id: string | null
+          slug: string | null
+          status: string | null
+          subcollection: string | null
+          tags: string[] | null
+          target_age: string | null
+          teaser: string | null
+          title: string | null
+          tone: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          category?: string | null
+          collection?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          custom_slug?: string | null
+          description?: string | null
+          difficulty?: string | null
+          display_title?: string | null
+          emoji_hint?: string | null
+          era?: string | null
+          fanitasot?: Json | null
+          featured_in_category?: boolean | null
+          game_mode?: string | null
+          genre?: string | null
+          hero_alt?: string | null
+          hero_focal_x?: number | null
+          hero_focal_y?: number | null
+          hero_image?: string | null
+          hero_side?: string | null
+          id?: string | null
+          ig_tilit?: string[] | null
+          image_url?: string | null
+          is_daily?: boolean | null
+          korttinimi?: string | null
+          lasten_aihe?: string | null
+          learn?: Json | null
+          lukija?: string | null
+          platform?: string | null
+          play_count?: number | null
+          published_at?: string | null
+          scheduled_for?: string | null
+          section_tags?: string[] | null
+          seo_description?: string | null
+          seo_title?: string | null
+          site_id?: string | null
+          slug?: string | null
+          status?: string | null
+          subcollection?: string | null
+          tags?: string[] | null
+          target_age?: string | null
+          teaser?: string | null
+          title?: string | null
+          tone?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          category?: string | null
+          collection?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          custom_slug?: string | null
+          description?: string | null
+          difficulty?: string | null
+          display_title?: string | null
+          emoji_hint?: string | null
+          era?: string | null
+          fanitasot?: Json | null
+          featured_in_category?: boolean | null
+          game_mode?: string | null
+          genre?: string | null
+          hero_alt?: string | null
+          hero_focal_x?: number | null
+          hero_focal_y?: number | null
+          hero_image?: string | null
+          hero_side?: string | null
+          id?: string | null
+          ig_tilit?: string[] | null
+          image_url?: string | null
+          is_daily?: boolean | null
+          korttinimi?: string | null
+          lasten_aihe?: string | null
+          learn?: Json | null
+          lukija?: string | null
+          platform?: string | null
+          play_count?: number | null
+          published_at?: string | null
+          scheduled_for?: string | null
+          section_tags?: string[] | null
+          seo_description?: string | null
+          seo_title?: string | null
+          site_id?: string | null
+          slug?: string | null
+          status?: string | null
+          subcollection?: string | null
+          tags?: string[] | null
+          target_age?: string | null
+          teaser?: string | null
+          title?: string | null
+          tone?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      _taso_backup_20261107: {
+        Row: {
+          backup_at: string | null
+          id: string | null
+          taso: number | null
+        }
+        Insert: {
+          backup_at?: string | null
+          id?: string | null
+          taso?: number | null
+        }
+        Update: {
+          backup_at?: string | null
+          id?: string | null
+          taso?: number | null
         }
         Relationships: []
       }
@@ -10435,6 +11152,111 @@ export type Database = {
           },
         ]
       }
+      jako_tapahtumat: {
+        Row: {
+          created_at: string
+          id: number
+          jako_id: string
+          kanava: string | null
+          polku: string
+          session_id: string | null
+          tapahtuma: string
+          variantti: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: never
+          jako_id: string
+          kanava?: string | null
+          polku: string
+          session_id?: string | null
+          tapahtuma: string
+          variantti?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: never
+          jako_id?: string
+          kanava?: string | null
+          polku?: string
+          session_id?: string | null
+          tapahtuma?: string
+          variantti?: string | null
+        }
+        Relationships: []
+      }
+      kaupungit: {
+        Row: {
+          asukasnimitys: string | null
+          created_at: string
+          elatiivi: string
+          hero_kuva: string | null
+          hook: string | null
+          hook_og: string | null
+          inessiivi: string
+          julkaistu: boolean
+          kaupunkivisa_quiz_id: string | null
+          korttinimi: string | null
+          nimi: string
+          slug: string
+          tunnusrivi: string | null
+          updated_at: string
+          vaakuna_url: string | null
+          vanhat_kunnat: string[]
+        }
+        Insert: {
+          asukasnimitys?: string | null
+          created_at?: string
+          elatiivi: string
+          hero_kuva?: string | null
+          hook?: string | null
+          hook_og?: string | null
+          inessiivi: string
+          julkaistu?: boolean
+          kaupunkivisa_quiz_id?: string | null
+          korttinimi?: string | null
+          nimi: string
+          slug: string
+          tunnusrivi?: string | null
+          updated_at?: string
+          vaakuna_url?: string | null
+          vanhat_kunnat?: string[]
+        }
+        Update: {
+          asukasnimitys?: string | null
+          created_at?: string
+          elatiivi?: string
+          hero_kuva?: string | null
+          hook?: string | null
+          hook_og?: string | null
+          inessiivi?: string
+          julkaistu?: boolean
+          kaupunkivisa_quiz_id?: string | null
+          korttinimi?: string | null
+          nimi?: string
+          slug?: string
+          tunnusrivi?: string | null
+          updated_at?: string
+          vaakuna_url?: string | null
+          vanhat_kunnat?: string[]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "kaupungit_kaupunkivisa_quiz_id_fkey"
+            columns: ["kaupunkivisa_quiz_id"]
+            isOneToOne: false
+            referencedRelation: "quiz_cards"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "kaupungit_kaupunkivisa_quiz_id_fkey"
+            columns: ["kaupunkivisa_quiz_id"]
+            isOneToOne: false
+            referencedRelation: "quizzes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       kunnat: {
         Row: {
           code: string
@@ -11853,6 +12675,39 @@ export type Database = {
           },
         ]
       }
+      quiz_suosio: {
+        Row: {
+          paivitetty: string
+          quiz_id: string
+          selaimia_90pv: number
+        }
+        Insert: {
+          paivitetty?: string
+          quiz_id: string
+          selaimia_90pv: number
+        }
+        Update: {
+          paivitetty?: string
+          quiz_id?: string
+          selaimia_90pv?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "quiz_suosio_quiz_id_fkey"
+            columns: ["quiz_id"]
+            isOneToOne: true
+            referencedRelation: "quiz_cards"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "quiz_suosio_quiz_id_fkey"
+            columns: ["quiz_id"]
+            isOneToOne: true
+            referencedRelation: "quizzes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       quizzes: {
         Row: {
           category: string
@@ -11878,10 +12733,12 @@ export type Database = {
           ig_tilit: string[]
           image_url: string | null
           is_daily: boolean | null
+          kausi: string
           korttinimi: string | null
           lasten_aihe: string | null
           learn: Json | null
           lukija: string | null
+          paikkakunnat: string[] | null
           platform: string
           play_count: number | null
           published_at: string | null
@@ -11924,10 +12781,12 @@ export type Database = {
           ig_tilit?: string[]
           image_url?: string | null
           is_daily?: boolean | null
+          kausi?: string
           korttinimi?: string | null
           lasten_aihe?: string | null
           learn?: Json | null
           lukija?: string | null
+          paikkakunnat?: string[] | null
           platform: string
           play_count?: number | null
           published_at?: string | null
@@ -11970,10 +12829,12 @@ export type Database = {
           ig_tilit?: string[]
           image_url?: string | null
           is_daily?: boolean | null
+          kausi?: string
           korttinimi?: string | null
           lasten_aihe?: string | null
           learn?: Json | null
           lukija?: string | null
+          paikkakunnat?: string[] | null
           platform?: string
           play_count?: number | null
           published_at?: string | null
@@ -12593,6 +13454,87 @@ export type Database = {
         }
         Relationships: []
       }
+      vihjepeli_pelit: {
+        Row: {
+          aihe: string
+          arvaukset: string[] | null
+          entry: string | null
+          id: string
+          kohde: string
+          landing_path: string | null
+          oikein: boolean
+          paivan_kohde: boolean
+          pisteet: number | null
+          played_at: string
+          referrer_host: string | null
+          session_id: string | null
+          siemen: string
+        }
+        Insert: {
+          aihe: string
+          arvaukset?: string[] | null
+          entry?: string | null
+          id?: string
+          kohde: string
+          landing_path?: string | null
+          oikein: boolean
+          paivan_kohde?: boolean
+          pisteet?: number | null
+          played_at?: string
+          referrer_host?: string | null
+          session_id?: string | null
+          siemen: string
+        }
+        Update: {
+          aihe?: string
+          arvaukset?: string[] | null
+          entry?: string | null
+          id?: string
+          kohde?: string
+          landing_path?: string | null
+          oikein?: boolean
+          paivan_kohde?: boolean
+          pisteet?: number | null
+          played_at?: string
+          referrer_host?: string | null
+          session_id?: string | null
+          siemen?: string
+        }
+        Relationships: []
+      }
+      vihjepeli_vihjeet: {
+        Row: {
+          aihe: string
+          id: string
+          kohde: string
+          lahde: string | null
+          luotu: string
+          tarkistettu: boolean
+          taso: number
+          teksti: string
+        }
+        Insert: {
+          aihe: string
+          id?: string
+          kohde: string
+          lahde?: string | null
+          luotu?: string
+          tarkistettu?: boolean
+          taso: number
+          teksti: string
+        }
+        Update: {
+          aihe?: string
+          id?: string
+          kohde?: string
+          lahde?: string | null
+          luotu?: string
+          tarkistettu?: boolean
+          taso?: number
+          teksti?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       celebrity_vote_counts: {
@@ -12668,6 +13610,18 @@ export type Database = {
           },
         ]
       }
+      jako_mittarit: {
+        Row: {
+          alkaen: string | null
+          aloitukset: number | null
+          avaukset: number | null
+          jaetut_linkit: number | null
+          pelimuoto: string | null
+          valmiit_kierrokset: number | null
+          variantti: string | null
+        }
+        Relationships: []
+      }
       quiz_cards: {
         Row: {
           badge: string | null
@@ -12683,6 +13637,8 @@ export type Database = {
           hero_focal_y: number | null
           hero_image: string | null
           id: string | null
+          kausi: string | null
+          paikkakunnat: string[] | null
           play_count: number | null
           published_at: string | null
           question_count: number | null
@@ -12690,6 +13646,7 @@ export type Database = {
           site_id: string | null
           slug: string | null
           subcollection: string | null
+          suosio_90pv: number | null
           tags: string[] | null
           target_age: string | null
           teaser: string | null
@@ -12709,6 +13666,8 @@ export type Database = {
           hero_focal_y?: number | null
           hero_image?: string | null
           id?: string | null
+          kausi?: string | null
+          paikkakunnat?: string[] | null
           play_count?: number | null
           published_at?: string | null
           question_count?: never
@@ -12716,6 +13675,7 @@ export type Database = {
           site_id?: string | null
           slug?: string | null
           subcollection?: string | null
+          suosio_90pv?: never
           tags?: string[] | null
           target_age?: string | null
           teaser?: string | null
@@ -12735,6 +13695,8 @@ export type Database = {
           hero_focal_y?: number | null
           hero_image?: string | null
           id?: string | null
+          kausi?: string | null
+          paikkakunnat?: string[] | null
           play_count?: number | null
           published_at?: string | null
           question_count?: never
@@ -12742,6 +13704,7 @@ export type Database = {
           site_id?: string | null
           slug?: string | null
           subcollection?: string | null
+          suosio_90pv?: never
           tags?: string[] | null
           target_age?: string | null
           teaser?: string | null
@@ -12927,6 +13890,10 @@ export type Database = {
           vuosi: number
         }[]
       }
+      merkitse_jaetuksi: {
+        Args: { p_id: string; p_kanava: string }
+        Returns: undefined
+      }
       ootko_etusivu: { Args: { p_key?: string }; Returns: Json }
       ootko_is_live: {
         Args: { p_publish_at: string; p_status: string }
@@ -13001,6 +13968,7 @@ export type Database = {
         Args: { p_date: string; p_site: string }
         Returns: string
       }
+      paivita_quiz_suosio: { Args: never; Returns: undefined }
       slugify_name: { Args: { src: string }; Returns: string }
       todays_celebrities: {
         Args: { p_site_id: string }

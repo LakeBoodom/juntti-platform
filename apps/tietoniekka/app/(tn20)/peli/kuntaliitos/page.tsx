@@ -13,7 +13,8 @@ import { helsinginPaiva } from "@/lib/aika";
 import { arvoReitti, reittiAlueista, KL_MAAKUNNAT, maakuntaTunnuksella } from "@/lib/kuntaliitos/reitti";
 import { sivunReitti, viikonAikavali } from "@/lib/reittipeli/viikonReitit";
 import ReittipeliClient from "@/components/tn20/reittipeli/ReittipeliClient";
-import { reittiJakokuva, reittiKorttinimi } from "@/lib/reittipeli/kuvat";
+import { reittiJakokuva, reittiKorttinimi, reittiKoukku } from "@/lib/reittipeli/kuvat";
+import { reittiKaveri } from "@/lib/kaveri";
 import { uusiReittiSiemen } from "@/lib/kuntaliitos";
 import { redirect } from "next/navigation";
 import "./kuntaliitos.css";
@@ -32,8 +33,8 @@ export async function generateMetadata({ searchParams }: { searchParams: Promise
     alternates: { canonical: "/peli/kuntaliitos" },
     ...jakoMeta({
       /* Esikatselukortti (v4 §4): "{Lähtö} → {Maali} – karttapeli" jaetulla reitillä, muuten pelin nimi. */
-      ...esikatselu({ nimi: reittiKorttinimi("kuntaliitos", sp) ?? "Kuntaliitos", muoto: "kuntaliitos" }),
-      url: jakoOsoite("/peli/kuntaliitos", sp, ["maakunta", "reitti", "tulos"]),
+      ...esikatselu({ nimi: reittiKorttinimi("kuntaliitos", sp) ?? "Kuntaliitos", muoto: "kuntaliitos", koukku: reittiKoukku("kuntaliitos", sp) }),
+      url: jakoOsoite("/peli/kuntaliitos", sp, ["maakunta", "reitti", "tulos", "y"]),
       kuva: reittiJakokuva("kuntaliitos", sp, "/og/sivu/kuntaliitos"),
     }),
   };
@@ -65,6 +66,7 @@ export default async function KuntaliitosSivu({ searchParams }: Props) {
         otsikko={valinta.otsikko}
         intro={valinta.intro}
         viikko={valinta.kuluva}
+        kaveri={pyydetty ? reittiKaveri(sp.tulos, sp.y) : null}
       />
     </>
   );

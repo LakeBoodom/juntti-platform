@@ -7,6 +7,8 @@
 // Pelin tallennus lisää riviin seurantaKentat(): entry, referrer_host, landing_path. Kaikki try/catchissa:
 // estetty storage tai yksityinen selaus → kentät null, peli tallentuu silti.
 
+import { kirjaaValmis } from "@/lib/jakoseuranta";
+
 const SESSIO = "tn_session_entry";
 const VIIMEISIN = "tn_last_entry";
 
@@ -91,6 +93,7 @@ export async function lisaaPelirivi(
   rivi: Record<string, unknown>,
 ): Promise<unknown> {
   const kentat = seurantaKentat();
+  kirjaaValmis(); // jaetun linkin kierros (lib/jakoseuranta.ts)
   const { error } = await sb.from(taulu).insert({ ...rivi, ...kentat });
   if (!error) return null;
   const { error: e2 } = await sb.from(taulu).insert(rivi);

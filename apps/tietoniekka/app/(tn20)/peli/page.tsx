@@ -34,6 +34,7 @@ import LastenPeli from "./lapset/LastenPeli";
 import { LAPSET_SIVU, haeLastenVisa, haeMuutLastenVisat, lapsetNakyvissa } from "@/lib/lapset/data";
 import "../lapset.css";
 import { heroFokus, heroMode } from "@/lib/herotila";
+import { haePaikkakunnanMuutVisat } from "@/lib/kaupunkisivu";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 
@@ -234,6 +235,8 @@ type QuizRow = {
      golfvisassa näkyi tennisvisan kuva. */
   hero_image: string | null; hero_focal_x: number | null; hero_focal_y: number | null;
   hero_side: string | null; hero_alt: string | null;
+  /** Kaupunkisivut (7.11.2026): visan paikkakunnat → "Lisää {elatiivi}" -ryhmä. */
+  paikkakunnat?: string[] | null;
   /** SEO-erä A9: Quiz.dateModified */
   updated_at?: string | null;
   /* Aihekohtaiset tulostasot (migraatio 20260928, Instagram-kierros 4) */
@@ -459,6 +462,11 @@ export default async function Peli20({
       kind: "teksti",
       challengePath: `/peli?mega=${encodeURIComponent(mega)}`,
       autoStart: params.aloita === "1",
+      /* Haastetun polku (v4 §5): jaettu megatulos (&tulos=n-total) samalla kysymysmäärällä → vertailu ja vastahaaste. */
+      haaste: (() => {
+        const t = jaettuTulos(params.tulos);
+        return t && t.kaikki === questions.length ? { oikein: t.n, kysymyksia: t.kaikki, pisteet: 0 } : undefined;
+      })(),
       /* Pelikehys (TOTEUTUSBRIEF §4, 20.10.2026): K1 paluu /kokoelmat, K2 aloitus, K4 tulos. */
       kehys: {
         peli: "Megavisat",
@@ -655,7 +663,6 @@ export default async function Peli20({
       haaste: haaste
         ? {
             oikein: haaste.oikein, kysymyksia: haaste.kysymyksia, pisteet: haaste.pisteet,
-            kompastus: kKuva >= 0 ? (haaste.oikein === haaste.kysymyksia ? "taydet" : "vaarin") : undefined,
           }
         : undefined,
       /* Jakonimi ilman "visa"-häntää (v4 §2): variaatio tai kortiston nimi ("Maiden liput"). */
@@ -679,7 +686,7 @@ export default async function Peli20({
 
   let q = sb
     .from("quizzes")
-    .select("id, slug, title, display_title, teaser, description, category, collection, genre, section_tags, learn, hero_image, hero_focal_x, hero_focal_y, hero_side, hero_alt, fanitasot, korttinimi, updated_at")
+    .select("id, slug, title, display_title, teaser, description, category, collection, genre, section_tags, learn, hero_image, hero_focal_x, hero_focal_y, hero_side, hero_alt, fanitasot, korttinimi, paikkakunnat, updated_at")
     .eq("status", "published");
   q = quizId ? q.eq("id", quizId) : q.eq("slug", slug!);
   const { data: quiz } = await q.maybeSingle<QuizRow>();
@@ -688,7 +695,7 @@ export default async function Peli20({
   const resolved = resolveCollection(quiz);
   /* Ristiinnostot (SEO-erä A3): portaittainen, satunnaistettu haku — ks. lib/related.ts. */
   const pakettiLinkki = tulosPakettiLinkki(quiz.section_tags);
-  const [{ data: qs }, genreRes, relatedRes, celebRes, mukana] = await Promise.all([
+  const [{ data: qs }, genreRes, relatedRes, celebRes, mukana, paikka] = await Promise.all([
     sb
       .from("questions")
       .select("id, sort_order, question_text, explanation, answers, audio")
@@ -704,6 +711,8 @@ export default async function Peli20({
       ? sb.from("celebrities").select("name, role, image_url, wikipedia_url, nimi_elatiivi" as never).eq("trivia_quiz_id", quiz.id).maybeSingle()
       : Promise.resolve({ data: null }),
     haeVisassaMukana(sb, quiz.id),
+    /* Kaupunkisivut (brief 7.11.2026 §2): saman paikkakunnan visat omana ryhmänään ennen ristiinnostoja. */
+    haePaikkakunnanMuutVisat(quiz),
   ]);
 
   const collection = quiz.collection ?? "yleistieto";
@@ -792,7 +801,9 @@ export default async function Peli20({
       }
     : null;
 
-  const relatedRows = (relatedRes.data ?? []) as RelatedRow[];
+  /* Samaa visaa ei näytetä kahdesti: paikkakunnan visat pois ristiinnostoista. */
+  const paikkaIdt = new Set(paikka?.visat.map((v) => v.id) ?? []);
+  const relatedRows = ((relatedRes.data ?? []) as RelatedRow[]).filter((r) => !paikkaIdt.has(r.id));
   const relHref = (r: RelatedRow) =>
     visaHref(r);
 
@@ -826,6 +837,13 @@ export default async function Peli20({
         : null,
     /* Visapakettien SEO-brief 1.11.2026: jouluvisan tulosnäkymästä tekstilinkki joulun visapakettiin. */
     paketti: await pakettiLinkki,
+    paikka: paikka
+      ? {
+          otsikko: paikka.otsikko,
+          kaikki: paikka.kaikki,
+          visat: paikka.visat.map((v) => ({ id: v.id, title: v.title, meta: `${v.question_count} kysymystä`, href: v.href, kuva: v.kuva, kuvaPos: v.kuvaPos })),
+        }
+      : null,
     citySlug: KAUPUNGIT.find((c) => c.quizSlug === quiz.slug)?.id ?? null,
     jakoNimi: korttinimi({ korttinimi: quiz.korttinimi, title: quiz.display_title ?? quiz.title }),
     fanitasot:
@@ -866,13 +884,12 @@ export default async function Peli20({
     const oikein = Number(tulosHaaste[1]), kysymyksia = Number(tulosHaaste[2]);
     if (kysymyksia > 0 && oikein <= kysymyksia) game.haaste = { oikein, kysymyksia, pisteet: 0 };
   }
-  /* Vaihe E: kysymyskortista (&k=<id>) visa alkaa kaverin kysymyksellä, muut perässä normaalisti. k hyväksytään vain,
-     jos kysymys kuuluu visaan; muuten parametri ohitetaan. */
+  /* Vaihe E: vanhoista kysymyskortin linkeistä (&k=<id>) visa alkaa kaverin kysymyksellä, muut perässä normaalisti.
+     k hyväksytään vain, jos kysymys kuuluu visaan; muuten parametri ohitetaan. Uudet linkit eivät kanna k:ta (v4). */
   const kParam = typeof params.k === "string" ? params.k : null;
   const kIndeksi = kParam && game.haaste ? game.questions.findIndex((q) => q.id === kParam) : -1;
   if (game.haaste && kIndeksi >= 0) {
     game.questions = [game.questions[kIndeksi], ...game.questions.filter((_, i) => i !== kIndeksi)];
-    game.haaste.kompastus = game.haaste.oikein === game.haaste.kysymyksia ? "taydet" : "vaarin";
   }
 
   const collectionLabel = resolved.label;
@@ -923,6 +940,27 @@ export default async function Peli20({
           publisher: { "@type": "Organization", name: "Tietoniekka", url: abs("/") },
         }}
       />
+
+      {paikka && (
+        <section className="tn-seo-related tn-seo-ssr" data-tn-entry="visasivu:paikkakunta">
+          <div className="tn-seo-in">
+            <h2>{paikka.otsikko}</h2>
+            <ul>
+              {paikka.visat.map((v) => (
+                <li key={v.id}>
+                  <a href={v.href}>{v.title}</a>
+                  <span> · {v.question_count} kysymystä</span>
+                </li>
+              ))}
+            </ul>
+            {paikka.kaikki && (
+              <a className="tn-seo-hub" href={paikka.kaikki.href}>
+                {paikka.kaikki.teksti} →
+              </a>
+            )}
+          </div>
+        </section>
+      )}
 
       {relatedRows.length > 0 && (
         <section className="tn-seo-related tn-seo-ssr" data-tn-entry="visasivu:ristiinnosto">

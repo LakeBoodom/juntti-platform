@@ -33,7 +33,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     alternates: { canonical: aanivisaHref(r) },
     ...(esikatselu() ? { robots: { index: false, follow: false } } : {}),
     /* Esikatselukortti (Jakotekstit v4 §4): "{ryhmä} – äänivisa", "Kuuntele ja tunnista kymmenen ääntä." */
-    ...jakoMeta({ ...esikatselukortti({ nimi: r.otsikko, muoto: "aanivisa", n: AANIVISA_KYSYMYKSIA }), url: aanivisaHref(r), kuva: `/og/aanivisa/${r.polku}` }),
+    ...jakoMeta({ ...esikatselukortti({ nimi: r.otsikko, muoto: "aanivisa", n: AANIVISA_KYSYMYKSIA, koukku: r.koukku }), url: aanivisaHref(r), kuva: `/og/aanivisa/${r.polku}` }),
   };
 }
 

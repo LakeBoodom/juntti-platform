@@ -13,7 +13,8 @@ import { helsinginPaiva } from "@/lib/aika";
 import { arvoReitti, reittiAlueista, RN_MAANOSAT, maanosaTunnuksella } from "@/lib/rajanaapurit/reitti";
 import { sivunReitti, viikonAikavali } from "@/lib/reittipeli/viikonReitit";
 import ReittipeliClient from "@/components/tn20/reittipeli/ReittipeliClient";
-import { reittiJakokuva, reittiKorttinimi } from "@/lib/reittipeli/kuvat";
+import { reittiJakokuva, reittiKorttinimi, reittiKoukku } from "@/lib/reittipeli/kuvat";
+import { reittiKaveri } from "@/lib/kaveri";
 import { uusiReittiSiemen } from "@/lib/kuntaliitos";
 import { redirect } from "next/navigation";
 import "../kuntaliitos/kuntaliitos.css";
@@ -31,8 +32,8 @@ export async function generateMetadata({ searchParams }: { searchParams: Promise
     alternates: { canonical: "/peli/rajanaapurit" },
     ...jakoMeta({
       /* Esikatselukortti (v4 §4): "{Lähtö} → {Maali} – karttapeli" jaetulla reitillä, muuten pelin nimi. */
-      ...esikatselu({ nimi: reittiKorttinimi("rajanaapurit", sp) ?? "Rajanaapurit", muoto: "rajanaapurit" }),
-      url: jakoOsoite("/peli/rajanaapurit", sp, ["maanosa", "reitti", "tulos"]),
+      ...esikatselu({ nimi: reittiKorttinimi("rajanaapurit", sp) ?? "Rajanaapurit", muoto: "rajanaapurit", koukku: reittiKoukku("rajanaapurit", sp) }),
+      url: jakoOsoite("/peli/rajanaapurit", sp, ["maanosa", "reitti", "tulos", "y"]),
       kuva: reittiJakokuva("rajanaapurit", sp, "/og/sivu/rajanaapurit"),
     }),
   };
@@ -64,6 +65,7 @@ export default async function RajanaapuritSivu({ searchParams }: Props) {
         otsikko={valinta.otsikko}
         intro={valinta.intro}
         viikko={valinta.kuluva}
+        kaveri={pyydetty ? reittiKaveri(sp.tulos, sp.y) : null}
       />
     </>
   );

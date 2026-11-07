@@ -15,6 +15,9 @@
 // julkaistulle visalle (§4, data), seuraava peli rekisteristä (pelikehys K4, 20.10.2026),
 // yhteinen numerointi (§6), oikea reitti = päivän generoitu reitti (§7).
 
+import { vastahaasteteksti } from "@/lib/korttinimi";
+import { KaveriRivi, KaveriVertailu } from "@/components/tn20/kaveri/Kaveri";
+import type { KaverinTulos, OmaTulos } from "@/lib/kaveri";
 import { lisaaPelirivi } from "@/lib/seuranta";
 import { useEffect, useMemo, useRef, useState, type CSSProperties, type KeyboardEvent, type PointerEvent as RPointerEvent } from "react";
 import { getSupabase } from "@/lib/supabase";
@@ -161,10 +164,13 @@ export default function VpkClient({
   k,
   hubHref,
   lahde,
+  kaveri = null,
 }: {
   k: VpkKierros;
   hubHref: string;
   lahde: string;
+  /** Haastetun polku (v4 §5): kaverin tulos saman päivän ketjusta. */
+  kaveri?: KaverinTulos | null;
 }) {
   const [slots, setSlots] = useState<Array<string | null>>(TYHJA);
   /* Palautus 21.10.2026 (Heikki): peli alkaa suoraan laudalta kuten ennen pelikehystä — ei K2-aloitusnäkymää. */
@@ -323,8 +329,11 @@ export default function VpkClient({
       linkkiin (?tulos=n-total), jotta Facebookin og-kuvaus kertoo sen. Tulos piirretään vain selaimessa. */
   const jako = paivanTulos && typeof location !== "undefined"
     ? {
-        teksti: jakoteksti(paivanTulos.kortit),
-        url: `${location.origin}${VPK_SIVU}?tulos=${paivanTulos.kortit.filter(Boolean).length}-${VPK_JARJESTETTAVIA}`,
+        teksti: kaveri
+          ? vastahaasteteksti(`${paivanTulos.kortit.filter(Boolean).length}/${VPK_JARJESTETTAVIA}`, kaveri.lyhyt)
+          : jakoteksti(paivanTulos.kortit),
+        /* Päivä linkkiin (&pv=), jotta kaveri saa vertailun vain saman päivän ketjusta (v4 §5). */
+        url: `${location.origin}${VPK_SIVU}?tulos=${paivanTulos.kortit.filter(Boolean).length}-${VPK_JARJESTETTAVIA}&pv=${k.iso}`,
       }
     : null;
 
@@ -351,6 +360,7 @@ export default function VpkClient({
           <span>{k.paivays}</span>
         )}
       </div>
+      {kaveri && !harjoitus && <KaveriRivi kaveri={kaveri} className="vpk-kaveri" />}
       <h1 className="vpk-h1">
         {VPK_NIMI} <span>{harjoitus ? "Harjoitus" : `#${k.numero}`}</span>
       </h1>
@@ -514,6 +524,7 @@ export default function VpkClient({
             setNakyma={setNakyma}
             uusiKetju={uusiKetju}
             jako={jako}
+            vertailu={kaveri && paivanTulos ? { oma: (() => { const n = paivanTulos.kortit.filter(Boolean).length; return { luku: `${n}/${VPK_JARJESTETTAVIA}`, lyhyt: `${n}/${VPK_JARJESTETTAVIA}`, arvo: n }; })(), kaveri } : null}
           />
         )
       )}
@@ -547,6 +558,7 @@ function Tulos(p: {
   setNakyma: (n: "oma" | "oikea") => void;
   uusiKetju: () => void;
   jako: { teksti: string; url: string } | null;
+  vertailu: { oma: OmaTulos; kaveri: KaverinTulos } | null;
 }) {
   const { k, tulos, koko, edustajat, paljastettu, valmis } = p;
   const vp = koko.map((id) => edustajat.get(id)!.vp);
@@ -621,13 +633,15 @@ function Tulos(p: {
       </div>
 
       {/* K4 v2 (pelimuotojen kehys 25.10.2026): jako Jakoalueella, uusi ketju toissijaisena linkkinä (ei lime-nappia). */}
+      {valmis && p.vertailu && <div className="vpk-vertailu"><KaveriVertailu oma={p.vertailu.oma} kaveri={p.vertailu.kaveri} taso="h2" /></div>}
+
       {valmis && (
         <div className="vpk-k4">
           {p.jako && (
             <Jakoalue
               className="vpk-jako"
               id="vpk-jako-h"
-              otsikko="Haasta kaveri"
+              otsikko={p.vertailu ? "Lähetä vastahaaste" : "Haasta kaveri"}
               waNappi="Jaa WhatsAppissa"
               teksti={p.jako.teksti}
               url={p.jako.url}

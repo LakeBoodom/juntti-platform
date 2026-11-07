@@ -1,0 +1,26 @@
+/* HAASTETUN POLKU (Jakotekstit v4 §5, vaihe 3): KaveriRivi ja KaveriVertailu (components/tn20/kaveri/Kaveri.tsx).
+   Värit pelikehyksen iholta; ilman ihoa tumma oletus. Tuomio ei ole pelkkä väri: teksti kertoo voittajan. */
+.tn20 .kv-rivi { margin: 0; display: flex; flex-direction: column; gap: 4px; padding: 12px 14px; border-radius: 14px;
+  background: var(--pk-chip, #1f1b14); border: 1.5px solid var(--pk-line, #2c2517); color: var(--pk-ink, #f5f0e6); }
+.tn20 .kv-rivi b { font-size: 18px; font-weight: 800; line-height: 1.2; color: var(--pk-ink, #f5f0e6); }
+.tn20 .kv-rivi span { font-size: 15px; font-weight: 600; line-height: 1.4; color: var(--pk-dim, #a79e8c); text-wrap: pretty; }
+
+.tn20 .kv-vertailu { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.tn20 .kv-vs { display: flex; align-items: flex-end; gap: 20px; flex-wrap: wrap; }
+.tn20 .kv-vs > div { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.tn20 .kv-kaveri { padding-bottom: 6px; }
+.tn20 .kv-pikku { font-size: 12px; font-weight: 800; letter-spacing: .16em; text-transform: uppercase; color: var(--pk-dim, #a79e8c); }
+.tn20 .kv-luku { font-family: var(--rk-cond), "Barlow Condensed", sans-serif; font-weight: 800; font-size: 64px; line-height: .9;
+  letter-spacing: -.02em; color: var(--pk-ink, #f5f0e6); font-variant-numeric: tabular-nums; overflow-wrap: normal; word-break: normal; }
+.tn20 .kv-luku--pieni { font-size: 36px; color: var(--pk-dim, #a79e8c); }
+.tn20 .kv-tuomio { margin: 2px 0 0; font-family: var(--rk-cond), "Barlow Condensed", sans-serif; font-weight: 800; font-size: 30px;
+  line-height: 1; text-transform: uppercase; color: var(--pk-acc, #e8a320); }
+.tn20 .kv-tuomio[data-tuomio="havio"] { color: #ffa88f; }
+.tn20 [data-iho="kerma"] .kv-tuomio[data-tuomio="havio"] { color: #a8361c; }
+.tn20 .kv-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+@media (min-width: 1024px) {
+  .tn20 .kv-luku { font-size: 96px; }
+  .tn20 .kv-luku--pieni { font-size: 52px; }
+  .tn20 .kv-tuomio { font-size: 38px; }
+}
+@media (max-width: 359px) { .tn20 .kv-luku { font-size: 52px; } .tn20 .kv-luku--pieni { font-size: 30px; } }

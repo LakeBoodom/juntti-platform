@@ -7,13 +7,14 @@
 // UI-sääntö 9: ei selitelausetta otsikon alla.
 import { useEffect, useRef, useState } from "react";
 import { jakoviesti } from "@/lib/korttinimi";
+import { jakoLinkki, kirjaaJako, uusiJakoId } from "@/lib/jakoseuranta";
 import "./jakoalue.css";
 
 export type Jakokanava = "whatsapp" | "facebook" | "kopioi" | "jaa";
 
 
 /** Jaon toiminnot ilman ulkoasua — pelimuodot, joilla on oma haasta-nappinsa, käyttävät tätä suoraan. */
-export function useJako({ teksti, url, otsikko, onJaettu }: {
+export function useJako({ teksti, url: perusUrl, otsikko, onJaettu: kutsujan }: {
   teksti: string;
   /** null = linkki ei ole vielä valmis (napit pois käytöstä). */
   url: string | null;
@@ -24,6 +25,15 @@ export function useJako({ teksti, url, otsikko, onJaettu }: {
   const [tila, setTila] = useState<"kopioitu" | "virhe" | "jakovirhe" | null>(null);
   const [voiJakaa, setVoiJakaa] = useState(false);
   const ajastin = useRef<ReturnType<typeof setTimeout> | null>(null);
+  /* Jakotunnus ?j= (lib/jakoseuranta.ts): luodaan selaimessa mountin jälkeen, jotta palvelimen ja selaimen
+     HTML on sama. Sama tunnus kaikille tämän näkymän kanaville. */
+  const [jakoId, setJakoId] = useState<string | null>(null);
+  useEffect(() => { try { setJakoId(uusiJakoId()); } catch { /* ei cryptoa */ } }, []);
+  const url = perusUrl ? jakoLinkki(perusUrl, jakoId) : null;
+  const onJaettu = (k: Jakokanava) => {
+    if (jakoId && url) kirjaaJako(jakoId, url, k);
+    return kutsujan?.(k);
+  };
   useEffect(() => {
     try { setVoiJakaa(typeof navigator.share === "function"); } catch { /* ei navigatoria */ }
     return () => { if (ajastin.current) clearTimeout(ajastin.current); };
@@ -51,6 +61,9 @@ export function useJako({ teksti, url, otsikko, onJaettu }: {
     kopioi,
     jaa: voiJakaa ? jaa : null,
     kopioitu: tila === "kopioitu",
+    /** Jaettava osoite tunnuksineen (Facebook-nappi ja kanavakirjaus). */
+    url,
+    onJaettu,
     /** Ruudunlukijan tila (role=status). */
     tila: tila === "kopioitu" ? "Linkki kopioitu leikepöydälle."
       : tila === "virhe" ? "Linkin kopiointi ei onnistunut. Yritä uudelleen."
@@ -76,7 +89,7 @@ export default function Jakoalue(p: {
 }) {
   const j = useJako({ teksti: p.teksti, url: p.url, otsikko: p.natiiviOtsikko, onJaettu: p.onJaettu });
   const hid = p.id ?? "tn-jako-h";
-  const fb = p.fbUrl === undefined ? p.url : p.fbUrl;
+  const fb = p.fbUrl === undefined ? j.url : p.fbUrl;
   return (
     <section className={p.className ? `tn-jako ${p.className}` : "tn-jako"} aria-labelledby={hid}>
       {/* Otsikko vain ruudunlukijalle (Heikki 23.10.2026: "Pystyykö kaveri parempaan?" pois näkyvistä). */}
@@ -87,7 +100,7 @@ export default function Jakoalue(p: {
         target="_blank"
         rel="noopener"
         aria-disabled={!j.valmis || undefined}
-        onClick={() => p.onJaettu?.("whatsapp")}
+        onClick={() => j.onJaettu("whatsapp")}
       >
         <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2 22l5.25-1.38a9.9 9.9 0 004.79 1.22c5.46 0 9.9-4.45 9.9-9.91C21.94 6.45 17.5 2 12.04 2zm5.8 14.16c-.24.68-1.4 1.3-1.93 1.35-.53.05-1.03.24-3.47-.72-2.94-1.16-4.78-4.2-4.92-4.4-.14-.2-1.16-1.55-1.16-2.96 0-1.4.73-2.09 1-2.38.26-.29.57-.36.76-.36h.56c.18.01.42-.07.65.5.24.58.82 2 .89 2.15.07.14.12.31.02.5-.1.2-.15.32-.29.5-.15.17-.31.39-.44.52-.15.14-.3.3-.13.59.17.29.75 1.23 1.6 2 1.1.97 2.03 1.28 2.32 1.42.29.15.46.12.63-.07.17-.2.73-.85.93-1.14.2-.29.39-.24.66-.15.27.1 1.7.8 1.99.95.29.14.48.22.55.34.07.12.07.71-.17 1.39z" /></svg>
         {p.waNappi}
@@ -108,7 +121,7 @@ export default function Jakoalue(p: {
             href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(fb)}`}
             target="_blank"
             rel="noopener"
-            onClick={() => p.onJaettu?.("facebook")}
+            onClick={() => j.onJaettu("facebook")}
           >
             <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="11" fill="#1877F2" /><path d="M13.4 19v-6h2l.3-2.4h-2.3V9.1c0-.7.2-1.2 1.2-1.2h1.2V5.8c-.2 0-1-.1-1.8-.1-1.8 0-3 1.1-3 3.1v1.8h-2V13h2v6h2.4z" fill="#fff" /></svg>
             Facebook

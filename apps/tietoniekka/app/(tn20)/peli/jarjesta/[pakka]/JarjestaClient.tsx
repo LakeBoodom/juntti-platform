@@ -5,7 +5,8 @@
 // Osa C (31.10.2026): Järjestä-hubin pakka; hubista tultaessa (?aloita=1) ensimmäinen kierros tulee valmiina palvelimelta.
 // CD "Järjestä yhtenäinen UX" (Heikki 2.11.2026): yksi rivi paluulinkkinä, Korjaa rivi → Lukitse valintasi → Seuraava rivi.
 
-import { tulosjakoteksti } from "@/lib/korttinimi";
+import { tulosjakoteksti, vastahaasteteksti } from "@/lib/korttinimi";
+import { jarjestaKaveri } from "@/lib/kaveri";
 import { useEffect, useMemo, useState } from "react";
 import { haeJarjestysKierros } from "@/lib/jarjesta/kierros";
 import {
@@ -58,10 +59,13 @@ function tallennaEdelliset(slug: string, ids: string[]) {
 export default function JarjestaClient({
   pakka,
   initialRound = null,
+  kaverinTulos = null,
 }: {
   pakka: Pakka;
   /** Hubista (?aloita=1): palvelimella arvottu ensimmäinen kierros, jo sekoitettuna. */
   initialRound?: JarjestysKohde[] | null;
+  /** Haastetun polku: kaverin tulos samalla rivillä (?kohteet=…&tulos=n-total). */
+  kaverinTulos?: { n: number; kaikki: number } | null;
 }) {
   const alussa = !!initialRound && initialRound.length >= 3;
   const [round, setRound] = useState<JarjestysKohde[] | null>(alussa ? initialRound : null);
@@ -69,6 +73,8 @@ export default function JarjestaClient({
   const [phase, setPhase] = useState<Phase>(alussa ? "ordering" : "start");
   const [notice, setNotice] = useState<string | null>(null);
   const [uusiKesken, setUusiKesken] = useState(false);
+  /* Kaverin tulos koskee vain jaettua riviä: uusi kierros päättää vertailun. */
+  const [kaveri, setKaveri] = useState(() => (kaverinTulos ? jarjestaKaveri(kaverinTulos) : null));
   // Osa C: paluu Järjestä-hubiin (ei kokoelmaan).
   const koti = HUB;
   // Palvelimen arpoma ensimmäinen kierros toistonestoon kuten clientillä arvottu.
@@ -93,7 +99,9 @@ export default function JarjestaClient({
      ja Facebookin og-kuvaus kertoo tuloksen. Tulosvaihe piirretään vain selaimessa. */
   const jakoTiedot = () => ({
     url: `${location.origin}${location.pathname}?kohteet=${(round ?? []).map((k) => k.id).join(",")}&tulos=${scoreResult?.correctCount ?? 0}-${scoreResult?.totalCount ?? 0}`,
-    teksti: tulosjakoteksti(pakka.kortti.otsikko, `sain ${scoreResult?.correctCount ?? 0}/${scoreResult?.totalCount ?? 0} oikeille paikoille`),
+    teksti: kaveri
+      ? vastahaasteteksti(`${scoreResult?.correctCount ?? 0}/${scoreResult?.totalCount ?? 0}`, kaveri.lyhyt)
+      : tulosjakoteksti(pakka.kortti.otsikko, `sain ${scoreResult?.correctCount ?? 0}/${scoreResult?.totalCount ?? 0} oikeille paikoille`),
   });
 
   async function aloita() {
@@ -101,6 +109,7 @@ export default function JarjestaClient({
     if (phase === "start") setPhase("loading");
     else setUusiKesken(true);
     setNotice(null);
+    setKaveri(null);
     const next = await haeJarjestysKierros(
       pakka.slug,
       lueEdelliset(pakka.slug),
@@ -184,6 +193,7 @@ export default function JarjestaClient({
                 seuraava={aloitaHref(seuraavaPakka(pakka.slug))}
                 uusi={{ teksti: "Uusi kierros", onClick: aloita, kesken: uusiKesken }}
                 jako={{ ...jakoTiedot(), natiiviOtsikko: PELI }}
+                vertailu={kaveri ? { oma: { luku: `${scoreResult.correctCount}/${scoreResult.totalCount}`, lyhyt: `${scoreResult.correctCount}/${scoreResult.totalCount}`, arvo: scoreResult.correctCount }, kaveri } : null}
               />
             }
             alaviite={lahteet.length > 0 ? `Lähde: ${lahteet.join(", ")}` : null}
@@ -197,6 +207,7 @@ export default function JarjestaClient({
     <PeliKehys iho="tumma">
       <Pelipalkki iho="tumma" peli={PELI} koti={koti} pelissa paluuNuoli />
       <Korjausrivi
+        kaveri={kaveri}
         lause={pakka.pelilause}
         ylin={pakka.ylin}
         alin={pakka.alin}

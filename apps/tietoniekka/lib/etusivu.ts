@@ -108,7 +108,11 @@ export const HOSTS_INTRO = {
 /* Footerin kokoelma- ja pelimuotolinkit johdetaan navigaation rekisteristä (lib/nav.ts), jotta
    uudet kokoelmat ja pelimuodot tulevat alatunnisteeseen automaattisesti (Heikki 6.10.2026:
    Vaalit, Tiede, Juhlat ja reittipelit puuttuivat käsin ylläpidetystä listasta). */
-export const FOOTER_COLLECTIONS = NAV_COLLECTIONS.map((c) => ({ label: c.label, href: c.href ?? `/kokoelma/${c.slug}` }));
+export const FOOTER_COLLECTIONS = [
+  ...NAV_COLLECTIONS.map((c) => ({ label: c.label, href: c.href ?? `/kokoelma/${c.slug}` })),
+  /* Kaupunkisivut (7.11.2026): lista kaikista kaupunkisivuista. */
+  { label: "Kaupungit A–Ö", href: "/kaupunki" },
+];
 
 /* Pelimuodot = navigaation pelimuodot (Visapaketit mukana 31.10.), aakkosjärjestyksessä kuten valikoissa. Päivän visa
    poistettu (Heikki 31.10.2026): ei oma pelimuoto, ja ankkuri /#paivan-visa ei toiminut. Henkilövisat poistettu

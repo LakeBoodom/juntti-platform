@@ -10,6 +10,8 @@
 // Tämä tiedosto on tavallinen moduuli (ei "use server"), joten sitä voi käyttää sekä
 // palvelimella (sivu, OG-kuva, sitemap, pelirekisteri) että clientillä.
 
+import type { KasinKoukku } from "@/lib/koukku";
+
 export type Pakka = {
   slug: string;
   /** false = konfiguraatio valmiina, mutta ei sivua/sitemapia/hubiriviä (odottaa hyväksyntää). */
@@ -71,6 +73,8 @@ export type Pakka = {
   ryhma: "paikat" | "politiikka";
   /** Pelin lause (CD 3d): peruste ja suunta. */
   pelilause: string;
+  /** Esikatselukortin vertailukoukku (v4 §4, vaihe 4): kaksi pakan kohdetta aakkosjärjestyksessä. */
+  koukku?: KasinKoukku;
   /** Listan ylä- ja alapään merkit ("↑ Korkein", "↓ Matalin"). */
   ylin: string;
   alin: string;
@@ -105,6 +109,7 @@ export const PAKAT: Pakka[] = [
     kuva: VAALIT_KUVA,
     korttikuva: "/20/vaalit/pakat/presidentit.webp",
     pelilause: "Presidentit virkaanastumisen mukaan, ensimmäinen ensin.",
+    koukku: { kysymys: "Kumpi aloitti presidenttinä ensin?", vaihtoehdot: ["L. K. Relander", "P. E. Svinhufvud"] },
     ylin: "Ensimmäinen",
     alin: "Viimeisin",
     ryhma: "politiikka",
@@ -130,6 +135,7 @@ export const PAKAT: Pakka[] = [
     kuva: VAALIT_KUVA,
     korttikuva: "/20/vaalit/pakat/paaministerit.webp",
     pelilause: "Pääministerit ensimmäisen kauden mukaan, varhaisin ensin.",
+    koukku: { kysymys: "Kumpi oli pääministerinä ensin?", vaihtoehdot: ["Esko Aho", "Harri Holkeri"] },
     ylin: "Varhaisin",
     alin: "Viimeisin",
     ryhma: "politiikka",
@@ -155,6 +161,7 @@ export const PAKAT: Pakka[] = [
     kuva: VAALIT_KUVA,
     korttikuva: "/20/vaalit/pakat/paaministerit-kesto.webp",
     pelilause: "Pääministerit kausien yhteispituuden mukaan, pisin ensin.",
+    koukku: { kysymys: "Kumpi oli pääministerinä pidempään?", vaihtoehdot: ["Harri Holkeri", "Juha Sipilä"] },
     ylin: "Pisin",
     alin: "Lyhin",
     ryhma: "politiikka",
@@ -183,6 +190,7 @@ export const PAKAT: Pakka[] = [
     kuva: VAALIT_KUVA,
     korttikuva: "/20/vaalit/pakat/eduskunta-pisimpaan.webp",
     pelilause: "Kansanedustajat eduskuntavuosien mukaan, pisimpään ollut ensin.",
+    koukku: { kysymys: "Kumpi on ollut kansanedustajana pidempään?", vaihtoehdot: ["Ben Zyskowicz", "Erkki Tuomioja"] },
     ylin: "Eniten vuosia",
     alin: "Vähiten vuosia",
     ryhma: "politiikka",
@@ -210,6 +218,7 @@ export const PAKAT: Pakka[] = [
     korttikuva: "/20/vaalit/pakat/eduskuntaryhmat.webp",
     hubKuva: "/20/jarjesta/pyorylat/eduskuntaryhmat.webp",
     pelilause: "Eduskuntaryhmät koon mukaan, suurin ensin.",
+    koukku: { kysymys: "Kumpi eduskuntaryhmä on suurempi?", vaihtoehdot: ["Perussuomalaiset", "SDP"] },
     ylin: "Suurin",
     alin: "Pienin",
     ryhma: "politiikka",
@@ -236,6 +245,7 @@ export const PAKAT: Pakka[] = [
     korttikuva: "/20/vaalit/pakat/puolueet-ika.webp",
     hubKuva: "/20/jarjesta/pyorylat/puolueet-ika.webp",
     pelilause: "Puolueet perustamisvuoden mukaan, vanhin ensin.",
+    koukku: { kysymys: "Kumpi puolue on vanhempi?", vaihtoehdot: ["Keskusta", "Kokoomus"] },
     ylin: "Vanhin",
     alin: "Nuorin",
     ryhma: "politiikka",
@@ -263,6 +273,7 @@ export const PAKAT: Pakka[] = [
     korttikuva: "/20/vaalit/pakat/vaalipiirit-paikat.webp",
     hubKuva: "/20/jarjesta/pyorylat/vaalipiirit-paikat.webp",
     pelilause: "Vaalipiirit paikkamäärän mukaan, eniten paikkoja ensin.",
+    koukku: { kysymys: "Kumpi vaalipiiri saa enemmän paikkoja?", vaihtoehdot: ["Oulu", "Varsinais-Suomi"] },
     ylin: "Eniten paikkoja",
     alin: "Vähiten paikkoja",
     ryhma: "politiikka",
@@ -294,6 +305,7 @@ export const PAKAT: Pakka[] = [
     korttikuva: "/20/luonto/k/tunturin-salainen-elama-lappi-visa.webp",
     hubKuva: "/20/jarjesta/pyorylat/tunturit-korkeus.webp",
     pelilause: "Tunturit korkeuden mukaan, korkein ensin.",
+    koukku: { kysymys: "Kumpi tunturi on korkeampi?", vaihtoehdot: ["Ounastunturi", "Yllästunturi"] },
     ylin: "Korkein",
     alin: "Matalin",
     ryhma: "paikat",
@@ -320,6 +332,7 @@ export const PAKAT: Pakka[] = [
     korttikuva: "/20/maantieto/k/maailman-korkeimmat-vuoret-visa.webp",
     hubKuva: "/20/jarjesta/pyorylat/vuoret-korkeus.webp",
     pelilause: "Vuoret korkeuden mukaan, korkein ensin.",
+    koukku: { kysymys: "Kumpi vuori on korkeampi?", vaihtoehdot: ["Denali", "Kilimanjaro"] },
     ylin: "Korkein",
     alin: "Matalin",
     ryhma: "paikat",
@@ -349,6 +362,7 @@ export const PAKAT: Pakka[] = [
     korttikuva: "/20/luonto/k/jarvien-katketyt-ihmeet-visa.webp",
     hubKuva: "/20/jarjesta/pyorylat/jarvet-pinta-ala.webp",
     pelilause: "Järvet pinta-alan mukaan, suurin ensin.",
+    koukku: { kysymys: "Kumpi järvi on suurempi?", vaihtoehdot: ["Inarijärvi", "Päijänne"] },
     ylin: "Suurin",
     alin: "Pienin",
     ryhma: "paikat",
@@ -376,6 +390,7 @@ export const PAKAT: Pakka[] = [
     korttikuva: "/20/kaupungit/k/helsinki.webp",
     hubKuva: "/20/jarjesta/pyorylat/kaupungit-asukasluku.webp",
     pelilause: "Kaupungit asukasluvun mukaan, suurin ensin.",
+    koukku: { kysymys: "Kummassa kaupungissa on enemmän asukkaita?", vaihtoehdot: ["Oulu", "Turku"] },
     ylin: "Suurin",
     alin: "Pienin",
     ryhma: "paikat",
@@ -400,6 +415,7 @@ export const PAKAT: Pakka[] = [
     kuva: "/20/jarjesta/maakunnat.webp",
     korttikuva: "/20/jarjesta/maakunnat.webp",
     pelilause: "Maakunnat pinta-alan mukaan, suurin ensin.",
+    koukku: { kysymys: "Kumpi maakunta on suurempi?", vaihtoehdot: ["Etelä-Pohjanmaa", "Pirkanmaa"] },
     ylin: "Suurin",
     alin: "Pienin",
     ryhma: "paikat",
@@ -430,6 +446,7 @@ export const PAKAT: Pakka[] = [
     korttikuva: "/20/luonto/k/suomen-kansallispuistot-visa.webp",
     hubKuva: "/20/jarjesta/pyorylat/kansallispuistot-pinta-ala.webp",
     pelilause: "Kansallispuistot pinta-alan mukaan, suurin ensin.",
+    koukku: { kysymys: "Kumpi kansallispuisto on suurempi?", vaihtoehdot: ["Oulanka", "Syöte"] },
     ylin: "Suurin",
     alin: "Pienin",
     ryhma: "paikat",

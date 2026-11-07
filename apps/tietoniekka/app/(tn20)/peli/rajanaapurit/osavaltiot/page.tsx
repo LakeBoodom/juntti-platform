@@ -13,7 +13,8 @@ import { arvoUsaReitti, usaReittiAlueista } from "@/lib/rajanaapurit/osavaltiot"
 import { RN_USA_SIVU } from "@/lib/rajanaapurit";
 import { sivunReitti, viikonAikavali } from "@/lib/reittipeli/viikonReitit";
 import ReittipeliClient from "@/components/tn20/reittipeli/ReittipeliClient";
-import { reittiJakokuva, reittiKorttinimi } from "@/lib/reittipeli/kuvat";
+import { reittiJakokuva, reittiKorttinimi, reittiKoukku } from "@/lib/reittipeli/kuvat";
+import { reittiKaveri } from "@/lib/kaveri";
 import { uusiReittiSiemen } from "@/lib/kuntaliitos";
 import { maanantai, viikonSiemen } from "@/lib/reittipeli/viikonReitit";
 import { redirect } from "next/navigation";
@@ -32,8 +33,8 @@ export async function generateMetadata({ searchParams }: { searchParams: Promise
     alternates: { canonical: RN_USA_SIVU },
     ...jakoMeta({
       /* Esikatselukortti (v4 §4): "{Lähtö} → {Maali} – karttapeli" jaetulla reitillä, muuten pelin nimi. */
-      ...esikatselu({ nimi: reittiKorttinimi("osavaltiot", sp) ?? "Rajanaapurit: Yhdysvallat", muoto: "osavaltiot" }),
-      url: jakoOsoite(RN_USA_SIVU, sp, ["reitti", "tulos"]),
+      ...esikatselu({ nimi: reittiKorttinimi("osavaltiot", sp) ?? "Rajanaapurit: Yhdysvallat", muoto: "osavaltiot", koukku: reittiKoukku("osavaltiot", sp) }),
+      url: jakoOsoite(RN_USA_SIVU, sp, ["reitti", "tulos", "y"]),
       kuva: reittiJakokuva("osavaltiot", sp, `/og/reitti/osavaltiot?reitti=${viikonSiemen(maanantai(helsinginPaiva().iso))}`),
     }),
   };
@@ -63,6 +64,7 @@ export default async function OsavaltiotSivu({ searchParams }: Props) {
         otsikko={valinta.otsikko}
         intro={valinta.intro}
         viikko={valinta.kuluva}
+        kaveri={pyydetty ? reittiKaveri(sp.tulos, sp.y) : null}
       />
     </>
   );

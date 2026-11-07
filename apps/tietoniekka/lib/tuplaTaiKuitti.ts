@@ -60,6 +60,8 @@ export type TuplaTeema = {
   /** Mistä kysymykset arvotaan: visojen slugit tai koko kokoelma (quizzes.collection) */
   visat: string[] | { kokoelma: string };
   paluu: { href: string; teksti: string };
+  /** Esikatselukortin koukku (v4 §4, vaihe 4): teeman poolin kysymyksen id (questions.id), valittu käsin 7.11.2026. */
+  koukku?: string;
 };
 
 /** Pelimuodon oma sivu — kaikki teemat samassa paikassa (Heikki 26.9.2026). */
@@ -127,6 +129,7 @@ export const TEEMAT: TuplaTeema[] = [
     nosto: "Liigan pelaajat, kaudet ja pudotuspelien muistot.",
     visat: SM_LIIGA_VISAT,
     paluu: { href: "/peli/tupla-tai-kuitti", teksti: "Kaikki Tupla tai kuitti -aiheet" },
+    koukku: "98e20a4c-4006-45b7-8445-c4366bf83244",
   },
 ];
 
@@ -152,6 +155,7 @@ TEEMAT.push(
     nosto: "Kaupunkien historia, maamerkit ja paikalliset erikoisuudet.",
     visat: KAUPUNGIT.map((k) => k.quizSlug),
     paluu: { href: "/peli/tupla-tai-kuitti", teksti: "Kaikki Tupla tai kuitti -aiheet" },
+    koukku: "c9a80e40-6ca0-48b6-b2ed-5a1e1ff23bd2",
   },
   {
     slug: "luonto",
@@ -172,6 +176,7 @@ TEEMAT.push(
     nosto: "Eläimet, kasvit ja luonnon ihmeet.",
     visat: { kokoelma: "luonto" },
     paluu: { href: "/peli/tupla-tai-kuitti", teksti: "Kaikki Tupla tai kuitti -aiheet" },
+    koukku: "81ea1727-fde5-4544-90ba-afcd6556eeae",
   },
   {
     slug: "musiikki",
@@ -192,6 +197,7 @@ TEEMAT.push(
     nosto: "Artistit, hitit ja levyt kotimaasta maailmalle.",
     visat: { kokoelma: "musiikki" },
     paluu: { href: "/peli/tupla-tai-kuitti", teksti: "Kaikki Tupla tai kuitti -aiheet" },
+    koukku: "a35b5249-d084-47fd-8f04-e3b45eef83b9",
   },
   // Heikki 26.9.2026: Kulttuuri (pääsylippu) ja TV ja suoratoisto (popcorn)
   {
@@ -213,6 +219,7 @@ TEEMAT.push(
     nosto: "Suomalainen taide, design, kirjallisuus ja perinteet.",
     visat: { kokoelma: "kulttuuri" },
     paluu: { href: "/peli/tupla-tai-kuitti", teksti: "Kaikki Tupla tai kuitti -aiheet" },
+    koukku: "4839f48d-d98a-4cb0-8090-66cba27347c7",
   },
   {
     slug: "tv-ja-suoratoisto",
@@ -233,6 +240,7 @@ TEEMAT.push(
     nosto: "Sarjat, hahmot ja ohjelmat kotisohvalta.",
     visat: { kokoelma: "tv" },
     paluu: { href: "/peli/tupla-tai-kuitti", teksti: "Kaikki Tupla tai kuitti -aiheet" },
+    koukku: "844da92d-4417-422e-9d98-7b1c8738dcbb",
   },
   // Heikki 26.9.2026: Historia (yleinen kolikko aarteena, CD 2A) ja Maantieto (kompassi)
   {
@@ -254,6 +262,7 @@ TEEMAT.push(
     nosto: "Kuninkaat, sodat, presidentit ja arki ennen vanhaan.",
     visat: { kokoelma: "historia" },
     paluu: { href: "/peli/tupla-tai-kuitti", teksti: "Kaikki Tupla tai kuitti -aiheet" },
+    koukku: "e84caaae-8cb4-4aba-ad70-8c46e8ff33a5",
   },
   {
     slug: "maantieto",
@@ -275,6 +284,7 @@ TEEMAT.push(
     // Maantieto-kokoelma on kannassa "matkakohteet" (nav.ts)
     visat: { kokoelma: "matkakohteet" },
     paluu: { href: "/peli/tupla-tai-kuitti", teksti: "Kaikki Tupla tai kuitti -aiheet" },
+    koukku: "95218a71-9813-4dd6-aa3f-c4bd61913366",
   },
 );
 

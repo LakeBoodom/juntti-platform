@@ -6,13 +6,15 @@
 
 import type { Metadata } from "next";
 import { JsonLd, peliLd } from "@/lib/jsonLd";
-import { jakoMeta, jakoOsoite } from "@/lib/jakoMeta";
+import { jakoMeta, jakoOsoite, jaettuTulos } from "@/lib/jakoMeta";
+import { jarjestaKaveri } from "@/lib/kaveri";
 import { esikatselu } from "@/lib/esikatselu";
 import { helsinginPaiva } from "@/lib/aika";
-import { VPK_JAKONIMI, VPK_NIMI, VPK_SIVU } from "@/lib/vaalipiiriketju";
+import { VPK_JAKONIMI, VPK_KOUKKU, VPK_JARJESTETTAVIA, VPK_NIMI, VPK_SIVU } from "@/lib/vaalipiiriketju";
 import { harjoitusKierros, paivanKierros } from "@/lib/vaalipiiriketju/data";
 import VpkClient from "@/components/tn20/vaalipiiriketju/VpkClient";
 import "./vaalipiiriketju.css";
+import { koukkuTeksti } from "@/lib/koukku";
 
 export const dynamic = "force-dynamic";
 
@@ -26,7 +28,7 @@ export async function generateMetadata({ searchParams }: { searchParams: Promise
     description: KUVAUS,
     alternates: { canonical: VPK_SIVU },
     /* Esikatselukortti (v4 §4): sama kortti pelille ja tulokselle. */
-    ...jakoMeta({ ...esikatselu({ nimi: VPK_JAKONIMI, muoto: "vaalipiiriketju" }), url: jakoOsoite(VPK_SIVU, sp, ["tulos"]), kuva: "/og/sivu/vaalipiiriketju" }),
+    ...jakoMeta({ ...esikatselu({ nimi: VPK_JAKONIMI, muoto: "vaalipiiriketju", koukku: koukkuTeksti(VPK_KOUKKU) }), url: jakoOsoite(VPK_SIVU, sp, ["tulos", "pv"]), kuva: "/og/sivu/vaalipiiriketju" }),
   };
 }
 
@@ -42,11 +44,14 @@ export default async function VaalipiiriketjuSivu({ searchParams }: Props) {
   const ketju = typeof sp.ketju === "string" && SIEMEN.test(sp.ketju) ? sp.ketju : null;
   const iso = helsinginPaiva().iso;
   const k = ketju ? await harjoitusKierros(iso, ketju) : await paivanKierros(iso);
+  /* Haastetun polku (v4 §5): kaverin tulos vain saman päivän ketjusta (?tulos=n-6&pv=YYYY-MM-DD). */
+  const kt = !ketju && sp.pv === iso ? jaettuTulos(sp.tulos) : null;
+  const kaveri = kt && kt.kaikki === VPK_JARJESTETTAVIA ? jarjestaKaveri(kt, "Järjestä samat kuusi kansanedustajaa") : null;
   return (
     <>
       <JsonLd data={peliLd({ name: VPK_NIMI, url: VPK_SIVU, description: KUVAUS })} />
       {k ? (
-        <VpkClient k={k} hubHref={HUB} lahde={LAHDE} />
+        <VpkClient k={k} hubHref={HUB} lahde={LAHDE} kaveri={kaveri} />
       ) : (
         <div className="vpk">
           <div className="vpk-virhe" role="alert">
