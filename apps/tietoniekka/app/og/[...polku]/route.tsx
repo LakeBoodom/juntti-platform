@@ -642,7 +642,7 @@ export async function GET(req: Request, ctx: { params: Promise<{ polku: string[]
        päivittäin (?p=YYYY-MM-DD välimuistin avaimena). Ei maata, lippua eikä tulosta. */
     const p = url.searchParams.get("p");
     const k = await maaKierros(p && /^\d{4}-\d{2}-\d{2}$/.test(p) ? p : helsinginPaiva().iso, null);
-    vastaus = await pelisivunEsikatselu({ nimi: "Mikä maa?", muoto: "vihjepeli", kuva: "/20/mika-maa/kompassi.webp", accent: "#B4532A", lause: k?.vihjeet[0] });
+    vastaus = await pelisivunEsikatselu({ nimi: "Mikä maa?", muoto: "vihjepeli", kuva: "/20/mika-maa/tunnus.webp", accent: "#B4532A", lause: k?.vihjeet[0] });
   } else if (tyyppi === "sivu" && PELISIVUT[avain]) {
     vastaus = await pelisivunEsikatselu(PELISIVUT[avain]);
   } else if (tyyppi === "sivu" && SIVUT[avain]) {

@@ -97,8 +97,8 @@
 .tn20 .kh-kortti--mm { border-color: #e0d8c6; background: #f2ede2; color: #12222c; }
 .tn20 .kh-kortti--mm:hover { border-color: #b4532a; }
 .tn20 .kh-kortti--mm:has(.kh-nimi a:focus-visible) { outline-color: #0e3a5c; }
-.tn20 .kh-mm-kuva { display: grid; place-items: center; aspect-ratio: 4 / 3; background: #dce6e4; }
-.tn20 .kh-mm-kompassi { width: 52%; height: auto; }
+.tn20 .kh-mm-kuva { display: grid; place-items: center; aspect-ratio: 4 / 3; background: #f2ede2; border-bottom: 1px solid #e0d8c6; }
+.tn20 .kh-mm-tunnus { width: 88%; height: auto; }
 .tn20 .kh-kortti--mm .kh-laji { color: #0a6e70; }
 .tn20 .kh-kortti--mm .kh-nimi { color: #0e3a5c; }
 .tn20 .kh-mm-vihje {
