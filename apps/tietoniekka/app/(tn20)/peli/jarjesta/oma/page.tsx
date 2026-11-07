@@ -2,7 +2,8 @@
 // /peli/jarjesta/oma?a=<attr_key>&h=<celebrity-id:t>&p=<henkilön slug>. Täsmälleen ne henkilöt, jotka
 // henkilösivun kortti näytti. Parametrisivu → ei indeksoida (henkilösivu on indeksoitava sisältö).
 import type { Metadata } from "next";
-import { jakoMeta, jakoOsoite, pelituloksenOg } from "@/lib/jakoMeta";
+import { jakoMeta, jakoOsoite } from "@/lib/jakoMeta";
+import { esikatselu } from "@/lib/esikatselu";
 import { getSupabase } from "@/lib/supabase";
 import { arvoTeksti, haeLaatuArvot, haeLaatuDefit } from "@/lib/laadullinen";
 import { fiPvm, parsePvm } from "@/lib/henkilo";
@@ -16,10 +17,14 @@ export const dynamic = "force-dynamic";
    og:url = jaettu pakka parametreineen (a, h, p). */
 export async function generateMetadata({ searchParams }: { searchParams: Sp }): Promise<Metadata> {
   const sp = await searchParams;
+  /* Esikatselukortti (v4 §4): "{pakan otsikko} – järjestyspeli", sama kortti tulokselle. */
+  const sb = getSupabase();
+  const def = sb && typeof sp.a === "string" ? (await haeLaatuDefit(sb)).get(sp.a) : undefined;
+  const nimi = def ? def.otsikko.charAt(0).toUpperCase() + def.otsikko.slice(1) : "Laita järjestykseen";
   return {
     title: "Laita järjestykseen | Tietoniekka",
     robots: { index: false, follow: true },
-    ...jakoMeta({ ...(pelituloksenOg(sp, "oikealla paikalla") ?? { title: "Laita järjestykseen", description: "Järjestä kortit oikeaan järjestykseen – pystytkö parempaan?" }), url: jakoOsoite("/peli/jarjesta/oma", sp, ["a", "h", "p", "tulos"]), kuva: "/og/sivu/ikajarjestys" }),
+    ...jakoMeta({ ...esikatselu({ nimi, muoto: "jarjesta", lause: "Laita kortit oikeaan järjestykseen." }), url: jakoOsoite("/peli/jarjesta/oma", sp, ["a", "h", "p", "tulos"]), kuva: "/og/sivu/ikajarjestys" }),
   };
 }
 

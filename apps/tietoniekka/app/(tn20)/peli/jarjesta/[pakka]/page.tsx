@@ -8,7 +8,8 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { JsonLd, peliLd } from "@/lib/jsonLd";
-import { jakoMeta, jakoOsoite, pelituloksenOg } from "@/lib/jakoMeta";
+import { jakoMeta, jakoOsoite } from "@/lib/jakoMeta";
+import { esikatselu } from "@/lib/esikatselu";
 import { JULKAISTUT, haePakka, pakkaHref } from "@/lib/jarjesta/pakat";
 import { haeJarjestysKierros, haeJarjestysKohteet } from "@/lib/jarjesta/kierros";
 import { IKA_PAKAT, haeIkaPakka, type IkaPakka } from "@/lib/jarjesta/hub";
@@ -27,7 +28,8 @@ export function generateStaticParams() {
 
 export async function generateMetadata({ params, searchParams }: { params: Promise<{ pakka: string }>; searchParams: Haku }): Promise<Metadata> {
   const slug = (await params).pakka;
-  /* Jaettu tulos (?tulos=n-total, 23.10.2026): og-kuvaus tuloksesta, og:url = jaettu linkki. */
+  /* Esikatselukortti (Jakotekstit v4 §4): "{pakka} – järjestyspeli" ja pakan oma lause; sama kortti tulokselle
+     (tulos on viestissä). og:url = jaettu linkki, jotta kaveri saa saman rivin. */
   const sp = await searchParams;
   const ika = haeIkaPakka(slug);
   if (ika) {
@@ -37,7 +39,7 @@ export async function generateMetadata({ params, searchParams }: { params: Promi
       title: `${nimi} – järjestä syntymävuoden mukaan | Tietoniekka`,
       description: kuvaus,
       alternates: { canonical: ika.href },
-      ...jakoMeta({ ...(pelituloksenOg(sp, "oikealla paikalla") ?? { title: nimi, description: kuvaus }), url: jakoOsoite(ika.href, sp, ["henkilot", "rivi", "tulos"]), kuva: "/og/sivu/ikajarjestys" }),
+      ...jakoMeta({ ...esikatselu({ nimi: ika.nimi, muoto: "ikajarjestys", lause: ika.pelilause }), url: jakoOsoite(ika.href, sp, ["henkilot", "rivi", "tulos"]), kuva: `/og/jarjesta/${ika.slug}` }),
     };
   }
   const p = haePakka(slug);
@@ -47,7 +49,7 @@ export async function generateMetadata({ params, searchParams }: { params: Promi
     title: `${p.seoTitle} | Tietoniekka`,
     description: `${p.kuvaus} ${p.rajaus}`,
     alternates: { canonical: url },
-    ...jakoMeta({ ...(pelituloksenOg(sp, "oikealla paikalla") ?? { title: p.seoTitle, description: p.kuvaus }), url: jakoOsoite(url, sp, ["kohteet", "tulos"]), kuva: `/og/jarjesta/${p.slug}` }),
+    ...jakoMeta({ ...esikatselu({ nimi: p.kortti.otsikko, muoto: "jarjesta", lause: p.pelilause }), url: jakoOsoite(url, sp, ["kohteet", "tulos"]), kuva: `/og/jarjesta/${p.slug}` }),
   };
 }
 

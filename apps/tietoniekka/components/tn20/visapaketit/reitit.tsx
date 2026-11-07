@@ -4,6 +4,7 @@ import type { Metadata } from "next";
 import { notFound, permanentRedirect } from "next/navigation";
 import { cache } from "react";
 import { jakoMeta } from "@/lib/jakoMeta";
+import { esikatselu } from "@/lib/esikatselu";
 import {
   haeSivu, lapsetHref, sivunHakuotsikko, sivunNimi, sivunTaso, sivunTekstit, valitsinNakyy, type Sivu, type Taso,
 } from "@/lib/visapaketit";
@@ -31,7 +32,8 @@ export async function pakettiMetadata(slug: string, painos: string | null, sp: H
     alternates: { canonical },
     // Televisionäkymä, tuloste ja juontajan näkymä: sisältö on jo pakettisivulla. Esikatselu (luonnos) ei koskaan indeksiin.
     ...(nakyma !== "sivu" || sivu.vp.esikatselu ? { robots: { index: false, follow: nakyma !== "sivu" } } : {}),
-    ...jakoMeta({ title: nimi, description, url: canonical, kuva: `/og/visapaketti/${p.slug}` }),
+    /* Esikatselukortti (Jakotekstit v4 §4): "{paketti} – valmis visailta" ja "Valmiit kysymykset ja vastaukset." */
+    ...jakoMeta({ ...esikatselu({ nimi: sivunNimi(sivu), muoto: "visapaketti" }), url: canonical, kuva: `/og/visapaketti/${p.slug}` }),
   };
 }
 

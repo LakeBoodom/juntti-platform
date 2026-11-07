@@ -6,15 +6,16 @@
 // kaveri saa täsmälleen saman sarjan.
 
 import { JsonLd, breadcrumbLd, abs } from "@/lib/jsonLd";
-import { korttinimi, tasonimiTuloksesta } from "@/lib/korttinimi";
-import { jakoOsoite, JAKO_OG_OTSIKKO, jakoKuvaus, jaettuTulos } from "@/lib/jakoMeta";
-import { mahtuuKorttiin } from "@/lib/kysymyskortti";
+import { korttinimi } from "@/lib/korttinimi";
+import { jakoOsoite, jaettuTulos } from "@/lib/jakoMeta";
+import { esikatselu } from "@/lib/esikatselu";
+import { visanKoukku, megaKoukku } from "@/lib/koukku";
 import { haeRistiinnostot, type RelatedRow } from "@/lib/related";
 import { henkiloHref } from "@/lib/henkiloSlug";
 import { visaHref } from "@/lib/visaHref";
 import { getSupabase } from "@/lib/supabase";
 import { getKuvavisat, getKuvavisatByIds } from "@/lib/queries";
-import { TASOT, MAANOSAT, KATEGORIAT, variaationNimi, alueRajaus, poolinHarhauttimet, getViikkovisa, getViikkoKollaasi, levynSavy, VIIKKOVISA_KUVIA, kuvavisanKansi } from "@/lib/kuvavisat2026";
+import { TASOT, MAANOSAT, KATEGORIAT, variaationNimi, alueRajaus, poolinHarhauttimet, getViikkovisa, getViikkoKollaasi, levynSavy, VIIKKOVISA_KUVIA, kuvavisanKansi, kuvavisanNimi } from "@/lib/kuvavisat2026";
 import { viikkoInfo, viikkoNimi, viikkoAvaimesta, VIIKKO_AKSENTTI } from "@/lib/viikkovisa";
 import { haeHaaste } from "@/lib/haaste";
 import { kulttuuriImg } from "@/lib/kulttuuri";
@@ -76,7 +77,7 @@ async function pelinMetadata(p: Record<string, string | string[] | undefined>): 
      joten og ja twitter asetetaan nyt jokaisessa haarassa erikseen. */
   /* SEO-erä A2 (2.10.2026): jakokuva (/og/…) ja og:url jokaisessa haarassa — ilman niitä
      lapsen openGraph korvasi juuren kuvan ja jaetuista linkeistä puuttui kuva kokonaan. */
-  const og = (title: string, description: string, image: string, url: string): Metadata => ({
+  const og = ({ title, description }: { title: string; description: string }, image: string, url: string): Metadata => ({
     openGraph: {
       type: "website", locale: "fi_FI", siteName: "Tietoniekka", title, description, url,
       images: [{ url: image, width: 1200, height: 630, alt: title }],
@@ -94,7 +95,7 @@ async function pelinMetadata(p: Record<string, string | string[] | undefined>): 
     return {
       title: `${t} – tunnista kuvasta${suffix}`,
       description: d,
-      ...og(t, d, "/og/kuvavisa/viikko", "/kuvavisa/viikko"),
+      ...og(esikatselu({ nimi: t, muoto: "kuvavisa", n: VIIKKOVISA_KUVIA }), "/og/kuvavisa/viikko", "/kuvavisa/viikko"),
       /* Sarja vaihtuu maanantaisin, joten kanoninen osoite on parametriton (A6: /kuvavisa/viikko). */
       alternates: { canonical: "/kuvavisa/viikko" },
     };
@@ -111,7 +112,7 @@ async function pelinMetadata(p: Record<string, string | string[] | undefined>): 
       title: `${t} – tunnista kuvasta${suffix}`,
       description: kuvaDesc,
       /* og:url = jaettu osoite: haasteen ?ids= (sama kuvasarja kaverille) ja variaatio mukana. */
-      ...og(`${t} – tunnista kuvasta`, kuvaDesc, `/og/kuvavisa/${encodeURIComponent(kuvavisa)}`, jakoOsoite(`/kuvavisa/${encodeURIComponent(kuvavisa)}`, p, ["taso", "maanosa", "alue", "ids"])),
+      ...og(esikatselu({ nimi: vari ?? kuvavisanNimi(kuvavisa), muoto: "kuvavisa", n: 10 }), `/og/kuvavisa/${encodeURIComponent(kuvavisa)}`, jakoOsoite(`/kuvavisa/${encodeURIComponent(kuvavisa)}`, p, ["taso", "maanosa", "alue", "ids"])),
       /* T6: kanoninen osoite on kortiston perusvisa — variaatiot eivät kilpaile
          samasta hakutuloksesta keskenään. SEO-erä A6: polkumuoto /kuvavisa/<kortisto>. */
       alternates: { canonical: `/kuvavisa/${encodeURIComponent(kuvavisa)}` },
@@ -126,13 +127,13 @@ async function pelinMetadata(p: Record<string, string | string[] | undefined>): 
     const pelattavat = data.teaser ? (await megaMaarat(sb, [data.id])).get(data.id) : undefined;
     const megaDesc = data.teaser ? (pelattavat ? maaraTekstiin(data.teaser, pelattavat) : data.teaser) : "Megavisa: yksi istunto ilman taukoja. Pelaa ilmaiseksi Tietoniekassa.";
     const megaUrl = `/peli?mega=${encodeURIComponent(mega)}`;
-    /* Jaettu megatulos (&tulos=n-total, 23.10.2026): yhteinen jako-otsikko ja tuloskuvaus, og:url = jaettu linkki. */
+    /* Esikatselukortti (v4 §4): "{nimi} – 50 kysymyksen visa", koukku megan omista kysymyksistä. Jaettu tulos
+       (&tulos=n-total) pysyy og:url:ssa, jotta Facebook ei vaihda kaverin linkkiä; kortti on sama. */
     const megaTulos = jaettuTulos(tulosRaw);
+    const koukku = await megaKoukku(data.id);
     return {
       title: `${megaNimi}${suffix}`, description: megaDesc,
-      ...(megaTulos
-        ? og(JAKO_OG_OTSIKKO, jakoKuvaus(`${megaTulos.n}/${megaTulos.kaikki} oikein`, null, megaTulos.n === megaTulos.kaikki), `/og/mega/${encodeURIComponent(mega)}`, `${megaUrl}&tulos=${tulosRaw}`)
-        : og(megaNimi, megaDesc, `/og/mega/${encodeURIComponent(mega)}`, megaUrl)),
+      ...og(esikatselu({ nimi: korttinimi({ korttinimi: null, title: megaNimi }), muoto: "megavisa", n: pelattavat, koukku: koukku?.kysymys }), `/og/mega/${encodeURIComponent(mega)}`, megaTulos ? `${megaUrl}&tulos=${tulosRaw}` : megaUrl),
       alternates: { canonical: megaUrl },
     };
   }
@@ -143,14 +144,14 @@ async function pelinMetadata(p: Record<string, string | string[] | undefined>): 
       const kuvaus = lasten.kuvaus ?? `${lasten.otsikko} – tietovisa lapsille Tietoniekassa.`;
       return {
         title: `${lasten.otsikko}${suffix}`, description: kuvaus,
-        ...og(lasten.otsikko, kuvaus, `/og/visa/${encodeURIComponent(lasten.slug)}`, `/visa/${lasten.slug}`),
+        ...og(esikatselu({ nimi: lasten.otsikko, muoto: "tietovisa", n: lasten.kysymykset.length, koukku: (await visanKoukku(lasten.id)).koukku?.kysymys }), `/og/visa/${encodeURIComponent(lasten.slug)}`, `/visa/${lasten.slug}`),
         alternates: { canonical: `/visa/${lasten.slug}` },
         ...(lasten.julkaistu ? {} : { robots: { index: false, follow: false } }),
       };
     }
-    let q = sb.from("quizzes").select("id, title, display_title, teaser, description, slug, seo_title, seo_description, collection, korttinimi, fanitasot").eq("status", "published");
+    let q = sb.from("quizzes").select("id, title, display_title, teaser, description, slug, seo_title, seo_description, collection, korttinimi").eq("status", "published");
     q = quizId ? q.eq("id", quizId) : q.eq("slug", slug!);
-    const { data } = await q.maybeSingle<{ id: string; title: string; display_title: string | null; teaser: string | null; description: string | null; slug: string | null; seo_title: string | null; seo_description: string | null; collection: string | null; korttinimi: string | null; fanitasot: unknown }>();
+    const { data } = await q.maybeSingle<{ id: string; title: string; display_title: string | null; teaser: string | null; description: string | null; slug: string | null; seo_title: string | null; seo_description: string | null; collection: string | null; korttinimi: string | null }>();
     if (!data) return { title: `Visaa ei löytynyt${suffix}` };
     const name = data.display_title ?? data.title;
     /* Kanoninen osoite on /visa/<slug> (julkaisu 31.8.2026) — myös silloin kun
@@ -176,27 +177,15 @@ async function pelinMetadata(p: Record<string, string | string[] | undefined>): 
       hakuOtsikko = `${henkilo} – tietovisa: kuinka hyvin tunnet?${suffix}`;
     }
     const visaPolku = data.slug ? `/visa/${data.slug}` : `/peli?quiz_id=${quizId}`;
-    /* Vaihe D (22.10.2026): tuloslinkin postikortti; og-kentät 23.10.2026 yhteinen otsikko + "Sain 7/10: tasonimi.
-       Pystytkö parempaan?" Virheellinen tulos (n > total) → tavallinen visakortti. */
+    /* Esikatselukortti (Jakotekstit v4 §4, vaihe 2): "{korttinimi} – tietovisa", kuvaus = koukku + "Kymmenen kysymystä.",
+       kuva = koukkukortti. Sama kortti tulos- ja pelilinkille: tulos on viestissä, ei kortissa. og:url = jaettu
+       tuloslinkki (ei canonical), jotta Facebook ei vie kaveria parametrittomaan osoitteeseen. Vanhojen linkkien &k=
+       ohitetaan: koukku valitaan palvelimella. */
     const jaettu = jaettuTulos(tulos);
-    const ogKuva = data.slug ? `/og/visa/${encodeURIComponent(data.slug)}${jaettu ? `?tulos=${tulos}` : ""}` : "/og-image.png";
-    if (jaettu) {
-      const taso = tasonimiTuloksesta(data.fanitasot, jaettu.n, jaettu.kaikki);
-      /* Vaihe E: &k=<id> → kysymyskortti, og:title = kysymys. k kelpaa vain, jos kysymys kuuluu visaan ja mahtuu korttiin. */
-      const kParam = str("k");
-      if (kParam && data.slug) {
-        const { data: kq } = await sb.from("questions").select("question_text, answers, audio").eq("id", kParam).eq("quiz_id", data.id).maybeSingle<{ question_text: string; answers: unknown; audio: unknown }>();
-        const vaihtoehdot = Array.isArray(kq?.answers) ? (kq!.answers as Array<{ text: string }>).slice(0, 4).map((a) => a.text) : [];
-        if (kq && mahtuuKorttiin({ question: kq.question_text, options: vaihtoehdot, audio: kq.audio != null })) {
-          const kKuva = `/og/visa/${encodeURIComponent(data.slug)}?tulos=${tulos}&k=${encodeURIComponent(kParam)}`;
-          const kOsoite = `${visaPolku}?tulos=${tulos}&k=${encodeURIComponent(kParam)}`;
-          return { title: hakuOtsikko, description: visaDesc, ...og(JAKO_OG_OTSIKKO, jakoKuvaus(`${jaettu.n}/${jaettu.kaikki}`, taso, jaettu.n === jaettu.kaikki), kKuva, kOsoite), ...canonical };
-        }
-      }
-      /* og:url = jaettu tuloslinkki (ei canonical), jotta Facebook ei korvaa postikorttia visakortilla. */
-      return { title: hakuOtsikko, description: visaDesc, ...og(JAKO_OG_OTSIKKO, jakoKuvaus(`${jaettu.n}/${jaettu.kaikki}`, taso, jaettu.n === jaettu.kaikki), ogKuva, `${visaPolku}?tulos=${tulos}`), ...canonical };
-    }
-    return { title: hakuOtsikko, description: visaDesc, ...og(name, visaDesc, ogKuva, visaPolku), ...canonical };
+    const { koukku, maara } = await visanKoukku(data.id);
+    const ogKuva = data.slug ? `/og/visa/${encodeURIComponent(data.slug)}` : "/og-image.png";
+    const kortti = esikatselu({ nimi: korttinimi({ korttinimi: data.korttinimi, title: name }), muoto: "tietovisa", n: maara || undefined, koukku: koukku?.kysymys });
+    return { title: hakuOtsikko, description: visaDesc, ...og(kortti, ogKuva, jaettu ? `${visaPolku}?tulos=${tulos}` : visaPolku), ...canonical };
   }
   return { title: `Visaa ei löytynyt${suffix}` };
 }
@@ -669,9 +658,8 @@ export default async function Peli20({
             kompastus: kKuva >= 0 ? (haaste.oikein === haaste.kysymyksia ? "taydet" : "vaarin") : undefined,
           }
         : undefined,
-      /* Viikkovisan haaste: jakoteksti "Viikkovisa 38 · Kuvat 12/15" kuten
-         alkuperäisessä viikkovisassa. */
-      jakoNimi: kuvavisa === "viikko" && variaatio ? variaatio : undefined,
+      /* Jakonimi ilman "visa"-häntää (v4 §2): variaatio tai kortiston nimi ("Maiden liput"). */
+      jakoNimi: variaatio ?? kuvavisanNimi(kuvavisa),
       spare: spareRows.map(toQ),
       questions: rows.map(toQ),
       related,

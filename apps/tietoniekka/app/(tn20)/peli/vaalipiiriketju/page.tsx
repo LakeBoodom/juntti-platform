@@ -6,10 +6,10 @@
 
 import type { Metadata } from "next";
 import { JsonLd, peliLd } from "@/lib/jsonLd";
-import { jakoMeta, jakoOsoite, pelituloksenOg } from "@/lib/jakoMeta";
-import { vpkTaso } from "@/lib/pelitasot";
+import { jakoMeta, jakoOsoite } from "@/lib/jakoMeta";
+import { esikatselu } from "@/lib/esikatselu";
 import { helsinginPaiva } from "@/lib/aika";
-import { VPK_NIMI, VPK_SIVU } from "@/lib/vaalipiiriketju";
+import { VPK_JAKONIMI, VPK_NIMI, VPK_SIVU } from "@/lib/vaalipiiriketju";
 import { harjoitusKierros, paivanKierros } from "@/lib/vaalipiiriketju/data";
 import VpkClient from "@/components/tn20/vaalipiiriketju/VpkClient";
 import "./vaalipiiriketju.css";
@@ -25,7 +25,8 @@ export async function generateMetadata({ searchParams }: { searchParams: Promise
     title: "Vaalipiiriketju – päivän peli kansanedustajista ja vaalipiireistä | Tietoniekka",
     description: KUVAUS,
     alternates: { canonical: VPK_SIVU },
-    ...jakoMeta({ ...(pelituloksenOg(sp, "oikein", vpkTaso) ?? { title: "Vaalipiiriketju – päivän peli", description: KUVAUS }), url: jakoOsoite(VPK_SIVU, sp, ["tulos"]), kuva: "/og/sivu/vaalipiiriketju" }),
+    /* Esikatselukortti (v4 §4): sama kortti pelille ja tulokselle. */
+    ...jakoMeta({ ...esikatselu({ nimi: VPK_JAKONIMI, muoto: "vaalipiiriketju" }), url: jakoOsoite(VPK_SIVU, sp, ["tulos"]), kuva: "/og/sivu/vaalipiiriketju" }),
   };
 }
 

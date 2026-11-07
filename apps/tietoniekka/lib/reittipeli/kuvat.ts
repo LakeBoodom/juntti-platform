@@ -52,13 +52,32 @@ export function reittiSiemenesta(peli: ReittipeliAvain, siemen: string, ryhmaTun
   return r ? { ids: r.ratkaisu.map((k) => k.k), otsikko: v?.otsikko ?? null, ryhma } : null;
 }
 
-/** Pelisivun og:image: jaetulla tuloksella (?tulos=7-7) reitin jakokortti (7b), muuten sivun oma kuva. */
+/** Jaetun reitin siemen ja ryhmä osoitteesta (?reitti=, ?maanosa=/?maakunta=), tai null. */
+function jaettuReitti(peli: ReittipeliAvain, sp: Record<string, string | string[] | undefined>) {
+  const siemen = typeof sp.reitti === "string" && /^[a-z0-9-]{3,40}$/.test(sp.reitti) ? sp.reitti : null;
+  if (!siemen) return null;
+  const param = REITTIPELIT[peli].param;
+  const ryhma = param && typeof sp[param] === "string" ? (sp[param] as string) : null;
+  return { siemen, param, ryhma };
+}
+
+/** Pelisivun og:image (Jakotekstit v4 §4, vaihe 2): jaetulla reitillä (?reitti=) reitin jakokortti ilman tulosta,
+ *  muuten sivun oma kuva. Tulos on viestissä, ei kortissa. */
 export function reittiJakokuva(peli: ReittipeliAvain, sp: Record<string, string | string[] | undefined>, oletus: string): string {
-  if (typeof sp.tulos !== "string" || !/^\d{1,2}-\d{1,2}$/.test(sp.tulos)) return oletus;
+  const j = jaettuReitti(peli, sp);
+  if (!j) return oletus;
   const q = new URLSearchParams();
-  for (const k of [REITTIPELIT[peli].param, "reitti", "tulos"]) {
-    const v = k ? sp[k] : undefined;
-    if (k && typeof v === "string") q.set(k, v);
-  }
+  if (j.param && j.ryhma) q.set(j.param, j.ryhma);
+  q.set("reitti", j.siemen);
   return `/og/reitti/${peli}?${q}`;
+}
+
+/** Jaetun reitin korttinimi "Portugali → Viro" (sama kuin jakotekstissä), tai null. */
+export function reittiKorttinimi(peli: ReittipeliAvain, sp: Record<string, string | string[] | undefined>): string | null {
+  const j = jaettuReitti(peli, sp);
+  const r = j ? reittiSiemenesta(peli, j.siemen, j.ryhma) : null;
+  if (!r) return null;
+  const pisteet = REITTIPELIT[peli].kuvakartta(r.ids, r.ryhma, { suhde: 1 }).pisteet;
+  const a = pisteet[0]?.n, b = pisteet[pisteet.length - 1]?.n;
+  return a && b ? `${a} → ${b}` : null;
 }

@@ -293,6 +293,13 @@ export function poolinHarhauttimet(
   return valitut;
 }
 
+/** Kortiston nimi jakoon ja esikatselukorttiin ilman "visa"-häntää (Jakotekstit v4 §2): "Maiden liput", ei "Lippuvisa". */
+export function kuvavisanNimi(type: string): string {
+  if (type === "viikko") return "Viikkovisa";
+  if (type === "kaupungit") return "Suomen kaupungit";
+  return KATEGORIAT.find((k) => k.type === type || (type === "vaakuna" && k.type === "vaakunat"))?.otsikko ?? "Kuvavisa";
+}
+
 export function variaationNimi(type: string, taso?: string | null, maanosaKey?: string | null): string | null {
   /* Viikkovisasta jaettu haaste: taso-kenttä kantaa viikkoavaimen ("2026-38"),
      jotta haastesivu ja sen og:title nimeävät visan "Viikkovisa 38 · Kuvat"

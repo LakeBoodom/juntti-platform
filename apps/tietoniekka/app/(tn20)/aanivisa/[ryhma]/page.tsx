@@ -6,11 +6,12 @@ import "../../aanivisa.css";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import AanivisaClient from "@/components/tn20/aanivisa/AanivisaClient";
-import { aanivisaHref, ryhmaPolusta, AANI_RYHMAT } from "@/lib/aanivisat";
+import { aanivisaHref, ryhmaPolusta, AANI_RYHMAT, AANIVISA_KYSYMYKSIA } from "@/lib/aanivisat";
 import { esikatselu, haeAaniviikko } from "@/lib/aanivisat/data";
 import { getSupabase } from "@/lib/supabase";
 import { visaHref } from "@/lib/visaHref";
 import { jakoMeta } from "@/lib/jakoMeta";
+import { esikatselu as esikatselukortti } from "@/lib/esikatselu";
 
 export const revalidate = 600;
 
@@ -31,7 +32,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     description,
     alternates: { canonical: aanivisaHref(r) },
     ...(esikatselu() ? { robots: { index: false, follow: false } } : {}),
-    ...jakoMeta({ title, description, url: aanivisaHref(r), kuva: "/og/kokoelma/luonto" }),
+    /* Esikatselukortti (Jakotekstit v4 §4): "{ryhmä} – äänivisa", "Kuuntele ja tunnista kymmenen ääntä." */
+    ...jakoMeta({ ...esikatselukortti({ nimi: r.otsikko, muoto: "aanivisa", n: AANIVISA_KYSYMYKSIA }), url: aanivisaHref(r), kuva: `/og/aanivisa/${r.polku}` }),
   };
 }
 

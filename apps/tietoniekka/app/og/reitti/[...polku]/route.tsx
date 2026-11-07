@@ -1,6 +1,6 @@
 // REITTIPELIEN KUVAT (CD-handoff "Rajanaapurit: Yhdysvallat" 1.11.2026, mallit 6c, 7a, 7b, 7d):
 //
-//   /og/reitti/<peli>?reitti=<siemen>&tulos=7-7   jakokortti 1200 × 630 (7b): tumma vasen puoli, vaalea kartta oikealla
+//   /og/reitti/<peli>?reitti=<siemen>             jakokortti 1200 × 630 (7b): tumma vasen puoli, vaalea kartta oikealla (v4: ei tulosta)
 //   /og/reitti/<peli>                             sivun jakokuva: sama kortti viikon reitillä ilman tulosta
 //   /og/reitti/<peli>/kortti?reitti=<siemen>      Seuraava peli -kortin kuva (7d; nykyisen pelikortin 120 px:n kuvaan 640 × 225)
 //   /og/reitti/<peli>/hub?reitti=<siemen>         Karttapelit-sivun kortti 4:3 (4a)
@@ -18,6 +18,7 @@ import sharp from "sharp";
 import { helsinginPaiva } from "@/lib/aika";
 import { maanantai, viikonSiemen } from "@/lib/reittipeli/viikonReitit";
 import { REITTIPELIT, onReittipeli, reittiSiemenesta, type ReittipeliAvain } from "@/lib/reittipeli/kuvat";
+import { kuvalause, pelityyppi } from "@/lib/esikatselu";
 
 export const runtime = "nodejs";
 
@@ -137,15 +138,19 @@ async function kartta(peli: ReittipeliAvain, ids: string[], ryhma: string | null
   return `data:image/png;base64,${Buffer.from(await img.arrayBuffer()).toString("base64")}`;
 }
 
-function tulosParam(raw: string | null): { n: number; m: number } | null {
-  const t = raw?.match(/^(\d{1,2})-(\d{1,2})$/);
-  if (!t) return null;
-  const n = +t[1], m = +t[2];
-  return m > 0 && m <= 20 && n <= m ? { n, m } : null;
+/* Reitin nimi kortille: pisin sana mahtuu 470 px:n sarakkeeseen (Archivo Condensed 900 ≈ 0,6 em/merkki). */
+function nimiKoko(sanat: string[]): number {
+  const pisin = Math.max(...sanat.map((w) => w.length), 4);
+  return Math.floor(Math.min(84, 470 / (pisin * 0.62)));
 }
 
-async function jakokortti(peli: ReittipeliAvain, r: NonNullable<ReturnType<typeof reittiSiemenesta>>, tulos: { n: number; m: number } | null) {
+/* Jakokortti (Jakotekstit v4 §4, vaihe 2, 7.11.2026): tyyppimerkintä "Karttapeli", reitti "Lähtö → Maali" ja tehtävä.
+   Ei tulosta eikä "Pystytkö parempaan?" -kehotusta: tulos on viestissä. */
+async function jakokortti(peli: ReittipeliAvain, r: NonNullable<ReturnType<typeof reittiSiemenesta>>) {
   const g = REITTIPELIT[peli];
+  const pisteet = g.kuvakartta(r.ids, r.ryhma, { suhde: 1 }).pisteet;
+  const lahto = pisteet[0]?.n ?? "", maali = pisteet[pisteet.length - 1]?.n ?? "";
+  const koko = nimiKoko(`${lahto} ${maali}`.toUpperCase().split(/\s+/));
   const paneeli = await kartta(peli, r.ids, r.ryhma, MUODOT.paneeli);
   const img = new ImageResponse(
     (
@@ -159,25 +164,19 @@ async function jakokortti(peli: ReittipeliAvain, r: NonNullable<ReturnType<typeo
               <span style={{ color: KERMA }}>NIEKKA</span>
             </div>
             <div style={{ display: "flex", width: 2, height: 26, background: "#3A3120", margin: "0 16px" }} />
-            <div style={{ display: "flex", fontSize: 24, fontWeight: 800, letterSpacing: 3.8, color: TURKOOSI }}>{g.laji.toUpperCase()}</div>
+            <div style={{ display: "flex", fontSize: 24, fontWeight: 800, letterSpacing: 3.8, color: TURKOOSI }}>{pelityyppi(peli).toUpperCase()}</div>
           </div>
-          <div style={{ display: "flex", marginTop: 44, fontFamily: "Archivo Condensed", fontWeight: 900, fontSize: 84, lineHeight: 0.94, textTransform: "uppercase" }}>{g.kartta}</div>
-          {r.otsikko && <div style={{ display: "flex", marginTop: 12, fontSize: 30, fontWeight: 700, lineHeight: 1.15, color: HAALEA }}>{r.otsikko}</div>}
           <div style={{ display: "flex", flexGrow: 1 }} />
-          {tulos && (
-            <div style={{ display: "flex", alignItems: "baseline" }}>
-              <div style={{ display: "flex", fontFamily: "Archivo Condensed", fontWeight: 900, fontSize: 150, lineHeight: 0.9 }}>
-                <span>{tulos.n}</span>
-                <span style={{ color: TURKOOSI }}>{`/${tulos.m}`}</span>
-              </div>
-              <div style={{ display: "flex", marginLeft: 18, fontFamily: "Barlow Condensed", fontWeight: 800, fontSize: 48, lineHeight: 1 }}>YHTEYTTÄ</div>
-            </div>
-          )}
-          {tulos && (
-            <div style={{ display: "flex", marginTop: 14, fontFamily: "Barlow Condensed", fontWeight: 800, fontSize: 48, lineHeight: 1, color: LIME }}>
-              {tulos.n === tulos.m ? "PYSTYTKÖ SAMAAN?" : "PYSTYTKÖ PAREMPAAN?"}
-            </div>
-          )}
+          <div style={{ display: "flex", flexDirection: "column", fontFamily: "Archivo Condensed", fontWeight: 900, fontSize: koko, lineHeight: 0.94, textTransform: "uppercase" }}>
+            <div style={{ display: "flex", flexWrap: "wrap" }}>{lahto}</div>
+            <div style={{ display: "flex", flexWrap: "wrap" }}><span style={{ color: TURKOOSI, marginRight: 16 }}>→</span>{maali}</div>
+          </div>
+          {r.otsikko && <div style={{ display: "flex", marginTop: 16, fontSize: 28, fontWeight: 700, lineHeight: 1.15, color: HAALEA }}>{r.otsikko}</div>}
+          <div style={{ display: "flex", marginTop: 26, fontFamily: "Barlow Condensed", fontWeight: 800, fontSize: 38, lineHeight: 1.02, textTransform: "uppercase", color: LIME }}>
+            {kuvalause(peli)}
+          </div>
+          <div style={{ display: "flex", flexGrow: 1 }} />
+          <div style={{ display: "flex", fontSize: 26, fontWeight: 800, color: KERMA }}>tietoniekka.fi</div>
         </div>
       </div>
     ),
@@ -206,6 +205,6 @@ export async function GET(req: Request, ctx: { params: Promise<{ polku: string[]
     const jpg = await sharp(Buffer.from(kuva.split(",")[1], "base64")).jpeg({ quality: 84, mozjpeg: true }).toBuffer();
     return new Response(new Uint8Array(jpg), { headers: { "Content-Type": "image/jpeg", "Cache-Control": valimuisti } });
   }
-  const jpg = await jakokortti(peli, r, tulosParam(url.searchParams.get("tulos")));
+  const jpg = await jakokortti(peli, r);
   return new Response(new Uint8Array(jpg), { headers: { "Content-Type": "image/jpeg", "Cache-Control": valimuisti } });
 }

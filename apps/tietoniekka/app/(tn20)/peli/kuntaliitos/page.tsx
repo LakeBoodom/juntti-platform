@@ -6,13 +6,14 @@
 // Reitti ja sen alueen kartta arvotaan palvelimella (lib/kuntaliitos/reitti.ts).
 
 import { JsonLd, peliLd } from "@/lib/jsonLd";
-import { jakoMeta, jakoOsoite, pelituloksenOg } from "@/lib/jakoMeta";
+import { jakoMeta, jakoOsoite } from "@/lib/jakoMeta";
+import { esikatselu } from "@/lib/esikatselu";
 import type { Metadata } from "next";
 import { helsinginPaiva } from "@/lib/aika";
 import { arvoReitti, reittiAlueista, KL_MAAKUNNAT, maakuntaTunnuksella } from "@/lib/kuntaliitos/reitti";
 import { sivunReitti, viikonAikavali } from "@/lib/reittipeli/viikonReitit";
 import ReittipeliClient from "@/components/tn20/reittipeli/ReittipeliClient";
-import { reittiJakokuva } from "@/lib/reittipeli/kuvat";
+import { reittiJakokuva, reittiKorttinimi } from "@/lib/reittipeli/kuvat";
 import { uusiReittiSiemen } from "@/lib/kuntaliitos";
 import { redirect } from "next/navigation";
 import "./kuntaliitos.css";
@@ -30,10 +31,8 @@ export async function generateMetadata({ searchParams }: { searchParams: Promise
     // Reittiparametrit (?reitti=) ovat saman sivun muunnelmia
     alternates: { canonical: "/peli/kuntaliitos" },
     ...jakoMeta({
-      ...(pelituloksenOg(sp, "rajaa") ?? {
-        title: "Kuntaliitos – rakenna reitti naapurikuntien kautta",
-        description: "Järjestä kahdeksan kuntaa reitiksi niin, että jokaisella vierekkäisellä parilla on yhteinen raja. Uusi viikon reitti joka maanantai.",
-      }),
+      /* Esikatselukortti (v4 §4): "{Lähtö} → {Maali} – karttapeli" jaetulla reitillä, muuten pelin nimi. */
+      ...esikatselu({ nimi: reittiKorttinimi("kuntaliitos", sp) ?? "Kuntaliitos", muoto: "kuntaliitos" }),
       url: jakoOsoite("/peli/kuntaliitos", sp, ["maakunta", "reitti", "tulos"]),
       kuva: reittiJakokuva("kuntaliitos", sp, "/og/sivu/kuntaliitos"),
     }),
