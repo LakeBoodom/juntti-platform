@@ -5,6 +5,7 @@
 
 import aineisto from "../maat.json";
 import { etaisyysPalaute } from "../palaute/etaisyys";
+import { MM_JULKAISU } from "../mikamaa";
 import type { Kohde, Vaikeus, VihjepeliAihe } from "../tyypit";
 
 type MaaRivi = {
@@ -29,8 +30,8 @@ export function maaTaysi(id: string): MaaTaysi | null {
     : null;
 }
 
-/** Julkaisupäivä: päivän maan historia alkaa tästä (etusivun Mikä maa? -paikka, lib/pelimuodot.ts). */
-export const MAA_JULKAISU = "2026-11-30";
+/** Julkaisupäivä: päivän maan historia alkaa tästä (yksi lähde: lib/vihjepeli/mikamaa.ts MM_JULKAISU). */
+export const MAA_JULKAISU = MM_JULKAISU;
 
 export const MAA_AIHE: VihjepeliAihe<MaaKohde> = {
   avain: "maa",

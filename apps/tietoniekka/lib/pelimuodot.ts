@@ -2,6 +2,7 @@
 // mitä kokoelmia se palvelee (serves). Kokoelmasivun "Pelit tässä kokoelmassa" (V6) ja pelien
 // tulosnäkymän "Seuraava peli" (K4) hakevat pelit täältä — kokoelman asetuksessa ei ole pelilistaa.
 // Uusi pelimuoto tai Tupla tai kuitin aihe ilmestyy oikeille sivuille itsestään.
+import { MM_JULKAISU } from "./vihjepeli/mikamaa";
 import { TEEMAT, TUPLA_SIVU } from "./tuplaTaiKuitti";
 import { JULKAISTUT, pakkaHref } from "./jarjesta/pakat";
 import { helsinginPaiva } from "./aika";
@@ -170,7 +171,7 @@ export const ETUSIVUN_PELIMUODOT: EtusivunPelimuoto[] = [
   { slug: "klassinen", ryhma: "tietovisat", laji: "Tietovisa", nimi: "Klassinen visa", etusivu_rivi: "{visat} visaa kaikista aiheista", href: "/kokoelmat", kuva: "/20/hero-mikko-laura.webp", kuvaPos: "70% 24%", aksentti: TIETO, tila: "pelattava", julkaisu: null },
   { slug: "tupla", ryhma: "tietovisat", laji: "Tietovisa", nimi: "Tupla tai kuitti", etusivu_rivi: "Tuplaa pisteet tai pidä ne", href: "/peli/tupla-tai-kuitti", kuva: "/20/tupla/banneri-desk.webp", kuvaPos: "64% 38%", aksentti: TIETO, tila: "pelattava", julkaisu: null },
   { slug: "megavisat", ryhma: "tietovisat", laji: "Tietovisa", nimi: "Megavisat", etusivu_rivi: "Laajat teemavisat yhdellä istumalla", href: "/megavisat", kuva: "/20/megavisat/mikko-hero-900.webp", kuvaPos: "50% 22%", aksentti: TIETO, tila: "pelattava", julkaisu: null },
-  { slug: "mika-maa", ryhma: "tietovisat", laji: "Tietovisa", nimi: "Mikä maa?", etusivu_rivi: "Tunnista maa vihjeistä ja siluetista", href: "/peli/mika-maa", kuva: null, aksentti: MAA, tila: "tulossa", julkaisu: "2026-11-30" },
+  { slug: "mika-maa", ryhma: "tietovisat", laji: "Tietovisa", nimi: "Mikä maa?", etusivu_rivi: "Tunnista maa vihjeistä ja siluetista", href: "/peli/mika-maa", kuva: null, aksentti: MAA, tila: "tulossa", julkaisu: MM_JULKAISU },
   { slug: "pikapeli", ryhma: "tietovisat", laji: "Tietovisa", nimi: "Pikapeli", etusivu_rivi: "Vastaa ennen kuin aika loppuu", href: "", kuva: null, aksentti: TIETO, tila: "tulossa", julkaisu: null },
   { slug: "kuvavisat", ryhma: "kuva-aani", laji: "Kuvavisa", nimi: "Kuvavisat", etusivu_rivi: "Tunnista kuvista maiden liput, maakuntien vaakunat, eläimiä, lintuja ja monta muuta aihetta", href: "/kokoelma/kuvavisat", kuva: "/20/kuvavisat/hero-800.webp", aksentti: KUVA, tila: "pelattava", julkaisu: null },
   /* Viikon kuvavisa pois etusivulta (CD v8, 30.10.2026): Kuvavisat-kortti kattaa sen. */

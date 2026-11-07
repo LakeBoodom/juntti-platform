@@ -5,6 +5,10 @@ import { jarjestysluvulla, tulosjakoteksti } from "../korttinimi";
 import { ARVAUKSIA } from "./tyypit";
 import type { MaaKohde, MaaTaysi } from "./aiheet/maa";
 
+/** Julkaisupäivä: päivän maan historia (toistosuoja) alkaa tästä, etusivun paikka syttyy, sivukartta ja hakukoneet
+ *  avautuvat. Heikki 7.11.2026: julkaistaan heti, kun kaikki on valmista → päivä asetetaan tuotantoon viennin päiväksi. */
+export const MM_JULKAISU = "2026-11-30";
+
 export const MM_NIMI = "Mikä maa?";
 export const MM_SIVU = "/peli/mika-maa";
 export const MM_KOTI = { href: "/peli/karttapelit", nimi: "Karttapelit" };
