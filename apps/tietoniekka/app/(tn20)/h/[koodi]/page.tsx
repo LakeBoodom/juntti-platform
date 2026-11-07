@@ -12,50 +12,38 @@
 // Metadata on tarkoituksella OMA: juurilayoutin openGraph.title on kaikilla
 // sivuilla sama, ja juuri tämä osoite on se jonka kaveri saa WhatsAppissa.
 
-import { jakoMeta, JAKO_OG_OTSIKKO, jakoKuvaus } from "@/lib/jakoMeta";
+import { jakoMeta } from "@/lib/jakoMeta";
+import { esikatselu } from "@/lib/esikatselu";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import Peli20 from "../../peli/page";
 import { haeHaaste } from "@/lib/haaste";
-import { variaationNimi, haeKuvakysymys } from "@/lib/kuvavisat2026";
+import { variaationNimi, haeKuvakysymys, kuvavisanNimi } from "@/lib/kuvavisat2026";
 import { mahtuuKorttiin } from "@/lib/kysymyskortti";
 
 export const dynamic = "force-dynamic";
 
-const OTSIKOT: Record<string, string> = {
-  liput: "Lippuvisa", vaakunat: "Vaakunavisa", vaakuna: "Vaakunavisa", linnut: "Lintuvisa",
-  elaimet: "Eläinvisa", kasvit: "Kasvivisa", maalaukset: "Maalausvisa",
-  henkilot: "Henkilövisa", rakennukset: "Rakennusvisa", kaupungit: "Kaupunkivisa",
-};
-
-export async function generateMetadata(
-  { params, searchParams }: { params: Promise<{ koodi: string }>; searchParams: Promise<Record<string, string | string[] | undefined>> },
-): Promise<Metadata> {
+export async function generateMetadata({ params }: { params: Promise<{ koodi: string }> }): Promise<Metadata> {
   const { koodi } = await params;
-  const { k } = await searchParams;
   const h = await haeHaaste(koodi);
   if (!h) return { title: "Haastetta ei löytynyt | Tietoniekka" };
-  const nimi = variaationNimi(h.kuvavisa, h.taso, h.maanosa) ?? OTSIKOT[h.kuvavisa] ?? "Kuvavisa";
-  const title = `Kaverisi sai ${h.oikein}/${h.kysymyksia} — pystytkö parempaan?`;
+  const nimi = variaationNimi(h.kuvavisa, h.taso, h.maanosa) ?? kuvavisanNimi(h.kuvavisa);
+  const title = `Kaverisi sai ${h.oikein}/${h.kysymyksia}`;
   const description = `${nimi}: ${h.kysymyksia} kuvaa, neljä vaihtoehtoa. Samat kuvat samassa järjestyksessä kuin haastajalla.`;
-  /* Vaihe D/E (23.10.2026): haastetunnuksen jakokuva on postikortti (tulos kannasta), ja Facebookin linkissä ?k=<kuvan id>
-     kysymyskortti. og-kentät kuten /visa/-tuloslinkillä. */
-  const kuvaParam = new URLSearchParams({ tulos: `${h.oikein}-${h.kysymyksia}`, nimi });
-  /* og-kentät 23.10.2026 (Heikki): yhteinen otsikko ja "Sain 9/10. Pystytkö parempaan?" (kuvavisoilla ei tasonimeä). */
-  const ogOtsikko = JAKO_OG_OTSIKKO;
-  const ogKuvaus = jakoKuvaus(`${h.oikein}/${h.kysymyksia}`, null, h.oikein === h.kysymyksia);
-  let ogOsoite = `/h/${koodi}`;
-  if (typeof k === "string" && h.kuvaIdt.includes(k)) {
-    const kysymys = await haeKuvakysymys(k);
-    if (kysymys && mahtuuKorttiin({ question: kysymys.question, options: kysymys.options })) {
-      kuvaParam.set("k", k);
-      ogOsoite = `/h/${koodi}?k=${encodeURIComponent(k)}`;
-    }
+  /* Esikatselukortti (Jakotekstit v4 §4, vaihe 2): "{nimi} – kuvavisa", koukku = sarjan ensimmäinen korttiin mahtuva
+     kuvakysymys (sama kaikille jaoille, ei tulosta kortissa). Vanhojen linkkien ?k= ohitetaan. */
+  let koukku: Awaited<ReturnType<typeof haeKuvakysymys>> = null;
+  for (const id of h.kuvaIdt.slice(0, 5)) {
+    const q = await haeKuvakysymys(id);
+    /* Jakokorteissa ei henkilökuvia (v4 §4). */
+    if (q && q.type !== "henkilot" && q.question.trim().length <= 75 && mahtuuKorttiin({ question: q.question, options: q.options })) { koukku = q; break; }
   }
+  const kuvaParam = new URLSearchParams({ nimi, ...(koukku ? { k: koukku.id } : {}) });
+  const kortti = esikatselu({ nimi, muoto: "kuvavisa", n: h.kysymyksia, koukku: koukku?.question });
   return {
     title: `${title} | Tietoniekka`,
     description,
-    ...jakoMeta({ title: ogOtsikko, description: ogKuvaus, url: ogOsoite, kuva: `/og/kuvavisa/${encodeURIComponent(h.kuvavisa)}?${kuvaParam}` }),
+    ...jakoMeta({ ...kortti, url: `/h/${koodi}`, kuva: `/og/kuvavisa/${encodeURIComponent(h.kuvavisa)}?${kuvaParam}` }),
     /* Haastelinkkejä on yksi per peli — ne eivät kuulu hakukoneisiin, ja
        kanoninen osoite on kortiston perusvisa (SEO-erä A6: /kuvavisa/<kortisto>). */
     robots: { index: false, follow: true },

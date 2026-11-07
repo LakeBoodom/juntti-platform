@@ -38,7 +38,6 @@ import type { KollaasiKuva } from "../../../lib/kuvavisat2026";
 import { igAvaus, igValmis } from "../../../lib/igMittaus";
 import "../peli2026.css";
 import { lyhennettyNimi, tulosjakoteksti, vastahaasteteksti } from "@/lib/korttinimi";
-import { valitseKorttikysymys, kysymysLinkki } from "@/lib/kysymyskortti";
 import type { Jakokanava } from "@/components/tn20/jako/Jakoalue";
 import TulosNakyma from "@/components/tn20/tulos/TulosNakyma";
 import Pelipalkki from "@/components/tn20/pelikehys/Pelipalkki";
@@ -988,10 +987,8 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
     : quiz.haaste.kompastus === "vaarin" ? " ja kompastui tähän. Tiedätkö sinä?"
     : quiz.haaste.kompastus === "taydet" ? ". Tiedätkö sinä tämän?"
     : quiz.haaste.oikein === quiz.haaste.kysymyksia ? " – pystytkö samaan?" : " – pystytkö parempaan?";
-  /* Vaihe E: Facebook jakaa kysymyskortin (&k=<id>), jos visassa on rajoihin mahtuva kysymys; muuten postikortin.
-     Kortti on vain visan omalle osoitteelle (/visa/…?tulos=) ja kuvavisan haastetunnukselle (/h/…). */
-  const korttiK = done ? valitseKorttikysymys(questions, hist, right === total) : null;
-  const fbUrl = jakoUrl && korttiK && (jakoUrl.includes("/visa/") || jakoUrl.includes("/h/")) ? kysymysLinkki(jakoUrl, korttiK) : jakoUrl;
+  /* Jakotekstit v4 vaihe 2: esikatselukortin kysymys (koukku) valitaan palvelimella, joten Facebook saa saman linkin
+     kuin muut kanavat (ei enää &k=<kompastuskysymys>). */
   const shareText = quiz.haaste && done
     ? vastahaasteteksti(`${right}/${total}`, `${quiz.haaste.oikein}/${quiz.haaste.kysymyksia}`)
     : tulosjakoteksti(jakoNimi, isKuva ? `tunnistin ${right}/${total}` : `sain ${right}/${total} oikein`);
@@ -1210,7 +1207,7 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
               haaste={h}
               vastaukset={hist.map((v) => (v === "ok" || v === "bad" || v === "skipped" ? v : undefined))}
               avaaVastaukset={(i, el) => openReview(i, el)}
-              jako={{ teksti: shareText, url: jakoUrl, fbUrl, natiiviOtsikko: `Tietoniekka · ${quiz.title}`, onJaettu: (k) => markShared(k) }}
+              jako={{ teksti: shareText, url: jakoUrl, natiiviOtsikko: `Tietoniekka · ${quiz.title}`, onJaettu: (k) => markShared(k) }}
               seuraavat={quiz.related.map((r, i) => ({
                 id: r.id,
                 title: r.title,

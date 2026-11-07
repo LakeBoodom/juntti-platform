@@ -5,14 +5,15 @@
 //   /peli/osavaltiot                           ohjaus tänne (next.config.mjs)
 
 import { JsonLd, peliLd } from "@/lib/jsonLd";
-import { jakoMeta, jakoOsoite, pelituloksenOg } from "@/lib/jakoMeta";
+import { jakoMeta, jakoOsoite } from "@/lib/jakoMeta";
+import { esikatselu } from "@/lib/esikatselu";
 import type { Metadata } from "next";
 import { helsinginPaiva } from "@/lib/aika";
 import { arvoUsaReitti, usaReittiAlueista } from "@/lib/rajanaapurit/osavaltiot";
 import { RN_USA_SIVU } from "@/lib/rajanaapurit";
 import { sivunReitti, viikonAikavali } from "@/lib/reittipeli/viikonReitit";
 import ReittipeliClient from "@/components/tn20/reittipeli/ReittipeliClient";
-import { reittiJakokuva } from "@/lib/reittipeli/kuvat";
+import { reittiJakokuva, reittiKorttinimi } from "@/lib/reittipeli/kuvat";
 import { uusiReittiSiemen } from "@/lib/kuntaliitos";
 import { maanantai, viikonSiemen } from "@/lib/reittipeli/viikonReitit";
 import { redirect } from "next/navigation";
@@ -30,7 +31,8 @@ export async function generateMetadata({ searchParams }: { searchParams: Promise
     description: KUVAUS,
     alternates: { canonical: RN_USA_SIVU },
     ...jakoMeta({
-      ...(pelituloksenOg(sp, "rajaa") ?? { title: "Rajanaapurit: Yhdysvallat – rakenna reitti osavaltioiden kautta", description: KUVAUS }),
+      /* Esikatselukortti (v4 §4): "{Lähtö} → {Maali} – karttapeli" jaetulla reitillä, muuten pelin nimi. */
+      ...esikatselu({ nimi: reittiKorttinimi("osavaltiot", sp) ?? "Rajanaapurit: Yhdysvallat", muoto: "osavaltiot" }),
       url: jakoOsoite(RN_USA_SIVU, sp, ["reitti", "tulos"]),
       kuva: reittiJakokuva("osavaltiot", sp, `/og/reitti/osavaltiot?reitti=${viikonSiemen(maanantai(helsinginPaiva().iso))}`),
     }),

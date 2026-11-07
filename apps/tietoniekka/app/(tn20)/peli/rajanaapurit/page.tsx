@@ -6,13 +6,14 @@
 //   /peli/rajanaapurit?reitti=x7k2      tietty reitti (Arvo uusi reitti, haastelinkki); ?reitti=uusi arpoo uuden
 
 import { JsonLd, peliLd } from "@/lib/jsonLd";
-import { jakoMeta, jakoOsoite, pelituloksenOg } from "@/lib/jakoMeta";
+import { jakoMeta, jakoOsoite } from "@/lib/jakoMeta";
+import { esikatselu } from "@/lib/esikatselu";
 import type { Metadata } from "next";
 import { helsinginPaiva } from "@/lib/aika";
 import { arvoReitti, reittiAlueista, RN_MAANOSAT, maanosaTunnuksella } from "@/lib/rajanaapurit/reitti";
 import { sivunReitti, viikonAikavali } from "@/lib/reittipeli/viikonReitit";
 import ReittipeliClient from "@/components/tn20/reittipeli/ReittipeliClient";
-import { reittiJakokuva } from "@/lib/reittipeli/kuvat";
+import { reittiJakokuva, reittiKorttinimi } from "@/lib/reittipeli/kuvat";
 import { uusiReittiSiemen } from "@/lib/kuntaliitos";
 import { redirect } from "next/navigation";
 import "../kuntaliitos/kuntaliitos.css";
@@ -29,10 +30,8 @@ export async function generateMetadata({ searchParams }: { searchParams: Promise
       "Järjestä kahdeksan valtiota reitiksi niin, että jokaisella vierekkäisellä parilla on yhteinen maaraja. Uusi viikon reitti joka maanantai.",
     alternates: { canonical: "/peli/rajanaapurit" },
     ...jakoMeta({
-      ...(pelituloksenOg(sp, "rajaa") ?? {
-        title: "Rajanaapurit – rakenna reitti naapurivaltioiden kautta",
-        description: "Järjestä kahdeksan valtiota reitiksi niin, että jokaisella vierekkäisellä parilla on yhteinen maaraja. Uusi viikon reitti joka maanantai.",
-      }),
+      /* Esikatselukortti (v4 §4): "{Lähtö} → {Maali} – karttapeli" jaetulla reitillä, muuten pelin nimi. */
+      ...esikatselu({ nimi: reittiKorttinimi("rajanaapurit", sp) ?? "Rajanaapurit", muoto: "rajanaapurit" }),
       url: jakoOsoite("/peli/rajanaapurit", sp, ["maanosa", "reitti", "tulos"]),
       kuva: reittiJakokuva("rajanaapurit", sp, "/og/sivu/rajanaapurit"),
     }),
