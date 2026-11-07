@@ -19,6 +19,7 @@ import { NAV_COLLECTIONS } from "@/lib/nav";
 import { KATEGORIAT } from "@/lib/kuvavisat2026";
 import { getPublishedQuizSlugs } from "@/lib/queries";
 import { haeHakemisto } from "@/lib/henkilot";
+import { KAUPUNGIT_LISTA, haeKaupunkilista, kaupunkiHref } from "@/lib/kaupunkisivu";
 import { KUUKAUDET, kuukausiSlug } from "@/lib/henkiloRyhmat";
 import { LAPSET_SIVU, lapsetNakyvissa } from "@/lib/lapset/data";
 import {
@@ -100,5 +101,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       ]
     : [];
 
-  return [...staticPages, ...collectionPages, ...kuvavisaPages, ...pakettiPages, ...henkiloPages, ...quizPages];
+  // Kaupunkisivut (7.11.2026): lista ja julkaistut kanoniset /kaupunki/<slug>; lyhyet /<slug>-osoitteet eivät ole täällä.
+  const kaupungit = await haeKaupunkilista();
+  const kaupunkiPages: MetadataRoute.Sitemap = kaupungit.length
+    ? [u(KAUPUNGIT_LISTA, "weekly", 0.8), ...kaupungit.map((k) => u(kaupunkiHref(k.slug), "weekly", 0.8))]
+    : [];
+
+  return [...staticPages, ...collectionPages, ...kaupunkiPages, ...kuvavisaPages, ...pakettiPages, ...henkiloPages, ...quizPages];
 }

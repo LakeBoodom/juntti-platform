@@ -122,6 +122,8 @@ export type GameQuiz = {
   henkilo?: { href: string; linkki: string } | null;
   /** Tulosnäkymän tekstilinkki visapakettiin (jouluvisat → joulun visapaketti, 1.11.2026). */
   paketti?: { href: string; teksti: string } | null;
+  /** Kaupunkisivut (7.11.2026): saman paikkakunnan visat ("Lisää Mikkelistä", enintään 3) ja linkki kaupunkisivulle. */
+  paikka?: { otsikko: string; visat: GameRelated[]; kaikki: { href: string; teksti: string } | null } | null;
   /** K2: "Pelaa uudelleen" lataa sivun uudelleen uuden arvonnan vuoksi (kuvavisat). */
   reloadOnRestart?: boolean;
   /** K2: ohita aloitusnäkymä (?aloita=1 uudelleenlatauksen jälkeen). */
@@ -1208,16 +1210,27 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
               vastaukset={hist.map((v) => (v === "ok" || v === "bad" || v === "skipped" ? v : undefined))}
               avaaVastaukset={(i, el) => openReview(i, el)}
               jako={{ teksti: shareText, url: jakoUrl, natiiviOtsikko: `Tietoniekka · ${quiz.title}`, onJaettu: (k) => markShared(k) }}
-              seuraavat={quiz.related.map((r, i) => ({
-                id: r.id,
-                title: r.title,
-                href: r.href ?? `/peli?quiz_id=${r.id}`,
-                kuva: r.kuva ?? null,
-                kuvaPos: r.kuvaPos,
-                ala: i === 0 ? "Samasta aiheesta" : r.kokoelma ?? r.meta,
-              }))}
+              seuraavat={[
+                /* Kaupunkisivut: saman paikkakunnan visat ensin ("Lisää Mikkelistä"), sitten ristiinnostot. */
+                ...(quiz.paikka?.visat ?? []).map((r) => ({
+                  id: r.id,
+                  title: r.title,
+                  href: r.href ?? `/peli?quiz_id=${r.id}`,
+                  kuva: r.kuva ?? null,
+                  kuvaPos: r.kuvaPos,
+                  ala: quiz.paikka!.otsikko,
+                })),
+                ...quiz.related.map((r, i) => ({
+                  id: r.id,
+                  title: r.title,
+                  href: r.href ?? `/peli?quiz_id=${r.id}`,
+                  kuva: r.kuva ?? null,
+                  kuvaPos: r.kuvaPos,
+                  ala: i === 0 ? "Samasta aiheesta" : r.kokoelma ?? r.meta,
+                })),
+              ]}
               pelaaUudelleen={vk ? null : restart}
-              kaikki={vk ? { href: quiz.hubHref || "/kokoelma/kuvavisat", teksti: "Lisää kuvavisoja" } : { href: quiz.hubHref || "/kokoelmat", teksti: quiz.hubHref ? category : "Kokoelmat" }}
+              kaikki={vk ? { href: quiz.hubHref || "/kokoelma/kuvavisat", teksti: "Lisää kuvavisoja" } : quiz.paikka?.kaikki ?? { href: quiz.hubHref || "/kokoelmat", teksti: quiz.hubHref ? category : "Kokoelmat" }}
             />
           </main>
         </div>
@@ -1380,7 +1393,26 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
 
               </div>
 
-                {quiz.related.length > 0 && (
+                {/* Kaupunkisivut (7.11.2026): saman paikkakunnan visat ensin omana ryhmänään ("Lisää Mikkelistä") ja linkki
+                    kaupunkisivulle; muuten ristiinnostot kuten ennen. */}
+                {quiz.paikka && quiz.paikka.visat.length > 0 ? (
+                <div className="tng-heromore" data-tn-entry="visasivu:paikkakunta">
+                  <div className="tng-heromore-head">
+                    <span className="tng-heromore-t">{quiz.paikka.otsikko}</span>
+                    {quiz.paikka.kaikki
+                      ? <a className="tng-heromore-all" href={quiz.paikka.kaikki.href}>{quiz.paikka.kaikki.teksti} →</a>
+                      : <a className="tng-heromore-all" href={quiz.hubHref}>{quiz.collectionLabel} →</a>}
+                  </div>
+                  <div className="tng-heromore-grid">
+                    {quiz.paikka.visat.slice(0, 3).map((r) => (
+                      <a key={r.id} className="tng-herorec" href={r.href ?? quiz.hubHref}>
+                        {r.title}
+                        <span>{r.meta}</span>
+                      </a>
+                    ))}
+                  </div>
+                </div>
+                ) : quiz.related.length > 0 && (
                 <div className="tng-heromore" data-tn-entry="visasivu:ristiinnosto">
                   <div className="tng-heromore-head">
                     <span className="tng-heromore-t">Pelaa myös näitä</span>
