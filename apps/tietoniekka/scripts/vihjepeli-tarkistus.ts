@@ -59,7 +59,7 @@ const fe = MAA_AIHE.palaute(maa("FIN"), maa("EST"));
 if (fe.tyyppi !== "etaisyys" || fe.suunta !== "etelä" || fe.naapuri) virhe("Suomi → Viro: odotettiin etelä, ei maanaapuri");
 
 console.log("4. Harjoitus");
-for (const p of paivat.slice(0, 60)) for (const s of ["a", "b", "c"]) if (harjoitusKohde(MAA_AIHE, p, s).id === paivanKohde(MAA_AIHE, p).id) virhe(`harjoitus = päivän maa ${p}`);
+for (const p of paivat.slice(0, 60)) for (const s of ["a", "b", "c"]) if (harjoitusKohde(MAA_AIHE, p, s)?.id ===paivanKohde(MAA_AIHE, p).id) virhe(`harjoitus = päivän maa ${p}`);
 
 console.log(virheet ? `\n${virheet} virhettä` : "\nKaikki tarkistukset läpi");
 process.exit(virheet ? 1 : 0);

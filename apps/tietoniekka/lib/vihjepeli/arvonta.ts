@@ -48,11 +48,11 @@ export function eilinenKohde<K extends Kohde>(aihe: VihjepeliAihe<K>, iso: strin
   return eilen < aihe.julkaisu ? null : paivanKohde(aihe, eilen);
 }
 
-/** Harjoituskohde (?kohde=<siemen>): satunnainen arvottava kohde, ei koskaan päivän kohde. */
-export function harjoitusKohde<K extends Kohde>(aihe: VihjepeliAihe<K>, iso: string, s: string): K {
-  const paivan = paivanKohde(aihe, iso).id;
+/** Harjoituskohde (?kohde=<siemen>): satunnainen arvottava kohde, ei koskaan päivän kohde.
+ *  paivan: päivän kohde, kun aihe on rajattu (esim. vain maat, joilla on tarkistetut vihjeet) eikä sen historia kelpaa. */
+export function harjoitusKohde<K extends Kohde>(aihe: VihjepeliAihe<K>, iso: string, s: string, paivan = paivanKohde(aihe, iso).id): K | null {
   const joukko = aihe.kohteet.filter((k) => aihe.arvottava(k, iso) && k.id !== paivan);
-  return sekoitaSiemenella(joukko, siemen(`vihjepeli-${aihe.avain}-harjoitus-${s}`))[0];
+  return sekoitaSiemenella(joukko, siemen(`vihjepeli-${aihe.avain}-harjoitus-${s}`))[0] ?? null;
 }
 
 // ── Haku ──────────────────────────────────────────────

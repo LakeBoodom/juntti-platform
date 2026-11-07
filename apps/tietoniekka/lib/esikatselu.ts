@@ -17,7 +17,7 @@ const iso = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
 
 export type Pelimuoto =
   | "tietovisa" | "kuvavisa" | "aanivisa" | "megavisa" | "tupla" | "rajanaapurit" | "osavaltiot" | "kuntaliitos"
-  | "vaalipiiriketju" | "jarjesta" | "ikajarjestys" | "visapaketti";
+  | "vaalipiiriketju" | "jarjesta" | "ikajarjestys" | "visapaketti" | "vihjepeli";
 
 /** og:titlen pelityyppi (§4), pienellä. Megavisassa kysymysmäärä visasta. */
 export function pelityyppi(m: Pelimuoto, n?: number): string {
@@ -31,6 +31,8 @@ export function pelityyppi(m: Pelimuoto, n?: number): string {
     case "vaalipiiriketju": return "kansanedustajapeli";
     case "jarjesta": case "ikajarjestys": return "järjestyspeli";
     case "visapaketti": return "valmis visailta";
+    /* Mikä maa? (CD-paketti 7.11.2026 §5): "Mikä maa? – arvauspeli". */
+    case "vihjepeli": return "arvauspeli";
   }
 }
 
@@ -51,6 +53,8 @@ export function tehtavalause(m: Pelimuoto, n?: number): string {
     case "jarjesta": return "Laita kahdeksan oikeaan järjestykseen.";
     case "ikajarjestys": return "Laita kahdeksan tunnettua ikäjärjestykseen.";
     case "visapaketti": return "Valmiit kysymykset ja vastaukset.";
+    /* Koukku = päivän vihje 1 (CD §5): "{vihje 1} Arvaa maa mahdollisimman vähillä vihjeillä." */
+    case "vihjepeli": return "Arvaa maa mahdollisimman vähillä vihjeillä.";
   }
 }
 
