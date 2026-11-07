@@ -84,6 +84,9 @@ function Visakortti({ v, yksin }: { v: KaupunkiVisa; yksin: boolean }) {
           )}
         </span>
         <span className="ks-kortti-nimi">{v.title}</span>
+        {/* Heikki 7.11.2026: kortin pitää näyttää peliltä (Jukurit näytti pelkältä seuralta) → sama kehote kuin
+            kokoelmasivujen korteissa (UI-sääntö 8, .tn-card-cta). */}
+        <span className="tn-card-cta">Pelaa →</span>
       </a>
     </li>
   );
@@ -169,9 +172,9 @@ export default async function KaupunkiPage({ params }: Props) {
       )}
 
       {s.ryhmat.map((g) => (
-        <section key={g.nimi} className="ks-osio ks-ryhma" aria-label={g.nimi}>
+        <section key={g.nimi} className="ks-osio ks-ryhma" aria-label={g.otsikko}>
           <div className="ks-osio-otsikko">
-            <h2 className="ks-h2">{g.nimi}</h2>
+            <h2 className="ks-h2" style={{ "--ks-em": pisimmanSananEm(g.otsikko) } as CSSProperties}>{g.otsikko}</h2>
           </div>
           <ul className="ks-kortit">
             {g.visat.map((v) => <Visakortti key={v.id} v={v} yksin={g.visat.length === 1} />)}
@@ -182,7 +185,7 @@ export default async function KaupunkiPage({ params }: Props) {
       {s.henkilot.length > 0 && (
         <div className="ks-osio ks-henkilot">
           {/* "Kaikki →" puuttuu: henkilöhakemistoa ei voi suodattaa syntymäpaikalla (brief §1.3, raportoitu). */}
-          <SukulaisLaatat otsikko={`${k.inessiivi} ${s.henkilot.length === 1 ? "syntynyt" : "syntyneitä"}`} laatat={s.henkilot.map((h) => ({ ...h, ala: "" }))} />
+          <SukulaisLaatat otsikko={`${k.inessiivi} ${s.henkilot.length === 1 ? "syntynyt" : "syntyneitä"}`} laatat={s.henkilot.map((h) => ({ ...h, ala: "" }))} cta="Pelaa →" />
         </div>
       )}
 

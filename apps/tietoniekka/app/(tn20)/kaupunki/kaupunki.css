@@ -86,9 +86,11 @@
 .tn20 .ks-osio { padding: 30px var(--ks-reuna) 0; }
 .tn20 .ks-kausi-osio { padding-left: 16px; padding-right: 16px; }
 .tn20 .ks-osio-otsikko { display: flex; align-items: baseline; gap: 16px; margin-bottom: 12px; }
+.tn20 .ks-osio-otsikko { container-type: inline-size; }
 .tn20 .ks-h2 {
   margin: 0; font-family: var(--tn-font-display); font-weight: 900; text-transform: uppercase; line-height: 1;
-  font-size: 22px; color: var(--tn-text); overflow-wrap: normal; word-break: keep-all;
+  font-size: min(22px, calc(100cqw * .97 / var(--ks-em, 8))); color: var(--tn-text); overflow-wrap: normal; word-break: keep-all;
+  text-wrap: balance;
 }
 /* Mobiili: vaakarivi, kortti 168 px (yksin 240 px). Rivi ulottuu ruudun reunaan asti. */
 .tn20 .ks-kortit {
@@ -113,6 +115,7 @@
   color: var(--tn-gold); overflow: hidden; overflow-wrap: normal; word-break: keep-all; hyphens: manual;
 }
 .tn20 .ks-kortti-teksti::before { content: ""; position: absolute; left: 12px; top: 12px; width: 28px; height: 4px; border-radius: 2px; background: var(--tn-gold); }
+.tn20 .ks-kortti .tn-card-cta { margin-top: -2px; }
 .tn20 .ks-kortti-nimi { font-size: 15px; font-weight: 700; line-height: 1.25; text-wrap: pretty; overflow-wrap: break-word; transition: color var(--dur-fast) var(--ease-standard); }
 
 /* Henkilöt: henkilösivun Muut-laatat (henkilo.css), ilman ikää. */
@@ -172,7 +175,7 @@
   .tn20 .ks-kausi-cta { height: 48px; padding: 0 22px; border-radius: 12px; border: 1.5px solid #a9d8ee; font-weight: 800; font-size: 15px; color: #ddf1fa; white-space: nowrap; }
   .tn20 .ks-osio-otsikko { margin-bottom: 18px; }
   .tn20 .ks-osio-otsikko::after { content: ""; flex: 1; height: 1px; background: #2c2517; align-self: center; }
-  .tn20 .ks-h2 { font-size: 34px; }
+  .tn20 .ks-h2 { font-size: min(34px, calc(100cqw * .97 / var(--ks-em, 8))); }
   .tn20 .ks-henkilot .hub-laatat-head .hub-h3 { font-size: min(34px, calc(100cqw / (var(--hub-lw, 10) * 0.82))); }
   .tn20 .ks-kortti a { gap: 10px; }
   .tn20 .ks-kortti-kuva { border-radius: 16px; }

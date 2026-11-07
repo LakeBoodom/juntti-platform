@@ -68,11 +68,12 @@ export async function haeNaytettavaKaupunki(slug: string): Promise<Kaupunki | nu
 
 /* ── Visat ─────────────────────────────────────────────────────────────────────────────────────────────── */
 
-/** Kategoria → ryhmä (brief §2). Kategoriaton tai tuntematon → kokoelman mukaan → Historia ja maamerkit. */
+/** Kategoria → ryhmä (brief §2). Kategoriaton tai tuntematon → kokoelman mukaan → Historia ja maamerkit.
+ *  otsikko: näkyvä otsikko, jossa sana "visat" kertoo, että kortit ovat pelejä (Heikki 7.11.2026). */
 export const RYHMAT = [
-  { nimi: "Historia ja maamerkit", kategoriat: ["kaupungit", "historia", "maantieto", "yleistieto"], kokoelmat: ["historia", "matkakohteet", "yleistieto"] },
-  { nimi: "Urheilu", kategoriat: ["urheilu", "jaakiekko"], kokoelmat: ["urheilu", "jaakiekko", "jalkapallo"] },
-  { nimi: "Kulttuuri ja kieli", kategoriat: ["kulttuuri", "musiikki", "tv-sarjat", "elokuvat", "juhlat-ja-perinteet"], kokoelmat: ["kulttuuri", "musiikki", "tv", "elokuvat", "juhlat"] },
+  { nimi: "Historia ja maamerkit", otsikko: "Historia- ja maamerkkivisat", kategoriat: ["kaupungit", "historia", "maantieto", "yleistieto"], kokoelmat: ["historia", "matkakohteet", "yleistieto"] },
+  { nimi: "Urheilu", otsikko: "Urheiluvisat", kategoriat: ["urheilu", "jaakiekko"], kokoelmat: ["urheilu", "jaakiekko", "jalkapallo"] },
+  { nimi: "Kulttuuri ja kieli", otsikko: "Kulttuuri- ja kielivisat", kategoriat: ["kulttuuri", "musiikki", "tv-sarjat", "elokuvat", "juhlat-ja-perinteet"], kokoelmat: ["kulttuuri", "musiikki", "tv", "elokuvat", "juhlat"] },
 ] as const;
 
 function ryhmaVisalle(category: string | null, collection: string | null): string {
@@ -185,7 +186,7 @@ export type Kaupunkisivu = {
   kaupunki: Kaupunki;
   kaupunkivisa: (KaupunkiVisa & { kuvaus: string | null }) | null;
   kausinosto: (KaupunkiVisa & { kausi: string }) | null;
-  ryhmat: Array<{ nimi: string; visat: KaupunkiVisa[] }>;
+  ryhmat: Array<{ nimi: string; otsikko: string; visat: KaupunkiVisa[] }>;
   henkilot: KaupunkiHenkilo[];
   /** Visoja yhteensä (kaupunkivisa + muut) — vain otsikkoon ja kuvaukseen, ei sivulle. */
   visoja: number;
@@ -204,7 +205,7 @@ export const haeKaupunkisivu = cache(async (slug: string): Promise<Kaupunkisivu 
     ? muut.filter((v) => v.kausi === kausi).sort((a, b) => (b.published_at ?? "").localeCompare(a.published_at ?? ""))[0] ?? null
     : null;
   const ryhmiin = muut.filter((v) => v.id !== kausiRivi?.id).map(visaksi);
-  const ryhmat = RYHMAT.map((g) => ({ nimi: g.nimi, visat: ryhmiin.filter((v) => v.ryhma === g.nimi) })).filter((g) => g.visat.length);
+  const ryhmat = RYHMAT.map((g) => ({ nimi: g.nimi, otsikko: g.otsikko, visat: ryhmiin.filter((v) => v.ryhma === g.nimi) })).filter((g) => g.visat.length);
   return {
     kaupunki: k,
     kaupunkivisa: kaupunkivisaRivi ? visaksi(kaupunkivisaRivi) : null,
