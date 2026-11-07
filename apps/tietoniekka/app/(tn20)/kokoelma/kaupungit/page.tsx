@@ -8,6 +8,7 @@ import { getPageContent } from "@/lib/pageContent";
 import KokoelmaRunko from "@/components/tn20/runko/KokoelmaRunko";
 import { haeRunkoData } from "@/lib/kokoelmat/data";
 import { KAUPUNGIT_KOKOELMA } from "@/lib/kokoelmat/kaupungit";
+import { KAUPUNGIT_LISTA, haeKaupunkilista } from "@/lib/kaupunkisivu";
 
 export const revalidate = 300; // SEO-erä A4 (2.10.2026): ISR 5 min
 
@@ -23,7 +24,15 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function KaupungitLanding() {
-  const d = await haeRunkoData(KAUPUNGIT_KOKOELMA);
+  const [d, kaupungit] = await Promise.all([haeRunkoData(KAUPUNGIT_KOKOELMA), haeKaupunkilista()]);
   if (!d) return <main style={{ padding: 32 }}>Ei tietokantayhteyttä.</main>;
-  return <KokoelmaRunko d={d} />;
+  /* Kaupunkisivut (7.11.2026): linkki kaupunkilistaan samassa paikassa kuin Tunnetut henkilöt -sivun A–Ö-linkki. */
+  const lista = kaupungit.length ? (
+    <div className="rk-haku">
+      <div className="rk-haku-rivi">
+        <a className="rk-haku-kaikki" href={KAUPUNGIT_LISTA}>Kaikki {kaupungit.length} kaupunkisivua A–Ö →</a>
+      </div>
+    </div>
+  ) : null;
+  return <KokoelmaRunko d={d} v3Lisa={lista} />;
 }
