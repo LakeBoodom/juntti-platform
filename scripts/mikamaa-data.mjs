@@ -2,7 +2,7 @@
 //
 // Tuottaa apps/tietoniekka/lib/vihjepeli/maat.json: kaikki YK:n 193 jäsenmaata (Heikki 7.11.2026: YK:n lista).
 //   k ISO-3 · n nimi · syn synonyymit (haku) · m maanosa · pk pääkaupunki · pkl pääkaupunki paljastaa nimen → lippu
-//   lat/lon (Natural Earthin nimipiste; Venäjä ja Kanada käsin kuten Rajanaapureissa) · nr maarajanaapurit
+//   lat/lon (siluetin osien painopiste; Venäjä ja Kanada käsin kuten Rajanaapureissa) · nr maarajanaapurit
 //   d siluetti omassa 1000 × 1000 -ruudussaan (tasavälinen projektio maan keskipisteen leveydellä) · b sen laatikko
 //   v lippu · taso A/B/C
 //
@@ -26,16 +26,16 @@ const OUT = join(juuri, "apps/tietoniekka/lib/vihjepeli/maat.json");
 const LIPUT = join(juuri, "apps/tietoniekka/public/20/rajanaapurit/liput");
 const NE = "https://raw.githubusercontent.com/nvkelso/natural-earth-vector/master/geojson/ne_50m_admin_0_countries.geojson";
 
-/* Vaikeustasot (ehdotus 7.11.2026, Heikki katselmoi). A ja B ovat aloitusjoukko: päivän maa ja harjoitustila
+/* Vaikeustasot (Heikki hyväksyi 7.11.2026: Venäjä ei arvonnassa, Bulgaria A:han). A ja B ovat aloitusjoukko: päivän maa ja harjoitustila
    arpovat vain niistä, ja vain niille kirjoitetaan vihjeet ensimmäisessä erässä. C-maat ovat täydennyslistassa
    (jokaisen arvauksen etäisyys lasketaan), mutta niitä ei arvota ennen vihje-erää 2. */
-const TASO_A = "FIN SWE NOR DNK ISL EST LVA LTU RUS DEU FRA GBR IRL ESP PRT ITA GRC NLD BEL CHE AUT POL CZE HUN UKR TUR HRV USA CAN MEX BRA ARG CHL PER COL CUB JAM CHN JPN IND KOR PRK THA VNM IDN PHL SAU ISR IRN IRQ PAK AFG EGY ZAF MAR KEN NGA ETH AUS NZL".split(" ");
-const TASO_B = "ROU BGR SRB SVK SVN BLR LUX CYP MLT ALB BIH VEN BOL ECU URY PRY CRI PAN DOM MNG NPL LKA SGP MYS ARE QAT KAZ SYR LBN JOR GEO ARM TUN DZA LBY GHA SEN TZA MDG UGA".split(" ");
+const TASO_A = "FIN SWE NOR DNK ISL EST LVA LTU BGR DEU FRA GBR IRL ESP PRT ITA GRC NLD BEL CHE AUT POL CZE HUN UKR TUR HRV USA CAN MEX BRA ARG CHL PER COL CUB JAM CHN JPN IND KOR PRK THA VNM IDN PHL SAU ISR IRN IRQ PAK AFG EGY ZAF MAR KEN NGA ETH AUS NZL".split(" ");
+const TASO_B = "ROU SRB SVK SVN BLR LUX CYP MLT ALB BIH VEN BOL ECU URY PRY CRI PAN DOM MNG NPL LKA SGP MYS ARE QAT KAZ SYR LBN JOR GEO ARM TUN DZA LBY GHA SEN TZA MDG UGA".split(" ");
 
 /** Natural Earthin erilliset alueet, jotka kuuluvat YK:n jäsenmaahan. */
 const YHDISTA = { SOL: "SOM", CYN: "CYP" };
-/** Keskipiste käsin (sama kuin Rajanaapurien nasta): Venäjän ja Kanadan nimipiste olisi kaukana asutuksesta. */
-const PISTE = { RUS: [40, 57], CAN: [-98, 56] };
+/** Keskipiste käsin: Venäjä ja Kanada kuten Rajanaapurien nasta (painopiste olisi kaukana asutuksesta). */
+const PISTE = { RUS: [40, 57], CAN: [-98, 56], USA: [-98.58, 39.83] }; // Yhdysvallat: mannerosan keskipiste (Alaska vetäisi Montanaan)
 /** Siluetista pois: Huippuvuoret ja Kanariansaaret. Ranskan merentakaiset alueet jäävät pois etäisyyssäännöllä. */
 const SILUETISTA_POIS = { NOR: ([lon, lat]) => lat > 72, ESP: ([lon, lat]) => lat < 30 };
 
@@ -43,7 +43,7 @@ const NIMI = { CHN: "Kiina", NLD: "Alankomaat", KOR: "Etelä-Korea", PRK: "Pohjo
 const SYN = {
   NLD: ["Hollanti"], GBR: ["Britannia", "Iso-Britannia", "Englanti"], USA: ["USA", "Amerikka"], MMR: ["Burma"],
   CZE: ["Tšekin tasavalta", "Tshekki"], BLR: ["Belarus"], SWZ: ["Swazimaa"], KOR: ["Korea"], CHN: ["China"],
-  COD: ["Kongo-Kinshasa", "Kongo"], COG: ["Kongo-Brazzaville", "Kongo"], ARE: ["Yhdistyneet arabiemiraatit", "Emiraatit"],
+  COD: ["Kongo-Kinshasa"], COG: ["Kongo-Brazzaville"], ARE: ["Yhdistyneet arabiemiraatit", "Emiraatit"],
   TLS: ["Timor-Leste"], CPV: ["Cabo Verde"], TUR: ["Türkiye"], MKD: ["Makedonia"], GEO: ["Gruusia"], BIH: ["Bosnia"],
   CIV: ["Côte d’Ivoire"], NOR: ["Norway"], NZL: ["New Zealand"], FSM: ["Mikronesian liittovaltio"],
 };
@@ -157,6 +157,19 @@ function siluetti(k, keski) {
     const [a, b, c, d] = laatikko([r]);
     return Math.max(a - x1, x0 - c, 0) <= raja && Math.max(b - y1, y0 - d, 0) <= raja;
   });
+  // Painopiste (pinta-alalla painotettu) mukana olevista osista → etäisyyksien keskipiste. Nimipiste on
+  // kartan nimiötä varten ja voi olla kaukana keskeltä (Ruotsin nimipiste Lapissa: Ruotsi näkyi Suomesta luoteessa).
+  let [sa, sx, sy] = [0, 0, 0];
+  for (const r of renkaat) {
+    const n = r.length;
+    for (let i = 0; i < n; i++) {
+      const [x1_, y1_] = r[i], [x2_, y2_] = r[(i + 1) % n], c = x1_ * y2_ - x2_ * y1_;
+      sa += c; sx += (x1_ + x2_) * c; sy += (y1_ + y2_) * c;
+    }
+  }
+  const pp = [sx / (3 * sa), sy / (3 * sa)];
+  const c0 = Math.cos(keski[1] * rad);
+  const painopiste = [((pp[0] / (R * rad * c0) + keski[0] + 540) % 360) - 180, -pp[1] / (R * rad)];
   // Mittakaava: pidempi sivu 1000 yksikköä, keskitettynä 1000 × 1000 -ruutuun.
   const [bx0, by0, bx1, by1] = laatikko(renkaat);
   const s = 1000 / Math.max(bx1 - bx0, by1 - by0);
@@ -172,7 +185,7 @@ function siluetti(k, keski) {
       valmiit.push([[cx, cy - 6], [cx + 6, cy], [cx, cy + 6], [cx - 6, cy]]);
     }
   }
-  return { d: polku(valmiit), b: laatikko(valmiit) };
+  return { d: polku(valmiit), b: laatikko(valmiit), painopiste };
 }
 
 // ── Lippu: puuttuvat flag-icons-kopiot (4:3) samaan kokoon kuin Rajanaapureissa (240 × 180) ──
@@ -206,19 +219,27 @@ for (const w of wd.sort((a, b) => a.k.localeCompare(b.k))) {
   const pk = PK[w.k] ?? (w.caps.length === 1 ? w.caps[0] : null);
   if (!pk) throw new Error(`pääkaupunki epäselvä: ${w.k} ${w.caps}`);
   // Synonyymit: käsin + Wikidatan suomenkieliset muut nimet (ei virallisia muotoja) + englanninkielinen nimi + Wikidatan nimi.
-  const syn = [...new Set([...(SYN[w.k] ?? []), ...w.alts.filter((a) => !VIRALLINEN.test(a)), w.en, w.fi, db?.name_fi])]
+  const syn = [...new Set([...(SYN[w.k] ?? []), ...w.alts.filter((a) => !VIRALLINEN.test(a)), w.en, w.fi, db?.name_fi.replace(/\s*\(.*\)$/, "")])]
     .filter((s) => s && taita(s) !== taita(n));
   // Pääkaupunki paljastaa nimen (Guatemala, Kuwait, Djibouti, Brasília…) → vihje 5 on lippu.
   const pkl = PKL_KASIN.includes(w.k) || [n, ...syn].some((s) => { const a = taita(s), b = taita(pk); return a.length >= 4 && (b.includes(a.slice(0, 5)) || a.includes(b.slice(0, 5))); });
-  const keski = PISTE[w.k] ?? [q.LABEL_X, q.LABEL_Y];
+  const { painopiste, ...muoto } = siluetti(w.k, [q.LABEL_X, q.LABEL_Y]); // projektion keskus nimipisteestä
+  const keski = PISTE[w.k] ?? painopiste;
   maat.push({
     k: w.k, n, ...(syn.length ? { syn } : {}), m, pk, ...(pkl ? { pkl: true } : {}),
     lat: +keski[1].toFixed(3), lon: +keski[0].toFixed(3),
     ...(naapurit.has(w.k) ? { nr: [...new Set(naapurit.get(w.k))].sort() } : {}),
-    ...siluetti(w.k, [q.LABEL_X, q.LABEL_Y]), // projektion keskus nimipisteestä myös Venäjällä (Moskovasta muoto kiertyisi)
+    ...muoto,
     v: await lippu(w.k, w.iso2),
     taso: TASO_A.includes(w.k) ? "A" : TASO_B.includes(w.k) ? "B" : "C",
   });
+}
+// Synonyymi, joka sopii kahteen maahan ("Kongo"), ei kelpaa kummallekaan: pelaaja valitsee listasta.
+const kaytot = new Map();
+for (const m of maat) for (const x of [m.n, ...(m.syn ?? [])]) kaytot.set(taita(x), (kaytot.get(taita(x)) ?? 0) + 1);
+for (const m of maat) if (m.syn) {
+  m.syn = m.syn.filter((x) => kaytot.get(taita(x)) === 1);
+  if (!m.syn.length) delete m.syn;
 }
 for (const k of [...TASO_A, ...TASO_B]) if (!jasenet.has(k)) throw new Error(`tasolistassa tuntematon koodi: ${k}`);
 

@@ -119,7 +119,7 @@ const YEAR_S = 365.25 * 86400;
    paljastuksessa nimenomaan linnuntienä, jottei se ole harhaanjohtava. */
 const MAAN_SADE_KM = 6371;
 
-export function haversineKm(a: DuelEntity, b: DuelEntity): number {
+export function haversineKm(a: Pick<DuelEntity, "lat" | "lon">, b: Pick<DuelEntity, "lat" | "lon">): number {
   const rad = (x: number) => (x * Math.PI) / 180;
   const la1 = rad(a.lat as number);
   const la2 = rad(b.lat as number);
