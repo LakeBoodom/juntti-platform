@@ -63,6 +63,7 @@ export function kuvalause(m: Pelimuoto, n?: number): string {
   if (m === "megavisa") return n ? `${n} kysymystä` : "Pitkä visa";
   if (m === "jarjesta") return "Laita kahdeksan järjestykseen";
   if (m === "ikajarjestys") return "Laita kahdeksan ikäjärjestykseen";
+  if (m === "vaalipiiriketju") return "Kuusi kansanedustajaa";
   return tehtavalause(m, n).replace(/\.$/, "");
 }
 

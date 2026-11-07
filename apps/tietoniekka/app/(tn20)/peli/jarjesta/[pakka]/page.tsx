@@ -17,6 +17,7 @@ import { getChainRound, getChainRoundByIds } from "@/lib/ikajarjestys";
 import { henkiloKuva } from "@/lib/henkilokuvat";
 import JarjestaClient from "./JarjestaClient";
 import IkajarjestysClient from "./IkajarjestysClient";
+import { koukkuTeksti } from "@/lib/koukku";
 
 export const dynamicParams = false;
 
@@ -39,7 +40,7 @@ export async function generateMetadata({ params, searchParams }: { params: Promi
       title: `${nimi} – järjestä syntymävuoden mukaan | Tietoniekka`,
       description: kuvaus,
       alternates: { canonical: ika.href },
-      ...jakoMeta({ ...esikatselu({ nimi: ika.nimi, muoto: "ikajarjestys", lause: ika.pelilause }), url: jakoOsoite(ika.href, sp, ["henkilot", "rivi", "tulos"]), kuva: `/og/jarjesta/${ika.slug}` }),
+      ...jakoMeta({ ...esikatselu({ nimi: ika.nimi, muoto: "ikajarjestys", lause: ika.pelilause, koukku: koukkuTeksti(ika.koukku) }), url: jakoOsoite(ika.href, sp, ["henkilot", "rivi", "tulos"]), kuva: `/og/jarjesta/${ika.slug}` }),
     };
   }
   const p = haePakka(slug);
@@ -49,7 +50,7 @@ export async function generateMetadata({ params, searchParams }: { params: Promi
     title: `${p.seoTitle} | Tietoniekka`,
     description: `${p.kuvaus} ${p.rajaus}`,
     alternates: { canonical: url },
-    ...jakoMeta({ ...esikatselu({ nimi: p.kortti.otsikko, muoto: "jarjesta", lause: p.pelilause }), url: jakoOsoite(url, sp, ["kohteet", "tulos"]), kuva: `/og/jarjesta/${p.slug}` }),
+    ...jakoMeta({ ...esikatselu({ nimi: p.kortti.otsikko, muoto: "jarjesta", lause: p.pelilause, koukku: koukkuTeksti(p.koukku) }), url: jakoOsoite(url, sp, ["kohteet", "tulos"]), kuva: `/og/jarjesta/${p.slug}` }),
   };
 }
 

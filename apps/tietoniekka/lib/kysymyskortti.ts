@@ -9,4 +9,9 @@ export const mahtuuKorttiin = (q: { question: string; options: string[]; audio?:
   !q.audio && q.question.trim().length <= KYSYMYS_MAX && q.options.length >= 2 && q.options.every((o) => o.trim().length <= VAIHTOEHTO_MAX);
 
 /** Kortin vaihtoehdot aakkosjärjestyksessä: oikea vastaus ei erotu järjestyksestä eikä paikasta. */
-export const korttiVaihtoehdot = (opts: string[]) => [...opts].map((o) => o.trim()).sort((a, b) => a.localeCompare(b, "fi"));
+/* Lukuvaihtoehdot ("550", "1 500", "15 000") suuruusjärjestykseen, muut aakkosiin (vaihe 4, 7.11.2026). */
+const luku = (o: string) => (/^[\d\s.,]+$/.test(o) ? Number(o.replace(/\s/g, "").replace(",", ".")) : NaN);
+export const korttiVaihtoehdot = (opts: string[]) => {
+  const v = opts.map((o) => o.trim());
+  return v.every((o) => !Number.isNaN(luku(o))) ? v.sort((a, b) => luku(a) - luku(b)) : v.sort((a, b) => a.localeCompare(b, "fi"));
+};

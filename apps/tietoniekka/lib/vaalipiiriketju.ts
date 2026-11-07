@@ -97,6 +97,9 @@ export function tarkista(vpt: string[], linkit: Record<string, VpkLinkki>) {
 /** Jakotekstin nimi (jakotekstit v4, 6.11.2026): pelimuodon nimi ei selitä itseään vastaanottajalle. */
 export const VPK_JAKONIMI = "Kansanedustajien vaalipiirit";
 
+/** Esikatselukortin vertailukoukku (v4 §4, vaihe 4). Espoo kuuluu Uudenmaan vaalipiiriin. */
+export const VPK_KOUKKU = { kysymys: "Kumpaan vaalipiiriin Espoo kuuluu?", vaihtoehdot: ["Helsinki", "Uusimaa"] as [string, string] };
+
 /** Jaettava teksti (CD 2k): ei nimiä, ei vaalipiirejä, ei reittiä. Aina päivän ketjun tulos. */
 export function jakoteksti(kortit: boolean[]): string {
   return tulosjakoteksti(VPK_JAKONIMI, `sain ${kortit.filter(Boolean).length}/${VPK_JARJESTETTAVIA} oikein`);

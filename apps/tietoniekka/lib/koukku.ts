@@ -1,6 +1,6 @@
 // KOUKKUKYSYMYS (Jakotekstit v4 §4, vaihe 2): tietovisan ja megavisan esikatselukortin kysymys valitaan visan omista
 // kysymyksistä palvelimella, joten sama koukku näkyy kuvassa, og:descriptionissa ja Facebookin kortissa.
-// Kannassa ei ole vielä koukkukysymys-kenttää (vaihe 4). Valinta on deterministinen:
+// Valinta on deterministinen (käsin valitut koukut muille pelimuodoille: KasinKoukku alla, vaihe 4):
 //   1) etusivun Tiesitkö?-poolin kysymys (questions.hook), 2) keskivaikea taso (3, sitten 4, 2, 5, 1),
 //   3) lähimpänä visan keskikohtaa (ensimmäinen kysymys on usein lämmittely), 4) id.
 // Ehdot: ≤ 75 merkkiä, 2–4 vaihtoehtoa ≤ 28 merkkiä, ei ääntä eikä kuvaa (kuvaa ei näytetä kortissa).
@@ -62,4 +62,29 @@ export async function megaKoukku(megaId: string): Promise<Koukku | null> {
     rivit.push(...((q ?? []) as unknown as Rivi[]));
   }
   return valitseKoukku(rivit);
+}
+
+/* KÄSIN VALITUT KOUKUT (Jakotekstit v4 §4, vaihe 4, 7.11.2026). Pelimuodoille, joilla ei ole omaa kysymyslistaa
+   (Järjestä, äänivisa, Vaalipiiriketju, reittipelit), koukku kirjoitetaan pelin tietoihin:
+   - vertailu (kortti A): "Kumpi tunturi on korkeampi?" + kaksi kohdetta pakan omasta datasta (luvut tarkistettu
+     fact_attributes-taulusta 7.11.2026); og:descriptionissa "Kumpi tunturi on korkeampi, Ounastunturi vai Yllästunturi?"
+   - tekstikoukku: pelkkä kysymys ilman vaihtoehtoja (nimikortin alarivi).
+   Tuplan teemat osoittavat oman poolinsa kysymykseen id:llä (haeKysymysKoukku). */
+export type KasinKoukku = { kysymys: string; vaihtoehdot?: [string, string] };
+
+/** og:descriptionin koukku: vertailussa "Kumpi X, A vai B?", muuten kysymys sellaisenaan. */
+export function koukkuTeksti(k: KasinKoukku | Koukku | null | undefined): string | null {
+  if (!k) return null;
+  const v = k.vaihtoehdot;
+  if (v && v.length === 2 && !("id" in k)) return `${k.kysymys.replace(/\?$/, "")}, ${v[0]} vai ${v[1]}?`;
+  return k.kysymys;
+}
+
+/** Yksittäinen kysymys koukuksi (Tuplan teemat); sama korttiehto kuin valitseKoukussa. */
+export async function haeKysymysKoukku(id: string | null | undefined): Promise<Koukku | null> {
+  if (!id) return null;
+  const sb = getSupabase();
+  if (!sb) return null;
+  const { data } = await sb.from("questions").select(SARAKKEET as "id").eq("id", id).limit(1);
+  return valitseKoukku((data ?? []) as unknown as Rivi[]);
 }
