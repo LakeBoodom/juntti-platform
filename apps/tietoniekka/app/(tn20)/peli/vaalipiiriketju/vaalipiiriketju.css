@@ -285,3 +285,9 @@
 .tn20 .vpk-taso { margin: 4px 0 0; font-family: var(--rk-cond), "Barlow Condensed", sans-serif; font-weight: 800; font-size: 28px; line-height: 1.05; text-transform: uppercase; color: var(--pk-acc, #b4a5ff); }
 .tn20 .vpk-k4 { display: flex; flex-direction: column; gap: 12px; max-width: 560px; }
 .tn20 [data-iho] .vpk-jako { --tj-ink: var(--pk-ink); --tj-soft: var(--pk-dim); --tj-muted: var(--pk-dim); --tj-line: var(--pk-line); --tj-card: var(--pk-kortti); --tj-raja: var(--pk-line); --tj-acc: var(--pk-acc); }
+
+/* Haastetun polku (Jakotekstit v4 §5, vaihe 3): kaverin tulos otsakkeen yläpuolella, tuloksessa vertailu. */
+.tn20 .vpk-kaveri { margin-bottom: 6px; max-width: 560px; }
+.tn20 .vpk-vertailu { max-width: 560px; }
+.tn20 .vpk .kv-tuomio { color: #b6ff3c; }
+.tn20 .vpk .kv-tuomio[data-tuomio="havio"] { color: #ffa88f; }

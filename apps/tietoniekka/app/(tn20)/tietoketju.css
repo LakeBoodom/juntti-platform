@@ -167,6 +167,7 @@
 
 .tn20 .jr-lauta { display: flex; flex-direction: column; gap: 8px; max-width: 560px; margin: 0 auto; padding: 10px 16px 0; box-sizing: border-box; color: var(--tk-text-primary); }
 /* "KORJAA RIVI" (6 merkkiä pisin sana): 32 px mahtuu 320 px:iin; CD 32–36 px (wdth 70) → staattinen 32 px. */
+.tn20 .jr-kaveri { margin-bottom: 14px; }
 .tn20 .jr-h1 { margin: 0; font-family: "Archivo Variable", "Archivo", sans-serif; font-weight: 900; font-size: 32px; line-height: .95; letter-spacing: -.02em; text-transform: uppercase; }
 .tn20 .jr-lause { margin: 6px 0 0; font-size: 14px; line-height: 1.4; color: var(--tk-text-secondary); text-wrap: pretty; }
 .tn20 .jr-lauta-rivit { display: flex; flex-direction: column; gap: 5px; }

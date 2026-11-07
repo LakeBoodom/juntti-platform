@@ -44,6 +44,7 @@ import Pelipalkki from "@/components/tn20/pelikehys/Pelipalkki";
 import PeliKehys from "@/components/tn20/pelikehys/PeliKehys";
 import PeliAloitus from "@/components/tn20/pelikehys/PeliAloitus";
 import PeliTulos from "@/components/tn20/pelikehys/PeliTulos";
+import { haasterivi, type KaverinTulos } from "@/lib/kaveri";
 import type { Pelimuoto } from "@/lib/pelimuodot";
 
 const BASE_POINTS = 100;
@@ -134,9 +135,6 @@ export type GameQuiz = {
   /** K3: haastajan tulos, kun sivulle tultiin /h/<koodi>-linkistä. */
   haaste?: {
     oikein: number; kysymyksia: number; pisteet: number;
-    /** Vaihe E: kysymyskortista (&k=) tultaessa kaverin kysymys on ensimmäisenä. vaarin = kaveri kompastui siihen,
-        taydet = kaverilla täydet (Heikki 23.10.: ei "visan vaikein", koska vaikeutta ei mitata). */
-    kompastus?: "vaarin" | "taydet";
   };
   /** Viikkovisa (kierros 4, 18.9.2026): palvelimella lasketut viikkotiedot +
       aloitusnäkymän kollaasi. Kun annettu, peli on yhden yrityksen viikkovisa:
@@ -982,13 +980,13 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
      samaan .tng-restitle-mitoitukseen kuin "Harjoiteltavaa jäi". */
   const faniIndeksi = [0, 40, 60, 80, 100].indexOf(tier.min);
   const fanitaso = !vk && quiz.fanitasot && faniIndeksi >= 0 ? quiz.fanitasot[faniIndeksi] : null;
-  /* Haastebannerin loppu (vaiheet A ja E): kysymyskortista tultaessa kaverin kysymys on visan ensimmäinen. */
-  const haasteLoppu = !quiz.haaste ? ""
-    : quiz.haaste.kompastus === "vaarin" ? " ja kompastui tähän. Tiedätkö sinä?"
-    : quiz.haaste.kompastus === "taydet" ? ". Tiedätkö sinä tämän?"
-    : quiz.haaste.oikein === quiz.haaste.kysymyksia ? " – pystytkö samaan?" : " – pystytkö parempaan?";
-  /* Jakotekstit v4 vaihe 2: esikatselukortin kysymys (koukku) valitaan palvelimella, joten Facebook saa saman linkin
-     kuin muut kanavat (ei enää &k=<kompastuskysymys>). */
+  /* Haastetun polku (Jakotekstit v4 §5, vaihe 3): "Kaverisi sai 7/10." ylimpänä ja rivi siitä, mitä tehdään. */
+  const kaveri: KaverinTulos | null = quiz.haaste ? {
+    otsikko: `Kaverisi sai ${quiz.haaste.oikein}/${quiz.haaste.kysymyksia}.`,
+    rivi: haasterivi(isKuva ? "Tunnista samat kuvat" : "Vastaa samoihin kysymyksiin", quiz.haaste.oikein === quiz.haaste.kysymyksia),
+    luku: `${quiz.haaste.oikein}/${quiz.haaste.kysymyksia}`, lyhyt: `${quiz.haaste.oikein}/${quiz.haaste.kysymyksia}`,
+    arvo: quiz.haaste.oikein,
+  } : null;
   const shareText = quiz.haaste && done
     ? vastahaasteteksti(`${right}/${total}`, `${quiz.haaste.oikein}/${quiz.haaste.kysymyksia}`)
     : tulosjakoteksti(jakoNimi, isKuva ? `tunnistin ${right}/${total}` : `sain ${right}/${total} oikein`);
@@ -1132,6 +1130,7 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
               </button>
             }
             alarivi={kehys.alarivi}
+            kaveri={kaveri}
             ohjeet={kehys.ohjeet.map((o) => ({
               otsikko: o.otsikko,
               sisalto: (
@@ -1172,6 +1171,7 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
                 {vastaukset}
               </details>
             }
+            vertailu={kaveri ? { oma: { luku: `${right}/${total}`, lyhyt: `${right}/${total}`, arvo: right }, kaveri } : null}
             jako={{ teksti: shareText, url: jakoUrl, natiiviOtsikko: `Tietoniekka · ${quiz.title}`, onJaettu: (k) => markShared(k) }}
             toiminnot={
               uusi
@@ -1348,7 +1348,8 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
                   {/* Vaihe A (21.10.2026): haastebanneri myös herollisessa aloituksessa (/visa/<slug>?tulos=). */}
                   {quiz.haaste ? (
                     <p className="tng-start-chal tng-start-chal--hero">
-                      <b>Kaverisi sai {quiz.haaste.oikein}/{quiz.haaste.kysymyksia}</b>{haasteLoppu}
+                      <b>{kaveri!.otsikko}</b>
+                      <span>{kaveri!.rivi}</span>
                     </p>
                   ) : (
                     quiz.teaser && <p className="tng-herop">{quiz.teaser}</p>
@@ -1476,8 +1477,8 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
                   voitettavaa — se on koko linkin syy. */}
               {quiz.haaste && (
                 <p className="tng-start-chal">
-                  <b>Kaverisi sai {quiz.haaste.oikein}/{quiz.haaste.kysymyksia}</b>{haasteLoppu}
-                  {isKuva && <span>Samat kuvat samassa järjestyksessä.</span>}
+                  <b>{kaveri!.otsikko}</b>
+                  <span>{kaveri!.rivi}</span>
                 </p>
               )}
               {quiz.teaser && <p className="tng-start-p">{quiz.teaser}</p>}

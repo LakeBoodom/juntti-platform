@@ -17,7 +17,9 @@
 // kortin ja toinen napautus vaihtaa paikat. Näppäimistö: välilyönti valitsee, nuolet siirtävät.
 
 import { lisaaPelirivi } from "@/lib/seuranta";
-import { jarjestysluvulla, tulosjakoteksti } from "@/lib/korttinimi";
+import { jarjestysluvulla, tulosjakoteksti, vastahaasteteksti } from "@/lib/korttinimi";
+import { KaveriRivi, KaveriVertailu } from "@/components/tn20/kaveri/Kaveri";
+import { reittiOma, type KaverinTulos } from "@/lib/kaveri";
 import { useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type PointerEvent as RPointerEvent, type KeyboardEvent } from "react";
 import { getSupabase } from "@/lib/supabase";
 import { KL_SIVU, KL_YHTEYKSIA, KL_YRITYKSET, pariAvain, reittiPisteet, uusiReittiSiemen, type KlKartta, type KlKunta, type KlReitti } from "@/lib/kuntaliitos";
@@ -370,6 +372,7 @@ export default function ReittipeliClient({
   maakunnat,
   maakuntaTunnus,
   viikko,
+  kaveri = null,
 }: {
   peli: ReittipeliNimi;
   reitti: KlReitti | null;
@@ -385,6 +388,8 @@ export default function ReittipeliClient({
   intro: boolean;
   /** Kuluvan viikon maanantai (YYYY-MM-DD): Seuraava peli -korttien viikon reitit. */
   viikko: string;
+  /** Haastetun polku (v4 §5): kaverin tulos samalla reitillä (?reitti=…&tulos=n-7&y=yritys). */
+  kaveri?: KaverinTulos | null;
 }) {
   const peli = PELIT[peliNimi];
   const [jarjestys, setJarjestys] = useState<string[]>(reitti?.alku ?? []);
@@ -650,17 +655,25 @@ export default function ReittipeliClient({
     const pisteet = reittiPisteet(tarkistettu.oikein, onnistui ? yritys : KL_YRITYKSET);
     const tulos = `${tarkistettu.oikein}/${KL_YHTEYKSIA} rajaa`;
     const polku = osoite(siemen);
-    const url = `${location.origin}${polku}${polku.includes("?") ? "&" : "?"}tulos=${tarkistettu.oikein}-${KL_YHTEYKSIA}`;
+    /* Löydetyllä reitillä yritys linkkiin (&y=), jotta kaverin näkymä ja vertailu kertovat sen (v4 §5). */
+    const url = `${location.origin}${polku}${polku.includes("?") ? "&" : "?"}tulos=${tarkistettu.oikein}-${KL_YHTEYKSIA}${onnistui ? `&y=${yritys}` : ""}`;
+    const omaTulos = reittiOma(tarkistettu.oikein, KL_YHTEYKSIA, onnistui ? yritys : null);
     /* Jakotekstit v4 (6.11.2026): nimi on reitti "Portugali → Viro"; löytynyt reitti kertoo yrityksen, muuten oikeat rajat. */
     const nimi = `${ratkaisu[0]?.n ?? ""} → ${ratkaisu.at(-1)?.n ?? ""}`;
-    const teksti = tulosjakoteksti(nimi, onnistui ? `löysin reitin ${jarjestysluvulla(yritys)} yrityksellä` : `sain ${tulos} oikein`);
+    const teksti = kaveri
+      ? vastahaasteteksti(omaTulos.lyhyt, kaveri.lyhyt)
+      : tulosjakoteksti(nimi, onnistui ? `löysin reitin ${jarjestysluvulla(yritys)} yrityksellä` : `sain ${tulos} oikein`);
     return (
       <div className={`kl ${peli.luokka} kl--tulos ${runkoCond.variable}`} data-iho="kerma">
         {palkki}
         <main className="pk-tulos-ulko">
           <div className="pk-tulos kl-lopetus">
             <div className="kl-tulos" data-lopetus={lopetus} role="status">
-              <h1>{onnistui ? "Onnistuit!" : lopetus === "loppui" ? "Yritykset loppuivat" : "Reitti paljastettu"}</h1>
+              {kaveri ? (
+                <KaveriVertailu oma={omaTulos} kaveri={kaveri} />
+              ) : (
+                <h1>{onnistui ? "Onnistuit!" : lopetus === "loppui" ? "Yritykset loppuivat" : "Reitti paljastettu"}</h1>
+              )}
               <p>{tulos}{onnistui ? ` · ${yritys}. yrityksellä` : ""} · {pisteet} p</p>
             </div>
             <div className="kl-lopetus-kartta"><Kartta peli={peli} reitti={reitti} piirretty={piirretty} nimet /></div>
@@ -677,7 +690,7 @@ export default function ReittipeliClient({
             <Jakoalue
               className="pk-tulos-jako"
               id="pk-jako-h"
-              otsikko="Haasta kaveri"
+              otsikko={kaveri ? "Lähetä vastahaaste" : "Haasta kaveri"}
               waNappi="Jaa WhatsAppissa"
               teksti={teksti}
               url={url}
@@ -702,6 +715,7 @@ export default function ReittipeliClient({
 
       <div className="kl-main">
         <h1 className="kl-sr">{peli.nimi}</h1>
+        {kaveri && <KaveriRivi kaveri={kaveri} className="kl-kaveri" />}
         <div className="kl-karttapala" ref={karttaPala} data-korjattava={(pelissa && !!tarkistettu) || undefined}>
           {korjattava("m")}
           <Kartta peli={peli} reitti={reitti} piirretty={vaihe === "tarkistus" ? piirretty : 0} nimet={false} />

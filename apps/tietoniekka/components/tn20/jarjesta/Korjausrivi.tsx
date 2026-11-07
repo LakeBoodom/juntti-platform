@@ -6,6 +6,8 @@ import type { ReactNode } from "react";
 import { ReorderableChainList } from "@/components/tn20/ReorderableChainList";
 import type { RankingCardPerson } from "@/components/tn20/RankingCard";
 import { VAIHTO_OHJE } from "@/lib/jarjesta/rivi";
+import { KaveriRivi } from "@/components/tn20/kaveri/Kaveri";
+import type { KaverinTulos } from "@/lib/kaveri";
 
 export default function Korjausrivi<T extends RankingCardPerson>({
   lause,
@@ -15,6 +17,7 @@ export default function Korjausrivi<T extends RankingCardPerson>({
   onReorder,
   onTarkista,
   huomautus,
+  kaveri,
 }: {
   lause: string;
   ylin: string;
@@ -23,10 +26,13 @@ export default function Korjausrivi<T extends RankingCardPerson>({
   onReorder: (next: T[]) => void;
   onTarkista: () => void;
   huomautus?: ReactNode;
+  /** Haastetun polku (v4 §5): kaverin tulos ylimpänä. */
+  kaveri?: KaverinTulos | null;
 }) {
   return (
     <main className="jr-lauta">
       <div className="jr-lauta-vasen">
+        {kaveri && <KaveriRivi kaveri={kaveri} className="jr-kaveri" />}
         <h1 className="jr-h1">Korjaa rivi</h1>
         <p className="jr-lause">{lause} {VAIHTO_OHJE}</p>
         {huomautus}

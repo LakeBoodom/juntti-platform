@@ -2,6 +2,8 @@
 // (<details>). Valinta ja nappi näkyvät 390 × 844:ssä ilman vieritystä. Pelikohtainen sisältö tulee propseina;
 // iho periytyy kääreestä (data-iho).
 import type { CSSProperties, ReactNode } from "react";
+import { KaveriRivi } from "@/components/tn20/kaveri/Kaveri";
+import type { KaverinTulos } from "@/lib/kaveri";
 
 export default function PeliAloitus({
   otsikko,
@@ -11,6 +13,7 @@ export default function PeliAloitus({
   alarivi,
   ohjeet,
   pisinSana,
+  kaveri,
 }: {
   otsikko: ReactNode;
   /** KORTTISÄÄNTÖ: h1:n koko pisimmästä sanasta (merkkiä). Merkkijono-otsikolle lasketaan itse. */
@@ -23,12 +26,15 @@ export default function PeliAloitus({
   /** Pieni rivi napin alla (päivän sarja, paras tulos). Ei nappi. */
   alarivi?: ReactNode;
   ohjeet: Array<{ otsikko: string; sisalto: ReactNode }>;
+  /** Haastetun polku (v4 §5): kaverin tulos ylimpänä. */
+  kaveri?: KaverinTulos | null;
 }) {
   const lw = pisinSana ?? (typeof otsikko === "string" ? Math.max(...otsikko.split(/\s+/).map((w) => w.length)) : undefined);
   return (
     <section className="pk-aloitus">
+      {kaveri && <KaveriRivi kaveri={kaveri} />}
       <h1 className="pk-h1" style={lw ? ({ "--pk-lw": lw } as CSSProperties) : undefined}>{otsikko}</h1>
-      <p className="pk-lause">{lause}</p>
+      {lause && <p className="pk-lause">{lause}</p>}
       {valinta}
       <div className="pk-toiminto">
         {toiminto}

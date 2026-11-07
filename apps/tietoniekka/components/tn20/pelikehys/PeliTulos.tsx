@@ -8,6 +8,8 @@ import type { CSSProperties, ReactNode } from "react";
 import type { Pelimuoto } from "@/lib/pelimuodot";
 import { PeliIkoniSvg } from "@/components/tn20/runko/PeliIkoni";
 import Jakoalue, { type Jakokanava } from "@/components/tn20/jako/Jakoalue";
+import { KaveriVertailu } from "@/components/tn20/kaveri/Kaveri";
+import type { KaverinTulos, OmaTulos } from "@/lib/kaveri";
 
 export type PeliToiminto = { teksti: string; onClick?: () => void; href?: string };
 
@@ -20,6 +22,7 @@ export default function PeliTulos({
   jako,
   seuraavat,
   toiminnot,
+  vertailu,
 }: {
   /** Iso luku: "32", "6/7", "41/50". */
   luku: ReactNode;
@@ -36,6 +39,8 @@ export default function PeliTulos({
   seuraavat: Pelimuoto[];
   /** Toissijaiset toiminnot linkkeinä: "Pelaa uusi kierros", "Pelaa sama sarja uudelleen". */
   toiminnot: PeliToiminto[];
+  /** Haastetun polku (v4 §5): oma ja kaverin tulos rinnakkain, tuomio otsikkona; jako on vastahaaste. */
+  vertailu?: { oma: OmaTulos; kaveri: KaverinTulos } | null;
 }) {
   return (
     /* Ulompi kääre on container: kaksipalstaisuus seuraa pelin oman sisältöalueen leveyttä (Tupla ~500 px,
@@ -44,12 +49,18 @@ export default function PeliTulos({
     <div className="pk-tulos">
       <div className="pk-tulos-vasen">
         <section className="pk-tulos-tulos" aria-labelledby="pk-tulos-h">
-          <div className="pk-tulos-luku" aria-hidden="true">
-            <b>{luku}</b>
-            {yksikko && <span>{yksikko}</span>}
-          </div>
-          <span className="pk-sr">{luku} {yksikko}.</span>
-          <h1 id="pk-tulos-h" className="pk-tulos-taso">{tasonimi}</h1>
+          {vertailu ? (
+            <KaveriVertailu oma={vertailu.oma} kaveri={vertailu.kaveri} id="pk-tulos-h" />
+          ) : (
+            <>
+              <div className="pk-tulos-luku" aria-hidden="true">
+                <b>{luku}</b>
+                {yksikko && <span>{yksikko}</span>}
+              </div>
+              <span className="pk-sr">{luku} {yksikko}.</span>
+              <h1 id="pk-tulos-h" className="pk-tulos-taso">{tasonimi}</h1>
+            </>
+          )}
           {lause && <p className="pk-tulos-ala">{lause}</p>}
         </section>
         {lisa && <div className="pk-tulos-lisa">{lisa}</div>}
@@ -58,7 +69,7 @@ export default function PeliTulos({
       <Jakoalue
         className="pk-tulos-jako"
         id="pk-jako-h"
-        otsikko="Haasta kaveri"
+        otsikko={vertailu ? "Lähetä vastahaaste" : "Haasta kaveri"}
         waNappi="Jaa WhatsAppissa"
         teksti={jako.teksti}
         url={jako.url}

@@ -10,7 +10,9 @@
 // tallennusta pelaajan järjestyksestä — sessionStorage tyhjenee välilehden
 // sulkeutuessa eikä mitään kirjoiteta kantaan pelin aikana.
 
-import { tulosjakoteksti } from "@/lib/korttinimi";
+import { tulosjakoteksti, vastahaasteteksti } from "@/lib/korttinimi";
+import { jarjestaKaveri } from "@/lib/kaveri";
+import { lukusana } from "@/lib/esikatselu";
 import { useMemo, useState } from "react";
 import { getChainRound } from "@/lib/ikajarjestys";
 import {
@@ -59,11 +61,14 @@ export default function IkajarjestysClient({
   pakka,
   initialRound,
   kasvot = [],
+  kaverinTulos = null,
 }: {
   pakka: IkaPakka;
   initialRound: ChainPerson[] | null;
   /** Aloituksen kasvoketju (P3, 21.10.2026): enintään 8 kuvallista henkilöä syntymäjärjestyksessä. */
   kasvot?: Array<{ id: string; name: string; kuva: string }>;
+  /** Haastetun polku: kaverin tulos samalla rivillä (?henkilot=…&tulos=n-total). */
+  kaverinTulos?: { n: number; kaikki: number } | null;
 }) {
   const category = pakka.kategoria;
   const [round, setRound] = useState<ChainPerson[] | null>(initialRound);
@@ -79,6 +84,8 @@ export default function IkajarjestysClient({
   const [emptyNotice, setEmptyNotice] = useState<string | null>(null);
   const [partialRoundNotice, setPartialRoundNotice] = useState<string | null>(null);
   const [uusiKesken, setUusiKesken] = useState(false);
+  /* Kaverin tulos koskee vain jaettua riviä: uusi kierros päättää vertailun. */
+  const [kaveri, setKaveri] = useState(() => (kaverinTulos ? jarjestaKaveri(kaverinTulos, `Laita samat ${lukusana(kaverinTulos.kaikki)} ikäjärjestykseen`) : null));
 
   // Henkilösivun nosto voi sisältää ulkomaisia henkilöitä → silloin ei "Tunnetut suomalaiset".
   const nimi = round?.some((h) => h.suomalainen === false) ? "Tunnetut henkilöt" : pakka.nimi;
@@ -89,7 +96,9 @@ export default function IkajarjestysClient({
      (?tulos=n-total), jotta Facebookin og-kuvaus kertoo tuloksen. Tulosvaihe piirretään vain selaimessa. */
   const jakoTiedot = () => ({
     url: `${location.origin}${pakka.href}?henkilot=${(round ?? []).map((p) => p.id).join(",")}&rivi=1&tulos=${scoreResult?.correctCount ?? 0}-${scoreResult?.totalCount ?? 0}`,
-    teksti: tulosjakoteksti(nimi, `sain ${scoreResult?.correctCount ?? 0}/${scoreResult?.totalCount ?? 0} oikeille paikoille`),
+    teksti: kaveri
+      ? vastahaasteteksti(`${scoreResult?.correctCount ?? 0}/${scoreResult?.totalCount ?? 0}`, kaveri.lyhyt)
+      : tulosjakoteksti(nimi, `sain ${scoreResult?.correctCount ?? 0}/${scoreResult?.totalCount ?? 0} oikeille paikoille`),
   });
 
   async function startRound() {
@@ -98,6 +107,7 @@ export default function IkajarjestysClient({
     else setUusiKesken(true);
     setEmptyNotice(null);
     setPartialRoundNotice(null);
+    setKaveri(null);
     const lastSeen = readLastSeen();
     const next = await getChainRound(category, lastSeen);
     setUusiKesken(false);
@@ -194,6 +204,7 @@ export default function IkajarjestysClient({
                 seuraava={aloitaHref(seuraavaPakka(pakka.slug))}
                 uusi={{ teksti: "Uusi kierros", onClick: () => startRound(), kesken: uusiKesken }}
                 jako={{ ...jakoTiedot(), natiiviOtsikko: PELI }}
+                vertailu={kaveri && scoreResult ? { oma: { luku: `${scoreResult.correctCount}/${scoreResult.totalCount}`, lyhyt: `${scoreResult.correctCount}/${scoreResult.totalCount}`, arvo: scoreResult.correctCount }, kaveri } : null}
               />
             }
           />
@@ -207,6 +218,7 @@ export default function IkajarjestysClient({
     <PeliKehys iho="tumma">
       <Pelipalkki iho="tumma" peli={HUB.nimi} koti={HUB} pelissa paluuNuoli />
       <Korjausrivi
+        kaveri={kaveri}
         lause={pakka.pelilause}
         ylin="Vanhin"
         alin="Nuorin"

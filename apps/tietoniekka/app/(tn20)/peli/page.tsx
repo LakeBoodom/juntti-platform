@@ -459,6 +459,11 @@ export default async function Peli20({
       kind: "teksti",
       challengePath: `/peli?mega=${encodeURIComponent(mega)}`,
       autoStart: params.aloita === "1",
+      /* Haastetun polku (v4 §5): jaettu megatulos (&tulos=n-total) samalla kysymysmäärällä → vertailu ja vastahaaste. */
+      haaste: (() => {
+        const t = jaettuTulos(params.tulos);
+        return t && t.kaikki === questions.length ? { oikein: t.n, kysymyksia: t.kaikki, pisteet: 0 } : undefined;
+      })(),
       /* Pelikehys (TOTEUTUSBRIEF §4, 20.10.2026): K1 paluu /kokoelmat, K2 aloitus, K4 tulos. */
       kehys: {
         peli: "Megavisat",
@@ -655,7 +660,6 @@ export default async function Peli20({
       haaste: haaste
         ? {
             oikein: haaste.oikein, kysymyksia: haaste.kysymyksia, pisteet: haaste.pisteet,
-            kompastus: kKuva >= 0 ? (haaste.oikein === haaste.kysymyksia ? "taydet" : "vaarin") : undefined,
           }
         : undefined,
       /* Jakonimi ilman "visa"-häntää (v4 §2): variaatio tai kortiston nimi ("Maiden liput"). */
@@ -866,13 +870,12 @@ export default async function Peli20({
     const oikein = Number(tulosHaaste[1]), kysymyksia = Number(tulosHaaste[2]);
     if (kysymyksia > 0 && oikein <= kysymyksia) game.haaste = { oikein, kysymyksia, pisteet: 0 };
   }
-  /* Vaihe E: kysymyskortista (&k=<id>) visa alkaa kaverin kysymyksellä, muut perässä normaalisti. k hyväksytään vain,
-     jos kysymys kuuluu visaan; muuten parametri ohitetaan. */
+  /* Vaihe E: vanhoista kysymyskortin linkeistä (&k=<id>) visa alkaa kaverin kysymyksellä, muut perässä normaalisti.
+     k hyväksytään vain, jos kysymys kuuluu visaan; muuten parametri ohitetaan. Uudet linkit eivät kanna k:ta (v4). */
   const kParam = typeof params.k === "string" ? params.k : null;
   const kIndeksi = kParam && game.haaste ? game.questions.findIndex((q) => q.id === kParam) : -1;
   if (game.haaste && kIndeksi >= 0) {
     game.questions = [game.questions[kIndeksi], ...game.questions.filter((_, i) => i !== kIndeksi)];
-    game.haaste.kompastus = game.haaste.oikein === game.haaste.kysymyksia ? "taydet" : "vaarin";
   }
 
   const collectionLabel = resolved.label;
