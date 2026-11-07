@@ -15,6 +15,9 @@ import { HUB_HREF, IKA_PAKAT } from "@/lib/jarjesta/hub";
 import { VPK_SIVU } from "@/lib/vaalipiiriketju";
 import { RN_SIVU, RN_USA_SIVU } from "@/lib/rajanaapurit";
 import { KARTTAPELIT_SIVU } from "@/lib/karttapelit";
+import { MM_SIVU } from "@/lib/vihjepeli/mikamaa";
+import { MAA_JULKAISU } from "@/lib/vihjepeli/aiheet/maa";
+import { helsinginPaiva } from "@/lib/aika";
 import { NAV_COLLECTIONS } from "@/lib/nav";
 import { KATEGORIAT } from "@/lib/kuvavisat2026";
 import { getPublishedQuizSlugs } from "@/lib/queries";
@@ -55,6 +58,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...IKA_PAKAT.map((p) => u(p.href, "weekly", 0.6)),
     ...JULKAISTUT.map((p) => u(pakkaHref(p), "monthly", 0.6)),
     u(VPK_SIVU, "daily", 0.7),
+    /* Mikä maa? julkaisupäivästä (MM_JULKAISU, 7.11.2026) alkaen; sitä ennen sivu oli noindex. */
+    ...(helsinginPaiva().iso >= MAA_JULKAISU ? [u(MM_SIVU, "daily", 0.7)] : []),
     u("/kuvavisa/viikko", "weekly", 0.7),
     /* Lasten visat (vaihe 5): /lapset vasta kun LAPSET_ENABLED; julkaistut lasten visat tulevat quizPagesista. */
     ...(lapsetNakyvissa() ? [u(LAPSET_SIVU, "weekly", 0.8)] : []),

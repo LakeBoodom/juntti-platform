@@ -66,6 +66,8 @@ export const NAV_MODES: NavMode[] = aakkosin([
   { href: "/peli/tupla-tai-kuitti", label: "Tupla tai kuitti", desc: "Tuplaa pisteet tai pidä ne", color: "#E8A320" },
   // Karttapelit (Heikki 1.11.2026): Rajanaapurit, Kuntaliitos ja Yhdysvallat yhdellä sivulla
   { href: "/peli/karttapelit", label: "Karttapelit", desc: "Järjestä maat, kunnat ja osavaltiot reitiksi naapurista naapuriin", color: "#4ADE80" },
+  // Mikä maa? (Heikki 7.11.2026): päivän maa vihjeistä; rivi julkaistaan pelin mukana.
+  { href: "/peli/mika-maa", label: "Mikä maa?", desc: "Tunnista maa vihjeistä ja siluetista", color: "#B4532A" },
   // Vaalipiiriketju (Heikki 5.10.2026): päivän peli vaalipiireistä
   { href: "/peli/vaalipiiriketju", label: "Vaalipiiriketju", desc: "Ketjuta kansanedustajat vaalipiireittäin", color: "#B4A5FF" },
   // Järjestä (Heikki 1.11.2026): hub korvaa entisen Ikäjärjestys-rivin; ikäjärjestys on hubin henkilöpakka.

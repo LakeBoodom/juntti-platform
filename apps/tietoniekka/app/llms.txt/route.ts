@@ -35,6 +35,7 @@ const PELIMUODOT: Array<[string, string, string]> = [
   ["/peli/kuntaliitos", "Kuntaliitos", "Järjestä kahdeksan kuntaa reitiksi naapurikuntien kautta; uusi reitti joka päivä"],
   ["/peli/rajanaapurit", "Rajanaapurit", "Sama reittipeli valtioilla ja maarajoilla; uusi viikon reitti joka maanantai"],
   ["/peli/rajanaapurit/osavaltiot", "Rajanaapurit: Yhdysvallat", "Rajanaapurit Yhdysvaltain 48 manner-osavaltiolla; uusi viikon reitti joka maanantai"],
+  ["/peli/mika-maa", "Mikä maa?", "Päivän maa vihjeistä: kuusi arvausta, jokainen väärä arvaus avaa uuden vihjeen ja kertoo etäisyyden ja suunnan oikeaan maahan; sama maa kaikille"],
   ["/peli/jarjesta", "Järjestä", "Järjestyspelit: presidentit, pääministerit, puolueet, tunturit, vuoret, järvet, kaupungit, maakunnat, kansallispuistot ja tunnettujen suomalaisten ikäjärjestys; uusi päivän rivi joka päivä"],
   ["/kuvavisa/viikko", "Viikkovisa", "Viikoittain vaihtuva kuvavisa, sama kaikille koko viikon"],
   ["/megavisat", "Megavisat", "Pitkät visat yhteen istuntoon"],
