@@ -32,13 +32,14 @@ const TEKSTI = ".tn-tulos-tasonimi,.tn-tulos-pisteet,.tn-tulos-tuomio,.tn-tulos-
       const n = await p.$(".tng-next"); if (n) { await n.click().catch(() => {}); await p.waitForTimeout(160); }
     }
     if (!(await p.$(".tn-tulos"))) { console.log(MOOTTORI, polku, "EI TULOSNÄKYMÄÄ"); virheita++; await ctx.close(); continue; }
-    // Vaihe C: jakoteksti briefin muodossa, ei emojeita; WhatsApp-linkissä sama teksti + osoite.
+    // Jakotekstit v4 (6.11.2026): "{nimi}: sain 7/10 oikein. Kokeile itse:" (kuvavisa "tunnistin 7/10") tai vastahaaste
+    // "Minä 7/10, sinä 6/10. Uusi kierros?"; ei emojeita, huutomerkkejä eikä Tietoniekkaa, ≤ 120 merkkiä, osoite omalla rivillään.
     const jako = await p.evaluate(() => ({ wa: document.querySelector(".tn-jako-wa")?.getAttribute("href") ?? "" }));
-    const muoto = /^.+ – sain \d+\/\d+ Tietoniekassa(: [^.]+)?\. Pystytkö (parempaan|samaan)\?$|^.+ – sain \d+\/\d+ Tietoniekassa, sinä \d+\/\d+\. Vastahaaste: pystytkö (parempaan|samaan)\?$/u;
-    const emoji = /\p{Extended_Pictographic}/u;
+    const muoto = /^[^:]+: (sain \d+\/\d+ oikein|tunnistin \d+\/\d+)\. Kokeile itse:$|^Minä \d+\/\d+, sinä \d+\/\d+\. Uusi kierros\?$/u;
+    const emoji = /\p{Extended_Pictographic}|!|Tietoniek/u;
     const waT = decodeURIComponent(jako.wa.replace(/^https:\/\/wa\.me\/\?text=/, ""));
-    jako.t = waT.replace(/ https?:\/\/\S+$/, "");
-    if (!muoto.test(jako.t) || emoji.test(jako.t) || !waT.startsWith(jako.t + " http")) { console.log(MOOTTORI, polku, "✗ jakoteksti:", JSON.stringify(jako.t), "| wa:", JSON.stringify(waT)); virheita++; }
+    jako.t = waT.replace(/\nhttps?:\/\/\S+$/, "");
+    if (!muoto.test(jako.t) || emoji.test(jako.t) || jako.t.length > 120 || !waT.startsWith(jako.t + "\nhttp")) { console.log(MOOTTORI, polku, "✗ jakoteksti:", JSON.stringify(jako.t), "| wa:", JSON.stringify(waT)); virheita++; }
     else console.log(MOOTTORI, polku, "jakoteksti ✓", JSON.stringify(waT));
     for (const w of LEVEYDET) {
       const h = w === 1440 ? 900 : 844;

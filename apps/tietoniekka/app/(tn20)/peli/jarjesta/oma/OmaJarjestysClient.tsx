@@ -1,7 +1,7 @@
 "use client";
 // Laadullinen järjestyspakka (brief 4.10.2026): sama lauta ja tulos kuin pakkapeleissä (Korjausrivi → RevealSequencer),
 // tasatulokset lib/jarjesta/pisteytys.ts. CD "Järjestä yhtenäinen UX" (Heikki 2.11.2026).
-import { pelijakoteksti } from "@/lib/korttinimi";
+import { tulosjakoteksti } from "@/lib/korttinimi";
 import { useMemo, useState } from "react";
 import { RevealSequencer, type RevealItem } from "@/components/tn20/RevealSequencer";
 import { arvioi, pisteet } from "@/lib/jarjesta/pisteytys";
@@ -76,7 +76,7 @@ export default function OmaJarjestysClient({
      ja Facebookin og-kuvaus kertoo tuloksen. Tulosvaihe piirretään vain selaimessa. */
   const jakoTiedot = () => ({
     url: (() => { const u = new URL(location.href); u.searchParams.set("tulos", `${tulos.correctCount}-${tulos.totalCount}`); return u.toString(); })(),
-    teksti: pelijakoteksti(otsikko, `${tulos.correctCount}/${tulos.totalCount} oikealla paikalla`, tulos.correctCount === tulos.totalCount),
+    teksti: tulosjakoteksti(otsikko, `sain ${tulos.correctCount}/${tulos.totalCount} oikeille paikoille`),
   });
 
   // Pelikehys K1 (20.10.2026): paluu henkilösivulle, jolta pakka avattiin.

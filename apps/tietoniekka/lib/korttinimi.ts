@@ -9,27 +9,26 @@ export function lyhennettyNimi(title: string): string {
 
 export const korttinimi = (q: { korttinimi?: string | null; title: string }) => q.korttinimi?.trim() || lyhennettyNimi(q.title);
 
-/* Jakoteksti (vaihe C, 22.10.2026) — WhatsApp, Kopioi ja Jaa…; osoite lisätään perään erikseen. Ei emojeita.
-   "{nimi} – sain 7/10 Tietoniekassa: {tasonimi}. Pystytkö parempaan?" · täydet → "Pystytkö samaan?" ·
-   ilman tasonimeä kaksoispiste ja tasonimi jäävät pois. */
-export function jakoteksti(nimi: string, oikein: number, kysymyksia: number, tasonimi?: string | null): string {
-  const taso = tasonimi?.trim();
-  return `${nimi} – sain ${oikein}/${kysymyksia} Tietoniekassa${taso ? `: ${taso}` : ""}. ${oikein === kysymyksia ? "Pystytkö samaan?" : "Pystytkö parempaan?"}`;
-}
+/* JAKOTEKSTIT v4 (6.11.2026, Heikki): koko Tietoniekassa kolme jakotekstiä, jotka kuulostavat ihmisen kirjoittamilta.
+   Pelin esittely, pelityyppi ja koukku ovat esikatselukortin tehtävä, eivät viestin. Säännöt: korttinimi alussa
+   (ei taivutusta, ei "visa"-häntää), ei emojeita, huutomerkkejä, tasonimiä, "Pystytkö parempaan?"-kehotusta eikä
+   sanaa Tietoniekka; ilman osoitetta enintään 120 merkkiä. Osoite lisätään omalle rivilleen (Jakoalue / jakoviesti). */
 
-/* Vastahaaste (vaihe A): "{nimi} – sain 8/10 Tietoniekassa, sinä 7/10. Vastahaaste: pystytkö parempaan?" */
-export function vastahaasteteksti(nimi: string, oikein: number, kysymyksia: number, kaveri: { oikein: number; kysymyksia: number }): string {
-  return `${nimi} – sain ${oikein}/${kysymyksia} Tietoniekassa, sinä ${kaveri.oikein}/${kaveri.kysymyksia}. Vastahaaste: ${oikein === kysymyksia ? "pystytkö samaan?" : "pystytkö parempaan?"}`;
-}
+/** Jaa peli: "Suomen majakat – kokeile tätä:" */
+export const jaaPeliTeksti = (nimi: string) => `${nimi} – kokeile tätä:`;
 
-/* Pelimuotojen väliaikainen jakoteksti (pikakorjaus 22.10.2026) samalla kaavalla:
-   "Tupla tai kuitti: SM-liiga – sain 32 kiekkoa Tietoniekassa. Pystytkö parempaan?" — ei emojeita eikä tulosriviä.
-   Kunnollinen jakoalue tulee pelimuotobriefissä (Jakoalue-komponentti). */
-export function pelijakoteksti(nimi: string, tulos: string, taydet = false, tasonimi?: string | null): string {
-  /* Tasonimi kuten tietovisassa (pelimuotojen kehys 25.10.2026): "…– sain 32 kiekkoa Tietoniekassa: Turva piti." */
-  const taso = tasonimi?.trim();
-  return `${nimi} – sain ${tulos} Tietoniekassa${taso ? `: ${taso}` : ""}. ${taydet ? "Pystytkö samaan?" : "Pystytkö parempaan?"}`;
-}
+/** Jaa tulokseni: "Suomen majakat: sain 7/10 oikein. Kokeile itse:". Tuloslause pienellä alkukirjaimella. */
+export const tulosjakoteksti = (nimi: string, tuloslause: string) => `${nimi}: ${tuloslause}. Kokeile itse:`;
+
+/** Vastahaaste lyhyillä tuloksilla ilman verbiä: "Minä 4/5, sinä 3/5. Uusi kierros?" */
+export const vastahaasteteksti = (oma: string, kaveri: string) => `Minä ${oma}, sinä ${kaveri}. Uusi kierros?`;
+
+/** Viesti osoitteineen: osoite omalla rivillään. */
+export const jakoviesti = (teksti: string, url: string) => `${teksti}\n${url}`;
+
+const JARJESTYS = ["ensimmäisellä", "toisella", "kolmannella", "neljännellä", "viidennellä", "kuudennella", "seitsemännellä", "kahdeksannella", "yhdeksännellä"];
+/** Järjestysluku adessiivina sanana ("kolmannella"), 10 ja yli numerona ("11."). */
+export const jarjestysluvulla = (n: number) => (n >= 1 && n <= JARJESTYS.length ? JARJESTYS[n - 1] : `${n}.`);
 
 /* Tasonimi tuloksesta (quizzes.fanitasot, 5 nimeä, rajat 0/40/60/80/100 %) — sama logiikka kuin GameClientin
    faniIndeksi. Jakokuvat (postikortin tasonauha) ja tuloslinkin og:description. */

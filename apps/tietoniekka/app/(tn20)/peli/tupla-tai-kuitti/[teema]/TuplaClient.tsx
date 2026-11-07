@@ -6,7 +6,7 @@
 // Ei kantaan kirjoittamista vielä; paras tulos muistetaan selaimessa sarjakohtaisesti.
 
 import { lisaaPelirivi } from "@/lib/seuranta";
-import { pelijakoteksti } from "@/lib/korttinimi";
+import { jaaPeliTeksti, tulosjakoteksti } from "@/lib/korttinimi";
 import { tuplaTaso } from "@/lib/pelitasot";
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 import {
@@ -259,11 +259,12 @@ export default function TuplaClient({ teema: t, sarja, siemen, paivanSarja, paiv
   const arvoUusi = () => location.assign(`?sarja=${uusiSiemen()}`);
 
   /* Jako (K4 v2, 25.10.2026): Jakoalue-komponentti. Tulos (saalis + lopetuksen syy) linkkiin, jotta kaveri saa saman
-     sarjan ja Facebookin og-kuvaus kertoo tuloksen. Tulos piirretään vain pelin jälkeen selaimessa (ei SSR). */
+     sarjan ja Facebookin og-kuvaus kertoo tuloksen. Tulos piirretään vain pelin jälkeen selaimessa (ei SSR).
+     Jakotekstit v4 (6.11.2026): oikeiden vastausten määrä, ei kiekkoja; nollalla jaetaan peli, ei tulosta. */
   const jako = loppu
     ? {
         url: `${typeof location !== "undefined" ? location.origin : "https://tietoniekka.fi"}/peli/tupla-tai-kuitti/${t.slug}?sarja=${encodeURIComponent(siemen)}&tulos=${loppu.saalis}&syy=${loppu.syy}`,
-        teksti: pelijakoteksti(`Tupla tai kuitti: ${t.nimi}`, maara(loppu.saalis, p), loppu.syy === "taydet", tuplaTaso(loppu.syy, loppu.saalis)),
+        teksti: loppu.oikein > 0 ? tulosjakoteksti(t.nimi, `sain ${loppu.oikein} oikein peräkkäin`) : jaaPeliTeksti(t.nimi),
       }
     : null;
 

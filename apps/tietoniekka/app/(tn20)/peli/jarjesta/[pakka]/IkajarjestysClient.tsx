@@ -10,7 +10,7 @@
 // tallennusta pelaajan järjestyksestä — sessionStorage tyhjenee välilehden
 // sulkeutuessa eikä mitään kirjoiteta kantaan pelin aikana.
 
-import { pelijakoteksti } from "@/lib/korttinimi";
+import { tulosjakoteksti } from "@/lib/korttinimi";
 import { useMemo, useState } from "react";
 import { getChainRound } from "@/lib/ikajarjestys";
 import {
@@ -89,7 +89,7 @@ export default function IkajarjestysClient({
      (?tulos=n-total), jotta Facebookin og-kuvaus kertoo tuloksen. Tulosvaihe piirretään vain selaimessa. */
   const jakoTiedot = () => ({
     url: `${location.origin}${pakka.href}?henkilot=${(round ?? []).map((p) => p.id).join(",")}&rivi=1&tulos=${scoreResult?.correctCount ?? 0}-${scoreResult?.totalCount ?? 0}`,
-    teksti: pelijakoteksti(`${PELI}: ${nimi}`, `${scoreResult?.correctCount ?? 0}/${scoreResult?.totalCount ?? 0} oikealla paikalla`, !!scoreResult && scoreResult.correctCount === scoreResult.totalCount),
+    teksti: tulosjakoteksti(nimi, `sain ${scoreResult?.correctCount ?? 0}/${scoreResult?.totalCount ?? 0} oikeille paikoille`),
   });
 
   async function startRound() {

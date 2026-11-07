@@ -323,7 +323,7 @@ export default function VpkClient({
       linkkiin (?tulos=n-total), jotta Facebookin og-kuvaus kertoo sen. Tulos piirretään vain selaimessa. */
   const jako = paivanTulos && typeof location !== "undefined"
     ? {
-        teksti: jakoteksti(paivanTulos.numero, paivanTulos.kortit),
+        teksti: jakoteksti(paivanTulos.kortit),
         url: `${location.origin}${VPK_SIVU}?tulos=${paivanTulos.kortit.filter(Boolean).length}-${VPK_JARJESTETTAVIA}`,
       }
     : null;

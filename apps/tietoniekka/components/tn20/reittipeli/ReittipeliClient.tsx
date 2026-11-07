@@ -17,7 +17,7 @@
 // kortin ja toinen napautus vaihtaa paikat. Näppäimistö: välilyönti valitsee, nuolet siirtävät.
 
 import { lisaaPelirivi } from "@/lib/seuranta";
-import { pelijakoteksti } from "@/lib/korttinimi";
+import { jarjestysluvulla, tulosjakoteksti } from "@/lib/korttinimi";
 import { useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type PointerEvent as RPointerEvent, type KeyboardEvent } from "react";
 import { getSupabase } from "@/lib/supabase";
 import { KL_SIVU, KL_YHTEYKSIA, KL_YRITYKSET, pariAvain, reittiPisteet, uusiReittiSiemen, type KlKartta, type KlKunta, type KlReitti } from "@/lib/kuntaliitos";
@@ -432,7 +432,6 @@ export default function ReittipeliClient({
     const h = q.toString();
     return h ? `${peli.sivu}?${h}` : peli.sivu;
   };
-  const maakuntaNimi = maakunnat.find((m) => m.tunnus === maakuntaTunnus)?.nimi ?? null;
   if (!reitti) return <Virhe peli={peli} uusi={() => location.assign(osoite(uusiReittiSiemen()))} />;
 
   // ── Siirrot ──
@@ -652,8 +651,9 @@ export default function ReittipeliClient({
     const tulos = `${tarkistettu.oikein}/${KL_YHTEYKSIA} rajaa`;
     const polku = osoite(siemen);
     const url = `${location.origin}${polku}${polku.includes("?") ? "&" : "?"}tulos=${tarkistettu.oikein}-${KL_YHTEYKSIA}`;
-    const nimi = otsikko ? `${peli.nimi}${peli.nimi.includes(":") ? " –" : ":"} ${otsikko} ${peli.pitkin}` : (paivanReitti ? `${peli.nimi}: ${reittiNimi.toLowerCase()}` : peli.nimi) + (maakuntaNimi ? ` (${maakuntaNimi})` : "");
-    const teksti = pelijakoteksti(nimi, `${tulos} oikein${onnistui ? (yritys === 1 ? " ensimmäisellä yrityksellä" : ` ${yritys}. yrityksellä`) : ""}`, onnistui);
+    /* Jakotekstit v4 (6.11.2026): nimi on reitti "Portugali → Viro"; löytynyt reitti kertoo yrityksen, muuten oikeat rajat. */
+    const nimi = `${ratkaisu[0]?.n ?? ""} → ${ratkaisu.at(-1)?.n ?? ""}`;
+    const teksti = tulosjakoteksti(nimi, onnistui ? `löysin reitin ${jarjestysluvulla(yritys)} yrityksellä` : `sain ${tulos} oikein`);
     return (
       <div className={`kl ${peli.luokka} kl--tulos ${runkoCond.variable}`} data-iho="kerma">
         {palkki}

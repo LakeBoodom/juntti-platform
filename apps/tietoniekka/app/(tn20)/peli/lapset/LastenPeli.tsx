@@ -25,6 +25,7 @@ import type { LastenKortti, LastenKysymys, LastenVisa } from "@/lib/lapset/data"
 import { arvoKlippi, valijuontoUrl, VALIJUONNOT, type Juontaja } from "@/lib/lapset/valijuonnot";
 import { IKA_MERKKI, JUONTAJA_ABL, JUONTAJA_NIMI, LASTEN_AIHEET, juontajaKuvat, type Tunnelma } from "@/lib/lapset/juontajat";
 import { getSupabase } from "@/lib/supabase";
+import { jaaPeliTeksti, jakoviesti } from "@/lib/korttinimi";
 
 type Vaihe = "intro" | "peli" | "tulos";
 type Laji = "intro" | "kysymys" | "vihje" | "vinkit-loppu" | "reaktio" | "viimeinen" | "tiesitko" | "tulos";
@@ -346,11 +347,11 @@ export default function LastenPeli({ visa, muut, takaisin, paketti = null }: {
 
   const jaa = async () => {
     const url = `${window.location.origin}/visa/${visa.slug}`;
-    const teksti = `Pelasimme ${visa.otsikko} -visan Tietoniekassa. Pelaa sinäkin!`;
+    const teksti = jaaPeliTeksti(visa.otsikko); // jakotekstit v4 (6.11.2026)
     try {
       if (navigator.share) { await navigator.share({ title: visa.otsikko, text: teksti, url }); return; }
     } catch { return; }
-    try { await navigator.clipboard.writeText(`${teksti} ${url}`); setJaettu("Linkki kopioitu"); } catch { /* */ }
+    try { await navigator.clipboard.writeText(jakoviesti(teksti, url)); setJaettu("Linkki kopioitu"); } catch { /* */ }
   };
 
   /* ── Näkymän osat ─────────────────────────────────────────────── */

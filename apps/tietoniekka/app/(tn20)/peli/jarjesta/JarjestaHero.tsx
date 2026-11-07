@@ -9,7 +9,7 @@ import { RankingCard, type RankingCardState } from "@/components/tn20/RankingCar
 import { ReorderableChainList } from "@/components/tn20/ReorderableChainList";
 import { useRiviPaljastus } from "@/components/tn20/RevealSequencer";
 import RiviJatko from "@/components/tn20/jarjesta/RiviJatko";
-import { pelijakoteksti } from "@/lib/korttinimi";
+import { tulosjakoteksti } from "@/lib/korttinimi";
 import { oikeaJarjestys, type JarjestysKohde } from "@/lib/jarjesta/pakat";
 import { arvioi, pisteet } from "@/lib/jarjesta/pisteytys";
 import { VAIHTO_OHJE, vuosiTaiPaiva } from "@/lib/jarjesta/rivi";
@@ -123,7 +123,7 @@ export default function JarjestaHero({
 
   const jakoTiedot = () => ({
     url: `${location.origin}${href}?kohteet=${rivi.map((k) => k.id).join(",")}&tulos=${tulos.correctCount}-${tulos.totalCount}`,
-    teksti: pelijakoteksti(`Järjestä: ${jakoNimi}`, `${tulos.correctCount}/${tulos.totalCount} oikealla paikalla`, tulos.correctCount === tulos.totalCount),
+    teksti: tulosjakoteksti(jakoNimi, `sain ${tulos.correctCount}/${tulos.totalCount} oikeille paikoille`),
     natiiviOtsikko: "Järjestä",
   });
 

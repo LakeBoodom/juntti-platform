@@ -37,7 +37,7 @@ import { lueViikkoTulos, tallennaViikkoTulos, type ViikkoInfo, type ViikkoTulos 
 import type { KollaasiKuva } from "../../../lib/kuvavisat2026";
 import { igAvaus, igValmis } from "../../../lib/igMittaus";
 import "../peli2026.css";
-import { lyhennettyNimi, jakoteksti, vastahaasteteksti } from "@/lib/korttinimi";
+import { lyhennettyNimi, tulosjakoteksti, vastahaasteteksti } from "@/lib/korttinimi";
 import { valitseKorttikysymys, kysymysLinkki } from "@/lib/kysymyskortti";
 import type { Jakokanava } from "@/components/tn20/jako/Jakoalue";
 import TulosNakyma from "@/components/tn20/tulos/TulosNakyma";
@@ -939,9 +939,9 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
     : quiz.challengePath.startsWith("/visa/") ? `?tulos=${right}-${total}`
     : quiz.challengePath.startsWith("/peli?mega=") ? `&tulos=${right}-${total}` : "";
   const challengeUrl = haasteKoodi ? `${origin}/h/${haasteKoodi}` : `${origin}${quiz.challengePath}${tulosParam}`;
-  /* Vaihe C (22.10.2026): "{korttinimi} – sain n/10 Tietoniekassa: {tasonimi}. Pystytkö parempaan?" (täydet: "samaan"),
-     vastahaaste kuten vaiheessa A. Ei emojeita. Nimi = quizzes.korttinimi ?? lyhennetty title (page.tsx → jakoNimi);
-     viikkovisalla "Viikkovisa 38 · Kuvat". Tasonimi vain aihekohtaisista fanitasoista (fanitaso alla). */
+  /* Jakotekstit v4 (6.11.2026): "{korttinimi}: sain 7/10 oikein. Kokeile itse:" (kuvavisa "tunnistin 7/10"), vastahaaste
+     "Minä 7/10, sinä 6/10. Uusi kierros?". Nimi = quizzes.korttinimi ?? lyhennetty title (page.tsx → jakoNimi);
+     viikkovisalla "Viikkovisa 38 · Kuvat". */
   const jakoNimi = quiz.jakoNimi ?? lyhennettyNimi(quiz.title);
   const linkReady = !!quiz.challengePath;
   const jakoUrl = linkReady ? challengeUrl : null;
@@ -993,8 +993,8 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
   const korttiK = done ? valitseKorttikysymys(questions, hist, right === total) : null;
   const fbUrl = jakoUrl && korttiK && (jakoUrl.includes("/visa/") || jakoUrl.includes("/h/")) ? kysymysLinkki(jakoUrl, korttiK) : jakoUrl;
   const shareText = quiz.haaste && done
-    ? vastahaasteteksti(jakoNimi, right, total, quiz.haaste)
-    : jakoteksti(jakoNimi, right, total, fanitaso);
+    ? vastahaasteteksti(`${right}/${total}`, `${quiz.haaste.oikein}/${quiz.haaste.kysymyksia}`)
+    : tulosjakoteksti(jakoNimi, isKuva ? `tunnistin ${right}/${total}` : `sain ${right}/${total} oikein`);
 
   const openReview = (i: number, opener?: HTMLElement | null) => {
     if (review == null) openerRef.current = opener ?? (document.activeElement as HTMLElement | null);
