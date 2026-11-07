@@ -5,7 +5,7 @@
 // Osa C (31.10.2026): Järjestä-hubin pakka; hubista tultaessa (?aloita=1) ensimmäinen kierros tulee valmiina palvelimelta.
 // CD "Järjestä yhtenäinen UX" (Heikki 2.11.2026): yksi rivi paluulinkkinä, Korjaa rivi → Lukitse valintasi → Seuraava rivi.
 
-import { pelijakoteksti } from "@/lib/korttinimi";
+import { tulosjakoteksti } from "@/lib/korttinimi";
 import { useEffect, useMemo, useState } from "react";
 import { haeJarjestysKierros } from "@/lib/jarjesta/kierros";
 import {
@@ -93,7 +93,7 @@ export default function JarjestaClient({
      ja Facebookin og-kuvaus kertoo tuloksen. Tulosvaihe piirretään vain selaimessa. */
   const jakoTiedot = () => ({
     url: `${location.origin}${location.pathname}?kohteet=${(round ?? []).map((k) => k.id).join(",")}&tulos=${scoreResult?.correctCount ?? 0}-${scoreResult?.totalCount ?? 0}`,
-    teksti: pelijakoteksti(`${PELI}: ${pakka.kortti.otsikko}`, `${scoreResult?.correctCount ?? 0}/${scoreResult?.totalCount ?? 0} oikealla paikalla`, !!scoreResult && scoreResult.correctCount === scoreResult.totalCount),
+    teksti: tulosjakoteksti(pakka.kortti.otsikko, `sain ${scoreResult?.correctCount ?? 0}/${scoreResult?.totalCount ?? 0} oikeille paikoille`),
   });
 
   async function aloita() {

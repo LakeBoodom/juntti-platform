@@ -19,6 +19,7 @@ import {
   type AaniKysymys, type AaniTallenne, type AaniViikko, type KuvaKuplat,
 } from "@/lib/aanivisat";
 import { kirjaaPelimuotoPeli } from "@/lib/pelimuotoPelit";
+import { jakoviesti, tulosjakoteksti } from "@/lib/korttinimi";
 
 type Linkki = { otsikko: string; href: string };
 type Vaihe = "intro" | "peli" | "tulos";
@@ -292,7 +293,8 @@ export default function AanivisaClient({ viikko, jatka, sivu }: { viikko: AaniVi
     if (!uusi && autoRef.current) window.clearTimeout(autoRef.current);
   };
 
-  const jakoteksti = `Tunnistin ${oikein}/${N} ${ryhma.monikko} äänestä. Pystytkö parempaan?`;
+  /* Jakotekstit v4 (6.11.2026): "Suomen linnut: tunnistin 6/8. Kokeile itse:", osoite omalla rivillään. */
+  const jakoteksti = tulosjakoteksti(ryhma.otsikko, `tunnistin ${oikein}/${N}`);
   const jakoUrl = typeof window !== "undefined" ? `${window.location.origin}${sivu}` : sivu;
   const jaa = async () => {
     try {
@@ -302,7 +304,7 @@ export default function AanivisaClient({ viikko, jatka, sivu }: { viikko: AaniVi
       }
     } catch { return; }
     try {
-      await navigator.clipboard.writeText(`${jakoteksti} ${jakoUrl}`);
+      await navigator.clipboard.writeText(jakoviesti(jakoteksti, jakoUrl));
       setJaettu("Linkki kopioitu");
     } catch { setJaettu(null); }
   };
@@ -460,7 +462,7 @@ export default function AanivisaClient({ viikko, jatka, sivu }: { viikko: AaniVi
               <span className="av-jaa-sono"><MiniSono src={kysymykset[0].sono} /></span>
               <span>”{jakoteksti}”</span>
             </div>
-            <a className="av-jaa-wa" href={`https://wa.me/?text=${encodeURIComponent(`${jakoteksti} ${jakoUrl}`)}`} target="_blank" rel="noopener noreferrer">
+            <a className="av-jaa-wa" href={`https://wa.me/?text=${encodeURIComponent(jakoviesti(jakoteksti, jakoUrl))}`} target="_blank" rel="noopener noreferrer">
               Haasta WhatsAppissa
             </a>
             <div className="av-jaa-rivi">

@@ -2,10 +2,11 @@
 // JAKOALUE (Tulosnäkymä ja jakaminen, vaihe C, 22.10.2026) — yleiskäyttöinen: tietovisan tulosnäkymä (TulosNakyma)
 // ja pelimuodot (pelikehyksen PeliTulos, haasta-paikka). Kanavat: WhatsApp pääpainikkeena; hiirellä Facebook ja
 // Kopioi, kosketuslaitteilla "Jaa linkkinä" (navigator.share, Heikki 23.10.2026). Ei muita kanavanappeja.
-// Jakoteksti ilman osoitetta tulee kutsujalta (lib/korttinimi.ts: jakoteksti / vastahaasteteksti); osoite lisätään perään.
+// Jakoteksti ilman osoitetta tulee kutsujalta (lib/korttinimi.ts, jakotekstit v4); osoite lisätään omalle rivilleen.
 // Kanava kirjataan onJaettu-kutsulla (quiz_plays.share_channel, viimeisin kanava riittää).
 // UI-sääntö 9: ei selitelausetta otsikon alla.
 import { useEffect, useRef, useState } from "react";
+import { jakoviesti } from "@/lib/korttinimi";
 import "./jakoalue.css";
 
 export type Jakokanava = "whatsapp" | "facebook" | "kopioi" | "jaa";
@@ -32,7 +33,7 @@ export function useJako({ teksti, url, otsikko, onJaettu }: {
     if (ajastin.current) clearTimeout(ajastin.current);
     ajastin.current = setTimeout(() => setTila(null), 3000);
   };
-  const viesti = url ? `${teksti} ${url}` : teksti;
+  const viesti = url ? jakoviesti(teksti, url) : teksti;
   function kopioi() {
     if (!url) return;
     if (!navigator.clipboard?.writeText) { nayta("virhe"); return; }
