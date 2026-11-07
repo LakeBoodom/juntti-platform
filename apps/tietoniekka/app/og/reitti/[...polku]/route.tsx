@@ -17,13 +17,13 @@ import { join } from "node:path";
 import sharp from "sharp";
 import { helsinginPaiva } from "@/lib/aika";
 import { maanantai, viikonSiemen } from "@/lib/reittipeli/viikonReitit";
-import { REITTIPELIT, onReittipeli, reittiSiemenesta, type ReittipeliAvain } from "@/lib/reittipeli/kuvat";
-import { kuvalause, pelityyppi } from "@/lib/esikatselu";
+import { REITTIPELIT, onReittipeli, reitinKoukku, reittiSiemenesta, type ReittipeliAvain } from "@/lib/reittipeli/kuvat";
+import { pelityyppi } from "@/lib/esikatselu";
 
 export const runtime = "nodejs";
 
 const V = { maa: "#DCE6E8", ulko: "#EDF2F3", tausta: "#F3EFE6", taustaReuna: "#D8CFBD", paate: "#1B7F7F", navy: "#0E3657", kerma: "#FAF7F0", reuna: "#F5F0E6" };
-const POHJA = "#131109", KERMA = "#F5F0E6", KULTA = "#E8A320", TURKOOSI = "#2DD4BF", LIME = "#B6FF3C", HAALEA = "#CFC7B6";
+const POHJA = "#131109", KERMA = "#F5F0E6", KULTA = "#E8A320", TURKOOSI = "#2DD4BF", LIME = "#B6FF3C";
 
 let origin = "https://tietoniekka.fi";
 
@@ -171,9 +171,9 @@ async function jakokortti(peli: ReittipeliAvain, r: NonNullable<ReturnType<typeo
             <div style={{ display: "flex", flexWrap: "wrap" }}>{lahto}</div>
             <div style={{ display: "flex", flexWrap: "wrap" }}><span style={{ color: TURKOOSI, marginRight: 16 }}>→</span>{maali}</div>
           </div>
-          {r.otsikko && <div style={{ display: "flex", marginTop: 16, fontSize: 28, fontWeight: 700, lineHeight: 1.15, color: HAALEA }}>{r.otsikko}</div>}
-          <div style={{ display: "flex", marginTop: 26, fontFamily: "Barlow Condensed", fontWeight: 800, fontSize: 38, lineHeight: 1.02, textTransform: "uppercase", color: LIME }}>
-            {kuvalause(peli)}
+          {/* Koukku (v4 §4, vaihe 4) tehtävälauseen paikalla; viikon reitin koukku sisältää taivutetun otsikon. */}
+          <div style={{ display: "flex", marginTop: 26, fontFamily: "Barlow Condensed", fontWeight: 800, fontSize: 40, lineHeight: 1.05, color: LIME }}>
+            {reitinKoukku(peli, r)}
           </div>
           <div style={{ display: "flex", flexGrow: 1 }} />
           <div style={{ display: "flex", fontSize: 26, fontWeight: 800, color: KERMA }}>tietoniekka.fi</div>

@@ -6,6 +6,7 @@
 // Tavallinen moduuli: käytetään sekä palvelimella että clientillä.
 
 import { JULKAISTUT, pakkaHref, type Pakka } from "./pakat";
+import type { KasinKoukku } from "@/lib/koukku";
 
 export const HUB_HREF = "/peli/jarjesta";
 export const HUB = { href: HUB_HREF, nimi: "Järjestä" };
@@ -27,7 +28,7 @@ export type HubPakka = {
   href: string;
 };
 
-export type IkaPakka = HubPakka & { kategoria: string; kuvaus: string; pelilause: string };
+export type IkaPakka = HubPakka & { kategoria: string; kuvaus: string; pelilause: string; koukku?: KasinKoukku };
 
 /* Hubin pyörylät: omat kopiot (henkilokuvat.ts), krediitit henkilokuvalahteet.ts → /kuvien-lahteet. */
 const SELANNE = "/20/henkilot/k/teemu-selanne-on-the-ice-november-2010-8f51e8.webp";
@@ -48,10 +49,11 @@ export const HENKILOPAKKA: IkaPakka = {
   href: `${HUB_HREF}/tunnetut-suomalaiset`,
   kuvaus: "Aseta kahdeksan tunnettua henkilöä syntymävuoden mukaan vanhimmasta nuorimpaan.",
   pelilause: "Suomalaiset syntymävuoden mukaan, vanhin ensin.",
+  koukku: { kysymys: "Kumpi syntyi ensin?", vaihtoehdot: ["Sauli Niinistö", "Tarja Halonen"] },
 };
 
 /** Alan pakka: sivuston henkilöryhmä, vain suomalaiset. Media, vaikuttajat ja poliitikot vain Kaikki alat -pakassa (CD 4a). */
-const alanPakka = (slug: string, nimi: string, kohde: string, kuva: string): IkaPakka => ({
+const alanPakka = (slug: string, nimi: string, kohde: string, kuva: string, koukku: KasinKoukku): IkaPakka => ({
   slug,
   kategoria: `suomalaiset:${slug}`,
   nimi,
@@ -60,13 +62,15 @@ const alanPakka = (slug: string, nimi: string, kohde: string, kuva: string): Ika
   href: `${HUB_HREF}/${slug}`,
   kuvaus: `Aseta kahdeksan tunnettua suomalaista ${kohde} syntymävuoden mukaan vanhimmasta nuorimpaan.`,
   pelilause: `${nimi} syntymävuoden mukaan, vanhin ensin.`,
+  koukku,
 });
 
 export const IKA_PAKAT: IkaPakka[] = [
-  alanPakka("urheilijat", "Urheilijat", "urheilijaa", SELANNE),
-  alanPakka("muusikot", "Muusikot", "muusikkoa", TAHKA),
-  alanPakka("nayttelijat", "Näyttelijät", "näyttelijää", SALMINEN),
-  alanPakka("kirjailijat", "Kirjailijat", "kirjailijaa", OKSANEN),
+  /* Koukut (v4 §4, vaihe 4): syntymäpäivät tarkistettu celebrities-taulusta 7.11.2026. */
+  alanPakka("urheilijat", "Urheilijat", "urheilijaa", SELANNE, { kysymys: "Kumpi syntyi ensin?", vaihtoehdot: ["Jari Litmanen", "Teemu Selänne"] }),
+  alanPakka("muusikot", "Muusikot", "muusikkoa", TAHKA, { kysymys: "Kumpi syntyi ensin?", vaihtoehdot: ["Arja Koriseva", "Jari Sillanpää"] }),
+  alanPakka("nayttelijat", "Näyttelijät", "näyttelijää", SALMINEN, { kysymys: "Kumpi syntyi ensin?", vaihtoehdot: ["Laura Malmivaara", "Peter Franzén"] }),
+  alanPakka("kirjailijat", "Kirjailijat", "kirjailijaa", OKSANEN, { kysymys: "Kumpi syntyi ensin?", vaihtoehdot: ["Jari Tervo", "Kari Hotakainen"] }),
   HENKILOPAKKA,
 ];
 
