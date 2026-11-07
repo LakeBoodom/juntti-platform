@@ -145,8 +145,8 @@ async function haePaikkakunnanVisat(slugit: string[]): Promise<VisaRivi[]> {
 /* ── Henkilöt ──────────────────────────────────────────────────────────────────────────────────────────── */
 
 export type KaupunkiHenkilo = { name: string; href: string; image_url: string | null };
-/** Henkilöosio näkyy vasta kolmella (Heikki 7.11.2026); enintään 8. */
-export const HENKILOT_MIN = 3;
+/** Henkilöosio näkyy jo yhdellä henkilöllä (Heikki 7.11.2026: yksikin auttaa pientä kaupunkia); enintään 8. */
+export const HENKILOT_MIN = 1;
 export const HENKILOT_MAX = 8;
 
 async function haeSyntyneet(k: Kaupunki): Promise<KaupunkiHenkilo[]> {

@@ -54,10 +54,12 @@ export default async function KaupunkilistaPage() {
         <div className="tn-seo-in">
           <a href="/">Etusivu</a>
           <span aria-hidden="true"> / </span>
-          <span aria-current="page">Kaupungit</span>
+          <a href="/kokoelma/kaupungit">Suomen kaupungit</a>
+          <span aria-hidden="true"> / </span>
+          <span aria-current="page">Kaupungit A–Ö</span>
         </div>
       </nav>
-      <JsonLd data={breadcrumbLd([{ name: "Etusivu", url: "/" }, { name: "Kaupungit" }])} />
+      <JsonLd data={breadcrumbLd([{ name: "Etusivu", url: "/" }, { name: "Suomen kaupungit", url: "/kokoelma/kaupungit" }, { name: "Kaupungit A–Ö" }])} />
       <JsonLd
         data={{
           "@context": "https://schema.org",

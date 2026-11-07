@@ -11,9 +11,20 @@ import { JsonLd, abs, breadcrumbLd } from "@/lib/jsonLd";
 import { jakoMeta } from "@/lib/jakoMeta";
 import { heroFokus } from "@/lib/herotila";
 import {
-  KAUPUNGIT_LISTA, archivoEm, haeKaupunkisivu, pisimmanSananEm, tunnusriviNakyviin, kaupunginKoukku, kaupunkiHref, type KaupunkiVisa, type Kaupunkisivu,
+  archivoEm, haeKaupunkisivu, pisimmanSananEm, tunnusriviNakyviin, kaupunginKoukku, kaupunkiHref, type KaupunkiVisa, type Kaupunkisivu,
 } from "@/lib/kaupunkisivu";
 import SukulaisLaatat from "@/components/tn20/hub/SukulaisLaatat";
+import { KAUPUNGIT } from "@/lib/kaupungit";
+import { KAUPUNGIT_KOKOELMA } from "@/lib/kokoelmat/kaupungit";
+
+/* Murupolku Suomen kaupungit -hubiin ja kaupungin alueen osioon (Heikki 7.11.2026: kaupunkisivu ei korvaa hubia,
+   vaan on sen alasivu): Etusivu › Suomen kaupungit › Savo ja Karjala › Mikkeli. */
+const HUB = "/kokoelma/kaupungit";
+function alue(slug: string): { nimi: string; href: string } | null {
+  const region = KAUPUNGIT.find((k) => k.id === slug)?.region;
+  const osio = region ? KAUPUNGIT_KOKOELMA.sections.find((s) => s.title === region) : undefined;
+  return region && osio ? { nimi: region, href: `${HUB}#osio-${osio.slug}` } : null;
+}
 import KaupunkiJako from "../KaupunkiJako";
 import "../../henkilo.css";
 import "../kaupunki.css";
@@ -89,6 +100,7 @@ export default async function KaupunkiPage({ params }: Props) {
   /* Kaupunkikuvista on 800 px:n kopio kansiossa k/ (kokoelmakortit); 1600 px:n alkuperäinen leveille näytöille. */
   const pieni = k.hero_kuva?.match(/^\/20\/kaupungit\/([a-z]+)\.webp$/) ? k.hero_kuva.replace("/20/kaupungit/", "/20/kaupungit/k/") : null;
   const korttinimi = k.korttinimi ?? k.nimi;
+  const a = alue(k.slug);
   const visat = [...(visa ? [visa] : []), ...(s.kausinosto ? [s.kausinosto] : []), ...s.ryhmat.flatMap((g) => g.visat)];
 
   return (
@@ -170,7 +182,7 @@ export default async function KaupunkiPage({ params }: Props) {
       {s.henkilot.length > 0 && (
         <div className="ks-osio ks-henkilot">
           {/* "Kaikki →" puuttuu: henkilöhakemistoa ei voi suodattaa syntymäpaikalla (brief §1.3, raportoitu). */}
-          <SukulaisLaatat otsikko={`${k.inessiivi} syntyneitä`} laatat={s.henkilot.map((h) => ({ ...h, ala: "" }))} />
+          <SukulaisLaatat otsikko={`${k.inessiivi} ${s.henkilot.length === 1 ? "syntynyt" : "syntyneitä"}`} laatat={s.henkilot.map((h) => ({ ...h, ala: "" }))} />
         </div>
       )}
 
@@ -182,12 +194,18 @@ export default async function KaupunkiPage({ params }: Props) {
         <div className="tn-seo-in">
           <a href="/">Etusivu</a>
           <span aria-hidden="true"> / </span>
-          <a href={KAUPUNGIT_LISTA}>Kaupungit</a>
+          <a href={HUB}>{KAUPUNGIT_KOKOELMA.nimi}</a>
           <span aria-hidden="true"> / </span>
+          {a && (
+            <>
+              <a href={a.href}>{a.nimi}</a>
+              <span aria-hidden="true"> / </span>
+            </>
+          )}
           <span aria-current="page">{k.nimi}</span>
         </div>
       </nav>
-      <JsonLd data={breadcrumbLd([{ name: "Etusivu", url: "/" }, { name: "Kaupungit", url: KAUPUNGIT_LISTA }, { name: k.nimi }])} />
+      <JsonLd data={breadcrumbLd([{ name: "Etusivu", url: "/" }, { name: KAUPUNGIT_KOKOELMA.nimi, url: HUB }, ...(a ? [{ name: a.nimi, url: a.href }] : []), { name: k.nimi }])} />
       <JsonLd
         data={{
           "@context": "https://schema.org",
