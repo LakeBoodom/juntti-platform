@@ -1,6 +1,6 @@
 // KOUKKUKYSYMYS (Jakotekstit v4 §4, vaihe 2): tietovisan ja megavisan esikatselukortin kysymys valitaan visan omista
 // kysymyksistä palvelimella, joten sama koukku näkyy kuvassa, og:descriptionissa ja Facebookin kortissa.
-// Kannassa ei ole vielä koukkukysymys-kenttää (vaihe 4). Valinta on deterministinen:
+// Valinta on deterministinen (käsin valitut koukut muille pelimuodoille: KasinKoukku alla, vaihe 4):
 //   1) etusivun Tiesitkö?-poolin kysymys (questions.hook), 2) keskivaikea taso (3, sitten 4, 2, 5, 1),
 //   3) lähimpänä visan keskikohtaa (ensimmäinen kysymys on usein lämmittely), 4) id.
 // Ehdot: ≤ 75 merkkiä, 2–4 vaihtoehtoa ≤ 28 merkkiä, ei ääntä eikä kuvaa (kuvaa ei näytetä kortissa).
