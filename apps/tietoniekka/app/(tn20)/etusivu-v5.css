@@ -172,62 +172,42 @@
 /* 320 px: kuva 132 → 112 px, jotta iälle ja nimelle jää tilaa (nappi rivittyy, mitattu 31.10.: 0 ylivuotoa Chromium + WebKit). */
 @media (max-width: 359px) { .tn20 .tn-es-synt { grid-template-columns: 112px minmax(0, 1fr); } }
 
-/* Mikä maa? -banneri (CD "Tietoniekka - Mika maa bannerit" 1a, Heikki 8.11.2026): laivastonsininen, päivän vihje 1
-   otsikkona, kohdistin ja keksitty maa oikealla/ylhäällä. Asettelu kontin leveydestä: < 560 mobiili (CD 358 × 440),
-   560–999 tabletti (CD 720 × 300), ≥ 1000 desktop (CD 1200 × 360). Korkeus on min-height, joten pitkä vihje kasvattaa
-   banneria eikä leikkaudu. Teksti ei mene maan päälle: mobiilissa teksti alkaa kuvan alta, leveämmissä kuva on
-   tekstipalstan oikealla puolella.
+/* Mikä maa? -paikka (CD "Tietoniekka - Mika maa bannerit" 1a sovitettuna Päivän pelien kolmanteen paikkaan, Heikki
+   8.11.2026): laivastonsininen, päivän vihje 1 otsikkona, kohdistin ja keksitty maa. Kortin leveydestä: < 400 px
+   kohdistin oikeassa yläkulmassa ja teksti sen alla (mobiili), ≥ 400 px kohdistin oikealla ja teksti vasemmassa
+   58 %:n palstassa (desktopin sivupalsta 431 px, tabletti koko leveys). Teksti ei koskaan mene maan päälle (mitattu).
    KORTTISÄÄNTÖ (mitattu 8.11.2026 Range-menetelmällä): vihjeen pisin sana lainausmerkkeineen ≤ 0,49 em/merkki
-   (Archivo Variable 800, wdth 88) → min(CD, 168cqi / --lw) = 0,95 / 0,565 (13 % varaa); CD:n koot 28/30/44 px, yli
-   50 merkkiä 24/26/36 px. "MIKÄ MAA?" 4,4 em (ei rivity) → mobiili/tabletti min(56px, 20cqi), desktop samalla rivillä
-   CTA:n kanssa min(76px, 13cqi). 0 ylivuotoa 320–2450 px pisimmillä vihjeillä (SRB, QAT, MYS). */
-.tn20 .tn-es-mmb-paikka { container: mmb / inline-size; }
+   (Archivo Variable 800, wdth 88) → min(koko, 168cqi / --lw) = 0,95 / 0,565 (13 % varaa) tekstipalstan omassa
+   säiliössä. 0 ylivuotoa 320–2450 px pisimmillä vihjeillä (SRB, QAT, MYS), Chromium + WebKit. */
+.tn20 .tn-es-mmb-paikka { container: mmb / inline-size; display: flex; }
 .tn20 .tn-es-mmb {
-  position: relative; display: flex; flex-direction: column; justify-content: flex-end; min-height: 440px; box-sizing: border-box;
-  border-radius: 22px; overflow: hidden; background: #0E3A5C; color: #F2EDE2;
+  position: relative; flex: 1 1 auto; display: flex; flex-direction: column; justify-content: flex-end; box-sizing: border-box;
+  border-radius: 18px; overflow: hidden; background: #0E3A5C; color: #F2EDE2;
   transition: transform var(--dur-fast, 120ms) var(--ease-standard, ease);
 }
 @media (hover: hover) { .tn20 a.tn-es-mmb:hover { transform: translateY(-2px); } }
-.tn20 .tn-es-mmb-kuva { position: absolute; width: 380px; height: 380px; right: -110px; top: -100px; }
+.tn20 .tn-es-mmb-kuva { position: absolute; width: 240px; height: 240px; right: -64px; top: -64px; }
 .tn20 .tn-es-mmb-teksti {
-  position: relative; container: mmbt / inline-size; display: flex; flex-direction: column; gap: 12px;
-  margin-top: 190px; padding: 0 22px 22px;
+  position: relative; container: mmbt / inline-size; display: flex; flex-direction: column; gap: 10px;
+  margin-top: 112px; padding: 0 18px 18px;
 }
-.tn20 .tn-es-mmb-kicker { font-size: 12px; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; color: #A9C7DD; }
+.tn20 .tn-es-mmb-kicker { font-size: 12px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; color: #A9C7DD; }
 .tn20 .tn-es-mmb-vihje {
-  font-family: var(--es-display); font-weight: 800; font-variation-settings: "wdth" 88; line-height: 1.06; letter-spacing: -.01em;
-  font-size: min(28px, calc(168cqi / var(--lw))); overflow-wrap: normal; word-break: keep-all; text-wrap: balance;
+  font-family: var(--es-display); font-weight: 800; font-variation-settings: "wdth" 88; line-height: 1.08; letter-spacing: -.01em;
+  font-size: min(24px, calc(168cqi / var(--lw))); overflow-wrap: normal; word-break: keep-all; text-wrap: balance;
 }
-.tn20 .tn-es-mmb-vihje[data-pitka] { font-size: min(24px, calc(168cqi / var(--lw))); }
-.tn20 .tn-es-mmb-ala { display: flex; flex-direction: column; align-items: flex-start; gap: 16px; }
-.tn20 .tn-es-mmb-nimi {
-  font-family: var(--es-display); font-weight: 900; font-variation-settings: "wdth" 68; line-height: .86; letter-spacing: -.02em;
-  text-transform: uppercase; white-space: nowrap; font-size: min(56px, 20cqi);
+.tn20 .tn-es-mmb-vihje[data-pitka] { font-size: min(21px, calc(168cqi / var(--lw))); }
+.tn20 .tn-es-mmb-nappi { margin-top: 4px; border: 1.5px solid #F2EDE2; color: #F2EDE2; }
+@container mmb (min-width: 400px) {
+  .tn20 .tn-es-mmb { justify-content: center; min-height: 220px; }
+  .tn20 .tn-es-mmb-kuva { width: 300px; height: 300px; right: -90px; top: calc(50% - 150px); }
+  .tn20 .tn-es-mmb-teksti { width: 58%; box-sizing: border-box; gap: 12px; margin: 0; padding: 24px 0 24px 26px; }
 }
-.tn20 .tn-es-mmb-cta {
-  display: flex; align-items: center; justify-content: center; align-self: stretch; height: 52px; padding: 0 24px; border-radius: 999px;
-  background: var(--es-lime); color: #131109; font-family: var(--es-display); font-weight: 900; font-variation-settings: "wdth" 86;
-  font-size: 16px; text-transform: uppercase; white-space: nowrap;
-}
-@container mmb (min-width: 560px) {
-  .tn20 .tn-es-mmb { justify-content: center; min-height: 300px; }
-  .tn20 .tn-es-mmb-kuva { width: 440px; height: 440px; right: -120px; top: -70px; }
-  .tn20 .tn-es-mmb-teksti { width: 61%; box-sizing: border-box; gap: 14px; margin: 0; padding: 32px 0 32px 40px; }
+@container mmb (min-width: 640px) {
+  .tn20 .tn-es-mmb-kuva { width: 360px; height: 360px; right: -80px; top: calc(50% - 180px); }
+  .tn20 .tn-es-mmb-teksti { padding: 32px 0 32px 36px; }
   .tn20 .tn-es-mmb-vihje { font-size: min(30px, calc(168cqi / var(--lw))); }
   .tn20 .tn-es-mmb-vihje[data-pitka] { font-size: min(26px, calc(168cqi / var(--lw))); }
-  .tn20 .tn-es-mmb-ala { gap: 18px; }
-  .tn20 .tn-es-mmb-cta { align-self: flex-start; height: 48px; padding: 0 22px; font-size: 15px; }
-}
-@container mmb (min-width: 1000px) {
-  .tn20 .tn-es-mmb { min-height: 360px; border-radius: 24px; }
-  .tn20 .tn-es-mmb-kuva { width: 620px; height: 620px; right: -40px; top: -130px; }
-  .tn20 .tn-es-mmb-teksti { width: 55%; gap: 18px; padding: 40px 0 40px 64px; }
-  .tn20 .tn-es-mmb-kicker { font-size: 14px; }
-  .tn20 .tn-es-mmb-vihje { font-size: min(44px, calc(168cqi / var(--lw))); line-height: 1.04; letter-spacing: -.015em; }
-  .tn20 .tn-es-mmb-vihje[data-pitka] { font-size: min(36px, calc(168cqi / var(--lw))); }
-  .tn20 .tn-es-mmb-ala { flex-direction: row; align-items: center; gap: 24px; }
-  .tn20 .tn-es-mmb-nimi { font-size: min(76px, 13cqi); }
-  .tn20 .tn-es-mmb-cta { height: 56px; padding: 0 26px; font-size: 17px; }
 }
 
 /* ── 2 Tiesitkö? ── */

@@ -111,15 +111,19 @@
 }
 .tn20 .mm-ehdotukset li { display: flex; align-items: center; min-height: 48px; padding: 0 14px; border-radius: 10px; font-size: 18px; font-weight: 600; color: var(--mm-teksti); cursor: pointer; }
 .tn20 .mm-ehdotukset li[aria-selected="true"], .tn20 .mm-ehdotukset li:hover { background: #f4eee2; }
+.tn20 .mm-viimeinen { margin: 0; padding: 12px 14px; border-radius: 14px; background: #fbe7e1; box-shadow: inset 0 0 0 1.5px var(--mm-terra); font-size: 15px; line-height: 1.4; color: var(--mm-teksti); }
+.tn20 .mm-viimeinen b { color: var(--mm-vaara); }
 .tn20 .mm-viesti { margin: 0; min-height: 20px; font-size: 14px; font-weight: 600; color: var(--mm-heikko); }
 
 /* ── Tulos ───────────────────────────────────── */
-.tn20 .mm-main--tulos { gap: 28px; padding: 20px 16px 24px; }
-.tn20 .mm-tulos-yla { display: flex; flex-direction: column; align-items: stretch; gap: 28px; }
-.tn20 .mm-tulos-vasen { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; gap: 18px; }
+/* Pelikehyksen .pk-tulos (Heikki 8.11.: sama jakoalue kuin muissa peleissä, kermaisella iholla vaalea kortti).
+   Yksi palsta kaikilla leveyksillä: jako pelin alla, ei oikeassa palstassa (Heikki 8.11. kohta 3). */
+.tn20 .pk-tulos.mm-lopetus { display: flex; flex-direction: column; align-items: stretch; gap: 24px; }
+.tn20 .pk-tulos.mm-lopetus > .tn-jako { width: 100%; max-width: 560px; position: static; }
 .tn20 .mm-tulos-otsake { display: flex; flex-direction: column; gap: 8px; container: mm-otsake / inline-size; }
+.tn20 .mm-iso-alku { flex: 1 0 100%; font-family: "Barlow Condensed", sans-serif; font-weight: 800; font-size: 26px; line-height: 1; text-transform: uppercase; color: var(--mm-ok); }
 .tn20 .mm-eyebrow { margin: 0; font-family: var(--rk-cond-font, "Barlow Condensed"), "Barlow Condensed", sans-serif; font-weight: 700; font-size: 14px; letter-spacing: .18em; text-transform: uppercase; color: var(--mm-ok); }
-.tn20 .mm-iso { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 14px; margin: 0; padding-top: 6px; }
+.tn20 .mm-iso { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px 14px; margin: 0; padding-top: 6px; font-weight: inherit; }
 .tn20 .mm-iso-luku { font-family: var(--mm-display); font-weight: 900; font-variation-settings: "wdth" 68; font-size: 96px; line-height: .82; letter-spacing: -.03em; color: var(--mm-navy); }
 .tn20 .mm-iso-yks { font-family: "Barlow Condensed", sans-serif; font-weight: 800; font-size: 34px; line-height: 1; text-transform: uppercase; color: var(--mm-navy); }
 /* Maan nimi (0 pistettä): CD 80/136 px. Mitattu 7.11.: Archivo Variable 900 wdth 68 versaalina 0,47 em/merkki, "DOMINIKAANINEN" 0,57 em
@@ -154,11 +158,9 @@
 .tn20 .mm-polku .mm-km { font-size: 14px; }
 .tn20 .mm-polku .mm-nuoli { width: 24px; height: 24px; }
 .tn20 .mm-polku .mm-nuoli svg { stroke-width: 3; }
-.tn20 .mm-jako { flex: none; width: 100%; box-sizing: border-box; }
 .tn20 .mm-kaikki { display: flex; flex-direction: column; gap: 8px; }
 .tn20 .mm-kaikki ol { margin: 0; padding-left: 22px; display: flex; flex-direction: column; gap: 6px; font-size: 16px; line-height: 1.45; color: var(--mm-teksti); }
-.tn20 .mm-linkit { margin-top: -8px; }
-/* Arvo uusi maa (Heikki 8.11.): toissijainen pilleri — lime on Jakoalueen ja pelin Arvaa-napin. */
+/* Arvo uusi maa (Heikki 8.11.): toissijainen pilleri — lime on pelin Arvaa-napin. */
 .tn20 .mm-uusi-maa {
   align-self: flex-start; display: inline-flex; align-items: center; justify-content: center; min-height: 52px; padding: 0 28px;
   border: 2px solid var(--mm-navy); border-radius: 999px; background: var(--mm-navy); color: #f2ede2; cursor: pointer;
@@ -190,14 +192,12 @@
   .tn20 .mm-rivit .mm-nuoli { width: 36px; height: 36px; }
   .tn20 .mm-ehdotukset { bottom: auto; top: calc(100% + 6px); }
 
-  .tn20 .mm-main--tulos { gap: 40px; padding: 48px 72px 40px; }
-  .tn20 .mm-tulos-yla { flex-direction: row; align-items: flex-start; gap: 48px; }
   .tn20 .mm-tulos-kortit { flex-direction: row; }
   .tn20 .mm-iso-luku { font-size: 136px; }
   .tn20 .mm-iso-yks { font-size: 48px; }
   .tn20 .mm-iso-nimi { font-size: min(136px, calc(165cqi / var(--mm-len, 8))); }
   .tn20 .mm-maakortti-nimi { font-size: min(48px, calc(150cqi / var(--mm-len, 8))); }
-  .tn20 .mm-jako { width: 440px; }
+  .tn20 .mm-iso-alku { font-size: 36px; }
 }
 
 /* ── Virhe ───────────────────────────────────── */

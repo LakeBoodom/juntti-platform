@@ -54,8 +54,7 @@ function PaivanPelit({ d }: { d: D }) {
       </div>
       <div className="tn-es-pp-ruudukko">
         {visa && <PaivanVisaV5 k={visa} />}
-        {/* Mikä maa? on 8.11. alkaen oma banneri ruudukon alla (CD 1a), joten sivupalstassa on vain Synttärit. */}
-        <div className="tn-es-pp-sivu" data-yksi="">
+        <div className="tn-es-pp-sivu" data-yksi={!mikaMaa || undefined}>
           {/* Synttärit A (v7 1b): iso ikä täyttää oikean puolen. Muistopäivänä "vuotta syntymästä".
               Nappi nimeää visan (31.10.); U+200B yhdysmerkin jälkeen, koska Safari ei katkaise siitä keep-all-tilassa. */}
           {sankari && (
@@ -78,9 +77,9 @@ function PaivanPelit({ d }: { d: D }) {
               </span>
             </a>
           )}
+          {mikaMaa && <MikaMaaBanneri href={mikaMaa.href} vihje={mikaMaa.vihje} />}
         </div>
       </div>
-      {mikaMaa && <MikaMaaBanneri href={mikaMaa.href} vihje={mikaMaa.vihje} />}
     </section>
   );
 }

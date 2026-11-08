@@ -1,8 +1,10 @@
-// Etusivu — Mikä maa? -banneri (CD "Tietoniekka - Mika maa bannerit" 1a "Kohdistin · päivän vihje otsikkona", Heikki 8.11.2026).
-// Päivän vihje 1 otsikkona, joten banneri vaihtuu päivittäin ilman kuvatuotantoa. Sama keksitty maa ja kohdistin kuin
-// pelin tunnuksessa (MikaMaaTunnus). Kolme asettelua kontin leveydestä (CD: mobiili 358 × 440, tabletti 720 × 300,
-// desktop 1200 × 360). Yli 50 merkin vihjeellä koko pienenee yhden portaan (CD). CTA "Arvaa maa" (CD:n "Pelaa Mikä maa?"
-// toistaisi nimen heti vieressä). CSS: app/(tn20)/etusivu-v5.css, luokat .tn-es-mmb-*.
+// Etusivu — Päivän pelit, Mikä maa? -paikka (CD "Tietoniekka - Mika maa bannerit" 1a "Kohdistin · päivän vihje otsikkona",
+// sovitettu Päivän pelien kolmanteen paikkaan, Heikki 8.11.2026: asettelu pysyy sovittuna — Päivän visa vasemmalla,
+// Synttärit ja Mikä maa? oikealla allekkain; mobiilissa kaikki allekkain). Päivän vihje 1 otsikkona, joten kortti vaihtuu
+// päivittäin ilman kuvatuotantoa. Sama keksitty maa ja kohdistin kuin pelin tunnuksessa (MikaMaaTunnus). Kaksi asettelua
+// kortin leveydestä: kapea (kohdistin oikeassa yläkulmassa, teksti alla, kuten CD 1a mobiili) ja leveä (kohdistin oikealla,
+// teksti vasemmalla). Yli 50 merkin vihjeellä koko pienenee yhden portaan (CD). Nappi ääriviivana kuten Synttäreissä —
+// lime on Päivän visan. CSS: app/(tn20)/etusivu-v5.css, luokat .tn-es-mmb-*.
 import type { CSSProperties } from "react";
 import { MAA } from "@/components/tn20/vihjepeli/MikaMaaTunnus";
 
@@ -31,16 +33,13 @@ export default function MikaMaaBanneri({ href, vihje }: { href: string; vihje: s
           <text x={200} y={212} textAnchor="middle" fontFamily="Archivo Variable, Archivo, sans-serif" fontWeight={900} fontSize={34} fill="#0E3A5C">?</text>
         </svg>
         <span className="tn-es-mmb-teksti">
-          <span className="tn-es-mmb-kicker">Päivän maa</span>
+          <span className="tn-es-mmb-kicker">Mikä maa?</span>
           {otsikko && (
             <span className="tn-es-mmb-vihje" data-pitka={vihje!.length > 50 ? "" : undefined} style={{ "--lw": pisin(otsikko) } as CSSProperties}>
               {otsikko}
             </span>
           )}
-          <span className="tn-es-mmb-ala">
-            <span className="tn-es-mmb-nimi">Mikä maa?</span>
-            <span className="tn-es-mmb-cta">Arvaa maa</span>
-          </span>
+          <span className="tn-es-nappi tn-es-mmb-nappi">Arvaa päivän maa</span>
         </span>
       </a>
     </div>
