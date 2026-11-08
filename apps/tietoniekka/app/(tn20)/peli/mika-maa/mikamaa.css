@@ -37,7 +37,8 @@
 
 /* ── Otsikkorivi: nimi ja kuusi lokeroa (rivittyy 320 px:ssä lokerot nimen alle) ── */
 .tn20 .mm-otsake { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 10px 16px; }
-.tn20 .mm-otsake-t { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+/* Väli: line-height .86 jättää Ä:n pisteet rivilaatikon yläpuolelle (≈ 0,2 em), joten väli ≈ 0,25 em otsikon koosta. */
+.tn20 .mm-otsake-t { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
 .tn20 .mm-paiva { font-family: "Barlow Condensed", sans-serif; font-size: 13px; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; color: var(--mm-himmea); }
 .tn20 .mm-paiva a { color: var(--mm-teksti); text-underline-offset: 3px; text-decoration-color: var(--mm-viiva2); }
 /* CD 36/72 px wdth 68. "MIKÄ MAA?" ≈ 4,1 em → 36 px = 148 px. */
@@ -57,16 +58,22 @@
 
 /* ── Lauta ───────────────────────────────────── */
 .tn20 .mm-lauta { display: flex; flex-direction: column; gap: 12px; }
-.tn20 .mm-vihjeet { order: 1; display: flex; flex-direction: column; gap: 8px; min-width: 0; }
-.tn20 .mm-pelialue { order: 2; display: flex; flex-direction: column; gap: 6px; min-width: 0; }
-.tn20 .mm-uusin-alue { display: flex; flex-direction: column; gap: 8px; scroll-margin-top: 12px; }
+/* Mobiili (Heikki 8.11.): arvausrivit ensin, sitten vihjeet aikajärjestyksessä ja syöte alareunassa → uusin vihje on aina
+   suoraan syötteen yläpuolella. */
+.tn20 .mm-pelialue { order: 1; display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.tn20 .mm-pelialue:empty { display: none; }
+.tn20 .mm-vihjeet { order: 2; display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.tn20 .mm-uusin-alue { display: flex; flex-direction: column; scroll-margin-top: 12px; }
 
 .tn20 .mm-vihje-n { flex: none; width: 14px; font-family: var(--mm-display); font-weight: 900; font-size: 14px; color: var(--mm-hiljainen); }
 .tn20 .mm-uusin {
   display: flex; align-items: baseline; gap: 12px; padding: 14px 16px; border-radius: 16px;
-  background: var(--mm-pinta); box-shadow: inset 0 0 0 2px var(--mm-terra);
+  background: var(--mm-pinta); box-shadow: inset 0 0 0 1px var(--mm-viiva);
 }
-.tn20 .mm-uusin .mm-vihje-n { color: var(--mm-terra); }
+.tn20 .mm-uusin[data-tuorein] { box-shadow: inset 0 0 0 2px var(--mm-terra); }
+.tn20 .mm-uusin[data-tuorein] .mm-vihje-n { color: var(--mm-terra); }
+/* Kuudes yritys: ei uutta vihjettä, vaan uusimman vihjeen paikalla kerrotaan, että vielä voi yrittää (Heikki 8.11.). */
+.tn20 .mm-uusin.mm-viimeinen { margin: 0; font-size: 19px; line-height: 1.35; font-weight: 700; color: var(--mm-teksti); }
 .tn20 .mm-uusin-t { font-size: 19px; line-height: 1.38; font-weight: 600; color: var(--mm-teksti); text-wrap: pretty; }
 .tn20 .mm-lippuvihje { display: block; }
 .tn20 .mm-lippu { display: block; width: 96px; height: auto; aspect-ratio: 4 / 3; object-fit: cover; border-radius: 4px; }
@@ -138,11 +145,8 @@
 }
 .tn20 .mm-ehdotukset li { display: flex; align-items: center; min-height: 48px; padding: 0 14px; border-radius: 10px; font-size: 18px; font-weight: 600; color: var(--mm-teksti); cursor: pointer; }
 .tn20 .mm-ehdotukset li[aria-selected="true"], .tn20 .mm-ehdotukset li:hover { background: var(--mm-viiva); }
-.tn20 .mm-viimeinen { margin: 0 0 10px; padding: 10px 12px; border-radius: 12px; background: rgba(240, 138, 93, .12); box-shadow: inset 0 0 0 1.5px var(--mm-terra); font-size: 14px; line-height: 1.4; color: var(--mm-teksti); }
-.tn20 .mm-viimeinen b { color: var(--mm-terra); }
-.tn20 .mm-viesti { margin: 0; font-size: 14px; font-weight: 600; line-height: 1.35; color: var(--mm-himmea); }
-.tn20 .mm-viesti:not(:empty) { margin-top: 8px; }
-.tn20 .mm-alarivi { display: flex; justify-content: flex-end; }
+.tn20 .mm-alarivi { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 4px; }
+.tn20 .mm-viesti { flex: 1 1 auto; min-width: 0; margin: 0; font-size: 14px; font-weight: 600; line-height: 1.35; color: var(--mm-himmea); }
 .tn20 .mm-ohita {
   flex: none; display: inline-flex; align-items: center; min-height: 44px; padding: 0 4px; border: 0; background: none; cursor: pointer;
   font-size: 15px; font-weight: 700; color: var(--mm-teksti); text-decoration: underline; text-underline-offset: 4px; text-decoration-color: var(--mm-viiva2);
@@ -203,6 +207,7 @@
 @container mm (min-width: 900px) {
   .tn20 .mm-main { gap: 32px; padding: 44px 72px 56px; }
   .tn20 .mm-paiva { font-size: 14px; }
+  .tn20 .mm-otsake-t { gap: 18px; }
   .tn20 .mm-h1 { font-size: 72px; }
   .tn20 .mm-lokerot { gap: 6px; }
   .tn20 .mm-lokerot > span { width: 44px; height: 44px; border-radius: 12px; font-size: 18px; }
@@ -237,7 +242,7 @@
   .tn20 .mm-kentta { height: 60px; border-radius: 16px; font-size: 18px; padding: 0 18px; }
   .tn20 .mm-arvaa { height: 60px; padding: 0 26px; font-size: 18px; }
   .tn20 .mm-ehdotukset { bottom: auto; top: calc(100% + 6px); }
-  .tn20 .mm-viimeinen { margin-bottom: 12px; font-size: 15px; padding: 12px 14px; }
+  .tn20 .mm-uusin.mm-viimeinen { font-size: 24px; }
 
   .tn20 .mm-tulos-yla { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); grid-template-areas: "t k" "j k"; grid-template-rows: auto 1fr; column-gap: 40px; row-gap: 24px; }
   .tn20 .mm-tulos-yla > .tn-jako { align-self: end; }
