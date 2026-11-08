@@ -217,8 +217,9 @@ export const haeKaupunkisivu = cache(async (slug: string): Promise<Kaupunkisivu 
 });
 
 /** /kaupunki-lista: julkaistut aakkosjärjestyksessä visamäärineen. */
-export async function haeKaupunkilista(): Promise<Array<Kaupunki & { visoja: number }>> {
-  const kaupungit = (await haeKaupungit()).filter((k) => k.julkaistu);
+/** Julkaistut kaupungit visamäärineen A–Ö. julkaisemattomat: myös julkaisemattomat (kokoelmasivun kortit esikatselussa). */
+export async function haeKaupunkilista(julkaisemattomat = false): Promise<Array<Kaupunki & { visoja: number }>> {
+  const kaupungit = (await haeKaupungit()).filter((k) => k.julkaistu || julkaisemattomat);
   const visat = await haePaikkakunnanVisat(kaupungit.map((k) => k.slug));
   return kaupungit
     .map((k) => ({ ...k, visoja: visat.filter((v) => v.paikkakunnat?.includes(k.slug)).length }))
