@@ -9,6 +9,24 @@ import { kokoelmaKortti } from "./rekisteri";
 export const HISTORIA_KORTTIKUVAT = new Set([
   "autonomian-aika-visa", "kekkosen-suomi-kylma-sota-idansuhteet", "mannerheim-visa",
   "suomen-itsenaistyminen-visa", "suomen-presidentit-visa", "suomi-1980-luvulla",
+  // 8.11.2026: kuvattomien visojen kuvat (Heikin valinnat)
+  "suomenlinna-visa",
+  "suomen-vanhat-kaupungit-visa",
+  "suomen-kolme-legendaarista-linnaa",
+  "talvisota-visa",
+  "jatkosota-visa",
+  "lapin-sota-aseveljet-vastakkain",
+  "keski-ajan-suomi",
+  "ruotsin-vallan-aika-visa",
+  "venajan-tsaarit-visa",
+  "ruotsin-kuninkaalliset-visa",
+  "kansallinen-heraaminen-suomalaisuusaate",
+  "jalleenrakennuksen-suomi-sotakorvaukset-evakot",
+  "naiset-suomen-historian-tekijoina",
+  "suomen-historia-lapileikkaus",
+  "suomen-muinaishistoria-visa",
+  "suomi-ennen-vanhaan-arjen-historia",
+  "suomi-maailmalle-modernin-suomen-nousu",
 ]);
 
 export const HISTORIA: Kokoelma = {

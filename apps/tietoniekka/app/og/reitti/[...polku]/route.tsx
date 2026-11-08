@@ -6,6 +6,7 @@
 //   /og/reitti/<peli>/hub?reitti=<siemen>         Karttapelit-sivun kortti 4:3 (4a)
 //   /og/reitti/<peli>/ruutu?reitti=<siemen>       neliö pieniin kuviin (etusivun kortti, kokoelmasivun peli), vain tunnus
 //   /og/reitti/<peli>/puolikas?reitti=<siemen>    Maantieto-kortin puolikas (7a): pystyrajaus, päätepisteissä vain tunnus
+//   /og/reitti/<peli>/leve?reitti=<siemen>        16:9 kaupunkisivun Kuntaliitos-kortille desktopilla (8.11.2026)
 //
 // <peli> = rajanaapurit | osavaltiot | kuntaliitos (lib/reittipeli/kuvat.ts). Kartta piirretään pelin omasta
 // aineistosta (SVG → sharp), merkit ja tekstit Satorilla. Kuvissa näkyvät vain lähtö ja maali sekä katkoviivakaari
@@ -64,6 +65,7 @@ const MUODOT = {
   hub: { w: 640, h: 480, viiva: 4, piste: 11, fontti: 19, pilleri: 38, lippu: [52, 35] },
   ruutu: { w: 400, h: 400, viiva: 3, piste: 8, fontti: 0, pilleri: 0, lippu: [44, 29], vainTunnus: true },
   puolikas: { w: 388, h: 438, viiva: 3, piste: 8, fontti: 0, pilleri: 0, lippu: [44, 29], vainTunnus: true },
+  leve: { w: 640, h: 360, viiva: 4, piste: 10, fontti: 17, pilleri: 34, lippu: [48, 32] },
 } satisfies Record<string, Muoto>;
 
 /** Kartta + päätepisteiden merkit yhdeksi kuvaksi (data-URI). */
@@ -191,7 +193,7 @@ export async function GET(req: Request, ctx: { params: Promise<{ polku: string[]
   const [peli, muoto] = polku;
   const url = new URL(req.url);
   origin = url.origin;
-  if (!peli || !onReittipeli(peli) || (muoto && !["kortti", "hub", "ruutu", "puolikas"].includes(muoto))) return new Response(null, { status: 404 });
+  if (!peli || !onReittipeli(peli) || (muoto && !(Object.hasOwn(MUODOT, muoto) && muoto !== "paneeli"))) return new Response(null, { status: 404 });
   const g = REITTIPELIT[peli];
   const pyydetty = url.searchParams.get("reitti");
   const siemen = pyydetty && /^[a-z0-9-]{3,40}$/.test(pyydetty) ? pyydetty : viikonSiemen(maanantai(helsinginPaiva().iso));
@@ -201,7 +203,7 @@ export async function GET(req: Request, ctx: { params: Promise<{ polku: string[]
   const valimuisti = pyydetty ? "public, max-age=86400, s-maxage=2592000" : "public, max-age=3600, s-maxage=21600";
 
   if (muoto) {
-    const kuva = await kartta(peli, r.ids, r.ryhma, MUODOT[muoto as "kortti" | "hub" | "ruutu" | "puolikas"]);
+    const kuva = await kartta(peli, r.ids, r.ryhma, MUODOT[muoto as Exclude<keyof typeof MUODOT, "paneeli">]);
     const jpg = await sharp(Buffer.from(kuva.split(",")[1], "base64")).jpeg({ quality: 84, mozjpeg: true }).toBuffer();
     return new Response(new Uint8Array(jpg), { headers: { "Content-Type": "image/jpeg", "Cache-Control": valimuisti } });
   }

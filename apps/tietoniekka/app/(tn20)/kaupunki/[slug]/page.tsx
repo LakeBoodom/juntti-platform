@@ -3,6 +3,7 @@
 // Sen alla kauden nosto, visaryhmät ja syntyneet; tyhjät osiot puuttuvat kokonaan. Kaikki linkit palvelimella
 // renderöityjä <a href> -linkkejä. Visamäärä vain otsikossa ja kuvauksessa, ei sivulla (Heikki 1.11.).
 // ISR 1 h; julkaisemattomat näkyvät vain esikatselussa (noindex), ks. lib/kaupunkisivu.ts.
+import { kaupunginKuntaliitos } from "@/lib/kuntaliitos/reitti";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import type { CSSProperties } from "react";
@@ -105,6 +106,7 @@ export default async function KaupunkiPage({ params }: Props) {
   const korttinimi = k.korttinimi ?? k.nimi;
   const a = alue(k.slug);
   const visat = [...(visa ? [visa] : []), ...(s.kausinosto ? [s.kausinosto] : []), ...s.ryhmat.flatMap((g) => g.visat)];
+  const reitti = kaupunginKuntaliitos(k.slug);
 
   return (
     <main className="ks">
@@ -181,6 +183,27 @@ export default async function KaupunkiPage({ params }: Props) {
           </ul>
         </section>
       ))}
+
+      {/* Kuntaliitos-reitti kaupungista (Heikki 8.11.2026): sama korttimuoto kuin kausinostolla, karttapelin turkoosi. */}
+      {reitti && (
+        <div className="ks-osio">
+          <a className="ks-kausi ks-kausi--reitti" href={reitti.href} style={{ "--ks-em": pisimmanSananEm(reitti.otsikko) } as CSSProperties}>
+            <span className="ks-kausi-kuva">
+              <picture>
+                <source media="(min-width: 1024px)" srcSet={reitti.kuvaLeve} />
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={reitti.kuva} alt="" loading="lazy" />
+              </picture>
+            </span>
+            <span className="ks-kausi-teksti">
+              <span className="ks-kausi-tag">Kuntaliitos</span>
+              <span className="ks-kausi-nimi">{reitti.otsikko}</span>
+              <span className="ks-kausi-kuvaus">Rakenna reitti naapurikuntien kautta.</span>
+            </span>
+            <span className="ks-kausi-cta">Pelaa <span aria-hidden="true">→</span></span>
+          </a>
+        </div>
+      )}
 
       {s.henkilot.length > 0 && (
         <div className="ks-osio ks-henkilot">

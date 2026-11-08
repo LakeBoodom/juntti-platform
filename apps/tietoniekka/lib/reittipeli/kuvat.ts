@@ -7,7 +7,7 @@ import * as KL from "@/lib/kuntaliitos/reitti";
 import * as USA from "@/lib/rajanaapurit/osavaltiot";
 import { RN_SIVU, RN_USA_SIVU } from "@/lib/rajanaapurit";
 import { KL_SIVU } from "@/lib/kuntaliitos";
-import { VIIKON_REITIT, viikkoSiemenesta, viikonReitti } from "@/lib/reittipeli/viikonReitit";
+import { VIIKON_REITIT, kiinteaReitti, viikkoSiemenesta } from "@/lib/reittipeli/viikonReitit";
 
 type Kuvakartta = ReturnType<typeof RN.kuvakartta>;
 export type ReittipeliAvain = keyof typeof VIIKON_REITIT;
@@ -42,12 +42,12 @@ export const REITTIPELIT: Record<ReittipeliAvain, {
 
 export const onReittipeli = (p: string): p is ReittipeliAvain => p in REITTIPELIT;
 
-/** Reitti siemenestä kuten pelisivulla: viikko-YYYY-MM-DD = viikon reitti (otsikkoineen), muuten arvonta. */
+/** Reitti siemenestä kuten pelisivulla: viikko-YYYY-MM-DD = viikon reitti, kaupunki-<slug> = kaupunkisivun reitti
+    (molemmat otsikkoineen), muuten arvonta. */
 export function reittiSiemenesta(peli: ReittipeliAvain, siemen: string, ryhmaTunnus: string | null) {
   const g = REITTIPELIT[peli];
-  const viikko = viikkoSiemenesta(siemen);
-  const v = viikko ? viikonReitti(peli, viikko) : null;
-  const ryhma = viikko ? null : g.ryhma(ryhmaTunnus);
+  const v = kiinteaReitti(peli, siemen);
+  const ryhma = v || viikkoSiemenesta(siemen) ? null : g.ryhma(ryhmaTunnus);
   const r = (v && g.alueista(v.reitti, siemen)) || g.arvo(siemen, ryhma);
   return r ? { ids: r.ratkaisu.map((k) => k.k), otsikko: v?.otsikko ?? null, ryhma } : null;
 }

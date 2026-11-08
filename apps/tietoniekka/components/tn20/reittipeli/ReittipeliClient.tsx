@@ -424,7 +424,8 @@ export default function ReittipeliClient({
   const [siirraEnsin, setSiirraEnsin] = useState(false);
 
   useEffect(() => () => { if (ajastin.current) clearInterval(ajastin.current); }, []);
-  const pelattuAvain = `tn_${peliNimi}_viikko`;
+  /* Pelattu-merkintä herolle: viikon reitti yhdellä avaimella, kaupunkisivun reitit (kaupunki-<slug>) kukin omallaan. */
+  const pelattuAvain = `tn_${peliNimi}_${siemen.startsWith("kaupunki-") ? siemen : "viikko"}`;
   useEffect(() => {
     try { if (intro && localStorage.getItem(pelattuAvain) === siemen) setPelattu(true); } catch {}
   }, [intro, pelattuAvain, siemen]);
