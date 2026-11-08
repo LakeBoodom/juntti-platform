@@ -2,7 +2,7 @@
 // Sama maa kaikille tänään (Helsingin päivä, toistosuoja 60 pv, lib/vihjepeli/arvonta.ts). Vihjeet 1–3 tulevat
 // kannasta (vihjepeli_vihjeet, vain tarkistetut), siluetti, maanosa ja pääkaupunki aineistosta (maat.json).
 //   /peli/mika-maa             päivän maa
-//   /peli/mika-maa?kohde=x7k2  harjoitusmaa ("Pelaa harjoitusmaa"), ei vaikuta päivän tulokseen
+//   /peli/mika-maa?kohde=x7k2  arvottu maa ("Arvo uusi maa", 98 muuta maata), ei vaikuta päivän tulokseen
 // Julkaistu 7.11.2026 (MM_JULKAISU): päivän maan historia ja toistosuoja alkavat siitä, ks. arvonta.historia().
 
 import type { Metadata } from "next";

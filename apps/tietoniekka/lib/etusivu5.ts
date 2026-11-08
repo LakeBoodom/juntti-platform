@@ -17,6 +17,7 @@ import { listaaVisapaketit, landinginPaketit, ajankohtainen, kauttaJaljella, kor
 import { JUHLAT_KOKOELMA, pvm, juhlaKalenteri, paavisa, paiviaValissa, vpLyhyt, type Esiintyma } from "@/lib/juhlat";
 import { LAPSET_SIVU, lapsetNakyvissa } from "@/lib/lapset/data";
 import { COLLECTION_LABEL, resolveCollection } from "@/lib/visanKokoelma";
+import { maaKierros } from "@/lib/vihjepeli/data";
 
 const VIIKONPAIVAT = ["Sunnuntai", "Maanantai", "Tiistai", "Keskiviikko", "Torstai", "Perjantai", "Lauantai"];
 const VP_LYHYT = ["Su", "Ma", "Ti", "Ke", "To", "Pe", "La"];
@@ -114,7 +115,9 @@ export async function haeEtusivu(opts: {
      etusivun arvokkainta tilaa — Tulossa-sääntö pätee vain Valitse peli -osiossa. */
   const pelimuodot = ETUSIVUN_PELIMUODOT.map((p) => pelimuotoTanaan(p, today.iso));
   const mmConf = pelimuodot.find((p) => p.slug === "mika-maa");
-  const mikaMaa = mmConf && mmConf.tila === "pelattava" && nakyyEtusivulla(mmConf, today.iso) ? mmConf : null;
+  const mmNakyy = mmConf && mmConf.tila === "pelattava" && nakyyEtusivulla(mmConf, today.iso) && mmConf.href ? mmConf : null;
+  /* Banneri (CD 1a, 8.11.): päivän vihje 1 otsikkona; ilman vihjettä (kanta ei vastaa) banneri ilman otsikkoa. */
+  const mikaMaa = mmNakyy ? { href: mmNakyy.href, vihje: (await maaKierros(today.iso, null))?.vihjeet[0] ?? null } : null;
 
   /* ── 2 Tiesitkö? ── questions.hook-pooli. Kierto (Heikki 31.10.2026): palvelin antaa koko poolin, selain arpoo
      koukun joka käynnillä ennen piirtoa (EtusivuV5 → TiesitkoKierto). oletus = päiväsiemenen koukku (ilman JS:ää,

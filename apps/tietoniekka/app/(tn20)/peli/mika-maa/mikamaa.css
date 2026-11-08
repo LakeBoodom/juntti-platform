@@ -158,6 +158,15 @@
 .tn20 .mm-kaikki { display: flex; flex-direction: column; gap: 8px; }
 .tn20 .mm-kaikki ol { margin: 0; padding-left: 22px; display: flex; flex-direction: column; gap: 6px; font-size: 16px; line-height: 1.45; color: var(--mm-teksti); }
 .tn20 .mm-linkit { margin-top: -8px; }
+/* Arvo uusi maa (Heikki 8.11.): toissijainen pilleri — lime on Jakoalueen ja pelin Arvaa-napin. */
+.tn20 .mm-uusi-maa {
+  align-self: flex-start; display: inline-flex; align-items: center; justify-content: center; min-height: 52px; padding: 0 28px;
+  border: 2px solid var(--mm-navy); border-radius: 999px; background: var(--mm-navy); color: #f2ede2; cursor: pointer;
+  font-family: var(--mm-display); font-weight: 900; font-variation-settings: "wdth" 86; font-size: 16px; letter-spacing: .02em; text-transform: uppercase;
+  transition: transform var(--dur-fast, 120ms) var(--ease-standard, ease);
+}
+.tn20 .mm-uusi-maa:hover { transform: translateY(-1px); }
+.tn20 .mm-uusi-maa:focus-visible { outline: 2px solid var(--mm-terra); outline-offset: 3px; }
 
 /* ── Leveä ───────────────────────────────────── */
 @container mm (min-width: 900px) {
@@ -231,7 +240,6 @@
 }
 .tn20 .mm-in-h1[data-pitka] { font-size: min(34px, calc(153cqi / var(--mm-in-lw, 10))); }
 .tn20 .mm-in-h1 span { display: block; margin-top: 6px; color: #e8a320; }
-.tn20 .mm-in-lede { margin: 0; font-size: 17px; line-height: 1.45; color: #cfc7b6; text-wrap: pretty; }
 .tn20 .mm-in-kuva { aspect-ratio: 5 / 4; border-radius: 20px; overflow: hidden; background: #f2ede2; }
 .tn20 .mm-in-kuva svg { display: block; width: 100%; height: 100%; }
 .tn20 .mm-in-toiminto { display: flex; flex-direction: column; align-items: stretch; gap: 10px; }
@@ -240,44 +248,31 @@
   font-variation-settings: "wdth" 86; font-size: 17px; letter-spacing: .02em;
 }
 .tn20 .mm-in-cta:focus-visible { outline: 2px solid #e8a320; outline-offset: 3px; }
-.tn20 .mm-in-uusi { display: none; font-size: 15px; font-weight: 600; color: #a79e8c; }
-.tn20 .mm-in-syyt { list-style: none; margin: 0; padding: 6px 20px 0; display: flex; flex-direction: column; }
-.tn20 .mm-in-syyt li { display: grid; grid-template-columns: 34px minmax(0, 1fr); gap: 10px; padding: 14px 0; border-top: 1px solid #2c2517; }
-.tn20 .mm-in-syyt li:last-child { border-bottom: 1px solid #2c2517; }
-.tn20 .mm-in-nro { font-family: "Archivo Variable", "Archivo", sans-serif; font-weight: 900; font-size: 15px; color: #e8a320; }
-.tn20 .mm-in-syyt div, .tn20 .mm-in-ohje li div { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
-.tn20 .mm-in-syyt b { font-size: 16px; color: #f5f0e6; }
-.tn20 .mm-in-syyt div span { font-size: 15px; line-height: 1.5; color: #cfc7b6; text-wrap: pretty; }
-.tn20 .mm-in-ohje { display: flex; flex-direction: column; gap: 10px; padding: 28px 16px 32px; }
+.tn20 .mm-in-ohje li div { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.tn20 .mm-in-ohje { display: flex; flex-direction: column; gap: 10px; padding: 12px 16px 32px; }
 .tn20 .mm-in-ohje h2 { margin: 0; font-size: 12px; font-weight: 800; letter-spacing: .16em; text-transform: uppercase; color: #8e8676; }
 .tn20 .mm-in-ohje ol { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
-.tn20 .mm-in-ohje li { display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-radius: 14px; border: 1px solid #2c2517; background: #0f0d07; }
+.tn20 .mm-in-ohje li { display: flex; align-items: flex-start; gap: 12px; padding: 12px 14px; border-radius: 14px; border: 1px solid #2c2517; background: #0f0d07; }
 .tn20 .mm-in-merkki {
   flex: none; display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; box-sizing: border-box; border-radius: 999px; border: 1.5px solid;
   font-family: "Archivo Variable", "Archivo", sans-serif; font-weight: 900; font-size: 14px;
 }
 .tn20 .mm-in-ohje b { font-family: "Archivo Variable", "Archivo", sans-serif; font-weight: 900; font-size: 15px; text-transform: uppercase; color: #f5f0e6; }
-.tn20 .mm-in-ohje li div span { font-size: 13px; line-height: 1.4; color: #cfc7b6; text-wrap: pretty; }
+.tn20 .mm-in-ohje li div span { font-size: 14px; line-height: 1.4; color: #cfc7b6; text-wrap: pretty; }
 
 @container mm-in (min-width: 900px) {
   .tn20 .mm-in-yla {
     display: grid; grid-template-columns: minmax(0, 6fr) minmax(0, 5fr); column-gap: 64px; row-gap: 24px; align-items: start;
-    grid-template-areas: "e k" "h k" "l k" "c k"; grid-template-rows: auto auto auto 1fr; padding: 64px 80px 56px;
+    grid-template-areas: "e k" "h k" "c k"; grid-template-rows: auto auto 1fr; padding: 64px 80px 56px;
   }
   .tn20 .mm-in-eyebrow { grid-area: e; font-size: 13px; }
   .tn20 .mm-in-otsikko { grid-area: h; }
   .tn20 .mm-in-h1 { font-size: min(76px, calc(153cqi / var(--mm-in-lw, 10))); line-height: .88; }
   .tn20 .mm-in-h1[data-pitka] { font-size: min(60px, calc(153cqi / var(--mm-in-lw, 10))); }
   .tn20 .mm-in-h1 span { margin-top: 8px; }
-  .tn20 .mm-in-lede { grid-area: l; max-width: 44ch; font-size: 20px; }
   .tn20 .mm-in-kuva { grid-area: k; align-self: center; border-radius: 22px; }
   .tn20 .mm-in-toiminto { grid-area: c; flex-direction: row; align-items: center; gap: 20px; }
-  .tn20 .mm-in-uusi { display: inline; }
-  .tn20 .mm-in-syyt { flex-direction: row; gap: 32px; padding: 0 80px; }
-  .tn20 .mm-in-syyt li { flex: 1 1 0; display: flex; flex-direction: column; gap: 8px; padding: 16px 0 0; border-top: 2px solid #e8a320; }
-  .tn20 .mm-in-syyt li:last-child { border-bottom: 0; }
-  .tn20 .mm-in-syyt b { font-size: 18px; line-height: 1.25; }
-  .tn20 .mm-in-ohje { padding: 56px 80px 72px; gap: 12px; }
+  .tn20 .mm-in-ohje { padding: 8px 80px 72px; gap: 12px; }
   .tn20 .mm-in-ohje ol { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
   .tn20 .mm-in-ohje li { padding: 16px 18px; }
 }

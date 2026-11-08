@@ -6,7 +6,7 @@
 //   - Arvaa-painike on lime-pilleri (UI-laatusääntö 5, Heikki 7.11. kohta 2).
 //   - Uusin vihje on valkoinen kortti punaisella reunalla. Vanhemmat tiivistyvät kahdelle riville; napautus avaa.
 //   - Väärä arvaus: etäisyys keskipisteiden välillä (10 km:n tarkkuus) ja suunta kahdeksana ilmansuuntana.
-//   - Päivän maa kerran päivässä (tulos selaimeen → "jo pelattu"). Harjoitusmaa (?kohde=) ei vaikuta siihen.
+//   - Päivän maa kerran päivässä (tulos selaimeen → "jo pelattu"). Arvottu maa (?kohde=, "Arvo uusi maa") ei vaikuta siihen.
 //   - Tulos on pelkkä arvausnumero ("3. arvauksella"), ei tasonimeä; jako Jakoalueella (jakotekstit v4).
 // Selaimeen tulee vain kevyt maalista ja kierroksen oma maa (siluetti), ei koko aineistoa.
 
@@ -92,19 +92,17 @@ function Siluetti({ d, laatikko, nimi }: { d: string; laatikko: [number, number,
 
 type Rivi = { maa: MaaKohde | null; oikein: boolean; km: number; suunta: Suunta };
 
-const SYYT = [
-  { h: "Yksi maa päivässä, sama kaikille.", s: "Kaikki arvaavat tänään saman maan. Vertaa kavereiden kanssa, monennellako vihjeellä osuit." },
-  { h: "Väärä arvaus vie lähemmäs.", s: "Ohi mennyt arvaus näyttää etäisyyden ja suunnan. Päättely on puoli peliä." },
-  { h: "Parissa minuutissa valmis.", s: "Kuusi vihjettä, kuusi yritystä. Jokaisesta vihjeestä jää käteen jokin fakta." },
-];
-const SAANNOT = [
-  { k: "1", h: "Lue vihje", s: "Kirjoita maan nimi. Ensimmäinen vihje on vaikein.", c: "#E8A320" },
-  { k: "↗", h: "Katso suunta", s: "Väärä arvaus näyttää etäisyyden ja suunnan oikeaan maahan.", c: "#F08A5D" },
-  { k: "6", h: "Kuusi yritystä", s: "Jokainen väärä arvaus avaa uuden vihjeen. Neljännellä näet siluetin.", c: "#8FD9D0" },
+/* Ohjeet kolmessa kohdassa (Heikki 8.11.2026: aloitussivun lede, kolme syytä ja Näin pelaat toistivat samaa).
+   Suunnan merkki on SVG: ↗-merkki piirtyy iOS:llä emojina. */
+const SAANNOT: Array<{ k: string | null; h: string; s: string; c: string }> = [
+  { k: "6", h: "Kuusi arvausta", s: "Ensimmäinen vihje on vaikein. Jokainen väärä arvaus avaa uuden, ja neljäs näyttää maan ääriviivat.", c: "#E8A320" },
+  { k: null, h: "Väärä arvaus vie lähemmäs", s: "Näet, kuinka kaukana oikea maa on ja mihin suuntaan.", c: "#F08A5D" },
+  { k: "1", h: "Uusi maa joka päivä", s: "Kaikki arvaavat saman maan. Vertaa kavereiden kanssa, monennellako osuit.", c: "#8FD9D0" },
 ];
 
-/** ALOITUSSIVU (CD-paketti v0.2, 0a/0b): päivän vihje 1 otsikkona ja kysymys perään, yksi lause, tunnus, CTA, kolme syytä
- *  ja Näin pelaat. Jos päivän maa on jo pelattu, CTA vie tulokseen. Otsikon koko lasketaan pisimmästä sanasta (KORTTISÄÄNTÖ). */
+/** ALOITUSSIVU (CD-paketti v0.2, 0a/0b; tiivistetty 8.11.): päivän vihje 1 otsikkona ja kysymys perään, tunnus, CTA ja
+ *  Näin pelaat kolmessa kohdassa. Jos päivän maa on jo pelattu, CTA vie tulokseen. Otsikon koko lasketaan pisimmästä
+ *  sanasta (KORTTISÄÄNTÖ). */
 function Aloitus({ paiva, vihje, pelattu, aloita }: { paiva: string; vihje: string; pelattu: boolean; aloita: () => void }) {
   const pisin = Math.max(4, ...vihje.split(/[\s-]+/).map((w) => w.replace(/[.,:;]/g, "").length));
   return (
@@ -112,38 +110,31 @@ function Aloitus({ paiva, vihje, pelattu, aloita }: { paiva: string; vihje: stri
       <Pelipalkki iho="tumma" peli={MM_NIMI} koti={MM_KOTI} />
       <main className="mm-in">
         <div className="mm-in-yla">
-          <span className="mm-in-eyebrow">Päivän maa · {paiva} · sama kaikille</span>
+          <span className="mm-in-eyebrow">Päivän maa · {paiva}</span>
           <div className="mm-in-otsikko">
             <h1 className="mm-in-h1" data-pitka={vihje.length > 50 ? "" : undefined} style={{ "--mm-in-lw": pisin } as CSSProperties}>
               {vihje} <span>{MM_NIMI}</span>
             </h1>
           </div>
-          <p className="mm-in-lede">Tunnista maa kuudella vihjeellä. Jokainen väärä arvaus kertoo, kuinka kaukana olet ja mihin suuntaan jatkaa.</p>
           <div className="mm-in-kuva">
             <MikaMaaTunnus sanamerkki />
           </div>
           <div className="mm-in-toiminto">
             <button type="button" className="tn-cta-lime mm-in-cta" onClick={aloita}>{pelattu ? "Katso tuloksesi" : "Arvaa päivän maa"}</button>
-            <span className="mm-in-uusi">Uusi maa joka päivä keskiyöllä</span>
           </div>
         </div>
-        <ol className="mm-in-syyt">
-          {SYYT.map((x, i) => (
-            <li key={i}>
-              <span className="mm-in-nro">{String(i + 1).padStart(2, "0")}</span>
-              <div>
-                <b>{x.h}</b>
-                <span>{x.s}</span>
-              </div>
-            </li>
-          ))}
-        </ol>
         <section className="mm-in-ohje" aria-labelledby="mm-in-ohje-h">
           <h2 id="mm-in-ohje-h">Näin pelaat</h2>
           <ol>
             {SAANNOT.map((x) => (
               <li key={x.h}>
-                <span className="mm-in-merkki" style={{ color: x.c, borderColor: x.c }} aria-hidden="true">{x.k}</span>
+                <span className="mm-in-merkki" style={{ color: x.c, borderColor: x.c }} aria-hidden="true">
+                  {x.k ?? (
+                    <svg viewBox="0 0 24 24" width={18} height={18}>
+                      <path d="M7 17 17 7M9 7h8v8" fill="none" stroke="currentColor" strokeWidth={2.6} strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                  )}
+                </span>
                 <div>
                   <b>{x.h}</b>
                   <span>{x.s}</span>
@@ -166,7 +157,7 @@ export default function VihjepeliClient({ k }: { k: MaaKierros }) {
   const [auki, setAuki] = useState<Set<number>>(new Set());
   const [kaikki, setKaikki] = useState(false);
   const [paivanTulos, setPaivanTulos] = useState<MaaTallenne | null>(null);
-  /* Päivän maa alkaa aloitussivulta (CD v0.2); harjoitusmaa ("Pelaa harjoitusmaa") suoraan laudalle. */
+  /* Päivän maa alkaa aloitussivulta (CD v0.2); arvottu maa ("Arvo uusi maa") suoraan laudalle. */
   const [aloitus, setAloitus] = useState(k.harjoitus === null);
   const kentta = useRef<HTMLInputElement>(null);
   const juuri = useRef<HTMLDivElement>(null);
@@ -302,7 +293,7 @@ export default function VihjepeliClient({ k }: { k: MaaKierros }) {
         <span className="mm-paiva">
           {harjoitus ? (
             <>
-              Harjoitusmaa · <a href={MM_SIVU}>Päivän maa {k.paiva}</a>
+              Arvottu maa · <a href={MM_SIVU}>Päivän maa {k.paiva}</a>
             </>
           ) : (
             `Päivän maa ${k.paiva}`
@@ -348,7 +339,7 @@ export default function VihjepeliClient({ k }: { k: MaaKierros }) {
             <div className="mm-tulos-vasen">
               <section className="mm-tulos-otsake" aria-live="polite">
                 <h1 className="mm-eyebrow">
-                  {harjoitus ? "Harjoitusmaa" : `Päivän maa ${k.paiva}`}
+                  {harjoitus ? "Arvottu maa" : `Päivän maa ${k.paiva}`}
                   {!ratkesi && " oli"}
                 </h1>
                 <p className="mm-iso">
@@ -406,6 +397,8 @@ export default function VihjepeliClient({ k }: { k: MaaKierros }) {
             )}
           </div>
 
+          {/* Heikki 8.11.: pelin jälkeen voi pelata toisen maan (98 muuta maata, ei päivän maata). */}
+          <button type="button" className="mm-uusi-maa" onClick={uusiHarjoitus}>Arvo uusi maa</button>
           {kaikki && (
             <section className="mm-kaikki" aria-labelledby="mm-kaikki-h">
               <h2 className="mm-pikku" id="mm-kaikki-h">Vihjeet</h2>
@@ -424,7 +417,6 @@ export default function VihjepeliClient({ k }: { k: MaaKierros }) {
             <button type="button" aria-expanded={kaikki} onClick={() => setKaikki((v) => !v)}>
               {kaikki ? "Piilota vihjeet" : "Näytä kaikki vihjeet"}
             </button>
-            <button type="button" onClick={uusiHarjoitus}>Pelaa harjoitusmaa</button>
             {harjoitus && <a href={MM_SIVU}>Päivän maa {k.paiva}</a>}
           </nav>
         </div>
