@@ -12,7 +12,7 @@
 //   - Tulos "Sait oikein 3. yrityksellä" (Heikki 8.11.); jako Jakoalueella tuloksen alla (jakotekstit v4).
 // Selaimeen tulee vain kevyt maalista ja kierroksen oma maa (siluetti), ei koko aineistoa.
 
-import { useEffect, useMemo, useRef, useState, type CSSProperties, type KeyboardEvent } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type KeyboardEvent } from "react";
 import Pelipalkki from "@/components/tn20/pelikehys/Pelipalkki";
 import { SeuraavaPeli } from "@/components/tn20/pelikehys/PeliTulos";
 import Jakoalue from "@/components/tn20/jako/Jakoalue";
@@ -224,6 +224,7 @@ export default function VihjepeliClient({ k }: { k: MaaKierros }) {
   const kentta = useRef<HTMLInputElement>(null);
   const juuri = useRef<HTMLDivElement>(null);
   const uusinAlue = useRef<HTMLDivElement>(null);
+  const syoteAlue = useRef<HTMLDivElement>(null);
 
   const harjoitus = k.harjoitus !== null;
   const o = k.oikea;
@@ -256,30 +257,35 @@ export default function VihjepeliClient({ k }: { k: MaaKierros }) {
   const ehdot = useMemo(() => (syote.trim() ? ehdotukset(k.kohteet, syote, 8).filter((m) => !arvatut.has(m.id)).slice(0, 5) : []), [syote, k.kohteet, arvatut]);
   const listaAuki = lista && ehdot.length > 0 && !valmis;
 
-  /* Ehdotuslista aukeaa alaspäin, ettei se peitä vihjettä (Heikki 8.11.). Mobiilissa näppäimistö vie ruudun alaosan,
-     joten tila mitataan näkyvästä alueesta (visualViewport): jos alle mahtuu vähintään kaksi riviä, lista tulee alle ja
-     vierittyy tarvittaessa, muuten yläpuolelle. */
-  const [listanPaikka, setListanPaikka] = useState<{ alas: boolean; max: number }>({ alas: true, max: 320 });
-  useEffect(() => {
+  /* Ehdotukset (Heikki 8.11.): desktopilla lista kentän alle. Mobiilissa syöte on ruudun alareunassa ja näppäimistö vie
+     kaiken sen alta, ja ylöspäin aukeava lista peitti vihjeen. Siksi mobiilissa ehdotukset ovat yhtenä nappirivinä
+     suoraan kentän yläpuolella, syöteosan sisällä: rivi näkyy aina näppäimistön yläpuolella, ja uusin vihje vieritetään
+     rivin yläpuolelle. Tila päätellään asettelusta (syöteosa sticky = mobiili), ei näppäimistön mittauksesta, koska
+     iOS:n visualViewport ei kerro luotettavasti näppäimistön ja Safarin työkalurivin korkeutta. */
+  const [rivina, setRivina] = useState(false);
+  useLayoutEffect(() => {
     if (!listaAuki) return;
-    const mittaa = () => {
-      const k = kentta.current?.getBoundingClientRect();
-      if (!k) return;
-      const vv = window.visualViewport;
-      const ala = (vv ? vv.offsetTop + vv.height : window.innerHeight) - k.bottom - 12;
-      const yla = k.top - (vv ? vv.offsetTop : 0) - 12;
-      const alas = ala >= 110 || ala >= yla;
-      // Ylöspäin enintään kolme riviä, jotta lista peittää vihjettä mahdollisimman vähän (lisäkirjaimet rajaavat listaa).
-      setListanPaikka({ alas, max: alas ? Math.max(100, Math.min(320, ala)) : Math.max(100, Math.min(160, yla)) });
-    };
-    mittaa();
-    window.visualViewport?.addEventListener("resize", mittaa);
-    window.visualViewport?.addEventListener("scroll", mittaa);
-    return () => {
-      window.visualViewport?.removeEventListener("resize", mittaa);
-      window.visualViewport?.removeEventListener("scroll", mittaa);
-    };
+    const s = syoteAlue.current;
+    setRivina(!!s && getComputedStyle(s).position === "sticky");
   }, [listaAuki]);
+  const nakyviin = (liike: ScrollBehavior) => {
+    const el = uusinAlue.current;
+    const s = syoteAlue.current;
+    if (!el) return;
+    const peitto = s && getComputedStyle(s).position === "sticky" ? s.offsetHeight : 0;
+    el.style.scrollMarginBottom = `${peitto + 12}px`;
+    el.scrollIntoView({ block: "end", behavior: liike });
+  };
+  useEffect(() => {
+    if (!listaAuki || !rivina) return;
+    const r = requestAnimationFrame(() => {
+      const el = uusinAlue.current?.getBoundingClientRect();
+      const s = syoteAlue.current?.getBoundingClientRect();
+      // Vieritetään vain, jos nappirivi jäi uusimman vihjeen päälle.
+      if (el && s && el.bottom > s.top - 4) nakyviin(hiljaa() ? "auto" : "smooth");
+    });
+    return () => cancelAnimationFrame(r);
+  }, [listaAuki, rivina]);
 
   const valitse = (m: MaaKohde) => {
     setSyote(m.nimi);
@@ -317,14 +323,7 @@ export default function VihjepeliClient({ k }: { k: MaaKierros }) {
     if (!loppui) {
       // Uusin vihje on vihjeiden alimpana: vieritetään se näkyviin syötteen yläpuolelle (mobiilissa syöte peittää
       // ruudun alareunan, joten marginaaliksi syötteen korkeus).
-      requestAnimationFrame(() => {
-        const el = uusinAlue.current;
-        if (!el) return;
-        const syoteK = document.querySelector<HTMLElement>(".mm-syote");
-        const peitto = syoteK && getComputedStyle(syoteK).position === "sticky" ? syoteK.offsetHeight : 0;
-        el.style.scrollMarginBottom = `${peitto + 12}px`;
-        el.scrollIntoView({ block: "end", behavior: liike });
-      });
+      requestAnimationFrame(() => nakyviin(liike));
       return;
     }
     const t: MaaTallenne = { kohde: o.id, arvaukset: uudet, ratkesi: ratkesiNyt };
@@ -523,25 +522,30 @@ export default function VihjepeliClient({ k }: { k: MaaKierros }) {
       vihjeKortti(uusin, true)
     );
 
+  const ehdotusLista = (
+    <ul className="mm-ehdotukset" id="mm-ehdotukset" role="listbox" aria-label="Ehdotukset" aria-orientation={rivina ? "horizontal" : undefined} data-rivi={rivina || undefined}>
+      {ehdot.map((m, i) => (
+        <li
+          key={m.id}
+          id={`mm-e-${m.id}`}
+          role="option"
+          aria-selected={i === valittu}
+          onPointerDown={(e) => e.preventDefault()}
+          onClick={() => valitse(m)}
+        >
+          {m.nimi}
+        </li>
+      ))}
+    </ul>
+  );
+
   return (
     <div className="mm" data-iho="tumma" ref={juuri}>
       <Pelipalkki iho="tumma" peli={MM_NIMI} koti={MM_KOTI} tila={tila} pelissa paluuNuoli />
       <div className="mm-main">
-        <header className="mm-otsake">
-          <div className="mm-otsake-t">
-            <span className="mm-paiva">
-              {harjoitus ? (
-                <>
-                  Arvottu maa · <a href={MM_SIVU}>Päivän maa {k.paiva}</a>
-                </>
-              ) : (
-                `Päivän maa ${k.paiva}`
-              )}
-            </span>
-            <h1 className="mm-h1">{MM_NIMI}</h1>
-          </div>
-          <Lokerot arvaukset={arvaukset} oikea={o.id} valmis={false} />
-        </header>
+        {/* Ei otsikkoriviä (Heikki 8.11.): nimi ja yrityslaskuri ovat jo pelipalkissa, päiväys ei auta pelatessa, ja
+            tiivis yläosa jättää mobiilissa tilaa näppäimistön yläpuolelle. */}
+        <h1 className="mm-sr">{MM_NIMI}</h1>
         <div className="mm-lauta">
           {/* Vihjeet aikajärjestyksessä (Heikki 8.11.): käytetyt ylhäällä, siluetti niiden alla ja uusin alimpana, lähimpänä
               syötettä. Mobiilissa arvausrivit tulevat ennen vihjeitä, joten uusin vihje on aina suoraan syötteen yläpuolella. */}
@@ -574,7 +578,8 @@ export default function VihjepeliClient({ k }: { k: MaaKierros }) {
           </section>
 
           {/* Syöte: desktopilla oikean palstan ylimpänä, mobiilissa ruudun alareunassa (sticky, CD 8b). */}
-          <div className="mm-syote">
+          <div className="mm-syote" ref={syoteAlue}>
+            {listaAuki && rivina && ehdotusLista}
             <form
               className="mm-syoterivi"
               onSubmit={(e) => {
@@ -611,22 +616,7 @@ export default function VihjepeliClient({ k }: { k: MaaKierros }) {
                   onFocus={() => setLista(true)}
                   onBlur={() => setTimeout(() => setLista(false), 150)}
                 />
-                {listaAuki && (
-                  <ul className="mm-ehdotukset" id="mm-ehdotukset" role="listbox" aria-label="Ehdotukset" data-alas={listanPaikka.alas || undefined} style={{ maxHeight: listanPaikka.max }}>
-                    {ehdot.map((m, i) => (
-                      <li
-                        key={m.id}
-                        id={`mm-e-${m.id}`}
-                        role="option"
-                        aria-selected={i === valittu}
-                        onPointerDown={(e) => e.preventDefault()}
-                        onClick={() => valitse(m)}
-                      >
-                        {m.nimi}
-                      </li>
-                    ))}
-                  </ul>
-                )}
+                {listaAuki && !rivina && ehdotusLista}
               </div>
               <button type="submit" className="tn-cta-lime mm-arvaa">Arvaa</button>
             </form>
