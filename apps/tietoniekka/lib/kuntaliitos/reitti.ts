@@ -5,6 +5,8 @@
 
 import data from "./kunnat.json";
 import { luoReittimoottori, type RpData } from "@/lib/reittipeli/moottori";
+import { KL_SIVU } from "@/lib/kuntaliitos";
+import { KAUPUNKIREITIT, kaupunginSiemen } from "./kaupunkireitit";
 
 const moottori = luoReittimoottori(
   { lahde: data.lahde, alueet: data.kunnat, rajat: data.rajat } as unknown as RpData,
@@ -30,3 +32,11 @@ export const KL_LAHDE = moottori.lahde;
 export const reittiAlueista = moottori.reittiAlueista;
 export const PELATTAVIA = moottori.pelattavia;
 export const kuvakartta = moottori.kuvakartta;
+
+/** Kaupunkisivun Kuntaliitos-kortti (8.11.2026): kaupungin oma reitti, jos se on olemassa ja kelpaa moottorille. */
+export function kaupunginKuntaliitos(slug: string): { otsikko: string; href: string; kuva: string; kuvaLeve: string } | null {
+  const v = KAUPUNKIREITIT[slug];
+  const siemen = kaupunginSiemen(slug);
+  if (!v || !reittiAlueista(v.reitti, siemen)) return null;
+  return { otsikko: v.otsikko, href: `${KL_SIVU}?reitti=${siemen}`, kuva: `/og/reitti/kuntaliitos/ruutu?reitti=${siemen}`, kuvaLeve: `/og/reitti/kuntaliitos/leve?reitti=${siemen}` };
+}

@@ -6,6 +6,8 @@
 // Kun lista loppuu, hero arpoo viikon reitin siemenellä ja otsikko on perusmuodossa.
 // Lisää uudet viikot listan loppuun (alkaa = maanantai). Tavallinen moduuli: kelpaa myös selaimeen.
 
+import { kaupunginReittiSiemenesta } from "@/lib/kuntaliitos/kaupunkireitit";
+
 export type ViikonReitti = { alkaa: string; otsikko: string; reitti: string[] };
 
 export const VIIKON_REITIT: Record<"rajanaapurit" | "kuntaliitos" | "osavaltiot", ViikonReitti[]> = {
@@ -204,8 +206,17 @@ export const viikkoSiemenesta = (siemen: string | null) => (siemen ? SIEMEN.exec
 
 export const viikonReitti = (peli: keyof typeof VIIKON_REITIT, alkaa: string) => VIIKON_REITIT[peli].find((v) => v.alkaa === alkaa) ?? null;
 
+/** Käsin otsikoitu kiinteä reitti siemenestä: viikko-YYYY-MM-DD (viikon reitti) tai kuntaliitoksen
+    kaupunki-<slug> (kaupunkisivun reitti, lib/kuntaliitos/kaupunkireitit.ts). Muuten null = arvottu reitti. */
+export function kiinteaReitti(peli: keyof typeof VIIKON_REITIT, siemen: string | null): { otsikko: string; reitti: string[] } | null {
+  const viikko = viikkoSiemenesta(siemen);
+  if (viikko) return viikonReitti(peli, viikko);
+  return peli === "kuntaliitos" ? kaupunginReittiSiemenesta(siemen) : null;
+}
+
 /** Sivun reitti (palvelimella): viikon reitti heroineen, kun ei pyydettyä reittiä eikä ryhmää;
-    ?reitti=viikko-… on jaettu viikon reitti (suoraan laudalle); muuten arvonta kuten ennen. */
+    ?reitti=viikko-… on jaettu viikon reitti (suoraan laudalle); kaupunkisivun reitti (?reitti=kaupunki-…)
+    alkaa herosta kuten viikon reitti, koska sinne tullaan kaupunkisivun kortista; muuten arvonta kuten ennen. */
 export function sivunReitti<R>(
   peli: keyof typeof VIIKON_REITIT,
   p: { paivaIso: string; pyydetty: string | null; ryhma: string | null },
@@ -218,6 +229,11 @@ export function sivunReitti<R>(
     const siemen = viikonSiemen(alkaa);
     const v = viikonReitti(peli, alkaa);
     return { reitti: (v && f.alueista(v.reitti, siemen)) || f.arvo(siemen, null), siemen, otsikko: v?.otsikko ?? null, intro: !jaettu, kuluva };
+  }
+  const kiintea = kiinteaReitti(peli, p.pyydetty);
+  if (kiintea && p.pyydetty) {
+    const r = f.alueista(kiintea.reitti, p.pyydetty);
+    if (r) return { reitti: r, siemen: p.pyydetty, otsikko: kiintea.otsikko, intro: true, kuluva };
   }
   const siemen = p.pyydetty ?? p.paivaIso;
   return { reitti: f.arvo(siemen, p.ryhma), siemen, otsikko: null, intro: false, kuluva };

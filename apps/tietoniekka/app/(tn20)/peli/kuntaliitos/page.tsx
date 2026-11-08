@@ -3,6 +3,7 @@
 //   /peli/kuntaliitos               viikon reitti + hero (sama kaikille koko viikon, lib/reittipeli/viikonReitit.ts)
 //   /peli/kuntaliitos?reitti=x7k2   tietty reitti (Arvo uusi reitti, haastelinkki)
 //   /peli/kuntaliitos?maakunta=uusimaa   reitti alkaa Uudeltamaalta (oma päivän reitti per maakunta)
+//   /peli/kuntaliitos?reitti=kaupunki-mikkeli   kaupunkisivun reitti herolla (lib/kuntaliitos/kaupunkireitit.ts)
 // Reitti ja sen alueen kartta arvotaan palvelimella (lib/kuntaliitos/reitti.ts).
 
 import { JsonLd, peliLd } from "@/lib/jsonLd";
@@ -52,6 +53,7 @@ export default async function KuntaliitosSivu({ searchParams }: Props) {
   const paiva = helsinginPaiva();
   const maakunta = maakuntaTunnuksella(typeof sp.maakunta === "string" ? sp.maakunta : null);
   const valinta = sivunReitti("kuntaliitos", { paivaIso: paiva.iso, pyydetty, ryhma: maakunta?.nimi ?? null }, { arvo: arvoReitti, alueista: reittiAlueista });
+  const kaveri = pyydetty ? reittiKaveri(sp.tulos, sp.y) : null;
   return (
     <>
       <JsonLd data={peliLd({ name: "Kuntaliitos", url: "/peli/kuntaliitos", description: "Järjestä kahdeksan kuntaa reitiksi niin, että jokaisella vierekkäisellä parilla on yhteinen raja. Uusi viikon reitti joka maanantai." })} />
@@ -64,9 +66,9 @@ export default async function KuntaliitosSivu({ searchParams }: Props) {
         paivanReitti={!pyydetty}
         reittiNimi={maakunta ? `Päivän reitti ${paiva.pv}.${paiva.kk}.` : `Viikon reitti ${viikonAikavali(valinta.kuluva)}`}
         otsikko={valinta.otsikko}
-        intro={valinta.intro}
+        intro={valinta.intro && !kaveri}
         viikko={valinta.kuluva}
-        kaveri={pyydetty ? reittiKaveri(sp.tulos, sp.y) : null}
+        kaveri={kaveri}
       />
     </>
   );

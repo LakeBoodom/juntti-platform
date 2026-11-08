@@ -81,6 +81,11 @@
 }
 .tn20 .ks-kausi-kuvaus { display: none; }
 .tn20 .ks-kausi-cta { display: flex; align-items: center; min-height: 44px; font-weight: 700; font-size: 14px; color: #a9d8ee; }
+/* Kuntaliitos-kortti: karttapelien turkoosi (jakokortin "Karttapeli"), vaalea kartta kuvana. */
+.tn20 .ks-kausi--reitti { border-color: #22575a; background: #111a19; }
+.tn20 .ks-kausi--reitti:hover { border-color: #2dd4bf; }
+.tn20 .ks-kausi--reitti .ks-kausi-kuva { background: #dce6e8; }
+.tn20 .ks-kausi--reitti .ks-kausi-tag, .tn20 .ks-kausi--reitti .ks-kausi-cta { color: #2dd4bf; }
 
 /* ── Osiot ────────────────────────────────────────────────────────────────────────────────────────────── */
 .tn20 .ks-osio { padding: 30px var(--ks-reuna) 0; }
@@ -173,6 +178,7 @@
   .tn20 .ks-kausi-nimi { font-size: min(30px, calc((100cqw - 540px) * .97 / var(--ks-em, 8))); line-height: .95; }
   .tn20 .ks-kausi-kuvaus { display: block; font-size: 16px; color: #b9c6cc; }
   .tn20 .ks-kausi-cta { height: 48px; padding: 0 22px; border-radius: 12px; border: 1.5px solid #a9d8ee; font-weight: 800; font-size: 15px; color: #ddf1fa; white-space: nowrap; }
+    .tn20 .ks-kausi--reitti .ks-kausi-cta { border-color: #2dd4bf; color: #d5faf4; }
   .tn20 .ks-osio-otsikko { margin-bottom: 18px; }
   .tn20 .ks-osio-otsikko::after { content: ""; flex: 1; height: 1px; background: #2c2517; align-self: center; }
   .tn20 .ks-h2 { font-size: min(34px, calc(100cqw * .97 / var(--ks-em, 8))); }
