@@ -11,6 +11,7 @@
 // public/20/rajanaapurit/liput/<koodi>.webp (sama kansio kuin Rajanaapureilla, puuttuvat lisätään).
 //
 //   NEXT_PUBLIC_SUPABASE_URL=… NEXT_PUBLIC_SUPABASE_ANON_KEY=… node scripts/mikamaa-data.mjs
+//   node scripts/mikamaa-paakaupungit.mjs   (pääkaupunkien sijainnit etäisyyteen, aina tämän jälkeen)
 
 import { writeFileSync, existsSync, mkdirSync } from "node:fs";
 import { dirname, join } from "node:path";

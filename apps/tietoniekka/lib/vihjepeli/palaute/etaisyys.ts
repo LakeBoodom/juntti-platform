@@ -1,4 +1,5 @@
-// VIHJEPELI — etäisyys- ja suuntapalaute (maa, myöhemmin kaupunki). Linnuntie keskipisteiden välillä.
+// VIHJEPELI — etäisyys- ja suuntapalaute (maa, myöhemmin kaupunki). Linnuntie aiheen antamien pisteiden välillä
+// (maat: pääkaupungit, Heikki 8.11.2026).
 
 import { haversineKm } from "../../duel";
 import type { Palaute, Suunta } from "../tyypit";

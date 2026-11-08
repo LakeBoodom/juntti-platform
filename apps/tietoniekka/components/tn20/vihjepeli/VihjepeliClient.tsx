@@ -256,6 +256,31 @@ export default function VihjepeliClient({ k }: { k: MaaKierros }) {
   const ehdot = useMemo(() => (syote.trim() ? ehdotukset(k.kohteet, syote, 8).filter((m) => !arvatut.has(m.id)).slice(0, 5) : []), [syote, k.kohteet, arvatut]);
   const listaAuki = lista && ehdot.length > 0 && !valmis;
 
+  /* Ehdotuslista aukeaa alaspäin, ettei se peitä vihjettä (Heikki 8.11.). Mobiilissa näppäimistö vie ruudun alaosan,
+     joten tila mitataan näkyvästä alueesta (visualViewport): jos alle mahtuu vähintään kaksi riviä, lista tulee alle ja
+     vierittyy tarvittaessa, muuten yläpuolelle. */
+  const [listanPaikka, setListanPaikka] = useState<{ alas: boolean; max: number }>({ alas: true, max: 320 });
+  useEffect(() => {
+    if (!listaAuki) return;
+    const mittaa = () => {
+      const k = kentta.current?.getBoundingClientRect();
+      if (!k) return;
+      const vv = window.visualViewport;
+      const ala = (vv ? vv.offsetTop + vv.height : window.innerHeight) - k.bottom - 12;
+      const yla = k.top - (vv ? vv.offsetTop : 0) - 12;
+      const alas = ala >= 110 || ala >= yla;
+      // Ylöspäin enintään kolme riviä, jotta lista peittää vihjettä mahdollisimman vähän (lisäkirjaimet rajaavat listaa).
+      setListanPaikka({ alas, max: alas ? Math.max(100, Math.min(320, ala)) : Math.max(100, Math.min(160, yla)) });
+    };
+    mittaa();
+    window.visualViewport?.addEventListener("resize", mittaa);
+    window.visualViewport?.addEventListener("scroll", mittaa);
+    return () => {
+      window.visualViewport?.removeEventListener("resize", mittaa);
+      window.visualViewport?.removeEventListener("scroll", mittaa);
+    };
+  }, [listaAuki]);
+
   const valitse = (m: MaaKohde) => {
     setSyote(m.nimi);
     setLista(false);
@@ -587,7 +612,7 @@ export default function VihjepeliClient({ k }: { k: MaaKierros }) {
                   onBlur={() => setTimeout(() => setLista(false), 150)}
                 />
                 {listaAuki && (
-                  <ul className="mm-ehdotukset" id="mm-ehdotukset" role="listbox" aria-label="Ehdotukset">
+                  <ul className="mm-ehdotukset" id="mm-ehdotukset" role="listbox" aria-label="Ehdotukset" data-alas={listanPaikka.alas || undefined} style={{ maxHeight: listanPaikka.max }}>
                     {ehdot.map((m, i) => (
                       <li
                         key={m.id}

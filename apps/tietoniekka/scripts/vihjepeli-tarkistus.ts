@@ -49,7 +49,7 @@ console.log(`  ${MAAT.length} maata, ${nimet.size} hakunimeä; "Ch" → ${ehdotu
 
 console.log("3. Etäisyys ja suunta");
 const maa = (id: string) => MAAT.find((m) => m.id === id)!;
-for (const [a, b] of [["FIN", "SWE"], ["FIN", "CHL"], ["JPN", "BRA"], ["BRA", "CHL"], ["ARG", "CHL"], ["FIN", "EST"]]) {
+for (const [a, b] of [["FIN", "SWE"], ["FIN", "CHL"], ["JPN", "BRA"], ["BRA", "CHL"], ["ARG", "CHL"], ["FIN", "EST"], ["LVA", "EST"], ["LTU", "EST"], ["NOR", "EST"]]) {
   const p = MAA_AIHE.palaute(maa(a), maa(b));
   if (p.tyyppi === "etaisyys") console.log(`  ${maa(a).nimi} → ${maa(b).nimi}: ${p.km} km, ${p.suunta} (${p.asteet}°)${p.naapuri ? ", naapuri" : ""}`);
 }
@@ -57,6 +57,10 @@ const fs = MAA_AIHE.palaute(maa("FIN"), maa("SWE"));
 if (fs.tyyppi !== "etaisyys" || !["länsi", "lounas"].includes(fs.suunta) || !fs.naapuri) virhe("Suomi → Ruotsi: odotettiin länsi tai lounas ja naapuri");
 const fe = MAA_AIHE.palaute(maa("FIN"), maa("EST"));
 if (fe.tyyppi !== "etaisyys" || fe.suunta !== "etelä" || fe.naapuri) virhe("Suomi → Viro: odotettiin etelä, ei maanaapuri");
+// Pääkaupunkien väli (Heikki 8.11.2026): Helsinki–Tallinna ≈ 80 km, Riika–Tallinna ≈ 280 km.
+if (fe.tyyppi !== "etaisyys" || fe.km < 70 || fe.km > 100) virhe(`Suomi → Viro: ${fe.tyyppi === "etaisyys" ? fe.km : "?"} km, odotettiin 70–100`);
+const le = MAA_AIHE.palaute(maa("LVA"), maa("EST"));
+if (le.tyyppi !== "etaisyys" || le.km < 260 || le.km > 300 || le.suunta !== "pohjoinen") virhe("Latvia → Viro: odotettiin ≈ 280 km pohjoiseen");
 
 console.log("4. Harjoitus");
 for (const p of paivat.slice(0, 60)) for (const s of ["a", "b", "c"]) if (harjoitusKohde(MAA_AIHE, p, s)?.id ===paivanKohde(MAA_AIHE, p).id) virhe(`harjoitus = päivän maa ${p}`);

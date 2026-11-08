@@ -2,6 +2,8 @@
 // Vihje 4 = siluetti + maanosa, vihje 5 = pääkaupunki tai lippu (pkl: pääkaupunki paljastaisi nimen).
 // Arvotaan vain A- ja B-maat (Heikki 7.11.2026: 99 maata, Venäjä ei arvonnassa); C-maat ovat täydennyslistassa.
 // Siluetit (≈ 200 kt) jäävät palvelimelle: selaimeen menee kevyt lista ja kierroksen oma kohde.
+// Etäisyys ja suunta pääkaupunkien välillä (pl, scripts/mikamaa-paakaupungit.mjs; Heikki 8.11.2026: painopisteiden
+// väli antoi Suomesta Viroon 650 km, pelaaja ajattelee Helsinki–Tallinna ≈ 80 km).
 
 import aineisto from "../maat.json";
 import { etaisyysPalaute } from "../palaute/etaisyys";
@@ -10,10 +12,10 @@ import type { Kohde, Vaikeus, VihjepeliAihe } from "../tyypit";
 
 type MaaRivi = {
   k: string; n: string; syn?: string[]; m: string; pk: string; pkl?: true;
-  lat: number; lon: number; nr?: string[]; d: string; b: number[]; v: string; taso: string;
+  lat: number; lon: number; pl: number[]; nr?: string[]; d: string; b: number[]; v: string; taso: string;
 };
 
-/** Selaimeen menevä osa: täydennys ja palaute (etäisyys, suunta, naapuri). */
+/** Selaimeen menevä osa: täydennys ja palaute (etäisyys, suunta, naapuri). lat/lon = pääkaupungin sijainti. */
 export type MaaKohde = Kohde & { lat: number; lon: number; nr?: string[] };
 /** Kierroksen oikea maa: myös vihjeiden 4–5 aineisto ja tulosnäkymä. */
 export type MaaTaysi = MaaKohde & { maanosa: string; paakaupunki: string; lippuVihjeena: boolean; siluetti: string; laatikko: [number, number, number, number]; lippu: string };
@@ -21,7 +23,7 @@ export type MaaTaysi = MaaKohde & { maanosa: string; paakaupunki: string; lippuV
 const rivit = (aineisto as { maat: MaaRivi[] }).maat;
 const laatikko = (b: number[]) => b as [number, number, number, number];
 
-export const MAAT: MaaKohde[] = rivit.map((r) => ({ id: r.k, nimi: r.n, ...(r.syn ? { syn: r.syn } : {}), taso: r.taso as Vaikeus, lat: r.lat, lon: r.lon, ...(r.nr ? { nr: r.nr } : {}) }));
+export const MAAT: MaaKohde[] = rivit.map((r) => ({ id: r.k, nimi: r.n, ...(r.syn ? { syn: r.syn } : {}), taso: r.taso as Vaikeus, lat: r.pl[0], lon: r.pl[1], ...(r.nr ? { nr: r.nr } : {}) }));
 
 export function maaTaysi(id: string): MaaTaysi | null {
   const r = rivit.find((x) => x.k === id);

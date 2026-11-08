@@ -141,8 +141,12 @@
 }
 .tn20 .mm-ehdotukset {
   position: absolute; z-index: 5; left: 0; right: 0; bottom: calc(100% + 6px); list-style: none; margin: 0; padding: 4px;
-  display: flex; flex-direction: column; border-radius: 14px; background: var(--mm-pinta); box-shadow: 0 0 0 1px var(--mm-viiva2), 0 10px 24px rgba(0, 0, 0, .5);
+  display: flex; flex-direction: column; overflow-y: auto; overscroll-behavior: contain;
+  border-radius: 14px; background: var(--mm-pinta); box-shadow: 0 0 0 1px var(--mm-viiva2), 0 10px 24px rgba(0, 0, 0, .5);
 }
+/* Alaspäin, kun tila riittää (Heikki 8.11.: ylöspäin aukeava lista peitti vihjeen); paikka mitataan komponentissa. */
+.tn20 .mm-ehdotukset[data-alas] { bottom: auto; top: calc(100% + 6px); }
+.tn20 .mm-ehdotukset li { flex: none; }
 .tn20 .mm-ehdotukset li { display: flex; align-items: center; min-height: 48px; padding: 0 14px; border-radius: 10px; font-size: 18px; font-weight: 600; color: var(--mm-teksti); cursor: pointer; }
 .tn20 .mm-ehdotukset li[aria-selected="true"], .tn20 .mm-ehdotukset li:hover { background: var(--mm-viiva); }
 .tn20 .mm-alarivi { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 4px; }
@@ -241,7 +245,6 @@
   .tn20 .mm-palkki { height: 6px; border-radius: 3px; }
   .tn20 .mm-kentta { height: 60px; border-radius: 16px; font-size: 18px; padding: 0 18px; }
   .tn20 .mm-arvaa { height: 60px; padding: 0 26px; font-size: 18px; }
-  .tn20 .mm-ehdotukset { bottom: auto; top: calc(100% + 6px); }
   .tn20 .mm-uusin.mm-viimeinen { font-size: 24px; }
 
   .tn20 .mm-tulos-yla { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); grid-template-areas: "t k" "j k"; grid-template-rows: auto 1fr; column-gap: 40px; row-gap: 24px; }
