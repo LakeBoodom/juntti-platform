@@ -13,6 +13,7 @@ import PaivanVisaV5 from "./PaivanVisaV5";
 import Juhlabanneri from "./Juhlabanneri";
 import IkaLaskuri from "./IkaLaskuri";
 import PeliKuvitus, { KUVITETUT } from "./PeliKuvitus";
+import MikaMaaBanneri from "./MikaMaaBanneri";
 import { kuvanSrcSet } from "@/lib/kuvaVariantit";
 
 type D = NonNullable<EtusivuData>;
@@ -37,7 +38,7 @@ function Kuva({ src, pos, luokka, eager, sizes = KUVA_SIZES }: {
 
 function PaivanPelit({ d }: { d: D }) {
   const { pvm, visa, mikaMaa, sankari } = d.paivanPelit;
-  const mmPelattava = mikaMaa?.tila === "pelattava";
+  const mmPelattava = !!mikaMaa;
   /* "n/3 pelattu tänään" vasta kun päiväpelejä (Päivän visa, Mikä maa?) on ≥ 2 pelattavana; Synttärit ei ole päiväpeli. */
   const paivapeleja = [visa, mmPelattava].filter(Boolean).length;
   const maara = [visa, mmPelattava, sankari].filter(Boolean).length;
@@ -76,37 +77,10 @@ function PaivanPelit({ d }: { d: D }) {
               </span>
             </a>
           )}
-          {mikaMaa && <MikaMaa m={mikaMaa} />}
+          {mikaMaa && <MikaMaaBanneri href={mikaMaa.href} vihje={mikaMaa.vihje} />}
         </div>
       </div>
     </section>
-  );
-}
-
-/** Päivän pelit, kolmas paikka: Mikä maa? (kompassinpunainen). Tulossa-kortti ei ole klikattava. */
-function MikaMaa({ m }: { m: NonNullable<D["paivanPelit"]["mikaMaa"]> }) {
-  const tulossa = m.tila === "tulossa";
-  const [, kk, pv] = (m.julkaisu ?? "").split("-").map(Number);
-  const sisus = (
-    <>
-      <span className="tn-es-mm-merkki" aria-hidden="true">
-        <i /><i /><i /><i /><i /><i />
-      </span>
-      <span className="tn-es-slot-teksti">
-        <span className="tn-es-laji"><i aria-hidden="true" /><span>{m.nimi}</span></span>
-        <span className="tn-es-slot-h" style={lw("Päivän maa")}>Päivän maa</span>
-        <span className="tn-es-slot-rivi">{m.etusivu_rivi}</span>
-        {tulossa
-          ? <span className="tn-es-mm-leima">Tulossa{m.julkaisu ? ` ${pv}.${kk}.` : ""}</span>
-          : <span className="tn-es-nappi tn-es-nappi--acc">Arvaa</span>}
-      </span>
-    </>
-  );
-  const tyyli = { "--acc": m.aksentti } as CSSProperties;
-  return tulossa ? (
-    <div className="tn-es-slot tn-es-mm" data-tulossa aria-disabled="true" style={tyyli}>{sisus}</div>
-  ) : (
-    <a className="tn-es-slot tn-es-mm" href={m.href} data-paivan-peli="slotti" data-tn-entry="etusivu:mika-maa" style={tyyli}>{sisus}</a>
   );
 }
 

@@ -40,11 +40,11 @@ export function lueTallenne(iso: string): MaaTallenne | null {
   }
 }
 
-/** Jakotekstit v4: "Mikä maa?: arvasin kolmannella arvauksella. Kokeile itse:" */
+/** Jakotekstit v4: "Mikä maa?: sain oikein kolmannella yrityksellä. Kokeile itse:" (Heikki 8.11.: ei "arvasin"). */
 export function jakoteksti(t: Pick<MaaTallenne, "arvaukset" | "ratkesi">): string {
   return tulosjakoteksti(
     MM_NIMI,
-    t.ratkesi ? `arvasin ${jarjestysluvulla(t.arvaukset.length)} arvauksella` : "en arvannut kuudella arvauksella" /* ARVAUKSIA = 6 */,
+    t.ratkesi ? `sain oikein ${jarjestysluvulla(t.arvaukset.length)} yrityksellä` : "en saanut oikein kuudella yrityksellä" /* ARVAUKSIA = 6 */,
   );
 }
 

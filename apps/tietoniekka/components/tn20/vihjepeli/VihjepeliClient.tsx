@@ -1,22 +1,25 @@
 "use client";
-// MIKÄ MAA? — pelinäkymä (CD "Tietoniekka - Mika maa paketti" 7.11.2026, osiot 1 ja 2; Heikin päätökset 7.11.).
-//   - Kuusi arvausta. Vihje 1 näkyy heti, jokainen väärä arvaus avaa seuraavan: 2, 3, siluetti + maanosa,
-//     pääkaupunki (tai lippu, jos pääkaupunki paljastaisi nimen). Kuudes arvaus tehdään kaikilla viidellä vihjeellä.
-//   - Ei ingressiä: otsikkorivillä nimi, päivän maan rivi ja kuusi pistettä (Heikki 7.11. kohta 4).
-//   - Arvaa-painike on lime-pilleri (UI-laatusääntö 5, Heikki 7.11. kohta 2).
-//   - Uusin vihje on valkoinen kortti punaisella reunalla. Vanhemmat tiivistyvät kahdelle riville; napautus avaa.
-//   - Väärä arvaus: etäisyys keskipisteiden välillä (10 km:n tarkkuus) ja suunta kahdeksana ilmansuuntana.
-//   - Päivän maa kerran päivässä (tulos selaimeen → "jo pelattu"). Harjoitusmaa (?kohde=) ei vaikuta siihen.
-//   - Tulos on pelkkä arvausnumero ("3. arvauksella"), ei tasonimeä; jako Jakoalueella (jakotekstit v4).
+// MIKÄ MAA? — pelinäkymä (CD "Tietoniekka - Mika maa paketti" 7.11.2026; CD "Mikä maa? mustalla" 8a–8d, Heikki 8.11.2026).
+//   - Musta pohja aloitussivulta tulokseen kuten muu Tietoniekka. Laivastonsininen on maan oma väri: siluettilaatta
+//     ja paljastuskortti. Lime vain Arvaa-painikkeessa ja oikean yrityksen merkissä.
+//   - Kuusi yritystä numeroituina lokeroina. Vihje 1 näkyy heti, jokainen väärä vastaus avaa seuraavan: 2, 3, siluetti
+//     + maanosa, pääkaupunki (tai lippu, jos pääkaupunki paljastaisi nimen). Kuudes yritys tehdään kaikilla vihjeillä.
+//   - Vihjeet aikajärjestyksessä, uusin alimpana oranssilla reunalla lähimpänä syötettä (Heikki 8.11.). Mobiilissa
+//     arvausrivit ennen vihjeitä ja syöte ruudun alareunassa, joten uusin vihje on aina suoraan syötteen yläpuolella.
+//   - Kuudennella yrityksellä uusimman vihjeen paikalla "Voit yrittää vielä uudelleen." (Heikki 8.11.).
+//   - Väärä vastaus: etäisyys keskipisteiden välillä, suunta ja lähestymispalkki (lähempänä pidempi ja lämpimämpi).
+//   - Päivän maa kerran päivässä (tulos selaimeen → "jo pelattu"). Arvottu maa (?kohde=, "Arvo uusi maa") ei vaikuta siihen.
+//   - Tulos "Sait oikein 3. yrityksellä" (Heikki 8.11.); jako Jakoalueella tuloksen alla (jakotekstit v4).
 // Selaimeen tulee vain kevyt maalista ja kierroksen oma maa (siluetti), ei koko aineistoa.
 
-import { useEffect, useMemo, useRef, useState, type CSSProperties, type KeyboardEvent } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type KeyboardEvent } from "react";
 import Pelipalkki from "@/components/tn20/pelikehys/Pelipalkki";
 import { SeuraavaPeli } from "@/components/tn20/pelikehys/PeliTulos";
 import Jakoalue from "@/components/tn20/jako/Jakoalue";
 import { getSupabase } from "@/lib/supabase";
 import { lisaaPelirivi } from "@/lib/seuranta";
 import { seuraavatPelit } from "@/lib/pelimuodot";
+import { jarjestysluvulla } from "@/lib/korttinimi";
 import { ehdotukset, pisteet, tunnista } from "@/lib/vihjepeli/arvonta";
 import { etaisyysPalaute } from "@/lib/vihjepeli/palaute/etaisyys";
 import { ARVAUKSIA, type Suunta } from "@/lib/vihjepeli/tyypit";
@@ -92,19 +95,76 @@ function Siluetti({ d, laatikko, nimi }: { d: string; laatikko: [number, number,
 
 type Rivi = { maa: MaaKohde | null; oikein: boolean; km: number; suunta: Suunta };
 
-const SYYT = [
-  { h: "Yksi maa päivässä, sama kaikille.", s: "Kaikki arvaavat tänään saman maan. Vertaa kavereiden kanssa, monennellako vihjeellä osuit." },
-  { h: "Väärä arvaus vie lähemmäs.", s: "Ohi mennyt arvaus näyttää etäisyyden ja suunnan. Päättely on puoli peliä." },
-  { h: "Parissa minuutissa valmis.", s: "Kuusi vihjettä, kuusi yritystä. Jokaisesta vihjeestä jää käteen jokin fakta." },
-];
-const SAANNOT = [
-  { k: "1", h: "Lue vihje", s: "Kirjoita maan nimi. Ensimmäinen vihje on vaikein.", c: "#E8A320" },
-  { k: "↗", h: "Katso suunta", s: "Väärä arvaus näyttää etäisyyden ja suunnan oikeaan maahan.", c: "#F08A5D" },
-  { k: "6", h: "Kuusi yritystä", s: "Jokainen väärä arvaus avaa uuden vihjeen. Neljännellä näet siluetin.", c: "#8FD9D0" },
+/** Lähestymispalkki (CD 8a): täyttö 8–100 % (4 200 km → lähes tyhjä) ja väri sinisestä oranssiin. */
+const KYLMA = [79, 126, 162];
+const LAMMIN = [240, 138, 93];
+function lahestys(kmMatka: number) {
+  const t = Math.max(0.08, Math.min(1, 1 - kmMatka / 4200));
+  const c = KYLMA.map((v, i) => Math.round(v + (LAMMIN[i] - v) * t));
+  return { "--mm-t": t.toFixed(3), "--mm-lampo": `rgb(${c.join(",")})` } as CSSProperties;
+}
+
+function Palkki({ km: matka }: { km: number }) {
+  return (
+    <span className="mm-palkki" aria-hidden="true">
+      <span style={lahestys(matka)} />
+    </span>
+  );
+}
+
+/** Kuusi yritystä lokeroina (CD 8a–8d): väärä ✗, ohitettu –, oikein ✓, vuorossa oleva numero limellä, tulevat himmeinä. */
+function Lokerot({ arvaukset, oikea, valmis, iso }: { arvaukset: string[]; oikea: string; valmis: boolean; iso?: boolean }) {
+  const n = arvaukset.length;
+  const ratkesi = arvaukset.includes(oikea);
+  const nimi = valmis
+    ? ratkesi
+      ? `Oikein ${jarjestysluvulla(n)} yrityksellä kuudesta`
+      : `Ei oikein kuudella yrityksellä`
+    : `Yritys ${n + 1} kuudesta, ${ARVAUKSIA - n} jäljellä`;
+  return (
+    <span className="mm-lokerot" data-iso={iso || undefined} role="img" aria-label={nimi}>
+      {Array.from({ length: ARVAUKSIA }, (_, i) => {
+        const id = arvaukset[i];
+        const tila = id === undefined ? (i === n && !valmis ? "nyt" : "tuleva") : id === oikea ? "ok" : id === OHITA ? "ohi" : "vaara";
+        return (
+          <span key={i} data-tila={tila}>
+            {tila === "ok" ? "✓" : tila === "vaara" ? "✗" : tila === "ohi" ? "–" : i + 1}
+          </span>
+        );
+      })}
+    </span>
+  );
+}
+
+/** Laivastonsininen siluettilaatta kohdistinrenkain (CD 8a/8b, sama kieli kuin tunnuksessa). */
+function Siltaulu({ o, uusin }: { o: MaaKierros["oikea"]; uusin: boolean }) {
+  return (
+    <div className="mm-siltaulu" data-uusin={uusin || undefined} data-uusi={uusin ? "" : undefined}>
+      <svg className="mm-siltaulu-renkaat" viewBox="0 0 400 400" aria-hidden="true">
+        <circle cx={200} cy={200} r={170} />
+        <circle cx={200} cy={200} r={120} />
+      </svg>
+      <span className="mm-siltaulu-otsikko">
+        <span className="mm-sr">Vihje 4: </span>
+        <span aria-hidden="true">Vihje 4 · ääriviivat</span>
+      </span>
+      <Siluetti d={o.siluetti} laatikko={o.laatikko} />
+      <span className="mm-maanosa">{o.maanosa}</span>
+    </div>
+  );
+}
+
+/* Ohjeet kolmessa kohdassa (Heikki 8.11.2026: aloitussivun lede, kolme syytä ja Näin pelaat toistivat samaa).
+   Suunnan merkki on SVG: ↗-merkki piirtyy iOS:llä emojina. */
+const SAANNOT: Array<{ k: string | null; h: string; s: string; c: string }> = [
+  { k: "6", h: "Kuusi yritystä", s: "Ensimmäinen vihje on vaikein. Jokainen väärä vastaus avaa uuden, ja neljäs näyttää maan ääriviivat. Viimeinen yritys tehdään kaikilla viidellä vihjeellä.", c: "#E8A320" },
+  { k: null, h: "Väärä vastaus vie lähemmäs", s: "Näet, kuinka kaukana oikea maa on ja mihin suuntaan.", c: "#F08A5D" },
+  { k: "1", h: "Uusi maa joka päivä", s: "Kaikki arvaavat saman maan. Vertaa kavereiden kanssa, monennellako osuit.", c: "#8FD9D0" },
 ];
 
-/** ALOITUSSIVU (CD-paketti v0.2, 0a/0b): päivän vihje 1 otsikkona ja kysymys perään, yksi lause, tunnus, CTA, kolme syytä
- *  ja Näin pelaat. Jos päivän maa on jo pelattu, CTA vie tulokseen. Otsikon koko lasketaan pisimmästä sanasta (KORTTISÄÄNTÖ). */
+/** ALOITUSSIVU (CD-paketti v0.2, 0a/0b; tiivistetty 8.11.): päivän vihje 1 otsikkona ja kysymys perään, tunnus, CTA ja
+ *  Näin pelaat kolmessa kohdassa. Jos päivän maa on jo pelattu, CTA vie tulokseen. Otsikon koko lasketaan pisimmästä
+ *  sanasta (KORTTISÄÄNTÖ). */
 function Aloitus({ paiva, vihje, pelattu, aloita }: { paiva: string; vihje: string; pelattu: boolean; aloita: () => void }) {
   const pisin = Math.max(4, ...vihje.split(/[\s-]+/).map((w) => w.replace(/[.,:;]/g, "").length));
   return (
@@ -112,38 +172,31 @@ function Aloitus({ paiva, vihje, pelattu, aloita }: { paiva: string; vihje: stri
       <Pelipalkki iho="tumma" peli={MM_NIMI} koti={MM_KOTI} />
       <main className="mm-in">
         <div className="mm-in-yla">
-          <span className="mm-in-eyebrow">Päivän maa · {paiva} · sama kaikille</span>
+          <span className="mm-in-eyebrow">Päivän maa · {paiva}</span>
           <div className="mm-in-otsikko">
             <h1 className="mm-in-h1" data-pitka={vihje.length > 50 ? "" : undefined} style={{ "--mm-in-lw": pisin } as CSSProperties}>
               {vihje} <span>{MM_NIMI}</span>
             </h1>
           </div>
-          <p className="mm-in-lede">Tunnista maa kuudella vihjeellä. Jokainen väärä arvaus kertoo, kuinka kaukana olet ja mihin suuntaan jatkaa.</p>
           <div className="mm-in-kuva">
-            <MikaMaaTunnus sanamerkki />
+            <MikaMaaTunnus sanamerkki tumma />
           </div>
           <div className="mm-in-toiminto">
             <button type="button" className="tn-cta-lime mm-in-cta" onClick={aloita}>{pelattu ? "Katso tuloksesi" : "Arvaa päivän maa"}</button>
-            <span className="mm-in-uusi">Uusi maa joka päivä keskiyöllä</span>
           </div>
         </div>
-        <ol className="mm-in-syyt">
-          {SYYT.map((x, i) => (
-            <li key={i}>
-              <span className="mm-in-nro">{String(i + 1).padStart(2, "0")}</span>
-              <div>
-                <b>{x.h}</b>
-                <span>{x.s}</span>
-              </div>
-            </li>
-          ))}
-        </ol>
         <section className="mm-in-ohje" aria-labelledby="mm-in-ohje-h">
           <h2 id="mm-in-ohje-h">Näin pelaat</h2>
           <ol>
             {SAANNOT.map((x) => (
               <li key={x.h}>
-                <span className="mm-in-merkki" style={{ color: x.c, borderColor: x.c }} aria-hidden="true">{x.k}</span>
+                <span className="mm-in-merkki" style={{ color: x.c, borderColor: x.c }} aria-hidden="true">
+                  {x.k ?? (
+                    <svg viewBox="0 0 24 24" width={18} height={18}>
+                      <path d="M7 17 17 7M9 7h8v8" fill="none" stroke="currentColor" strokeWidth={2.6} strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                  )}
+                </span>
                 <div>
                   <b>{x.h}</b>
                   <span>{x.s}</span>
@@ -166,10 +219,12 @@ export default function VihjepeliClient({ k }: { k: MaaKierros }) {
   const [auki, setAuki] = useState<Set<number>>(new Set());
   const [kaikki, setKaikki] = useState(false);
   const [paivanTulos, setPaivanTulos] = useState<MaaTallenne | null>(null);
-  /* Päivän maa alkaa aloitussivulta (CD v0.2); harjoitusmaa ("Pelaa harjoitusmaa") suoraan laudalle. */
+  /* Päivän maa alkaa aloitussivulta (CD v0.2); arvottu maa ("Arvo uusi maa") suoraan laudalle. */
   const [aloitus, setAloitus] = useState(k.harjoitus === null);
   const kentta = useRef<HTMLInputElement>(null);
   const juuri = useRef<HTMLDivElement>(null);
+  const uusinAlue = useRef<HTMLDivElement>(null);
+  const syoteAlue = useRef<HTMLDivElement>(null);
 
   const harjoitus = k.harjoitus !== null;
   const o = k.oikea;
@@ -202,6 +257,36 @@ export default function VihjepeliClient({ k }: { k: MaaKierros }) {
   const ehdot = useMemo(() => (syote.trim() ? ehdotukset(k.kohteet, syote, 8).filter((m) => !arvatut.has(m.id)).slice(0, 5) : []), [syote, k.kohteet, arvatut]);
   const listaAuki = lista && ehdot.length > 0 && !valmis;
 
+  /* Ehdotukset (Heikki 8.11.): desktopilla lista kentän alle. Mobiilissa syöte on ruudun alareunassa ja näppäimistö vie
+     kaiken sen alta, ja ylöspäin aukeava lista peitti vihjeen. Siksi mobiilissa ehdotukset ovat yhtenä nappirivinä
+     suoraan kentän yläpuolella, syöteosan sisällä: rivi näkyy aina näppäimistön yläpuolella, ja uusin vihje vieritetään
+     rivin yläpuolelle. Tila päätellään asettelusta (syöteosa sticky = mobiili), ei näppäimistön mittauksesta, koska
+     iOS:n visualViewport ei kerro luotettavasti näppäimistön ja Safarin työkalurivin korkeutta. */
+  const [rivina, setRivina] = useState(false);
+  useLayoutEffect(() => {
+    if (!listaAuki) return;
+    const s = syoteAlue.current;
+    setRivina(!!s && getComputedStyle(s).position === "sticky");
+  }, [listaAuki]);
+  const nakyviin = (liike: ScrollBehavior) => {
+    const el = uusinAlue.current;
+    const s = syoteAlue.current;
+    if (!el) return;
+    const peitto = s && getComputedStyle(s).position === "sticky" ? s.offsetHeight : 0;
+    el.style.scrollMarginBottom = `${peitto + 12}px`;
+    el.scrollIntoView({ block: "end", behavior: liike });
+  };
+  useEffect(() => {
+    if (!listaAuki || !rivina) return;
+    const r = requestAnimationFrame(() => {
+      const el = uusinAlue.current?.getBoundingClientRect();
+      const s = syoteAlue.current?.getBoundingClientRect();
+      // Vieritetään vain, jos nappirivi jäi uusimman vihjeen päälle.
+      if (el && s && el.bottom > s.top - 4) nakyviin(hiljaa() ? "auto" : "smooth");
+    });
+    return () => cancelAnimationFrame(r);
+  }, [listaAuki, rivina]);
+
   const valitse = (m: MaaKohde) => {
     setSyote(m.nimi);
     setLista(false);
@@ -218,7 +303,7 @@ export default function VihjepeliClient({ k }: { k: MaaKierros }) {
       return;
     }
     if (arvatut.has(m.id)) {
-      setViesti(`Arvasit jo: ${m.nimi}.`);
+      setViesti(`Kokeilit jo: ${m.nimi}.`);
       return;
     }
     kirjaa([...arvaukset, m.id], m.id === o.id ? `Oikein: ${o.nimi}.` : `Väärin: ${m.nimi}.`);
@@ -233,8 +318,14 @@ export default function VihjepeliClient({ k }: { k: MaaKierros }) {
     const ratkesiNyt = uudet[uudet.length - 1] === o.id;
     const loppui = ratkesiNyt || uudet.length >= ARVAUKSIA;
     const vaaria = uudet.filter((id) => id !== o.id).length;
-    setViesti(ratkesiNyt ? alku : loppui ? `Oikea maa oli ${o.nimi}.` : vaaria < VIHJEITA ? `${alku} Uusi vihje avautui.` : `${alku} Viimeinen arvaus.`);
-    if (!loppui) return;
+    setViesti(ratkesiNyt ? alku : loppui ? `Oikea maa oli ${o.nimi}.` : vaaria < VIHJEITA ? `${alku} Uusi vihje avautui.` : alku);
+    const liike = hiljaa() ? "auto" : "smooth";
+    if (!loppui) {
+      // Uusin vihje on vihjeiden alimpana: vieritetään se näkyviin syötteen yläpuolelle (mobiilissa syöte peittää
+      // ruudun alareunan, joten marginaaliksi syötteen korkeus).
+      requestAnimationFrame(() => nakyviin(liike));
+      return;
+    }
     const t: MaaTallenne = { kohde: o.id, arvaukset: uudet, ratkesi: ratkesiNyt };
     if (!harjoitus) {
       try {
@@ -245,7 +336,7 @@ export default function VihjepeliClient({ k }: { k: MaaKierros }) {
       setPaivanTulos(t);
     }
     void tallenna({ siemen: k.harjoitus ?? k.iso, kohde: o.id, paivan: !harjoitus, arvaukset: uudet, oikein: t.ratkesi });
-    requestAnimationFrame(() => juuri.current?.scrollIntoView({ block: "start", behavior: hiljaa() ? "auto" : "smooth" }));
+    requestAnimationFrame(() => juuri.current?.scrollIntoView({ block: "start", behavior: liike }));
   };
 
   const ohita = () => {
@@ -275,47 +366,19 @@ export default function VihjepeliClient({ k }: { k: MaaKierros }) {
   // ── Vihjeet ──
   const vihjeTeksti = (i: number) => (i < 3 ? k.vihjeet[i] : i === 4 && !o.lippuVihjeena ? `Pääkaupunki on ${o.paakaupunki}.` : null);
   const lippu = <img className="mm-lippu" src={o.lippu} alt="Päivän maan lippu" width={120} height={90} />;
-  const siluettiAuki = avattu >= 4;
-  /** Vihje 4 on siluetti omana uusimpana korttinaan (Heikki 7.11.: vihje 3 siluetin vieressä hämmensi); vihjeen 5
-   *  avauduttua siluetti pienenee laataksi uusimman vihjeen viereen. Tekstivihjeet 1–3 tiivistyvät pinoon. */
-  const uusinTeksti = avattu === 4 ? null : avattu - 1;
-  const vanhat = Array.from({ length: Math.min(avattu - 1, 3) }, (_, i) => i);
-
-  const vihjeKortti = (i: number) => (
-    <div className="mm-uusin" key={`u${i}-${avattu}`} data-uusi={avattu - 1 === i ? "" : undefined}>
+  const uusin = avattu - 1;
+  const vihjeKortti = (i: number, tuorein: boolean) => (
+    <div className="mm-uusin" key={`u${i}`} data-tuorein={tuorein || undefined} data-uusi={tuorein ? "" : undefined}>
+      <span className="mm-vihje-n" aria-hidden="true">{i + 1}</span>
       <span className="mm-sr">Vihje {i + 1}: </span>
-      {i === 4 && o.lippuVihjeena ? (
-        <span className="mm-lippuvihje">{lippu}</span>
-      ) : (
-        <span className="mm-uusin-t">{vihjeTeksti(i)}</span>
-      )}
+      {i === 4 && o.lippuVihjeena ? <span className="mm-lippuvihje">{lippu}</span> : <span className="mm-uusin-t">{vihjeTeksti(i)}</span>}
     </div>
   );
+  /** Tekstivihjeet 1–3, jotka eivät ole uusin (CD 8a: numeroituina uusimman alla). */
+  const vanhat = Array.from({ length: Math.min(uusin, 3) }, (_, i) => i);
 
-  const tila = valmis ? undefined : `Arvaus ${arvaukset.length + 1}/${ARVAUKSIA}`;
+  const tila = valmis ? undefined : `Yritys ${arvaukset.length + 1}/${ARVAUKSIA}`;
   const jaljella = ARVAUKSIA - arvaukset.length;
-
-  const otsake = (
-    <header className="mm-otsake">
-      <div className="mm-otsake-t">
-        <h1 className="mm-h1">{MM_NIMI}</h1>
-        <span className="mm-paiva">
-          {harjoitus ? (
-            <>
-              Harjoitusmaa · <a href={MM_SIVU}>Päivän maa {k.paiva}</a>
-            </>
-          ) : (
-            `Päivän maa ${k.paiva}`
-          )}
-        </span>
-      </div>
-      <span className="mm-pisteet" role="img" aria-label={`${jaljella} arvausta jäljellä`}>
-        {Array.from({ length: ARVAUKSIA }, (_, i) => (
-          <span key={i} data-kaytetty={i < arvaukset.length ? "" : undefined} />
-        ))}
-      </span>
-    </header>
-  );
 
   if (aloitus) {
     return (
@@ -340,105 +403,152 @@ export default function VihjepeliClient({ k }: { k: MaaKierros }) {
     const jako = jakoTulos && typeof location !== "undefined"
       ? { teksti: jakoteksti(jakoTulos), url: `${location.origin}${MM_SIVU}?tulos=${jakoTulos.ratkesi ? jakoTulos.arvaukset.length : 0}-${ARVAUKSIA}` }
       : null;
+    /* Tulos (CD 8c/8d): desktopilla vasemmalla tulos, lokerot ja jako, oikealla paljastuskortti; mobiilissa tulos,
+       paljastuskortti, jako. Sen alla yritykset, Pelaa seuraavaksi ja tekstilinkit (Arvo uusi maa ensimmäisenä). */
     return (
-      <div className="mm" data-iho="kerma" ref={juuri}>
-        <Pelipalkki iho="kerma" peli={MM_NIMI} koti={MM_KOTI} />
-        <div className="mm-main mm-main--tulos">
-          <div className="mm-tulos-yla">
-            <div className="mm-tulos-vasen">
+      <div className="mm" data-iho="tumma" ref={juuri}>
+        <Pelipalkki iho="tumma" peli={MM_NIMI} koti={MM_KOTI} />
+        <main className="pk-tulos-ulko">
+          <div className="pk-tulos mm-lopetus">
+            <div className="mm-tulos-yla">
               <section className="mm-tulos-otsake" aria-live="polite">
-                <h1 className="mm-eyebrow">
-                  {harjoitus ? "Harjoitusmaa" : `Päivän maa ${k.paiva}`}
+                <p className="mm-eyebrow">
+                  {harjoitus ? "Arvottu maa" : `Päivän maa ${k.paiva}`}
                   {!ratkesi && " oli"}
-                </h1>
-                <p className="mm-iso">
-                  {ratkesi ? (
-                    <>
-                      <span className="mm-iso-luku">{n}.</span> <span className="mm-iso-yks">arvauksella</span>
-                    </>
-                  ) : (
-                    <span className="mm-iso-nimi" style={{ "--mm-len": pisinSana } as CSSProperties}>{o.nimi}</span>
-                  )}
                 </p>
+                {ratkesi ? (
+                  /* Heikki 8.11.: "Sait oikein 6. yrityksellä", ei "arvauksella" (vastaaja tietää, ei arvaa). */
+                  <h1 className="mm-iso" aria-label={`Sait oikein ${jarjestysluvulla(n)} yrityksellä`}>
+                    <span className="mm-iso-alku">Sait oikein</span>
+                    <span className="mm-iso-luku">{n}.</span> <span className="mm-iso-yks">yrityksellä</span>
+                  </h1>
+                ) : (
+                  <h1 className="mm-iso">
+                    <span className="mm-iso-nimi" style={{ "--mm-len": pisinSana } as CSSProperties}>{o.nimi}</span>
+                  </h1>
+                )}
+                <Lokerot arvaukset={arvaukset} oikea={o.id} valmis iso />
                 {lahin && (
                   <p className="mm-tulos-rivi">
                     {`${lahin.maa.nimi} oli lähin, ${km.format(lahin.km)} km:n päässä.`}
                   </p>
                 )}
               </section>
-              <div className="mm-tulos-kortit">
-                <div className="mm-maakortti">
-                  <div className="mm-maakortti-sil">
-                    <Siluetti d={o.siluetti} laatikko={o.laatikko} nimi={o.nimi} />
-                  </div>
-                  <div className="mm-maakortti-t">
-                    <img className="mm-maakortti-lippu" src={o.lippu} alt={`${o.nimi}, lippu`} width={64} height={48} />
-                    <span className="mm-maakortti-nimi" style={{ "--mm-len": pisinSana } as CSSProperties}>{o.nimi}</span>
-                    <span className="mm-maakortti-tiedot">
-                      <span>
-                        Pääkaupunki <b>{o.paakaupunki}</b>
-                      </span>
-                      <span>{o.maanosa}</span>
-                    </span>
-                  </div>
+              <section className="mm-maakortti" aria-label={`Oikea vastaus: ${o.nimi}`}>
+                <div className="mm-maakortti-sil">
+                  <Siluetti d={o.siluetti} laatikko={o.laatikko} nimi={o.nimi} />
                 </div>
-                <div className="mm-polku">
-                  <h2 className="mm-pikku">Arvauksesi</h2>
-                  <ol>
-                    {rivit.map((r, i) => (
-                      <li key={r.maa?.id ?? `o${i}`} data-oikein={r.oikein ? "" : undefined} data-ohitettu={r.maa ? undefined : ""}>
-                        <span className="mm-merkki" aria-label={r.oikein ? "Oikein" : r.maa ? "Väärin" : undefined} aria-hidden={r.maa ? undefined : true}>{r.oikein ? "✓" : r.maa ? "✗" : "–"}</span>
-                        <span className="mm-rivi-nimi">{r.maa?.nimi ?? "Ohitettu"}</span>
-                        {!r.oikein && r.maa && (
+                <div className="mm-maakortti-t">
+                  <img className="mm-maakortti-lippu" src={o.lippu} alt={`${o.nimi}, lippu`} width={72} height={54} />
+                  <span className="mm-maakortti-nimi" style={{ "--mm-len": pisinSana } as CSSProperties}>{o.nimi}</span>
+                  <span className="mm-maakortti-tiedot">
+                    <span>
+                      Pääkaupunki <b>{o.paakaupunki}</b>
+                    </span>
+                    <span>{o.maanosa}</span>
+                  </span>
+                </div>
+              </section>
+              {jako && (
+                <Jakoalue className="pk-tulos-jako mm-jako" id="pk-jako-h" otsikko="Haasta kaveri" waNappi="Jaa WhatsAppissa" teksti={jako.teksti} url={jako.url} natiiviOtsikko={MM_NIMI} />
+              )}
+            </div>
+            <section className="mm-polku" aria-labelledby="mm-polku-h">
+              <h2 className="mm-pikku" id="mm-polku-h">Yrityksesi</h2>
+              <ol>
+                {rivit.map((r, i) => (
+                  <li key={r.maa?.id ?? `o${i}`} data-oikein={r.oikein ? "" : undefined} data-ohitettu={r.maa ? undefined : ""}>
+                    <span className="mm-polku-rivi">
+                      <span className="mm-polku-n" aria-hidden="true">{i + 1}</span>
+                      <span className="mm-rivi-nimi">
+                        {!r.oikein && r.maa && <span className="mm-sr">Väärin: </span>}
+                        {r.maa?.nimi ?? "Ohitettu"}
+                      </span>
+                      {r.oikein ? (
+                        <span className="mm-km mm-km-ok">Oikein</span>
+                      ) : (
+                        r.maa && (
                           <>
                             <span className="mm-km">{km.format(r.km)} km</span>
-                            <Nuoli suunta={r.suunta} koko={15} />
+                            <Nuoli suunta={r.suunta} koko={14} />
                           </>
-                        )}
-                      </li>
-                    ))}
-                  </ol>
-                </div>
-              </div>
-            </div>
-            {jako && (
-              <Jakoalue className="mm-jako" id="mm-jako-h" otsikko="Haasta kaveri" waNappi="Jaa WhatsAppissa" teksti={jako.teksti} url={jako.url} natiiviOtsikko={MM_NIMI} />
-            )}
-          </div>
-
-          {kaikki && (
-            <section className="mm-kaikki" aria-labelledby="mm-kaikki-h">
-              <h2 className="mm-pikku" id="mm-kaikki-h">Vihjeet</h2>
-              <ol>
-                {[0, 1, 2].map((i) => (
-                  <li key={i}>{k.vihjeet[i]}</li>
+                        )
+                      )}
+                    </span>
+                    {r.maa && (r.oikein ? <span className="mm-palkki" data-taysi aria-hidden="true"><span /></span> : <Palkki km={r.km} />)}
+                  </li>
                 ))}
-                <li>Siluetti ja maanosa: {o.maanosa}</li>
-                <li>{o.lippuVihjeena ? "Lippu" : `Pääkaupunki on ${o.paakaupunki}.`}</li>
               </ol>
             </section>
-          )}
-
-          <nav className="pk-tulos-linkit mm-linkit" aria-label="Muut toiminnot">
-            <a href={MM_KOTI.href}>Kaikki karttapelit</a>
-            <button type="button" aria-expanded={kaikki} onClick={() => setKaikki((v) => !v)}>
-              {kaikki ? "Piilota vihjeet" : "Näytä kaikki vihjeet"}
-            </button>
-            <button type="button" onClick={uusiHarjoitus}>Pelaa harjoitusmaa</button>
-            {harjoitus && <a href={MM_SIVU}>Päivän maa {k.paiva}</a>}
-          </nav>
-        </div>
-        <SeuraavaPeli seuraavat={seuraavatPelit("mika-maa", "matkakohteet")} />
+            <nav className="pk-tulos-linkit" aria-label="Muut toiminnot">
+              {/* Heikki 8.11.: pelin jälkeen voi pelata toisen maan (98 muuta maata, ei päivän maata). CD 8c: tekstilinkkinä.
+                  Tämän pelin linkit ennen muiden pelimuotojen nostoja (Heikki 8.11. ilta). */}
+              <button type="button" onClick={uusiHarjoitus}>Arvo uusi maa</button>
+              <button type="button" aria-expanded={kaikki} onClick={() => setKaikki((v) => !v)}>
+                {kaikki ? "Piilota vihjeet" : "Näytä kaikki vihjeet"}
+              </button>
+              {harjoitus && <a href={MM_SIVU}>Päivän maa {k.paiva}</a>}
+              <a href={MM_KOTI.href}>Kaikki karttapelit</a>
+            </nav>
+            {kaikki && (
+              <section className="mm-kaikki" aria-labelledby="mm-kaikki-h">
+                <h2 className="mm-pikku" id="mm-kaikki-h">Vihjeet</h2>
+                <ol>
+                  {[0, 1, 2].map((i) => (
+                    <li key={i}>{k.vihjeet[i]}</li>
+                  ))}
+                  <li>Siluetti ja maanosa: {o.maanosa}</li>
+                  <li>{o.lippuVihjeena ? "Lippu" : `Pääkaupunki on ${o.paakaupunki}.`}</li>
+                </ol>
+              </section>
+            )}
+            <SeuraavaPeli seuraavat={seuraavatPelit("mika-maa", "matkakohteet")} />
+          </div>
+        </main>
       </div>
     );
   }
 
+  /** Uusin vihje (oranssi reuna): tekstikortti, siluettilaatta (vihje 4) tai pääkaupunki/lippu (vihje 5). Kuudennella
+   *  yrityksellä uusinta vihjettä ei ole; sen paikalla kerrotaan, että vielä voi yrittää (Heikki 8.11.). */
+  const uusinKortti = jaljella === 1 ? (
+    <p className="mm-uusin mm-viimeinen" key="viimeinen" data-tuorein="" data-uusi="">
+      Voit yrittää vielä uudelleen.
+    </p>
+  ) :
+    uusin === 3 ? (
+      <Siltaulu o={o} uusin />
+    ) : (
+      vihjeKortti(uusin, true)
+    );
+
+  const ehdotusLista = (
+    <ul className="mm-ehdotukset" id="mm-ehdotukset" role="listbox" aria-label="Ehdotukset" aria-orientation={rivina ? "horizontal" : undefined} data-rivi={rivina || undefined}>
+      {ehdot.map((m, i) => (
+        <li
+          key={m.id}
+          id={`mm-e-${m.id}`}
+          role="option"
+          aria-selected={i === valittu}
+          onPointerDown={(e) => e.preventDefault()}
+          onClick={() => valitse(m)}
+        >
+          {m.nimi}
+        </li>
+      ))}
+    </ul>
+  );
+
   return (
-    <div className="mm" data-iho="kerma" ref={juuri}>
-      <Pelipalkki iho="kerma" peli={MM_NIMI} koti={MM_KOTI} tila={tila} pelissa paluuNuoli />
+    <div className="mm" data-iho="tumma" ref={juuri}>
+      <Pelipalkki iho="tumma" peli={MM_NIMI} koti={MM_KOTI} tila={tila} pelissa paluuNuoli />
       <div className="mm-main">
-        {otsake}
+        {/* Ei otsikkoriviä (Heikki 8.11.): nimi ja yrityslaskuri ovat jo pelipalkissa, päiväys ei auta pelatessa, ja
+            tiivis yläosa jättää mobiilissa tilaa näppäimistön yläpuolelle. */}
+        <h1 className="mm-sr">{MM_NIMI}</h1>
         <div className="mm-lauta">
+          {/* Vihjeet aikajärjestyksessä (Heikki 8.11.): käytetyt ylhäällä, siluetti niiden alla ja uusin alimpana, lähimpänä
+              syötettä. Mobiilissa arvausrivit tulevat ennen vihjeitä, joten uusin vihje on aina suoraan syötteen yläpuolella. */}
           <section className="mm-vihjeet" aria-label="Vihjeet">
             {vanhat.map((i) => (
               <button
@@ -453,47 +563,23 @@ export default function VihjepeliClient({ k }: { k: MaaKierros }) {
                   return n;
                 })}
               >
-                <span className="mm-sr">Vihje {i + 1}: </span>
-                {vihjeTeksti(i)}
+                <span className="mm-vihje-n" aria-hidden="true">{i + 1}</span>
+                <span className="mm-vanha-t">
+                  <span className="mm-sr">Vihje {i + 1}: </span>
+                  {vihjeTeksti(i)}
+                </span>
               </button>
             ))}
-            {siluettiAuki ? (
-              <div className="mm-silrivi" data-yksin={uusinTeksti === null ? "" : undefined}>
-                <div className="mm-siltaulu" key={`s${avattu}`} data-uusi={avattu === 4 ? "" : undefined}>
-                  <span className="mm-sr">Vihje 4: </span>
-                  <span className="mm-siltaulu-otsikko">Maan ääriviivat</span>
-                  <Siluetti d={o.siluetti} laatikko={o.laatikko} />
-                  <span className="mm-maanosa">{o.maanosa}</span>
-                </div>
-                {uusinTeksti !== null && vihjeKortti(uusinTeksti)}
-              </div>
-            ) : (
-              uusinTeksti !== null && vihjeKortti(uusinTeksti)
-            )}
+            {uusin >= 4 && <Siltaulu o={o} uusin={false} />}
+            {jaljella === 1 && uusin === 4 && vihjeKortti(4, false)}
+            <div className="mm-uusin-alue" ref={uusinAlue}>
+              {uusinKortti}
+            </div>
           </section>
 
-          <section className="mm-pelialue" aria-label="Arvaukset">
-            {rivit.length > 0 && (
-              <ol className="mm-rivit">
-                {rivit.map((r, i) =>
-                  r.maa ? (
-                    <li key={r.maa.id}>
-                      <span className="mm-merkki" aria-label="Väärin">✗</span>
-                      <span className="mm-rivi-nimi">{r.maa.nimi}</span>
-                      <span className="mm-palaute">
-                        <span className="mm-km">{km.format(r.km)} km</span>
-                        <Nuoli suunta={r.suunta} koko={20} />
-                      </span>
-                    </li>
-                  ) : (
-                    <li key={`o${i}`} data-ohitettu="">
-                      <span className="mm-merkki" aria-hidden="true">–</span>
-                      <span className="mm-rivi-nimi">Ohitettu</span>
-                    </li>
-                  ),
-                )}
-              </ol>
-            )}
+          {/* Syöte: desktopilla oikean palstan ylimpänä, mobiilissa ruudun alareunassa (sticky, CD 8b). */}
+          <div className="mm-syote" ref={syoteAlue}>
+            {listaAuki && rivina && ehdotusLista}
             <form
               className="mm-syoterivi"
               onSubmit={(e) => {
@@ -530,22 +616,7 @@ export default function VihjepeliClient({ k }: { k: MaaKierros }) {
                   onFocus={() => setLista(true)}
                   onBlur={() => setTimeout(() => setLista(false), 150)}
                 />
-                {listaAuki && (
-                  <ul className="mm-ehdotukset" id="mm-ehdotukset" role="listbox" aria-label="Ehdotukset">
-                    {ehdot.map((m, i) => (
-                      <li
-                        key={m.id}
-                        id={`mm-e-${m.id}`}
-                        role="option"
-                        aria-selected={i === valittu}
-                        onPointerDown={(e) => e.preventDefault()}
-                        onClick={() => valitse(m)}
-                      >
-                        {m.nimi}
-                      </li>
-                    ))}
-                  </ul>
-                )}
+                {listaAuki && !rivina && ehdotusLista}
               </div>
               <button type="submit" className="tn-cta-lime mm-arvaa">Arvaa</button>
             </form>
@@ -553,6 +624,34 @@ export default function VihjepeliClient({ k }: { k: MaaKierros }) {
               <p className="mm-viesti" role="status" aria-live="polite">{viesti}</p>
               <button type="button" className="mm-ohita" onClick={ohita}>{jaljella === 1 ? "Näytä vastaus" : "Ohita"}</button>
             </div>
+          </div>
+
+          <section className="mm-pelialue" aria-label="Arvaukset">
+            {rivit.length > 0 && (
+              <ol className="mm-rivit">
+                {rivit.map((r, i) =>
+                  r.maa ? (
+                    <li key={r.maa.id}>
+                      <span className="mm-rivi-yla">
+                        <span className="mm-rivi-nimi">
+                          <span className="mm-sr">Väärin: </span>
+                          {r.maa.nimi}
+                        </span>
+                        <span className="mm-km">{km.format(r.km)} km</span>
+                        <Nuoli suunta={r.suunta} koko={18} />
+                      </span>
+                      <Palkki km={r.km} />
+                    </li>
+                  ) : (
+                    <li key={`o${i}`} data-ohitettu="">
+                      <span className="mm-rivi-yla">
+                        <span className="mm-rivi-nimi">Ohitettu</span>
+                      </span>
+                    </li>
+                  ),
+                )}
+              </ol>
+            )}
           </section>
         </div>
       </div>
