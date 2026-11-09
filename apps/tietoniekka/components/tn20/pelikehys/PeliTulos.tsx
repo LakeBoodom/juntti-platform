@@ -9,6 +9,7 @@ import type { Pelimuoto } from "@/lib/pelimuodot";
 import { PeliIkoniSvg } from "@/components/tn20/runko/PeliIkoni";
 import Jakoalue, { type Jakokanava } from "@/components/tn20/jako/Jakoalue";
 import { KaveriVertailu } from "@/components/tn20/kaveri/Kaveri";
+import SkMittari from "@/components/tn20/seuraavaksi/SkMittari";
 import type { KaverinTulos, OmaTulos } from "@/lib/kaveri";
 
 export type PeliToiminto = { teksti: string; onClick?: () => void; href?: string };
@@ -99,7 +100,10 @@ export function SeuraavaPeli({ seuraavat }: { seuraavat: Pelimuoto[] }) {
   return (
     <nav className="pk-seuraava" aria-labelledby="pk-seuraava-h" data-tn-entry="tulos:seuraava">
       <h2 id="pk-seuraava-h" className="pk-seuraava-h">Pelaa seuraavaksi</h2>
-      <Pelikortit pelit={seuraavat} />
+      {/* Lähtötason mittaus "Pelaa seuraavaksi" -pilottia varten (9.11.2026). */}
+      <SkMittari avain={seuraavat.map((p) => p.slug).join(",")}>
+        <Pelikortit pelit={seuraavat} />
+      </SkMittari>
     </nav>
   );
 }
@@ -110,8 +114,8 @@ export function SeuraavaPeli({ seuraavat }: { seuraavat: Pelimuoto[] }) {
 export function Pelikortit({ pelit }: { pelit: Pelimuoto[] }) {
   return (
     <div className="pk-seuraava-rivi">
-      {pelit.map((p) => (
-        <a key={p.slug} className="pk-pelikortti" href={p.href}>
+      {pelit.map((p, i) => (
+        <a key={p.slug} className="pk-pelikortti" href={p.href} data-sk-paikka={i + 1} data-sk-tyyppi="peli">
           {/* Pelin oma kuva kortin yläosassa (pelimuotojen kehys, Heikki 25.10.2026); ilman kuvaa kuvake. Ei valinnan syy
               -labelia (UI-sääntö 9). */}
           {p.kuva ? (

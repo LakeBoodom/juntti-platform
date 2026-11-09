@@ -1,0 +1,77 @@
+/* "PELAA SEURAAVAKSI" -RIVI (pilotti 9.11.2026; CD "Promojärjestelmä kierros 2": A1-visakortti, A2-pelikortti,
+   osio-otsikko Barlow Condensed 800 28 px). Värit CD:stä: kortti #1B1710, viiva #2C2517, kuva-ala #241F15,
+   hover-viiva #5A4E36, kulta #E8A320 (ei limeä tässä rivissä). Kortit samankokoiset (venyvät rivin korkeimpaan).
+   Mobiili (< 768): vaakarivi, kortti 242 px, seuraava näkyy reunassa; ≥ 768: kolme saraketta. */
+.tn20 .sk-osio { --sk-ink: #f5f0e6; --sk-soft: #cfc7b6; --sk-card: #1b1710; --sk-line: #2c2517; --sk-line2: #5a4e36; --sk-plate: #241f15; --sk-gold: #e8a320;
+  display: flex; flex-direction: column; gap: 12px; min-width: 0; color: var(--sk-ink); }
+.tn20 .sk-h {
+  margin: 0; min-height: 44px; display: flex; align-items: center;
+  font-family: var(--tn-font-cond, "Barlow Condensed"), "Barlow Condensed", sans-serif; font-weight: 800; font-size: 28px; line-height: 1;
+  text-transform: uppercase; letter-spacing: 0; color: var(--sk-ink);
+}
+.tn20 .sk-rivi {
+  display: grid; grid-auto-flow: column; grid-auto-columns: 242px; gap: 10px;
+  overflow-x: auto; overscroll-behavior-x: contain; scroll-snap-type: x mandatory; scrollbar-width: none;
+  margin: 0 calc(-1 * var(--sk-gutter, 16px)); padding: 2px var(--sk-gutter, 16px) 6px; scroll-padding-inline: var(--sk-gutter, 16px);
+}
+.tn20 .sk-rivi::-webkit-scrollbar { display: none; }
+/* a.sk-kortti: pelisivun linkkiväri (.tng a) ei saa periytyä kortin tekstiin. */
+.tn20 a.sk-kortti {
+  scroll-snap-align: start; display: flex; flex-direction: column; min-width: 0; min-height: 44px; box-sizing: border-box;
+  border-radius: 16px; overflow: hidden; background: var(--sk-card); border: 1px solid var(--sk-line);
+  color: var(--sk-ink); text-decoration: none;
+  transition: transform var(--dur-fast, 120ms) var(--ease-standard, cubic-bezier(.4, 0, .2, 1)), border-color var(--dur-fast, 120ms) var(--ease-standard, cubic-bezier(.4, 0, .2, 1));
+}
+.tn20 .sk-kortti:focus-visible { outline: 2px solid var(--sk-ink); outline-offset: 3px; }
+@media (hover: hover) {
+  .tn20 .sk-kortti:hover { transform: translateY(-2px); border-color: var(--sk-line2); }
+}
+.tn20 .sk-kortti:active { transform: scale(.98); }
+
+.tn20 .sk-kuva { position: relative; flex: none; aspect-ratio: 16 / 10; background: var(--sk-plate); overflow: hidden; }
+.tn20 .sk-kuva img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: 50% 40%; }
+/* Tupla tai kuitin palkintoikoni: läpinäkyvä kuvitus kokonaisena tummalla kultahehkulla. */
+.tn20 .sk-kuva[data-sovitus="contain"] { background: radial-gradient(70% 80% at 50% 45%, rgba(232, 163, 32, .22), rgba(27, 23, 16, 0) 70%), #17140d; }
+.tn20 .sk-kuva[data-sovitus="contain"] img { object-fit: contain; padding: 12px 0 10px; box-sizing: border-box; }
+/* Kuvaton visa (CD k2): kokoelman tai lajin nimi aksenttivärillä, visan nimi pysyy otsikkona. */
+.tn20 .sk-kuvaton {
+  position: absolute; inset: 0; display: flex; align-items: flex-end; padding: 12px;
+  background: radial-gradient(90% 90% at 100% 0%, rgba(232, 163, 32, .22), rgba(27, 23, 16, 0) 70%), #17140d;
+  font-family: var(--tn-font-cond, "Barlow Condensed"), "Barlow Condensed", sans-serif; font-weight: 800; font-size: 26px; line-height: .9;
+  text-transform: uppercase; color: var(--sk-gold); overflow-wrap: normal; word-break: normal; hyphens: manual;
+}
+/* Lajimerkki (malli etusivun .tn-es-laji): 12 px, versaali, tumma laatta kuvan päällä → kontrasti > 12:1. */
+.tn20 .sk-merkki {
+  position: absolute; top: 8px; left: 8px; display: inline-flex; align-items: center; min-height: 22px; padding: 0 8px;
+  border-radius: 999px; background: rgba(19, 17, 9, .86); color: var(--sk-ink);
+  font-size: 12px; font-weight: 800; letter-spacing: .1em; line-height: 1; text-transform: uppercase; white-space: nowrap;
+}
+
+.tn20 .sk-teksti { flex: 1 1 auto; display: flex; flex-direction: column; gap: 6px; padding: 10px 12px 8px; min-width: 0; }
+/* KORTTISÄÄNTÖ: Archivo 900 on staattinen (ei wdth-akselia) → CD:n 17 px mitattu ennen julkaisua (Range, 320–2450 + WebKit).
+   Pitkät sanat saavat tavuviivat (katko → U+00AD), siksi word-break: normal (WebKit ei katkaise tavuviivasta keep-allissa). */
+.tn20 .sk-nimi {
+  font-family: "Archivo", sans-serif; font-weight: 900; font-size: 17px; line-height: 1; letter-spacing: -.01em; color: var(--sk-ink);
+  text-transform: uppercase; text-wrap: balance; overflow-wrap: normal; word-break: normal; hyphens: manual;
+}
+.tn20 .sk-kuvaus { font-size: 14px; line-height: 1.35; color: var(--sk-soft); }
+.tn20 .sk-cta {
+  margin-top: auto; display: flex; align-items: center; gap: 4px; min-height: 28px;
+  font-family: var(--tn-font-cond, "Barlow Condensed"), "Barlow Condensed", sans-serif; font-weight: 800; font-size: 16px; letter-spacing: .04em;
+  text-transform: uppercase; color: var(--sk-gold);
+}
+
+@media (min-width: 768px) {
+  .tn20 .sk-rivi { grid-auto-flow: row; grid-template-columns: repeat(3, minmax(0, 1fr)); grid-auto-columns: auto; gap: 18px; overflow: visible; margin: 0; padding: 0; }
+  .tn20 .sk-kuva { aspect-ratio: 16 / 9; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .tn20 .sk-kortti { transition: none; }
+  .tn20 .sk-kortti:hover, .tn20 .sk-kortti:active { transform: none; }
+}
+
+/* Aloitusnäkymän "Samasta aiheesta" heron alla (Heikki 9.11.: ei heron päälle). */
+.tn20 .sk-alku { box-sizing: border-box; width: 100%; max-width: 1296px; margin: 0 auto; padding: 28px 16px 40px; --sk-gutter: 16px; }
+@media (min-width: 768px) {
+  .tn20 .sk-alku { padding: 36px clamp(20px, 3vw, 72px) 56px; }
+}

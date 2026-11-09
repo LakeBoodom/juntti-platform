@@ -99,3 +99,13 @@
   .tn20 .tn-tulos-kortit { gap: 14px; }
   .tn20 .tn-tulos-kortti-kuva { aspect-ratio: 16 / 9; }
 }
+
+/* "Pelaa seuraavaksi" -pilotti (9.11.2026, CD "Promojärjestelmä kierros 2" 4d): rivi viimeisenä, linkkien jälkeen,
+   desktopilla koko leveydeltä molempien palstojen alla. */
+.tn20 .tn-tulos-sk { min-width: 0; }
+@media (max-width: 1023px) {
+  .tn20 .tn-tulos-sk { order: 6; margin-top: 8px; }
+}
+@media (min-width: 1024px) {
+  .tn20 .tn-tulos-sk { grid-column: 1 / -1; }
+}
