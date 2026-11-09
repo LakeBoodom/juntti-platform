@@ -599,12 +599,16 @@
 .tn20 .tn-es-promo-kuva { position: relative; display: block; height: 104px; flex: none; background: #1A110B; }
 .tn20 .tn-es-promo-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
 .tn20 .tn-es-promo-teksti { display: flex; flex-direction: column; justify-content: center; gap: 8px; padding: 12px 16px 14px; flex: 1; min-width: 0; container-type: inline-size; }
-.tn20 .tn-es-promo-yla { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
-.tn20 .tn-es-promo-ala { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+/* Rotaatiotila (Heikki 9.11.): otsake + koukku (visan oma kysymys) + Pelaa omalla rivillään; korkeus joustaa koukun mukaan. */
+.tn20 .tn-es-promo--1 { height: auto; min-height: 250px; }
+.tn20 .tn-es-promo--1 .tn-es-promo-teksti { gap: 12px; padding: 16px 16px 18px; }
+.tn20 .tn-es-promo-otsake { display: flex; flex-direction: column; gap: 6px; }
+/* Mitattu (TreeWalker + Range): lähtöarvo 0.95 × leveys / (0.67 × pisin sana); CD 20 px, nyt 26 px. */
 .tn20 .tn-es-promo-h {
-  min-width: 0; font-family: var(--es-display); font-weight: 900; font-variation-settings: "wdth" 76; line-height: .94; text-transform: uppercase;
-  font-size: min(20px, calc((100cqw - 90px) / (var(--lw) * .64))); overflow-wrap: normal; word-break: keep-all;
+  min-width: 0; font-family: var(--es-display); font-weight: 900; font-variation-settings: "wdth" 76; letter-spacing: -.02em; line-height: .95; text-transform: uppercase;
+  font-size: min(26px, calc(100cqw / (var(--lw) * .64))); overflow-wrap: normal; word-break: keep-all; text-wrap: balance;
 }
+.tn20 .tn-es-promo-koukku { font-size: 14px; font-weight: 600; line-height: 1.35; color: var(--es-teksti); text-wrap: pretty; }
 .tn20 .tn-es-ootko-h { font-weight: 800; font-size: 21px; line-height: 1.08; letter-spacing: -.01em; }
 .tn20 .tn-es-ootko-cta { align-self: flex-start; display: inline-flex; align-items: center; min-height: 44px; padding: 0 18px; border-radius: 12px; background: #E2B6FF; color: #1A1022; font-weight: 800; font-size: 14px; }
 
@@ -759,12 +763,14 @@
   .tn20 .tn-jb-alarivi { font-size: 16px; }
   .tn20 .tn-jb-cta { min-height: 52px; padding: 0 28px; font-size: 16px; }
 
-  .tn20 .tn-es-promo { width: 970px; flex-direction: row; display: grid; grid-template-columns: 400px minmax(0, 1fr); }
-  .tn20 .tn-es-promo-kuva { height: 250px; }
+  /* Heikki 9.11.: sivun levyinen (oli IAB 970), reunat linjassa muiden osioiden kanssa. */
+  .tn20 .tn-es-promo { width: 100%; flex-direction: row; display: grid; grid-template-columns: 400px minmax(0, 1fr); }
+  .tn20 .tn-es-promo-kuva { height: 100%; min-height: 250px; }
   .tn20 .tn-es-promo-teksti { gap: 12px; padding: 0 40px; }
-  .tn20 .tn-es-promo-yla { flex-direction: column; align-items: flex-start; gap: 12px; }
-  .tn20 .tn-es-promo-ala { gap: 20px; }
-  .tn20 .tn-es-promo-h { font-size: min(24px, calc((100cqw - 120px) / (var(--lw) * .64))); }
+  .tn20 .tn-es-promo--1 .tn-es-promo-teksti { gap: 16px; padding: 32px 48px; }
+  .tn20 .tn-es-promo-otsake { gap: 10px; }
+  .tn20 .tn-es-promo-h { font-size: min(44px, calc(100cqw / (var(--lw) * .64))); }
+  .tn20 .tn-es-promo-koukku { font-size: 18px; max-width: 34em; }
   .tn20 .tn-es-ootko-h { font-size: 40px; line-height: 1.02; letter-spacing: -.02em; }
   .tn20 .tn-es-ootko-cta { min-height: 48px; padding: 0 24px; border-radius: 14px; font-size: 16px; }
 

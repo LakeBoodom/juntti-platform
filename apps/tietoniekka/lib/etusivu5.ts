@@ -189,8 +189,9 @@ export async function haeEtusivu(opts: {
   };
   let promo1:
     | Juhlabanneri
-    | { tila: "rotaatio"; kicker: string; otsikko: string; href: string; kuva: string | null; kuvaPos?: string }
+    | { tila: "rotaatio"; kicker: string; otsikko: string; koukku: string | null; href: string; kuva: string | null; kuvaPos?: string }
     | null = null;
+  let promo1Visa: string | null = null;
   if (lahin) {
     const paivia = Math.max(0, paiviaValissa(lahin.alku + (lahin.kohde ?? 0) * 864e5, tanaanPv));
     if (paivia <= COUNTDOWN_PAIVAA) {
@@ -211,12 +212,12 @@ export async function haeEtusivu(opts: {
     const pooli = cards.filter((c) => c.collection && c.collection !== "tunnetut-henkilot" && c.collection !== JUHLAT_KOKOELMA && c.game_mode !== "mega");
     const pelatuimmat = pooli.filter((c) => suosio(c.suosio_90pv ?? 0) > 0).sort((a, b) => (b.suosio_90pv ?? 0) - (a.suosio_90pv ?? 0)).slice(0, 5);
     const uusimmat = [...pooli].filter((c) => c.published_at).sort((a, b) => (b.published_at! > a.published_at! ? 1 : -1)).slice(0, 5);
-    const ehdokkaat: Array<{ kicker: string; otsikko: string; href: string; kuva: string | null; kuvaPos?: string }> = [];
+    const ehdokkaat: Array<{ id?: string; kicker: string; otsikko: string; href: string; kuva: string | null; kuvaPos?: string }> = [];
     for (const k of [...pelatuimmat, ...uusimmat]) {
       if (ehdokkaat.some((e) => e.href === visaHref(k))) continue;
       const kk = visanKorttikuva(k);
       if (!kk.kuva) continue;
-      ehdokkaat.push({ kicker: kokoelmaNimi(k.collection) ?? "Visa", otsikko: nimi(k), href: visaHref(k), kuva: kk.kuva, kuvaPos: kk.kuvaPos });
+      ehdokkaat.push({ id: k.id, kicker: kokoelmaNimi(k.collection) ?? "Visa", otsikko: nimi(k), href: visaHref(k), kuva: kk.kuva, kuvaPos: kk.kuvaPos });
     }
     const { data: promot } = await sb
       .from("etusivu_promot" as never)
@@ -227,7 +228,12 @@ export async function haeEtusivu(opts: {
       for (let i = 0; i < Math.max(1, p.paino); i++) ehdokkaat.push({ kicker: p.kicker ?? "Tietoniekka", otsikko: p.otsikko, href: p.href, kuva: p.kuva });
     }
     const valittu = poimi(ehdokkaat, paivaNro);
-    if (valittu) promo1 = { tila: "rotaatio", ...valittu };
+    /* Heikki 9.11.: rotaatiobanneriin koukku kuten Laura ja Mikko -korteissa (visan oma kysymys, haetaan alla). */
+    if (valittu) {
+      const { id, ...v } = valittu;
+      promo1 = { tila: "rotaatio", ...v, koukku: null };
+      promo1Visa = id ?? null;
+    }
   }
 
   /* ── 6 Laura ja Mikko suosittelevat ── viikoittain juontajan kokoelmista. v9 (Heikki 30.10.): faktan tilalla koukku =
@@ -242,7 +248,7 @@ export async function haeEtusivu(opts: {
   });
   const koukut = new Map<string, string>();
   {
-    const ids = valitut.map((v) => v.k?.id).filter((x): x is string => !!x);
+    const ids = [...valitut.map((v) => v.k?.id), promo1Visa].filter((x): x is string => !!x);
     const { data } = ids.length
       ? await sb.from("questions").select("quiz_id, question_text, answers, sort_order").in("quiz_id", ids).order("sort_order")
       : { data: [] };
@@ -254,6 +260,7 @@ export async function haeEtusivu(opts: {
       koukut.set(q.quiz_id, t);
     }
   }
+  if (promo1?.tila === "rotaatio" && promo1Visa) promo1.koukku = koukut.get(promo1Visa) ?? null;
   const juontajat = valitut.map(({ j, k }) =>
     k ? { key: j.key, nimi: j.nimi, kuva: j.kuva, aksentti: j.aksentti, visa: nimi(k), teaser: koukut.get(k.id) ?? sitaatti(k)!, koukku: koukut.has(k.id), href: visaHref(k) } : null,
   ).filter((x): x is NonNullable<typeof x> => !!x);

@@ -226,14 +226,14 @@ function Promo1({ p }: { p: NonNullable<D["promo1"]> }) {
         <span className="tn-es-promo-kuva">
           <Kuva src={p.kuva} pos={p.kuvaPos} luokka="tn-es-promo-img" sizes="(min-width: 1100px) 970px, 100vw" />
         </span>
+        {/* Heikki 9.11.: koukku (visan oma kysymys) otsikon alle, Pelaa omalle rivilleen kuten Laura ja Mikko -korteissa. */}
         <span className="tn-es-promo-teksti">
-          <span className="tn-es-promo-yla">
+          <span className="tn-es-promo-otsake">
             <span className="tn-es-kicker tn-es-kicker--oranssi">{p.kicker}</span>
-          </span>
-          <span className="tn-es-promo-ala">
             <span className="tn-es-promo-h" style={lw(p.otsikko)}>{p.otsikko}</span>
-            <span className="tn-es-nappi">Pelaa</span>
           </span>
+          {p.koukku && <span className="tn-es-promo-koukku">{p.koukku}</span>}
+          <span className="tn-es-nappi">Pelaa</span>
         </span>
       </a>
     </div>
