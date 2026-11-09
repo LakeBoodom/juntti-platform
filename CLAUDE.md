@@ -201,3 +201,33 @@ Skilli `tietoniekka-ui-laatu` on näiden sääntöjen lähde; tässä tiivistelm
    tarvitsee niitä ollakseen ymmärrettävä, korjaa layout — älä lisää selitettä. Ei koske
    virheviestejä, tyhjiä tiloja eikä saavutettavuuslabeleita (aria-label, visuaalisesti piilotettu teksti).
 
+
+## PELINÄKYMÄSÄÄNNÖT — CD-paketit, syöte ja tulos (Heikki 8.–9.11.2026)
+
+Opittu Mikä maa? -pelistä, jossa samat asiat korjattiin useaan kertaan. Sama teksti
+laajempana skilliin `tietoniekka-ui-laatu` (luku 5).
+
+1. **CD-paketin vastaanotto:** ennen toteutusta korjataan aina nämä, ja poikkeamat kerrotaan
+   Heikille lauseella kustakin.
+   - CD:n oma jakolaatikko → jaettu `Jakoalue` (`components/tn20/jako/Jakoalue.tsx`, tumma iho
+     `data-iho`). Jakotekstit `lib/korttinimi.ts`:stä. Jakoalueen otsikko vain ruudunlukijalle;
+     mobiilissa "Jaa WhatsAppissa" + "Jaa linkkinä", Facebook ja Kopioi vain hiirellä.
+   - Aputekstit, vinkit, "Tiesitkö?"-faktat ja alaotsikot pois.
+   - Fonttikoot kalibroidaan mittaamalla (KORTTISÄÄNTÖ). Lime vain ensisijaiseen CTA:han.
+   - "Harjoittele" → "Arvo uusi …". Karttasiluetti aina pohjoinen ylöspäin, ei kiertoa.
+2. **Ei toistoa:** pelin nimi ja yrityslaskuri ovat `Pelipalkki`ssa (`tila="Yritys 1/6"`), joten
+   pelinäkymään ei tule otsikkoriviä eikä lokeroriviä (`<h1>` visuaalisesti piilotettuna).
+   Lokerorivi on sallittu tulosnäkymässä.
+3. **Kirjoitettava vastaus + ehdotukset:** mobiilissa (syöte sticky alareunassa) ehdotukset
+   vaakasuuntaisena nappirivinä kentän yläpuolella syöteosan sisällä; desktopissa pudotuslista
+   kentän alle. Tila päätellään asettelusta, ei näppäimistön mittauksesta (iOS `visualViewport`
+   ei ole luotettava). Napit ≥ 44 px, enintään 5, `onPointerDown` preventDefault. Testaa myös
+   375 × 400; oikea iPhone-testi on Heikillä. Malli: `components/tn20/vihjepeli/VihjepeliClient.tsx`.
+4. **Uusin tieto lähimpänä syötettä:** vihjeet vanhimmasta uusimpaan, uusin vieritetään syötteen
+   yläpuolelle jokaisen yrityksen jälkeen. Viimeisellä yrityksellä "Voit yrittää vielä uudelleen."
+5. **Tulosnäkymän järjestys:** tulos ("Sait oikein 3. yrityksellä", aina "yrityksellä") →
+   vastauskortti ja jako → pelaajan yritykset → tämän pelin omat linkit → vasta lopuksi muut
+   pelimuodot (`SeuraavaPeli`).
+6. **Etäisyydet** maiden välillä pääkaupungista pääkaupunkiin, ei keskipisteistä.
+7. **Sudenkuopat:** `overflow: clip` eikä `hidden`, kun vain leikataan koriste (hidden puristaa
+   flex/grid-lapsen). KORTTISÄÄNTÖ-mittaus tekstisolmuista (TreeWalker + Range).
