@@ -40,6 +40,8 @@ import "../peli2026.css";
 import { lyhennettyNimi, tulosjakoteksti, vastahaasteteksti } from "@/lib/korttinimi";
 import type { Jakokanava } from "@/components/tn20/jako/Jakoalue";
 import TulosNakyma from "@/components/tn20/tulos/TulosNakyma";
+import SeuraavaksiRivi from "@/components/tn20/seuraavaksi/SeuraavaksiRivi";
+import type { Seuraavat } from "@/lib/seuraavaksi/tyypit";
 import Pelipalkki from "@/components/tn20/pelikehys/Pelipalkki";
 import PeliKehys from "@/components/tn20/pelikehys/PeliKehys";
 import PeliAloitus from "@/components/tn20/pelikehys/PeliAloitus";
@@ -124,6 +126,9 @@ export type GameQuiz = {
   paketti?: { href: string; teksti: string } | null;
   /** Kaupunkisivut (7.11.2026): saman paikkakunnan visat ("Lisää Mikkelistä", enintään 3) ja linkki kaupunkisivulle. */
   paikka?: { otsikko: string; visat: GameRelated[]; kaikki: { href: string; teksti: string } | null } | null;
+  /** "Pelaa seuraavaksi" -pilotti (9.11.2026, kaikki urheilu): kolme paikkaa ehdokkaineen. null = pilotin ulkopuolella,
+   *  jolloin aloitus- ja tulosnäkymä ovat ennallaan (paikka + related). */
+  seuraavaksi?: Seuraavat | null;
   /** K2: "Pelaa uudelleen" lataa sivun uudelleen uuden arvonnan vuoksi (kuvavisat). */
   reloadOnRestart?: boolean;
   /** K2: ohita aloitusnäkymä (?aloita=1 uudelleenlatauksen jälkeen). */
@@ -945,6 +950,7 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
   const linkReady = !!quiz.challengePath;
   const jakoUrl = linkReady ? challengeUrl : null;
   const category = quiz.collectionLabel;
+  const sk = quiz.seuraavaksi ?? null;
   const countLabel = `${total} ${isKuva ? "kuvaa" : "kysymystä"}`;
   const hero = quiz.hero ?? null;
   const mode = phase === "start" ? (hero ? "hero" : "aloitus") : done ? "valmis" : "peli";
@@ -1210,7 +1216,7 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
               vastaukset={hist.map((v) => (v === "ok" || v === "bad" || v === "skipped" ? v : undefined))}
               avaaVastaukset={(i, el) => openReview(i, el)}
               jako={{ teksti: shareText, url: jakoUrl, natiiviOtsikko: `Tietoniekka · ${quiz.title}`, onJaettu: (k) => markShared(k) }}
-              seuraavat={[
+              seuraavat={sk ? [] : [
                 /* Kaupunkisivut: saman paikkakunnan visat ensin ("Lisää Mikkelistä"), sitten ristiinnostot. */
                 ...(quiz.paikka?.visat ?? []).map((r) => ({
                   id: r.id,
@@ -1230,7 +1236,18 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
                 })),
               ]}
               pelaaUudelleen={vk ? null : restart}
-              kaikki={vk ? { href: quiz.hubHref || "/kokoelma/kuvavisat", teksti: "Lisää kuvavisoja" } : quiz.paikka?.kaikki ?? { href: quiz.hubHref || "/kokoelmat", teksti: quiz.hubHref ? category : "Kokoelmat" }}
+              kaikki={sk ? sk.lajiLinkki : vk ? { href: quiz.hubHref || "/kokoelma/kuvavisat", teksti: "Lisää kuvavisoja" } : quiz.paikka?.kaikki ?? { href: quiz.hubHref || "/kokoelmat", teksti: quiz.hubHref ? category : "Kokoelmat" }}
+              /* Pilotti: lajilinkki ("Jääkiekko →") ja kaupunkisivu, jos visalla on paikkakunta (säännöt §4, Tappara). */
+              lisaKaikki={sk ? quiz.paikka?.kaikki ?? null : null}
+              seuraavaksi={sk ? (
+                <SeuraavaksiRivi
+                  id="sk-tulos"
+                  otsikko="Pelaa seuraavaksi"
+                  paikat={[{ paikka: 1, ehdokkaat: sk.p1 }, { paikka: 2, ehdokkaat: sk.p2 }, { paikka: 3, ehdokkaat: sk.p3 }]}
+                  meta={{ pilotti: sk.pilotti, nakyma: "tulos", lahde: sk.lahde }}
+                />
+              ) : null}
+              mittaus={sk ? null : { pilotti: null, nakyma: "tulos", lahde: quiz.challengePath }}
             />
           </main>
         </div>
@@ -1395,7 +1412,8 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
 
                 {/* Kaupunkisivut (7.11.2026): saman paikkakunnan visat ensin omana ryhmänään ("Lisää Mikkelistä") ja linkki
                     kaupunkisivulle; muuten ristiinnostot kuten ennen. */}
-                {quiz.paikka && quiz.paikka.visat.length > 0 ? (
+                {/* "Pelaa seuraavaksi" -pilotti (Heikki 11.11.): pilotin visoissa aloitusnäkymä on ilman ehdotuksia. */}
+                {sk ? null : quiz.paikka && quiz.paikka.visat.length > 0 ? (
                 <div className="tng-heromore" data-tn-entry="visasivu:paikkakunta">
                   <div className="tng-heromore-head">
                     <span className="tng-heromore-t">{quiz.paikka.otsikko}</span>

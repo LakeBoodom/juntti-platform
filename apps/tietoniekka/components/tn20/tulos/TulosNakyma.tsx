@@ -7,8 +7,9 @@
 // Jakoalue: yleiskäyttöinen Jakoalue-komponentti (vaihe C) — WhatsApp pääpainikkeena, Facebook ja Kopioi, Jaa… kosketuslaitteilla.
 // Desktopilla (≥ 1024 px) tulos, vastaukset ja seuraava visa vasemmassa palstassa, jako oikealla.
 // Kova vaatimus: 390 × 844:ssä tulos ja WhatsApp-painike ilman vieritystä.
-import type { CSSProperties } from "react";
+import { useRef, type CSSProperties, type ReactNode } from "react";
 import Jakoalue, { type Jakokanava } from "@/components/tn20/jako/Jakoalue";
+import { useSeuraavaksiMittaus, type SkMeta } from "@/lib/seuraavaksi/mittaus";
 import "@/app/(tn20)/tulosnakyma.css";
 
 export type TulosVastaus = "ok" | "bad" | "skipped" | undefined;
@@ -33,7 +34,15 @@ export default function TulosNakyma(p: {
   seuraavat: TulosSeuraava[];
   pelaaUudelleen: (() => void) | null;
   kaikki: { href: string; teksti: string };
+  /** "Pelaa seuraavaksi" -pilotti (9.11.2026): toinen tekstilinkki (kaupunkisivu) lajilinkin rinnalle. */
+  lisaKaikki?: { href: string; teksti: string } | null;
+  /** Pilotin rivi linkkien jälkeen koko leveydeltä (CD k2 4d); korvaa seuraavat-kortit. */
+  seuraavaksi?: ReactNode;
+  /** Pilotin ulkopuolinen nykyinen "Pelaa seuraavaksi" -rivi mitataan lähtötasoksi (brief §3). */
+  mittaus?: SkMeta | null;
 }) {
+  const seuraavaRef = useRef<HTMLElement>(null);
+  useSeuraavaksiMittaus(seuraavaRef, p.seuraavat.length ? p.mittaus ?? null : null, p.seuraavat.slice(0, 2).map((s) => s.id).join(","));
   const ensimmainenVaarin = Math.max(0, p.vastaukset.findIndex((v) => v === "bad"));
   const h = p.haaste;
   const tuomio = h ? (p.right > h.oikein ? "voitto" : p.right < h.oikein ? "havio" : "tasan") : null;
@@ -105,11 +114,11 @@ export default function TulosNakyma(p: {
         {/* Metapelilohko: METAPELI_ENABLED-lipun takana (ei vielä toteutettu, ei jätä aukkoa). */}
 
         {p.seuraavat.length > 0 && (
-          <nav className="tn-tulos-seuraava" aria-labelledby="tn-tulos-seuraava-h" data-tn-entry="tulos:seuraava">
+          <nav ref={seuraavaRef} className="tn-tulos-seuraava" aria-labelledby="tn-tulos-seuraava-h" data-tn-entry="tulos:seuraava">
             <h2 id="tn-tulos-seuraava-h" className="tn-tulos-pikku">Pelaa seuraavaksi</h2>
             <div className="tn-tulos-kortit">
-              {p.seuraavat.slice(0, 2).map((s) => (
-                <a key={s.id} className="tn-tulos-kortti" href={s.href}>
+              {p.seuraavat.slice(0, 2).map((s, i) => (
+                <a key={s.id} className="tn-tulos-kortti" href={s.href} data-sk-paikka={i + 1} data-sk-tyyppi="visa">
                   <span className="tn-tulos-kortti-kuva">
                     {s.kuva && (
                       // eslint-disable-next-line @next/next/no-img-element
@@ -134,6 +143,7 @@ export default function TulosNakyma(p: {
             </button>
           )}
           <a href={p.kaikki.href}>{p.kaikki.teksti} <span aria-hidden="true">→</span></a>
+          {p.lisaKaikki && <a href={p.lisaKaikki.href}>{p.lisaKaikki.teksti} <span aria-hidden="true">→</span></a>}
         </div>
       </div>
 
@@ -146,6 +156,8 @@ export default function TulosNakyma(p: {
         natiiviOtsikko={p.jako.natiiviOtsikko}
         onJaettu={p.jako.onJaettu}
       />
+
+      {p.seuraavaksi && <div className="tn-tulos-sk">{p.seuraavaksi}</div>}
     </div>
   );
 }

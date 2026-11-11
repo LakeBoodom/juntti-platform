@@ -35,6 +35,7 @@ import { LAPSET_SIVU, haeLastenVisa, haeMuutLastenVisat, lapsetNakyvissa } from 
 import "../lapset.css";
 import { heroFokus, heroMode } from "@/lib/herotila";
 import { haePaikkakunnanMuutVisat } from "@/lib/kaupunkisivu";
+import { haeSeuraavat } from "@/lib/seuraavaksi/hae";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 
@@ -237,6 +238,8 @@ type QuizRow = {
   hero_side: string | null; hero_alt: string | null;
   /** Kaupunkisivut (7.11.2026): visan paikkakunnat → "Lisää {elatiivi}" -ryhmä. */
   paikkakunnat?: string[] | null;
+  /** "Pelaa seuraavaksi" -pilotti (9.11.2026): sarja-aihe (jääkiekon nhl/arvokisat, jalkapallon valioliiga …). */
+  subcollection?: string | null;
   /** SEO-erä A9: Quiz.dateModified */
   updated_at?: string | null;
   /* Aihekohtaiset tulostasot (migraatio 20260928, Instagram-kierros 4) */
@@ -686,7 +689,7 @@ export default async function Peli20({
 
   let q = sb
     .from("quizzes")
-    .select("id, slug, title, display_title, teaser, description, category, collection, genre, section_tags, learn, hero_image, hero_focal_x, hero_focal_y, hero_side, hero_alt, fanitasot, korttinimi, paikkakunnat, updated_at")
+    .select("id, slug, title, display_title, teaser, description, category, collection, genre, subcollection, section_tags, learn, hero_image, hero_focal_x, hero_focal_y, hero_side, hero_alt, fanitasot, korttinimi, paikkakunnat, updated_at")
     .eq("status", "published");
   q = quizId ? q.eq("id", quizId) : q.eq("slug", slug!);
   const { data: quiz } = await q.maybeSingle<QuizRow>();
@@ -708,7 +711,7 @@ export default async function Peli20({
     /* Henkilövisan kuva tulee celebrities-riviltä (Wikipedia/Wikimedia), ei
        kokoelmakartasta — henkilövisoja on 243 eikä niille ole omia kuvia. */
     quiz.collection === "tunnetut-henkilot"
-      ? sb.from("celebrities").select("name, role, image_url, wikipedia_url, nimi_elatiivi" as never).eq("trivia_quiz_id", quiz.id).maybeSingle()
+      ? sb.from("celebrities").select("name, role, image_url, wikipedia_url, nimi_elatiivi, laji" as never).eq("trivia_quiz_id", quiz.id).maybeSingle()
       : Promise.resolve({ data: null }),
     haeVisassaMukana(sb, quiz.id),
     /* Kaupunkisivut (brief 7.11.2026 §2): saman paikkakunnan visat omana ryhmänään ennen ristiinnostoja. */
@@ -744,7 +747,15 @@ export default async function Peli20({
      se on juuri se virhe, jossa golfvisa sai tennisvisan kuvan. */
   const heroParam = typeof params.hero === "string" ? params.hero : null;
   const isPerson = collection === "tunnetut-henkilot";
-  const celeb = (celebRes.data ?? null) as unknown as { name: string; role: string | null; image_url: string | null; wikipedia_url?: string | null; nimi_elatiivi?: string | null } | null;
+  const celeb = (celebRes.data ?? null) as unknown as { name: string; role: string | null; image_url: string | null; wikipedia_url?: string | null; nimi_elatiivi?: string | null; laji?: string | null } | null;
+  /* "Pelaa seuraavaksi" -pilotti (toteutusbrief 8.11.2026, Heikki 9.11.: kaikki urheilu). Muut visat: null → ennallaan. */
+  const seuraavaksi = await haeSeuraavat(sb, {
+    id: quiz.id, slug: quiz.slug, title: quiz.title, display_title: quiz.display_title,
+    collection: quiz.collection, category: quiz.category, genre: quiz.genre, subcollection: quiz.subcollection ?? null,
+    paikkakunnat: quiz.paikkakunnat ?? null, henkilonLaji: isPerson ? celeb?.laji ?? null : null,
+    /* Paikan 3 (Tänään) testipäivä vain esikatselussa ja paikallisesti: ?sk_pvm=2026-11-13. */
+    testipaiva: process.env.VERCEL_ENV !== "production" && typeof params.sk_pvm === "string" && /^\d{4}-\d{2}-\d{2}$/.test(params.sk_pvm) ? params.sk_pvm : null,
+  }).catch(() => null);
   /* Wikimedian thumb-osoitteessa leveys on polussa (".../330px-Tiedosto.jpg").
      Kannassa olevat kuvat ovat 330 px leveitä — liian pieniä 3:4-kortille — ja
      Wikimedia hyväksyy vain tietyt kokoportaat, joista 1280 on suurin toimiva.
@@ -844,6 +855,7 @@ export default async function Peli20({
           visat: paikka.visat.map((v) => ({ id: v.id, title: v.title, meta: `${v.question_count} kysymystä`, href: v.href, kuva: v.kuva, kuvaPos: v.kuvaPos })),
         }
       : null,
+    seuraavaksi,
     citySlug: KAUPUNGIT.find((c) => c.quizSlug === quiz.slug)?.id ?? null,
     jakoNimi: korttinimi({ korttinimi: quiz.korttinimi, title: quiz.display_title ?? quiz.title }),
     fanitasot:
