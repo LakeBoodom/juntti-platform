@@ -27,6 +27,11 @@ export type Pakka = {
   /** Suuntamerkin teksti (lyhyt — merkki on 28 px korkea pilleri). */
   suunta: string;
   kind: string;
+  /** Monen kindin pakka (tietomalli vaihe B): pooli = kaikki nämä kindit, `kind` ohitetaan.
+   *  Esim. ["recurring_event", "attraction"] + attrKey "start_year". Puuttuu → pelkkä `kind`. */
+  kinds?: string[];
+  /** Vain tämän ryhmän entiteetit (fact_entities.group_key), esim. "festivaali". */
+  groupKey?: string;
   attrKey: string;
   /** '' = koko ura / oletus; muuten esim. seura ('Tappara'). */
   scope: string;

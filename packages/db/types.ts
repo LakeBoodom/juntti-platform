@@ -8033,6 +8033,225 @@ export type Database = {
         }
         Relationships: []
       }
+      _rovaniemi_paavisa_backup_20261110: {
+        Row: {
+          animal_sound: Json | null
+          answers: Json | null
+          audio: Json | null
+          created_at: string | null
+          explanation: string | null
+          hook: boolean | null
+          hook_alkaa: string | null
+          hook_paattyy: string | null
+          hook_teema: string | null
+          id: string | null
+          image_credit: string | null
+          image_license_note: string | null
+          image_position: string | null
+          image_url: string | null
+          question_text: string | null
+          question_type: string | null
+          quiz_id: string | null
+          sort_order: number | null
+          taso: number | null
+          vihje_laura: string | null
+          vihje_mikko: string | null
+        }
+        Insert: {
+          animal_sound?: Json | null
+          answers?: Json | null
+          audio?: Json | null
+          created_at?: string | null
+          explanation?: string | null
+          hook?: boolean | null
+          hook_alkaa?: string | null
+          hook_paattyy?: string | null
+          hook_teema?: string | null
+          id?: string | null
+          image_credit?: string | null
+          image_license_note?: string | null
+          image_position?: string | null
+          image_url?: string | null
+          question_text?: string | null
+          question_type?: string | null
+          quiz_id?: string | null
+          sort_order?: number | null
+          taso?: number | null
+          vihje_laura?: string | null
+          vihje_mikko?: string | null
+        }
+        Update: {
+          animal_sound?: Json | null
+          answers?: Json | null
+          audio?: Json | null
+          created_at?: string | null
+          explanation?: string | null
+          hook?: boolean | null
+          hook_alkaa?: string | null
+          hook_paattyy?: string | null
+          hook_teema?: string | null
+          id?: string | null
+          image_credit?: string | null
+          image_license_note?: string | null
+          image_position?: string | null
+          image_url?: string | null
+          question_text?: string | null
+          question_type?: string | null
+          quiz_id?: string | null
+          sort_order?: number | null
+          taso?: number | null
+          vihje_laura?: string | null
+          vihje_mikko?: string | null
+        }
+        Relationships: []
+      }
+      _rovaniemi_paavisa_quiz_backup_20261110: {
+        Row: {
+          category: string | null
+          collection: string | null
+          created_at: string | null
+          created_by: string | null
+          custom_slug: string | null
+          description: string | null
+          difficulty: string | null
+          display_title: string | null
+          emoji_hint: string | null
+          era: string | null
+          fanitasot: Json | null
+          featured_in_category: boolean | null
+          game_mode: string | null
+          genre: string | null
+          hero_alt: string | null
+          hero_focal_x: number | null
+          hero_focal_y: number | null
+          hero_image: string | null
+          hero_side: string | null
+          id: string | null
+          ig_tilit: string[] | null
+          image_url: string | null
+          is_daily: boolean | null
+          kausi: string | null
+          korttinimi: string | null
+          lasten_aihe: string | null
+          learn: Json | null
+          lukija: string | null
+          paikkakunnat: string[] | null
+          platform: string | null
+          play_count: number | null
+          published_at: string | null
+          scheduled_for: string | null
+          section_tags: string[] | null
+          seo_description: string | null
+          seo_title: string | null
+          site_id: string | null
+          slug: string | null
+          status: string | null
+          subcollection: string | null
+          tags: string[] | null
+          target_age: string | null
+          teaser: string | null
+          title: string | null
+          tone: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          category?: string | null
+          collection?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          custom_slug?: string | null
+          description?: string | null
+          difficulty?: string | null
+          display_title?: string | null
+          emoji_hint?: string | null
+          era?: string | null
+          fanitasot?: Json | null
+          featured_in_category?: boolean | null
+          game_mode?: string | null
+          genre?: string | null
+          hero_alt?: string | null
+          hero_focal_x?: number | null
+          hero_focal_y?: number | null
+          hero_image?: string | null
+          hero_side?: string | null
+          id?: string | null
+          ig_tilit?: string[] | null
+          image_url?: string | null
+          is_daily?: boolean | null
+          kausi?: string | null
+          korttinimi?: string | null
+          lasten_aihe?: string | null
+          learn?: Json | null
+          lukija?: string | null
+          paikkakunnat?: string[] | null
+          platform?: string | null
+          play_count?: number | null
+          published_at?: string | null
+          scheduled_for?: string | null
+          section_tags?: string[] | null
+          seo_description?: string | null
+          seo_title?: string | null
+          site_id?: string | null
+          slug?: string | null
+          status?: string | null
+          subcollection?: string | null
+          tags?: string[] | null
+          target_age?: string | null
+          teaser?: string | null
+          title?: string | null
+          tone?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          category?: string | null
+          collection?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          custom_slug?: string | null
+          description?: string | null
+          difficulty?: string | null
+          display_title?: string | null
+          emoji_hint?: string | null
+          era?: string | null
+          fanitasot?: Json | null
+          featured_in_category?: boolean | null
+          game_mode?: string | null
+          genre?: string | null
+          hero_alt?: string | null
+          hero_focal_x?: number | null
+          hero_focal_y?: number | null
+          hero_image?: string | null
+          hero_side?: string | null
+          id?: string | null
+          ig_tilit?: string[] | null
+          image_url?: string | null
+          is_daily?: boolean | null
+          kausi?: string | null
+          korttinimi?: string | null
+          lasten_aihe?: string | null
+          learn?: Json | null
+          lukija?: string | null
+          paikkakunnat?: string[] | null
+          platform?: string | null
+          play_count?: number | null
+          published_at?: string | null
+          scheduled_for?: string | null
+          section_tags?: string[] | null
+          seo_description?: string | null
+          seo_title?: string | null
+          site_id?: string | null
+          slug?: string | null
+          status?: string | null
+          subcollection?: string | null
+          tags?: string[] | null
+          target_age?: string | null
+          teaser?: string | null
+          title?: string | null
+          tone?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       _selko_yleistieto_q_backup_20261029: {
         Row: {
           animal_sound: Json | null
@@ -9011,6 +9230,78 @@ export type Database = {
           title?: string | null
           tone?: string | null
           updated_at?: string | null
+        }
+        Relationships: []
+      }
+      _vanhat_korjaukset_backup_20261109: {
+        Row: {
+          animal_sound: Json | null
+          answers: Json | null
+          audio: Json | null
+          created_at: string | null
+          explanation: string | null
+          hook: boolean | null
+          hook_alkaa: string | null
+          hook_paattyy: string | null
+          hook_teema: string | null
+          id: string | null
+          image_credit: string | null
+          image_license_note: string | null
+          image_position: string | null
+          image_url: string | null
+          question_text: string | null
+          question_type: string | null
+          quiz_id: string | null
+          sort_order: number | null
+          taso: number | null
+          vihje_laura: string | null
+          vihje_mikko: string | null
+        }
+        Insert: {
+          animal_sound?: Json | null
+          answers?: Json | null
+          audio?: Json | null
+          created_at?: string | null
+          explanation?: string | null
+          hook?: boolean | null
+          hook_alkaa?: string | null
+          hook_paattyy?: string | null
+          hook_teema?: string | null
+          id?: string | null
+          image_credit?: string | null
+          image_license_note?: string | null
+          image_position?: string | null
+          image_url?: string | null
+          question_text?: string | null
+          question_type?: string | null
+          quiz_id?: string | null
+          sort_order?: number | null
+          taso?: number | null
+          vihje_laura?: string | null
+          vihje_mikko?: string | null
+        }
+        Update: {
+          animal_sound?: Json | null
+          answers?: Json | null
+          audio?: Json | null
+          created_at?: string | null
+          explanation?: string | null
+          hook?: boolean | null
+          hook_alkaa?: string | null
+          hook_paattyy?: string | null
+          hook_teema?: string | null
+          id?: string | null
+          image_credit?: string | null
+          image_license_note?: string | null
+          image_position?: string | null
+          image_url?: string | null
+          question_text?: string | null
+          question_type?: string | null
+          quiz_id?: string | null
+          sort_order?: number | null
+          taso?: number | null
+          vihje_laura?: string | null
+          vihje_mikko?: string | null
         }
         Relationships: []
       }
@@ -10566,6 +10857,125 @@ export type Database = {
           },
         ]
       }
+      entity_facts: {
+        Row: {
+          clue_level: number | null
+          created_at: string
+          entity_id: string
+          fact_type: string
+          id: string
+          notability: number
+          source: string
+          status: string
+          text: string
+          verified_at: string
+        }
+        Insert: {
+          clue_level?: number | null
+          created_at?: string
+          entity_id: string
+          fact_type: string
+          id?: string
+          notability?: number
+          source: string
+          status?: string
+          text: string
+          verified_at: string
+        }
+        Update: {
+          clue_level?: number | null
+          created_at?: string
+          entity_id?: string
+          fact_type?: string
+          id?: string
+          notability?: number
+          source?: string
+          status?: string
+          text?: string
+          verified_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "entity_facts_entity_id_fkey"
+            columns: ["entity_id"]
+            isOneToOne: false
+            referencedRelation: "fact_entities"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      entity_timeline: {
+        Row: {
+          created_at: string
+          detail: string | null
+          entity_id: string
+          entry_type: string
+          id: string
+          linked_entity: string | null
+          metric: string | null
+          next_review_at: string | null
+          notability: number
+          num_value: number | null
+          season: string | null
+          source: string
+          value_text: string | null
+          verified_at: string
+          volatility: string
+          year: number
+        }
+        Insert: {
+          created_at?: string
+          detail?: string | null
+          entity_id: string
+          entry_type: string
+          id?: string
+          linked_entity?: string | null
+          metric?: string | null
+          next_review_at?: string | null
+          notability?: number
+          num_value?: number | null
+          season?: string | null
+          source: string
+          value_text?: string | null
+          verified_at: string
+          volatility?: string
+          year: number
+        }
+        Update: {
+          created_at?: string
+          detail?: string | null
+          entity_id?: string
+          entry_type?: string
+          id?: string
+          linked_entity?: string | null
+          metric?: string | null
+          next_review_at?: string | null
+          notability?: number
+          num_value?: number | null
+          season?: string | null
+          source?: string
+          value_text?: string | null
+          verified_at?: string
+          volatility?: string
+          year?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "entity_timeline_entity_id_fkey"
+            columns: ["entity_id"]
+            isOneToOne: false
+            referencedRelation: "fact_entities"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "entity_timeline_linked_entity_fkey"
+            columns: ["linked_entity"]
+            isOneToOne: false
+            referencedRelation: "fact_entities"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       etusivu_promot: {
         Row: {
           aktiivinen: boolean
@@ -10623,6 +11033,7 @@ export type Database = {
           gap_mode: string
           jarjesta_title: string | null
           kind: string
+          kinds: string[] | null
           max_domain_distance: number
           max_gap: number | null
           mid_gap: number | null
@@ -10646,6 +11057,7 @@ export type Database = {
           gap_mode?: string
           jarjesta_title?: string | null
           kind: string
+          kinds?: string[] | null
           max_domain_distance?: number
           max_gap?: number | null
           mid_gap?: number | null
@@ -10669,6 +11081,7 @@ export type Database = {
           gap_mode?: string
           jarjesta_title?: string | null
           kind?: string
+          kinds?: string[] | null
           max_domain_distance?: number
           max_gap?: number | null
           mid_gap?: number | null
@@ -10689,6 +11102,7 @@ export type Database = {
           attr_key: string
           display_value: string | null
           entity_id: string
+          metric: string | null
           next_review_at: string | null
           num_value: number | null
           scope: string
@@ -10702,6 +11116,7 @@ export type Database = {
           attr_key: string
           display_value?: string | null
           entity_id: string
+          metric?: string | null
           next_review_at?: string | null
           num_value?: number | null
           scope?: string
@@ -10715,6 +11130,7 @@ export type Database = {
           attr_key?: string
           display_value?: string | null
           entity_id?: string
+          metric?: string | null
           next_review_at?: string | null
           num_value?: number | null
           scope?: string
@@ -10735,9 +11151,11 @@ export type Database = {
       }
       fact_entities: {
         Row: {
+          archive_url: string | null
           celebrity_id: string | null
           created_at: string | null
           domain: string | null
+          group_key: string | null
           id: string
           image_credit: string | null
           image_url: string | null
@@ -10746,18 +11164,22 @@ export type Database = {
           lon: number | null
           name: string
           name_partitive: string | null
+          official_url: string | null
           prominence: number | null
           role_label: string | null
           show_role: boolean
           status: string
+          tags: string[]
           updated_at: string | null
           wiki_url: string | null
           wikidata_id: string | null
         }
         Insert: {
+          archive_url?: string | null
           celebrity_id?: string | null
           created_at?: string | null
           domain?: string | null
+          group_key?: string | null
           id?: string
           image_credit?: string | null
           image_url?: string | null
@@ -10766,18 +11188,22 @@ export type Database = {
           lon?: number | null
           name: string
           name_partitive?: string | null
+          official_url?: string | null
           prominence?: number | null
           role_label?: string | null
           show_role?: boolean
           status?: string
+          tags?: string[]
           updated_at?: string | null
           wiki_url?: string | null
           wikidata_id?: string | null
         }
         Update: {
+          archive_url?: string | null
           celebrity_id?: string | null
           created_at?: string | null
           domain?: string | null
+          group_key?: string | null
           id?: string
           image_credit?: string | null
           image_url?: string | null
@@ -10786,10 +11212,12 @@ export type Database = {
           lon?: number | null
           name?: string
           name_partitive?: string | null
+          official_url?: string | null
           prominence?: number | null
           role_label?: string | null
           show_role?: boolean
           status?: string
+          tags?: string[]
           updated_at?: string | null
           wiki_url?: string | null
           wikidata_id?: string | null
