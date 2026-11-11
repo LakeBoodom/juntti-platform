@@ -6,9 +6,10 @@
 // Kaikki best-effort: fetch keepalive (klikkaus ehtii lähteä sivun vaihtuessa), virheet niellään.
 
 import { useEffect, type RefObject } from "react";
+import type { Pilotti } from "./tyypit";
 
 export type SkMeta = {
-  pilotti: "urheilu" | null;
+  pilotti: Pilotti | null;
   nakyma: "aloitus" | "tulos";
   /** Lähdevisan slug tai pelimuodon slug. */
   lahde: string;

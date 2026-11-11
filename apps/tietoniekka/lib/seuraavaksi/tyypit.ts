@@ -28,8 +28,11 @@ export type Ehdokas = {
 
 /** Kolme paikkaa (Heikki 11.11. kierros 3): 1 Lähin sama, 2 Sama aihe toisena pelimuotona, 3 Tänään. Jokaisessa 3–5 ehdokasta järjestyksessä;
  *  selain valitsee kustakin ensimmäisen pelaamattoman. Listat ovat erilliset, joten sama ehdokas ei näy kahdessa paikassa. */
+/** Laajennukset: urheilu (pilotti 9.11.: urheiluvisat ja urheilijat), henkilot (11.11.: muut henkilövisat). */
+export type Pilotti = "urheilu" | "henkilot";
+
 export type Seuraavat = {
-  pilotti: "urheilu";
+  pilotti: Pilotti;
   p1: Ehdokas[];
   p2: Ehdokas[];
   p3: Ehdokas[];
