@@ -711,7 +711,7 @@ export default async function Peli20({
     /* Henkilövisan kuva tulee celebrities-riviltä (Wikipedia/Wikimedia), ei
        kokoelmakartasta — henkilövisoja on 243 eikä niille ole omia kuvia. */
     quiz.collection === "tunnetut-henkilot"
-      ? sb.from("celebrities").select("name, role, image_url, wikipedia_url, nimi_elatiivi, laji" as never).eq("trivia_quiz_id", quiz.id).maybeSingle()
+      ? sb.from("celebrities").select("name, role, image_url, wikipedia_url, nimi_elatiivi, laji, ryhma, politiikka_roolit, death_date" as never).eq("trivia_quiz_id", quiz.id).maybeSingle()
       : Promise.resolve({ data: null }),
     haeVisassaMukana(sb, quiz.id),
     /* Kaupunkisivut (brief 7.11.2026 §2): saman paikkakunnan visat omana ryhmänään ennen ristiinnostoja. */
@@ -747,12 +747,15 @@ export default async function Peli20({
      se on juuri se virhe, jossa golfvisa sai tennisvisan kuvan. */
   const heroParam = typeof params.hero === "string" ? params.hero : null;
   const isPerson = collection === "tunnetut-henkilot";
-  const celeb = (celebRes.data ?? null) as unknown as { name: string; role: string | null; image_url: string | null; wikipedia_url?: string | null; nimi_elatiivi?: string | null; laji?: string | null } | null;
-  /* "Pelaa seuraavaksi" -pilotti (toteutusbrief 8.11.2026, Heikki 9.11.: kaikki urheilu). Muut visat: null → ennallaan. */
+  const celeb = (celebRes.data ?? null) as unknown as { name: string; role: string | null; image_url: string | null; wikipedia_url?: string | null; nimi_elatiivi?: string | null; laji?: string | null; ryhma?: string | null; politiikka_roolit?: string[] | null; death_date?: string | null } | null;
+  /* "Pelaa seuraavaksi" (toteutusbrief 8.11.2026): pilotti kaikki urheilu (Heikki 9.11.) ja kaikki henkilövisat (11.11.).
+     Muut visat: null → ennallaan. */
   const seuraavaksi = await haeSeuraavat(sb, {
     id: quiz.id, slug: quiz.slug, title: quiz.title, display_title: quiz.display_title,
     collection: quiz.collection, category: quiz.category, genre: quiz.genre, subcollection: quiz.subcollection ?? null,
     paikkakunnat: quiz.paikkakunnat ?? null, henkilonLaji: isPerson ? celeb?.laji ?? null : null,
+    henkilonRyhma: isPerson ? celeb?.ryhma ?? null : null, henkilonRoolit: isPerson ? celeb?.politiikka_roolit ?? null : null,
+    henkiloKuoli: isPerson ? celeb?.death_date ?? null : null,
     /* Paikan 3 (Tänään) testipäivä vain esikatselussa ja paikallisesti: ?sk_pvm=2026-11-13. */
     testipaiva: process.env.VERCEL_ENV !== "production" && typeof params.sk_pvm === "string" && /^\d{4}-\d{2}-\d{2}$/.test(params.sk_pvm) ? params.sk_pvm : null,
   }).catch(() => null);

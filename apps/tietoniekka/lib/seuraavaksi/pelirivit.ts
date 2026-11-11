@@ -6,9 +6,11 @@
 //     (VihjepeliClient), joten rivi on "vihjeistä", ei "siluetista".
 //   - Järjestä-pakat: 8 korttia (pick 8 kaikissa pakoissa). Rivi pakan pelilauseesta ("Leijonat maaottelujen mukaan, …").
 //   - Reittipelit: reitti lähtömaasta/-kunnasta maaliin rajanaapureiden kautta.
+//   - Ikäjärjestys (henkilöpakat): 8 henkilöä (lib/ikajarjestysConstants ROUND_SIZE), syntymävuoden mukaan.
 import type { Pelimuoto } from "@/lib/pelimuodot";
 import { PAKAT } from "@/lib/jarjesta/pakat";
 import { ARVAUKSIA } from "@/lib/vihjepeli/tyypit";
+import { ROUND_SIZE } from "@/lib/ikajarjestysConstants";
 
 const LUKUSANA: Record<number, string> = { 4: "neljällä", 5: "viidellä", 6: "kuudella", 7: "seitsemällä", 8: "kahdeksalla" };
 
@@ -36,3 +38,14 @@ export function pelinRivi(p: Pick<Pelimuoto, "slug" | "ikoni" | "kuvaus">): stri
   const k = p.kuvaus?.replace(/\.$/, "").trim();
   return k && k.length <= 48 ? k : null;
 }
+
+const PERUSLUKU: Record<number, string> = { 6: "kuusi", 7: "seitsemän", 8: "kahdeksan", 9: "yhdeksän", 10: "kymmenen" };
+/** Ikäjärjestyksen pakan henkilö partitiivissa ("Laita kahdeksan muusikkoa ikäjärjestykseen"). */
+const IKA_KOHDE: Record<string, string> = {
+  urheilijat: "urheilijaa",
+  muusikot: "muusikkoa",
+  nayttelijat: "näyttelijää",
+  kirjailijat: "kirjailijaa",
+  "tunnetut-suomalaiset": "suomalaista",
+};
+export const ikaRivi = (pakka: string) => `Laita ${PERUSLUKU[ROUND_SIZE] ?? ROUND_SIZE} ${IKA_KOHDE[pakka] ?? "henkilöä"} ikäjärjestykseen`;
