@@ -12,10 +12,14 @@
 import {
   domainDistance,
   haversineKm,
+  poolFor,
+  teemanRyhma,
   type DuelData,
   type DuelDef,
   type DuelEntity,
+  type PoolOpts,
 } from "./duel";
+import { mittariSopiiKaikille } from "./vertailu";
 
 export type RankItem = {
   entity: DuelEntity;
@@ -85,10 +89,10 @@ function minStepFor(def: DuelDef): number {
   return 0;
 }
 
-function poolFor(entities: DuelEntity[], def: DuelDef): DuelEntity[] {
-  if (def.mode === "distance")
-    return entities.filter((e) => e.kind === def.kind && e.lat !== null && e.lon !== null);
-  return entities.filter((e) => e.kind === def.kind && e.v[def.key] !== undefined);
+/** Mittarisääntö ketjulle: jokaisen parin mittarit sopivat (lib/vertailu.ts). */
+function mittaritOk(def: DuelDef, chosen: DuelEntity[]): boolean {
+  if (def.mode === "distance") return true;
+  return chosen.every((e, i) => mittariSopiiKaikille(e.m[def.key], chosen.slice(0, i).map((x) => x.m[def.key])));
 }
 
 /** Järjestyspeliin kelpaavat vain numeeriset ja etäisyysattribuutit, joilla on ohje. */
@@ -101,9 +105,10 @@ function rankableDefs(defs: DuelDef[], theme: string): DuelDef[] {
   );
 }
 
-export function hasRankContent(data: DuelData, theme: string): boolean {
+export function hasRankContent(data: DuelData, theme: string, opts: PoolOpts = {}): boolean {
+  const groupKey = opts.groupKey ?? teemanRyhma(theme);
   return rankableDefs(data.defs, theme).some(
-    (d) => poolFor(data.entities, d).length >= MIN_LEN + (d.mode === "distance" ? 1 : 0),
+    (d) => poolFor(data.entities, d, { groupKey }).length >= MIN_LEN + (d.mode === "distance" ? 1 : 0),
   );
 }
 
@@ -111,9 +116,11 @@ export function makeRankTask(
   data: DuelData,
   theme: string,
   used: Set<string>,
+  opts: PoolOpts = {},
 ): RankTask | null {
   const defs = rankableDefs(data.defs, theme);
   if (!defs.length) return null;
+  const groupKey = opts.groupKey ?? teemanRyhma(theme);
 
   // Ensin yritetään viittä. Jos aineisto on ohut (järviä on 8 ja osa niistä
   // lähes samankokoisia), viiden ketju ei mahdu alarajan läpi lainkaan —
@@ -121,7 +128,7 @@ export function makeRankTask(
   for (let attempt = 0; attempt < 400; attempt++) {
     const relax = attempt >= 240;
     const def = pick(defs);
-    const pool = poolFor(data.entities, def);
+    const pool = poolFor(data.entities, def, { groupKey });
 
     let ref: DuelEntity | null = null;
     let candidates = pool;
@@ -140,12 +147,14 @@ export function makeRankTask(
     // Lipuissa harhauttimen läheisyys ratkaistaan alojen etäisyydellä. Sama
     // ajatus pätee tässä: sekalainen joukko eri aloilta on tunnistustehtävä,
     // ei tietotehtävä. Numeerisissa tämä koskee vain henkilöitä, joilla ala on.
-    if (def.kind === "person") {
+    if (def.kinds.includes("person")) {
       const tooFar = chosen.some((a) =>
         chosen.some((b) => domainDistance(a.domain, b.domain) > def.maxDomainDistance),
       );
       if (tooFar) continue;
     }
+    // Eri mittarit samassa ketjussa (pääkonserttien yleisö vs. katsojat) → ei vertailukelpoinen.
+    if (!mittaritOk(def, chosen)) continue;
 
     const items: RankItem[] = chosen.map((e) => {
       const value = ref ? haversineKm(ref, e) : e.v[def.key];

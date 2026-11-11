@@ -13,11 +13,13 @@ import { vaakunaKuva } from "./vaakunat";
 import { puolueNimi } from "../vaalit/puolue";
 import { haePakka, oikeaJarjestys, type JarjestysKohde, type Pakka } from "./pakat";
 import { RIVIN_PITUUS, siemen, vaaraJarjestys } from "./siemen";
+import { maarittelynKindit, mittariSopiiKaikille } from "../vertailu";
 
 type Rivi = {
   num_value: number | string | null;
   display_value: string | null;
   source: string | null;
+  metric: string | null;
   fact_entities: {
     id: string;
     name: string;
@@ -28,7 +30,7 @@ type Rivi = {
   } | null;
 };
 
-type Ehdokas = JarjestysKohde & { tunnettu: boolean };
+type Ehdokas = JarjestysKohde & { tunnettu: boolean; mittari: string | null };
 
 const relVali = (a: number, b: number) => Math.abs(a - b) / Math.max(Math.abs(a), Math.abs(b), 1);
 
@@ -59,7 +61,9 @@ function poimi(p: Pakka, pool: Ehdokas[], vali: Pakka["vali"], rng: () => number
     for (const k of jono) {
       if (valitut.length >= pick) break;
       if (valitut.some((v) => v.id === k.id)) continue;
-      if (valitut.every((v) => riittavaVali(vali, v.value, k.value))) valitut.push(k);
+      if (!valitut.every((v) => riittavaVali(vali, v.value, k.value))) continue;
+      // Mittarisääntö (lib/vertailu.ts): eri asiaa mittaavat luvut eivät samaan kierrokseen.
+      if (mittariSopiiKaikille(k.mittari, valitut.map((v) => v.mittari))) valitut.push(k);
     }
     const parempi =
       valitut.length > paras.length ||
@@ -91,15 +95,18 @@ function lahdeDomain(source: string | null): string | null {
   return /wikipedia/i.test(source) ? "Wikipedia" : null;
 }
 
-/** Saman kindin toisen attribuutin arvot entiteeteittäin. */
-async function attrKartta(sb: NonNullable<ReturnType<typeof getSupabase>>, kind: string, attrKey: string) {
+/** Pakan kindit: `kinds` (monen kindin pakka) tai pelkkä `kind`. */
+const pakanKindit = (p: Pakka) => maarittelynKindit(p.kind, p.kinds);
+
+/** Pakan kindien toisen attribuutin arvot entiteeteittäin. */
+async function attrKartta(sb: NonNullable<ReturnType<typeof getSupabase>>, kinds: string[], attrKey: string) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { data } = await (sb as any)
     .from("fact_attributes")
     .select("entity_id, num_value, text_value, display_value, fact_entities!inner(kind)")
     .eq("attr_key", attrKey)
     .eq("scope", "")
-    .eq("fact_entities.kind", kind);
+    .in("fact_entities.kind", kinds);
   const m = new Map<string, { num: number; text: string | null }>();
   for (const r of (data ?? []) as { entity_id: string; num_value: number | string | null; text_value: string | null; display_value: string | null }[])
     m.set(r.entity_id, { num: Number(r.num_value), text: r.text_value ?? r.display_value });
@@ -111,24 +118,29 @@ async function haePool(p: Pakka): Promise<Ehdokas[]> {
   const sb = getSupabase();
   if (!sb) return [];
 
+  const kinds = pakanKindit(p);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { data, error } = await (sb as any)
+  let q = (sb as any)
     .from("fact_attributes")
-    .select("num_value, display_value, source, fact_entities!inner(id, name, role_label, image_url, prominence, celebrity_id, kind, status)")
+    .select("num_value, display_value, source, metric, fact_entities!inner(id, name, role_label, image_url, prominence, celebrity_id, kind, status, group_key)")
     .eq("attr_key", p.attrKey)
     .eq("scope", p.scope)
-    .eq("fact_entities.kind", p.kind)
     .eq("fact_entities.status", "published")
     .not("num_value", "is", null);
+  // Yksi kind → eq kuten ennen: sama kyselysuunnitelma ja sama rivijärjestys, joten siemennetty
+  // päivän rivi pysyy ennallaan (haePaivanRivi sekoittaa kannan palauttamassa järjestyksessä).
+  q = kinds.length === 1 ? q.eq("fact_entities.kind", kinds[0]) : q.in("fact_entities.kind", kinds);
+  if (p.groupKey) q = q.eq("fact_entities.group_key", p.groupKey);
+  const { data, error } = await q;
   if (error || !data) {
     console.error("haePool:", error);
     return [];
   }
 
   const [syntyneet, ehto, rooli] = await Promise.all([
-    p.pool?.syntynytVahintaan ? attrKartta(sb, p.kind, "birth") : null,
-    p.pool?.ehto ? attrKartta(sb, p.kind, p.pool.ehto.attrKey) : null,
-    p.rooliAttr ? attrKartta(sb, p.kind, p.rooliAttr) : null,
+    p.pool?.syntynytVahintaan ? attrKartta(sb, kinds, "birth") : null,
+    p.pool?.ehto ? attrKartta(sb, kinds, p.pool.ehto.attrKey) : null,
+    p.rooliAttr ? attrKartta(sb, kinds, p.rooliAttr) : null,
   ]);
   const minVuosi = p.pool?.syntynytVahintaan;
   const vuosiOk = (id: string) => {
@@ -163,6 +175,7 @@ async function haePool(p: Pakka): Promise<Ehdokas[]> {
         valueLabel: arvoTeksti(p, r, value),
         lahde: lahdeDomain(r.source),
         tunnettu: !!tunn && (!!e.celebrity_id || value >= tunn.arvoVahintaan),
+        mittari: r.metric ?? null,
       };
     })
     .filter((k) => Number.isFinite(k.value));
@@ -171,7 +184,7 @@ async function haePool(p: Pakka): Promise<Ehdokas[]> {
 /** Kuvat kaikille tai ei kenellekään (brief §2): yksikin puuttuva oma kopio → tekstikortit, ei koskaan siluettia. */
 function kuvatKaikille(valitut: Ehdokas[]): JarjestysKohde[] {
   const kuvat = valitut.every((k) => henkiloKuva(k.image_url));
-  return valitut.map(({ tunnettu: _t, ...k }) => (kuvat ? k : { ...k, image_url: null, hideThumb: true }));
+  return valitut.map(({ tunnettu: _t, mittari: _m, ...k }) => (kuvat ? k : { ...k, image_url: null, hideThumb: true }));
 }
 
 export async function haeJarjestysKierros(slug: string, excludeIds: string[] = []): Promise<JarjestysKohde[]> {

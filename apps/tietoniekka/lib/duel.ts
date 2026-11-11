@@ -5,6 +5,7 @@
 // (peli), joten generaattori on puhdas funktio ilman DB-riippuvuutta.
 
 import { getSupabase } from "./supabase";
+import { maarittelynKindit, mittaritSopivat } from "./vertailu";
 
 export type DuelEntity = {
   id: string;
@@ -16,6 +17,10 @@ export type DuelEntity = {
   image: string | null;
   v: Record<string, number>;
   d: Record<string, string>;
+  /** Mittari attribuuteittain (fact_attributes.metric), vain kun asetettu. Ks. mittaritSopivat. */
+  m: Record<string, string>;
+  /** fact_entities.group_key ("festivaali", "huvipuisto", "poliitikot" …) tai null. */
+  group: string | null;
   /** Sijainti. Vaaditaan distance-moodin kysymyksiin, muuten null. */
   lat: number | null;
   lon: number | null;
@@ -26,6 +31,11 @@ export type DuelEntity = {
 export type DuelDef = {
   key: string;
   kind: string;
+  /**
+   * Vertailupoolin kindit: fact_attribute_defs.kinds, tai [kind] kun kinds on NULL.
+   * Esim. start_year = recurring_event + attraction ("Pori Jazz vai Särkänniemi?").
+   */
+  kinds: string[];
   theme: string;
   subject: string;
   question: string;
@@ -171,14 +181,25 @@ function difficultyOf(
   return "vaikea";
 }
 
+/** Pelin lisärajaus. groupKey = vain tämän ryhmän entiteetit (fact_entities.group_key),
+ *  esim. festivaalien yhteinen Kumpi? = start_year (kinds) + groupKey "festivaali". */
+export type PoolOpts = { groupKey?: string | null };
+
 /**
- * Kysymykseen kelpaavat entiteetit. Distance-moodissa ehtona on sijainti,
- * muissa se että attribuutti on ylipäänsä tallennettu.
+ * Kysymykseen kelpaavat entiteetit. Kind tulee määrittelyn kindeistä (kinds tai kind).
+ * Distance-moodissa ehtona on sijainti, muissa se että attribuutti on ylipäänsä tallennettu.
  */
-function poolFor(entities: DuelEntity[], def: DuelDef): DuelEntity[] {
-  if (def.mode === "distance")
-    return entities.filter((e) => e.kind === def.kind && hasCoords(e));
-  return entities.filter((e) => e.kind === def.kind && e.v[def.key] !== undefined);
+export function poolFor(entities: DuelEntity[], def: DuelDef, opts: PoolOpts = {}): DuelEntity[] {
+  const g = opts.groupKey ?? null;
+  const base = entities.filter((e) => def.kinds.includes(e.kind) && (!g || e.group === g));
+  if (def.mode === "distance") return base.filter(hasCoords);
+  return base.filter((e) => e.v[def.key] !== undefined);
+}
+
+/** Saako parin muodostaa: mittarisääntö (lib/vertailu.ts). Distance-moodissa ei tallennettua arvoa. */
+export function pariSopii(def: DuelDef, a: DuelEntity, b: DuelEntity): boolean {
+  if (def.mode === "distance") return true;
+  return mittaritSopivat(a.m[def.key], b.m[def.key]);
 }
 
 function fiDate(epoch: number): string {
@@ -250,8 +271,10 @@ export function makeDuel(
   data: DuelData,
   theme: string,
   used: Set<string>,
+  opts: PoolOpts = {},
 ): Duel | null {
   const blocked = new Set(data.blocks);
+  const groupKey = opts.groupKey ?? teemanRyhma(theme);
   const usableDefs = data.defs.filter(
     (d) => theme === "sekoitus" || d.theme === theme,
   );
@@ -259,7 +282,7 @@ export function makeDuel(
 
   for (let attempt = 0; attempt < 400; attempt++) {
     const def = pick(usableDefs);
-    const pool = poolFor(data.entities, def);
+    const pool = poolFor(data.entities, def, { groupKey });
     if (pool.length < 2) continue;
 
     let a: DuelEntity, b: DuelEntity;
@@ -293,6 +316,8 @@ export function makeDuel(
     }
 
     if (a.id === b.id) continue;
+    // Eri mittarit (esim. pääkonserttien yleisö vs. katsojat) → ei vertailukelpoinen pari.
+    if (!pariSopii(def, a, b)) continue;
 
     // Distance-moodissa vertailtava arvo lasketaan, muissa se on tallennettu.
     const dist =
@@ -343,6 +368,14 @@ export function makeDuel(
 
 /* ─── DB-haku ─────────────────────────────────────────────────────── */
 
+/** fact_entities-kysely (julkaistut). Sama valinta testiskriptissä (scripts/tietomalli-tarkistus.ts). */
+export const DUEL_ENTITY_SELECT =
+  "id, name, kind, role_label, show_role, domain, group_key, image_url, lat, lon, name_partitive, fact_attributes(attr_key, scope, num_value, display_value, metric)";
+
+/** Toteutetut vertailutavat. Kannassa on myös 'category' (vaihe A), jota peli ei vielä osaa:
+ *  sellainen määrittely ohitetaan, ettei se päädy numeeriseen vertailuun tekstiarvoilla. */
+const TUETUT_MOODIT = new Set(["numeric", "flag", "distance"]);
+
 export async function getDuelData(): Promise<DuelData | null> {
   const sb = getSupabase();
   if (!sb) return null;
@@ -351,9 +384,7 @@ export async function getDuelData(): Promise<DuelData | null> {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (sb as any)
       .from("fact_entities")
-      .select(
-        "id, name, kind, role_label, show_role, domain, image_url, lat, lon, name_partitive, fact_attributes(attr_key, scope, num_value, display_value)",
-      )
+      .select(DUEL_ENTITY_SELECT)
       .eq("status", "published")
       .limit(2000),
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -366,18 +397,36 @@ export async function getDuelData(): Promise<DuelData | null> {
     console.error("getDuelData:", entRes.error ?? defRes.error);
     return null;
   }
+  return rakennaDuelData(entRes.data ?? [], defRes.data ?? [], blockRes.data ?? []);
+}
 
+/**
+ * Kantarivit → DuelData. Puhdas funktio: getDuelData kutsuu tätä anon-avaimen riveillä,
+ * tarkistusskripti service rolen riveillä (pilotin luonnosentiteetit, enabled=false-määrittelyt).
+ */
+export function rakennaDuelData(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const entities: DuelEntity[] = (entRes.data ?? []).map((x: any) => {
+  entRows: any[],
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  defRows: any[],
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  blockRows: any[] = [],
+): DuelData {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const entities: DuelEntity[] = entRows.map((x: any) => {
     const v: Record<string, number> = {};
     const d: Record<string, string> = {};
+    const m: Record<string, string> = {};
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     for (const a of x.fact_attributes ?? []) {
-      // Vain koko uran / oletusarvo. Seurakohtaiset rivit (scope 'Tappara' jne.) ovat
-      // järjestyspeliä varten ja ylikirjoittaisivat muuten uran arvon satunnaisesti.
+      // Vain koko uran / oletusarvo (scope = ''). Seurakohtaiset rivit (scope 'Tappara' jne.)
+      // ovat järjestyspeliä varten ja ylikirjoittaisivat muuten uran arvon satunnaisesti.
       if (a.scope) continue;
+      // Tekstiarvoiset rivit (num_value NULL) eivät ole vertailtavia lukuja.
+      if (a.num_value === null || a.num_value === undefined) continue;
       v[a.attr_key] = Number(a.num_value);
       if (a.display_value) d[a.attr_key] = a.display_value;
+      if (a.metric) m[a.attr_key] = a.metric;
     }
     return {
       id: x.id,
@@ -386,9 +435,11 @@ export async function getDuelData(): Promise<DuelData | null> {
       role: x.role_label,
       showRole: x.show_role !== false,
       domain: x.domain,
+      group: x.group_key ?? null,
       image: x.image_url,
       v,
       d,
+      m,
       lat: x.lat === null || x.lat === undefined ? null : Number(x.lat),
       lon: x.lon === null || x.lon === undefined ? null : Number(x.lon),
       partitive: x.name_partitive ?? null,
@@ -396,28 +447,32 @@ export async function getDuelData(): Promise<DuelData | null> {
     // Sijainti yksinään riittää: etäisyyskysymys ei tarvitse tallennettua arvoa.
   }).filter((e: DuelEntity) => Object.keys(e.v).length > 0 || hasCoords(e));
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const defs: DuelDef[] = (defRes.data ?? []).map((d: any) => ({
-    key: d.attr_key,
-    kind: d.kind,
-    theme: d.theme,
-    subject: d.subject_label ?? "KUMPI",
-    question: d.question_text,
-    winner: d.winner,
-    mode: d.compare_mode ?? "numeric",
-    easyGap: d.easy_gap === null ? null : Number(d.easy_gap),
-    midGap: d.mid_gap === null ? null : Number(d.mid_gap),
-    maxGap: d.max_gap === null || d.max_gap === undefined ? null : Number(d.max_gap),
-    minGap: d.min_gap === null || d.min_gap === undefined ? null : Number(d.min_gap),
-    gapMode: d.gap_mode === "absolute" ? "absolute" : "relative",
-    gapDivisor: d.gap_divisor === null || d.gap_divisor === undefined ? 1 : Number(d.gap_divisor),
-    maxDomainDistance: d.max_domain_distance ?? 1,
-    rankLabel: d.rank_label ?? null,
-    rankLabelRev: d.rank_label_rev ?? null,
-    factTemplate: d.fact_template,
-  }));
+  const defs: DuelDef[] = defRows
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    .filter((d: any) => TUETUT_MOODIT.has(d.compare_mode ?? "numeric"))
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    .map((d: any) => ({
+      key: d.attr_key,
+      kind: d.kind,
+      kinds: maarittelynKindit(d.kind, d.kinds),
+      theme: d.theme,
+      subject: d.subject_label ?? "KUMPI",
+      question: d.question_text,
+      winner: d.winner,
+      mode: d.compare_mode ?? "numeric",
+      easyGap: d.easy_gap === null ? null : Number(d.easy_gap),
+      midGap: d.mid_gap === null ? null : Number(d.mid_gap),
+      maxGap: d.max_gap === null || d.max_gap === undefined ? null : Number(d.max_gap),
+      minGap: d.min_gap === null || d.min_gap === undefined ? null : Number(d.min_gap),
+      gapMode: d.gap_mode === "absolute" ? "absolute" : "relative",
+      gapDivisor: d.gap_divisor === null || d.gap_divisor === undefined ? 1 : Number(d.gap_divisor),
+      maxDomainDistance: d.max_domain_distance ?? 1,
+      rankLabel: d.rank_label ?? null,
+      rankLabelRev: d.rank_label_rev ?? null,
+      factTemplate: d.fact_template,
+    }));
 
-  const blocks: string[] = (blockRes.data ?? []).map(
+  const blocks: string[] = blockRows.map(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (b: any) => `${b.attr_key}|${[b.entity_a, b.entity_b].sort().join("|")}`,
   );
@@ -431,7 +486,7 @@ export async function getDuelData(): Promise<DuelData | null> {
       const yes = pool.filter((e) => e.v[def.key] === 1);
       const no = pool.filter((e) => e.v[def.key] === 0);
       return yes.some((w) =>
-        no.some((x) => domainDistance(w.domain, x.domain) <= def.maxDomainDistance),
+        no.some((x) => domainDistance(w.domain, x.domain) <= def.maxDomainDistance && pariSopii(def, w, x)),
       );
     }
     if (def.mode === "distance") {
@@ -449,11 +504,14 @@ export async function getDuelData(): Promise<DuelData | null> {
           }
       return false;
     }
-    if (def.maxGap === null && def.minGap === null) return pool.length >= 2;
-    // Vähintään yksi pari sallitun kaistan sisällä
+    // Vähintään yksi pari: eri arvot, sama mittari ja ero sallitun kaistan sisällä.
     for (let i = 0; i < pool.length; i++)
       for (let j = i + 1; j < pool.length; j++)
-        if (pool[i].v[def.key] !== pool[j].v[def.key] && gapOk(def, gap(def, pool[i], pool[j])))
+        if (
+          pool[i].v[def.key] !== pool[j].v[def.key] &&
+          pariSopii(def, pool[i], pool[j]) &&
+          gapOk(def, gap(def, pool[i], pool[j]))
+        )
           return true;
     return false;
   });
@@ -461,7 +519,11 @@ export async function getDuelData(): Promise<DuelData | null> {
   return { entities, defs: usable, blocks };
 }
 
-export const DUEL_THEMES = [
+/** Kumpi?-teema. groupKey (valinnainen) rajaa poolin yhteen ryhmään, esim.
+ *  { id: "kesa", label: "Festivaalit", groupKey: "festivaali" } = festivaalien yhteinen Kumpi?. */
+export type DuelTheme = { id: string; label: string; groupKey?: string };
+
+export const DUEL_THEMES: DuelTheme[] = [
   { id: "sekoitus", label: "Sekoitus" },
   { id: "ihmiset", label: "Ihmiset" },
   { id: "suomi", label: "Suomi" },
@@ -469,3 +531,8 @@ export const DUEL_THEMES = [
   { id: "luonto", label: "Luonto" },
   { id: "historia", label: "Historia" },
 ];
+
+/** Teeman ryhmärajaus DUEL_THEMES-konfiguraatiosta (null = ei rajausta). */
+export function teemanRyhma(theme: string): string | null {
+  return DUEL_THEMES.find((t) => t.id === theme)?.groupKey ?? null;
+}
