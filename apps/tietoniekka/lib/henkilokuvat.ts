@@ -401,22 +401,8 @@ export const HENKILOKUVAT: Record<string, string> = {
   "Rishi Sunak Official Cabinet Portrait, September 2021 (cropped).jpg": "/20/henkilot/k/rishi-sunak-official-cabinet-portrait-se-c592c5.webp",
   "Ville Niinisto Grona forbundet (grona) Finland. Nordiska radets session 2010.jpg": "/20/henkilot/k/ville-niinisto-grona-forbundet-grona-fin-6fca42.webp",
   "2023 Prince of Wales (cropped)02.JPG": "/20/henkilot/k/2023-prince-of-wales-cropped-02-585f46.webp",
-  /* 11.11.2026: 15 puuttunutta kopiota (henkilösivun yläkuva ei enää lataa Wikimediasta). */
+  /* 11.11.2026: Lenita Airisto (henkilösivun yläkuva ei enää lataa Wikimediasta). */
   "Diplomiekonomi Lenita Airisto vuonna 1976.jpg": "/20/henkilot/k/diplomiekonomi-lenita-airisto-vuonna-1976-103288.webp",
-  "Evelina Yle Kioski Journal 2019.jpg": "/20/henkilot/k/evelina-yle-kioski-journal-2019-c49526.webp",
-  "Jamie Kennedy by Gage Skidmore 2.jpg": "/20/henkilot/k/jamie-kennedy-by-gage-skidmore-2-2de8cf.webp",
-  "Jamie Oliver (cropped).jpg": "/20/henkilot/k/jamie-oliver-cropped-cb20fa.webp",
-  "John Fogerty at the 2011 Cisco Ottawa Bluesfest.jpg": "/20/henkilot/k/john-fogerty-at-the-2011-cisco-ottawa-bluesfest-b01fd2.webp",
-  "Jussi Markkanen.jpg": "/20/henkilot/k/jussi-markkanen-889420.webp",
-  "Kerry Ingram by Gage Skidmore.jpg": "/20/henkilot/k/kerry-ingram-by-gage-skidmore-75b970.webp",
-  "MaggieQSmileSDCCJuly10.jpg": "/20/henkilot/k/maggieqsmilesdccjuly10-21ab39.webp",
-  "Naomi Campbell Cannes 2017 2.jpg": "/20/henkilot/k/naomi-campbell-cannes-2017-2-a3389d.webp",
-  "Oivanen Mikko.JPG": "/20/henkilot/k/oivanen-mikko-afaa0c.webp",
-  "Richard Ayoade at Soho Hotel (cropped).jpg": "/20/henkilot/k/richard-ayoade-at-soho-hotel-cropped-403c18.webp",
-  "Ristomatti Ratia.jpg": "/20/henkilot/k/ristomatti-ratia-ddb88c.webp",
-  "Rubens Barrichello 2010 Malaysia.jpg": "/20/henkilot/k/rubens-barrichello-2010-malaysia-e3c994.webp",
-  "Sari-Tamminen-2019.jpg": "/20/henkilot/k/sari-tamminen-2019-175e1f.webp",
-  "Tarjei Sandvik Moe, Oslo 2018.jpg": "/20/henkilot/k/tarjei-sandvik-moe-oslo-2018-00023a.webp",
 };
 
 /** Commons-tiedoston nimi URL:sta (thumb- tai alkuperäinen polku), välilyönnein. */
