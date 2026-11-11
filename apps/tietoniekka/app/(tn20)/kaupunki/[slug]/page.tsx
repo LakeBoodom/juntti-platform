@@ -208,7 +208,7 @@ export default async function KaupunkiPage({ params }: Props) {
       {s.henkilot.length > 0 && (
         <div className="ks-osio ks-henkilot">
           {/* "Kaikki →" puuttuu: henkilöhakemistoa ei voi suodattaa syntymäpaikalla (brief §1.3, raportoitu). */}
-          <SukulaisLaatat otsikko={`${k.inessiivi} ${s.henkilot.length === 1 ? "syntynyt" : "syntyneitä"}`} laatat={s.henkilot.map((h) => ({ ...h, ala: "" }))} cta="Pelaa →" />
+          <SukulaisLaatat otsikko={`${k.inessiivi} ${s.henkilot.length === 1 ? "syntynyt" : "syntyneitä"}`} laatat={s.henkilot} cta="Pelaa →" />
         </div>
       )}
 
