@@ -26,14 +26,13 @@ export type Kaupunki = {
   hook_og: string | null;
   hero_kuva: string | null;
   vaakuna_url: string | null;
-  vanhat_kunnat: string[];
   /** Tietomallin kaupunkientiteetti (H5): henkilöosio born_in-suhteista. */
   entity_id: string | null;
   julkaistu: boolean;
 };
 
 const KENTAT =
-  "slug, nimi, inessiivi, elatiivi, asukasnimitys, korttinimi, kaupunkivisa_quiz_id, tunnusrivi, hook, hook_og, hero_kuva, vaakuna_url, vanhat_kunnat, entity_id, julkaistu";
+  "slug, nimi, inessiivi, elatiivi, asukasnimitys, korttinimi, kaupunkivisa_quiz_id, tunnusrivi, hook, hook_og, hero_kuva, vaakuna_url, entity_id, julkaistu";
 
 export const kaupunkiHref = (slug: string) => `/kaupunki/${slug}`;
 export const KAUPUNGIT_LISTA = "/kaupunki";
@@ -148,9 +147,8 @@ async function haePaikkakunnanVisat(slugit: string[]): Promise<VisaRivi[]> {
 /* ── Henkilöt ──────────────────────────────────────────────────────────────────────────────────────────── */
 /* H5 "Täältä kotoisin" (11.11.2026): henkilöt luetaan tietomallin born_in-suhteista (fact_relationships →
    kaupungit.entity_id), joissa lakkautetut kunnat on jo kytketty nykyiseen kuntaan (detail "Nastola (nyk. Lahti)").
-   Varahaku: henkilö, jolla ei ole julkaistua person-entiteettiä born_in-suhteineen (entiteetti puuttuu tai on
-   hidden, jolloin RLS piilottaa suhteen), haetaan syntymäpaikan tekstistä: inessiivi tai kaupungit.vanhat_kunnat.
-   Vanhat kunnat jäävät vain varahakuun (11.11.: Pedro Hietanen, s. Jaalassa, entiteetti hidden). */
+   Henkilö näkyy vain, jos hänellä on julkaistu person-entiteetti born_in-suhteineen. Tekstihaun varahaku ja
+   kaupungit.vanhat_kunnat poistettiin 11.11.2026 (Heikki), kun kaikki henkilöt olivat suhteiden piirissä. */
 
 /** `ala`: vanhan kunnan lisärivi ("s. Nastolassa"), tyhjä jos henkilö on syntynyt nykyisen kunnan alueella. */
 export type KaupunkiHenkilo = { name: string; href: string; image_url: string | null; ala: string };
@@ -183,62 +181,23 @@ export function vanhaKuntaRivi(detail: string | null | undefined): string {
   return ines ? `s. ${ines}` : d;
 }
 
-type CelebRivi = { id: string; name: string; image_url: string | null; priority: number | null; trivia_quiz_id: string | null; birth_place: string | null };
-const CELEB_KENTAT = "id, name, image_url, priority, trivia_quiz_id, birth_place";
+type CelebRivi = { id: string; name: string; image_url: string | null; priority: number | null; trivia_quiz_id: string | null };
+const CELEB_KENTAT = "id, name, image_url, priority, trivia_quiz_id";
 
-/** Henkilöt (celebrity_id), joilla on julkaistu person-entiteetti ja born_in-suhde mihin tahansa kuntaan.
- *  Pyyntökohtainen välimuisti (noin 260 riviä). */
-const haeSuhteellisetHenkilot = cache(async (): Promise<Set<string>> => {
+/** Kaupungissa syntyneet born_in-suhteista. Jokainen henkilö kerran (celebrity_id). */
+export async function haeSyntyneet(k: Kaupunki): Promise<KaupunkiHenkilo[]> {
   const sb = sbAny();
-  if (!sb) return new Set();
-  const { data } = await sb
+  const siteId = await getSiteId();
+  if (!sb || !siteId || !k.entity_id) return [];
+
+  const suhteet = await sb
     .from("fact_relationships")
-    .select("fact_entities!fact_relationships_from_entity_fkey!inner(celebrity_id, kind, status)")
+    .select("detail, fact_entities!fact_relationships_from_entity_fkey!inner(celebrity_id, kind, status)")
     .eq("rel_type", "born_in")
+    .eq("to_entity", k.entity_id)
     .eq("fact_entities.kind", "person")
     .eq("fact_entities.status", "published")
-    .limit(5000);
-  return new Set(
-    ((data ?? []) as Array<{ fact_entities: { celebrity_id: string | null } }>).flatMap((r) => (r.fact_entities.celebrity_id ? [r.fact_entities.celebrity_id] : [])),
-  );
-});
-
-/** Tekstihaku (ennen H5:tä ainoa haku): syntymäpaikka = inessiivi tai vanha kunta ("Helsingissä" tai
- *  "Helsingissä, Suomessa"). celebrities-RLS piilottaa henkilöt, joiden visa on luonnos, joten jokaisella
- *  rivillä on julkaistu henkilösivu. */
-export async function haeSyntyneetTekstilla(k: Kaupunki): Promise<CelebRivi[]> {
-  const sb = sbAny();
-  const siteId = await getSiteId();
-  if (!sb || !siteId) return [];
-  const muodot = [k.inessiivi, ...(k.vanhat_kunnat ?? [])];
-  const lainaus = (s: string) => `"${s.replace(/"/g, "")}"`;
-  const ehto = [`birth_place.in.(${muodot.map(lainaus).join(",")})`, ...muodot.map((m) => `birth_place.like.${lainaus(`${m},*`)}`)].join(",");
-  const { data } = await sb.from("celebrities").select(CELEB_KENTAT).eq("site_id", siteId).or(ehto).limit(300);
-  return (data ?? []) as CelebRivi[];
-}
-
-export type SyntyneetTulos = { henkilot: KaupunkiHenkilo[]; varahaulla: string[] };
-
-/** Kaupungissa syntyneet: born_in-suhteet + varahaku. Jokainen henkilö kerran (celebrity_id). */
-export async function haeSyntyneetTiedoin(k: Kaupunki): Promise<SyntyneetTulos> {
-  const sb = sbAny();
-  const siteId = await getSiteId();
-  if (!sb || !siteId) return { henkilot: [], varahaulla: [] };
-
-  const [suhteet, suhteelliset, tekstilla] = await Promise.all([
-    k.entity_id
-      ? sb
-          .from("fact_relationships")
-          .select("detail, fact_entities!fact_relationships_from_entity_fkey!inner(celebrity_id, kind, status)")
-          .eq("rel_type", "born_in")
-          .eq("to_entity", k.entity_id)
-          .eq("fact_entities.kind", "person")
-          .eq("fact_entities.status", "published")
-          .limit(500)
-      : Promise.resolve({ data: [] }),
-    haeSuhteellisetHenkilot(),
-    haeSyntyneetTekstilla(k),
-  ]);
+    .limit(500);
 
   /* Sama henkilö voi olla kahtena entiteettinä (person + player); kind = person ja celebrity_id kerran. */
   const lisarivi = new Map<string, string>();
@@ -251,13 +210,7 @@ export async function haeSyntyneetTiedoin(k: Kaupunki): Promise<SyntyneetTulos> 
   const { data: celebData } = lisarivi.size
     ? await sb.from("celebrities").select(CELEB_KENTAT).eq("site_id", siteId).in("id", [...lisarivi.keys()])
     : { data: [] };
-  const varalla = tekstilla.filter((c) => !suhteelliset.has(c.id) && !lisarivi.has(c.id));
-  /* Varahaun lisärivi: syntymäpaikka on vanha kunta ("Jaalassa") eikä kaupungin oma inessiivi. */
-  for (const c of varalla) {
-    const paikka = (c.birth_place ?? "").split(",")[0].trim();
-    lisarivi.set(c.id, paikka && paikka !== k.inessiivi ? `s. ${paikka}` : "");
-  }
-  const rivit = [...((celebData ?? []) as CelebRivi[]), ...varalla];
+  const rivit = (celebData ?? []) as CelebRivi[];
 
   /* Tunnettuus (brief: priority/is_hero ensin): priority on lähes kaikilla 5 ja is_hero tarkoittaa etusivun nostoa,
      joten järjestys on kuvalliset ensin → henkilövisan suosio (eri selaimet 90 pv) → priority → aakkoset. */
@@ -268,14 +221,9 @@ export async function haeSyntyneetTiedoin(k: Kaupunki): Promise<SyntyneetTulos> 
     for (const r of (s ?? []) as Array<{ id: string; suosio_90pv: number | null }>) suosio.set(r.id, r.suosio_90pv ?? 0);
   }
   const pisteet = (r: CelebRivi) => (r.trivia_quiz_id ? suosio.get(r.trivia_quiz_id) ?? 0 : 0);
-  const henkilot = rivit
+  return rivit
     .sort((a, b) => Number(!!b.image_url) - Number(!!a.image_url) || pisteet(b) - pisteet(a) || (b.priority ?? 0) - (a.priority ?? 0) || a.name.localeCompare(b.name, "fi"))
     .map((r) => ({ name: r.name, href: henkiloHref(r.name), image_url: r.image_url, ala: lisarivi.get(r.id) ?? "" }));
-  return { henkilot, varahaulla: varalla.map((c) => c.name) };
-}
-
-async function haeSyntyneet(k: Kaupunki): Promise<KaupunkiHenkilo[]> {
-  return (await haeSyntyneetTiedoin(k)).henkilot;
 }
 
 /* ── Sivu ──────────────────────────────────────────────────────────────────────────────────────────────── */
