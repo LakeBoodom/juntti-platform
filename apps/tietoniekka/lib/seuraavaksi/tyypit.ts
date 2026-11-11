@@ -12,8 +12,9 @@ export type Ehdokas = {
   sovitus?: "contain";
   /** Lajimerkki kuvan päällä: "Tietovisa", "Tupla tai kuitti", "Järjestä", "Karttapeli", "Kuvavisa". */
   merkki: string;
-  /** Pelikortin oma rivi (pelimuodon kuvaus). */
-  rivi?: string;
+  /** Pelattu-tieto selaimessa: oletus = visa tn_played_quizzes-listassa (koskaan pelattu). Päivän pelit: pelattu tänään
+   *  (Mikä maa: tn-mm-<pvm>; Päivän visa: tn_paivan_visa_<pvm> tai tn_pelattu_pvm; Päivän sankari: tn_pelattu_pvm). */
+  pelattu?: { tapa: "mika-maa" | "paivan-visa" | "tanaan" };
   /** Kuvaton visa: kuva-alueelle kokoelman tai lajin nimi aksenttivärillä (CD k2, A1-kuvaton tila). */
   kuvaton: string;
   /** Porras, josta ehdokas tuli (mittaus ja Heikin raportti), esim. "p1.aihe:NHL". */

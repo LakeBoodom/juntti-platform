@@ -1412,6 +1412,7 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
 
                 {/* Kaupunkisivut (7.11.2026): saman paikkakunnan visat ensin omana ryhmänään ("Lisää Mikkelistä") ja linkki
                     kaupunkisivulle; muuten ristiinnostot kuten ennen. */}
+                {/* "Pelaa seuraavaksi" -pilotti (Heikki 11.11.): pilotin visoissa aloitusnäkymä on ilman ehdotuksia. */}
                 {sk ? null : quiz.paikka && quiz.paikka.visat.length > 0 ? (
                 <div className="tng-heromore" data-tn-entry="visasivu:paikkakunta">
                   <div className="tng-heromore-head">
@@ -1446,19 +1447,6 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
                 </div>
               )}
             </section>
-          )}
-
-          {/* "Pelaa seuraavaksi" -pilotti: "Samasta aiheesta" heron alla omana osionaan (Heikki 9.11.: kuvakortit eivät
-              mahdu heron päälle). Paikat 1 ja 3, enintään kolme visaa (säännöt §2.7): p1, p3, seuraava p1. */}
-          {phase === "start" && hero && sk && (
-            <div className="sk-alku">
-              <SeuraavaksiRivi
-                id="sk-alku"
-                otsikko="Samasta aiheesta"
-                paikat={[{ paikka: 1, ehdokkaat: sk.p1 }, { paikka: 3, ehdokkaat: sk.p3 }, { paikka: 1, ehdokkaat: sk.p1 }]}
-                meta={{ pilotti: sk.pilotti, nakyma: "aloitus", lahde: sk.lahde }}
-              />
-            </div>
           )}
 
           {/* ── Viikkovisan aloitusnäkymä (10A Sinetti, kierros 11 korjattuna) ── */}

@@ -31,3 +31,18 @@ select coalesce(pilotti, 'lahtotaso') as ryhma, nakyma, paikka,
   min(created_at) as alkaen
 from public.seuraavaksi_tapahtumat group by 1, 2, 3;
 revoke all on public.seuraavaksi_mittarit from anon, authenticated;
+
+-- "Jotain muuta" -paikka (Heikki 11.11.2026): sivuston pelatuimmat visat 7 päivän ajalta. quiz_plays ei ole luettavissa
+-- anonyymisti, joten vain koonti (visa + pelimäärä) security definer -funktiolla; ei istuntoja eikä yksittäisiä rivejä.
+create or replace function public.suosituimmat_visat_7pv(p_n int default 15)
+returns table (quiz_id uuid, pelit bigint)
+language sql stable security definer set search_path = public as $$
+  select qp.quiz_id, count(*) as pelit
+  from public.quiz_plays qp
+  where qp.played_at > now() - interval '7 days' and qp.quiz_id is not null
+  group by qp.quiz_id
+  order by count(*) desc, qp.quiz_id
+  limit least(greatest(coalesce(p_n, 15), 1), 50);
+$$;
+revoke all on function public.suosituimmat_visat_7pv(int) from public;
+grant execute on function public.suosituimmat_visat_7pv(int) to anon, authenticated;

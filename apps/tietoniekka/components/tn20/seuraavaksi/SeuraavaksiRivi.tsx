@@ -1,35 +1,63 @@
 "use client";
 // "PELAA SEURAAVAKSI" -RIVI (pilotti, toteutusbrief 8.11.2026 §2; CD "Promojärjestelmä kierros 2": A1-visakortti,
-// A2-pelikortti, osio-otsikko). Kolme samankokoista korttia: mobiilissa vaakarivi, jossa seuraava kortti näkyy reunassa,
-// ≥ 768 px kolme saraketta. Koko kortti on linkki. Lajimerkki kuvan päällä vasemmassa yläkulmassa ("Tietovisa",
-// "Tupla tai kuitti" …). "Pelaa →" kultaisena: rivissä ei ole limeä (päänappi on lime).
-// Ehdokkaista valitaan selaimessa kustakin paikasta ensimmäinen pelaamaton (tn_played_quizzes); palvelimen HTML:ssä
-// (ja ilman JS:ää) näkyy kunkin paikan ensimmäinen ehdokas.
+// A2-pelikortti, osio-otsikko). Heikki 11.11.2026: mobiilissa (< 768) kolme tiivistä riviä allekkain (kuva 96 × 72
+// vasemmalla, lajimerkki + nimi oikealla, koko rivi linkki, ≥ 72 px) — kaikki näkyvät ilman pyyhkäisyä. ≥ 768 px kolme
+// samankokoista korttia: lajimerkki kuvan päällä, nimi ja kultainen "Pelaa →" (rivissä ei limeä; päänappi on lime).
+// Ei kuvausrivejä (UI-sääntö 9).
+// Ehdokkaista valitaan selaimessa kustakin paikasta ensimmäinen pelaamaton; palvelimen HTML:ssä (ja ilman JS:ää) näkyy
+// kunkin paikan ensimmäinen ehdokas.
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { katko } from "@/lib/kokoelmat/data";
+import { helsinginPaiva } from "@/lib/aika";
 import type { Ehdokas } from "@/lib/seuraavaksi/tyypit";
 import { useSeuraavaksiMittaus, type SkMeta } from "@/lib/seuraavaksi/mittaus";
 import "./seuraavaksi.css";
 
-/** Paikka 1–3 (mittaus). Sama lista voi olla kahdesti: aloitusnäkymä ottaa p1:stä kaksi (p1, p3, p1). */
+/** Paikka 1–3 (mittaus). */
 export type SkPaikka = { paikka: number; ehdokkaat: Ehdokas[] };
 
-function pelatut(): Set<string> {
+type Pelitieto = { kaikki: Set<string>; tanaan: Record<string, string>; iso: string; ls: Storage | null };
+
+function lueStorage(): Pelitieto {
+  const iso = helsinginPaiva().iso;
   try {
-    return new Set(JSON.parse(window.localStorage.getItem("tn_played_quizzes") ?? "[]") as string[]);
+    const ls = window.localStorage;
+    return {
+      kaikki: new Set(JSON.parse(ls.getItem("tn_played_quizzes") ?? "[]") as string[]),
+      tanaan: JSON.parse(ls.getItem("tn_pelattu_pvm") ?? "{}") as Record<string, string>,
+      iso,
+      ls,
+    };
   } catch {
-    return new Set();
+    return { kaikki: new Set(), tanaan: {}, iso, ls: null };
+  }
+}
+
+/** Visa: koskaan pelattu. Päivän pelit: pelattu tänään (avaimet: lib/vihjepeli/mikamaa, lib/paivanVisa, PelattuTanaan). */
+function pelattu(e: Ehdokas, t: Pelitieto): boolean {
+  try {
+    switch (e.pelattu?.tapa) {
+      case "mika-maa":
+        return !!t.ls?.getItem(`tn-mm-${t.iso}`);
+      case "paivan-visa":
+        return !!t.ls?.getItem(`tn_paivan_visa_${t.iso}`) || t.tanaan[e.id] === t.iso;
+      case "tanaan":
+        return t.tanaan[e.id] === t.iso;
+      default:
+        return e.tyyppi === "visa" && t.kaikki.has(e.id);
+    }
+  } catch {
+    return false;
   }
 }
 
 /** Kustakin paikasta ensimmäinen pelaamaton; jos kaikki pelattu, ensimmäinen. Sama ehdokas ei koskaan kahdesti. */
-function valitse(paikat: SkPaikka[], pelattu: Set<string>): Array<{ paikka: number; e: Ehdokas }> {
+function valitse(paikat: SkPaikka[], t: Pelitieto | null): Array<{ paikka: number; e: Ehdokas }> {
   const kaytetty = new Set<string>();
   const ulos: Array<{ paikka: number; e: Ehdokas }> = [];
   for (const p of paikat) {
     const vapaat = p.ehdokkaat.filter((e) => !kaytetty.has(e.id));
-    const pelaamattomat = vapaat.filter((e) => !pelattu.has(e.id));
-    const e = pelaamattomat[0] ?? vapaat[0];
+    const e = (t ? vapaat.find((x) => !pelattu(x, t)) : undefined) ?? vapaat[0];
     if (!e) continue;
     kaytetty.add(e.id);
     ulos.push({ paikka: p.paikka, e });
@@ -38,10 +66,10 @@ function valitse(paikat: SkPaikka[], pelattu: Set<string>): Array<{ paikka: numb
 }
 
 export default function SeuraavaksiRivi({ otsikko, paikat, meta, id }: { otsikko: string; paikat: SkPaikka[]; meta: SkMeta; id: string }) {
-  const [valitut, setValitut] = useState(() => valitse(paikat, new Set()));
+  const [valitut, setValitut] = useState(() => valitse(paikat, null));
   const avain = paikat.map((p) => `${p.paikka}:${p.ehdokkaat.map((e) => e.id).join("|")}`).join(";");
   useEffect(() => {
-    setValitut(valitse(paikat, pelatut()));
+    setValitut(valitse(paikat, lueStorage()));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [avain]);
   const ref = useRef<HTMLElement>(null);
@@ -53,14 +81,7 @@ export default function SeuraavaksiRivi({ otsikko, paikat, meta, id }: { otsikko
       <h2 id={`${id}-h`} className="sk-h">{otsikko}</h2>
       <div className="sk-rivi">
         {valitut.map(({ paikka, e }) => (
-          <a
-            key={e.id}
-            className="sk-kortti"
-            href={e.href}
-            data-sk-paikka={paikka}
-            data-sk-tyyppi={e.tyyppi}
-            data-sk-porras={e.porras}
-          >
+          <a key={e.id} className="sk-kortti" href={e.href} data-sk-paikka={paikka} data-sk-tyyppi={e.tyyppi} data-sk-porras={e.porras}>
             <span className="sk-kuva" data-sovitus={e.sovitus}>
               {e.kuva ? (
                 // eslint-disable-next-line @next/next/no-img-element
@@ -68,11 +89,12 @@ export default function SeuraavaksiRivi({ otsikko, paikat, meta, id }: { otsikko
               ) : (
                 <span className="sk-kuvaton" aria-hidden="true">{e.kuvaton}</span>
               )}
-              <span className="sk-merkki">{e.merkki}</span>
+              {/* Desktop: merkki kuvan päällä. Mobiilin rivissä sama merkki on tekstipuolella (sk-merkki--rivi). */}
+              <span className="sk-merkki sk-merkki--kuva">{e.merkki}</span>
             </span>
             <span className="sk-teksti">
+              <span className="sk-merkki sk-merkki--rivi">{e.merkki}</span>
               <span className="sk-nimi">{katko(e.nimi)}</span>
-              {e.rivi && <span className="sk-kuvaus">{e.rivi}</span>}
               <span className="sk-cta">Pelaa <span aria-hidden="true">→</span></span>
             </span>
           </a>
