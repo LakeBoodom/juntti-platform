@@ -4,6 +4,7 @@
 // "Olisi nyt N v" lasketaan palvelimella Suomen ajassa.
 import { getSupabase } from "./supabase";
 import { getSiteId } from "./queries";
+import { vakaasti } from "./vakaaJarjestys";
 import { lajiMonikko, ryhma, ryhmaOf, type RyhmaKey } from "./henkiloRyhmat";
 import { lueFaktat, type Fakta } from "./henkiloKaava";
 import { visaHref } from "./visaHref";
@@ -25,6 +26,9 @@ export function parsePvm(iso: string | null | undefined): Pvm | null {
   const m = iso?.match(/^(\d{4})-(\d{2})-(\d{2})/);
   return m ? { y: +m[1], m: +m[2], d: +m[3] } : null;
 }
+
+/** Helsingin päivä YYYY-MM-DD (vakaan järjestyksen rajapäivän vertailuun). */
+const paivaIso = () => { const t = tanaan(); return `${t.y}-${String(t.m).padStart(2, "0")}-${String(t.d).padStart(2, "0")}`; };
 
 export const fiPvm = (p: Pvm) => `${p.d}.${p.m}.${p.y}`;
 
@@ -168,7 +172,8 @@ export async function haeHenkiloSivu(slug: string): Promise<HenkiloSivu | { ohja
   // Kaikki henkilöt kevyesti (≈ 380 riviä, ISR-välimuistissa): osoitteen ratkaisu, muut-laatat ja
   // samana päivänä syntyneet. DATE-sarakkeeseen ei voi käyttää like-hakua (CLAUDE.md) → suodatus JS:ssä.
   const { data: kaikkiData } = await sb.from("celebrities").select(KEVYT).eq("site_id", siteId).limit(2000);
-  const kaikkiRivit = (kaikkiData ?? []) as unknown as Rivi[];
+  // Vakaa järjestys (lib/vakaaJarjestys.ts): päivän järjestyskortin siemenarvonta ei riipu kannan rivijärjestyksestä.
+  const kaikkiRivit = vakaasti((kaikkiData ?? []) as unknown as Rivi[], (x) => x.id, paivaIso());
   const osuma = kaikkiRivit.find((x) => henkiloSlug(x.name) === slug);
   if (!osuma) {
     const vanha = kaikkiRivit.find((x) => x.slug === slug);
@@ -264,7 +269,8 @@ export async function haeHenkiloSivu(slug: string): Promise<HenkiloSivu | { ohja
   if (defit.size) {
     // Henkilön omat mittarit → kaikkien niiden arvot (pieni joukko: kymmeniä rivejä per mittari).
     const omat = await haeLaatuArvot(sb, [...defit.keys()], [c.id]);
-    const arvot = omat.size ? await haeLaatuArvot(sb, [...omat.keys()]) : new Map();
+    const arvot: Map<string, LaatuArvo[]> = omat.size ? await haeLaatuArvot(sb, [...omat.keys()]) : new Map();
+    for (const [k, v] of arvot) arvot.set(k, vakaasti(v, (a) => a.celebId, paivaIso()));
     const pakka = valitseLaatuPakka({
       henkilo: itse,
       kaikki: kaikkiRivit.map(pool),

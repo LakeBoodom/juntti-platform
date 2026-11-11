@@ -7,6 +7,7 @@
 // aktivointia; esikatselun setti lasketaan samalla arvonnalla mutta sitä ei tallenneta.
 import { getSupabase } from "@/lib/supabase";
 import { getSiteId } from "@/lib/queries";
+import { vakaasti } from "@/lib/vakaaJarjestys";
 import {
   AANI_RYHMAT, AANIVISA_MIN, type AaniKysymys, type AaniRyhma, type AaniViikko, type RyhmaMeta, type SonoTick,
 } from "@/lib/aanivisat";
@@ -82,6 +83,13 @@ function kysymys(r: Rivi, pooli: Rivi[], rnd: () => number): AaniKysymys {
   };
 }
 
+/** ISO-viikon maanantai (YYYY-MM-DD). Viikko 1 = viikko, jolla on vuoden 4.1. */
+function isoViikonMaanantai(vuosi: number, viikko: number): string {
+  const tammi4 = new Date(Date.UTC(vuosi, 0, 4));
+  const ma1 = Date.UTC(vuosi, 0, 4 - ((tammi4.getUTCDay() + 6) % 7));
+  return new Date(ma1 + (viikko - 1) * 7 * 86_400_000).toISOString().slice(0, 10);
+}
+
 /** Kuluvan viikon äänivisa ryhmälle. null = ryhmä ei julkaistu (tuotannossa < AANIVISA_MIN aktiivista). */
 export async function haeAaniviikko(ryhma: RyhmaMeta): Promise<AaniViikko | null> {
   const sb = getSupabase();
@@ -100,7 +108,9 @@ export async function haeAaniviikko(ryhma: RyhmaMeta): Promise<AaniViikko | null
   if (!rivi?.idt?.length) return null;
   const kartta = new Map(pooli.map((p) => [p.id, p]));
   const rnd = siemen(`${ryhma.key}:${rivi.vuosi}:${rivi.viikko}`);
-  const kysymykset = rivi.idt.map((id) => kartta.get(id)).filter((r): r is Rivi => !!r).map((r) => kysymys(r, pooli, rnd));
+  // Vakaa harhautinpooli (lib/vakaaJarjestys.ts). Viikon visa: vaihto vasta viikon rajalla (maanantai ≥ rajapäivä).
+  const vakaaPooli = vakaasti(pooli, (p) => p.id, isoViikonMaanantai(rivi.vuosi, rivi.viikko));
+  const kysymykset = rivi.idt.map((id) => kartta.get(id)).filter((r): r is Rivi => !!r).map((r) => kysymys(r, vakaaPooli, rnd));
   return { ryhma, vuosi: rivi.vuosi, viikko: rivi.viikko, kysymykset };
 }
 

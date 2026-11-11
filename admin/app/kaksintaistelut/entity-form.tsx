@@ -16,6 +16,8 @@ import { createEntity, updateEntity, DATE_ATTRS, type EntityInput, type AttrValu
 export type Def = {
   attr_key: string;
   kind: string;
+  /** Monen kindin määrittely (tietomalli vaihe B): vertailupooli kaikista listan kindeistä. */
+  kinds?: string[] | null;
   theme: string;
   subject_label: string;
   question_text: string;
@@ -61,7 +63,8 @@ export function EntityForm({
   defs: Def[];
   onDone: () => void;
 }) {
-  const kinds = Array.from(new Set(defs.map((d) => d.kind)));
+  // Lajivalikkoon myös kindit, jotka ovat vain määrittelyn kinds-listassa (esim. attraction), ja kohteen oma laji.
+  const kinds = Array.from(new Set([...defs.flatMap((d) => [d.kind, ...(d.kinds ?? [])]), ...(initial?.kind ? [initial.kind] : [])]));
   const [name, setName] = useState(initial?.name ?? "");
   const [kind, setKind] = useState(initial?.kind ?? kinds[0] ?? "person");
   const [roleLabel, setRoleLabel] = useState(initial?.role_label ?? "");
@@ -94,12 +97,13 @@ export function EntityForm({
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
 
-  const kindDefs = defs.filter((d) => d.kind === kind);
+  // Määrittely koskee kohdetta, jos pääkind täsmää tai kohteen kind on kinds-listassa (Särkänniemen start_year).
+  const kindDefs = defs.filter((d) => d.kind === kind || (d.kinds ?? []).includes(kind));
   // Sijaintikentät näytetään vain jos tälle lajille on etäisyyskysymys.
   const needsCoords = kindDefs.some((d) => d.compare_mode === "distance");
 
   function buildAttributes(): AttrValue[] {
-    return kindDefs.map((d) => {
+    return kindDefs.flatMap((d) => {
       const raw = (vals[d.attr_key] ?? "").trim();
       let num: number | null = null;
       if (raw) num = DATE_ATTRS.includes(d.attr_key) ? dateToEpoch(raw) : Number(raw.replace(",", "."));
@@ -110,14 +114,18 @@ export function EntityForm({
             ? "s. " + raw.slice(0, 4)
             : `${num.toLocaleString("fi-FI")}${d.unit_label ? " " + d.unit_label : ""}`;
       const prev = existing.get(d.attr_key);
+      // Tyhjä kenttä poistaa rivin vain, jos kannassa oli luku, jonka käyttäjä tyhjensi. Pelkät tekstirivit
+      // (num_value NULL: mp_party, mp_district, nationality, organizer …) eivät näy lomakkeella → ei kosketa.
+      if (num === null && (prev?.num_value ?? null) === null) return [];
       const changed = prev?.num_value !== num;
-      return {
+      return [{
         attr_key: d.attr_key,
         num_value: num,
-        display_value: display,
+        // Muuttamaton arvo pitää kannan näyttöarvon ("noin 450 000", "1975"); uusi arvo muotoillaan lomakkeella.
+        display_value: !changed && prev?.display_value ? prev.display_value : display,
         source: sources[d.attr_key]?.trim() || null,
         verified_at: changed ? today() : (prev?.verified_at ?? today()),
-      };
+      }];
     });
   }
 

@@ -4,6 +4,7 @@
 // 7 Promo 2 · 8 Lapsille · 9 Visapaketit.
 import { getSupabase, SITE_SLUG } from "@/lib/supabase";
 import { helsinginPaiva } from "@/lib/aika";
+import { vakaasti } from "@/lib/vakaaJarjestys";
 import { visaHref } from "@/lib/visaHref";
 import { getPaivanVisaKortti } from "@/lib/paivanVisaKortti";
 import { muotoileSankari, type SankariRivi } from "@/lib/paivanSankari";
@@ -209,7 +210,8 @@ export async function haeEtusivu(opts: {
   }
   if (!promo1) {
     // Rotaatiopooli: admin-promot (etusivu_promot, paino) + pelatuimmat + uusimmat visat. Henkilö- ja juhlavisat pois.
-    const pooli = cards.filter((c) => c.collection && c.collection !== "tunnetut-henkilot" && c.collection !== JUHLAT_KOKOELMA && c.game_mode !== "mega");
+    // Vakaa järjestys (lib/vakaaJarjestys.ts): tasatilanteet suosiossa ja julkaisuajassa id:n mukaan, ei kannan järjestyksessä.
+    const pooli = vakaasti(cards, (c) => c.id, today.iso).filter((c) => c.collection && c.collection !== "tunnetut-henkilot" && c.collection !== JUHLAT_KOKOELMA && c.game_mode !== "mega");
     const pelatuimmat = pooli.filter((c) => suosio(c.suosio_90pv ?? 0) > 0).sort((a, b) => (b.suosio_90pv ?? 0) - (a.suosio_90pv ?? 0)).slice(0, 5);
     const uusimmat = [...pooli].filter((c) => c.published_at).sort((a, b) => (b.published_at! > a.published_at! ? 1 : -1)).slice(0, 5);
     const ehdokkaat: Array<{ id?: string; kicker: string; otsikko: string; href: string; kuva: string | null; kuvaPos?: string }> = [];

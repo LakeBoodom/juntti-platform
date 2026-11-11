@@ -7,6 +7,7 @@
 //   4. allowedNotability-taulukko kaikille yhdistelmille.
 //   5. getFacts anon-avaimella (Jari Litmanen: 5 vihjettä, tasot 1–5) ja getTimeline (RLS piilottaa luonnokset).
 //   6. Nykyiset pelit: Kumpi?/Järjestä oikein julkaistulla datalla, Laita järjestykseen -pakat ja päivän rivit.
+//   7. Vaihe B2: päivän rivit eivät riipu kannan rivijärjestyksestä (pooli sekoitettu välissä), rajapäivä.
 // Ajo (apps/tietoniekka): NEXT_PUBLIC_SUPABASE_URL=… NEXT_PUBLIC_SUPABASE_ANON_KEY=… node scripts/run-ts.cjs scripts/tietomalli-tarkistus.ts
 
 import { DUEL_THEMES, domainDistance, getDuelData, makeDuel, poolFor, rakennaDuelData } from "@/lib/duel";
@@ -15,12 +16,19 @@ import { mittaritSopivat, mittariSopiiKaikille, maarittelynKindit } from "@/lib/
 import { allowedNotability, getFacts, getTimeline, type Level, type PoolScope } from "@/lib/factPool";
 import { JULKAISTUT } from "@/lib/jarjesta/pakat";
 import { haeJarjestysKierros, haePaivanRivi } from "@/lib/jarjesta/kierros";
+import { arvoPaivanRivi } from "@/lib/jarjesta/arvonta";
+import { haePool } from "@/lib/jarjesta/pooli";
+import { paivaAvain } from "@/lib/jarjesta/siemen";
+import { VAKAA_JARJESTYS_ALKAEN, vakaasti } from "@/lib/vakaaJarjestys";
+import { arvoSarja, type KysymysRivi } from "@/lib/tuplaTaiKuitti";
+import { getSupabase } from "@/lib/supabase";
 
 let virheet = 0;
 const virhe = (s: string) => { virheet++; console.log(`  VIRHE: ${s}`); };
 const ok = (ehto: boolean, s: string) => (ehto ? console.log(`  ok: ${s}`) : virhe(s));
 
-/* ─── Ote kannasta (service role, 11.11.2026): start_year- ja ev_attendance-rivit ─── */
+/* ─── Ote kannasta (service role, 11.11.2026): start_year- ja ev_attendance-rivit ───
+   Mittarit siivouksen jälkeen (11.11.): start_year-riveillä ei mittaria, muilla pelkät koodit. */
 type A = { attr_key: string; scope: string; num_value: number | null; display_value: string | null; metric: string | null };
 const ent = (id: string, name: string, kind: string, group_key: string, domain: string | null, attrs: A[]) =>
   ({ id, name, kind, role_label: null, show_role: true, domain, group_key, image_url: null, lat: null, lon: null, name_partitive: null, fact_attributes: attrs });
@@ -32,9 +40,9 @@ const OTE = [
   ent("2bfbb7f3-2739-49d3-8be8-7463bcbf5bbc", "Rauman Pitsiviikko", "recurring_event", "kaupunkifestivaali", "kesa", [sy(1971)]),
   ent("c28009c3-9b28-4906-bfad-34a6f8becbcf", "Särkänniemi", "attraction", "huvipuisto", "kesa", [sy(1975), { attr_key: "attr_season", scope: "", num_value: null, display_value: "huhti–lokakuu", metric: null }]),
   ent("4c46d32d-154f-4607-8d85-52b8114c74a8", "Tuomaan Markkinat", "recurring_event", "helsinki-talvi", null, [sy(1994)]),
-  ent("2fbb91ab-d3e4-4b39-af75-6e37a3d34449", "Joulupukin Pajakylä", "attraction", "rovaniemi-joulu", null, [sy(1985, "avausvuosi")]),
-  ent("e70c10fe-67cc-44eb-85c5-2c000a7f29b4", "Rovaniemen kirkko", "attraction", "rovaniemi-jalleenrakennus", null, [sy(1950, "valmistumisvuosi")]),
-  ent("7b85a117-c6e3-4993-89a1-e27ecc3e288e", "Föri", "attraction", "turun-eriskummallisuudet", null, [sy(1904, "vuosi")]),
+  ent("2fbb91ab-d3e4-4b39-af75-6e37a3d34449", "Joulupukin Pajakylä", "attraction", "rovaniemi-joulu", null, [sy(1985)]),
+  ent("e70c10fe-67cc-44eb-85c5-2c000a7f29b4", "Rovaniemen kirkko", "attraction", "rovaniemi-jalleenrakennus", null, [sy(1950)]),
+  ent("7b85a117-c6e3-4993-89a1-e27ecc3e288e", "Föri", "attraction", "turun-eriskummallisuudet", null, [sy(1904)]),
 ];
 const START_YEAR = { attr_key: "start_year", kind: "recurring_event", kinds: ["recurring_event", "attraction"], theme: "kesa", question_text: "on vanhempi?", winner: "low", easy_gap: 18, mid_gap: 7, compare_mode: "numeric", fact_template: "{a}: vuodesta {aarvo}, {b}: vuodesta {barvo}.", max_gap: 80, min_gap: 2, gap_mode: "absolute", gap_divisor: 1, max_domain_distance: 1, rank_label: "vanhimmasta uusimpaan", rank_label_rev: "uusimmasta vanhimpaan" };
 const EV_ATT = { ...START_YEAR, attr_key: "ev_attendance", kinds: ["recurring_event"], gap_mode: "relative", easy_gap: 0.6, mid_gap: 0.3, max_gap: null, min_gap: null, question_text: "keräsi enemmän yleisöä?", winner: "high" };
@@ -160,6 +168,56 @@ async function main() {
     const rivi = await haePaivanRivi(p.slug, "2026-11-11");
     ok(k.length === p.pick, `Laita järjestykseen ${p.slug}: kierros ${k.length}/${p.pick}, päivän rivi ${rivi.map((x) => x.name).join(" | ")}`);
   }
+
+  console.log("7. Vaihe B2: päivän rivien vakaa järjestys");
+  const ennen = new Date(Date.parse(`${VAKAA_JARJESTYS_ALKAEN}T12:00:00Z`) - 86_400_000).toISOString().slice(0, 10);
+  const kaanteinen = [{ id: "b" }, { id: "a" }];
+  ok(vakaasti(kaanteinen, (x) => x.id, ennen).map((x) => x.id).join() === "b,a", `ennen rajaa (${ennen}): kannan järjestys kuten ennen`);
+  ok(vakaasti(kaanteinen, (x) => x.id, VAKAA_JARJESTYS_ALKAEN).map((x) => x.id).join() === "a,b", `rajasta (${VAKAA_JARJESTYS_ALKAEN}) alkaen: id-järjestys`);
+  /** Sekoitus Math.randomilla: eri järjestys joka ajolla, kuten kannan vaihtuva rivijärjestys. */
+  const sekaisin = <T,>(a: T[]) => { const b = a.slice(); for (let i = b.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [b[i], b[j]] = [b[j], b[i]]; } return b; };
+  const huomenna = new Date(Date.now() + 86_400_000);
+  const alku = paivaAvain(huomenna) > VAKAA_JARJESTYS_ALKAEN ? paivaAvain(huomenna) : VAKAA_JARJESTYS_ALKAEN;
+  const paivat = [0, 1, 2].map((n) => new Date(Date.parse(`${alku}T12:00:00Z`) + n * 86_400_000).toISOString().slice(0, 10));
+  let eroja = 0;
+  let riveja = 0;
+  for (const p of JULKAISTUT) {
+    const pooli = await haePool(p);
+    for (const pv of paivat) {
+      const a = arvoPaivanRivi(p, pooli, p.slug, pv).map((x) => x.id).join();
+      for (const toinen of [sekaisin(pooli), pooli.slice().reverse()]) {
+        riveja++;
+        if (arvoPaivanRivi(p, toinen, p.slug, pv).map((x) => x.id).join() !== a) {
+          eroja++;
+          virhe(`${p.slug} ${pv}: rivi muuttui, kun pooli sekoitettiin`);
+        }
+      }
+      if (p.slug === "presidentit")
+        console.log(`  ${pv} presidentit: ${arvoPaivanRivi(p, pooli, p.slug, pv).map((x) => x.name).join(" | ")}`);
+    }
+  }
+  // Kontrolli: ennen rajaa (vanha käytös) sama sekoitus muuttaa rivejä, eli testi todella mittaa järjestysriippuvuutta.
+  let kontrolli = 0;
+  for (const p of JULKAISTUT) {
+    const pooli = await haePool(p);
+    if (arvoPaivanRivi(p, pooli, p.slug, ennen).map((x) => x.id).join() !== arvoPaivanRivi(p, pooli.slice().reverse(), p.slug, ennen).map((x) => x.id).join()) kontrolli++;
+  }
+  ok(kontrolli > 0, `kontrolli: ilman vakaata järjestystä käänteinen pooli muuttaa ${kontrolli}/${JULKAISTUT.length} pakan rivin`);
+  ok(eroja === 0, `Laita järjestykseen: ${JULKAISTUT.length} pakkaa × ${paivat.length} päivää (${paivat.join(", ")}), ${riveja} vertailua sekoitettuun pooliin, eroja ${eroja}`);
+  // Ennen rajaa sama kuin ennen muutosta: kannan järjestyksessä (haePaivanRivi = arvoPaivanRivi kannan poolilla).
+  const pres = JULKAISTUT.find((p) => p.slug === "presidentit")!;
+  ok((await haePaivanRivi(pres.slug, ennen)).map((x) => x.id).join() === arvoPaivanRivi(pres, await haePool(pres), pres.slug, ennen).map((x) => x.id).join(), `presidentit ${ennen}: ennen rajaa kannan järjestys (ennallaan)`);
+
+  const sb = getSupabase()!;
+  const { data: kys } = await sb.from("questions").select("id, quiz_id, question_text, explanation, answers, taso").not("taso", "is", null).is("image_url", null).limit(600);
+  const kysRivit = (kys ?? []) as unknown as KysymysRivi[];
+  let tuplaErot = 0;
+  for (const pv of paivat) {
+    const siem = `testi-${pv}`;
+    const a = arvoSarja(kysRivit, new Map(), siem, pv).map((x) => x.id).join();
+    if (arvoSarja(sekaisin(kysRivit), new Map(), siem, pv).map((x) => x.id).join() !== a) tuplaErot++;
+  }
+  ok(kysRivit.length > 50 && tuplaErot === 0, `Tupla tai kuitti: ${kysRivit.length} kysymystä, sarja sama sekoitetulla poolilla ${paivat.length} päivänä (eroja ${tuplaErot})`);
 
   console.log(virheet ? `\n${virheet} VIRHETTÄ` : "\nKaikki tarkistukset ok");
   process.exit(virheet ? 1 : 0);
