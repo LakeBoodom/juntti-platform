@@ -18,7 +18,7 @@ import { JsonLd, abs } from "@/lib/jsonLd";
 import { katko, pisinSana } from "@/lib/kokoelmat/data";
 import { pieniKuva } from "@/lib/pienetKuvat";
 import {
-  type PakettiRivi, ajankohtainen, korttiHref, landinginPaketit, lapsetHref, listaaVisapaketit, metarivi, sarjaNimi, valitsinNakyy,
+  type PakettiRivi, ajankohtainen, korttiHref, landinginPaketit, lapsetHref, listaaVisapaketit, metarivi, paketinKorttinimi, valitsinNakyy,
 } from "@/lib/visapaketit";
 
 export const revalidate = 300;
@@ -35,7 +35,8 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-const nimi = (p: PakettiRivi) => (p.sarja ? sarjaNimi(p.sarja) : p.otsikko);
+/* Korttinimi yhtenäinen etusivun kanssa (11.11.2026): "Joulun visapaketti", "Pubivisapaketti". */
+const nimi = (p: PakettiRivi) => paketinKorttinimi(p);
 const meta = (p: PakettiRivi) => [...(p.sarja && p.painos_nimi ? [p.painos_nimi] : []), ...metarivi(p, p.kierroksia, p.kysymyksia)].join(" · ");
 const lastenNimi = (p: PakettiRivi) => p.lasten_otsikko ?? `${p.otsikko} lapsille`;
 const H1 = "Visapaketit – valmiit tietovisat vastauksineen";

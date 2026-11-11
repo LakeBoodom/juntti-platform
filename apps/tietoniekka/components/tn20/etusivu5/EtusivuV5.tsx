@@ -320,7 +320,7 @@ function LapsetJaPaketit({ l, vp }: { l: D["lapset"]; vp: D["visapaketit"] }) {
           <div className="tn-es-otsake">
             <span className="tn-es-kicker">Visapaketit · ilmainen</span>
             <h2 id="tn-es-vp-h" className="tn-es-h2">Visailta valmiina</h2>
-            <p className="tn-es-vp-ingressi">Valmiit kierrokset vastauksineen. Pelaa yhdessä, näytä ruudulta tai tulosta joukkueille.</p>
+            <p className="tn-es-vp-ingressi">Valmis tietovisa juhliin, kerhoon tai pubiporukalle. Näytä kysymykset ruudulta tai tulosta paperille, ilmaiseksi.</p>
           </div>
           {vp.iso && (
             <a className="tn-es-vp-iso" href={vp.iso.href}>

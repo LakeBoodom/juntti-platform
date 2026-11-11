@@ -160,6 +160,15 @@ export function landinginPaketit(rivit: PakettiRivi[]): PakettiRivi[] {
 /** Sarjan näyttönimi slugista: 'pubivisa' → 'Pubivisa' (sarjan pääsivun h1). */
 export const sarjaNimi = (sarja: string) => sarja.charAt(0).toUpperCase() + sarja.slice(1);
 
+/** Paketin nimi korteissa (etusivu ja /visapaketit, Heikki 11.11.2026): "Joulun visapaketti", "Pubivisapaketti",
+ *  "Lasten visapaketti". Heikin ensisijainen "…tietovisapaketti" leikkautui etusivun rivissä 320 px:ssä 1,1 px
+ *  (Chromium + WebKit), joten hänen varamuotonsa: "tietovisa" → "visa". Kannan otsikko ("Joulun tietovisa") jää
+ *  paketin omalle sivulle, ruudulle ja tulosteeseen, joissa se nimeää itse visan. */
+export function paketinKorttinimi(p: { sarja: string | null; otsikko: string }): string {
+  const perus = p.sarja ? sarjaNimi(p.sarja) : p.otsikko;
+  return /visa$/i.test(perus) ? `${perus.replace(/tietovisa$/i, "visa")}paketti` : perus;
+}
+
 /** ?esikatselu=… pakettisivun, televisionäkymän ja tulosteen välisiin linkkeihin. Taso on osoitteessa
  *  (/visapaketti/<slug>/lapset, 1.11.2026), ei enää ?taso-parametrissa. */
 export const hakuosa = (esikatselu: string | null) => (esikatselu ? `?${new URLSearchParams({ esikatselu })}` : "");
