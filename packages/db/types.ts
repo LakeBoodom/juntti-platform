@@ -11618,6 +11618,7 @@ export type Database = {
           asukasnimitys: string | null
           created_at: string
           elatiivi: string
+          entity_id: string | null
           hero_kuva: string | null
           hook: string | null
           hook_og: string | null
@@ -11636,6 +11637,7 @@ export type Database = {
           asukasnimitys?: string | null
           created_at?: string
           elatiivi: string
+          entity_id?: string | null
           hero_kuva?: string | null
           hook?: string | null
           hook_og?: string | null
@@ -11654,6 +11656,7 @@ export type Database = {
           asukasnimitys?: string | null
           created_at?: string
           elatiivi?: string
+          entity_id?: string | null
           hero_kuva?: string | null
           hook?: string | null
           hook_og?: string | null
@@ -11669,6 +11672,13 @@ export type Database = {
           vanhat_kunnat?: string[]
         }
         Relationships: [
+          {
+            foreignKeyName: "kaupungit_entity_id_fkey"
+            columns: ["entity_id"]
+            isOneToOne: false
+            referencedRelation: "fact_entities"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "kaupungit_kaupunkivisa_quiz_id_fkey"
             columns: ["kaupunkivisa_quiz_id"]
@@ -13401,6 +13411,45 @@ export type Database = {
           },
         ]
       }
+      seuraavaksi_tapahtumat: {
+        Row: {
+          created_at: string
+          id: number
+          kohde: string
+          lahde: string
+          nakyma: string
+          paikka: number
+          pilotti: string | null
+          porras: string | null
+          tapahtuma: string
+          tyyppi: string
+        }
+        Insert: {
+          created_at?: string
+          id?: never
+          kohde: string
+          lahde: string
+          nakyma: string
+          paikka: number
+          pilotti?: string | null
+          porras?: string | null
+          tapahtuma: string
+          tyyppi: string
+        }
+        Update: {
+          created_at?: string
+          id?: never
+          kohde?: string
+          lahde?: string
+          nakyma?: string
+          paikka?: number
+          pilotti?: string | null
+          porras?: string | null
+          tapahtuma?: string
+          tyyppi?: string
+        }
+        Relationships: []
+      }
       sites: {
         Row: {
           active: boolean
@@ -14148,6 +14197,18 @@ export type Database = {
           },
         ]
       }
+      seuraavaksi_mittarit: {
+        Row: {
+          alkaen: string | null
+          klikkaukset: number | null
+          klikkaus_pct: number | null
+          nakyma: string | null
+          naytot: number | null
+          paikka: number | null
+          ryhma: string | null
+        }
+        Relationships: []
+      }
       v_pelilahteet: {
         Row: {
           entry: string | null
@@ -14398,6 +14459,13 @@ export type Database = {
       }
       paivita_quiz_suosio: { Args: never; Returns: undefined }
       slugify_name: { Args: { src: string }; Returns: string }
+      suosituimmat_visat_7pv: {
+        Args: { p_n?: number }
+        Returns: {
+          pelit: number
+          quiz_id: string
+        }[]
+      }
       todays_celebrities: {
         Args: { p_site_id: string }
         Returns: {
@@ -14448,6 +14516,13 @@ export type Database = {
         Returns: string
       }
       visapaketti: { Args: { p_avain?: string; p_slug: string }; Returns: Json }
+      visojen_pelit_30pv: {
+        Args: { p_ids: string[] }
+        Returns: {
+          pelit: number
+          quiz_id: string
+        }[]
+      }
     }
     Enums: {
       [_ in never]: never
