@@ -136,7 +136,8 @@ export default function TopBar({ tagline }: { tagline?: string } = {}) {
               <b>TIETO</b>
               <span>NIEKKA</span>
             </a>
-            <span className="tn-tagline">{taglineOsat(tagline ?? SITE_TAGLINE)}</span>
+            {/* Etusivulla mobiilissa ei taglinea (Heikki 11.11.2026): sama visamäärä on Pelaa aiheittain -osion yläpuolella. */}
+            <span className="tn-tagline" data-etusivu={pathname === "/" ? "" : undefined}>{taglineOsat(tagline ?? SITE_TAGLINE)}</span>
           </div>
 
           {/* Työpöytävalikot */}

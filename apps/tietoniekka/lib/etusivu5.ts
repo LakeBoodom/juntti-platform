@@ -14,7 +14,7 @@ import { KOKOELMA_KORTIT } from "@/lib/kokoelmat/rekisteri";
 import { visanKorttikuva } from "@/lib/kokoelmat/visanKorttikuva";
 import { ETUSIVU_RYHMAT, ETUSIVUN_PELIMUODOT, nakyyEtusivulla, pelimuotoTanaan, ryhmanNimi } from "@/lib/pelimuodot";
 import { JUONTAJIEN_SUOSITUKSET, PROMO2_OOTKO } from "@/lib/etusivu";
-import { listaaVisapaketit, landinginPaketit, ajankohtainen, kauttaJaljella, korttiHref } from "@/lib/visapaketit";
+import { listaaVisapaketit, landinginPaketit, ajankohtainen, kauttaJaljella, korttiHref, paketinKorttinimi } from "@/lib/visapaketit";
 import { JUHLAT_KOKOELMA, pvm, juhlaKalenteri, paavisa, paiviaValissa, vpLyhyt, type Esiintyma } from "@/lib/juhlat";
 import { LAPSET_SIVU, lapsetNakyvissa } from "@/lib/lapset/data";
 import { COLLECTION_LABEL, resolveCollection } from "@/lib/visanKokoelma";
@@ -275,7 +275,7 @@ export async function haeEtusivu(opts: {
   const kaudenPaketti = ajankohtainen(kaikkiPaketit);
   const isoPaketti = kaudenPaketti && kauttaJaljella(kaudenPaketti) !== null ? kaudenPaketti : null;
   const pakettiKortti = (p: (typeof kaikkiPaketit)[number]) => ({
-    avain: p.slug, otsikko: p.otsikko, alarivi: p.painos_nimi, href: korttiHref(p),
+    avain: p.slug, otsikko: paketinKorttinimi(p), alarivi: p.painos_nimi, href: korttiHref(p),
     kuva: p.hero_image ?? PAKETTI_KUVA_VARA, kuvaAlt: p.hero_alt ?? "",
   });
   const visapaketit = {
