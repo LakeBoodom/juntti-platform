@@ -11,6 +11,7 @@ import Crumbs from "@/components/tn20/Crumbs";
 import FaktaRivi from "@/components/tn20/hub/FaktaRivi";
 import Lyhyesti from "@/components/tn20/hub/Lyhyesti";
 import PeliHylly, { type HyllyPeli } from "@/components/tn20/hub/PeliHylly";
+import { henkiloKuva } from "@/lib/henkilokuvat";
 import SukulaisLaatat from "@/components/tn20/hub/SukulaisLaatat";
 import LahdeRivi from "@/components/tn20/hub/LahdeRivi";
 import { JsonLd, abs } from "@/lib/jsonLd";
@@ -159,6 +160,9 @@ export default async function HenkiloPage({ params }: { params: Promise<{ slug: 
     }
   }
 
+  /* Yläkuva omasta kopiosta (UI-laatusäännöt 6 ja 8, Heikki 11.11.2026): ei koskaan suoraan upload.wikimedia.orgista.
+     Ilman sallitun lisenssin kopiota näytetään nimikirjaimet. */
+  const kuva = henkiloKuva(h.image_url);
   const lw = Math.max(...h.name.split(/\s+/).map((w) => w.length), 6);
 
   const personLd = {
@@ -169,7 +173,7 @@ export default async function HenkiloPage({ params }: { params: Promise<{ slug: 
     ...(h.deathIso ? { deathDate: h.deathIso } : {}),
     ...(h.birth_place ? { birthPlace: { "@type": "Place", name: h.birth_place } } : {}),
     ...(h.role ? { jobTitle: h.role } : {}),
-    ...(h.image_url ? { image: h.image_url } : {}),
+    ...(kuva ? { image: abs(kuva) } : {}),
     ...(h.wikipedia_url ? { sameAs: [h.wikipedia_url] } : {}),
     url: abs(henkiloHref(h.slug)),
     ...(h.visa ? { subjectOf: { "@type": "Quiz", name: h.visa.otsikko, url: abs(h.visa.href) } } : {}),
@@ -185,7 +189,7 @@ export default async function HenkiloPage({ params }: { params: Promise<{ slug: 
     hyllyPelit.push({
       tyyppi: "visa", id: h.visa.id, href: aloitaHref, fanitasot: h.visa.fanitasot,
       otsikko: genetiivi ? `Kuinka hyvin tunnet ${genetiivi}?` : h.visa.otsikko,
-      kuva: h.image_url, kuvaPos: `${h.focal.x * 100}% ${h.focal.y * 100}%`,
+      /* Ei kuvaa (Heikki 11.11.2026): sama muotokuva on jo sivun yläosassa, mobiilissa ne näkyivät päällekkäin. */
     });
   if (h.nosto) hyllyPelit.push({ tyyppi: "jarjestys", ...h.nosto });
   const ini = h.name
@@ -212,9 +216,9 @@ export default async function HenkiloPage({ params }: { params: Promise<{ slug: 
                 <figure className="hs-muotokuva">
                   <div className="hs-passe">
                     <div className="hs-kuva">
-                      {h.image_url ? (
+                      {kuva ? (
                         // eslint-disable-next-line @next/next/no-img-element
-                        <img src={h.image_url} alt={h.name} style={{ objectPosition: `${h.focal.x * 100}% ${h.focal.y * 100}%` }} />
+                        <img src={kuva} alt={h.name} style={{ objectPosition: `${h.focal.x * 100}% ${h.focal.y * 100}%` }} />
                       ) : (
                         <span className="hub-laatta-ini" aria-hidden="true">
                           {ini}
@@ -223,7 +227,7 @@ export default async function HenkiloPage({ params }: { params: Promise<{ slug: 
                       <span className="hub-duotone" aria-hidden="true" />
                     </div>
                   </div>
-                  {h.image_url && <figcaption>Kuva: Wikimedia Commons</figcaption>}
+                  {kuva && <figcaption>Kuva: Wikimedia Commons</figcaption>}
                 </figure>
                 <header className="hs-otsikko">
                   <span className="hub-eyebrow">{R.lyhyt}</span>
