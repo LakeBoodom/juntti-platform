@@ -1,14 +1,13 @@
 // "PELAA SEURAAVAKSI" -PILOTTI: ehdotusfunktio (palvelin). Toteutusbrief 8.11.2026 §1, säännöt §2–3.
 // Pilotti 9.11.2026 (Heikki): kaikki urheilu = collection 'urheilu' ja urheilijoiden henkilövisat (celebrities.laji).
 //
-// Henkilövisan jälkeen (Heikki 11.11.2026): 1 = toinen henkilövisa (aihevisat varalla), 2 = peli, 3 = jotain muuta (päivän peli / viikon suosituin).
-// Seuran ja tapahtuman jälkeen ennallaan. Paikat ja portaat (ensimmäinen porras, joka tuottaa ehdokkaita, täyttää ensin; satunnaisuus vain portaan sisällä):
-//   p1 Syvemmälle (visa): saman lajin ei-henkilövisa, jolla yhteinen tarkka aihe → saman kaupungin lajin visa →
-//      yhteinen laaja aihe (sarja) → mikä tahansa lajin ei-henkilövisa → lajin henkilövisat → muu urheiluvisa.
-//   p2 Toinen peli (peli): lajin pelimuodot (PELIMUODOT.serves), yhteinen aihe ensin. Jos lajilla ei ole peliä,
-//      paikka täytetään p1:n seuraavilla ehdokkailla (säännöt §2.4), ei yleisellä pelimuodolla.
-//   p3 Laajemmalle (visa): henkilön jälkeen saman lajin henkilö, jolla yhteinen aihe → muu lajin henkilö;
-//      seuran/tapahtuman jälkeen henkilö, jonka nimessä on lähteen aihe → lajin henkilö; sitten lajin muut visat.
+// Paikat (Heikki 11.11.2026, kierros 3):
+//   p1 Lähin sama: henkilövisan jälkeen saman lajin toinen henkilö syntymävuoden läheisyyden mukaan, tasatilanteessa
+//      pelatuin 30 päivän ajalta (ei arvontaa; varalla aihevisat). Seura- ja tapahtumavisan jälkeen saman lajin toinen visa:
+//      yhteinen tarkka aihe → saman kaupungin lajin visa → yhteinen sarja → mikä tahansa lajin visa → muu urheiluvisa.
+//   p2 Sama aihe, toinen pelimuoto: lajin pelimuodot (PELIMUODOT.serves), aiheen peli ensin. Jos pelimuotoa ei ole, saman
+//      aiheen visa, joka on eri tyyppiä kuin paikan 1 ehdotus (henkilön jälkeen seura-/tapahtumavisa, seuran jälkeen henkilö).
+//   p3 Tänään: lib/seuraavaksi/tanaan.ts (portaat a–e). Päivän visa ja sankari varataan paikalle 3 ennen paikkoja 1–2.
 // Lasten visat ja megavisat pois kuten lib/related.ts:ssä. Lähdevisa ei koskaan ehdokkaana.
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { visaHref } from "@/lib/visaHref";
@@ -16,25 +15,25 @@ import { visanKorttikuva } from "@/lib/kokoelmat/visanKorttikuva";
 import { henkiloKuva } from "@/lib/henkilokuvat";
 import { PELIMUODOT, viikonKuvat, type Pelimuoto } from "@/lib/pelimuodot";
 import { helsinginPaiva } from "@/lib/aika";
-import { SITE_SLUG } from "@/lib/supabase";
-import { muotoileSankari, type SankariRivi } from "@/lib/paivanSankari";
-import { MM_JULKAISU, MM_NIMI, MM_SIVU } from "@/lib/vihjepeli/mikamaa";
 import { URHEILULAJIT, YLEINEN, lajiAvaimella, visanAiheet, visanLaji, type Aihe, type Laji } from "./urheilu";
+import { pelinRivi } from "./pelirivit";
+import { haePaiva, tanaanEhdokkaat } from "./tanaan";
 import type { Ehdokas, Seuraavat } from "./tyypit";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 type Sb = SupabaseClient<any, any, any>;
 
 const N = 5;
-const SEL = "id, slug, custom_slug, title, display_title, collection, category, genre, subcollection, paikkakunnat, hero_image, hero_focal_x, hero_focal_y, game_mode, target_age";
+const SEL = "id, slug, custom_slug, title, display_title, collection, category, genre, subcollection, paikkakunnat, hero_image, hero_focal_x, hero_focal_y, game_mode, target_age, suosio_90pv";
 
 type Rivi = {
   id: string; slug: string | null; custom_slug: string | null; title: string; display_title: string | null;
   collection: string | null; category: string | null; genre: string | null; subcollection: string | null;
   paikkakunnat: string[] | null; hero_image: string | null; hero_focal_x: number | null; hero_focal_y: number | null;
-  game_mode: string | null; target_age: string | null;
+  game_mode: string | null; target_age: string | null; suosio_90pv: number | null;
 };
-type Visa = Rivi & { laji: Laji; aiheet: Aihe[]; henkilo: { kuva: string | null } | null };
+type Henkilo = { kuva: string | null; syntyi: number | null; nimi: string };
+type Visa = Rivi & { laji: Laji; aiheet: Aihe[]; henkilo: Henkilo | null };
 
 export type Lahde = {
   id: string; slug: string | null; title: string; display_title: string | null;
@@ -42,6 +41,8 @@ export type Lahde = {
   paikkakunnat: string[] | null;
   /** Henkilövisan celebrities.laji. */
   henkilonLaji: string | null;
+  /** Vain esikatselu ja paikallinen kehitys (?sk_pvm=2026-11-13): paikan 3 päivä. Tuotannossa aina null. */
+  testipaiva?: string | null;
 };
 
 /** Pilotin rajaus (brief §0): ainoa paikka, joka päättää, kuuluuko visa pilottiin. Laajennus = yksi ehto lisää. */
@@ -62,13 +63,14 @@ function sekoita<T>(a: T[]): T[] {
 
 const kelpaa = (r: Rivi) => r.game_mode !== "mega" && r.target_age !== "4-7" && r.target_age !== "8-12";
 
-/** Urheilun visat: kokoelma 'urheilu' + urheilijoiden henkilövisat. Noin 250 riviä kahdella haulla. */
+/** Urheilun visat: kokoelma 'urheilu' + urheilijoiden henkilövisat (lähde mukana; suodatetaan kutsujassa). */
 async function haeUrheiluvisat(sb: Sb): Promise<Visa[]> {
   const [{ data: omat }, { data: hlot }] = await Promise.all([
     sb.from("quiz_cards" as never).select(SEL).eq("collection", "urheilu").limit(600),
-    sb.from("celebrities").select("trivia_quiz_id, laji, image_url").in("laji", [...URHEILULAJIT]).not("trivia_quiz_id", "is", null).limit(600),
+    sb.from("celebrities").select("trivia_quiz_id, laji, image_url, birth_date, name").in("laji", [...URHEILULAJIT]).not("trivia_quiz_id", "is", null).limit(600),
   ]);
-  const henkilot = new Map(((hlot ?? []) as Array<{ trivia_quiz_id: string; laji: string; image_url: string | null }>).map((h) => [h.trivia_quiz_id, h]));
+  type H = { trivia_quiz_id: string; laji: string; image_url: string | null; birth_date: string | null; name: string };
+  const henkilot = new Map(((hlot ?? []) as H[]).map((h) => [h.trivia_quiz_id, h]));
   const { data: hRivit } = henkilot.size
     ? await sb.from("quiz_cards" as never).select(SEL).in("id", [...henkilot.keys()])
     : { data: [] };
@@ -80,9 +82,19 @@ async function haeUrheiluvisat(sb: Sb): Promise<Visa[]> {
   for (const r of ((hRivit ?? []) as Rivi[]).filter(kelpaa)) {
     const h = henkilot.get(r.id)!;
     const laji = lajiAvaimella(h.laji);
-    visat.push({ ...r, laji, aiheet: visanAiheet(laji, r), henkilo: { kuva: henkiloKuva(h.image_url) } });
+    const syntyi = h.birth_date ? Number(h.birth_date.slice(0, 4)) : null;
+    visat.push({ ...r, laji, aiheet: visanAiheet(laji, r), henkilo: { kuva: henkiloKuva(h.image_url), syntyi: Number.isFinite(syntyi) ? syntyi : null, nimi: h.name } });
   }
   return visat;
+}
+
+/** Pelikerrat 30 päivän ajalta (RPC visojen_pelit_30pv); ennen migraatiota 90 päivän suosio (quiz_cards.suosio_90pv). */
+async function pelikerrat(sb: Sb, visat: Visa[]): Promise<{ kerrat: Map<string, number>; lahde: "30pv" | "90pv" }> {
+  const { data, error } = visat.length
+    ? await sb.rpc("visojen_pelit_30pv" as never, { p_ids: visat.map((v) => v.id) } as never)
+    : { data: [], error: null };
+  if (!error) return { kerrat: new Map(((data ?? []) as Array<{ quiz_id: string; pelit: number }>).map((r) => [r.quiz_id, Number(r.pelit)])), lahde: "30pv" };
+  return { kerrat: new Map(visat.map((v) => [v.id, v.suosio_90pv ?? 0])), lahde: "90pv" };
 }
 
 function visaEhdokas(v: Visa, porras: string): Ehdokas {
@@ -106,7 +118,7 @@ const PELIN_MERKKI: Record<Pelimuoto["ikoni"], string> = {
 };
 
 /* Pelikortin nimi (Heikki 11.11.): kun lajimerkki on pelin nimi, kortissa on pelkkä variantti ("SM-liiga", ei
-   "Tupla tai kuitti: SM-liiga"). Laita järjestykseen -pakan merkki on "Järjestä", nimi pakan aihe. Ei kuvausriviä (sääntö 9). */
+   "Tupla tai kuitti: SM-liiga"). Kuvausrivi kierroksella 3: mitä pelissä tehdään (lib/seuraavaksi/pelirivit.ts). */
 const ETULIITE = /^(Tupla tai kuitti|Laita järjestykseen|Järjestä):\s*/;
 
 function peliEhdokas(p0: Pelimuoto, laji: Laji, porras: string): Ehdokas {
@@ -120,6 +132,7 @@ function peliEhdokas(p0: Pelimuoto, laji: Laji, porras: string): Ehdokas {
     kuva: p.kuva?.src ?? null,
     sovitus: p.kuva?.contain ? "contain" : undefined,
     merkki,
+    rivi: pelinRivi(p),
     kuvaton: laji.nimi,
     porras,
   };
@@ -142,78 +155,12 @@ function keraa<T extends { id: string }>(portaat: Array<[string, T[]]>, kaytetty
 const jaettu = (a: Aihe[], b: Aihe[]) => a.some((x) => b.some((y) => y.avain === x.avain));
 const aiheNimi = (lahde: Aihe[], v: Visa) => lahde.find((a) => v.aiheet.some((b) => b.avain === a.avain))?.avain ?? "";
 
-/* ── "Jotain muuta" (Heikki 11.11.: henkilövisan paikka 3, aiheesta riippumaton) ──────────────────────────────────
-   Portaat: 1) päivän peli, jota ei ole pelattu tänään: Mikä maa → Päivän visa → Päivän sankari; 2) sivuston pelatuin visa
-   7 päivän ajalta, jota pelaaja ei ole pelannut (RPC suosituimmat_visat_7pv; ennen migraatiota quiz_cards.suosio_90pv).
-   Pelattu tänään -tieto on selaimessa (Ehdokas.pelattu), joten palvelin antaa kaikki ja selain valitsee. */
-type KorttiRivi = Rivi & { suosio_90pv?: number | null };
-
-async function jotainMuuta(sb: Sb, kaytetty: Set<string>): Promise<Ehdokas[]> {
-  const tanaan = helsinginPaiva().iso;
-  const { data: site } = await sb.from("sites").select("id").eq("slug", SITE_SLUG).maybeSingle();
-  const siteId = (site as { id: string } | null)?.id ?? null;
-  const [pvRes, sRes, suosRes] = await Promise.all([
-    siteId ? sb.rpc("paivan_visa_tanaan" as never, { p_site: siteId } as never) : Promise.resolve({ data: null }),
-    siteId ? sb.rpc("paivan_sankari" as never, { p_site: siteId, p_date: tanaan } as never) : Promise.resolve({ data: null }),
-    sb.rpc("suosituimmat_visat_7pv" as never, { p_n: 15 } as never),
-  ]);
-  const pvId = ((pvRes.data ?? []) as Array<{ quiz_id: string }>)[0]?.quiz_id ?? null;
-  const sankariRivi = ((sRes.data ?? []) as SankariRivi[])[0] ?? null;
-  const suosRpc = suosRes.error ? null : ((suosRes.data ?? []) as Array<{ quiz_id: string }>).map((r) => r.quiz_id);
-
-  const idt = [...new Set([pvId, ...(suosRpc ?? [])].filter((x): x is string => !!x))];
-  const [{ data: rivit }, { data: varalla }] = await Promise.all([
-    idt.length ? sb.from("quiz_cards" as never).select(SEL).in("id", idt) : Promise.resolve({ data: [] }),
-    /* Ennen migraatiota (tai jos RPC ei vastaa): 90 päivän suosio. */
-    suosRpc ? Promise.resolve({ data: [] }) : sb.from("quiz_cards" as never).select(`${SEL}, suosio_90pv`).order("suosio_90pv", { ascending: false }).limit(20),
-  ]);
-  const kortit = new Map(((rivit ?? []) as KorttiRivi[]).map((r) => [r.id, r]));
-  const ulos: Ehdokas[] = [];
-  const lisaa = (e: Ehdokas) => {
-    if (kaytetty.has(e.id)) return;
-    kaytetty.add(e.id);
-    ulos.push(e);
-  };
-
-  if (tanaan >= MM_JULKAISU) {
-    lisaa({
-      tyyppi: "peli", id: "mika-maa", nimi: MM_NIMI, href: MM_SIVU, kuva: "/20/mika-maa/tunnus.webp", kuvaPos: "50% 50%",
-      merkki: "Päivän peli", kuvaton: "Päivän peli", porras: "p3.paivan-peli:mika-maa", pelattu: { tapa: "mika-maa" },
-    });
-  }
-  const pv = pvId ? kortit.get(pvId) : null;
-  if (pv && kelpaa(pv)) {
-    const k = visanKorttikuva(pv);
-    lisaa({
-      tyyppi: "visa", id: pv.id, nimi: pv.display_title ?? pv.title, href: `${visaHref(pv)}${pv.slug ? "?" : "&"}paivan_visa=1`,
-      kuva: k.kuva, kuvaPos: k.kuvaPos, merkki: "Päivän peli", kuvaton: "Päivän visa", porras: "p3.paivan-peli:paivan-visa",
-      pelattu: { tapa: "paivan-visa" },
-    });
-  }
-  if (sankariRivi) {
-    const s = muotoileSankari(sankariRivi);
-    lisaa({
-      tyyppi: "visa", id: s.quizId, nimi: sankariRivi.quiz_title, href: s.playHref, kuva: s.kuva, kuvaPos: s.kuvaPos,
-      merkki: "Päivän peli", kuvaton: "Synttärit", porras: "p3.paivan-peli:sankari", pelattu: { tapa: "tanaan" },
-    });
-  }
-  const suositut: KorttiRivi[] = suosRpc
-    ? suosRpc.map((id) => kortit.get(id)).filter((r): r is KorttiRivi => !!r)
-    : ((varalla ?? []) as KorttiRivi[]);
-  for (const r of suositut.filter(kelpaa)) {
-    if (ulos.length >= 3 + N) break;
-    const k = visanKorttikuva(r);
-    lisaa({
-      tyyppi: "visa", id: r.id, nimi: r.display_title ?? r.title, href: visaHref(r), kuva: k.kuva, kuvaPos: k.kuvaPos,
-      merkki: "Suosittu", kuvaton: "Suosittu", porras: suosRpc ? "p3.suosituin-7pv" : "p3.suosituin-90pv",
-    });
-  }
-  return ulos;
-}
-
 export async function haeSeuraavat(sb: Sb, l: Lahde): Promise<Seuraavat | null> {
   if (onPilotissa(l) !== "urheilu") return null;
-  const visat = (await haeUrheiluvisat(sb)).filter((v) => v.id !== l.id);
+  const iso = l.testipaiva ?? helsinginPaiva().iso;
+  const [kaikkiVisat, paiva] = await Promise.all([haeUrheiluvisat(sb), haePaiva(sb, iso, !!l.testipaiva)]);
+  const lahdeVisa = kaikkiVisat.find((v) => v.id === l.id) ?? null;
+  const visat = kaikkiVisat.filter((v) => v.id !== l.id);
   const laji = visanLaji({ ...l, henkilonLaji: l.henkilonLaji });
   const aiheet = visanAiheet(laji, l);
   const tarkat = aiheet.filter((a) => !a.laaja);
@@ -226,61 +173,62 @@ export async function haeSeuraavat(sb: Sb, l: Lahde): Promise<Seuraavat | null> 
   const lajinHenkilot = lajin.filter((v) => v.henkilo);
   const muut = visat.filter((v) => v.laji.avain !== laji.avain && !v.henkilo);
 
-  const kaytetty = new Set<string>([l.id]);
-  const nimea = (por: string, v: Visa) => (por.endsWith(".aihe") || por.endsWith("henkilo-aihe") ? `${por}:${aiheNimi(tarkat, v)}` : por);
+  /* Päivän visa ja sankari kuuluvat paikalle 3 (Tänään): varataan ennen paikkoja 1–2. */
+  const varatut = new Set([paiva.paivanVisa?.id, paiva.sankari?.quiz_id].filter((x): x is string => !!x && x !== l.id));
+  const kaytetty = new Set<string>([l.id, ...varatut]);
+  const nimea = (por: string, v: Visa) => (/\.(aihe|henkilo-aihe)$/.test(por) ? `${por}:${aiheNimi(tarkat, v)}` : por);
 
-  /* Aihevisat (seura, NHL, Leijonat …): seuran/tapahtuman jälkeen paikka 1, henkilön jälkeen paikan 1 varaehdokkaat. */
-  const aihePortaat: Array<[string, Visa[]]> = [
-    ["p1.aihe", omat.filter((v) => tarkat.length > 0 && jaettu(tarkat, v.aiheet))],
-    ["p1.kaupunki", omat.filter((v) => (v.paikkakunnat ?? []).some((p) => paikat.has(p)))],
-    ["p1.sarja", omat.filter((v) => laajat.length > 0 && jaettu(laajat, v.aiheet))],
-    ["p1.laji", omat],
-    /* Lajit, joilla on vain henkilövisoja (talviurheilu, yleisurheilu …): syvemmälle = saman lajin henkilöt. */
-    ["p1.lajin-henkilo", omat.length ? [] : lajinHenkilot.filter((v) => tarkat.length > 0 && jaettu(tarkat, v.aiheet))],
-    ["p1.lajin-henkilot", omat.length ? [] : lajinHenkilot],
-    ["p1.urheilu", laji === YLEINEN ? omat : muut],
+  /* Saman lajin muut kuin henkilövisat (seura, NHL, Leijonat, tapahtumat). */
+  const aihePortaat = (etu: string): Array<[string, Visa[]]> => [
+    [`${etu}.aihe`, omat.filter((v) => tarkat.length > 0 && jaettu(tarkat, v.aiheet))],
+    [`${etu}.kaupunki`, omat.filter((v) => (v.paikkakunnat ?? []).some((p) => paikat.has(p)))],
+    [`${etu}.sarja`, omat.filter((v) => laajat.length > 0 && jaettu(laajat, v.aiheet))],
+    [`${etu}.laji`, omat],
+    [`${etu}.urheilu`, laji === YLEINEN ? omat : muut],
   ];
-  /* Henkilöt: saman lajin henkilö, jolla yhteinen aihe → muu lajin henkilö. */
+  /* Henkilöt satunnaisessa järjestyksessä portaan sisällä (seura- ja tapahtumavisan p2 ilman peliä). */
   const henkiloPortaat = (etu: string): Array<[string, Visa[]]> => [
     [`${etu}.henkilo-aihe`, lajinHenkilot.filter((v) => tarkat.length > 0 && jaettu(tarkat, v.aiheet))],
     [`${etu}.lajin-henkilo`, lajinHenkilot],
   ];
 
-  /* p2 Toinen peli: lajin pelimuodot, aiheen peli ensin (Tappara → Järjestä: Tapparan pisteet, kun pakka julkaistaan). */
+  /* p2: lajin pelimuodot, aiheen peli ensin (Tappara → Järjestä: Tapparan pisteet, kun pakka julkaistaan). */
   const pelit = PELIMUODOT.filter((p) => p.tila === "pelattava" && (p.serves.includes(laji.avain) || p.serves.includes("urheilu")));
   const aiheenPeli = (p: Pelimuoto) => aiheet.some((a) => a.re.test(p.nimi));
   const pelitJarj = [...pelit.filter(aiheenPeli), ...pelit.filter((p) => !aiheenPeli(p))];
   const peliEhdokkaat = pelitJarj.slice(0, N).map((p) => peliEhdokas(p, laji, aiheenPeli(p) ? "p2.aiheen-peli" : "p2.lajin-peli"));
 
-  if (henkilo) {
-    /* Henkilövisan jälkeen (Heikki 11.11.): 1 = toinen henkilövisa, 2 = saman aiheen peli, 3 = jotain muuta. */
-    const p1Hlot = keraa(henkiloPortaat("p1"), kaytetty, 4).map(([por, v]) => visaEhdokas(v, nimea(por, v)));
-    const vara = keraa(aihePortaat, kaytetty, pelitJarj.length ? 3 : N + 3).map(([por, v]) => visaEhdokas(v, nimea(`vara>${por}`, v)));
-    let p1: Ehdokas[];
-    let p2: Ehdokas[];
-    if (pelitJarj.length) {
-      p1 = [...p1Hlot, ...vara];
-      p2 = peliEhdokkaat;
-    } else {
-      p1 = [...p1Hlot, ...vara.filter((_, i) => i % 2 === 1)];
-      p2 = vara.filter((_, i) => i % 2 === 0).map((e) => ({ ...e, porras: `p2.ei-pelia>${e.porras.replace(/^vara>/, "")}` }));
-    }
-    const p3 = await jotainMuuta(sb, kaytetty).catch(() => [] as Ehdokas[]);
-    return { pilotti: "urheilu", p1, p2, p3, lajiLinkki: laji.hub, lahde: l.slug ?? l.id };
-  }
-
-  /* Seura-, sarja- ja tapahtumavisat: 1 = aihevisa, 2 = peli (tai p1:n seuraava ehdokas), 3 = henkilö. */
   let p1: Ehdokas[];
   let p2: Ehdokas[];
-  if (pelitJarj.length) {
-    p1 = keraa(aihePortaat, kaytetty, N).map(([por, v]) => visaEhdokas(v, nimea(por, v)));
-    p2 = peliEhdokkaat;
+  if (henkilo) {
+    /* p1: saman lajin henkilöt syntymävuoden läheisyyden mukaan, tasatilanteessa pelatuin 30 pv, sitten nimi. Ei arvontaa. */
+    const syntyi = lahdeVisa?.henkilo?.syntyi ?? null;
+    const { kerrat, lahde: kertaLahde } = await pelikerrat(sb, lajinHenkilot);
+    const ero = (v: Visa) => (syntyi != null && v.henkilo?.syntyi != null ? Math.abs(v.henkilo.syntyi - syntyi) : 999);
+    const jarj = lajinHenkilot.filter((v) => !kaytetty.has(v.id)).sort((a, b) =>
+      ero(a) - ero(b) || (kerrat.get(b.id) ?? 0) - (kerrat.get(a.id) ?? 0) || (a.henkilo!.nimi).localeCompare(b.henkilo!.nimi, "fi"));
+    const p1Hlot = jarj.slice(0, 8).map((v) => {
+      kaytetty.add(v.id);
+      return visaEhdokas(v, syntyi != null && v.henkilo?.syntyi != null ? `p1.henkilo-ika:${v.henkilo.syntyi}` : `p1.henkilo-${kertaLahde}`);
+    });
+    /* p2: peli; ilman peliä saman aiheen seura- tai tapahtumavisa (eri tyyppiä kuin paikan 1 henkilö). */
+    p2 = pelitJarj.length ? peliEhdokkaat : keraa(aihePortaat("p2"), kaytetty, N).map(([por, v]) => visaEhdokas(v, nimea(por, v)));
+    const vara = keraa(aihePortaat("vara>p1"), kaytetty, 3).map(([por, v]) => visaEhdokas(v, nimea(por, v)));
+    p1 = [...p1Hlot, ...vara];
   } else {
-    const kaikki = keraa(aihePortaat, kaytetty, N * 2).map(([por, v]) => visaEhdokas(v, nimea(por, v)));
-    p1 = kaikki.filter((_, i) => i % 2 === 0);
-    p2 = kaikki.filter((_, i) => i % 2 === 1).map((e) => ({ ...e, porras: `p2.ei-pelia>${e.porras}` }));
+    /* Seura-, sarja- ja tapahtumavisa: p1 saman lajin toinen visa; p2 peli, ilman peliä saman aiheen henkilö. */
+    p1 = keraa(aihePortaat("p1"), kaytetty, N).map(([por, v]) => visaEhdokas(v, nimea(por, v)));
+    p2 = pelitJarj.length ? peliEhdokkaat : keraa(henkiloPortaat("p2"), kaytetty, N).map(([por, v]) => visaEhdokas(v, nimea(por, v)));
   }
-  /* Henkilö, jonka nimessä on lähteen aihe (Tappara → "Patrik Laine – Tapparasta NHL:n maalintekijäksi"). */
-  const p3 = keraa([...henkiloPortaat("p3"), ["p3.laji", omat], ["p3.urheilu", muut]], kaytetty, N).map(([por, v]) => visaEhdokas(v, nimea(por, v)));
+
+  /* p3 Tänään: liittyy lähteeseen = urheiluvisa samasta lajista (ei yleinen urheilu) tai yhteinen aihe. */
+  const urheilu = new Map(visat.map((v) => [v.id, v]));
+  const liittyy = (id: string) => {
+    const v = urheilu.get(id);
+    if (!v) return false;
+    return (laji !== YLEINEN && v.laji.avain === laji.avain) || (aiheet.length > 0 && jaettu(aiheet, v.aiheet));
+  };
+  const p3Kaytetty = new Set([...kaytetty].filter((id) => !varatut.has(id)));
+  const p3 = await tanaanEhdokkaat(sb, paiva, { liittyy }, p3Kaytetty, N).catch(() => [] as Ehdokas[]);
   return { pilotti: "urheilu", p1, p2, p3, lajiLinkki: laji.hub, lahde: l.slug ?? l.id };
 }

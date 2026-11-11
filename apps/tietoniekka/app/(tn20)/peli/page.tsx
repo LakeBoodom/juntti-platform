@@ -753,6 +753,8 @@ export default async function Peli20({
     id: quiz.id, slug: quiz.slug, title: quiz.title, display_title: quiz.display_title,
     collection: quiz.collection, category: quiz.category, genre: quiz.genre, subcollection: quiz.subcollection ?? null,
     paikkakunnat: quiz.paikkakunnat ?? null, henkilonLaji: isPerson ? celeb?.laji ?? null : null,
+    /* Paikan 3 (Tänään) testipäivä vain esikatselussa ja paikallisesti: ?sk_pvm=2026-11-13. */
+    testipaiva: process.env.VERCEL_ENV !== "production" && typeof params.sk_pvm === "string" && /^\d{4}-\d{2}-\d{2}$/.test(params.sk_pvm) ? params.sk_pvm : null,
   }).catch(() => null);
   /* Wikimedian thumb-osoitteessa leveys on polussa (".../330px-Tiedosto.jpg").
      Kannassa olevat kuvat ovat 330 px leveitä — liian pieniä 3:4-kortille — ja

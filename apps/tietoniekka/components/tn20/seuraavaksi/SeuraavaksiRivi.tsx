@@ -3,7 +3,8 @@
 // A2-pelikortti, osio-otsikko). Heikki 11.11.2026: mobiilissa (< 768) kolme tiivistä riviä allekkain (kuva 96 × 72
 // vasemmalla, lajimerkki + nimi oikealla, koko rivi linkki, ≥ 72 px) — kaikki näkyvät ilman pyyhkäisyä. ≥ 768 px kolme
 // samankokoista korttia: lajimerkki kuvan päällä, nimi ja kultainen "Pelaa →" (rivissä ei limeä; päänappi on lime).
-// Ei kuvausrivejä (UI-sääntö 9).
+// Kierros 3 (Heikki 11.11.): nimen alla yksi rivi vain pelikortissa (mitä pelissä tehdään) ja paikan 3 portaissa a–c
+// (syy päivän datasta); poikkeus UI-sääntöön 9. Paikan 3 merkki "Tänään · 11.11." pienellä live-pisteellä (ei muistovisassa).
 // Ehdokkaista valitaan selaimessa kustakin paikasta ensimmäinen pelaamaton; palvelimen HTML:ssä (ja ilman JS:ää) näkyy
 // kunkin paikan ensimmäinen ehdokas.
 import { useEffect, useRef, useState, type CSSProperties } from "react";
@@ -33,16 +34,15 @@ function lueStorage(): Pelitieto {
   }
 }
 
-/** Visa: koskaan pelattu. Päivän pelit: pelattu tänään (avaimet: lib/vihjepeli/mikamaa, lib/paivanVisa, PelattuTanaan). */
+/** Visa: koskaan pelattu. Mikä maa: pelattu tänään. Päivän visa: pelattu tänään tai koskaan (avaimet: lib/vihjepeli/mikamaa,
+ *  lib/paivanVisa, PelattuTanaan). */
 function pelattu(e: Ehdokas, t: Pelitieto): boolean {
   try {
     switch (e.pelattu?.tapa) {
       case "mika-maa":
         return !!t.ls?.getItem(`tn-mm-${t.iso}`);
       case "paivan-visa":
-        return !!t.ls?.getItem(`tn_paivan_visa_${t.iso}`) || t.tanaan[e.id] === t.iso;
-      case "tanaan":
-        return t.tanaan[e.id] === t.iso;
+        return !!t.ls?.getItem(`tn_paivan_visa_${t.iso}`) || t.tanaan[e.id] === t.iso || t.kaikki.has(e.id);
       default:
         return e.tyyppi === "visa" && t.kaikki.has(e.id);
     }
@@ -90,11 +90,12 @@ export default function SeuraavaksiRivi({ otsikko, paikat, meta, id }: { otsikko
                 <span className="sk-kuvaton" aria-hidden="true">{e.kuvaton}</span>
               )}
               {/* Desktop: merkki kuvan päällä. Mobiilin rivissä sama merkki on tekstipuolella (sk-merkki--rivi). */}
-              <span className="sk-merkki sk-merkki--kuva">{e.merkki}</span>
+              <span className="sk-merkki sk-merkki--kuva">{e.live ? <i className="sk-live" aria-hidden="true" /> : null}{e.merkki}</span>
             </span>
             <span className="sk-teksti">
-              <span className="sk-merkki sk-merkki--rivi">{e.merkki}</span>
+              <span className="sk-merkki sk-merkki--rivi">{e.live ? <i className="sk-live" aria-hidden="true" /> : null}{e.merkki}</span>
               <span className="sk-nimi">{katko(e.nimi)}</span>
+              {e.rivi ? <span className="sk-syy">{e.rivi}</span> : null}
               <span className="sk-cta">Pelaa <span aria-hidden="true">→</span></span>
             </span>
           </a>

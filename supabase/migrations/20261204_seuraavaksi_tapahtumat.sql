@@ -46,3 +46,17 @@ language sql stable security definer set search_path = public as $$
 $$;
 revoke all on function public.suosituimmat_visat_7pv(int) from public;
 grant execute on function public.suosituimmat_visat_7pv(int) to anon, authenticated;
+
+-- Paikka 1 henkilövisan jälkeen (Heikki 11.11.2026, kierros 3): saman lajin henkilöt syntymävuoden mukaan, tasatilanteessa
+-- pelatuin 30 päivän ajalta. Vain annettujen visojen pelimäärät (enintään 800 tunnistetta), ei istuntoja eikä rivejä.
+create or replace function public.visojen_pelit_30pv(p_ids uuid[])
+returns table (quiz_id uuid, pelit bigint)
+language sql stable security definer set search_path = public as $$
+  select qp.quiz_id, count(*) as pelit
+  from public.quiz_plays qp
+  where qp.played_at > now() - interval '30 days'
+    and qp.quiz_id = any (p_ids[1:800])
+  group by qp.quiz_id;
+$$;
+revoke all on function public.visojen_pelit_30pv(uuid[]) from public;
+grant execute on function public.visojen_pelit_30pv(uuid[]) to anon, authenticated;
