@@ -261,3 +261,18 @@
   .tn20 .tnm2-feat, .tn20 .tnm2-card { transition: none; }
   .tn20 .tnm2-feat:hover, .tn20 .tnm2-card:hover { transform: none; }
 }
+
+/* Hub-malli mobiilissa (Heikki 11.11.2026): ruudukko ja Näin mega toimii -osio vain ≥ 768; alle 768 tiiviit rivit
+   (KorttiRivi) ja ohjeet suljettuina (HubOhjeet). */
+.tn20 .tnm2-mob { display: flex; flex-direction: column; gap: 18px; padding-top: 12px; padding-bottom: 28px; }
+@media (max-width: 767px) { .tn20 .tnm2-section--desk { display: none; } }
+@media (min-width: 768px) { .tn20 .tnm2-mob { display: none; } }
+/* Mobiilin yläosa (hub-malli): h1 + yksi rivi → tilastorivi pois; studiokuva säilyy, nauha 330 → 250 px; välit tiiviimmiksi. */
+@media (max-width: 767px) {
+  .tn20 .tnm2 .tnms[data-variant="overlay"] .tnms-media { height: 250px; }
+  .tn20 .tnm2 .tnms-stats { display: none; }
+  .tn20 .tnm2 .tnms-lead { margin-bottom: 0; }
+  .tn20 .tnm2 .tnms { margin-bottom: 16px; }
+  .tn20 .tnm2 .tnm2-featwrap { padding-top: 0; }
+  .tn20 .tnm2 .tnm2-feat-media { min-height: 170px; }
+}

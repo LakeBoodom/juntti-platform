@@ -1,8 +1,8 @@
 // KARTTAPELIT /peli/karttapelit (CD-handoff "Rajanaapurit: Yhdysvallat", hub 4a; Heikki 1.11.2026). Kortit karttojen
 // mukaan: Maailma, Suomi, Yhdysvallat. Kuva on viikon reitin lähtö ja maali vaalealla kartalla (6c, ei ratkaisua), koukku
-// viikon reitin otsikko. Mobiilissa koko kortti on linkki pelin omalle sivulle; desktopilla kortissa myös aluevalinta ja
-// Pelaa. Kokoava sivu, joten ylänavigaatio ja murupolku (lib/nav.ts PELIMUOTOHUBIT). Intro, korttien lauseet ja Näin pelaat
-// Heikin pyynnöstä 1.11.2026 (poikkeus UI-sääntöön 9: pelimuoto ei ole kaikille tuttu). Kartat vaaleina (6c).
+// viikon reitin otsikko. Desktopilla kortissa myös aluevalinta ja Pelaa. Kokoava sivu, joten ylänavigaatio ja murupolku
+// (lib/nav.ts PELIMUOTOHUBIT). Kartat vaaleina (6c). Hub-malli 11.11.2026 (Heikki): h1 + yksi rivi; mobiilissa Mikä maa?
+// isona ja reittipelit tiiviinä riveinä; Näin pelaat sekä Lähteet ja rajaukset suljettuina.
 
 import type { CSSProperties } from "react";
 import type { Metadata } from "next";
@@ -22,6 +22,7 @@ import { maaKierros } from "@/lib/vihjepeli/data";
 import { MAA_JULKAISU } from "@/lib/vihjepeli/aiheet/maa";
 import { MM_SIVU } from "@/lib/vihjepeli/mikamaa";
 import "../kuntaliitos/reittihero.css";
+import MobiiliRivit from "@/components/tn20/korttirivi/KorttiRivi";
 import "./karttapelit.css";
 
 /* Viikon reitti vaihtuu maanantaina ja Mikä maa? -kortin vihje 1 keskiyöllä → sivu uusitaan 10 minuutin välein. */
@@ -50,19 +51,17 @@ export default async function KarttapelitSivu() {
       <JsonLd data={peliLd({ name: "Karttapelit", url: KARTTAPELIT_SIVU, description: KUVAUS })} />
       <Crumbs items={[{ label: "Karttapelit" }]} />
       <main className="kh">
+        {/* Hub-malli (Heikki 11.11.2026): h1 + yksi rivi, ei alaotsikoita eikä kuvauskappaletta. */}
         <header className="kh-yla">
-          <h1 className="kh-h1">Tunnetko maat, kunnat <span>ja osavaltiot?</span></h1>
-          <div className="kh-intro">
-            <p className="kh-lead">Pääsetkö perille karttaa pitkin?</p>
-            <p>{mm ? "Arvaa päivän maa vihjeistä tai rakenna reitti kahden paikan välille niin, että jokainen pala rajautuu seuraavaan." : "Rakenna reitti kahden paikan välille niin, että jokainen pala rajautuu seuraavaan."}</p>
-          </div>
+          <h1 className="kh-h1">Karttapelit</h1>
+          <p className="kh-lause">{mm ? "Arvaa päivän maa tai rakenna reitti naapurista naapuriin." : "Rakenna reitti naapurista naapuriin."}</p>
         </header>
         <ul className="kh-kortit" data-mm={mm ? "" : undefined}>
           {mm && <MikaMaaKortti href={MM_SIVU} paiva={mm.paiva} vihje={mm.vihjeet[0]} />}
           {KARTTAPELIT.map((k) => {
             const koukku = karttapelinKoukku(k, viikko);
             return (
-              <li key={k.peli} className="kh-kortti">
+              <li key={k.peli} className="kh-kortti kh-kortti--reitti">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img className="kh-kuva" src={karttapelinKuva(k, viikko)} alt="" width={640} height={480} loading="lazy" />
                 <div className="kh-teksti">
@@ -91,20 +90,37 @@ export default async function KarttapelitSivu() {
             );
           })}
         </ul>
-        <section className="kh-ohje" aria-labelledby="kh-ohje-h">
-          <h2 id="kh-ohje-h">Näin pelaat</h2>
+        {/* Mobiili (< 768): Mikä maa? isona korttina yllä, reittipelit tiiviinä riveinä (KorttiRivi). Alueen valinta pelin
+            omassa aloitusnäkymässä; desktopin korteissa maanosa- ja maakuntavalinta kuten ennen. */}
+        <MobiiliRivit
+          nimi="Reittipelit"
+          kortit={KARTTAPELIT.map((k) => ({
+            href: k.href, kuva: karttapelinKuva(k, viikko), kuvaton: "Karttapeli", merkki: k.laji, nimi: k.nimi,
+            rivi: karttapelinKoukku(k, viikko) ?? k.kuvaus,
+          }))}
+        />
+        {/* Näin pelaat sekä lähteet ja rajaukset suljettuina (lähdemerkinnät pysyvät sivulla, lisenssiehto). */}
+        <div className="pk-ohjeet kh-ohjeet">
+          <details className="pk-ohje">
+            <summary>Näin pelaat<span aria-hidden="true">+</span></summary>
+            <div className="pk-ohje-sisalto kh-ohje">
           <ol>
             <li><b>Aloita</b>Saat lähdön, maalin ja kuusi palaa sekaisin.</li>
             <li><b>Järjestä</b>Raahaa palat niin, että jokainen rajautuu seuraavaan.</li>
             <li><b>Tarkista</b>Näet, montako rajaa on väärin, mutta et sitä, mitkä. Saat kaksi uutta yritystä.</li>
           </ol>
-        </section>
-        <footer className="kh-huomautukset">
-          <p>Uusi viikon reitti joka maanantai, päivän reitti jokaiselle maanosalle ja maakunnalle.</p>
-          {KARTTAPELIT.map((k) => (
-            <p key={k.peli}><b>{k.nimi}:</b> {k.huomautus} {LAHTEET[k.peli]}</p>
-          ))}
-        </footer>
+            </div>
+          </details>
+          <details className="pk-ohje">
+            <summary>Lähteet ja rajaukset<span aria-hidden="true">+</span></summary>
+            <div className="pk-ohje-sisalto kh-huomautukset">
+              <p>Uusi viikon reitti joka maanantai, päivän reitti jokaiselle maanosalle ja maakunnalle.</p>
+              {KARTTAPELIT.map((k) => (
+                <p key={k.peli}><b>{k.nimi}:</b> {k.huomautus} {LAHTEET[k.peli]}</p>
+              ))}
+            </div>
+          </details>
+        </div>
       </main>
     </PeliKehys>
   );

@@ -6,7 +6,7 @@
    ≥ 768: kolme samankokoista korttia, merkki kuvan päällä, "Pelaa →" kultaisena.
    Kierros 3 (Heikki 11.11.): kaikki rivit yhtä korkeita (grid-auto-rows: 1fr), nimen alla pelikortissa kuvausrivi ja paikan 3
    portaissa syyrivi (.sk-syy, 13 px), paikan 3 merkissä live-piste (CD "Tänään-sivu kierros 3": 7 px, lime #B6FF3C). */
-.tn20 .sk-osio { --sk-ink: #f5f0e6; --sk-soft: #cfc7b6; --sk-card: #1b1710; --sk-line: #2c2517; --sk-line2: #5a4e36; --sk-plate: #241f15; --sk-gold: #e8a320;
+.tn20 :is(.sk-osio, .sk-rivi--mobiili) { --sk-ink: #f5f0e6; --sk-soft: #cfc7b6; --sk-card: #1b1710; --sk-line: #2c2517; --sk-line2: #5a4e36; --sk-plate: #241f15; --sk-gold: #e8a320;
   display: flex; flex-direction: column; gap: 12px; min-width: 0; color: var(--sk-ink); }
 .tn20 .sk-h {
   margin: 0; min-height: 44px; display: flex; align-items: center;
@@ -14,6 +14,11 @@
   text-transform: uppercase; letter-spacing: 0; color: var(--sk-ink);
 }
 .tn20 .sk-rivi { display: grid; grid-template-columns: minmax(0, 1fr); grid-auto-rows: 1fr; gap: 8px; }
+/* Hub-sivujen mobiililista (KorttiRivi.tsx MobiiliRivit, 11.11.2026): sama rivi; rivit sisällön mittaisia (ei 1fr),
+   ≥ 768 piilossa, koska sivun omat kortit näkyvät. */
+.tn20 .sk-rivi--mobiili { grid-auto-rows: auto; color: var(--sk-ink); }
+.tn20 .sk-li { display: flex; min-width: 0; }
+.tn20 .sk-li > .sk-kortti { flex: 1; }
 /* a.sk-kortti: pelisivun linkkiväri (.tng a) ei saa periytyä kortin tekstiin. */
 .tn20 a.sk-kortti {
   display: flex; flex-direction: row; align-items: stretch; min-width: 0; min-height: 74px; box-sizing: border-box;
@@ -69,6 +74,7 @@
 }
 
 @media (min-width: 768px) {
+  .tn20 .sk-rivi--mobiili { display: none; }
   .tn20 .sk-rivi { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; }
   .tn20 a.sk-kortti { flex-direction: column; border-radius: 16px; }
   .tn20 .sk-kuva { width: auto; min-height: 0; aspect-ratio: 16 / 9; }

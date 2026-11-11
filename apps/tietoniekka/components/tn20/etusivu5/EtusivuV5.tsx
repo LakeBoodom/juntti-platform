@@ -148,9 +148,10 @@ function Tiesitko({ t, lcp }: { t: NonNullable<D["tiesitko"]>; lcp: boolean }) {
   );
 }
 
-function Aiheet({ a }: { a: D["aiheet"] }) {
+/** Pelaa aiheittain (myös /kokoelmat, 11.11.2026): `maarat` = visamäärä kokoelmittain pienellä nimen alla. */
+export function Aiheet({ a, maarat, entry = "etusivu:kokoelmat" }: { a: D["aiheet"]; maarat?: Record<string, number>; entry?: string }) {
   return (
-    <section className="tn-es-osio" aria-labelledby="tn-es-aiheet-h" data-tn-entry="etusivu:kokoelmat">
+    <section className="tn-es-osio" aria-labelledby="tn-es-aiheet-h" data-tn-entry={entry}>
       <div className="tn-es-otsake">
         <span className="tn-es-kicker">{a.kicker}</span>
         <h2 id="tn-es-aiheet-h" className="tn-es-h2">Pelaa aiheittain</h2>
@@ -162,6 +163,7 @@ function Aiheet({ a }: { a: D["aiheet"] }) {
               <Kuva src={x.kuva} pos={x.kuvaPos} luokka="tn-es-aihe-img" sizes="(min-width: 1100px) 220px, (min-width: 700px) 25vw, 33vw" />
             </span>
             <span className="tn-es-aihe-nimi" lang="fi">{x.nimi}</span>
+            {maarat && maarat[x.slug] ? <span className="tn-es-aihe-maara">{maarat[x.slug]} visaa</span> : null}
           </a>
         ))}
       </div>
@@ -169,9 +171,9 @@ function Aiheet({ a }: { a: D["aiheet"] }) {
   );
 }
 
-function Pelit({ p }: { p: D["pelit"] }) {
+export function Pelit({ p, entry = "etusivu:pelimuodot" }: { p: D["pelit"]; entry?: string }) {
   return (
-    <section className="tn-es-osio" aria-labelledby="tn-es-pelit-h" data-tn-entry="etusivu:pelimuodot">
+    <section className="tn-es-osio" aria-labelledby="tn-es-pelit-h" data-tn-entry={entry}>
       <div className="tn-es-otsake">
         <span className="tn-es-kicker">{p.kicker}</span>
         <h2 id="tn-es-pelit-h" className="tn-es-h2">Valitse peli</h2>

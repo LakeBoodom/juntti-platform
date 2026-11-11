@@ -12,7 +12,7 @@ import { getSiteStats } from "@/lib/siteStats";
 import { suosio } from "@/lib/suosio";
 import { KOKOELMA_KORTIT } from "@/lib/kokoelmat/rekisteri";
 import { visanKorttikuva } from "@/lib/kokoelmat/visanKorttikuva";
-import { ETUSIVU_RYHMAT, ETUSIVUN_PELIMUODOT, nakyyEtusivulla, pelimuotoTanaan, ryhmanNimi } from "@/lib/pelimuodot";
+import { ETUSIVU_RYHMAT, ETUSIVUN_PELIMUODOT, nakyyEtusivulla, pelimuotoTanaan, ryhmanNimi, type EtusivunPelimuoto } from "@/lib/pelimuodot";
 import { JUONTAJIEN_SUOSITUKSET, PROMO2_OOTKO } from "@/lib/etusivu";
 import { listaaVisapaketit, landinginPaketit, ajankohtainen, kauttaJaljella, korttiHref, paketinKorttinimi } from "@/lib/visapaketit";
 import { JUHLAT_KOKOELMA, pvm, juhlaKalenteri, paavisa, paiviaValissa, vpLyhyt, type Esiintyma } from "@/lib/juhlat";
@@ -32,6 +32,28 @@ const AIHE_POS: Record<string, string> = {
   kulttuuri: "50% 40%", luonto: "50% 50%", matkakohteet: "50% 50%", musiikki: "78% 28%", kaupungit: "50% 50%",
   tiede: "50% 50%", "tunnetut-henkilot": "50% 28%", tv: "50% 35%", urheilu: "50% 50%", vaalit: "50% 40%",
 };
+
+export type AiheTiili = { slug: string; nimi: string; href: string; kuva: string | null; kuvaPos?: string };
+
+/** Pelaa aiheittain -tiilet (etusivu ja /kokoelmat, Heikki 11.11.2026). `lapset` lisää Lasten visat (Kokoelmat-sivu). */
+export function aiheTiilet(opts: { lapset?: { href: string; kuva: string } } = {}): AiheTiili[] {
+  const tiilet: AiheTiili[] = KOKOELMA_KORTIT.filter((k) => k.avoin !== false && k.slug !== "kuvavisat").map((k) => ({
+    slug: k.slug, nimi: k.nimi, href: k.href, kuva: k.img, kuvaPos: AIHE_POS[k.slug] ?? k.pos,
+  }));
+  if (opts.lapset) tiilet.push({ slug: "lapset", nimi: "Lasten visat", href: opts.lapset.href, kuva: opts.lapset.kuva, kuvaPos: "50% 50%" });
+  return tiilet.sort((a, b) => a.nimi.localeCompare(b.nimi, "fi"));
+}
+
+/** Valitse peli -ryhmät (etusivu ja /kokoelmat). Pelimuotojen määrä lasketaan näkyvistä korteista. */
+export function peliRyhmat(pelimuodot: EtusivunPelimuoto[], tanaan: string, visat: string) {
+  const ryhmat = ETUSIVU_RYHMAT.map((g) => {
+    const kortit = pelimuodot.filter((p) => p.ryhma === g.avain && nakyyEtusivulla(p, tanaan)).map((p) => ({
+      ...p, etusivu_rivi: p.etusivu_rivi.replace("{visat}", visat),
+    }));
+    return { ...g, nimi: ryhmanNimi(kortit, g.nimi), kortit };
+  }).filter((g) => g.kortit.some((k) => k.tila === "pelattava"));
+  return { ryhmat, pelimuotoja: ryhmat.reduce((n, g) => n + g.kortit.length, 0) };
+}
 
 type Kortti = {
   id: string; slug: string | null; custom_slug: string | null; title: string; display_title: string | null;
@@ -164,19 +186,11 @@ export async function haeEtusivu(opts: {
 
   /* ── 3 Pelaa aiheittain ── kokoelmarekisteri (avoimet, ei Kuvavisoja — ne ovat pelimuoto), suomen aakkosjärjestyksessä
      (Heikki 29.10.; vain tässä osiossa — rekisterin oma järjestys navigaatiossa ja Kokoelmat-sivulla ennallaan). */
-  const aiheet = KOKOELMA_KORTIT.filter((k) => k.avoin !== false && k.slug !== "kuvavisat").map((k) => ({
-    slug: k.slug, nimi: k.nimi, href: k.href, kuva: k.img, kuvaPos: AIHE_POS[k.slug] ?? k.pos,
-  })).sort((a, b) => a.nimi.localeCompare(b.nimi, "fi"));
+  const aiheet = aiheTiilet();
 
   /* ── 4 Valitse peli ── */
   const visat = `${stats.quizzesFloor}+`;
-  const ryhmat = ETUSIVU_RYHMAT.map((g) => {
-    const kortit = pelimuodot.filter((p) => p.ryhma === g.avain && nakyyEtusivulla(p, today.iso)).map((p) => ({
-      ...p, etusivu_rivi: p.etusivu_rivi.replace("{visat}", visat),
-    }));
-    return { ...g, nimi: ryhmanNimi(kortit, g.nimi), kortit };
-  }).filter((g) => g.kortit.some((k) => k.tila === "pelattava"));
-  const pelimuotoja = ryhmat.reduce((n, g) => n + g.kortit.length, 0);
+  const { ryhmat, pelimuotoja } = peliRyhmat(pelimuodot, today.iso, visat);
 
   /* ── 5 Promo 1 ── countdown (lähin juhla ≤ 14 pv, jolla on julkaistu visa) tai rotaatio */
   const tanaanPv = pvm(today.vuosi, today.kk, today.pv);

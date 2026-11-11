@@ -4,10 +4,17 @@ import type { Metadata } from "next";
 // TIETONIEKKA 2.0 — KAIKKI KOKOELMAT -indeksi (navigaation "Kaikki kokoelmat →" -kohde).
 // CD:n navigaatiosääntö (lukittu 17.8.2026): kaikki valikkolinkit vievät todellisille
 // sivuille, eivät etusivun ankkureihin — tämä sivu on se todellinen sivu.
-// Luvut kannasta (quiz_cards), lista lib/nav.ts-kokoonpanosta (sama kuin valikoissa).
+// Hub-malli 11.11.2026 (Heikki): etusivun Pelaa aiheittain- ja Valitse peli -ruudukot (lib/etusivu5.ts aiheTiilet, peliRyhmat;
+// components/tn20/etusivu5/EtusivuV5.tsx Aiheet, Pelit). Visamäärät kannasta (quiz_cards) tiilen alla pienellä.
 import Crumbs from "@/components/tn20/Crumbs";
 import { getCounts } from "@/lib/kokoelmaMaarat";
-import { NAV_COLLECTIONS, NAV_MODES, navHref } from "@/lib/nav";
+import { getSiteStats } from "@/lib/siteStats";
+import { helsinginPaiva } from "@/lib/aika";
+import { aiheTiilet, peliRyhmat } from "@/lib/etusivu5";
+import { ETUSIVUN_PELIMUODOT, VISAPAKETIT_KORTTI, pelimuotoTanaan } from "@/lib/pelimuodot";
+import { LAPSET_SIVU, lapsetNakyvissa } from "@/lib/lapset/data";
+import { Aiheet, Pelit } from "@/components/tn20/etusivu5/EtusivuV5";
+import "../etusivu-v5.css";
 
 export const metadata: Metadata = {
   title: "Kaikki kokoelmat – tietovisat aiheittain | Tietoniekka",
@@ -24,54 +31,27 @@ export const metadata: Metadata = {
 export const revalidate = 300; // SEO-erä A4 (2.10.2026): ISR 5 min
 
 export default async function KokoelmatPage() {
-  const counts = await getCounts();
+  const [counts, stats] = await Promise.all([getCounts(), getSiteStats()]);
+  const tanaan = helsinginPaiva().iso;
+  /* Hub-malli (Heikki 11.11.2026): sisältönä etusivun kaksi ruudukkoa. Pelaa aiheittain + Lasten visat; Valitse peli ilman
+     Klassinen visa -korttia (se vie tälle samalle sivulle), tilalla Visapaketit. Visamäärät pienellä tiilen alla. */
+  const tiilet = aiheTiilet(lapsetNakyvissa() ? { lapset: { href: LAPSET_SIVU, kuva: "/20/lapset/etusivu-peli.webp" } } : {});
+  const pelimuodot = [VISAPAKETIT_KORTTI, ...ETUSIVUN_PELIMUODOT.filter((p) => p.slug !== "klassinen")].map((p) => pelimuotoTanaan(p, tanaan));
+  const { ryhmat, pelimuotoja } = peliRyhmat(pelimuodot, tanaan, `${stats.quizzesFloor}+`);
 
   return (
     <main style={{ minHeight: "100dvh" }}>
       <KokoelmaLd avain="kokoelmat" nimi="Kaikki kokoelmat" polku="/kokoelmat" />
       <Crumbs items={[{ label: "Kokoelmat" }]} />
-      <div className="tn-shell">
-      <header className="tn-colx-head">
-        <h1 className="tn-colx-title">
-          Kaikki <span>kokoelmat</span>
-        </h1>
-        <p className="tn-colx-lede">
-          Valitse aihe, josta tiedät eniten — tai se, josta haluat oppia lisää.
-        </p>
-      </header>
-
-      <div className="tn-colx-grid">
-        {NAV_COLLECTIONS.map((c) => (
-          <a
-            key={c.slug}
-            className="tn-colx-card"
-            href={navHref(c)}
-            style={{ "--dot": c.color } as React.CSSProperties}
-          >
-            <span className="tn-menu-dot" aria-hidden />
-            <span>{c.label}</span>
-            <span className="tn-colx-count">{counts[c.slug] ?? 0} visaa</span>
-          </a>
-        ))}
-      </div>
-
-      <p className="tn-colx-sub">Pelimuodot</p>
-      <div className="tn-colx-grid">
-        {NAV_MODES.map((m) => (
-          <a
-            key={m.href}
-            className="tn-colx-card"
-            href={m.href}
-            style={{ "--dot": m.color } as React.CSSProperties}
-          >
-            <span className="tn-menu-dot" aria-hidden />
-            <span>{m.label}</span>
-            <span className="tn-colx-count">{m.desc}</span>
-          </a>
-        ))}
-      </div>
-
-      <div className="tn-colx-foot" />
+      <div className="tn-es5 tn-kok">
+        <header className="tn-colx-head tn-kok-head">
+          <h1 className="tn-colx-title">
+            Kaikki <span>kokoelmat</span>
+          </h1>
+          <p className="tn-colx-lede">Valitse aihe tai pelimuoto.</p>
+        </header>
+        <Aiheet a={{ kicker: `${stats.quizzesFloor}+ visaa · ${tiilet.length} kokoelmaa`, tiilet }} maarat={{ ...counts, lapset: counts.lapset ?? 0 }} entry="kokoelmat:aiheet" />
+        <Pelit p={{ kicker: `${pelimuotoja} pelimuotoa`, ryhmat }} entry="kokoelmat:pelimuodot" />
       </div>
     </main>
   );

@@ -30,7 +30,7 @@ export type Pelimuoto = {
 };
 
 /** Tupla tai kuitin aihe → kokoelma. Kausipainokset (Halloween, joulu) palvelevat Juhlia. */
-const TUPLA_KOKOELMA: Record<string, string> = {
+export const TUPLA_KOKOELMA: Record<string, string> = {
   "sm-liiga": "jaakiekko",
   "suomen-kaupungit": "kaupungit",
   luonto: "luonto",
@@ -136,7 +136,7 @@ export const ETUSIVU_RYHMAT: Array<{ avain: EtusivuRyhma; nimi: string; kaikki?:
 /** Ryhmän nimi näkyvien korttien lajeista (Heikki 28.10.: "Järjestä ja Kumpi?" ilman Kumpi?-korttia → "Järjestä").
  *  Kaksi "-visat"-osaa yhdistetään: Kuvavisat + Äänivisat → "Kuva- ja äänivisat". */
 const LAJI_RYHMASSA: Record<string, string> = {
-  Tietovisa: "Tietovisat", Visapeli: "Tietovisat", Kuvavisa: "Kuvavisat", "Äänivisa": "Äänivisat", Karttapeli: "Karttapelit", "Päivän peli": "Karttapelit",
+  Tietovisa: "Tietovisat", Visapeli: "Tietovisat", Visapaketti: "Tietovisat", Kuvavisa: "Kuvavisat", "Äänivisa": "Äänivisat", Karttapeli: "Karttapelit", "Päivän peli": "Karttapelit",
   "Järjestä": "Järjestä", "Järjestyspeli": "Järjestä", "Kumpi?": "Kumpi?",
 };
 export function ryhmanNimi(kortit: Array<Pick<EtusivunPelimuoto, "laji">>, oletus: string): string {
@@ -192,6 +192,12 @@ export const ETUSIVUN_PELIMUODOT: EtusivunPelimuoto[] = [
   { slug: "vaalipiiriketju", ryhma: "jarjesta", laji: "Järjestä", nimi: "Vaalipiiriketju", tavut: "Vaali|piiri|ketju", etusivu_rivi: "Ketjuta kansanedustajat vaalipiireittäin", href: "/peli/vaalipiiriketju", kuva: "/20/vaalit/vaalipiiriketju.webp", aksentti: JARJ, tila: "pelattava", julkaisu: null },
   { slug: "kumpi", ryhma: "jarjesta", laji: "Kumpi?", nimi: "Kumpi?", etusivu_rivi: "Vanhempi, suurempi, korkeampi – valitse parista", href: "", kuva: null, aksentti: JARJ, tila: "tulossa", julkaisu: null },
 ];
+
+/** Kokoelmat-sivun Valitse peli (Heikki 11.11.2026): Klassinen visa vie tälle samalle sivulle, joten sen tilalla Visapaketit. */
+export const VISAPAKETIT_KORTTI: EtusivunPelimuoto = {
+  slug: "visapaketit", ryhma: "tietovisat", laji: "Visapaketti", nimi: "Visapaketit", etusivu_rivi: "Valmiit tietovisat porukalle vastauksineen",
+  href: "/visapaketit", kuva: "/20/visapaketit/pubivisa.webp", kuvaPos: "50% 45%", aksentti: TIETO, tila: "pelattava", julkaisu: null,
+};
 
 /** Pelimuoto tänään: Tulossa-kortti, jolla on osoite, syttyy pelattavaksi julkaisupäivänä ilman käsin vaihtoa
  *  (Mikä maa? julkaistu 7.11.2026). Esikatselussa ja paikallisesti julkaisupäivää ei odoteta, jotta kortin voi testata etukäteen. */

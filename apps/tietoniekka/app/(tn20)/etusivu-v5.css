@@ -248,6 +248,10 @@
 .tn20 .tn-es-aihe { display: flex; flex-direction: column; gap: 7px; min-width: 0; container-type: inline-size; }
 .tn20 .tn-es-aihe-kuva { display: block; aspect-ratio: 16 / 10; border-radius: 10px; border: 1px solid var(--es-viiva); overflow: hidden; background: #0F0D07; }
 .tn20 .tn-es-aihe-img { display: block; width: 100%; height: 100%; object-fit: cover; }
+/* Kokoelmat-sivu (11.11.2026): visamäärä tiilen alla pienellä; sivun otsake etusivun osioiden rytmissä. */
+.tn20 .tn-es-aihe-maara { margin-top: -4px; font-size: 12px; font-weight: 600; line-height: 1.2; color: var(--es-himmea); }
+.tn20 .tn-kok-head { padding: 0; }
+.tn20 .tn-kok .tn-es-aihe-nimi { min-height: 0; }
 /* Nimi: design 13 px. Ei tavutusta (analyysi 30.10.: Safari katkoi ahneesti "PY-HÄT"); koko tiilen leveydestä niin, että
    pisin sana SUORATOISTO (11 merkkiä × .594 em, Range-mitattu, × 1,05) = 6,86 em mahtuu ehjänä. 320 px:ssä tiili 88 px → 12,8 px.
    Kaksi riviä varattu (min-height), jotta kuvat pysyvät samassa linjassa. */

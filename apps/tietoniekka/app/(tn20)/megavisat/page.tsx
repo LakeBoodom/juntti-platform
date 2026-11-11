@@ -15,6 +15,8 @@
 // linjaus kuin muissa teemasivuissa (Jääkiekko/Jalkapallo/Maantieto):
 // sivuston globaali yläpalkki + Crumbs-murupolku hoitavat navigaation.
 
+import MobiiliRivit from "@/components/tn20/korttirivi/KorttiRivi";
+import HubOhjeet from "@/components/tn20/korttirivi/HubOhjeet";
 import { KokoelmaLd } from "@/components/tn20/KokoelmaLd";
 import { jakoMeta } from "@/lib/jakoMeta";
 import "../megavisat.css";
@@ -93,6 +95,18 @@ export default async function MegavisatLanding() {
   const lyhin = kaikkiMaarat.length ? Math.min(...kaikkiMaarat) : 0;
   const pisin = kaikkiMaarat.length ? Math.max(...kaikkiMaarat) : 0;
 
+  const saannot = [
+    {
+      n: 1,
+      t: "Valitse aihe",
+      d: lyhin && lyhin !== pisin
+        ? `Jokainen mega on oma kokonaisuutensa: ${lyhin} kysymystä kahvitauolle, ${pisin} illan sessioon.`
+        : "Jokainen mega on oma kokonaisuutensa: valitse aihe ja pelaa yhdellä istumalla.",
+    },
+    { n: 2, t: "Yksi istunto, ei taukoja", d: "Mega ei tallenna välitilaa. Poistuminen kesken päättää kierroksen." },
+    { n: 3, t: "Putki ratkaisee", d: "Peräkkäiset oikeat kasvattavat kerrointa. Yksi väärä nollaa sen." },
+  ];
+
   return (
     <main className="tnm2" style={{ minHeight: "100dvh" }}>
       <KokoelmaLd avain="megavisat" nimi="Megavisat" polku="/megavisat" />
@@ -106,7 +120,7 @@ export default async function MegavisatLanding() {
         accent="#E8A320"
         eyebrow="Pitkä peli"
         title={["Megavisat"]}
-        lead="Megavisa on yksi istunto ilman taukoja: valitse aihe ja pelaa loppuun asti. Ei selityksiä — vain pisteet ja putki."
+        lead="Valitse aihe ja pelaa yhdellä istumalla."
         stats={totalMegas > 0 ? [{ n: totalMegas, label: "megavisaa" }, ...(vali ? [{ n: vali, label: "kysymystä per mega" }] : [])] : []}
       />
 
@@ -181,7 +195,7 @@ export default async function MegavisatLanding() {
 
       {/* ─── Kaikki megavisat ─── */}
       {gridItems.length > 0 && (
-        <section className="tn-shell tnm2-section" id="megat">
+        <section className="tn-shell tnm2-section tnm2-section--desk" id="megat">
           <div className="tnm2-gridhead">
             <h2 className="tnm2-h2">Kaikki megavisat</h2>
             <span className="tnm2-gridnote">
@@ -214,21 +228,25 @@ export default async function MegavisatLanding() {
         </section>
       )}
 
+      {/* Mobiili (Heikki 11.11.2026, hub-malli): muut megat tiiviinä riveinä (kuva, aihe, nimi, kysymysmäärä) ja Näin mega
+          toimii suljettuna. Desktop ennallaan. */}
+      {gridItems.length > 0 && (
+        <section className="tn-shell tnm2-mob" aria-label="Kaikki megavisat">
+          <MobiiliRivit
+            kortit={gridItems.map(({ card, quiz, count }) => ({
+              href: `/peli?mega=${quiz!.slug}`, kuva: card.img, kuvaPos: card.pos, kuvaton: "Megavisa",
+              merkki: card.tag, nimi: quiz!.title, rivi: `${count} kysymystä`,
+            }))}
+          />
+          <HubOhjeet kohdat={[{ otsikko: "Näin mega toimii", sisalto: <ol>{saannot.map((r) => <li key={r.n}><b>{r.t}.</b> {r.d}</li>)}</ol> }]} />
+        </section>
+      )}
+
       {/* ─── Näin mega toimii ─── */}
-      <section className="tn-shell tnm2-section">
+      <section className="tn-shell tnm2-section tnm2-section--desk">
         <h2 className="tnm2-h2">Näin mega toimii</h2>
         <div className="tnm2-rules">
-          {[
-            {
-              n: 1,
-              t: "Valitse aihe",
-              d: lyhin && lyhin !== pisin
-                ? `Jokainen mega on oma kokonaisuutensa: ${lyhin} kysymystä kahvitauolle, ${pisin} illan sessioon.`
-                : "Jokainen mega on oma kokonaisuutensa: valitse aihe ja pelaa yhdellä istumalla.",
-            },
-            { n: 2, t: "Yksi istunto, ei taukoja", d: "Mega ei tallenna välitilaa. Poistuminen kesken päättää kierroksen." },
-            { n: 3, t: "Putki ratkaisee", d: "Peräkkäiset oikeat kasvattavat kerrointa. Yksi väärä nollaa sen." },
-          ].map((r) => (
+          {saannot.map((r) => (
             <div key={r.n} className="tnm2-rule">
               <span className="tnm2-rule-num">{r.n}</span>
               <span>
