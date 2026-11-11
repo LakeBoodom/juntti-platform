@@ -216,12 +216,18 @@
 .tn20 .hub-visa-kuva img { display: block; width: 100%; height: 100%; object-fit: cover; }
 .tn20 .hub-visa-teksti { display: flex; flex-direction: column; gap: 10px; min-width: 0; container-type: inline-size; }
 .tn20 .hub-nosto--visa .hub-nosto-otsikko { font-size: min(38px, calc(100cqw / (var(--hub-lw, 10) * 0.72))); line-height: 0.95; text-wrap: balance; }
+/* Korttikokeilu 11.11.2026: otsikkona visan kysymys (≤ 90 merkkiä, pisin sana 19). 38 px:llä pisin kysymys oli 6 riviä
+   leveällä desktop-kortilla; 30 px → 5 riviä. Mobiilissa 24 px (alla, kapea kortti) ja pisimmän sanan kaavasta
+   Kerroin 0.8 (ei 0.72): versaali "CHAMPIONSHIPIN" ylitti 320 px:ssä 5 px:llä kertoimella 0.72
+   (mitattu 320–2450 + WebKit 320–430, Range-mittaus, 0 ylivuotoa). */
+.tn20 .hub-nosto--visa[data-versio="kysymys"] .hub-nosto-otsikko { font-size: min(30px, calc(100cqw / (var(--hub-lw, 10) * 0.8))); line-height: 1; }
 .tn20 .hub-cta-lime--levea { align-self: stretch; justify-content: center; height: auto; min-height: 60px; border-radius: 15px; font-size: 20px; }
 @container (max-width: 479px) {
   .tn20 .hub-nosto.hub-nosto--visa { gap: 16px; padding: 20px; }
   .tn20 .hub-visa-paa { grid-template-columns: 76px minmax(0, 1fr); gap: 16px; }
   .tn20 .hub-visa-kuva { width: 76px; border-radius: 10px; }
   .tn20 .hub-nosto--visa .hub-nosto-otsikko { font-size: min(26px, calc(100cqw / (var(--hub-lw, 10) * 0.72))); }
+  .tn20 .hub-nosto--visa[data-versio="kysymys"] .hub-nosto-otsikko { font-size: min(24px, calc(100cqw / (var(--hub-lw, 10) * 0.8))); }
   .tn20 .hub-cta-lime--levea { min-height: 54px; font-size: 17px; }
 }
 
