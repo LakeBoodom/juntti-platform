@@ -112,6 +112,8 @@ function visaEhdokas(v: Visa, porras: string): Ehdokas {
   };
 }
 
+const TUPLA_LOGO = "/20/tupla/logo.webp";
+
 const PELIN_MERKKI: Record<Pelimuoto["ikoni"], string> = {
   tupla: "Tupla tai kuitti", jarjestys: "Järjestä", ika: "Järjestä", ketju: "Karttapeli", kartta: "Karttapeli",
   kuva: "Kuvavisa", aani: "Äänivisa", kumpi: "Kumpi?",
@@ -129,8 +131,9 @@ function peliEhdokas(p0: Pelimuoto, laji: Laji, porras: string): Ehdokas {
     id: p.slug,
     nimi: ETULIITE.test(p.nimi) && (p.ikoni === "tupla" || p.ikoni === "jarjestys") ? p.nimi.replace(ETULIITE, "") : p.nimi,
     href: p.href,
-    kuva: p.kuva?.src ?? null,
-    sovitus: p.kuva?.contain ? "contain" : undefined,
+    /* Tupla tai kuitti: pelin oma ilme eli logo (sanamerkki + kultakolikko) tummalla pohjalla (Heikki 11.11. katselmus). */
+    kuva: p.ikoni === "tupla" ? TUPLA_LOGO : p.kuva?.src ?? null,
+    sovitus: p.ikoni === "tupla" ? "logo" : p.kuva?.contain ? "contain" : undefined,
     merkki,
     rivi: pelinRivi(p),
     kuvaton: laji.nimi,

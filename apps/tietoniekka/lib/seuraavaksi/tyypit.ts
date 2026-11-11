@@ -9,7 +9,7 @@ export type Ehdokas = {
   kuva: string | null;
   kuvaPos?: string;
   /** Tupla tai kuitin palkintoikoni ym. läpinäkyvä kuvitus kokonaisena. */
-  sovitus?: "contain";
+  sovitus?: "contain" | "logo";
   /** Lajimerkki: "Tietovisa", "Tupla tai kuitti", "Järjestä", "Karttapeli", "Kuvavisa"; paikassa 3 "Tänään · 11.11." tai "Suosittu". */
   merkki: string;
   /** Pieni live-piste merkin edessä (paikka 3, päivän data; ei muistovisassa). */

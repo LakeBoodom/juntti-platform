@@ -32,6 +32,9 @@
 /* Tupla tai kuitin palkintoikoni: läpinäkyvä kuvitus kokonaisena tummalla kultahehkulla. */
 .tn20 .sk-kuva[data-sovitus="contain"] { background: radial-gradient(70% 80% at 50% 45%, rgba(232, 163, 32, .22), rgba(27, 23, 16, 0) 70%), #17140d; }
 .tn20 .sk-kuva[data-sovitus="contain"] img { object-fit: contain; padding: 8px 0 6px; box-sizing: border-box; }
+/* Tupla tai kuitin logo (640 × 374): keskitetty tummalle pohjalle, mobiilissa 84 px leveä (96 px:n kuva-alue). */
+.tn20 .sk-kuva[data-sovitus="logo"] { background: radial-gradient(75% 85% at 50% 50%, rgba(232, 163, 32, .16), rgba(14, 13, 11, 0) 72%), #0e0d0b; }
+.tn20 .sk-kuva[data-sovitus="logo"] img { object-fit: contain; object-position: 50% 50%; padding: 8px 6px; box-sizing: border-box; }
 /* Kuvaton visa (CD k2): kokoelman tai lajin nimi aksenttivärillä, visan nimi pysyy otsikkona. */
 .tn20 .sk-kuvaton {
   position: absolute; inset: 0; display: flex; align-items: flex-end; padding: 8px;
@@ -70,6 +73,8 @@
   .tn20 a.sk-kortti { flex-direction: column; border-radius: 16px; }
   .tn20 .sk-kuva { width: auto; min-height: 0; aspect-ratio: 16 / 9; }
   .tn20 .sk-kuva[data-sovitus="contain"] img { padding: 12px 0 10px; }
+  /* Desktop: merkki kuvan vasemmassa yläkulmassa (22 px + 8 px) → yläpadding pitää logon sen alla. */
+  .tn20 .sk-kuva[data-sovitus="logo"] img { padding: 38px 18% 18px; }
   .tn20 .sk-kuvaton { padding: 12px; font-size: 26px; line-height: .9; }
   .tn20 .sk-merkki--rivi { display: none; }
   .tn20 .sk-merkki--kuva {
