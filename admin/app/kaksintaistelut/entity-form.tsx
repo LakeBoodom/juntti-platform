@@ -103,7 +103,7 @@ export function EntityForm({
   const needsCoords = kindDefs.some((d) => d.compare_mode === "distance");
 
   function buildAttributes(): AttrValue[] {
-    return kindDefs.map((d) => {
+    return kindDefs.flatMap((d) => {
       const raw = (vals[d.attr_key] ?? "").trim();
       let num: number | null = null;
       if (raw) num = DATE_ATTRS.includes(d.attr_key) ? dateToEpoch(raw) : Number(raw.replace(",", "."));
@@ -114,15 +114,18 @@ export function EntityForm({
             ? "s. " + raw.slice(0, 4)
             : `${num.toLocaleString("fi-FI")}${d.unit_label ? " " + d.unit_label : ""}`;
       const prev = existing.get(d.attr_key);
+      // Tyhjä kenttä poistaa rivin vain, jos kannassa oli luku, jonka käyttäjä tyhjensi. Pelkät tekstirivit
+      // (num_value NULL: mp_party, mp_district, nationality, organizer …) eivät näy lomakkeella → ei kosketa.
+      if (num === null && (prev?.num_value ?? null) === null) return [];
       const changed = prev?.num_value !== num;
-      return {
+      return [{
         attr_key: d.attr_key,
         num_value: num,
         // Muuttamaton arvo pitää kannan näyttöarvon ("noin 450 000", "1975"); uusi arvo muotoillaan lomakkeella.
         display_value: !changed && prev?.display_value ? prev.display_value : display,
         source: sources[d.attr_key]?.trim() || null,
         verified_at: changed ? today() : (prev?.verified_at ?? today()),
-      };
+      }];
     });
   }
 
