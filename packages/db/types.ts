@@ -8912,6 +8912,78 @@ export type Database = {
         }
         Relationships: []
       }
+      _turku_kaarina_backup_20261111: {
+        Row: {
+          animal_sound: Json | null
+          answers: Json | null
+          audio: Json | null
+          created_at: string | null
+          explanation: string | null
+          hook: boolean | null
+          hook_alkaa: string | null
+          hook_paattyy: string | null
+          hook_teema: string | null
+          id: string | null
+          image_credit: string | null
+          image_license_note: string | null
+          image_position: string | null
+          image_url: string | null
+          question_text: string | null
+          question_type: string | null
+          quiz_id: string | null
+          sort_order: number | null
+          taso: number | null
+          vihje_laura: string | null
+          vihje_mikko: string | null
+        }
+        Insert: {
+          animal_sound?: Json | null
+          answers?: Json | null
+          audio?: Json | null
+          created_at?: string | null
+          explanation?: string | null
+          hook?: boolean | null
+          hook_alkaa?: string | null
+          hook_paattyy?: string | null
+          hook_teema?: string | null
+          id?: string | null
+          image_credit?: string | null
+          image_license_note?: string | null
+          image_position?: string | null
+          image_url?: string | null
+          question_text?: string | null
+          question_type?: string | null
+          quiz_id?: string | null
+          sort_order?: number | null
+          taso?: number | null
+          vihje_laura?: string | null
+          vihje_mikko?: string | null
+        }
+        Update: {
+          animal_sound?: Json | null
+          answers?: Json | null
+          audio?: Json | null
+          created_at?: string | null
+          explanation?: string | null
+          hook?: boolean | null
+          hook_alkaa?: string | null
+          hook_paattyy?: string | null
+          hook_teema?: string | null
+          id?: string | null
+          image_credit?: string | null
+          image_license_note?: string | null
+          image_position?: string | null
+          image_url?: string | null
+          question_text?: string | null
+          question_type?: string | null
+          quiz_id?: string | null
+          sort_order?: number | null
+          taso?: number | null
+          vihje_laura?: string | null
+          vihje_mikko?: string | null
+        }
+        Relationships: []
+      }
       _tv_q_backup_20260924: {
         Row: {
           answers: Json | null
@@ -11631,7 +11703,6 @@ export type Database = {
           tunnusrivi: string | null
           updated_at: string
           vaakuna_url: string | null
-          vanhat_kunnat: string[]
         }
         Insert: {
           asukasnimitys?: string | null
@@ -11650,7 +11721,6 @@ export type Database = {
           tunnusrivi?: string | null
           updated_at?: string
           vaakuna_url?: string | null
-          vanhat_kunnat?: string[]
         }
         Update: {
           asukasnimitys?: string | null
@@ -11669,7 +11739,6 @@ export type Database = {
           tunnusrivi?: string | null
           updated_at?: string
           vaakuna_url?: string | null
-          vanhat_kunnat?: string[]
         }
         Relationships: [
           {
