@@ -1,9 +1,9 @@
-// H5 "Täältä kotoisin" — vertailu (11.11.2026): kaupunkisivun henkilöosio vanhalla tekstihaulla vs. uudella
-// born_in-suhdehaulla kaikille 35 kaupungille (vanha = tuotannon haku: inessiivi + kaupungit.vanhat_kunnat). Raportoi menetetyt ja uudet henkilöt, varahaun osumat,
-// kaksoiskappaleet ja vanhan kunnan lisärivit. Virhe, jos joku putoaa pois tai näkyy kahdesti.
+// H5 "Täältä kotoisin" — tarkistus (11.11.2026): kaupunkisivun henkilöosio born_in-suhteista kaikille 35 kaupungille.
+// Tarkistaa vanhan kunnan lisärivien taivutuksen, entity_id:n jokaisella kaupungilla ja ettei kukaan näy kahdesti.
+// Tekstihaun varahaku ja kaupungit.vanhat_kunnat poistettiin 11.11.2026; vertailu niihin tehtiin ennen poistoa.
 // Ajo (apps/tietoniekka): NEXT_PUBLIC_SUPABASE_URL=… NEXT_PUBLIC_SUPABASE_ANON_KEY=… node scripts/run-ts.cjs scripts/h5-vertailu.ts
 
-import { HENKILOT_MAX, haeKaupungit, haeSyntyneetTekstilla, haeSyntyneetTiedoin, vanhaKuntaRivi } from "@/lib/kaupunkisivu";
+import { HENKILOT_MAX, haeKaupungit, haeSyntyneet, vanhaKuntaRivi } from "@/lib/kaupunkisivu";
 
 async function main() {
   let virheet = 0;
@@ -22,29 +22,17 @@ async function main() {
   const kaupungit = await haeKaupungit();
   ok(kaupungit.length === 35 && kaupungit.every((k) => k.entity_id), `entity_id: ${kaupungit.filter((k) => k.entity_id).length}/${kaupungit.length}`);
 
-  console.log("\nKaupunki            vanha  uusi  näkyvissä  muutos");
-  let varaYht = 0;
+  console.log("\nKaupunki            henkilöt  näkyvissä");
   const lisarivit: string[] = [];
   for (const k of kaupungit) {
-    const vanha = (await haeSyntyneetTekstilla(k)).map((c) => c.name);
-    const { henkilot, varahaulla } = await haeSyntyneetTiedoin(k);
-    const uusi = henkilot.map((h) => h.name);
-    const pois = vanha.filter((n) => !uusi.includes(n));
-    const uudet = uusi.filter((n) => !vanha.includes(n));
-    const kahdesti = uusi.filter((n, i) => uusi.indexOf(n) !== i);
-    varaYht += varahaulla.length;
+    const henkilot = await haeSyntyneet(k);
+    const nimet = henkilot.map((h) => h.name);
+    const kahdesti = nimet.filter((n, i) => nimet.indexOf(n) !== i);
     for (const h of henkilot) if (h.ala) lisarivit.push(`${k.nimi}: ${h.name} – ${h.ala}`);
-    const muutos = [
-      uudet.length ? `+ ${uudet.join(", ")}` : "",
-      pois.length ? `− ${pois.join(", ")}` : "",
-      varahaulla.length ? `(varahaku: ${varahaulla.join(", ")})` : "",
-    ].filter(Boolean).join("  ");
-    console.log(`${k.nimi.padEnd(20)}${String(vanha.length).padStart(5)}${String(uusi.length).padStart(6)}${String(Math.min(uusi.length, HENKILOT_MAX)).padStart(11)}  ${muutos}`);
-    if (pois.length) { virheet++; console.log(`  VIRHE: ${k.nimi} menettää ${pois.join(", ")}`); }
+    console.log(`${k.nimi.padEnd(20)}${String(nimet.length).padStart(8)}${String(Math.min(nimet.length, HENKILOT_MAX)).padStart(11)}`);
     if (kahdesti.length) { virheet++; console.log(`  VIRHE: ${k.nimi} kahdesti ${kahdesti.join(", ")}`); }
   }
-  console.log(`\nVarahaun kautta yhteensä: ${varaYht} henkilöä`);
-  console.log(`Vanhan kunnan lisärivit (${lisarivit.length}):\n  ${lisarivit.join("\n  ")}`);
+  console.log(`\nVanhan kunnan lisärivit (${lisarivit.length}):\n  ${lisarivit.join("\n  ")}`);
   console.log(virheet ? `\n${virheet} VIRHETTÄ` : "\nKaikki tarkistukset ok");
   process.exit(virheet ? 1 : 0);
 }
