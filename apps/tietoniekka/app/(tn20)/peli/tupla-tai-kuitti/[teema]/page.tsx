@@ -64,7 +64,7 @@ export default async function TuplaSivu({ params, searchParams }: Props) {
     .in("quiz_id", [...nimet.keys()])
     .is("image_url", null)
     .not("taso", "is", null);
-  const sarja = arvoSarja((data ?? []) as unknown as KysymysRivi[], nimet, siemen);
+  const sarja = arvoSarja((data ?? []) as unknown as KysymysRivi[], nimet, siemen, paiva);
   if (sarja.length < 10) notFound();
 
   const [, kk, pv] = paiva.split("-").map(Number);

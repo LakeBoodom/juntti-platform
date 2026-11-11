@@ -15,6 +15,7 @@
 
 import { JK_ACCENT } from "./jaakiekko";
 import { KAUPUNGIT } from "./kaupungit";
+import { vakaasti } from "./vakaaJarjestys";
 
 /** Palkintoikonit (CD "TN Tupla tai kuitti" 1C): yksi SVG-symboli per palkinto,
     kasa rakennetaan toistamalla samaa symbolia. */
@@ -343,9 +344,10 @@ function sekoita<T>(a: T[], r: () => number): T[] {
     ole samaa oikeaa vastausta, eikä kysymyksen oikea vastaus saa esiintyä toisen
     kysymyksen tekstissä (esim. Joensuu-kysymys mainitsee Stenbäckin, joka on Mikkeli-
     kysymyksen vastaus). Jos tasolta loppuvat ehdokkaat, otetaan lähin taso. */
-export function arvoSarja(rivit: KysymysRivi[], visaNimet: Map<string, string>, siemen: string): TuplaKysymys[] {
+export function arvoSarja(rivit: KysymysRivi[], visaNimet: Map<string, string>, siemen: string, paiva: string): TuplaKysymys[] {
   const r = satunnainen(siemen);
-  const kelvot = rivit.filter((x) => {
+  // Vakaa poolin järjestys (lib/vakaaJarjestys.ts): kannan rivijärjestys ei vaihda sarjaa kesken päivän.
+  const kelvot = vakaasti(rivit, (x) => x.id, paiva).filter((x) => {
     const v = (x.answers ?? []).filter((a) => a?.text?.trim());
     return x.taso != null && v.length === 4 && v.filter((a) => a.is_correct).length === 1;
   });

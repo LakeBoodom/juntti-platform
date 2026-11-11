@@ -7,179 +7,10 @@
 // synny (esim. vain 8 eri arvoa 13:sta), sallitaan tasapelit — pisteytys hyväksyy silloin kumman
 // tahansa järjestyksen (lib/jarjesta/pisteytys.ts).
 
-import { getSupabase } from "../supabase";
 import { henkiloKuva } from "../henkilokuvat";
-import { vaakunaKuva } from "./vaakunat";
-import { puolueNimi } from "../vaalit/puolue";
-import { haePakka, oikeaJarjestys, type JarjestysKohde, type Pakka } from "./pakat";
-import { RIVIN_PITUUS, siemen, vaaraJarjestys } from "./siemen";
-import { maarittelynKindit, mittariSopiiKaikille } from "../vertailu";
-
-type Rivi = {
-  num_value: number | string | null;
-  display_value: string | null;
-  source: string | null;
-  metric: string | null;
-  fact_entities: {
-    id: string;
-    name: string;
-    role_label: string | null;
-    image_url: string | null;
-    prominence: number | null;
-    celebrity_id: string | null;
-  } | null;
-};
-
-type Ehdokas = JarjestysKohde & { tunnettu: boolean; mittari: string | null };
-
-const relVali = (a: number, b: number) => Math.abs(a - b) / Math.max(Math.abs(a), Math.abs(b), 1);
-
-function riittavaVali(vali: Pakka["vali"], a: number, b: number): boolean {
-  const ero = vali.tapa === "suhteellinen" ? relVali(a, b) : Math.abs(a - b);
-  return ero >= vali.min;
-}
-
-function sekoita<T>(arr: T[], rng: () => number = Math.random): T[] {
-  const out = arr.slice();
-  for (let i = out.length - 1; i > 0; i--) {
-    const j = Math.floor(rng() * (i + 1));
-    [out[i], out[j]] = [out[j], out[i]];
-  }
-  return out;
-}
-
-/** Ahne poiminta satunnaisjärjestyksestä; muutama yritys, paras talteen. Tunnettuja-vaatimus:
- *  ehdokasjonon alkuun `maara` satunnaista tunnettua, jolloin ne pääsevät kierrokseen ensin. */
-function poimi(p: Pakka, pool: Ehdokas[], vali: Pakka["vali"], rng: () => number = Math.random, pick = p.pick): Ehdokas[] {
-  const tarve = p.pool?.tunnettuja?.maara ?? 0;
-  const tunnettuja = (k: Ehdokas[]) => k.filter((x) => x.tunnettu).length;
-  let paras: Ehdokas[] = [];
-  for (let yritys = 0; yritys < 24; yritys++) {
-    const sekaisin = sekoita(pool, rng);
-    const jono = tarve ? [...sekaisin.filter((k) => k.tunnettu).slice(0, tarve), ...sekaisin] : sekaisin;
-    const valitut: Ehdokas[] = [];
-    for (const k of jono) {
-      if (valitut.length >= pick) break;
-      if (valitut.some((v) => v.id === k.id)) continue;
-      if (!valitut.every((v) => riittavaVali(vali, v.value, k.value))) continue;
-      // Mittarisääntö (lib/vertailu.ts): eri asiaa mittaavat luvut eivät samaan kierrokseen.
-      if (mittariSopiiKaikille(k.mittari, valitut.map((v) => v.mittari))) valitut.push(k);
-    }
-    const parempi =
-      valitut.length > paras.length ||
-      (valitut.length === paras.length && tunnettuja(valitut) > tunnettuja(paras));
-    if (parempi) paras = valitut;
-    if (paras.length >= pick && tunnettuja(paras) >= Math.min(tarve, pick)) break;
-  }
-  return paras;
-}
-
-/** "2 858 km²" sellaisenaan; pelkkä luku saa yksikön; tarkenne suluissa pois (pakka kertoo sen jo). */
-function arvoTeksti(p: Pakka, r: Rivi, n: number): string {
-  let t = (r.display_value ?? "").trim();
-  if (p.scope) t = t.replace(new RegExp(`\\s*\\(${p.scope}\\)\\s*$`), "");
-  if (!t) t = n.toLocaleString("fi-FI");
-  t = t.replace(/\s*\([^)]*\)\s*$/, ""); // "13 798 km² (maa-ala)" → pakan lause kertoo perusteen
-  if (/^[\d\s .,]+$/.test(t) && p.yksikko) t = `${t} ${p.yksikko}`;
-  return t;
-}
-
-/** Lähteen verkkotunnus: URL:n host, tai lähdetekstin alussa oleva verkkotunnus
- *  ("avoindata.eduskunta.fi MemberOfParliament …"), tai "Wikipedia". Muuten ei näytetä. */
-function lahdeDomain(source: string | null): string | null {
-  if (!source) return null;
-  const url = source.match(/https?:\/\/([^/\s]+)/);
-  if (url) return url[1].replace(/^www\./, "");
-  const host = source.match(/\b((?:[a-z0-9-]+\.)+[a-z]{2,})\b/i);
-  if (host) return host[1].toLowerCase();
-  return /wikipedia/i.test(source) ? "Wikipedia" : null;
-}
-
-/** Pakan kindit: `kinds` (monen kindin pakka) tai pelkkä `kind`. */
-const pakanKindit = (p: Pakka) => maarittelynKindit(p.kind, p.kinds);
-
-/** Pakan kindien toisen attribuutin arvot entiteeteittäin. */
-async function attrKartta(sb: NonNullable<ReturnType<typeof getSupabase>>, kinds: string[], attrKey: string) {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { data } = await (sb as any)
-    .from("fact_attributes")
-    .select("entity_id, num_value, text_value, display_value, fact_entities!inner(kind)")
-    .eq("attr_key", attrKey)
-    .eq("scope", "")
-    .in("fact_entities.kind", kinds);
-  const m = new Map<string, { num: number; text: string | null }>();
-  for (const r of (data ?? []) as { entity_id: string; num_value: number | string | null; text_value: string | null; display_value: string | null }[])
-    m.set(r.entity_id, { num: Number(r.num_value), text: r.text_value ?? r.display_value });
-  return m;
-}
-
-/** Pakan koko pelattava joukko (julkaistut kohteet, pakan rajaukset). */
-async function haePool(p: Pakka): Promise<Ehdokas[]> {
-  const sb = getSupabase();
-  if (!sb) return [];
-
-  const kinds = pakanKindit(p);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  let q = (sb as any)
-    .from("fact_attributes")
-    .select("num_value, display_value, source, metric, fact_entities!inner(id, name, role_label, image_url, prominence, celebrity_id, kind, status, group_key)")
-    .eq("attr_key", p.attrKey)
-    .eq("scope", p.scope)
-    .eq("fact_entities.status", "published")
-    .not("num_value", "is", null);
-  // Yksi kind → eq kuten ennen: sama kyselysuunnitelma ja sama rivijärjestys, joten siemennetty
-  // päivän rivi pysyy ennallaan (haePaivanRivi sekoittaa kannan palauttamassa järjestyksessä).
-  q = kinds.length === 1 ? q.eq("fact_entities.kind", kinds[0]) : q.in("fact_entities.kind", kinds);
-  if (p.groupKey) q = q.eq("fact_entities.group_key", p.groupKey);
-  const { data, error } = await q;
-  if (error || !data) {
-    console.error("haePool:", error);
-    return [];
-  }
-
-  const [syntyneet, ehto, rooli] = await Promise.all([
-    p.pool?.syntynytVahintaan ? attrKartta(sb, kinds, "birth") : null,
-    p.pool?.ehto ? attrKartta(sb, kinds, p.pool.ehto.attrKey) : null,
-    p.rooliAttr ? attrKartta(sb, kinds, p.rooliAttr) : null,
-  ]);
-  const minVuosi = p.pool?.syntynytVahintaan;
-  const vuosiOk = (id: string) => {
-    if (!minVuosi || !syntyneet) return true;
-    const b = syntyneet.get(id);
-    return !b || new Date(b.num * 1000).getUTCFullYear() >= minVuosi;
-  };
-  const ehtoOk = (id: string) => !p.pool?.ehto || ehto?.get(id)?.num === p.pool.ehto.num;
-  const vain = p.pool?.vainNimet ? new Set(p.pool.vainNimet) : null;
-  const pois = new Set(p.pool?.poisNimet ?? []);
-  const nimiOk = (nimi: string) => (!vain || vain.has(nimi)) && !pois.has(nimi);
-
-  const maxProm = p.pool?.maxProminence;
-  const tunn = p.pool?.tunnettuja;
-  return (data as Rivi[])
-    .filter((r) => r.fact_entities && (!maxProm || (r.fact_entities.prominence ?? 1) <= maxProm))
-    .filter((r) => vuosiOk(r.fact_entities!.id) && ehtoOk(r.fact_entities!.id) && nimiOk(r.fact_entities!.name))
-    .map((r) => {
-      const e = r.fact_entities!;
-      const value = Number(r.num_value);
-      const nimi = p.nimiKentta === "role_label" ? e.role_label ?? e.name : p.kind === "party" ? puolueNimi(e.name) ?? e.name : e.name;
-      const roolinArvo = rooli?.get(e.id)?.text ?? null;
-      return {
-        id: e.id,
-        name: nimi,
-        role: p.rooliAttr ? puolueNimi(roolinArvo) ?? "" : p.naytaRooli ? (e.role_label ?? "").replace(/^[^·]*·\s*/, "") : "",
-        /* Tunnus (maakunnat): vaakunan oma kopio nimen mukaan, kannan image_url on täysikokoinen alkuperäinen. */
-        image_url: p.piilotaKuva ? null : p.tunnus ? vaakunaKuva(e.name) : e.image_url,
-        hideThumb: p.piilotaKuva || undefined,
-        tunnus: p.tunnus || undefined,
-        value,
-        valueLabel: arvoTeksti(p, r, value),
-        lahde: lahdeDomain(r.source),
-        tunnettu: !!tunn && (!!e.celebrity_id || value >= tunn.arvoVahintaan),
-        mittari: r.metric ?? null,
-      };
-    })
-    .filter((k) => Number.isFinite(k.value));
-}
+import { haePakka, type JarjestysKohde } from "./pakat";
+import { arvoPaivanRivi, poimi, sekoita, type Ehdokas } from "./arvonta";
+import { haePool } from "./pooli";
 
 /** Kuvat kaikille tai ei kenellekään (brief §2): yksikin puuttuva oma kopio → tekstikortit, ei koskaan siluettia. */
 function kuvatKaikille(valitut: Ehdokas[]): JarjestysKohde[] {
@@ -205,20 +36,13 @@ export async function haeJarjestysKierros(slug: string, excludeIds: string[] = [
 
 /** Päivän rivi (CD kierros 5a, 31.10.2026): RIVIN_PITUUS kohdetta väärässä järjestyksessä, sama kaikille
  *  koko päivän (siemen = päivä + pakka). Pelataan hubissa, jaettu tulos avautuu ?kohteet=-linkillä.
- *  `vainNimet` rajaa rivin arvonnan näihin kohteisiin (hubin haaste, pakka itse pysyy ennallaan). */
+ *  `vainNimet` rajaa rivin arvonnan näihin kohteisiin (hubin haaste, pakka itse pysyy ennallaan).
+ *  Arvonta lib/jarjesta/arvonta.ts:ssä (vakaa poolin järjestys, vaihe B2). */
 export async function haePaivanRivi(slug: string, paiva: string, vainNimet?: readonly string[]): Promise<JarjestysKohde[]> {
   const p = haePakka(slug);
   if (!p) return [];
-  const kaikki = await haePool(p);
-  const pool = vainNimet ? kaikki.filter((k) => vainNimet.includes(k.name)) : kaikki;
-  const rng = siemen(`${paiva}:${slug}`);
-  /* Päivän rivissä mieluiten tunnettuja: pakan tunnettuja-ehto (esim. eduskuntavuodet) koskee koko riviä. */
-  const tunnetut = p.pool?.tunnettuja ? pool.filter((k) => k.tunnettu) : pool;
-  const lahde = tunnetut.length >= RIVIN_PITUUS * 2 ? tunnetut : pool;
-  let valitut = poimi(p, lahde, p.vali, rng, RIVIN_PITUUS);
-  if (valitut.length < RIVIN_PITUUS) valitut = poimi(p, lahde, { tapa: "absoluuttinen", min: 0 }, rng, RIVIN_PITUUS);
-  if (valitut.length < 3) return [];
-  return kuvatKaikille(vaaraJarjestys(oikeaJarjestys(valitut as JarjestysKohde[], p.direction) as Ehdokas[], rng));
+  const valitut = arvoPaivanRivi(p, await haePool(p), slug, paiva, vainNimet);
+  return valitut.length ? kuvatKaikille(valitut) : [];
 }
 
 /** Täsmälleen nämä kohteet annetussa järjestyksessä (?kohteet=id,id,… : päivän rivi ja jaettu kierros). */
