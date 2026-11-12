@@ -39,3 +39,6 @@ export function karttapelinKoukku(k: Karttapeli, viikko: string): string | null 
 }
 
 export const karttapelinKuva = (k: Karttapeli, viikko: string) => `/og/reitti/${k.peli}/hub?reitti=${viikonSiemen(viikko)}`;
+
+/** Hub-sivun rivikuva 288 × 216 (hub-runko §4, 12.11.2026): sama viikon reitti, vain lähtö- ja maalitunnus. */
+export const karttapelinRivikuva = (k: Karttapeli, viikko: string) => `/og/reitti/${k.peli}/rivi?reitti=${viikonSiemen(viikko)}`;

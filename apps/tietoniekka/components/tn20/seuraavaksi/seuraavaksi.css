@@ -99,6 +99,38 @@
   .tn20 .sk-kortti:hover, .tn20 .sk-kortti:active { transform: none; }
 }
 
+/* Hub-sivun nosto (KorttiRivi.tsx HubNosto, runko §2): sama rivi kultareunuksella, merkkipilleri ja lime CTA-nappi.
+   Mobiili (Heikki 12.11.): kuva 96 × 72 ja merkki + nimi vierekkäin kuten tavallisessa rivissä, kuvaus ja nappi alla koko leveydeltä.
+   ≥ 768: kuva (sama 96 px kuin riveissä) | merkki, nimi, kuvaus | nappi. */
+.tn20 .sk-rivi--nosto { display: block; }
+.tn20 a.sk-kortti--nosto {
+  display: grid; grid-template-columns: 96px minmax(0, 1fr); grid-template-areas: "kuva teksti" "ala ala";
+  border: 2px solid var(--sk-gold); background: #201a0f;
+}
+.tn20 .sk-kortti--nosto .sk-kuva { grid-area: kuva; }
+.tn20 .sk-kortti--nosto .sk-teksti { grid-area: teksti; }
+.tn20 .sk-nosto-ala { grid-area: ala; display: flex; flex-direction: column; gap: 10px; padding: 10px 12px 12px; min-width: 0; }
+.tn20 .sk-nosto-yla { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; }
+.tn20 .sk-nosto-merkki {
+  display: inline-flex; align-items: center; min-height: 22px; padding: 0 8px; border-radius: 999px; background: var(--sk-gold); color: #131109;
+  font-size: 11px; font-weight: 800; letter-spacing: .08em; line-height: 1; text-transform: uppercase; white-space: nowrap;
+}
+.tn20 .sk-nosto-cta {
+  display: flex; align-items: center; justify-content: center; gap: 6px; min-height: 48px;
+  font-family: var(--tn-font-cond, "Barlow Condensed"), "Barlow Condensed", sans-serif; font-weight: 800; font-size: 18px; letter-spacing: .04em; line-height: 1;
+}
+@media (min-width: 768px) {
+  .tn20 a.sk-kortti--nosto {
+    grid-template-columns: 96px minmax(0, 1fr) auto; grid-template-rows: auto auto;
+    grid-template-areas: "kuva teksti cta" "kuva syy cta"; border-radius: 14px;
+  }
+  .tn20 .sk-rivi--nosto .sk-merkki--rivi { display: inline-flex; }
+  .tn20 .sk-rivi--nosto .sk-teksti { align-self: end; justify-content: flex-end; gap: 6px; padding: 12px 16px 4px; }
+  .tn20 .sk-nosto-ala { display: contents; }
+  .tn20 .sk-rivi--nosto .sk-syy { grid-area: syy; align-self: start; padding: 0 16px 12px; font-size: 14px; }
+  .tn20 .sk-nosto-cta { grid-area: cta; align-self: center; margin: 0 20px 0 8px; padding: 0 24px; }
+}
+
 /* Hub-rivi pysyy rivinä myös ≥ 768 (sama kuvakoko 96 × 72, merkki tekstipuolella, ei Pelaa-kehotetta: koko rivi on linkki). */
 @media (min-width: 768px) {
   .tn20 .sk-rivi--hub { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px 16px; }

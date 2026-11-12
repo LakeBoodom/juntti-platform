@@ -54,6 +54,37 @@ export function RiviLinkki({ k, data, eager }: { k: RiviKortti; data?: Record<st
   );
 }
 
+/** Hub-sivun nosto (runko §2, Heikki 12.11.2026): enintään yksi, sama rivi korostettuna — kultareunus, merkki (esim.
+ *  "Uusin", "Kaikki aiheet") ja CTA-nappi. Ei täysleveää kuvaa. Mobiilissa merkki + nimi kuvan vieressä kuten tavallisessa
+ *  rivissä, kuvaus ja nappi niiden alla koko leveydeltä (Heikki 12.11.); ≥ 768 kuvaus nimen alla ja nappi oikealla. */
+export function HubNosto({ k, merkki, cta, entry }: { k: RiviKortti; merkki: string; cta: string; entry?: string }) {
+  return (
+    <div className="sk-rivi--hub sk-rivi--nosto">
+      <a className="sk-kortti sk-kortti--nosto" href={k.href} data-tn-entry={entry}>
+        <span className="sk-kuva" data-sovitus={k.sovitus}>
+          {k.kuva ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={k.kuva} alt="" loading="eager" decoding="async" width={320} height={200} style={k.kuvaPos ? ({ objectPosition: k.kuvaPos } as CSSProperties) : undefined} />
+          ) : (
+            <span className="sk-kuvaton" aria-hidden="true">{k.kuvaton}</span>
+          )}
+        </span>
+        <span className="sk-teksti">
+          <span className="sk-nosto-yla">
+            <span className="sk-nosto-merkki">{merkki}</span>
+            {k.merkki ? <span className="sk-merkki sk-merkki--rivi">{k.merkki}</span> : null}
+          </span>
+          <span className="sk-nimi">{katko(k.nimi)}</span>
+        </span>
+        <span className="sk-nosto-ala">
+          {k.rivi ? <span className="sk-syy">{k.rivi}</span> : null}
+          <span className="sk-nosto-cta tn-cta-lime">{cta} <span aria-hidden="true">→</span></span>
+        </span>
+      </a>
+    </div>
+  );
+}
+
 /** Hub-sivun laajuus (runko §3): rivit allekkain mobiilissa, ≥ 768 kahdessa sarakkeessa; aina sama rivi, ei kuvaruudukkoa.
  *  Ensimmäiset `eager` kuvaa ladataan heti (ensimmäinen ruutu), loput laiskasti. */
 export default function HubRivit({ kortit, nimi, eager = 4 }: { kortit: RiviKortti[]; nimi: string; eager?: number }) {
