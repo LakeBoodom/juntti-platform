@@ -29,8 +29,8 @@ export default function PeliTulos({
   luku: ReactNode;
   /** Yksikkö luvun perässä: "kiekkoa", "yhteyttä", "oikein". */
   yksikko?: string;
-  /** Tasonimi otsikkona (lib/pelitasot.ts). */
-  tasonimi: string;
+  /** Tasonimi otsikkona (lib/pelitasot.ts). Puuttuu megavisalta (12.11.2026): otsikko vain ruudunlukijalle. */
+  tasonimi?: string;
   /** Yksi lause tuloksesta. */
   lause?: ReactNode;
   /** Pelin oma tulosvisuaali (tikapuut, reitti kartalla, ketju, vastausten läpikäynti). */
@@ -58,8 +58,14 @@ export default function PeliTulos({
                 <b>{luku}</b>
                 {yksikko && <span>{yksikko}</span>}
               </div>
-              <span className="pk-sr">{luku} {yksikko}.</span>
-              <h1 id="pk-tulos-h" className="pk-tulos-taso">{tasonimi}</h1>
+              {tasonimi ? (
+                <>
+                  <span className="pk-sr">{luku} {yksikko}.</span>
+                  <h1 id="pk-tulos-h" className="pk-tulos-taso">{tasonimi}</h1>
+                </>
+              ) : (
+                <h1 id="pk-tulos-h" className="pk-sr">{luku} {yksikko}</h1>
+              )}
             </>
           )}
           {lause && <p className="pk-tulos-ala">{lause}</p>}

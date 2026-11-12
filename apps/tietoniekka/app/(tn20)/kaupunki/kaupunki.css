@@ -126,9 +126,6 @@
 /* Henkilöt: henkilösivun Muut-laatat (henkilo.css), ilman ikää. */
 .tn20 .ks-henkilot .hub-laatat-lista { margin: 0 calc(-1 * var(--ks-reuna)); padding: 0 var(--ks-reuna) 4px; }
 
-/* Jakorivi: sama Jakoalue kuin tulosnäkymässä, kehyksessä sivun lopussa. */
-.tn20 .ks-jako { margin: 2px 0 0; padding: 16px; border-radius: 16px; border: 1px solid #2c2517; }
-.tn20 .ks-jako .tn-jako { margin: 0; }
 .tn20 .ks-muru { margin-top: 28px; }
 
 /* ── Tabletti 768–1023: hero korkeampi, ryhmät kolmeen sarakkeeseen ─────────────────────────────────────── */
@@ -188,7 +185,6 @@
   .tn20 .ks-kortti-nimi { font-size: 17px; }
   .tn20 .ks-kortti-teksti { font-size: 18px; padding: 16px; }
   .tn20 .ks-kortti-teksti::before { left: 16px; top: 16px; }
-  .tn20 .ks-jako { max-width: 560px; padding: 20px 24px; border-radius: 18px; }
 }
 /* 1024–1279: kapeammat reunat ja kortti, jotta nimelle jää tilaa (1024 px:ssä tekstipalsta oli 328 px). */
 @media (min-width: 1024px) and (max-width: 1279px) {

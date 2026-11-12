@@ -7,7 +7,7 @@ import { henkiloKuva } from "@/lib/henkilokuvat";
 //   - pelityypillä oma aksentti: Ikäjärjestys violetti, henkilövisa meripihka
 //   - 2 peliä: nosto + täysleveä rivi · 3–4: nosto + muut rinnakkain · 5+: kolmen sarake + "Kaikki"-linkki
 //   - "Muista kokoelmista" -lista hyllyn alla
-// Henkilövisan tila luetaan localStoragesta (GameClient → tn_quiz_results): pelattu → "Sait 4/5 · taso".
+// Henkilövisan tila luetaan localStoragesta (GameClient → tn_quiz_results): pelattu → "Sait 4/5" (fanitaso pois 12.11.2026).
 import { useEffect, useState } from "react";
 
 export type HyllyLaatta = { name: string; image_url: string | null; oma: boolean };
@@ -36,7 +36,6 @@ export type HyllyPeli =
 export type HyllyLinkki = { otsikko: string; href: string; meta?: string };
 
 type Tulos = { right: number; total: number };
-const KYNNYKSET = [0, 40, 60, 80, 100];
 
 function lueTulos(id: string): Tulos | null {
   try {
@@ -51,18 +50,13 @@ function lueTulos(id: string): Tulos | null {
 const pisin = (t: string) => Math.max(...t.split(/\s+/).flatMap((w) => w.split(/(?<=-)/)).map((w) => w.length), 6);
 const lw = (t: string) => ({ "--hub-lw": pisin(t) }) as React.CSSProperties;
 
-function VisaTila({ peli, children }: { peli: Extract<HyllyPeli, { tyyppi: "visa" }>; children: (t: Tulos | null, taso: string | null) => React.ReactNode }) {
+function VisaTila({ peli, children }: { peli: Extract<HyllyPeli, { tyyppi: "visa" }>; children: (t: Tulos | null) => React.ReactNode }) {
   const [tulos, setTulos] = useState<Tulos | null>(null);
   useEffect(() => setTulos(lueTulos(peli.id)), [peli.id]);
-  let taso: string | null = null;
-  if (tulos && peli.fanitasot) {
-    const pct = (tulos.right / tulos.total) * 100;
-    taso = peli.fanitasot[KYNNYKSET.reduce((acc, k, i) => (pct >= k ? i : acc), 0)] ?? null;
-  }
-  return <>{children(tulos, taso)}</>;
+  return <>{children(tulos)}</>;
 }
 
-function TulosRivi({ tulos, taso }: { tulos: Tulos; taso: string | null }) {
+function TulosRivi({ tulos }: { tulos: Tulos }) {
   return (
     <span className="hub-visa-tulos">
       <span className="hub-visa-palkit" aria-hidden="true">
@@ -72,7 +66,6 @@ function TulosRivi({ tulos, taso }: { tulos: Tulos; taso: string | null }) {
       </span>
       <span>
         Sait {tulos.right}/{tulos.total}
-        {taso ? ` · ${taso}` : ""}
       </span>
     </span>
   );
@@ -137,7 +130,7 @@ function Nosto({ peli }: { peli: HyllyPeli }) {
   if (peli.tyyppi === "visa") {
     return (
       <VisaTila peli={peli}>
-        {(tulos, taso) => (
+        {(tulos) => (
           <a className="hub-nosto hub-nosto--visa" href={peli.href} style={lw(peli.otsikko)} data-kuva={peli.kuva ? "" : undefined}>
             <span className="hub-visa-paa">
               {peli.kuva && (
@@ -149,7 +142,7 @@ function Nosto({ peli }: { peli: HyllyPeli }) {
               <span className="hub-visa-teksti">
                 <span className="hub-tyyppi hub-tyyppi--visa">Henkilövisa</span>
                 <span className="hub-nosto-otsikko">{peli.otsikko}</span>
-                {tulos && <TulosRivi tulos={tulos} taso={taso} />}
+                {tulos && <TulosRivi tulos={tulos} />}
               </span>
             </span>
             <span className="hub-cta-lime hub-cta-lime--levea">{tulos ? "Pelaa uudelleen" : "Aloita visa"} <span aria-hidden="true">→</span></span>
@@ -176,7 +169,7 @@ function Rivi({ peli, kortti }: { peli: HyllyPeli; kortti: boolean }) {
   if (peli.tyyppi === "visa") {
     return (
       <VisaTila peli={peli}>
-        {(tulos, taso) => (
+        {(tulos) => (
           <a className={kortti ? "hub-rivi hub-rivi--kortti hub-rivi--visa" : "hub-rivi hub-rivi--visa"} href={peli.href} style={lw(peli.otsikko)}>
             {!kortti && (
               <span className="hub-rivi-ikoni" aria-hidden="true">
@@ -186,7 +179,7 @@ function Rivi({ peli, kortti }: { peli: HyllyPeli; kortti: boolean }) {
             <span className="hub-rivi-teksti">
               <span className="hub-rivi-eyebrow">Henkilövisa</span>
               <span className="hub-rivi-nimi">{peli.otsikko}</span>
-              {tulos && <TulosRivi tulos={tulos} taso={taso} />}
+              {tulos && <TulosRivi tulos={tulos} />}
             </span>
             <span className="hub-rivi-cta">{tulos ? "Pelaa uudelleen" : "Aloita visa →"}</span>
           </a>
