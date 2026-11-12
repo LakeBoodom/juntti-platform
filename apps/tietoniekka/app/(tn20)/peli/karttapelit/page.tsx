@@ -2,7 +2,7 @@
 // 1.11.2026). 1) hero = karttakuvitus + nimi + intro (Heikin luonnos 12.11. korostettuna); 2) nosto = Mikä maa? korostettuna
 // rivinä (päivän vihje 1 koukkuna, CD 7.11. §3: kokoelman ensimmäinen); 3) kartat jaettuina riveinä: Maailma, Suomi,
 // Yhdysvallat (merkki = pelin nimi, rivi = viikon reitin koukku, kuva = viikon reitin lähtö ja maali, /og/reitti/<peli>/rivi);
-// 4) Näin pelaat suljettuna, rajaukset ja lähteet alalaidassa. Aluevalinta (maanosa, maakunta) on pelien omalla aloitussivulla.
+// 4) Näin pelaat sekä Lähteet ja rajaukset suljettuina (Heikki 12.11.). Aluevalinta (maanosa, maakunta) on pelien omalla aloitussivulla.
 // Kokoava sivu, joten ylänavigaatio ja murupolku (lib/nav.ts PELIMUOTOHUBIT).
 
 import type { Metadata } from "next";
@@ -91,13 +91,17 @@ export default async function KarttapelitSivu() {
                   <li><b>Tarkista.</b> Näet, montako rajaa on väärin, mutta et sitä, mitkä. Saat kaksi uutta yritystä.</li>
                 </ul>
               ),
+            }, {
+              otsikko: "Lähteet ja rajaukset",
+              sisalto: (
+                <ul>
+                  {KARTTAPELIT.map((k) => (
+                    <li key={k.peli}><b>{k.laji === k.nimi ? k.nimi : `${k.laji}: ${k.nimi}`}.</b> {k.huomautus} {LAHTEET[k.peli]}</li>
+                  ))}
+                </ul>
+              ),
             }]}
           />
-          <footer className="hub-huom">
-            {KARTTAPELIT.map((k) => (
-              <p key={k.peli}><b>{k.laji === k.nimi ? k.nimi : `${k.laji}: ${k.nimi}`}.</b> {k.huomautus} {LAHTEET[k.peli]}</p>
-            ))}
-          </footer>
         </div>
       </main>
     </PeliKehys>

@@ -55,7 +55,8 @@ export function RiviLinkki({ k, data, eager }: { k: RiviKortti; data?: Record<st
 }
 
 /** Hub-sivun nosto (runko §2, Heikki 12.11.2026): enintään yksi, sama rivi korostettuna — kultareunus, merkki (esim.
- *  "Uusin", "Kaikki aiheet") ja CTA-nappi. Ei täysleveää kuvaa. Mobiilissa nappi rivin alla koko leveydeltä, ≥ 768 oikealla. */
+ *  "Uusin", "Kaikki aiheet") ja CTA-nappi. Ei täysleveää kuvaa. Mobiilissa merkki + nimi kuvan vieressä kuten tavallisessa
+ *  rivissä, kuvaus ja nappi niiden alla koko leveydeltä (Heikki 12.11.); ≥ 768 kuvaus nimen alla ja nappi oikealla. */
 export function HubNosto({ k, merkki, cta, entry }: { k: RiviKortti; merkki: string; cta: string; entry?: string }) {
   return (
     <div className="sk-rivi--hub sk-rivi--nosto">
@@ -74,9 +75,11 @@ export function HubNosto({ k, merkki, cta, entry }: { k: RiviKortti; merkki: str
             {k.merkki ? <span className="sk-merkki sk-merkki--rivi">{k.merkki}</span> : null}
           </span>
           <span className="sk-nimi">{katko(k.nimi)}</span>
-          {k.rivi ? <span className="sk-syy">{k.rivi}</span> : null}
         </span>
-        <span className="sk-nosto-cta tn-cta-lime">{cta} <span aria-hidden="true">→</span></span>
+        <span className="sk-nosto-ala">
+          {k.rivi ? <span className="sk-syy">{k.rivi}</span> : null}
+          <span className="sk-nosto-cta tn-cta-lime">{cta} <span aria-hidden="true">→</span></span>
+        </span>
       </a>
     </div>
   );

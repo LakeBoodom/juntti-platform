@@ -63,7 +63,7 @@ export type NavMode = {
    Rakenne kestää uudet rivit sellaisenaan → Kumpi? ja Järjestä lisätään 2.5:ssä. */
 export const NAV_MODES: NavMode[] = aakkosin([
   // Tupla tai kuitti (Heikki 26.9.2026): uusi pelimuoto ensimmäisenä
-  { href: "/peli/tupla-tai-kuitti", label: "Tupla tai kuitti", desc: "Tuplaa pisteet tai pidä ne", color: "#E8A320" },
+  { href: "/peli/tupla-tai-kuitti", label: "Tupla tai kuitti", desc: "Tuplaa pottisi tai ota kuitti", color: "#E8A320" },
   // Karttapelit (Heikki 1.11.2026): Rajanaapurit, Kuntaliitos ja Yhdysvallat yhdellä sivulla
   { href: "/peli/karttapelit", label: "Karttapelit", desc: "Järjestä maat, kunnat ja osavaltiot reitiksi naapurista naapuriin", color: "#4ADE80" },
   // Mikä maa? (Heikki 7.11.2026): päivän maa vihjeistä; rivi julkaistaan pelin mukana.
@@ -77,7 +77,7 @@ export const NAV_MODES: NavMode[] = aakkosin([
   /* Äänivisat (Heikki 1.11.2026): suoraan äänivisan sivulle. Ainoa ryhmä on Suomen linnut; kokoava sivu, kun ryhmiä tulee lisää. */
   { href: "/aanivisa/suomen-linnut", label: "Äänivisat", desc: "Tunnista lintu laulusta", color: "#4ADE80" },
   /* Visapaketit (Heikki 31.10.2026): pelaamisen tapa (visailta porukalla), ei aihe → Pelimuodot-valikkoon. */
-  { href: "/visapaketit", label: "Visapaketit", desc: "Valmis visailta ruudulle tai tulosteeksi", color: "#F0C020" },
+  { href: "/visapaketit", label: "Visapaketit", desc: "Valmis tietovisa juhliin, kerhon tapahtumaan tai pubiporukalle", color: "#F0C020" },
 ]);
 
 export const hubHref = (slug: string) => `/kokoelma/${slug}`;

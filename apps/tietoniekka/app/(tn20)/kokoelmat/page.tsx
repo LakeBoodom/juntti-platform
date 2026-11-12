@@ -11,6 +11,7 @@ import HubRivit, { type RiviKortti } from "@/components/tn20/korttirivi/KorttiRi
 import { jakoMeta } from "@/lib/jakoMeta";
 import { getCounts } from "@/lib/kokoelmaMaarat";
 import { NAV_COLLECTIONS, NAV_MODES, navHref } from "@/lib/nav";
+import { ETUSIVUN_PELIMUODOT } from "@/lib/pelimuodot";
 
 export const metadata: Metadata = {
   title: "Kaikki kokoelmat – tietovisat aiheittain | Tietoniekka",
@@ -39,13 +40,21 @@ const PELIMUOTOKUVAT: Record<string, Pick<RiviKortti, "kuva" | "sovitus">> = {
   "/visapaketit": { kuva: "/20/rivi/peli-visapaketit.webp" },
 };
 
+/** Pelimuodot samassa järjestyksessä kuin etusivun Valitse peli -osiossa (Heikki 12.11.2026), ei aakkosin.
+ *  Karttapelit-hub asettuu etusivun Rajanaapurit-kortin paikalle; etusivulla puuttuvat (Visapaketit) loppuun. */
+const ETUSIVUN_VASTINE: Record<string, string> = { "/peli/karttapelit": "/peli/rajanaapurit" };
+const etusivunPaikka = (href: string) => {
+  const i = ETUSIVUN_PELIMUODOT.findIndex((p) => p.href === (ETUSIVUN_VASTINE[href] ?? href));
+  return i < 0 ? ETUSIVUN_PELIMUODOT.length : i;
+};
+
 export default async function KokoelmatPage() {
   const counts = await getCounts();
   const aiheet: RiviKortti[] = NAV_COLLECTIONS.map((c) => {
     const n = counts[c.slug] ?? 0;
     return { href: navHref(c), kuva: `/20/rivi/kokoelma-${c.slug}.webp`, kuvaton: c.label, nimi: c.label, rivi: n > 0 ? `${n} visaa` : null };
   });
-  const pelimuodot: RiviKortti[] = NAV_MODES.map((m) => ({
+  const pelimuodot: RiviKortti[] = [...NAV_MODES].sort((a, b) => etusivunPaikka(a.href) - etusivunPaikka(b.href)).map((m) => ({
     href: m.href, kuva: PELIMUOTOKUVAT[m.href]?.kuva ?? null, sovitus: PELIMUOTOKUVAT[m.href]?.sovitus, kuvaton: m.label, nimi: m.label, rivi: m.desc,
   }));
 

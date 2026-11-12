@@ -31,7 +31,7 @@ export type MegaCard = {
 export const MEGA_FEATURED: MegaCard = {
   slug: "suuri-mega-50",
   tag: "Kaikki aiheet",
-  desc: "Sekoitus jokaisesta kokoelmasta — kysymykset kaikilta tuotteen alueilta samassa istunnossa.",
+  desc: "Kysymyksiä kaikista aiheista samassa visassa.",
   img: "/20/megavisat/mega-yleistieto.webp",
   pos: "center 42%",
   aihe: "yleistieto",
