@@ -31,15 +31,27 @@ export default function SiteFooter() {
                 Instagram
               </a>
             </div>
-            <nav className="tn-es-foot-col" aria-label="Kokoelmat">
+            {/* Mobiili (< 768, Heikki 11.11.2026): Kokoelmat ja Pelimuodot suljettuina (<details>), linkit DOMissa. Desktopin
+                sarakkeet alla ennallaan (piilossa < 768). Ei JavaScriptiä → ei hyppäystä latauksessa. */}
+            <div className="tn-es-foot-mob">
+              <details className="tn-es-foot-det">
+                <summary>Kokoelmat<span aria-hidden="true">+</span></summary>
+                <nav aria-label="Kokoelmat">{FOOTER_COLLECTIONS.map((c) => <a key={c.href} href={c.href}>{c.label}</a>)}</nav>
+              </details>
+              <details className="tn-es-foot-det">
+                <summary>Pelimuodot<span aria-hidden="true">+</span></summary>
+                <nav aria-label="Pelimuodot">{FOOTER_MODES.map((m) => <a key={m.href} href={m.href}>{m.label}</a>)}</nav>
+              </details>
+            </div>
+            <nav className="tn-es-foot-col tn-es-foot-col--desk" aria-label="Kokoelmat">
               <div className="tn-es-foot-h">Kokoelmat</div>
               {FOOTER_COLLECTIONS.map((c) => <a key={c.href} href={c.href}>{c.label}</a>)}
             </nav>
-            <nav className="tn-es-foot-col" aria-label="Pelimuodot">
+            <nav className="tn-es-foot-col tn-es-foot-col--desk" aria-label="Pelimuodot">
               <div className="tn-es-foot-h">Pelimuodot</div>
               {FOOTER_MODES.map((m) => <a key={m.href} href={m.href}>{m.label}</a>)}
             </nav>
-            <nav className="tn-es-foot-col" aria-label="Tietoniekka">
+            <nav className="tn-es-foot-col tn-es-foot-col--site" aria-label="Tietoniekka">
               <div className="tn-es-foot-h">Tietoniekka</div>
               {FOOTER_SITE.map((m) => <a key={m.href} href={m.href}>{m.label}</a>)}
             </nav>
