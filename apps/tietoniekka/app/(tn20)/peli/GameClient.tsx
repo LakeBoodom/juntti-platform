@@ -317,9 +317,11 @@ function fitHeading(el: HTMLElement | null, animate = false) {
   if (el.clientWidth && words.length > 0 && ctx) {
     const ls = parseFloat(cs.letterSpacing) || 0;
     const baseSize = size;
+    /* Kysymysotsikko on 12.11.2026 alkaen normaalilla kirjoitusasulla: mitataan sanat siinä muodossa kuin ne näkyvät. */
+    const isot = cs.textTransform === "uppercase";
     const widthAt = (s: number) => {
       ctx.font = `${cs.fontStyle} ${cs.fontWeight} ${s}px ${cs.fontFamily}`;
-      return Math.max(...words.map((w) => ctx.measureText(w.toUpperCase()).width + ls * (s / baseSize) * w.length));
+      return Math.max(...words.map((w) => ctx.measureText(isot ? w.toUpperCase() : w).width + ls * (s / baseSize) * w.length));
     };
     /* KORTTISÄÄNTÖ-korjaus 19.9.2026: otsikon max-width on ch-yksiköissä (esim.
        27ch), joten se skaalautuu fontin mukana — 28-merkkinen sana ("VARA-
@@ -983,11 +985,8 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
   const pct = Math.round((right / scored) * 100);
   const tasot = vk ? TIERS_VIIKKO : TIERS;
   const tier = tasot.find((t) => pct >= t.min) ?? tasot[tasot.length - 1];
-  /* Fanitaso: aihekohtainen tason nimi otsikoksi, yleinen taso leipätekstin alkuun.
-     Nimet on rajattu admin-puolella (sana enintään 14 merkkiä), joten ne mahtuvat
-     samaan .tng-restitle-mitoitukseen kuin "Harjoiteltavaa jäi". */
-  const faniIndeksi = [0, 40, 60, 80, 100].indexOf(tier.min);
-  const fanitaso = !vk && quiz.fanitasot && faniIndeksi >= 0 ? quiz.fanitasot[faniIndeksi] : null;
+  /* Fanitaso (quizzes.fanitasot) ja yleinen tasonimi poistettu tulosnäkymästä 12.11.2026 (Heikki: käyttäjäpalaute,
+     päätetty designerin kanssa). Tason leipäteksti (tier.body) jää. */
   /* Haastetun polku (Jakotekstit v4 §5, vaihe 3): "Kaverisi sai 7/10." ylimpänä ja rivi siitä, mitä tehdään. */
   const kaveri: KaverinTulos | null = quiz.haaste ? {
     otsikko: `Kaverisi sai ${quiz.haaste.oikein}/${quiz.haaste.kysymyksia}.`,
@@ -1167,7 +1166,6 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
           <PeliTulos
             luku={`${right}/${total}`}
             yksikko="oikein"
-            tasonimi={fanitaso ?? tier.title}
             lause={[tier.body, `${score} pistettä.`].filter(Boolean).join(" ")}
             lisa={
               /* K4: läpikäynti tuloksen alla, oletuksena kiinni (Heikki 20.10.2026: kysymyksiä on paljon). */
@@ -1209,7 +1207,6 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
               right={right}
               total={total}
               score={score}
-              tasonimi={fanitaso ?? tier.title}
               lause={h ? `${erotusLause(right - h.oikein)} · ${score} pistettä` : tier.body}
               lisaLinkki={quiz.henkilo ? { href: quiz.henkilo.href, teksti: quiz.henkilo.linkki } : quiz.paketti ?? null}
               haaste={h}

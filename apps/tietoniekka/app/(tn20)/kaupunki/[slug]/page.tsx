@@ -26,7 +26,6 @@ function alue(slug: string): { nimi: string; href: string } | null {
   const osio = region ? KAUPUNGIT_KOKOELMA.sections.find((s) => s.title === region) : undefined;
   return region && osio ? { nimi: region, href: `${HUB}#osio-${osio.slug}` } : null;
 }
-import KaupunkiJako from "../KaupunkiJako";
 import "../../henkilo.css";
 import "../kaupunki.css";
 
@@ -103,7 +102,6 @@ export default async function KaupunkiPage({ params }: Props) {
   const kuvaPos = `${Math.round(fokus.x * 100)}% ${Math.round(fokus.y * 100)}%`;
   /* Kaupunkikuvista on 800 px:n kopio kansiossa k/ (kokoelmakortit); 1600 px:n alkuperäinen leveille näytöille. */
   const pieni = k.hero_kuva?.match(/^\/20\/kaupungit\/([a-z]+)\.webp$/) ? k.hero_kuva.replace("/20/kaupungit/", "/20/kaupungit/k/") : null;
-  const korttinimi = k.korttinimi ?? k.nimi;
   const a = alue(k.slug);
   const visat = [...(visa ? [visa] : []), ...(s.kausinosto ? [s.kausinosto] : []), ...s.ryhmat.flatMap((g) => g.visat)];
   const reitti = kaupunginKuntaliitos(k.slug);
@@ -211,10 +209,6 @@ export default async function KaupunkiPage({ params }: Props) {
           <SukulaisLaatat otsikko={`${k.inessiivi} ${s.henkilot.length === 1 ? "syntynyt" : "syntyneitä"}`} laatat={s.henkilot} cta="Pelaa →" />
         </div>
       )}
-
-      <div className="ks-osio">
-        <KaupunkiJako slug={k.slug} korttinimi={korttinimi} />
-      </div>
 
       <nav className="tn-seo-nav ks-muru" aria-label="Murupolku">
         <div className="tn-seo-in">

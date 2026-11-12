@@ -2,7 +2,8 @@
 // TULOSNÄKYMÄ (Tulosnäkymä ja jakaminen -brief, vaihe B, 22.10.2026; Claude Designin arkki v0.3, näkymät 3a–3c).
 // Tavallinen tietovisa, kuvavisa ja viikkovisa. Järjestys kuten pelikehyksen K4:ssä:
 //   tulos → (metapeli, lipun takana) → haasta kaveri → seuraava visa → toissijaiset linkit.
-// Tulos näkyy kerran (iso n/total, tasonimi, pisteet pienellä, yksi lause). "Vastauksesi" on oma laatikkonsa
+// Tulos näkyy kerran (iso n/total, pisteet pienellä, yksi lause). Tasonimi (fanitaso) poistettu 12.11.2026 (Heikki:
+// käyttäjäpalaute, päätetty designerin kanssa); otsikko on ruudunlukijalle "n/total oikein". "Vastauksesi" on oma laatikkonsa
 // tuloksen alla (✓/✗-ruudut + Näytä); koko laatikko on yksi painike, joka avaa läpikäynnin.
 // Jakoalue: yleiskäyttöinen Jakoalue-komponentti (vaihe C) — WhatsApp pääpainikkeena, Facebook ja Kopioi, Jaa… kosketuslaitteilla.
 // Desktopilla (≥ 1024 px) tulos, vastaukset ja seuraava visa vasemmassa palstassa, jako oikealla.
@@ -21,8 +22,6 @@ export default function TulosNakyma(p: {
   right: number;
   total: number;
   score: number;
-  /** Tasonimi (quizzes.fanitasot) tai yleinen taso. */
-  tasonimi: string;
   lause: string;
   /** Henkilövisan "Lue lisää …" -linkki. */
   lisaLinkki?: { href: string; teksti: string } | null;
@@ -74,10 +73,7 @@ export default function TulosNakyma(p: {
               <div className="tn-tulos-rivi">
                 <span className="tn-tulos-luku" aria-hidden="true"><b>{p.right}</b><i>/{p.total}</i></span>
                 <div className="tn-tulos-taso">
-                  <span className="tn-sr">{p.right}/{p.total} oikein.</span>
-                  <h1 id="tn-tulos-h" className="tn-tulos-tasonimi">
-                    {p.tasonimi}
-                  </h1>
+                  <h1 id="tn-tulos-h" className="tn-sr">{p.right}/{p.total} oikein</h1>
                   <span className="tn-tulos-pisteet">{p.score} pistettä</span>
                 </div>
               </div>
