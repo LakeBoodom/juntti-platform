@@ -7,11 +7,11 @@
 // (syy päivän datasta); poikkeus UI-sääntöön 9. Paikan 3 merkki "Tänään · 11.11." pienellä live-pisteellä (ei muistovisassa).
 // Ehdokkaista valitaan selaimessa kustakin paikasta ensimmäinen pelaamaton; palvelimen HTML:ssä (ja ilman JS:ää) näkyy
 // kunkin paikan ensimmäinen ehdokas.
-import { useEffect, useRef, useState, type CSSProperties } from "react";
-import { katko } from "@/lib/kokoelmat/data";
+import { useEffect, useRef, useState } from "react";
 import { helsinginPaiva } from "@/lib/aika";
 import type { Ehdokas } from "@/lib/seuraavaksi/tyypit";
 import { useSeuraavaksiMittaus, type SkMeta } from "@/lib/seuraavaksi/mittaus";
+import { RiviLinkki } from "@/components/tn20/korttirivi/KorttiRivi";
 import "./seuraavaksi.css";
 
 /** Paikka 1–3 (mittaus). */
@@ -81,24 +81,7 @@ export default function SeuraavaksiRivi({ otsikko, paikat, meta, id }: { otsikko
       <h2 id={`${id}-h`} className="sk-h">{otsikko}</h2>
       <div className="sk-rivi">
         {valitut.map(({ paikka, e }) => (
-          <a key={e.id} className="sk-kortti" href={e.href} data-sk-paikka={paikka} data-sk-tyyppi={e.tyyppi} data-sk-porras={e.porras}>
-            <span className="sk-kuva" data-sovitus={e.sovitus}>
-              {e.kuva ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img src={e.kuva} alt="" loading="lazy" decoding="async" width={320} height={200} style={e.kuvaPos ? ({ objectPosition: e.kuvaPos } as CSSProperties) : undefined} />
-              ) : (
-                <span className="sk-kuvaton" aria-hidden="true">{e.kuvaton}</span>
-              )}
-              {/* Desktop: merkki kuvan päällä. Mobiilin rivissä sama merkki on tekstipuolella (sk-merkki--rivi). */}
-              <span className="sk-merkki sk-merkki--kuva">{e.live ? <i className="sk-live" aria-hidden="true" /> : null}{e.merkki}</span>
-            </span>
-            <span className="sk-teksti">
-              <span className="sk-merkki sk-merkki--rivi">{e.live ? <i className="sk-live" aria-hidden="true" /> : null}{e.merkki}</span>
-              <span className="sk-nimi">{katko(e.nimi)}</span>
-              {e.rivi ? <span className="sk-syy">{e.rivi}</span> : null}
-              <span className="sk-cta">Pelaa <span aria-hidden="true">→</span></span>
-            </span>
-          </a>
+          <RiviLinkki key={e.id} k={e} data={{ "data-sk-paikka": String(paikka), "data-sk-tyyppi": e.tyyppi, "data-sk-porras": e.porras }} />
         ))}
       </div>
     </section>
