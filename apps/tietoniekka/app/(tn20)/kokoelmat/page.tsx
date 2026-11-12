@@ -1,11 +1,14 @@
-import { KokoelmaLd } from "@/components/tn20/KokoelmaLd";
-import { jakoMeta } from "@/lib/jakoMeta";
+// KAIKKI KOKOELMAT /kokoelmat hub-rungolla (Heikki 12.11.2026, vaihe 2): hero ilman kuvaa (nimi + nykyinen yksi rivi),
+// aiheet jaettuina riveinä (kuva, nimi, visamäärä kannasta) ja Pelimuodot omana osionaan samoina riveinä.
+// Navigaation "Kaikki kokoelmat →" -kohde (CD:n navigaatiosääntö 17.8.2026: valikkolinkit vievät todellisille sivuille).
+// Lista lib/nav.ts-kokoonpanosta (sama kuin valikoissa), luvut kannasta (getCounts), rivikuvat public/20/rivi/ (288 × 216).
 import type { Metadata } from "next";
-// TIETONIEKKA 2.0 — KAIKKI KOKOELMAT -indeksi (navigaation "Kaikki kokoelmat →" -kohde).
-// CD:n navigaatiosääntö (lukittu 17.8.2026): kaikki valikkolinkit vievät todellisille
-// sivuille, eivät etusivun ankkureihin — tämä sivu on se todellinen sivu.
-// Luvut kannasta (quiz_cards), lista lib/nav.ts-kokoonpanosta (sama kuin valikoissa).
+import { KokoelmaLd } from "@/components/tn20/KokoelmaLd";
 import Crumbs from "@/components/tn20/Crumbs";
+import PeliKehys from "@/components/tn20/pelikehys/PeliKehys";
+import HubHero from "@/components/tn20/korttirivi/HubHero";
+import HubRivit, { type RiviKortti } from "@/components/tn20/korttirivi/KorttiRivi";
+import { jakoMeta } from "@/lib/jakoMeta";
 import { getCounts } from "@/lib/kokoelmaMaarat";
 import { NAV_COLLECTIONS, NAV_MODES, navHref } from "@/lib/nav";
 
@@ -23,56 +26,43 @@ export const metadata: Metadata = {
 
 export const revalidate = 300; // SEO-erä A4 (2.10.2026): ISR 5 min
 
+/** Pelimuodon rivikuva (scripts/rivikuvat.py). Uusi pelimuoto ilman kuvaa saa kuvattoman rivin (nimi kuva-alueella). */
+const PELIMUOTOKUVAT: Record<string, Pick<RiviKortti, "kuva" | "sovitus">> = {
+  "/peli/tupla-tai-kuitti": { kuva: "/20/rivi/peli-tupla-logo.webp", sovitus: "logo" },
+  "/peli/karttapelit": { kuva: "/20/rivi/peli-karttapelit.webp" },
+  "/peli/mika-maa": { kuva: "/20/rivi/peli-mika-maa.webp" },
+  "/peli/vaalipiiriketju": { kuva: "/20/rivi/peli-vaalipiiriketju.webp" },
+  "/peli/jarjesta": { kuva: "/20/rivi/peli-jarjesta.webp" },
+  "/megavisat": { kuva: "/20/rivi/peli-megavisat.webp" },
+  "/kokoelma/kuvavisat": { kuva: "/20/rivi/peli-kuvavisat.webp" },
+  "/aanivisa/suomen-linnut": { kuva: "/20/rivi/peli-aanivisat.webp" },
+  "/visapaketit": { kuva: "/20/rivi/peli-visapaketit.webp" },
+};
+
 export default async function KokoelmatPage() {
   const counts = await getCounts();
+  const aiheet: RiviKortti[] = NAV_COLLECTIONS.map((c) => {
+    const n = counts[c.slug] ?? 0;
+    return { href: navHref(c), kuva: `/20/rivi/kokoelma-${c.slug}.webp`, kuvaton: c.label, nimi: c.label, rivi: n > 0 ? `${n} visaa` : null };
+  });
+  const pelimuodot: RiviKortti[] = NAV_MODES.map((m) => ({
+    href: m.href, kuva: PELIMUOTOKUVAT[m.href]?.kuva ?? null, sovitus: PELIMUOTOKUVAT[m.href]?.sovitus, kuvaton: m.label, nimi: m.label, rivi: m.desc,
+  }));
 
   return (
-    <main style={{ minHeight: "100dvh" }}>
+    <PeliKehys iho="tumma">
       <KokoelmaLd avain="kokoelmat" nimi="Kaikki kokoelmat" polku="/kokoelmat" />
       <Crumbs items={[{ label: "Kokoelmat" }]} />
-      <div className="tn-shell">
-      <header className="tn-colx-head">
-        <h1 className="tn-colx-title">
-          Kaikki <span>kokoelmat</span>
-        </h1>
-        <p className="tn-colx-lede">
-          Valitse aihe, josta tiedät eniten — tai se, josta haluat oppia lisää.
-        </p>
-      </header>
-
-      <div className="tn-colx-grid">
-        {NAV_COLLECTIONS.map((c) => (
-          <a
-            key={c.slug}
-            className="tn-colx-card"
-            href={navHref(c)}
-            style={{ "--dot": c.color } as React.CSSProperties}
-          >
-            <span className="tn-menu-dot" aria-hidden />
-            <span>{c.label}</span>
-            <span className="tn-colx-count">{counts[c.slug] ?? 0} visaa</span>
-          </a>
-        ))}
-      </div>
-
-      <p className="tn-colx-sub">Pelimuodot</p>
-      <div className="tn-colx-grid">
-        {NAV_MODES.map((m) => (
-          <a
-            key={m.href}
-            className="tn-colx-card"
-            href={m.href}
-            style={{ "--dot": m.color } as React.CSSProperties}
-          >
-            <span className="tn-menu-dot" aria-hidden />
-            <span>{m.label}</span>
-            <span className="tn-colx-count">{m.desc}</span>
-          </a>
-        ))}
-      </div>
-
-      <div className="tn-colx-foot" />
-      </div>
-    </main>
+      <main>
+        <div className="hub">
+          <HubHero nimi="Kaikki kokoelmat" intro="Valitse aihe, josta tiedät eniten — tai se, josta haluat oppia lisää." />
+          <HubRivit kortit={aiheet} nimi="Kokoelmat" eager={6} />
+          <section className="hub-osio" aria-labelledby="hub-pelimuodot">
+            <h2 className="hub-h2" id="hub-pelimuodot">Pelimuodot</h2>
+            <HubRivit kortit={pelimuodot} nimi="Pelimuodot" eager={0} />
+          </section>
+        </div>
+      </main>
+    </PeliKehys>
   );
 }

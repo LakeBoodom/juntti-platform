@@ -35,3 +35,15 @@
   .tn20 .hub-hero--ilman { grid-template-columns: minmax(0, 1fr); }
   .tn20 .hub-intro { font-size: 17px; }
 }
+
+/* Osio-otsikko hubin sisällä (Kokoelmat: "Pelimuodot") — sama kuin "Pelaa seuraavaksi" -otsikko (.sk-h). */
+.tn20 .hub-osio { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+.tn20 .hub-h2 {
+  margin: 0; min-height: 44px; display: flex; align-items: center;
+  font-family: var(--rk-cond, "Barlow Condensed"), "Barlow Condensed", sans-serif; font-weight: 800; font-size: 28px; line-height: 1;
+  text-transform: uppercase; color: var(--hub-ink);
+}
+/* Rajaukset ja lähteet sivun alalaidassa (Karttapelit, Heikki 2.11.2026: pelaajalle toissijaista). #A79E8C pohjalla #131109 ≈ 7:1. */
+.tn20 .hub-huom { display: grid; gap: 6px; max-width: 90ch; padding-top: 14px; border-top: 1px solid var(--hub-line); }
+.tn20 .hub-huom p { margin: 0; font-size: 12px; line-height: 1.45; color: #a79e8c; }
+.tn20 .hub-huom b { font-weight: 700; }

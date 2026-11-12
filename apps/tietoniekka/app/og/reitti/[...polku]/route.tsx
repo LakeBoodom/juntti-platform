@@ -7,6 +7,7 @@
 //   /og/reitti/<peli>/ruutu?reitti=<siemen>       neliö pieniin kuviin (etusivun kortti, kokoelmasivun peli), vain tunnus
 //   /og/reitti/<peli>/puolikas?reitti=<siemen>    Maantieto-kortin puolikas (7a): pystyrajaus, päätepisteissä vain tunnus
 //   /og/reitti/<peli>/leve?reitti=<siemen>        16:9 kaupunkisivun Kuntaliitos-kortille desktopilla (8.11.2026)
+//   /og/reitti/<peli>/rivi?reitti=<siemen>        hub-sivun rivi 288 × 216 (96 × 72 × 3, hub-runko §4, 12.11.2026), vain tunnus
 //
 // <peli> = rajanaapurit | osavaltiot | kuntaliitos (lib/reittipeli/kuvat.ts). Kartta piirretään pelin omasta
 // aineistosta (SVG → sharp), merkit ja tekstit Satorilla. Kuvissa näkyvät vain lähtö ja maali sekä katkoviivakaari
@@ -66,6 +67,7 @@ const MUODOT = {
   ruutu: { w: 400, h: 400, viiva: 3, piste: 8, fontti: 0, pilleri: 0, lippu: [44, 29], vainTunnus: true },
   puolikas: { w: 388, h: 438, viiva: 3, piste: 8, fontti: 0, pilleri: 0, lippu: [44, 29], vainTunnus: true },
   leve: { w: 640, h: 360, viiva: 4, piste: 10, fontti: 17, pilleri: 34, lippu: [48, 32] },
+  rivi: { w: 288, h: 216, viiva: 3, piste: 8, fontti: 0, pilleri: 0, lippu: [46, 31], vainTunnus: true },
 } satisfies Record<string, Muoto>;
 
 /** Kartta + päätepisteiden merkit yhdeksi kuvaksi (data-URI). */
