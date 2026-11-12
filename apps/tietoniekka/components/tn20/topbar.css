@@ -54,6 +54,7 @@
 /* Koko tagline tarvitsee 196 px; mitattu tila (Range, 29.10.): 320 → 141, 360 → 182, 375 → 190, 390 → 196 (0 marginaalia),
    768 → 201 → alle 400 px vain "700+ visaa" (TopBar taglineOsat). */
 @media (max-width: 399px) { .tn20 .tn-tagline-alku { display: none; } }
+@media (max-width: 767px) { .tn20 .tn-tagline[data-etusivu] { display: none; } }
 .tn20 .tn-topbar-right { margin-left: auto; display: flex; align-items: center; gap: 0; min-width: 0; }
 
 /* ── Nostot (Pelaa yhdessä ≥ 1440 px · Suosittu nyt ≥ 700 px) ────────────

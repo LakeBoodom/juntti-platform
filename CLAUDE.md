@@ -200,6 +200,20 @@ Skilli `tietoniekka-ui-laatu` on näiden sääntöjen lähde; tässä tiivistelm
 9. **Ei taglineja, aputekstejä eikä toissijaisia labeleita** (Heikki 22.10.2026). Jos näkymä
    tarvitsee niitä ollakseen ymmärrettävä, korjaa layout — älä lisää selitettä. Ei koske
    virheviestejä, tyhjiä tiloja eikä saavutettavuuslabeleita (aria-label, visuaalisesti piilotettu teksti).
+   **Poikkeus (Heikki 12.11.2026): pelimuodon hub-sivun herossa intro sallittu** — Tupla tai kuitti, Megavisat ja
+   Karttapelit: kuva + nimi (h1) + 2–4 lausetta, ensimmäinen korostettuna, teksti omalla pohjallaan (ei kuvan päällä).
+   Kokoelmat ja tavalliset tietovisasivut: enintään yksi rivi. Ei kovakoodattuja lukuja, määrät datasta.
+
+## HUB-RUNKO — pelimuotojen ja kokoelmien hub-sivut (Heikki 12.11.2026)
+
+1. **Hero** = `HubHero` (`components/tn20/korttirivi/`): kuva + h1 + intro (ks. UI-sääntö 9, poikkeus).
+2. **Nosto** enintään yksi, ja se on sama rivikomponentti korostettuna (kultareunus, merkki esim. "Uusin", CTA-nappi).
+   Ei koko leveyden 16:9-kuvaa; nosto ei syö heron tilaa.
+3. **Laajuus** = aina jaettu `HubRivit` (`KorttiRivi.tsx`): sama kuvakoko 96 × 72 vasemmalla, lajimerkki, nimi, yksi
+   tietorivi. Ei 2- tai 3-sarakkeisia kuvaruudukoita mobiilissa; ≥ 768 sama rivi kahdessa sarakkeessa.
+4. **Rivikuvat oikean kokoisina**: 288 × 216 -kopio (`scripts/rivikuvat.py` → `public/20/rivi/`), ei korttikuvaa.
+5. **Ei kovakoodattuja lukuja** teksteissä: megojen määrä, kysymysmäärien vaihteluväli ja visamäärät datasta.
+6. Ohjeet suljettuina (`HubOhjeet`). Malli: `/peli/tupla-tai-kuitti` (vaihe 1).
 
 
 ## PELINÄKYMÄSÄÄNNÖT — CD-paketit, syöte ja tulos (Heikki 8.–9.11.2026)

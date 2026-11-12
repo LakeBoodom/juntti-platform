@@ -100,22 +100,24 @@
 .tn20 .tng-acol { min-width: 0; width: 100%; display: flex; flex-direction: column; gap: clamp(10px, 1.2cqw, 16px); padding: 0 clamp(16px, 2.6cqw, 44px) clamp(16px, 2cqw, 32px); }
 
 /* Kysymysotsikko: CD clamp(28px, min(4.7cqi, 9.2cqh), 74px); qlen med/long portaat;
-   JS auto-fit pienentää edelleen jos pisin sana ei mahdu (KORTTISÄÄNTÖ). */
+   JS auto-fit pienentää edelleen jos pisin sana ei mahdu (KORTTISÄÄNTÖ).
+   12.11.2026 (Heikki): kysymys normaalilla kirjoitusasulla (ei versaaleja). Pienaakkosten ali- ja yläpidennykset
+   (g, j, p, y, Ä, Ö) tarvitsevat ilmaa: rivivälit 0.98–1.05 → 1.06–1.1. */
 .tn20 .tng-context { font-size: clamp(10.5px, 1cqw, 13px); font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase; color: var(--tnAccText); }
 .tn20 .tng-qh {
   margin: 0; max-width: 23ch;
   font-family: var(--tn-font-display); font-weight: 900;
-  font-size: clamp(28px, min(4.7cqw, 9.2dvh), 74px); line-height: 0.98; letter-spacing: -0.015em;
-  text-transform: uppercase; color: #fffbf2; text-wrap: balance;
+  font-size: clamp(28px, min(4.7cqw, 9.2dvh), 74px); line-height: 1.06; letter-spacing: -0.015em;
+  color: #fffbf2; text-wrap: balance;
   hyphens: none; -webkit-hyphens: none; overflow-wrap: normal; word-break: keep-all;
   text-shadow: 0 2px 30px rgba(0, 0, 0, 0.6);
   /* 1a (CD kierros 5, arvo 5): kevennys lukituksessa 180 ms — vastauslista ei
      liiku, koska se on omassa palstassaan ja rivit 1/2 jakavat saman korkeuden. */
   transition: font-size 180ms cubic-bezier(0.2, 0.7, 0.3, 1), line-height 180ms cubic-bezier(0.2, 0.7, 0.3, 1);
 }
-.tn20 .tng-qh[data-img="1"] { max-width: 26ch; font-size: clamp(24px, min(3.2cqw, 6.4dvh), 46px); line-height: 1.02; }
-.tn20 .tng-qh[data-qlen="med"] { font-size: clamp(26px, min(4cqw, 7.8dvh), 58px); max-width: 27ch; line-height: 1.02; }
-.tn20 .tng-qh[data-qlen="long"] { font-size: clamp(24px, min(3.4cqw, 6.6dvh), 46px); max-width: 32ch; line-height: 1.05; }
+.tn20 .tng-qh[data-img="1"] { max-width: 26ch; font-size: clamp(24px, min(3.2cqw, 6.4dvh), 46px); line-height: 1.08; }
+.tn20 .tng-qh[data-qlen="med"] { font-size: clamp(26px, min(4cqw, 7.8dvh), 58px); max-width: 27ch; line-height: 1.08; }
+.tn20 .tng-qh[data-qlen="long"] { font-size: clamp(24px, min(3.4cqw, 6.6dvh), 46px); max-width: 32ch; line-height: 1.1; }
 /* Kannan pisimmät kysymykset (~440 merkkiä, esim. Sibelius-kysymys) — oma porras
    designin med/long-portaiden jatkoksi, jotta kysymys ei täytä koko ruutua. */
 .tn20 .tng-qh[data-qlen="xlong"] { font-size: clamp(19px, min(2.4cqw, 5dvh), 32px); max-width: 44ch; line-height: 1.12; letter-spacing: 0; }

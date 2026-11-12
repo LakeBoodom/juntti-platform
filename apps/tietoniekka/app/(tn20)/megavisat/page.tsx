@@ -1,29 +1,21 @@
-// TIETONIEKKA 2.0 — MEGAVISAT-LANDING (uusi CD-design 26.8.2026,
-// design_handoff_megavisat/README.md: hero "Pitkä peli" + MEGA-kuvamerkki →
-// nosto (Yleistiedon mega) → kuvakorttiruudukko 6 megaa → Näin mega toimii →
-// footer). Korvaa 13.–14.8. version (aihekortit ilman kuvia, pituusvalitsin
-// piilotettuna Aloita/Tulossa-logiikan taakse).
-//
-// README:n vakiosäännöt noudatettu: EI pituus/suodatin-pillereitä, EI
-// "Tulossa"-kortteja (kaikki 7 megaa on koottu mega_questions-tauluun,
-// pelattavissa vaikka status=draft — draft on tarkoituksellinen niin kauan
-// kuin koko 2.0 on preview-branchilla, Heikin päätös 26.8.2026). Kortit
-// haetaan kannasta slugilla — jos mega puuttuisi, kortti jää pois listasta
-// hiljaa sen sijaan että linkittäisi tyhjään.
-//
-// Designin oma header + heron sisäinen inline-nav jätetty pois — sama
-// linjaus kuin muissa teemasivuissa (Jääkiekko/Jalkapallo/Maantieto):
-// sivuston globaali yläpalkki + Crumbs-murupolku hoitavat navigaation.
+// MEGAVISAT /megavisat hub-rungolla (Heikki 12.11.2026, vaihe 2): 1) hero = studiokuva (Mikko) + nimi + intro omalla
+// pohjallaan ja datasta laskettu rivi "{n} megavisaa · {min}–{max} kysymystä"; 2) nosto = Yleistiedon megavisa korostettuna
+// rivinä (korvaa entisen täysleveän Uusin-kortin; "Uusin" ei pitänyt paikkaansa, mega on vanhin → merkki "Kaikki aiheet");
+// 3) muut megat jaettuina riveinä (kuva, nimi, tietorivi "{n} kysymystä · kesto"); 4) Näin mega toimii suljettuna.
+// Kortit haetaan kannasta slugilla — jos mega puuttuu tai siinä ei ole pelattavia kysymyksiä, rivi jää pois hiljaa.
+// Kysymysmäärät datasta (megaMaarat = pelattavat kysymykset, sama luku kuin pelissä), ei kovakoodattuina.
 
 import { KokoelmaLd } from "@/components/tn20/KokoelmaLd";
 import { jakoMeta } from "@/lib/jakoMeta";
-import "../megavisat.css";
 import type { Metadata } from "next";
 import { cache } from "react";
 import { getSupabase } from "@/lib/supabase";
 import Crumbs from "@/components/tn20/Crumbs";
-import { MobiiliSankari } from "@/components/tn20/MobiiliSankari";
-import { MEGA_FEATURED, MEGA_GRID, megaDuration, megaMaarat, maaraVali } from "@/lib/megavisat";
+import PeliKehys from "@/components/tn20/pelikehys/PeliKehys";
+import HubHero from "@/components/tn20/korttirivi/HubHero";
+import HubRivit, { HubNosto, type RiviKortti } from "@/components/tn20/korttirivi/KorttiRivi";
+import HubOhjeet from "@/components/tn20/korttirivi/HubOhjeet";
+import { MEGA_FEATURED, MEGA_GRID, megaDuration, megaMaarat, maaraVali, type MegaCard } from "@/lib/megavisat";
 
 export const revalidate = 300; // SEO-erä A4 (2.10.2026): ISR 5 min
 
@@ -82,165 +74,79 @@ const haeMegat = cache(async () => {
   return { featuredQuiz, featuredCount, gridItems, kaikkiMaarat, aiheet };
 });
 
+/* Intro: Heikin teksti 12.11.2026 (ensimmäinen lause korostettuna). */
+const KOROSTUS = "Megavisa on pitkä tietovisa yhdestä aiheesta, yhdellä istumalla ja ilman taukoja.";
+const INTRO = "Valitse aihe ja katso, kuinka pitkälle tietosi kantavat.";
+
+/* Rivi: nimi + tietorivi "{n} kysymystä · ~20 min" (datasta). Nostossa lisäksi aiheen kuvaus. */
+const rivi = (card: MegaCard, quiz: MegaRow, count: number): RiviKortti => ({
+  href: `/peli?mega=${quiz.slug}`,
+  kuva: `/20/rivi/mega-${card.slug}.webp`,
+  kuvaton: card.tag,
+  nimi: quiz.title.replace(/ -/g, "\u00a0-"), // "Maailman kolkat -megavisa": yhdysmerkki ei jää rivin alkuun
+  rivi: `${count} kysymystä · ${megaDuration(count)}`,
+});
+
 export default async function MegavisatLanding() {
   const megat = await haeMegat();
   if (!megat) return <main style={{ padding: 32 }}>Ei tietokantayhteyttä.</main>;
   const { featuredQuiz, featuredCount, gridItems, kaikkiMaarat } = megat;
-
-  const totalMegas = (featuredQuiz && featuredCount > 0 ? 1 : 0) + gridItems.length;
-  const totalQuestions = kaikkiMaarat.reduce((sum, n) => sum + n, 0);
   const vali = maaraVali(kaikkiMaarat);
+  const nosto = featuredQuiz && featuredCount > 0
+    ? { ...rivi(MEGA_FEATURED, featuredQuiz, featuredCount), merkki: `${featuredCount} kysymystä · ${megaDuration(featuredCount)}`, rivi: MEGA_FEATURED.desc }
+    : null;
+  const rivit = gridItems.map(({ card, quiz, count }) => rivi(card, quiz!, count));
   const lyhin = kaikkiMaarat.length ? Math.min(...kaikkiMaarat) : 0;
   const pisin = kaikkiMaarat.length ? Math.max(...kaikkiMaarat) : 0;
 
+  const saannot = [
+    {
+      t: "Valitse aihe",
+      d: lyhin && lyhin !== pisin
+        ? `Jokainen mega on oma kokonaisuutensa: ${lyhin} kysymystä kahvitauolle, ${pisin} illan sessioon.`
+        : "Jokainen mega on oma kokonaisuutensa: valitse aihe ja pelaa yhdellä istumalla.",
+    },
+    { t: "Yksi istunto, ei taukoja", d: "Mega ei tallenna välitilaa. Poistuminen kesken päättää kierroksen." },
+    { t: "Putki ratkaisee", d: "Peräkkäiset oikeat kasvattavat kerrointa. Yksi väärä nollaa sen." },
+  ];
+
   return (
-    <main className="tnm2" style={{ minHeight: "100dvh" }}>
+    <PeliKehys iho="tumma">
       <KokoelmaLd avain="megavisat" nimi="Megavisat" polku="/megavisat" />
       <Crumbs items={[{ label: "Megavisat" }]} />
-
-      {/* Mobiili: Mikko Megavisa-studiossa (Heikki 26.9.2026), teksti kuvan päällä */}
-      <MobiiliSankari
-        variant="overlay"
-        tint="#0D0B05"
-        image={{ src: "/20/megavisat/mikko-hero-mob.webp", position: "center 4%", alt: "Mikko Megavisa-studiossa" }}
-        accent="#E8A320"
-        eyebrow="Pitkä peli"
-        title={["Megavisat"]}
-        lead="Megavisa on yksi istunto ilman taukoja: valitse aihe ja pelaa loppuun asti. Ei selityksiä — vain pisteet ja putki."
-        stats={totalMegas > 0 ? [{ n: totalMegas, label: "megavisaa" }, ...(vali ? [{ n: vali, label: "kysymystä per mega" }] : [])] : []}
-      />
-
-      {/* ─── Hero: "Pitkä peli" ─── */}
-      <section className="tnm2-herowrap tnm2-herowrap--kuva tnms-desk">
-        {/* Herokuva: Mikko Megavisa-studiossa (Heikki 26.9.2026), korvaa MEGA-kuvamerkin */}
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          className="tnm2-herokuva"
-          src="/20/megavisat/mikko-hero.webp"
-          srcSet="/20/megavisat/mikko-hero-900.webp 900w, /20/megavisat/mikko-hero.webp 1672w"
-          sizes="100vw"
-          alt="Mikko Megavisa-studiossa"
-          width={1672}
-          height={941}
-          fetchPriority="high"
-        />
-        <div className="tn-shell tnm2-hero">
-          <div className="tnm2-hero-left">
-            <span className="tnm2-pill">Pitkä peli</span>
-            <h1 className="tnm2-h1">Megavisat</h1>
-            <p className="tnm2-lede">
-              Megavisa on yksi istunto ilman taukoja: valitse aihe ja pelaa loppuun asti.{" "}
-              <b>Ei selityksiä</b> — vain pisteet ja putki.
-            </p>
-            {totalMegas > 0 && (
-              <div className="tnm2-stats">
-                <div className="tnm2-stat">
-                  <span className="tnm2-stat-val">{totalMegas}</span>
-                  <span className="tnm2-stat-label">megavisaa</span>
-                </div>
-                {vali && (
-                  <div className="tnm2-stat">
-                    <span className="tnm2-stat-val">{vali}</span>
-                    <span className="tnm2-stat-label">kysymystä per mega</span>
-                  </div>
-                )}
-                <div className="tnm2-stat">
-                  <span className="tnm2-stat-val">0</span>
-                  <span className="tnm2-stat-label">taukoa</span>
-                </div>
-              </div>
-            )}
-          </div>
+      <main>
+        <div className="hub">
+          <HubHero
+            kuva={{
+              src: "/20/megavisat/mikko-hero.webp",
+              srcSet: "/20/megavisat/mikko-hero-900.webp 900w, /20/megavisat/mikko-hero.webp 1672w",
+              alt: "Mikko Megavisa-studiossa",
+              width: 1672,
+              height: 941,
+              pos: "center 30%",
+            }}
+            nimi="Megavisat"
+            korostus={KOROSTUS}
+            intro={INTRO}
+            lisa={kaikkiMaarat.length && vali ? `${kaikkiMaarat.length} megavisaa · ${vali} kysymystä` : undefined}
+          />
+          {nosto ? <HubNosto k={nosto} merkki="Kaikki aiheet" cta="Aloita mega" entry="megavisat:nosto" /> : null}
+          <HubRivit kortit={rivit} nimi="Megavisat" eager={3} />
+          <HubOhjeet
+            kohdat={[{
+              otsikko: "Näin mega toimii",
+              sisalto: (
+                <ul>
+                  {saannot.map((r) => (
+                    <li key={r.t}><b>{r.t}.</b> {r.d}</li>
+                  ))}
+                </ul>
+              ),
+            }]}
+          />
         </div>
-      </section>
-
-      {/* ─── Nosto: Yleistiedon mega ─── */}
-      {featuredQuiz && featuredCount > 0 && (
-        <section className="tn-shell tnm2-featwrap">
-          <a className="tnm2-feat" href={`/peli?mega=${featuredQuiz.slug}`}>
-            <span className="tnm2-feat-media">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={MEGA_FEATURED.img} alt="" loading="eager" style={{ objectPosition: MEGA_FEATURED.pos }} />
-              <span className="tnm2-feat-badge">Uusin</span>
-            </span>
-            <span className="tnm2-feat-body">
-              <span className="tnm2-feat-tag"><i aria-hidden />{MEGA_FEATURED.tag}</span>
-              <span className="tnm2-feat-title">{featuredQuiz.title}</span>
-              <span className="tnm2-feat-desc">{MEGA_FEATURED.desc}</span>
-              <span className="tnm2-feat-foot">
-                <span className="tnm2-feat-num">
-                  {featuredCount}
-                  <small>kysymystä · {megaDuration(featuredCount)}</small>
-                </span>
-                <span className="tnm2-feat-cta">Aloita mega →</span>
-              </span>
-            </span>
-          </a>
-        </section>
-      )}
-
-      {/* ─── Kaikki megavisat ─── */}
-      {gridItems.length > 0 && (
-        <section className="tn-shell tnm2-section" id="megat">
-          <div className="tnm2-gridhead">
-            <h2 className="tnm2-h2">Kaikki megavisat</h2>
-            <span className="tnm2-gridnote">
-              {totalMegas} megavisaa · {totalQuestions} kysymystä yhteensä
-            </span>
-          </div>
-          <div className="tnm2-grid">
-            {gridItems.map(({ card, quiz, count }) => (
-              <a key={card.slug} className="tnm2-card" href={`/peli?mega=${quiz!.slug}`}>
-                <span className="tnm2-card-media">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={card.img} alt="" loading="lazy" style={{ objectPosition: card.pos }} />
-                  <span className="tnm2-card-qpill">
-                    <b>{count}</b>
-                    <span>kysymystä</span>
-                  </span>
-                  <span className="tnm2-card-tag"><i aria-hidden />{card.tag}</span>
-                </span>
-                <span className="tnm2-card-body">
-                  <span className="tnm2-card-title">{quiz!.title}</span>
-                  <span className="tnm2-card-desc">{card.desc}</span>
-                  <span className="tnm2-card-foot">
-                    <span className="tnm2-card-duration">{megaDuration(count)} · yksi istunto</span>
-                    <span className="tnm2-card-cta tn-card-cta">Pelaa →</span>
-                  </span>
-                </span>
-              </a>
-            ))}
-          </div>
-        </section>
-      )}
-
-      {/* ─── Näin mega toimii ─── */}
-      <section className="tn-shell tnm2-section">
-        <h2 className="tnm2-h2">Näin mega toimii</h2>
-        <div className="tnm2-rules">
-          {[
-            {
-              n: 1,
-              t: "Valitse aihe",
-              d: lyhin && lyhin !== pisin
-                ? `Jokainen mega on oma kokonaisuutensa: ${lyhin} kysymystä kahvitauolle, ${pisin} illan sessioon.`
-                : "Jokainen mega on oma kokonaisuutensa: valitse aihe ja pelaa yhdellä istumalla.",
-            },
-            { n: 2, t: "Yksi istunto, ei taukoja", d: "Mega ei tallenna välitilaa. Poistuminen kesken päättää kierroksen." },
-            { n: 3, t: "Putki ratkaisee", d: "Peräkkäiset oikeat kasvattavat kerrointa. Yksi väärä nollaa sen." },
-          ].map((r) => (
-            <div key={r.n} className="tnm2-rule">
-              <span className="tnm2-rule-num">{r.n}</span>
-              <span>
-                <b>{r.t}</b>
-                <p>{r.d}</p>
-              </span>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* Alatunniste tulee layoutista (SiteFooter, QA-005 29.8.2026) */}
-    </main>
+      </main>
+      {/* Alatunniste tulee layoutista (SiteFooter) */}
+    </PeliKehys>
   );
 }

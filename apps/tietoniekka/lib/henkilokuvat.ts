@@ -401,6 +401,8 @@ export const HENKILOKUVAT: Record<string, string> = {
   "Rishi Sunak Official Cabinet Portrait, September 2021 (cropped).jpg": "/20/henkilot/k/rishi-sunak-official-cabinet-portrait-se-c592c5.webp",
   "Ville Niinisto Grona forbundet (grona) Finland. Nordiska radets session 2010.jpg": "/20/henkilot/k/ville-niinisto-grona-forbundet-grona-fin-6fca42.webp",
   "2023 Prince of Wales (cropped)02.JPG": "/20/henkilot/k/2023-prince-of-wales-cropped-02-585f46.webp",
+  /* 11.11.2026: Lenita Airisto (henkilösivun yläkuva ei enää lataa Wikimediasta). */
+  "Diplomiekonomi Lenita Airisto vuonna 1976.jpg": "/20/henkilot/k/diplomiekonomi-lenita-airisto-vuonna-1976-103288.webp",
 };
 
 /** Commons-tiedoston nimi URL:sta (thumb- tai alkuperäinen polku), välilyönnein. */

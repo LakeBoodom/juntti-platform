@@ -58,7 +58,7 @@ function PaivanPelit({ d }: { d: D }) {
           {/* Synttärit A (v7 1b): iso ikä täyttää oikean puolen. Muistopäivänä "vuotta syntymästä".
               Nappi nimeää visan (31.10.); U+200B yhdysmerkin jälkeen, koska Safari ei katkaise siitä keep-all-tilassa. */}
           {sankari && (
-            <a className="tn-es-synt" href={sankari.playHref} data-tn-entry="etusivu:synttarit">
+            <a className="tn-es-synt" href={sankari.playHref} data-tn-entry="etusivu:synttarit" aria-label={`Pelaa ${sankari.nimi} -visa`}>
               <span className="tn-es-synt-kuva">
                 <Kuva src={sankari.kuva} pos={sankari.kuvaPos} luokka="tn-es-synt-img" sizes="(min-width: 1100px) 180px, 132px" />
               </span>
@@ -73,7 +73,8 @@ function PaivanPelit({ d }: { d: D }) {
                   </span>
                   <span className="tn-es-synt-h" style={lw(sankari.nimi)}>{sankari.nimi}</span>
                 </span>
-                <span className="tn-es-nappi tn-es-synt-nappi">Pelaa {sankari.nimi.replace(/(?<=\p{L})-(?=\p{L})/gu, "-\u200B")} -visa</span>
+                {/* Heikki 11.11.: lyhyt "Pelaa visa"; visan nimi linkin aria-labelissa. */}
+                <span className="tn-es-nappi tn-es-synt-nappi">Pelaa visa</span>
               </span>
             </a>
           )}
@@ -192,14 +193,17 @@ function Pelit({ p }: { p: D["pelit"] }) {
                   </span>
                   {m.tila === "tulossa" && <span className="tn-es-leima">Tulossa</span>}
                   <span className="tn-es-peli-teksti">
-                    {/* Järjestä-kortti (CD 31.10.2026): vain otsikko — laji = nimi ja kuvaus tyhjä jätetään pois. */}
+                    {/* Lajimerkki, kun se eroaa nimestä (Järjestä-kortti 11.11.: "Järjestyspeli"). */}
                     {m.laji !== m.nimi && (
                       <span className="tn-es-laji" style={{ "--acc": m.aksentti } as CSSProperties}>
                         <i aria-hidden="true" />
                         <span className="tn-es-laji-teksti">{m.laji}</span>
                       </span>
                     )}
-                    <span className="tn-es-peli-h" lang="fi" style={lw(m.nimi)}>{m.nimi}</span>
+                    {/* Mobiili (11.11.): nimi rivittyy tavutuskohdista (U+00AD); --lwt = pisin tavuosa, desktop --lw ennallaan. */}
+                    <span className="tn-es-peli-h" lang="fi" style={{ ...lw(m.nimi), "--lwt": pisin((m.tavut ?? m.nimi).replace(/\|/g, " ")) } as CSSProperties}>
+                      {m.tavut ? m.tavut.replace(/\|/g, "\u00AD") : m.nimi}
+                    </span>
                     {m.etusivu_rivi && <span className="tn-es-peli-rivi">{m.etusivu_rivi}</span>}
                     <span className="tn-es-peli-nuoli" aria-hidden="true">›</span>
                   </span>
@@ -259,7 +263,8 @@ function Juontajat({ j }: { j: D["juontajat"] }) {
                 <span className="tn-es-juontaja-h" style={lw(h.visa)}>{h.visa}</span>
               </span>
               <span className="tn-es-juontaja-koukku">{h.koukku ? h.teaser : `”${h.teaser}”`}</span>
-              <span className="tn-es-nappi tn-es-nappi--lime">Pelaa</span>
+              {/* Heikki 11.11.: tumma toissijainen nappi kuten Promo-kortissa; lime vain Päivän visassa (UI-laatusääntö 5). */}
+              <span className="tn-es-nappi">Pelaa</span>
             </span>
           </a>
         ))}
@@ -315,7 +320,7 @@ function LapsetJaPaketit({ l, vp }: { l: D["lapset"]; vp: D["visapaketit"] }) {
           <div className="tn-es-otsake">
             <span className="tn-es-kicker">Visapaketit · ilmainen</span>
             <h2 id="tn-es-vp-h" className="tn-es-h2">Visailta valmiina</h2>
-            <p className="tn-es-vp-ingressi">Valmiit kierrokset vastauksineen. Pelaa yhdessä, näytä ruudulta tai tulosta joukkueille.</p>
+            <p className="tn-es-vp-ingressi">Valmis tietovisa juhliin, kerhoon tai pubiporukalle. Näytä kysymykset ruudulta tai tulosta paperille, ilmaiseksi.</p>
           </div>
           {vp.iso && (
             <a className="tn-es-vp-iso" href={vp.iso.href}>

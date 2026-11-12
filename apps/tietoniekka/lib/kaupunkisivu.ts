@@ -3,7 +3,7 @@
 //   /kaupunki/<slug>  kaupunkisivu (vain julkaistu = true; esikatselu- ja kehitysympäristössä myös julkaisemattomat)
 //   /kaupunki         lista julkaistuista
 //   /<slug>           308 → /kaupunki/<slug> (app/(tn20)/[lyhyt]/page.tsx)
-// Visat ryhmitellään kategorian mukaan (RYHMAT). Henkilöt: syntymäpaikka (ennen pilkkua) = inessiivi tai vanha kunta.
+// Visat ryhmitellään kategorian mukaan (RYHMAT). Henkilöt: born_in-suhteet (H5), varalla syntymäpaikan teksti.
 // Koukku puuttuu → varateksti "Mitä tiedät {elatiivi}?" (CD:n sääntö). Kausinosto: quizzes.kausi = nykyinen kausi.
 import { cache } from "react";
 import { getSupabase } from "@/lib/supabase";
@@ -26,12 +26,13 @@ export type Kaupunki = {
   hook_og: string | null;
   hero_kuva: string | null;
   vaakuna_url: string | null;
-  vanhat_kunnat: string[];
+  /** Tietomallin kaupunkientiteetti (H5): henkilöosio born_in-suhteista. */
+  entity_id: string | null;
   julkaistu: boolean;
 };
 
 const KENTAT =
-  "slug, nimi, inessiivi, elatiivi, asukasnimitys, korttinimi, kaupunkivisa_quiz_id, tunnusrivi, hook, hook_og, hero_kuva, vaakuna_url, vanhat_kunnat, julkaistu";
+  "slug, nimi, inessiivi, elatiivi, asukasnimitys, korttinimi, kaupunkivisa_quiz_id, tunnusrivi, hook, hook_og, hero_kuva, vaakuna_url, entity_id, julkaistu";
 
 export const kaupunkiHref = (slug: string) => `/kaupunki/${slug}`;
 export const KAUPUNGIT_LISTA = "/kaupunki";
@@ -144,28 +145,73 @@ async function haePaikkakunnanVisat(slugit: string[]): Promise<VisaRivi[]> {
 }
 
 /* ── Henkilöt ──────────────────────────────────────────────────────────────────────────────────────────── */
+/* H5 "Täältä kotoisin" (11.11.2026): henkilöt luetaan tietomallin born_in-suhteista (fact_relationships →
+   kaupungit.entity_id), joissa lakkautetut kunnat on jo kytketty nykyiseen kuntaan (detail "Nastola (nyk. Lahti)").
+   Henkilö näkyy vain, jos hänellä on julkaistu person-entiteetti born_in-suhteineen. Tekstihaun varahaku ja
+   kaupungit.vanhat_kunnat poistettiin 11.11.2026 (Heikki), kun kaikki henkilöt olivat suhteiden piirissä. */
 
-export type KaupunkiHenkilo = { name: string; href: string; image_url: string | null };
+/** `ala`: vanhan kunnan lisärivi ("s. Nastolassa"), tyhjä jos henkilö on syntynyt nykyisen kunnan alueella. */
+export type KaupunkiHenkilo = { name: string; href: string; image_url: string | null; ala: string };
 /** Henkilöosio näkyy jo yhdellä henkilöllä (Heikki 7.11.2026: yksikin auttaa pientä kaupunkia); enintään 8. */
 export const HENKILOT_MIN = 1;
 export const HENKILOT_MAX = 8;
 
-async function haeSyntyneet(k: Kaupunki): Promise<KaupunkiHenkilo[]> {
+/* Lakkautettujen kuntien inessiivit (sisä- vai ulkopaikallissija on sanakohtainen, ei pääteltävissä). Tuntematon
+   kunta näytetään suhteen detail-tekstinä sellaisenaan ("Nastola (nyk. Lahti)"). */
+const VANHA_KUNTA_INESSIIVI: Record<string, string> = {
+  Haukipudas: "Haukiputaalla",
+  Haukivuori: "Haukivuorella",
+  Jaala: "Jaalassa",
+  Juankoski: "Juankoskella",
+  Nastola: "Nastolassa",
+  Nurmo: "Nurmossa",
+  Peräseinäjoki: "Peräseinäjoella",
+  Sammatti: "Sammatissa",
+  Valkeala: "Valkealassa",
+};
+
+/** born_in-suhteen detail → kortin lisärivi. "Nastola (nyk. Lahti)" → "s. Nastolassa";
+ *  "Mikkelin maalaiskunta (nyk. Mikkeli)" → "s. Mikkelin maalaiskunnassa". */
+export function vanhaKuntaRivi(detail: string | null | undefined): string {
+  const d = detail?.trim();
+  if (!d) return "";
+  const kunta = d.split(" (nyk.")[0].trim();
+  const mlk = /^(.+) maalaiskunta$/.exec(kunta);
+  const ines = mlk ? `${mlk[1]} maalaiskunnassa` : VANHA_KUNTA_INESSIIVI[kunta];
+  return ines ? `s. ${ines}` : d;
+}
+
+type CelebRivi = { id: string; name: string; image_url: string | null; priority: number | null; trivia_quiz_id: string | null };
+const CELEB_KENTAT = "id, name, image_url, priority, trivia_quiz_id";
+
+/** Kaupungissa syntyneet born_in-suhteista. Jokainen henkilö kerran (celebrity_id). */
+export async function haeSyntyneet(k: Kaupunki): Promise<KaupunkiHenkilo[]> {
   const sb = sbAny();
   const siteId = await getSiteId();
-  if (!sb || !siteId) return [];
-  const muodot = [k.inessiivi, ...(k.vanhat_kunnat ?? [])];
-  const lainaus = (s: string) => `"${s.replace(/"/g, "")}"`;
-  /* "Helsingissä" tai "Helsingissä, Suomessa" (lisäys pilkun jälkeen). celebrities-RLS piilottaa henkilöt, joiden
-     visa on luonnos, joten jokaisella rivillä on julkaistu henkilösivu. */
-  const ehto = [`birth_place.in.(${muodot.map(lainaus).join(",")})`, ...muodot.map((m) => `birth_place.like.${lainaus(`${m},*`)}`)].join(",");
-  const { data } = await sb
-    .from("celebrities")
-    .select("name, image_url, priority, trivia_quiz_id")
-    .eq("site_id", siteId)
-    .or(ehto)
-    .limit(300);
-  const rivit = (data ?? []) as Array<{ name: string; image_url: string | null; priority: number | null; trivia_quiz_id: string | null }>;
+  if (!sb || !siteId || !k.entity_id) return [];
+
+  const suhteet = await sb
+    .from("fact_relationships")
+    .select("detail, fact_entities!fact_relationships_from_entity_fkey!inner(celebrity_id, kind, status)")
+    .eq("rel_type", "born_in")
+    .eq("to_entity", k.entity_id)
+    .eq("fact_entities.kind", "person")
+    .eq("fact_entities.status", "published")
+    .limit(500);
+
+  /* Sama henkilö voi olla kahtena entiteettinä (person + player); kind = person ja celebrity_id kerran. */
+  const lisarivi = new Map<string, string>();
+  for (const r of (suhteet.data ?? []) as Array<{ detail: string | null; fact_entities: { celebrity_id: string | null } }>) {
+    const id = r.fact_entities.celebrity_id;
+    if (!id) continue;
+    const rivi = vanhaKuntaRivi(r.detail);
+    if (!lisarivi.has(id) || (rivi && !lisarivi.get(id))) lisarivi.set(id, rivi);
+  }
+  const { data: celebData } = lisarivi.size
+    ? await sb.from("celebrities").select(CELEB_KENTAT).eq("site_id", siteId).in("id", [...lisarivi.keys()])
+    : { data: [] };
+  const rivit = (celebData ?? []) as CelebRivi[];
+
   /* Tunnettuus (brief: priority/is_hero ensin): priority on lähes kaikilla 5 ja is_hero tarkoittaa etusivun nostoa,
      joten järjestys on kuvalliset ensin → henkilövisan suosio (eri selaimet 90 pv) → priority → aakkoset. */
   const idt = rivit.flatMap((r) => (r.trivia_quiz_id ? [r.trivia_quiz_id] : []));
@@ -174,10 +220,10 @@ async function haeSyntyneet(k: Kaupunki): Promise<KaupunkiHenkilo[]> {
     const { data: s } = await sb.from("quiz_cards").select("id, suosio_90pv").in("id", idt);
     for (const r of (s ?? []) as Array<{ id: string; suosio_90pv: number | null }>) suosio.set(r.id, r.suosio_90pv ?? 0);
   }
-  const pisteet = (r: (typeof rivit)[number]) => (r.trivia_quiz_id ? suosio.get(r.trivia_quiz_id) ?? 0 : 0);
+  const pisteet = (r: CelebRivi) => (r.trivia_quiz_id ? suosio.get(r.trivia_quiz_id) ?? 0 : 0);
   return rivit
     .sort((a, b) => Number(!!b.image_url) - Number(!!a.image_url) || pisteet(b) - pisteet(a) || (b.priority ?? 0) - (a.priority ?? 0) || a.name.localeCompare(b.name, "fi"))
-    .map((r) => ({ name: r.name, href: henkiloHref(r.name), image_url: r.image_url }));
+    .map((r) => ({ name: r.name, href: henkiloHref(r.name), image_url: r.image_url, ala: lisarivi.get(r.id) ?? "" }));
 }
 
 /* ── Sivu ──────────────────────────────────────────────────────────────────────────────────────────────── */

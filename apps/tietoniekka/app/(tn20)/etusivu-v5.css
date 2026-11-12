@@ -94,6 +94,9 @@
 }
 .tn20 .tn-es-pv:not([data-kuva]) { min-height: 0; }
 .tn20 .tn-es-pv::before { content: ""; position: absolute; inset: 0 0 auto; height: 4px; background: var(--pv); z-index: 2; }
+/* Kuvakortissa ei yläviivaa (Heikki 11.11.2026): viikonpäivän väri näkyi vaaleana raitana kuvan yläpuolella (keskiviikko =
+   vaaleansininen). Kuva peittää kortin yläreunaan asti; tunnusväri jää merkkiin ja taustan hehkuun. */
+.tn20 .tn-es-pv[data-kuva]::before { content: none; }
 .tn20 .tn-es-pv-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 30%; z-index: -2; }
 .tn20 .tn-es-pv[data-kuva]::after {
   content: ""; position: absolute; inset: 0; z-index: -1;
@@ -512,6 +515,40 @@
 }
 /* Tulossa-kortissa (Mikä maa?) kuvitus himmennetään kuten valokuva. */
 .tn20 .tn-es-peli[data-tulossa] .tn-es-peli-kuva:has(.tn-pk) { filter: grayscale(.4); opacity: .7; }
+
+/* Mobiili < 768 (Heikki 11.11.2026): karusellin tilalle kahden sarakkeen ruudukko, kaikki 11 pelimuotoa näkyvät ilman
+   sivuttaispyyhkäisyä. Kortissa kuva (16:10) + lajimerkki + nimi, ei kuvausriviä. Nimi rivittyy tavutuskohdista (tavut → U+00AD,
+   --lwt = pisin tavuosa) ja on 14–18 px; tavuviivojen takia word-break: normal (KORTTISÄÄNTÖ 5, WebKit). Kuvitusten 242 × 151
+   -kehys skaalataan kortin levyiseksi 10 px:n portain (pyöristys ylöspäin: reunat leikkautuvat ≤ 4 %, ei tyhjää reunaa). */
+@media (max-width: 767px) {
+  .tn20 .tn-es-rivi {
+    display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; overflow: visible; margin: 0; padding: 0;
+    scroll-snap-type: none;
+  }
+  .tn20 .tn-es-peli { width: auto; scroll-snap-align: none; }
+  .tn20 .tn-es-peli-kuva { height: auto; aspect-ratio: 242 / 151; }
+  .tn20 .tn-es-peli-teksti { gap: 6px; padding: 10px 12px 14px; }
+  .tn20 .tn-es-peli .tn-es-laji { font-size: 11px; letter-spacing: .07em; }
+  .tn20 .tn-es-peli-h {
+    font-size: clamp(14px, calc(100cqw / (var(--lwt, var(--lw)) * .64)), 18px); line-height: 1;
+    overflow-wrap: normal; word-break: normal; -webkit-hyphens: manual; hyphens: manual;
+  }
+  .tn20 .tn-es-peli-rivi { display: none; }
+}
+@container pk (max-width: 249px) { .tn20 .tn-pk-kehys { transform: translate(-50%, -50%) scale(1.033); } }
+@container pk (max-width: 239px) { .tn20 .tn-pk-kehys { transform: translate(-50%, -50%) scale(0.992); } }
+@container pk (max-width: 229px) { .tn20 .tn-pk-kehys { transform: translate(-50%, -50%) scale(0.95); } }
+@container pk (max-width: 219px) { .tn20 .tn-pk-kehys { transform: translate(-50%, -50%) scale(0.909); } }
+@container pk (max-width: 209px) { .tn20 .tn-pk-kehys { transform: translate(-50%, -50%) scale(0.868); } }
+@container pk (max-width: 199px) { .tn20 .tn-pk-kehys { transform: translate(-50%, -50%) scale(0.826); } }
+@container pk (max-width: 189px) { .tn20 .tn-pk-kehys { transform: translate(-50%, -50%) scale(0.785); } }
+@container pk (max-width: 179px) { .tn20 .tn-pk-kehys { transform: translate(-50%, -50%) scale(0.744); } }
+@container pk (max-width: 169px) { .tn20 .tn-pk-kehys { transform: translate(-50%, -50%) scale(0.702); } }
+@container pk (max-width: 159px) { .tn20 .tn-pk-kehys { transform: translate(-50%, -50%) scale(0.661); } }
+@container pk (max-width: 149px) { .tn20 .tn-pk-kehys { transform: translate(-50%, -50%) scale(0.62); } }
+@container pk (max-width: 139px) { .tn20 .tn-pk-kehys { transform: translate(-50%, -50%) scale(0.579); } }
+@container pk (max-width: 200px) { .tn20 .tn-pk-usa-rivi { transform: scale(.5); } }
+@container pk (max-width: 160px) { .tn20 .tn-pk-usa-rivi { transform: scale(.42); } }
 
 /* Tabletti ja desktop ≥ 768: ruudukko, sarakkeet ryhmän korttimäärästä (--sar = min(kortit, 4), EtusivuV5): 3 kortin ryhmä
    täyttää rivin eikä jätä tyhjää neljännestä (etusivuanalyysi 30.10. kohta 2). Kaikki kortit mahtuvat → ei nuolia. */

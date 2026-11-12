@@ -19,11 +19,7 @@
 .tn20 .tn-tulos-luku i { font-style: normal; color: var(--tt-acc); }
 .tn20 .tn-tulos-luku--pieni { font-size: 40px; color: var(--tt-muted); }
 .tn20 .tn-tulos-taso { display: flex; flex-direction: column; gap: 2px; min-width: 0; flex: 1 1 auto; }
-.tn20 .tn-tulos-tasonimi {
-  margin: 0; font-family: var(--rk-cond, "Barlow Condensed"), "Barlow Condensed", sans-serif; font-weight: 800; font-size: 24px; line-height: 1.02;
-  text-transform: uppercase; overflow-wrap: normal; word-break: normal; hyphens: manual;
-}
-.tn20 .tn-tulos-pisteet { font-size: 13px; font-weight: 600; color: var(--tt-muted); white-space: nowrap; }
+.tn20 .tn-tulos-pisteet { font-size: 15px; font-weight: 600; color: var(--tt-muted); white-space: nowrap; }
 .tn20 .tn-tulos-lause { margin: 0; max-width: 56ch; font-size: 15px; line-height: 1.5; color: var(--tt-soft); text-wrap: pretty; }
 .tn20 .tn-tulos-lisa { align-self: flex-start; display: inline-flex; align-items: center; gap: 6px; min-height: 44px; font-size: 14px; font-weight: 700; color: var(--tt-acc); text-decoration: none; }
 .tn20 .tn-tulos-pikku { margin: 0; font-size: 12px; font-weight: 800; letter-spacing: .16em; text-transform: uppercase; color: var(--tt-muted); }
@@ -83,7 +79,6 @@
 }
 @media (max-width: 359px) {
   .tn20 .tn-tulos-luku { font-size: 64px; }
-  .tn20 .tn-tulos-tasonimi { font-size: 21px; }
 }
 
 /* Desktop (3b): vasen palsta tulos + vastaukset + seuraava visa, oikealla jako. */
@@ -91,7 +86,7 @@
   .tn20 .tn-tulos { display: grid; grid-template-columns: minmax(0, 1fr) minmax(360px, 480px); gap: 40px; align-items: start; padding: 28px clamp(20px, 3vw, 72px) 56px; }
   .tn20 .tn-tulos-luku { font-size: 112px; }
   .tn20 .tn-tulos-luku--pieni { font-size: 56px; }
-  .tn20 .tn-tulos-tasonimi { font-size: 34px; }
+  .tn20 .tn-tulos-pisteet { font-size: 17px; }
   .tn20 .tn-tulos-tuomio { font-size: 34px; }
   .tn20 .tn-tulos-lause { font-size: 16px; }
   .tn20 .tn-tulos-ruutu { max-width: 34px; }

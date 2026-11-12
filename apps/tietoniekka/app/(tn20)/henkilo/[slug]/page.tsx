@@ -185,7 +185,7 @@ export default async function HenkiloPage({ params }: { params: Promise<{ slug: 
   // "Aloita visa" vie suoraan 1. kysymykseen (Heikki 4.10.): henkilösivu on jo visan esittely.
   const aloitaHref = h.visa ? `${h.visa.href}${h.visa.href.includes("?") ? "&" : "?"}aloita=1` : "";
   const genetiivi = h.elatiivi && /st[aä]$/.test(h.elatiivi) ? h.elatiivi.replace(/st[aä]$/, "n") : null;
-  /* Kokeilu (Heikki 11.11.2026, vain esikatselu): otsikon tilalla visan oikea kysymys; Aloita visa alkaa sillä (&k=,
+  /* Kokeilu (Heikki 11.11.2026, tuotantoon 12.11.): otsikon tilalla visan oikea kysymys; Aloita visa alkaa sillä (&k=,
      ilman haastebanneria). Ei sopivaa kysymystä → nykyinen otsikko. Mittaus: kortti_kokeilut + quiz_plays.entry. */
   const kk = h.korttikysymys;
   if (h.visa)

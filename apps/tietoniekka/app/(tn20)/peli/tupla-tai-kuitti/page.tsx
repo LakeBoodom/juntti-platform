@@ -1,7 +1,5 @@
-// TUPLA TAI KUITTI — pelin aloitus pelikehyksessä (TOTEUTUSBRIEF "Kokoelmasivun runko ja pelikehys" §4,
-// vaihe 4, 20.10.2026): K1 pelipalkki (paluu /kokoelmat) + K2 aloitus (aiheen valinta ja "Aloita · <aihe>"
-// 390 × 844:ssä ilman vieritystä). Entinen studiokuva, nosto ja aiheruudukko korvautuivat valinnalla; ohjelman
-// historia ja säännöt ovat avattavina. Sivuston yläpalkki on piilossa (lib/nav.ts isGameRoute).
+// TUPLA TAI KUITTI — pelimuodon hub-sivu (hub-runko, Heikki 12.11.2026): hero (studiokuva + nimi + intro), aiheet
+// jaettuina riveinä, ohjeet suljettuina. Toteutus TuplaHub.tsx; aiheen pelisivun aloitus on [teema]/ (TuplaAloitus).
 
 import { JsonLd, peliLd } from "@/lib/jsonLd";
 import { jakoMeta } from "@/lib/jakoMeta";
@@ -10,7 +8,7 @@ import { TEEMAT, TUPLA_SIVU } from "@/lib/tuplaTaiKuitti";
 import { TuplaSaannot, TuplaTausta } from "./ohjeet";
 import PeliKehys from "@/components/tn20/pelikehys/PeliKehys";
 import Crumbs from "@/components/tn20/Crumbs";
-import TuplaAloitus from "./TuplaAloitus";
+import TuplaHub from "./TuplaHub";
 
 export const revalidate = 300; // SEO-erä A4
 
@@ -29,18 +27,20 @@ export const metadata: Metadata = {
 };
 
 export default function TuplaTaiKuittiSivu() {
-  const aiheet = TEEMAT.map((t) => ({ slug: t.slug, nimi: t.painos?.nimi ?? t.nimi, accent: t.accent }));
+  /* Rivi = aiheen nimi + kuvausrivi (TEEMAT.nosto); kuva = kokoelman korttikuvan pieni rivikopio (scripts/rivikuvat.py). */
+  const aiheet = TEEMAT.map((t) => ({
+    href: `/peli/tupla-tai-kuitti/${t.slug}?aloita=1`,
+    kuva: `/20/rivi/tupla-${t.slug}.webp`,
+    kuvaton: t.nimi,
+    nimi: t.painos?.nimi ?? t.nimi,
+    rivi: t.nosto,
+  }));
   return (
     <PeliKehys iho="tumma">
       <JsonLd data={peliLd({ name: "Tupla tai kuitti", url: TUPLA_SIVU, description: "Kymmenen yhä vaikeampaa kysymystä; jokainen oikea vastaus tuplaa potin – kuittaa ajoissa tai pelaa kaikesta." })} />
       <Crumbs items={[{ label: "Tupla tai kuitti" }]} />
       <main>
-        <TuplaAloitus
-          aiheet={aiheet}
-          valittu={aiheet[0].slug}
-          saannot={<TuplaSaannot />}
-          tausta={<TuplaTausta />}
-        />
+        <TuplaHub aiheet={aiheet} saannot={<TuplaSaannot />} tausta={<TuplaTausta />} />
       </main>
     </PeliKehys>
   );

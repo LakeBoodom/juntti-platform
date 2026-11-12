@@ -1,0 +1,45 @@
+/* HUB-SIVUN RUNKO (HubHero.tsx, Heikki 12.11.2026). Tumma pohja #131109 (pelikehyksen tumma iho / etusivu).
+   Mobiili: kuva reunasta reunaan 16:9, nimi + intro kuvan alla omalla pohjallaan (ei liukuvärin päällä), laajuusrivit,
+   ohjeet suljettuina. ≥ 760: sisältö 720 px, kuva pyöristettynä. ≥ 1024: kuva ja teksti rinnakkain, sisältö .tn-shellin levyinen (1184 px). */
+.tn20 .hub {
+  --hub-pad: clamp(20px, 4vw, 48px); --hub-ink: #f5f0e6; --hub-dim: #cfc7b6; --hub-line: #2c2517;
+  display: flex; flex-direction: column; gap: 22px; max-width: 720px; margin: 0 auto; padding: 0 var(--hub-pad) 40px;
+  box-sizing: border-box; color: var(--hub-ink);
+}
+.tn20 .hub-hero { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+.tn20 .hub-hero-kuva { margin-inline: calc(-1 * var(--hub-pad)); overflow: clip; background: #0e0d0b; }
+.tn20 .hub-hero-kuva img { display: block; width: 100%; height: auto; aspect-ratio: 16 / 9; object-fit: cover; }
+.tn20 .hub-hero--ilman { padding-top: 24px; }
+.tn20 .hub-hero-teksti { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+/* KORTTISÄÄNTÖ: pisin hub-nimen sana "KARTTAPELIT" (11 merkkiä). Barlow Condensed 800 versaalina ≈ 0.5 em/merkki →
+   320 px:n sivulla (280 px tilaa) enintään ~50 px; 10vw = 32 px @ 320, 39 px @ 390. Mitattu Range-menetelmällä 12.11.2026. */
+.tn20 .hub-h1 {
+  margin: 0; font-family: var(--rk-cond, "Barlow Condensed"), "Barlow Condensed", sans-serif; font-weight: 800; font-size: clamp(32px, 10vw, 56px);
+  line-height: .95; letter-spacing: -.005em; text-transform: uppercase; color: var(--hub-ink);
+  overflow-wrap: normal; word-break: keep-all; text-wrap: balance;
+}
+/* Intro (pelimuodon hub: 2–4 lausetta, poikkeus UI-sääntöön 9): ensimmäinen lause korostettuna. Leipäteksti #CFC7B6
+   pohjalla #131109 ≈ 11:1. */
+.tn20 .hub-intro { margin: 0; max-width: 60ch; font-size: 16px; line-height: 1.5; color: var(--hub-dim); text-wrap: pretty; }
+.tn20 .hub-intro strong { font-weight: 700; color: var(--hub-ink); }
+.tn20 .hub-lisa { margin: 0; font-size: 14px; font-weight: 700; letter-spacing: .02em; color: var(--hub-dim); font-variant-numeric: tabular-nums; }
+.tn20 .hub .pk-ohjeet { margin-top: 0; }
+
+@media (min-width: 760px) {
+  .tn20 .hub-hero { padding-top: 24px; }
+  .tn20 .hub-hero-kuva { margin-inline: 0; border-radius: 18px; }
+}
+@media (min-width: 1024px) {
+  .tn20 .hub { max-width: 1280px; gap: 28px; } /* = .tn-shell: reunat murupolun ja yläpalkin linjassa */
+  .tn20 .hub-hero { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); align-items: center; gap: 40px; padding-top: 32px; }
+  .tn20 .hub-hero--ilman { grid-template-columns: minmax(0, 1fr); }
+  .tn20 .hub-intro { font-size: 17px; }
+}
+
+/* Osio-otsikko hubin sisällä (Kokoelmat: "Pelimuodot") — sama kuin "Pelaa seuraavaksi" -otsikko (.sk-h). */
+.tn20 .hub-osio { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+.tn20 .hub-h2 {
+  margin: 0; min-height: 44px; display: flex; align-items: center;
+  font-family: var(--rk-cond, "Barlow Condensed"), "Barlow Condensed", sans-serif; font-weight: 800; font-size: 28px; line-height: 1;
+  text-transform: uppercase; color: var(--hub-ink);
+}
