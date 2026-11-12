@@ -185,10 +185,14 @@ export default async function HenkiloPage({ params }: { params: Promise<{ slug: 
   // "Aloita visa" vie suoraan 1. kysymykseen (Heikki 4.10.): henkilösivu on jo visan esittely.
   const aloitaHref = h.visa ? `${h.visa.href}${h.visa.href.includes("?") ? "&" : "?"}aloita=1` : "";
   const genetiivi = h.elatiivi && /st[aä]$/.test(h.elatiivi) ? h.elatiivi.replace(/st[aä]$/, "n") : null;
+  /* Kokeilu (Heikki 11.11.2026, tuotantoon 12.11.): otsikon tilalla visan oikea kysymys; Aloita visa alkaa sillä (&k=,
+     ilman haastebanneria). Ei sopivaa kysymystä → nykyinen otsikko. Mittaus: kortti_kokeilut + quiz_plays.entry. */
+  const kk = h.korttikysymys;
   if (h.visa)
     hyllyPelit.push({
-      tyyppi: "visa", id: h.visa.id, href: aloitaHref, fanitasot: h.visa.fanitasot,
-      otsikko: genetiivi ? `Kuinka hyvin tunnet ${genetiivi}?` : h.visa.otsikko,
+      tyyppi: "visa", id: h.visa.id, href: kk ? `${aloitaHref}&k=${kk.id}` : aloitaHref, fanitasot: h.visa.fanitasot,
+      otsikko: kk ? kk.kysymys : genetiivi ? `Kuinka hyvin tunnet ${genetiivi}?` : h.visa.otsikko,
+      kokeilu: { versio: kk ? "kysymys" : "otsikko", sivu: h.slug },
       /* Ei kuvaa (Heikki 11.11.2026): sama muotokuva on jo sivun yläosassa, mobiilissa ne näkyivät päällekkäin. */
     });
   if (h.nosto) hyllyPelit.push({ tyyppi: "jarjestys", ...h.nosto });

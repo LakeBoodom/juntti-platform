@@ -9,6 +9,7 @@ import { henkiloKuva } from "@/lib/henkilokuvat";
 //   - "Muista kokoelmista" -lista hyllyn alla
 // Henkilövisan tila luetaan localStoragesta (GameClient → tn_quiz_results): pelattu → "Sait 4/5" (fanitaso pois 12.11.2026).
 import { useEffect, useState } from "react";
+import { useKorttiKokeilu } from "@/lib/korttiKokeilu";
 
 export type HyllyLaatta = { name: string; image_url: string | null; oma: boolean };
 
@@ -30,6 +31,8 @@ export type HyllyPeli =
       tyyppi: "visa"; id: string; otsikko: string; href: string; fanitasot?: string[] | null;
       /** Henkilön kuva visanostoon (5a) ja sen rajaus (object-position). */
       kuva?: string | null; kuvaPos?: string;
+      /** Henkilösivun korttikokeilu (11.11.2026): otsikkona visan kysymys vai "Kuinka hyvin tunnet …?". */
+      kokeilu?: { versio: "kysymys" | "otsikko"; sivu: string };
     }
   | { tyyppi: "muu"; eyebrow: string; otsikko: string; href: string; aksentti: string };
 
@@ -73,6 +76,7 @@ function TulosRivi({ tulos }: { tulos: Tulos }) {
 
 /** Nosto: Ikäjärjestys (violetti, laatat + akseli) tai henkilövisa. */
 function Nosto({ peli }: { peli: HyllyPeli }) {
+  const kokeiluRef = useKorttiKokeilu(peli.tyyppi === "visa" ? peli.kokeilu : undefined);
   if (peli.tyyppi === "jarjestys") {
     return (
       <a className="hub-nosto hub-nosto--ika" href={peli.href} style={lw(peli.otsikko)}>
@@ -131,7 +135,15 @@ function Nosto({ peli }: { peli: HyllyPeli }) {
     return (
       <VisaTila peli={peli}>
         {(tulos) => (
-          <a className="hub-nosto hub-nosto--visa" href={peli.href} style={lw(peli.otsikko)} data-kuva={peli.kuva ? "" : undefined}>
+          <a
+            ref={kokeiluRef}
+            className="hub-nosto hub-nosto--visa"
+            href={peli.href}
+            style={lw(peli.otsikko)}
+            data-kuva={peli.kuva ? "" : undefined}
+            data-versio={peli.kokeilu?.versio}
+            data-tn-entry={peli.kokeilu ? `henkilosivu:${peli.kokeilu.versio}` : undefined}
+          >
             <span className="hub-visa-paa">
               {peli.kuva && (
                 <span className="hub-visa-kuva">
@@ -141,7 +153,8 @@ function Nosto({ peli }: { peli: HyllyPeli }) {
               )}
               <span className="hub-visa-teksti">
                 <span className="hub-tyyppi hub-tyyppi--visa">Henkilövisa</span>
-                <span className="hub-nosto-otsikko">{peli.otsikko}</span>
+                {/* U+200B yhdysmerkin jälkeen: Safari ei katkaise yhdysmerkistä keep-all-otsikossa (KORTTISÄÄNTÖ 4). */}
+                <span className="hub-nosto-otsikko">{peli.otsikko.replace(/(?<=\p{L})-(?=\p{L})/gu, "-\u200B")}</span>
                 {tulos && <TulosRivi tulos={tulos} />}
               </span>
             </span>

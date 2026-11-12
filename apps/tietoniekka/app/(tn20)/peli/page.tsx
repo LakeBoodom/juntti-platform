@@ -902,8 +902,10 @@ export default async function Peli20({
   /* Vaihe E: vanhoista kysymyskortin linkeistä (&k=<id>) visa alkaa kaverin kysymyksellä, muut perässä normaalisti.
      k hyväksytään vain, jos kysymys kuuluu visaan; muuten parametri ohitetaan. Uudet linkit eivät kanna k:ta (v4). */
   const kParam = typeof params.k === "string" ? params.k : null;
-  const kIndeksi = kParam && game.haaste ? game.questions.findIndex((q) => q.id === kParam) : -1;
-  if (game.haaste && kIndeksi >= 0) {
+  /* Henkilösivun korttikokeilu (11.11.2026): ?aloita=1&k=<id> ilman haastetta → visa alkaa kortin kysymyksellä, ei
+     haastebanneria (game.haaste pysyy tyhjänä). */
+  const kIndeksi = kParam ? game.questions.findIndex((q) => q.id === kParam) : -1;
+  if (kIndeksi >= 0) {
     game.questions = [game.questions[kIndeksi], ...game.questions.filter((_, i) => i !== kIndeksi)];
   }
 

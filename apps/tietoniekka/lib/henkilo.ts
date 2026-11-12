@@ -8,6 +8,7 @@ import { vakaasti } from "./vakaaJarjestys";
 import { lajiMonikko, ryhma, ryhmaOf, type RyhmaKey } from "./henkiloRyhmat";
 import { lueFaktat, type Fakta } from "./henkiloKaava";
 import { visaHref } from "./visaHref";
+import { KYSYMYS_MAX } from "./kysymyskortti";
 import { COLLECTION_LABEL } from "./visanKokoelma";
 import { henkiloSlug } from "./henkiloSlug";
 import { nimiVuotaa, rakennaVuotolista, vastaustenLuvut, type VisanKysymys } from "./vuotolista";
@@ -101,6 +102,9 @@ export type HenkiloSivu = {
   visa: { id: string; href: string; otsikko: string; fanitasot: string[] | null } | null;
   /** Oman visan kysymystekstit sort_order-järjestyksessä (meta descriptionin koukkukysymys, SEO 25.10.2026). */
   visanKysymykset: string[];
+  /** Kokeilu 11.11.2026: visakortin otsikoksi visan oikea kysymys (FB-kysymyskortin sääntö: ≤ 90 merkkiä, ei kuva- eikä
+   *  äänikysymys, ensimmäinen sopiva sort_order-järjestyksessä). null = ei sopivaa → "Kuinka hyvin tunnet …?". */
+  korttikysymys: { id: string; kysymys: string } | null;
   nosto: JarjestysNosto | null;
   /** "Liittyvät visat" (8.10.2026): celebrity_related_quizzes (score > 0, score desc, enintään 4),
    *  täydennettynä saman lajin / ryhmän henkilövisoilla. */
@@ -205,7 +209,7 @@ export async function haeHenkiloSivu(slug: string): Promise<HenkiloSivu | { ohja
           .maybeSingle()
       : Promise.resolve({ data: null }),
     c.trivia_quiz_id
-      ? sb.from("questions").select("question_text, answers, sort_order").eq("quiz_id", c.trivia_quiz_id).order("sort_order")
+      ? sb.from("questions").select("id, question_text, answers, sort_order, image_url, audio, animal_sound" as "question_text").eq("quiz_id", c.trivia_quiz_id).order("sort_order")
       : Promise.resolve({ data: [] }),
   ]);
   const kaikki = kaikkiRivit.filter((x) => x.id !== c.id);
@@ -411,6 +415,7 @@ export async function haeHenkiloSivu(slug: string): Promise<HenkiloSivu | { ohja
     wikipedia_url: c.wikipedia_url,
     visa,
     visanKysymykset: visa ? kysymykset.map((k) => k.question_text.trim()).filter(Boolean) : [],
+    korttikysymys: visa ? valitseKorttikysymys(kysymykset as unknown as KysymysRivi[]) : null,
     nosto,
     aiheet,
     muut,
@@ -434,3 +439,14 @@ const KOKOELMA_NIMI: Record<string, string> = {
   yleistieto: "Yleistieto",
 };
 
+
+type KysymysRivi = { id?: string; question_text: string; image_url?: string | null; audio?: unknown; animal_sound?: unknown };
+/** Henkilösivun visakortin kysymys (kokeilu 11.11.2026): sama raja kuin FB-kysymyskortissa (KYSYMYS_MAX 90), ei kuvaa
+ *  eikä ääntä, ensimmäinen sopiva. Vastausvaihtoehtoja ei näytetä kortissa, joten niiden pituus ei rajaa. */
+export function valitseKorttikysymys(rivit: KysymysRivi[]): { id: string; kysymys: string } | null {
+  for (const r of rivit) {
+    const k = r.question_text?.trim() ?? "";
+    if (r.id && k && k.length <= KYSYMYS_MAX && !r.image_url && r.audio == null && r.animal_sound == null) return { id: r.id, kysymys: k };
+  }
+  return null;
+}
