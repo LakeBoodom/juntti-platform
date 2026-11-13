@@ -24,6 +24,19 @@ export type RiviKortti = {
   rivi?: string | null;
 };
 
+function RiviKuva({ k, eager }: { k: RiviKortti; eager?: boolean }) {
+  return (
+    <span className="sk-kuva" data-sovitus={k.sovitus}>
+      {k.kuva ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img src={k.kuva} alt="" loading={eager ? "eager" : "lazy"} decoding="async" width={320} height={200} style={k.kuvaPos ? ({ objectPosition: k.kuvaPos } as CSSProperties) : undefined} />
+      ) : (
+        <span className="sk-kuvaton" aria-hidden="true">{k.kuvaton}</span>
+      )}
+    </span>
+  );
+}
+
 /** Yksi rivi/kortti. `data` = mittauksen data-attribuutit (Seuraavaksi). */
 export function RiviLinkki({ k, data, eager }: { k: RiviKortti; data?: Record<string, string | undefined>; eager?: boolean }) {
   const merkki = k.merkki ? (
@@ -54,37 +67,6 @@ export function RiviLinkki({ k, data, eager }: { k: RiviKortti; data?: Record<st
   );
 }
 
-/** Hub-sivun nosto (runko §2, Heikki 12.11.2026): enintään yksi, sama rivi korostettuna — kultareunus, merkki (esim.
- *  "Uusin", "Kaikki aiheet") ja CTA-nappi. Ei täysleveää kuvaa. Mobiilissa merkki + nimi kuvan vieressä kuten tavallisessa
- *  rivissä, kuvaus ja nappi niiden alla koko leveydeltä (Heikki 12.11.); ≥ 768 kuvaus nimen alla ja nappi oikealla. */
-export function HubNosto({ k, merkki, cta, entry }: { k: RiviKortti; merkki: string; cta: string; entry?: string }) {
-  return (
-    <div className="sk-rivi--hub sk-rivi--nosto">
-      <a className="sk-kortti sk-kortti--nosto" href={k.href} data-tn-entry={entry}>
-        <span className="sk-kuva" data-sovitus={k.sovitus}>
-          {k.kuva ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={k.kuva} alt="" loading="eager" decoding="async" width={320} height={200} style={k.kuvaPos ? ({ objectPosition: k.kuvaPos } as CSSProperties) : undefined} />
-          ) : (
-            <span className="sk-kuvaton" aria-hidden="true">{k.kuvaton}</span>
-          )}
-        </span>
-        <span className="sk-teksti">
-          <span className="sk-nosto-yla">
-            <span className="sk-nosto-merkki">{merkki}</span>
-            {k.merkki ? <span className="sk-merkki sk-merkki--rivi">{k.merkki}</span> : null}
-          </span>
-          <span className="sk-nimi">{katko(k.nimi)}</span>
-        </span>
-        <span className="sk-nosto-ala">
-          {k.rivi ? <span className="sk-syy">{k.rivi}</span> : null}
-          <span className="sk-nosto-cta tn-cta-lime">{cta} <span aria-hidden="true">→</span></span>
-        </span>
-      </a>
-    </div>
-  );
-}
-
 /** Hub-sivun laajuus (runko §3): rivit allekkain mobiilissa, ≥ 768 kahdessa sarakkeessa; aina sama rivi, ei kuvaruudukkoa.
  *  Ensimmäiset `eager` kuvaa ladataan heti (ensimmäinen ruutu), loput laiskasti. */
 export default function HubRivit({ kortit, nimi, eager = 4 }: { kortit: RiviKortti[]; nimi: string; eager?: number }) {
@@ -94,6 +76,50 @@ export default function HubRivit({ kortit, nimi, eager = 4 }: { kortit: RiviKort
       {kortit.map((k, i) => (
         <li key={k.href} className="sk-li">
           <RiviLinkki k={k} eager={i < eager} />
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+/** Avautuva rivi (Kuvavisat, Heikki 12.11.2026): sama rivi, mutta napautus avaa aiheen visalistan rivin alle (natiivi
+ *  <details>, ei JavaScriptiä). Linkit ≥ 44 px; ryhmän otsikko (esim. "Vaikeustaso") pienenä. */
+export type AvattavaRivi = { avain: string; kortti: RiviKortti; ryhmat: Array<{ otsikko: string | null; linkit: Array<{ href: string; nimi: string }> }> };
+
+/** Hub-lista, jonka alussa on tavallisia linkkirivejä (esim. viikkovisa) ja sen jälkeen avautuvia rivejä. */
+export function HubAvattavat({ kortit = [], avattavat, nimi, eager = 4 }: { kortit?: RiviKortti[]; avattavat: AvattavaRivi[]; nimi: string; eager?: number }) {
+  return (
+    <ul className="sk-rivi sk-rivi--hub sk-rivi--avattava" aria-label={nimi}>
+      {kortit.map((k, i) => (
+        <li key={k.href} className="sk-li">
+          <RiviLinkki k={k} eager={i < eager} />
+        </li>
+      ))}
+      {avattavat.map((a, i) => (
+        <li key={a.avain} className="sk-li">
+          <details className="sk-avattava" id={a.avain}>
+            <summary className="sk-kortti">
+              <RiviKuva k={a.kortti} eager={kortit.length + i < eager} />
+              <span className="sk-teksti">
+                {a.kortti.merkki ? <span className="sk-merkki sk-merkki--rivi">{a.kortti.merkki}</span> : null}
+                <span className="sk-nimi">{katko(a.kortti.nimi)}</span>
+                {a.kortti.rivi ? <span className="sk-syy">{a.kortti.rivi}</span> : null}
+              </span>
+              <span className="sk-avaa" aria-hidden="true" />
+            </summary>
+            <div className="sk-avattu">
+              {a.ryhmat.map((r, j) => (
+                <div key={r.otsikko ?? `r${j}`} className="sk-avattu-ryhma">
+                  {r.otsikko ? <span className="sk-avattu-otsikko">{r.otsikko}</span> : null}
+                  <ul className="sk-avattu-linkit">
+                    {r.linkit.map((l) => (
+                      <li key={l.href}><a href={l.href}>{l.nimi}</a></li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+            </div>
+          </details>
         </li>
       ))}
     </ul>

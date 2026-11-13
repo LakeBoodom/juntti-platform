@@ -20,7 +20,7 @@
 .tn20 .sk-li { display: flex; min-width: 0; }
 .tn20 .sk-li > .sk-kortti { flex: 1; }
 /* a.sk-kortti: pelisivun linkkiväri (.tng a) ei saa periytyä kortin tekstiin. */
-.tn20 a.sk-kortti {
+.tn20 :is(a, summary).sk-kortti {
   display: flex; flex-direction: row; align-items: stretch; min-width: 0; min-height: 74px; box-sizing: border-box;
   border-radius: 14px; overflow: hidden; background: var(--sk-card); border: 1px solid var(--sk-line);
   color: var(--sk-ink); text-decoration: none;
@@ -99,42 +99,45 @@
   .tn20 .sk-kortti:hover, .tn20 .sk-kortti:active { transform: none; }
 }
 
-/* Hub-sivun nosto (KorttiRivi.tsx HubNosto, runko §2): sama rivi kultareunuksella, merkkipilleri ja lime CTA-nappi.
-   Mobiili (Heikki 12.11.): kuva 96 × 72 ja merkki + nimi vierekkäin kuten tavallisessa rivissä, kuvaus ja nappi alla koko leveydeltä.
-   ≥ 768: kuva (sama 96 px kuin riveissä) | merkki, nimi, kuvaus | nappi. */
-.tn20 .sk-rivi--nosto { display: block; }
-.tn20 a.sk-kortti--nosto {
-  display: grid; grid-template-columns: 96px minmax(0, 1fr); grid-template-areas: "kuva teksti" "ala ala";
-  border: 2px solid var(--sk-gold); background: #201a0f;
+/* Avautuva hub-rivi (KorttiRivi.tsx HubAvattavat, Kuvavisat 12.11.2026): summary on sama rivi (a.sk-kortti-säännöt
+   koskevat myös summarya), oikealla nuoli; auki-tilassa visalista rivin alla. Linkit ≥ 44 px. */
+.tn20 .sk-rivi--avattava { grid-auto-rows: auto; align-items: start; }
+.tn20 .sk-avattava { flex: 1; min-width: 0; border-radius: 14px; }
+.tn20 summary.sk-kortti { list-style: none; cursor: pointer; }
+.tn20 summary.sk-kortti::-webkit-details-marker { display: none; }
+/* Nuoli on koriste: koko summary-rivi on kosketuskohde (≥ 74 px), joten nuolelle riittää 28 px (KORTTISÄÄNTÖ 320: "Rakennukset"). */
+.tn20 .sk-avaa { flex: none; align-self: center; width: 28px; height: 44px; margin-right: 8px; display: grid; place-items: center; color: var(--sk-gold); }
+.tn20 .sk-avattava .sk-teksti { padding-right: 2px; }
+.tn20 .sk-avaa::before {
+  content: ""; width: 9px; height: 9px; border-right: 2.5px solid currentColor; border-bottom: 2.5px solid currentColor;
+  transform: translateY(-2px) rotate(45deg); transition: transform var(--dur-base, 240ms) var(--ease-standard, cubic-bezier(.4, 0, .2, 1));
 }
-.tn20 .sk-kortti--nosto .sk-kuva { grid-area: kuva; }
-.tn20 .sk-kortti--nosto .sk-teksti { grid-area: teksti; }
-.tn20 .sk-nosto-ala { grid-area: ala; display: flex; flex-direction: column; gap: 10px; padding: 10px 12px 12px; min-width: 0; }
-.tn20 .sk-nosto-yla { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; }
-.tn20 .sk-nosto-merkki {
-  display: inline-flex; align-items: center; min-height: 22px; padding: 0 8px; border-radius: 999px; background: var(--sk-gold); color: #131109;
-  font-size: 11px; font-weight: 800; letter-spacing: .08em; line-height: 1; text-transform: uppercase; white-space: nowrap;
+.tn20 .sk-avattava[open] .sk-avaa::before { transform: translateY(2px) rotate(225deg); }
+.tn20 .sk-avattava[open] > summary.sk-kortti { border-color: var(--sk-line2); border-bottom-left-radius: 0; border-bottom-right-radius: 0; }
+.tn20 .sk-avattava[open] > summary.sk-kortti:hover { transform: none; }
+.tn20 .sk-avattu {
+  display: flex; flex-direction: column; gap: 12px; padding: 12px 12px 14px; background: var(--sk-card);
+  border: 1px solid var(--sk-line2); border-top: 0; border-radius: 0 0 14px 14px;
 }
-.tn20 .sk-nosto-cta {
-  display: flex; align-items: center; justify-content: center; gap: 6px; min-height: 48px;
-  font-family: var(--tn-font-cond, "Barlow Condensed"), "Barlow Condensed", sans-serif; font-weight: 800; font-size: 18px; letter-spacing: .04em; line-height: 1;
+.tn20 .sk-avattu-ryhma { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.tn20 .sk-avattu-otsikko { font-size: 12px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: var(--sk-soft); }
+.tn20 .sk-avattu-linkit { display: flex; flex-wrap: wrap; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.tn20 .sk-avattu-linkit a {
+  display: inline-flex; align-items: center; min-height: 44px; padding: 0 16px; box-sizing: border-box; border-radius: 999px;
+  border: 1px solid var(--sk-line2); background: var(--sk-plate); color: var(--sk-ink); font-size: 15px; font-weight: 700; line-height: 1.15; text-decoration: none;
 }
+.tn20 .sk-avattu-linkit a:hover { border-color: var(--sk-gold); }
+.tn20 .sk-avattu-linkit a:focus-visible { outline: 2px solid var(--sk-ink); outline-offset: 2px; }
+@media (prefers-reduced-motion: reduce) { .tn20 .sk-avaa::before { transition: none; } }
+/* ≥ 768 avautuva lista pysyy yhtenä sarakkeena (720 px): kahdessa sarakkeessa avattu rivi jätti viereensä tyhjän alueen. */
 @media (min-width: 768px) {
-  .tn20 a.sk-kortti--nosto {
-    grid-template-columns: 96px minmax(0, 1fr) auto; grid-template-rows: auto auto;
-    grid-template-areas: "kuva teksti cta" "kuva syy cta"; border-radius: 14px;
-  }
-  .tn20 .sk-rivi--nosto .sk-merkki--rivi { display: inline-flex; }
-  .tn20 .sk-rivi--nosto .sk-teksti { align-self: end; justify-content: flex-end; gap: 6px; padding: 12px 16px 4px; }
-  .tn20 .sk-nosto-ala { display: contents; }
-  .tn20 .sk-rivi--nosto .sk-syy { grid-area: syy; align-self: start; padding: 0 16px 12px; font-size: 14px; }
-  .tn20 .sk-nosto-cta { grid-area: cta; align-self: center; margin: 0 20px 0 8px; padding: 0 24px; }
+  .tn20 .sk-rivi--hub.sk-rivi--avattava { grid-template-columns: minmax(0, 1fr); max-width: 720px; }
 }
 
 /* Hub-rivi pysyy rivinä myös ≥ 768 (sama kuvakoko 96 × 72, merkki tekstipuolella, ei Pelaa-kehotetta: koko rivi on linkki). */
 @media (min-width: 768px) {
   .tn20 .sk-rivi--hub { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px 16px; }
-  .tn20 .sk-rivi--hub a.sk-kortti { flex-direction: row; border-radius: 14px; }
+  .tn20 .sk-rivi--hub :is(a, summary).sk-kortti { flex-direction: row; border-radius: 14px; }
   .tn20 .sk-rivi--hub .sk-kuva { width: 96px; min-height: 72px; aspect-ratio: auto; }
   .tn20 .sk-rivi--hub .sk-merkki--kuva, .tn20 .sk-rivi--hub .sk-cta { display: none; }
   .tn20 .sk-rivi--hub .sk-merkki--rivi { display: inline-flex; }
