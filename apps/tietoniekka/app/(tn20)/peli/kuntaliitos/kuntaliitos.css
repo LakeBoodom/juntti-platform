@@ -232,7 +232,11 @@
   .tn20 .kl-info li:last-child { grid-column: 1 / -1; }
   .tn20 .pk-tulos.kl-lopetus { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(340px, 1fr); column-gap: 24px; row-gap: 12px; align-items: start; padding: 16px clamp(14px, 2.2cqi, 28px) 32px; }
   .tn20 .pk-tulos.kl-lopetus > .kl-tulos { grid-column: 2; grid-row: 1; }
-  .tn20 .pk-tulos.kl-lopetus > .kl-lopetus-kartta { grid-column: 1; grid-row: 1 / span 4; position: sticky; top: 12px; }
+  /* Kartta pysyy näkyvissä vieritettäessä, mutta vain oman palstansa (rivit 1–4) sisällä: sticky on kartassa, ei
+     ruudukon solussa. Solussa sticky rajautui koko ruudukkoon ja iso kartta liukui Pelaa seuraavaksi -korttien päälle
+     (Heikki 13.11.2026). */
+  .tn20 .pk-tulos.kl-lopetus > .kl-lopetus-kartta { grid-column: 1; grid-row: 1 / span 4; align-self: stretch; }
+  .tn20 .pk-tulos.kl-lopetus > .kl-lopetus-kartta > .kl-kartta { position: sticky; top: 12px; }
   .tn20 .pk-tulos.kl-lopetus > .kl-ketjut { grid-column: 2; grid-row: 2; }
   .tn20 .pk-tulos.kl-lopetus > .tn-jako { grid-column: 2; grid-row: 3; position: static; padding: 16px; }
   .tn20 .pk-tulos.kl-lopetus > .pk-seuraava { grid-column: 1 / -1; grid-row: 5; }

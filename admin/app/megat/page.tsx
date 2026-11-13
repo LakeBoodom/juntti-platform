@@ -6,6 +6,7 @@ import { Nav } from "@/components/nav";
 import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
+import { AlertTriangle } from "lucide-react";
 import { ComposerForm } from "./composer-form";
 
 export const dynamic = "force-dynamic";
@@ -32,17 +33,38 @@ export default async function MegatPage() {
     ((tilastot ?? []) as unknown as Array<{ quiz_id: string; pelit: number }>).map((t) => [t.quiz_id, Number(t.pelit)]),
   );
 
-  // Kysymysmäärät per Mega
+  // Kysymysmäärät per Mega + pelattavat (Heikki 13.11.2026): linkki on pelattava, kun sen kysymyksen lähdevisa on
+  // julkaistu (tai kuvavisa aktiivinen). Jos lähdevisa palautetaan luonnokseksi, julkinen sivu näyttää vähemmän kysymyksiä
+  // kuin megaan on linkitetty → varoitus tällä sivulla.
   const counts = new Map<string, number>();
+  const pelattavat = new Map<string, number>();
   if (megas.length > 0) {
     const { data: links } = await admin
       .from("mega_questions" as never)
-      .select("mega_quiz_id" as never)
+      .select("mega_quiz_id, question_id, kuvavisa_id" as never)
       .in("mega_quiz_id" as never, megas.map((m) => m.id) as never[]);
-    for (const l of (links ?? []) as unknown as Array<{ mega_quiz_id: string }>) {
+    const rivit = (links ?? []) as unknown as Array<{ mega_quiz_id: string; question_id: string | null; kuvavisa_id: string | null }>;
+    const erissa = async <T,>(taulu: string, sarakkeet: string, idt: string[]): Promise<T[]> => {
+      const out: T[] = [];
+      for (let i = 0; i < idt.length; i += 200) {
+        const { data: d } = await admin.from(taulu as never).select(sarakkeet as never).in("id" as never, idt.slice(i, i + 200) as never[]);
+        out.push(...((d ?? []) as unknown as T[]));
+      }
+      return out;
+    };
+    const kysymykset = await erissa<{ id: string; quiz_id: string }>("questions", "id, quiz_id", [...new Set(rivit.flatMap((l) => (l.question_id ? [l.question_id] : [])))]);
+    const lahteet = await erissa<{ id: string; status: string }>("quizzes", "id, status", [...new Set(kysymykset.map((k) => k.quiz_id))]);
+    const kuvat = await erissa<{ id: string; active: boolean }>("kuvavisas", "id, active", [...new Set(rivit.flatMap((l) => (l.kuvavisa_id ? [l.kuvavisa_id] : [])))]);
+    const julkaistu = new Set(lahteet.filter((q) => q.status === "published").map((q) => q.id));
+    const kysymysOk = new Set(kysymykset.filter((k) => julkaistu.has(k.quiz_id)).map((k) => k.id));
+    const kuvaOk = new Set(kuvat.filter((k) => k.active).map((k) => k.id));
+    for (const l of rivit) {
       counts.set(l.mega_quiz_id, (counts.get(l.mega_quiz_id) ?? 0) + 1);
+      const ok = l.question_id ? kysymysOk.has(l.question_id) : l.kuvavisa_id ? kuvaOk.has(l.kuvavisa_id) : false;
+      if (ok) pelattavat.set(l.mega_quiz_id, (pelattavat.get(l.mega_quiz_id) ?? 0) + 1);
     }
   }
+  const vajaat = megas.filter((m) => (pelattavat.get(m.id) ?? 0) < (counts.get(m.id) ?? 0));
 
   return (
     <>
@@ -57,6 +79,28 @@ export default async function MegatPage() {
             </p>
           </div>
         </div>
+
+        {vajaat.length > 0 && (
+          <div className="flex gap-3 rounded-md border border-red-600/40 bg-red-600/10 p-4 text-sm text-red-800">
+            <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
+            <div>
+              <p className="font-medium">
+                {vajaat.length === 1 ? "Yhdessä megassa" : `${vajaat.length} megassa`} on kysymyksiä, jotka eivät näy pelaajille.
+              </p>
+              <p className="mt-1">
+                Kysymyksen lähdevisa on palautettu luonnokseksi (tai kuvavisa poistettu käytöstä), joten julkinen sivu näyttää
+                vähemmän kysymyksiä kuin megaan on linkitetty:{" "}
+                {vajaat.map((m, i) => (
+                  <span key={m.id}>
+                    {i > 0 && ", "}
+                    <Link href={`/megat/${m.id}`} className="underline">{m.title}</Link> {pelattavat.get(m.id) ?? 0}/{counts.get(m.id) ?? 0}
+                  </span>
+                ))}
+                . Vaihda kysymykset julkaistuista visoista tai julkaise lähdevisa.
+              </p>
+            </div>
+          </div>
+        )}
 
         <ComposerForm />
 
@@ -84,7 +128,16 @@ export default async function MegatPage() {
                         {m.title}
                       </Link>
                     </TableCell>
-                    <TableCell>{counts.get(m.id) ?? 0}</TableCell>
+                    <TableCell>
+                      {(pelattavat.get(m.id) ?? 0) < (counts.get(m.id) ?? 0) ? (
+                        <span className="inline-flex items-center gap-1 text-red-700" title="Pelattavat / linkitetyt: osa lähdevisoista on luonnoksia">
+                          <AlertTriangle className="h-3.5 w-3.5" />
+                          {pelattavat.get(m.id) ?? 0}/{counts.get(m.id) ?? 0}
+                        </span>
+                      ) : (
+                        counts.get(m.id) ?? 0
+                      )}
+                    </TableCell>
                     <TableCell>
                       <span className={
                         m.status === "published"

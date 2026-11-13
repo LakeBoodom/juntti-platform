@@ -24,6 +24,13 @@
 .tn20 .hub-intro strong { font-weight: 700; color: var(--hub-ink); }
 .tn20 .hub-lisa { margin: 0; font-size: 14px; font-weight: 700; letter-spacing: .02em; color: var(--hub-dim); font-variant-numeric: tabular-nums; }
 .tn20 .hub .pk-ohjeet { margin-top: 0; }
+/* Heron nappi (Heikki 13.11.2026): yksi lime-pilleri intron alla, ≥ 48 px; väri ja muoto .tn-cta-limestä. */
+.tn20 .hub-cta {
+  align-self: flex-start; display: inline-flex; align-items: center; gap: 8px; min-height: 48px; margin-top: 6px; padding: 0 24px;
+  box-sizing: border-box; font-family: var(--rk-cond, "Barlow Condensed"), "Barlow Condensed", sans-serif; font-weight: 800; font-size: 18px;
+  letter-spacing: .04em; line-height: 1; text-decoration: none;
+}
+.tn20 .hub-cta:focus-visible { outline: 2px solid var(--hub-ink); outline-offset: 3px; }
 
 @media (min-width: 760px) {
   .tn20 .hub-hero { padding-top: 24px; }

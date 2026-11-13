@@ -130,15 +130,17 @@ export default function JarjestaHero({
   return (
     <section className="jh-hero" aria-labelledby="jh-h1">
       <header className="jh-intro">
+        {/* Yläotsikko (brief 13.11.2026): pelimuodon nimi näkyvänä merkkinä, ei otsikko. Ruudunlukija saa nimen h1:n alusta. */}
+        <p className="jh-ylaotsikko" aria-hidden="true">Järjestä</p>
         {kaikkiOikein ? (
-          <h1 id="jh-h1" className="jh-h1">Nyt rivi on <span className="jh-oikein">oikein</span>.</h1>
+          <h1 id="jh-h1" className="jh-h1"><span className="jh-sr">Järjestä – </span>Nyt rivi on <span className="jh-oikein">oikein</span>.</h1>
         ) : (
           <>
-            <h1 id="jh-h1" className="jh-h1">Tämä rivi on <span className="jh-eroton"><Vaarin />.</span></h1>
+            <h1 id="jh-h1" className="jh-h1"><span className="jh-sr">Järjestä – </span>Tämä rivi on <span className="jh-eroton"><Vaarin />.</span></h1>
             <p className="jh-ala">Osaatko korjata sen?</p>
           </>
         )}
-        <p className="jh-lause">Kuka tuli ensin? Mikä on suurin? Entä korkein? Kaikki on sekaisin – ja sinun tehtäväsi on laittaa asiat oikeaan järjestykseen. Näyttää helpolta, kunnes alat järjestää. Montako riviä saat oikein?</p>
+        <p className="jh-lause">Kuka tuli ensin? Mikä on suurin? Entä korkein? Presidentit, tunturit, järvet, puolueet ja tunnetut suomalaiset ovat menneet sekaisin – ja sinun tehtäväsi on laittaa ne järjestykseen. Näyttää helpolta, kunnes alat järjestää. Montako riviä saat oikein?</p>
       </header>
 
       <div className="jh-tehtava">

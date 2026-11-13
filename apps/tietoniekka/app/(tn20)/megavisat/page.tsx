@@ -1,7 +1,6 @@
 // MEGAVISAT /megavisat hub-rungolla (Heikki 12.11.2026, vaihe 2): 1) hero = studiokuva (Mikko) + nimi + intro omalla
-// pohjallaan ja datasta laskettu rivi "{n} megavisaa · {min}–{max} kysymystä"; 2) nosto = Yleistiedon megavisa korostettuna
-// rivinä (korvaa entisen täysleveän Uusin-kortin; "Uusin" ei pitänyt paikkaansa, mega on vanhin → merkki "Kaikki aiheet");
-// 3) muut megat jaettuina riveinä (kuva, nimi, tietorivi "{n} kysymystä · kesto"); 4) Näin mega toimii suljettuna.
+// pohjallaan ja datasta laskettu rivi "{n} megavisaa · {min}–{max} kysymystä"; 2) ei nostoa (Heikki 12.11., vaihe 3): kaikki
+// megat samanarvoisina riveinä uusin ensin (kannan luontiaika), tietorivi "{n} kysymystä · kesto"; 3) Näin mega toimii suljettuna.
 // Kortit haetaan kannasta slugilla — jos mega puuttuu tai siinä ei ole pelattavia kysymyksiä, rivi jää pois hiljaa.
 // Kysymysmäärät datasta (megaMaarat = pelattavat kysymykset, sama luku kuin pelissä), ei kovakoodattuina.
 
@@ -13,7 +12,7 @@ import { getSupabase } from "@/lib/supabase";
 import Crumbs from "@/components/tn20/Crumbs";
 import PeliKehys from "@/components/tn20/pelikehys/PeliKehys";
 import HubHero from "@/components/tn20/korttirivi/HubHero";
-import HubRivit, { HubNosto, type RiviKortti } from "@/components/tn20/korttirivi/KorttiRivi";
+import HubRivit, { type RiviKortti } from "@/components/tn20/korttirivi/KorttiRivi";
 import HubOhjeet from "@/components/tn20/korttirivi/HubOhjeet";
 import { MEGA_FEATURED, MEGA_GRID, megaDuration, megaMaarat, maaraVali, type MegaCard } from "@/lib/megavisat";
 
@@ -43,7 +42,7 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-type MegaRow = { slug: string; title: string; teaser: string | null };
+type MegaRow = { slug: string; title: string; teaser: string | null; created_at: string };
 
 /** Sivun megat näyttöjärjestyksessä (nosto + ruudukko) pelattavine kysymysmäärineen; metadata ja sivu jakavat haun. */
 const haeMegat = cache(async () => {
@@ -53,7 +52,7 @@ const haeMegat = cache(async () => {
 
   const { data: quizRows } = await sb
     .from("quizzes" as never)
-    .select("id, slug, title, teaser")
+    .select("id, slug, title, teaser, created_at")
     .eq("game_mode" as unknown as "status", "mega")
     .in("slug", allSlugs);
   const quizzes = (quizRows ?? []) as unknown as Array<MegaRow & { id: string }>;
@@ -71,14 +70,18 @@ const haeMegat = cache(async () => {
     .filter((g) => g.quiz && g.count > 0);
   const kaikkiMaarat = [...(featuredQuiz && featuredCount > 0 ? [featuredCount] : []), ...gridItems.map((g) => g.count)];
   const aiheet = [...(featuredQuiz && featuredCount > 0 ? [MEGA_FEATURED.aihe] : []), ...gridItems.map((g) => g.card.aihe)];
-  return { featuredQuiz, featuredCount, gridItems, kaikkiMaarat, aiheet };
+  /* Hub-sivun rivit (vaihe 3): kaikki megat, uusin ensin kannan luontiajasta. */
+  const rivit = [...(featuredQuiz && featuredCount > 0 ? [{ card: MEGA_FEATURED, quiz: featuredQuiz, count: featuredCount }] : []), ...gridItems.map((g) => ({ ...g, quiz: g.quiz! }))]
+    .sort((a, b) => b.quiz.created_at.localeCompare(a.quiz.created_at));
+  return { featuredQuiz, featuredCount, gridItems, kaikkiMaarat, aiheet, rivit };
 });
 
-/* Intro: Heikin teksti 12.11.2026 (ensimmäinen lause korostettuna). */
-const KOROSTUS = "Megavisa on pitkä tietovisa yhdestä aiheesta, yhdellä istumalla ja ilman taukoja.";
-const INTRO = "Valitse aihe ja katso, kuinka pitkälle tietosi kantavat.";
+/* Hero-tekstit: CC-brief "Hub-sivujen hero-tekstien yhtenäistys" (Heikki hyväksyi 13.11.2026). Koukku korostettuna, sitten myyntiteksti.
+   "kerroin" → "bonus" (Heikki 13.11.): pelissä putki antaa +50 p/porras (GameClient STREAK_BONUS), ei kerrointa. */
+const KOROSTUS = "Kymmenen kysymystä on vasta lämmittely.";
+const INTRO = "Megavisa on tietovisojen pitkä matka: kysymys toisensa perään yleistiedosta, urheilusta, viihteestä ja Suomen kaupungeista. Mitä pidempi oikeiden putki, sitä isompi bonus – ja yksi väärä vastaus nollaa sen. Kuinka pitkälle tietosi kantavat?";
 
-/* Rivi: nimi + tietorivi "{n} kysymystä · ~20 min" (datasta). Nostossa lisäksi aiheen kuvaus. */
+/* Rivi: nimi + tietorivi "{n} kysymystä · ~20 min" (datasta). */
 const rivi = (card: MegaCard, quiz: MegaRow, count: number): RiviKortti => ({
   href: `/peli?mega=${quiz.slug}`,
   kuva: `/20/rivi/mega-${card.slug}.webp`,
@@ -90,12 +93,9 @@ const rivi = (card: MegaCard, quiz: MegaRow, count: number): RiviKortti => ({
 export default async function MegavisatLanding() {
   const megat = await haeMegat();
   if (!megat) return <main style={{ padding: 32 }}>Ei tietokantayhteyttä.</main>;
-  const { featuredQuiz, featuredCount, gridItems, kaikkiMaarat } = megat;
+  const { kaikkiMaarat } = megat;
   const vali = maaraVali(kaikkiMaarat);
-  const nosto = featuredQuiz && featuredCount > 0
-    ? { ...rivi(MEGA_FEATURED, featuredQuiz, featuredCount), merkki: `${featuredCount} kysymystä · ${megaDuration(featuredCount)}`, rivi: MEGA_FEATURED.desc }
-    : null;
-  const rivit = gridItems.map(({ card, quiz, count }) => rivi(card, quiz!, count));
+  const rivit = megat.rivit.map(({ card, quiz, count }) => rivi(card, quiz, count));
   const lyhin = kaikkiMaarat.length ? Math.min(...kaikkiMaarat) : 0;
   const pisin = kaikkiMaarat.length ? Math.max(...kaikkiMaarat) : 0;
 
@@ -130,8 +130,7 @@ export default async function MegavisatLanding() {
             intro={INTRO}
             lisa={kaikkiMaarat.length && vali ? `${kaikkiMaarat.length} megavisaa · ${vali} kysymystä` : undefined}
           />
-          {nosto ? <HubNosto k={nosto} merkki="Kaikki aiheet" cta="Aloita mega" entry="megavisat:nosto" /> : null}
-          <HubRivit kortit={rivit} nimi="Megavisat" eager={3} />
+          <HubRivit kortit={rivit} nimi="Megavisat" eager={4} />
           <HubOhjeet
             kohdat={[{
               otsikko: "Näin mega toimii",

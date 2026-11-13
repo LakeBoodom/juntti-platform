@@ -17,6 +17,9 @@
 .tn20 .jh-intro { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
 .tn20 .jh-h1 { margin: 0; font-family: "Archivo Variable", "Archivo", sans-serif; font-weight: 900; font-size: clamp(36px, 11.5vw, 44px); line-height: .92; letter-spacing: -.02em; text-transform: uppercase; overflow-wrap: normal; word-break: keep-all; text-wrap: balance; }
 .tn20 .jh-eroton { white-space: nowrap; }
+/* Yläotsikko (brief 13.11.2026): pelimuodon nimi pienenä kultaisena merkkinä ison otsikon yläpuolella (sama merkkityyli
+   kuin hub-rivien "Päivän peli"). Kulta #E8A320 + tumma teksti #131109 ≈ 8,9:1. */
+.tn20 .jh-ylaotsikko { align-self: flex-start; margin: 0; padding: 5px 10px; border-radius: 999px; background: #e8a320; color: #131109; font-size: 12px; font-weight: 800; line-height: 1.1; letter-spacing: .12em; text-transform: uppercase; }
 .tn20 .jh-oikein { color: var(--tk-lime); }
 /* "VÄÄRIN" (CD 5a): koralli #ff6b4a tummalla ≈ 6,9:1. Kirjaimet vinossa (--jh-t); sisääntulo kerran: suorasta
    sekaisin pienellä ylityksellä, porrastus 45 ms. Vain transform; reduced-motion-portti (globals.css) lyhentää. */

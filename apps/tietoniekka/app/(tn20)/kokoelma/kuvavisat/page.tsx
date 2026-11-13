@@ -1,17 +1,26 @@
-// KUVAVISAT yhteisellä rungolla (TOTEUTUSBRIEF "Kokoelmasivun runko ja pelikehys", vaihe 3, 20.10.2026).
-// Staattinen segmentti ohittaa [collection]-reitin. Kohteet ovat kuvavisojen kategorioita ja muunnelmia
-// (lib/kokoelmat/kuvavisat.ts). P5 (Heikki 21.10.2026): V2–V5:n tilalla viikon visa heti heron alla ja
-// kategoriaruudukko esikatselukuvineen (KuvavisaKategoriat); viikon visa pois V6-pelilistasta.
-import "../../runko.css";
+// KUVAVISAT /kokoelma/kuvavisat hub-rungolla (Heikki 12.11.2026, vaihe 3): 1) hero = nykyinen kollaasikuva + nimi + intro
+// (KUVAVISAT.ingress) ja nappi "Pelaa viikkovisa" / "Katso tuloksesi" (Heikki 13.11.); 2) ei nostoa: viikkovisa on listan ensimmäinen rivi merkillä "Viikkovisa · vk {n}" (sama koko kuin
+// muut); 3) kahdeksan aihetta jaettuina riveinä (kuva 96 px, nimi, kuvausrivi), rivin napautus avaa aiheen visat rivin alle
+// (HubAvattavat, natiivi <details>; "Valitse visa" -pudotusvalikko ja "Pelaa vielä nämä" -osio poistuivat).
+// Aiheiden kuvat = entiset esikatselukuvat rivikopioina (public/20/rivi/kuvavisa-<tyyppi>.webp; grafiikka vaalealla levyllä).
+// Staattinen segmentti ohittaa [collection]-reitin. Tiedot: lib/kuvavisat2026.ts (getKuvavisatHub, getViikkovisa).
 import type { Metadata } from "next";
+import { KokoelmaLd } from "@/components/tn20/KokoelmaLd";
+import Crumbs from "@/components/tn20/Crumbs";
+import PeliKehys from "@/components/tn20/pelikehys/PeliKehys";
+import HubHero from "@/components/tn20/korttirivi/HubHero";
+import ViikkovisaCta from "@/components/tn20/korttirivi/ViikkovisaCta";
+import { HubAvattavat, type AvattavaRivi, type RiviKortti } from "@/components/tn20/korttirivi/KorttiRivi";
 import { jakoMeta } from "@/lib/jakoMeta";
 import { getPageContent } from "@/lib/pageContent";
-import KokoelmaRunko from "@/components/tn20/runko/KokoelmaRunko";
-import { haeRunkoData } from "@/lib/kokoelmat/data";
-import { KUVAVISAT, kuvavisaKohteet } from "@/lib/kokoelmat/kuvavisat";
-import { getKuvavisatHub, getViikkovisa } from "@/lib/kuvavisat2026";
+import { KUVAVISAT } from "@/lib/kokoelmat/kuvavisat";
+import { getKuvavisatHub, getViikkovisa, ryhmiteltyVariaatiot } from "@/lib/kuvavisat2026";
 import { viikkoInfo } from "@/lib/viikkovisa";
-import KuvavisaKategoriat from "@/components/tn20/runko/KuvavisaKategoriat";
+
+/* Hero-tekstit: CC-brief "Hub-sivujen hero-tekstien yhtenäistys" (Heikki hyväksyi 13.11.2026). Viikkovisan voimassaolo
+   ("voimassa … asti · N pv jäljellä") on viikkovisarivin tietorivinä heron alla, ei herossa. */
+const KOROSTUS = "Yksi kuva, neljä vaihtoehtoa – tunnistatko oikean?";
+const INTRO = "Lippu, vaakuna, lintu vai mestariteos? Kuvavisoissa vastaus on silmiesi edessä, mutta vaihtoehdot näyttävät hämmentävän samalta. Aiheina maailman liput, Suomen vaakunat ja linnut, eläimet, maalaukset, rakennukset ja kasvit.";
 
 export const revalidate = 300; // SEO-erä A4 (2.10.2026): ISR 5 min
 
@@ -29,14 +38,44 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function KuvavisatLanding() {
   const [hub, vv] = await Promise.all([getKuvavisatHub(), getViikkovisa()]);
-  const d = await haeRunkoData(KUVAVISAT, kuvavisaKohteet(hub.kategoriat));
-  if (!d) return <main style={{ padding: 32 }}>Ei tietokantayhteyttä.</main>;
   /* Viikkotiedot palvelimella (viikkoInfo), ei selaimen kellosta. */
-  const viikkovisa = vv ? { info: viikkoInfo(vv.vuosi, vv.viikko), kuvia: vv.kuvaIdt.length } : null;
+  const info = vv ? viikkoInfo(vv.vuosi, vv.viikko) : null;
+  const viikko: RiviKortti[] = vv && info
+    ? [{ href: "/kuvavisa/viikko", kuva: "/20/rivi/kuvavisa-viikko.webp", kuvaton: "Viikkovisa", merkki: `Viikkovisa · vk ${info.viikko}`, nimi: "Viikon kuvavisa", rivi: `${vv.kuvaIdt.length} kuvaa kaikista aiheista · ${info.jaljellaTeksti}` }]
+    : [];
+  /* Aiheen visat: "Kaikki <monikko>" ensin, sitten vaikeustasot ja maanosat. */
+  const aiheet: AvattavaRivi[] = hub.kategoriat.map((k) => {
+    const ryhmat = ryhmiteltyVariaatiot(k.variaatiot);
+    const jarj = [...ryhmat.filter((r) => !r.label), ...ryhmat.filter((r) => r.label)];
+    return {
+      avain: `kv-${k.meta.type}`,
+      kortti: { href: `#kv-${k.meta.type}`, kuva: `/20/rivi/kuvavisa-${k.meta.type}.webp`, kuvaton: k.meta.otsikko, nimi: k.meta.otsikko, rivi: k.meta.kuvaus },
+      ryhmat: jarj.map((r) => ({ otsikko: r.label, linkit: r.items.map((v) => ({ href: v.href, nimi: v.label })) })),
+    };
+  });
+
   return (
-    <KokoelmaRunko
-      d={viikkovisa ? { ...d, pelit: d.pelit.filter((p) => p.slug !== "kuvavisa-viikko") } : d}
-      sisalto={<KuvavisaKategoriat kategoriat={hub.kategoriat} viikkovisa={viikkovisa} />}
-    />
+    <PeliKehys iho="tumma">
+      <KokoelmaLd avain={KUVAVISAT.slug} nimi={KUVAVISAT.nimi} polku="/kokoelma/kuvavisat" />
+      <Crumbs items={[{ label: "Kokoelmat", href: "/kokoelmat" }, { label: KUVAVISAT.nimi }]} />
+      <main data-tn-entry="kokoelma">
+        <div className="hub">
+          <HubHero
+            kuva={{
+              src: KUVAVISAT.hero.image!,
+              srcSet: "/20/kuvavisat/hero-800.webp 800w, /20/kuvavisat/hero.webp 1915w",
+              alt: KUVAVISAT.hero.alt ?? "",
+              width: 1915,
+              height: 821,
+            }}
+            nimi={KUVAVISAT.nimi}
+            korostus={KOROSTUS}
+            intro={INTRO}
+            cta={info ? <ViikkovisaCta avain={info.avain} /> : undefined}
+          />
+          <HubAvattavat kortit={viikko} avattavat={aiheet} nimi="Kuvavisat" />
+        </div>
+      </main>
+    </PeliKehys>
   );
 }
