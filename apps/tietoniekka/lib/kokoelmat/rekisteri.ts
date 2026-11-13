@@ -27,7 +27,7 @@ export const KOKOELMA_KORTIT: KokoelmaKortti[] = [
   { slug: "tv", nimi: "TV ja suoratoisto", href: "/kokoelma/tv", img: "/20/etusivu/aihe-tv.webp", teema: "viihde", suosio: 3, mastery: { name: "Sarjaniekka", icon: "tv", color: "#FF3D9E" } },
   { slug: "elokuvat", nimi: "Elokuvat", href: "/kokoelma/elokuvat", img: "/20/etusivu/aihe-elokuvat.webp", teema: "viihde", suosio: 4, mastery: { name: "Elokuvaniekka", icon: "elokuva", color: "#FF5C3D" } },
   { slug: "musiikki", nimi: "Musiikki", href: "/kokoelma/musiikki", img: "/20/etusivu/aihe-musiikki.webp", teema: "viihde", suosio: 5, mastery: { name: "Musiikkiniekka", icon: "musiikki", color: "#A855F7" } },
-  { slug: "historia", nimi: "Historia", href: "/kokoelma/historia", img: "/20/etusivu/sp-turun-linna-kortti.webp", pos: "center 45%", teema: "tieto", suosio: 6, mastery: { name: "Historianiekka", icon: "historia", color: "#E8A320" } },
+  { slug: "historia", nimi: "Historia", href: "/kokoelma/historia", img: "/20/etusivu/aihe-historia.webp", teema: "tieto", suosio: 6, mastery: { name: "Historianiekka", icon: "historia", color: "#E8A320" } },
   { slug: "jaakiekko", nimi: "Jääkiekko", href: "/kokoelma/jaakiekko", img: "/20/etusivu/aihe-jaakiekko.webp", teema: "urheilu", suosio: 7, mastery: { name: "Kiekkoniekka", icon: "kiekko", color: "#4FD1F5" } },
   { slug: "jalkapallo", nimi: "Jalkapallo", href: "/kokoelma/jalkapallo", img: "/20/etusivu/aihe-jalkapallo.webp", teema: "urheilu", suosio: 8, mastery: { name: "Futisniekka", icon: "pallo", color: "#35D6A0" } },
   { slug: "kaupungit", nimi: "Suomen kaupungit", href: "/kokoelma/kaupungit", img: "/20/etusivu/aihe-kaupungit.webp", teema: "tieto", suosio: 9, mastery: { name: "Kaupunkiniekka", icon: "kaupunki", color: "#E8A320" } },
