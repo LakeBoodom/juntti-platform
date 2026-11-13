@@ -1,6 +1,5 @@
 // KARTTAPELIT /peli/karttapelit hub-rungolla (Heikki 12.11.2026, vaiheet 2–3; aiemmin CD-handoff "Rajanaapurit: Yhdysvallat" 4a).
-// 1) hero = kuva + nimi + intro (Heikin teksti 12.11., ensimmäinen lause korostettuna). Kuva on väliaikaisesti etusivun
-//    Rajanaapurit-kortin kuvitus (Viro–Latvia–?–Puola, PeliKuvitus "rajanaapurit" kuvana); lopullinen kuva teetetään erikseen.
+// 1) hero = kuva + nimi + koukku + myyntiteksti (brief 13.11.). Kuva: Laura ja Mikko maailmankartan edessä (Heikki 13.11.).
 // 2) ei nostoa (vaihe 3): päivittäin vaihtuva Mikä maa? on listan ensimmäinen rivi merkillä "Päivän peli", sitten kartat:
 //    Maailma, Suomi, Yhdysvallat (merkki = pelin nimi, rivi = viikon reitin koukku, kuva = /og/reitti/<peli>/rivi).
 // Heron nappi "Arvaa päivän maa" → Mikä maa? (Heikki 13.11.). 3) Näin pelaat sekä Lähteet ja rajaukset suljettuina. Aluevalinta (maanosa, maakunta) on pelien omalla aloitussivulla.
@@ -39,9 +38,9 @@ export const metadata: Metadata = {
 
 const LAHTEET = { rajanaapurit: RN_LAHDE, kuntaliitos: KL_LAHDE, osavaltiot: USA_LAHDE };
 
-/* Intro: Heikin teksti 12.11.2026 (vaihe 3), ensimmäinen lause korostettuna. */
-const KOROSTUS = "Mikä maa on minkäkin vieressä?";
-const INTRO = "Tunnista päivän maa vihjeistä. Rakenna reitti maasta toiseen rajanaapuri kerrallaan, maailmalla tai Yhdysvaltain osavaltioissa. Tai kulje Suomen halki kunta kunnalta. Kartta on tuttu, kunnes pitää muistaa naapurit.";
+/* Hero-tekstit: CC-brief "Hub-sivujen hero-tekstien yhtenäistys" (Heikki hyväksyi 13.11.2026). Herossa ei ohjeita eikä päivitysrytmiä. */
+const KOROSTUS = "Luuletko tuntevasi kartan?";
+const INTRO = "Arvaa maa pelkkien vihjeiden perusteella tai rakenna reitti naapurista naapuriin – maailmalla, Suomen kunnissa ja Yhdysvaltain osavaltioissa. Kartta näyttää selvältä, kunnes pitää muistaa, kuka rajautuu kenenkin kanssa. Löydätkö perille?";
 /** Mikä maa? -rivin tietorivi = etusivun pelikortin rivi (sama teksti kaikkialla). */
 const MM_RIVI = ETUSIVUN_PELIMUODOT.find((p) => p.slug === "mika-maa")?.etusivu_rivi ?? null;
 
@@ -67,9 +66,9 @@ export default async function KarttapelitSivu() {
         <div className="hub">
           <HubHero
             kuva={{
-              src: "/20/karttapelit/hero-valiaikainen.webp",
-              srcSet: "/20/karttapelit/hero-valiaikainen-800.webp 800w, /20/karttapelit/hero-valiaikainen.webp 1600w",
-              alt: "Rajanaapurit-pelin reitti: Virosta Latvian kautta Puolaan",
+              src: "/20/karttapelit/hero.webp",
+              srcSet: "/20/karttapelit/hero-800.webp 800w, /20/karttapelit/hero.webp 1600w",
+              alt: "Laura ja Mikko esittelevät maailmankarttaa studiossa",
               width: 1600,
               height: 900,
             }}

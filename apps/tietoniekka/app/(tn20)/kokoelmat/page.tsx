@@ -64,7 +64,7 @@ export default async function KokoelmatPage() {
       <Crumbs items={[{ label: "Kokoelmat" }]} />
       <main>
         <div className="hub">
-          <HubHero nimi="Kaikki kokoelmat" intro="Valitse aihe, josta tiedät eniten — tai se, josta haluat oppia lisää." />
+          <HubHero nimi="Kaikki kokoelmat" intro="Jääkiekosta ja elokuvista historiaan, luontoon ja tunnettuihin suomalaisiin – satoja ilmaisia tietovisoja aiheittain. Valitse aihe, josta tiedät eniten, tai se, josta haluat oppia lisää." />
           <HubRivit kortit={aiheet} nimi="Kokoelmat" eager={6} />
           <section className="hub-osio" aria-labelledby="hub-pelimuodot">
             <h2 className="hub-h2" id="hub-pelimuodot">Pelimuodot</h2>

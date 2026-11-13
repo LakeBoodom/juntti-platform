@@ -11,9 +11,10 @@ import HubOhjeet from "@/components/tn20/korttirivi/HubOhjeet";
 /* Intro: Heikin hyväksymä suunta 12.11.2026 (sanoja voi vielä hioa). Tarkistettu pelilogiikkaa vasten (lib/tuplaTaiKuitti.ts):
    potti tuplaantuu 1 → 512, väärä vastaus vie potin (turvatasot kerrotaan Näin pelaat -kohdassa), kuittaus/tuplaus
    jokaisen oikean jälkeen paitsi kymmenennen, jolloin peli päättyy täyteen pottiin. */
-const KOROSTUS = "Tietoniekan versio legendaarisesta Tupla tai kuitti -pelistä.";
+/* Hero-tekstit 13.11.2026: CC-brief "Hub-sivujen hero-tekstien yhtenäistys" (Heikki hyväksyi). */
+const KOROSTUS = "Tuplaatko vai otatko kuitin?";
 const INTRO =
-  "Valitse aihe ja vastaa. Jokainen oikea vastaus tuplaa pottisi, väärä vie sen. Jokaisen oikean vastauksen jälkeen päätät itse: otatko kuitin ja pidät voittosi, vai tuplaatko vielä kerran?";
+  "Tietoniekan versio legendaarisesta Tupla tai kuitti -pelistä. Jokainen oikea vastaus tuplaa potin, ja kysymykset kovenevat loppua kohti. Kuittaa ajoissa – tai pane kaikki yhden vastauksen varaan. Aiheita SM-liigasta ja musiikista historiaan ja maantietoon.";
 
 export default function TuplaHub({ aiheet, saannot, tausta }: { aiheet: RiviKortti[]; saannot: ReactNode; tausta: ReactNode }) {
   return (

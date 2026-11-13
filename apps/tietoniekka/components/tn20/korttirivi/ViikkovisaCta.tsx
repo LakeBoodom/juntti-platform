@@ -1,5 +1,5 @@
 "use client";
-// KUVAVISOJEN HERON NAPPI (Heikki 13.11.2026): "Pelaa viikkovisa" → kuluvan viikon viikkovisa; jos pelaaja on jo pelannut
+// KUVAVISOJEN HERON NAPPI (Heikki 13.11.2026): "Pelaa viikon kuvavisa" → kuluvan viikon viikkovisa; jos pelaaja on jo pelannut
 // sen (localStorage, lib/viikkovisa.ts lueViikkoTulos), "Katso tuloksesi" → tarkastelunäkymä. Palvelin renderöi
 // pelaamattoman tilan, tulos luetaan selaimessa (sama malli kuin entisessä ViikkovisaPromossa).
 import { useEffect, useState } from "react";
@@ -10,7 +10,7 @@ export default function ViikkovisaCta({ avain }: { avain: string }) {
   useEffect(() => { setPelattu(!!lueViikkoTulos(avain)); }, [avain]);
   return (
     <a className="hub-cta tn-cta-lime" href={pelattu ? "/kuvavisa/viikko?tarkastele=1" : "/kuvavisa/viikko"} data-tn-entry="kuvavisat:hero">
-      {pelattu ? "Katso tuloksesi" : "Pelaa viikkovisa"} <span aria-hidden="true">→</span>
+      {pelattu ? "Katso tuloksesi" : "Pelaa viikon kuvavisa"} <span aria-hidden="true">→</span>
     </a>
   );
 }

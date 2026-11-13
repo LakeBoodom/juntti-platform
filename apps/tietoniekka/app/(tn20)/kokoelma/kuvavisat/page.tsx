@@ -17,6 +17,11 @@ import { KUVAVISAT } from "@/lib/kokoelmat/kuvavisat";
 import { getKuvavisatHub, getViikkovisa, ryhmiteltyVariaatiot } from "@/lib/kuvavisat2026";
 import { viikkoInfo } from "@/lib/viikkovisa";
 
+/* Hero-tekstit: CC-brief "Hub-sivujen hero-tekstien yhtenäistys" (Heikki hyväksyi 13.11.2026). Viikkovisan voimassaolo
+   ("voimassa … asti · N pv jäljellä") on viikkovisarivin tietorivinä heron alla, ei herossa. */
+const KOROSTUS = "Yksi kuva, neljä vaihtoehtoa – tunnistatko oikean?";
+const INTRO = "Lippu, vaakuna, lintu vai mestariteos? Kuvavisoissa vastaus on silmiesi edessä, mutta vaihtoehdot näyttävät hämmentävän samalta. Aiheina maailman liput, Suomen vaakunat ja linnut, eläimet, maalaukset, rakennukset ja kasvit.";
+
 export const revalidate = 300; // SEO-erä A4 (2.10.2026): ISR 5 min
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://tietoniekka.fi";
@@ -64,7 +69,8 @@ export default async function KuvavisatLanding() {
               height: 821,
             }}
             nimi={KUVAVISAT.nimi}
-            intro={KUVAVISAT.ingress}
+            korostus={KOROSTUS}
+            intro={INTRO}
             cta={info ? <ViikkovisaCta avain={info.avain} /> : undefined}
           />
           <HubAvattavat kortit={viikko} avattavat={aiheet} nimi="Kuvavisat" />

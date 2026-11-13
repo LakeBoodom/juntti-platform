@@ -76,9 +76,9 @@ const haeMegat = cache(async () => {
   return { featuredQuiz, featuredCount, gridItems, kaikkiMaarat, aiheet, rivit };
 });
 
-/* Intro: Heikin teksti 12.11.2026 (ensimmäinen lause korostettuna). */
-const KOROSTUS = "Megavisa on pitkä tietovisa yhdestä aiheesta, yhdellä istumalla ja ilman taukoja.";
-const INTRO = "Valitse aihe ja katso, kuinka pitkälle tietosi kantavat.";
+/* Hero-tekstit: CC-brief "Hub-sivujen hero-tekstien yhtenäistys" (Heikki hyväksyi 13.11.2026). Koukku korostettuna, sitten myyntiteksti. */
+const KOROSTUS = "Kymmenen kysymystä on vasta lämmittely.";
+const INTRO = "Megavisa on tietovisojen pitkä matka: kysymys toisensa perään yleistiedosta, urheilusta, viihteestä ja Suomen kaupungeista. Mitä pidempi oikeiden putki, sitä kovempi kerroin – ja yksi väärä vastaus nollaa sen. Kuinka pitkälle tietosi kantavat?";
 
 /* Rivi: nimi + tietorivi "{n} kysymystä · ~20 min" (datasta). */
 const rivi = (card: MegaCard, quiz: MegaRow, count: number): RiviKortti => ({
