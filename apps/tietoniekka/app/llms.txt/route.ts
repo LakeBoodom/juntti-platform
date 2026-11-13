@@ -8,7 +8,9 @@ const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://tietoniekka.fi";
  * kategoriat, sankarisivut poistuivat, visasivut ovat /visa/<slug>.
  */
 /* SEO-erä A8 (2.10.2026): luvut kannasta (lib/siteStats.ts), tunti välimuistissa. Lisätty
-   pelimuodot, Tiede ja Juhlat; poistettu väite "pääosin 10-kysymyksisiä" (henkilövisoissa 5). */
+   pelimuodot, Tiede ja Juhlat; poistettu väite "pääosin 10-kysymyksisiä" (henkilövisoissa 5).
+   13.11.2026: henkilövisoja laajennetaan 5 → 10 kysymykseen, joten tyyppikohtainen luku pois: "5–10 kysymystä".
+   Kannan teksteissä olevat määrät tarkistaa scripts/kysymysmaara-tarkistus.ts. */
 export const revalidate = 3600;
 
 const COLLECTIONS: Array<[string, string, string]> = [
@@ -80,7 +82,7 @@ export async function GET() {
   lines.push("## Visat");
   lines.push("");
   lines.push(
-    `Sivustolla on ${stats.quizzes} julkaistua tietovisaa osoitteissa /visa/<slug>. Visat ovat monivalintatehtäviä: neljä vaihtoehtoa ja yksi oikea vastaus, ja jokaisen kysymyksen jälkeen näytetään selitys. Aihevisoissa on yleensä 10 kysymystä, henkilövisoissa 5. Megavisoissa kysymyksiä on enemmän.`,
+    `Sivustolla on ${stats.quizzes} julkaistua tietovisaa osoitteissa /visa/<slug>. Visat ovat monivalintatehtäviä: neljä vaihtoehtoa ja yksi oikea vastaus, ja jokaisen kysymyksen jälkeen näytetään selitys. Visoissa on yleensä 5–10 kysymystä, megavisoissa enemmän.`,
   );
   lines.push("");
   lines.push("## Aineiston käyttö");
