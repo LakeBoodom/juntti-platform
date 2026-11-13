@@ -12,7 +12,7 @@ import "./hub.css";
 
 export type HubKuva = { src: string; srcSet?: string; sizes?: string; alt: string; width: number; height: number; pos?: string };
 
-export default function HubHero({ kuva, nimi, korostus, intro, lisa }: {
+export default function HubHero({ kuva, nimi, korostus, intro, lisa, cta }: {
   kuva?: HubKuva;
   nimi: string;
   /** Intron ensimmäinen lause, korostettuna. */
@@ -21,6 +21,8 @@ export default function HubHero({ kuva, nimi, korostus, intro, lisa }: {
   intro?: string;
   /** Datasta laskettu rivi introsta erillään (esim. "8 megavisaa · 20–50 kysymystä"). */
   lisa?: ReactNode;
+  /** Heron ainoa nappi (.tn-cta-lime) intron alla — vain sivuilla, joilla on päivän tai viikon peli (Heikki 13.11.2026). */
+  cta?: ReactNode;
 }) {
   return (
     <header className={`hub-hero${kuva ? "" : " hub-hero--ilman"}`}>
@@ -49,6 +51,7 @@ export default function HubHero({ kuva, nimi, korostus, intro, lisa }: {
           </p>
         ) : null}
         {lisa ? <p className="hub-lisa">{lisa}</p> : null}
+        {cta ?? null}
       </div>
     </header>
   );

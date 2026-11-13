@@ -3,7 +3,7 @@
 //    Rajanaapurit-kortin kuvitus (Viro–Latvia–?–Puola, PeliKuvitus "rajanaapurit" kuvana); lopullinen kuva teetetään erikseen.
 // 2) ei nostoa (vaihe 3): päivittäin vaihtuva Mikä maa? on listan ensimmäinen rivi merkillä "Päivän peli", sitten kartat:
 //    Maailma, Suomi, Yhdysvallat (merkki = pelin nimi, rivi = viikon reitin koukku, kuva = /og/reitti/<peli>/rivi).
-// 3) Näin pelaat sekä Lähteet ja rajaukset suljettuina. Aluevalinta (maanosa, maakunta) on pelien omalla aloitussivulla.
+// Heron nappi "Arvaa päivän maa" → Mikä maa? (Heikki 13.11.). 3) Näin pelaat sekä Lähteet ja rajaukset suljettuina. Aluevalinta (maanosa, maakunta) on pelien omalla aloitussivulla.
 // Kokoava sivu, joten ylänavigaatio ja murupolku (lib/nav.ts PELIMUOTOHUBIT).
 
 import type { Metadata } from "next";
@@ -76,6 +76,7 @@ export default async function KarttapelitSivu() {
             nimi="Karttapelit"
             korostus={KOROSTUS}
             intro={INTRO}
+            cta={mm ? <a className="hub-cta tn-cta-lime" href={MM_SIVU} data-tn-entry="karttapelit:hero">Arvaa päivän maa <span aria-hidden="true">→</span></a> : undefined}
           />
           <HubRivit kortit={[...paivan, ...kartat]} nimi="Karttapelit" />
           <HubOhjeet

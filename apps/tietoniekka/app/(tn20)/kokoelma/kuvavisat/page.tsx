@@ -1,5 +1,5 @@
 // KUVAVISAT /kokoelma/kuvavisat hub-rungolla (Heikki 12.11.2026, vaihe 3): 1) hero = nykyinen kollaasikuva + nimi + intro
-// (KUVAVISAT.ingress); 2) ei nostoa: viikkovisa on listan ensimmäinen rivi merkillä "Viikkovisa · vk {n}" (sama koko kuin
+// (KUVAVISAT.ingress) ja nappi "Pelaa viikkovisa" / "Katso tuloksesi" (Heikki 13.11.); 2) ei nostoa: viikkovisa on listan ensimmäinen rivi merkillä "Viikkovisa · vk {n}" (sama koko kuin
 // muut); 3) kahdeksan aihetta jaettuina riveinä (kuva 96 px, nimi, kuvausrivi), rivin napautus avaa aiheen visat rivin alle
 // (HubAvattavat, natiivi <details>; "Valitse visa" -pudotusvalikko ja "Pelaa vielä nämä" -osio poistuivat).
 // Aiheiden kuvat = entiset esikatselukuvat rivikopioina (public/20/rivi/kuvavisa-<tyyppi>.webp; grafiikka vaalealla levyllä).
@@ -9,6 +9,7 @@ import { KokoelmaLd } from "@/components/tn20/KokoelmaLd";
 import Crumbs from "@/components/tn20/Crumbs";
 import PeliKehys from "@/components/tn20/pelikehys/PeliKehys";
 import HubHero from "@/components/tn20/korttirivi/HubHero";
+import ViikkovisaCta from "@/components/tn20/korttirivi/ViikkovisaCta";
 import { HubAvattavat, type AvattavaRivi, type RiviKortti } from "@/components/tn20/korttirivi/KorttiRivi";
 import { jakoMeta } from "@/lib/jakoMeta";
 import { getPageContent } from "@/lib/pageContent";
@@ -64,6 +65,7 @@ export default async function KuvavisatLanding() {
             }}
             nimi={KUVAVISAT.nimi}
             intro={KUVAVISAT.ingress}
+            cta={info ? <ViikkovisaCta avain={info.avain} /> : undefined}
           />
           <HubAvattavat kortit={viikko} avattavat={aiheet} nimi="Kuvavisat" />
         </div>
