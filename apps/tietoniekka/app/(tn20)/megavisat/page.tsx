@@ -76,9 +76,10 @@ const haeMegat = cache(async () => {
   return { featuredQuiz, featuredCount, gridItems, kaikkiMaarat, aiheet, rivit };
 });
 
-/* Hero-tekstit: CC-brief "Hub-sivujen hero-tekstien yhtenäistys" (Heikki hyväksyi 13.11.2026). Koukku korostettuna, sitten myyntiteksti. */
+/* Hero-tekstit: CC-brief "Hub-sivujen hero-tekstien yhtenäistys" (Heikki hyväksyi 13.11.2026). Koukku korostettuna, sitten myyntiteksti.
+   "kerroin" → "bonus" (Heikki 13.11.): pelissä putki antaa +50 p/porras (GameClient STREAK_BONUS), ei kerrointa. */
 const KOROSTUS = "Kymmenen kysymystä on vasta lämmittely.";
-const INTRO = "Megavisa on tietovisojen pitkä matka: kysymys toisensa perään yleistiedosta, urheilusta, viihteestä ja Suomen kaupungeista. Mitä pidempi oikeiden putki, sitä kovempi kerroin – ja yksi väärä vastaus nollaa sen. Kuinka pitkälle tietosi kantavat?";
+const INTRO = "Megavisa on tietovisojen pitkä matka: kysymys toisensa perään yleistiedosta, urheilusta, viihteestä ja Suomen kaupungeista. Mitä pidempi oikeiden putki, sitä isompi bonus – ja yksi väärä vastaus nollaa sen. Kuinka pitkälle tietosi kantavat?";
 
 /* Rivi: nimi + tietorivi "{n} kysymystä · ~20 min" (datasta). */
 const rivi = (card: MegaCard, quiz: MegaRow, count: number): RiviKortti => ({
