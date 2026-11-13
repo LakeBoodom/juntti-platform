@@ -1,6 +1,5 @@
 /* REITTIPELIEN HERO + ALUEVALINTA (CD "Reittipelit intro v0.2", kierros 3, 1.11.2026).
-   Tumma hero vaalean pelin päällä: hero näkyy vain ennen Aloitusta (viikon reitti), sen jälkeen peli
-   jatkuu kermaisena kuten ennen. Värit CD:stä: pohja #131109, pinta #17140D, viiva #3A3120,
+   Tumma hero; hero näkyy vain ennen Aloitusta (viikon reitti). 13.11.2026 myös peli on tumma (kuntaliitos.css). Värit CD:stä: pohja #131109, pinta #17140D, viiva #3A3120,
    kulta #E8A320 (päätepisteet), lime #B6FF3C vain Aloitus-napissa.
    KORTTISÄÄNTÖ: otsikko mitoitetaan pisimmän sanan mukaan (--rh-lw, yhdysmerkki saa rivittää);
    palojen nimet eivät rivity eivätkä leikkaudu (pisin Kongon demokraattinen tasavalta rivittyy sanoittain). */
@@ -113,11 +112,11 @@
 /* ── Aluevalinta (3c) ─────────────────────────────────── */
 .tn20 .rv-nappi {
   display: inline-flex; align-items: center; gap: 10px; min-height: 44px; padding: 0 14px 0 16px; box-sizing: border-box;
-  border-radius: 999px; border: 1px solid var(--kl-viiva, #e0d8c6); background: var(--kl-pinta, #fbf8f1); color: var(--kl-navy, #0e3a5c);
+  border-radius: 999px; border: 1px solid var(--kl-viiva, #3a3120); background: var(--kl-pinta, #1c1912); color: var(--kl-teksti, #f2ede2);
   font-weight: 700; font-size: 14px; white-space: nowrap; cursor: pointer;
 }
 .tn20 .rv-nappi svg { width: 16px; height: 16px; }
-.tn20 .rv-nappi:focus-visible { outline: 3px solid var(--kl-navy, #0e3a5c); outline-offset: 3px; }
+.tn20 .rv-nappi:focus-visible { outline: 3px solid var(--kl-teksti, #f2ede2); outline-offset: 3px; }
 .tn20 .rh .rv-nappi { border-color: var(--rh-viiva); background: none; color: var(--rh-leipa); }
 .tn20 .rh .rv-nappi:hover { border-color: var(--rh-kulta); color: var(--rh-kulta); }
 

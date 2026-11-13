@@ -1,6 +1,6 @@
 /* KUNTALIITOS — reittipeli (CD "Kuntaliitos v0.2", kierros 5, 26.9.2026).
-   Oma vaalea ilme karttapeleille: luonnonvalkoinen pöytä, valkoiset vaakunalaatat,
-   syvänsininen päätoiminto, turkoosi vain kartassa, reittiviivassa ja onnistumisessa.
+   Alun perin oma vaalea ilme; 13.11.2026 (Heikki) tumma kuten muut pelit: musta pöytä, tummat palat, kartta vaaleana
+   korttina, lime vain päätoiminnossa (Tarkista reitti / Yritä uudelleen), kulta lähdössä ja maalissa.
    Näyttö mitoittuu oman säiliönsä mukaan (container kl). UX-uudistus 2.11.2026 (CD "Rajanaapurit mobiili ja desktop UX"):
    alle 720 px kartta kiinni ylhäällä ja nappi alhaalla, väli vierii sivun mukana (ei omaa vieritystä, se sotkisi raahauksen);
    720 px:stä kartta vasemmalla ja peli oikealla, koko näkymä mahtuu näytölle.
@@ -13,18 +13,23 @@
 
 .tn20 .kl {
   --kl-display: "Archivo Variable", "Archivo", sans-serif;
-  --kl-bg: #f2ede2;
-  --kl-pinta: #fbf8f1;
-  --kl-viiva: #e0d8c6;
+  /* Tumma iho (Heikki 13.11.2026): reittipelit samalla mustalla pohjalla kuin muut pelit; kartta jää vaaleaksi kortiksi
+     (sama periaate kuin heron mallissa 6c, 1.11.2026). Värit Mikä maa? -pelistä (#131109 / #1C1912 / #3A3120). */
+  --kl-bg: #131109;
+  --kl-pinta: #1c1912;
+  --kl-pinta-2: #26211a;
+  --kl-viiva: #3a3120;
+  --kl-viiva-2: #4a4130;
+  --kl-kerma: #f2ede2;
   --kl-navy: #0e3a5c;
   --kl-navy-v: #07253c;
   --kl-teal: #159a9c;
-  --kl-teal-teksti: #0e7375; /* UI-laatu K2: teal tekstinä kermalla 3,23 → 5,31:1 */
-  --kl-teal-t: #0a6e70;
+  --kl-teal-teksti: #5fcfc4; /* turkoosi tekstinä tummalla pinnalla #1C1912 ≈ 9,4:1 */
+  --kl-teal-t: #5fcfc4;
   --kl-puna: #d8543c;
-  --kl-puna-t: #a63a25;
-  --kl-teksti: #12222c;
-  --kl-heikko: #4e5c64;
+  --kl-puna-t: #ff8a70; /* koralli tummalla ≈ 7,6:1 */
+  --kl-teksti: #f2ede2;
+  --kl-heikko: #cfc7b6;
   --kl-ruskea: #6a6353;
   container: kl / inline-size;
   min-height: 100dvh;
@@ -249,3 +254,49 @@
 .tn20 .kl-tulos .kv-vertailu { flex: 1 1 100%; }
 .tn20 .kl-tulos .kv-tuomio { font-family: var(--rk-cond), "Barlow Condensed", sans-serif; font-variation-settings: normal; font-size: 30px; color: var(--kl-teal-t); }
 .tn20 .kl-tulos .kv-tuomio[data-tuomio="havio"] { color: #a8361c; }
+
+/* ── TUMMA IHO (Heikki 13.11.2026) ─────────────────────────────────────────────────────────────
+   Yllä olevat säännöt ovat vaalean ilmeen mitoitukset; tässä vain värit tummalle pohjalle. Kartta (.kl-kartta-alue)
+   ja sen merkit pysyvät vaaleina: kartta on näkymän vaalea elementti. Kontrastit mitattu tummaa pintaa vasten:
+   teksti #F2EDE2 / #1C1912 ≈ 15:1, heikko #CFC7B6 ≈ 10:1, lime-nappi #131109 / #B6FF3C ≈ 16:1. */
+.tn20 .kl-kortti { background: var(--kl-pinta); border-color: var(--kl-viiva); box-shadow: 0 2px 0 #0b0904; }
+.tn20 .kl-kortti[data-tila="lepo"]:hover { border-color: var(--kl-viiva-2); }
+.tn20 .kl-kortti[data-tila="siirtyva"] { box-shadow: 0 10px 22px rgba(0, 0, 0, .55); }
+.tn20 .kl-kortti[data-tila="lukittu"] { background: transparent; border-color: var(--kl-viiva-2); }
+.tn20 .kl-kortti:focus-visible { outline-color: var(--kl-kerma); }
+.tn20 .kl-nimi { color: var(--kl-teksti); }
+.tn20 .kl-paate-merkki { background: #e8a320; color: #131109; }
+.tn20 .kl-kahva { background: var(--kl-pinta-2); border-color: var(--kl-viiva-2); }
+.tn20 .kl-kisko { background: var(--kl-viiva); }
+.tn20 .kl-liitos[data-piirretty] .kl-kisko { background: var(--kl-teal-t); }
+.tn20 .kl-kortti .kl-lippu::after, .tn20 .kl-ketju .kl-lippu::after { box-shadow: inset 0 0 0 1px rgba(245, 240, 230, .18); }
+.tn20 .kl-kortti .kl-kilpi, .tn20 .kl-ketju .kl-kilpi { --kl-reuna: var(--kl-viiva-2); }
+
+/* Päätoiminto lime (UI-sääntö 5, sama kuin Mikä maa? -pelin Arvaa); toissijainen tumma ääriviivanappi. */
+.tn20 .kl-nappi { border-radius: 999px; background: var(--tn-lime, #b6ff3c); box-shadow: none; color: #131109; transition: background-color var(--dur-fast) var(--ease-standard); }
+.tn20 .kl-nappi:hover { background: #cbff6e; }
+.tn20 .kl-nappi:active { transform: translateY(2px); box-shadow: none; }
+.tn20 .kl-nappi--2 { border: 1.5px solid var(--kl-viiva-2); background: transparent; box-shadow: none; color: var(--kl-teksti); }
+.tn20 .kl-nappi--2:hover { background: var(--kl-pinta); border-color: #6a5d40; }
+.tn20 .kl-nappi--2:active { box-shadow: none; }
+.tn20 .kl-nappi:focus-visible, .tn20 .kl-linkki:focus-visible { outline-color: var(--kl-kerma); }
+.tn20 .kl-rakentuu { border-color: #1f5f5c; background: rgba(21, 154, 156, .14); color: var(--kl-teal-t); }
+.tn20 .kl-yritykset-pisteet i { border-color: var(--kl-teksti); }
+.tn20 .kl-korjattava { border-color: #6b4f17; background: rgba(232, 163, 32, .12); }
+.tn20 .kl-korjattava b { color: #f2c874; }
+
+/* Tulos */
+.tn20 .kl-tulos { border-color: var(--kl-viiva); background: var(--kl-pinta); }
+.tn20 .kl-tulos[data-lopetus="onnistui"] { border-color: #1f5f5c; background: rgba(21, 154, 156, .12); }
+.tn20 .kl-tulos h1 { color: var(--kl-teksti); }
+.tn20 .kl-ketju { border-color: var(--kl-viiva); background: var(--kl-pinta); }
+.tn20 .kl-ketju li { border-color: var(--kl-viiva); background: var(--kl-pinta-2); color: var(--kl-teksti); }
+.tn20 .kl-ketju li[data-vaara] { border-color: var(--kl-puna); background: rgba(216, 84, 60, .16); color: var(--kl-puna-t); }
+
+/* Näin pelaat ja virhetila */
+.tn20 .kl-info h2 { color: var(--kl-teksti); }
+.tn20 .kl-info ol { color: #ddd5c4; }
+.tn20 .kl-virhe-laatikko { background: var(--kl-pinta); box-shadow: none; }
+.tn20 .kl-virhe-ik { border-color: var(--kl-viiva-2); }
+.tn20 .kl-virhe-laatikko > b { color: var(--kl-teksti); }
+.tn20 .kl-tulos .kv-tuomio[data-tuomio="havio"] { color: var(--kl-puna-t); }

@@ -608,7 +608,7 @@ export default function ReittipeliClient({
   /* ── Pelikehys (vaihe 4, 20.10.2026): K1 palkki. ── */
   const pelissa = vaihe === "peli";
   const jaljella = KL_YRITYKSET - yritys;
-  const palkki = <Pelipalkki iho={vaihe === "intro" ? "tumma" : "kerma"} peli={peli.nimi} koti={KOTI} pelissa={pelissa || vaihe === "tarkistus"} paluuNuoli />;
+  const palkki = <Pelipalkki iho="tumma" peli={peli.nimi} koti={KOTI} pelissa={pelissa || vaihe === "tarkistus"} paluuNuoli />;
   /* CD 2a/3b: Korjattavaa näkyy mobiilissa kartan yläpuolella ja desktopilla pelipalstan ylimpänä. */
   const korjattava = (paikka: "m" | "d") => pelissa && tarkistettu && (
     <div className={`kl-korjattava kl-korjattava--${paikka}`} key={yritys}>
@@ -633,7 +633,7 @@ export default function ReittipeliClient({
       requestAnimationFrame(() => kortit.current.get(jarjestys[1])?.focus({ preventScroll: true }));
     };
     return (
-      <div className={`kl ${peli.luokka} kl--intro ${runkoCond.variable}`} data-iho="kerma">
+      <div className={`kl ${peli.luokka} kl--intro ${runkoCond.variable}`} data-iho="tumma">
         {palkki}
         <main>
           <Intro peli={peli} reitti={reitti} otsikko={otsikko} pelattu={pelattu} aloita={aloita}
@@ -665,7 +665,7 @@ export default function ReittipeliClient({
       ? vastahaasteteksti(omaTulos.lyhyt, kaveri.lyhyt)
       : tulosjakoteksti(nimi, onnistui ? `löysin reitin ${jarjestysluvulla(yritys)} yrityksellä` : `sain ${tulos} oikein`);
     return (
-      <div className={`kl ${peli.luokka} kl--tulos ${runkoCond.variable}`} data-iho="kerma">
+      <div className={`kl ${peli.luokka} kl--tulos ${runkoCond.variable}`} data-iho="tumma">
         {palkki}
         <main className="pk-tulos-ulko">
           <div className="pk-tulos kl-lopetus">
@@ -711,7 +711,7 @@ export default function ReittipeliClient({
 
   const viim = jarjestys.length - 1;
   return (
-    <div className={`kl ${peli.luokka} ${runkoCond.variable}`} data-iho="kerma">
+    <div className={`kl ${peli.luokka} ${runkoCond.variable}`} data-iho="tumma">
       {palkki}
 
       <div className="kl-main">
@@ -830,8 +830,8 @@ function karttapelit(peli: ReittipeliNimi, viikko: string): Pelimuoto[] {
 
 function Virhe({ peli, uusi }: { peli: Peli; uusi: () => void }) {
   return (
-    <div className={`kl ${runkoCond.variable}`} data-iho="kerma">
-      <Pelipalkki iho="kerma" peli={peli.nimi} koti={KOTI} />
+    <div className={`kl ${runkoCond.variable}`} data-iho="tumma">
+      <Pelipalkki iho="tumma" peli={peli.nimi} koti={KOTI} />
       <div className="kl-virhe">
         <div className="kl-virhe-laatikko">
           <span className="kl-virhe-ik"><Ikoni d={IKONI.varoitus} w={1.8} /></span>
