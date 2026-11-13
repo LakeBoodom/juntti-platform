@@ -38,6 +38,7 @@ import { haePaikkakunnanMuutVisat } from "@/lib/kaupunkisivu";
 import { haeSeuraavat } from "@/lib/seuraavaksi/hae";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
+import { visanHakuotsikko } from "@/lib/hakuotsikko";
 
 export const dynamic = "force-dynamic";
 
@@ -145,7 +146,7 @@ async function pelinMetadata(p: Record<string, string | string[] | undefined>): 
     if (lasten) {
       const kuvaus = lasten.kuvaus ?? `${lasten.otsikko} – tietovisa lapsille Tietoniekassa.`;
       return {
-        title: `${lasten.otsikko}${suffix}`, description: kuvaus,
+        title: { absolute: visanHakuotsikko({ nimi: lasten.otsikko, kysymyksia: lasten.kysymykset.length }) }, description: kuvaus,
         ...og(esikatselu({ nimi: lasten.otsikko, muoto: "tietovisa", n: lasten.kysymykset.length, koukku: (await visanKoukku(lasten.id)).koukku?.kysymys }), `/og/visa/${encodeURIComponent(lasten.slug)}`, `/visa/${lasten.slug}`),
         alternates: { canonical: `/visa/${lasten.slug}` },
         ...(lasten.julkaistu ? {} : { robots: { index: false, follow: false } }),
@@ -164,20 +165,9 @@ async function pelinMetadata(p: Record<string, string | string[] | undefined>): 
        kohta 2) — käytetään description-kenttää fallbackina ennen geneeristä
        lausetta, jotta hakutuloksen kuvaus on oikea lähes kaikilla visoilla. */
     const visaDesc = data.seo_description ?? data.teaser ?? data.description ?? `${name} – ilmainen tietovisa Tietoniekassa.`;
-    /* Hakuotsikko (Trends-/Search Console -analyysi 23.9.2026, claude/TRENDS_KYSYNTAKARTTA.md):
-       henkilöhaut tuovat paljon näyttökertoja mutta tuskin klikkauksia, koska
-       pelkkä "Nimi – näyttelijä" ei kerro hakijalle, että kyseessä on visa.
-       Klikkaukset tulevat "aihe + visa" -hauista. Siksi:
-       1) quizzes.seo_title voittaa aina (suffiksi lisätään, jos se puuttuu),
-       2) henkilövisoille sääntöpohjainen "Nimi – tietovisa: kuinka hyvin tunnet?".
-       Sivun näkyvä otsikko ja jakokortin og-otsikko pysyvät ennallaan. */
-    let hakuOtsikko = `${name}${suffix}`;
-    if (data.seo_title) {
-      hakuOtsikko = /tietoniekka/i.test(data.seo_title) ? data.seo_title : `${data.seo_title}${suffix}`;
-    } else if (data.collection === "tunnetut-henkilot") {
-      const henkilo = name.split(/\s[–—-]\s/)[0].trim();
-      hakuOtsikko = `${henkilo} – tietovisa: kuinka hyvin tunnet?${suffix}`;
-    }
+    /* Hakuotsikko: "{Aihe}-tietovisa – {alaotsikko} | Tietoniekka" tai seo_title (lib/hakuotsikko.ts, SEO-brief
+       13.11.2026). Korvaa 23.9. henkilövisojen "Nimi – tietovisa: kuinka hyvin tunnet?" -säännön. Vain <title>:
+       sivun näkyvä otsikko ja jakokortin og-otsikko pysyvät ennallaan. Määrä lasketaan alempana (visanKoukku). */
     const visaPolku = data.slug ? `/visa/${data.slug}` : `/peli?quiz_id=${quizId}`;
     /* Esikatselukortti (Jakotekstit v4 §4, vaihe 2): "{korttinimi} – tietovisa", kuvaus = koukku + "Kymmenen kysymystä.",
        kuva = koukkukortti. Sama kortti tulos- ja pelilinkille: tulos on viestissä, ei kortissa. og:url = jaettu
@@ -187,7 +177,8 @@ async function pelinMetadata(p: Record<string, string | string[] | undefined>): 
     const { koukku, maara } = await visanKoukku(data.id);
     const ogKuva = data.slug ? `/og/visa/${encodeURIComponent(data.slug)}` : "/og-image.png";
     const kortti = esikatselu({ nimi: korttinimi({ korttinimi: data.korttinimi, title: name }), muoto: "tietovisa", n: maara || undefined, koukku: koukku?.kysymys });
-    return { title: hakuOtsikko, description: visaDesc, ...og(kortti, ogKuva, jaettu ? `${visaPolku}?tulos=${tulos}` : visaPolku), ...canonical };
+    const hakuOtsikko = visanHakuotsikko({ nimi: name, seoTitle: data.seo_title, kysymyksia: maara });
+    return { title: { absolute: hakuOtsikko }, description: visaDesc, ...og(kortti, ogKuva, jaettu ? `${visaPolku}?tulos=${tulos}` : visaPolku), ...canonical };
   }
   return { title: `Visaa ei löytynyt${suffix}` };
 }
