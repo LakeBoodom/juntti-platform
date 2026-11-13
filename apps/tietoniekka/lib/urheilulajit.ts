@@ -62,7 +62,7 @@ export const UL_LOHKOT: UlLohko[] = [
     visat: [
       { quizSlug: "rallin-mm-sarja-historia-huippuhetket-visa", tag: "MM-sarja", title: "Rallin MM-sarja", sub: "Sarjan kovin tietovisa: kaudet, autot ja ratkaisuhetket.", img: ulImg("ralli-mm"), pos: "center 35%", color: "#B6FF3C" },
       { quizSlug: "suomalaiset-rallin-mm-sarjassa-visa", tag: "Suomi", title: "Lentävät suomalaiset", sub: "Rallin MM-legendat testissä — Suomen pitkä voittoputki.", img: ulImg("ralli-suomi"), pos: "center 30%", color: "#4FD1F5" },
-      { quizSlug: "suomen-mm-ralli-jyvaskyla", tag: "Suomen MM-ralli", title: "Jyväskylän MM-ralli", sub: "Kuinka hyvin tunnet sorateiden nopeimman osakilpailun?", img: ulImg("ralli-jyvaskyla"), pos: "center 30%", color: "#F5C518" },
+      { quizSlug: "suomen-mm-ralli-jyvaskyla", tag: "Suomen MM-ralli", title: "Jyväskylän MM-ralli", sub: "Kuinka hyvin tunnet sorateiden nopeimman osakilpailun?", img: ulImg("ralli-jyvaskyla"), pos: "40% 50%", color: "#F5C518" },
     ],
   },
   {

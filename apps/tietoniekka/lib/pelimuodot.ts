@@ -169,9 +169,9 @@ export type EtusivunPelimuoto = {
 export const TULOSSA_PAIVAA = 35;
 const TIETO = "#F0A24B", KUVA = "#22D3EE", KARTTA = "#4ADE80", JARJ = "#C4A1FF", MAA = "#B4532A";
 export const ETUSIVUN_PELIMUODOT: EtusivunPelimuoto[] = [
-  { slug: "klassinen", ryhma: "tietovisat", laji: "Tietovisa", nimi: "Klassinen visa", etusivu_rivi: "{visat} visaa kaikista aiheista", href: "/kokoelmat", kuva: "/20/hero-mikko-laura.webp", kuvaPos: "70% 24%", aksentti: TIETO, tila: "pelattava", julkaisu: null },
   { slug: "tupla", ryhma: "tietovisat", laji: "Visapeli", nimi: "Tupla tai kuitti", etusivu_rivi: "Tuplaa pottisi tai ota kuitti", href: "/peli/tupla-tai-kuitti", kuva: "/20/tupla/banneri-desk.webp", kuvaPos: "64% 38%", aksentti: TIETO, tila: "pelattava", julkaisu: null },
   { slug: "megavisat", ryhma: "tietovisat", laji: "Tietovisa", nimi: "Megavisat", etusivu_rivi: "Laajat teemavisat yhdellä istumalla", href: "/megavisat", kuva: "/20/megavisat/mikko-hero-900.webp", kuvaPos: "50% 22%", aksentti: TIETO, tila: "pelattava", julkaisu: null },
+  { slug: "klassinen", ryhma: "tietovisat", laji: "Tietovisa", nimi: "Klassinen visa", etusivu_rivi: "{visat} visaa kaikista aiheista", href: "/kokoelmat", kuva: "/20/hero-mikko-laura.webp", kuvaPos: "70% 24%", aksentti: TIETO, tila: "pelattava", julkaisu: null },
   { slug: "pikapeli", ryhma: "tietovisat", laji: "Tietovisa", nimi: "Pikapeli", etusivu_rivi: "Vastaa ennen kuin aika loppuu", href: "", kuva: null, aksentti: TIETO, tila: "tulossa", julkaisu: null },
   { slug: "kuvavisat", ryhma: "kuva-aani", laji: "Kuvavisa", nimi: "Kuvavisat", etusivu_rivi: "Tunnista kuvista maiden liput, maakuntien vaakunat, eläimiä, lintuja ja monta muuta aihetta", href: "/kokoelma/kuvavisat", kuva: "/20/kuvavisat/hero-800.webp", aksentti: KUVA, tila: "pelattava", julkaisu: null },
   /* Viikon kuvavisa pois etusivulta (CD v8, 30.10.2026): Kuvavisat-kortti kattaa sen. */
