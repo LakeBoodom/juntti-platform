@@ -28,7 +28,7 @@ const COUNTDOWN_PAIVAA = 14;
 const TUOTANTO = process.env.VERCEL_ENV === "production";
 /** Aihetiilien 16:10-rajaus (CD etusivu v7 1h, 30.10.2026). Puuttuva → rekisterin pos tai keskitetty. */
 const AIHE_POS: Record<string, string> = {
-  elokuvat: "50% 50%", historia: "50% 55%", jalkapallo: "50% 50%", juhlat: "50% 50%", jaakiekko: "50% 35%",
+  elokuvat: "50% 50%", historia: "50% 55%", jalkapallo: "50% 50%", juhlat: "50% 50%", jaakiekko: "50% 50%",
   kulttuuri: "50% 50%", luonto: "50% 50%", matkakohteet: "50% 50%", musiikki: "50% 50%", kaupungit: "50% 50%",
   tiede: "50% 50%", "tunnetut-henkilot": "50% 50%", tv: "50% 50%", urheilu: "50% 50%", vaalit: "50% 40%",
 };
