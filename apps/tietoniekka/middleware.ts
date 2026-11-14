@@ -5,7 +5,8 @@
 //     (dynaaminen; esim. tulosvariantin jakokuva og:image tarvitsee ?tulos=)
 //   • /peli?visa=<slug> (ei muita parametreja) → 308 /visa/<slug> (SEO 25.10.2026; aiemmin sisäinen
 //     uudelleenkirjoitus, jolloin /peli?visa= keräsi Googlessa omia näyttöjään kanonisen ohi)
-//   • parametrilliset pelisivut (/peli?… ja /visa/<slug>?…) → noindex, follow (SEO 25.10.2026):
+//   • parametrilliset pelisivut (/peli?… ja /visa/<slug>?…) → noindex, follow (SEO 25.10.2026), paitsi pelkkä
+//     /peli?mega=<slug> (13.11.2026: megan ainoa osoite, indeksoitava):
 //     X-Robots-Tag-otsake + sisäinen merkki ?_noindex=1, jolla /peli lisää robots-metan HTML:ään.
 //     Kanoninen osoite pysyy ennallaan. Ei robots.txt-estoa — Google ei silloin näkisi noindexiä.
 //   • rungolle siirtyneiden kokoelmien vanhat parametrit → 308 osion ankkuriin (runko 19.10.2026):
@@ -85,6 +86,9 @@ export function middleware(req: NextRequest) {
     r.search = "";
     return NextResponse.redirect(r, 308);
   }
+  /* Megavisa (SEO-brief 13.11.2026): megalla ei ole omaa esittelysivua, joten pelkkä /peli?mega=<slug> on sen ainoa
+     indeksoitava osoite (canonical itseensä, ks. peli/page.tsx). Muut parametrit (&tulos= ym.) → noindex normaalisti. */
+  if (url.pathname === "/peli" && avaimet.length === 1 && avaimet[0] === "mega" && url.searchParams.get("mega")) return NextResponse.next();
   if (url.pathname === "/peli" && avaimet.length > 0) return pelivariantti(url.clone());
   return NextResponse.next();
 }
