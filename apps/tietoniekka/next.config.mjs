@@ -58,6 +58,12 @@ const nextConfig = {
         destination: "/visa/kouvola-visa-raiteiden-risteyksessa",
         permanent: true,
       },
+      /* 14.11.2026: kaksi lähes samaa visaa yhdistettiin (Heikki) → vanha osoite yhdistettyyn visaan. */
+      {
+        source: "/visa/suomalaiset-euroopassa-champions-league",
+        destination: "/visa/mestarien-liiga-suomalaiset",
+        permanent: true,
+      },
       /* 1.0 pelimuodot */
       { source: "/mega", destination: "/megavisat", permanent: true },
       { source: "/kumpi", destination: "/", permanent: true },

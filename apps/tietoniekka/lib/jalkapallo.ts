@@ -92,13 +92,11 @@ export const JP_CL: JpCard[] = [
   { quizSlug: "mestarien-liiga-comebackit-yllatykset", tag: "Comebackit", title: "Comebackit ja yllätykset", desc: "Illat, joina kolmen maalin tappioasema ei riittänyt lopettamaan mitään.", img: jpImg("cl-comebackit"), pos: "center 40%", color: "#35D6A0" },
 ];
 
-/** Suomalaiset eurokentillä (4, teksti kokonaan kuvan päällä). */
+/** Suomalaiset eurokentillä (3, teksti kokonaan kuvan päällä). */
 export const JP_FINNS: JpCard[] = [
   { quizSlug: "mestarien-liiga-suomalaiset", tag: "Mestarien liiga", title: "Sinivalkoiset Euroopan huipulla", desc: "Suomalaiset Mestarien liigassa: Litmanen, Hyypiä ja muut tunnelin läpi kulkeneet.", img: jpImg("cl-suomalaiset2"), pos: "center 40%", color: "#4FD1F5" },
   { quizSlug: "suomalaiset-euroopassa-historia", tag: "Seurat", title: "Suomalaisseurat eurokentillä", desc: "Karsintakierrosten sankarit ja ne illat, jolloin Suomi voitti Euroopassa.", img: jpImg("cl-eurokentat"), pos: "center 40%", color: "#B6FF3C" },
-  // 19.9.2026: julkaistu 23.8. mutta puuttui sivulta. Kuva on CD-paketin
-  // alkuperäinen cl-suomalaiset (käyttämättä jäänyt, Heikin valinta).
-  { quizSlug: "suomalaiset-euroopassa-champions-league", tag: "Pelaajat", title: "Tunnelista tähtihymniin", desc: "Suomalaispelaajat Mestarien liigassa — Ajaxista ja Liverpoolista TsSKA:han.", img: jpImg("cl-suomalaiset"), pos: "center 40%", color: "#F5C518" },
+  // 14.11.2026: "Suomalaispelaajat Mestarien liigassa" yhdistettiin tähän visaan (Heikki), vanha osoite ohjataan.
   { quizSlug: "suomalaiset-euroopassa-hjk", tag: "HJK", title: "HJK:n eurotarina", desc: "Kesä 1998 ja tie Mestarien liigan lohkovaiheeseen — Suomen ainoa.", img: jpImg("cl-hjk"), pos: "center 35%", color: "#3C6FF5" },
 ];
 
