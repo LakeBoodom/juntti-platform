@@ -131,7 +131,7 @@ export default async function KuvienLahteetPage() {
         <Lista rivit={kulttuuri} />
         <h2 style={{ fontSize: 22, margin: "34px 0 14px" }}>Urheilu-kokoelma</h2>
         <Lista rivit={urheilu} />
-        <h2 style={{ fontSize: 22, margin: "34px 0 14px" }}>Jalkapallo: Valioliigan seurat</h2>
+        <h2 style={{ fontSize: 22, margin: "34px 0 14px" }}>Jalkapallo: Valioliiga ja Mestarien liiga</h2>
         <Lista rivit={jalkapallo} />
         <h2 style={{ fontSize: 22, margin: "34px 0 14px" }}>Jalkapallo: Euroopan suurseurat</h2>
         <Lista rivit={jalkapalloEuro} />
