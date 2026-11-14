@@ -50,8 +50,8 @@ export const UL_LOHKOT: UlLohko[] = [
     intro: "Autourheilun kuningasluokka: maailmanmestarit, tallit ja se pieni maa, joka tuotti kolme mestaria.",
     layout: "lead", ratio: "16/10", gridMin: 300,
     visat: [
-      { quizSlug: "formula-1-tiedatko-f1n-perusteet", tag: "Kuningasluokka", title: "Formula 1", sub: "Onko autourheilun kuningasluokan tieto hallussa? Mestarit, tallit ja radat.", img: ulImg("f1-kaikki"), pos: "center 50%", color: "#EF0107" },
-      { quizSlug: "formula1-suuri-tietovisa", tag: "Megavisa", title: "Kaasu pohjaan", sub: "Suuri Formula 1 -tietovisa: pisimmät sarjat, kovimmat kaudet.", img: ulImg("f1-kaasu"), pos: "center 50%", color: "#E8A320" },
+      { quizSlug: "formula-1-tiedatko-f1n-perusteet", tag: "Säännöt", title: "Säännöt ja historia", sub: "Liput, pisteet, aika-ajot ja sarjan alkuvuodet.", img: ulImg("f1-kaikki"), pos: "center 50%", color: "#EF0107" },
+      { quizSlug: "formula1-suuri-tietovisa", tag: "Legendat", title: "Radat ja legendat", sub: "Monza, Spa, Fangio ja Graham Hill.", img: ulImg("f1-kaasu"), pos: "center 50%", color: "#E8A320" },
       { quizSlug: "formula1-suomalaiset", tag: "Suomi", title: "Lentävät suomalaiset", sub: "Suomi Formula 1:ssä — kolme mestaria ja pieni maa isolla varjolla.", img: ulImg("f1-suomi"), pos: "center 50%", color: "#4FD1F5" },
     ],
   },
