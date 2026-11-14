@@ -34,7 +34,7 @@ export type UlLohko = {
 };
 
 export const UL_HERO = {
-  img: ulImg("ralli-jyvaskyla2"),
+  img: ulImg("ralli-gronholm"), // 14.11.2026 Heikki: Marcus Grönholm (oikea valokuva AI-kuvan tilalle)
   titleLines: ["Kaasua, mailoja", "ja mitaleita"] as const,
   introLines: [
     "Formula 1, ralli, golf, tennis ja urheiluhistoria — viisi lohkoa, joissa",
@@ -50,9 +50,9 @@ export const UL_LOHKOT: UlLohko[] = [
     intro: "Autourheilun kuningasluokka: maailmanmestarit, tallit ja se pieni maa, joka tuotti kolme mestaria.",
     layout: "lead", ratio: "16/10", gridMin: 300,
     visat: [
-      { quizSlug: "formula-1-tiedatko-f1n-perusteet", tag: "Kuningasluokka", title: "Formula 1", sub: "Onko autourheilun kuningasluokan tieto hallussa? Mestarit, tallit ja radat.", img: ulImg("f1-kaikki"), pos: "center 46%", color: "#EF0107" },
-      { quizSlug: "formula1-suuri-tietovisa", tag: "Megavisa", title: "Kaasu pohjaan", sub: "Suuri Formula 1 -tietovisa: pisimmät sarjat, kovimmat kaudet.", img: ulImg("f1-kaasu"), pos: "center 50%", color: "#E8A320" },
-      { quizSlug: "formula1-suomalaiset", tag: "Suomi", title: "Lentävät suomalaiset", sub: "Suomi Formula 1:ssä — kolme mestaria ja pieni maa isolla varjolla.", img: ulImg("f1-suomi"), pos: "center 38%", color: "#4FD1F5" },
+      { quizSlug: "formula-1-tiedatko-f1n-perusteet", tag: "Säännöt", title: "Säännöt ja historia", sub: "Liput, pisteet, aika-ajot ja sarjan alkuvuodet.", img: ulImg("f1-kaikki"), pos: "center 50%", color: "#EF0107" },
+      { quizSlug: "formula1-suuri-tietovisa", tag: "Legendat", title: "Radat ja legendat", sub: "Monza, Spa, Fangio ja Graham Hill.", img: ulImg("f1-kaasu"), pos: "center 50%", color: "#E8A320" },
+      { quizSlug: "formula1-suomalaiset", tag: "Suomi", title: "Lentävät suomalaiset", sub: "Suomi Formula 1:ssä — kolme mestaria ja pieni maa isolla varjolla.", img: ulImg("f1-suomi"), pos: "center 50%", color: "#4FD1F5" },
     ],
   },
   {
@@ -60,8 +60,8 @@ export const UL_LOHKOT: UlLohko[] = [
     intro: "Sorateiden MM-sarja, Jyväskylän hyppyrit ja sukupolvi toisensa jälkeen suomalaisia maailmanmestareita.",
     layout: "grid", ratio: "4/5", gridMin: 250,
     visat: [
-      { quizSlug: "rallin-mm-sarja-historia-huippuhetket-visa", tag: "MM-sarja", title: "Rallin MM-sarja", sub: "Sarjan kovin tietovisa: kaudet, autot ja ratkaisuhetket.", img: ulImg("ralli-mm"), pos: "center 35%", color: "#B6FF3C" },
-      { quizSlug: "suomalaiset-rallin-mm-sarjassa-visa", tag: "Suomi", title: "Lentävät suomalaiset", sub: "Rallin MM-legendat testissä — Suomen pitkä voittoputki.", img: ulImg("ralli-suomi"), pos: "center 30%", color: "#4FD1F5" },
+      { quizSlug: "rallin-mm-sarja-historia-huippuhetket-visa", tag: "MM-sarja", title: "Rallin MM-sarja", sub: "Sarjan kovin tietovisa: kaudet, autot ja ratkaisuhetket.", img: ulImg("ralli-mm"), pos: "center 50%", color: "#B6FF3C" },
+      { quizSlug: "suomalaiset-rallin-mm-sarjassa-visa", tag: "Suomi", title: "Lentävät suomalaiset", sub: "Rallin MM-legendat testissä — Suomen pitkä voittoputki.", img: ulImg("ralli-suomi"), pos: "center 40%", color: "#4FD1F5" },
       { quizSlug: "suomen-mm-ralli-jyvaskyla", tag: "Suomen MM-ralli", title: "Jyväskylän MM-ralli", sub: "Kuinka hyvin tunnet sorateiden nopeimman osakilpailun?", img: ulImg("ralli-jyvaskyla"), pos: "40% 50%", color: "#F5C518" },
     ],
   },
@@ -72,8 +72,8 @@ export const UL_LOHKOT: UlLohko[] = [
     visat: [
       { quizSlug: "pga-tour-tietovisa", tag: "PGA Tour", title: "PGA Tour", sub: "Amerikan kiertue: kaudet, kentät ja rahalistan kärki.", img: ulImg("golf-pga"), pos: "center 40%", color: "#35D6A0" },
       { quizSlug: "dp-world-tour-euroopan-golfkiertue-visa", tag: "DP World Tour", title: "DP World Tour", sub: "Euroopan golfkiertue Ryder Cupin varjossa ja valossa.", img: ulImg("golf-dpworld"), pos: "center 45%", color: "#B6FF3C" },
-      { quizSlug: "the-open-golfin-vanhin-major", tag: "Major", title: "The Open", sub: "Golfin vanhin majorturnaus — linkkikentät, tuuli ja Claret Jug.", img: ulImg("golf-open"), pos: "center 45%", color: "#E8A320" },
-      { quizSlug: "suomalaiset-golfin-ammattilaiskiertueilla-visa", tag: "Suomi", title: "Sinivalkoiset viheriöillä", sub: "Suomalaisgolfin kovin tietovisa — majorit ja läpimurrot.", img: ulImg("golf-suomi"), pos: "center 40%", color: "#4FD1F5" },
+      { quizSlug: "the-open-golfin-vanhin-major", tag: "Major", title: "The Open", sub: "Golfin vanhin majorturnaus — linkkikentät, tuuli ja Claret Jug.", img: ulImg("golf-open"), pos: "center 55%", color: "#E8A320" },
+      { quizSlug: "suomalaiset-golfin-ammattilaiskiertueilla-visa", tag: "Suomi", title: "Sinivalkoiset viheriöillä", sub: "Suomalaisgolfin kovin tietovisa — majorit ja läpimurrot.", img: ulImg("golf-suomi"), pos: "center 35%", color: "#4FD1F5" },
     ],
   },
   {
@@ -82,9 +82,9 @@ export const UL_LOHKOT: UlLohko[] = [
     layout: "grid", ratio: "4/5", gridMin: 240,
     visat: [
       { quizSlug: "atp-tour-historia-huippuhetket-visa", tag: "ATP", title: "Syöttöä ja breikkejä", sub: "ATP-kiertueen kovin tietovisa: rankingit ja ennätykset.", img: ulImg("tennis-atp"), pos: "center 30%", color: "#F5C518" },
-      { quizSlug: "us-open-tennis-visa", tag: "Major", title: "US Open", sub: "Miten hyvin tunnet New Yorkin kovaäänisimmän majorin?", img: ulImg("tennis-usopen"), pos: "25% 35%", color: "#3C6FF5" },
-      { quizSlug: "suomalaiset-atp-wta-kiertueilla-visa", tag: "Suomi", title: "Kentän valloittajat", sub: "Suomen tennistähdet testissä — Davis Cupista maailmalle.", img: ulImg("tennis-suomi"), pos: "center 32%", color: "#4FD1F5" },
-      { quizSlug: "roger-federer-tennislegenda", tag: "Legenda", title: "Roger Federer", sub: "Tennislegenda testissä: majorit, tyyli ja ennätykset.", img: ulImg("tennis-federer"), pos: "center 32%", color: "#E8A320" },
+      { quizSlug: "us-open-tennis-visa", tag: "Major", title: "US Open", sub: "Miten hyvin tunnet New Yorkin kovaäänisimmän majorin?", img: ulImg("tennis-usopen"), pos: "center 55%", color: "#3C6FF5" },
+      { quizSlug: "suomalaiset-atp-wta-kiertueilla-visa", tag: "Suomi", title: "Kentän valloittajat", sub: "Suomen tennistähdet testissä — Davis Cupista maailmalle.", img: ulImg("tennis-suomi"), pos: "center 40%", color: "#4FD1F5" },
+      { quizSlug: "roger-federer-tennislegenda", tag: "Legenda", title: "Roger Federer", sub: "Tennislegenda testissä: majorit, tyyli ja ennätykset.", img: ulImg("tennis-federer"), pos: "center 35%", color: "#E8A320" },
     ],
   },
   {
@@ -93,7 +93,7 @@ export const UL_LOHKOT: UlLohko[] = [
     layout: "grid", ratio: "16/9", gridMin: 340,
     visat: [
       { quizSlug: "helsingin-olympiastadion", tag: "Stadion", title: "Helsingin olympiastadion", sub: "Onko stadikan historia hallussasi? Kesä 1952 ja kaikki sen jälkeen.", img: ulImg("historia-olympiastadion"), pos: "center 40%", color: "#E8A320" },
-      { quizSlug: "elaintarhan-ajot", tag: "Katuratojen aika", title: "Eläintarhan ajot", sub: "Kaasua, mutkia ja historiaa Helsingin puistokaduilla.", img: ulImg("historia-elaintarha"), pos: "center 50%", color: "#EF0107" },
+      { quizSlug: "elaintarhan-ajot", tag: "Katuratojen aika", title: "Eläintarhan ajot", sub: "Kaasua, mutkia ja historiaa Helsingin puistokaduilla.", img: ulImg("historia-elaintarha"), pos: "center 55%", color: "#EF0107" },
     ],
   },
 ];

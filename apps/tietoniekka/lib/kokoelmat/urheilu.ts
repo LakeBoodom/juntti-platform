@@ -15,7 +15,7 @@ export const URHEILU: Kokoelma = {
   highlight: "mitaleita",
   ingress: "Koripallo, lentopallo, salibandy, käsipallo, jääpallo, Formula 1, ralli, golf, tennis ja suomalaisen urheilun suuret hetket.",
   accent: kokoelmaKortti("urheilu")!.mastery.color,
-  hero: { image: UL_HERO.img, focalX: 0.5, focalY: 0.45, alt: "Ralliauto hyppää Jyväskylän MM-rallissa" },
+  hero: { image: UL_HERO.img, focalX: 0.5, focalY: 0.45, alt: "Marcus Grönholm haastattelussa rallin MM-osakilpailussa" },
   cta: "suosituin",
   osiotNimi: "Lajit",
   sections: [
