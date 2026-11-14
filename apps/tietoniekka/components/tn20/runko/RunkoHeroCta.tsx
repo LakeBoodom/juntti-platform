@@ -3,7 +3,7 @@
 // Palvelin renderöi suosituimman (ensikävijä); selain vaihtaa palaavalle pelaajalle seuraavaan
 // pelaamattomaan. Pelaajan tieto tulee anonyymista pelihistoriasta (localStorage tn_played_quizzes,
 // sama kuin pelinäkymä), ei metapelistä — näkyy myös ilman METAPELI_ENABLED-lippua.
-//   ensikävijä          → ei selitettä (3.11.2026: "Moni aloittaa tästä" pois, UI-sääntö 9) + suosituin visa
+//   ensikävijä          → ei selitettä (3.11.2026: "Moni aloittaa tästä" pois, UI-sääntö 9) + päivän nosto (14.11.2026)
 //   palaava (pelannut)  → "Seuraavaksi tämä" + seuraava pelaamaton (sivun järjestyksessä)
 //   cta: "arvo"         → "Kokeile tätä" + satunnainen pelaamaton
 //   asetuksen ctaSelite   → ensikävijän selite (Juhlat: "Lähin juhla: …" + lähimmän juhlan visa)
@@ -32,7 +32,11 @@ export default function RunkoHeroCta({ suosituin, jarjestys, tila, selite: oletu
       return;
     }
     if (jarjestys.some((v) => ps.has(v.id))) {
-      setKohde(pelaamattomat[0]);
+      /* 14.11.2026: seuraava pelaamaton päivän nostosta eteenpäin (ei aina sivun ensimmäisestä), muuten palaava
+         pelaaja näkisi aina saman alun visan. Jos päivän nosto on pelaamatta, se pysyy. */
+      const i0 = Math.max(0, jarjestys.findIndex((v) => v.id === suosituin.id));
+      const kierto = [...jarjestys.slice(i0), ...jarjestys.slice(0, i0)].filter((v) => !ps.has(v.id));
+      setKohde(kierto[0] ?? pelaamattomat[0]);
       setSelite(SELITE.seuraava);
     }
   }, [jarjestys, suosituin, tila]);

@@ -13,6 +13,9 @@ export type KokoelmaOsio = {
   featured?: string;
   /** Aikajanan (V4) vuosirivi, esim. "1809–1917". */
   vuodet?: string;
+  /** Käsin asetettu visajärjestys (slugit, Heikki 14.11.2026: arvokkaimmasta vähiten arvokkaaseen). Listaamattomat
+      visat tulevat perään tavallisessa järjestyksessä. featured voittaa tämänkin. */
+  jarjestys?: string[];
 };
 
 export type Tunnusosa = "aikajana" | "vuosikiekko" | "laskuri" | "sijoitusnauha" | "synttarit";
