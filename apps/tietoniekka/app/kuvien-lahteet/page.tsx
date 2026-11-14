@@ -3,6 +3,7 @@ import { jakoMeta } from "@/lib/jakoMeta";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { KUVALAHTEET, commonsUrl, type Kuvalahde } from "@/lib/kuvalahteet";
+import { JP_EURO } from "@/lib/jalkapallo";
 import { AANI_RYHMAT } from "@/lib/aanivisat";
 import { haeAaniLahteet, type AaniLahde } from "@/lib/aanivisat/data";
 import { getSupabase } from "@/lib/supabase";
@@ -44,7 +45,9 @@ export default async function KuvienLahteetPage() {
   const urheilu = KUVALAHTEET.filter((k) => k.kokoelma === "urheilulajit");
   const ikajarjestys = KUVALAHTEET.filter((k) => k.kokoelma === "ikajarjestys");
   const etusivu = KUVALAHTEET.filter((k) => k.kokoelma === "etusivu");
-  const jalkapallo = KUVALAHTEET.filter((k) => k.kokoelma === "jalkapallo");
+  const euroIdt = new Set(JP_EURO.map((c) => c.id));
+  const jalkapallo = KUVALAHTEET.filter((k) => k.kokoelma === "jalkapallo" && !euroIdt.has(k.slug));
+  const jalkapalloEuro = KUVALAHTEET.filter((k) => k.kokoelma === "jalkapallo" && euroIdt.has(k.slug));
 
   return (
     <main
@@ -130,6 +133,8 @@ export default async function KuvienLahteetPage() {
         <Lista rivit={urheilu} />
         <h2 style={{ fontSize: 22, margin: "34px 0 14px" }}>Jalkapallo: Valioliigan seurat</h2>
         <Lista rivit={jalkapallo} />
+        <h2 style={{ fontSize: 22, margin: "34px 0 14px" }}>Jalkapallo: Euroopan suurseurat</h2>
+        <Lista rivit={jalkapalloEuro} />
         <h2 style={{ fontSize: 22, margin: "34px 0 14px" }}>Etusivu: Pelaa aiheittain</h2>
         <Lista rivit={etusivu} />
         <h2 style={{ fontSize: 22, margin: "34px 0 14px" }}>Etusivu: Kuka on vanhin?</h2>
