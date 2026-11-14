@@ -95,6 +95,7 @@ export const HENKILOKUVAT: Record<string, string> = {
   "Eurooppa-neuvosto 23.–24.3.2023 (52766857233) (cropped).jpg": "/20/henkilot/k/eurooppa-neuvosto-23-24-3-2023-52766857233-cropp-05c868.webp",
   "EvaWahlstrom.jpg": "/20/henkilot/k/evawahlstrom-75d40d.webp",
   "F12019 Schloss Gabelhofen (22) (cropped).jpg": "/20/henkilot/k/f12019-schloss-gabelhofen-22-cropped-4bd53d.webp",
+  "Federer WM16 (37) (28136155830).jpg": "/20/henkilot/k/federer-wm16-37-28136155830-a6c40c.webp",
   "Formula1Gabelhofen2022 (04) (cropped).jpg": "/20/henkilot/k/formula1gabelhofen2022-04-cropped-9b0008.webp",
   "Galileo by leoni.jpg": "/20/henkilot/k/galileo-by-leoni-191960.webp",
   "Gene Simmons 2012.jpg": "/20/henkilot/k/gene-simmons-2012-f416a9.webp",

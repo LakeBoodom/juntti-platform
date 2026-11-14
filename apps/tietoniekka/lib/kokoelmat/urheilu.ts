@@ -29,7 +29,7 @@ export const URHEILU: Kokoelma = {
     { slug: "f1", eyebrow: "Autourheilu", title: "Formula 1", featured: "formula-1-tiedatko-f1n-perusteet" },
     { slug: "ralli", eyebrow: "Autourheilu", title: "Ralli" },
     { slug: "golf", eyebrow: "Mailapelit", title: "Golf" },
-    { slug: "tennis", eyebrow: "Mailapelit", title: "Tennis", jarjestys: ["atp-tour-historia-huippuhetket-visa", "suomalaiset-atp-wta-kiertueilla-visa", "us-open-tennis-visa", "roger-federer-tennislegenda"] },
+    { slug: "tennis", eyebrow: "Mailapelit", title: "Tennis", jarjestys: ["atp-tour-historia-huippuhetket-visa", "suomalaiset-atp-wta-kiertueilla-visa", "us-open-tennis-visa"] },
     { slug: "urheiluhistoria", eyebrow: "Muistot", title: "Urheiluhistoria", chip: "Historia" },
   ],
   related: ["jaakiekko", "jalkapallo", "tunnetut-henkilot"],

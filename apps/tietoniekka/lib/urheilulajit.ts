@@ -84,7 +84,7 @@ export const UL_LOHKOT: UlLohko[] = [
       { quizSlug: "atp-tour-historia-huippuhetket-visa", tag: "ATP", title: "Syöttöä ja breikkejä", sub: "ATP-kiertueen kovin tietovisa: rankingit ja ennätykset.", img: ulImg("tennis-atp"), pos: "center 30%", color: "#F5C518" },
       { quizSlug: "us-open-tennis-visa", tag: "Major", title: "US Open", sub: "Miten hyvin tunnet New Yorkin kovaäänisimmän majorin?", img: ulImg("tennis-usopen"), pos: "center 55%", color: "#3C6FF5" },
       { quizSlug: "suomalaiset-atp-wta-kiertueilla-visa", tag: "Suomi", title: "Kentän valloittajat", sub: "Suomen tennistähdet testissä — Davis Cupista maailmalle.", img: ulImg("tennis-suomi"), pos: "center 40%", color: "#4FD1F5" },
-      { quizSlug: "roger-federer-tennislegenda", tag: "Legenda", title: "Roger Federer", sub: "Tennislegenda testissä: majorit, tyyli ja ennätykset.", img: ulImg("tennis-federer"), pos: "center 35%", color: "#E8A320" },
+      // 14.11.2026: Roger Federer siirrettiin Tunnetut henkilöt -kokoelmaan (henkilösivu), visan kuva säilyy heroissa.
     ],
   },
   {
