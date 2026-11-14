@@ -8,6 +8,7 @@ import { naapurit, type KokoelmaKortti } from "./rekisteri";
 import { lapsetNakyvissa } from "@/lib/lapset/data";
 import { kokoelmanPaketti, type PakettiRivi } from "@/lib/visapaketit";
 import { suosio } from "@/lib/suosio";
+import { helsinginPaiva } from "@/lib/aika";
 import type { Kokoelma, KokoelmaOsio, RunkoVisa } from "./tyypit";
 
 /** S2: ennen "Näytä kaikki" -nappia näkyy osion ensimmäinen kortti + tämä määrä (21.10.2026: kaikki kortit samaa
@@ -134,6 +135,24 @@ export async function haeRunkoData(k: Kokoelma, ulkoiset?: UlkoinenKohde[]): Pro
   return { ...kokoa(k, rivit.map((r) => ({ tagit: r.section_tags ?? [], visa: visa(r) })), maarat), paketti };
 }
 
+/** Heron Pelaa-napin visa (Heikki 14.11.2026): vaihtuu päivittäin (Suomen aika), sama kaikille saman päivän aikana.
+    Ehdokkaina kuvalliset visat (ellei kuvallisia ole). Aiemmin nappi näytti suosituimman, mutta suosioraja (5 selainta /
+    90 pv) ei täyttynyt useimmissa kokoelmissa, joten nappi jäi pysyvästi sivun ensimmäiseen visaan (Urheilu: Joensuun
+    Kataja). Kokoelman slug sekoittaa järjestyksen, ettei kaikilla sivuilla nosteta samana päivänä n:ttä visaa.
+    Juhlat ohittaa tämän sivullaan (lähimmän juhlan visa). Palaavalle pelaajalle selain valitsee seuraavan pelaamattoman. */
+function paivanNosto<T extends { id: string; kuva?: string | null }>(slug: string, visat: T[]): T | null {
+  const kuvalliset = visat.filter((v) => v.kuva);
+  const ehdokkaat = kuvalliset.length ? kuvalliset : visat;
+  if (!ehdokkaat.length) return null;
+  const { iso } = helsinginPaiva();
+  const paiva = Math.floor(Date.parse(`${iso}T00:00:00Z`) / 86_400_000);
+  let h = 0;
+  for (const c of slug) h = (h * 31 + c.charCodeAt(0)) >>> 0;
+  /* Askel 7 (alkuluku): peräkkäiset päivät eivät osu saman osion vierekkäisiin visoihin, kun ehdokkaita ei ole 7:n monikertaa. */
+  const askel = ehdokkaat.length % 7 === 0 ? 1 : 7;
+  return ehdokkaat[(h + paiva * askel) % ehdokkaat.length];
+}
+
 /** Osiot, korttianatomia (S1), katkaisu (S2) ja hero/V6/V7-data kohteista. */
 function kokoa(k: Kokoelma, kohteet: UlkoinenKohde[], maarat: Record<string, number>): RunkoData {
   const nahty = new Set<string>();
@@ -173,7 +192,7 @@ function kokoa(k: Kokoelma, kohteet: UlkoinenKohde[], maarat: Record<string, num
 
   const kaikki = osiot.flatMap((o) => [...(o.b ? [o.b] : []), ...o.kortit]);
   const uniikit = [...new Map(kaikki.map((v) => [v.id, v])).values()];
-  const top = [...uniikit].sort((a, b) => suosio(b.playCount) - suosio(a.playCount))[0] ?? null;
+  const top = paivanNosto(k.slug, uniikit);
 
   return {
     k,
