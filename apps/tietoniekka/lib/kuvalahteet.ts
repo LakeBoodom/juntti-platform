@@ -20,11 +20,13 @@
 //  4. Uusi kuva ei mene tuotantoon ilman riviä tässä tiedostossa. Poikkeus: henkilökuvien omat kopiot
 //     (376 kpl, 18.10.2026) ovat generoituina lib/henkilokuvalahteet.ts:ssä samassa muodossa.
 
+import { JP_CLUBS } from "./jalkapallo";
+
 export type Kuvalahde = {
   /** Visan slug = kuvatiedoston nimi kansiossa public/20/<kokoelma>/ */
   slug: string;
   /** Kokoelma, jonka kansiossa kuva on. */
-  kokoelma: "musiikki" | "kaupungit" | "jaakiekko" | "vaalit" | "historia" | "maantieto" | "luonto" | "ikajarjestys" | "henkilot" | "kulttuuri" | "urheilulajit" | "etusivu" | "jalkapallo";
+  kokoelma: "musiikki" | "kaupungit" | "jaakiekko" | "vaalit" | "historia" | "maantieto" | "luonto" | "ikajarjestys" | "henkilot" | "kulttuuri" | "urheilulajit" | "etusivu" | "jalkapallo" | "urheilu";
   /** Mitä kuvassa on — näytetään lähdesivulla. */
   kuvaus: string;
   /** Tiedoston nimi Wikimedia Commonsissa (ilman File:-etuliitettä). */
@@ -139,6 +141,9 @@ export const KUVALAHTEET: Kuvalahde[] = [
   { slug: "fulham", kokoelma: "jalkapallo", kuvaus: "Clint Dempsey Fulhamin harjoituksissa 2009", tiedosto: "Clint Dempsey, 2009.jpg", tekija: "Mikhail Slain", lisenssi: "CC BY-SA 3.0", lisenssiUrl: CC("by-sa/3.0"), vuosi: "2009" },
   { slug: "sunderland", kokoelma: "jalkapallo", kuvaus: "Stadium of Light, Sunderland", tiedosto: "Stadium of Light (Sunderland A.F.C.).jpg", tekija: "Quintin Soloviev", lisenssi: "CC BY 4.0", lisenssiUrl: CC("by/4.0"), vuosi: "2025" },
   { slug: "leeds", kokoelma: "jalkapallo", kuvaus: "Daniel Farke Leedsin mestaruusparaatissa 2025", tiedosto: "Daniel Farke at Lesds United's championship winners parade 5th May 2025.jpg", tekija: "Catbabylon", lisenssi: "CC BY-SA 4.0", lisenssiUrl: CC("by-sa/4.0"), vuosi: "2025" },
+  { slug: "hull", kokoelma: "jalkapallo", kuvaus: "Konstantinos Tzolakis, Ruotsi–Kreikka 2026", tiedosto: "Sweden - Greece27 (Konstantinos Tzolakis) (cropped).jpg", tekija: "Mikael Hervestad", lisenssi: "CC BY-SA 4.0", lisenssiUrl: CC("by-sa/4.0"), vuosi: "2026" },
+  { slug: "coventry", kokoelma: "jalkapallo", kuvaus: "Frank Lampard, Chelsea–Swansea 2017", tiedosto: "Frank Lampard 2017.jpg", tekija: "@cfcunofficial (Chelsea Debs)", lisenssi: "CC BY-SA 2.0", lisenssiUrl: CC("by-sa/2.0"), vuosi: "2017" },
+  { slug: "ipswich", kokoelma: "jalkapallo", kuvaus: "Ipswichin pelaajat heittävät Kieran McKennaa ilmaan nousun varmistuttua, Portman Road 2024", tiedosto: "Town v Huddersfield, May 2024 (108).jpg", tekija: "Xaneph", lisenssi: "CC BY-SA 4.0", lisenssiUrl: CC("by-sa/4.0"), vuosi: "2024" },
   { slug: "aihe-elokuvat", kokoelma: "etusivu", kuvaus: "Tyhjä elokuvasali ja valaistu valkokangas (etusivun Elokuvat-kortti)", tiedosto: "Free seats movie theater photo (rawpixel)", tekija: "rawpixel", lisenssi: "CC0", lisenssiUrl: "https://creativecommons.org/publicdomain/zero/1.0/", lahdeUrl: "https://www.rawpixel.com/image/5921209/photo-image-public-domain-free-film" },
   { slug: "aihe-jalkapallo", kokoelma: "etusivu", kuvaus: "Cristiano Ronaldo vapaapotkulla, Manchester United–Liverpool, Old Trafford 2009 (etusivun Jalkapallo-kortti)", tiedosto: "2009-3-14 ManUtd vs LFC Ronaldo Freekick Back.JPG", tekija: "Sdo216", lisenssi: "CC BY-SA 3.0", lisenssiUrl: CC("by-sa/3.0"), vuosi: "2009" },
   { slug: "aihe-juhlat", kokoelma: "etusivu", kuvaus: "Joulupukki (etusivun Juhlat ja pyhät -kortti)", tiedosto: "Jonathan G Meath portrays Santa Claus.jpg", tekija: "Jonathan Meath", lisenssi: "CC BY-SA 2.5", lisenssiUrl: CC("by-sa/2.5"), vuosi: "2010" },
@@ -382,6 +387,16 @@ export const KUVALAHTEET: Kuvalahde[] = [
   { slug: "aktialiiga-kasipallon-paasarja", kokoelma: "urheilulajit", kuvaus: "Maalivahti Otto Pohjanheimo, Parainen", tiedosto: "Otto Johannes Pohjanheimo.jpg", tekija: "Ottojohannes", lisenssi: "CC BY-SA 4.0", lisenssiUrl: CC("by-sa/4.0"), vuosi: "2023" },
   { slug: "kasipallon-tahdet-ja-legendat", kokoelma: "urheilulajit", kuvaus: "Bertrand Gille, käsipallon EM-kisat 2010", tiedosto: "CZE vs FRA (01) - 2010 European Men's Handball Championship.jpg", tekija: "Steindy", lisenssi: "CC BY-SA 3.0", lisenssiUrl: CC("by-sa/3.0"), vuosi: "2010" },
 ];
+
+/* Valioliigan seuravisojen pelinäkymän herot (public/20/urheilu/<visan slug>.webp, 14.11.2026) ovat samoja
+   valokuvia kuin seurakortit (public/20/jalkapallo/<seura-id>.webp) → rivit johdetaan jalkapallon riveistä,
+   jotta jakokortin krediitti löytyy myös heron polulle. Lähdesivu listaa vain jalkapallon rivit. */
+const JP_HERO_SLUG = new Map(JP_CLUBS.map((c) => [c.id, c.quizSlug] as const));
+KUVALAHTEET.push(
+  ...KUVALAHTEET.filter((k) => k.kokoelma === "jalkapallo" && JP_HERO_SLUG.has(k.slug)).map(
+    (k): Kuvalahde => ({ ...k, kokoelma: "urheilu", slug: JP_HERO_SLUG.get(k.slug)! }),
+  ),
+);
 
 /** Commons-tiedostosivun osoite — lisenssiehtojen vaatima linkki lähteeseen. */
 export function commonsUrl(tiedosto: string): string {
