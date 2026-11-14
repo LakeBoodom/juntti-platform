@@ -19,16 +19,17 @@ export const URHEILU: Kokoelma = {
   cta: "suosituin",
   osiotNimi: "Lajit",
   sections: [
-    // 3.11.2026 (Heikki): ajankohtaisimmat lajit ensin, palloilu lajeittain.
-    { slug: "koripallo", eyebrow: "Palloilu", title: "Koripallo" },
-    { slug: "lentopallo", eyebrow: "Palloilu", title: "Lentopallo" },
-    { slug: "salibandy", eyebrow: "Palloilu", title: "Salibandy" },
+    // 3.11.2026 (Heikki): ajankohtaisimmat lajit ensin, palloilu lajeittain. 14.11.2026: osioiden sisäinen järjestys
+    // käsin (jarjestys) arvokkaimmasta vähiten arvokkaaseen.
+    { slug: "koripallo", eyebrow: "Palloilu", title: "Koripallo", jarjestys: ["koripallon-suomalaislegendat", "susijengin-arvokisatarina", "korisliigan-historia-ja-mestarit", "tapiolan-honka", "kotkan-ktp-basket", "joensuun-kataja", "kouvolan-kouvot", "salon-vilpas"] },
+    { slug: "lentopallo", eyebrow: "Palloilu", title: "Lentopallo", jarjestys: ["veljekset-lentopallomiehet", "lentopallon-legendat-suomessa", "lentopallon-mestaruusliiga", "kokkolan-tiikerit"] },
+    { slug: "salibandy", eyebrow: "Palloilu", title: "Salibandy", jarjestys: ["suomi-salibandyn-mm-kisoissa", "salibandyn-tahdet-ja-legendat", "f-liiga-salibandyn-paasarja", "suomen-salibandynaiset", "tampereen-classic", "seinajoen-peliveljet-spv"] },
     { slug: "kasipallo", eyebrow: "Palloilu", title: "Käsipallo" },
     { slug: "jaapallo", eyebrow: "Palloilu", title: "Jääpallo", featured: "jaapallo-pakkasen-pallopeli" },
     { slug: "f1", eyebrow: "Autourheilu", title: "Formula 1", featured: "formula-1-tiedatko-f1n-perusteet" },
     { slug: "ralli", eyebrow: "Autourheilu", title: "Ralli" },
     { slug: "golf", eyebrow: "Mailapelit", title: "Golf" },
-    { slug: "tennis", eyebrow: "Mailapelit", title: "Tennis" },
+    { slug: "tennis", eyebrow: "Mailapelit", title: "Tennis", jarjestys: ["atp-tour-historia-huippuhetket-visa", "suomalaiset-atp-wta-kiertueilla-visa", "us-open-tennis-visa", "roger-federer-tennislegenda"] },
     { slug: "urheiluhistoria", eyebrow: "Muistot", title: "Urheiluhistoria", chip: "Historia" },
   ],
   related: ["jaakiekko", "jalkapallo", "tunnetut-henkilot"],

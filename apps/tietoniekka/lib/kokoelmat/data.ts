@@ -168,6 +168,13 @@ function kokoa(k: Kokoelma, kohteet: UlkoinenKohde[], maarat: Record<string, num
             ? (a.julkaistu ?? "").localeCompare(b.julkaistu ?? "")
             : suosio(b.playCount) - suosio(a.playCount) || a.nimi.localeCompare(b.nimi, "fi"),
         );
+      if (s.jarjestys?.length) {
+        const paikka = (slug: string | null | undefined) => {
+          const i = slug ? s.jarjestys!.indexOf(slug) : -1;
+          return i < 0 ? Number.MAX_SAFE_INTEGER : i;
+        };
+        vs = vs.map((v, i) => ({ v, i })).sort((a, b) => paikka(a.v.slug) - paikka(b.v.slug) || a.i - b.i).map((x) => x.v);
+      }
       const fi = s.featured ? vs.findIndex((v) => v.slug === s.featured) : -1;
       if (fi > 0) vs = [vs[fi], ...vs.slice(0, fi), ...vs.slice(fi + 1)];
       /* S1: ensimmäinen (tai nostettu) on osion ensimmäinen kortti (b), jos sillä on kuva. Piirretään samana A-korttina
