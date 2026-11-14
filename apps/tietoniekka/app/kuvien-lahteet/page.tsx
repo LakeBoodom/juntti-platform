@@ -25,7 +25,7 @@ export const metadata: Metadata = {
   }),
 };
 
-const PAIVITETTY = "13.11.2026";
+const PAIVITETTY = "14.11.2026";
 
 export default async function KuvienLahteetPage() {
   const [aanet, linnut, elaimet] = await Promise.all([
@@ -44,6 +44,7 @@ export default async function KuvienLahteetPage() {
   const urheilu = KUVALAHTEET.filter((k) => k.kokoelma === "urheilulajit");
   const ikajarjestys = KUVALAHTEET.filter((k) => k.kokoelma === "ikajarjestys");
   const etusivu = KUVALAHTEET.filter((k) => k.kokoelma === "etusivu");
+  const jalkapallo = KUVALAHTEET.filter((k) => k.kokoelma === "jalkapallo");
 
   return (
     <main
@@ -127,6 +128,8 @@ export default async function KuvienLahteetPage() {
         <Lista rivit={kulttuuri} />
         <h2 style={{ fontSize: 22, margin: "34px 0 14px" }}>Urheilu-kokoelma</h2>
         <Lista rivit={urheilu} />
+        <h2 style={{ fontSize: 22, margin: "34px 0 14px" }}>Jalkapallo: Valioliigan seurat</h2>
+        <Lista rivit={jalkapallo} />
         <h2 style={{ fontSize: 22, margin: "34px 0 14px" }}>Etusivu: Pelaa aiheittain</h2>
         <Lista rivit={etusivu} />
         <h2 style={{ fontSize: 22, margin: "34px 0 14px" }}>Etusivu: Kuka on vanhin?</h2>
