@@ -20,11 +20,13 @@
 //  4. Uusi kuva ei mene tuotantoon ilman riviä tässä tiedostossa. Poikkeus: henkilökuvien omat kopiot
 //     (376 kpl, 18.10.2026) ovat generoituina lib/henkilokuvalahteet.ts:ssä samassa muodossa.
 
+import { JP_CLUBS } from "./jalkapallo";
+
 export type Kuvalahde = {
   /** Visan slug = kuvatiedoston nimi kansiossa public/20/<kokoelma>/ */
   slug: string;
   /** Kokoelma, jonka kansiossa kuva on. */
-  kokoelma: "musiikki" | "kaupungit" | "jaakiekko" | "vaalit" | "historia" | "maantieto" | "luonto" | "ikajarjestys" | "henkilot" | "kulttuuri" | "urheilulajit" | "etusivu" | "jalkapallo";
+  kokoelma: "musiikki" | "kaupungit" | "jaakiekko" | "vaalit" | "historia" | "maantieto" | "luonto" | "ikajarjestys" | "henkilot" | "kulttuuri" | "urheilulajit" | "etusivu" | "jalkapallo" | "urheilu";
   /** Mitä kuvassa on — näytetään lähdesivulla. */
   kuvaus: string;
   /** Tiedoston nimi Wikimedia Commonsissa (ilman File:-etuliitettä). */
@@ -385,6 +387,16 @@ export const KUVALAHTEET: Kuvalahde[] = [
   { slug: "aktialiiga-kasipallon-paasarja", kokoelma: "urheilulajit", kuvaus: "Maalivahti Otto Pohjanheimo, Parainen", tiedosto: "Otto Johannes Pohjanheimo.jpg", tekija: "Ottojohannes", lisenssi: "CC BY-SA 4.0", lisenssiUrl: CC("by-sa/4.0"), vuosi: "2023" },
   { slug: "kasipallon-tahdet-ja-legendat", kokoelma: "urheilulajit", kuvaus: "Bertrand Gille, käsipallon EM-kisat 2010", tiedosto: "CZE vs FRA (01) - 2010 European Men's Handball Championship.jpg", tekija: "Steindy", lisenssi: "CC BY-SA 3.0", lisenssiUrl: CC("by-sa/3.0"), vuosi: "2010" },
 ];
+
+/* Valioliigan seuravisojen pelinäkymän herot (public/20/urheilu/<visan slug>.webp, 14.11.2026) ovat samoja
+   valokuvia kuin seurakortit (public/20/jalkapallo/<seura-id>.webp) → rivit johdetaan jalkapallon riveistä,
+   jotta jakokortin krediitti löytyy myös heron polulle. Lähdesivu listaa vain jalkapallon rivit. */
+const JP_HERO_SLUG = new Map(JP_CLUBS.map((c) => [c.id, c.quizSlug] as const));
+KUVALAHTEET.push(
+  ...KUVALAHTEET.filter((k) => k.kokoelma === "jalkapallo" && JP_HERO_SLUG.has(k.slug)).map(
+    (k): Kuvalahde => ({ ...k, kokoelma: "urheilu", slug: JP_HERO_SLUG.get(k.slug)! }),
+  ),
+);
 
 /** Commons-tiedostosivun osoite — lisenssiehtojen vaatima linkki lähteeseen. */
 export function commonsUrl(tiedosto: string): string {
