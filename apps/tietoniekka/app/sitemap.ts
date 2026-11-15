@@ -1,116 +1,14 @@
 // TIETONIEKKA — sitemap 2.0-rakenteesta (julkaisu 31.8.2026).
-// 1.0:n /kategoria/* ja /sankari/* poistuivat julkaisussa (301-ohjaukset
-// next.config.mjs:ssä) eivätkä kuulu enää sitemapiin. Visasivujen kanoninen
-// osoite on /visa/<slug> (SEO_STRATEGIA §3.1).
+// 1.0:n /kategoria/* ja /sankari/* poistuivat julkaisussa (301-ohjaukset next.config.mjs:ssä) eivätkä kuulu
+// sitemapiin. Visasivujen kanoninen osoite on /visa/<slug> (SEO_STRATEGIA §3.1).
 //
-// SEO-erä A5 (2.10.2026): hubit johdetaan samasta lähteestä kuin /kokoelmat ja navigaatio
-// (NAV_COLLECTIONS) + kuvavisat; lisätty Ikäjärjestys, kuvavisat (/kuvavisa/<kortisto>),
-// Viikkovisa ja /kuvien-lahteet. Megat eivät päädy /visa/-osoitteina (ne antoivat 404);
-// 25.10.2026 alkaen ne eivät ole sitemapissa lainkaan (13.11.2026: pelkkä /peli?mega= indeksoitava, ei sitemapissa).
+// 15.11.2026: rivit ja niiden todelliset muutospäivät (lastmod) tulevat lib/sivukartta.ts:stä. Sama sitemap.xml
+// on IndexNow-ilmoitusten lähde (supabase/functions/indexnow): sivukartan osoite = ilmoitettava osoite.
 import type { MetadataRoute } from "next";
-import { TEEMAT, TUPLA_SIVU } from "@/lib/tuplaTaiKuitti";
-import { KL_SIVU } from "@/lib/kuntaliitos";
-import { JULKAISTUT, pakkaHref } from "@/lib/jarjesta/pakat";
-import { HUB_HREF, IKA_PAKAT } from "@/lib/jarjesta/hub";
-import { VPK_SIVU } from "@/lib/vaalipiiriketju";
-import { RN_SIVU, RN_USA_SIVU } from "@/lib/rajanaapurit";
-import { KARTTAPELIT_SIVU } from "@/lib/karttapelit";
-import { MM_SIVU } from "@/lib/vihjepeli/mikamaa";
-import { MAA_JULKAISU } from "@/lib/vihjepeli/aiheet/maa";
-import { helsinginPaiva } from "@/lib/aika";
-import { NAV_COLLECTIONS } from "@/lib/nav";
-import { KATEGORIAT } from "@/lib/kuvavisat2026";
-import { getPublishedQuizSlugs } from "@/lib/queries";
-import { haeHakemisto } from "@/lib/henkilot";
-import { KAUPUNGIT_LISTA, haeKaupunkilista, kaupunkiHref } from "@/lib/kaupunkisivu";
-import { KUUKAUDET, kuukausiSlug } from "@/lib/henkiloRyhmat";
-import { LAPSET_SIVU, lapsetNakyvissa } from "@/lib/lapset/data";
-import {
-  VP_LANDING, type PakettiRivi, lapsetHref, listaaVisapaketit, muokattu, pakettiHref, sarjaHref, sarjanPainokset, valitsinNakyy,
-} from "@/lib/visapaketit";
-
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://tietoniekka.fi";
+import { sivukartanRivit } from "@/lib/sivukartta";
 
 export const revalidate = 3600;
 
-/* Kokoelmahubit: navigaation kokoelmat (sama lista kuin /kokoelmat) + Kuvavisat, joka on
-   navigaatiossa pelimuotona mutta jolla on oma hub-sivunsa. */
-/* Omalla osoitteella olevat kokoelmat (Lasten visat → /lapset) ovat sitemapissa omina riveinään. */
-const COLLECTION_HUBS = [...NAV_COLLECTIONS.filter((c) => !c.href).map((c) => c.slug), "kuvavisat"];
-
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const now = new Date();
-  const u = (polku: string, changeFrequency: "daily" | "weekly" | "monthly" | "yearly", priority: number, lastModified: Date = now) =>
-    ({ url: `${SITE_URL}${polku}`, lastModified, changeFrequency, priority });
-
-  const staticPages: MetadataRoute.Sitemap = [
-    u("/", "daily", 1.0),
-    u("/kokoelmat", "weekly", 0.9),
-    u("/megavisat", "weekly", 0.8),
-    u(TUPLA_SIVU, "weekly", 0.8),
-    ...TEEMAT.map((t) => u(`${TUPLA_SIVU}/${t.slug}`, "daily", 0.6)),
-    u(KL_SIVU, "daily", 0.7),
-    u(KARTTAPELIT_SIVU, "weekly", 0.7),
-    u(RN_SIVU, "daily", 0.7),
-    u(RN_USA_SIVU, "weekly", 0.6),
-    /* Järjestä-hub ja kaikki pakat (osa C 31.10.2026: Ikäjärjestyksen aiheet pakkoina, /peli/ikajarjestys ohjaa). */
-    u(HUB_HREF, "daily", 0.7),
-    ...IKA_PAKAT.map((p) => u(p.href, "weekly", 0.6)),
-    ...JULKAISTUT.map((p) => u(pakkaHref(p), "monthly", 0.6)),
-    u(VPK_SIVU, "daily", 0.7),
-    /* Mikä maa? julkaisupäivästä (MM_JULKAISU, 7.11.2026) alkaen; sitä ennen sivu oli noindex. */
-    ...(helsinginPaiva().iso >= MAA_JULKAISU ? [u(MM_SIVU, "daily", 0.7)] : []),
-    u("/kuvavisa/viikko", "weekly", 0.7),
-    /* Lasten visat (vaihe 5): /lapset vasta kun LAPSET_ENABLED; julkaistut lasten visat tulevat quizPagesista. */
-    ...(lapsetNakyvissa() ? [u(LAPSET_SIVU, "weekly", 0.8)] : []),
-    u("/kuvien-lahteet", "monthly", 0.2),
-    u("/tietosuoja", "yearly", 0.2),
-  ];
-
-  const collectionPages = COLLECTION_HUBS.map((slug) => u(`/kokoelma/${slug}`, "weekly", 0.9));
-  const kuvavisaPages = [...KATEGORIAT.map((k) => k.type), "kaupungit"].map((k) => u(`/kuvavisa/${k}`, "weekly", 0.7));
-
-  const quizzes = await getPublishedQuizSlugs();
-  /* SEO 25.10.2026: megavisat pois. 13.11.2026 alkaen pelkkä /peli?mega=<slug> on indeksoitava (megalla ei ole omaa
-     esittelysivua), mutta sitemapissa ei silti ole yhtään /peli?…-osoitetta: megat saavat sitemapiin oman sivunsa myöhemmin. */
-  const quizPages: MetadataRoute.Sitemap = quizzes
-    .filter((q) => q.slug && q.game_mode !== "mega")
-    .map((q) => u(`/visa/${q.slug}`, "monthly", 0.7, q.updated_at ? new Date(q.updated_at) : now));
-
-  // Erä B3: henkilöhakemisto, synttärikuukaudet ja henkilösivut (ryhmä- ja lajisivut poistuivat 25.10.2026).
-  const henkilot = await haeHakemisto();
-  const henkiloPages: MetadataRoute.Sitemap = [
-    u("/henkilot", "weekly", 0.8),
-    ...KUUKAUDET.map((_, i) => u(`/henkilot/kuukausi/${kuukausiSlug(i)}`, "monthly", 0.5)),
-    ...henkilot.map((h) => u(h.href, "weekly", 0.6)),
-  ];
-
-  // Visapaketit (28.10.2026): landing, paketit ja sarjojen pääsivut. Ruutu- ja tulostenäkymät ovat noindex.
-  // SEO-brief 1.11.2026: sarjan voimassa oleva painos ei ole sitemapissa (kanoninen = sarjan pääsivu), arkistoituneet
-  // painokset ovat; 'molemmat'-paketin lastenversio omalla osoitteellaan (/visapaketti/<slug>/lapset).
-  const paketit = await listaaVisapaketit();
-  const sarjat = [...new Set(paketit.flatMap((p) => (p.sarja ? [p.sarja] : [])))];
-  const voimassa = new Set(sarjat.map((s) => sarjanPainokset(paketit, s)[0]?.slug));
-  const pvm = (p: PakettiRivi) => { const m = muokattu(p); return m ? new Date(m) : now; };
-  const pakettiPages: MetadataRoute.Sitemap = paketit.length
-    ? [
-        u(VP_LANDING, "weekly", 0.8),
-        ...sarjat.map((s) => u(sarjaHref(s), "weekly", 0.8, pvm(sarjanPainokset(paketit, s)[0]))),
-        ...paketit.flatMap((p) => {
-          if (p.sarja) return voimassa.has(p.slug) ? [] : [u(pakettiHref(p), "monthly", 0.5, pvm(p))];
-          return [
-            u(pakettiHref(p), "weekly", 0.8, pvm(p)),
-            ...(valitsinNakyy(p) ? [u(lapsetHref(p), "weekly", 0.8, pvm(p))] : []),
-          ];
-        }),
-      ]
-    : [];
-
-  // Kaupunkisivut (7.11.2026): lista ja julkaistut kanoniset /kaupunki/<slug>; lyhyet /<slug>-osoitteet eivät ole täällä.
-  const kaupungit = await haeKaupunkilista();
-  const kaupunkiPages: MetadataRoute.Sitemap = kaupungit.length
-    ? [u(KAUPUNGIT_LISTA, "weekly", 0.8), ...kaupungit.map((k) => u(kaupunkiHref(k.slug), "weekly", 0.8))]
-    : [];
-
-  return [...staticPages, ...collectionPages, ...kaupunkiPages, ...kuvavisaPages, ...pakettiPages, ...henkiloPages, ...quizPages];
+  return sivukartanRivit();
 }
