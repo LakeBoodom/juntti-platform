@@ -25,7 +25,7 @@ export const JALKAPALLO: Kokoelma = {
       jarjestys: [
         "huuhkajat-historia", "espanja-la-roja-jalkapallomaajoukkue", "argentiina-jalkapallo", "les-bleus-ranskan-jalkapallomaajoukkue",
         "brasilian-maajoukkue-jalkapallo", "englannin-maajoukkue-jalkapallo", "portugali-maajoukkue-jalkapallo", "belgian-punaiset-paholaiset",
-        "norjan-maajoukkue-jalkapallo", "jalkapallon-mm-kisat-2026", "mm-finaalit-jalkapallo", "italia-1990-mm-kisat",
+        "norjan-maajoukkue-jalkapallo", "jalkapallon-mm-kisat-2026", "mm-finaalit-jalkapallo",
       ],
     },
     { slug: "valioliigan-seurat", eyebrow: "Englanti", title: "Valioliigan seurat", chip: "Seurat", featured: "arsenal-fc-legendat" },

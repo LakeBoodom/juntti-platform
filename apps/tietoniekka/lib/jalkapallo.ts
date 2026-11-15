@@ -122,7 +122,6 @@ export const JP_MAAJOUKKUEET: { quizSlug: string; img: string }[] = [
   ["norjan-maajoukkue-jalkapallo", "mj-norja"],
   ["jalkapallon-mm-kisat-2026", "mj-mm2026"],
   ["mm-finaalit-jalkapallo", "mj-mmfinaalit"],
-  ["italia-1990-mm-kisat", "mj-mm1990"],
 ].map(([quizSlug, id]) => ({ quizSlug, img: `/20/jalkapallo/hero/${id}-800.webp` }));
 
 const QUIZ_IMG = new Map<string, string>([
