@@ -45,6 +45,7 @@ export default async function KuvienLahteetPage() {
   const urheilu = KUVALAHTEET.filter((k) => k.kokoelma === "urheilulajit");
   const ikajarjestys = KUVALAHTEET.filter((k) => k.kokoelma === "ikajarjestys");
   const etusivu = KUVALAHTEET.filter((k) => k.kokoelma === "etusivu");
+  const henkilovisat = KUVALAHTEET.filter((k) => k.kokoelma === "henkilot");
   const euroIdt = new Set(JP_EURO.map((c) => c.id));
   const jalkapallo = KUVALAHTEET.filter((k) => k.kokoelma === "jalkapallo" && !euroIdt.has(k.slug));
   const jalkapalloEuro = KUVALAHTEET.filter((k) => k.kokoelma === "jalkapallo" && euroIdt.has(k.slug));
@@ -139,6 +140,8 @@ export default async function KuvienLahteetPage() {
         <Lista rivit={etusivu} />
         <h2 style={{ fontSize: 22, margin: "34px 0 14px" }}>Etusivu: Kuka on vanhin?</h2>
         <Lista rivit={ikajarjestys} />
+        <h2 style={{ fontSize: 22, margin: "34px 0 14px" }}>Henkilövisojen yläkuvat</h2>
+        <Lista rivit={henkilovisat} />
         <h2 style={{ fontSize: 22, margin: "34px 0 14px" }}>Henkilökuvat (henkilösivut, Tunnetut henkilöt, Päivän sankari, Ikäjärjestys)</h2>
         <Lista rivit={HENKILOKUVALAHTEET} />
         {linnut.length > 0 && <KuvavisaLahteet otsikko="Lintujen kuvavisa" avain="lintu" rivit={linnut} />}
