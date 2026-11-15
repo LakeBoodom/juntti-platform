@@ -109,7 +109,7 @@ const QUIZ_POS = new Map<string, string>(
 /** Kokoelmasivun (runko) korttikuvan rajauskohta. */
 export const jalkapalloQuizPos = (slug: string) => QUIZ_POS.get(slug);
 
-/** Maajoukkueet-osio (Heikki 15.11.2026): kortti- ja herokuva samasta 1600 px:n kuvasta (-800-versio srcsetissä). */
+/** Maajoukkueet-osio (Heikki 15.11.2026): korttikuva = 800 px:n versio, visasivun hero (quizzes.hero_image) = 1600 px. */
 export const JP_MAAJOUKKUEET: { quizSlug: string; img: string }[] = [
   ["huuhkajat-historia", "huuhkajat"],
   ["espanja-la-roja-jalkapallomaajoukkue", "mj-espanja"],
@@ -123,7 +123,7 @@ export const JP_MAAJOUKKUEET: { quizSlug: string; img: string }[] = [
   ["jalkapallon-mm-kisat-2026", "mj-mm2026"],
   ["mm-finaalit-jalkapallo", "mj-mmfinaalit"],
   ["italia-1990-mm-kisat", "mj-mm1990"],
-].map(([quizSlug, id]) => ({ quizSlug, img: `/20/jalkapallo/hero/${id}.webp` }));
+].map(([quizSlug, id]) => ({ quizSlug, img: `/20/jalkapallo/hero/${id}-800.webp` }));
 
 const QUIZ_IMG = new Map<string, string>([
   ...JP_MAAJOUKKUEET.map((c) => [c.quizSlug, c.img] as const),
