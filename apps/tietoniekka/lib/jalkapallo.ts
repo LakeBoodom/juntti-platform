@@ -6,7 +6,7 @@
 export const jpImg = (id: string) => `/20/jalkapallo/${id}.webp`;
 
 export const JP_HERO = {
-  img: jpImg("pl-derby"),
+  img: jpImg("espanja-mm-2026"), // Heikki 15.11.2026: maailmanmestari Espanja (oli AI-kuva pl-derby)
   titleLines: ["Kaikki", "jalkapallosta"] as const,
   introLines: [
     "Valioliiga, Euroopan suurseurat ja Mestarien liigan ikuiset illat.",
@@ -109,7 +109,24 @@ const QUIZ_POS = new Map<string, string>(
 /** Kokoelmasivun (runko) korttikuvan rajauskohta. */
 export const jalkapalloQuizPos = (slug: string) => QUIZ_POS.get(slug);
 
+/** Maajoukkueet-osio (Heikki 15.11.2026): kortti- ja herokuva samasta 1600 px:n kuvasta (-800-versio srcsetissä). */
+export const JP_MAAJOUKKUEET: { quizSlug: string; img: string }[] = [
+  ["huuhkajat-historia", "huuhkajat"],
+  ["espanja-la-roja-jalkapallomaajoukkue", "mj-espanja"],
+  ["argentiina-jalkapallo", "mj-argentiina"],
+  ["les-bleus-ranskan-jalkapallomaajoukkue", "mj-ranska"],
+  ["brasilian-maajoukkue-jalkapallo", "mj-brasilia"],
+  ["englannin-maajoukkue-jalkapallo", "mj-englanti"],
+  ["portugali-maajoukkue-jalkapallo", "mj-portugali"],
+  ["belgian-punaiset-paholaiset", "mj-belgia"],
+  ["norjan-maajoukkue-jalkapallo", "mj-norja"],
+  ["jalkapallon-mm-kisat-2026", "mj-mm2026"],
+  ["mm-finaalit-jalkapallo", "mj-mmfinaalit"],
+  ["italia-1990-mm-kisat", "mj-mm1990"],
+].map(([quizSlug, id]) => ({ quizSlug, img: `/20/jalkapallo/hero/${id}.webp` }));
+
 const QUIZ_IMG = new Map<string, string>([
+  ...JP_MAAJOUKKUEET.map((c) => [c.quizSlug, c.img] as const),
   ...JP_CLUBS.map((c) => [c.quizSlug, jpImg(c.id)] as const),
   ...JP_EURO.map((c) => [c.quizSlug, jpImg(c.id)] as const),
   ...[...JP_PL_GENERAL, ...JP_CL, ...JP_FINNS].map((c) => [c.quizSlug, c.img] as const),

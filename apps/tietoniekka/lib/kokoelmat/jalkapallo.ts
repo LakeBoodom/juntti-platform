@@ -13,12 +13,21 @@ export const JALKAPALLO: Kokoelma = {
   eyebrow: "",
   title: "Kaikki ",
   highlight: "jalkapallosta",
-  ingress: "Valioliiga, Euroopan suurseurat ja Mestarien liigan ikuiset illat.",
+  ingress: "Maajoukkueet, Valioliiga, Euroopan suurseurat ja Mestarien liigan ikuiset illat.",
   accent: kokoelmaKortti("jalkapallo")!.mastery.color,
-  hero: { image: JP_HERO.img, focalX: 0.5, focalY: 0.45, alt: "Valioliigan ottelu täydellä stadionilla" },
+  hero: { image: JP_HERO.img, focalX: 0.5, focalY: 0.3, alt: "Espanja juhlii jalkapallon maailmanmestaruutta 2026" },
   cta: "suosituin",
   osiotNimi: "Lohkot",
   sections: [
+    // Heikki 15.11.2026: maajoukkueet ensimmäiseksi, Huuhkajat kärkeen; perässä MM-kisavisat.
+    {
+      slug: "maajoukkueet", eyebrow: "Maailma", title: "Maajoukkueet", chip: "Maajoukkueet", featured: "huuhkajat-historia",
+      jarjestys: [
+        "huuhkajat-historia", "espanja-la-roja-jalkapallomaajoukkue", "argentiina-jalkapallo", "les-bleus-ranskan-jalkapallomaajoukkue",
+        "brasilian-maajoukkue-jalkapallo", "englannin-maajoukkue-jalkapallo", "portugali-maajoukkue-jalkapallo", "belgian-punaiset-paholaiset",
+        "norjan-maajoukkue-jalkapallo", "jalkapallon-mm-kisat-2026", "mm-finaalit-jalkapallo", "italia-1990-mm-kisat",
+      ],
+    },
     { slug: "valioliigan-seurat", eyebrow: "Englanti", title: "Valioliigan seurat", chip: "Seurat", featured: "arsenal-fc-legendat" },
     { slug: "valioliiga", eyebrow: "Englanti", title: "Kaikki Valioliigasta", chip: "Valioliiga" },
     { slug: "suurseurat", eyebrow: "Eurooppa", title: "Euroopan suurseurat", chip: "Suurseurat", featured: "euroopan-suurseurat-real-madrid" },
