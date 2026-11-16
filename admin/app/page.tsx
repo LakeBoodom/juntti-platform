@@ -1,4 +1,4 @@
-import { supabaseFromCookies } from "@/lib/supabase-server";
+import { supabaseFromCookies, getSupabaseAdmin } from "@/lib/supabase-server";
 import { Nav } from "@/components/nav";
 import Link from "next/link";
 
@@ -7,6 +7,14 @@ export default async function HomePage() {
   const {
     data: { user },
   } = await supabase.auth.getUser();
+
+  /* Tietomalli (brief 15.11.2026 osa 5): faktat, joiden tarkistuspäivä on mennyt tai osuu 14 päivän sisään.
+     Faktapooli piilottaa menneet; Cowork siirtää päivää tarkistuksen jälkeen (D16). */
+  const raja = new Date(Date.now() + 14 * 86_400_000).toISOString().slice(0, 10);
+  const { count: tarkistettavat } = await (getSupabaseAdmin() as any)
+    .from("entity_facts")
+    .select("id", { count: "exact", head: true })
+    .lte("next_review_at", raja);
 
   return (
     <>
@@ -60,6 +68,13 @@ export default async function HomePage() {
               Aseta visa ajanjaksolle
             </div>
           </Link>
+          <div className="block rounded-lg border p-4">
+            <div className="text-sm text-muted-foreground">Tietomalli</div>
+            <div className="text-lg font-medium">Tarkistettavat faktat ({tarkistettavat ?? 0})</div>
+            <div className="text-xs text-muted-foreground">
+              Tarkistuspäivä mennyt tai 14 päivän sisällä
+            </div>
+          </div>
         </div>
       </main>
     </>

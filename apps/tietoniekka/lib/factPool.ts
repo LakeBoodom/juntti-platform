@@ -8,8 +8,13 @@
 // sekoituksessa pelaaja ei tiedä etukäteen, mistä kysytään.
 //
 // RLS: anon-avaimella näkyvät vain julkaistujen entiteettien rivit ja faktoista vain status='approved'.
+//
+// Tarkistuspäivä (15.11.2026): fakta, jonka next_review_at on mennyt, ohitetaan. Vanhentunut fakta julkisesti on
+// huonompi kuin puuttuva. Fakta ei poistu, se piiloutuu kunnes Cowork siirtää tarkistuspäivää (null = ajaton).
+// Käyttäjät 15.11.2026: ei vielä yhtään sivua; tulevat Kaksi totta, Mikä henkilö? ja vihjepelit.
 
 import { getSupabase } from "./supabase";
+import { helsinginPaiva } from "./aika";
 
 /** entity = yhden entiteetin oma pooli, group = ryhmän yhteinen (festivaalit), mixed = koko sekoitus. */
 export type PoolScope = "entity" | "group" | "mixed";
@@ -82,7 +87,7 @@ export async function getTimeline(
 }
 
 /**
- * Hyväksytyt faktat. Vihjeet järjestetään vaikeimmasta helpoimpaan (clue_level 1 → 5),
+ * Hyväksytyt faktat, joiden tarkistuspäivä ei ole mennyt (tänään on vielä voimassa). Vihjeet järjestetään vaikeimmasta helpoimpaan (clue_level 1 → 5),
  * eli siinä järjestyksessä kuin vihjepeli ne näyttää. Tarinat entiteeteittäin.
  */
 export async function getFacts(
@@ -98,6 +103,7 @@ export async function getFacts(
     .eq("fact_type", opts.factType)
     .eq("status", "approved")
     .in("notability", opts.notability)
+    .or(`next_review_at.is.null,next_review_at.gte.${helsinginPaiva().iso}`)
     .order("entity_id")
     .order("clue_level", { ascending: true, nullsFirst: false })
     .order("id");
