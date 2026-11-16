@@ -85,7 +85,7 @@ export const COLLECTION_BG: Record<string, string> = {
   kulttuuri: "/20/kulttuuri/hero-kollaasi.webp",
   historia: "/20/historia/hero-aikajana.webp",
   luonto: "/20/luonto/hero-landing.webp",
-  "tunnetut-henkilot": "/20/teema-tunnetut-henkilot.webp",
+  "tunnetut-henkilot": "/20/teema-tunnetut-henkilot-kollaasi.webp", // 16.11.2026: oli AI-kuva
   juhlat: "/20/juhlat/halloween.webp",
   vaalit: "/20/vaalit/hero.webp",
 };

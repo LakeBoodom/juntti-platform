@@ -20,7 +20,7 @@ export const HENKILOT: Kokoelma = {
   highlight: "henkilöt",
   ingress: "Näyttelijät, artistit, urheilijat ja muut tutut kasvot — kuinka hyvin tunnet heidät?",
   accent: kokoelmaKortti("tunnetut-henkilot")!.mastery.color,
-  hero: { image: "/20/teema-tunnetut-henkilot.webp", focalX: 0.5, focalY: 0.35, alt: "Tunnettuja suomalaisia" },
+  hero: { image: "/20/teema-tunnetut-henkilot-kollaasi.webp", focalX: 0.5, focalY: 0.3, alt: "Urho Kekkonen, Tarja Halonen, Saku Koivu, Jenni Vartiainen, Aki Kaurismäki ja Mika Häkkinen" }, // Heikki 16.11.2026: etusivun kollaasi (oli AI-kuva)
   cta: "suosituin",
   osiotNimi: "Ryhmät",
   sections: RYHMAT.map((r) => ({ slug: `henkilot-${r.key}`, title: r.nimi, chip: r.lyhyt })),
