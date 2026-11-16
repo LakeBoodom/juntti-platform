@@ -8,7 +8,7 @@
   position: relative; display: flex; align-items: center; flex: 1; min-width: 0;
   color: #A79E8C;
 }
-.tn-haku-ikoni { position: absolute; left: 16px; pointer-events: none; }
+.tn-haku-kentta .tn-haku-ikoni { position: absolute; left: 16px; pointer-events: none; }
 .tn-haku-kentta input {
   width: 100%; min-height: 52px; box-sizing: border-box;
   padding: 0 16px 0 46px; border: 1px solid #3A3120; border-radius: 14px;
