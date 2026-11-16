@@ -23,7 +23,8 @@
 //   taglinen mukana. Nostojen sisältö lib/etusivu.ts HEADER_PROMOS (kausivaihto
 //   yhdestä paikasta).
 // - Piilossa pelinäkymässä (/peli) — pelikuoren omat logosäännöt (lukittu 1.8.2026).
-// - Ei Tänään-kohtaa, ei Klassista, ei hakua eikä tiliä (CD:n säännöt).
+// - Ei Tänään-kohtaa, ei Klassista eikä tiliä (CD:n säännöt). Haku lisätty 16.11.2026 (Heikki): suurennuslasi
+//   avaa sivuston hakuikkunan (components/tn20/haku), etusivulla lisäksi näkyvä hakukenttä.
 //   Kaikki linkit vievät todellisille sivuille — ei etusivun ankkureihin.
 import "./topbar.css";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -31,6 +32,8 @@ import { usePathname } from "next/navigation";
 import { NAV_COLLECTIONS, NAV_MODES, isGameRoute, navHref } from "@/lib/nav";
 import { HEADER_PROMOS, SITE_TAGLINE } from "@/lib/etusivu";
 import StreakButton from "./StreakButton";
+import HakuDialogi, { HakuIkoni } from "./haku/HakuDialogi";
+import { avaaHaku, lataaIndeksi } from "./haku/hakuTila";
 
 type MenuId = "kokoelmat" | "pelimuodot";
 
@@ -218,6 +221,15 @@ export default function TopBar({ tagline }: { tagline?: string } = {}) {
                 <span className="tn-promo-label">{p.label} →</span>
               </a>
             ))}
+            <button
+              type="button"
+              className="tn-haku-btn"
+              aria-label="Haku"
+              onClick={() => avaaHaku()}
+              onPointerEnter={() => void lataaIndeksi().catch(() => {})}
+            >
+              <HakuIkoni />
+            </button>
             <StreakButton />
             {/* Mobiilivalikko: hampurilaisikoni (Heikin katselmus 18.8.2026 —
                 korvasi "Selaa"-tekstinapin); < 1100 px (etusivu 2026 prod) */}
@@ -231,6 +243,8 @@ export default function TopBar({ tagline }: { tagline?: string } = {}) {
           </div>
         </div>
       </header>
+
+      <HakuDialogi />
 
       {/* Mobiilin Selaa-paneeli */}
       {sheet && (
