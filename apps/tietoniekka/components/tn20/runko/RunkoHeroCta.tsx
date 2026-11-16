@@ -1,24 +1,24 @@
 "use client";
-// V1:n ainoa lime-pilleri "Pelaa: <visan nimi>" (runko §3) ja sen selite (Heikki 19.10.2026).
-// Palvelin renderöi suosituimman (ensikävijä); selain vaihtaa palaavalle pelaajalle seuraavaan
-// pelaamattomaan. Pelaajan tieto tulee anonyymista pelihistoriasta (localStorage tn_played_quizzes,
-// sama kuin pelinäkymä), ei metapelistä — näkyy myös ilman METAPELI_ENABLED-lippua.
-//   ensikävijä          → ei selitettä (3.11.2026: "Moni aloittaa tästä" pois, UI-sääntö 9) + päivän nosto (14.11.2026)
+// V1:n ainoa lime-pilleri ja sen selite (Heikki 19.10.2026). Palvelin renderöi suosituimman (ensikävijä); selain
+// vaihtaa palaavalle pelaajalle seuraavaan pelaamattomaan. Pelaajan tieto tulee anonyymista pelihistoriasta
+// (localStorage tn_played_quizzes, sama kuin pelinäkymä), ei metapelistä — näkyy myös ilman METAPELI_ENABLED-lippua.
+//
+// B3b (UI-mikrotekstit 27.10., toteutettu 15.11.2026): napissa kiinteä "Aloita visa →" (sama kuin visan aloitussivulla),
+// ei visan nimeä. Napin vieressä (mobiilissa alla) kaksi riviä: selite ja visan koko näyttönimi lihavoituna.
+// Koko alue on yksi linkki samaan visaan. Selite ei kerro päivitysrytmiä (hub-linja 13.11.2026).
+//   ensikävijä          → "Kokeile tätä" + päivän nosto (14.11.2026)
 //   palaava (pelannut)  → "Seuraavaksi tämä" + seuraava pelaamaton (sivun järjestyksessä)
 //   cta: "arvo"         → "Kokeile tätä" + satunnainen pelaamaton
-//   asetuksen ctaSelite   → ensikävijän selite (Juhlat: "Lähin juhla: …" + lähimmän juhlan visa)
+//   asetuksen ctaSelite → ensikävijän selite (Juhlat: "Lähin juhla: …" + lähimmän juhlan visa)
 import { useEffect, useState } from "react";
 
 type Visa = { id: string; nimi: string; href: string };
-
-/** Napissa visan lyhyt nimi: ajatusviivaa (– tai —) edeltävä osa (Heikki 20.10.2026: "Pelaa: Suomen esihistoria"). */
-const lyhyt = (nimi: string) => nimi.split(/\s[–—]\s/)[0].trim();
 
 const SELITE = { seuraava: "Seuraavaksi tämä", arvo: "Kokeile tätä" } as const;
 
 export default function RunkoHeroCta({ suosituin, jarjestys, tila, selite: oletusSelite }: { suosituin: Visa; jarjestys: Visa[]; tila: "suosituin" | "seuraava" | "arvo"; selite?: string }) {
   const [kohde, setKohde] = useState(suosituin);
-  const [selite, setSelite] = useState<string | undefined>(tila === "arvo" ? SELITE.arvo : oletusSelite);
+  const [selite, setSelite] = useState<string>(tila === "arvo" ? SELITE.arvo : oletusSelite ?? SELITE.arvo);
   useEffect(() => {
     let pelatut: string[] = [];
     try {
@@ -41,11 +41,12 @@ export default function RunkoHeroCta({ suosituin, jarjestys, tila, selite: oletu
     }
   }, [jarjestys, suosituin, tila]);
   return (
-    <div className="rk-cta-ryhma">
-      {selite && <span className="rk-cta-selite">{selite}</span>}
-      <a className="rk-cta tn-cta-lime" href={kohde.href}>
-        Pelaa: {lyhyt(kohde.nimi)}
-      </a>
-    </div>
+    <a className="rk-cta-ryhma" href={kohde.href}>
+      <span className="rk-cta tn-cta-lime">Aloita visa <span aria-hidden="true">→</span></span>
+      <span className="rk-cta-kohde">
+        <span className="rk-cta-selite">{selite}</span>
+        <b className="rk-cta-nimi">{kohde.nimi}</b>
+      </span>
+    </a>
   );
 }

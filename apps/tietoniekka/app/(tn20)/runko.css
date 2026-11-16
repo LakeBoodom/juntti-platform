@@ -60,13 +60,22 @@
 /* Heron napin selite (Heikki 19.10.2026): "Seuraavaksi tämä" / "Kokeile tätä" / Juhlien "Lähin juhla: …"; ensikävijällä ei selitettä.
    21.10.2026: selite napin oikealle puolelle pystysuunnassa keskitettynä (ei erillisenä rivinä napin yläpuolella);
    kapeassa näkymässä rivittyy napin alle. */
-.tn20 .rk-cta-ryhma { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; }
-.tn20 .rk-cta-ryhma .rk-cta-selite { order: 2; }
+/* B3b (15.11.2026): koko ryhmä on yksi linkki. Nappi "Aloita visa →", vieressä (kapeassa alla) selite + visan koko
+   nimi lihavoituna; nimi saa rivittyä kahdelle riville eikä katkea sanan keskeltä. */
+.tn20 .rk-cta-ryhma { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px; color: inherit; text-decoration: none; }
+.tn20 .rk-cta-kohde { display: flex; flex-direction: column; gap: 2px; min-width: 0; flex: 1 1 14rem; }
 .tn20 .rk-cta-selite { font-size: 13px; line-height: 1.3; color: var(--tn-text-muted); }
+.tn20 .rk-cta-nimi {
+  font-size: 16px; line-height: 1.3; font-weight: 800; color: var(--rk-ink, #F5F0E6);
+  overflow-wrap: normal; word-break: normal; text-wrap: balance;
+}
+.tn20 .rk-cta-ryhma:hover .rk-cta-nimi { text-decoration: underline; text-underline-offset: 3px; }
+.tn20 .rk-cta-ryhma:focus-visible { outline: none; }
+.tn20 .rk-cta-ryhma:focus-visible .rk-cta { outline: 2px solid #F5F0E6; outline-offset: 3px; }
 .tn20 .rk-cta {
-  display: inline-flex; align-items: center; min-height: 52px; max-width: 100%; padding: 10px 24px;
+  display: inline-flex; align-items: center; gap: 8px; min-height: 52px; max-width: 100%; padding: 10px 24px;
   font-family: var(--rk-cond); font-weight: 800; font-size: 18px; line-height: 1.1; letter-spacing: .02em;
-  overflow-wrap: anywhere;
+  white-space: nowrap;
 }
 @media (min-width: 900px) {
   /* Matala hero (Heikki 21.10.2026): 500 px → ~340 px, jotta 1440 × 900:ssa ensimmäinen korttirivi kuvineen näkyy
