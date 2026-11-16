@@ -118,7 +118,8 @@ function Ikkuna({ alku }: { alku: string }) {
                 {g.rivit.map((r) => (
                   <li key={r.h}>
                     <a href={r.h} className="tn-haku-rivi" onClick={() => suljeHaku()}>
-                      {r.n}
+                      <span className="tn-haku-rivi-n">{r.n}</span>
+                      {r.c && <span className="tn-haku-rivi-c">{r.c}</span>}
                     </a>
                   </li>
                 ))}

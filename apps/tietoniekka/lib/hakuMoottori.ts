@@ -9,8 +9,9 @@
 export type HakuTyyppi = "v" | "h" | "k" | "c" | "p";
 
 /** Indeksin rivi. t = tyyppi (visa, henkilö, kaupunki, kokoelma, peli), n = näkyvä nimi, h = osoite,
- *  a = lisähakusanat (eivät näy), s = suosio (järjestyksen tasapeli). */
-export type HakuKohde = { t: HakuTyyppi; n: string; h: string; a?: string; s?: number };
+ *  a = lisähakusanat (eivät näy), s = suosio (järjestyksen tasapeli), c = kokoelman nimi rivin perässä (erottaa
+ *  samannimiset visat, esim. Talvisota-elokuva ja Talvisota-historia). */
+export type HakuKohde = { t: HakuTyyppi; n: string; h: string; a?: string; s?: number; c?: string };
 
 export const HAKU_RYHMAT: { t: HakuTyyppi; otsikko: string; max: number }[] = [
   { t: "v", otsikko: "Visat", max: 8 },
@@ -82,7 +83,7 @@ export function hae(indeksi: Valmis[], q: string): Map<HakuTyyppi, HakuKohde[]> 
   for (const { k } of pisteet) {
     const r = HAKU_RYHMAT.find((g) => g.t === k.t)!;
     const lista = tulos.get(k.t) ?? [];
-    if (lista.length < r.max) lista.push({ t: k.t, n: k.n, h: k.h });
+    if (lista.length < r.max) lista.push({ t: k.t, n: k.n, h: k.h, c: k.c });
     tulos.set(k.t, lista);
   }
   return tulos;

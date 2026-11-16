@@ -78,7 +78,8 @@ export async function haeHakuindeksi(): Promise<HakuKohde[]> {
         k.game_mode === "mega" ? "megavisa" : "",
         lasten ? "lapset lasten" : "",
       ].filter(Boolean).join(" ");
-      kohteet.push({ t: "v", n: nimi, h: visaHref(k), a: lisa || undefined, s: k.play_count ?? 0 });
+      const kokoelma = k.game_mode === "mega" ? "Megavisa" : lasten ? "Lasten visat" : k.collection ? COLLECTION_LABEL[k.collection] : undefined;
+      kohteet.push({ t: "v", n: nimi, h: visaHref(k), a: lisa || undefined, s: k.play_count ?? 0, c: kokoelma });
     }
     for (const h of (henkilot.data ?? []) as { name: string; nickname: string | null; role: string | null }[]) {
       kohteet.push({ t: "h", n: h.name, h: henkiloHref(h.name), a: [h.nickname, h.role].filter(Boolean).join(" ") || undefined });

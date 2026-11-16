@@ -63,6 +63,9 @@
   display: flex; align-items: center; min-height: 48px; padding: 8px 12px; border-radius: 10px;
   color: #F5F0E6; text-decoration: none; font-size: 16px; font-weight: 600; line-height: 1.3;
 }
+.tn-haku-rivi { justify-content: space-between; gap: 12px; }
+.tn-haku-rivi-n { min-width: 0; }
+.tn-haku-rivi-c { flex: none; font-size: 13px; font-weight: 600; color: #A79E8C; }
 .tn-haku-rivi:hover { background: rgba(255, 255, 255, 0.05); }
 .tn-haku-rivi:focus-visible { outline: 2px solid #B6FF3C; outline-offset: -2px; background: rgba(182, 255, 60, 0.06); }
 

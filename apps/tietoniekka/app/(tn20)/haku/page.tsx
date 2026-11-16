@@ -36,7 +36,7 @@ export default async function HakuSivu({ searchParams }: { searchParams: Promise
             <ul>
               {g.rivit.map((r) => (
                 <li key={r.h}>
-                  <a href={r.h} className="tn-haku-rivi">{r.n}</a>
+                  <a href={r.h} className="tn-haku-rivi"><span className="tn-haku-rivi-n">{r.n}</span>{r.c && <span className="tn-haku-rivi-c">{r.c}</span>}</a>
                 </li>
               ))}
             </ul>
