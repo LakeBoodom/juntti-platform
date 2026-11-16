@@ -2,7 +2,8 @@
 // lib/hakuotsikko.ts-säännön. Uusi otsikko lasketaan samalla funktiolla kuin sivulla. Nykyinen otsikko on 23.9.
 // säännön kopio (seo_title → sellaisenaan, tunnetut henkilöt → "Nimi – tietovisa: kuinka hyvin tunnet?", muut nimi).
 //
-// Ajo (apps/tietoniekka): NEXT_PUBLIC_SUPABASE_URL=… NEXT_PUBLIC_SUPABASE_ANON_KEY=… node scripts/run-ts.cjs scripts/hakuotsikot-csv.ts > hakuotsikot.csv
+// Ajo (apps/tietoniekka): NEXT_PUBLIC_SUPABASE_URL=… NEXT_PUBLIC_SUPABASE_ANON_KEY=… node scripts/run-ts.cjs scripts/hakuotsikot-csv.ts > ../../docs/hakuotsikot-<pvm>.csv
+// Tulos repoon docs/-kansioon Coworkia varten (poikkeukset seo_title-kenttään, Heikki hyväksyy).
 
 import { createClient } from "@supabase/supabase-js";
 import { visanHakuotsikko, HAKUOTSIKKO_MAX } from "../lib/hakuotsikko";
@@ -64,12 +65,16 @@ async function main() {
   const maara = new Map<string, number>();
   for (const k of kysymykset) maara.set(k.quiz_id, (maara.get(k.quiz_id) ?? 0) + 1);
 
-  const rivit = [["slug", "nykyinen_title", "uusi_title", "merkkeja", "yli_60", "seo_title_kaytossa"].join(",")];
+  // 16.11.2026 (Coworkin brief): sarakkeet slug, display_title, title (sivun <title>), merkkimäärä, seo_title käytössä.
+  // ?vanha=1 lisää 13.11. säännön mukaisen vanhan otsikon vertailuun.
+  const vanha = process.argv.includes("--vanha");
+  const rivit = [["slug", "display_title", "title", "merkkeja", "yli_60", "seo_title_kaytossa", ...(vanha ? ["vanha_title"] : [])].join(",")];
   for (const v of visat) {
     if (v.game_mode === "mega") continue; // megat eivät ole /visa/-sivuja
     const nimi = v.display_title ?? v.title;
     const uusi = visanHakuotsikko({ nimi, seoTitle: v.seo_title, kysymyksia: maara.get(v.id) ?? 0 });
-    rivit.push([csv(v.slug), csv(nykyinen(v, nimi)), csv(uusi), uusi.length, uusi.length > HAKUOTSIKKO_MAX ? "kyllä" : "", v.seo_title ? "kyllä" : ""].join(","));
+    rivit.push([csv(v.slug), csv(nimi), csv(uusi), uusi.length, uusi.length > HAKUOTSIKKO_MAX ? "kyllä" : "", v.seo_title ? "kyllä" : "",
+      ...(vanha ? [csv(nykyinen(v, nimi))] : [])].join(","));
   }
   process.stdout.write(rivit.join("\n") + "\n");
   console.error(`${rivit.length - 1} visaa.`);
