@@ -53,6 +53,7 @@
 }
 .tn-haku-sulje:focus-visible { outline: 2px solid #B6FF3C; outline-offset: 2px; }
 .tn-haku-tulokset { flex: 1; overflow-y: auto; overscroll-behavior: contain; padding: 4px 16px 32px; }
+.tn-haku-tulokset:empty { display: none; }
 .tn-haku-tyhja { margin: 20px 4px; font-size: 15px; color: #CFC7B6; }
 .tn-haku-ryhma { margin-top: 16px; }
 .tn-haku-ryhma-h {
@@ -77,6 +78,13 @@
     border: 1px solid #3A3120; border-radius: 18px; box-shadow: 0 24px 60px rgba(0, 0, 0, 0.5);
   }
   .tn-haku-lomake { padding: 14px 16px; }
+  /* Etusivun kentästä avattu: paneeli kentän päällä, kenttä samassa kohdassa, tulokset alle. Tausta himmenee vähemmän. */
+  .tn-haku-root[data-ankkuroitu] .tn-haku-tausta { background: rgba(8, 7, 4, 0.45); }
+  .tn-haku-root[data-ankkuroitu] .tn-haku-paneeli { border-radius: 15px; }
+  .tn-haku-root[data-ankkuroitu] .tn-haku-lomake { padding: 0; border-bottom: 0; }
+  .tn-haku-root[data-ankkuroitu] .tn-haku-kentta input { border-color: #B6FF3C; }
+  .tn-haku-root[data-ankkuroitu] .tn-haku-sulje { margin-right: 6px; }
+  .tn-haku-root[data-ankkuroitu] .tn-haku-tulokset { border-top: 1px solid #2C2517; }
 }
 
 /* /haku-sivu */

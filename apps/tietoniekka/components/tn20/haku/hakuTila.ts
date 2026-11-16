@@ -5,8 +5,14 @@
 import { flushSync } from "react-dom";
 import type { HakuKohde } from "@/lib/hakuMoottori";
 
-type Tila = { auki: boolean; alku: string; avaaja: HTMLElement | null };
-let tila: Tila = { auki: false, alku: "", avaaja: null };
+/** ankkuri = etusivun kentän sijainti: työpöydällä ikkuna avautuu kentän päälle ja tulokset sen alle (Heikki 16.11.:
+ *  "se ei pysy hakulaatikon sisällä"). */
+type Tila = { auki: boolean; alku: string; avaaja: HTMLElement | null; ankkuri: DOMRect | null };
+let tila: Tila = { auki: false, alku: "", avaaja: null, ankkuri: null };
+/* Sulkiessa fokus palaa avaajaan. Jos avaaja on etusivun kenttä, sen onFocus ei saa avata hakua uudelleen
+   (korjaus 16.11.: Sulje avasi ikkunan heti uudelleen ja sivu jäi lukkoon). */
+let palautetaan = false;
+export const palautusKaynnissa = () => palautetaan;
 const kuuntelijat = new Set<() => void>();
 const ilmoita = () => kuuntelijat.forEach((f) => f());
 
@@ -18,9 +24,10 @@ export function tilaa(f: () => void) {
 }
 export const hakuTila = () => tila;
 
-export function avaaHaku(alku = "") {
+export function avaaHaku(alku = "", ankkuri: DOMRect | null = null) {
+  if (tila.auki) return;
   const avaaja = document.activeElement instanceof HTMLElement ? document.activeElement : null;
-  tila = { auki: true, alku, avaaja };
+  tila = { auki: true, alku, avaaja, ankkuri };
   flushSync(ilmoita);
   const k = document.getElementById(HAKU_KENTTA_ID) as HTMLInputElement | null;
   k?.focus();
@@ -30,9 +37,14 @@ export function avaaHaku(alku = "") {
 
 export function suljeHaku() {
   const avaaja = tila.avaaja;
-  tila = { auki: false, alku: "", avaaja: null };
+  tila = { auki: false, alku: "", avaaja: null, ankkuri: null };
   ilmoita();
-  avaaja?.focus?.();
+  palautetaan = true;
+  try {
+    avaaja?.focus?.({ preventScroll: true });
+  } finally {
+    palautetaan = false;
+  }
 }
 
 let lataus: Promise<HakuKohde[]> | null = null;

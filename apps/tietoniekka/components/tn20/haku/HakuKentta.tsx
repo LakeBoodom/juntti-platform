@@ -4,14 +4,15 @@
 import "./haku.css";
 import { useRef } from "react";
 import { HAKU_PLACEHOLDER, HakuIkoni } from "./HakuDialogi";
-import { avaaHaku, lataaIndeksi } from "./hakuTila";
+import { avaaHaku, lataaIndeksi, palautusKaynnissa } from "./hakuTila";
 
 export default function HakuKentta() {
   const ref = useRef<HTMLInputElement>(null);
   const avaa = () => {
-    const alku = ref.current?.value ?? "";
-    if (ref.current) ref.current.value = "";
-    avaaHaku(alku);
+    if (palautusKaynnissa() || !ref.current) return;
+    const alku = ref.current.value;
+    ref.current.value = "";
+    avaaHaku(alku, ref.current.getBoundingClientRect());
   };
   return (
     <form className="tn-haku-etusivu" role="search" action="/haku" method="get" data-tn-entry="etusivu:haku">
@@ -26,6 +27,8 @@ export default function HakuKentta() {
           autoComplete="off"
           placeholder={HAKU_PLACEHOLDER}
           onFocus={avaa}
+          onClick={avaa}
+          onInput={avaa}
           onPointerEnter={() => void lataaIndeksi().catch(() => {})}
         />
       </span>

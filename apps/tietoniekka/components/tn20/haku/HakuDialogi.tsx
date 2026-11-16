@@ -8,7 +8,7 @@ import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from "reac
 import { hae, ryhmitellyt, valmistele, type HakuKohde } from "@/lib/hakuMoottori";
 import { HAKU_KENTTA_ID, hakuTila, lataaIndeksi, suljeHaku, tilaa } from "./hakuTila";
 
-const PALVELIN = { auki: false, alku: "", avaaja: null };
+const PALVELIN = { auki: false, alku: "", avaaja: null, ankkuri: null };
 
 export const HAKU_PLACEHOLDER = "Hae visaa, peliä tai aihetta";
 
@@ -24,10 +24,15 @@ export function HakuIkoni() {
 export default function HakuDialogi() {
   const t = useSyncExternalStore(tilaa, hakuTila, () => PALVELIN);
   if (!t.auki) return null;
-  return <Ikkuna alku={t.alku} />;
+  return <Ikkuna alku={t.alku} ankkuri={t.ankkuri} />;
 }
 
-function Ikkuna({ alku }: { alku: string }) {
+function Ikkuna({ alku, ankkuri }: { alku: string; ankkuri: DOMRect | null }) {
+  /* Työpöydällä etusivun kentästä avattu ikkuna asettuu kentän kohdalle (kenttä pysyy paikallaan, tulokset alle). */
+  const ankkuroitu = !!ankkuri && typeof window !== "undefined" && window.innerWidth >= 760;
+  const paneeliTyyli: React.CSSProperties | undefined = ankkuroitu
+    ? { top: Math.max(8, ankkuri!.top - 1), left: ankkuri!.left - 1, width: ankkuri!.width + 2, transform: "none", maxHeight: `calc(100vh - ${Math.max(8, ankkuri!.top) + 24}px)` }
+    : undefined;
   const [q, setQ] = useState(alku);
   const [indeksi, setIndeksi] = useState<ReturnType<typeof valmistele> | null>(null);
   const [virhe, setVirhe] = useState(false);
@@ -83,9 +88,9 @@ function Ikkuna({ alku }: { alku: string }) {
   };
 
   return (
-    <div className="tn-haku-root">
+    <div className="tn-haku-root" data-ankkuroitu={ankkuroitu || undefined}>
       <button type="button" className="tn-haku-tausta" aria-label="Sulje haku" tabIndex={-1} onClick={suljeHaku} />
-      <div className="tn-haku-paneeli" role="dialog" aria-modal="true" aria-label="Haku">
+      <div className="tn-haku-paneeli" role="dialog" aria-modal="true" aria-label="Haku" style={paneeliTyyli}>
         <form className="tn-haku-lomake" role="search" action="/haku" method="get" onSubmit={onSubmit}>
           <label htmlFor={HAKU_KENTTA_ID} className="tn-haku-sr">Haku</label>
           <span className="tn-haku-kentta">
