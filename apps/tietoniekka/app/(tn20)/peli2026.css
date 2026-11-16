@@ -980,11 +980,12 @@
 .tn20 a.tng-herocat:hover { text-decoration: underline; text-underline-offset: 3px; }
 /* C6 (15.11.2026): henkilövisan rivi henkilösivulle aloitusnäkymässä. Koko rivi on linkki, kosketusalue 44 px
    (rivikorkeus 20 + 2 × 12). Saa rivittyä kahdelle riville kapealla; nimi lihavoituna, "Henkilösivu →" aksentilla. */
-.tn20 .tng-henkilorivi {
+.tn20 .tng a.tng-henkilorivi, .tn20 .tng-henkilorivi {
   display: inline-block; align-self: flex-start; padding: 12px 0; font-size: 14px; line-height: 20px; font-weight: 600;
   color: #D9D1C1; text-decoration: none; overflow-wrap: normal;
 }
 .tn20 .tng-henkilorivi b { font-weight: 800; color: #F5F0E6; }
+/* .tng a (0,2,1) värjäisi koko rivin aksentilla; rooli pysyy vaaleana, vain "Henkilösivu →" aksentilla. */
 .tn20 .tng-henkilorivi > span { color: var(--tnAccText); font-weight: 800; white-space: nowrap; }
 .tn20 .tng-henkilorivi:hover > span { text-decoration: underline; text-underline-offset: 3px; }
 
