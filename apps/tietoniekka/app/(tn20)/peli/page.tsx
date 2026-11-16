@@ -12,6 +12,9 @@ import { esikatselu } from "@/lib/esikatselu";
 import { visanKoukku, megaKoukku } from "@/lib/koukku";
 import { haeRistiinnostot, type RelatedRow } from "@/lib/related";
 import { henkiloHref } from "@/lib/henkiloSlug";
+
+/** "Formulakuljettaja" → "formulakuljettaja"; "ABBA-laulaja" ennallaan (toinen kirjain iso). */
+const pieniAlkukirjain = (s: string) => (/^\p{Lu}\p{Ll}/u.test(s) ? s.charAt(0).toLocaleLowerCase("fi") + s.slice(1) : s);
 import { visaHref } from "@/lib/visaHref";
 import { getSupabase } from "@/lib/supabase";
 import { getKuvavisat, getKuvavisatByIds } from "@/lib/queries";
@@ -838,7 +841,13 @@ export default async function Peli20({
     /* Erä B6: henkilösivu. Elatiivi kannasta (Cowork), muuten koko nimi — ei generoitua taivutusta. */
     henkilo:
       isPerson && celeb
-        ? { href: henkiloHref(celeb.name), linkki: celeb.nimi_elatiivi?.trim() ? `Lue lisää ${celeb.nimi_elatiivi.trim()}` : `Lue lisää: ${celeb.name}` }
+        ? {
+            href: henkiloHref(celeb.name),
+            /* C6 (Heikki 25.10., brief 15.11.2026): näkyvä rivi "Nimi · rooli · Henkilösivu →" aloitus- ja tulosnäkymään.
+               Rooli pienellä alkukirjaimella (ei lyhenteissä: "ABBA-laulaja" pysyy). Ei ikää: ikä on henkilösivun koukku. */
+            nimi: celeb.name,
+            rooli: celeb.role?.trim() ? pieniAlkukirjain(celeb.role.trim()) : null,
+          }
         : null,
     /* Visapakettien SEO-brief 1.11.2026: jouluvisan tulosnäkymästä tekstilinkki joulun visapakettiin. */
     paketti: await pakettiLinkki,

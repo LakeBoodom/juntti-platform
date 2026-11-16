@@ -121,7 +121,7 @@ export type GameQuiz = {
     sovitus?: "contain";
   } | null;
   /** Erä B6: henkilövisan henkilösivu — aloitusnäkymän yläotsikko ja tulosnäkymän "Lue lisää …" -linkki. */
-  henkilo?: { href: string; linkki: string } | null;
+  henkilo?: { href: string; nimi: string; rooli: string | null } | null;
   /** Tulosnäkymän tekstilinkki visapakettiin (jouluvisat → joulun visapaketti, 1.11.2026). */
   paketti?: { href: string; teksti: string } | null;
   /** Kaupunkisivut (7.11.2026): saman paikkakunnan visat ("Lisää Mikkelistä", enintään 3) ja linkki kaupunkisivulle. */
@@ -175,6 +175,19 @@ function erotusLause(ero: number): string {
   if (ero === 0) return "Yhtä monta oikein";
   const n = Math.abs(ero);
   return `${LUVUT[n] ?? n} ${n === 1 ? "oikea" : "oikeaa"} ${ero > 0 ? "enemmän" : "vähemmän"}`;
+}
+
+/* C6 (brief 15.11.2026): henkilövisan näkyvä linkki henkilösivulle aloitusnäkymässä. Hakukoneesta tullut ei
+   huomannut pientä tunnistetta. Koko rivi on yksi linkki; pelin aikana ei näy (vain aloitus- ja tulosnäkymä). */
+const henkiloRiviTeksti = (h: NonNullable<GameQuiz["henkilo"]>) => [h.nimi, h.rooli, "Henkilösivu"].filter(Boolean).join(" · ");
+
+function HenkiloRivi({ h }: { h: NonNullable<GameQuiz["henkilo"]> }) {
+  return (
+    <a className="tng-henkilorivi" href={h.href}>
+      <b>{h.nimi}</b>
+      {h.rooli ? <> · {h.rooli}</> : null} · <span>Henkilösivu <span aria-hidden="true">→</span></span>
+    </a>
+  );
 }
 
 function VisassaMukana({ hlot }: { hlot?: GameQuiz["mukana"] }) {
@@ -1208,7 +1221,7 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
               total={total}
               score={score}
               lause={h ? `${erotusLause(right - h.oikein)} · ${score} pistettä` : tier.body}
-              lisaLinkki={quiz.henkilo ? { href: quiz.henkilo.href, teksti: quiz.henkilo.linkki } : quiz.paketti ?? null}
+              lisaLinkki={quiz.henkilo ? { href: quiz.henkilo.href, teksti: henkiloRiviTeksti(quiz.henkilo) } : quiz.paketti ?? null}
               haaste={h}
               vastaukset={hist.map((v) => (v === "ok" || v === "bad" || v === "skipped" ? v : undefined))}
               avaaVastaukset={(i, el) => openReview(i, el)}
@@ -1367,7 +1380,8 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
                     <span aria-current="page">{quiz.title}</span>
                   </nav>
                   {quiz.henkilo ? (
-                    <a className="tng-herocat" href={quiz.henkilo.href}><i aria-hidden />{hero.roleLabel ? `${category} · ${hero.roleLabel}` : category}</a>
+                    /* Rooli näkyy henkilösivurivillä (C6 15.11.2026), joten tunnisteessa vain kokoelma. */
+                    <span className="tng-herocat"><i aria-hidden />{category}</span>
                   ) : (
                     <span className="tng-herocat"><i aria-hidden />{hero.roleLabel ? `${category} · ${hero.roleLabel}` : quiz.genreLabel && quiz.genreLabel.toLowerCase() !== category.toLowerCase() ? `${category} · ${quiz.genreLabel}` : category}</span>
                   )}
@@ -1386,6 +1400,7 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
                     <span className="tng-herometa">{countLabel}</span>
                     {heroCredit && <span className="tng-herocredit">{heroCredit}</span>}
                   </div>
+                  {quiz.henkilo && <HenkiloRivi h={quiz.henkilo} />}
                   <VisassaMukana hlot={quiz.mukana} />
                 </div>
 
@@ -1533,6 +1548,7 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
                 <button type="button" className="tng-start-btn tn-cta-lime" onClick={startGame}>Aloita visa <span aria-hidden>→</span></button>
                 <span className="tng-start-count">{countLabel}</span>
               </div>
+              {quiz.henkilo && <HenkiloRivi h={quiz.henkilo} />}
               <VisassaMukana hlot={quiz.mukana} />
             </section>
           )}
