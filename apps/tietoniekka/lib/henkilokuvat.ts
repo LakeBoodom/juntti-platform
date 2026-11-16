@@ -273,6 +273,7 @@ export const HENKILOKUVAT: Record<string, string> = {
   "Paula Vesala - Ilosaarirock 2012 1.jpg": "/20/henkilot/k/paula-vesala-ilosaarirock-2012-1-b6372f.webp",
   "Paula-Koivuniemi-2019.jpg": "/20/henkilot/k/paula-koivuniemi-2019-58eb4f.webp",
   "Pauli Kiuru 2018.jpg": "/20/henkilot/k/pauli-kiuru-2018-aa3698.webp",
+  "Robert Pattinson Venice Film Festival (cropped).jpg": "/20/henkilot/k/robert-pattinson-venice-film-festival-cropped-5e1c7a.webp",
   "Paulus Arajuuri (cropped).jpg": "/20/henkilot/k/paulus-arajuuri-cropped-72049d.webp",
   "Pedro Almodóvar-69720 (cropped).jpg": "/20/henkilot/k/pedro-almodovar-69720-cropped-c43446.webp",
   "Pedro Hietanen (cropped).jpg": "/20/henkilot/k/pedro-hietanen-cropped-37e270.webp",
