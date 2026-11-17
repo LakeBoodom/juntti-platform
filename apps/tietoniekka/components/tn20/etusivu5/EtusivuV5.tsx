@@ -15,7 +15,7 @@ import IkaLaskuri from "./IkaLaskuri";
 import PeliKuvitus, { KUVITETUT } from "./PeliKuvitus";
 import MikaMaaBanneri from "./MikaMaaBanneri";
 import { kuvanSrcSet } from "@/lib/kuvaVariantit";
-import HakuKentta from "@/components/tn20/haku/HakuKentta";
+import HakuLaatikko from "@/components/tn20/haku/HakuLaatikko";
 
 type D = NonNullable<EtusivuData>;
 
@@ -357,7 +357,7 @@ export default function EtusivuV5({ d }: { d: D }) {
   return (
     <div className="tn-es5" data-tn-entry="etusivu:muu">
       {/* Haku (Heikki 16.11.2026): näkyvä kenttä Päivän pelien yläpuolella. */}
-      <HakuKentta />
+      <div className="tn-haku-etusivu"><HakuLaatikko id="tn-haku-etusivu-q" entry="etusivu:haku" /></div>
       <PaivanPelit d={d} />
       {d.tiesitko && <Tiesitko t={d.tiesitko} lcp={!d.paivanPelit.visa?.kuva} />}
       <Aiheet a={d.aiheet} />

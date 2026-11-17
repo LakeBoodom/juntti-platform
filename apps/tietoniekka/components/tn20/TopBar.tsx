@@ -23,8 +23,9 @@
 //   taglinen mukana. Nostojen sisältö lib/etusivu.ts HEADER_PROMOS (kausivaihto
 //   yhdestä paikasta).
 // - Piilossa pelinäkymässä (/peli) — pelikuoren omat logosäännöt (lukittu 1.8.2026).
-// - Ei Tänään-kohtaa, ei Klassista eikä tiliä (CD:n säännöt). Haku lisätty 16.11.2026 (Heikki): suurennuslasi
-//   avaa sivuston hakuikkunan (components/tn20/haku), etusivulla lisäksi näkyvä hakukenttä.
+// - Ei Tänään-kohtaa, ei Klassista eikä tiliä (CD:n säännöt). Haku lisätty 16.11.2026 (Heikki): etusivulla näkyvä
+//   hakukenttä, suurennuslasi vie siihen; muilla sivuilla suurennuslasi avaa saman kentän palkin alle. Ei
+//   ponnahdusikkunaa eikä sivun lukitusta (Heikki 16.11.: "voisin vain scrollata normaalisti").
 //   Kaikki linkit vievät todellisille sivuille — ei etusivun ankkureihin.
 import "./topbar.css";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -32,8 +33,7 @@ import { usePathname } from "next/navigation";
 import { NAV_COLLECTIONS, NAV_MODES, isGameRoute, navHref } from "@/lib/nav";
 import { HEADER_PROMOS, SITE_TAGLINE } from "@/lib/etusivu";
 import StreakButton from "./StreakButton";
-import HakuDialogi, { HakuIkoni } from "./haku/HakuDialogi";
-import { avaaHaku, lataaIndeksi } from "./haku/hakuTila";
+import HakuLaatikko, { HakuIkoni, lataaIndeksi } from "./haku/HakuLaatikko";
 
 type MenuId = "kokoelmat" | "pelimuodot";
 
@@ -53,6 +53,33 @@ export default function TopBar({ tagline }: { tagline?: string } = {}) {
   const pathname = usePathname() ?? "";
   const [open, setOpen] = useState<MenuId | null>(null);
   const [sheet, setSheet] = useState(false);
+  const [haku, setHaku] = useState(false);
+  const hakuRef = useRef<HTMLDivElement>(null);
+  const hakuBtn = useRef<HTMLButtonElement>(null);
+
+  /* Palkin alle avattu haku: klikkaus muualle tai Esc piilottaa (ei lukitse sivua). */
+  useEffect(() => {
+    if (!haku) return;
+    const pois = (e: PointerEvent) => {
+      const t = e.target as Node;
+      if (!hakuRef.current?.contains(t) && !hakuBtn.current?.contains(t)) setHaku(false);
+    };
+    const esc = (e: KeyboardEvent) => { if (e.key === "Escape") { setHaku(false); hakuBtn.current?.focus(); } };
+    document.addEventListener("pointerdown", pois);
+    document.addEventListener("keydown", esc);
+    return () => { document.removeEventListener("pointerdown", pois); document.removeEventListener("keydown", esc); };
+  }, [haku]);
+
+  /* Etusivulla suurennuslasi vie näkyvään hakukenttään; muualla avaa kentän palkin alle. */
+  const avaaHaku = () => {
+    const etusivunKentta = document.getElementById("tn-haku-etusivu-q");
+    if (etusivunKentta) {
+      etusivunKentta.scrollIntoView({ block: "center", behavior: "smooth" });
+      etusivunKentta.focus({ preventScroll: true });
+      return;
+    }
+    setHaku((a) => !a);
+  };
 
   const rootRef = useRef<HTMLDivElement>(null);
   const kokoelmatBtn = useRef<HTMLButtonElement>(null);
@@ -225,7 +252,9 @@ export default function TopBar({ tagline }: { tagline?: string } = {}) {
               type="button"
               className="tn-haku-btn"
               aria-label="Haku"
-              onClick={() => avaaHaku()}
+              ref={hakuBtn}
+              aria-expanded={haku}
+              onClick={avaaHaku}
               onPointerEnter={() => void lataaIndeksi().catch(() => {})}
             >
               <HakuIkoni />
@@ -242,9 +271,12 @@ export default function TopBar({ tagline }: { tagline?: string } = {}) {
             </button>
           </div>
         </div>
+        {haku && (
+          <div ref={hakuRef} className="tn-haku-ylapaneeli">
+            <HakuLaatikko id="tn-haku-yla-q" autoFocus entry="ylapalkki:haku" />
+          </div>
+        )}
       </header>
-
-      <HakuDialogi />
 
       {/* Mobiilin Selaa-paneeli */}
       {sheet && (

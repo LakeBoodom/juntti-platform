@@ -3,7 +3,7 @@
 import type { Metadata } from "next";
 import "@/components/tn20/haku/haku.css";
 import Crumbs from "@/components/tn20/Crumbs";
-import { HAKU_PLACEHOLDER, HakuIkoni } from "@/components/tn20/haku/HakuDialogi";
+import { HAKU_PLACEHOLDER, HakuIkoni } from "@/components/tn20/haku/HakuLaatikko";
 import { haeHakuindeksi } from "@/lib/haku";
 import { hae, ryhmitellyt, valmistele } from "@/lib/hakuMoottori";
 
@@ -22,7 +22,7 @@ export default async function HakuSivu({ searchParams }: { searchParams: Promise
       <Crumbs items={[{ label: "Haku" }]} />
       <main className="tn-haku-sivu">
         <h1>Haku</h1>
-        <form className="tn-haku-etusivu" role="search" action="/haku" method="get">
+        <form className="tn-haku" role="search" action="/haku" method="get">
           <label htmlFor="tn-haku-sivu-q" className="tn-haku-sr">Haku</label>
           <span className="tn-haku-kentta">
             <HakuIkoni />

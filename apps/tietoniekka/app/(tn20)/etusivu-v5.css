@@ -22,7 +22,7 @@
 .tn20 .tn-es5 a:focus-visible { outline: 2px solid var(--es-lime); outline-offset: 3px; }
 .tn20 .tn-es-vain-desk { display: none; }
 /* Hakukenttä (16.11.2026): lähemmäs Päivän pelejä kuin osioiden 44 px:n väli. */
-.tn20 .tn-es5 > .tn-haku-etusivu { margin-bottom: -24px; }
+.tn20 .tn-es5 > .tn-haku-etusivu { margin-bottom: -24px; position: relative; z-index: 5; }
 
 /* Yhteiset */
 .tn20 .tn-es-otsake { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
