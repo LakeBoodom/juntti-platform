@@ -46,6 +46,12 @@ juntti-platform/
 └── CLAUDE.md
 ```
 
+## Verify ennen committia (Heikki 17.11.2026)
+
+Aja skill `verify` (`.claude/skills/verify/`) ennen jokaista committia ja ennen kuin raportoit työn
+valmiiksi. Tarkistuksia ajetaan enintään kolme korjauskierrosta, sitten asia viedään Heikille.
+Commit-viestiin tulee leima `Verifioitu: …` (myös `Verifioitu: ei`).
+
 ## Core rules
 
 1. **Admin UI uses Lucide icons.** Homepage uses emoji until the Countdown Icons PDF is processed. Never mix emoji + lucide in the same section on the homepage.
