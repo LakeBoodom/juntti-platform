@@ -70,31 +70,6 @@ function MiniSono({ src }: { src: string }) {
   return <img className="av-minisono" src={src} alt="" draggable={false} />;
 }
 
-function Lahteet({ k }: { k: AaniKysymys }) {
-  return (
-    <div className="av-lahteet">
-      <div>
-        <span className="av-lahde-l">Ääni</span>
-        <a href={k.aani.lahde} target="_blank" rel="noopener noreferrer">
-          {k.aani.tekija} · {k.aani.lisenssi}
-        </a>
-      </div>
-      {k.kuva && (
-        <div>
-          <span className="av-lahde-l">Kuva</span>
-          {k.kuva.lahde ? (
-            <a href={k.kuva.lahde} target="_blank" rel="noopener noreferrer">
-              {k.kuva.tekija ?? "Wikimedia Commons"}{k.kuva.lisenssi ? ` · ${k.kuva.lisenssi}` : ""}
-            </a>
-          ) : (
-            <span>{k.kuva.tekija ?? "Wikimedia Commons"}{k.kuva.lisenssi ? ` · ${k.kuva.lisenssi}` : ""}</span>
-          )}
-        </div>
-      )}
-    </div>
-  );
-}
-
 export default function AanivisaClient({ viikko, jatka, sivu }: { viikko: AaniViikko; jatka: Linkki[]; sivu: string }) {
   const { ryhma, kysymykset } = viikko;
   const N = kysymykset.length;
@@ -570,7 +545,6 @@ export default function AanivisaClient({ viikko, jatka, sivu }: { viikko: AaniVi
                 </div>
               )}
               <div className="av-seuraava-rivi">
-                <Lahteet k={k} />
                 <div className="av-seuraava-palkki">
                   <button type="button" className="av-cta av-seuraava" onClick={seuraava}>
                     {qi + 1 < N ? "Seuraava ääni →" : "Katso tulos →"}

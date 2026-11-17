@@ -4,6 +4,11 @@
 // lainkaan → Tietosuoja-linkki puuttui 8 sivulta. Renderöidään layoutista
 // kaikille sivuille; pelinäkymä (/peli, /visa, /h) on headeriton ja footeriton (pelikuoren
 // säännöt), samoin kuin TopBar.
+// Pelisivut (kuvalähdebrief 17.11.2026): koska kuvien tekijät ovat vain sivulla /kuvien-lahteet, pelisivuille tulee
+// kevyt alatunniste pelkillä Tietoniekka-linkeillä (Tietosuoja, Kuvien lähteet) pelin aloitus- ja tulosnäkymän alle.
+// Kuvavisan kysymysnäkymässä sivu on lukittu (tn-game-lock), joten alatunniste ei näy pelin aikana. Paketin
+// televisionäkymä, tuloste ja vetäjän näkymä ovat koko ruudun näkymiä ilman alatunnistetta: tulosteessa on oma
+// lähdeluettelo, ja paketin oma sivu (josta ne avataan) näyttää koko alatunnisteen.
 import { usePathname } from "next/navigation";
 import { isGameRoute } from "@/lib/nav";
 import { FOOTER_COLLECTIONS, FOOTER_MODES, FOOTER_SITE, FOOTER_INSTAGRAM } from "@/lib/etusivu";
@@ -11,7 +16,16 @@ import "./footer.css";
 
 export default function SiteFooter() {
   const pathname = usePathname() ?? "";
-  if (isGameRoute(pathname)) return null;
+  if (isGameRoute(pathname)) {
+    if (/^\/visapaketti\/.+\/(ruutu|tulosta|vetaja)\/?$/.test(pathname)) return null;
+    return (
+      <footer className="tn-es-foot tn-es-foot--peli">
+        <nav className="tn-es-foot-in tn-es-foot-pelirivi" aria-label="Tietoniekka">
+          {FOOTER_SITE.map((m) => <a key={m.href} href={m.href}>{m.label}</a>)}
+        </nav>
+      </footer>
+    );
+  }
   const year = new Date().getFullYear();
   return (
       <footer className="tn-es-foot">

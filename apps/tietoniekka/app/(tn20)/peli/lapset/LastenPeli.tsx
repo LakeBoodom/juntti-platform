@@ -403,8 +403,7 @@ export default function LastenPeli({ visa, muut, takaisin, paketti = null }: {
   const avatar = (kuka: Juontaja, puhuu = false) => (
     <span className="lp-i-avatar" data-kuka={kuka} data-puhuu={puhuu || undefined} style={{ backgroundImage: `url(${kuvat.avatar[kuka]})` }} aria-hidden="true" />
   );
-  /** Kuvavisan valokuvien tekijätiedot (CC BY/BY-SA vaatii näkyvän merkinnän). Omat kuvitukset: ei merkintää. */
-  const kuvaLahteet = (q: LastenKysymys) => [...new Set([q.kuvaKrediitti, ...q.vastaukset.map((v) => v.kuvaKrediitti)].filter((x): x is string => !!x))];
+  /* Kuvien ja eläinäänten tekijät ja lisenssit ovat vain sivulla /kuvien-lahteet (kuvalähdebrief 17.11.2026). */
   const kynnys3 = Math.ceil(N * 0.8), kynnys2 = Math.ceil(N * 0.5);
   const tahdet = pienet ? 3 : oikeita >= kynnys3 ? 3 : oikeita >= kynnys2 ? 2 : 1;
 
@@ -573,7 +572,6 @@ export default function LastenPeli({ visa, muut, takaisin, paketti = null }: {
               <div className="lp-i-kuva">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={k.kuva} alt="" style={k.kuvaKohdistus ? { objectPosition: k.kuvaKohdistus } : undefined} />
-                {k.kuvaKrediitti && <span className="lp-i-krediitti">{k.kuvaKrediitti}</span>}
               </div>
             )}
             <div className="lp-i-oikea">
@@ -617,19 +615,6 @@ export default function LastenPeli({ visa, muut, takaisin, paketti = null }: {
                   )}
                   {k.tiesitko && <p><strong>Tiesitkö?</strong> {k.tiesitko}</p>}
                 </section>
-              )}
-
-              {vastattu && (kuvaLahteet(k).filter((x) => x !== k.kuvaKrediitti).length > 0 || k.elainaani) && (
-                <p className="lp-lahde">
-                  {kuvaLahteet(k).filter((x) => x !== k.kuvaKrediitti).length > 0 && <>Kuvat: {kuvaLahteet(k).filter((x) => x !== k.kuvaKrediitti).join(" · ")}{k.elainaani ? " · " : ""}</>}
-                  {k.elainaani && (
-                    <>Ääni:{" "}
-                      {k.elainaani.lahdeUrl
-                        ? <a href={k.elainaani.lahdeUrl} target="_blank" rel="noopener noreferrer">{k.elainaani.tekija} / iNaturalist, {k.elainaani.lisenssi}</a>
-                        : <>{k.elainaani.tekija} / iNaturalist, {k.elainaani.lisenssi}</>}
-                    </>
-                  )}
-                </p>
               )}
 
               <div className="lp-venyke" />
@@ -755,20 +740,6 @@ export default function LastenPeli({ visa, muut, takaisin, paketti = null }: {
             </div>
             <p>{k.tiesitko}</p>
           </section>
-        )}
-
-        {vastattu && kuvaLahteet(k).length > 0 && (
-          <p className="lp-lahde">Kuvat: {kuvaLahteet(k).join(" · ")}</p>
-        )}
-        {k.elainaani && vastattu && (
-          <p className="lp-lahde">
-            Ääni:{" "}
-            {k.elainaani.lahdeUrl ? (
-              <a href={k.elainaani.lahdeUrl} target="_blank" rel="noopener noreferrer">{k.elainaani.tekija} / iNaturalist, {k.elainaani.lisenssi}</a>
-            ) : (
-              <>{k.elainaani.tekija} / iNaturalist, {k.elainaani.lisenssi}</>
-            )}
-          </p>
         )}
 
         <div className="lp-venyke" />

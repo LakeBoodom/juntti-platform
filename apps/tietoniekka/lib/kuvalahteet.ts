@@ -10,8 +10,11 @@
 //  1. Sallitut lisenssit: CC0 / public domain, CC BY, CC BY-SA. EI NC- eikä
 //     ND-lisenssejä — Tietoniekka on kaupallinen sivusto ja kuvia rajataan.
 //  2. Jokaisesta CC BY- ja CC BY-SA -kuvasta on näytettävä tekijä, lisenssi ja
-//     linkki lähteeseen. Se tehdään sivulla /kuvien-lahteet, johon viitataan
-//     kokoelmasivun kuvakrediitistä ja alatunnisteesta.
+//     linkki lähteeseen. Se tehdään VAIN sivulla /kuvien-lahteet, johon jokaisen
+//     sivun alatunniste linkittää (kuvalähdebrief, Heikki 17.11.2026). Näkymiin ei
+//     lisätä kuvakohtaisia lähdemerkintöjä. Uusi kuva = rivi rekisteriin, näkyy
+//     sivulla /kuvien-lahteet. Poikkeukset: jakokortit (lib/kuvakrediitti.ts) ja
+//     visapakettien tuloste (lähdeluettelo). Ks. lib/lahdesivu.ts.
 //  3. Kuvia on rajattu 640x360-kokoon ja skaalattu (musiikin 24.9. lisätyillä
 //     visoilla myös pelinäkymän hero public/20/musiikki/hero/<slug>.webp: koko
 //     kuva + saman kuvan sumennettu jatke sivuilla). Rajaus on muokkaus, joten
@@ -158,6 +161,8 @@ export const KUVALAHTEET: Kuvalahde[] = [
   { slug: "cl-maalintekijat", kokoelma: "jalkapallo", kuvaus: "Robert Lewandowski Bayern Münchenin paidassa 2019", tiedosto: "Robert Lewandowski, FC Bayern München (by Sven Mandel, 2019-05-27) 01.jpg", tekija: "Sven Mandel", lisenssi: "CC BY-SA 4.0", lisenssiUrl: CC("by-sa/4.0"), vuosi: "2019" },
   { slug: "cl-hjk", kokoelma: "jalkapallo", kuvaus: "Aki Riihilahti HJK:n paidassa 2010", tiedosto: "Aki Riihilahti.jpg", tekija: "Javatyk", lisenssi: "CC BY-SA 3.0", lisenssiUrl: CC("by-sa/3.0"), vuosi: "2010" },
   { slug: "cl-eurokentat", kokoelma: "jalkapallo", kuvaus: "TPS:n kannattajat 2018", tiedosto: "Turun palloseura supporters 2018.jpg", tekija: "Peltimikko", lisenssi: "CC BY-SA 4.0", lisenssiUrl: CC("by-sa/4.0"), vuosi: "2018" },
+  /* Matti Järvisen henkilökuva ja visan yläkuva (29.9.2026): Finna, ei Commonsissa. Krediitti oli aiemmin vain visan hero_alt-kentässä. */
+  { slug: "matti-jarvinen-1930", kokoelma: "henkilot", kuvaus: "Keihäänheiton olympiavoittaja Matti Järvinen 1930-luvun alussa", tiedosto: "Matti Järvinen, Museovirasto", tekija: "Tuntematon kuvaaja / Museovirasto, Historian kuvakokoelma (Otavan kokoelma)", lisenssi: "CC BY 4.0", lisenssiUrl: CC("by/4.0"), vuosi: "1930-luvun alku", lahdeUrl: "https://www.finna.fi/Record/museovirasto.3F85D3EABD8361A3E47AE94F9F1FA71D" },
   { slug: "lenita-airisto", kokoelma: "henkilot", kuvaus: "Diplomiekonomi Lenita Airisto vuonna 1976", tiedosto: "Diplomiekonomi Lenita Airisto vuonna 1976.jpg", tekija: "Kuvasiskot", lisenssi: "CC BY 4.0", lisenssiUrl: CC("by/4.0"), vuosi: "1976" },
   { slug: "robert-pattinson", kokoelma: "henkilot", kuvaus: "Robert Pattinson, Venetsian elokuvajuhlat 2026", tiedosto: "Robert Pattinson Venice Film Festival (cropped).jpg", tekija: "Colleen Sturtevant", lisenssi: "CC BY-SA 4.0", lisenssiUrl: CC("by-sa/4.0"), vuosi: "2026" },
   { slug: "j-k-rowling", kokoelma: "henkilot", kuvaus: "J. K. Rowling 2010", tiedosto: "J. K. Rowling 2010.jpg", tekija: "Daniel Ogren", lisenssi: "CC BY 2.0", lisenssiUrl: CC("by/2.0"), vuosi: "2010" },

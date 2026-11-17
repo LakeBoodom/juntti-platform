@@ -198,6 +198,9 @@ Skilli `tietoniekka-ui-laatu` on näiden sääntöjen lähde; tässä tiivistelm
    (kokoelmasivujen CTA).
 6. **Ei kuvia suoraan Wikimediasta etusivulle.** Käytä omia kopioita `public/`-kansiossa,
    krediitit `lib/kuvalahteet.ts`.
+   **Näkymiin ei lisätä kuvakohtaisia lähdemerkintöjä** (Heikki 17.11.2026). Uusi kuva = rivi rekisteriin, näkyy
+   sivulla /kuvien-lahteet, johon jokaisen sivun alatunniste linkittää (pelisivuilla kevyt alatunniste).
+   Poikkeukset: jakokortit (OG) ja visapakettien tulosteen lähdeluettelo. Ks. `lib/lahdesivu.ts`.
 7. **Fokus näkyy aina** (2 px rengas, ei `outline: none` ilman korvaavaa `:focus-visible`-tyyliä).
    Skip-linkki `#main` on (tn20)-layoutissa.
 8. **Kokoelmasivut:** uusi teemasivu käyttää jaettua korttikehotetta (`.tn-card-cta`, "Pelaa →") ja

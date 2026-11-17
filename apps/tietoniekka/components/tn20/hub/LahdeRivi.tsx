@@ -1,14 +1,12 @@
-// Aihesivujen lähderivi (erä B4): "Kuva: Wikimedia Commons" + "Lue lisää: Wikipedia ↗".
-export default function LahdeRivi({ kuva, wikipedia }: { kuva?: string | null; wikipedia?: string | null }) {
-  if (!kuva && !wikipedia) return null;
+// Aihesivujen lähderivi (erä B4): "Lue lisää: Wikipedia ↗". Kuvan lähde ei näy tässä (kuvalähdebrief 17.11.2026):
+// tekijä ja lisenssi ovat vain sivulla /kuvien-lahteet, johon alatunniste linkittää.
+export default function LahdeRivi({ wikipedia }: { wikipedia?: string | null }) {
+  if (!wikipedia) return null;
   return (
     <p className="hub-lahde">
-      {kuva && <span>Kuva: {kuva}</span>}
-      {wikipedia && (
-        <a href={wikipedia} target="_blank" rel="noopener noreferrer">
-          Lue lisää: Wikipedia ↗
-        </a>
-      )}
+      <a href={wikipedia} target="_blank" rel="noopener noreferrer">
+        Lue lisää: Wikipedia ↗
+      </a>
     </p>
   );
 }

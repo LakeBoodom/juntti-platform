@@ -102,7 +102,7 @@ export type JkCard = {
 const IMG = (n: string) => `/20/jaakiekko/${n}.webp`;
 
 // Derbykortit (1.10.2026): oikeat valokuvat AI-kuvien tilalle, samat kuin visojen pelinäkymässä.
-// Tekijät lib/kuvalahteet.ts → /kuvien-lahteet (krediittirivi kokoelmasivun lopussa).
+// Tekijät lib/kuvalahteet.ts → /kuvien-lahteet (alatunnisteen linkki Kuvien lähteet).
 export const JK_DERBIES: JkCard[] = [
   { quizSlug: "sm-liiga-stadin-derby-hifk-jokerit", tag: "Stadin derby", title: "HIFK vs. Jokerit",
     desc: "Kausi 2026-27 tuo stadin derbyt takaisin. Uutta historiaa luodaan, vanha on täynnä uskomattomia tapahtumia.",

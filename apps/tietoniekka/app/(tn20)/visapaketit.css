@@ -101,7 +101,6 @@
 .tn20 .tn-vp-varoitus { margin: 0; font-size: 13px; font-weight: 700; color: var(--tn-orange); }
 .tn20 .tn-vp-kuva { margin: 0; max-width: 360px; }
 .tn20 .tn-vp-kuva img { display: block; width: 100%; height: auto; aspect-ratio: 3 / 2; object-fit: cover; border-radius: 12px; background: var(--tn-surface-2); }
-.tn20 .tn-vp-krediitti { display: block; margin-top: 4px; font-size: 12px; color: var(--tn-text-dim); }
 .tn20 .tn-vp-aani { display: flex; flex-direction: column; gap: 4px; }
 .tn20 .tn-vp-aani audio { width: min(100%, 320px); height: 44px; }
 .tn20 .tn-vp-vaihtoehdot { margin: 0; padding-left: 22px; display: grid; gap: 4px; font-size: 15px; color: var(--tn-text-soft); }
@@ -198,6 +197,10 @@
 .tn20 .tn-vp-arkki-h3 { margin: 0 0 6px; font-size: 16px; font-weight: 800; }
 .tn20 .tn-vp-arkki-vastaukset { margin: 0; padding-left: 28px; display: flex; flex-direction: column; gap: 4px; font-size: 14px; }
 .tn20 .tn-vp-arkki-selitys { color: #3d3a33; }
+/* Tulosteen lähdeluettelo vastaussivun lopussa (kuvalähdebrief 17.11.2026): pieni, ei korosteta. */
+.tn20 .tn-vp-lahteet { break-inside: avoid; margin-top: 24px; font-size: 12px; color: #3d3a33; }
+.tn20 .tn-vp-lahteet .tn-vp-arkki-h3 { font-size: 13px; }
+.tn20 .tn-vp-lahteet ul { margin: 0; padding-left: 18px; display: flex; flex-direction: column; gap: 2px; }
 
 @page { size: A4; margin: 14mm 16mm 18mm; }
 /* Alalaidan osoite joka sivulle keskelle www-muodossa (Heikki 29.10.: paperilla tunnistettava osoitteeksi), sivunumero oikealle.
@@ -221,6 +224,7 @@
   .tn20 .tn-vp-arkki-kicker { color: #000; }
   .tn20 .tn-vp-arkki-vastaukset { font-size: 12pt; }
   .tn20 .tn-vp-arkki-selitys { color: #222; }
+  .tn20 .tn-vp-lahteet { font-size: 8.5pt; color: #222; }
 }
 
 /* ══ TELEVISIONÄKYMÄ ════════════════════════════════════════════════
@@ -274,7 +278,6 @@
 .tn20 .tn-vp-ruutu-selitys { margin: 0; font-size: clamp(15px, min(1.6vw, 2.8vh), 54px); line-height: 1.45; color: var(--tn-text-soft); text-wrap: pretty; }
 .tn20 .tn-vp-ruutu-kuva { margin: 0; min-width: 0; }
 .tn20 .tn-vp-ruutu-kuva img { display: block; width: 100%; max-height: 52vh; aspect-ratio: 3 / 2; object-fit: cover; border-radius: clamp(12px, 1.4vw, 28px); background: var(--tn-surface-2); }
-.tn20 .tn-vp-ruutu-kuva figcaption { margin-top: 6px; font-size: clamp(12px, .8vw, 20px); color: var(--tn-text-dim); }
 
 .tn20 .tn-vp-ruutu-kooste { display: flex; flex-direction: column; gap: clamp(12px, 2.4vh, 36px); min-height: 0; }
 .tn20 .tn-vp-ruutu-kooste-h { margin: 0; font-family: var(--vp-cond); font-weight: 800; text-transform: uppercase; font-size: clamp(28px, min(3.6vw, 6.4vh), 124px); line-height: 1; }

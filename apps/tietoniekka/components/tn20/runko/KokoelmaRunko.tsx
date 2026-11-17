@@ -279,12 +279,6 @@ export default function KokoelmaRunko({ d, tunnusosa, v3Lisa, heroLisa, sisalto 
         </section>
       )}
 
-      {k.kuvakrediitti && (
-        <p className="rk-krediitti">
-          {k.kuvakrediitti} · <a href="/kuvien-lahteet">tekijät ja lisenssit</a>
-        </p>
-      )}
-
       {/* ─── V7 Lisää kokoelmia (asetuksesta tai automaattisesti, S6) ─── */}
       {d.lisaa.length > 0 && (
         <section className="rk-lisaa" aria-labelledby="rk-lisaa-h">

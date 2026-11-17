@@ -28,6 +28,5 @@ export const KULTTUURI: Kokoelma = {
   mastery: { name: kokoelmaKortti("kulttuuri")!.mastery.name, icon: "kulttuuri" },
   haku: { collection: "kulttuuri" },
   korttikuva: kulttuuriImgKortti,
-  kuvakrediitti: "Valokuvat ja maalaukset: Wikimedia Commons, CC BY / CC BY-SA / public domain",
 };
 

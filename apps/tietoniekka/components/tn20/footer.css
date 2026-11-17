@@ -75,3 +75,10 @@
 @media (max-width: 767px) and (prefers-reduced-motion: no-preference) {
   .tn20 .tn-es-foot-det summary span { transition: transform var(--dur-fast, 120ms) var(--ease-standard, ease); }
 }
+
+/* ── Pelisivujen kevyt alatunniste (kuvalähdebrief 17.11.2026): vain Tietosuoja + Kuvien lähteet, samaa tyyliä
+   kuin alatunnisteen Tietoniekka-linkit (osuma-alue ≥ 32 px, väli 12 px). Ei omaa korostusta. */
+.tn20 .tn-es-foot-pelirivi { display: flex; flex-wrap: wrap; gap: 12px 24px; padding-block: 14px; }
+.tn20 .tn-es-foot-pelirivi a { display: inline-flex; align-items: center; min-height: 32px; padding: 6px 0; box-sizing: border-box; font-size: clamp(12.5px, 1.15cqw, 14.5px); font-weight: 600; color: #cfc7b6; }
+.tn20 .tn-es-foot-pelirivi a:hover { color: var(--tn-lime); }
+@media print { .tn20 .tn-es-foot--peli { display: none; } }
