@@ -231,7 +231,6 @@ export default async function HenkiloPage({ params }: { params: Promise<{ slug: 
                       <span className="hub-duotone" aria-hidden="true" />
                     </div>
                   </div>
-                  {kuva && <figcaption>Kuva: Wikimedia Commons</figcaption>}
                 </figure>
                 <header className="hs-otsikko">
                   <span className="hub-eyebrow">{R.lyhyt}</span>

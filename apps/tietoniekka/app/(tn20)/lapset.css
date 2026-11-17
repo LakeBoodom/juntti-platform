@@ -129,9 +129,6 @@
 }
 .tn20 .lp-elain-nappi[data-soi] { box-shadow: 0 0 0 6px rgba(47, 107, 69, .3), 0 0 0 14px rgba(47, 107, 69, .14); }
 .tn20 .lp-elain-t { font-family: var(--lp-cond); font-weight: 800; font-size: 26px; }
-.tn20 .lp-lahde { margin: 10px 20px 0; font-size: 13px; color: var(--lp-harmaa); }
-.tn20 .lp-lahde a { color: inherit; text-decoration: underline; }
-
 /* Tiesitkö (2j): muut vaihtoehdot väistyvät, kortti liukuu tilalle */
 .tn20 .lp-tiesitko {
   margin: 14px 16px 0; display: flex; flex-direction: column; gap: 10px; padding: 18px; border-radius: 22px; background: var(--lp-kupla);
@@ -338,7 +335,6 @@
   .tn20 .lp-vastaus-n { text-align: center; }
   .tn20 .lp-tahti { top: 16px; right: 16px; margin-top: 0; }
   .tn20 .lp-tiesitko, .tn20 .lp-kysymyskuva { width: 100%; max-width: 640px; margin-left: auto; margin-right: auto; }
-  .tn20 .lp-lahde { text-align: center; }
   .tn20 .lp-kaista { height: 370px; }
   .tn20 .lp-hehku { left: calc(50% - 220px); bottom: 110px; width: 300px; height: 270px; }
   .tn20 .lp-kaista[data-puhuja="mikko"] .lp-hehku { right: auto; left: calc(50% - 80px); }
@@ -444,10 +440,6 @@
    keskitettynä pois (kuikka, metso, ilves, orava; tarkistettu 22 kuvasta 10.10.2026). Kuvakohtainen poikkeus
    questions.image_position → inline object-position. */
 .tn20 .lp-i-kuva img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center 30%; }
-.tn20 .lp-i-krediitti {
-  position: absolute; right: 8px; bottom: 6px; max-width: calc(100% - 16px); padding: 2px 8px; border-radius: 999px; background: rgba(15, 21, 32, .62);
-  color: #E6DCC9; font-size: 10.5px; font-weight: 600; line-height: 1.5; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-}
 /* Vastauksen jälkeen kuva madaltuu 112 px:iin (2k), jotta reaktio ja fakta mahtuvat */
 .tn20 .lp[data-ika="8-12"][data-vastattu] .lp-i-kuva { aspect-ratio: auto; height: 112px; }
 .tn20 .lp-i-kysymysrivi { margin: 16px 18px 0; display: grid; grid-template-columns: minmax(0, 1fr) 48px; gap: 12px; align-items: start; }
@@ -580,7 +572,6 @@
   .tn20 .lp-i-ala { padding: 0; }
   .tn20 .lp-i-vihje { min-height: 76px; padding: 0 16px 0 10px; font-size: 22px; gap: 12px; }
   .tn20 .lp-i-vihje .lp-i-avatar { width: 56px; height: 56px; }
-  .tn20 .lp[data-ika="8-12"] .lp-lahde { text-align: left; margin-left: 0; }
   .tn20 .lp[data-ika="8-12"] .lp-elain { margin: 16px 0 0; }
   .tn20 .lp[data-ika="8-12"][data-vaihe="intro"] .lp-kehys { max-width: 520px; }
 }

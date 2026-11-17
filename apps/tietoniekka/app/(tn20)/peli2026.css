@@ -350,8 +350,6 @@
 .tn20 .tng-herobtn:hover { transform: translateY(-1px); }
 .tn20 .tng-herobtn:focus-visible { outline: 2px solid #fffbf2; outline-offset: 3px; }
 .tn20 .tng-herometa { font-size: clamp(11.5px, 1.05cqw, 13px); font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase; color: #a79e8c; }
-/* Kuvalähde: mobiilissa kysymysmäärän perässä, ei koskaan kuvan päällä pillerissä */
-.tn20 .tng-herocredit { font-size: clamp(12px, 0.95cqw, 12px); font-weight: 700; letter-spacing: 0.02em; color: rgba(255, 251, 242, 0.55); }
 
 /* Henkilövisan kuvakortti: kiinteä 3:4, ei koskaan koko taustakuvaksi.
    Pystyssä kortti nousee tekstin yläpuolelle (order: -1) — muuten henkilöstä
@@ -432,10 +430,6 @@
     mask-image: linear-gradient(90deg, transparent 0%, #000 26%);
   }
   .tn20 .tng-hero[data-kind="henkilo"] .tng-herobody { max-width: min(660px, 52%); }
-  /* 1.10.2026: krediitti omalle rivilleen napin alle (absoluuttinen sijoitus osui napin ja
-     kysymysmäärän päälle, koska lähin sijoitettu esivanhempi on rivi eikä hero). */
-  .tn20 .tng-herocredit { flex-basis: 100%; }
-  .tn20 .tng-hero[data-kind="henkilo"] .tng-herocredit { position: static; text-align: right; }
 }
 /* Pystytabletti: sama 2b kuin mobiilissa, vain typografia kasvaa */
 @media (max-aspect-ratio: 1/1) and (min-width: 700px) {
@@ -752,7 +746,9 @@
    peitti pystykuvassa juuri sen alareunan, josta vaakuna tai rakennus
    tunnistetaan. */
 .tn20 .tng-medialine { flex: 0 0 auto; display: flex; align-items: center; gap: 12px; min-height: 28px; }
-/* Ei ellipsiä: KORTTISÄÄNTÖ (CLAUDE.md) pitää leikkautunutta tekstiä
+/* Siirtymäaika (lib/lahdesivu.ts, 17.11.2026): näkyy vain kuvavisan kuvilla, joiden tekijä ja lisenssi eivät
+   vielä ole sivulla /kuvien-lahteet. Poistetaan, kun kaikki kuvavisas.source_credit-rivit on täydennetty.
+   Ei ellipsiä: KORTTISÄÄNTÖ (CLAUDE.md) pitää leikkautunutta tekstiä
    julkaisublokkerina, ja "Kuva · Wikipedia / Wikimedia Commons" on 36 merkkiä
    eli se ei mahdu 390 px leveälle riville suurennusnapin viereen. Rivittyy
    kahdelle riville sen sijaan että katkeaisi kolmeen pisteeseen. */
@@ -1029,7 +1025,6 @@
   .tn20 .tng-hero .tng-henkilorivi { order: 3; margin-top: -4px; }
   .tn20 .tng-hero .tng-crumbs { order: 4; font-size: 12px; color: #8A826F; }
   .tn20 .tng-hero .tng-crumbs a, .tn20 .tng-hero .tng-crumbs [aria-current] { color: #8A826F; }
-  .tn20 .tng-herocredit { order: 5; margin-top: -6px; font-size: 12px; color: rgba(245, 240, 230, 0.45); }
   .tn20 .tng-herop, .tn20 .tng-herometa { display: none; }
   /* Otsikko: Archivo Variable 900 wdth 118, 30 px, rivikorkeus 1 (handoff). KORTTISÄÄNTÖ: pisin
      sana rajaa koon. Mitattu 7.10.2026 (versaali, pisimmät suomen sanat, leveys / em / merkki):

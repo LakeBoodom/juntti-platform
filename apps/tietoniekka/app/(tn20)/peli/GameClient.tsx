@@ -48,6 +48,7 @@ import PeliAloitus from "@/components/tn20/pelikehys/PeliAloitus";
 import PeliTulos from "@/components/tn20/pelikehys/PeliTulos";
 import { haasterivi, type KaverinTulos } from "@/lib/kaveri";
 import type { Pelimuoto } from "@/lib/pelimuodot";
+import { krediittiPelissa } from "@/lib/lahdesivu";
 
 const BASE_POINTS = 100;
 const STREAK_BONUS = 50;
@@ -976,10 +977,8 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
   /* Pisimmän sanan merkkimäärä → CSS:n --tng-lw, jolla otsikon koko rajataan niin, että pisinkin sana
      mahtuu palstaan (KORTTISÄÄNTÖ, peli2026.css). */
   const heroLw = Math.max(...quiz.title.split(/[\s\u2013\u2014-]+/).map((w) => w.length), 1);
-  /* hero_alt sisältää saavutettavuustekstin JA mahdollisen kuvalähteen. Näkyviin
-     tulee vain lähdeosuus ("Kuva: …"), ei koko alt-tekstiä: vapaasti lisensoitu
-     kuva vaatii näkyvän merkinnän, AI-kuvitus ei vaadi mitään. */
-  const heroCredit = hero?.alt && /kuva:/i.test(hero.alt) ? hero.alt.slice(hero.alt.search(/kuva:/i)).trim() : null;
+  /* hero_alt voi sisältää kuvalähteen ("Kuva: …"). Se jää alt-tekstiin, mutta näkyviin sitä ei nosteta:
+     tekijä ja lisenssi ovat sivulla /kuvien-lahteet (kuvalähdebrief 17.11.2026). */
 
   /* Wikimedia ei generoi thumbia alkuperäistä leveämmäksi: jos 1280 px puuttuu,
      hero jäisi tyhjäksi. Pudotaan silloin kerran kannan 330 px:n kuvaan. */
@@ -1398,7 +1397,6 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
                   <div className="tng-herorow">
                     <button type="button" className="tng-herobtn tn-cta-lime" onClick={startGame}>Aloita visa <span aria-hidden>→</span></button>
                     <span className="tng-herometa">{countLabel}</span>
-                    {heroCredit && <span className="tng-herocredit">{heroCredit}</span>}
                   </div>
                   {quiz.henkilo && <HenkiloRivi h={quiz.henkilo} />}
                   <VisassaMukana hlot={quiz.mukana} />
@@ -1608,7 +1606,8 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
                         siksi aria-hidden ja tabIndex -1, ei kaksoiskontrollia. */}
                     {lukittu && (
                       <div className="tng-medialine">
-                        {q.credit ? <span className="tng-credit">Kuva · {q.credit}</span> : null}
+                        {/* Siirtymäaika (lib/lahdesivu.ts): vain kuvat, joiden tekijä ja lisenssi eivät vielä ole lähdesivulla. */}
+                        {krediittiPelissa(q.credit) ? <span className="tng-credit">Kuva · {krediittiPelissa(q.credit)}</span> : null}
                         <button
                           type="button"
                           className="tng-zoomrow"

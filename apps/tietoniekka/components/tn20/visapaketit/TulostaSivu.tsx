@@ -2,12 +2,15 @@
 // ("Joukkue: ____", kysymykset numeroituina, vastausviiva), lopuksi vastaussivu vetäjälle. Selaimen
 // "Tallenna PDF:nä" riittää, erillistä PDF-generointia ei ole. Ruudulla sama sisältö arkkeina + Tulosta-nappi.
 // Arkin yläosa (Heikki 29.10.): sanamerkki + kierros ylärivillä, paketin nimi + "Joukkue" alarivillä.
+// Lähdeluettelo (kuvalähdebrief 17.11.2026): paperissa linkki /kuvien-lahteet ei toimi, joten vastaussivun loppuun
+// kuvien ja äänitteiden tekijä / lisenssi. Ruudulla näkyvässä paketissa merkintöjä ei ole.
 import "@/app/(tn20)/visapaketit.css";
 import { runkoCond } from "@/components/tn20/runko/runkoFontti";
 import {
   type Kierros, type PakettiKysymys, type Sivu, type Taso,
   hakuosa, kevytKuva, sivunNimi, kuvaOnKysymys, kysymysTeksti, oikeaVastaus, tasonKierrokset, viittaaVaihtoehtoihin,
 } from "@/lib/visapaketit";
+import { kuvavisanLahde } from "@/lib/lahdesivu";
 import TulostaNappi from "./TulostaNappi";
 
 export default function TulostaSivu({ sivu, taso, esikatselu }: { sivu: Sivu; taso: Taso; esikatselu: string | null }) {
@@ -51,6 +54,7 @@ export default function TulostaSivu({ sivu, taso, esikatselu }: { sivu: Sivu; ta
         </header>
         <h2 id="t-vastaukset" className="tn-vp-arkki-h">Vastaukset</h2>
         {kierrokset.map((k) => <Vastaukset key={k.nro} k={k} />)}
+        <Lahdeluettelo kierrokset={kierrokset} />
       </section>
     </main>
   );
@@ -76,6 +80,33 @@ function TulosteKysymys({ q }: { q: PakettiKysymys }) {
       )}
       <span className="tn-vp-vastausviiva" aria-hidden="true" />
     </li>
+  );
+}
+
+/** "Tekijä / Wikimedia Commons, CC BY-SA 4.0" → "Tekijä / CC BY-SA 4.0"; muu muoto sellaisenaan. */
+const tekijaJaLisenssi = (credit: string) => {
+  const l = kuvavisanLahde(credit);
+  return l ? `${l.tekija} / ${l.lisenssi}` : credit;
+};
+
+/** Kuvien ja äänitteiden tekijät kysymyksittäin. Omat kuvitukset (ei image_credit) eivät ole luettelossa. */
+function Lahdeluettelo({ kierrokset }: { kierrokset: Kierros[] }) {
+  const rivit = kierrokset.flatMap((k) =>
+    k.kysymykset.flatMap((q, i) => {
+      const kohta = `Kierros ${k.nro}, kysymys ${i + 1}`;
+      const out: string[] = [];
+      if (q.image_url && q.image_credit) out.push(`${kohta}, kuva: ${tekijaJaLisenssi(q.image_credit)}`);
+      if (q.animal_sound?.url && q.animal_sound.tekija)
+        out.push(`${kohta}, ääni: ${q.animal_sound.tekija}${q.animal_sound.lisenssi ? ` / ${q.animal_sound.lisenssi}` : ""}`);
+      return out;
+    }),
+  );
+  if (!rivit.length) return null;
+  return (
+    <div className="tn-vp-lahteet">
+      <h3 className="tn-vp-arkki-h3">Kuvien ja äänien lähteet</h3>
+      <ul>{rivit.map((r) => <li key={r}>{r}</li>)}</ul>
+    </div>
   );
 }
 

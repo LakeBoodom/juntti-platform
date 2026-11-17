@@ -170,7 +170,6 @@ export default function RuutuNakyma({ packId, otsikko, kierrokset, paluu, vetaja
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={r.q.image_url} alt="" width={1536} height={1024}
                   style={r.q.image_position ? ({ objectPosition: r.q.image_position } as CSSProperties) : undefined} />
-                {r.q.image_credit && <figcaption>{r.q.image_credit}</figcaption>}
               </figure>
             )}
           </div>

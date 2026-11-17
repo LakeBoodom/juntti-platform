@@ -205,15 +205,11 @@ function KysymysRivi({ q }: { q: PakettiKysymys }) {
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={kevytKuva(q.image_url!)} alt="" loading="lazy" decoding="async" fetchPriority="low" width={1536} height={1024}
             style={q.image_position ? { objectPosition: q.image_position } : undefined} />
-          {q.image_credit && <figcaption className="tn-vp-krediitti">{q.image_credit}</figcaption>}
         </figure>
       )}
       {q.animal_sound?.url && (
         <div className="tn-vp-aani">
           <audio controls preload="none" src={q.animal_sound.url} aria-label="Kuuntele ääni" />
-          {q.animal_sound.tekija && (
-            <span className="tn-vp-krediitti">Ääni: {q.animal_sound.tekija}{q.animal_sound.lisenssi ? ` / ${q.animal_sound.lisenssi}` : ""}</span>
-          )}
         </div>
       )}
       {viittaaVaihtoehtoihin(q) && q.answers && (

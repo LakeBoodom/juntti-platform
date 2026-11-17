@@ -230,16 +230,12 @@
 .tn20 .av-tiesitko span { font-size: 12px; font-weight: 800; letter-spacing: 0.16em; text-transform: uppercase; color: var(--av-vihrea); }
 .tn20 .av-tiesitko p { margin: 0; font-size: 17px; line-height: 1.45; color: #F4EEE0; text-wrap: pretty; }
 
+/* Äänen ja kuvan tekijät ovat vain sivulla /kuvien-lahteet (kuvalähdebrief 17.11.2026); rivillä on pelkkä Seuraava. */
 .tn20 .av-seuraava-rivi { display: flex; flex-direction: column-reverse; gap: 14px; }
-.tn20 .av-lahteet { display: flex; flex-direction: column; gap: 6px; padding: 12px 14px; border-radius: 12px; border: 1px solid #241E13; }
-.tn20 .av-lahteet > div { display: flex; gap: 12px; font-size: 13px; line-height: 1.4; color: #CBC1AD; min-width: 0; }
-.tn20 .av-lahteet a { color: #CBC1AD; text-decoration: underline; text-underline-offset: 3px; overflow-wrap: anywhere; }
-.tn20 .av-lahteet a:hover { color: var(--av-teksti); }
-.tn20 .av-lahde-l { flex: none; width: 40px; padding-top: 1px; font-size: 11px; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; color: #A79E8C; }
 
 /* Mobiili: Seuraava kiinteänä alapalkkina (näkyy aina ilman vieritystä). */
 @media (max-width: 899.98px) {
-  /* Kiinteän Seuraava-palkin korkeus + väli, jotta Tiesitkö ja lähteet voi lukea kokonaan. */
+  /* Kiinteän Seuraava-palkin korkeus + väli, jotta Tiesitkö jää kokonaan näkyviin. */
   .tn20 .av--peli[data-vastattu] .av-peli { padding-bottom: calc(112px + env(safe-area-inset-bottom)); }
   .tn20 .av-seuraava-palkki {
     position: fixed; left: 0; right: 0; bottom: 0; z-index: 30; padding: 12px 16px calc(12px + env(safe-area-inset-bottom));
@@ -364,8 +360,7 @@
   .tn20 .av-uudelleen-sono { height: 32px; }
   .tn20 .av-tiesitko { padding: 18px 20px; gap: 8px; }
   .tn20 .av-tiesitko p { font-size: 19px; }
-  .tn20 .av-seuraava-rivi { flex-direction: row; align-items: center; gap: 16px; }
-  .tn20 .av-lahteet { flex: 1; min-width: 0; padding: 0; border: 0; gap: 4px; }
+  .tn20 .av-seuraava-rivi { flex-direction: row; align-items: center; justify-content: flex-end; gap: 16px; }
   .tn20 .av-seuraava { padding: 0 30px; white-space: nowrap; }
   .tn20 .av-intro-sisalto { padding: 180px 32px 48px; }
   .tn20 .av-kortisto-grid { grid-template-columns: repeat(5, minmax(0, 1fr)); }

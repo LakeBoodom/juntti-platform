@@ -69,8 +69,6 @@ export type Kokoelma = {
   kuvaKevyt?: (src: string) => string;
   /** Korttikuvan object-position visan slugista (esim. "center 40%"); oletuksena keskitetty. */
   korttikuvaPos?: (slug: string) => string | undefined;
-  /** Kuvakrediittirivi sivun loppuun (CC BY / CC BY-SA -valokuvat), linkki /kuvien-lahteet. */
-  kuvakrediitti?: string;
   /** Kuvaton kohde silti kuvakorttina (nimikirjaimet), ei C-listarivinä (Tunnetut henkilöt, Heikki 25.10.2026). */
   korttiIlmanKuvaa?: boolean;
   /** Kortin metarivi (vuosi, maa, aihe). Kysymysmäärä lisätään automaattisesti vain, jos ≠ 10. */

@@ -33,7 +33,8 @@ export async function generateMetadata({ searchParams }: { searchParams: Promise
 }
 
 const HUB = "/kokoelma/vaalit";
-const LAHDE = "Kansanedustajat: eduskunnan avoin data (istuvat kansanedustajat). Vaalipiirien rajat: Tilastokeskus, CC BY 4.0.";
+/* Kartan rajojen lisenssi (Tilastokeskus, CC BY 4.0) on sivulla /kuvien-lahteet (kuvalähdebrief 17.11.2026). */
+const LAHDE = "Kansanedustajat: eduskunnan avoin data (istuvat kansanedustajat).";
 
 const SIEMEN = /^[a-z0-9]{3,16}$/;
 
