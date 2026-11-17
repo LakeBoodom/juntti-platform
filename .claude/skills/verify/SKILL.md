@@ -38,7 +38,10 @@ Katso `git diff --name-only origin/main...HEAD` (ja työpuun muutokset) ja aja k
 - Playwright-skriptit ajetaan Heikin koneella `device_bash`illa, jos se on saatavilla
   (playwright erilliseen kansioon, ks. skriptin otsake). Jos ei ole, korvaa mittaus selainpaneelin
   `javascript_tool`illa ja merkitse leimaan, mitä jäi ajamatta.
-- Preview valmistuu Hobby-jonossa ~5–10 minuutissa. Jos webhook ei laukea, tee tyhjä commit.
+- Previewn tila: Vercel MCP `list_deployments` (teamId `team_d8ClUfyvgtYEzX9YmbQ4rXeF`, tietoniekka
+  `prj_1fdefpr5qU2ACIabsYs2eIhhK9uw`, suodata `branch`). Valmistuu Hobby-jonossa ~5–10 minuutissa.
+  Jos webhook ei laukea, tee tyhjä commit. `CANCELED` pelkässä dokumentaatiomuutoksessa on odotettu
+  (Vercel ohittaa buildin, kun sovelluksen tiedostot eivät muutu), ei virhe.
 
 ## 3. Korjauskierrokset: enintään kolme
 
