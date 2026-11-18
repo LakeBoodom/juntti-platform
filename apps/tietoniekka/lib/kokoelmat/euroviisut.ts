@@ -10,7 +10,7 @@ export const EUROVIISUT_AUKI = 3;
 export const EUROVIISUT: Kokoelma = {
   slug: "euroviisut",
   nimi: "Euroviisut",
-  eyebrow: "Uusi kokoelma",
+  eyebrow: "",
   title: "",
   highlight: "Euroviisut",
   ingress: "Suomen viisutaival vuodesta 1961, voittajat ja UMK:n suurimmat hetket.",

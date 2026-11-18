@@ -12,7 +12,7 @@ export const TIEDE: Kokoelma = {
   eyebrow: "",
   title: "Tiede ja ",
   highlight: "teknologia",
-  ingress: "Maailma on kummallisempi kuin luulet. Kehosta avaruuteen ja keksintöjen syntytarinoihin.",
+  ingress: "Kehosta avaruuteen, kemian kummallisuuksiin ja keksintöjen syntytarinoihin.",
   accent: kokoelmaKortti("tiede")!.mastery.color,
   hero: { image: TIEDE_HERO.img, focalX: 0.22, focalY: 0.5, alt: "Kollaasi tieteestä: avaruus, aivot ja keksinnöt" },
   cta: "suosituin",

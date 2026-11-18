@@ -16,7 +16,7 @@ export const VAALIT: Kokoelma = {
   eyebrow: "",
   title: "Vaalit ja ",
   highlight: "politiikka",
-  ingress: "Tunnetko eduskunnan? 200 kansanedustajaa, 13 vaalipiiriä ja Suomen politiikan pitkä linja.",
+  ingress: "Eduskuntavaalit, puoluejohtajat, pääministerit ja presidentit Ståhlbergista Stubbiin.",
   accent: kokoelmaKortti("vaalit")!.mastery.color,
   hero: { image: "/20/vaalit/hero.webp", focalX: 0.5, focalY: 0.5, alt: "Eduskuntatalon pylväikkö ja portaat viistosti kuvattuna" },
   cta: "suosituin",
