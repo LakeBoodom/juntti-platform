@@ -13,7 +13,7 @@ export const KULTTUURI: Kokoelma = {
   eyebrow: "",
   title: "",
   highlight: "Kulttuuri",
-  ingress: "Taide, design, kirjallisuus, musiikki ja suomalaiset ilmiöt saunasta murteisiin.",
+  ingress: "Kalevalasta Muumeihin, Aallosta saunaan ja slangiin – kuinka hyvin tunnet suomalaisen kulttuurin?",
   accent: kokoelmaKortti("kulttuuri")!.mastery.color,
   hero: { image: KULTTUURI_HERO, focalX: 0.5, focalY: 0.4, alt: "Ateneumin taidemuseon julkisivu, Helsinki. Kuva: Htm / Wikimedia Commons, CC BY-SA 3.0" },
   cta: "suosituin",

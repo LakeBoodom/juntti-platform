@@ -12,7 +12,7 @@ export const KAUPUNGIT_KOKOELMA: Kokoelma = {
   eyebrow: "",
   title: "Suomen ",
   highlight: "kaupungit",
-  ingress: "Kaupunkien ja tunturien tarinat Hangosta Saariselälle.",
+  ingress: "Hangosta Saariselälle – tunnetko Suomen kaupunkien, kuntien ja tuntureiden tarinat?",
   accent: kokoelmaKortti("kaupungit")!.mastery.color,
   hero: { image: KAUPUNGIT_HERO_IMG, focalX: 0.75, focalY: 0.3, alt: "Laura ja Mikko matkalla" },
   cta: "suosituin",

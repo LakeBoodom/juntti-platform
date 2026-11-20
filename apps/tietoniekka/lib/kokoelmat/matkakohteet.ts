@@ -12,7 +12,7 @@ export const MATKAKOHTEET: Kokoelma = {
   eyebrow: "",
   title: "",
   highlight: "Maantieto",
-  ingress: "Vuoret, joet, saaret, sää ja kaupungit — myös ne, jotka luulet tuntevasi.",
+  ingress: "Maailman suurimmat kaupungit, korkeimmat vuoret ja hurjimmat sääilmiöt – mitä kaikkea tiedät maapallosta?",
   accent: kokoelmaKortti("matkakohteet")!.mastery.color,
   hero: { image: MAANTIETO_HERO, focalX: 0.47, focalY: 0.3, alt: "Vuorenhuippu vuonojen keskellä" },
   cta: "suosituin",

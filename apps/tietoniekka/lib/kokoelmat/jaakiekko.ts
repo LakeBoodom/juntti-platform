@@ -12,7 +12,7 @@ export const JAAKIEKKO: Kokoelma = {
   eyebrow: "",
   title: "",
   highlight: "Jääkiekko",
-  ingress: "Liigaseurat ja -legendat, derbyt, Leijonien kultavuodet ja suomalaiset NHL:ssä.",
+  ingress: "Liigan paikallistaisteluista Leijonien kultajuhliin ja NHL-legendoihin – kuinka hyvin tunnet kiekkomaailman?",
   accent: kokoelmaKortti("jaakiekko")!.mastery.color,
   hero: { image: JK_HERO.img, focalX: 0.5, focalY: 0.5, alt: "Jäähalli ennen ottelua" },
   cta: "suosituin",

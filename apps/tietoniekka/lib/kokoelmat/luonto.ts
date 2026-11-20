@@ -12,7 +12,7 @@ export const LUONTO: Kokoelma = {
   eyebrow: "",
   title: "",
   highlight: "Luonto",
-  ingress: "Suurpedoista lintuihin, soista revontuliin ja metsän marjoista sieniin.",
+  ingress: "Linnuista suurpetoihin, marjoista revontuliin – kuinka hyvin tunnet Suomen luonnon?",
   accent: kokoelmaKortti("luonto")!.mastery.color,
   hero: { image: LUONTO_HERO, focalX: 0.6, focalY: 0.45, alt: "Suomalainen järvimaisema" },
   cta: "suosituin",

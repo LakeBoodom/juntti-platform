@@ -13,7 +13,7 @@ export const URHEILU: Kokoelma = {
   eyebrow: "",
   title: "",
   highlight: "Urheilu",
-  ingress: "Palloilu, moottoriurheilu, golf, tennis ja suomalaisen urheilun suuret hetket.",
+  ingress: "Formuloista golfiin, koripallosta salibandyyn – kuinka hyvin tunnet suosikkilajisi tai -joukkueesi?",
   accent: kokoelmaKortti("urheilu")!.mastery.color,
   hero: { image: UL_HERO.img, focalX: 0.62, focalY: 0.28, alt: "Marcus Grönholm haastattelussa rallin MM-osakilpailussa" },
   cta: "suosituin",

@@ -18,7 +18,7 @@ export const HENKILOT: Kokoelma = {
   eyebrow: "",
   title: "Tunnetut ",
   highlight: "henkilöt",
-  ingress: "Näyttelijät, artistit, urheilijat, poliitikot ja muut tutut kasvot.",
+  ingress: "Meille kaikille tuttuja nimiä urheilusta, viihteestä ja politiikasta – mutta kuinka hyvin heidät oikeasti tunnet?",
   accent: kokoelmaKortti("tunnetut-henkilot")!.mastery.color,
   hero: { image: "/20/teema-tunnetut-henkilot-kollaasi.webp", focalX: 0.5, focalY: 0.3, alt: "Urho Kekkonen, Tarja Halonen, Saku Koivu, Jenni Vartiainen, Aki Kaurismäki ja Mika Häkkinen" }, // Heikki 16.11.2026: etusivun kollaasi (oli AI-kuva)
   cta: "suosituin",

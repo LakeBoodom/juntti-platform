@@ -15,7 +15,7 @@ export const TV: Kokoelma = {
   eyebrow: "",
   title: "TV ja ",
   highlight: "suoratoisto",
-  ingress: "Kotimaiset klassikot, maailman puhutuimmat sarjat ja tosi-tv:n suurimmat hetket.",
+  ingress: "Kummelista Squid Gameen ja Frendeistä Salkkareihin – kuinka paljon ruudun tapahtumista jäi mieleen?",
   accent: "#FF3D9E",
   hero: { image: TV_HERO, focalX: 0.64, focalY: 0.4, alt: "Laura katsoo televisiota sohvalla" },
   cta: "suosituin",
