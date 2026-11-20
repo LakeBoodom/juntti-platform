@@ -90,7 +90,7 @@ export const navHref = (c: Pick<NavCollection, "slug" | "href">) => c.href ?? hu
    tulosnäkymässä näkyi kaksi yläpalkkia päällekkäin. */
 /** Pelimuotojen kokoavat sivut ovat sivuston sivuja: ylänavigaatio, murupolku ja alatunniste (Heikki 1.11.2026).
     Pelinäkymät niiden alla pysyvät omalla pelipalkillaan. */
-const PELIMUOTOHUBIT = new Set(["/peli/karttapelit", "/peli/jarjesta", "/peli/tupla-tai-kuitti"]);
+const PELIMUOTOHUBIT = new Set(["/peli/karttapelit", "/peli/jarjesta", "/peli/tupla-tai-kuitti", "/kumpi/seura"]);
 export const isGameRoute = (pathname: string) =>
   !PELIMUOTOHUBIT.has(pathname.replace(/\/$/, "")) &&
   // Pelikehys (vaihe 4, 20.10.2026): myös Tupla tai kuitin aihesivu on pelin K2-aloitus omalla pelipalkillaan.
@@ -98,5 +98,5 @@ export const isGameRoute = (pathname: string) =>
   // sivuston palkki myös vieritti sivua sivuttain WebKitissä 768 → 390 px:n koonmuutoksessa).
   // Visapaketit (28.10.2026): "/visa" ilman kauttaviivaa osui myös /visapaketit-sivuihin, joilla navigaatio kuuluu
   // näkyä. Paketin televisionäkymä, tuloste ja juontajan näkymä ovat koko ruudun näkymiä ilman sivuston palkkia ja alatunnistetta.
-  (pathname.startsWith("/peli") || pathname === "/visa" || pathname.startsWith("/visa/") || pathname.startsWith("/h/") || pathname.startsWith("/kuvavisa/") ||
+  (pathname.startsWith("/peli") || pathname.startsWith("/kumpi/") || pathname === "/visa" || pathname.startsWith("/visa/") || pathname.startsWith("/h/") || pathname.startsWith("/kuvavisa/") ||
     /^\/visapaketti\/.+\/(ruutu|tulosta|vetaja)\/?$/.test(pathname));
