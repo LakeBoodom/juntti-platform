@@ -18,6 +18,62 @@
   --ease-emphasized: cubic-bezier(0.22, 1, 0.36, 1);
   --ease-exit: cubic-bezier(0.4, 0, 1, 1);
 
+  /* ─── Kumpi? 2.0 (CD "Kumpi 2.0 kierros 1 – spec", 17.11.2026): :root-lohko sellaisenaan, --kp-*. ───
+     Kestot ja käyrät yllä (--dur-*, --ease-*) ovat samat kuin specissä. */
+  --kp-hubi-bg: #131109;
+  --kp-hubi-pinta: #1F1B12;
+  --kp-peli-bg: #131109;
+  --kp-teksti: #F4EDE0;
+  --kp-teksti-2: rgba(244, 237, 224, .72);
+  --kp-kortti-bg: #221D13;
+  --kp-kortti-reuna: rgba(244, 237, 224, .22);
+  --kp-kortti-reuna-himmea: rgba(244, 237, 224, .10);
+  --kp-laatta: rgba(19, 17, 9, .9);
+  --kp-duotone-bg: #2B2470;
+  --kp-duotone: #5D50E6;
+  --kp-muste: #131109;
+  --kp-muste-2: #5C5446;
+  --kp-lime: #B6FF3C;
+  --kp-kulta: #E8A320;
+  --kp-oikea: #3FAE6E;
+  --kp-vaara: #E5533F;
+  --kp-kello: #F4EDE0;
+  --kp-kello-loppu: #FF7A3D;
+  --kp-fs-kysymys: 40px;
+  --kp-fs-kysymys-desk: 72px;
+  --kp-fs-nimi: 22px;
+  --kp-fs-arvo: 30px;
+  --kp-fs-palkki: 17px;
+  --kp-palkki-h: 56px;
+  --kp-kortti-vali: 12px;
+  --kp-kortti-vali-desk: 20px;
+  --kp-kortti-pad: 14px 14px 16px;
+  --kp-kortti-r: 18px;
+  --kp-kortti-reuna-w: 3px;
+  --kp-kortit-min: 200px;
+  --kp-kortit-max: 380px;
+  --kp-badge: 26px;
+  --kp-fakta-min-h: 76px;
+  --kp-rengas: 40px;
+  --kp-hero-merkki: 260px;
+  --kp-kello-h: 8px;
+  --kp-kello-rivi: 32px;
+  --kp-cta-h: 54px;
+  --kp-nappi-h: 50px;
+  --kp-nappi-r: 14px;
+  --kp-desk-max: 960px;
+  --kp-pop: 240ms;
+  --kp-shake: 360ms;
+  --kp-paljastus: 240ms;
+  --kp-fakta-viive: 60ms;
+  --kp-eteneminen: 2500ms;
+  --kp-poistuminen: 170ms;
+  --kp-sisaantulo: 240ms;
+  --kp-kello-kesto: 10000ms;
+  --kp-kello-kiristys: 7000ms;
+  --kp-kello-varoitus: 3000ms;
+  --kp-juhla: 900ms;
+
   /* ─── Brändivärit ───────────────────────────────────────────────── */
   --color-surface-dark: #0f1520;
   --color-surface-card-dark: #1a2130;

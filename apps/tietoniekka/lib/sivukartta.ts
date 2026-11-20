@@ -16,6 +16,7 @@
 import type { MetadataRoute } from "next";
 import { TEEMAT, TUPLA_SIVU } from "@/lib/tuplaTaiKuitti";
 import { KL_SIVU } from "@/lib/kuntaliitos";
+import { TEEMAT as KUMPI_TEEMAT, SEURAT as KUMPI_SEURAT } from "@/lib/kumpi/teemat";
 import { JULKAISTUT, pakkaHref } from "@/lib/jarjesta/pakat";
 import { HUB_HREF, IKA_PAKAT } from "@/lib/jarjesta/hub";
 import { VPK_SIVU } from "@/lib/vaalipiiriketju";
@@ -142,6 +143,11 @@ export async function sivukartanRivit(): Promise<MetadataRoute.Sitemap> {
     u("/megavisat", "weekly", 0.8, myohaisin(...megat.map((q) => q.updated_at))),
     u(TUPLA_SIVU, "weekly", 0.8),
     ...TEEMAT.map((t) => u(`${TUPLA_SIVU}/${t.slug}`, "daily", 0.6, tanaan)),
+    /* Kumpi? 2.0 (julkaistu 20.11.2026): hubi, teemat, Oma seura -valinta ja 17 seurasivua. */
+    u("/kumpi", "weekly", 0.8),
+    ...KUMPI_TEEMAT.map((t) => u(`/kumpi/${t.slug}`, "weekly", 0.6)),
+    u("/kumpi/seura", "monthly", 0.5),
+    ...KUMPI_SEURAT.map((s) => u(`/kumpi/seura/${s.slug}`, "weekly", 0.5)),
     u(KL_SIVU, "daily", 0.7, viikko),
     u(KARTTAPELIT_SIVU, "weekly", 0.7, viikko),
     u(RN_SIVU, "daily", 0.7, viikko),

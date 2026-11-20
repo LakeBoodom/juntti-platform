@@ -12013,10 +12013,38 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "duel_pair_blocks_entity_a_fkey"
+            columns: ["entity_a"]
+            isOneToOne: false
+            referencedRelation: "juna_asemat"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "duel_pair_blocks_entity_a_fkey"
+            columns: ["entity_a"]
+            isOneToOne: false
+            referencedRelation: "juna_reitit"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "duel_pair_blocks_entity_b_fkey"
             columns: ["entity_b"]
             isOneToOne: false
             referencedRelation: "fact_entities"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "duel_pair_blocks_entity_b_fkey"
+            columns: ["entity_b"]
+            isOneToOne: false
+            referencedRelation: "juna_asemat"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "duel_pair_blocks_entity_b_fkey"
+            columns: ["entity_b"]
+            isOneToOne: false
+            referencedRelation: "juna_reitit"
             referencedColumns: ["id"]
           },
         ]
@@ -12055,10 +12083,96 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "duel_pair_stats_entity_a_fkey"
+            columns: ["entity_a"]
+            isOneToOne: false
+            referencedRelation: "juna_asemat"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "duel_pair_stats_entity_a_fkey"
+            columns: ["entity_a"]
+            isOneToOne: false
+            referencedRelation: "juna_reitit"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "duel_pair_stats_entity_b_fkey"
             columns: ["entity_b"]
             isOneToOne: false
             referencedRelation: "fact_entities"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "duel_pair_stats_entity_b_fkey"
+            columns: ["entity_b"]
+            isOneToOne: false
+            referencedRelation: "juna_asemat"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "duel_pair_stats_entity_b_fkey"
+            columns: ["entity_b"]
+            isOneToOne: false
+            referencedRelation: "juna_reitit"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      entity_fact_lies: {
+        Row: {
+          created_at: string | null
+          entity_id: string
+          id: string
+          lie_kind: string
+          source: string | null
+          status: string
+          text: string
+          truth: string
+          verified_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          entity_id: string
+          id?: string
+          lie_kind: string
+          source?: string | null
+          status?: string
+          text: string
+          truth: string
+          verified_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          entity_id?: string
+          id?: string
+          lie_kind?: string
+          source?: string | null
+          status?: string
+          text?: string
+          truth?: string
+          verified_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "entity_fact_lies_entity_id_fkey"
+            columns: ["entity_id"]
+            isOneToOne: false
+            referencedRelation: "fact_entities"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "entity_fact_lies_entity_id_fkey"
+            columns: ["entity_id"]
+            isOneToOne: false
+            referencedRelation: "juna_asemat"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "entity_fact_lies_entity_id_fkey"
+            columns: ["entity_id"]
+            isOneToOne: false
+            referencedRelation: "juna_reitit"
             referencedColumns: ["id"]
           },
         ]
@@ -12109,6 +12223,20 @@ export type Database = {
             columns: ["entity_id"]
             isOneToOne: false
             referencedRelation: "fact_entities"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "entity_facts_entity_id_fkey"
+            columns: ["entity_id"]
+            isOneToOne: false
+            referencedRelation: "juna_asemat"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "entity_facts_entity_id_fkey"
+            columns: ["entity_id"]
+            isOneToOne: false
+            referencedRelation: "juna_reitit"
             referencedColumns: ["id"]
           },
         ]
@@ -12177,10 +12305,38 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "entity_timeline_entity_id_fkey"
+            columns: ["entity_id"]
+            isOneToOne: false
+            referencedRelation: "juna_asemat"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "entity_timeline_entity_id_fkey"
+            columns: ["entity_id"]
+            isOneToOne: false
+            referencedRelation: "juna_reitit"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "entity_timeline_linked_entity_fkey"
             columns: ["linked_entity"]
             isOneToOne: false
             referencedRelation: "fact_entities"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "entity_timeline_linked_entity_fkey"
+            columns: ["linked_entity"]
+            isOneToOne: false
+            referencedRelation: "juna_asemat"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "entity_timeline_linked_entity_fkey"
+            columns: ["linked_entity"]
+            isOneToOne: false
+            referencedRelation: "juna_reitit"
             referencedColumns: ["id"]
           },
         ]
@@ -12243,6 +12399,8 @@ export type Database = {
           jarjesta_title: string | null
           kind: string
           kinds: string[] | null
+          kumpi_kysymys: string | null
+          kumpi_kysymys_kaanteinen: string | null
           max_domain_distance: number
           max_gap: number | null
           mid_gap: number | null
@@ -12267,6 +12425,8 @@ export type Database = {
           jarjesta_title?: string | null
           kind: string
           kinds?: string[] | null
+          kumpi_kysymys?: string | null
+          kumpi_kysymys_kaanteinen?: string | null
           max_domain_distance?: number
           max_gap?: number | null
           mid_gap?: number | null
@@ -12291,6 +12451,8 @@ export type Database = {
           jarjesta_title?: string | null
           kind?: string
           kinds?: string[] | null
+          kumpi_kysymys?: string | null
+          kumpi_kysymys_kaanteinen?: string | null
           max_domain_distance?: number
           max_gap?: number | null
           mid_gap?: number | null
@@ -12354,6 +12516,20 @@ export type Database = {
             columns: ["entity_id"]
             isOneToOne: false
             referencedRelation: "fact_entities"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "duel_attributes_entity_id_fkey"
+            columns: ["entity_id"]
+            isOneToOne: false
+            referencedRelation: "juna_asemat"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "duel_attributes_entity_id_fkey"
+            columns: ["entity_id"]
+            isOneToOne: false
+            referencedRelation: "juna_reitit"
             referencedColumns: ["id"]
           },
         ]
@@ -12447,6 +12623,7 @@ export type Database = {
           detail: string | null
           from_entity: string
           id: string
+          ordinal: number | null
           rel_type: string
           season_from: string | null
           season_to: string | null
@@ -12460,6 +12637,7 @@ export type Database = {
           detail?: string | null
           from_entity: string
           id?: string
+          ordinal?: number | null
           rel_type: string
           season_from?: string | null
           season_to?: string | null
@@ -12473,6 +12651,7 @@ export type Database = {
           detail?: string | null
           from_entity?: string
           id?: string
+          ordinal?: number | null
           rel_type?: string
           season_from?: string | null
           season_to?: string | null
@@ -12490,10 +12669,38 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "fact_relationships_from_entity_fkey"
+            columns: ["from_entity"]
+            isOneToOne: false
+            referencedRelation: "juna_asemat"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fact_relationships_from_entity_fkey"
+            columns: ["from_entity"]
+            isOneToOne: false
+            referencedRelation: "juna_reitit"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "fact_relationships_to_entity_fkey"
             columns: ["to_entity"]
             isOneToOne: false
             referencedRelation: "fact_entities"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fact_relationships_to_entity_fkey"
+            columns: ["to_entity"]
+            isOneToOne: false
+            referencedRelation: "juna_asemat"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fact_relationships_to_entity_fkey"
+            columns: ["to_entity"]
+            isOneToOne: false
+            referencedRelation: "juna_reitit"
             referencedColumns: ["id"]
           },
         ]
@@ -12913,6 +13120,20 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "kaupungit_entity_id_fkey"
+            columns: ["entity_id"]
+            isOneToOne: false
+            referencedRelation: "juna_asemat"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "kaupungit_entity_id_fkey"
+            columns: ["entity_id"]
+            isOneToOne: false
+            referencedRelation: "juna_reitit"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "kaupungit_kaupunkivisa_quiz_id_fkey"
             columns: ["kaupunkivisa_quiz_id"]
             isOneToOne: false
@@ -12954,6 +13175,110 @@ export type Database = {
           versio?: string
         }
         Relationships: []
+      }
+      kumpi_vastaukset: {
+        Row: {
+          attr_key: string
+          created_at: string
+          entity_a: string
+          entity_b: string | null
+          id: number
+          kysymys_nro: number | null
+          oikein: boolean
+          pari: string
+          pelitapa: string
+          session_id: string | null
+          teema: string
+          valinta: string | null
+          valinta_ix: number | null
+          vastausaika_ms: number | null
+        }
+        Insert: {
+          attr_key: string
+          created_at?: string
+          entity_a: string
+          entity_b?: string | null
+          id?: never
+          kysymys_nro?: number | null
+          oikein: boolean
+          pari: string
+          pelitapa: string
+          session_id?: string | null
+          teema: string
+          valinta?: string | null
+          valinta_ix?: number | null
+          vastausaika_ms?: number | null
+        }
+        Update: {
+          attr_key?: string
+          created_at?: string
+          entity_a?: string
+          entity_b?: string | null
+          id?: never
+          kysymys_nro?: number | null
+          oikein?: boolean
+          pari?: string
+          pelitapa?: string
+          session_id?: string | null
+          teema?: string
+          valinta?: string | null
+          valinta_ix?: number | null
+          vastausaika_ms?: number | null
+        }
+        Relationships: []
+      }
+      kumpi_visakysymykset: {
+        Row: {
+          created_at: string
+          huomio: string | null
+          id: string
+          kysymys: string
+          oikea: string
+          oikea_fakta: string | null
+          question_id: string
+          status: string
+          teemat: string[]
+          vaara: string
+          vaara_fakta: string | null
+          vaikeus: string
+        }
+        Insert: {
+          created_at?: string
+          huomio?: string | null
+          id?: string
+          kysymys: string
+          oikea: string
+          oikea_fakta?: string | null
+          question_id: string
+          status?: string
+          teemat: string[]
+          vaara: string
+          vaara_fakta?: string | null
+          vaikeus: string
+        }
+        Update: {
+          created_at?: string
+          huomio?: string | null
+          id?: string
+          kysymys?: string
+          oikea?: string
+          oikea_fakta?: string | null
+          question_id?: string
+          status?: string
+          teemat?: string[]
+          vaara?: string
+          vaara_fakta?: string | null
+          vaikeus?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "kumpi_visakysymykset_question_id_fkey"
+            columns: ["question_id"]
+            isOneToOne: true
+            referencedRelation: "questions"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       kunnat: {
         Row: {
@@ -15356,6 +15681,32 @@ export type Database = {
           pelimuoto: string | null
           valmiit_kierrokset: number | null
           variantti: string | null
+        }
+        Relationships: []
+      }
+      juna_asemat: {
+        Row: {
+          id: string | null
+          junia_paivassa: number | null
+          kaupunki_id: string | null
+          koodi: string | null
+          lat: number | null
+          lon: number | null
+          nimi: string | null
+          status: string | null
+          tyyppi: string | null
+        }
+        Relationships: []
+      }
+      juna_reitit: {
+        Row: {
+          asemat: Json | null
+          id: string | null
+          juna: string | null
+          lahto: string | null
+          maaranpaa: string | null
+          reitti: string | null
+          status: string | null
         }
         Relationships: []
       }

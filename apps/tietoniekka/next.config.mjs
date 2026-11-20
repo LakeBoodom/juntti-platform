@@ -66,7 +66,6 @@ const nextConfig = {
       },
       /* 1.0 pelimuodot */
       { source: "/mega", destination: "/megavisat", permanent: true },
-      { source: "/kumpi", destination: "/", permanent: true },
       { source: "/jarjesta", destination: "/", permanent: true },
     ];
   },
