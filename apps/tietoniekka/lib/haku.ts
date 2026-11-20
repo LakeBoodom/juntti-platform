@@ -30,7 +30,7 @@ const KOKOELMA_SANAT: Record<string, string> = {
   lapset: "lasten visat lapsille",
 };
 const PELI_SANAT: Record<string, string> = {
-  "/peli/karttapelit": "kartta rajanaapurit kuntaliitos yhdysvallat osavaltiot reittipeli",
+  "/peli/karttapelit": "kartta rajanaapurit kuntaliitos yhdysvallat osavaltiot reittipeli junankuljettaja juna rautatie",
   "/peli/jarjesta": "ikäjärjestys järjestys presidentit",
   "/peli/mika-maa": "maa liput arvaa maa",
   "/peli/tupla-tai-kuitti": "riski tuplaa",
@@ -44,6 +44,7 @@ const PELI_SANAT: Record<string, string> = {
 const LISAPELIT: HakuKohde[] = [
   { t: "p", n: "Rajanaapurit", h: "/peli/rajanaapurit", a: "valtiot kartta naapurit" },
   { t: "p", n: "Kuntaliitos", h: "/peli/kuntaliitos", a: "kunnat kartta" },
+  { t: "p", n: "Junankuljettaja", h: "/peli/junankuljettaja", a: "juna rautatiet asemat radat kartta" },
   { t: "p", n: "Ikäjärjestys", h: "/peli/ikajarjestys", a: "kuka on vanhin järjestä" },
 ];
 

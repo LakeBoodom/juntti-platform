@@ -211,9 +211,9 @@ function Pelit({ p }: { p: D["pelit"] }) {
                 </>
               );
               return m.tila === "tulossa" ? (
-                <div key={m.slug} className="tn-es-peli" data-tulossa aria-disabled="true">{sisus}</div>
+                <div key={m.slug} className="tn-es-peli" data-tulossa data-leve={m.leve || undefined} aria-disabled="true">{sisus}</div>
               ) : (
-                <a key={m.slug} className="tn-es-peli" href={m.href}>{sisus}</a>
+                <a key={m.slug} className="tn-es-peli" data-leve={m.leve || undefined} href={m.href}>{sisus}</a>
               );
             })}
           </div>

@@ -23,6 +23,8 @@ import { maaKierros } from "@/lib/vihjepeli/data";
 import { MAA_JULKAISU } from "@/lib/vihjepeli/aiheet/maa";
 import { MM_SIVU } from "@/lib/vihjepeli/mikamaa";
 import { ETUSIVUN_PELIMUODOT } from "@/lib/pelimuodot";
+import { JK_OLETUSTASO, JK_SIVU } from "@/lib/junankuljettaja";
+import { JK_LAHDE, paivanValinta } from "@/lib/junankuljettaja/vuoro";
 
 /* Viikon reitti vaihtuu maanantaina ja Mikä maa? -päivä keskiyöllä → sivu uusitaan 10 minuutin välein. */
 export const revalidate = 600;
@@ -58,6 +60,11 @@ export default async function KarttapelitSivu() {
     nimi: k.nimi,
     rivi: karttapelinKoukku(k, viikko) ?? k.kuvaus,
   }));
+  /* Junankuljettaja (CD kierros 1, 4c): rivissä päivän vuoro keskitasolla, kuva sama kaikille vuoroille (ei paljasta reittiä). */
+  const juna: RiviKortti = {
+    href: JK_SIVU, kuva: "/20/junankuljettaja/rivi.svg", kuvaton: "Rautatiet", merkki: "Junankuljettaja", nimi: "Rautatiet",
+    rivi: `${paivanValinta(iso, JK_OLETUSTASO).reitti.otsikko} asema kerrallaan`,
+  };
   return (
     <PeliKehys iho="tumma">
       <JsonLd data={peliLd({ name: "Karttapelit", url: KARTTAPELIT_SIVU, description: KUVAUS })} />
@@ -77,7 +84,7 @@ export default async function KarttapelitSivu() {
             intro={INTRO}
             cta={mm ? <a className="hub-cta tn-cta-lime" href={MM_SIVU} data-tn-entry="karttapelit:hero">Arvaa päivän maa <span aria-hidden="true">→</span></a> : undefined}
           />
-          <HubRivit kortit={[...paivan, ...kartat]} nimi="Karttapelit" />
+          <HubRivit kortit={[...paivan, ...kartat, juna]} nimi="Karttapelit" />
           <HubOhjeet
             kohdat={[{
               otsikko: "Näin pelaat",
@@ -95,6 +102,7 @@ export default async function KarttapelitSivu() {
                   {KARTTAPELIT.map((k) => (
                     <li key={k.peli}><b>{k.laji === k.nimi ? k.nimi : `${k.laji}: ${k.nimi}`}.</b> {k.huomautus} {LAHTEET[k.peli]}</li>
                   ))}
+                  <li><b>Junankuljettaja.</b> Reitit ja asemien järjestys ovat yhden aikataulun mukaisen junan pysähdyksiä, joten kaikki radan asemat eivät ole mukana. {JK_LAHDE}</li>
                 </ul>
               ),
             }]}

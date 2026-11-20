@@ -22,7 +22,8 @@ export const KL_YRITYKSET = 3;
 export const reittiPisteet = (oikein: number, yrityksia: number) => Math.max(0, (oikein - (yrityksia - 1)) * KL_PISTEET);
 
 /** Kunta pelikortissa ja kartalla. x/y = nastan paikka prosentteina kartasta. */
-export type KlKunta = { k: string; n: string; m: string; v: string | null; x: number; y: number };
+/** a = kartan alue, jos se on eri kuin k (Junankuljettaja: k = asemakoodi, a = aseman kunta). */
+export type KlKunta = { k: string; n: string; m: string; v: string | null; x: number; y: number; a?: string };
 
 /** Kartan tausta: reitin alueen kunnat valmiina SVG-polkuina (viewBox-koordinaatit). */
 /** u = alue valitun ryhmän (maakunta, maanosa) ulkopuolella (himmennetään), t = pelin ulkopuolinen taustan alue. */

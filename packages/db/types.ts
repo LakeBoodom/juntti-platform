@@ -1157,6 +1157,51 @@ export type Database = {
         }
         Relationships: []
       }
+      _fact_attributes_backup_20261120: {
+        Row: {
+          as_of: string | null
+          attr_key: string | null
+          display_value: string | null
+          entity_id: string | null
+          metric: string | null
+          next_review_at: string | null
+          num_value: number | null
+          scope: string | null
+          source: string | null
+          text_value: string | null
+          verified_at: string | null
+          volatility: string | null
+        }
+        Insert: {
+          as_of?: string | null
+          attr_key?: string | null
+          display_value?: string | null
+          entity_id?: string | null
+          metric?: string | null
+          next_review_at?: string | null
+          num_value?: number | null
+          scope?: string | null
+          source?: string | null
+          text_value?: string | null
+          verified_at?: string | null
+          volatility?: string | null
+        }
+        Update: {
+          as_of?: string | null
+          attr_key?: string | null
+          display_value?: string | null
+          entity_id?: string | null
+          metric?: string | null
+          next_review_at?: string | null
+          num_value?: number | null
+          scope?: string | null
+          source?: string | null
+          text_value?: string | null
+          verified_at?: string | null
+          volatility?: string | null
+        }
+        Relationships: []
+      }
       _fact_backup_20260917: {
         Row: {
           fact: string | null
@@ -6320,6 +6365,51 @@ export type Database = {
           taso?: number | null
           vihje_laura?: string | null
           vihje_mikko?: string | null
+        }
+        Relationships: []
+      }
+      _kumpi_visakysymykset_backup_20261120: {
+        Row: {
+          created_at: string | null
+          huomio: string | null
+          id: string | null
+          kysymys: string | null
+          oikea: string | null
+          oikea_fakta: string | null
+          question_id: string | null
+          status: string | null
+          teemat: string[] | null
+          vaara: string | null
+          vaara_fakta: string | null
+          vaikeus: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          huomio?: string | null
+          id?: string | null
+          kysymys?: string | null
+          oikea?: string | null
+          oikea_fakta?: string | null
+          question_id?: string | null
+          status?: string | null
+          teemat?: string[] | null
+          vaara?: string | null
+          vaara_fakta?: string | null
+          vaikeus?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          huomio?: string | null
+          id?: string | null
+          kysymys?: string | null
+          oikea?: string | null
+          oikea_fakta?: string | null
+          question_id?: string | null
+          status?: string | null
+          teemat?: string[] | null
+          vaara?: string | null
+          vaara_fakta?: string | null
+          vaikeus?: string | null
         }
         Relationships: []
       }
@@ -13053,6 +13143,51 @@ export type Database = {
           session_id?: string | null
           tapahtuma?: string
           variantti?: string | null
+        }
+        Relationships: []
+      }
+      junankuljettaja_pelit: {
+        Row: {
+          asemat: string[]
+          entry: string | null
+          id: string
+          landing_path: string | null
+          oikein: number
+          paivan_reitti: boolean
+          played_at: string
+          referrer_host: string | null
+          session_id: string | null
+          siemen: string
+          taso: string | null
+          yritys: number
+        }
+        Insert: {
+          asemat: string[]
+          entry?: string | null
+          id?: string
+          landing_path?: string | null
+          oikein: number
+          paivan_reitti?: boolean
+          played_at?: string
+          referrer_host?: string | null
+          session_id?: string | null
+          siemen: string
+          taso?: string | null
+          yritys: number
+        }
+        Update: {
+          asemat?: string[]
+          entry?: string | null
+          id?: string
+          landing_path?: string | null
+          oikein?: number
+          paivan_reitti?: boolean
+          played_at?: string
+          referrer_host?: string | null
+          session_id?: string | null
+          siemen?: string
+          taso?: string | null
+          yritys?: number
         }
         Relationships: []
       }

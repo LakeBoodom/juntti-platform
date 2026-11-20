@@ -13,7 +13,7 @@ const STORAGE = "https://pkfsdzqwfxqczirjddue.supabase.co/storage/v1/object/publ
 const VAAKUNA = `${STORAGE}/kuntavaakunat`;
 
 /** Pelit, joilla on kuvitus (slug → kuvitus). Muut pelikortit käyttävät valokuvaa. */
-export const KUVITETUT = new Set(["kuvavisat", "aanivisat", "kuntaliitos", "rajanaapurit", "rajanaapurit-yhdysvallat", "vaalipiiriketju", "mika-maa", "jarjesta"]);
+export const KUVITETUT = new Set(["kuvavisat", "aanivisat", "kuntaliitos", "rajanaapurit", "rajanaapurit-yhdysvallat", "vaalipiiriketju", "mika-maa", "jarjesta", "junankuljettaja"]);
 
 /** Järjestä-kortti: VÄÄRIN-kirjainten kierrot ja siirrot (sama kuin hubin otsikossa). */
 const VAARIN: Array<[string, string]> = [
@@ -123,6 +123,26 @@ export default function PeliKuvitus({ slug }: { slug: string }) {
         <Reitti luokka="tn-pk--kunta" lahto={vaakuna("285", "Kotka")} toka={vaakuna("286", "Kouvola")} maali={vaakuna("491", "Mikkeli")}
           oikea={vaakuna("507", "Mäntyharju")} harhautin={vaakuna("075", "Hamina")}
           jatko={{ maali: vaakuna("681", "Rantasalmi"), oikea: vaakuna("178", "Juva") }} />
+      );
+    case "junankuljettaja":
+      /* Banneri (CD "Junankuljettaja, kierros 1", kohta 6): kermainen yläosa ja junakaista, asemapalat junan edessä
+         (Seinäjoki, Lapua, ?, Kokkola) ja kaksi irtopalaa kaistan yläreunassa. Palan sivu --t kuva-alueen koosta, kaikki
+         muut mitat sen kerrannaisia (sama rakenne joka kokoon). Kauhava sopii aukkoon, Vaasa ei ole radalla. */
+      return (
+        <span className="tn-pk tn-pk--jbn" aria-hidden="true">
+          <span className="tn-jbn-kaista"><img src="/20/junankuljettaja/hero-juna.svg" alt="" width={700} height={100} loading="lazy" /></span>
+          <span className="tn-jbn-rivi">
+            <span className="tn-jbn-p" data-paa=""><span className="tn-jbn-l">Lähtö</span><i />Seinäjoki</span>
+            <s />
+            <span className="tn-jbn-p"><i />Lapua</span>
+            <s data-katko="" />
+            <span className="tn-jbn-p" data-aukko=""><b>?</b></span>
+            <s data-katko="" />
+            <span className="tn-jbn-p" data-paa=""><span className="tn-jbn-l">Määränpää</span><i />Kokkola</span>
+          </span>
+          <span className="tn-jbn-irto" data-n="a"><i />Kauhava</span>
+          <span className="tn-jbn-irto" data-n="b"><i />Vaasa</span>
+        </span>
       );
     case "rajanaapurit":
       /* Viro–Latvia–[Liettua]–Puola; C jatkuu –[Slovakia]–Unkari. Saksa rajautuu Puolaan mutta ei Latviaan eikä Unkariin. */
