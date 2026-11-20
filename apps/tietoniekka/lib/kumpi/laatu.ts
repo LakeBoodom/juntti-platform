@@ -1,7 +1,7 @@
 // KUMPI? 2.0 — laatuportti (brief A5). Puhdas: data → raportti. Ajetaan skriptillä scripts/kumpi-laatu.ts ja
 // esikatselun rajapinnassa /api/kumpi/laatu (palvelimella service role -datalla; tuotannossa 404).
 
-import { FLAG_VUODET, KIERROS_KAAVA, teeKysymys, teemanPooli, teeSekoitusKysymys, uusiJakso, uusiKonteksti, uusiSekoitus, teemanSpecit } from "./generate";
+import { FLAG_VUODET, KIERROS_KAAVA, VISA_MAX, teeJakso, teemanPooli, uusiKierrosTila } from "./generate";
 import { KAIKKI_TEEMAT, KP_ATTR, MV_ATTR, RYHMAN_MAKSIMI, mikaTahansaTeema, type Teema } from "./teemat";
 import type { KEnt, KumpiData, KumpiKysymys } from "./tyypit";
 
@@ -27,7 +27,28 @@ function arvo(e: KEnt, avain: string, teema: Teema): number | undefined {
   return e.v[key];
 }
 
+/** Visakysymyksen tarkistukset: lause, avainsana, nimien ja faktojen pituus, ei vastausvuotoa. */
+function tarkistaVisa(q: KumpiKysymys): string[] {
+  const v: string[] = [];
+  const [a, b] = q.vaihtoehdot;
+  const nimi = `visa: ${q.lause}`;
+  if (!q.osat.avain) v.push(`avainsana puuttuu (${nimi})`);
+  if (q.lause.length > MAX_KYSYMYS) v.push(`kysymys liian pitkä ${q.lause.length} (${nimi})`);
+  if (!/^Kum/.test(q.lause)) v.push(`ei ala kumpi-sanalla (${nimi})`);
+  if (a.nimi === b.nimi) v.push(`sama nimi kahdesti (${nimi})`);
+  for (const x of q.vaihtoehdot) {
+    if (x.nimi.length > 30) v.push(`nimi liian pitkä: ${x.nimi}`);
+    if (x.arvo.length > 28) v.push(`fakta liian pitkä: ${x.arvo}`);
+    const pisin = Math.max(...x.nimi.split(/[\s\-–]+/).map((w) => w.length));
+    if (pisin > MAX_SANA) v.push(`nimen sana liian pitkä: ${x.nimi}`);
+  }
+  const oikea = q.vaihtoehdot[q.oikea].nimi.toLowerCase();
+  if (oikea.length > 3 && q.lause.toLowerCase().includes(oikea)) v.push(`vastaus vuotaa kysymyksestä (${nimi})`);
+  return v;
+}
+
 export function tarkistaKysymys(q: KumpiKysymys, data: KumpiData, teema: Teema, ent: Map<string, KEnt>): string[] {
+  if (q.attr === "visa") return tarkistaVisa(q);
   const v: string[] = [];
   const [a, b] = q.vaihtoehdot.map((x) => ent.get(x.id)!);
   const avain = q.pari.split("|")[0];
@@ -85,49 +106,32 @@ export function tarkistaTeema(data: KumpiData, teema: Teema, n = 500, siemen = "
   const kysymykset: KumpiKysymys[] = [];
   const virheet: string[] = [];
   let tyhjat = 0;
-  let attribuutit: string[] = [];
-  let pooli = 0;
-  if (teema.osat) {
-    const sek = uusiSekoitus(data, teema, `${siemen}-${teema.slug}`);
-    attribuutit = sek.osat.flatMap((o) => o.specit.map((s) => `${o.ctx.teema.slug}:${s.avain}`));
-    pooli = sek.osat.reduce((x, o) => x + o.ctx.pohja.length, 0);
-    while (kysymykset.length < n && tyhjat < 10) {
-      const jakso = uusiJakso(1);
-      sek.ryhmaMaara.clear();
-      const tassa: KumpiKysymys[] = [];
-      for (const t of KIERROS_KAAVA) {
-        const q = teeSekoitusKysymys(sek, t, jakso);
-        if (q) tassa.push(q);
-      }
-      if (tassa.length < KIERROS_KAAVA.length) tyhjat++;
-      const ryhmia = new Set(tassa.map((q) => mikaTahansaTeema(q.teema)?.ryhma));
-      const kiekko = tassa.filter((q) => mikaTahansaTeema(q.teema)?.ryhma === "jaakiekko").length;
+  const tila = uusiKierrosTila(data, teema, `${siemen}-${teema.slug}`);
+  const attribuutit = tila.sek
+    ? tila.sek.osat.flatMap((o) => o.specit.map((s) => `${o.ctx.teema.slug}:${s.avain}`))
+    : tila.perus?.specit.map((s) => s.avain) ?? [];
+  const pooli = tila.sek ? tila.sek.osat.reduce((x, o) => x + o.ctx.pohja.length, 0) : teemanPooli(data, teema).length;
+  while (kysymykset.length < n && tyhjat < 10) {
+    const tassa = teeJakso(tila);
+    if (tassa.length < KIERROS_KAAVA.length) tyhjat++;
+    const visoja = tassa.filter((q) => q.attr === "visa").length;
+    if (visoja > VISA_MAX) virheet.push(`visakysymyksiä ${visoja}/10 jaksossa`);
+    if (tila.sek) {
+      const ryhmia = new Set(tassa.filter((q) => q.attr !== "visa").map((q) => mikaTahansaTeema(q.teema)?.ryhma));
+      const kiekko = tassa.filter((q) => q.attr !== "visa" && mikaTahansaTeema(q.teema)?.ryhma === "jaakiekko").length;
       if (ryhmia.size > 1 && kiekko > (RYHMAN_MAKSIMI.jaakiekko ?? 99)) virheet.push(`jääkiekkoa ${kiekko}/10 jaksossa`);
-      kysymykset.push(...tassa);
     }
-  } else {
-    const ctx = uusiKonteksti(data, teema, `${siemen}-${teema.slug}`);
-    const specit = teemanSpecit(ctx);
-    attribuutit = specit.map((s) => s.avain);
-    pooli = teemanPooli(data, teema).length;
-    while (kysymykset.length < n && tyhjat < 10) {
-      const jakso = uusiJakso();
-      let tassa = 0;
-      for (const t of KIERROS_KAAVA) {
-        const q = teeKysymys(ctx, t, jakso, specit);
-        if (q) { kysymykset.push(q); tassa++; }
-      }
-      if (tassa < KIERROS_KAAVA.length) tyhjat++;
-    }
+    kysymykset.push(...tassa);
   }
   for (const q of kysymykset) virheet.push(...tarkistaKysymys(q, data, mikaTahansaTeema(q.teema) ?? teema, ent));
   const vaikeudet: Record<string, number> = {};
   for (const q of kysymykset) vaikeudet[q.vaikeus] = (vaikeudet[q.vaikeus] ?? 0) + 1;
   const kaanteisia = kysymykset.filter((q) => q.kaanteinen).length;
+  const visoja = kysymykset.filter((q) => q.attr === "visa").length;
   return {
     raportti: {
       slug: teema.slug, nimi: teema.nimi, pooli, attribuutit, kysymyksia: kysymykset.length,
-      vaikeudet: { ...vaikeudet, kaanteisia }, virheet: [...new Set(virheet)].slice(0, 30),
+      vaikeudet: { ...vaikeudet, kaanteisia, visoja }, virheet: [...new Set(virheet)].slice(0, 30),
     },
     kysymykset,
   };

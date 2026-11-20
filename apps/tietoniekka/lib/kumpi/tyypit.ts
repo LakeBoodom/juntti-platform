@@ -49,7 +49,22 @@ export type KDef = {
   enabled: boolean;
 };
 
+/** Tietovisakysymys Kumpi?-muodossa (kumpi_visakysymykset, Heikki 20.11.2026). */
+export type KVisa = {
+  id: string;
+  /** Teemat, joihin kysymys kuuluu (urheilu, ihmiset, liiga, suomikiekon-legendat, seura-<seura>). */
+  teemat: string[];
+  kysymys: string;
+  oikea: string;
+  vaara: string;
+  oikeaFakta: string | null;
+  vaaraFakta: string | null;
+  vaikeus: Vaikeus;
+};
+
 export type KumpiData = {
+  /** Visakysymykset (esikatselussa myös luonnokset). */
+  visat: KVisa[];
   entities: KEnt[];
   defs: Record<string, KDef>;
   /** "attr|idA|idB" (id:t järjestettyinä). */

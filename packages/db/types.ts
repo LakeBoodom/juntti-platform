@@ -13181,7 +13181,7 @@ export type Database = {
           attr_key: string
           created_at: string
           entity_a: string
-          entity_b: string
+          entity_b: string | null
           id: number
           kysymys_nro: number | null
           oikein: boolean
@@ -13190,13 +13190,14 @@ export type Database = {
           session_id: string | null
           teema: string
           valinta: string | null
+          valinta_ix: number | null
           vastausaika_ms: number | null
         }
         Insert: {
           attr_key: string
           created_at?: string
           entity_a: string
-          entity_b: string
+          entity_b?: string | null
           id?: never
           kysymys_nro?: number | null
           oikein: boolean
@@ -13205,13 +13206,14 @@ export type Database = {
           session_id?: string | null
           teema: string
           valinta?: string | null
+          valinta_ix?: number | null
           vastausaika_ms?: number | null
         }
         Update: {
           attr_key?: string
           created_at?: string
           entity_a?: string
-          entity_b?: string
+          entity_b?: string | null
           id?: never
           kysymys_nro?: number | null
           oikein?: boolean
@@ -13220,9 +13222,63 @@ export type Database = {
           session_id?: string | null
           teema?: string
           valinta?: string | null
+          valinta_ix?: number | null
           vastausaika_ms?: number | null
         }
         Relationships: []
+      }
+      kumpi_visakysymykset: {
+        Row: {
+          created_at: string
+          huomio: string | null
+          id: string
+          kysymys: string
+          oikea: string
+          oikea_fakta: string | null
+          question_id: string
+          status: string
+          teemat: string[]
+          vaara: string
+          vaara_fakta: string | null
+          vaikeus: string
+        }
+        Insert: {
+          created_at?: string
+          huomio?: string | null
+          id?: string
+          kysymys: string
+          oikea: string
+          oikea_fakta?: string | null
+          question_id: string
+          status?: string
+          teemat: string[]
+          vaara: string
+          vaara_fakta?: string | null
+          vaikeus: string
+        }
+        Update: {
+          created_at?: string
+          huomio?: string | null
+          id?: string
+          kysymys?: string
+          oikea?: string
+          oikea_fakta?: string | null
+          question_id?: string
+          status?: string
+          teemat?: string[]
+          vaara?: string
+          vaara_fakta?: string | null
+          vaikeus?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "kumpi_visakysymykset_question_id_fkey"
+            columns: ["question_id"]
+            isOneToOne: true
+            referencedRelation: "questions"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       kunnat: {
         Row: {

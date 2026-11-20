@@ -23,6 +23,7 @@ export function kirjaaVastaus(q: KumpiKysymys, pelitapa: Pelitapa, valinta: 0 | 
   try {
     const sb = getSupabase();
     if (!sb) return;
+    const visa = q.attr === "visa";
     // kumpi_vastaukset puuttuu generoiduista tyypeistä, kunnes packages/db/types.ts päivitetään.
     // Supabasen kysely lähtee vasta then-kutsusta (pelkkä void ei lähetä mitään).
     (sb as unknown as { from: (t: string) => { insert: (r: object) => PromiseLike<unknown> } })
@@ -32,9 +33,11 @@ export function kirjaaVastaus(q: KumpiKysymys, pelitapa: Pelitapa, valinta: 0 | 
         teema: q.teema,
         attr_key: q.attr,
         pari: q.pari.slice(0, 200),
-        entity_a: q.vaihtoehdot[0].id,
-        entity_b: q.vaihtoehdot[1].id,
-        valinta: valinta === null ? null : q.vaihtoehdot[valinta].id,
+        // Visakysymys: entity_a = kumpi_visakysymykset.id, ei entiteettipareja; valinta paikkana (valinta_ix).
+        entity_a: visa ? q.pari.slice(5) : q.vaihtoehdot[0].id,
+        entity_b: visa ? null : q.vaihtoehdot[1].id,
+        valinta: visa || valinta === null ? null : q.vaihtoehdot[valinta].id,
+        valinta_ix: valinta,
         oikein: valinta === q.oikea,
         vastausaika_ms: Math.max(0, Math.min(600000, Math.round(ms))),
         kysymys_nro: nro,

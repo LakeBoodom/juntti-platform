@@ -47,6 +47,7 @@ export function rakennaKumpiData(r: {
   legendat: string[];
   suomalaiset: string[];
   tanaan: string;
+  visat?: any[];
 }): KumpiData {
   const legendat = new Set(r.legendat);
   const suomalaiset = new Set(r.suomalaiset);
@@ -147,7 +148,14 @@ export function rakennaKumpiData(r: {
   }
 
   const blocks = r.blocks.map((b) => `${b.attr_key}|${[b.entity_a, b.entity_b].sort().join("|")}`);
-  return { entities, defs, blocks, inessiivit };
+  // Visakysymykset: vain julkaistujen visojen kysymykset (lähdevisa voidaan piilottaa myöhemmin).
+  const visat = (r.visat ?? [])
+    .filter((v) => v.questions?.quizzes?.status === "published")
+    .map((v) => ({
+      id: v.id, teemat: v.teemat ?? [], kysymys: v.kysymys, oikea: v.oikea, vaara: v.vaara,
+      oikeaFakta: v.oikea_fakta ?? null, vaaraFakta: v.vaara_fakta ?? null, vaikeus: v.vaikeus,
+    }));
+  return { entities, defs, blocks, inessiivit, visat };
 }
 
 export async function lataaKumpiData(): Promise<KumpiData | null> {
@@ -155,7 +163,7 @@ export async function lataaKumpiData(): Promise<KumpiData | null> {
   if (!a) return null;
   const { sb, laaja } = a;
   const tilat = laaja ? ["published", "draft"] : ["published"];
-  const [entities, defs, blocks, relaatiot, faktat, julkkikset] = await Promise.all([
+  const [entities, defs, blocks, relaatiot, faktat, julkkikset, visat] = await Promise.all([
     kaikki((alku, loppu) =>
       sb.from("fact_entities")
         .select("id, name, kind, image_url, celebrity_id, lat, lon, name_partitive, fact_attributes(attr_key, scope, num_value, display_value, text_value, metric, volatility, next_review_at)")
@@ -171,12 +179,17 @@ export async function lataaKumpiData(): Promise<KumpiData | null> {
     kaikki((alku, loppu) => sb.from("fact_relationships").select("from_entity, to_entity, rel_type").in("rel_type", ["same_as", "played_for"]).order("id").range(alku, loppu)),
     kaikki((alku, loppu) => sb.from("entity_facts").select("entity_id").order("id").range(alku, loppu)),
     kaikki((alku, loppu) => sb.from("celebrities").select("id").eq("suomalainen", true).order("id").range(alku, loppu)),
+    kaikki((alku, loppu) =>
+      sb.from("kumpi_visakysymykset")
+        .select("id, teemat, kysymys, oikea, vaara, oikea_fakta, vaara_fakta, vaikeus, questions!inner(quizzes!inner(status))")
+        .in("status", tilat).order("id").range(alku, loppu)),
   ]);
   return rakennaKumpiData({
     entities, defs, blocks, relaatiot,
     legendat: [...new Set(faktat.map((f: any) => f.entity_id as string))],
     suomalaiset: julkkikset.map((c: any) => c.id as string),
     tanaan: helsinginPaiva().iso,
+    visat,
   });
 }
 /* eslint-enable @typescript-eslint/no-explicit-any */

@@ -8,7 +8,7 @@ import {
   KIEKKO_JAKAUMA, KIEKKO_LUOKKA, KP_ATTR, MV_ATTR, RYHMAN_MAKSIMI, RYHMAN_OLETUSMAKSIMI, mikaTahansaTeema, onKiekko,
   type KiekkoLuokka, type Teema,
 } from "./teemat";
-import type { KDef, KEnt, KumpiData, KumpiKysymys, Vaikeus, Vaihtoehto } from "./tyypit";
+import type { KDef, KEnt, KVisa, KumpiData, KumpiKysymys, Vaikeus, Vaihtoehto } from "./tyypit";
 
 const VUOSI_S = 365.25 * 86400;
 
@@ -456,16 +456,94 @@ export function teeKysymys(ctx: Konteksti, tavoite: Vaikeus, jakso: Jakso, speci
 export const KIERROS_KAAVA: Vaikeus[] = ["helppo", "helppo", "helppo", "helppo", "keski", "keski", "keski", "keski", "vaikea", "vaikea"];
 
 export function teeKierros(data: KumpiData, teema: Teema, siemen: string): KumpiKysymys[] {
-  if (teema.osat) return teeSekoitusKierros(data, teema, siemen);
-  const ctx = uusiKonteksti(data, teema, siemen);
-  const specit = teemanSpecit(ctx);
-  const jakso = uusiJakso();
-  const out: KumpiKysymys[] = [];
-  for (const t of KIERROS_KAAVA) {
-    const q = teeKysymys(ctx, t, jakso, specit);
-    if (q) out.push(q);
+  return teeJakso(uusiKierrosTila(data, teema, siemen));
+}
+
+/* ─── Kierroksen tila: perus- tai yhdistelmäteema + visakysymykset ─── */
+
+export type KierrosTila = {
+  teema: Teema;
+  perus: { ctx: Konteksti; specit: Spec[] } | null;
+  sek: Sekoitus | null;
+  visat: KVisa[];
+  visaRng: Rng;
+  visaKaytetyt: Set<string>;
+};
+
+export function uusiKierrosTila(data: KumpiData, teema: Teema, siemen: string): KierrosTila {
+  let perus: KierrosTila["perus"] = null;
+  if (!teema.osat) {
+    const ctx = uusiKonteksti(data, teema, siemen);
+    perus = { ctx, specit: teemanSpecit(ctx) };
   }
+  return {
+    teema, perus, sek: teema.osat ? uusiSekoitus(data, teema, siemen) : null,
+    visat: teemanVisat(data, teema), visaRng: siemenRng(`${siemen}-visa`), visaKaytetyt: new Set(),
+  };
+}
+
+/** Yksi kymmenen kysymyksen jakso (kierros). Visakysymyksiä enintään 3 (Heikki 20.11.2026) ennalta arvotuissa
+ *  paikoissa; ensimmäinen kysymys on aina vertailu. Jos visakysymystä ei löydy, paikalle tulee vertailu. */
+export function teeJakso(tila: KierrosTila): KumpiKysymys[] {
+  const jakso = uusiJakso(tila.sek ? 1 : 2);
+  tila.sek?.ryhmaMaara.clear();
+  const vapaat = tila.visat.filter((v) => !tila.visaKaytetyt.has(v.id)).length;
+  const paikat = visaPaikat(vapaat, tila.visaRng);
+  const out: KumpiKysymys[] = [];
+  KIERROS_KAAVA.forEach((t, i) => {
+    if (paikat.has(i)) {
+      const v = teeVisaKysymys(tila, t);
+      if (v) { out.push(v); return; }
+    }
+    const q = tila.sek ? teeSekoitusKysymys(tila.sek, t, jakso) : tila.perus ? teeKysymys(tila.perus.ctx, t, jakso, tila.perus.specit) : null;
+    if (q) out.push(q);
+  });
   return out;
+}
+
+/* ─── Visakysymykset (kumpi_visakysymykset) ────────────────────────── */
+
+export const VISA_MAX = 3;
+
+/** Teeman visakysymykset. Yleistieto: kaikki paitsi pelkästään seurakohtaiset; muut: oma slug teemat-listassa. */
+export function teemanVisat(data: KumpiData, teema: Teema): KVisa[] {
+  if (teema.slug === "yleistieto") return data.visat.filter((v) => v.teemat.some((t) => !t.startsWith("seura-")));
+  return data.visat.filter((v) => v.teemat.includes(teema.slug));
+}
+
+/** Visakysymysten paikat (0-pohjainen): 3 kappaletta, kun niitä on runsaasti, muuten vähemmän; tasaisesti kierrokselle. */
+function visaPaikat(vapaat: number, rng: Rng): Set<number> {
+  const k = Math.min(VISA_MAX, vapaat >= 15 ? 3 : vapaat >= 6 ? 2 : vapaat >= 2 ? 1 : 0);
+  const alueet = k === 3 ? [[1, 3], [4, 6], [7, 9]] : k === 2 ? [[2, 4], [6, 8]] : k === 1 ? [[3, 7]] : [];
+  return new Set(alueet.map(([a, b]) => a + Math.floor(rng() * (b - a + 1))));
+}
+
+function teeVisaKysymys(tila: KierrosTila, tavoite: Vaikeus): KumpiKysymys | null {
+  const vapaat = tila.visat.filter((v) => !tila.visaKaytetyt.has(v.id));
+  if (!vapaat.length) return null;
+  const sopivat = vapaat.filter((v) => v.vaikeus === tavoite);
+  const lista = sopivat.length ? sopivat : vapaat;
+  const v = lista[Math.floor(tila.visaRng() * lista.length)];
+  tila.visaKaytetyt.add(v.id);
+  const oikeaEnsin = tila.visaRng() < 0.5;
+  const o: Vaihtoehto = { id: `${v.id}-o`, nimi: v.oikea, lyhyt: v.oikea, kuva: null, arvo: v.oikeaFakta ?? "" };
+  const w: Vaihtoehto = { id: `${v.id}-v`, nimi: v.vaara, lyhyt: v.vaara, kuva: null, arvo: v.vaaraFakta ?? "" };
+  const osat = jaaKysymys(v.kysymys);
+  const lause = kokoLause(osat);
+  return {
+    pari: `visa|${v.id}`,
+    attr: "visa",
+    teema: tila.teema.slug,
+    osat,
+    lause,
+    listalause: listalause(lause, oikeaEnsin ? v.oikea : v.vaara, oikeaEnsin ? v.vaara : v.oikea),
+    vaihtoehdot: oikeaEnsin ? [o, w] : [w, o],
+    oikea: oikeaEnsin ? 0 : 1,
+    kaanteinen: false,
+    vaikeus: v.vaikeus,
+    arvoTyyppi: "lause",
+    fakta: v.oikeaFakta ? `${v.oikea}: ${v.oikeaFakta}.` : `Oikea vastaus on ${v.oikea}.`,
+  };
 }
 
 /** Putken vaikeus kysymysnumerolla (1-pohjainen): 1–5 helppo, 6–15 helppo/keski, 16–25 keski, 26– keski/vaikea. */
@@ -523,13 +601,3 @@ export function teeSekoitusKysymys(sek: Sekoitus, tavoite: Vaikeus, jakso: Jakso
   return null;
 }
 
-export function teeSekoitusKierros(data: KumpiData, teema: Teema, siemen: string): KumpiKysymys[] {
-  const sek = uusiSekoitus(data, teema, siemen);
-  const jakso = uusiJakso(1);
-  const out: KumpiKysymys[] = [];
-  for (const t of KIERROS_KAAVA) {
-    const q = teeSekoitusKysymys(sek, t, jakso);
-    if (q) out.push(q);
-  }
-  return out;
-}
