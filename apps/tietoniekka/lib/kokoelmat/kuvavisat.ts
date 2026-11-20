@@ -14,7 +14,7 @@ export const KUVAVISAT: Kokoelma = {
   eyebrow: "",
   title: "",
   highlight: "Kuvavisat",
-  ingress: "Liput, vaakunat, linnut, eläimet, kasvit, maalaukset, rakennukset ja henkilöt kuvasta.",
+  ingress: "Liput, eläimet, linnut ja kuuluisat henkilöt – kuinka hyvin tunnistat ne kuvista?",
   accent: kokoelmaKortti("kuvavisat")!.mastery.color,
   hero: { image: "/20/kuvavisat/hero.webp", focalX: 0.5, focalY: 0.5, alt: "Kuvavisojen kuvia: liput, linnut ja maalaukset" },
   cta: "arvo",

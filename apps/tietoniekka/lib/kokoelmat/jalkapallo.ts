@@ -13,7 +13,7 @@ export const JALKAPALLO: Kokoelma = {
   eyebrow: "",
   title: "",
   highlight: "Jalkapallo",
-  ingress: "Maajoukkueet, Valioliiga, Euroopan suurseurat, Mestarien liiga ja suomalaiset eurokentillä.",
+  ingress: "Huuhkajista Valioliigan suurseuroihin ja Mestarien liigaan – tunnetko joukkueet, tähdet ja mestarit?",
   accent: kokoelmaKortti("jalkapallo")!.mastery.color,
   hero: { image: JP_HERO.img, focalX: 0.5, focalY: 0.3, alt: "Espanja juhlii jalkapallon maailmanmestaruutta 2026" },
   cta: "suosituin",

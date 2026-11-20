@@ -35,7 +35,7 @@ export const HISTORIA: Kokoelma = {
   eyebrow: "",
   title: "",
   highlight: "Historia",
-  ingress: "Kivikaudesta 80-luvulle: Ruotsin vallan vuosisadat, autonomia, sodat ja jälleenrakennus.",
+  ingress: "Kivikaudesta itsenäisyyteen ja kasarin Suomeen – kuinka hyvin muistat historiamme käänteet?",
   accent: kokoelmaKortti("historia")!.mastery.color,
   hero: { image: "/20/historia/hero-aikajana.webp", focalX: 0.5, focalY: 0.4, alt: "Suomen historia kivikaudesta nykypäivään" },
   cta: "suosituin",

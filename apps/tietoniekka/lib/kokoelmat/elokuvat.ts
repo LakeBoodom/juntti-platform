@@ -12,7 +12,7 @@ export const ELOKUVAT: Kokoelma = {
   eyebrow: "",
   title: "",
   highlight: "Elokuvat",
-  ingress: "Hollywoodin hitit, kotimaiset suosikit ja klassikot Casablancasta Matrixiin.",
+  ingress: "Uunosta Barbieen, Casablancasta Tähtien sotaan – muistatko näiden elokuvien hahmot, tarinat ja tapahtumat?",
   accent: kokoelmaKortti("elokuvat")!.mastery.color,
   hero: { image: ELOKUVAT_HERO, focalX: 0.56, focalY: 0.32, alt: "Elokuvateatterin valkokangas ja punaiset istuimet" },
   cta: "suosituin",

@@ -16,7 +16,7 @@ export const VAALIT: Kokoelma = {
   eyebrow: "",
   title: "Vaalit ja ",
   highlight: "politiikka",
-  ingress: "Eduskuntavaalit, puoluejohtajat, pääministerit ja presidentit Ståhlbergista Stubbiin.",
+  ingress: "Eduskuntavaaleista puoluejohtajiin ja presidentteihin – kuinka hyvin tunnet Suomen politiikan käänteet?",
   accent: kokoelmaKortti("vaalit")!.mastery.color,
   hero: { image: "/20/vaalit/hero.webp", focalX: 0.5, focalY: 0.5, alt: "Eduskuntatalon pylväikkö ja portaat viistosti kuvattuna" },
   cta: "suosituin",
