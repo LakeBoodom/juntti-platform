@@ -9,3 +9,7 @@ where attr_key in (
   'liiga_assists', 'liiga_clubs', 'liiga_debut', 'liiga_games', 'liiga_gk_wins', 'liiga_seasons', 'liiga_shutouts',
   'nhl_assists', 'nhl_debut', 'nhl_draft_pick', 'nhl_games', 'nhl_gk_wins', 'nhl_shutouts', 'played_for_club'
 ) and enabled = false;
+
+-- Heikin lupa 20.11.2026 (2): Oma seura tarvitsee kaikki 17 Liiga-seuraa julkaistuina (pelaajien played_for-suhteet).
+-- Seurojen omat määrittelyt (titles, home_capacity …) pysyvät pois päältä; jalkapalloseurat (veikkausliiga) luonnoksina.
+update public.fact_entities set status = 'published' where kind = 'team' and status = 'draft' and group_key = 'liiga';

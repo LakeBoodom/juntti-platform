@@ -66,14 +66,6 @@ const nextConfig = {
       },
       /* 1.0 pelimuodot */
       { source: "/mega", destination: "/megavisat", permanent: true },
-      /* Kumpi? 2.0 (brief 20.11.2026): uudelleenohjaus vain tuotannossa, jotta esikatselussa peliä voi kokeilla.
-         Vaihe C (Heikin luvalla) poistaa nämä kaksi riviä. Alasivut ohjataan väliaikaisesti (307), ei pysyvästi. */
-      ...(process.env.VERCEL_ENV === "production"
-        ? [
-            { source: "/kumpi", destination: "/", permanent: true },
-            { source: "/kumpi/:polku*", destination: "/", permanent: false },
-          ]
-        : []),
       { source: "/jarjesta", destination: "/", permanent: true },
     ];
   },
