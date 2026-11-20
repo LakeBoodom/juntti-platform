@@ -4,7 +4,8 @@
 // 3 tarkistusta, vinkkinä vain väärien asemavälien määrä, 10 p / oikea väli, jokainen uusi yritys −10 p.
 //   - Päivän vuoro on kaikille sama (tasokohtainen) ja vaihtuu keskiyöllä; "Arvo uusi vuoro" antaa satunnaisen.
 //   - Vaikeustasot helppo, keski ja vaikea: asemia on aina kuusi, vaikeus tulee asemien tunnettuudesta.
-//   - Asemapalassa kunta vihjeenä, kun aseman nimi on eri kuin kunnan ("Pännäinen · Pedersöre").
+//   - Asemapalassa ei kuntavihjettä (Heikki 20.11.2026: hämäsi enemmän kuin auttoi). Aseman kunta on aineistossa
+//     (kartan alueet), ei palassa.
 // Tämä tiedosto kelpaa myös selaimeen. Reittiaineisto ja arvonta ovat palvelimella (lib/junankuljettaja/vuoro.ts).
 
 export const JK_SIVU = "/peli/junankuljettaja";

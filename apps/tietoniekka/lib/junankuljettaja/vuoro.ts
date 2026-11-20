@@ -28,12 +28,6 @@ const ALKUPAIVA = "2026-11-16";
 
 export type JkValinta = { reitti: Reitti; valitut: number[] };
 
-/** Kunta vihjeenä vain, kun aseman nimi ei kerro sitä ("Pännäinen · Pedersöre", ei "Hanko-Pohjoinen · Hanko"). */
-function vihje(a: Asema): string {
-  const kunta = a.kn.replace(/ kunta$/, "");
-  return a.n === kunta || a.n.startsWith(`${kunta} `) || a.n.startsWith(`${kunta}-`) ? "" : kunta;
-}
-
 /** Kuusi väliasemaa tasaisesti ketjun varrelta: ketju jaetaan kuuteen osaan ja jokaisesta otetaan yksi. */
 function poimi(reitti: Reitti, r: () => number): number[] {
   const n = reitti.asemat.length - 2;
@@ -97,7 +91,7 @@ export function valintaSiemenesta(siemen: string, taso: JkTaso): JkValinta {
 export function rakennaVuoro(v: JkValinta, siemen: string): KlReitti {
   const asemat = [0, ...v.valitut, v.reitti.asemat.length - 1].map((i) => v.reitti.asemat[i]);
   const { kartta, pisteet } = karttaPisteista(asemat.map((a) => a.p));
-  const ratkaisu: KlKunta[] = asemat.map((a, i) => ({ k: a.k, n: a.n, m: vihje(a), v: null, a: a.ku, ...pisteet[i] }));
+  const ratkaisu: KlKunta[] = asemat.map((a, i) => ({ k: a.k, n: a.n, m: "", v: null, a: a.ku, ...pisteet[i] }));
   const ids = asemat.map((a) => a.k);
   // Lähtöjärjestys: väliasemat sekaisin niin, että oikeita välejä on korkeintaan kaksi (kuten Kuntaliitoksessa).
   const r = satunnainen(`junankuljettaja:alku:${siemen}`);

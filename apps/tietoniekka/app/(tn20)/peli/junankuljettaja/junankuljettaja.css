@@ -92,13 +92,16 @@
     grid-template-areas: "paa reitti" "jako reitti" "yr reitti" "arvo reitti" "muut muut" "linkit linkit";
     grid-template-rows: auto auto auto 1fr auto auto; gap: 28px 56px; max-width: 1168px; padding: 48px 24px 72px;
   }
-  .tn20 .jk-tulos > .jk-tulos-paa { grid-area: paa; }
-  .tn20 .jk-tulos > .jk-reitti { grid-area: reitti; position: sticky; top: 16px; }
-  .tn20 .jk-tulos > .tn-jako { grid-area: jako; grid-column: auto; grid-row: auto; position: static; padding: 16px; }
-  .tn20 .jk-tulos > .jk-yr { grid-area: yr; }
-  .tn20 .jk-tulos > .jk-arvo { grid-area: arvo; align-self: start; }
-  .tn20 .jk-tulos > .pk-seuraava { grid-area: muut; }
-  .tn20 .jk-tulos > .pk-tulos-linkit { grid-area: linkit; }
+  .tn20 .pk-tulos.jk-tulos > .jk-tulos-paa { grid-area: paa; }
+  /* Ei stickyä: ruudukon solussa sticky rajautuu koko ruudukkoon ja kartta liukui Pelaa seuraavaksi -korttien päälle
+     (Heikki 20.11.2026, sama virhe kuin Kuntaliitoksessa 13.11.). Jakoalueen yleissääntö (pk-tulos > tn-jako: sarake 2,
+     rivi 1, sticky) kumotaan asettamalla rivi ja sarake nimetyllä alueella, ei auto-arvoilla. */
+  .tn20 .pk-tulos.jk-tulos > .jk-reitti { grid-area: reitti; }
+  .tn20 .pk-tulos.jk-tulos > .tn-jako { grid-area: jako; position: static; top: auto; padding: 16px; }
+  .tn20 .pk-tulos.jk-tulos > .jk-yr { grid-area: yr; }
+  .tn20 .pk-tulos.jk-tulos > .jk-arvo { grid-area: arvo; align-self: start; }
+  .tn20 .pk-tulos.jk-tulos > .pk-seuraava { grid-area: muut; }
+  .tn20 .pk-tulos.jk-tulos > .pk-tulos-linkit { grid-area: linkit; }
   .tn20 .jk-reitti .kl-kartta-alue { aspect-ratio: 640 / 620; max-height: calc(100svh - 160px); }
   .tn20 .jk-ketju li { font-size: 15px; padding: 6px 12px; }
 }

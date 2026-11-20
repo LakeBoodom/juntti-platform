@@ -90,7 +90,8 @@ const PELIT: Record<ReittipeliNimi, Peli> = {
     nimi: "Junankuljettaja", sivu: JK_SIVU, param: "taso", kaikki: "",
     tunnus: "asema", taulu: "junankuljettaja_pelit", kentta: "asemat",
     alueet: "asemat", alueiden: "kunnista", ketju: "Asemaketju",
-    rivitys: false, vihje: true, valitsin: "ei", luokka: "kl--juna",
+    /* Ei kuntavihjettä paloissa (Heikki 20.11.2026: hämää enemmän kuin auttaa). */
+    rivitys: false, vihje: false, valitsin: "ei", luokka: "kl--juna",
     info: ["Lähtö ja määränpää pysyvät paikallaan.", "Järjestä väliasemat.", "Raahaa tai napauta kahta asemaa, niin ne vaihtavat paikkaa."],
     pitkin: "asema kerrallaan", valitse: "", vali: ["asemaväli", "asemaväliä"], maali: "Määränpää",
   },
