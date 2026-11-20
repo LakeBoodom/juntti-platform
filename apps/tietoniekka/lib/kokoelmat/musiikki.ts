@@ -12,9 +12,9 @@ export const MUSIIKKI: Kokoelma = {
   slug: "musiikki",
   nimi: "Musiikki",
   eyebrow: "",
-  title: "Musiikki ja ",
-  highlight: "artistit",
-  ingress: "Suomirapin kingit, stadionien supertähdet ja biisit, jotka jäivät soimaan päähän.",
+  title: "",
+  highlight: "Musiikki",
+  ingress: "Suomipop, rock, iskelmä ja rap sekä maailman supertähdet ABBAsta Taylor Swiftiin.",
   accent: kokoelmaKortti("musiikki")!.mastery.color,
   /* Fokus Lauran ja Mikon kasvoissa (oikea kolmannes) — älä keskitä (CD 19.8.2026). */
   hero: { image: MUSIIKKI_HERO, focalX: 0.7, focalY: 0.4, alt: "Laura ja Mikko festareilla" },

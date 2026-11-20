@@ -23,9 +23,9 @@ export function juhlatKokoelma(kalenteri: Esiintyma[], nosto: Esiintyma | null):
     slug: "juhlat",
     nimi: "Juhlat ja pyhät",
     eyebrow: "",
-    title: "",
-    highlight: "Juhlat",
-    ingress: "Visat vuoden juhliin ja perinteisiin.",
+    title: "Juhlat ja ",
+    highlight: "pyhät",
+    ingress: "Joulusta pääsiäiseen ja vapusta halloweeniin: vuoden juhlat ja perinteet.",
     accent: kokoelmaKortti("juhlat")!.mastery.color,
     hero: nosto?.kuva
       ? { image: nosto.kuva, focalX: 0.5, focalY: 0.45, alt: nosto.nimi }
