@@ -15,14 +15,15 @@ import { KasvoketjuBanneri } from "@/components/tn20/EtusivunBannerit";
 import { JULKAISTUT, pakkaHref } from "@/lib/jarjesta/pakat";
 import { haeRunkoData } from "@/lib/kokoelmat/data";
 import { VAALIT, vaalitKohteet } from "@/lib/kokoelmat/vaalit";
-import { haeVaalitHub } from "@/lib/vaalit/data";
+import { VAALIPAIVA, haeVaalitHub } from "@/lib/vaalit/data";
 
 export const revalidate = 3600;
 
 const POLKU = "/kokoelma/vaalit";
 const OTSIKKO = "Vaalit ja politiikka – tietovisat ja pelit eduskunnasta | Tietoniekka";
-const KUVAUS =
-  "Tunnetko eduskunnan? Eduskuntavaalit, 13 vaalipiiriä, puoluejohtajat, pääministerit ja presidentit sekä Suomen politiikan historia visoina. Laskuri eduskuntavaaleihin 18.4.2027.";
+/* Hakukonekuvaus (Heikki 20.11.2026): sama linja kuin heron ingressi, ei kysymystä eikä vanhenevia lukuja;
+   vaalipäivä tulee VAALIPAIVA-vakiosta, joten se pysyy laskurin kanssa samana. */
+const KUVAUS = `Eduskuntavaalit, puoluejohtajat, pääministerit ja presidentit Ståhlbergista Stubbiin: Suomen politiikan visat ja pelit. Laskuri eduskuntavaaleihin ${VAALIPAIVA.d}.${VAALIPAIVA.m}.${VAALIPAIVA.y}.`;
 
 export async function generateMetadata(): Promise<Metadata> {
   return {
