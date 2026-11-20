@@ -64,3 +64,23 @@ tietoa saa luotettavasti.
 
 Taulukko per aineisto: rivejä tarkistettu / korjattu / poistettu, epävarmat tapaukset lähteineen. Ei kantamuutoksia
 `enabled`- eikä `status`-kenttiin.
+
+## 4. Visakysymykset Kumpi?-muodossa (pilotti, lisätty 20.11.2026)
+
+Taulussa `kumpi_visakysymykset` on 835 luonnosta (`status = draft`). Ne on muunnettu julkaistuista tietovisoista:
+jääkiekko (seurojen omat visat, SM-liiga, Leijonat, NHL), urheilu sekä suomalaisten henkilöiden ja politiikan visat.
+Kentät: `kysymys` (avainsana hakasulkeissa), `oikea`, `vaara` (uskottavin väärä vaihtoehto), `oikea_fakta` ja
+`vaara_fakta` (kortin arvorivi, ≤ 26 merkkiä), `vaikeus`, `teemat`, `question_id` (lähdekysymys).
+
+Tarkista ja korjaa suoraan riville (älä muuta `status`-kenttää):
+- **Suomen kieli:** lause on luonteva ja yksiselitteinen. Esimerkki korjattavasta: "Kumman Akilles kohtasi
+  [jääpallofinaaleissa] 2020 ja 2021?" → "Kumman joukkueen Akilles kohtasi …".
+- **Faktat:** `oikea_fakta` kertoo jotain, mitä kysymyksessä ei jo lue (ei "Valmentajapalkinto" palkintokysymyksessä).
+  `vaara_fakta` on muunnettu osin yleistiedosta: tarkista jokainen täytetty `vaara_fakta` lähteestä, ja tyhjennä se
+  (null), jos lähdettä ei löydy.
+- **Yksiselitteisyys:** väärä vaihtoehto on varmasti väärä (ei esim. myös oikein eri tulkinnalla).
+- Huono kysymys: aseta `status = 'hidden'` ja kirjoita syy kenttään `huomio`.
+
+**Havaittu virhe tuotannon visassa:** kysymys 586f68a0-e81c-46cd-a2cc-43137cc05193 väittää Tellervo Koiviston
+olleen SDP:n kansanedustaja 1972–1975. Tiettävästi hän oli Helsingin kaupunginvaltuutettu, ei kansanedustaja. Tarkista
+ja korjaa visa (ei ole mukana Kumpi?-kysymyksissä).
