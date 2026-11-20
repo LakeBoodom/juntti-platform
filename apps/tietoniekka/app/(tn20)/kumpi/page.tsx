@@ -1,6 +1,7 @@
 // KUMPI? 2.0 — pelimuodon hub /kumpi. Sama runko kuin Tupla tai kuitissa (Heikki 20.11.2026): HubHero (studiokuva +
 // nimi + intro), teemat jaettuina riveinä (kuva 96 × 72, lajimerkkinä ryhmä, yksi tietorivi), ohjeet suljettuina.
-// Ryhmäjärjestys (Heikki 20.11.): Suomi, Luonto, Urheilu, Jääkiekko, Maailma, Ihmiset — jääkiekko ei alussa.
+// Kokoelma (Heikki 20.11.): Yleistieto ensin, sitten Suomi, Luonto, Urheilu, Jääkiekko (Legendat, Liiga, Oma seura),
+// Maailma ja Ihmiset. Yleistieto, Urheilu ja Ihmiset ovat yhdistelmäteemoja (lib/kumpi/teemat.ts).
 // Jääkiekolla kolme riviä (Legendat, Liiga, Oma seura); 17 seuraa vain Oma seura -valinnasta. Hubiin otetaan teema
 // vain, jos siitä syntyy ≥ 30 kysymystä (lib/kumpi/sivu.ts). Päivän Kumpi? ja Putki tulevat vaiheessa 2.
 import type { Metadata } from "next";
@@ -21,7 +22,7 @@ export const revalidate = 3600;
 
 const KOROSTUS = "Kaksi vaihtoehtoa, vain toinen on oikein.";
 const INTRO =
-  "Kumpi kaupunki on vanhempi, kumpi järvi suurempi, kumpi pelasi enemmän Liiga-otteluita? Valitse teema ja pelaa kymmenen kysymyksen kierros. Jääkiekosta voit valita myös oman seurasi.";
+  "Kumpi kaupunki on vanhempi, kumpi järvi suurempi, kumpi pelasi enemmän Liiga-otteluita? Pelaa kymmenen kysymyksen kierros kaikista aiheista tai valitse oma teemasi. Jääkiekosta voit valita myös oman seurasi.";
 
 export const metadata: Metadata = {
   title: "Kumpi? – kaksi vaihtoehtoa, vain toinen on oikein",
@@ -58,27 +59,30 @@ export default async function KumpiHub() {
           />
           <ul className="sk-rivi sk-rivi--hub" aria-label="Teemat">
             {RYHMAT.flatMap((r) => {
-              const rivit = hub.teemat
-                .filter((t) => t.teema.ryhma === r.avain)
+              const ryhmanTeemat = hub.teemat.filter((t) => t.teema.ryhma === r.avain);
+              const omaSeura = r.avain === "jaakiekko" && hub.seurat.length > 0;
+              // Lajimerkki vain ryhmissä, joissa on useampi rivi (Jääkiekko); muuten se toistaisi nimen.
+              const merkki = ryhmanTeemat.length + (omaSeura ? 1 : 0) > 1 ? r.nimi : undefined;
+              const rivit = ryhmanTeemat
                 .map((t, i) => {
                   const k: RiviKortti = {
                     href: `/kumpi/${t.teema.slug}`,
                     kuva: RIVIKUVAT[t.teema.slug] ?? null,
                     kuvaton: t.teema.nimi,
-                    merkki: r.nimi,
+                    merkki,
                     nimi: t.teema.nimi,
                     rivi: t.rivi,
                   };
                   return (
                     <li key={t.teema.slug} className="sk-li">
-                      <RiviLinkki k={k} eager={r.avain === "suomi" && i < 2} />
+                      <RiviLinkki k={k} eager={(r.avain === "yleistieto" || r.avain === "suomi") && i < 2} />
                     </li>
                   );
                 });
-              if (r.avain === "jaakiekko" && hub.seurat.length > 0) {
+              if (omaSeura) {
                 rivit.push(
                   <li key="oma-seura" className="sk-li">
-                    <OmaSeura seurat={hub.seurat} kuva={RIVIKUVAT["oma-seura"]} merkki={r.nimi} />
+                    <OmaSeura seurat={hub.seurat} kuva={RIVIKUVAT["oma-seura"]} merkki={merkki} />
                   </li>,
                 );
               }

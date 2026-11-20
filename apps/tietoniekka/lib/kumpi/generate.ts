@@ -5,7 +5,7 @@
 import { siemen as siemenRng } from "@/lib/jarjesta/siemen";
 import { mittaritSopivat } from "@/lib/vertailu";
 import {
-  KIEKKO_JAKAUMA, KIEKKO_LUOKKA, KP_ATTR, MV_ATTR, onKiekko,
+  KIEKKO_JAKAUMA, KIEKKO_LUOKKA, KP_ATTR, MV_ATTR, RYHMAN_MAKSIMI, RYHMAN_OLETUSMAKSIMI, mikaTahansaTeema, onKiekko,
   type KiekkoLuokka, type Teema,
 } from "./teemat";
 import type { KDef, KEnt, KumpiData, KumpiKysymys, Vaikeus, Vaihtoehto } from "./tyypit";
@@ -212,11 +212,13 @@ export type Jakso = {
   /** Edellisen kysymyksen attribuutti ja montako kertaa se on tullut peräkkäin: enintään kaksi samaa peräkkäin. */
   edellinen: string | null;
   perakkain: number;
+  /** Montako samaa attribuuttia saa tulla peräkkäin: 2 perusteemoissa, 1 yhdistelmissä (Yleistieto). */
+  maxPerakkain: number;
   attrMaara: Map<string, number>;
   henkiloMaara: Map<string, number>;
   luokkaMaara: Map<KiekkoLuokka, number>;
 };
-export const uusiJakso = (): Jakso => ({ edellinen: null, perakkain: 0, attrMaara: new Map(), henkiloMaara: new Map(), luokkaMaara: new Map() });
+export const uusiJakso = (maxPerakkain = 2): Jakso => ({ edellinen: null, perakkain: 0, maxPerakkain, attrMaara: new Map(), henkiloMaara: new Map(), luokkaMaara: new Map() });
 
 export type Konteksti = {
   data: KumpiData;
@@ -344,8 +346,13 @@ function rakenna(ctx: Konteksti, s: Spec, def: KDef, a: KEnt, b: KEnt, vaikeus: 
     bArvo = nayttoarvo(b, s);
   }
 
+  // Vastakkainen suunta puolessa kysymyksistä (Heikki 20.11.2026): "Kumpi on pienempi?" → oikea on pienempi.
+  // Faktalause pysyy luonnollisessa suunnassa (w = määrittelyn voittaja), koska pohjat on kirjoitettu niin.
+  const kaanteinen = def.mode === "numeric" && !!def.kaanteinen && ctx.rng() < 0.5;
+  const oikeaA = kaanteinen ? !aVoittaa : aVoittaa;
+
   // Kysymyslause: paikkamerkit ensin, sitten seurakohtaisille seuran inessiivi ("… Tapparassa?").
-  let lause = def.kysymys.replaceAll("{x_inessive}", ines).replaceAll("{x}", x);
+  let lause = (kaanteinen ? def.kaanteinen! : def.kysymys).replaceAll("{x_inessive}", ines).replaceAll("{x}", x);
   if (s.seura) {
     // Seura kertoo jo sarjan: "[Liiga-otteluita]" → "[otteluita] Tapparassa" (lyhyempi, mahtuu korttisääntöön).
     lause = lause.replace(/\[Liiga-/, "[");
@@ -371,7 +378,8 @@ function rakenna(ctx: Konteksti, s: Spec, def: KDef, a: KEnt, b: KEnt, vaikeus: 
     lause: kokoLause(osat),
     listalause: listalause(kokoLause(osat), la, lb),
     vaihtoehdot: [vaihtoehto(a, la, aArvo), vaihtoehto(b, lb, bArvo)],
-    oikea: aVoittaa ? 0 : 1,
+    oikea: oikeaA ? 0 : 1,
+    kaanteinen,
     vaikeus,
     arvoTyyppi: def.mode === "numeric" ? "luku" : "lause",
     fakta: fakta(def, s, w, l, aVoittaa ? aArvo : bArvo, aVoittaa ? bArvo : aArvo, ines || x),
@@ -409,7 +417,7 @@ export function teeKysymys(ctx: Konteksti, tavoite: Vaikeus, jakso: Jakso, speci
   };
   const ehdokkaat = specit.filter(sallittu);
   // Testipalaute 20.11.: "ei koskaan peräkkäin" teki kahden attribuutin teemoista tasaisen vuorottelun → enintään 2 peräkkäin.
-  const eriKuinEdellinen = (s: Spec) => s.key !== jakso.edellinen || jakso.perakkain < 2;
+  const eriKuinEdellinen = (s: Spec) => s.key !== jakso.edellinen || jakso.perakkain < jakso.maxPerakkain;
   const vaihtelevat = ehdokkaat.some(eriKuinEdellinen) ? ehdokkaat.filter(eriKuinEdellinen) : ehdokkaat;
   const ensisijaiset = kiekko ? vaihtelevat.filter(luokkaVapaa) : vaihtelevat;
 
@@ -448,6 +456,7 @@ export function teeKysymys(ctx: Konteksti, tavoite: Vaikeus, jakso: Jakso, speci
 export const KIERROS_KAAVA: Vaikeus[] = ["helppo", "helppo", "helppo", "helppo", "keski", "keski", "keski", "keski", "vaikea", "vaikea"];
 
 export function teeKierros(data: KumpiData, teema: Teema, siemen: string): KumpiKysymys[] {
+  if (teema.osat) return teeSekoitusKierros(data, teema, siemen);
   const ctx = uusiKonteksti(data, teema, siemen);
   const specit = teemanSpecit(ctx);
   const jakso = uusiJakso();
@@ -465,4 +474,62 @@ export function putkenVaikeus(n: number, rng: Rng): Vaikeus {
   if (n <= 15) return rng() < 0.5 ? "helppo" : "keski";
   if (n <= 25) return "keski";
   return rng() < 0.5 ? "keski" : "vaikea";
+}
+
+/* ─── Yhdistelmäteemat (Yleistieto, Ihmiset, Urheilu) ──────────────── */
+
+export type Sekoitus = {
+  osat: Array<{ ctx: Konteksti; specit: Spec[]; paino: number }>;
+  rng: Rng;
+  /** Montako kysymystä kustakin ryhmästä tässä jaksossa. */
+  ryhmaMaara: Map<string, number>;
+};
+
+export function uusiSekoitus(data: KumpiData, teema: Teema, siemen: string): Sekoitus {
+  const osat = (teema.osat ?? [])
+    .map((slug) => mikaTahansaTeema(slug))
+    .filter((t): t is Teema => !!t && !t.osat)
+    .map((t) => {
+      const ctx = uusiKonteksti(data, t, `${siemen}-${t.slug}`);
+      const specit = teemanSpecit(ctx);
+      // Tasapaino osien välillä (Ihmiset: tunnetut suomalaiset ja politiikka puoliksi), ei attribuuttien määrän mukaan.
+      return { ctx, specit, paino: 1 };
+    })
+    .filter((o) => o.specit.length > 0);
+  return { osat, rng: siemenRng(`${siemen}-sekoitus`), ryhmaMaara: new Map() };
+}
+
+/**
+ * Yksi kysymys yhdistelmästä. Monta ryhmää (Yleistieto): ensin arvotaan ryhmä tasaisesti niistä, joiden kiintiö ei ole
+ * täynnä (jääkiekko ≤ 2, muut ≤ 3 jaksossa), sitten ryhmän teema tasaisesti. Yksi ryhmä (Ihmiset, Urheilu): osat
+ * tasaisesti. Jakso on yhteinen, joten attribuutti- ja henkilörajat pätevät koko kierrokseen, eikä sama
+ * kysymystyyppi tule peräkkäin.
+ */
+export function teeSekoitusKysymys(sek: Sekoitus, tavoite: Vaikeus, jakso: Jakso): KumpiKysymys | null {
+  const ryhmat = [...new Set(sek.osat.map((o) => o.ctx.teema.ryhma))];
+  const monta = ryhmat.length > 1;
+  const vapaa = (r: string) => !monta || (sek.ryhmaMaara.get(r) ?? 0) < (RYHMAN_MAKSIMI[r as Teema["ryhma"]] ?? RYHMAN_OLETUSMAKSIMI);
+  const ryhmaJarj = painotettuJarjestys(ryhmat.filter(vapaa).map((r) => ({ r, paino: 1 })), sek.rng).map((x) => x.r);
+  for (const r of ryhmaJarj) {
+    const osat = painotettuJarjestys(sek.osat.filter((o) => o.ctx.teema.ryhma === r), sek.rng);
+    for (const o of osat) {
+      const q = teeKysymys(o.ctx, tavoite, jakso, o.specit);
+      if (q) {
+        sek.ryhmaMaara.set(r, (sek.ryhmaMaara.get(r) ?? 0) + 1);
+        return q;
+      }
+    }
+  }
+  return null;
+}
+
+export function teeSekoitusKierros(data: KumpiData, teema: Teema, siemen: string): KumpiKysymys[] {
+  const sek = uusiSekoitus(data, teema, siemen);
+  const jakso = uusiJakso(1);
+  const out: KumpiKysymys[] = [];
+  for (const t of KIERROS_KAAVA) {
+    const q = teeSekoitusKysymys(sek, t, jakso);
+    if (q) out.push(q);
+  }
+  return out;
 }

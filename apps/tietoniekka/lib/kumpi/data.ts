@@ -140,6 +140,7 @@ export function rakennaKumpiData(r: {
       gapMode: x.gap_mode === "absolute" ? "absolute" : "relative",
       gapDivisor: x.gap_divisor == null ? 1 : Number(x.gap_divisor),
       kysymys: x.kumpi_kysymys,
+      kaanteinen: x.kumpi_kysymys_kaanteinen ?? null,
       factTemplate: x.fact_template ?? null,
       enabled: !!x.enabled,
     };

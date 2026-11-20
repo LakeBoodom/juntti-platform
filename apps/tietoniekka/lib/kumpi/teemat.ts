@@ -15,10 +15,11 @@ export const SUOMEN_VEDET = new Set([
   "Vantaanjoki", "Könkämäeno", "Aurajoki",
 ]);
 
-export type Ryhma = "jaakiekko" | "urheilu" | "suomi" | "luonto" | "maailma" | "ihmiset";
+export type Ryhma = "yleistieto" | "jaakiekko" | "urheilu" | "suomi" | "luonto" | "maailma" | "ihmiset";
 
 /** Hubin ryhmäjärjestys (Heikki 20.11.2026): jääkiekko ei alussa, jotta hubi ei näytä jääkiekkopeliltä. */
 export const RYHMAT: Array<{ avain: Ryhma; nimi: string }> = [
+  { avain: "yleistieto", nimi: "Yleistieto" },
   { avain: "suomi", nimi: "Suomi" },
   { avain: "luonto", nimi: "Luonto" },
   { avain: "urheilu", nimi: "Urheilu" },
@@ -28,17 +29,29 @@ export const RYHMAT: Array<{ avain: Ryhma; nimi: string }> = [
 ];
 
 /** Hubin rivikuvat (288 × 216, scripts/rivikuvat.py): sivuston omia kopioita, krediitit jo /kuvien-lahteet-sivulla. */
+/** Hubin rivin tietorivi (Heikki 20.11.2026: kirjoitetaan, kun kokoelma on vahvistettu). Mitä teemassa verrataan;
+ *  ei lukumääriä. */
+export const KUVAUKSET: Record<string, string> = {
+  yleistieto: "Kaikki aiheet sekaisin Suomesta luontoon, urheiluun ja politiikkaan",
+  suomi: "Kaupunkien ja maakuntien asukasluvut, iät ja pinta-alat",
+  luonto: "Järvet, joet, tunturit, kansallispuistot ja majakat",
+  urheilu: "Olympiavoittajat ja F1-mestarit",
+  "suomikiekon-legendat": "Stanley Cupit, MM-kullat ja NHL-urat",
+  liiga: "Ottelut, maalit, pisteet ja seurat",
+  maailma: "Maat, vuoret, järvet ja joet",
+  ihmiset: "Tunnetut suomalaiset, kansanedustajat ja pääministerit",
+};
+
 export const RIVIKUVAT: Record<string, string> = {
   suomi: "/20/rivi/tupla-suomen-kaupungit.webp",
   luonto: "/20/rivi/kumpi-jarvet.webp",
-  olympiavoittajat: "/20/rivi/kumpi-olympiavoittajat.webp",
-  f1: "/20/rivi/kumpi-f1.webp",
   "suomikiekon-legendat": "/20/rivi/kumpi-suomikiekon-legendat.webp",
   liiga: "/20/rivi/tupla-sm-liiga.webp",
   "oma-seura": "/20/rivi/kokoelma-jaakiekko.webp",
+  yleistieto: "/20/rivi/mega-suuri-mega-50.webp",
+  urheilu: "/20/rivi/kumpi-olympiavoittajat.webp",
+  ihmiset: "/20/rivi/kokoelma-tunnetut-henkilot.webp",
   maailma: "/20/rivi/kumpi-vuoret.webp",
-  "tunnetut-suomalaiset": "/20/rivi/kokoelma-tunnetut-henkilot.webp",
-  politiikka: "/20/rivi/kokoelma-vaalit.webp",
 };
 
 /** Jääkiekon jakauma kymmenen kysymyksen jaksossa (A2): 3 tilasto + 3 ura/seura + 2 saavutus + 2 tausta. */
@@ -86,6 +99,9 @@ export type Pooli =
   | { tapa: "suomalaiset" };
 
 export type Teema = {
+  /** Yhdistelmäteema (Yleistieto, Ihmiset, Urheilu): kysymykset arvotaan näistä perusteemoista (slugit), kukin oman
+   *  poolinsa säännöillä. pooli ja attrs eivät silloin ole käytössä. */
+  osat?: string[];
   /** Kuvat korteissa vain, jos teeman jokaisessa kysymyksessä on kuva (Heikki 20.11.2026: ei satunnaisesti).
    *  Yksikään nykyinen teema ei täytä ehtoa, joten kaikki ovat kuvattomia. */
   kuvat?: boolean;
@@ -98,7 +114,9 @@ export type Teema = {
   merkki?: string;
 };
 
-export const TEEMAT: Teema[] = [
+/** Perusteemat: yksi pooli ja omat attribuutit. Hubissa näkyvät Suomi, Luonto, Maailma, Legendat ja Liiga; muut ovat
+ *  yhdistelmäteemojen osia (Heikki 20.11.2026: kokoelma tiivistetään, jotta kierroksessa on vaihtelua). */
+export const PERUSTEEMAT: Teema[] = [
   {
     slug: "suomikiekon-legendat", nimi: "Suomikiekon legendat", ryhma: "jaakiekko", pooli: { tapa: "legendat" },
     // Järjestys ratkaisee vain hubin tietorivin (kolme ensimmäistä avainsanaa): legendoille ominaiset ensin.
@@ -129,6 +147,30 @@ export const TEEMAT: Teema[] = [
   { slug: "tunnetut-suomalaiset", nimi: "Tunnetut suomalaiset", ryhma: "ihmiset", pooli: { tapa: "suomalaiset" }, attrs: ["birth"] },
   { slug: "politiikka", nimi: "Politiikka", ryhma: "ihmiset", pooli: { tapa: "kind", kinds: ["person"] }, attrs: ["mp_first_year", "mp_years", "pm_days", "pm_start"] },
 ];
+
+
+const sekoitus = (slug: string, nimi: string, ryhma: Ryhma, osat: string[]): Teema => ({
+  slug, nimi, ryhma, osat, pooli: { tapa: "kind", kinds: [] }, attrs: [],
+});
+
+/** Yleistiedon osat: kaikki perusteemat. Jääkiekkoa enintään 2/10 ja kustakin muusta ryhmästä enintään 3/10. */
+export const YLEISTIETO_OSAT = ["suomi", "luonto", "maailma", "tunnetut-suomalaiset", "politiikka", "olympiavoittajat", "f1", "suomikiekon-legendat", "liiga"];
+
+/** Hubin seitsemän riviä (Heikki 20.11.2026) + Oma seura. Järjestys hubissa tulee RYHMAT-listasta. */
+export const TEEMAT: Teema[] = [
+  sekoitus("yleistieto", "Yleistieto", "yleistieto", YLEISTIETO_OSAT),
+  PERUSTEEMAT.find((t) => t.slug === "suomi")!,
+  PERUSTEEMAT.find((t) => t.slug === "luonto")!,
+  sekoitus("urheilu", "Urheilu", "urheilu", ["olympiavoittajat", "f1"]),
+  PERUSTEEMAT.find((t) => t.slug === "suomikiekon-legendat")!,
+  PERUSTEEMAT.find((t) => t.slug === "liiga")!,
+  PERUSTEEMAT.find((t) => t.slug === "maailma")!,
+  sekoitus("ihmiset", "Ihmiset", "ihmiset", ["tunnetut-suomalaiset", "politiikka"]),
+];
+
+/** Ryhmän enimmäismäärä yhdistelmäkierroksessa (Yleistieto). */
+export const RYHMAN_MAKSIMI: Partial<Record<Ryhma, number>> = { jaakiekko: 2 };
+export const RYHMAN_OLETUSMAKSIMI = 3;
 
 /** Liigaseurat (Oma seura -valinta ja /kumpi/seura/[seura]). Nimi = fact_attributes.scope ja fact_entities.name. */
 export const SEURAT: Array<{ slug: string; nimi: string }> = [
@@ -164,7 +206,14 @@ export function seuraTeema(slug: string): Teema | null {
   };
 }
 
+/** Hubin teema slugilla (sivut /kumpi/[teema]). */
 export const teemaSlugilla = (slug: string): Teema | null => TEEMAT.find((t) => t.slug === slug) ?? null;
+
+/** Mikä tahansa teema (myös yhdistelmän osa ja seura) slugilla: generaattori ja laatuportti. */
+export function mikaTahansaTeema(slug: string): Teema | null {
+  if (slug.startsWith("seura-")) return seuraTeema(slug.slice(6));
+  return TEEMAT.find((t) => t.slug === slug) ?? PERUSTEEMAT.find((t) => t.slug === slug) ?? null;
+}
 
 /** Kaikki pelattavat teemat (hubin teemat + seurat) laatuporttia varten. */
 export const KAIKKI_TEEMAT = (): Teema[] => [...TEEMAT, ...SEURAT.map((s) => seuraTeema(s.slug)!)];

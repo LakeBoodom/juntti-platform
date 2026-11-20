@@ -43,6 +43,8 @@ export type KDef = {
   gapDivisor: number;
   /** fact_attribute_defs.kumpi_kysymys: avainsana hakasulkeissa. */
   kysymys: string;
+  /** Vastakkainen muoto ("Kumpi on pienempi?"), kumpi_kysymys_kaanteinen. null = vain perussuunta. */
+  kaanteinen: string | null;
   factTemplate: string | null;
   enabled: boolean;
 };
@@ -81,6 +83,8 @@ export type KumpiKysymys = {
   listalause: string;
   vaihtoehdot: [Vaihtoehto, Vaihtoehto];
   oikea: 0 | 1;
+  /** true = kysytty vastakkaiseen suuntaan (oikea vastaus on määrittelyn "häviäjä"). */
+  kaanteinen: boolean;
   vaikeus: Vaikeus;
   /** "luku" = arvorivi 30 px yhdellä rivillä; "lause" = flag/seura-lause, sovitetaan ja saa rivittyä. */
   arvoTyyppi: "luku" | "lause";

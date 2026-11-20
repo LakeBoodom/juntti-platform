@@ -12400,6 +12400,7 @@ export type Database = {
           kind: string
           kinds: string[] | null
           kumpi_kysymys: string | null
+          kumpi_kysymys_kaanteinen: string | null
           max_domain_distance: number
           max_gap: number | null
           mid_gap: number | null
@@ -12425,6 +12426,7 @@ export type Database = {
           kind: string
           kinds?: string[] | null
           kumpi_kysymys?: string | null
+          kumpi_kysymys_kaanteinen?: string | null
           max_domain_distance?: number
           max_gap?: number | null
           mid_gap?: number | null
@@ -12450,6 +12452,7 @@ export type Database = {
           kind?: string
           kinds?: string[] | null
           kumpi_kysymys?: string | null
+          kumpi_kysymys_kaanteinen?: string | null
           max_domain_distance?: number
           max_gap?: number | null
           mid_gap?: number | null

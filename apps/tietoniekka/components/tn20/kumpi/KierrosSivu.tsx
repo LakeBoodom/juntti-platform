@@ -11,7 +11,7 @@ import KumpiKierros from "./KumpiKierros";
 import "./kumpi.css";
 
 /** Teeman kotikokoelma "Pelaa seuraavaksi" -valintaan: saman aiheen pelit ensin. */
-const KOTI: Record<Teema["ryhma"], string> = {
+const KOTI: Partial<Record<Teema["ryhma"], string>> = {
   jaakiekko: "jaakiekko", urheilu: "urheilu", suomi: "kaupungit", luonto: "luonto", maailma: "matkakohteet", ihmiset: "tunnetut-henkilot",
 };
 

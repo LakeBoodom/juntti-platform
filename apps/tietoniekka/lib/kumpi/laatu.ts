@@ -1,8 +1,8 @@
 // KUMPI? 2.0 — laatuportti (brief A5). Puhdas: data → raportti. Ajetaan skriptillä scripts/kumpi-laatu.ts ja
 // esikatselun rajapinnassa /api/kumpi/laatu (palvelimella service role -datalla; tuotannossa 404).
 
-import { FLAG_VUODET, KIERROS_KAAVA, teeKysymys, teemanPooli, uusiJakso, uusiKonteksti, teemanSpecit } from "./generate";
-import { KAIKKI_TEEMAT, KP_ATTR, MV_ATTR, type Teema } from "./teemat";
+import { FLAG_VUODET, KIERROS_KAAVA, teeKysymys, teemanPooli, teeSekoitusKysymys, uusiJakso, uusiKonteksti, uusiSekoitus, teemanSpecit } from "./generate";
+import { KAIKKI_TEEMAT, KP_ATTR, MV_ATTR, RYHMAN_MAKSIMI, mikaTahansaTeema, type Teema } from "./teemat";
 import type { KEnt, KumpiData, KumpiKysymys } from "./tyypit";
 
 /** Kysymyksen enimmäispituus (merkkiä) ja nimen pisimmän sanan enimmäispituus korttisäännön rajoissa:
@@ -43,7 +43,9 @@ export function tarkistaKysymys(q: KumpiKysymys, data: KumpiData, teema: Teema, 
     else if (va === vb) v.push(`tasapeli (${nimi})`);
     else {
       const aVoittaa = def.winner === "low" ? va < vb : va > vb;
-      if ((aVoittaa ? 0 : 1) !== q.oikea) v.push(`väärä oikea vastaus (${nimi})`);
+      const aOikea = q.kaanteinen ? !aVoittaa : aVoittaa;
+      if ((aOikea ? 0 : 1) !== q.oikea) v.push(`väärä oikea vastaus (${nimi}${q.kaanteinen ? ", käänteinen" : ""})`);
+      if (q.kaanteinen && !def.kaanteinen) v.push(`käänteinen ilman käänteistä lausetta (${nimi})`);
     }
   }
   if (def.mode === "flag") {
@@ -75,29 +77,57 @@ export function tarkistaKysymys(q: KumpiKysymys, data: KumpiData, teema: Teema, 
 }
 
 /** Generoi teemasta enintään `n` kysymystä (kymmenen jaksoina, ei toistuvia pareja) ja tarkistaa ne. */
+/** Generoi teemasta enintään `n` kysymystä (kymmenen jaksoina, ei toistuvia pareja) ja tarkistaa ne.
+ *  Yhdistelmäteemassa (osat) kukin kysymys tarkistetaan oman perusteemansa säännöillä, ja jääkiekon kiintiö
+ *  (≤ 2/10 Yleistiedossa) tarkistetaan jaksoittain. */
 export function tarkistaTeema(data: KumpiData, teema: Teema, n = 500, siemen = "laatu"): { raportti: TeemaRaportti; kysymykset: KumpiKysymys[] } {
-  const ctx = uusiKonteksti(data, teema, `${siemen}-${teema.slug}`);
-  const specit = teemanSpecit(ctx);
   const ent = new Map(data.entities.map((e) => [e.id, e]));
   const kysymykset: KumpiKysymys[] = [];
+  const virheet: string[] = [];
   let tyhjat = 0;
-  while (kysymykset.length < n && tyhjat < 10) {
-    const jakso = uusiJakso();
-    let tassa = 0;
-    for (const t of KIERROS_KAAVA) {
-      const q = teeKysymys(ctx, t, jakso, specit);
-      if (q) { kysymykset.push(q); tassa++; }
+  let attribuutit: string[] = [];
+  let pooli = 0;
+  if (teema.osat) {
+    const sek = uusiSekoitus(data, teema, `${siemen}-${teema.slug}`);
+    attribuutit = sek.osat.flatMap((o) => o.specit.map((s) => `${o.ctx.teema.slug}:${s.avain}`));
+    pooli = sek.osat.reduce((x, o) => x + o.ctx.pohja.length, 0);
+    while (kysymykset.length < n && tyhjat < 10) {
+      const jakso = uusiJakso(1);
+      sek.ryhmaMaara.clear();
+      const tassa: KumpiKysymys[] = [];
+      for (const t of KIERROS_KAAVA) {
+        const q = teeSekoitusKysymys(sek, t, jakso);
+        if (q) tassa.push(q);
+      }
+      if (tassa.length < KIERROS_KAAVA.length) tyhjat++;
+      const ryhmia = new Set(tassa.map((q) => mikaTahansaTeema(q.teema)?.ryhma));
+      const kiekko = tassa.filter((q) => mikaTahansaTeema(q.teema)?.ryhma === "jaakiekko").length;
+      if (ryhmia.size > 1 && kiekko > (RYHMAN_MAKSIMI.jaakiekko ?? 99)) virheet.push(`jääkiekkoa ${kiekko}/10 jaksossa`);
+      kysymykset.push(...tassa);
     }
-    if (tassa < KIERROS_KAAVA.length) tyhjat++;
+  } else {
+    const ctx = uusiKonteksti(data, teema, `${siemen}-${teema.slug}`);
+    const specit = teemanSpecit(ctx);
+    attribuutit = specit.map((s) => s.avain);
+    pooli = teemanPooli(data, teema).length;
+    while (kysymykset.length < n && tyhjat < 10) {
+      const jakso = uusiJakso();
+      let tassa = 0;
+      for (const t of KIERROS_KAAVA) {
+        const q = teeKysymys(ctx, t, jakso, specit);
+        if (q) { kysymykset.push(q); tassa++; }
+      }
+      if (tassa < KIERROS_KAAVA.length) tyhjat++;
+    }
   }
-  const virheet = kysymykset.flatMap((q) => tarkistaKysymys(q, data, teema, ent));
+  for (const q of kysymykset) virheet.push(...tarkistaKysymys(q, data, mikaTahansaTeema(q.teema) ?? teema, ent));
   const vaikeudet: Record<string, number> = {};
   for (const q of kysymykset) vaikeudet[q.vaikeus] = (vaikeudet[q.vaikeus] ?? 0) + 1;
+  const kaanteisia = kysymykset.filter((q) => q.kaanteinen).length;
   return {
     raportti: {
-      slug: teema.slug, nimi: teema.nimi, pooli: teemanPooli(data, teema).length,
-      attribuutit: specit.map((s) => s.avain), kysymyksia: kysymykset.length, vaikeudet,
-      virheet: [...new Set(virheet)].slice(0, 30),
+      slug: teema.slug, nimi: teema.nimi, pooli, attribuutit, kysymyksia: kysymykset.length,
+      vaikeudet: { ...vaikeudet, kaanteisia }, virheet: [...new Set(virheet)].slice(0, 30),
     },
     kysymykset,
   };
