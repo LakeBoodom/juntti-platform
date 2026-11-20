@@ -8,7 +8,7 @@ import type { KEnt, KumpiData, KumpiKysymys } from "./tyypit";
 /** Kysymyksen enimmäispituus (merkkiä) ja nimen pisimmän sanan enimmäispituus korttisäännön rajoissa:
  *  kysymys mahtuu 26 px:iin neljälle riville @320. Nimen pisin sana (Kristiinankaupunki 18) mahtuu kuvattomaan korttiin
  *  @320 noin 18 px:llä; sovitus pienentää tarvittaessa alle 20 px:n (KumpiKierros), joten nimi ei koskaan leikkaudu. */
-export const MAX_KYSYMYS = 64;
+export const MAX_KYSYMYS = 66;
 export const MAX_SANA = 18;
 
 export type TeemaRaportti = {
@@ -109,7 +109,8 @@ export function laatuportti(data: KumpiData, n = 500) {
   // sitten täytetään. Näin otoksessa näkyvät myös harvinaiset tyypit (kyllä/ei, seurakysymys).
   const otos: KumpiKysymys[] = [];
   const nahty = new Set<string>();
-  const kaikki = teemat.flatMap((t, k) => t.kysymykset.map((q, j) => ({ q, jarj: j * 100 + ((k * 7) % 100) })));
+  // Järjestys: teemat vuorotellen ja jakson paikka kiertäen (teema k aloittaa paikasta 3k mod 10) → eri vaikeuksia.
+  const kaikki = teemat.flatMap((t, k) => t.kysymykset.map((q, j) => ({ q, jarj: (((j % 10) + 10 - ((k * 3) % 10)) % 10) * 100_000 + Math.floor(j / 10) * 100 + k })));
   kaikki.sort((a, b) => a.jarj - b.jarj);
   for (const { q } of kaikki) {
     if (otos.length >= 30) break;

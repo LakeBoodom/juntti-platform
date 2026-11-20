@@ -24,7 +24,8 @@ export function kirjaaVastaus(q: KumpiKysymys, pelitapa: Pelitapa, valinta: 0 | 
     const sb = getSupabase();
     if (!sb) return;
     // kumpi_vastaukset puuttuu generoiduista tyypeistä, kunnes packages/db/types.ts päivitetään.
-    void (sb as unknown as { from: (t: string) => { insert: (r: object) => Promise<unknown> } })
+    // Supabasen kysely lähtee vasta then-kutsusta (pelkkä void ei lähetä mitään).
+    (sb as unknown as { from: (t: string) => { insert: (r: object) => PromiseLike<unknown> } })
       .from("kumpi_vastaukset")
       .insert({
         pelitapa,
@@ -38,7 +39,8 @@ export function kirjaaVastaus(q: KumpiKysymys, pelitapa: Pelitapa, valinta: 0 | 
         vastausaika_ms: Math.max(0, Math.min(600000, Math.round(ms))),
         kysymys_nro: nro,
         session_id: istunto(),
-      });
+      })
+      .then(() => undefined, () => undefined);
   } catch {
     /* kirjaus ei saa estää peliä */
   }
