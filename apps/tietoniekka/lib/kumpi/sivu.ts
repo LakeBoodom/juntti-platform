@@ -22,14 +22,16 @@ export async function arvoKierros(teema: Teema, siemen: string): Promise<KumpiKy
   return k.length >= 10 ? k : null;
 }
 
-/** Teeman esimerkkiavainsanat hubin riville ("Liiga-otteluita · NHL-pisteitä · Stanley Cupin"). Datasta, ei käsin. */
-function avainsanat(data: KumpiData, teema: Teema): string {
+/** Hubin rivin tietorivi: teeman ensimmäinen kysymyslause kannasta ilman hakasulkeita ("Kumpi järvi on suurempi?").
+ *  Testipalaute 20.11.: pelkät avainsanat ("Suurempi · Korkeammalle") eivät kertoneet, mitä teemassa kysytään. */
+function esimerkkikysymys(data: KumpiData, teema: Teema): string {
   const ctx = uusiKonteksti(data, teema, "hubi");
-  const sanat = teemanSpecit(ctx)
-    .map((s) => jaaKysymys(data.defs[s.key].kysymys).avain)
-    .filter((a) => a && !a.includes("{"));
-  const rivi = [...new Set(sanat)].slice(0, 3).join(" · ");
-  return rivi.charAt(0).toUpperCase() + rivi.slice(1);
+  const lause = teemanSpecit(ctx)
+    .map((s) => data.defs[s.key].kysymys)
+    .find((k) => !k.includes("{"));
+  if (!lause) return "";
+  const o = jaaKysymys(lause);
+  return `${o.ennen}${o.avain}${o.jalkeen}`;
 }
 
 export type HubTeema = { teema: Teema; rivi: string };
@@ -44,7 +46,7 @@ export function hubinTeemat() {
     if (!data) return null;
     const kelpaa = (t: Teema) => tarkistaTeema(data, t, HUBIN_MINIMI, "hubi").raportti.kysymyksia >= HUBIN_MINIMI;
     return {
-      teemat: TEEMAT.filter(kelpaa).map((t) => ({ teema: t, rivi: avainsanat(data, t) })),
+      teemat: TEEMAT.filter(kelpaa).map((t) => ({ teema: t, rivi: esimerkkikysymys(data, t) })),
       seurat: SEURAT.filter((s) => kelpaa(seuraTeema(s.slug)!)),
     };
   })();

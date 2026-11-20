@@ -70,12 +70,24 @@ function arvo(e: KEnt, s: Spec): number | undefined {
 
 /* ─── Pooli ────────────────────────────────────────────────────────── */
 
+/**
+ * Suomikiekon legenda (testipalaute 20.11.2026: pelkät entity_facts-rivit päästivät mukaan nykypelaajia kuten
+ * Haapala ja Metsola). Pelkkä yksi MM- tai olympiakulta ei riitä (vuoden 2022 joukkueet). Legenda = Stanley Cup,
+ * vähintään 500 NHL-ottelua, 150 maaottelua tai 900 Liiga-ottelua. Raja-arvot ovat Heikin vahvistettavia.
+ */
+export function onLegenda(e: KEnt): boolean {
+  return (
+    e.v.has_stanley_cup === 1 || (e.v.stanley_cups ?? 0) > 0 ||
+    (e.v.nhl_games ?? 0) >= 500 || (e.v.nt_games ?? 0) >= 150 || (e.v.liiga_games ?? 0) >= 900
+  );
+}
+
 export function teemanPooli(data: KumpiData, teema: Teema): KEnt[] {
   const p = teema.pooli;
   return data.entities.filter((e) => {
     switch (p.tapa) {
       case "kind": return p.kinds.includes(e.kind);
-      case "legendat": return e.kind === "player" && e.legenda;
+      case "legendat": return e.kind === "player" && onLegenda(e);
       case "liiga": return e.kind === "player" && e.v.liiga_games !== undefined;
       case "seura": return e.kind === "player" && e.seurat.includes(p.seura);
       case "suomalaiset": return e.kind === "person" && e.suomalainen;
@@ -196,13 +208,14 @@ const pariAvain = (key: string, a: KEnt, b: KEnt) => `${key}|${[a.id, b.id].sort
 
 /** Jakson (10 kysymystä) monipuolisuustila. */
 export type Jakso = {
-  /** Edellisen kysymyksen attribuutti: samaa ei peräkkäin, jos muuta on tarjolla. */
+  /** Edellisen kysymyksen attribuutti ja montako kertaa se on tullut peräkkäin: enintään kaksi samaa peräkkäin. */
   edellinen: string | null;
+  perakkain: number;
   attrMaara: Map<string, number>;
   henkiloMaara: Map<string, number>;
   luokkaMaara: Map<KiekkoLuokka, number>;
 };
-export const uusiJakso = (): Jakso => ({ edellinen: null, attrMaara: new Map(), henkiloMaara: new Map(), luokkaMaara: new Map() });
+export const uusiJakso = (): Jakso => ({ edellinen: null, perakkain: 0, attrMaara: new Map(), henkiloMaara: new Map(), luokkaMaara: new Map() });
 
 export type Konteksti = {
   data: KumpiData;
@@ -365,6 +378,7 @@ function rakenna(ctx: Konteksti, s: Spec, def: KDef, a: KEnt, b: KEnt, vaikeus: 
 
 function kirjaa(ctx: Konteksti, jakso: Jakso, q: KumpiKysymys, a: KEnt, b: KEnt) {
   ctx.kaytetyt.add(q.pari);
+  jakso.perakkain = jakso.edellinen === q.attr ? jakso.perakkain + 1 : 1;
   jakso.edellinen = q.attr;
   jakso.attrMaara.set(q.attr, (jakso.attrMaara.get(q.attr) ?? 0) + 1);
   for (const e of [a, b]) jakso.henkiloMaara.set(e.ihminen, (jakso.henkiloMaara.get(e.ihminen) ?? 0) + 1);
@@ -392,7 +406,8 @@ export function teeKysymys(ctx: Konteksti, tavoite: Vaikeus, jakso: Jakso, speci
     return !l || (jakso.luokkaMaara.get(l) ?? 0) < KIEKKO_JAKAUMA[l];
   };
   const ehdokkaat = specit.filter(sallittu);
-  const eriKuinEdellinen = (s: Spec) => s.key !== jakso.edellinen;
+  // Testipalaute 20.11.: "ei koskaan peräkkäin" teki kahden attribuutin teemoista tasaisen vuorottelun → enintään 2 peräkkäin.
+  const eriKuinEdellinen = (s: Spec) => s.key !== jakso.edellinen || jakso.perakkain < 2;
   const vaihtelevat = ehdokkaat.some(eriKuinEdellinen) ? ehdokkaat.filter(eriKuinEdellinen) : ehdokkaat;
   const ensisijaiset = kiekko ? vaihtelevat.filter(luokkaVapaa) : vaihtelevat;
 

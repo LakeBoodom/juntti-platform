@@ -4,14 +4,36 @@
 
 export type Ryhma = "jaakiekko" | "urheilu" | "suomi" | "luonto" | "maailma" | "ihmiset";
 
+/** Hubin ryhmäjärjestys (Heikki 20.11.2026): jääkiekko ei alussa, jotta hubi ei näytä jääkiekkopeliltä. */
 export const RYHMAT: Array<{ avain: Ryhma; nimi: string }> = [
-  { avain: "jaakiekko", nimi: "Jääkiekko" },
-  { avain: "urheilu", nimi: "Urheilu" },
   { avain: "suomi", nimi: "Suomi" },
   { avain: "luonto", nimi: "Luonto" },
+  { avain: "urheilu", nimi: "Urheilu" },
+  { avain: "jaakiekko", nimi: "Jääkiekko" },
   { avain: "maailma", nimi: "Maailma" },
   { avain: "ihmiset", nimi: "Ihmiset" },
 ];
+
+/** Hubin rivikuvat (288 × 216, scripts/rivikuvat.py): sivuston omia kopioita, krediitit jo /kuvien-lahteet-sivulla. */
+export const RIVIKUVAT: Record<string, string> = {
+  kaupungit: "/20/rivi/tupla-suomen-kaupungit.webp",
+  maakunnat: "/20/rivi/kuvavisa-vaakunat.webp",
+  jarvet: "/20/rivi/kumpi-jarvet.webp",
+  joet: "/20/rivi/kumpi-joet.webp",
+  kansallispuistot: "/20/rivi/kumpi-kansallispuistot.webp",
+  majakat: "/20/rivi/kumpi-majakat.webp",
+  tunturit: "/20/rivi/kumpi-tunturit.webp",
+  olympiavoittajat: "/20/rivi/kumpi-olympiavoittajat.webp",
+  f1: "/20/rivi/kumpi-f1.webp",
+  jalkapallo: "/20/rivi/kumpi-jalkapallo.webp",
+  "suomikiekon-legendat": "/20/rivi/kumpi-suomikiekon-legendat.webp",
+  liiga: "/20/rivi/tupla-sm-liiga.webp",
+  "oma-seura": "/20/rivi/kokoelma-jaakiekko.webp",
+  maat: "/20/rivi/kuvavisa-liput.webp",
+  vuoret: "/20/rivi/kumpi-vuoret.webp",
+  "tunnetut-suomalaiset": "/20/rivi/kokoelma-tunnetut-henkilot.webp",
+  politiikka: "/20/rivi/kokoelma-vaalit.webp",
+};
 
 /** Jääkiekon jakauma kymmenen kysymyksen jaksossa (A2): 3 tilasto + 3 ura/seura + 2 saavutus + 2 tausta. */
 export type KiekkoLuokka = "tilasto" | "ura" | "saavutus" | "tausta";

@@ -8,7 +8,7 @@ import { plausible } from "@/lib/kumpi/kirjaus";
 
 const AVAIN = "kumpi_oma_seura";
 
-export default function OmaSeura({ seurat, kuva }: { seurat: Array<{ slug: string; nimi: string }>; kuva: string }) {
+export default function OmaSeura({ seurat, kuva, merkki }: { seurat: Array<{ slug: string; nimi: string }>; kuva: string; merkki?: string }) {
   const [auki, setAuki] = useState(false);
   const [oma, setOma] = useState<string | null>(null);
   const avaaja = useRef<HTMLAnchorElement>(null);
@@ -50,11 +50,14 @@ export default function OmaSeura({ seurat, kuva }: { seurat: Array<{ slug: strin
         aria-haspopup="dialog"
         onClick={(e) => { e.preventDefault(); setAuki(true); }}
       >
-        <span className="sk-kuva" data-sovitus="contain">
+        {/* Sama rivi kuin RiviLinkki (components/tn20/korttirivi/KorttiRivi.tsx). */}
+        <span className="sk-kuva">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={kuva} alt="" loading="lazy" decoding="async" width={320} height={200} />
+          {merkki ? <span className="sk-merkki sk-merkki--kuva">{merkki}</span> : null}
         </span>
         <span className="sk-teksti">
+          {merkki ? <span className="sk-merkki sk-merkki--rivi">{merkki}</span> : null}
           <span className="sk-nimi">Oma seura</span>
           <span className="sk-syy">{omaNimi ? `${omaNimi} →` : "Valitse seura"}</span>
           <span className="sk-cta">Valitse <span aria-hidden="true">→</span></span>

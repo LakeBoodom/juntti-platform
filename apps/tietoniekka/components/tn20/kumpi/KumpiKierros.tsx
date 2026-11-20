@@ -7,6 +7,7 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import Jakoalue from "@/components/tn20/jako/Jakoalue";
 import { SeuraavaPeli } from "@/components/tn20/pelikehys/PeliTulos";
+import PeliKehys from "@/components/tn20/pelikehys/PeliKehys";
 import type { Pelimuoto } from "@/lib/pelimuodot";
 import { jaaPeliTeksti, tulosjakoteksti } from "@/lib/korttinimi";
 import { kirjaaKierrosValmis, kirjaaVastaus, plausible, type Pelitapa } from "@/lib/kumpi/kirjaus";
@@ -153,7 +154,15 @@ export default function KumpiKierros({
   const juuri = useRef<HTMLDivElement>(null);
   const kysRef = useRef<HTMLParagraphElement>(null);
   const kortitRef = useRef<HTMLDivElement>(null);
+  // Sisääntuloanimaatio käynnistetään vasta ensimmäisessä ruudunpäivityksessä: taustavälilehdessä (ei rAF:ia) kysymys
+  // näkyy suoraan eikä jää animaation alkutilaan himmeäksi (testipalaute 20.11.2026, kohta 8).
+  const sisaanRef = useCallback((el: HTMLElement | null) => {
+    if (!el) return;
+    requestAnimationFrame(() => el.classList.add("kp-sisaan"));
+  }, []);
   const fokusKorteissa = useRef(false);
+  /** Paljastuksen hetki: sitä seuraava 400 ms:n napautus ei ohita (tuplanapautus, testipalaute 20.11.2026). */
+  const avattu = useRef(0);
 
   const q = kysymykset[Math.min(i, n - 1)];
   const valinta = valinnat[i] ?? null;
@@ -237,6 +246,7 @@ export default function KumpiKierros({
     uudet[i] = ix;
     setValinnat(uudet);
     setVaihe("auki");
+    avattu.current = performance.now();
     setIlmoitus(`${ix === q.oikea ? "Oikein." : "Väärin."} ${q.fakta}`);
     kirjaaVastaus(q, pelitapa, ix, performance.now() - alku.current, i + 1);
     if (ajastin.current) clearTimeout(ajastin.current);
@@ -263,12 +273,12 @@ export default function KumpiKierros({
     <div
       ref={juuri}
       className={juuriLuokka}
-      onClick={() => { if (vaihe === "auki") seuraava(); }}
+      onClick={() => { if (vaihe === "auki" && performance.now() - avattu.current > 400) seuraava(); }}
       onKeyDown={(e) => { if (vaihe === "auki" && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); seuraava(); } }}
     >
       <Palkki teema={teema.nimi} tila={`${i + 1}/${n}`} />
       <h1 className="kp-sr">Kumpi? – {teema.nimi}</h1>
-      <main id="main" className="kp-paa" key={i}>
+      <main id="main" className="kp-paa" key={i} ref={sisaanRef}>
         <div className="kp-pino">
           <KumpiMerkki className="kp-taustamerkki" />
           <p className="kp-kys" ref={kysRef}>
@@ -337,7 +347,8 @@ function Tulos({ kysymykset, valinnat, teema, siemen, polku, seuraavat }: {
   const nimi = `Kumpi? ${teema.nimi}`;
   const url = origin ? `${origin}${polku}?sarja=${encodeURIComponent(siemen)}&oikein=${oikein}` : null;
   return (
-    <div className="kp-peli kp-peli--tulos">
+    /* PeliKehys: pelikehyksen tyylit ja tumma iho "Pelaa seuraavaksi" -korteille (sama kuin muiden pelien tuloksissa). */
+    <PeliKehys iho="tumma" className="kp-peli kp-peli--tulos">
       <Palkki teema={teema.nimi} />
       <main id="main" className="kp-tulos">
         <h1 className="kp-tulos-h"><b>{oikein}/{n}</b> oikein</h1>
@@ -369,16 +380,17 @@ function Tulos({ kysymykset, valinnat, teema, siemen, polku, seuraavat }: {
             {kysymykset.map((q, j) => {
               const ok = osumat[j];
               const v = valinnat[j];
-              const oikeaNimi = q.vaihtoehdot[q.oikea].lyhyt;
+              const w = q.vaihtoehdot[q.oikea];
+              const l = q.vaihtoehdot[1 - q.oikea];
               return (
                 <li key={q.pari} className={ok ? "ok" : "ng"}>
                   <span className="kp-merkki" aria-hidden="true">{ok ? "✓" : "✗"}</span>
                   <span className="kp-sr">{ok ? "Oikein: " : "Väärin: "}</span>
                   <span className="kp-vastaus">
                     <b>{q.listalause}</b>
-                    <span>
-                      {ok || v === null ? oikeaNimi : <>Oikea: {oikeaNimi} · Valitsit: {q.vaihtoehdot[v].lyhyt}</>}
-                    </span>
+                    {/* Arvot (testipalaute 20.11.): oikea ensin. Väärästä vastauksesta myös oma valinta. */}
+                    <span>{w.lyhyt}: {w.arvo} · {l.lyhyt}: {l.arvo}</span>
+                    {!ok && v !== null ? <span>Valitsit: {q.vaihtoehdot[v].lyhyt}</span> : null}
                   </span>
                 </li>
               );
@@ -391,6 +403,6 @@ function Tulos({ kysymykset, valinnat, teema, siemen, polku, seuraavat }: {
         </nav>
         <SeuraavaPeli seuraavat={seuraavat} />
       </main>
-    </div>
+    </PeliKehys>
   );
 }
