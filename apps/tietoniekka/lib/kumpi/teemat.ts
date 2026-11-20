@@ -70,7 +70,8 @@ export type Teema = {
 export const TEEMAT: Teema[] = [
   {
     slug: "suomikiekon-legendat", nimi: "Suomikiekon legendat", ryhma: "jaakiekko", pooli: { tapa: "legendat" },
-    attrs: [...LIIGA_URA, "liiga_debut", "liiga_seasons", ...NHL, ...SAAVUTUS, "nt_games", "nt_points", ...TAUSTA],
+    // Järjestys ratkaisee vain hubin tietorivin (kolme ensimmäistä avainsanaa): legendoille ominaiset ensin.
+    attrs: [...new Set(["stanley_cups", "wc_golds", "nhl_points", ...SAAVUTUS, ...NHL, ...LIIGA_URA, "liiga_debut", "liiga_seasons", "nt_games", "nt_points", ...TAUSTA])],
   },
   {
     slug: "liiga", nimi: "Liiga", ryhma: "jaakiekko", pooli: { tapa: "liiga" },
