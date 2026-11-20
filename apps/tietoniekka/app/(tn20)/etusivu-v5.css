@@ -343,11 +343,6 @@
 .tn20 .tn-pk--kunta { background: radial-gradient(70% 110% at 100% 50%, #8FC9BF 0%, rgba(143,201,191,.35) 45%, transparent 75%), #F1ECE0; --pk: #2BA39A; }
 .tn20 .tn-pk--raja { background: radial-gradient(60% 70% at 20% 30%, #A9BFB4 0%, transparent 70%), radial-gradient(60% 80% at 85% 75%, #B9C2BC 0%, transparent 70%), #CDD5CC; --pk: #D99A1E; }
 .tn20 .tn-pk--vaali { background: linear-gradient(rgba(241,236,224,.82), rgba(241,236,224,.9)), url("/20/vaalit/vaalipiiriketju-600.webp") center / cover; --pk: #D9485F; }
-/* Junankuljettaja: kartan vaalea pohja ja junan navy-kaista alareunassa (CD kierros 1, hero). Palan tunnus = asemarengas. */
-.tn20 .tn-pk--juna { background: linear-gradient(transparent 78%, #0E3657 78%), radial-gradient(70% 110% at 0% 40%, #DCE6E8 0%, transparent 75%), #F4EFE4; --pk: #0E3657; }
-.tn20 .tn-pk-asema { display: block; flex: none; width: 16px; height: 16px; box-sizing: border-box; border-radius: 50%; border: 3.5px solid #0E3657; background: #fff; }
-.tn20 .tn-pk-pala[data-lukittu] .tn-pk-asema { border-color: #E8A320; background: #E8A320; }
-.tn20 .tn-pk-asema--pieni { width: 12px; height: 12px; border-width: 3px; }
 .tn20 .tn-pk-reitti { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; }
 .tn20 .tn-pk-ketju { display: flex; align-items: flex-start; }
 .tn20 .tn-pk-solmu { display: flex; flex-direction: column; align-items: center; gap: 4px; }
@@ -845,3 +840,61 @@
   .tn20 .tn-es5 * { transition: none !important; }
   .tn20 .tn-jb * { animation: none !important; }
 }
+
+/* ── Junankuljettaja-banneri (CD "Junankuljettaja, kierros 1", kohta 6, Heikki 20.11.2026) ──
+   Karttapelit-ryhmän viides kortti koko rivin levyisenä: mobiilissa pystykortti (kuva 204 px, teksti alla), ≥ 768 px
+   vaakabanneri (kuva oikealla 56 %, ≥ 1200 px 60 % ja korkeus 360). Kuvituksen mitat palan sivusta --t (kuva-alueen
+   kontista pk: cqh/cqw), joten sama rakenne käy joka kokoon. Koriste (aria-hidden), siksi pienet tekstit sallittuja. */
+.tn20 .tn-es-peli[data-leve] { grid-column: 1 / -1; background: #17140D; border-color: #2C2517; border-radius: 20px; }
+.tn20 .tn-es-peli[data-leve] .tn-es-peli-kuva { height: 204px; aspect-ratio: auto; }
+.tn20 .tn-es-peli[data-leve] .tn-es-peli-teksti { gap: 10px; padding: 22px 24px 26px; justify-content: center; }
+.tn20 .tn-es-peli[data-leve] .tn-es-laji { font-family: var(--rk-cond), "Barlow Condensed", sans-serif; font-size: 15px; letter-spacing: .16em; }
+.tn20 .tn-es-peli[data-leve] .tn-es-peli-h { font-size: min(27px, calc(100cqw / (var(--lw) * .64))); line-height: 1; }
+.tn20 .tn-es-peli[data-leve] .tn-es-peli-rivi { display: block; font-size: 17px; line-height: 1.4; color: #CFC7B6; }
+@media (min-width: 768px) {
+  .tn20 .tn-es-peli[data-leve] { display: flex; flex-direction: row-reverse; min-height: 300px; }
+  .tn20 .tn-es-peli[data-leve] .tn-es-peli-kuva { width: 56%; height: auto; }
+  .tn20 .tn-es-peli[data-leve] .tn-es-peli-teksti { flex: 1; padding: 28px 32px; }
+  .tn20 .tn-es-peli[data-leve] .tn-es-peli-rivi { font-size: 16px; }
+}
+@media (min-width: 1200px) {
+  .tn20 .tn-es-peli[data-leve] { min-height: 360px; }
+  .tn20 .tn-es-peli[data-leve] .tn-es-peli-kuva { width: 60%; }
+  .tn20 .tn-es-peli[data-leve] .tn-es-peli-teksti { gap: 16px; padding: 40px 48px; }
+  .tn20 .tn-es-peli[data-leve] .tn-es-laji { font-size: 17px; }
+  .tn20 .tn-es-peli[data-leve] .tn-es-peli-h { font-size: min(44px, calc(100cqw / (var(--lw) * .64))); }
+  .tn20 .tn-es-peli[data-leve] .tn-es-peli-rivi { font-size: 20px; }
+}
+.tn20 .tn-pk--jbn { --t: min(34cqh, 18.5cqw); --g: min(8cqh, 4.4cqw); background: linear-gradient(180deg, #FAF7F0, #EFE9DC); color: #0E3657; }
+.tn20 .tn-jbn-kaista { position: absolute; left: 0; right: 0; bottom: 0; height: 40%; overflow: hidden; background: #0E3657; }
+.tn20 .tn-pk .tn-jbn-kaista img { position: absolute; right: 0; bottom: 0; height: 100%; width: auto; aspect-ratio: 7 / 1; }
+.tn20 .tn-jbn-rivi { position: absolute; left: 0; right: 0; top: 19%; display: flex; justify-content: center; align-items: center; }
+.tn20 .tn-jbn-rivi s { flex: none; width: var(--g); height: max(2px, 1.2cqh); background: #0E3657; }
+.tn20 .tn-jbn-rivi s[data-katko] { background: repeating-linear-gradient(90deg, #0E3657 0 30%, transparent 30% 50%); }
+.tn20 .tn-jbn-p {
+  position: relative; flex: none; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: calc(var(--t) * .08);
+  width: var(--t); height: var(--t); box-sizing: border-box; border-radius: calc(var(--t) * .16); background: #fff;
+  box-shadow: 0 calc(var(--t) * .03) calc(var(--t) * .1) rgba(14, 54, 87, .18);
+  font-variation-settings: "wdth" 74; font-size: calc(var(--t) * .18); line-height: 1; white-space: nowrap;
+}
+.tn20 .tn-jbn-p[data-paa] { border: max(2px, calc(var(--t) * .03)) solid #0E3657; }
+.tn20 .tn-jbn-p[data-aukko] { background: #FAF7F0; border: max(2px, calc(var(--t) * .03)) dashed #0E3657; box-shadow: none; }
+.tn20 .tn-jbn-p b { font-size: calc(var(--t) * .42); font-weight: 900; }
+.tn20 .tn-jbn-p i { width: calc(var(--t) * .3); height: calc(var(--t) * .3); box-sizing: border-box; border-radius: 50%; border: calc(var(--t) * .065) solid #0E3657; background: #fff; }
+.tn20 .tn-jbn-p[data-paa] i { border: 0; background: #DDA53C; }
+.tn20 .tn-jbn-l {
+  position: absolute; bottom: calc(100% + var(--t) * .08); left: 50%; transform: translateX(-50%); white-space: nowrap;
+  padding: calc(var(--t) * .045) calc(var(--t) * .11); border-radius: calc(var(--t) * .07); background: #0E3657; color: #FAF7F0;
+  font-family: var(--tn-font-body, sans-serif); font-weight: 800; font-variation-settings: normal; font-size: calc(var(--t) * .16); letter-spacing: .1em; text-transform: uppercase;
+}
+.tn20 .tn-jbn-p:first-child .tn-jbn-l { left: 0; transform: none; }
+.tn20 .tn-jbn-p:last-child .tn-jbn-l { left: auto; right: 0; transform: none; }
+.tn20 .tn-jbn-irto {
+  position: absolute; top: 60%; display: flex; align-items: center; gap: calc(var(--t) * .1); height: calc(var(--t) * .5); box-sizing: border-box;
+  padding: 0 calc(var(--t) * .2) 0 calc(var(--t) * .14); border-radius: calc(var(--t) * .12); background: #fff; border: max(2px, calc(var(--t) * .03)) solid #0E3657;
+  box-shadow: 0 calc(var(--t) * .04) calc(var(--t) * .12) rgba(0, 0, 0, .3);
+  font-variation-settings: "wdth" 74; font-size: calc(var(--t) * .18); white-space: nowrap;
+}
+.tn20 .tn-jbn-irto i { width: calc(var(--t) * .2); height: calc(var(--t) * .2); box-sizing: border-box; border-radius: 50%; border: calc(var(--t) * .05) solid #0E3657; }
+.tn20 .tn-jbn-irto[data-n="a"] { left: 7%; transform: translateY(-55%) rotate(-5deg); }
+.tn20 .tn-jbn-irto[data-n="b"] { left: 34%; transform: translateY(-30%) rotate(3deg); }

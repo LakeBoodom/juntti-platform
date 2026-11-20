@@ -50,12 +50,10 @@ type Pala = { nimi: string; kuva: ReactNode; pieniKuva: ReactNode };
  *  Leveä koko C (CD desktop 31.10.): kuuden palan ketju — A/B:n Maali on C:ssä asetettu pala, perään toinen tyhjä
  *  paikka ja uusi Maali, irtopaloja kolme (jatko). Rajanaapuruudet tarkistettu kannasta (kuntien_rajat,
  *  vaalipiirien_rajat): kumpikin irtopala sopii vain omaan aukkoonsa, harhautin ei kumpaankaan. */
-function Reitti({ luokka, lahto, toka, maali, oikea, harhautin, jatko, maaliTeksti = "Maali" }: {
+function Reitti({ luokka, lahto, toka, maali, oikea, harhautin, jatko }: {
   luokka: string; lahto: Pala; toka: Pala; maali: Pala; oikea: Pala; harhautin: Pala; jatko: { maali: Pala; oikea: Pala };
-  /** Junankuljettajassa "Määränpää" kuten pelissä. */
-  maaliTeksti?: string;
 }) {
-  const solmu = (p: Pala | null, paa?: string, koko?: "c", vaihto?: boolean) => (
+  const solmu = (p: Pala | null, paa?: "Lähtö" | "Maali", koko?: "c", vaihto?: boolean) => (
     <span className="tn-pk-solmu" data-koko={koko} data-vaihto={vaihto || undefined}>
       <span className="tn-pk-paa" data-tyhja={!paa || undefined}>{paa}</span>
       {p ? (
@@ -76,11 +74,11 @@ function Reitti({ luokka, lahto, toka, maali, oikea, harhautin, jatko, maaliTeks
           {solmu(null)}
           <span className="tn-pk-liitos tn-pk-liitos--pisteet" />
           {/* A/B: Maali. C: asetettu pala (Maali-merkki ja lukitusreuna piiloon). */}
-          {solmu(maali, maaliTeksti, undefined, true)}
+          {solmu(maali, "Maali", undefined, true)}
           <span className="tn-pk-liitos tn-pk-liitos--pisteet" data-koko="c" />
           {solmu(null, undefined, "c")}
           <span className="tn-pk-liitos tn-pk-liitos--pisteet" data-koko="c" />
-          {solmu(jatko.maali, maaliTeksti, "c")}
+          {solmu(jatko.maali, "Maali", "c")}
         </span>
         <span className="tn-pk-irrot">
           <span className="tn-pk-irto" data-veto="">{oikea.pieniKuva}<b>{oikea.nimi}</b></span>
@@ -106,13 +104,6 @@ const edustaja = (piiri: string, kuva: string): Pala => ({
   pieniKuva: <img className="tn-pk-kasvo tn-pk-kasvo--pieni" src={`/20/henkilot/k/${kuva}.webp`} alt="" />,
 });
 
-/** Asema (Junankuljettaja): rengas kuten pelin asemapalassa; päätepisteissä täysi kulta. */
-const asema = (nimi: string): Pala => ({
-  nimi,
-  kuva: <span className="tn-pk-asema" />,
-  pieniKuva: <span className="tn-pk-asema tn-pk-asema--pieni" />,
-});
-
 function UsaPala({ k, nimi, paa, kulma }: { k: string; nimi: string; paa?: string; kulma: string }) {
   return (
     <span className="tn-pk-usa-pala" data-lukittu={paa ? "" : undefined} style={{ transform: kulma }}>
@@ -134,11 +125,24 @@ export default function PeliKuvitus({ slug }: { slug: string }) {
           jatko={{ maali: vaakuna("681", "Rantasalmi"), oikea: vaakuna("178", "Juva") }} />
       );
     case "junankuljettaja":
-      /* Päivän vuoron malli (CD kierros 1): Seinäjoki–Lapua–[Kauhava]–Kokkola; C jatkuu –[Ylivieska]–Oulu. Pelin tapaan
-         välissä voi olla muitakin asemia, vain järjestys ratkaisee. Harhautin Vaasa ei ole Seinäjoen–Oulun radalla. */
+      /* Banneri (CD "Junankuljettaja, kierros 1", kohta 6): kermainen yläosa ja junakaista, asemapalat junan edessä
+         (Seinäjoki, Lapua, ?, Kokkola) ja kaksi irtopalaa kaistan yläreunassa. Palan sivu --t kuva-alueen koosta, kaikki
+         muut mitat sen kerrannaisia (sama rakenne joka kokoon). Kauhava sopii aukkoon, Vaasa ei ole radalla. */
       return (
-        <Reitti luokka="tn-pk--juna" lahto={asema("Seinäjoki")} toka={asema("Lapua")} maali={asema("Kokkola")} maaliTeksti="Määränpää"
-          oikea={asema("Kauhava")} harhautin={asema("Vaasa")} jatko={{ maali: asema("Oulu"), oikea: asema("Ylivieska") }} />
+        <span className="tn-pk tn-pk--jbn" aria-hidden="true">
+          <span className="tn-jbn-kaista"><img src="/20/junankuljettaja/hero-juna.svg" alt="" width={700} height={100} loading="lazy" /></span>
+          <span className="tn-jbn-rivi">
+            <span className="tn-jbn-p" data-paa=""><span className="tn-jbn-l">Lähtö</span><i />Seinäjoki</span>
+            <s />
+            <span className="tn-jbn-p"><i />Lapua</span>
+            <s data-katko="" />
+            <span className="tn-jbn-p" data-aukko=""><b>?</b></span>
+            <s data-katko="" />
+            <span className="tn-jbn-p" data-paa=""><span className="tn-jbn-l">Määränpää</span><i />Kokkola</span>
+          </span>
+          <span className="tn-jbn-irto" data-n="a"><i />Kauhava</span>
+          <span className="tn-jbn-irto" data-n="b"><i />Vaasa</span>
+        </span>
       );
     case "rajanaapurit":
       /* Viro–Latvia–[Liettua]–Puola; C jatkuu –[Slovakia]–Unkari. Saksa rajautuu Puolaan mutta ei Latviaan eikä Unkariin. */
