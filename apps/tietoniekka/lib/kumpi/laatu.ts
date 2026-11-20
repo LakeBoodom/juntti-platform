@@ -10,6 +10,9 @@ import type { KEnt, KumpiData, KumpiKysymys } from "./tyypit";
  *  @320 noin 18 px:llä; sovitus pienentää tarvittaessa alle 20 px:n (KumpiKierros), joten nimi ei koskaan leikkaudu. */
 export const MAX_KYSYMYS = 66;
 export const MAX_SANA = 18;
+/** Visakysymyksissä ei ole kuvia (kortti täysleveä), joten pisin sana saa olla pidempi: "Kristillisdemokraatit" (21)
+ *  mahtuu @320 noin 17 px:llä. Sovitus pienentää tarvittaessa (KumpiKierros), ei leikkausta. */
+export const MAX_SANA_VISA = 22;
 
 export type TeemaRaportti = {
   slug: string;
@@ -40,7 +43,7 @@ function tarkistaVisa(q: KumpiKysymys): string[] {
     if (x.nimi.length > 30) v.push(`nimi liian pitkä: ${x.nimi}`);
     if (x.arvo.length > 28) v.push(`fakta liian pitkä: ${x.arvo}`);
     const pisin = Math.max(...x.nimi.split(/[\s\-–]+/).map((w) => w.length));
-    if (pisin > MAX_SANA) v.push(`nimen sana liian pitkä: ${x.nimi}`);
+    if (pisin > MAX_SANA_VISA) v.push(`nimen sana liian pitkä: ${x.nimi}`);
   }
   const oikea = q.vaihtoehdot[q.oikea].nimi.toLowerCase();
   if (oikea.length > 3 && q.lause.toLowerCase().includes(oikea)) v.push(`vastaus vuotaa kysymyksestä (${nimi})`);
