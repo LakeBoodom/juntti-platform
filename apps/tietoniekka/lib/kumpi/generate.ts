@@ -196,11 +196,13 @@ const pariAvain = (key: string, a: KEnt, b: KEnt) => `${key}|${[a.id, b.id].sort
 
 /** Jakson (10 kysymystä) monipuolisuustila. */
 export type Jakso = {
+  /** Edellisen kysymyksen attribuutti: samaa ei peräkkäin, jos muuta on tarjolla. */
+  edellinen: string | null;
   attrMaara: Map<string, number>;
   henkiloMaara: Map<string, number>;
   luokkaMaara: Map<KiekkoLuokka, number>;
 };
-export const uusiJakso = (): Jakso => ({ attrMaara: new Map(), henkiloMaara: new Map(), luokkaMaara: new Map() });
+export const uusiJakso = (): Jakso => ({ edellinen: null, attrMaara: new Map(), henkiloMaara: new Map(), luokkaMaara: new Map() });
 
 export type Konteksti = {
   data: KumpiData;
@@ -363,6 +365,7 @@ function rakenna(ctx: Konteksti, s: Spec, def: KDef, a: KEnt, b: KEnt, vaikeus: 
 
 function kirjaa(ctx: Konteksti, jakso: Jakso, q: KumpiKysymys, a: KEnt, b: KEnt) {
   ctx.kaytetyt.add(q.pari);
+  jakso.edellinen = q.attr;
   jakso.attrMaara.set(q.attr, (jakso.attrMaara.get(q.attr) ?? 0) + 1);
   for (const e of [a, b]) jakso.henkiloMaara.set(e.ihminen, (jakso.henkiloMaara.get(e.ihminen) ?? 0) + 1);
   const luokka = KIEKKO_LUOKKA[q.attr];
@@ -389,7 +392,9 @@ export function teeKysymys(ctx: Konteksti, tavoite: Vaikeus, jakso: Jakso, speci
     return !l || (jakso.luokkaMaara.get(l) ?? 0) < KIEKKO_JAKAUMA[l];
   };
   const ehdokkaat = specit.filter(sallittu);
-  const ensisijaiset = kiekko ? ehdokkaat.filter(luokkaVapaa) : ehdokkaat;
+  const eriKuinEdellinen = (s: Spec) => s.key !== jakso.edellinen;
+  const vaihtelevat = ehdokkaat.some(eriKuinEdellinen) ? ehdokkaat.filter(eriKuinEdellinen) : ehdokkaat;
+  const ensisijaiset = kiekko ? vaihtelevat.filter(luokkaVapaa) : vaihtelevat;
 
   // Jääkiekossa luokka arvotaan ensin, jotta luokat painottuvat tasaisesti eivätkä attribuuttien määrän mukaan.
   const jarjesta = (xs: Spec[]): Spec[] => {
@@ -403,6 +408,7 @@ export function teeKysymys(ctx: Konteksti, tavoite: Vaikeus, jakso: Jakso, speci
 
   const vaiheet: Array<{ xs: Spec[]; t: Vaikeus | null }> = [
     { xs: ensisijaiset, t: tavoite },
+    { xs: vaihtelevat, t: tavoite },
     { xs: ehdokkaat, t: tavoite },
     { xs: ehdokkaat, t: tavoite === "vaikea" ? "keski" : tavoite === "helppo" ? "keski" : "helppo" },
     { xs: ehdokkaat, t: null },
