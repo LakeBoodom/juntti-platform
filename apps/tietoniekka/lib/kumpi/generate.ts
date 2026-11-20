@@ -353,8 +353,9 @@ function rakenna(ctx: Konteksti, s: Spec, def: KDef, a: KEnt, b: KEnt, vaikeus: 
   }
   const osat = jaaKysymys(lause);
 
-  // Kuvasääntö: jos vain toisella on kuva, kumpikaan ei saa kuvaa.
-  const kuvat = !!a.kuva && !!b.kuva;
+  // Kuvasääntö: kuvat vain teemoissa, joissa jokaisessa kysymyksessä on kuva (Teema.kuvat), ja silloinkin vain jos
+  // molemmilla on kuva.
+  const kuvat = !!ctx.teema.kuvat && !!a.kuva && !!b.kuva;
   const [la, lb] = lyhytNimet(a, b);
   const vaihtoehto = (e: KEnt, lyhyt: string, arvoTxt: string): Vaihtoehto => ({
     id: e.id, nimi: e.nimi, lyhyt, kuva: kuvat ? e.kuva : null, arvo: arvoTxt,

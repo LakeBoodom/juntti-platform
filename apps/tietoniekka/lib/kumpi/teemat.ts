@@ -29,12 +29,10 @@ export const RYHMAT: Array<{ avain: Ryhma; nimi: string }> = [
 
 /** Hubin rivikuvat (288 × 216, scripts/rivikuvat.py): sivuston omia kopioita, krediitit jo /kuvien-lahteet-sivulla. */
 export const RIVIKUVAT: Record<string, string> = {
-  kaupungit: "/20/rivi/tupla-suomen-kaupungit.webp",
-  maakunnat: "/20/rivi/kuvavisa-vaakunat.webp",
+  suomi: "/20/rivi/tupla-suomen-kaupungit.webp",
   luonto: "/20/rivi/kumpi-jarvet.webp",
   olympiavoittajat: "/20/rivi/kumpi-olympiavoittajat.webp",
   f1: "/20/rivi/kumpi-f1.webp",
-  jalkapallo: "/20/rivi/kumpi-jalkapallo.webp",
   "suomikiekon-legendat": "/20/rivi/kumpi-suomikiekon-legendat.webp",
   liiga: "/20/rivi/tupla-sm-liiga.webp",
   "oma-seura": "/20/rivi/kokoelma-jaakiekko.webp",
@@ -88,6 +86,9 @@ export type Pooli =
   | { tapa: "suomalaiset" };
 
 export type Teema = {
+  /** Kuvat korteissa vain, jos teeman jokaisessa kysymyksessä on kuva (Heikki 20.11.2026: ei satunnaisesti).
+   *  Yksikään nykyinen teema ei täytä ehtoa, joten kaikki ovat kuvattomia. */
+  kuvat?: boolean;
   slug: string;
   nimi: string;
   ryhma: Ryhma;
@@ -109,9 +110,9 @@ export const TEEMAT: Teema[] = [
   },
   { slug: "olympiavoittajat", nimi: "Olympiavoittajat", ryhma: "urheilu", pooli: { tapa: "kind", kinds: ["person"] }, attrs: ["oly_golds", "oly_medals"] },
   { slug: "f1", nimi: "F1", ryhma: "urheilu", pooli: { tapa: "kind", kinds: ["person"] }, attrs: ["f1_titles", "f1_wins", "f1_poles"] },
-  { slug: "jalkapallo", nimi: "Jalkapallo", ryhma: "urheilu", pooli: { tapa: "kind", kinds: ["person"] }, attrs: ["fb_caps", "fb_intl_goals"] },
-  { slug: "kaupungit", nimi: "Kaupungit", ryhma: "suomi", pooli: { tapa: "kind", kinds: ["city"] }, attrs: ["population", "founded_year"] },
-  { slug: "maakunnat", nimi: "Maakunnat", ryhma: "suomi", pooli: { tapa: "kind", kinds: ["region"] }, attrs: ["region_pop", "region_area"] },
+  /* Jalkapallo pois (Heikki 20.11.2026), kunnes kannassa on selvästi enemmän legendoja kuin nykypelaajia.
+     Kaupungit ja maakunnat yhdeksi Suomi-teemaksi (Heikki 20.11.), kunnes niistä on enemmän erilaista dataa. */
+  { slug: "suomi", nimi: "Suomi", ryhma: "suomi", pooli: { tapa: "kind", kinds: ["city", "region"] }, attrs: ["population", "founded_year", "region_pop", "region_area"] },
   /* Luonto ja Maailma yhtenä teemana kumpikin (Heikki 20.11.2026): yksin järvet "eivät kanna", ja yhdistettynä
      kysymyksiin tulee vaihtelua. Luonnossa järvet ja joet vain Suomesta (SUOMEN_VEDET), maailman järvet ja joet
      Maailmassa. Pooli on kindien yhdiste; kukin kysymys vertaa vain saman attribuutin kohteita. */

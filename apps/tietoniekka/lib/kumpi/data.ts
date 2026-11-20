@@ -82,6 +82,11 @@ export function rakennaKumpiData(r: {
     for (const a of x.fact_attributes ?? []) {
       // Kausiluonteinen arvo, jonka tarkistuspäivä on mennyt, ei kelpaa (A2 erityisrajat).
       if (a.volatility === "seasonal" && a.next_review_at && a.next_review_at < r.tanaan) continue;
+      // Muuttuvat luvut pois (Heikki 20.11.2026: ei nykypelaajia, joiden luvut vaihtuvat): volatile aina, ja
+      // urheilijoilla ja kansanedustajilla (player, person) myös seasonal = aktiiviuran luku, joka muuttuu kesken kauden.
+      // Vuositilastot (asukasluvut, käyntimäärät) ovat seasonal ja jäävät, koska ne päivitetään kerran vuodessa.
+      if (a.volatility === "volatile") continue;
+      if (a.volatility === "seasonal" && (x.kind === "player" || x.kind === "person")) continue;
       if (a.attr_key === "position") {
         const p = String(a.text_value ?? a.display_value ?? "");
         paikka = p === "maalivahti" ? "mv" : p ? "kp" : null;
