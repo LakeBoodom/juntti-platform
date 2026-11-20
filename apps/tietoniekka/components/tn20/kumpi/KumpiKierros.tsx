@@ -2,13 +2,13 @@
 // KUMPI? 2.0 — Kierros (brief 20.11.2026, A6 + B). Kymmenen kysymystä, ei pisteitä eikä kelloa. Pelihetki (CD spec):
 // napautus kortista → arvot paljastuvat korttiin (✓/✗, ponnahdus/tärähdys) → etenemisrengas 2,5 s → seuraava.
 // Napautus mihin tahansa ohittaa renkaan. Faktalause vain ruudunlukijalle (aria-live), koska arvot näkyvät korteissa.
-// Tulosnäkymä (UI-sääntö: tulos → tuloskortti ja jako → vastaukset → pelin linkit → muut pelit).
+// Tulosnäkymä: tulos → tuloskortti ja jako → pelin linkit → muut pelit. Vastauslista poistettu (Heikki 20.11.2026:
+// vie paljon tilaa eikä tuo lisäarvoa).
 // KORTTISÄÄNTÖ: kysymyksen ja nimien koko sovitetaan Range-mittauksella pisimmän sanan mukaan (sana ei katkea keskeltä).
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import Jakoalue from "@/components/tn20/jako/Jakoalue";
-import { SeuraavaPeli } from "@/components/tn20/pelikehys/PeliTulos";
+import SeuraavaksiRivi, { type SkPaikka } from "@/components/tn20/seuraavaksi/SeuraavaksiRivi";
 import PeliKehys from "@/components/tn20/pelikehys/PeliKehys";
-import type { Pelimuoto } from "@/lib/pelimuodot";
 import { jaaPeliTeksti, tulosjakoteksti } from "@/lib/korttinimi";
 import { kirjaaKierrosValmis, kirjaaVastaus, plausible, type Pelitapa } from "@/lib/kumpi/kirjaus";
 import type { KumpiKysymys } from "@/lib/kumpi/tyypit";
@@ -142,7 +142,7 @@ export default function KumpiKierros({
   /** Teemasivun polku ("/kumpi/liiga"): uusi kierros ja jaettava osoite. */
   polku: string;
   pelitapa?: Pelitapa;
-  seuraavat: Pelimuoto[];
+  seuraavat: SkPaikka[];
 }) {
   const n = kysymykset.length;
   const [i, setI] = useState(0);
@@ -337,7 +337,7 @@ function Tulos({ kysymykset, valinnat, teema, siemen, polku, seuraavat }: {
   teema: { slug: string; nimi: string };
   siemen: string;
   polku: string;
-  seuraavat: Pelimuoto[];
+  seuraavat: SkPaikka[];
 }) {
   const n = kysymykset.length;
   const osumat = kysymykset.map((q, j) => valinnat[j] === q.oikea);
@@ -374,34 +374,12 @@ function Tulos({ kysymykset, valinnat, teema, siemen, polku, seuraavat }: {
           natiiviOtsikko={nimi}
           onJaettu={(k) => plausible("kumpi_share", { kanava: k, teema: teema.slug })}
         />
-        <section className="kp-vastaukset" aria-labelledby="kp-vastaukset-h">
-          <h2 id="kp-vastaukset-h">Vastauksesi</h2>
-          <ol>
-            {kysymykset.map((q, j) => {
-              const ok = osumat[j];
-              const v = valinnat[j];
-              const w = q.vaihtoehdot[q.oikea];
-              const l = q.vaihtoehdot[1 - q.oikea];
-              return (
-                <li key={q.pari} className={ok ? "ok" : "ng"}>
-                  <span className="kp-merkki" aria-hidden="true">{ok ? "✓" : "✗"}</span>
-                  <span className="kp-sr">{ok ? "Oikein: " : "Väärin: "}</span>
-                  <span className="kp-vastaus">
-                    <b>{q.listalause}</b>
-                    {/* Arvot (testipalaute 20.11.): oikea ensin. Väärästä vastauksesta myös oma valinta. */}
-                    <span>{w.lyhyt}: {w.arvo} · {l.lyhyt}: {l.arvo}</span>
-                    {!ok && v !== null ? <span>Valitsit: {q.vaihtoehdot[v].lyhyt}</span> : null}
-                  </span>
-                </li>
-              );
-            })}
-          </ol>
-        </section>
         <nav className="kp-tulos-linkit" aria-label="Kumpi?">
           <a className="tn-cta-lime kp-cta" href="/kumpi">Pelaa teemoittain</a>
           <a className="kp-nappi" href={polku}>Uusi kierros: {teema.nimi}</a>
         </nav>
-        <SeuraavaPeli seuraavat={seuraavat} />
+        {/* Sama "Pelaa seuraavaksi" -rivi kuin tietovisan tuloksessa (Heikki 20.11.2026). */}
+        <SeuraavaksiRivi otsikko="Pelaa seuraavaksi" paikat={seuraavat} meta={{ pilotti: null, nakyma: "tulos", lahde: `kumpi-${teema.slug}` }} id="kp-sk" />
       </main>
     </PeliKehys>
   );

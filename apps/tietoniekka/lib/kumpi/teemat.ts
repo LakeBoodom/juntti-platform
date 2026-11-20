@@ -2,6 +2,19 @@
 // Hubin kuusi ryhmää (Heikki 20.11.): jääkiekolla kolme korttia, 17 seuraa vain Oma seura -valinnasta.
 // Puhdas moduuli: käytetään palvelimella, selaimessa ja laatuportissa (scripts/kumpi-laatu.ts).
 
+import type { KEnt } from "./tyypit";
+
+/** Suomen järvet ja joet (kannassa ei maa- eikä sijaintitietoa järville ja joille, 20.11.2026). Laatokka on Venäjällä,
+ *  Iso Orjajärvi Kanadassa. Uusi suomalainen järvi tai joki lisätään tähän, muuten se menee Maailma-teemaan. */
+export const SUOMEN_VEDET = new Set([
+  "Saimaa", "Päijänne", "Inarijärvi", "Pielinen", "Oulujärvi", "Pihlajavesi", "Orivesi", "Haukivesi", "Keitele", "Kallavesi",
+  "Puruvesi", "Puula", "Lokan tekojärvi", "Höytiäinen", "Näsijärvi", "Lappajärvi", "Vesijärvi", "Vanajavesi", "Keurusselkä",
+  "Kilpisjärvi", "Tuusulanjärvi", "Bodominjärvi",
+  "Kemijoki", "Iijoki", "Ounasjoki", "Luttojoki", "Kitinen", "Muonionjoki", "Kymijoki", "Simojoki", "Tornionjoki", "Ivalojoki",
+  "Lapuanjoki", "Tenojoki", "Vuoksi", "Porvoonjoki", "Kyrönjoki", "Kokemäenjoki", "Loimijoki", "Paimionjoki", "Oulujoki",
+  "Vantaanjoki", "Könkämäeno", "Aurajoki",
+]);
+
 export type Ryhma = "jaakiekko" | "urheilu" | "suomi" | "luonto" | "maailma" | "ihmiset";
 
 /** Hubin ryhmäjärjestys (Heikki 20.11.2026): jääkiekko ei alussa, jotta hubi ei näytä jääkiekkopeliltä. */
@@ -18,19 +31,14 @@ export const RYHMAT: Array<{ avain: Ryhma; nimi: string }> = [
 export const RIVIKUVAT: Record<string, string> = {
   kaupungit: "/20/rivi/tupla-suomen-kaupungit.webp",
   maakunnat: "/20/rivi/kuvavisa-vaakunat.webp",
-  jarvet: "/20/rivi/kumpi-jarvet.webp",
-  joet: "/20/rivi/kumpi-joet.webp",
-  kansallispuistot: "/20/rivi/kumpi-kansallispuistot.webp",
-  majakat: "/20/rivi/kumpi-majakat.webp",
-  tunturit: "/20/rivi/kumpi-tunturit.webp",
+  luonto: "/20/rivi/kumpi-jarvet.webp",
   olympiavoittajat: "/20/rivi/kumpi-olympiavoittajat.webp",
   f1: "/20/rivi/kumpi-f1.webp",
   jalkapallo: "/20/rivi/kumpi-jalkapallo.webp",
   "suomikiekon-legendat": "/20/rivi/kumpi-suomikiekon-legendat.webp",
   liiga: "/20/rivi/tupla-sm-liiga.webp",
   "oma-seura": "/20/rivi/kokoelma-jaakiekko.webp",
-  maat: "/20/rivi/kuvavisa-liput.webp",
-  vuoret: "/20/rivi/kumpi-vuoret.webp",
+  maailma: "/20/rivi/kumpi-vuoret.webp",
   "tunnetut-suomalaiset": "/20/rivi/kokoelma-tunnetut-henkilot.webp",
   politiikka: "/20/rivi/kokoelma-vaalit.webp",
 };
@@ -69,7 +77,7 @@ const SAAVUTUS = ["has_nhl", "has_stanley_cup", "has_wc_gold", "oly_gold", "stan
 const TAUSTA = ["birth", "height_cm"];
 
 export type Pooli =
-  | { tapa: "kind"; kinds: string[] }
+  | { tapa: "kind"; kinds: string[]; rajaus?: (e: KEnt) => boolean }
   /** Pelaajat, joilla on entity_facts-rivejä (legendat). */
   | { tapa: "legendat" }
   /** Kaikki pelaajat, joilla on uran liiga_games. */
@@ -104,13 +112,19 @@ export const TEEMAT: Teema[] = [
   { slug: "jalkapallo", nimi: "Jalkapallo", ryhma: "urheilu", pooli: { tapa: "kind", kinds: ["person"] }, attrs: ["fb_caps", "fb_intl_goals"] },
   { slug: "kaupungit", nimi: "Kaupungit", ryhma: "suomi", pooli: { tapa: "kind", kinds: ["city"] }, attrs: ["population", "founded_year"] },
   { slug: "maakunnat", nimi: "Maakunnat", ryhma: "suomi", pooli: { tapa: "kind", kinds: ["region"] }, attrs: ["region_pop", "region_area"] },
-  { slug: "jarvet", nimi: "Järvet", ryhma: "luonto", pooli: { tapa: "kind", kinds: ["lake"] }, attrs: ["area_km2"] },
-  { slug: "joet", nimi: "Joet", ryhma: "luonto", pooli: { tapa: "kind", kinds: ["river"] }, attrs: ["river_length"] },
-  { slug: "kansallispuistot", nimi: "Kansallispuistot", ryhma: "luonto", pooli: { tapa: "kind", kinds: ["park"] }, attrs: ["park_area_km2", "park_founded", "park_visits"] },
-  { slug: "majakat", nimi: "Majakat", ryhma: "luonto", pooli: { tapa: "kind", kinds: ["lighthouse"] }, attrs: ["lh_built", "lh_height_m"] },
-  { slug: "tunturit", nimi: "Tunturit", ryhma: "luonto", pooli: { tapa: "kind", kinds: ["fell"] }, attrs: ["height_m"] },
-  { slug: "maat", nimi: "Maat", ryhma: "maailma", pooli: { tapa: "kind", kinds: ["country"] }, attrs: ["country_area", "country_pop"] },
-  { slug: "vuoret", nimi: "Vuoret", ryhma: "maailma", pooli: { tapa: "kind", kinds: ["mountain"] }, attrs: ["mountain_height"] },
+  /* Luonto ja Maailma yhtenä teemana kumpikin (Heikki 20.11.2026): yksin järvet "eivät kanna", ja yhdistettynä
+     kysymyksiin tulee vaihtelua. Luonnossa järvet ja joet vain Suomesta (SUOMEN_VEDET), maailman järvet ja joet
+     Maailmassa. Pooli on kindien yhdiste; kukin kysymys vertaa vain saman attribuutin kohteita. */
+  {
+    slug: "luonto", nimi: "Luonto", ryhma: "luonto",
+    pooli: { tapa: "kind", kinds: ["lake", "river", "park", "lighthouse", "fell"], rajaus: (e) => (e.kind !== "lake" && e.kind !== "river") || SUOMEN_VEDET.has(e.nimi) },
+    attrs: ["area_km2", "river_length", "height_m", "park_area_km2", "park_founded", "park_visits", "lh_built", "lh_height_m"],
+  },
+  {
+    slug: "maailma", nimi: "Maailma", ryhma: "maailma",
+    pooli: { tapa: "kind", kinds: ["country", "mountain", "lake", "river"], rajaus: (e) => (e.kind !== "lake" && e.kind !== "river") || !SUOMEN_VEDET.has(e.nimi) },
+    attrs: ["country_area", "country_pop", "mountain_height", "area_km2", "river_length"],
+  },
   { slug: "tunnetut-suomalaiset", nimi: "Tunnetut suomalaiset", ryhma: "ihmiset", pooli: { tapa: "suomalaiset" }, attrs: ["birth"] },
   { slug: "politiikka", nimi: "Politiikka", ryhma: "ihmiset", pooli: { tapa: "kind", kinds: ["person"] }, attrs: ["mp_first_year", "mp_years", "pm_days", "pm_start"] },
 ];

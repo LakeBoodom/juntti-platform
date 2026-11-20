@@ -86,7 +86,7 @@ export function teemanPooli(data: KumpiData, teema: Teema): KEnt[] {
   const p = teema.pooli;
   return data.entities.filter((e) => {
     switch (p.tapa) {
-      case "kind": return p.kinds.includes(e.kind);
+      case "kind": return p.kinds.includes(e.kind) && (!p.rajaus || p.rajaus(e));
       case "legendat": return e.kind === "player" && onLegenda(e);
       case "liiga": return e.kind === "player" && e.v.liiga_games !== undefined;
       case "seura": return e.kind === "player" && e.seurat.includes(p.seura);
@@ -152,7 +152,8 @@ function vaikeusErosta(key: string, def: KDef, g: number): Vaikeus {
 /** Kannan näyttöarvo kortin arvoriville: sulkulisäykset pois ("210 112 (31.12.2025)" → "210 112"), yli
  *  nelinumeroisiin lukuihin tuhaterotin ("3766 km" → "3 766 km"). Vuosilukuihin ei erotinta. */
 export function siistiArvo(nayttö: string, key: string): string {
-  let t = nayttö.replace(/\s*\([^)]*\)\s*$/, "").trim();
+  // " as." pois: kannassa osa asukasluvuista on "5 600 000 as.", osa ilman, ja kysymys kertoo jo yksikön.
+  let t = nayttö.replace(/\s*\([^)]*\)\s*$/, "").replace(/\s+as\.$/, "").trim();
   if (!VUOSI_ATTR.has(key)) t = t.replace(/(^|[^\d,.\u00a0 ])(\d{4,})(?![\d,])/g, (_, a: string, n: string) => `${a}${fiLuku(Number(n))}`);
   return t.replace(/(\d) (\d{3})/g, "$1\u00a0$2");
 }

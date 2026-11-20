@@ -175,6 +175,11 @@ const PELIN_MERKKI: Record<Pelimuoto["ikoni"], string> = {
    "Tupla tai kuitti: SM-liiga"). Kuvausrivi kierroksella 3: mitä pelissä tehdään (lib/seuraavaksi/pelirivit.ts). */
 const ETULIITE = /^(Tupla tai kuitti|Laita järjestykseen|Järjestä):\s*/;
 
+/** Pelimuoto "Pelaa seuraavaksi" -riviksi pelien omiin tulosnäkymiin (Kumpi?, Heikki 20.11.2026: sama rivi kuin
+ *  tietovisan tuloksessa). Kuvaton kortti näyttää pelin nimen. */
+export const pelimuodonEhdokas = (p: Pelimuoto, porras: string): Ehdokas =>
+  peliEhdokas(p, { nimi: p.nimi } as Laji, porras);
+
 function peliEhdokas(p0: Pelimuoto, laji: Laji, porras: string): Ehdokas {
   const p = viikonKuvat(p0);
   const merkki = PELIN_MERKKI[p.ikoni] ?? "Peli";
