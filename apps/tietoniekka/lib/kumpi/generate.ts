@@ -331,6 +331,8 @@ function rakenna(ctx: Konteksti, s: Spec, def: KDef, a: KEnt, b: KEnt, vaikeus: 
   // Kysymyslause: paikkamerkit ensin, sitten seurakohtaisille seuran inessiivi ("… Tapparassa?").
   let lause = def.kysymys.replaceAll("{x_inessive}", ines).replaceAll("{x}", x);
   if (s.seura) {
+    // Seura kertoo jo sarjan: "[Liiga-otteluita]" → "[otteluita] Tapparassa" (lyhyempi, mahtuu korttisääntöön).
+    lause = lause.replace(/\[Liiga-/, "[");
     lause = / Liigassa(?=[?\s\]])/.test(lause) ? lause.replace(/ Liigassa(?=[?\s\]])/, ` ${ines}`) : lause.replace(/\?$/, ` ${ines}?`);
   }
   const osat = jaaKysymys(lause);

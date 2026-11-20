@@ -28,7 +28,8 @@ function avainsanat(data: KumpiData, teema: Teema): string {
   const sanat = teemanSpecit(ctx)
     .map((s) => jaaKysymys(data.defs[s.key].kysymys).avain)
     .filter((a) => a && !a.includes("{"));
-  return [...new Set(sanat)].slice(0, 3).join(" · ");
+  const rivi = [...new Set(sanat)].slice(0, 3).join(" · ");
+  return rivi.charAt(0).toUpperCase() + rivi.slice(1);
 }
 
 export type HubTeema = { teema: Teema; rivi: string };

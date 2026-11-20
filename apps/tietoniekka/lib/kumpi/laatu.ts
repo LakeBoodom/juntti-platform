@@ -6,9 +6,10 @@ import { KAIKKI_TEEMAT, KP_ATTR, MV_ATTR, type Teema } from "./teemat";
 import type { KEnt, KumpiData, KumpiKysymys } from "./tyypit";
 
 /** Kysymyksen enimmäispituus (merkkiä) ja nimen pisimmän sanan enimmäispituus korttisäännön rajoissa:
- *  kysymys mahtuu 26 px:iin neljälle riville @320, nimen pisin sana 20 px:iin kuvattomassa kortissa @320. */
+ *  kysymys mahtuu 26 px:iin neljälle riville @320. Nimen pisin sana (Kristiinankaupunki 18) mahtuu kuvattomaan korttiin
+ *  @320 noin 18 px:llä; sovitus pienentää tarvittaessa alle 20 px:n (KumpiKierros), joten nimi ei koskaan leikkaudu. */
 export const MAX_KYSYMYS = 64;
-export const MAX_SANA = 16;
+export const MAX_SANA = 18;
 
 export type TeemaRaportti = {
   slug: string;
@@ -104,13 +105,21 @@ export function tarkistaTeema(data: KumpiData, teema: Teema, n = 500, siemen = "
 
 export function laatuportti(data: KumpiData, n = 500) {
   const teemat = KAIKKI_TEEMAT().map((t) => tarkistaTeema(data, t, n));
-  // 30 kysymyksen otos raporttiin: teemoista vuorotellen helppo, keskivaikea ja vaikea (jakson paikat 1, 6 ja 10).
+  // 30 kysymyksen otos raporttiin: ensin yksi kysymys jokaisesta attribuutista (teemat vuorotellen, eri vaikeudet),
+  // sitten täytetään. Näin otoksessa näkyvät myös harvinaiset tyypit (kyllä/ei, seurakysymys).
   const otos: KumpiKysymys[] = [];
-  for (const paikka of [0, 5, 9, 2, 7]) {
-    for (const t of teemat) {
-      const q = t.kysymykset[paikka];
-      if (q && otos.length < 30) otos.push(q);
-    }
+  const nahty = new Set<string>();
+  const kaikki = teemat.flatMap((t, k) => t.kysymykset.map((q, j) => ({ q, jarj: j * 100 + ((k * 7) % 100) })));
+  kaikki.sort((a, b) => a.jarj - b.jarj);
+  for (const { q } of kaikki) {
+    if (otos.length >= 30) break;
+    if (nahty.has(q.attr)) continue;
+    nahty.add(q.attr);
+    otos.push(q);
+  }
+  for (const { q } of kaikki) {
+    if (otos.length >= 30) break;
+    if (!otos.includes(q) && q.vaikeus !== "helppo") otos.push(q);
   }
   return { teemat: teemat.map((t) => t.raportti), otos };
 }
