@@ -52,7 +52,8 @@ export function reittiOma(oikein: number, kaikki: number, yritys: number | null)
 }
 
 /** Kaverin reittitulos osoitteesta; vanha linkki ilman yritystä (?tulos=7-7) ei kerro tarpeeksi → null. */
-export function reittiKaveri(tulos: string | string[] | undefined, y: string | string[] | undefined): KaverinTulos | null {
+/** sana = väli tuloksessa ("rajaa", Junankuljettajassa "asemaväliä"). */
+export function reittiKaveri(tulos: string | string[] | undefined, y: string | string[] | undefined, sana = "rajaa"): KaverinTulos | null {
   const m = typeof tulos === "string" ? tulos.match(/^(\d{1,2})-(\d{1,2})$/) : null;
   if (!m) return null;
   const n = Number(m[1]), kaikki = Number(m[2]);
@@ -60,7 +61,7 @@ export function reittiKaveri(tulos: string | string[] | undefined, y: string | s
   if (kaikki < 1 || n > kaikki || (n === kaikki) !== !!yritys) return null;
   const oma = reittiOma(n, kaikki, yritys);
   return {
-    otsikko: yritys ? `Kaverisi löysi reitin ${oma.lyhyt}.` : `Kaverisi sai ${n}/${kaikki} rajaa oikein.`,
+    otsikko: yritys ? `Kaverisi löysi reitin ${oma.lyhyt}.` : `Kaverisi sai ${n}/${kaikki} ${sana} oikein.`,
     rivi: haasterivi("Etsi sama reitti", yritys === 1),
     ...oma,
   };

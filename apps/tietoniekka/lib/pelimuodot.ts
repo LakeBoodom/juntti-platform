@@ -184,6 +184,8 @@ export const ETUSIVUN_PELIMUODOT: EtusivunPelimuoto[] = [
   { slug: "kuntaliitos", ryhma: "kartta", laji: "Karttapeli", nimi: "Kuntaliitos", tavut: "Kunta|liitos", etusivu_rivi: "Järjestä kunnat ketjuksi, jossa jokainen kunta rajautuu seuraavaan", href: "/peli/kuntaliitos", kuva: "/20/kuntaliitos/palapeli.webp", aksentti: KARTTA, tila: "pelattava", julkaisu: null },
   /* Yhdysvallat (CD "Rajanaapurit Yhdysvallat etusivun bannerit" 8b): kuvitus PeliKuvitus, kuva jakokuville. */
   { slug: "rajanaapurit-yhdysvallat", ryhma: "kartta", laji: "Karttapeli", nimi: "Rajanaapurit: Yhdysvallat", tavut: "Raja|naapurit: Yhdys|vallat", etusivu_rivi: "Rakenna reitti lähdöstä maaliin osavaltio kerrallaan", href: "/peli/rajanaapurit/osavaltiot", kuva: "/20/rajanaapurit/banneri-kartta.webp", aksentti: KARTTA, tila: "pelattava", julkaisu: null },
+  /* Junankuljettaja (CD kierros 1, Heikki 20.11.2026): neljäs reittipeli, kuvitus PeliKuvitus "junankuljettaja". */
+  { slug: "junankuljettaja", ryhma: "kartta", laji: "Karttapeli", nimi: "Junankuljettaja", tavut: "Junan|kuljettaja", etusivu_rivi: "Järjestä asemat radan varrelle lähdöstä määränpäähän", href: "/peli/junankuljettaja", kuva: null, aksentti: KARTTA, tila: "pelattava", julkaisu: null },
   /* CD "TN Etusivu Järjestä-kortti" (Heikki 31.10.2026): Laita järjestykseen ja Ikäjärjestys yhdeksi Järjestä-kortiksi → hub.
      Kuvitus PeliKuvitus "jarjesta". 11.11.: lajimerkki ja kuvaus kuten muissa korteissa; pakat (lib/jarjesta) = henkilöt
      syntymävuoden mukaan, presidentit, pääministerit, kansanedustajat, eduskuntaryhmät ja puolueet sekä tunturit, vuoret,

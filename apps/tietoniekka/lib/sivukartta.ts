@@ -16,6 +16,7 @@
 import type { MetadataRoute } from "next";
 import { TEEMAT, TUPLA_SIVU } from "@/lib/tuplaTaiKuitti";
 import { KL_SIVU } from "@/lib/kuntaliitos";
+import { JK_SIVU } from "@/lib/junankuljettaja";
 import { JULKAISTUT, pakkaHref } from "@/lib/jarjesta/pakat";
 import { HUB_HREF, IKA_PAKAT } from "@/lib/jarjesta/hub";
 import { VPK_SIVU } from "@/lib/vaalipiiriketju";
@@ -146,6 +147,7 @@ export async function sivukartanRivit(): Promise<MetadataRoute.Sitemap> {
     u(KARTTAPELIT_SIVU, "weekly", 0.7, viikko),
     u(RN_SIVU, "daily", 0.7, viikko),
     u(RN_USA_SIVU, "weekly", 0.6, viikko),
+    u(JK_SIVU, "daily", 0.7, tanaan),
     /* Järjestä-hub (päivän väärä rivi) ja kaikki pakat (osa C 31.10.2026: Ikäjärjestyksen aiheet pakkoina). */
     u(HUB_HREF, "daily", 0.7, tanaan),
     ...IKA_PAKAT.map((p) => u(p.href, "weekly", 0.6)),

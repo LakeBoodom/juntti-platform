@@ -343,6 +343,11 @@
 .tn20 .tn-pk--kunta { background: radial-gradient(70% 110% at 100% 50%, #8FC9BF 0%, rgba(143,201,191,.35) 45%, transparent 75%), #F1ECE0; --pk: #2BA39A; }
 .tn20 .tn-pk--raja { background: radial-gradient(60% 70% at 20% 30%, #A9BFB4 0%, transparent 70%), radial-gradient(60% 80% at 85% 75%, #B9C2BC 0%, transparent 70%), #CDD5CC; --pk: #D99A1E; }
 .tn20 .tn-pk--vaali { background: linear-gradient(rgba(241,236,224,.82), rgba(241,236,224,.9)), url("/20/vaalit/vaalipiiriketju-600.webp") center / cover; --pk: #D9485F; }
+/* Junankuljettaja: kartan vaalea pohja ja junan navy-kaista alareunassa (CD kierros 1, hero). Palan tunnus = asemarengas. */
+.tn20 .tn-pk--juna { background: linear-gradient(transparent 78%, #0E3657 78%), radial-gradient(70% 110% at 0% 40%, #DCE6E8 0%, transparent 75%), #F4EFE4; --pk: #0E3657; }
+.tn20 .tn-pk-asema { display: block; flex: none; width: 16px; height: 16px; box-sizing: border-box; border-radius: 50%; border: 3.5px solid #0E3657; background: #fff; }
+.tn20 .tn-pk-pala[data-lukittu] .tn-pk-asema { border-color: #E8A320; background: #E8A320; }
+.tn20 .tn-pk-asema--pieni { width: 12px; height: 12px; border-width: 3px; }
 .tn20 .tn-pk-reitti { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; }
 .tn20 .tn-pk-ketju { display: flex; align-items: flex-start; }
 .tn20 .tn-pk-solmu { display: flex; flex-direction: column; align-items: center; gap: 4px; }

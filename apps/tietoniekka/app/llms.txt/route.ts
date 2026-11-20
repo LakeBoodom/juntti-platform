@@ -35,6 +35,7 @@ const PELIMUODOT: Array<[string, string, string]> = [
   ["/peli/tupla-tai-kuitti", "Tupla tai kuitti", "Kymmenen yhä vaikeampaa kysymystä; jokainen oikea vastaus tuplaa potin"],
   ["/peli/karttapelit", "Karttapelit", "Kaikki karttapelit: reitti naapurista naapuriin maailmankartalla, Suomen kunnissa ja Yhdysvaltain osavaltioissa"],
   ["/peli/kuntaliitos", "Kuntaliitos", "Järjestä kahdeksan kuntaa reitiksi naapurikuntien kautta; uusi reitti joka päivä"],
+  ["/peli/junankuljettaja", "Junankuljettaja", "Järjestä kuusi väliasemaa radan kulkujärjestykseen lähdöstä määränpäähän; uusi päivän vuoro joka päivä kolmella vaikeustasolla"],
   ["/peli/rajanaapurit", "Rajanaapurit", "Sama reittipeli valtioilla ja maarajoilla; uusi viikon reitti joka maanantai"],
   ["/peli/rajanaapurit/osavaltiot", "Rajanaapurit: Yhdysvallat", "Rajanaapurit Yhdysvaltain 48 manner-osavaltiolla; uusi viikon reitti joka maanantai"],
   ["/peli/mika-maa", "Mikä maa?", "Päivän maa vihjeistä: kuusi yritystä, jokainen väärä vastaus avaa uuden vihjeen ja kertoo etäisyyden ja suunnan oikeaan maahan; sama maa kaikille"],

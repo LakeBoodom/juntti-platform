@@ -16,7 +16,7 @@ export const lukusana = (n: number) => (Number.isInteger(n) && n >= 0 && n < LUV
 const iso = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
 
 export type Pelimuoto =
-  | "tietovisa" | "kuvavisa" | "aanivisa" | "megavisa" | "tupla" | "rajanaapurit" | "osavaltiot" | "kuntaliitos"
+  | "tietovisa" | "kuvavisa" | "aanivisa" | "megavisa" | "tupla" | "rajanaapurit" | "osavaltiot" | "kuntaliitos" | "junankuljettaja"
   | "vaalipiiriketju" | "jarjesta" | "ikajarjestys" | "visapaketti" | "vihjepeli";
 
 /** og:titlen pelityyppi (§4), pienellä. Megavisassa kysymysmäärä visasta. */
@@ -27,7 +27,7 @@ export function pelityyppi(m: Pelimuoto, n?: number): string {
     case "aanivisa": return "äänivisa";
     case "megavisa": return n ? `${n} kysymyksen visa` : "megavisa";
     case "tupla": return "kaikki tai ei mitään";
-    case "rajanaapurit": case "osavaltiot": case "kuntaliitos": return "karttapeli";
+    case "rajanaapurit": case "osavaltiot": case "kuntaliitos": case "junankuljettaja": return "karttapeli";
     case "vaalipiiriketju": return "kansanedustajapeli";
     case "jarjesta": case "ikajarjestys": return "järjestyspeli";
     case "visapaketti": return "valmis visailta";
@@ -49,6 +49,7 @@ export function tehtavalause(m: Pelimuoto, n?: number): string {
     case "rajanaapurit": return "Etsi reitti maasta naapurimaahan.";
     case "osavaltiot": return "Etsi reitti osavaltiosta naapuriosavaltioon.";
     case "kuntaliitos": return "Kulje naapurikunnasta toiseen.";
+    case "junankuljettaja": return "Järjestä kuusi väliasemaa radan varrelle.";
     case "vaalipiiriketju": return "Arvaa kuuden kansanedustajan vaalipiiri.";
     case "jarjesta": return "Laita kahdeksan oikeaan järjestykseen.";
     case "ikajarjestys": return "Laita kahdeksan tunnettua ikäjärjestykseen.";

@@ -32,6 +32,8 @@ export const KL_LAHDE = moottori.lahde;
 export const reittiAlueista = moottori.reittiAlueista;
 export const PELATTAVIA = moottori.pelattavia;
 export const kuvakartta = moottori.kuvakartta;
+/** Kuntakartta asemille (Junankuljettaja). */
+export const karttaPisteista = moottori.karttaPisteista;
 
 /** Kaupunkisivun Kuntaliitos-kortti (8.11.2026): kaupungin oma reitti, jos se on olemassa ja kelpaa moottorille. */
 export function kaupunginKuntaliitos(slug: string): { otsikko: string; href: string; kuva: string; kuvaLeve: string } | null {

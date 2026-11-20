@@ -270,6 +270,17 @@ export function luoReittimoottori(data: RpData, a: RpAsetukset) {
     };
   }
 
+  /** Kartta mielivaltaisille pisteille (Junankuljettaja 20.11.2026: asemat aineiston koordinaateissa). Rajaus ja
+      alueet kuten reitillä; pisteet prosentteina kartan näkymästä (viewBox) kuten KlKunta.x/y. */
+  function karttaPisteista(pisteet: Array<[number, number]>) {
+    const k = kartta(pisteet.map((p) => ({ p }) as RpAlue), null);
+    const [vx, vy, vw, vh] = k.viewBox;
+    return {
+      kartta: { viewBox: k.viewBox.join(" "), tiivis: k.tiivis.join(" "), alueet: k.alueet },
+      pisteet: pisteet.map(([x, y]) => ({ x: Math.round(((x - vx) / vw) * 1000) / 10, y: Math.round(((y - vy) / vh) * 1000) / 10 })),
+    };
+  }
+
   /** Reiteille pääsevät alueet (pitkä maaraja naapuriin, ei valikon ulkopuolisesta ryhmästä): hero-luku. */
   const PELATTAVIA = ALOITUS.filter((k) => !ryhmat(PER.get(k)!).some((m) => a.eiValikkoon?.includes(m))).length;
 
@@ -277,6 +288,7 @@ export function luoReittimoottori(data: RpData, a: RpAsetukset) {
     arvoReitti,
     reittiAlueista,
     kuvakartta,
+    karttaPisteista,
     pelattavia: PELATTAVIA,
     valikko,
     ryhmaTunnuksella: (t: string | null | undefined) => valikko.find((m) => m.tunnus === t) ?? null,

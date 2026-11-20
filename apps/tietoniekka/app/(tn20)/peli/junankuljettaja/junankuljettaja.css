@@ -1,0 +1,159 @@
+/* JUNANKULJETTAJA (CD "Junankuljettaja, kierros 1", 20.11.2026). Pohjana Kuntaliitoksen tumma reittipeli (kuntaliitos.css);
+   tässä vain erot: asemapala (rengas ratalinjalla, kunta vihjeenä samalla rivillä), kartan nimilaput, juna, tulos,
+   hero ja Näin pelaat -kortit. Värit kuten muissa peleissä: tausta #131109, lime vain päätoiminnossa, kulta aksenttina. */
+
+.tn20 .kl--juna { --jk-kulta: #e8a320; --jk-kulta-2: #f2c874; --jk-ok: #7fe0d2; --jk-mute: #a79e8c; --jk-navy: #0e3657; --jk-vali: 520ms; }
+
+/* ── Asemapala: rengas 14 px vaakunan paikalla, päätepisteissä täysi kulta; ratalinja palojen läpi ── */
+.tn20 .kl--juna .kl-kortti { --kl-vw: 30px; --kl-varaus: 76px; min-height: 46px; gap: 10px; }
+.tn20 .kl--juna .kl-kortti[data-tila="lukittu"] { --kl-varaus: 120px; }
+.tn20 .kl-asema { position: relative; display: block; flex: none; width: 30px; align-self: stretch; }
+.tn20 .kl-asema::before { content: ""; position: absolute; left: 14px; top: -6px; bottom: -6px; width: 2px; background: var(--kl-viiva-2); }
+.tn20 .kl-asema::after {
+  content: ""; position: absolute; left: 8px; top: 50%; width: 14px; height: 14px; margin-top: -7px; box-sizing: border-box;
+  border-radius: 50%; background: var(--kl-pinta); border: 3px solid var(--kl-heikko);
+}
+.tn20 .kl--juna .kl-kortti[data-tila="lukittu"] .kl-asema::after { background: var(--jk-kulta); border-color: var(--jk-kulta); }
+.tn20 .kl--juna .kl-rivi:first-child .kl-asema::before { top: 50%; }
+.tn20 .kl--juna .kl-rivi:last-child .kl-asema::before { bottom: 50%; }
+.tn20 .kl--juna .kl-liitos { padding-left: 23px; }
+.tn20 .kl--juna .kl-kisko { width: 2px; background: var(--kl-viiva-2); }
+/* Nimi ja kunta samalla rivillä; jos vihje ei mahdu, se putoaa kokonaisena toiselle riville. */
+.tn20 .kl--juna .kl-kortti-t { flex-direction: row; flex-wrap: wrap; align-items: baseline; gap: 0 6px; }
+.tn20 .kl--juna .kl-maakunta { font-size: 13px; line-height: 16px; font-weight: 600; color: var(--kl-heikko); }
+.tn20 .kl--juna .kl-paate-merkki { font-size: 12px; line-height: 13px; }
+
+/* ── Kartta: päätepisteiden nimet navy-pillereinä, väliasemat valkoisina lappuina (CD 2) ── */
+.tn20 .kl--juna .kl-merkki-lappu:not([data-paa]) .kl-merkki-nimi {
+  padding: 4px 9px; background: #fff; color: var(--jk-navy); box-shadow: 0 0 0 1px #c5d2d6;
+  font-size: 12px; font-weight: 700; line-height: 15px; letter-spacing: 0; text-transform: none;
+}
+.tn20 .kl--juna .kl-merkki-lappu[data-paa] .kl-merkki-nimi { font-size: 12px; padding: 4px 9px; letter-spacing: .08em; }
+.tn20 .kl--juna .kl-piste { width: 10px; height: 10px; box-shadow: 0 0 0 2px #fff; }
+.tn20 .kl--juna .kl-viiva { stroke-width: 4px; }
+
+/* Juna: kerroksen kokoinen kääre siirtyy prosentteina (vain transform), merkki keskitetään pisteeseen. */
+.tn20 .kl-juna-kulku {
+  position: absolute; inset: 0; z-index: 3; pointer-events: none;
+  transition: transform var(--jk-vali) cubic-bezier(.4, 0, .2, 1);
+}
+.tn20 .kl-juna { position: absolute; left: 0; top: 0; width: 26px; height: 26px; transform: translate(-50%, -50%); filter: drop-shadow(0 2px 3px rgba(14, 54, 87, .35)); }
+.tn20 .kl-juna svg { display: block; width: 100%; height: 100%; overflow: visible; }
+
+/* ── Tulos (CD 3a/3b): otsikko, kartta ja asemaketju, jako, yritykset, taso + Arvo uusi vuoro, muut pelit ── */
+.tn20 .jk-tulos { gap: 24px; }
+.tn20 .jk-tulos-paa.kl-tulos { display: flex; flex-direction: column; align-items: flex-start; gap: 8px; padding: 0; border: 0; background: none; }
+.tn20 .jk-tulos-paa.kl-tulos[data-lopetus="onnistui"] { background: none; }
+.tn20 .jk-tulos-paa.kl-tulos h1 {
+  font-variation-settings: "wdth" 76; font-size: clamp(28px, 8cqi, 44px); line-height: .95; color: var(--kl-teksti); text-wrap: balance;
+}
+.tn20 .jk-pisteet { margin: 0; font-family: var(--kl-display); font-weight: 900; font-variation-settings: "wdth" 80; font-size: 20px; color: var(--jk-kulta-2); }
+.tn20 .jk-tulos-paa.kl-tulos .jk-pisteet { font-size: 20px; color: var(--jk-kulta-2); }
+.tn20 .jk-pisteet span { color: var(--jk-mute); }
+.tn20 .jk-reitti { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+.tn20 .jk-reitti .kl-kartta-alue { aspect-ratio: 366 / 430; max-height: 70svh; }
+.tn20 .jk-ketju { list-style: none; display: flex; flex-wrap: wrap; gap: 6px 0; margin: 0; padding: 0; }
+.tn20 .jk-ketju li { display: flex; align-items: center; padding: 5px 10px; border: 1px solid var(--kl-viiva); border-radius: 999px; font-size: 14px; line-height: 18px; font-weight: 700; white-space: nowrap; }
+.tn20 .jk-ketju li + li { margin-left: 10px; position: relative; }
+.tn20 .jk-ketju li + li::before { content: ""; position: absolute; right: 100%; top: 50%; width: 10px; height: 2px; margin-top: -1px; background: var(--kl-viiva-2); }
+.tn20 .jk-ketju li[data-paa] { background: var(--jk-kulta); border-color: var(--jk-kulta); color: #131109; font-weight: 800; }
+.tn20 .jk-reitti .kl-ketju .kl-asema { display: none; }
+.tn20 .jk-reitti .kl-ketju li { padding-left: 9px; }
+.tn20 .jk-ots { margin: 0 0 8px; font-family: var(--rk-cond), "Barlow Condensed", sans-serif; font-weight: 800; font-size: 15px; letter-spacing: .14em; text-transform: uppercase; color: var(--jk-mute); }
+.tn20 .jk-yr ol { list-style: none; display: flex; flex-direction: column; gap: 4px; margin: 0; padding: 0; }
+.tn20 .jk-yr li { display: flex; align-items: center; gap: 10px; min-height: 44px; padding: 4px 12px; border: 1px solid var(--kl-viiva); border-radius: 12px; background: var(--kl-pinta); color: var(--jk-kulta-2); }
+.tn20 .jk-yr li[data-oikein] { color: var(--jk-ok); }
+.tn20 .jk-yr svg { flex: none; width: 18px; height: 18px; }
+.tn20 .jk-yr b { font-weight: 800; color: var(--kl-teksti); }
+.tn20 .jk-yr span { margin-left: auto; font-size: 14px; font-weight: 700; text-align: right; }
+.tn20 .jk-arvo { display: flex; flex-direction: column; gap: 10px; }
+
+/* Taso ja päätoiminto (hero ja tulos) */
+.tn20 .jk-tasot { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.tn20 .jk-taso {
+  display: flex; align-items: center; justify-content: center; min-height: 44px; padding: 0 6px; border-radius: 999px; border: 1.5px solid var(--kl-viiva-2);
+  background: none; font-family: var(--tn-font-body); font-weight: 700; font-size: 15px; color: var(--kl-heikko); text-align: center; text-decoration: none; cursor: pointer;
+}
+.tn20 .jk-taso:hover { border-color: #6a5d40; }
+.tn20 .jk-taso[aria-pressed="true"], .tn20 .jk-taso[aria-current="true"] { border-color: var(--jk-kulta); color: var(--jk-kulta-2); }
+.tn20 .jk-taso:focus-visible, .tn20 .jk-cta:focus-visible { outline: 2px solid var(--kl-kerma); outline-offset: 2px; }
+.tn20 .jk-cta {
+  display: flex; align-items: center; justify-content: center; width: 100%; min-height: 52px; padding: 4px 12px; border: 0; border-radius: 999px;
+  background: var(--tn-lime, #b6ff3c); color: #131109; font-family: var(--kl-display); font-weight: 900; font-variation-settings: "wdth" 82;
+  font-size: 16px; letter-spacing: .04em; line-height: 1.1; text-transform: uppercase; text-align: center; cursor: pointer;
+  transition: background-color var(--dur-fast) var(--ease-standard);
+}
+.tn20 .jk-cta:hover { background: #cbff6e; }
+.tn20 .jk-cta:active { transform: translateY(2px); }
+
+@container (min-width: 900px) {
+  .tn20 .pk-tulos.jk-tulos {
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    grid-template-areas: "paa reitti" "jako reitti" "yr reitti" "arvo reitti" "muut muut" "linkit linkit";
+    grid-template-rows: auto auto auto 1fr auto auto; gap: 28px 56px; max-width: 1168px; padding: 48px 24px 72px;
+  }
+  .tn20 .jk-tulos > .jk-tulos-paa { grid-area: paa; }
+  .tn20 .jk-tulos > .jk-reitti { grid-area: reitti; position: sticky; top: 16px; }
+  .tn20 .jk-tulos > .tn-jako { grid-area: jako; grid-column: auto; grid-row: auto; position: static; padding: 16px; }
+  .tn20 .jk-tulos > .jk-yr { grid-area: yr; }
+  .tn20 .jk-tulos > .jk-arvo { grid-area: arvo; align-self: start; }
+  .tn20 .jk-tulos > .pk-seuraava { grid-area: muut; }
+  .tn20 .jk-tulos > .pk-tulos-linkit { grid-area: linkit; }
+  .tn20 .jk-reitti .kl-kartta-alue { aspect-ratio: 640 / 620; max-height: calc(100svh - 160px); }
+  .tn20 .jk-ketju li { font-size: 15px; padding: 6px 12px; }
+}
+
+/* ── Hero (CD 4a/4b): kuva, otsikko ja intro, päivän vuoro paloina, Aloita ja taso ── */
+.tn20 .jk-hero { display: flex; flex-direction: column; gap: 20px; padding: 20px 20px 32px; }
+.tn20 .jk-hero-t { display: flex; flex-direction: column; gap: 20px; }
+.tn20 .jk-hero-o { display: flex; flex-direction: column; gap: 12px; }
+.tn20 .jk-h1 {
+  margin: 0; font-family: var(--kl-display); font-weight: 900; font-variation-settings: "wdth" 70; font-size: clamp(30px, 9.4cqi, 64px);
+  line-height: .92; letter-spacing: -.01em; text-transform: uppercase; color: var(--kl-teksti); overflow-wrap: normal; word-break: keep-all;
+}
+.tn20 .jk-h1 span { display: block; color: var(--jk-kulta); }
+.tn20 .jk-ingressi { margin: 0; font-size: 16px; line-height: 1.5; color: var(--kl-heikko); max-width: 46ch; text-wrap: pretty; }
+.tn20 .jk-ingressi strong { color: var(--kl-teksti); font-weight: 700; }
+.tn20 .jk-intro { display: flex; flex-direction: column; align-items: flex-start; gap: 10px; }
+.tn20 .jk-paate {
+  display: flex; align-items: center; gap: 10px; min-height: 50px; padding: 0 16px 0 14px; border: 1.5px solid var(--jk-kulta); border-radius: 14px; background: #17140d;
+  font-family: var(--kl-display); font-weight: 900; font-variation-settings: "wdth" 76; font-size: 18px; text-transform: uppercase; color: var(--kl-teksti);
+}
+.tn20 .jk-paate i { width: 14px; height: 14px; border-radius: 50%; background: var(--jk-kulta); flex: none; }
+.tn20 .jk-valit { list-style: none; display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 0 20px; padding: 2px 0 2px 16px; border-left: 2px dashed var(--kl-viiva-2); }
+.tn20 .jk-valit li { display: flex; align-items: center; min-height: 40px; padding: 0 12px; border: 1px solid var(--kl-viiva); border-radius: 10px; background: var(--kl-pinta); font-weight: 700; font-size: 15px; white-space: nowrap; }
+.tn20 .jk-valit li[data-yli] { display: none; }
+.tn20 .jk-valit .jk-lisaa { background: none; border-style: dashed; color: var(--jk-mute); }
+.tn20 .jk-hero-n { display: flex; flex-direction: column; gap: 10px; }
+.tn20 .jk-kuva { display: flex; flex-direction: column; aspect-ratio: 6 / 5; border-radius: 14px; overflow: hidden; background: #fff; }
+.tn20 .jk-kuva-m { flex: 1; min-height: 0; display: flex; justify-content: center; }
+.tn20 .jk-kuva-m img { display: block; height: 100%; width: auto; aspect-ratio: 1; }
+.tn20 .jk-kuva-j { position: relative; flex: none; height: 28%; overflow: hidden; background: var(--jk-navy); }
+.tn20 .jk-kuva-j img { position: absolute; right: 0; bottom: 0; height: 100%; width: auto; aspect-ratio: 7 / 1; }
+
+/* Näin pelaat: kolme korttia (sama malli kuin Mikä maa? -pelissä), korvaa suljetut ohjeet. */
+.tn20 .jk-nain { padding: 8px 20px 40px; }
+.tn20 .jk-nain-r { list-style: none; display: grid; gap: 12px; margin: 0; padding: 0; }
+.tn20 .jk-nain-r li { display: flex; gap: 14px; padding: 18px 16px; border: 1px solid #2c2517; border-radius: 16px; background: #0f0d07; }
+.tn20 .jk-nain-i {
+  flex: none; display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 50%;
+  border: 1.5px solid var(--c); color: var(--c); font-family: var(--kl-display); font-weight: 900; font-size: 15px;
+}
+.tn20 .jk-nain h3 { margin: 0 0 6px; font-family: var(--kl-display); font-weight: 900; font-size: 15px; line-height: 1.2; letter-spacing: .02em; text-transform: uppercase; color: var(--kl-teksti); }
+.tn20 .jk-nain p { margin: 0; font-size: 15px; line-height: 1.45; color: var(--kl-heikko); }
+
+@container (min-width: 900px) {
+  .tn20 .jk-hero { display: grid; grid-template-columns: minmax(0, 6fr) minmax(0, 5fr); align-items: center; gap: 64px; max-width: 1280px; margin: 0 auto; padding: 56px 40px; }
+  .tn20 .jk-hero-t { order: -1; gap: 28px; }
+  .tn20 .jk-hero-o { gap: 16px; }
+  .tn20 .jk-kuva { aspect-ratio: 1; }
+  .tn20 .jk-kuva-m img { height: auto; width: 100%; max-height: 100%; }
+  .tn20 .jk-hero-n { max-width: 420px; }
+  .tn20 .jk-paate { font-size: 20px; min-height: 54px; }
+  .tn20 .jk-valit li[data-yli] { display: flex; }
+  .tn20 .jk-valit .jk-lisaa { display: none; }
+  .tn20 .jk-ingressi { font-size: 18px; line-height: 1.5; }
+  .tn20 .jk-nain { max-width: 1280px; margin: 0 auto; padding: 0 40px 72px; }
+  .tn20 .jk-nain-r { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+  .tn20 .jk-nain-r li { padding: 22px 20px; }
+}
