@@ -81,6 +81,9 @@ Tarkista ja korjaa suoraan riville (älä muuta `status`-kenttää):
 - **Yksiselitteisyys:** väärä vaihtoehto on varmasti väärä (ei esim. myös oikein eri tulkinnalla).
 - Huono kysymys: aseta `status = 'hidden'` ja kirjoita syy kenttään `huomio`.
 
-**Havaittu virhe tuotannon visassa:** kysymys 586f68a0-e81c-46cd-a2cc-43137cc05193 väittää Tellervo Koiviston
-olleen SDP:n kansanedustaja 1972–1975. Tiettävästi hän oli Helsingin kaupunginvaltuutettu, ei kansanedustaja. Tarkista
-ja korjaa visa (ei ole mukana Kumpi?-kysymyksissä).
+**Tellervo Koivisto (586f68a0-e81c-46cd-a2cc-43137cc05193): ei virhettä.** Cowork vahvisti 20.11. (Wikidata,
+fi.wikipedia, Yle): SDP:n kansanedustaja 1972–1975, Helsingin kaupunginvaltuustoon vasta 1976. Visa pysyy ennallaan, ja
+kysymys on palautettu Kumpi?-kysymyksiin (luonnos).
+
+**Tulos (Cowork 20.11.):** 835 tarkistettu, 207 korjattu (52 lausetta, 103 `oikea_fakta`, 51 `vaara_fakta` tyhjennetty),
+0 piilotettu. Varmuuskopio `_kumpi_visakysymykset_backup_20261120`. Kohdat 1–3 ja "Samalla korjattavaa" tekemättä.
