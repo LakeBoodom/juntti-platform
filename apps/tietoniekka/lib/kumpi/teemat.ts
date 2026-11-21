@@ -4,16 +4,9 @@
 
 import type { KEnt } from "./tyypit";
 
-/** Suomen järvet ja joet (kannassa ei maa- eikä sijaintitietoa järville ja joille, 20.11.2026). Laatokka on Venäjällä,
- *  Iso Orjajärvi Kanadassa. Uusi suomalainen järvi tai joki lisätään tähän, muuten se menee Maailma-teemaan. */
-export const SUOMEN_VEDET = new Set([
-  "Saimaa", "Päijänne", "Inarijärvi", "Pielinen", "Oulujärvi", "Pihlajavesi", "Orivesi", "Haukivesi", "Keitele", "Kallavesi",
-  "Puruvesi", "Puula", "Lokan tekojärvi", "Höytiäinen", "Näsijärvi", "Lappajärvi", "Vesijärvi", "Vanajavesi", "Keurusselkä",
-  "Kilpisjärvi", "Tuusulanjärvi", "Bodominjärvi",
-  "Kemijoki", "Iijoki", "Ounasjoki", "Luttojoki", "Kitinen", "Muonionjoki", "Kymijoki", "Simojoki", "Tornionjoki", "Ivalojoki",
-  "Lapuanjoki", "Tenojoki", "Vuoksi", "Porvoonjoki", "Kyrönjoki", "Kokemäenjoki", "Loimijoki", "Paimionjoki", "Oulujoki",
-  "Vantaanjoki", "Könkämäeno", "Aurajoki",
-]);
+/** Suomalainen järvi tai joki: tags sisältää "suomi" (Cowork 20.11.2026; rajavesillä myös "rajavesi"). Uusi järvi tai
+ *  joki menee oikeaan teemaan tagin perusteella, ilman nimilistaa. */
+export const suomenVesi = (e: KEnt) => e.tags.includes("suomi");
 
 export type Ryhma = "yleistieto" | "jaakiekko" | "urheilu" | "suomi" | "luonto" | "maailma" | "ihmiset";
 
@@ -34,12 +27,12 @@ export const RYHMAT: Array<{ avain: Ryhma; nimi: string }> = [
 export const KUVAUKSET: Record<string, string> = {
   yleistieto: "Kaikki aiheet sekaisin Suomesta luontoon, urheiluun ja politiikkaan",
   suomi: "Kaupunkien ja maakuntien asukasluvut, iät ja pinta-alat",
-  luonto: "Järvet, joet, tunturit, kansallispuistot ja majakat",
+  luonto: "Eläimet, järvet, joet, tunturit, kansallispuistot ja majakat",
   urheilu: "Olympiavoittajat ja F1-mestarit",
   "suomikiekon-legendat": "Stanley Cupit, MM-kullat ja NHL-urat",
   liiga: "Ottelut, maalit, pisteet ja seurat",
   maailma: "Maat, vuoret, järvet ja joet",
-  ihmiset: "Tunnetut suomalaiset, kansanedustajat ja pääministerit",
+  ihmiset: "Tunnetut suomalaiset, kansanedustajat, pääministerit ja presidentit",
 };
 
 export const RIVIKUVAT: Record<string, string> = {
@@ -99,6 +92,8 @@ export type Pooli =
   | { tapa: "suomalaiset" };
 
 export type Teema = {
+  /** Paino yhdistelmäteemassa (oletus 1): Liiga-seurat 0,4, jotta seurakysymyksiä on noin kolmannes Liigasta. */
+  paino?: number;
   /** Yhdistelmäteema (Yleistieto, Ihmiset, Urheilu): kysymykset arvotaan näistä perusteemoista (slugit), kukin oman
    *  poolinsa säännöillä. pooli ja attrs eivät silloin ole käytössä. */
   osat?: string[];
@@ -123,8 +118,15 @@ export const PERUSTEEMAT: Teema[] = [
     attrs: [...new Set(["stanley_cups", "wc_golds", "nhl_points", ...SAAVUTUS, ...NHL, ...LIIGA_URA, "liiga_debut", "liiga_seasons", "nt_games", "nt_points", ...TAUSTA])],
   },
   {
-    slug: "liiga", nimi: "Liiga", ryhma: "jaakiekko", pooli: { tapa: "liiga" },
+    slug: "liiga-pelaajat", nimi: "Liiga", ryhma: "jaakiekko", pooli: { tapa: "liiga" },
     attrs: [...LIIGA_URA, "liiga_debut", "liiga_seasons", "liiga_clubs", "played_for_club", ...TAUSTA],
+  },
+  /* Liigan 17 nykyistä seuraa (Cowork 20.11.2026). founded_hockey jää pois: perustamisvuosi on osalla emoseuran
+     (JYP, HPK) tai edeltäjän vuosi (Kiekko-Espoo, Pelicans, Tappara-nimi 1955), joten vertailu ei ole yksiselitteinen. */
+  {
+    slug: "liiga-seurat", nimi: "Liiga-seurat", ryhma: "jaakiekko", paino: 0.4,
+    pooli: { tapa: "kind", kinds: ["team"], rajaus: (e) => e.ryhma === "liiga" },
+    attrs: ["titles", "has_title", "first_title_year", "latest_title_year", "home_capacity", "is_founding_member", "liiga_since", "city_pop"],
   },
   { slug: "olympiavoittajat", nimi: "Olympiavoittajat", ryhma: "urheilu", pooli: { tapa: "kind", kinds: ["person"] }, attrs: ["oly_golds", "oly_medals"] },
   { slug: "f1", nimi: "F1", ryhma: "urheilu", pooli: { tapa: "kind", kinds: ["person"] }, attrs: ["f1_titles", "f1_wins", "f1_poles"] },
@@ -132,20 +134,23 @@ export const PERUSTEEMAT: Teema[] = [
      Kaupungit ja maakunnat yhdeksi Suomi-teemaksi (Heikki 20.11.), kunnes niistä on enemmän erilaista dataa. */
   { slug: "suomi", nimi: "Suomi", ryhma: "suomi", pooli: { tapa: "kind", kinds: ["city", "region"] }, attrs: ["population", "founded_year", "region_pop", "region_area"] },
   /* Luonto ja Maailma yhtenä teemana kumpikin (Heikki 20.11.2026): yksin järvet "eivät kanna", ja yhdistettynä
-     kysymyksiin tulee vaihtelua. Luonnossa järvet ja joet vain Suomesta (SUOMEN_VEDET), maailman järvet ja joet
+     kysymyksiin tulee vaihtelua. Luonnossa järvet ja joet vain Suomesta (tags "suomi"), maailman järvet ja joet
      Maailmassa. Pooli on kindien yhdiste; kukin kysymys vertaa vain saman attribuutin kohteita. */
   {
     slug: "luonto", nimi: "Luonto", ryhma: "luonto",
-    pooli: { tapa: "kind", kinds: ["lake", "river", "park", "lighthouse", "fell"], rajaus: (e) => (e.kind !== "lake" && e.kind !== "river") || SUOMEN_VEDET.has(e.nimi) },
-    attrs: ["area_km2", "river_length", "height_m", "park_area_km2", "park_founded", "park_visits", "lh_built", "lh_height_m"],
+    pooli: { tapa: "kind", kinds: ["lake", "river", "park", "lighthouse", "fell", "species"], rajaus: (e) => (e.kind !== "lake" && e.kind !== "river") || suomenVesi(e) },
+    // Eläimet (Cowork 20.11.2026): elinikä ja kanta verrataan vain saman mittarin lajien kesken (metric: pisin_todettu /
+    // tyypillinen, paria / yksilöä), ks. mittaritSopivat generaattorissa. Huippunopeus (4 lajia) jää pois.
+    attrs: ["area_km2", "river_length", "height_m", "park_area_km2", "park_founded", "park_visits", "lh_built", "lh_height_m",
+      "length_cm", "species_weight_kg", "lifespan_years", "wingspan_cm", "population_fi"],
   },
   {
     slug: "maailma", nimi: "Maailma", ryhma: "maailma",
-    pooli: { tapa: "kind", kinds: ["country", "mountain", "lake", "river"], rajaus: (e) => (e.kind !== "lake" && e.kind !== "river") || !SUOMEN_VEDET.has(e.nimi) },
+    pooli: { tapa: "kind", kinds: ["country", "mountain", "lake", "river"], rajaus: (e) => (e.kind !== "lake" && e.kind !== "river") || !suomenVesi(e) },
     attrs: ["country_area", "country_pop", "mountain_height", "area_km2", "river_length"],
   },
   { slug: "tunnetut-suomalaiset", nimi: "Tunnetut suomalaiset", ryhma: "ihmiset", pooli: { tapa: "suomalaiset" }, attrs: ["birth"] },
-  { slug: "politiikka", nimi: "Politiikka", ryhma: "ihmiset", pooli: { tapa: "kind", kinds: ["person"] }, attrs: ["mp_first_year", "mp_years", "pm_days", "pm_start"] },
+  { slug: "politiikka", nimi: "Politiikka", ryhma: "ihmiset", pooli: { tapa: "kind", kinds: ["person"] }, attrs: ["mp_first_year", "mp_years", "pm_days", "pm_start", "pres_start"] },
 ];
 
 
@@ -154,7 +159,7 @@ const sekoitus = (slug: string, nimi: string, ryhma: Ryhma, osat: string[]): Tee
 });
 
 /** Yleistiedon osat: kaikki perusteemat. Jääkiekkoa enintään 2/10 ja kustakin muusta ryhmästä enintään 3/10. */
-export const YLEISTIETO_OSAT = ["suomi", "luonto", "maailma", "tunnetut-suomalaiset", "politiikka", "olympiavoittajat", "f1", "suomikiekon-legendat", "liiga"];
+export const YLEISTIETO_OSAT = ["suomi", "luonto", "maailma", "tunnetut-suomalaiset", "politiikka", "olympiavoittajat", "f1", "suomikiekon-legendat", "liiga-pelaajat", "liiga-seurat"];
 
 /** Hubin seitsemän riviä (Heikki 20.11.2026) + Oma seura. Järjestys hubissa tulee RYHMAT-listasta. */
 export const TEEMAT: Teema[] = [
@@ -163,7 +168,8 @@ export const TEEMAT: Teema[] = [
   PERUSTEEMAT.find((t) => t.slug === "luonto")!,
   sekoitus("urheilu", "Urheilu", "urheilu", ["olympiavoittajat", "f1"]),
   PERUSTEEMAT.find((t) => t.slug === "suomikiekon-legendat")!,
-  PERUSTEEMAT.find((t) => t.slug === "liiga")!,
+  /* Liiga = pelaajat + seurat (Heikki 21.11.2026: Coworkin seuradata). Slug pysyy "liiga" (sivu, visakysymykset). */
+  sekoitus("liiga", "Liiga", "jaakiekko", ["liiga-pelaajat", "liiga-seurat"]),
   PERUSTEEMAT.find((t) => t.slug === "maailma")!,
   sekoitus("ihmiset", "Ihmiset", "ihmiset", ["tunnetut-suomalaiset", "politiikka"]),
 ];

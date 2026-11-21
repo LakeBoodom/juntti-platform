@@ -10,7 +10,7 @@ import { henkiloKuva } from "@/lib/henkilokuvat";
 import { helsinginPaiva } from "@/lib/aika";
 import type { KDef, KEnt, KumpiData } from "./tyypit";
 
-const KINDIT = ["player", "person", "team", "city", "region", "lake", "river", "park", "lighthouse", "fell", "country", "mountain", "event"];
+const KINDIT = ["player", "person", "team", "city", "region", "lake", "river", "park", "lighthouse", "fell", "country", "mountain", "event", "species"];
 const SIVU = 1000;
 const TTL_MS = 60 * 60 * 1000;
 
@@ -106,7 +106,8 @@ export function rakennaKumpiData(r: {
       if (a.metric) m[a.attr_key] = a.metric;
       if (a.num_value !== null && a.num_value !== undefined) v[a.attr_key] = Number(a.num_value);
     }
-    if (x.kind === "team") continue;
+    // Seuroista vertailuihin vain nykyiset 17 Liiga-seuraa (group_key liiga); jalkapalloseurat ja lakanneet pois.
+    if (x.kind === "team" && x.group_key !== "liiga") continue;
     // Pelaajien ikä: tarkka syntymäaika (birth, epoch-sekunnit) tai pelkkä vuosi (birth_year → 1.7.). Ero on aina
     // vähintään vuoden (min_gap), joten puolen vuoden epätarkkuus ei voi kääntää järjestystä.
     if (v.birth === undefined && v.birth_year !== undefined) v.birth = Date.UTC(v.birth_year, 6, 1) / 1000;
@@ -124,6 +125,8 @@ export function rakennaKumpiData(r: {
       paino,
       lat: x.lat == null ? null : Number(x.lat), lon: x.lon == null ? null : Number(x.lon),
       partitiivi: x.name_partitive ?? null,
+      ryhma: x.group_key ?? null,
+      tags: Array.isArray(x.tags) ? x.tags : [],
     });
   }
 
@@ -166,7 +169,7 @@ export async function lataaKumpiData(): Promise<KumpiData | null> {
   const [entities, defs, blocks, relaatiot, faktat, julkkikset, visat] = await Promise.all([
     kaikki((alku, loppu) =>
       sb.from("fact_entities")
-        .select("id, name, kind, image_url, celebrity_id, lat, lon, name_partitive, fact_attributes(attr_key, scope, num_value, display_value, text_value, metric, volatility, next_review_at)")
+        .select("id, name, kind, group_key, tags, image_url, celebrity_id, lat, lon, name_partitive, fact_attributes(attr_key, scope, num_value, display_value, text_value, metric, volatility, next_review_at)")
         .in("kind", KINDIT).in("status", tilat).order("id").range(alku, loppu)),
     (async () => {
       let q = sb.from("fact_attribute_defs").select("*").not("kumpi_kysymys", "is", null);

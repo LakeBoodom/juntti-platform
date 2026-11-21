@@ -23,7 +23,11 @@ export function fiLuku(n: number): string {
 }
 
 /** Attribuutit, joiden arvo on vuosiluku (ei tuhaterotinta). */
-const VUOSI_ATTR = new Set(["founded_year", "lh_built", "park_founded", "mp_first_year", "year", "liiga_debut", "nhl_debut", "start_year", "party_founded"]);
+const VUOSI_ATTR = new Set([
+  "founded_year", "lh_built", "park_founded", "mp_first_year", "year", "liiga_debut", "nhl_debut", "start_year", "party_founded",
+  // Presidentin aloitusvuosi (display_value "1925", Cowork 20.11.2026) ja seurojen vuodet.
+  "pres_start", "liiga_since", "first_title_year", "latest_title_year", "founded_hockey",
+]);
 
 /** "Kumpi heistä on pelannut enemmän [Liiga-otteluita]?" → osat. Paikkamerkit täytetään ennen jakoa. */
 export function jaaKysymys(lause: string): { ennen: string; avain: string; jalkeen: string } {
@@ -102,12 +106,16 @@ export const FLAG_VUODET: Record<string, string> = {
   oly_gold: "oly_gold_years",
 };
 
-/** Flag-arvorivit (brief A2): voittaja / ei-voittaja. Muut flagit eivät ole Kumpi?:ssa ennen kuin pari kirjoitetaan. */
-const FLAG_RIVIT: Record<string, { kylla: string | null; ei: string }> = {
+/** Flag-arvorivit (brief A2): voittaja / ei-voittaja. Muut flagit eivät ole Kumpi?:ssa ennen kuin pari kirjoitetaan.
+ *  Funktio = rivi entiteetin omista tiedoista (seuroilla mestaruusmäärä ja ensimmäinen liigakausi). */
+type FlagRivi = string | null | ((e: KEnt) => string | null);
+const FLAG_RIVIT: Record<string, { kylla: FlagRivi; ei: FlagRivi }> = {
   has_stanley_cup: { kylla: null, ei: "Ei ole voittanut" },
   has_wc_gold: { kylla: null, ei: "Ei ole voittanut" },
   oly_gold: { kylla: null, ei: "Ei ole voittanut" },
   has_nhl: { kylla: "Pelasi NHL:ssä", ei: "Ei ole pelannut NHL:ssä" },
+  has_title: { kylla: (e) => e.d.titles ? siistiArvo(e.d.titles, "titles") : "On voittanut", ei: "Ei ole voittanut" },
+  is_founding_member: { kylla: "Mukana 1975", ei: (e) => e.v.liiga_since ? `Liigaan ${e.v.liiga_since}` : "Ei ollut mukana" },
 };
 
 /** Kelpaako entiteetti attribuutin pooliin (arvo olemassa, flagilla nimenomainen 0/1 ja voittajalla vuodet). */
@@ -171,9 +179,10 @@ function nayttoarvo(e: KEnt, s: Spec): string {
 
 function flagArvo(e: KEnt, key: string, voittaja: boolean): string {
   const r = FLAG_RIVIT[key] ?? { kylla: "Kyllä", ei: "Ei" };
-  if (!voittaja) return r.ei;
+  const rivi = (x: FlagRivi) => (typeof x === "function" ? x(e) : x);
+  if (!voittaja) return rivi(r.ei) ?? "Ei";
   if (FLAG_VUODET[key]) return e.d[FLAG_VUODET[key]] ?? "Voitti";
-  return r.kylla ?? "Kyllä";
+  return rivi(r.kylla) ?? "Kyllä";
 }
 
 function fakta(def: KDef, s: Spec, w: KEnt, l: KEnt, wArvo: string, lArvo: string, x: string): string {
@@ -189,7 +198,8 @@ function fakta(def: KDef, s: Spec, w: KEnt, l: KEnt, wArvo: string, lArvo: strin
     .replaceAll("{a}", w.nimi).replaceAll("{b}", l.nimi)
     .replaceAll("{aarvo}", wArvo).replaceAll("{barvo}", lArvo)
     .replaceAll("{av}", wArvo).replaceAll("{bv}", lArvo)
-    .replaceAll("{apvm}", wArvo.replace(/^s\. /, "")).replaceAll("{bpvm}", lArvo.replace(/^s\. /, ""))
+    // {apvm}: tarkka päivämäärä tekstiarvosta, jos se on (presidentit "2.3.1925"; kortissa vain vuosi).
+    .replaceAll("{apvm}", w.t[s.key] ?? wArvo.replace(/^s\. /, "")).replaceAll("{bpvm}", l.t[s.key] ?? lArvo.replace(/^s\. /, ""))
     .replaceAll("{ero}", eroTxt).replaceAll("{x}", x);
 }
 
