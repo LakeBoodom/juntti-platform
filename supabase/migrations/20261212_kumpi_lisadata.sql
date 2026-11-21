@@ -23,5 +23,11 @@ update public.fact_attribute_defs set
   fact_template = 'Asukkaita kotikaupungissa: {a} {av}, {b} {bv}.'
 where attr_key = 'city_pop';
 
+-- Siipiväli: "kapeammat siivet" ei tarkoita kärkiväliä. Kärkiväli on vain linnuilla.
+update public.fact_attribute_defs set
+  kumpi_kysymys = 'Kummalla linnulla on pidempi [siipien kärkiväli]?',
+  kumpi_kysymys_kaanteinen = 'Kummalla linnulla on lyhyempi [siipien kärkiväli]?'
+where attr_key = 'wingspan_cm';
+
 -- 4. Coworkin maatagien korjaus: Iso Orjajärvi (Great Slave Lake, Kanada) ja Yläjärvi (Lake Superior) eivät ole Suomessa.
 update public.fact_entities set tags = array['ulkomaat'] where kind = 'lake' and name in ('Iso Orjajärvi', 'Yläjärvi');
