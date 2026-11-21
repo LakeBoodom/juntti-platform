@@ -29,6 +29,10 @@ export type KEnt = {
   lat: number | null;
   lon: number | null;
   partitiivi: string | null;
+  /** fact_entities.group_key (seuroilla "liiga", lajeilla "lintu"/"kala"/"nisakas"). */
+  ryhma: string | null;
+  /** fact_entities.tags (järvillä ja joilla "suomi"/"ulkomaat", Cowork 20.11.2026). */
+  tags: string[];
 };
 
 export type KDef = {
