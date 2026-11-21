@@ -357,16 +357,18 @@ function LapsetJaPaketit({ l, vp }: { l: D["lapset"]; vp: D["visapaketit"] }) {
 export default function EtusivuV5({ d }: { d: D }) {
   return (
     <div className="tn-es5" data-tn-entry="etusivu:muu">
-      {/* Pääviesti (Heikki 21.11.2026): sivun ainoa h1 = yläotsikko + koukku, alla alarivi. Tekstit lib/paaviesti.ts. */}
-      <div className="tn-es-paaviesti">
-        <h1 className="tn-es-pa-h1">
-          <span className="tn-es-pa-yla">{YLAOTSIKKO}</span>{" "}
-          <span className="tn-es-pa-koukku">{KOUKKU}</span>
-        </h1>
-        <p className="tn-es-pa-ala">{ALARIVI}</p>
+      <div className="tn-es-alku">
+        {/* Pääviesti (Heikki 21.11.2026): sivun ainoa h1 = yläotsikko + koukku, alla alarivi. Tekstit lib/paaviesti.ts. */}
+        <div className="tn-es-paaviesti">
+          <h1 className="tn-es-pa-h1">
+            <span className="tn-es-pa-yla">{YLAOTSIKKO}</span>{" "}
+            <span className="tn-es-pa-koukku">{KOUKKU}</span>
+          </h1>
+          <p className="tn-es-pa-ala">{ALARIVI}</p>
+        </div>
+        {/* Haku (Heikki 16.11.2026): näkyvä kenttä Päivän pelien yläpuolella; desktopilla pääviestin vieressä. */}
+        <div className="tn-haku-etusivu"><HakuLaatikko id="tn-haku-etusivu-q" entry="etusivu:haku" /></div>
       </div>
-      {/* Haku (Heikki 16.11.2026): näkyvä kenttä Päivän pelien yläpuolella. */}
-      <div className="tn-haku-etusivu"><HakuLaatikko id="tn-haku-etusivu-q" entry="etusivu:haku" /></div>
       <PaivanPelit d={d} />
       {d.tiesitko && <Tiesitko t={d.tiesitko} lcp={!d.paivanPelit.visa?.kuva} />}
       <Aiheet a={d.aiheet} />
