@@ -31,3 +31,9 @@ where attr_key = 'wingspan_cm';
 
 -- 4. Coworkin maatagien korjaus: Iso Orjajärvi (Great Slave Lake, Kanada) ja Yläjärvi (Lake Superior) eivät ole Suomessa.
 update public.fact_entities set tags = array['ulkomaat'] where kind = 'lake' and name in ('Iso Orjajärvi', 'Yläjärvi');
+
+-- 5. Nimet (Heikki 21.11.2026: ulkomaista nimeä ei käännetä, jos suomennosta ei oikeasti käytetä). "Iso Orjajärvi" ja
+--    "Yläjärvi" ovat fi.wikipedian otsikoita, mutta muuta käyttöä ei löytynyt, ja Yläjärvi on myös monen suomalaisen
+--    järven nimi. Tšadjärvi fi.wikipedian kirjoitusasun mukaan. (Ajettu execute_sql:llä migraation jälkeen.)
+update public.fact_entities set name = case name when 'Iso Orjajärvi' then 'Great Slave Lake' when 'Yläjärvi' then 'Lake Superior' when 'Tsadjärvi' then 'Tšadjärvi' end
+where kind = 'lake' and name in ('Iso Orjajärvi', 'Yläjärvi', 'Tsadjärvi');
