@@ -1,5 +1,5 @@
 // URHEILU rungolla (runko vaihe 3 ryhmä 2, 19.10.2026). Osiot ovat entiset viisi lajilohkoa
-// (CD "TN Urheilu -teemasivu" 26.8.2026) + viisi palloilulajia (3.11.2026); visat osioihin quizzes.section_tags-tagista
+// (CD "TN Urheilu -teemasivu" 26.8.2026) + viisi palloilulajia (3.11.2026) + Talviurheilu ja Darts (21.11.2026); visat osioihin quizzes.section_tags-tagista
 // (migraatiot 20261114_urheilu_tagit, 20261129_palloilu_lajeittain). Jääkiekolla ja jalkapallolla on omat kokoelmansa — entiset porttikortit ovat
 // nyt V7-naapureita. Haku: collection 'urheilu' + tämän kokoelman tagit (sama collection sisältää myös
 // jalkapallo- ja jääkiekkovisat, jotka eivät kuulu tänne).
@@ -20,13 +20,16 @@ export const URHEILU: Kokoelma = {
   osiotNimi: "Lajit",
   sections: [
     // 3.11.2026 (Heikki): ajankohtaisimmat lajit ensin, palloilu lajeittain. 14.11.2026: osioiden sisäinen järjestys
-    // käsin (jarjestys) arvokkaimmasta vähiten arvokkaaseen.
+    // käsin (jarjestys) arvokkaimmasta vähiten arvokkaaseen. 21.11.2026 (Heikki): Talviurheilu ensimmäiseksi, Darts
+    // Formula 1:n jälkeen (nostetaan ylemmäs, kun dartsin MM-kisat alkavat).
+    { slug: "talviurheilu", eyebrow: "Talvilajit", title: "Talviurheilu", jarjestys: ["suomalaiset-hiihtajat-olympialaisissa-visa", "makihypyn-suomalaislegendat-visa", "suomalaiset-talviolympiahetket-visa", "ampumahiihdon-legendat-visa", "yhdistetyn-hiihdon-suomalaissankarit-visa", "suomalaiset-alppihiihtajat-visa", "maastohiihdon-tahdet-visa", "neljan-maen-turnaus-visa", "alppihiihdon-legendat-visa"] },
     { slug: "koripallo", eyebrow: "Palloilu", title: "Koripallo", jarjestys: ["koripallon-suomalaislegendat", "susijengin-arvokisatarina", "korisliigan-historia-ja-mestarit", "tapiolan-honka", "kotkan-ktp-basket", "joensuun-kataja", "kouvolan-kouvot", "salon-vilpas"] },
     { slug: "lentopallo", eyebrow: "Palloilu", title: "Lentopallo", jarjestys: ["veljekset-lentopallomiehet", "lentopallon-legendat-suomessa", "lentopallon-mestaruusliiga", "kokkolan-tiikerit"] },
     { slug: "salibandy", eyebrow: "Palloilu", title: "Salibandy", jarjestys: ["suomi-salibandyn-mm-kisoissa", "salibandyn-tahdet-ja-legendat", "f-liiga-salibandyn-paasarja", "suomen-salibandynaiset", "tampereen-classic", "seinajoen-peliveljet-spv"] },
     { slug: "kasipallo", eyebrow: "Palloilu", title: "Käsipallo" },
     { slug: "jaapallo", eyebrow: "Palloilu", title: "Jääpallo", featured: "jaapallo-pakkasen-pallopeli" },
     { slug: "f1", eyebrow: "Autourheilu", title: "Formula 1", featured: "formula-1-tiedatko-f1n-perusteet" },
+    { slug: "darts", eyebrow: "Tikanheitto", title: "Darts", jarjestys: ["dartsin-mm-kisat-visa", "dartsin-tahdet-visa", "dartsin-ennatykset-visa"] },
     { slug: "ralli", eyebrow: "Autourheilu", title: "Ralli" },
     { slug: "golf", eyebrow: "Mailapelit", title: "Golf" },
     { slug: "tennis", eyebrow: "Mailapelit", title: "Tennis", jarjestys: ["atp-tour-historia-huippuhetket-visa", "suomalaiset-atp-wta-kiertueilla-visa", "us-open-tennis-visa"] },
