@@ -124,10 +124,26 @@ const PALLOILU_VISAT = [
   "kokkolan-tiikerit",
 ];
 
+/** Talviurheilu- ja Darts-osiot (Heikki 21.11.2026): sama malli kuin palloilussa, tiedoston nimi = visan slug. */
+const TALVI_DARTS_VISAT = [
+  "yhdistetyn-hiihdon-suomalaissankarit-visa",
+  "suomalaiset-talviolympiahetket-visa",
+  "ampumahiihdon-legendat-visa",
+  "suomalaiset-alppihiihtajat-visa",
+  "alppihiihdon-legendat-visa",
+  "neljan-maen-turnaus-visa",
+  "makihypyn-suomalaislegendat-visa",
+  "maastohiihdon-tahdet-visa",
+  "suomalaiset-hiihtajat-olympialaisissa-visa",
+  "dartsin-ennatykset-visa",
+  "dartsin-tahdet-visa",
+  "dartsin-mm-kisat-visa",
+];
+
 /** Päivän visa -kortin kuvahaku (etusivu): lajivisan quiz-slug → kuva. */
 const QUIZ_IMG = new Map<string, string>([
   ...UL_LOHKOT.flatMap((l) => l.visat.map((v) => [v.quizSlug, v.img] as const)),
-  ...PALLOILU_VISAT.map((s) => [s, ulImg(s)] as const),
+  ...[...PALLOILU_VISAT, ...TALVI_DARTS_VISAT].map((s) => [s, ulImg(s)] as const),
 ]);
 const QUIZ_POS = new Map<string, string>(
   UL_LOHKOT.flatMap((l) => l.visat.map((v) => [v.quizSlug, v.pos] as const)),
