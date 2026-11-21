@@ -7,6 +7,7 @@
 // Ei aputekstejä: otsikko, kortti, nappi (poikkeus: Lapsille-esittely, Heikki 30.10. v9). Osio-otsikon yläpuolella vain kicker-määrä.
 import type { CSSProperties } from "react";
 import { preload } from "react-dom";
+import { ALARIVI, KOUKKU, YLAOTSIKKO } from "@/lib/paaviesti";
 import type { EtusivuData, TiesitkoKohde } from "@/lib/etusivu5";
 import PelattuTanaan from "./PelattuTanaan";
 import PaivanVisaV5 from "./PaivanVisaV5";
@@ -152,8 +153,8 @@ function Tiesitko({ t, lcp }: { t: NonNullable<D["tiesitko"]>; lcp: boolean }) {
 function Aiheet({ a }: { a: D["aiheet"] }) {
   return (
     <section className="tn-es-osio" aria-labelledby="tn-es-aiheet-h" data-tn-entry="etusivu:kokoelmat">
+      {/* Pääviesti 21.11.2026: visamäärärivi ("800+ visaa · 15 kokoelmaa") pois yläpuolelta. */}
       <div className="tn-es-otsake">
-        <span className="tn-es-kicker">{a.kicker}</span>
         <h2 id="tn-es-aiheet-h" className="tn-es-h2">Pelaa aiheittain</h2>
       </div>
       <div className="tn-es-aiheet">
@@ -356,6 +357,14 @@ function LapsetJaPaketit({ l, vp }: { l: D["lapset"]; vp: D["visapaketit"] }) {
 export default function EtusivuV5({ d }: { d: D }) {
   return (
     <div className="tn-es5" data-tn-entry="etusivu:muu">
+      {/* Pääviesti (Heikki 21.11.2026): sivun ainoa h1 = yläotsikko + koukku, alla alarivi. Tekstit lib/paaviesti.ts. */}
+      <div className="tn-es-paaviesti">
+        <h1 className="tn-es-pa-h1">
+          <span className="tn-es-pa-yla">{YLAOTSIKKO}</span>{" "}
+          <span className="tn-es-pa-koukku">{KOUKKU}</span>
+        </h1>
+        <p className="tn-es-pa-ala">{ALARIVI}</p>
+      </div>
       {/* Haku (Heikki 16.11.2026): näkyvä kenttä Päivän pelien yläpuolella. */}
       <div className="tn-haku-etusivu"><HakuLaatikko id="tn-haku-etusivu-q" entry="etusivu:haku" /></div>
       <PaivanPelit d={d} />

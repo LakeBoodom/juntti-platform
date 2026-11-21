@@ -39,6 +39,22 @@
 }
 .tn20 .tn-es-osio { display: flex; flex-direction: column; gap: 16px; }
 
+/* Pääviesti (Heikki 21.11.2026): h1 = yläotsikko + koukku, alarivi <p>. Sama pieni yläotsikko / iso otsikko -pari kuin
+   osioissa (kicker + display). Ei uusia värejä. Negatiivinen alamarginaali tuo hakukentän lähemmäs kuin osioväli.
+   KORTTISÄÄNTÖ: koukun pisin sana "TIETONIEKAKSI." (14) → koko kontista, kerroin kuten osio-otsikoissa (mitattu 21.11.). */
+.tn20 .tn-es-paaviesti { display: flex; flex-direction: column; gap: 12px; margin-bottom: -16px; }
+.tn20 .tn-es-pa-h1 { margin: 0; display: flex; flex-direction: column; gap: 10px; }
+.tn20 .tn-es-pa-yla {
+  font-size: 12px; font-weight: 800; line-height: 1.35; letter-spacing: .16em; text-transform: uppercase; color: var(--es-kulta2);
+  text-wrap: balance;
+}
+.tn20 .tn-es-pa-koukku {
+  font-family: var(--es-display); font-weight: 900; font-variation-settings: "wdth" 72;
+  font-size: min(40px, calc((100vw - 40px) / 9.4)); line-height: .9; letter-spacing: -.02em; text-transform: uppercase;
+  overflow-wrap: normal; word-break: keep-all; text-wrap: balance; color: var(--es-teksti);
+}
+.tn20 .tn-es-pa-ala { margin: 0; max-width: 34em; font-size: 15px; line-height: 1.45; color: var(--es-teksti2); text-wrap: pretty; }
+
 .tn20 .tn-es-tagit { display: flex; flex-wrap: wrap; gap: 6px; }
 .tn20 .tn-es-tag {
   display: inline-flex; align-items: center; height: 26px; padding: 0 10px; border-radius: 999px; white-space: nowrap;
@@ -712,6 +728,10 @@
 /* ── Tabletti ≥ 700 ── */
 @media (min-width: 700px) {
   .tn20 .tn-es5 { --es-reuna: 40px; padding: 32px var(--es-reuna) 56px; gap: 56px; }
+  .tn20 .tn-es-paaviesti { margin-bottom: -24px; }
+  .tn20 .tn-es-pa-yla { font-size: 13px; }
+  .tn20 .tn-es-pa-koukku { font-size: 56px; }
+  .tn20 .tn-es-pa-ala { font-size: 16px; }
   .tn20 .tn-es-aiheet { grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 16px 12px; }
   .tn20 .tn-es-juontajat { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .tn20 .tn-es-lp { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start; gap: 22px; }
@@ -728,6 +748,10 @@
   .tn20 .tn-es-h2--iso { font-size: 76px; line-height: .88; font-variation-settings: "wdth" 70; }
   .tn20 .tn-es-osio { gap: 24px; }
   .tn20 .tn-es-tag { height: 28px; padding: 0 12px; font-size: 12px; }
+  .tn20 .tn-es-paaviesti { gap: 14px; margin-bottom: -32px; }
+  .tn20 .tn-es-pa-yla { font-size: 14px; letter-spacing: .18em; }
+  .tn20 .tn-es-pa-koukku { font-size: 72px; line-height: .88; font-variation-settings: "wdth" 70; }
+  .tn20 .tn-es-pa-ala { font-size: 17px; }
   .tn20 .tn-es-laji { font-size: 12px; letter-spacing: .16em; gap: 8px; }
   .tn20 .tn-es-laji i { width: 9px; height: 9px; }
   .tn20 .tn-es-nappi { min-height: 48px; padding: 0 22px; font-size: 15px; }

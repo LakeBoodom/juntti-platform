@@ -15,7 +15,7 @@ const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://tietoniekka.fi";
 export const metadata: Metadata = {
   title: "Tiede ja teknologia — tietovisat",
   description:
-    "20 tietovisaa kehosta avaruuteen: aivot, genetiikka, aurinkokunta, dinosaurukset, keksinnöt ja tiedemyytit. Ilmaisia visoja ilman kirjautumista.",
+    "20 tietovisaa kehosta avaruuteen: aivot, genetiikka, aurinkokunta, dinosaurukset, keksinnöt ja tiedemyytit. Ilmaisia visoja.",
   alternates: { canonical: `${SITE_URL}/kokoelma/tiede` },
   ...jakoMeta({
     url: `${SITE_URL}/kokoelma/tiede`,

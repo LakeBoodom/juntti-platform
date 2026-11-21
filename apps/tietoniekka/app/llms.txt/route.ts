@@ -1,4 +1,5 @@
 import { getSiteStats, yliVisaa } from "@/lib/siteStats";
+import { SIVUSTO_KUVAUS } from "@/lib/paaviesti";
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://tietoniekka.fi";
 
 /**
@@ -52,7 +53,8 @@ export async function GET() {
   lines.push("# Tietoniekka.fi");
   lines.push("");
   lines.push(
-    `> Suomalainen tietovisasivusto. ${yli} ja yli ${Math.floor(stats.questions / 1000) * 1000} kysymystä selityksineen: Päivän visa, ${stats.collections} kokoelmaa, pelimuodot, megavisat ja kuvavisat. Aina ilmainen, ei rekisteröitymistä, ei mainoksia.`,
+    /* Pääviesti 21.11.2026: esittely lib/paaviesti.ts; määrät jäävät toiseksi lauseeksi (koneluettava yhteenveto). */
+    `> ${SIVUSTO_KUVAUS} ${yli} ja yli ${Math.floor(stats.questions / 1000) * 1000} kysymystä selityksineen: Päivän visa, ${stats.collections} kokoelmaa, pelimuodot, megavisat ja kuvavisat. Aina ilmainen, ei mainoksia.`,
   );
   lines.push("");
   lines.push("## Pääsivut");

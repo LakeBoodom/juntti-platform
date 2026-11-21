@@ -19,7 +19,7 @@ import "../lapset-sivu.css";
 export const revalidate = 300;
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://tietoniekka.fi";
-const KUVAUS = "Tietovisoja lapsille: jouluvisat, eläinvisat ja lintuvisat pienille (4–7) ja isommille (8–12). Laura ja Mikko lukevat kysymykset ääneen. Ilmaiseksi, ilman kirjautumista ja mainoksia.";
+const KUVAUS = "Tietovisoja lapsille: jouluvisat, eläinvisat ja lintuvisat pienille (4–7) ja isommille (8–12). Laura ja Mikko lukevat kysymykset ääneen. Ilmaiseksi ja ilman mainoksia.";
 
 export const metadata: Metadata = {
   title: { absolute: "Lasten visat – tietovisoja lapsille | Tietoniekka" },

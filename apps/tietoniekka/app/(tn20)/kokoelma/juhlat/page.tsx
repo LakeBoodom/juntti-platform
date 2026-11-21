@@ -22,7 +22,7 @@ const ESIKATSELU = process.env.VERCEL_ENV !== "production";
 export const metadata: Metadata = {
   title: "Juhlat — tietovisat vuoden juhliin ja perinteisiin",
   description:
-    "Tietovisat halloweenista jouluun ja vappuun: juhlien historia, perinteet ja herkut. Ilmaisia visoja ilman kirjautumista.",
+    "Tietovisat halloweenista jouluun ja vappuun: juhlien historia, perinteet ja herkut. Ilmaisia visoja.",
   alternates: { canonical: `${SITE_URL}${JUHLAT_SIVU}` },
   ...jakoMeta({
     url: `${SITE_URL}${JUHLAT_SIVU}`,

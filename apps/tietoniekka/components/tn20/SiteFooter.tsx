@@ -12,6 +12,7 @@
 import { usePathname } from "next/navigation";
 import { isGameRoute } from "@/lib/nav";
 import { FOOTER_COLLECTIONS, FOOTER_MODES, FOOTER_SITE, FOOTER_INSTAGRAM } from "@/lib/etusivu";
+import { ALATUNNISTE } from "@/lib/paaviesti";
 import "./footer.css";
 
 export default function SiteFooter() {
@@ -36,7 +37,7 @@ export default function SiteFooter() {
                 <b>TIETO</b>
                 <span>NIEKKA</span>
               </a>
-              <p className="tn-es-foot-desc">Suomalainen tietovisasivusto. Uusia tietovisoja jatkuvasti.</p>
+              <p className="tn-es-foot-desc">{ALATUNNISTE}</p>
               <div className="tn-es-foot-h">Seuraa Tietoniekkaa somessa</div>
               <a className="tn-es-foot-ig" href={FOOTER_INSTAGRAM} target="_blank" rel="noopener noreferrer" aria-label="Tietoniekka Instagramissa">
                 <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">

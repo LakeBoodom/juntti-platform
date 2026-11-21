@@ -18,7 +18,7 @@ export const revalidate = 60;
 
 export const metadata: Metadata = {
   title: "Instagramista – pelaa julkaisujen visat",
-  description: "Tietoniekan Instagram-julkaisujen visat yhdessä paikassa. Ilmaiseksi, ilman kirjautumista.",
+  description: "Tietoniekan Instagram-julkaisujen visat yhdessä paikassa, ilmaiseksi.",
   alternates: { canonical: "/ig" },
   // Bio-linkin kohde, ei hakukoneille tarkoitettu sisältösivu.
   robots: { index: false, follow: true },
@@ -86,7 +86,7 @@ export default async function IgBioPage() {
       <header className="tnig-head">
         <p className="tnig-kicker">Instagramista</p>
         <h1 className="tnig-h1">Pelaa julkaisujen visat</h1>
-        <p className="tnig-lede">Näit visan Instagramissa? Se löytyy tästä. Ilmainen, ei kirjautumista.</p>
+        <p className="tnig-lede">Näit visan Instagramissa? Se löytyy tästä.</p>
       </header>
 
       {ylhaalla.length > 0 && (

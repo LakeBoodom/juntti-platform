@@ -32,8 +32,8 @@ export async function generateMetadata(): Promise<Metadata> {
   const aiheet = megat?.aiheet.slice(0, 3) ?? [];
   const aiheista = aiheet.length === 3 ? ` aiheista ${aiheet[0]}, ${aiheet[1]} ja ${aiheet[2]}` : "";
   const description = vali
-    ? `Pitkät tietovisat yhdeltä istumalta: ${vali} kysymystä${aiheista}. Ilmainen, ei kirjautumista.`
-    : "Pitkät tietovisat yhdeltä istumalta. Ilmainen, ei kirjautumista.";
+    ? `Pitkät tietovisat yhdeltä istumalta: ${vali} kysymystä${aiheista}. Ilmainen.`
+    : "Pitkät tietovisat yhdeltä istumalta. Ilmainen.";
   const canonical = `${SITE_URL}/megavisat`;
   return {
     title: { absolute: title }, description,

@@ -15,7 +15,7 @@ import { NAV_COLLECTIONS, NAV_MODES } from "./nav";
 /* UI-laatu 14.10.2026: etusivun kortit käyttävät *-kortti.webp-versioita (720 px, q76): kortti on enintään
    ~400 px leveä, alkuperäiset (960–1600 px) jäävät kokoelmasivujen heroiksi. */
 /* C10 (26.10.2026): varateksti ilman lukua — luku tulee aina palvelimelta (layout: getSiteStats), ei kahdesta paikasta. */
-export const SITE_TAGLINE = "Suomalainen tietovisasivusto";
+export const SITE_TAGLINE = "Tietovisat ja tietopelit"; // Pääviesti 21.11.2026 (lib/paaviesti.ts TAGLINE)
 
 export type HeaderPromo = { key: "yhdessa" | "suosittu"; kicker: string; label: string; href: string };
 

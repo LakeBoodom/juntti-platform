@@ -4,7 +4,7 @@
 // Korvasi 28.8.–27.10.2026 bannerisarjan (Juhlat, Tupla, Rajanaapurit, Kuvavisat, Luonto/Äänivisa, Suositut kokoelmat,
 // Kuka on vanhin?, Päivän sankari, Kuntaliitos, juontajat, Uusimmat visat).
 import { PaivaVahti } from "@/components/tn20/PaivaVahti";
-import { brand } from "@/config/brand";
+import { etusivunOtsikko } from "@/lib/paaviesti";
 import { JsonLd, abs } from "@/lib/jsonLd";
 import { haeEtusivu } from "@/lib/etusivu5";
 import EtusivuV5 from "@/components/tn20/etusivu5/EtusivuV5";
@@ -44,7 +44,7 @@ export default async function Etusivu20({
           "@type": "WebPage",
           "@id": `${abs("/")}#webpage`,
           url: abs("/"),
-          name: `Tietovisat – ilmaisia tietovisoja | ${brand.name}`,
+          name: etusivunOtsikko(),
           inLanguage: "fi-FI",
           isPartOf: { "@id": `${abs("/")}#website` },
           about: { "@id": `${abs("/")}#organization` },
@@ -52,8 +52,8 @@ export default async function Etusivu20({
           image: abs("/og-image.png"),
         }}
       />
-      {/* H1 = sivuston nimi, näkymätön (design: logo navigaatiossa); "Päivän pelit" on H2. */}
-      <h1 className="tn-es-sr-only">{brand.name} – suomalainen tietovisasivusto</h1>
+      {/* H1 = pääviestin yläotsikko + koukku (EtusivuV5, Heikki 21.11.2026); ennen näkymätön "Tietoniekka – suomalainen
+          tietovisasivusto". "Päivän pelit" on H2. */}
       <PaivaVahti pvm={d.today.iso} />
       <EtusivuV5 d={d} />
     </main>

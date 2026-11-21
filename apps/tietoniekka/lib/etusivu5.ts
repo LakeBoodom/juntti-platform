@@ -294,7 +294,7 @@ export async function haeEtusivu(opts: {
       sankari,
     },
     tiesitko,
-    aiheet: { kicker: `${visat} visaa · ${aiheet.length} kokoelmaa`, tiilet: aiheet },
+    aiheet: { tiilet: aiheet },
     pelit: { kicker: `${pelimuotoja} pelimuotoa`, ryhmat },
     promo1,
     juontajat,

@@ -198,16 +198,16 @@ const KUVAVISA_TITLES: Record<string, string> = {
 /* T6: kortistokohtainen meta description — aiemmin kaikilla kuvavisoilla oli sama
    lause, joten hakutuloksissa kymmenen visaa näytti identtisiltä. */
 const KUVAVISA_DESC: Record<string, string> = {
-  liput: "Tunnista maailman valtioiden liput. Ilmainen kuvavisa Tietoniekassa — ei kirjautumista.",
+  liput: "Tunnista maailman valtioiden liput. Ilmainen kuvavisa Tietoniekassa.",
   vaakunat: "Tunnista maakuntien, kaupunkien ja kuntien vaakunat. Ilmainen kuvavisa Tietoniekassa.",
-  linnut: "Tunnista Suomen linnut kuvasta. Ilmainen kuvavisa Tietoniekassa — ei kirjautumista.",
-  elaimet: "Tunnista eläinlajit lähikuvasta. Ilmainen kuvavisa Tietoniekassa — ei kirjautumista.",
+  linnut: "Tunnista Suomen linnut kuvasta. Ilmainen kuvavisa Tietoniekassa.",
+  elaimet: "Tunnista eläinlajit lähikuvasta. Ilmainen kuvavisa Tietoniekassa.",
   kasvit: "Tunnista Suomen kasvit ja puut kuvasta. Ilmainen kuvavisa Tietoniekassa.",
   maalaukset: "Tunnista klassikkomaalaukset ja niiden tekijät. Ilmainen kuvavisa Tietoniekassa.",
   henkilot: "Tunnista tunnetut henkilöt kuvasta. Ilmainen kuvavisa Tietoniekassa.",
   rakennukset: "Tunnista maailman rakennukset kuvasta. Ilmainen kuvavisa Tietoniekassa.",
   kaupungit: "Tunnista kaupungit yhdestä näkymästä. Ilmainen kuvavisa Tietoniekassa.",
-  viikko: "Kuvasarja kaikista kortistoista: liput, vaakunat, linnut, eläimet ja muut. Ilmainen kuvavisa Tietoniekassa — ei kirjautumista.",
+  viikko: "Kuvasarja kaikista kortistoista: liput, vaakunat, linnut, eläimet ja muut. Ilmainen kuvavisa Tietoniekassa.",
 };
 
 /* Urheilussa peli perii joukkueen värin (CD: "urheilu joukkueväri") */

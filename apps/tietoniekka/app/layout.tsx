@@ -1,4 +1,5 @@
-import { getSiteStats, yliVisaa, visaMaara } from "@/lib/siteStats";
+import { getSiteStats } from "@/lib/siteStats";
+import { KOUKKU_OG, KUVAUS_OG, SIVUSTO_KUVAUS, etusivunKuvaus, etusivunOtsikko } from "@/lib/paaviesti";
 import type { Metadata, Viewport } from "next";
 import Script from "next/script";
 import { JsonLd } from "@/lib/jsonLd";
@@ -22,15 +23,15 @@ const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://tietoniekka.fi";
 const META_BASE = process.env.VERCEL_ENV === "preview" && process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : SITE_URL;
 const PLAUSIBLE_DOMAIN = process.env.NEXT_PUBLIC_PLAUSIBLE_DOMAIN;
 
-/* SEO-erä A8 (2.10.2026): visamäärä kannasta (lib/siteStats.ts). */
-function rakennaMetadata(Yli: string, yli: string): Metadata {
+/* SEO-erä A8 (2.10.2026): visamäärä kannasta (lib/siteStats.ts). Pääviesti 21.11.2026: tekstit lib/paaviesti.ts. */
+function rakennaMetadata(quizzesFloor: number): Metadata {
   return {
   metadataBase: new URL(META_BASE),
   title: {
-    default: `${brand.name} — testaa tietosi`,
+    default: etusivunOtsikko(),
     template: `%s | ${brand.name}`,
   },
-  description: `${brand.name} — suomalainen tietovisasivusto. ${Yli}, Päivän visa, megavisat ja kuvavisat. Aina ilmainen.`,
+  description: etusivunKuvaus(quizzesFloor),
   applicationName: brand.name,
   keywords: [
     "visa",
@@ -48,21 +49,21 @@ function rakennaMetadata(Yli: string, yli: string): Metadata {
     locale: "fi_FI",
     url: SITE_URL,
     siteName: brand.name,
-    title: `${brand.name} — testaa tietosi`,
-    description: `Suomalainen tietovisasivusto — ${yli}, Päivän visa, megavisat ja kuvavisat. Aina ilmainen.`,
+    title: KOUKKU_OG,
+    description: KUVAUS_OG,
     images: [
       {
         url: "/og-image.png",
         width: 1200,
         height: 630,
-        alt: `${brand.name} — testaa tietosi`,
+        alt: KOUKKU_OG,
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: `${brand.name} — testaa tietosi`,
-    description: `Suomalainen tietovisasivusto — ${yli}, aina ilmainen.`,
+    title: KOUKKU_OG,
+    description: KUVAUS_OG,
     images: ["/og-image.png"],
   },
   robots: {
@@ -82,8 +83,7 @@ function rakennaMetadata(Yli: string, yli: string): Metadata {
 }
 
 export async function generateMetadata(): Promise<Metadata> {
-  const y = yliVisaa(await getSiteStats());
-  return rakennaMetadata(y, y.charAt(0).toLowerCase() + y.slice(1));
+  return rakennaMetadata((await getSiteStats()).quizzesFloor);
 }
 
 export const viewport: Viewport = {
@@ -95,7 +95,6 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const stats = await getSiteStats();
   return (
     <html lang="fi">
       <body>
@@ -112,7 +111,7 @@ export default async function RootLayout({
             url: SITE_URL,
             logo: { "@type": "ImageObject", url: `${SITE_URL}/icon-512.png`, width: 512, height: 512 },
             image: `${SITE_URL}/og-image.png`,
-            description: `${brand.name} — suomalainen tietovisasivusto. ${yliVisaa(stats)}: Päivän visa, kokoelmat, megavisat ja kuvavisat. Aina ilmainen, ei rekisteröitymistä.`,
+            description: SIVUSTO_KUVAUS,
             /* SEO-erä A9: Instagram-tili */
             sameAs: ["https://www.instagram.com/tietoniekka/"],
           }}
@@ -125,7 +124,7 @@ export default async function RootLayout({
             name: brand.name,
             url: SITE_URL,
             inLanguage: "fi-FI",
-            description: `Suomenkielisiä tietovisoja: Päivän visa, kokoelmat (urheilu, jääkiekko, jalkapallo, elokuvat, tv, musiikki, historia, luonto, matkakohteet, kulttuuri, Suomen kaupungit, tunnetut henkilöt), megavisat ja kuvavisat (liput, vaakunat, linnut, kasvit, eläimet). Tietoniekka on ilmainen suomalainen tietovisasivusto.`,
+            description: SIVUSTO_KUVAUS,
             publisher: { "@id": `${SITE_URL}/#organization` },
           }}
         />
