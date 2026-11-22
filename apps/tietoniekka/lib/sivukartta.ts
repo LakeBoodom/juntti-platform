@@ -146,6 +146,8 @@ export async function sivukartanRivit(): Promise<MetadataRoute.Sitemap> {
     ...TEEMAT.map((t) => u(`${TUPLA_SIVU}/${t.slug}`, "daily", 0.6, tanaan)),
     /* Kumpi? 2.0 (julkaistu 20.11.2026): hubi, teemat, Oma seura -valinta ja 17 seurasivua. */
     u("/kumpi", "weekly", 0.8),
+    u("/kumpi/paivan", "daily", 0.7),
+    u("/kumpi/putki", "monthly", 0.6),
     ...KUMPI_TEEMAT.map((t) => u(`/kumpi/${t.slug}`, "weekly", 0.6)),
     u("/kumpi/seura", "monthly", 0.5),
     ...KUMPI_SEURAT.map((s) => u(`/kumpi/seura/${s.slug}`, "weekly", 0.5)),
