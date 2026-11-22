@@ -12,7 +12,7 @@ Hakasulut kysymyksessä merkitsevät korostuksen, ne säilytetään.
 
 Jokaisesta kysymyksestä on käytävä ilmi laji tai sarja, ellei vaihtoehdoista tai kysymyksen nimistä selviä se
 yksiselitteisesti (esim. "Kumpi valmensi Tapparan mestaruuteen 2003?" on selvä, "Kumman maan Suomi kaatoi 2022
-MM-välierässä?" ei ole). Kysymyksen on mahduttava ruutuun ilman vieritystä: enintään 70 merkkiä hakasulkuja lukuun ottamatta (nyt pisin on 66).
+MM-välierässä?" ei ole). Kysymyksen on mahduttava ruutuun ilman vieritystä: enintään 66 merkkiä hakasulkuja lukuun ottamatta (laatuportin raja `MAX_KYSYMYS`, lib/kumpi/laatu.ts).
 Jos lajin lisääminen vie yli, lyhennä muualta (esim. "vuoden 2022" → "2022").
 
 Ehdotettu korjaustapa: lisää laji MM-kisojen tai turnauksen yhteyteen.
@@ -53,3 +53,9 @@ Liiga-kysymyksissä seuran nimi (Tappara, Kärpät, HIFK ...) riittää kertomaa
 - Älä muuta `oikea`- ja `vaara`-kenttiä äläkä `status`-kenttää.
 - Aja muutokset yhtenä `update`-lauseena ja kirjaa muutettujen rivien määrä. Claude Code tarkistaa sen jälkeen pituudet
   ja ajaa Kumpi?-pelin laatuportin (`scripts/kumpi-laatu.ts`).
+
+## Tulos (22.11.2026)
+
+Cowork päivitti 82 kysymystä (varmuuskopio `_kumpi_visakysymykset_backup_20261122`). Tämän ohjeen ensimmäinen versio antoi
+rajaksi virheellisesti 70 merkkiä, joten 30 kysymystä ylitti laatuportin 66 merkin rajan. Claude Code lyhensi ne Heikin luvalla
+("jääkiekon" → "kiekon" tms.), ja laatuportti meni läpi kaikissa teemoissa.
