@@ -494,13 +494,13 @@ export function uusiKierrosTila(data: KumpiData, teema: Teema, siemen: string): 
 
 /** Yksi kymmenen kysymyksen jakso (kierros). Visakysymyksiä enintään 3 (Heikki 20.11.2026) ennalta arvotuissa
  *  paikoissa; ensimmäinen kysymys on aina vertailu. Jos visakysymystä ei löydy, paikalle tulee vertailu. */
-export function teeJakso(tila: KierrosTila): KumpiKysymys[] {
+export function teeJakso(tila: KierrosTila, kaava: Vaikeus[] = KIERROS_KAAVA): KumpiKysymys[] {
   const jakso = uusiJakso(tila.sek ? 1 : 2);
   tila.sek?.ryhmaMaara.clear();
   const vapaat = tila.visat.filter((v) => !tila.visaKaytetyt.has(v.id)).length;
   const paikat = visaPaikat(vapaat, tila.visaRng);
   const out: KumpiKysymys[] = [];
-  KIERROS_KAAVA.forEach((t, i) => {
+  kaava.forEach((t, i) => {
     if (paikat.has(i)) {
       const v = teeVisaKysymys(tila, t);
       if (v) { out.push(v); return; }
@@ -564,6 +564,25 @@ export function putkenVaikeus(n: number, rng: Rng): Vaikeus {
   return rng() < 0.5 ? "keski" : "vaikea";
 }
 
+/**
+ * Putki (Heikki 17.11.2026): loputon jono, jossa vaikeus nousee kysymysnumeron mukaan (putkenVaikeus). Kysymykset
+ * syntyvät kymmenen kysymyksen jaksoina samasta kierrostilasta, joten monipuolisuussäännöt pätevät jokaiseen
+ * kymmenikköön, eikä sama pari toistu koskaan (konteksti muistaa käytetyt). Sama siemen antaa saman jonon, joten
+ * palvelin voi antaa jatkoa (alku, määrä) laskemalla jonon uudelleen.
+ */
+export function teePutki(data: KumpiData, teema: Teema, siemen: string, maara: number): KumpiKysymys[] {
+  const tila = uusiKierrosTila(data, teema, siemen);
+  const rng = siemenRng(`${siemen}-putki`);
+  const out: KumpiKysymys[] = [];
+  while (out.length < maara) {
+    const kaava = KIERROS_KAAVA.map((_, j) => putkenVaikeus(out.length + j + 1, rng));
+    const jakso = teeJakso(tila, kaava);
+    if (!jakso.length) break; // pooli loppui
+    out.push(...jakso);
+  }
+  return out.slice(0, maara);
+}
+
 /* ─── Yhdistelmäteemat (Yleistieto, Ihmiset, Urheilu) ──────────────── */
 
 export type Sekoitus = {
@@ -581,7 +600,8 @@ export function uusiSekoitus(data: KumpiData, teema: Teema, siemen: string): Sek
       const ctx = uusiKonteksti(data, t, `${siemen}-${t.slug}`);
       const specit = teemanSpecit(ctx);
       // Tasapaino osien välillä (Ihmiset: tunnetut suomalaiset ja politiikka puoliksi), ei attribuuttien määrän mukaan.
-      return { ctx, specit, paino: 1 };
+      // Teeman oma paino (Liiga-seurat 0,4: 17 seuraa vs. satoja pelaajia) pienentää osan osuutta.
+      return { ctx, specit, paino: t.paino ?? 1 };
     })
     .filter((o) => o.specit.length > 0);
   return { osat, rng: siemenRng(`${siemen}-sekoitus`), ryhmaMaara: new Map() };

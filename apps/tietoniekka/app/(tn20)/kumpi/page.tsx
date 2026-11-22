@@ -3,7 +3,8 @@
 // Kokoelma (Heikki 20.11.): Yleistieto ensin, sitten Suomi, Luonto, Urheilu, Jääkiekko (Legendat, Liiga, Oma seura),
 // Maailma ja Ihmiset. Yleistieto, Urheilu ja Ihmiset ovat yhdistelmäteemoja (lib/kumpi/teemat.ts).
 // Jääkiekolla kolme riviä (Legendat, Liiga, Oma seura); 17 seuraa vain Oma seura -valinnasta. Hubiin otetaan teema
-// vain, jos siitä syntyy ≥ 30 kysymystä (lib/kumpi/sivu.ts). Päivän Kumpi? ja Putki tulevat vaiheessa 2.
+// vain, jos siitä syntyy ≥ 30 kysymystä (lib/kumpi/sivu.ts). Vaihe 2 (22.11.2026): Päivän Kumpi? heron napiksi ja listan
+// ensimmäiseksi riviksi merkillä "Päivän peli" (sama malli kuin Karttapeleissä), Putki toiseksi riviksi.
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import PeliKehys from "@/components/tn20/pelikehys/PeliKehys";
@@ -12,6 +13,7 @@ import HubHero from "@/components/tn20/korttirivi/HubHero";
 import { RiviLinkki, type RiviKortti } from "@/components/tn20/korttirivi/KorttiRivi";
 import HubOhjeet from "@/components/tn20/korttirivi/HubOhjeet";
 import OmaSeura from "@/components/tn20/kumpi/OmaSeura";
+import { PaivanCta, PaivanRivi, PutkiRivi } from "@/components/tn20/kumpi/Pelitavat";
 import { JsonLd, peliLd } from "@/lib/jsonLd";
 import { jakoMeta } from "@/lib/jakoMeta";
 import { RYHMAT, RIVIKUVAT } from "@/lib/kumpi/teemat";
@@ -22,7 +24,7 @@ export const revalidate = 3600;
 
 const KOROSTUS = "Kaksi vaihtoehtoa, vain toinen on oikein.";
 const INTRO =
-  "Kumpi kaupunki on vanhempi, kumpi järvi suurempi, kumpi pelasi enemmän Liiga-otteluita? Pelaa kymmenen kysymyksen kierros kaikista aiheista tai valitse oma teemasi. Jääkiekosta voit valita myös oman seurasi.";
+  "Kumpi kaupunki on vanhempi, kumpi järvi suurempi, kumpi pelasi enemmän Liiga-otteluita? Pelaa päivän kymmenen, valitse oma teemasi tai lähde Putkeen, jossa kello käy ja yksi virhe riittää. Jääkiekosta voit valita myös oman seurasi.";
 
 export const metadata: Metadata = {
   title: "Kumpi? – kaksi vaihtoehtoa, vain toinen on oikein",
@@ -56,8 +58,11 @@ export default async function KumpiHub() {
             nimi="Kumpi?"
             korostus={KOROSTUS}
             intro={INTRO}
+            cta={<PaivanCta />}
           />
-          <ul className="sk-rivi sk-rivi--hub" aria-label="Teemat">
+          <ul className="sk-rivi sk-rivi--hub" aria-label="Pelitavat ja teemat">
+            <li className="sk-li"><PaivanRivi eager /></li>
+            <li className="sk-li"><PutkiRivi eager /></li>
             {RYHMAT.flatMap((r) => {
               const ryhmanTeemat = hub.teemat.filter((t) => t.teema.ryhma === r.avain);
               const omaSeura = r.avain === "jaakiekko" && hub.seurat.length > 0;
@@ -75,7 +80,7 @@ export default async function KumpiHub() {
                   };
                   return (
                     <li key={t.teema.slug} className="sk-li">
-                      <RiviLinkki k={k} eager={(r.avain === "yleistieto" || r.avain === "suomi") && i < 2} />
+                      <RiviLinkki k={k} eager={r.avain === "yleistieto" && i < 1} />
                     </li>
                   );
                 });
@@ -98,6 +103,25 @@ export default async function KumpiHub() {
                     Napauta vaihtoehtoa, jonka uskot oikeaksi. Molempien arvot paljastuvat kortteihin, ja peli siirtyy
                     itsestään seuraavaan kysymykseen – tai heti, kun napautat ruutua. Kierroksessa on kymmenen kysymystä,
                     ja ne vaikeutuvat loppua kohti.
+                  </p>
+                ),
+              },
+              {
+                otsikko: "Päivän Kumpi?",
+                sisalto: (
+                  <p>
+                    Päivän Kumpi? on kaikille sama kymmenen kysymyksen kierros kaikista aiheista. Sen voi pelata kerran
+                    päivässä, ja uusi kierros vaihtuu keskiyöllä.
+                  </p>
+                ),
+              },
+              {
+                otsikko: "Putki",
+                sisalto: (
+                  <p>
+                    Putkessa kysymyksiä tulee niin kauan kuin vastaat oikein, ja ne vaikeutuvat matkan varrella. Kuhunkin
+                    kysymykseen on aikaa kymmenen sekuntia, 21. kysymyksestä alkaen seitsemän. Väärä vastaus tai loppunut
+                    aika katkaisee putken.
                   </p>
                 ),
               },

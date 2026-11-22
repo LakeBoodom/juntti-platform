@@ -140,7 +140,31 @@
   .tn20 .kp-peli.ilman .kp-kortit { gap: var(--kp-kortti-vali-desk); }
   .tn20 .kp-taustamerkki { height: 540px; right: -120px; }
   .tn20 .kp-palkki { padding: 0 24px 0 12px; }
+  .tn20 .kp-kello { width: 100%; max-width: var(--kp-desk-max); margin: 0 auto; padding: 0 20px; }
+  /* Putki: kellorivi (32 px) otetaan kysymyksen väleistä, ettei sivu viery 1440 × 900:lla. */
+  .tn20 .kp-peli.putki .kp-kys { padding: 16px 20px 32px; }
 }
+
+/* ─── Putken kello (vaihe 2, CD spec): rivi 32 px, palkki 8 px, r 4; palkki scaleX 1 → 0 lineaarisesti 10 s / 7 s.
+   Viimeiset 3 s oranssina (#FF7A3D, 7,3:1) ja numerona, ei vilkkumista. Paljastuksen ajan kello pysähtyy harmaana:
+   yksi liikkuva ilmaisin kerrallaan (kysymyksen aikana kello, paljastuksen aikana etenemisrengas). ─── */
+.tn20 .kp-kello {
+  flex: none; height: var(--kp-kello-rivi); display: flex; align-items: center; gap: 12px; padding: 0 16px;
+  color: var(--kp-kello);
+}
+.tn20 .kp-kello-palkki { position: relative; flex: 1; height: var(--kp-kello-h); border-radius: 4px; background: rgba(244, 237, 224, .12); overflow: clip; }
+.tn20 .kp-kello-palkki i {
+  position: absolute; inset: 0; border-radius: 4px; background: currentColor; transform-origin: left center;
+  animation: kp-kello 10000ms linear 240ms both;
+}
+.tn20 .kp-kello b { flex: none; min-width: 2ch; text-align: right; font: 700 17px/1 "Barlow Condensed", var(--tn-font-body); font-variant-numeric: tabular-nums; }
+.tn20 .kp-kello.loppu { color: var(--kp-kello-loppu); }
+.tn20 .kp-kello.seis { color: rgba(244, 237, 224, .4); }
+.tn20 .kp-kello.seis .kp-kello-palkki i { animation-play-state: paused; }
+@keyframes kp-kello { from { transform: scaleX(1); } to { transform: scaleX(0); } }
+
+/* Päivän Kumpi?: peli piiloon, kunnes selain on tarkistanut, onko päivä jo pelattu (ei välähdystä ennen tulosta). */
+.tn20 .kp-peli.kp-odottaa .kp-paa { visibility: hidden; }
 
 /* ─── Tulos ─── */
 .tn20 .kp-peli--tulos { min-height: 100vh; }
@@ -174,6 +198,16 @@
 }
 @media (hover: hover) { .tn20 .kp-nappi:hover { background: rgba(244, 237, 224, .08); } }
 
+/* Putken tulos: luku, "Uusi ennätys" -merkki (juhlahetki 900 ms, scale .9 → 1,12 → 1, vain uudelle ennätykselle). */
+.tn20 .kp-putki-tulos { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+.tn20 .kp-ennatys {
+  margin: 4px 0 0; display: inline-flex; align-items: center; gap: 6px; min-height: 36px; padding: 0 16px; border-radius: 999px;
+  background: var(--kp-kulta); color: var(--kp-muste); font: 900 16px/1 var(--tn-font-display); text-transform: uppercase; letter-spacing: .02em;
+  animation: kp-juhla 900ms var(--ease-emphasized) both;
+}
+.tn20 .kp-ennatys-ed { margin: 0; font: 600 17px/1.2 "Barlow Condensed", var(--tn-font-body); color: var(--kp-teksti-2); }
+@keyframes kp-juhla { 0% { transform: scale(.9); opacity: 0; } 55% { transform: scale(1.12); opacity: 1; } 100% { transform: scale(1); } }
+
 /* ─── Hubi ─── */
 
 /* Oma seura -valinta: mobiilissa alapaneeli, desktopilla ponnahdus. */
@@ -201,6 +235,9 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  /* Kello pelkkänä numerona (CD spec). */
+  .tn20 .kp-kello-palkki { display: none; }
+  .tn20 .kp-kello { justify-content: flex-end; }
   .tn20 .kp-peli *, .tn20 .kp-peli *::before, .tn20 .kp-peli *::after, .tn20 .kp-seuravalinta-paneeli {
     animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important;
   }
