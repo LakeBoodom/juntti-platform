@@ -38,6 +38,8 @@ const PELIMUOTOKUVAT: Record<string, Pick<RiviKortti, "kuva" | "sovitus">> = {
   "/kokoelma/kuvavisat": { kuva: "/20/rivi/peli-kuvavisat.webp" },
   "/aanivisa/suomen-linnut": { kuva: "/20/rivi/peli-aanivisat.webp" },
   "/visapaketit": { kuva: "/20/rivi/peli-visapaketit.webp" },
+  "/kumpi": { kuva: "/20/rivi/peli-kumpi.webp" },
+  "/peli/junankuljettaja": { kuva: "/20/junankuljettaja/rivi.svg" },
 };
 
 /** Pelimuodot samassa järjestyksessä kuin etusivun Valitse peli -osiossa (Heikki 12.11.2026), ei aakkosin.
