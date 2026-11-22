@@ -36,6 +36,7 @@ export function PaivanRivi({ eager }: { eager?: boolean }) {
     kuvaton: "Päivän Kumpi?",
     merkki: "Päivän peli",
     nimi: "Päivän Kumpi?",
+    korostus: true,
     rivi: osumat ? `Tänään ${osumat.filter(Boolean).length}/${osumat.length} oikein` : PAIVAN_RIVI,
   };
   return <RiviLinkki k={k} eager={eager} />;
@@ -50,6 +51,7 @@ export function PutkiRivi({ eager }: { eager?: boolean }) {
     kuva: "/20/rivi/kumpi-putki.webp",
     kuvaton: "Putki",
     nimi: "Putki",
+    korostus: true,
     rivi: ennatys > 0 ? `Ennätyksesi ${ennatys} oikein putkeen` : PUTKI_RIVI,
   };
   return <RiviLinkki k={k} eager={eager} />;

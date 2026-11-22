@@ -24,15 +24,15 @@ export const revalidate = 3600;
 
 const KOROSTUS = "Kaksi vaihtoehtoa, vain toinen on oikein.";
 const INTRO =
-  "Kumpi kaupunki on vanhempi, kumpi järvi suurempi, kumpi pelasi enemmän Liiga-otteluita? Pelaa päivän kymmenen, valitse oma teemasi tai lähde Putkeen, jossa kello käy ja yksi virhe riittää. Jääkiekosta voit valita myös oman seurasi.";
+  "Kumpi kaupunki on vanhempi, kumpi järvi suurempi, kumpi pelasi enemmän Liiga-otteluita? Pelaa päivän kymmenen, valitse oma aiheesi tai lähde Putkeen, jossa kello käy ja yksi virhe riittää. Jääkiekosta voit valita myös oman seurasi.";
 
 export const metadata: Metadata = {
   title: "Kumpi? – kaksi vaihtoehtoa, vain toinen on oikein",
-  description: "Kumpi on vanhempi, kumpi suurempi, kumpi pelasi enemmän? Valitse teema ja pelaa kymmenen kysymyksen kierros Suomesta, luonnosta, urheilusta, jääkiekosta ja maailmalta.",
+  description: "Kumpi on vanhempi, kumpi suurempi, kumpi pelasi enemmän? Valitse aihe ja pelaa kymmenen kysymyksen kierros Suomesta, luonnosta, urheilusta, jääkiekosta ja maailmalta.",
   alternates: { canonical: "/kumpi" },
   ...jakoMeta({
     title: "Kumpi? – kaksi vaihtoehtoa, vain toinen on oikein",
-    description: "Valitse teema ja pelaa kymmenen kysymyksen kierros.",
+    description: "Valitse aihe ja pelaa kymmenen kysymyksen kierros.",
     url: "/kumpi",
     kuva: "/og/sivu/kumpi",
   }),
@@ -60,7 +60,7 @@ export default async function KumpiHub() {
             intro={INTRO}
             cta={<PaivanCta />}
           />
-          <ul className="sk-rivi sk-rivi--hub" aria-label="Pelitavat ja teemat">
+          <ul className="sk-rivi sk-rivi--hub" aria-label="Pelitavat ja aiheet">
             <li className="sk-li"><PaivanRivi eager /></li>
             <li className="sk-li"><PutkiRivi eager /></li>
             {RYHMAT.flatMap((r) => {

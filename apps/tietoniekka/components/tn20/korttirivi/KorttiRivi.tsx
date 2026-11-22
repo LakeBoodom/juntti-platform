@@ -22,6 +22,8 @@ export type RiviKortti = {
   nimi: string;
   /** Yksi tietorivi nimen alla. */
   rivi?: string | null;
+  /** Kultainen korostus pelimuodon omille riveille (esim. Kumpi?:n Päivän peli ja Putki, Heikki 22.11.2026). */
+  korostus?: boolean;
 };
 
 function RiviKuva({ k, eager }: { k: RiviKortti; eager?: boolean }) {
@@ -46,7 +48,7 @@ export function RiviLinkki({ k, data, eager }: { k: RiviKortti; data?: Record<st
     </>
   ) : null;
   return (
-    <a className="sk-kortti" href={k.href} {...data}>
+    <a className="sk-kortti" href={k.href} data-korostus={k.korostus ? "" : undefined} {...data}>
       <span className="sk-kuva" data-sovitus={k.sovitus}>
         {k.kuva ? (
           // eslint-disable-next-line @next/next/no-img-element

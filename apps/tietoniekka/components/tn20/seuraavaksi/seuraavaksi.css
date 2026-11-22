@@ -31,6 +31,13 @@
   .tn20 .sk-kortti:hover { transform: translateY(-2px); border-color: var(--sk-line2); }
 }
 .tn20 .sk-kortti:active { transform: scale(.98); }
+/* Korostettu rivi (RiviKortti.korostus): kultareunus 2 px (1 px reuna + sisävarjo, ei asettelun siirtymää) ja kultainen
+   sävy tekstipuolelle. Pelimuodon omat rivit erottuvat aiherivien joukosta (Kumpi?: Päivän peli ja Putki, 22.11.2026). */
+.tn20 .sk-kortti[data-korostus] {
+  border-color: var(--sk-gold); box-shadow: inset 0 0 0 1px var(--sk-gold);
+  background: linear-gradient(90deg, rgba(232, 163, 32, .16), rgba(232, 163, 32, .04) 70%), var(--sk-card);
+}
+@media (hover: hover) { .tn20 .sk-kortti[data-korostus]:hover { border-color: var(--sk-gold); } }
 
 .tn20 .sk-kuva { position: relative; flex: none; width: 96px; min-height: 72px; background: var(--sk-plate); overflow: hidden; }
 .tn20 .sk-kuva img { position: absolute; inset: 0; display: block; width: 100%; height: 100%; object-fit: cover; object-position: 50% 40%; }

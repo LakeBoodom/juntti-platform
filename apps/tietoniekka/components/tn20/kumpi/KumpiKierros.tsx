@@ -483,10 +483,8 @@ function Tulos({ osumat, teema, siemen, polku, pelitapa, pvm, seuraavat }: {
     <PeliKehys iho="tumma" className="kp-peli kp-peli--tulos">
       <Palkki teema={paivan ? "Päivän peli" : teema.nimi} />
       <main id="main" className="kp-tulos">
-        <h1 className="kp-tulos-h">
-          {paivan ? <span className="kp-sr">Päivän Kumpi?: </span> : null}
-          <b>{oikein}/{n}</b> oikein
-        </h1>
+        {/* Tulos näkyy kerran, tuloskortissa (Heikki 22.11.2026: iso luku ja kortti toistivat samaa). Otsikko ruudunlukijalle. */}
+        <h1 className="kp-sr">{paivan ? "Päivän Kumpi?: " : ""}{oikein}/{n} oikein</h1>
         <div className="kp-tuloskortti" aria-hidden="true">
           <div className="kp-tuloskortti-yla">
             <KumpiLogo className="kp-logo--kortti" />
@@ -510,11 +508,17 @@ function Tulos({ osumat, teema, siemen, polku, pelitapa, pvm, seuraavat }: {
           onJaettu={(k) => plausible("kumpi_share", { kanava: k, teema: teema.slug, pelitapa })}
         />
         <nav className="kp-tulos-linkit" aria-label="Kumpi?">
-          <a className="tn-cta-lime kp-cta" href="/kumpi">Pelaa teemoittain</a>
+          {/* Päivän Kumpi?:a ei voi pelata uudelleen, joten ensisijaista (lime) nappia ei ole: kaksi kevyttä nappia (Heikki 22.11.). */}
           {paivan ? (
-            <a className="kp-nappi" href="/kumpi/putki">Kokeile Putkea</a>
+            <>
+              <a className="kp-nappi" href="/kumpi">Valitse aihe</a>
+              <a className="kp-nappi" href="/kumpi/putki">Kokeile Putkea</a>
+            </>
           ) : (
-            <a className="kp-nappi" href={polku}>Uusi kierros: {teema.nimi}</a>
+            <>
+              <a className="tn-cta-lime kp-cta" href="/kumpi">Valitse aihe</a>
+              <a className="kp-nappi" href={polku}>Uusi kierros: {teema.nimi}</a>
+            </>
           )}
         </nav>
         {/* Sama "Pelaa seuraavaksi" -rivi kuin tietovisan tuloksessa (Heikki 20.11.2026). */}
@@ -537,24 +541,28 @@ function PutkiTulos({ tulos, seuraavat }: { tulos: { n: number; edellinen: numbe
     <PeliKehys iho="tumma" className="kp-peli kp-peli--tulos">
       <Palkki teema="Putki" />
       <main id="main" className="kp-tulos">
-        <div className="kp-putki-tulos">
-          <h1 className="kp-tulos-h"><b>{n}</b> oikein putkeen</h1>
-          {uusi ? (
-            <>
-              <p className="kp-ennatys"><span aria-hidden="true">★</span>Uusi ennätys</p>
-              {edellinen > 0 ? <p className="kp-ennatys-ed">Edellinen ennätys {edellinen}</p> : null}
-            </>
-          ) : edellinen > 0 ? (
-            <p className="kp-ennatys-ed">Ennätyksesi {edellinen}</p>
-          ) : null}
-        </div>
+        <h1 className="kp-sr">{n} oikein putkeen</h1>
+        {/* Tulos kerran, tuloskortissa (Heikki 22.11.2026). Ennätysmerkki ja edellinen ennätys kortin alla. */}
         <div className="kp-tuloskortti" aria-hidden="true">
           <div className="kp-tuloskortti-yla">
             <KumpiLogo className="kp-logo--kortti" />
             <span>Putki</span>
           </div>
           <b className="kp-tuloskortti-luku">{n}</b>
+          <span className="kp-tuloskortti-ala">oikein putkeen</span>
         </div>
+        {uusi || edellinen > 0 ? (
+          <div className="kp-putki-tulos">
+            {uusi ? (
+              <>
+                <p className="kp-ennatys"><span aria-hidden="true">★</span>Uusi ennätys</p>
+                {edellinen > 0 ? <p className="kp-ennatys-ed">Edellinen ennätys {edellinen}</p> : null}
+              </>
+            ) : (
+              <p className="kp-ennatys-ed">Ennätyksesi {edellinen}</p>
+            )}
+          </div>
+        ) : null}
         <Jakoalue
           className="kp-jako"
           id="kp-jako-h"
@@ -568,7 +576,7 @@ function PutkiTulos({ tulos, seuraavat }: { tulos: { n: number; edellinen: numbe
         <nav className="kp-tulos-linkit" aria-label="Kumpi?">
           <a className="tn-cta-lime kp-cta" href="/kumpi/putki">Yritä uudelleen</a>
           <a className="kp-nappi" href="/kumpi/paivan">Päivän Kumpi?</a>
-          <a className="kp-nappi" href="/kumpi">Pelaa teemoittain</a>
+          <a className="kp-nappi" href="/kumpi">Valitse aihe</a>
         </nav>
         <SeuraavaksiRivi otsikko="Pelaa seuraavaksi" paikat={seuraavat} meta={{ pilotti: null, nakyma: "tulos", lahde: "kumpi-putki" }} id="kp-sk" />
       </main>
