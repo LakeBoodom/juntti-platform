@@ -11,6 +11,8 @@ import PeliKehys from "@/components/tn20/pelikehys/PeliKehys";
 import HubHero from "@/components/tn20/korttirivi/HubHero";
 import HubRivit, { type RiviKortti } from "@/components/tn20/korttirivi/KorttiRivi";
 import HubOhjeet from "@/components/tn20/korttirivi/HubOhjeet";
+import NainPelaat from "@/components/tn20/ohjeet/NainPelaat";
+import { KL_KUNTIA, KL_YRITYKSET } from "@/lib/kuntaliitos";
 import { helsinginPaiva } from "@/lib/aika";
 import { JsonLd, peliLd } from "@/lib/jsonLd";
 import { jakoMeta } from "@/lib/jakoMeta";
@@ -85,17 +87,17 @@ export default async function KarttapelitSivu() {
             cta={mm ? <a className="hub-cta tn-cta-lime" href={MM_SIVU} data-tn-entry="karttapelit:hero">Arvaa päivän maa <span aria-hidden="true">→</span></a> : undefined}
           />
           <HubRivit kortit={[...paivan, ...kartat, juna]} nimi="Karttapelit" />
+          {/* Näin pelaat (Heikki 22.11.2026): jaettu NainPelaat auki; lähteet jäävät suljetuksi osioksi korttien alle. */}
+          <NainPelaat
+            className="hub-nain"
+            kohdat={[
+              { merkki: String(KL_KUNTIA - 2), otsikko: "Kuusi palaa väliin", teksti: "Saat lähdön, maalin ja kuusi palaa sekaisin. Järjestä ne niin, että jokainen rajautuu seuraavaan." },
+              { merkki: String(KL_YRITYKSET), otsikko: "Kolme tarkistusta", teksti: "Näet, montako rajaa on väärin, mutta et sitä, mitkä." },
+              { merkki: "1", otsikko: "Uutta joka päivä", teksti: "Mikä maa? ja Junankuljettaja vaihtuvat joka päivä, reittipelien viikon reitti maanantaisin." },
+            ]}
+          />
           <HubOhjeet
             kohdat={[{
-              otsikko: "Näin pelaat",
-              sisalto: (
-                <ul>
-                  <li><b>Aloita.</b> Saat lähdön, maalin ja kuusi palaa sekaisin.</li>
-                  <li><b>Järjestä.</b> Raahaa palat niin, että jokainen rajautuu seuraavaan.</li>
-                  <li><b>Tarkista.</b> Näet, montako rajaa on väärin, mutta et sitä, mitkä. Saat kaksi uutta yritystä.</li>
-                </ul>
-              ),
-            }, {
               otsikko: "Lähteet ja rajaukset",
               sisalto: (
                 <ul>

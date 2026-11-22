@@ -45,6 +45,7 @@ import type { Seuraavat } from "@/lib/seuraavaksi/tyypit";
 import Pelipalkki from "@/components/tn20/pelikehys/Pelipalkki";
 import PeliKehys from "@/components/tn20/pelikehys/PeliKehys";
 import PeliAloitus from "@/components/tn20/pelikehys/PeliAloitus";
+import type { OhjeKortti } from "@/components/tn20/ohjeet/NainPelaat";
 import PeliTulos from "@/components/tn20/pelikehys/PeliTulos";
 import { haasterivi, type KaverinTulos } from "@/lib/kaveri";
 import type { Pelimuoto } from "@/lib/pelimuodot";
@@ -164,7 +165,8 @@ export type GameQuiz = {
     koti: { href: string; nimi: string };
     lause: string;
     alarivi: string;
-    ohjeet: Array<{ otsikko: string; kohdat: Array<{ t: string; d: string }> }>;
+    /** Näin pelaat: kolme korttia auki (jaettu NainPelaat, Heikki 22.11.2026). */
+    nainPelaat: [OhjeKortti, OhjeKortti, OhjeKortti];
     seuraavat: Pelimuoto[];
   };
 };
@@ -1150,18 +1152,7 @@ export default function GameClient({ quiz }: { quiz: GameQuiz }) {
             }
             alarivi={kehys.alarivi}
             kaveri={kaveri}
-            ohjeet={kehys.ohjeet.map((o) => ({
-              otsikko: o.otsikko,
-              sisalto: (
-                <ol>
-                  {o.kohdat.map((k) => (
-                    <li key={k.t}>
-                      <b>{k.t}.</b> {k.d}
-                    </li>
-                  ))}
-                </ol>
-              ),
-            }))}
+            nainPelaat={kehys.nainPelaat}
           />
         </main>
       </PeliKehys>

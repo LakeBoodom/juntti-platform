@@ -29,6 +29,7 @@ import Pelipalkki from "@/components/tn20/pelikehys/Pelipalkki";
 import PeliKehys from "@/components/tn20/pelikehys/PeliKehys";
 import PeliAloitus from "@/components/tn20/pelikehys/PeliAloitus";
 import Korjausrivi from "@/components/tn20/jarjesta/Korjausrivi";
+import { jarjestaKortit } from "@/components/tn20/jarjesta/ohjeet";
 import RiviJatko from "@/components/tn20/jarjesta/RiviJatko";
 import { kirjaaPelimuotoPeli } from "@/lib/pelimuotoPelit";
 import { HUB, aloitaHref, seuraavaPakka, type IkaPakka } from "@/lib/jarjesta/hub";
@@ -185,7 +186,7 @@ export default function IkajarjestysClient({
                 <span role="status">Arvotaan kierrosta…</span>
               ) : undefined
             }
-            ohjeet={[]}
+            nainPelaat={jarjestaKortit(ROUND_SIZE, "Ylimpänä vanhin, alimpana nuorin.")}
           />
         </main>
       </PeliKehys>

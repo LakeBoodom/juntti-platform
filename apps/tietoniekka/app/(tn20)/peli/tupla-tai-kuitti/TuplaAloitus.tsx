@@ -5,6 +5,7 @@
 // suoraan (onAloita); muuten siirrytään aiheen sivulle ?aloita=1 (peli alkaa heti).
 import { useState, type CSSProperties, type ReactNode } from "react";
 import PeliAloitus from "@/components/tn20/pelikehys/PeliAloitus";
+import type { OhjeKortti } from "@/components/tn20/ohjeet/NainPelaat";
 import { KaveriRivi } from "@/components/tn20/kaveri/Kaveri";
 import type { KaverinTulos } from "@/lib/kaveri";
 import "./tuplaaloitus.css";
@@ -25,7 +26,7 @@ export default function TuplaAloitus({
   /** Sivun oma aihe: aloita ilman siirtymää. */
   onAloita?: () => void;
   alarivi?: ReactNode;
-  saannot: ReactNode;
+  saannot: [OhjeKortti, OhjeKortti, OhjeKortti];
   tausta: ReactNode;
   /** Haastetun polku (v4 §5): kaverin tulos ylimpänä, studiokuvan yläpuolella. */
   kaveri?: KaverinTulos | null;
@@ -80,10 +81,8 @@ export default function TuplaAloitus({
         </button>
       }
       alarivi={alarivi}
-      ohjeet={[
-        { otsikko: "Näin pelaat", sisalto: saannot },
-        { otsikko: "Pelin tausta", sisalto: tausta },
-      ]}
+      nainPelaat={saannot}
+      ohjeet={[{ otsikko: "Pelin tausta", sisalto: tausta }]}
     />
     </>
   );

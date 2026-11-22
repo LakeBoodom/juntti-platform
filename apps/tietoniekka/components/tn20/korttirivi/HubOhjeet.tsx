@@ -1,4 +1,5 @@
-// HUB-SIVUN OHJEET (Heikki 11.11.2026): "Näin pelaat" / "Näin mega toimii" suljettuina (<details>), avautuvat napauttamalla.
+// HUB-SIVUN LISÄTIEDOT (Heikki 11.11.2026; 22.11.2026 alkaen vain lisätiedot): "Pelin tausta", "Lähteet ja rajaukset"
+// suljettuina (<details>). Näin pelaat on aina auki kolmena korttina: components/tn20/ohjeet/NainPelaat.tsx.
 // Sama ulkoasu kuin pelien aloitusnäkymän ohjeissa (pelikehys.css .pk-ohje); data-iho antaa tumman ihon muuttujat.
 import type { ReactNode } from "react";
 import "@/app/(tn20)/pelikehys.css";

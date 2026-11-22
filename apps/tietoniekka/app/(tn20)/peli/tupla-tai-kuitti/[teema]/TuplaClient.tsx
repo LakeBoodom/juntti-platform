@@ -27,7 +27,7 @@ import { runkoCond } from "@/components/tn20/runko/runkoFontti";
 import { PELIMUODOT, seuraavatPelit } from "@/lib/pelimuodot";
 import { TEEMAT } from "@/lib/tuplaTaiKuitti";
 import TuplaAloitus from "../TuplaAloitus";
-import { TuplaSaannot, TuplaTausta } from "../ohjeet";
+import { TUPLA_KORTIT, TuplaTausta } from "../ohjeet";
 import { getSupabase } from "@/lib/supabase";
 
 type Vaihe = "alku" | "kysymys" | "palaute" | "loppu";
@@ -306,7 +306,7 @@ export default function TuplaClient({ teema: t, sarja, siemen, paivanSarja, paiv
             valittu={t.slug}
             onAloita={alusta}
             kaveri={kaveri}
-            saannot={<TuplaSaannot />}
+            saannot={TUPLA_KORTIT}
             tausta={<TuplaTausta />}
             alarivi={
               <>

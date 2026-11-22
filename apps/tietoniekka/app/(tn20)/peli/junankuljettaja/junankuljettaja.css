@@ -134,16 +134,6 @@
 .tn20 .jk-kuva-j { position: relative; flex: none; height: 28%; overflow: hidden; background: var(--jk-navy); }
 .tn20 .jk-kuva-j img { position: absolute; right: 0; bottom: 0; height: 100%; width: auto; aspect-ratio: 7 / 1; }
 
-/* Näin pelaat: kolme korttia (sama malli kuin Mikä maa? -pelissä), korvaa suljetut ohjeet. */
-.tn20 .jk-nain { padding: 8px 20px 40px; }
-.tn20 .jk-nain-r { list-style: none; display: grid; gap: 12px; margin: 0; padding: 0; }
-.tn20 .jk-nain-r li { display: flex; gap: 14px; padding: 18px 16px; border: 1px solid #2c2517; border-radius: 16px; background: #0f0d07; }
-.tn20 .jk-nain-i {
-  flex: none; display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 50%;
-  border: 1.5px solid var(--c); color: var(--c); font-family: var(--kl-display); font-weight: 900; font-size: 15px;
-}
-.tn20 .jk-nain h3 { margin: 0 0 6px; font-family: var(--kl-display); font-weight: 900; font-size: 15px; line-height: 1.2; letter-spacing: .02em; text-transform: uppercase; color: var(--kl-teksti); }
-.tn20 .jk-nain p { margin: 0; font-size: 15px; line-height: 1.45; color: var(--kl-heikko); }
 
 @container (min-width: 900px) {
   .tn20 .jk-hero { display: grid; grid-template-columns: minmax(0, 6fr) minmax(0, 5fr); align-items: center; gap: 64px; max-width: 1280px; margin: 0 auto; padding: 56px 40px; }
@@ -156,7 +146,4 @@
   .tn20 .jk-valit li[data-yli] { display: flex; }
   .tn20 .jk-valit .jk-lisaa { display: none; }
   .tn20 .jk-ingressi { font-size: 18px; line-height: 1.5; }
-  .tn20 .jk-nain { max-width: 1280px; margin: 0 auto; padding: 0 40px 72px; }
-  .tn20 .jk-nain-r { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
-  .tn20 .jk-nain-r li { padding: 22px 20px; }
 }

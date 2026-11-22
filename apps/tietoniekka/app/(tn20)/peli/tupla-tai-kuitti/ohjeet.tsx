@@ -1,6 +1,7 @@
-// TUPLA TAI KUITTI — K2-aloituksen avattavat ohjeet ("Näin pelaat", "Pelin tausta"), yhteiset aihesivulle ja
+// TUPLA TAI KUITTI — ohjeet: Näin pelaat -kortit (TUPLA_KORTIT, auki) ja avattava "Pelin tausta", yhteiset aihesivulle ja
 // aiheen pelisivulle (pelikehys, 20.10.2026). Tekstit uusittu 12.11.2026 (Heikki).
 import { POTTI, TURVAT } from "@/lib/tuplaTaiKuitti";
+import type { OhjeKortti } from "@/components/tn20/ohjeet/NainPelaat";
 
 /* Heikki 12.11.2026: "Näin pelaat" = pelin ohjeet (enintään 3 kohtaa, kokonaisin lausein); "Pelin tausta" = vain formaatin
    historia Suomessa. Luvut pelin vakioista (POTTI, TURVAT), ei kovakoodattuja. Taustan lähde: fi.wikipedia.org/wiki/Tupla_tai_kuitti
@@ -40,17 +41,12 @@ export const TUPLA_ESITTELY = [
   },
 ];
 
-export function TuplaSaannot() {
-  return (
-    <ul>
-      {TUPLA_SAANNOT.map((r) => (
-        <li key={r.h}>
-          <b>{r.h}.</b> {r.s}
-        </li>
-      ))}
-    </ul>
-  );
-}
+/** Näin pelaat -kortit (jaettu NainPelaat, Heikki 22.11.2026): merkkinä kysymysmäärä, tuplaus ja turvataso. */
+export const TUPLA_KORTIT: [OhjeKortti, OhjeKortti, OhjeKortti] = [
+  { merkki: String(KYSYMYKSIA), otsikko: TUPLA_SAANNOT[0].h, teksti: TUPLA_SAANNOT[0].s },
+  { merkki: "×2", otsikko: TUPLA_SAANNOT[1].h, teksti: TUPLA_SAANNOT[1].s },
+  { merkki: { kuvake: "lukko" }, otsikko: TUPLA_SAANNOT[2].h, teksti: TUPLA_SAANNOT[2].s },
+];
 
 export function TuplaTausta() {
   return (

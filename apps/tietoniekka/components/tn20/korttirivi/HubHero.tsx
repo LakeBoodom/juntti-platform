@@ -5,7 +5,7 @@
 //      Kokoelmat ja tavalliset sivut: enintään yksi rivi (`intro` yhtenä lauseena).
 //   2. NOSTO (enintään yksi) = sama rivikomponentti korostettuna — tulee vaiheessa 2.
 //   3. LAAJUUS = HubRivit (KorttiRivi.tsx), sama rivi kaikilla leveyksillä.
-//   4. Ohjeet suljettuina (HubOhjeet).
+//   4. Näin pelaat kolmena korttina auki (NainPelaat, 22.11.2026); lisätiedot (tausta, lähteet) suljettuina (HubOhjeet).
 // Desktop ≥ 1024: kuva ja teksti rinnakkain, sivun sisältö .tn-shellin levyinen.
 import type { ReactNode } from "react";
 import "./hub.css";

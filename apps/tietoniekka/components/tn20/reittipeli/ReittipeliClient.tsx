@@ -22,9 +22,10 @@ import { KaveriRivi, KaveriVertailu } from "@/components/tn20/kaveri/Kaveri";
 import { reittiOma, type KaverinTulos } from "@/lib/kaveri";
 import { useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type PointerEvent as RPointerEvent, type KeyboardEvent } from "react";
 import { getSupabase } from "@/lib/supabase";
-import { KL_PISTEET, KL_SIVU, KL_YHTEYKSIA, KL_YRITYKSET, pariAvain, reittiPisteet, uusiReittiSiemen, type KlKartta, type KlKunta, type KlReitti } from "@/lib/kuntaliitos";
+import { KL_KUNTIA, KL_PISTEET, KL_SIVU, KL_YHTEYKSIA, KL_YRITYKSET, pariAvain, reittiPisteet, uusiReittiSiemen, type KlKartta, type KlKunta, type KlReitti } from "@/lib/kuntaliitos";
 import { RN_SIVU, RN_USA_SIVU } from "@/lib/rajanaapurit";
 import AlueValinta from "./AlueValinta";
+import NainPelaat from "@/components/tn20/ohjeet/NainPelaat";
 import Pelipalkki from "@/components/tn20/pelikehys/Pelipalkki";
 import { SeuraavaPeli } from "@/components/tn20/pelikehys/PeliTulos";
 import Jakoalue from "@/components/tn20/jako/Jakoalue";
@@ -48,6 +49,9 @@ type Peli = {
   rivitys: boolean;
   /** Näin pelaat: päät ja järjestäminen pelin sanoilla. */
   info: [string, string, string];
+  /** Näin pelaat -kortin otsikko ("Kuusi välikuntaa") ja kolmas kortti (uusi reitti: viikko tai päivä). */
+  valit: string;
+  uusi: { merkki: string; otsikko: string; teksti: string };
   /** Maakunta kortissa vihjeenä (Kuntaliitos); maanosa olisi Rajanaapureissa turha (Heikki 2.11.2026). */
   vihje: boolean;
   /** Aluevalinta herossa: valikko (18 maakuntaa), pillerit (5 maanosaa) tai ei valintaa (Yhdysvallat). */
@@ -66,6 +70,7 @@ const PELIT: Record<ReittipeliNimi, Peli> = {
     alueet: "kunnat", alueiden: "kunnista", ketju: "Kuntaketju",
     rivitys: false, vihje: true, valitsin: "valikko", luokka: "kl--kuntaliitos",
     info: ["Lähtö- ja maalikunta pysyvät paikallaan.", "Järjestä välikunnat.", "Raahaa tai napauta kahta kuntaa vaihtaaksesi niiden paikat. Vierekkäisillä kunnilla pitää olla yhteinen raja."],
+    valit: "Kuusi välikuntaa", uusi: { merkki: "1", otsikko: "Uusi reitti joka viikko", teksti: "Viikon reitti on kaikille sama ja vaihtuu maanantaisin. Uuden reitin voit arpoa milloin vain." },
     pitkin: "kuntarajoja pitkin", valitse: "Valitse maakunta", vali: ["raja", "rajaa"], maali: "Maali",
   },
   rajanaapurit: {
@@ -74,6 +79,7 @@ const PELIT: Record<ReittipeliNimi, Peli> = {
     alueet: "valtiot", alueiden: "valtioista", ketju: "Valtioketju",
     rivitys: true, vihje: false, valitsin: "segmentit", luokka: "kl--rajanaapurit",
     info: ["Lähtö- ja maalimaa pysyvät paikallaan.", "Järjestä välimaat.", "Raahaa tai napauta kahta maata vaihtaaksesi niiden paikat. Vierekkäisillä mailla pitää olla yhteinen maaraja."],
+    valit: "Kuusi välimaata", uusi: { merkki: "1", otsikko: "Uusi reitti joka viikko", teksti: "Viikon reitti on kaikille sama ja vaihtuu maanantaisin. Uuden reitin voit arpoa milloin vain." },
     pitkin: "rajoja pitkin", valitse: "Valitse maanosa", vali: ["raja", "rajaa"], maali: "Maali",
   },
   osavaltiot: {
@@ -82,6 +88,7 @@ const PELIT: Record<ReittipeliNimi, Peli> = {
     alueet: "osavaltiot", alueiden: "osavaltioista", ketju: "Osavaltioketju",
     rivitys: true, vihje: false, valitsin: "ei", luokka: "kl--rajanaapurit kl--osavaltiot",
     info: ["Lähtö- ja maaliosavaltio pysyvät paikallaan.", "Järjestä väliosavaltiot.", "Raahaa tai napauta kahta osavaltiota vaihtaaksesi niiden paikat. Vierekkäisillä osavaltioilla pitää olla yhteinen maaraja."],
+    valit: "Kuusi väliosavaltiota", uusi: { merkki: "1", otsikko: "Uusi reitti joka viikko", teksti: "Viikon reitti on kaikille sama ja vaihtuu maanantaisin. Uuden reitin voit arpoa milloin vain." },
     pitkin: "rajoja pitkin", valitse: "", vali: ["raja", "rajaa"], maali: "Maali",
   },
   /* Junankuljettaja (CD "Junankuljettaja, kierros 1", 20.11.2026): asemat radan kulkujärjestykseen, kunta vihjeenä,
@@ -93,6 +100,7 @@ const PELIT: Record<ReittipeliNimi, Peli> = {
     /* Ei kuntavihjettä paloissa (Heikki 20.11.2026: hämää enemmän kuin auttaa). */
     rivitys: false, vihje: false, valitsin: "ei", luokka: "kl--juna",
     info: ["Lähtö ja määränpää pysyvät paikallaan.", "Järjestä väliasemat.", "Raahaa tai napauta kahta asemaa, niin ne vaihtavat paikkaa."],
+    valit: "Kuusi väliasemaa", uusi: { merkki: "1", otsikko: "Uusi vuoro joka päivä", teksti: "Kaikki ajavat saman reitin. Kun päivän vuoro on ajettu, voit arpoa uuden." },
     pitkin: "asema kerrallaan", valitse: "", vali: ["asemaväli", "asemaväliä"], maali: "Määränpää",
   },
 };
@@ -665,22 +673,20 @@ export default function ReittipeliClient({
       <span>{siirraEnsin && samaJarjestys ? "Siirrä ensin paloja" : vaarinTeksti(peli, KL_YHTEYKSIA - tarkistettu.oikein)}</span>
     </div>
   );
-  const ohjeet = (
-    <ol>
-      <li><b>Päät ovat kiinni.</b> {peli.info[0]}</li>
-      <li><b>{peli.info[1]}</b> {peli.info[2]}</li>
-      <li><b>Tarkista reitti.</b> Jos reitti ei ole oikein, näet montako rajaa on väärin, mutta et sitä, mitkä. Saat kaksi uutta yritystä.</li>
-      <li><b>Pisteet.</b> 10 p jokaisesta oikeasta rajasta. Jokainen uusi yritys vähentää 10 p.</li>
-      <li><b>Näppäimistö:</b> välilyönti valitsee, nuolinäppäimet siirtävät.</li>
-    </ol>
-  );
-
-  /* Junankuljettaja: Näin pelaat kolmena korttina suljetun listan tilalla (CD kierros 1, 4a). */
-  const info = peli.tunnus === "asema" ? <JkOhjeet /> : (
-    <section className="kl-info" aria-labelledby="kl-info-h">
-      <h2 id="kl-info-h">Näin pelaat</h2>
-      {ohjeet}
-    </section>
+  /* Näin pelaat (Heikki 22.11.2026): jaettu NainPelaat, kolme korttia kaikissa reittipeleissä (Junankuljettajan malli).
+     Näppäimistöohje ruudunlukijalle korttien alle. Palojen ja yritysten määrä pelin vakioista. */
+  const info = (
+    <NainPelaat
+      id="kl-info-h"
+      className="kl-info"
+      kohdat={[
+        { merkki: String(KL_KUNTIA - 2), otsikko: peli.valit, teksti: `${peli.info[0]} ${peli.info[2]}` },
+        { merkki: String(KL_YRITYKSET), otsikko: "Kolme tarkistusta", teksti: `Väärästä reitistä näet vain, montako ${peli.vali[1]} on väärin. Jokainen uusi yritys vähentää ${KL_PISTEET} pistettä.` },
+        peli.uusi,
+      ]}
+    >
+      <p className="tn-ohjeet-sr">Näppäimistöllä välilyönti valitsee palan ja nuolinäppäimet siirtävät sitä.</p>
+    </NainPelaat>
   );
 
   if (vaihe === "intro") {
@@ -1102,31 +1108,6 @@ function JkIntro({ reitti, pelattu, aloita, tasot, taso, osoite }: {
           <JkTasot tasot={tasot} taso={taso} osoite={osoite} />
         </div>
       </div>
-    </section>
-  );
-}
-
-const JK_OHJEET: Array<{ luku: string; vari: string; otsikko: string; teksti: string }> = [
-  { luku: "6", vari: "#E8A320", otsikko: "Kuusi väliasemaa", teksti: "Lähtö ja määränpää pysyvät paikallaan. Raahaa tai napauta kahta asemaa, niin ne vaihtavat paikkaa." },
-  { luku: "3", vari: "#E5895C", otsikko: "Kolme tarkistusta", teksti: "Väärästä reitistä näet vain, montako asemaväliä on väärin. Jokainen uusi yritys vähentää 10 pistettä." },
-  { luku: "1", vari: "#9ED9D1", otsikko: "Uusi vuoro joka päivä", teksti: "Kaikki ajavat saman reitin. Kun päivän vuoro on ajettu, voit arpoa uuden." },
-];
-
-function JkOhjeet() {
-  return (
-    <section className="jk-nain" aria-labelledby="jk-nain-h">
-      <h2 id="jk-nain-h" className="jk-ots">Näin pelaat</h2>
-      <ul className="jk-nain-r">
-        {JK_OHJEET.map((o) => (
-          <li key={o.otsikko}>
-            <span className="jk-nain-i" style={{ "--c": o.vari } as CSSProperties} aria-hidden="true">{o.luku}</span>
-            <div>
-              <h3>{o.otsikko}</h3>
-              <p>{o.teksti}</p>
-            </div>
-          </li>
-        ))}
-      </ul>
     </section>
   );
 }

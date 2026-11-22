@@ -13,6 +13,7 @@
 // Selaimeen tulee vain kevyt maalista ja kierroksen oma maa (siluetti), ei koko aineistoa.
 
 import { useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type KeyboardEvent } from "react";
+import NainPelaat, { type OhjeKortti } from "@/components/tn20/ohjeet/NainPelaat";
 import Pelipalkki from "@/components/tn20/pelikehys/Pelipalkki";
 import { SeuraavaPeli } from "@/components/tn20/pelikehys/PeliTulos";
 import Jakoalue from "@/components/tn20/jako/Jakoalue";
@@ -155,11 +156,11 @@ function Siltaulu({ o, uusin }: { o: MaaKierros["oikea"]; uusin: boolean }) {
 }
 
 /* Ohjeet kolmessa kohdassa (Heikki 8.11.2026: aloitussivun lede, kolme syytä ja Näin pelaat toistivat samaa).
-   Suunnan merkki on SVG: ↗-merkki piirtyy iOS:llä emojina. */
-const SAANNOT: Array<{ k: string | null; h: string; s: string; c: string }> = [
-  { k: "6", h: "Kuusi yritystä", s: "Ensimmäinen vihje on vaikein. Jokainen väärä vastaus avaa uuden, ja neljäs näyttää maan ääriviivat. Viimeinen yritys tehdään kaikilla viidellä vihjeellä.", c: "#E8A320" },
-  { k: null, h: "Väärä vastaus vie lähemmäs", s: "Näet, kuinka kaukana oikea maa on ja mihin suuntaan.", c: "#F08A5D" },
-  { k: "1", h: "Uusi maa joka päivä", s: "Kaikki arvaavat saman maan. Vertaa kavereiden kanssa, monennellako osuit.", c: "#8FD9D0" },
+   22.11.2026: jaettu NainPelaat-komponentti, sama kaikissa pelimuodoissa. */
+const SAANNOT: [OhjeKortti, OhjeKortti, OhjeKortti] = [
+  { merkki: "6", otsikko: "Kuusi yritystä", teksti: "Ensimmäinen vihje on vaikein. Jokainen väärä vastaus avaa uuden, ja neljäs näyttää maan ääriviivat. Viimeinen yritys tehdään kaikilla viidellä vihjeellä." },
+  { merkki: { kuvake: "nuoli" }, otsikko: "Väärä vastaus vie lähemmäs", teksti: "Näet, kuinka kaukana oikea maa on ja mihin suuntaan." },
+  { merkki: "1", otsikko: "Uusi maa joka päivä", teksti: "Kaikki arvaavat saman maan. Vertaa kavereiden kanssa, monennellako osuit." },
 ];
 
 /** ALOITUSSIVU (CD-paketti v0.2, 0a/0b; tiivistetty 8.11.): päivän vihje 1 otsikkona ja kysymys perään, tunnus, CTA ja
@@ -185,26 +186,7 @@ function Aloitus({ paiva, vihje, pelattu, aloita }: { paiva: string; vihje: stri
             <button type="button" className="tn-cta-lime mm-in-cta" onClick={aloita}>{pelattu ? "Katso tuloksesi" : "Arvaa päivän maa"}</button>
           </div>
         </div>
-        <section className="mm-in-ohje" aria-labelledby="mm-in-ohje-h">
-          <h2 id="mm-in-ohje-h">Näin pelaat</h2>
-          <ol>
-            {SAANNOT.map((x) => (
-              <li key={x.h}>
-                <span className="mm-in-merkki" style={{ color: x.c, borderColor: x.c }} aria-hidden="true">
-                  {x.k ?? (
-                    <svg viewBox="0 0 24 24" width={18} height={18}>
-                      <path d="M7 17 17 7M9 7h8v8" fill="none" stroke="currentColor" strokeWidth={2.6} strokeLinecap="round" strokeLinejoin="round" />
-                    </svg>
-                  )}
-                </span>
-                <div>
-                  <b>{x.h}</b>
-                  <span>{x.s}</span>
-                </div>
-              </li>
-            ))}
-          </ol>
-        </section>
+        <NainPelaat kohdat={SAANNOT} id="mm-in-ohje-h" className="mm-in-ohje" />
       </main>
     </div>
   );

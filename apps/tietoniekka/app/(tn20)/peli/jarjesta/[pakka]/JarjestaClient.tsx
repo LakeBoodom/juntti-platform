@@ -25,6 +25,7 @@ import Pelipalkki from "@/components/tn20/pelikehys/Pelipalkki";
 import PeliKehys from "@/components/tn20/pelikehys/PeliKehys";
 import PeliAloitus from "@/components/tn20/pelikehys/PeliAloitus";
 import Korjausrivi from "@/components/tn20/jarjesta/Korjausrivi";
+import { jarjestaKortit } from "@/components/tn20/jarjesta/ohjeet";
 import RiviJatko from "@/components/tn20/jarjesta/RiviJatko";
 import { kirjaaPelimuotoPeli } from "@/lib/pelimuotoPelit";
 import { HUB, aloitaHref, seuraavaPakka } from "@/lib/jarjesta/hub";
@@ -174,7 +175,7 @@ export default function JarjestaClient({
               </button>
             }
             alarivi={notice ? <span role="alert">{notice}</span> : pakka.rajaus}
-            ohjeet={[]}
+            nainPelaat={jarjestaKortit(pakka.pick, `Ylimpänä ${pakka.ylin.toLowerCase()}, alimpana ${pakka.alin.toLowerCase()}.`)}
           />
         </main>
       </PeliKehys>

@@ -1,8 +1,10 @@
-// K2 ALOITUS (§4, CD 5b–5c): h1 → yksi lause → valinta → yksi pääpainike → ohjeet ja tausta avattavina
+// K2 ALOITUS (§4, CD 5b–5c): h1 → yksi lause → valinta → yksi pääpainike → Näin pelaat kolmena korttina (NainPelaat,
+// Heikki 22.11.2026) → lisätiedot (esim. pelin tausta) avattavina
 // (<details>). Valinta ja nappi näkyvät 390 × 844:ssä ilman vieritystä. Pelikohtainen sisältö tulee propseina;
 // iho periytyy kääreestä (data-iho).
 import type { CSSProperties, ReactNode } from "react";
 import { KaveriRivi } from "@/components/tn20/kaveri/Kaveri";
+import NainPelaat, { type OhjeKortti } from "@/components/tn20/ohjeet/NainPelaat";
 import type { KaverinTulos } from "@/lib/kaveri";
 
 export default function PeliAloitus({
@@ -11,7 +13,8 @@ export default function PeliAloitus({
   valinta,
   toiminto,
   alarivi,
-  ohjeet,
+  ohjeet = [],
+  nainPelaat,
   pisinSana,
   kaveri,
 }: {
@@ -25,7 +28,10 @@ export default function PeliAloitus({
   toiminto: ReactNode;
   /** Pieni rivi napin alla (päivän sarja, paras tulos). Ei nappi. */
   alarivi?: ReactNode;
-  ohjeet: Array<{ otsikko: string; sisalto: ReactNode }>;
+  /** Näin pelaat: tasan kolme korttia, aina auki. */
+  nainPelaat?: [OhjeKortti, OhjeKortti, OhjeKortti];
+  /** Lisätiedot avattavina (pelin tausta, lähteet). */
+  ohjeet?: Array<{ otsikko: string; sisalto: ReactNode }>;
   /** Haastetun polku (v4 §5): kaverin tulos ylimpänä. */
   kaveri?: KaverinTulos | null;
 }) {
@@ -40,7 +46,8 @@ export default function PeliAloitus({
         {toiminto}
         {alarivi && <div className="pk-alarivi">{alarivi}</div>}
       </div>
-      <div className="pk-ohjeet">
+      {nainPelaat ? <NainPelaat kohdat={nainPelaat} className="pk-nain" /> : null}
+      {ohjeet.length ? <div className="pk-ohjeet">
         {ohjeet.map((o) => (
           <details key={o.otsikko} className="pk-ohje">
             <summary>
@@ -50,7 +57,7 @@ export default function PeliAloitus({
             <div className="pk-ohje-sisalto">{o.sisalto}</div>
           </details>
         ))}
-      </div>
+      </div> : null}
     </section>
   );
 }
