@@ -29,7 +29,7 @@ export type Kuvalahde = {
   /** Visan slug = kuvatiedoston nimi kansiossa public/20/<kokoelma>/ */
   slug: string;
   /** Kokoelma, jonka kansiossa kuva on. */
-  kokoelma: "musiikki" | "kaupungit" | "jaakiekko" | "vaalit" | "historia" | "maantieto" | "luonto" | "ikajarjestys" | "henkilot" | "kulttuuri" | "urheilulajit" | "etusivu" | "jalkapallo" | "urheilu";
+  kokoelma: "musiikki" | "kaupungit" | "jaakiekko" | "vaalit" | "historia" | "maantieto" | "luonto" | "ikajarjestys" | "henkilot" | "kulttuuri" | "urheilulajit" | "etusivu" | "jalkapallo" | "urheilu" | "elokuvat";
   /** Mitä kuvassa on — näytetään lähdesivulla. */
   kuvaus: string;
   /** Tiedoston nimi Wikimedia Commonsissa (ilman File:-etuliitettä). */
@@ -429,6 +429,9 @@ export const KUVALAHTEET: Kuvalahde[] = [
   { slug: "alvar-aalto-tiedatko-mestarin", kokoelma: "kulttuuri", kuvaus: "Alvar Aalto Finlandia-talon edessä 1970-luvulla", tiedosto: "Alvar Aalto utanför Finlandiahuset 1971-1976 SLSA 1150 foto 7972.jpg", tekija: "Göran Schildt / Svenska litteratursällskapet i Finland", lisenssi: "CC BY 4.0", lisenssiUrl: CC("by/4.0"), vuosi: "1971–1976", muokkaus: "koko kuva + sumennettu jatke" },
   { slug: "suomen-museot-tunnetko-kohteet", kokoelma: "kulttuuri", kuvaus: "Nykytaiteen museo Kiasman aula, Helsinki (arkkitehti Steven Holl)", tiedosto: "Kiasma 6.jpg", tekija: "Joel Rosenberg / Kansallisgalleria, Kuvataiteen keskusarkisto", lisenssi: "CC BY-SA 3.0", lisenssiUrl: CC("by-sa/3.0"), vuosi: "2001", muokkaus: "koko kuva + sumennettu jatke" },
   { slug: "loylyn-arvoitus-saunahistoria-visa", kokoelma: "kulttuuri", kuvaus: "Vastomista ja löylyä suomalaisessa saunassa", tiedosto: "Traditional Finnish sauna whisking and löyly.jpg", tekija: "Ville Kurki", lisenssi: "CC BY-SA 4.0", lisenssiUrl: CC("by-sa/4.0"), vuosi: "2023" },
+  // Elokuvat-kokoelma (Heikki 22.11.2026): AI-kuvat oikeiksi valokuviksi; sama tiedosto kortissa ja visan pääkuvana.
+  { slug: "casablanca-elokuva", kokoelma: "elokuvat", kuvaus: "Humphrey Bogart ja Ingrid Bergman, Casablancan promokuva", tiedosto: "Humphrey Bogart Ingrid Bergman Casablanca Promo Still.jpg", tekija: "Warner Bros.", lisenssi: "Public domain", lisenssiUrl: "", vuosi: "1942" },
+  { slug: "james-bond-elokuvat", kokoelma: "elokuvat", kuvaus: "Sean Connery Amstelin rannalla Amsterdamissa Timantit ovat ikuisia -elokuvan kuvauksissa", tiedosto: "Sean Connery as James Bond (1971).jpg", tekija: "Rob Mieremet / Anefo, Nationaal Archief", lisenssi: "CC BY-SA 3.0 NL", lisenssiUrl: "https://creativecommons.org/licenses/by-sa/3.0/nl/deed.en", vuosi: "1971" },
   { slug: "jaapallo-pakkasen-pallopeli", kokoelma: "urheilulajit", kuvaus: "IFK Motala–Lidköpings AIK, jääpallo-ottelu Ruotsissa 2011", tiedosto: "Bandy players.jpg", tekija: "Anemone Nemorosa", lisenssi: "CC BY 2.0", lisenssiUrl: CC("by/2.0"), vuosi: "2011" },
   { slug: "porvoon-akilles", kokoelma: "urheilulajit", kuvaus: "Porvoon Akilles–Lappeenrannan Pallo, jääpallo-ottelu Porvoossa 1971", tiedosto: "Bandy match Akilles-LaPa in Porvoo 1971 (JOKABBL3B B05-2).tif", tekija: "Leif Wikström", lisenssi: "CC BY 4.0", lisenssiUrl: CC("by/4.0"), vuosi: "1971" },
   { slug: "ralli-jyvaskyla", kokoelma: "urheilulajit", kuvaus: "Jari-Matti Latvala, Neste Oil Rally Finland 2010, Muurame (Jyväskylän MM-ralli -visa, Heikki 13.11.2026)", tiedosto: "Neste Oil Rally 2010 - Jari-Matti Latvala in shakedown.jpg", tekija: "kallerna", lisenssi: "CC BY-SA 3.0", lisenssiUrl: CC("by-sa/3.0"), vuosi: "2010" },
