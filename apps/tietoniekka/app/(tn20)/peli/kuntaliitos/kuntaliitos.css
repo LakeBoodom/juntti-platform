@@ -216,10 +216,8 @@
 .tn20 .kl-ketju-x svg { width: 100%; height: 100%; }
 
 /* ── Näin pelaat ───────────────────────────────────────── */
-.tn20 .kl-info { max-width: 1320px; margin: 0 auto; padding: 24px clamp(12px, 2.6cqi, 36px) 40px; }
-.tn20 .kl-info h2 { margin: 0 0 12px; font-family: var(--kl-display); font-weight: 900; font-variation-settings: "wdth" 80; font-size: 20px; text-transform: uppercase; color: var(--kl-navy); }
-.tn20 .kl-info ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; font-size: 15px; line-height: 1.45; color: #2f3d45; }
-.tn20 .kl-info li:last-child { font-size: 13px; color: var(--kl-heikko); }
+/* Kortit jaetusta NainPelaat-komponentista (components/tn20/ohjeet, 22.11.2026); tässä vain sivun reunat. */
+.tn20 .kl-info { max-width: 1320px; margin: 0 auto; padding: 24px clamp(12px, 2.6cqi, 36px) 40px; box-sizing: border-box; }
 
 @container kl (min-width: 720px) {
   .tn20 .kl-main { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(330px, 1fr); gap: 20px; align-items: start; padding: 12px clamp(14px, 2.2cqi, 28px); }
@@ -233,8 +231,6 @@
   .tn20 .kl-korjattava--m { display: none; }
   .tn20 .kl-korjattava--d { display: flex; }
   .tn20 .kl-karttapala[data-korjattava] .kl-kartta-alue { height: min(56cqi, max(300px, calc(100svh - 124px))); }
-  .tn20 .kl-info ol { grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px 28px; }
-  .tn20 .kl-info li:last-child { grid-column: 1 / -1; }
   .tn20 .pk-tulos.kl-lopetus { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(340px, 1fr); column-gap: 24px; row-gap: 12px; align-items: start; padding: 16px clamp(14px, 2.2cqi, 28px) 32px; }
   .tn20 .pk-tulos.kl-lopetus > .kl-tulos { grid-column: 2; grid-row: 1; }
   /* Kartta pysyy näkyvissä vieritettäessä, mutta vain oman palstansa (rivit 1–4) sisällä: sticky on kartassa, ei
@@ -297,9 +293,7 @@
 .tn20 .kl-ketju li { border-color: var(--kl-viiva); background: var(--kl-pinta-2); color: var(--kl-teksti); }
 .tn20 .kl-ketju li[data-vaara] { border-color: var(--kl-puna); background: rgba(216, 84, 60, .16); color: var(--kl-puna-t); }
 
-/* Näin pelaat ja virhetila */
-.tn20 .kl-info h2 { color: var(--kl-teksti); }
-.tn20 .kl-info ol { color: #ddd5c4; }
+/* Virhetila */
 .tn20 .kl-virhe-laatikko { background: var(--kl-pinta); box-shadow: none; }
 .tn20 .kl-virhe-ik { border-color: var(--kl-viiva-2); }
 .tn20 .kl-virhe-laatikko > b { color: var(--kl-teksti); }

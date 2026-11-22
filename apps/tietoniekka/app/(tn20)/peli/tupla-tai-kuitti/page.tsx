@@ -5,7 +5,7 @@ import { JsonLd, peliLd } from "@/lib/jsonLd";
 import { jakoMeta } from "@/lib/jakoMeta";
 import type { Metadata } from "next";
 import { TEEMAT, TUPLA_SIVU } from "@/lib/tuplaTaiKuitti";
-import { TuplaSaannot, TuplaTausta } from "./ohjeet";
+import { TUPLA_KORTIT, TuplaTausta } from "./ohjeet";
 import PeliKehys from "@/components/tn20/pelikehys/PeliKehys";
 import Crumbs from "@/components/tn20/Crumbs";
 import TuplaHub from "./TuplaHub";
@@ -40,7 +40,7 @@ export default function TuplaTaiKuittiSivu() {
       <JsonLd data={peliLd({ name: "Tupla tai kuitti", url: TUPLA_SIVU, description: "Kymmenen yhä vaikeampaa kysymystä; jokainen oikea vastaus tuplaa potin – kuittaa ajoissa tai pelaa kaikesta." })} />
       <Crumbs items={[{ label: "Tupla tai kuitti" }]} />
       <main>
-        <TuplaHub aiheet={aiheet} saannot={<TuplaSaannot />} tausta={<TuplaTausta />} />
+        <TuplaHub aiheet={aiheet} saannot={TUPLA_KORTIT} tausta={<TuplaTausta />} />
       </main>
     </PeliKehys>
   );

@@ -11,7 +11,7 @@ import PeliKehys from "@/components/tn20/pelikehys/PeliKehys";
 import Crumbs from "@/components/tn20/Crumbs";
 import HubHero from "@/components/tn20/korttirivi/HubHero";
 import { RiviLinkki, type RiviKortti } from "@/components/tn20/korttirivi/KorttiRivi";
-import HubOhjeet from "@/components/tn20/korttirivi/HubOhjeet";
+import NainPelaat from "@/components/tn20/ohjeet/NainPelaat";
 import OmaSeura from "@/components/tn20/kumpi/OmaSeura";
 import { PaivanRivi, PutkiRivi } from "@/components/tn20/kumpi/Pelitavat";
 import { JsonLd, peliLd } from "@/lib/jsonLd";
@@ -93,37 +93,13 @@ export default async function KumpiHub() {
               return rivit;
             })}
           </ul>
-          <HubOhjeet
+          {/* Näin pelaat (Heikki 22.11.2026): jaettu NainPelaat, kolme korttia auki kaikissa pelimuodoissa. */}
+          <NainPelaat
+            className="hub-nain"
             kohdat={[
-              {
-                otsikko: "Näin pelaat",
-                sisalto: (
-                  <p>
-                    Napauta vaihtoehtoa, jonka uskot oikeaksi. Molempien arvot paljastuvat kortteihin, ja peli siirtyy
-                    itsestään seuraavaan kysymykseen – tai heti, kun napautat ruutua. Kierroksessa on kymmenen kysymystä,
-                    ja ne vaikeutuvat loppua kohti.
-                  </p>
-                ),
-              },
-              {
-                otsikko: "Päivän Kumpi?",
-                sisalto: (
-                  <p>
-                    Päivän Kumpi? on kaikille sama kymmenen kysymyksen kierros kaikista aiheista. Sen voi pelata kerran
-                    päivässä, ja uusi kierros vaihtuu keskiyöllä.
-                  </p>
-                ),
-              },
-              {
-                otsikko: "Putki",
-                sisalto: (
-                  <p>
-                    Putkessa kysymyksiä tulee niin kauan kuin vastaat oikein, ja ne vaikeutuvat matkan varrella. Kuhunkin
-                    kysymykseen on aikaa kymmenen sekuntia, 21. kysymyksestä alkaen seitsemän. Väärä vastaus tai loppunut
-                    aika katkaisee putken.
-                  </p>
-                ),
-              },
+              { merkki: "10", otsikko: "Kymmenen kysymystä", teksti: "Kaksi vaihtoehtoa, vain toinen on oikein. Molempien arvot paljastuvat vastauksen jälkeen, ja kysymykset vaikeutuvat loppua kohti." },
+              { merkki: "1", otsikko: "Päivän Kumpi?", teksti: "Sama kierros kaikille kaikista aiheista. Sen voi pelata kerran päivässä, ja uusi kierros vaihtuu keskiyöllä." },
+              { merkki: { kuvake: "kello" }, otsikko: "Putki", teksti: "Kysymyksiä tulee, kunnes vastaat väärin. Aikaa on kymmenen sekuntia, 21. kysymyksestä alkaen seitsemän." },
             ]}
           />
         </div>

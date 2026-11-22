@@ -13,7 +13,7 @@ import Crumbs from "@/components/tn20/Crumbs";
 import PeliKehys from "@/components/tn20/pelikehys/PeliKehys";
 import HubHero from "@/components/tn20/korttirivi/HubHero";
 import HubRivit, { type RiviKortti } from "@/components/tn20/korttirivi/KorttiRivi";
-import HubOhjeet from "@/components/tn20/korttirivi/HubOhjeet";
+import NainPelaat from "@/components/tn20/ohjeet/NainPelaat";
 import { MEGA_FEATURED, MEGA_GRID, megaDuration, megaMaarat, maaraVali, type MegaCard } from "@/lib/megavisat";
 
 export const revalidate = 300; // SEO-erä A4 (2.10.2026): ISR 5 min
@@ -131,17 +131,14 @@ export default async function MegavisatLanding() {
             lisa={kaikkiMaarat.length && vali ? `${kaikkiMaarat.length} megavisaa · ${vali} kysymystä` : undefined}
           />
           <HubRivit kortit={rivit} nimi="Megavisat" eager={4} />
-          <HubOhjeet
-            kohdat={[{
-              otsikko: "Näin mega toimii",
-              sisalto: (
-                <ul>
-                  {saannot.map((r) => (
-                    <li key={r.t}><b>{r.t}.</b> {r.d}</li>
-                  ))}
-                </ul>
-              ),
-            }]}
+          {/* Näin pelaat (Heikki 22.11.2026): jaettu NainPelaat, kolme korttia auki; merkkinä megojen määrä datasta. */}
+          <NainPelaat
+            className="hub-nain"
+            kohdat={[
+              { merkki: kaikkiMaarat.length ? String(kaikkiMaarat.length) : { kuvake: "nuoli" }, otsikko: saannot[0].t, teksti: saannot[0].d },
+              { merkki: "1", otsikko: saannot[1].t, teksti: saannot[1].d },
+              { merkki: { kuvake: "ketju" }, otsikko: saannot[2].t, teksti: saannot[2].d },
+            ]}
           />
         </div>
       </main>

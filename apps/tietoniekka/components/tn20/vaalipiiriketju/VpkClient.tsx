@@ -22,6 +22,7 @@ import { lisaaPelirivi } from "@/lib/seuranta";
 import { useEffect, useMemo, useRef, useState, type CSSProperties, type KeyboardEvent, type PointerEvent as RPointerEvent } from "react";
 import { getSupabase } from "@/lib/supabase";
 import Pelipalkki from "@/components/tn20/pelikehys/Pelipalkki";
+import NainPelaat from "@/components/tn20/ohjeet/NainPelaat";
 import { SeuraavaPeli } from "@/components/tn20/pelikehys/PeliTulos";
 import Jakoalue from "@/components/tn20/jako/Jakoalue";
 import { vpkTaso } from "@/lib/pelitasot";
@@ -529,15 +530,18 @@ export default function VpkClient({
         )
       )}
 
-      <section className="vpk-info" aria-labelledby="vpk-info-h">
-        <h2 id="vpk-info-h">Näin pelaat</h2>
-        <ol>
-          <li><b>Ketjun päät ovat valmiina.</b> Ensimmäinen ja viimeinen kansanedustaja on lukittu paikoilleen, ja heidän vaalipiirinsä näkyy kartalla.</li>
-          <li><b>Järjestä kuusi väliin.</b> Jokainen kortti on istuva kansanedustaja eri vaalipiiristä. Vaalipiiri paljastuu vasta tarkistuksessa. Ahvenanmaalta pääsee lautalla Varsinais-Suomeen.</li>
-          <li><b>Mikä tahansa ehjä ketju kelpaa.</b> Kortti on oikein, jos sen vaalipiiri rajautuu edelliseen; viimeisen pitää rajautua myös ketjun loppuun. Uusi päivän ketju joka päivä, ja harjoitusketjuja voi pelata niin monta kuin haluaa.</li>
-        </ol>
+      {/* Näin pelaat (Heikki 22.11.2026): jaettu NainPelaat, kolme korttia; lähde korttien alla. */}
+      <NainPelaat
+        id="vpk-info-h"
+        className="vpk-info"
+        kohdat={[
+          { merkki: String(VPK_JARJESTETTAVIA), otsikko: "Järjestä kuusi väliin", teksti: "Ketjun päät ovat valmiina. Jokainen kortti on kansanedustaja eri vaalipiiristä, ja vaalipiiri paljastuu vasta tarkistuksessa." },
+          { merkki: { kuvake: "ketju" }, otsikko: "Ehjä ketju kelpaa", teksti: "Kortti on oikein, jos sen vaalipiiri rajautuu edelliseen. Ahvenanmaalta pääsee lautalla Varsinais-Suomeen." },
+          { merkki: "1", otsikko: "Uusi ketju joka päivä", teksti: "Kaikki pelaavat saman ketjun. Sen jälkeen voit arpoa uusia ketjuja niin monta kuin haluat." },
+        ]}
+      >
         <p className="vpk-lahde">{lahde}</p>
-      </section>
+      </NainPelaat>
     </div>
   );
 }

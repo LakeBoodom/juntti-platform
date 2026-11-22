@@ -222,7 +222,11 @@ Skilli `tietoniekka-ui-laatu` on näiden sääntöjen lähde; tässä tiivistelm
    tietorivi. Ei 2- tai 3-sarakkeisia kuvaruudukoita mobiilissa; ≥ 768 sama rivi kahdessa sarakkeessa.
 4. **Rivikuvat oikean kokoisina**: 288 × 216 -kopio (`scripts/rivikuvat.py` → `public/20/rivi/`), ei korttikuvaa.
 5. **Ei kovakoodattuja lukuja** teksteissä: megojen määrä, kysymysmäärien vaihteluväli ja visamäärät datasta.
-6. Ohjeet suljettuina (`HubOhjeet`). Malli: `/peli/tupla-tai-kuitti` (vaihe 1).
+6. **Näin pelaat aina auki kolmena korttina** (`NainPelaat`, `components/tn20/ohjeet/`, Heikki 22.11.2026). Sama osio
+   kaikissa pelimuodoissa: hubit, pelien aloitusnäkymät (`PeliAloitus` prop `nainPelaat`) ja omat aloitukset. Tasan kolme
+   korttia: merkki (pelin luku datasta tai vakioista, esim. 6 yritystä, tai SVG-kuvake, ei emoji) + otsikko + 1–2 lausetta.
+   Lisätiedot (pelin tausta, lähteet) suljettuina `HubOhjeet`-osiona korttien alla. Tavallinen tietovisa ilman ohjeita.
+   Malli: `/peli/tupla-tai-kuitti` (vaihe 1).
 
 
 ## PELINÄKYMÄSÄÄNNÖT — CD-paketit, syöte ja tulos (Heikki 8.–9.11.2026)
