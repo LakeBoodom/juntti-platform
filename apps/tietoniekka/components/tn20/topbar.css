@@ -208,7 +208,8 @@
   to { opacity: 1; transform: translateY(0); }
 }
 .tn20 .tn-menu-kokoelmat { width: min(560px, calc(100vw - 32px)); }
-.tn20 .tn-menu-pelimuodot { width: min(360px, calc(100vw - 32px)); }
+/* 11 pelimuotoa (22.11.2026): matalalla näytöllä valikko vierittyy, ettei alin rivi jää ruudun ulkopuolelle. */
+.tn20 .tn-menu-pelimuodot { width: min(360px, calc(100vw - 32px)); max-height: calc(100dvh - 96px); overflow-y: auto; overscroll-behavior: contain; }
 
 .tn20 .tn-menu-all {
   display: flex;

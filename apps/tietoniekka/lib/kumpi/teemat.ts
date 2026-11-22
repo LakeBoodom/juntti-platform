@@ -25,7 +25,7 @@ export const RYHMAT: Array<{ avain: Ryhma; nimi: string }> = [
 /** Hubin rivin tietorivi (Heikki 20.11.2026: kirjoitetaan, kun kokoelma on vahvistettu). Mitä teemassa verrataan;
  *  ei lukumääriä. */
 export const KUVAUKSET: Record<string, string> = {
-  yleistieto: "Kaikki aiheet sekaisin Suomesta luontoon, urheiluun ja politiikkaan",
+  yleistieto: "Kaikki aiheet sekaisin luonnosta urheiluun ja politiikkaan",
   suomi: "Kaupunkien ja maakuntien asukasluvut, iät ja pinta-alat",
   luonto: "Eläimet, järvet, joet, tunturit, kansallispuistot ja majakat",
   urheilu: "Olympia- ja MM-mitalit sekä F1-mestarit",
@@ -35,14 +35,16 @@ export const KUVAUKSET: Record<string, string> = {
   ihmiset: "Tunnetut suomalaiset, kansanedustajat, pääministerit ja presidentit",
 };
 
+/* Heikki 22.11.2026: Liiga ja Oma seura Liigan otteluvalokuviin (Manse- ja Satakunnan derby), Barkov Suomikiekon
+   legendoille, Luonto ja Suomi samat kuin etusivun Luonto- ja Kaupungit-korteissa, Urheilu Iivo Niskanen. */
 export const RIVIKUVAT: Record<string, string> = {
-  suomi: "/20/rivi/tupla-suomen-kaupungit.webp",
-  luonto: "/20/rivi/kumpi-jarvet.webp",
-  "suomikiekon-legendat": "/20/rivi/kumpi-suomikiekon-legendat.webp",
-  liiga: "/20/rivi/tupla-sm-liiga.webp",
-  "oma-seura": "/20/rivi/kokoelma-jaakiekko.webp",
+  suomi: "/20/rivi/kokoelma-kaupungit.webp",
+  luonto: "/20/rivi/kokoelma-luonto.webp",
+  "suomikiekon-legendat": "/20/rivi/kokoelma-jaakiekko.webp",
+  liiga: "/20/rivi/kumpi-liiga.webp",
+  "oma-seura": "/20/rivi/kumpi-oma-seura.webp",
   yleistieto: "/20/rivi/mega-suuri-mega-50.webp",
-  urheilu: "/20/rivi/kumpi-olympiavoittajat.webp",
+  urheilu: "/20/rivi/kumpi-urheilu.webp",
   ihmiset: "/20/rivi/kokoelma-tunnetut-henkilot.webp",
   maailma: "/20/rivi/kumpi-vuoret.webp",
 };

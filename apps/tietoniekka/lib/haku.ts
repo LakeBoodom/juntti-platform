@@ -39,12 +39,13 @@ const PELI_SANAT: Record<string, string> = {
   "/aanivisa/suomen-linnut": "äänet linnut laulu",
   "/visapaketit": "visailta pubivisa juhlat tulostettava",
   "/peli/vaalipiiriketju": "vaalit kansanedustajat",
+  "/kumpi": "kumpi kaksi vaihtoehtoa vertailu",
+  "/peli/junankuljettaja": "juna rautatiet asemat radat kartta",
 };
 /** Pelimuotojen omat pelit, jotka eivät ole valikossa omina riveinään. */
 const LISAPELIT: HakuKohde[] = [
   { t: "p", n: "Rajanaapurit", h: "/peli/rajanaapurit", a: "valtiot kartta naapurit" },
   { t: "p", n: "Kuntaliitos", h: "/peli/kuntaliitos", a: "kunnat kartta" },
-  { t: "p", n: "Junankuljettaja", h: "/peli/junankuljettaja", a: "juna rautatiet asemat radat kartta" },
   { t: "p", n: "Ikäjärjestys", h: "/peli/ikajarjestys", a: "kuka on vanhin järjestä" },
 ];
 

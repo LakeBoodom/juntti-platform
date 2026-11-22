@@ -78,6 +78,9 @@ export const NAV_MODES: NavMode[] = aakkosin([
   { href: "/aanivisa/suomen-linnut", label: "Äänivisat", desc: "Tunnista lintu laulusta", color: "#4ADE80" },
   /* Visapaketit (Heikki 31.10.2026): pelaamisen tapa (visailta porukalla), ei aihe → Pelimuodot-valikkoon. */
   { href: "/visapaketit", label: "Visapaketit", desc: "Valmis tietovisa juhliin, kerhon tapahtumaan tai pubiporukalle", color: "#F0C020" },
+  /* Kumpi? ja Junankuljettaja (Heikki 22.11.2026): ylävalikkoon ja alatunnisteeseen. Kuvaus = etusivun pelikortin rivi. */
+  { href: "/kumpi", label: "Kumpi?", desc: "Kaksi vaihtoehtoa, vain toinen on oikein", color: "#F0A24B" },
+  { href: "/peli/junankuljettaja", label: "Junankuljettaja", desc: "Järjestä asemat radan varrelle lähdöstä määränpäähän", color: "#4ADE80" },
 ]);
 
 export const hubHref = (slug: string) => `/kokoelma/${slug}`;
