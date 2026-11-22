@@ -3,8 +3,8 @@
 // Kokoelma (Heikki 20.11.): Yleistieto ensin, sitten Suomi, Luonto, Urheilu, Jääkiekko (Legendat, Liiga, Oma seura),
 // Maailma ja Ihmiset. Yleistieto, Urheilu ja Ihmiset ovat yhdistelmäteemoja (lib/kumpi/teemat.ts).
 // Jääkiekolla kolme riviä (Legendat, Liiga, Oma seura); 17 seuraa vain Oma seura -valinnasta. Hubiin otetaan teema
-// vain, jos siitä syntyy ≥ 30 kysymystä (lib/kumpi/sivu.ts). Vaihe 2 (22.11.2026): Päivän Kumpi? heron napiksi ja listan
-// ensimmäiseksi riviksi merkillä "Päivän peli" (sama malli kuin Karttapeleissä), Putki toiseksi riviksi.
+// vain, jos siitä syntyy ≥ 30 kysymystä (lib/kumpi/sivu.ts). Vaihe 2 (22.11.2026): Päivän Kumpi? ja Putki listan
+// kahdeksi ensimmäiseksi riviksi kultareunuksella. Heroon ei nappia (Heikki 22.11.: rivi on informatiivisempi, ei toistoa).
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import PeliKehys from "@/components/tn20/pelikehys/PeliKehys";
@@ -13,7 +13,7 @@ import HubHero from "@/components/tn20/korttirivi/HubHero";
 import { RiviLinkki, type RiviKortti } from "@/components/tn20/korttirivi/KorttiRivi";
 import HubOhjeet from "@/components/tn20/korttirivi/HubOhjeet";
 import OmaSeura from "@/components/tn20/kumpi/OmaSeura";
-import { PaivanCta, PaivanRivi, PutkiRivi } from "@/components/tn20/kumpi/Pelitavat";
+import { PaivanRivi, PutkiRivi } from "@/components/tn20/kumpi/Pelitavat";
 import { JsonLd, peliLd } from "@/lib/jsonLd";
 import { jakoMeta } from "@/lib/jakoMeta";
 import { RYHMAT, RIVIKUVAT } from "@/lib/kumpi/teemat";
@@ -58,7 +58,6 @@ export default async function KumpiHub() {
             nimi="Kumpi?"
             korostus={KOROSTUS}
             intro={INTRO}
-            cta={<PaivanCta />}
           />
           <ul className="sk-rivi sk-rivi--hub" aria-label="Pelitavat ja aiheet">
             <li className="sk-li"><PaivanRivi eager /></li>
