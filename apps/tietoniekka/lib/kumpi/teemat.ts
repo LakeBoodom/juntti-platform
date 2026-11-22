@@ -28,7 +28,7 @@ export const KUVAUKSET: Record<string, string> = {
   yleistieto: "Kaikki aiheet sekaisin Suomesta luontoon, urheiluun ja politiikkaan",
   suomi: "Kaupunkien ja maakuntien asukasluvut, iät ja pinta-alat",
   luonto: "Eläimet, järvet, joet, tunturit, kansallispuistot ja majakat",
-  urheilu: "Olympiavoittajat ja F1-mestarit",
+  urheilu: "Olympia- ja MM-mitalit sekä F1-mestarit",
   "suomikiekon-legendat": "Stanley Cupit, MM-kullat ja NHL-urat",
   liiga: "Ottelut, maalit, pisteet ja seurat",
   maailma: "Maat, vuoret, järvet ja joet",
@@ -128,7 +128,10 @@ export const PERUSTEEMAT: Teema[] = [
     pooli: { tapa: "kind", kinds: ["team"], rajaus: (e) => e.ryhma === "liiga" },
     attrs: ["titles", "has_title", "first_title_year", "latest_title_year", "home_capacity", "is_founding_member", "liiga_since", "city_pop"],
   },
-  { slug: "olympiavoittajat", nimi: "Olympiavoittajat", ryhma: "urheilu", pooli: { tapa: "kind", kinds: ["person"] }, attrs: ["oly_golds", "oly_medals"] },
+  /* MM-attribuutit (Heikki 22.11.2026) ovat vain osalla urheilijoista: pari arvotaan vain niistä, joilla arvo on
+     (kelpaa() generaattorissa), puuttuvaa ei lueta nollaksi. Kannassa oleva 0 MM-kultaa on oikea arvo (mitalisti ilman kultaa). */
+  { slug: "olympiavoittajat", nimi: "Olympiavoittajat", ryhma: "urheilu", pooli: { tapa: "kind", kinds: ["person"] },
+    attrs: ["oly_golds", "oly_medals", "oly_games", "wch_golds", "wch_medals"] },
   { slug: "f1", nimi: "F1", ryhma: "urheilu", pooli: { tapa: "kind", kinds: ["person"] }, attrs: ["f1_titles", "f1_wins", "f1_poles"] },
   /* Jalkapallo pois (Heikki 20.11.2026), kunnes kannassa on selvästi enemmän legendoja kuin nykypelaajia.
      Kaupungit ja maakunnat yhdeksi Suomi-teemaksi (Heikki 20.11.), kunnes niistä on enemmän erilaista dataa. */
