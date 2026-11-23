@@ -49,6 +49,7 @@ export default async function KuvienLahteetPage() {
   const luonto = KUVALAHTEET.filter((k) => k.kokoelma === "luonto");
   const kulttuuri = KUVALAHTEET.filter((k) => k.kokoelma === "kulttuuri");
   const urheilu = KUVALAHTEET.filter((k) => k.kokoelma === "urheilulajit");
+  const elokuvat = KUVALAHTEET.filter((k) => k.kokoelma === "elokuvat");
   const ikajarjestys = KUVALAHTEET.filter((k) => k.kokoelma === "ikajarjestys");
   const etusivu = KUVALAHTEET.filter((k) => k.kokoelma === "etusivu");
   const henkilovisat = KUVALAHTEET.filter((k) => k.kokoelma === "henkilot");
@@ -81,6 +82,7 @@ export default async function KuvienLahteetPage() {
     { id: "luonto", otsikko: "Luonto-kokoelma", sisalto: <Lista rivit={luonto} /> },
     { id: "kulttuuri", otsikko: "Kulttuuri-kokoelma", sisalto: <Lista rivit={kulttuuri} /> },
     { id: "urheilu", otsikko: "Urheilu-kokoelma", sisalto: <Lista rivit={urheilu} /> },
+    { id: "elokuvat", otsikko: "Elokuvat-kokoelma", sisalto: <Lista rivit={elokuvat} /> },
     { id: "jalkapallo", otsikko: "Jalkapallo: Valioliiga, Mestarien liiga ja maajoukkueet", sisalto: <Lista rivit={jalkapallo} /> },
     { id: "jalkapallo-euro", otsikko: "Jalkapallo: Euroopan suurseurat", sisalto: <Lista rivit={jalkapalloEuro} /> },
     { id: "etusivu", otsikko: "Etusivu: Pelaa aiheittain", sisalto: <Lista rivit={etusivu} /> },
