@@ -50,7 +50,8 @@ export const RIVIKUVAT: Record<string, string> = {
   urheilu: "/20/rivi/kumpi-urheilu.webp",
   ihmiset: "/20/rivi/kokoelma-tunnetut-henkilot.webp",
   maailma: "/20/rivi/kumpi-vuoret.webp",
-  musiikki: "/20/rivi/kokoelma-musiikki.webp",
+  // Eppu Normaali, Rakuuna Rock 2014 (Heikki 24.11.2026); krediitti rivillä eppu-normaali-tietovisa.
+  musiikki: "/20/rivi/kumpi-musiikki.webp",
 };
 
 /** Jääkiekon jakauma kymmenen kysymyksen jaksossa (A2): 3 tilasto + 3 ura/seura + 2 saavutus + 2 tausta. */
