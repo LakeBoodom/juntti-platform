@@ -4,6 +4,9 @@
 
 import type { KEnt } from "./tyypit";
 
+/** SM-sarjat-teeman seurojen group_keyt (Heikki 23.11.2026). Myös lib/kumpi/data.ts lataa vain nämä + Liigan. */
+export const SM_SARJAT = ["korisliiga", "lentopallo-mestaruusliiga", "superpesis", "veikkausliiga"];
+
 /** Suomalainen järvi tai joki: tags sisältää "suomi" (Cowork 20.11.2026; rajavesillä myös "rajavesi"). Uusi järvi tai
  *  joki menee oikeaan teemaan tagin perusteella, ilman nimilistaa. */
 export const suomenVesi = (e: KEnt) => e.tags.includes("suomi");
@@ -28,7 +31,7 @@ export const KUVAUKSET: Record<string, string> = {
   yleistieto: "Kaikki aiheet sekaisin luonnosta urheiluun ja politiikkaan",
   suomi: "Kaupunkien ja maakuntien asukasluvut, iät ja pinta-alat",
   luonto: "Eläimet, järvet, joet, tunturit, kansallispuistot ja majakat",
-  urheilu: "Olympia- ja MM-mitalit sekä F1-mestarit",
+  urheilu: "Olympia- ja MM-mitalit, F1-mestarit ja SM-sarjojen seurat",
   "suomikiekon-legendat": "Stanley Cupit, MM-kullat ja NHL-urat",
   liiga: "Ottelut, maalit, pisteet ja seurat",
   maailma: "Maat, vuoret, järvet ja joet",
@@ -134,6 +137,15 @@ export const PERUSTEEMAT: Teema[] = [
      (kelpaa() generaattorissa), puuttuvaa ei lueta nollaksi. Kannassa oleva 0 MM-kultaa on oikea arvo (mitalisti ilman kultaa). */
   { slug: "olympiavoittajat", nimi: "Olympiavoittajat", ryhma: "urheilu", pooli: { tapa: "kind", kinds: ["person"] },
     attrs: ["oly_golds", "oly_medals", "oly_games", "wch_golds", "wch_medals"] },
+  /* SM-sarjat (Heikki 23.11.2026, URHEILU_SEURAMESTARUUDET_2026_11_23): koris-, lentis-, pesis- ja jalkapalloseurojen
+     miesten Suomen mestaruudet. Laji on aina kysymyksessä, ja kukin attribuutti on vain oman lajinsa seuroilla, joten
+     pari on aina saman lajin seurat. Viimeisin mestaruus vain seuroilla, joilla mestaruus on. */
+  {
+    slug: "sm-seurat", nimi: "SM-sarjat", ryhma: "urheilu",
+    pooli: { tapa: "kind", kinds: ["team"], rajaus: (e) => SM_SARJAT.includes(e.ryhma ?? "") },
+    attrs: ["koripallo_titles_m", "lentopallo_titles_m", "pesapallo_titles_m", "jalkapallo_titles_m",
+      "koripallo_latest_title_m", "lentopallo_latest_title_m", "pesapallo_latest_title_m", "jalkapallo_latest_title_m"],
+  },
   { slug: "f1", nimi: "F1", ryhma: "urheilu", pooli: { tapa: "kind", kinds: ["person"] }, attrs: ["f1_titles", "f1_wins", "f1_poles"] },
   /* Jalkapallo pois (Heikki 20.11.2026), kunnes kannassa on selvästi enemmän legendoja kuin nykypelaajia.
      Kaupungit ja maakunnat yhdeksi Suomi-teemaksi (Heikki 20.11.), kunnes niistä on enemmän erilaista dataa. */
@@ -171,7 +183,7 @@ export const TEEMAT: Teema[] = [
   sekoitus("yleistieto", "Yleistieto", "yleistieto", YLEISTIETO_OSAT),
   PERUSTEEMAT.find((t) => t.slug === "suomi")!,
   PERUSTEEMAT.find((t) => t.slug === "luonto")!,
-  sekoitus("urheilu", "Urheilu", "urheilu", ["olympiavoittajat", "f1"]),
+  sekoitus("urheilu", "Urheilu", "urheilu", ["olympiavoittajat", "f1", "sm-seurat"]),
   PERUSTEEMAT.find((t) => t.slug === "suomikiekon-legendat")!,
   /* Liiga = pelaajat + seurat (Heikki 21.11.2026: Coworkin seuradata). Slug pysyy "liiga" (sivu, visakysymykset). */
   sekoitus("liiga", "Liiga", "jaakiekko", ["liiga-pelaajat", "liiga-seurat"]),

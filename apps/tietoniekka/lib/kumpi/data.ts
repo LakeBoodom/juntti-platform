@@ -9,7 +9,12 @@ import { createClient } from "@supabase/supabase-js";
 import { henkiloKuva } from "@/lib/henkilokuvat";
 import { helsinginPaiva } from "@/lib/aika";
 import type { KDef, KEnt, KumpiData } from "./tyypit";
+import { SM_SARJAT } from "./teemat";
 
+/** Seurojen group_keyt, jotka ladataan (Liiga + Kumpi?-teeman SM-sarjat). */
+const SEURARYHMAT = new Set(["liiga", ...SM_SARJAT]);
+/** Kannan nimissä lajitarkenne erottaa saman nimiset seurat ("KTP (koripallo)"). Kysymys kertoo lajin, joten tarkenne pois. */
+const LAJITARKENNE = /\s*\((koripallo|jalkapallo|lentopallo|pesäpallo)\)$/;
 const KINDIT = ["player", "person", "team", "city", "region", "lake", "river", "park", "lighthouse", "fell", "country", "mountain", "event", "species"];
 const SIVU = 1000;
 const TTL_MS = 60 * 60 * 1000;
@@ -106,8 +111,9 @@ export function rakennaKumpiData(r: {
       if (a.metric) m[a.attr_key] = a.metric;
       if (a.num_value !== null && a.num_value !== undefined) v[a.attr_key] = Number(a.num_value);
     }
-    // Seuroista vertailuihin vain nykyiset 17 Liiga-seuraa (group_key liiga); jalkapalloseurat ja lakanneet pois.
-    if (x.kind === "team" && x.group_key !== "liiga") continue;
+    // Seuroista vertailuihin nykyiset 17 Liiga-seuraa (group_key liiga) ja SM-sarjojen seurat (Heikki 23.11.2026:
+    // koris, lentis, pesis, jalkapallo); muut seurat ja lakanneet pois.
+    if (x.kind === "team" && !SEURARYHMAT.has(x.group_key ?? "")) continue;
     // Pelaajien ikä: tarkka syntymäaika (birth, epoch-sekunnit) tai pelkkä vuosi (birth_year → 1.7.). Ero on aina
     // vähintään vuoden (min_gap), joten puolen vuoden epätarkkuus ei voi kääntää järjestystä.
     if (v.birth === undefined && v.birth_year !== undefined) v.birth = Date.UTC(v.birth_year, 6, 1) / 1000;
@@ -119,7 +125,7 @@ export function rakennaKumpiData(r: {
         ? 1 + Math.min(4, (v.liiga_games ?? 0) / 250) + (v.nhl_games ? 1 : 0) + (legenda ? 2 : 0)
         : 1;
     entities.push({
-      id: x.id, nimi: x.name, kind: x.kind, kuva, v, d, t, s, m,
+      id: x.id, nimi: x.kind === "team" ? x.name.replace(LAJITARKENNE, "") : x.name, kind: x.kind, kuva, v, d, t, s, m,
       seurat: seurat.get(x.id) ?? [], paikka, ihminen, legenda,
       suomalainen: !!x.celebrity_id && suomalaiset.has(x.celebrity_id),
       paino,
