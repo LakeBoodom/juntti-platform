@@ -11,7 +11,7 @@ export const SM_SARJAT = ["korisliiga", "lentopallo-mestaruusliiga", "superpesis
  *  joki menee oikeaan teemaan tagin perusteella, ilman nimilistaa. */
 export const suomenVesi = (e: KEnt) => e.tags.includes("suomi");
 
-export type Ryhma = "yleistieto" | "jaakiekko" | "urheilu" | "suomi" | "luonto" | "maailma" | "ihmiset";
+export type Ryhma = "yleistieto" | "jaakiekko" | "urheilu" | "suomi" | "luonto" | "maailma" | "ihmiset" | "viihde";
 
 /** Hubin ryhmäjärjestys (Heikki 20.11.2026): jääkiekko ei alussa, jotta hubi ei näytä jääkiekkopeliltä. */
 export const RYHMAT: Array<{ avain: Ryhma; nimi: string }> = [
@@ -22,6 +22,8 @@ export const RYHMAT: Array<{ avain: Ryhma; nimi: string }> = [
   { avain: "jaakiekko", nimi: "Jääkiekko" },
   { avain: "maailma", nimi: "Maailma" },
   { avain: "ihmiset", nimi: "Ihmiset" },
+  /* Viihde (Heikki 24.11.2026): ensimmäisenä teemana Musiikki. */
+  { avain: "viihde", nimi: "Viihde" },
 ];
 
 /** Hubin rivikuvat (288 × 216, scripts/rivikuvat.py): sivuston omia kopioita, krediitit jo /kuvien-lahteet-sivulla. */
@@ -36,6 +38,7 @@ export const KUVAUKSET: Record<string, string> = {
   liiga: "Ottelut, maalit, pisteet ja seurat",
   maailma: "Maat, vuoret, järvet ja joet",
   ihmiset: "Tunnetut suomalaiset, kansanedustajat, pääministerit ja presidentit",
+  musiikki: "Spotify-kuuntelut ja yhtyeiden perustamisvuodet",
 };
 
 /* Heikki 22.11.2026: Liiga ja Oma seura Liigan otteluvalokuviin (Manse- ja Satakunnan derby), Barkov Suomikiekon
@@ -50,6 +53,8 @@ export const RIVIKUVAT: Record<string, string> = {
   urheilu: "/20/rivi/kumpi-urheilu.webp",
   ihmiset: "/20/rivi/kokoelma-tunnetut-henkilot.webp",
   maailma: "/20/rivi/kumpi-vuoret.webp",
+  // Eppu Normaali, Rakuuna Rock 2014 (Heikki 24.11.2026); krediitti rivillä eppu-normaali-tietovisa.
+  musiikki: "/20/rivi/kumpi-musiikki.webp",
 };
 
 /** Jääkiekon jakauma kymmenen kysymyksen jaksossa (A2): 3 tilasto + 3 ura/seura + 2 saavutus + 2 tausta. */
@@ -166,6 +171,16 @@ export const PERUSTEEMAT: Teema[] = [
     pooli: { tapa: "kind", kinds: ["country", "mountain", "lake", "river"], rajaus: (e) => (e.kind !== "lake" && e.kind !== "river") || !suomenVesi(e) },
     attrs: ["country_area", "country_pop", "mountain_height", "area_km2", "river_length"],
   },
+  /* Musiikki (Heikki 24.11.2026, VIIHDE_ERA3_SPOTIFY_2026_11_23): kappaleiden Spotify-kuuntelut Suomessa ja maailmalla
+     (kind song) sekä yhtyeiden perustamisvuodet (kind artist). music_sales_fi on kannassa pois käytöstä. Kukin attribuutti
+     on vain osalla kohteista, joten pari on aina kaksi kappaletta tai kaksi yhtyettä. */
+  {
+    // Kappaleen nimessä on esittäjä ja nimi ("Gettomasa: Shamppanjadieetillä"): sana yli 18 merkkiä (laatu.ts MAX_SANA)
+    // ei mahdu korttiin @320, joten tällainen kappale jää pois.
+    slug: "musiikki", nimi: "Musiikki", ryhma: "viihde",
+    pooli: { tapa: "kind", kinds: ["song", "artist"], rajaus: (e) => e.nimi.split(/[\s\-–]+/).every((w) => w.length <= 18) },
+    attrs: ["spotify_streams_fi", "spotify_streams_global", "band_founded"],
+  },
   { slug: "tunnetut-suomalaiset", nimi: "Tunnetut suomalaiset", ryhma: "ihmiset", pooli: { tapa: "suomalaiset" }, attrs: ["birth"] },
   { slug: "politiikka", nimi: "Politiikka", ryhma: "ihmiset", pooli: { tapa: "kind", kinds: ["person"] }, attrs: ["mp_first_year", "mp_years", "pm_days", "pm_start", "pres_start"] },
 ];
@@ -189,6 +204,7 @@ export const TEEMAT: Teema[] = [
   sekoitus("liiga", "Liiga", "jaakiekko", ["liiga-pelaajat", "liiga-seurat"]),
   PERUSTEEMAT.find((t) => t.slug === "maailma")!,
   sekoitus("ihmiset", "Ihmiset", "ihmiset", ["tunnetut-suomalaiset", "politiikka"]),
+  PERUSTEEMAT.find((t) => t.slug === "musiikki")!,
 ];
 
 /** Ryhmän enimmäismäärä yhdistelmäkierroksessa (Yleistieto). */

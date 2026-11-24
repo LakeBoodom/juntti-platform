@@ -15,7 +15,7 @@ import { SM_SARJAT } from "./teemat";
 const SEURARYHMAT = new Set(["liiga", ...SM_SARJAT]);
 /** Kannan nimissä lajitarkenne erottaa saman nimiset seurat ("KTP (koripallo)"). Kysymys kertoo lajin, joten tarkenne pois. */
 const LAJITARKENNE = /\s*\((koripallo|jalkapallo|lentopallo|pesäpallo)\)$/;
-const KINDIT = ["player", "person", "team", "city", "region", "lake", "river", "park", "lighthouse", "fell", "country", "mountain", "event", "species"];
+const KINDIT = ["player", "person", "team", "city", "region", "lake", "river", "park", "lighthouse", "fell", "country", "mountain", "event", "species", "song", "artist"];
 const SIVU = 1000;
 const TTL_MS = 60 * 60 * 1000;
 

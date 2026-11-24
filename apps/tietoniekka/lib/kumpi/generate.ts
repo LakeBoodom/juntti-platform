@@ -29,6 +29,7 @@ const VUOSI_ATTR = new Set([
   "pres_start", "liiga_since", "first_title_year", "latest_title_year", "founded_hockey",
   // SM-sarjojen viimeisin mestaruus (Heikki 23.11.2026).
   "koripallo_latest_title_m", "lentopallo_latest_title_m", "pesapallo_latest_title_m", "jalkapallo_latest_title_m",
+  "band_founded",
 ]);
 
 /** "Kumpi heistä on pelannut enemmän [Liiga-otteluita]?" → osat. Paikkamerkit täytetään ennen jakoa. */
