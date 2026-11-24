@@ -53,6 +53,7 @@ export function rakennaKumpiData(r: {
   suomalaiset: string[];
   tanaan: string;
   visat?: any[];
+  kaupungit?: any[];
 }): KumpiData {
   const legendat = new Set(r.legendat);
   const suomalaiset = new Set(r.suomalaiset);
@@ -63,7 +64,14 @@ export function rakennaKumpiData(r: {
   // same_as: pelaaja → henkilö. Molemmat saavat saman ihmistunnisteen (henkilön id), pelaaja henkilön kuvan.
   const henkiloksi = new Map<string, string>();
   const seurat = new Map<string, string[]>();
+  const syntymat = new Map<string, { kaupunki: string; tarkka: boolean }>();
   for (const rel of r.relaatiot) {
+    if (rel.rel_type === "born_in") {
+      // Useampi syntymäpaikka = epävarma: ei käytetä (Cowork teki vain yksiselitteiset).
+      if (syntymat.has(rel.from_entity)) syntymat.set(rel.from_entity, { kaupunki: "", tarkka: false });
+      else syntymat.set(rel.from_entity, { kaupunki: rel.to_entity, tarkka: !rel.detail });
+      continue;
+    }
     if (rel.rel_type === "same_as") {
       const [p, h] = kindIdlla.get(rel.from_entity) === "player" ? [rel.from_entity, rel.to_entity] : [rel.to_entity, rel.from_entity];
       henkiloksi.set(p, h);
@@ -127,6 +135,7 @@ export function rakennaKumpiData(r: {
     entities.push({
       id: x.id, nimi: x.kind === "team" ? x.name.replace(LAJITARKENNE, "") : x.name, kind: x.kind, kuva, v, d, t, s, m,
       seurat: seurat.get(x.id) ?? [], paikka, ihminen, legenda,
+      syntyma: syntymat.get(x.id) ?? null,
       suomalainen: !!x.celebrity_id && suomalaiset.has(x.celebrity_id),
       paino,
       lat: x.lat == null ? null : Number(x.lat), lon: x.lon == null ? null : Number(x.lon),
@@ -164,7 +173,9 @@ export function rakennaKumpiData(r: {
       id: v.id, teemat: v.teemat ?? [], kysymys: v.kysymys, oikea: v.oikea, vaara: v.vaara,
       oikeaFakta: v.oikea_fakta ?? null, vaaraFakta: v.vaara_fakta ?? null, vaikeus: v.vaikeus,
     }));
-  return { entities, defs, blocks, inessiivit, visat };
+  const kaupunkiInessiivit: Record<string, string> = {};
+  for (const k of r.kaupungit ?? []) if (k.entity_id && k.inessiivi) kaupunkiInessiivit[k.entity_id] = k.inessiivi;
+  return { entities, defs, blocks, inessiivit, kaupunkiInessiivit, visat };
 }
 
 export async function lataaKumpiData(): Promise<KumpiData | null> {
@@ -172,7 +183,7 @@ export async function lataaKumpiData(): Promise<KumpiData | null> {
   if (!a) return null;
   const { sb, laaja } = a;
   const tilat = laaja ? ["published", "draft"] : ["published"];
-  const [entities, defs, blocks, relaatiot, faktat, julkkikset, visat] = await Promise.all([
+  const [entities, defs, blocks, relaatiot, faktat, julkkikset, visat, kaupungit] = await Promise.all([
     kaikki((alku, loppu) =>
       sb.from("fact_entities")
         .select("id, name, kind, group_key, tags, image_url, celebrity_id, lat, lon, name_partitive, fact_attributes(attr_key, scope, num_value, display_value, text_value, metric, volatility, next_review_at)")
@@ -185,13 +196,14 @@ export async function lataaKumpiData(): Promise<KumpiData | null> {
       return data ?? [];
     })(),
     kaikki((alku, loppu) => sb.from("duel_pair_blocks").select("attr_key, entity_a, entity_b").range(alku, loppu)),
-    kaikki((alku, loppu) => sb.from("fact_relationships").select("from_entity, to_entity, rel_type").in("rel_type", ["same_as", "played_for"]).order("id").range(alku, loppu)),
+    kaikki((alku, loppu) => sb.from("fact_relationships").select("from_entity, to_entity, rel_type, detail").in("rel_type", ["same_as", "played_for", "born_in"]).order("id").range(alku, loppu)),
     kaikki((alku, loppu) => sb.from("entity_facts").select("entity_id").order("id").range(alku, loppu)),
     kaikki((alku, loppu) => sb.from("celebrities").select("id").eq("suomalainen", true).order("id").range(alku, loppu)),
     kaikki((alku, loppu) =>
       sb.from("kumpi_visakysymykset")
         .select("id, teemat, kysymys, oikea, vaara, oikea_fakta, vaara_fakta, vaikeus, questions!inner(quizzes!inner(status))")
         .in("status", tilat).order("id").range(alku, loppu)),
+    kaikki((alku, loppu) => sb.from("kaupungit").select("entity_id, inessiivi").order("slug").range(alku, loppu)),
   ]);
   return rakennaKumpiData({
     entities, defs, blocks, relaatiot,
@@ -199,6 +211,7 @@ export async function lataaKumpiData(): Promise<KumpiData | null> {
     suomalaiset: julkkikset.map((c: any) => c.id as string),
     tanaan: helsinginPaiva().iso,
     visat,
+    kaupungit,
   });
 }
 /* eslint-enable @typescript-eslint/no-explicit-any */

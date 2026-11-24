@@ -123,6 +123,7 @@ const FLAG_RIVIT: Record<string, { kylla: FlagRivi; ei: FlagRivi }> = {
 
 /** Kelpaako entiteetti attribuutin pooliin (arvo olemassa, flagilla nimenomainen 0/1 ja voittajalla vuodet). */
 function kelpaa(e: KEnt, s: Spec, def: KDef): boolean {
+  if (s.key === SYNTYMA) return !!e.syntyma?.kaupunki;
   if (def.mode === "category") return e.seurat.length > 0;
   const v = arvo(e, s);
   if (v === undefined || !Number.isFinite(v)) return false;
@@ -284,6 +285,7 @@ function yritaPari(ctx: Konteksti, s: Spec, def: KDef, tavoite: Vaikeus | null, 
   const p = pooli(ctx, s, def).filter((e) => henkiloVapaa(jakso, e));
   if (p.length < 2) return null;
 
+  if (s.key === SYNTYMA) return yritaSyntyma(ctx, s, def, tavoite, p);
   if (def.mode === "category") return yritaSeura(ctx, s, def, tavoite, jakso, p);
 
   const ehdokkaat = painotettuJarjestys(p, rng);
@@ -337,13 +339,51 @@ function yritaSeura(ctx: Konteksti, s: Spec, def: KDef, tavoite: Vaikeus | null,
   return null;
 }
 
+/** born_in (Heikki 24.11.2026): "Kumpi heistä on syntynyt Tampereella?" Oikealla tarkka born_in kaupunkiin x, väärällä
+ *  tunnettu syntymäpaikka muualla. Vanhassa, kaupunkiin liitetyssä kunnassa syntynyt ei ole kummallakaan puolella.
+ *  Kysytään vain kaupunkeja, joilla on inessiivi (taulu kaupungit). Aina keskivaikea, kuten seurakysymys. */
+const SYNTYMA = "born_in_city";
+
+function yritaSyntyma(ctx: Konteksti, s: Spec, def: KDef, tavoite: Vaikeus | null, p: KEnt[]): KumpiKysymys | null {
+  if (tavoite && tavoite !== "keski") return null;
+  const kaupungit = [...new Set(p.filter((e) => e.syntyma!.tarkka && ctx.data.kaupunkiInessiivit[e.syntyma!.kaupunki]).map((e) => e.syntyma!.kaupunki))];
+  for (let yritys = 0; yritys < 20 && kaupungit.length; yritys++) {
+    const x = kaupungit[Math.floor(ctx.rng() * kaupungit.length)];
+    const kylla = painotettuJarjestys(p.filter((e) => e.syntyma!.tarkka && e.syntyma!.kaupunki === x), ctx.rng);
+    const ei = painotettuJarjestys(p.filter((e) => e.syntyma!.kaupunki !== x), ctx.rng);
+    for (const w of kylla.slice(0, 6)) {
+      for (const l of ei.slice(0, 20)) {
+        if (w.ihminen === l.ihminen) continue;
+        const pk = `${pariAvain(s.avain, w, l)}|${x}`;
+        if (ctx.kaytetyt.has(pk) || ctx.blocks.has(pariAvain(s.key, w, l))) continue;
+        const [a, b] = ctx.rng() < 0.5 ? [w, l] : [l, w];
+        return rakenna(ctx, s, def, a, b, "keski", pk, x);
+      }
+    }
+  }
+  return null;
+}
+
+/** Kortin arvorivi syntymäpaikkakysymyksessä: "Syntynyt Kuopiossa", tai "Syntynyt muualla", jos kaupungin inessiiviä ei ole
+ *  tai syntymäkunta on myöhemmin liitetty kaupunkiin. */
+function syntymaRivi(ctx: Konteksti, e: KEnt): string {
+  const ines = e.syntyma?.tarkka ? ctx.data.kaupunkiInessiivit[e.syntyma.kaupunki] : undefined;
+  return ines ? `Syntynyt ${ines}` : "Syntynyt muualla";
+}
+
 function rakenna(ctx: Konteksti, s: Spec, def: KDef, a: KEnt, b: KEnt, vaikeus: Vaikeus, pk: string, x: string): KumpiKysymys {
-  const ines = x ? ctx.data.inessiivit[x] ?? x : s.seura ? ctx.data.inessiivit[s.seura] ?? s.seura : "";
+  const ines = s.key === SYNTYMA
+    ? ctx.data.kaupunkiInessiivit[x] ?? x
+    : x ? ctx.data.inessiivit[x] ?? x : s.seura ? ctx.data.inessiivit[s.seura] ?? s.seura : "";
 
   let aVoittaa: boolean;
   let aArvo: string;
   let bArvo: string;
-  if (def.mode === "category") {
+  if (s.key === SYNTYMA) {
+    aVoittaa = a.syntyma?.kaupunki === x;
+    aArvo = syntymaRivi(ctx, a);
+    bArvo = syntymaRivi(ctx, b);
+  } else if (def.mode === "category") {
     aVoittaa = a.seurat.includes(x);
     aArvo = aVoittaa ? `Pelasi ${ines}` : `Ei ole pelannut ${ines}`;
     bArvo = aVoittaa ? `Ei ole pelannut ${ines}` : `Pelasi ${ines}`;

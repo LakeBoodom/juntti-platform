@@ -37,7 +37,7 @@ export const KUVAUKSET: Record<string, string> = {
   "suomikiekon-legendat": "Stanley Cupit, MM-kullat ja NHL-urat",
   liiga: "Ottelut, maalit, pisteet ja seurat",
   maailma: "Maat, vuoret, järvet ja joet",
-  ihmiset: "Tunnetut suomalaiset, kansanedustajat, pääministerit ja presidentit",
+  ihmiset: "Tunnetut suomalaiset ja syntymäpaikat, kansanedustajat, pääministerit ja presidentit",
   musiikki: "Spotify-kuuntelut ja yhtyeiden perustamisvuodet",
 };
 
@@ -181,7 +181,8 @@ export const PERUSTEEMAT: Teema[] = [
     pooli: { tapa: "kind", kinds: ["song", "artist"], rajaus: (e) => e.nimi.split(/[\s\-–]+/).every((w) => w.length <= 18) },
     attrs: ["spotify_streams_fi", "spotify_streams_global", "band_founded"],
   },
-  { slug: "tunnetut-suomalaiset", nimi: "Tunnetut suomalaiset", ryhma: "ihmiset", pooli: { tapa: "suomalaiset" }, attrs: ["birth"] },
+  // Syntymäpaikka (Heikki 24.11.2026): born_in-suhteet, kysymys "Kumpi heistä on syntynyt Tampereella?".
+  { slug: "tunnetut-suomalaiset", nimi: "Tunnetut suomalaiset", ryhma: "ihmiset", pooli: { tapa: "suomalaiset" }, attrs: ["birth", "born_in_city"] },
   { slug: "politiikka", nimi: "Politiikka", ryhma: "ihmiset", pooli: { tapa: "kind", kinds: ["person"] }, attrs: ["mp_first_year", "mp_years", "pm_days", "pm_start", "pres_start"] },
 ];
 

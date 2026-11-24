@@ -18,6 +18,9 @@ export type KEnt = {
   m: Record<string, string>;
   /** Seurat (team-entiteettien nimet), joissa pelannut (played_for). Vain pelaajilla. */
   seurat: string[];
+  /** Syntymäkaupungin entiteetti-id (born_in, Heikki 24.11.2026). `tarkka` = false, kun henkilö on syntynyt myöhemmin
+   *  kaupunkiin liitetyssä kunnassa (detail "Nastola (nyk. Lahti)"): silloin kaupunkia ei kysytä eikä käytetä vääränä. */
+  syntyma: { kaupunki: string; tarkka: boolean } | null;
   /** "mv" = maalivahti, "kp" = kenttäpelaaja, null = ei tiedossa / ei pelaaja. */
   paikka: "mv" | "kp" | null;
   /** Saman ihmisen tunniste (same_as-ryhmä): sama henkilö- ja pelaajatietueelle. */
@@ -75,6 +78,8 @@ export type KumpiData = {
   blocks: string[];
   /** Seuran nimi → inessiivi ("Tapparassa"). */
   inessiivit: Record<string, string>;
+  /** Kaupungin entiteetti-id → inessiivi ("Tampereella"), taulusta kaupungit (born_in-kysymykset). */
+  kaupunkiInessiivit: Record<string, string>;
 };
 
 export type Vaikeus = "helppo" | "keski" | "vaikea";
