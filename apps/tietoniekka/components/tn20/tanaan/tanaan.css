@@ -61,16 +61,7 @@
   font-size: clamp(44px, 15.5vw, 62px); line-height: 1; letter-spacing: .01em; padding: 10px 0 6px; white-space: nowrap;
 }
 .tn20 .tv-mh-meta { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 2px 8px; font-family: var(--tv-cond); font-weight: 600; font-size: 14px; text-transform: uppercase; letter-spacing: .06em; color: var(--tv-ink2); padding-top: 7px; }
-/* Matala näkymä (375 × 667, Spec: ≤ 700 px): nimiö tiivistyy, vaihtoehdot 48 px (≥ 44) → neljä vaihtoehtoa mahtuu
-   ruutuun sivulla 1 (mitattu 24.11.: ennen 714 px / 699 px näkymä). */
-@media (max-height: 700px) {
-  .tn20 .tv-mh-name { font-size: 44px; padding: 6px 0 4px; }
-  .tn20 .tv-mh { padding-bottom: 10px; }
-  .tn20 .tv-mh-pub { padding-bottom: 4px; }
-  .tn20 .tv-opts { gap: 6px; }
-  .tn20 .tv-opt { min-height: 48px; padding-top: 8px; padding-bottom: 8px; }
-  .tn20 .tv-q { margin-bottom: 10px; padding-top: 10px; }
-}
+
 
 .tn20 .tv-kick { font-family: var(--tv-cond); font-weight: 700; font-size: 15px; letter-spacing: .14em; text-transform: uppercase; color: var(--tv-kick); padding-top: 9px; border-top: 3px solid var(--tv-ink); }
 .tn20 .tv-jrow { display: flex; gap: 14px; align-items: flex-start; }
@@ -222,4 +213,19 @@
   .tn20 .tv-pk-s { font-size: 30px; }
   .tn20 .tv-tu { display: grid; grid-template-columns: 500px minmax(0, 1fr); gap: 64px; max-width: 1240px; padding: 40px 0 72px; align-items: start; }
   .tn20 .tv-tu-big { font-size: 104px; }
+}
+
+/* Matala näkymä (375 × 667, Spec: ≤ 700 px): nimiö tiivistyy noin 92 px:iin (TÄNÄÄN 44 px, meta yhdellä rivillä),
+   juttu 26 px ja vaihtoehdot 48 px (≥ 44) → osasto, juttu, kysymys ja neljä vaihtoehtoa mahtuvat sivulla 1.
+   Tiedoston lopussa, jotta perussäännöt eivät kumoa tätä. */
+@media (max-height: 700px) and (max-width: 1023px) {
+  .tn20 .tv-pg { padding-top: 8px; }
+  .tn20 .tv-mh { padding-bottom: 8px; }
+  .tn20 .tv-mh-pub { padding-bottom: 3px; font-size: 12px; }
+  .tn20 .tv-mh-name { font-size: 44px; padding: 3px 0 1px; }
+  .tn20 .tv-mh-meta { padding-top: 4px; font-size: 13px; }
+  .tn20 .tv-jt { font-size: 26px; margin: 6px 0 10px; }
+  .tn20 .tv-q { font-size: 18px; margin-bottom: 10px; padding-top: 10px; }
+  .tn20 .tv-opts { gap: 6px; }
+  .tn20 .tv-opt { min-height: 48px; padding-top: 7px; padding-bottom: 7px; }
 }
