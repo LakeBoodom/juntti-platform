@@ -39,7 +39,8 @@
 .tn20 .tv-seg.nut { flex: .5; }
 
 .tn20 .tv-body { flex: 1; display: flex; width: 100%; }
-.tn20 .tv-col { flex: 1; min-width: 0; }
+/* Sivunkäännön 18 px:n liuku ei saa venyttää sivua vaakasuunnassa (clip, ei hidden: ei puristusta). */
+.tn20 .tv-col { flex: 1; min-width: 0; overflow-x: clip; }
 .tn20 .tv-pg { padding: 12px 18px 28px; max-width: 700px; margin: 0 auto; }
 .tn20 .tv-rail { display: none; }
 
@@ -60,9 +61,15 @@
   font-size: clamp(44px, 15.5vw, 62px); line-height: 1; letter-spacing: .01em; padding: 10px 0 6px; white-space: nowrap;
 }
 .tn20 .tv-mh-meta { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 2px 8px; font-family: var(--tv-cond); font-weight: 600; font-size: 14px; text-transform: uppercase; letter-spacing: .06em; color: var(--tv-ink2); padding-top: 7px; }
+/* Matala näkymä (375 × 667, Spec: ≤ 700 px): nimiö tiivistyy, vaihtoehdot 48 px (≥ 44) → neljä vaihtoehtoa mahtuu
+   ruutuun sivulla 1 (mitattu 24.11.: ennen 714 px / 699 px näkymä). */
 @media (max-height: 700px) {
   .tn20 .tv-mh-name { font-size: 44px; padding: 6px 0 4px; }
   .tn20 .tv-mh { padding-bottom: 10px; }
+  .tn20 .tv-mh-pub { padding-bottom: 4px; }
+  .tn20 .tv-opts { gap: 6px; }
+  .tn20 .tv-opt { min-height: 48px; padding-top: 8px; padding-bottom: 8px; }
+  .tn20 .tv-q { margin-bottom: 10px; padding-top: 10px; }
 }
 
 .tn20 .tv-kick { font-family: var(--tv-cond); font-weight: 700; font-size: 15px; letter-spacing: .14em; text-transform: uppercase; color: var(--tv-kick); padding-top: 9px; border-top: 3px solid var(--tv-ink); }

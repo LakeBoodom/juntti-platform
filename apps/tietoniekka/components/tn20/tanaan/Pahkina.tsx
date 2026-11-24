@@ -131,7 +131,6 @@ function KumpiPari({ data, onValmis }: { data: Extract<PahkinaData, { muoto: "ku
         {auki && (
           <p className="tv-pk-res">
             {ok ? "✓ Oikein" : "✗ Ei tällä kertaa"}
-            <small>{data.a.teksti} {data.a.arvo} · {data.b.teksti} {data.b.arvo}</small>
           </p>
         )}
       </div>
