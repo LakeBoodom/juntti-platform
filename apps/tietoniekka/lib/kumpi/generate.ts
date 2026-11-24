@@ -27,6 +27,7 @@ const VUOSI_ATTR = new Set([
   "founded_year", "lh_built", "park_founded", "mp_first_year", "year", "liiga_debut", "nhl_debut", "start_year", "party_founded",
   // Presidentin aloitusvuosi (display_value "1925", Cowork 20.11.2026) ja seurojen vuodet.
   "pres_start", "liiga_since", "first_title_year", "latest_title_year", "founded_hockey",
+  "band_founded",
 ]);
 
 /** "Kumpi heistä on pelannut enemmän [Liiga-otteluita]?" → osat. Paikkamerkit täytetään ennen jakoa. */

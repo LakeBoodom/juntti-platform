@@ -10,7 +10,7 @@ import { henkiloKuva } from "@/lib/henkilokuvat";
 import { helsinginPaiva } from "@/lib/aika";
 import type { KDef, KEnt, KumpiData } from "./tyypit";
 
-const KINDIT = ["player", "person", "team", "city", "region", "lake", "river", "park", "lighthouse", "fell", "country", "mountain", "event", "species"];
+const KINDIT = ["player", "person", "team", "city", "region", "lake", "river", "park", "lighthouse", "fell", "country", "mountain", "event", "species", "song", "artist"];
 const SIVU = 1000;
 const TTL_MS = 60 * 60 * 1000;
 
