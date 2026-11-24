@@ -1,0 +1,218 @@
+/* TÄNÄÄN · PÄIVÄN VISA 7+1 (CD "Tänään 7+1 kierros 1", Spec.html 22.11.2026; vaihe 1).
+   Lehden sivut kermalla (paperi), Päivän pähkinä tummalla. Värit designin mitatuista pareista (Spec: kontrastit):
+   muste 15,2:1, toissijainen 6,8:1, kicker tumma kulta 5,2:1 paperilla; kulta tekstinä paperilla kielletty (2,0:1).
+   Liike vain transform/opacity tokeneista; prefers-reduced-motion poistaa sivunkäännön (globals.css-portti).
+   KORTTISÄÄNTÖ: otsikot ilman katkoa keskeltä sanaa; mitattu 320–1440 (ks. raportti). */
+
+.tn20 .tv {
+  --tv-bg: #F4EDDC; --tv-bg2: #EBE2CD; --tv-ink: #1B1812; --tv-ink2: #575042; --tv-rule: #CBBFA5; --tv-line: #8C8270;
+  --tv-kick: #8A5800; --tv-ok: #1D6B35; --tv-no: #A8281F; --tv-cta: var(--tn-lime, #B6FF3C);
+  --tv-tumma: #131109; --tv-tumma2: #1F1C15; --tv-tumma-ink: #F3ECDD; --tv-tumma-ink2: #B5AB96; --tv-tumma-line: #7A6F5A; --tv-kulta: #E8A320;
+  --tv-display: "Archivo Variable", "Archivo", var(--tn-font-display, sans-serif);
+  --tv-cond: var(--rk-cond, "Barlow Condensed"), "Barlow Condensed", sans-serif;
+  min-height: 100dvh; display: flex; flex-direction: column;
+  background: var(--tv-bg); color: var(--tv-ink); font-family: var(--tn-font-body, "Barlow", system-ui, sans-serif);
+  -webkit-font-smoothing: antialiased;
+}
+.tn20 .tv *, .tn20 .tv *::before, .tn20 .tv *::after { box-sizing: border-box; }
+.tn20 .tv button { font-family: inherit; }
+.tn20 .tv :is(button, a, [tabindex]):focus-visible { outline: 2px solid var(--tv-ink); outline-offset: 2px; }
+.tn20 .tv-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+/* Ohjelmallinen fokus otsikkoon sivun vaihtuessa: ei näkyvää rengasta. */
+.tn20 .tv [tabindex="-1"]:focus:not(:focus-visible) { outline: none; }
+
+/* Yhteiset osat paperin sävyyn: pelikehyksen kerma-iho (pelipalkki, Pelaa seuraavaksi) ja Jakoalue (--tt-*). */
+.tn20 .tv {
+  --tt-ink: var(--tv-ink); --tt-soft: var(--tv-ink2); --tt-muted: var(--tv-ink2); --tt-line: var(--tv-rule); --tt-card: var(--tv-bg2); --tt-acc: var(--tv-kick);
+}
+.tn20 .tv[data-iho="kerma"], .tn20 .tv [data-iho="kerma"] {
+  --pk-bg: var(--tv-bg);
+  --pk-bar: var(--tv-bg); --pk-line: var(--tv-rule); --pk-ink: var(--tv-ink); --pk-logo: var(--tv-ink);
+  --pk-peli: var(--tv-ink); --pk-paluu: var(--tv-ink2); --pk-dim: var(--tv-ink2);
+}
+
+/* Edistymisrivi 7 + ½ segmenttiä. */
+.tn20 .tv-prog { display: flex; gap: 4px; padding: 6px 18px 0; width: 100%; max-width: 1060px; margin: 0 auto; }
+.tn20 .tv-seg { flex: 1; height: 3px; border-radius: 2px; background: var(--tv-rule); }
+.tn20 .tv-seg.done { background: var(--tv-ink); }
+.tn20 .tv-seg.cur { background: var(--tv-kick); }
+.tn20 .tv-seg.nut { flex: .5; }
+
+.tn20 .tv-body { flex: 1; display: flex; width: 100%; }
+.tn20 .tv-col { flex: 1; min-width: 0; }
+.tn20 .tv-pg { padding: 12px 18px 28px; max-width: 700px; margin: 0 auto; }
+.tn20 .tv-rail { display: none; }
+
+.tn20 .tv-turn.t-a { animation: tv-kaanto-a 220ms var(--ease-emphasized); }
+.tn20 .tv-turn.t-b { animation: tv-kaanto-b 220ms var(--ease-emphasized); }
+@keyframes tv-kaanto-a { from { opacity: 0; transform: translateX(18px); } to { opacity: 1; transform: none; } }
+@keyframes tv-kaanto-b { from { opacity: 0; transform: translateX(18px); } to { opacity: 1; transform: none; } }
+
+/* Nimiö (sivu 1; kansi korvaa sen vaiheessa 2). */
+.tn20 .tv-mh { text-align: center; padding: 2px 0 14px; }
+.tn20 .tv-mh-pub { font-family: var(--tv-cond); font-weight: 700; font-size: 13px; letter-spacing: .22em; text-transform: uppercase; color: var(--tv-ink2); padding-bottom: 6px; }
+.tn20 .tv-mh-ark { display: inline-block; margin-left: 10px; transform: rotate(-4deg); border: 2px solid var(--tv-ink2); border-radius: 6px; padding: 2px 8px 1px; letter-spacing: .12em; }
+.tn20 .tv-mh-r { border-top: 3px solid var(--tv-ink); border-bottom: 1px solid var(--tv-ink); height: 7px; }
+.tn20 .tv-mh-r.b { border-top-width: 1px; border-bottom-width: 3px; }
+/* KORTTISÄÄNTÖ: TÄNÄÄN 6 merkkiä, leveys 118 % → 62 px vie ~300 px; 320 px:n näkymässä sisältö 284 px → clamp. */
+.tn20 .tv-mh-name {
+  font-family: var(--tv-display); font-weight: 900; font-variation-settings: "wdth" 118; font-stretch: 118%;
+  font-size: clamp(44px, 15.5vw, 62px); line-height: 1; letter-spacing: .01em; padding: 10px 0 6px; white-space: nowrap;
+}
+.tn20 .tv-mh-meta { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 2px 8px; font-family: var(--tv-cond); font-weight: 600; font-size: 14px; text-transform: uppercase; letter-spacing: .06em; color: var(--tv-ink2); padding-top: 7px; }
+@media (max-height: 700px) {
+  .tn20 .tv-mh-name { font-size: 44px; padding: 6px 0 4px; }
+  .tn20 .tv-mh { padding-bottom: 10px; }
+}
+
+.tn20 .tv-kick { font-family: var(--tv-cond); font-weight: 700; font-size: 15px; letter-spacing: .14em; text-transform: uppercase; color: var(--tv-kick); padding-top: 9px; border-top: 3px solid var(--tv-ink); }
+.tn20 .tv-jrow { display: flex; gap: 14px; align-items: flex-start; }
+.tn20 .tv-jt {
+  flex: 1; min-width: 0; font-family: var(--tv-display); font-weight: 800; font-variation-settings: "wdth" 86; font-stretch: 86%;
+  font-size: 28px; line-height: 1.06; letter-spacing: -.005em; margin: 8px 0 14px;
+  text-wrap: balance; overflow-wrap: normal; word-break: keep-all; hyphens: manual;
+}
+.tn20 .tv-kuva { flex: none; width: 84px; height: 104px; margin-top: 10px; object-fit: cover; object-position: 50% 22%; border: 1px solid var(--tv-line); background: var(--tv-bg2); }
+.tn20 .tv-q { font-weight: 600; font-size: 19px; line-height: 1.3; margin: 0 0 14px; padding-top: 12px; border-top: 1px solid var(--tv-rule); overflow-wrap: break-word; }
+
+.tn20 .tv-opts { display: grid; gap: 8px; }
+.tn20 .tv-opt {
+  width: 100%; min-height: 52px; display: flex; align-items: center; gap: 12px; padding: 10px 14px 10px 12px;
+  border: 2px solid var(--tv-ink); background: var(--tv-bg); color: var(--tv-ink); border-radius: 10px;
+  font-weight: 600; font-size: 17px; line-height: 1.2; text-align: left; cursor: pointer;
+  transition: transform var(--dur-fast) var(--ease-standard), background-color var(--dur-fast) var(--ease-standard);
+  -webkit-tap-highlight-color: transparent;
+}
+@media (hover: hover) { .tn20 .tv-opt:not([aria-disabled]):hover { background: var(--tv-bg2); } }
+.tn20 .tv-opt:not([aria-disabled]):active { transform: scale(.98); }
+.tn20 .tv-opt[aria-disabled] { cursor: default; }
+.tn20 .tv-ol { flex: none; width: 22px; font-family: var(--tv-cond); font-weight: 700; font-size: 15px; color: var(--tv-ink2); }
+.tn20 .tv-ot { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+.tn20 .tv-mk { flex: none; font-weight: 800; font-size: 20px; min-width: 16px; text-align: right; }
+.tn20 .tv-opt.ok { background: var(--tv-ok); border-color: var(--tv-ok); color: #fff; }
+.tn20 .tv-opt.no { background: var(--tv-no); border-color: var(--tv-no); color: #fff; }
+.tn20 .tv-opt.ok .tv-ol, .tn20 .tv-opt.no .tv-ol { color: #fff; }
+.tn20 .tv-opt.dim { border-color: var(--tv-line); color: var(--tv-ink2); background: transparent; }
+.tn20 .tv-opt.pop { animation: tv-pop var(--dur-base) var(--ease-emphasized); }
+.tn20 .tv-opt.shake { animation: tv-shake 340ms var(--ease-standard); }
+@keyframes tv-pop { 0% { transform: scale(1); } 45% { transform: scale(1.04); } 100% { transform: scale(1); } }
+@keyframes tv-shake { 0%, 100% { transform: translateX(0); } 20% { transform: translateX(-7px); } 40% { transform: translateX(6px); } 60% { transform: translateX(-4px); } 80% { transform: translateX(2px); } }
+
+.tn20 .tv-sel { margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--tv-rule); animation: tv-nousu var(--dur-base) var(--ease-emphasized) both; scroll-margin-bottom: 96px; }
+.tn20 .tv-sel p { font-size: 16px; line-height: 1.45; margin: 0; }
+.tn20 .tv-sel-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; margin-top: 12px; }
+.tn20 .tv-src { font-family: var(--tv-cond); font-weight: 600; font-size: 14px; letter-spacing: .06em; text-transform: uppercase; color: var(--tv-ink2); }
+.tn20 .tv-jatko { display: inline-flex; align-items: center; gap: 7px; padding: 6px 12px 6px 10px; border: 1px dashed var(--tv-line); border-radius: 999px; font-weight: 600; font-size: 14px; color: var(--tv-ink); }
+.tn20 .tv-jatko svg { color: var(--tv-kick); flex: none; }
+@keyframes tv-nousu { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+
+/* Alapalkki vastauksen jälkeen: lime-nappi (näkymän ainoa lime). */
+.tn20 .tv-foot {
+  position: sticky; bottom: 0; z-index: 5; padding: 10px 18px max(18px, env(safe-area-inset-bottom));
+  border-top: 1px solid var(--tv-rule); background: var(--tv-bg); animation: tv-nousu 200ms var(--ease-emphasized) both;
+}
+.tn20 .tv-foot .tv-cta { width: 100%; max-width: 700px; margin: 0 auto; }
+.tn20 .tv-cta {
+  min-height: 52px; padding: 0 22px; border: 0; border-radius: 12px; background: var(--tv-cta); color: #131109;
+  font-weight: 800; font-size: 18px; display: flex; align-items: center; justify-content: center; gap: 10px;
+  cursor: pointer; text-decoration: none; transition: transform var(--dur-fast) var(--ease-standard);
+}
+.tn20 .tv-cta:active { transform: scale(.98); }
+
+/* ── Päivän pähkinä (tumma laatikko) ─────────────────────────────────────────────────────────── */
+.tn20 .tv-pk {
+  --tk-surface: var(--tv-tumma2);
+  background: var(--tv-tumma); color: var(--tv-tumma-ink); border: 1px solid #3A3429; border-radius: 16px; padding: 18px 16px 16px;
+}
+.tn20 .tv-pk :is(button, a):focus-visible { outline-color: var(--tv-tumma-ink); }
+.tn20 .tv-pk-k {
+  display: flex; align-items: center; gap: 8px; padding-bottom: 10px; border-bottom: 1px solid #3A3429;
+  font-family: var(--tv-cond); font-weight: 700; font-size: 15px; letter-spacing: .14em; text-transform: uppercase; color: var(--tv-kulta);
+}
+.tn20 .tv-pk-k h2 { margin: 0; font: inherit; letter-spacing: inherit; }
+.tn20 .tv-pk-k > span { margin-left: auto; color: var(--tv-tumma-ink2); letter-spacing: .08em; }
+.tn20 .tv-pk-s {
+  font-family: var(--tv-display); font-weight: 800; font-variation-settings: "wdth" 88; font-stretch: 88%;
+  font-size: 21px; line-height: 1.15; margin: 14px 0 6px; text-wrap: balance; overflow-wrap: normal; word-break: keep-all;
+}
+.tn20 .tv-pk-ohje { margin: 0 0 12px; font-size: 15px; color: var(--tv-tumma-ink2); }
+.tn20 .tv-pk-rivi { display: grid; gap: 8px; margin-top: 6px; }
+.tn20 .tv-pk-rivi .jr-merkki { color: var(--tv-tumma-ink2); }
+.tn20 .tv-pk-tulosrivi { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.tn20 .tv-pk-res { margin: 14px 0 0; font-weight: 700; font-size: 17px; animation: tv-nousu var(--dur-base) var(--ease-emphasized) both; }
+.tn20 .tv-pk-res small { display: block; font-weight: 500; font-size: 15px; color: var(--tv-tumma-ink2); margin-top: 4px; line-height: 1.35; }
+.tn20 .tv-pk-act { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 16px; align-items: center; }
+.tn20 .tv-pk-act .tv-cta { flex: 1 1 200px; }
+.tn20 .tv-pk-ohita {
+  margin-left: auto; min-height: 44px; padding: 0 6px; border: 0; background: transparent; color: var(--tv-tumma-ink2);
+  font-weight: 600; font-size: 15px; text-decoration: underline; text-underline-offset: 3px; cursor: pointer;
+}
+/* Kumpi?-kortit pähkinässä: Kumpi?-pelin kortti ilman koko ruudun pelinäkymää. */
+.tn20 .tv-pk-kumpi.kp-peli { min-height: 0; background: transparent; }
+.tn20 .tv-pk-kumpi .kp-kortit { padding: 0; min-height: 0; max-height: none; }
+.tn20 .tv-pk-kumpi .kp-kortit > .kp-kortti { min-height: 112px; }
+.tn20 .tv-pk-kumpi .kp-nimi { font-size: clamp(22px, 7vw, 30px); }
+
+/* ── Tulos ─────────────────────────────────────────────────────────────────────────────────── */
+.tn20 .tv-tu { padding: 18px 18px 40px; max-width: 700px; margin: 0 auto; display: flex; flex-direction: column; gap: 24px; }
+.tn20 .tv-tu-vasen, .tn20 .tv-tu-oikea { display: flex; flex-direction: column; gap: 24px; min-width: 0; }
+.tn20 .tv-tu-score { animation: tv-nousu 300ms var(--ease-emphasized) both; }
+.tn20 .tv-tu-n { display: flex; align-items: baseline; flex-wrap: wrap; gap: 4px 12px; }
+.tn20 .tv-tu-big { font-family: var(--tv-display); font-weight: 900; font-variation-settings: "wdth" 82; font-stretch: 82%; font-size: 76px; line-height: .9; letter-spacing: -.01em; }
+.tn20 .tv-tu-nut { font-family: var(--tv-display); font-weight: 800; font-variation-settings: "wdth" 86; font-stretch: 86%; font-size: 28px; }
+.tn20 .tv-tu-lause { font-size: 18px; line-height: 1.4; margin: 10px 0 0; }
+.tn20 .tv-tu-putki { display: inline-flex; align-items: center; gap: 6px; margin-top: 10px; font-family: var(--tv-cond); font-weight: 700; font-size: 16px; letter-spacing: .08em; text-transform: uppercase; color: var(--tv-kick); }
+.tn20 .tv-tu-h2 { font-family: var(--tv-display); font-weight: 900; font-variation-settings: "wdth" 96; font-stretch: 96%; font-size: 26px; line-height: 1.05; margin: 0; }
+.tn20 .tv-tu-huom { border-top: 3px solid var(--tv-ink); padding-top: 12px; display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px; }
+.tn20 .tv-tu-cd { font-family: var(--tv-display); font-weight: 800; font-size: 18px; font-variant-numeric: tabular-nums; color: var(--tv-ink2); }
+.tn20 .tv-tu-list { border-top: 3px solid var(--tv-ink); padding-top: 12px; }
+.tn20 .tv-tu-list ol { list-style: none; margin: 4px 0 0; padding: 0; }
+.tn20 .tv-tu-it { padding: 14px 0; border-bottom: 1px solid var(--tv-rule); display: grid; grid-template-columns: minmax(0, 1fr) 26px; gap: 4px 10px; }
+.tn20 .tv-tu-k { font-family: var(--tv-cond); font-weight: 700; font-size: 14px; letter-spacing: .14em; text-transform: uppercase; color: var(--tv-kick); }
+.tn20 .tv-tu-m { font-weight: 800; font-size: 20px; text-align: right; align-self: start; }
+.tn20 .tv-tu-m.ok { color: var(--tv-ok); }
+.tn20 .tv-tu-m.no { color: var(--tv-no); }
+.tn20 .tv-tu-j { grid-column: 1 / -1; margin: 2px 0 4px; font-family: var(--tv-display); font-weight: 800; font-variation-settings: "wdth" 88; font-stretch: 88%; font-size: 19px; line-height: 1.12; overflow-wrap: normal; word-break: keep-all; }
+.tn20 .tv-tu-a { grid-column: 1 / -1; font-size: 16px; line-height: 1.35; }
+.tn20 .tv-tu-a b { font-weight: 700; }
+.tn20 .tv-tu-x {
+  grid-column: 1 / -1; justify-self: start; display: inline-flex; align-items: center; gap: 8px; min-height: 44px; margin-top: 6px; padding: 0 14px;
+  border: 2px solid var(--tv-ink); border-radius: 999px; background: transparent; color: var(--tv-ink); font-weight: 700; font-size: 15px; text-decoration: none; cursor: pointer;
+}
+@media (hover: hover) { .tn20 .tv-tu-x:hover { background: var(--tv-bg2); } }
+/* Jakoalue ja Pelaa seuraavaksi kermalla: yhteiset komponentit, vain paperin värit. */
+
+.tn20 .tv-tyhja { flex: 1; display: grid; place-content: center; gap: 20px; padding: 40px 18px; text-align: center; }
+.tn20 .tv-tyhja h1 { font-family: var(--tv-display); font-weight: 900; font-size: 26px; line-height: 1.1; margin: 0; max-width: 18ch; }
+.tn20 .tv-tyhja .tv-cta { justify-self: center; }
+
+/* ── Desktop: sisällysluettelo + juttu (Spec: 300 + 700, väli 64) ─────────────────────────── */
+@media (min-width: 1024px) {
+  .tn20 .tv-body { display: grid; grid-template-columns: 300px minmax(0, 700px); justify-content: center; gap: 64px; padding: 0 24px; }
+  .tn20 .tv-body.leve { grid-template-columns: minmax(0, 1240px); }
+  .tn20 .tv-rail { display: block; padding: 28px 0; align-self: start; position: sticky; top: 0; }
+  .tn20 .tv-rail ol { list-style: none; margin: 0; padding: 0; }
+  .tn20 .tv-rail-h { font-family: var(--tv-display); font-weight: 900; font-variation-settings: "wdth" 118; font-stretch: 118%; font-size: 22px; padding-bottom: 10px; border-bottom: 3px solid var(--tv-ink); }
+  .tn20 .tv-rail-d { font-family: var(--tv-cond); font-weight: 600; font-size: 14px; letter-spacing: .06em; text-transform: uppercase; color: var(--tv-ink2); margin: 6px 0 10px; }
+  .tn20 .tv-ri { display: grid; grid-template-columns: 26px minmax(0, 1fr) 18px; gap: 8px; padding: 11px 0; border-top: 1px solid var(--tv-rule); color: var(--tv-ink2); }
+  .tn20 .tv-ri.cur, .tn20 .tv-ri.done { color: var(--tv-ink); }
+  .tn20 .tv-ri-n { font-family: var(--tv-cond); font-weight: 700; font-size: 16px; }
+  .tn20 .tv-ri-k { display: block; font-family: var(--tv-cond); font-weight: 700; font-size: 13px; letter-spacing: .12em; text-transform: uppercase; color: var(--tv-kick); }
+  .tn20 .tv-ri-j { display: block; font-weight: 600; font-size: 15px; line-height: 1.25; margin-top: 2px; }
+  .tn20 .tv-ri.cur .tv-ri-j { font-weight: 800; }
+  .tn20 .tv-ri-m { font-weight: 800; font-size: 16px; }
+  .tn20 .tv-pg { padding: 28px 0 40px; margin: 0; max-width: none; }
+  .tn20 .tv-mh-name { font-size: 108px; }
+  .tn20 .tv-jt { font-size: 46px; margin: 12px 0 20px; }
+  .tn20 .tv-kuva { width: 150px; height: 184px; }
+  .tn20 .tv-q { font-size: 23px; margin-bottom: 20px; }
+  .tn20 .tv-opts { grid-template-columns: 1fr 1fr; gap: 12px; }
+  .tn20 .tv-opt { min-height: 64px; font-size: 19px; }
+  .tn20 .tv-sel p { font-size: 18px; }
+  .tn20 .tv-foot { padding: 14px 24px 24px; }
+  .tn20 .tv-foot .tv-cta { max-width: 1064px; }
+  .tn20 .tv-pk { padding: 32px 36px 28px; }
+  .tn20 .tv-pk-s { font-size: 30px; }
+  .tn20 .tv-tu { display: grid; grid-template-columns: 500px minmax(0, 1fr); gap: 64px; max-width: 1240px; padding: 40px 0 72px; align-items: start; }
+  .tn20 .tv-tu-big { font-size: 104px; }
+}

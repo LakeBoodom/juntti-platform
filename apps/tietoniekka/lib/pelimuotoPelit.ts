@@ -4,7 +4,7 @@
 import { getSupabase } from "@/lib/supabase";
 import { lisaaPelirivi } from "@/lib/seuranta";
 
-export type PelimuotoPeli = "kuvavisa" | "aanivisa" | "jarjesta" | "jarjesta_oma" | "ikajarjestys";
+export type PelimuotoPeli = "kuvavisa" | "aanivisa" | "jarjesta" | "jarjesta_oma" | "ikajarjestys" | "tanaan";
 
 /** Sama selaimen satunnaistunniste kuin visapelin quiz_plays-tallennuksessa. */
 function istunto(): string {

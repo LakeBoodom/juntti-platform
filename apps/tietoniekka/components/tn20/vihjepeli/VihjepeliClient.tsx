@@ -16,6 +16,7 @@ import { useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperti
 import NainPelaat, { type OhjeKortti } from "@/components/tn20/ohjeet/NainPelaat";
 import Pelipalkki from "@/components/tn20/pelikehys/Pelipalkki";
 import { SeuraavaPeli } from "@/components/tn20/pelikehys/PeliTulos";
+import { TANAAN_PALUU } from "@/lib/tanaan/tallennus";
 import Jakoalue from "@/components/tn20/jako/Jakoalue";
 import { getSupabase } from "@/lib/supabase";
 import { lisaaPelirivi } from "@/lib/seuranta";
@@ -200,6 +201,14 @@ export default function VihjepeliClient({ k }: { k: MaaKierros }) {
   const [viesti, setViesti] = useState("");
   const [auki, setAuki] = useState<Set<number>>(new Set());
   const [kaikki, setKaikki] = useState(false);
+  /* Tänään-lehden paluu (pähkinä asettaa sessionStorageen lehden osoitteen). */
+  const [tanaanPaluu, setTanaanPaluu] = useState<string | null>(null);
+  useEffect(() => {
+    try {
+      const v = sessionStorage.getItem(TANAAN_PALUU);
+      if (v && v.startsWith("/paivan-visa/")) setTanaanPaluu(v);
+    } catch { /* ei storagea */ }
+  }, []);
   const [paivanTulos, setPaivanTulos] = useState<MaaTallenne | null>(null);
   /* Päivän maa alkaa aloitussivulta (CD v0.2); arvottu maa ("Arvo uusi maa") suoraan laudalle. */
   const [aloitus, setAloitus] = useState(k.harjoitus === null);
@@ -463,6 +472,8 @@ export default function VihjepeliClient({ k }: { k: MaaKierros }) {
               </ol>
             </section>
             <nav className="pk-tulos-linkit" aria-label="Muut toiminnot">
+              {/* Tänään-lehden pähkinänä pelattu (24.11.2026): paluu lehteen ensimmäisenä. */}
+              {tanaanPaluu && !harjoitus && <a href={tanaanPaluu}>Takaisin Tänään-lehteen</a>}
               {/* Heikki 8.11.: pelin jälkeen voi pelata toisen maan (98 muuta maata, ei päivän maata). CD 8c: tekstilinkkinä.
                   Tämän pelin linkit ennen muiden pelimuotojen nostoja (Heikki 8.11. ilta). */}
               <button type="button" onClick={uusiHarjoitus}>Arvo uusi maa</button>

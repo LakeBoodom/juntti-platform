@@ -87,7 +87,8 @@ const arvonRaja = (b: HTMLElement) => {
 
 /* ─── Kortti ──────────────────────────────────────────────────────── */
 
-function Kortti({ q, ix, valinta, auki, onValitse, kuvat }: {
+/** Kortti on jaettu Tänään-lehden Kumpi?-pähkinälle (Heikki 24.11.2026). */
+export function Kortti({ q, ix, valinta, auki, onValitse, kuvat }: {
   q: KumpiKysymys;
   ix: 0 | 1;
   valinta: 0 | 1 | null;
