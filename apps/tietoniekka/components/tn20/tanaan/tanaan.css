@@ -240,13 +240,15 @@
   flex: 1; display: flex; flex-direction: column; gap: 6px; padding: 12px; width: 100%; min-height: 0;
 }
 .tn20 .tv-kn-mast { flex: none; display: flex; align-items: center; gap: 8px; background: var(--tv-kulta); color: var(--tv-tumma); padding: 8px 12px 7px; }
-.tn20 .tv-kn-mid { flex: 1; min-width: 0; }
-.tn20 .tv-kn-name { display: block; font-family: var(--tv-display); font-weight: 900; font-variation-settings: "wdth" 118; font-stretch: 118%; font-size: 36px; line-height: 1; letter-spacing: .01em; }
+/* Nimiö pitää leveytensä; päiväys ja juhla (≤ 40 merkkiä) joustavat ja rivittyvät oikeaan reunaan (mitattu 26.11.:
+   "Saamelainen liputuspäivä" puristi TÄNÄÄN-nimiön 25 px yli). */
+.tn20 .tv-kn-mid { flex: none; min-width: 0; max-width: 62%; }
+.tn20 .tv-kn-name { display: block; font-family: var(--tv-display); font-weight: 900; font-variation-settings: "wdth" 118; font-stretch: 118%; font-size: clamp(28px, 9.2vw, 36px); line-height: 1; letter-spacing: .01em; }
 .tn20 .tv-kn-pub { display: block; margin-top: 2px; font-family: var(--tv-cond); font-weight: 700; font-size: 12px; letter-spacing: .2em; text-transform: uppercase; }
-.tn20 .tv-kn-date { display: flex; flex-direction: column; align-items: flex-end; gap: 3px; }
+.tn20 .tv-kn-date { flex: 1; min-width: 0; display: flex; flex-direction: column; align-items: flex-end; gap: 3px; }
 .tn20 .tv-kn-dt { display: inline-block; background: var(--tv-tumma); color: var(--tv-tumma-ink); font-family: var(--tv-display); font-weight: 900; font-variation-settings: "wdth" 80; font-stretch: 80%; font-size: 22px; line-height: 1; padding: 6px 10px 5px; transform: skewX(-10deg); text-transform: uppercase; white-space: nowrap; }
 .tn20 .tv-kn-dt > span { display: inline-block; transform: skewX(10deg); }
-.tn20 .tv-kn-jh { font-family: var(--tv-cond); font-weight: 700; font-size: 13px; letter-spacing: .1em; text-transform: uppercase; text-align: right; }
+.tn20 .tv-kn-jh { font-family: var(--tv-cond); font-weight: 700; font-size: 13px; line-height: 1.15; letter-spacing: .1em; text-transform: uppercase; text-align: right; overflow-wrap: normal; word-break: keep-all; }
 
 .tn20 .tv-kn-main { flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 6px; }
 .tn20 .tv-kn-lead { position: relative; flex: 1; min-height: 200px; container-type: size; background: var(--tv-tumma2); overflow: clip; }

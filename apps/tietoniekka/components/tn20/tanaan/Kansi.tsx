@@ -78,7 +78,7 @@ export default function Kansi({ kansi, pvLyhyt, juhla, julkaisija, arkisto, luon
                 <div key={i} className={`tv-kn-tile t${i}${t.kuva ? "" : " big"}`}>
                   {t.kuva && (
                     // eslint-disable-next-line @next/next/no-img-element
-                    <img className="tv-kn-timg" src={t.kuva} alt={t.kuva_alt ?? ""} loading="lazy" decoding="async" />
+                    <img className="tv-kn-timg" src={t.kuva} alt={t.kuva_alt ?? ""} decoding="async" />
                   )}
                   <div className="tv-kn-tx">
                     <h3 className="tv-kn-tt" style={{ "--lw": Math.max(...t.otsikko.split(/[\s\-–]+/).map((w) => w.length)) } as CSSProperties}>{t.otsikko}</h3>
