@@ -269,7 +269,8 @@
 .tn20 .tv-kn-lead.noimg .tv-kn-tarra { background: var(--tv-kulta); }
 /* Tulosleima: ainoa juhlahetki (Spec 700 ms, scale 1,18 → ,96 → 1, rotate −5°). */
 .tn20 .tv-kn-leima {
-  position: absolute; right: 12px; top: 42%; transform: rotate(-5deg); border: 3px solid var(--tv-kulta); background: var(--tv-tumma); color: var(--tv-tumma-ink);
+  /* Tarran paikalla (CD: top 42 %, mutta se peitti pääotsikon viimeisen rivin, mitattu 26.11.). */
+  position: absolute; right: 12px; bottom: 14px; max-width: calc(100% - 24px); transform: rotate(-5deg); border: 3px solid var(--tv-kulta); background: var(--tv-tumma); color: var(--tv-tumma-ink);
   font-family: var(--tv-display); font-weight: 900; font-variation-settings: "wdth" 88; font-stretch: 88%; font-size: 24px; line-height: 1; padding: 9px 13px 8px; border-radius: 8px; white-space: nowrap;
   animation: tv-leima 700ms var(--ease-emphasized) both;
 }
