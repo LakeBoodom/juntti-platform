@@ -22,12 +22,24 @@ export type Pahkina =
   | { muoto: "kumpi"; kysymys: string; a: { teksti: string; arvo: string }; b: { teksti: string; arvo: string }; oikea: 0 | 1 }
   | { muoto: "peli"; peli: "mika-maa" };
 
+/** Lehden kansi (CD Kansi.dc.html). Malli valitsee paikat; tyhjä paikka jää pois ja pääjuttu ottaa tilan. */
+export type Kansi = {
+  malli: "taysi" | "kaksi" | "yksi";
+  paajuttu: { karki: string; rivit: string[]; tarra: string | null; kuva: string | null; kuva_alt: string | null };
+  nauha: { a: string; b: string } | null;
+  laatat: Array<{ otsikko: string; alarivi: string; koukku: string | null; kuva: string | null; kuva_alt?: string | null }>;
+  myos: string[] | null;
+  pahkina: string;
+};
+
 export type Lehti = {
   /** YYYY-MM-DD (Suomen päivä) */
   pvm: string;
   juhla: string | null;
   jutut: Juttu[];
   pahkina: Pahkina;
+  /** Kansi; luonnoksella voi puuttua (silloin sivulla 1 nimiö). */
+  kansi: Kansi | null;
   loppi: string[];
   /** Esikatselu: luonnos näytetään (ei koskaan tuotannossa). */
   luonnos: boolean;

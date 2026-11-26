@@ -13,6 +13,7 @@ import { lueEteneminen, luePutki, paivitaPutki, tallennaEteneminen } from "@/lib
 import { pahkinanNimi, type Eteneminen, type Lehti, type PahkinanTila } from "@/lib/tanaan/tyypit";
 import Pahkina, { Nuoli } from "./Pahkina";
 import Tulos from "./Tulos";
+import Kansi from "./Kansi";
 import "./tanaan.css";
 
 const KIRJAIMET = "ABCD";
@@ -40,6 +41,9 @@ export default function TanaanLehti({ lehti, julkaisija, arkisto, jakoPolku }: {
   const [kaanto, setKaanto] = useState<"a" | "b">("a");
   const [putki, setPutki] = useState(0);
   const [jakoUrl, setJakoUrl] = useState<string | null>(null);
+  /* Kansi (vaihe 2): lehden ensimmäinen ruutu pelaamattomalle ja pelatulle päivälle; kesken jäänyt jatkuu sivulta.
+     Palvelin piirtää kannen heti (LCP), selain siirtyy sivulle, jos lehti on kesken. */
+  const [kannessa, setKannessa] = useState(!!lehti.kansi);
   const otsikkoRef = useRef<HTMLElement | null>(null);
   const vierRef = useRef<HTMLDivElement | null>(null);
   const kosketus = useRef<number | null>(null);
@@ -50,6 +54,8 @@ export default function TanaanLehti({ lehti, julkaisija, arkisto, jakoPolku }: {
   useEffect(() => {
     const t = lueEteneminen(lehti.pvm);
     if (t) setE(t.valmis ? { ...t, sivu: n + 1 } : t);
+    const aloitettu = !!t && (t.sivu > 0 || t.valinnat.some((v) => v != null));
+    if (aloitettu && !t.valmis) setKannessa(false);
     setPutki(luePutki(lehti.pvm));
     setJakoUrl(`${location.origin}${jakoPolku}`);
     setLadattu(true);
@@ -116,7 +122,40 @@ export default function TanaanLehti({ lehti, julkaisija, arkisto, jakoPolku }: {
   }
 
   const tila = sivu < n ? `${sivu + 1}/${n}` : sivu === n ? "+1" : undefined;
-  const ensimmainen = sivu === 0;
+  // Nimiö sivulla 1 vain ilman kantta (kansi toistaisi sen, brief luku 3).
+  const ensimmainen = sivu === 0 && !lehti.kansi;
+
+  function avaaLehti() {
+    siirretty.current = true;
+    setKaanto((k) => (k === "a" ? "b" : "a"));
+    setKannessa(false);
+  }
+
+  if (kannessa && lehti.kansi) {
+    const oikein = lehti.jutut.filter((j, i) => e.valinnat[i] === j.oikea).length;
+    const leima = e.valmis
+      ? `${oikein}/${n} ${e.pahkina === "ok" ? "+ pähkinä ✓" : e.pahkina === "fail" ? "· pähkinä ✗" : "· pähkinä auki"}`
+      : null;
+    return (
+      <div className="tv" data-iho="kerma" data-sivu="kansi">
+        <h1 className="tv-sr">Päivän visa · Tänään {pv.lyhyt} · päivän lehden kansi</h1>
+        <Pelipalkki peli="Tänään" muunnelma={pv.lyhyt} iho="tumma" pelissa koti={{ href: "/", nimi: "Etusivu" }} />
+        <main id="main" className="tv-kn-runko">
+          <Kansi
+            kansi={lehti.kansi}
+            pvLyhyt={pv.lyhyt}
+            juhla={lehti.juhla}
+            julkaisija={julkaisija}
+            arkisto={arkisto}
+            luonnos={lehti.luonnos}
+            leima={leima}
+            onPelaa={avaaLehti}
+            onVastaukset={avaaLehti}
+          />
+        </main>
+      </div>
+    );
+  }
 
   return (
     <div className="tv" data-iho="kerma" data-sivu={sivu < n ? "juttu" : sivu === n ? "pahkina" : "tulos"}>

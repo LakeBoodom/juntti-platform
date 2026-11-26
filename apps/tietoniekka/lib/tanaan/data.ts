@@ -3,7 +3,7 @@
 // paikallinen kehitys) service role, jotta luonnoksia ja tulevia päiviä voi testata (?pvm=YYYY-MM-DD).
 import { createClient } from "@supabase/supabase-js";
 import type { Database } from "@juntti/db";
-import type { Juttu, Lehti, Pahkina } from "./tyypit";
+import type { Juttu, Kansi, Lehti, Pahkina } from "./tyypit";
 
 /** Esikatselu = kaikki paitsi tuotanto. */
 export const tanaanEsikatselu = () => process.env.VERCEL_ENV !== "production";
@@ -24,7 +24,7 @@ export async function haeLehti(pvm: string): Promise<Lehti | null> {
   const sb = asiakas();
   if (!sb) return null;
   const [{ data: l }, { data: j }] = await Promise.all([
-    sb.from("tanaan_lehdet").select("pvm, tila, juhla, pahkina, loppi").eq("pvm", pvm).maybeSingle(),
+    sb.from("tanaan_lehdet").select("pvm, tila, juhla, kansi, pahkina, loppi").eq("pvm", pvm).maybeSingle(),
     sb.from("tanaan_jutut").select("*").eq("pvm", pvm).order("sivu"),
   ]);
   if (!l || !l.pahkina || !j || j.length !== 7) return null;
@@ -53,6 +53,7 @@ export async function haeLehti(pvm: string): Promise<Lehti | null> {
     juhla: l.juhla,
     jutut,
     pahkina: l.pahkina as Pahkina,
+    kansi: (l.kansi as Kansi | null) ?? null,
     loppi: l.loppi ?? [],
     luonnos: l.tila !== "julkaistu",
   };
