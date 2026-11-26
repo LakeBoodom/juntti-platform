@@ -72,7 +72,7 @@ export default function TanaanLehti({ lehti, julkaisija, arkisto, jakoPolku }: {
     vierRef.current?.scrollTo({ top: 0 });
     window.scrollTo({ top: 0 });
     otsikkoRef.current?.focus({ preventScroll: true });
-  }, [e.sivu]);
+  }, [e.sivu, kannessa]);
 
   const sivu = e.sivu;
   const juttu = sivu < n ? lehti.jutut[sivu] : null;
