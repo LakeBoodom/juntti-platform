@@ -1,4 +1,6 @@
 -- Tänään vaihe 3 (Heikki 26.11.2026): pitkän uutistekstin kuva vaatii alt-tekstin ja on sivuston oma tiedosto.
+-- Jutun otsikon pisin sana enintään 22 merkkiä (KORTTISÄÄNTÖ-mittaus 26.11.: 320 px:n näkymässä otsikko ≥ 26 px;
+-- pisin todellinen sana siemenessä "saamelaisvaltuuskunnan" = 22).
 create or replace function public.tanaan_jutun_virheet(j public.tanaan_jutut, taysi boolean)
 returns text[] language plpgsql stable set search_path = public, pg_temp as $$
 declare
@@ -13,6 +15,9 @@ begin
          || tanaan_pituus(j.selitys, p || 'selitys', 400, taysi)
          || tanaan_pituus(j.lahde, p || 'lähde', 40)
          || tanaan_pituus(j.kuva_alt, p || 'kuvan alt', 120);
+  if j.juttu is not null and tanaan_pisin_sana(j.juttu) > 22 then
+    v := v || format('%sjutun otsikon pisin sana on %s merkkiä (enintään 22)', p, tanaan_pisin_sana(j.juttu));
+  end if;
   if j.vaihtoehdot is not null then
     if coalesce(array_length(j.vaihtoehdot, 1), 0) <> 4 then
       v := v || (p || 'vaihtoehtoja pitää olla tasan 4');

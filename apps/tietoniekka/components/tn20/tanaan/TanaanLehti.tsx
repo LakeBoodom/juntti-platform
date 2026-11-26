@@ -291,17 +291,16 @@ export default function TanaanLehti({ lehti, julkaisija, arkisto, jakoPolku }: {
               {nimio}
               <div className="tv-au">
                 <article
-                  className={`tv-au-l${juttu.teksti ? "" : " lyhyt"}${otsikkoKuva ? " kuvalla" : ""}`}
+                  className={`tv-au-l${juttu.teksti ? "" : " lyhyt"}`}
                   style={{ "--lw": pisinSana(juttu.juttu) } as CSSProperties}
                 >
                   <div className="tv-kick">{juttu.osasto}</div>
-                  <div className="tv-jrow">
-                    {otsikko}
-                    {otsikkoKuva && (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img className="tv-kuva" src={otsikkoKuva.src} alt={otsikkoKuva.alt} width={150} height={184} />
-                    )}
-                  </div>
+                  {/* Pystykuva kelluu otsikon oikealla puolella (myös mobiilissa): pitkä sana siirtyy kuvan alle eikä pienennä otsikkoa. */}
+                  {otsikkoKuva && (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img className="tv-kuva" src={otsikkoKuva.src} alt={otsikkoKuva.alt} width={150} height={184} />
+                  )}
+                  {otsikko}
                   {juttu.teksti && <Uutisteksti juttu={juttu} pystyTekstissa={false} />}
                 </article>
                 <section className="tv-au-r" aria-label="Kysymys">
@@ -316,26 +315,26 @@ export default function TanaanLehti({ lehti, julkaisija, arkisto, jakoPolku }: {
               </div>
             </div>
           ) : juttu && uutissivu ? (
-            <article className={`tv-pg tv-turn t-${kaanto}`} key={`s${sivu}-u`}>
+            <article className={`tv-pg tv-turn t-${kaanto}`} key={`s${sivu}-u`} style={{ "--lw": pisinSana(juttu.juttu) } as CSSProperties}>
               {nimio}
               <div className="tv-kick">{juttu.osasto}</div>
               {otsikko}
               <Uutisteksti juttu={juttu} pystyTekstissa />
             </article>
           ) : juttu ? (
-            <article className={`tv-pg tv-turn t-${kaanto}`} key={`s${sivu}-v`}>
+            <article className={`tv-pg tv-turn t-${kaanto}`} key={`s${sivu}-v`} style={{ "--lw": pisinSana(juttu.juttu) } as CSSProperties}>
               {!kertaus && nimio}
               <div className="tv-kick">{juttu.osasto}</div>
               {kertaus ? (
                 <h2 className="tv-au-recap" tabIndex={-1} ref={(el) => { otsikkoRef.current = el; }}>{juttu.juttu}</h2>
               ) : (
-                <div className="tv-jrow">
-                  {otsikko}
+                <>
                   {juttu.kuva && (
                     // eslint-disable-next-line @next/next/no-img-element
                     <img className="tv-kuva" src={juttu.kuva} alt={juttu.kuvaAlt ?? ""} width={84} height={104} />
                   )}
-                </div>
+                  {otsikko}
+                </>
               )}
               {kysymys}
             </article>
