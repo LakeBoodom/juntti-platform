@@ -30,6 +30,8 @@ const VUOSI_ATTR = new Set([
   // SM-sarjojen viimeisin mestaruus (Heikki 23.11.2026).
   "koripallo_latest_title_m", "lentopallo_latest_title_m", "pesapallo_latest_title_m", "jalkapallo_latest_title_m",
   "band_founded",
+  // EU- ja Nato-jäsenyyden alkuvuosi (Heikki 26.11.2026).
+  "eu_join_year", "nato_join_year",
 ]);
 
 /** "Kumpi heistä on pelannut enemmän [Liiga-otteluita]?" → osat. Paikkamerkit täytetään ennen jakoa. */
@@ -176,6 +178,9 @@ function nayttoarvo(e: KEnt, s: Spec): string {
     return `s. ${new Date(v * 1000).getUTCFullYear()}`;
   }
   const v = arvo(e, s)!;
+  // Maan korkein kohta: kannan näyttöarvossa on huipun nimi ("Qullai Ismoili Somonī, 7 495 m"), joka ei mahdu korttiin.
+  // Kortille korkeus, huipun nimi faktalauseeseen ({apvm} = text_value).
+  if (s.key === "country_highpoint") return siistiArvo(`${Math.round(v)} m`, s.key);
   if (!s.seura && e.d[s.key]) return siistiArvo(e.d[s.key], s.key);
   if (VUOSI_ATTR.has(s.key)) return String(Math.round(v));
   return fiLuku(v);

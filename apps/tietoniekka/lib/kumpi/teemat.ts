@@ -169,7 +169,10 @@ export const PERUSTEEMAT: Teema[] = [
   {
     slug: "maailma", nimi: "Maailma", ryhma: "maailma",
     pooli: { tapa: "kind", kinds: ["country", "mountain", "lake", "river"], rajaus: (e) => (e.kind !== "lake" && e.kind !== "river") || !suomenVesi(e) },
-    attrs: ["country_area", "country_pop", "mountain_height", "area_km2", "river_length"],
+    // Maiden lisätiedot (Heikki 26.11.2026, MAAT_DATA_2026_11_26): EU- ja Nato-vuosi vain jäsenmailla ja korkein kohta
+    // 118 maalla, joten näissä pari on aina kaksi jäsenmaata tai kaksi maata, joilla tieto on.
+    attrs: ["country_area", "country_pop", "gdp_per_capita", "life_expectancy", "country_highpoint", "eu_join_year", "nato_join_year",
+      "mountain_height", "area_km2", "river_length"],
   },
   /* Musiikki (Heikki 24.11.2026, VIIHDE_ERA3_SPOTIFY_2026_11_23): kappaleiden Spotify-kuuntelut Suomessa ja maailmalla
      (kind song) sekä yhtyeiden perustamisvuodet (kind artist). music_sales_fi on kannassa pois käytöstä. Kukin attribuutti
