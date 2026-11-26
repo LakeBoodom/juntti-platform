@@ -100,7 +100,10 @@ export default function TanaanLehti({ lehti, julkaisija, arkisto, jakoPolku }: {
     if (!siirretty.current) return;
     vierRef.current?.scrollTo({ top: 0 });
     window.scrollTo({ top: 0 });
-    otsikkoRef.current?.focus({ preventScroll: true });
+    // Pähkinä- ja tulossivulla ei ole jutun otsikkoa: fokus sivun ensimmäiseen otsikkoon.
+    const el = otsikkoRef.current?.isConnected ? otsikkoRef.current : vierRef.current?.querySelector<HTMLElement>("h2");
+    if (el && !el.hasAttribute("tabindex")) el.tabIndex = -1;
+    el?.focus({ preventScroll: true });
   }, [e.sivu, kannessa, osa]);
 
   const sivu = e.sivu;
