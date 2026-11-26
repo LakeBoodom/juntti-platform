@@ -55,6 +55,8 @@ export type Pakka = {
     vainNimet?: string[];
     /** Nämä pois (esim. Ukko-Koli on vaara, ei tunturi). */
     poisNimet?: string[];
+    /** Vain entiteetit, joilla on tämä tagi (kunnat: "yleinen" = yleisiin peleihin, Cowork 26.11.2026). */
+    tagi?: string;
   };
   /** Tekstikortit: ei kuvapaikkaa koskaan. Muuten kuvat näytetään vain, jos kaikilla on kuva. */
   piilotaKuva?: boolean;
@@ -387,6 +389,8 @@ export const PAKAT: Pakka[] = [
     vali: { tapa: "suhteellinen", min: 0.05 },
     yksikko: "asukasta",
     pick: 8,
+    // Kannassa kaikki 308 kuntaa; yleiseen pakkaan vain yleiset (81).
+    pool: { tagi: "yleinen" },
     piilotaKuva: true,
     naytaRooli: true,
     collection: { slug: "kaupungit", nimi: "Suomen kaupungit" },

@@ -42,6 +42,7 @@ export const KUVAUKSET: Record<string, string> = {
   ihmiset: "Tunnetut suomalaiset ja syntymäpaikat, kansanedustajat, pääministerit ja presidentit",
   musiikki: "Spotify-kuuntelut ja yhtyeiden perustamisvuodet",
   historia: "Suomen ja maailman historian tapahtumat aikajärjestyksessä",
+  "suomen-historia": "Sodat, politiikka, kulttuuri ja urheilu Suomen historiasta",
 };
 
 /* Heikki 22.11.2026: Liiga ja Oma seura Liigan otteluvalokuviin (Manse- ja Satakunnan derby), Barkov Suomikiekon
@@ -60,6 +61,8 @@ export const RIVIKUVAT: Record<string, string> = {
   musiikki: "/20/rivi/kumpi-musiikki.webp",
   // Sama kuin kokoelmasivun Historia-kortissa (Mannerheim, SA-kuva); krediitti rivillä aihe-historia.
   historia: "/20/rivi/kokoelma-historia.webp",
+  // Svinhufvudin senaatti 1917 (krediitti rivillä suomen-itsenaistyminen-visa).
+  "suomen-historia": "/20/rivi/kumpi-suomen-historia.webp",
 };
 
 /** Jääkiekon jakauma kymmenen kysymyksen jaksossa (A2): 3 tilasto + 3 ura/seura + 2 saavutus + 2 tausta. */
@@ -159,7 +162,9 @@ export const PERUSTEEMAT: Teema[] = [
   { slug: "f1", nimi: "F1", ryhma: "urheilu", pooli: { tapa: "kind", kinds: ["person"] }, attrs: ["f1_titles", "f1_wins", "f1_poles"] },
   /* Jalkapallo pois (Heikki 20.11.2026), kunnes kannassa on selvästi enemmän legendoja kuin nykypelaajia.
      Kaupungit ja maakunnat yhdeksi Suomi-teemaksi (Heikki 20.11.), kunnes niistä on enemmän erilaista dataa. */
-  { slug: "suomi", nimi: "Suomi", ryhma: "suomi", pooli: { tapa: "kind", kinds: ["city", "region"] }, attrs: ["population", "founded_year", "region_pop", "region_area"] },
+  /* Kunnista vain yleiseen joukkoon merkityt (tags "yleinen", Cowork 26.11.2026, KUNNAT_VAKILUVUT_2026_11_26): kaikki
+     308 kuntaa ovat kannassa maakuntaformaatteja varten. Maakunnat (region) kaikki. */
+  { slug: "suomi", nimi: "Suomi", ryhma: "suomi", pooli: { tapa: "kind", kinds: ["city", "region"], rajaus: (e) => e.kind !== "city" || e.tags.includes("yleinen") }, attrs: ["population", "founded_year", "region_pop", "region_area"] },
   /* Luonto ja Maailma yhtenä teemana kumpikin (Heikki 20.11.2026): yksin järvet "eivät kanna", ja yhdistettynä
      kysymyksiin tulee vaihtelua. Luonnossa järvet ja joet vain Suomesta (tags "suomi"), maailman järvet ja joet
      Maailmassa. Pooli on kindien yhdiste; kukin kysymys vertaa vain saman attribuutin kohteita. */
@@ -200,6 +205,12 @@ export const PERUSTEEMAT: Teema[] = [
     pooli: { tapa: "kind", kinds: ["event"], rajaus: (e) => e.ryhma === "historia" && e.nimi.split(/[\s\-–]+/).every((w) => w.length <= 18) },
     attrs: ["year"],
   },
+  /* Suomen historia (Heikki 26.11.2026): sama pooli, ensimmäinen tagi "suomi" (tagit: suomi/maailma + aihe). */
+  {
+    slug: "suomen-historia", nimi: "Suomen historia", ryhma: "historia",
+    pooli: { tapa: "kind", kinds: ["event"], rajaus: (e) => e.ryhma === "historia" && e.tags[0] === "suomi" && e.nimi.split(/[\s\-–]+/).every((w) => w.length <= 18) },
+    attrs: ["year"],
+  },
   { slug: "politiikka", nimi: "Politiikka", ryhma: "ihmiset", pooli: { tapa: "kind", kinds: ["person"] }, attrs: ["mp_first_year", "mp_years", "pm_days", "pm_start", "pres_start"] },
 ];
 
@@ -223,6 +234,7 @@ export const TEEMAT: Teema[] = [
   PERUSTEEMAT.find((t) => t.slug === "maailma")!,
   sekoitus("ihmiset", "Ihmiset", "ihmiset", ["tunnetut-suomalaiset", "politiikka"]),
   PERUSTEEMAT.find((t) => t.slug === "historia")!,
+  PERUSTEEMAT.find((t) => t.slug === "suomen-historia")!,
   PERUSTEEMAT.find((t) => t.slug === "musiikki")!,
 ];
 
