@@ -27,7 +27,10 @@ export default function Kansi({ kansi, pvLyhyt, juhla, julkaisija, arkisto, luon
   const pj = kansi.paajuttu;
   const kuva = !!pj.kuva;
   const pisin = Math.max(...pj.rivit.map((r) => r.length));
-  const leveys = Math.min(kuva ? 19 : 27, 94 / (pisin * 0.56));
+  let leveys = Math.min(kuva ? 19 : 27, 94 / (pisin * 0.56));
+  // Tarra peittää laatikon oikean alakulman: viimeinen rivi enintään 52 % leveydestä, ettei tarra peitä sitä
+  // (mitattu 26.11. pisimmillä teksteillä; lyhyellä rivillä, kuten "LINNAA", raja ei pienennä otsikkoa).
+  if (pj.tarra) leveys = Math.min(leveys, 52 / (pj.rivit[pj.rivit.length - 1].length * 0.56));
   // Korkeusraja: Spec 56/70 cqh; mitattu 26.11. pisimmillä teksteillä (kaksirivinen kärki) → 48/60, ettei viimeinen rivi
   // valu laatikon alle 375 × 667 -näkymässä.
   const korkeus = (kuva ? 48 : 60) / pj.rivit.length;
@@ -87,7 +90,7 @@ export default function Kansi({ kansi, pvLyhyt, juhla, julkaisija, arkisto, luon
                   <div className="tv-kn-tx">
                     <h3 className="tv-kn-tt" style={{ "--lw": pisinSana(t.otsikko) } as CSSProperties}>{t.otsikko}</h3>
                     <span className="tv-kn-ts">{t.alarivi}</span>
-                    {t.koukku && <span className="tv-kn-hook"><span>{t.koukku}</span></span>}
+                    {t.koukku && <span className="tv-kn-hook" style={{ "--lw": pisinSana(t.koukku) } as CSSProperties}><span>{t.koukku}</span></span>}
                   </div>
                 </div>
               ))}

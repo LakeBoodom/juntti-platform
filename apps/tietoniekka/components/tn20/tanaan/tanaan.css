@@ -296,7 +296,8 @@
 .tn20 .tv-kn-tt { --tv-tt-max: 25px; margin: 0; font-family: var(--tv-display); font-weight: 900; font-variation-settings: "wdth" 68; font-stretch: 68%; font-size: min(var(--tv-tt-max), calc(100cqi / (var(--lw, 10) * .56))); line-height: .98; text-wrap: balance; overflow-wrap: normal; word-break: keep-all; width: 100%; }
 .tn20 .tv-kn-tile.big .tv-kn-tt { --tv-tt-max: 28px; }
 .tn20 .tv-kn-ts { font-weight: 600; font-size: 14px; line-height: 1.2; overflow-wrap: break-word; hyphens: auto; max-width: 100%; }
-.tn20 .tv-kn-hook { margin-top: auto; display: inline-block; max-width: 100%; overflow-wrap: break-word; background: var(--tv-tumma); color: var(--tv-tumma-ink); font-weight: 700; font-size: 14px; padding: 4px 9px 3px; transform: skewX(-10deg); }
+/* Koukku: koko pisimmästä sanasta (kanta: ≤ 11 merkkiä), 12–14 px, ettei sana ylitä kapeaa laattaa (mitattu 26.11.). */
+.tn20 .tv-kn-hook { margin-top: auto; display: inline-block; max-width: 100%; background: var(--tv-tumma); color: var(--tv-tumma-ink); font-weight: 700; font-size: clamp(12px, calc((100cqi - 20px) / (var(--lw, 8) * .6)), 14px); padding: 4px 9px 3px; transform: skewX(-10deg); }
 .tn20 .tv-kn-hook > span { display: inline-block; transform: skewX(10deg); }
 .tn20 .tv-kn-myos { background: var(--tv-bg); color: var(--tv-tumma); padding: 10px 12px 9px; }
 .tn20 .tv-kn-myos b { display: block; font-family: var(--tv-cond); font-weight: 700; font-size: 14px; letter-spacing: .14em; text-transform: uppercase; color: var(--tv-kick); }
@@ -326,7 +327,7 @@
   .tn20 .tv-kn-timg { width: 150px; }
   .tn20 .tv-kn-tt, .tn20 .tv-kn-tile.big .tv-kn-tt { --tv-tt-max: clamp(32px, 3.2vw, 46px); }
   .tn20 .tv-kn-ts { font-size: 19px; }
-  .tn20 .tv-kn-hook { font-size: 19px; }
+  .tn20 .tv-kn-hook { font-size: clamp(14px, calc((100cqi - 20px) / (var(--lw, 8) * .6)), 19px); }
   .tn20 .tv-kn-myos { flex: 1; padding: 20px 22px; }
   .tn20 .tv-kn-myos b { font-size: 17px; margin-bottom: 8px; }
   .tn20 .tv-kn-myos ul { flex-direction: column; flex-wrap: nowrap; gap: 0; font-size: 34px; font-variation-settings: "wdth" 72; font-stretch: 72%; font-weight: 900; }
