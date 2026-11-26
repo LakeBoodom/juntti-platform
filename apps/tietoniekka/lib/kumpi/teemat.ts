@@ -11,7 +11,7 @@ export const SM_SARJAT = ["korisliiga", "lentopallo-mestaruusliiga", "superpesis
  *  joki menee oikeaan teemaan tagin perusteella, ilman nimilistaa. */
 export const suomenVesi = (e: KEnt) => e.tags.includes("suomi");
 
-export type Ryhma = "yleistieto" | "jaakiekko" | "urheilu" | "suomi" | "luonto" | "maailma" | "ihmiset" | "viihde";
+export type Ryhma = "yleistieto" | "jaakiekko" | "urheilu" | "suomi" | "luonto" | "maailma" | "ihmiset" | "historia" | "viihde";
 
 /** Hubin ryhmäjärjestys (Heikki 20.11.2026): jääkiekko ei alussa, jotta hubi ei näytä jääkiekkopeliltä. */
 export const RYHMAT: Array<{ avain: Ryhma; nimi: string }> = [
@@ -22,6 +22,8 @@ export const RYHMAT: Array<{ avain: Ryhma; nimi: string }> = [
   { avain: "jaakiekko", nimi: "Jääkiekko" },
   { avain: "maailma", nimi: "Maailma" },
   { avain: "ihmiset", nimi: "Ihmiset" },
+  /* Historia (Heikki 26.11.2026, HISTORIA_TAPAHTUMAT_2026_11_26): tapahtumien vuodet. */
+  { avain: "historia", nimi: "Historia" },
   /* Viihde (Heikki 24.11.2026): ensimmäisenä teemana Musiikki. */
   { avain: "viihde", nimi: "Viihde" },
 ];
@@ -39,6 +41,7 @@ export const KUVAUKSET: Record<string, string> = {
   maailma: "Maat, vuoret, järvet ja joet",
   ihmiset: "Tunnetut suomalaiset ja syntymäpaikat, kansanedustajat, pääministerit ja presidentit",
   musiikki: "Spotify-kuuntelut ja yhtyeiden perustamisvuodet",
+  historia: "Suomen ja maailman historian tapahtumat aikajärjestyksessä",
 };
 
 /* Heikki 22.11.2026: Liiga ja Oma seura Liigan otteluvalokuviin (Manse- ja Satakunnan derby), Barkov Suomikiekon
@@ -55,6 +58,8 @@ export const RIVIKUVAT: Record<string, string> = {
   maailma: "/20/rivi/kumpi-vuoret.webp",
   // Eppu Normaali, Rakuuna Rock 2014 (Heikki 24.11.2026); krediitti rivillä eppu-normaali-tietovisa.
   musiikki: "/20/rivi/kumpi-musiikki.webp",
+  // Sama kuin kokoelmasivun Historia-kortissa (Mannerheim, SA-kuva); krediitti rivillä aihe-historia.
+  historia: "/20/rivi/kokoelma-historia.webp",
 };
 
 /** Jääkiekon jakauma kymmenen kysymyksen jaksossa (A2): 3 tilasto + 3 ura/seura + 2 saavutus + 2 tausta. */
@@ -186,6 +191,15 @@ export const PERUSTEEMAT: Teema[] = [
   },
   // Syntymäpaikka (Heikki 24.11.2026): born_in-suhteet, kysymys "Kumpi heistä on syntynyt Tampereella?".
   { slug: "tunnetut-suomalaiset", nimi: "Tunnetut suomalaiset", ryhma: "ihmiset", pooli: { tapa: "suomalaiset" }, attrs: ["birth", "born_in_city"] },
+  /* Historia (Heikki 26.11.2026): tapahtumat (kind event, group_key historia), attribuutti year. Saman vuoden parit
+     eivät synny (tasapeli ja min_gap 2), eikä saman aiheen alku ja loppu ("maailmansota alkoi / päättyi") muodosta paria
+     (samaAihe generaattorissa). */
+  {
+    slug: "historia", nimi: "Historia", ryhma: "historia",
+    // Nimen sana yli 18 merkkiä ("F1-maailmanmestaruuden", laatu.ts MAX_SANA) ei mahdu korttiin @320: jää pois kuten Musiikissa.
+    pooli: { tapa: "kind", kinds: ["event"], rajaus: (e) => e.ryhma === "historia" && e.nimi.split(/[\s\-–]+/).every((w) => w.length <= 18) },
+    attrs: ["year"],
+  },
   { slug: "politiikka", nimi: "Politiikka", ryhma: "ihmiset", pooli: { tapa: "kind", kinds: ["person"] }, attrs: ["mp_first_year", "mp_years", "pm_days", "pm_start", "pres_start"] },
 ];
 
@@ -195,7 +209,7 @@ const sekoitus = (slug: string, nimi: string, ryhma: Ryhma, osat: string[]): Tee
 });
 
 /** Yleistiedon osat: kaikki perusteemat. Jääkiekkoa enintään 2/10 ja kustakin muusta ryhmästä enintään 3/10. */
-export const YLEISTIETO_OSAT = ["suomi", "luonto", "maailma", "tunnetut-suomalaiset", "politiikka", "olympiavoittajat", "f1", "suomikiekon-legendat", "liiga-pelaajat", "liiga-seurat"];
+export const YLEISTIETO_OSAT = ["suomi", "luonto", "maailma", "tunnetut-suomalaiset", "politiikka", "olympiavoittajat", "f1", "suomikiekon-legendat", "liiga-pelaajat", "liiga-seurat", "historia"];
 
 /** Hubin seitsemän riviä (Heikki 20.11.2026) + Oma seura. Järjestys hubissa tulee RYHMAT-listasta. */
 export const TEEMAT: Teema[] = [
@@ -208,6 +222,7 @@ export const TEEMAT: Teema[] = [
   sekoitus("liiga", "Liiga", "jaakiekko", ["liiga-pelaajat", "liiga-seurat"]),
   PERUSTEEMAT.find((t) => t.slug === "maailma")!,
   sekoitus("ihmiset", "Ihmiset", "ihmiset", ["tunnetut-suomalaiset", "politiikka"]),
+  PERUSTEEMAT.find((t) => t.slug === "historia")!,
   PERUSTEEMAT.find((t) => t.slug === "musiikki")!,
 ];
 

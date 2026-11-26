@@ -284,6 +284,22 @@ function henkiloVapaa(j: Jakso, e: KEnt) {
   return (j.henkiloMaara.get(e.ihminen) ?? 0) < MAX_SAMA_HENKILO;
 }
 
+/** Tapahtumapari, jonka vastauksen voi päätellä nimestä: saman aiheen alku ja loppu ("Ensimmäinen maailmansota alkoi" /
+ *  "… päättyi", "Berliinin muuri rakennettiin" / "… murtui", "Elisabet II kruunattiin" / "… kuoli"). Tunnistetaan
+ *  yhteisestä vähintään 7-kirjaimisesta sanasta, kun yleiset tapahtumasanat ("perustettiin", "Ensimmäinen") ohitetaan. */
+const YLEISET_SANAT = new Set([
+  "ensimmäinen", "ensimmäiset", "ensimmäisen", "perustettiin", "julkaistiin", "ilmestyi", "avattiin", "käyttöön",
+  "otettiin", "valittiin", "pidettiin", "liittyi", "presidentiksi", "presidentti", "maailmanmestaruuden", "voitti", "päättyi",
+]);
+const aiheSanat = (nimi: string) =>
+  new Set(nimi.toLowerCase().split(/[\s\-–:,.]+/).filter((w) => !YLEISET_SANAT.has(w)).map((w) => w.replace(/(in|n)$/, "")).filter((w) => w.length >= 7));
+function samaAihe(a: KEnt, b: KEnt): boolean {
+  if (a.kind !== "event" || b.kind !== "event") return false;
+  const sa = aiheSanat(a.nimi);
+  for (const w of aiheSanat(b.nimi)) if (sa.has(w)) return true;
+  return false;
+}
+
 /** Yrittää muodostaa yhden kysymyksen annetulla attribuutilla ja vaikeudella. */
 function yritaPari(ctx: Konteksti, s: Spec, def: KDef, tavoite: Vaikeus | null, jakso: Jakso): KumpiKysymys | null {
   const { rng } = ctx;
@@ -300,6 +316,7 @@ function yritaPari(ctx: Konteksti, s: Spec, def: KDef, tavoite: Vaikeus | null, 
     const vastapuolet = painotettuJarjestys(p, rng);
     for (const b of vastapuolet) {
       if (b.id === a.id || b.ihminen === a.ihminen) continue;
+      if (samaAihe(a, b)) continue;
       const vb = arvo(b, s)!;
       if (va === vb) continue; // ei tasapelejä
       if (!mittaritSopivat(a.m[s.key], b.m[s.key])) continue;
