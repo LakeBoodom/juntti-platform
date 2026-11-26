@@ -5,7 +5,9 @@ export type Juttu = {
   sivu: number;
   osasto: string;
   juttu: string;
-  teksti: { ingressi: string; kappaleet: string[]; kuva?: string | null; kuva_muoto?: "vaaka" | "pysty" } | null;
+  /** Pitkä uutisteksti (vaihe 3): mobiilissa oma uutissivu ennen kysymystä, desktopilla aukeaman vasen sivu.
+   *  Kuva: teksti.kuva (vaaka/pysty); ilman sitä jutun oma kuva pystykuvana tekstin vieressä. */
+  teksti: { ingressi: string; kappaleet: string[]; kuva?: string | null; kuva_alt?: string | null; kuva_muoto?: "vaaka" | "pysty" } | null;
   kuva: string | null;
   kuvaAlt: string | null;
   kysymys: string;

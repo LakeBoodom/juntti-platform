@@ -42,7 +42,6 @@
 /* Sivunkäännön 18 px:n liuku ei saa venyttää sivua vaakasuunnassa (clip, ei hidden: ei puristusta). */
 .tn20 .tv-col { flex: 1; min-width: 0; overflow-x: clip; }
 .tn20 .tv-pg { padding: 12px 18px 28px; max-width: 700px; margin: 0 auto; }
-.tn20 .tv-rail { display: none; }
 
 .tn20 .tv-turn.t-a { animation: tv-kaanto-a 220ms var(--ease-emphasized); }
 .tn20 .tv-turn.t-b { animation: tv-kaanto-b 220ms var(--ease-emphasized); }
@@ -184,31 +183,60 @@
 .tn20 .tv-tyhja h1 { font-family: var(--tv-display); font-weight: 900; font-size: 26px; line-height: 1.1; margin: 0; max-width: 18ch; }
 .tn20 .tv-tyhja .tv-cta { justify-self: center; }
 
-/* ── Desktop: sisällysluettelo + juttu (Spec: 300 + 700, väli 64) ─────────────────────────── */
+/* ── Pitkä uutisteksti (vaihe 3, CD Aukeama.dc.html) ──────────────────────────────────────────
+   Mobiili: uutissivu (vaakakuva, ingressi, kappaleet, pystykuva kelluu tekstissä) → kysymyssivu, jossa otsikko kertauksena. */
+.tn20 .tv-au-ing { font-weight: 700; font-size: 19px; line-height: 1.35; margin: 0 0 12px; }
+.tn20 .tv-au-p { font-size: 17px; line-height: 1.55; margin: 0 0 12px; }
+.tn20 .tv-au-teksti::after { content: ""; display: block; clear: both; }
+.tn20 .tv-au-img { display: block; background: var(--tv-bg2); object-fit: cover; }
+.tn20 .tv-au-img.vaaka { width: 100%; height: auto; aspect-ratio: 2 / 1; margin: 0 0 14px; }
+.tn20 .tv-au-img.pysty { float: right; width: 112px; height: 140px; margin: 4px 0 10px 14px; object-position: 50% 22%; border: 1px solid var(--tv-line); }
+.tn20 .tv-au-recap {
+  font-family: var(--tv-display); font-weight: 800; font-variation-settings: "wdth" 86; font-stretch: 86%;
+  font-size: 19px; line-height: 1.12; margin: 8px 0 14px; overflow-wrap: normal; word-break: keep-all;
+}
+.tn20 .tv-foot-in { display: flex; gap: 10px; width: 100%; max-width: 700px; margin: 0 auto; }
+.tn20 .tv-foot-in .tv-cta { flex: 1; }
+.tn20 .tv-sec {
+  min-height: 52px; padding: 0 18px; border: 2px solid var(--tv-ink); border-radius: 12px; background: transparent; color: var(--tv-ink);
+  font-weight: 700; font-size: 17px; display: flex; align-items: center; justify-content: center; cursor: pointer;
+  transition: transform var(--dur-fast) var(--ease-standard);
+}
+.tn20 .tv-sec:active { transform: scale(.98); }
+@media (hover: hover) { .tn20 .tv-sec:hover { background: var(--tv-bg2); } }
+
+/* ── Desktop (≥ 1024 px): jokainen juttu on aukeama (Spec: 2 × 1fr, max 1280, keskellä 1 px viiva, sisäreuna 48) ──
+   Vasemmalla juttu: otsikko 48 px, lyhyellä jutulla 72 px; leipä kahdella palstalla. Oikealla kysymys 32 px ja vaihtoehdot
+   yhdessä sarakkeessa. KORTTISÄÄNTÖ: otsikon koko myös pisimmän sanan mukaan (--lw, palstan leveys cqi), ks. mittaus. */
 @media (min-width: 1024px) {
-  .tn20 .tv-body { display: grid; grid-template-columns: 300px minmax(0, 700px); justify-content: center; gap: 64px; padding: 0 24px; }
-  .tn20 .tv-body.leve { grid-template-columns: minmax(0, 1240px); }
-  .tn20 .tv-rail { display: block; padding: 28px 0; align-self: start; position: sticky; top: 0; }
-  .tn20 .tv-rail ol { list-style: none; margin: 0; padding: 0; }
-  .tn20 .tv-rail-h { font-family: var(--tv-display); font-weight: 900; font-variation-settings: "wdth" 118; font-stretch: 118%; font-size: 22px; padding-bottom: 10px; border-bottom: 3px solid var(--tv-ink); }
-  .tn20 .tv-rail-d { font-family: var(--tv-cond); font-weight: 600; font-size: 14px; letter-spacing: .06em; text-transform: uppercase; color: var(--tv-ink2); margin: 6px 0 10px; }
-  .tn20 .tv-ri { display: grid; grid-template-columns: 26px minmax(0, 1fr) 18px; gap: 8px; padding: 11px 0; border-top: 1px solid var(--tv-rule); color: var(--tv-ink2); }
-  .tn20 .tv-ri.cur, .tn20 .tv-ri.done { color: var(--tv-ink); }
-  .tn20 .tv-ri-n { font-family: var(--tv-cond); font-weight: 700; font-size: 16px; }
-  .tn20 .tv-ri-k { display: block; font-family: var(--tv-cond); font-weight: 700; font-size: 13px; letter-spacing: .12em; text-transform: uppercase; color: var(--tv-kick); }
-  .tn20 .tv-ri-j { display: block; font-weight: 600; font-size: 15px; line-height: 1.25; margin-top: 2px; }
-  .tn20 .tv-ri.cur .tv-ri-j { font-weight: 800; }
-  .tn20 .tv-ri-m { font-weight: 800; font-size: 16px; }
-  .tn20 .tv-pg { padding: 28px 0 40px; margin: 0; max-width: none; }
+  .tn20 .tv-body { display: block; padding: 0 24px; }
+  .tn20 .tv-pg { padding: 28px 0 40px; }
+  .tn20 .tv-mh { max-width: 1280px; margin: 0 auto; padding-top: 20px; }
   .tn20 .tv-mh-name { font-size: 108px; }
-  .tn20 .tv-jt { font-size: 46px; margin: 12px 0 20px; }
+  .tn20 .tv-au {
+    display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); max-width: 1280px; margin: 0 auto;
+    min-height: calc(100dvh - 160px);
+  }
+  .tn20 .tv-au-l { min-width: 0; padding: 32px 48px 40px 0; border-right: 1px solid var(--tv-ink); container-type: inline-size; }
+  .tn20 .tv-au-r { min-width: 0; padding: 32px 0 40px 48px; }
+  .tn20 .tv-au-l .tv-jt { font-size: min(48px, calc(100cqi / (var(--lw) * .52))); margin: 12px 0 18px; }
+  .tn20 .tv-au-l.kuvalla .tv-jt { font-size: min(48px, calc((100cqi - 164px) / (var(--lw) * .52))); }
+  .tn20 .tv-au-l.lyhyt .tv-jt { font-size: min(72px, calc(100cqi / (var(--lw) * .52))); line-height: 1; }
+  .tn20 .tv-au-l.lyhyt.kuvalla .tv-jt { font-size: min(72px, calc((100cqi - 164px) / (var(--lw) * .52))); }
   .tn20 .tv-kuva { width: 150px; height: 184px; }
-  .tn20 .tv-q { font-size: 23px; margin-bottom: 20px; }
-  .tn20 .tv-opts { grid-template-columns: 1fr 1fr; gap: 12px; }
+  .tn20 .tv-au-ing { font-size: 22px; }
+  .tn20 .tv-au-teksti { columns: 2; column-gap: 28px; }
+  .tn20 .tv-au-p { break-inside: avoid; }
+  .tn20 .tv-au-img.vaaka { aspect-ratio: auto; height: 230px; }
+  .tn20 .tv-au-r .tv-q {
+    font-family: var(--tv-display); font-weight: 800; font-variation-settings: "wdth" 88; font-stretch: 88%;
+    font-size: 32px; line-height: 1.12; border-top: 0; padding-top: 0; margin: 12px 0 22px;
+  }
+  .tn20 .tv-opts { gap: 10px; }
   .tn20 .tv-opt { min-height: 64px; font-size: 19px; }
   .tn20 .tv-sel p { font-size: 18px; }
-  .tn20 .tv-foot { padding: 14px 24px 24px; }
-  .tn20 .tv-foot .tv-cta { max-width: 1064px; }
+  .tn20 .tv-au-next { margin-top: 18px; display: flex; }
+  .tn20 .tv-au-next .tv-cta { flex: 1; }
   .tn20 .tv-pk { padding: 32px 36px 28px; }
   .tn20 .tv-pk-s { font-size: 30px; }
   .tn20 .tv-tu { display: grid; grid-template-columns: 500px minmax(0, 1fr); gap: 64px; max-width: 1240px; padding: 40px 0 72px; align-items: start; }
