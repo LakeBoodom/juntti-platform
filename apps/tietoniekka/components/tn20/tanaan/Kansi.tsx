@@ -81,7 +81,7 @@ export default function Kansi({ kansi, pvLyhyt, juhla, julkaisija, arkisto, luon
                     <img className="tv-kn-timg" src={t.kuva} alt={t.kuva_alt ?? ""} loading="lazy" decoding="async" />
                   )}
                   <div className="tv-kn-tx">
-                    <h3 className="tv-kn-tt">{t.otsikko}</h3>
+                    <h3 className="tv-kn-tt" style={{ "--lw": Math.max(...t.otsikko.split(/[\s\-–]+/).map((w) => w.length)) } as CSSProperties}>{t.otsikko}</h3>
                     <span className="tv-kn-ts">{t.alarivi}</span>
                     {t.koukku && <span className="tv-kn-hook"><span>{t.koukku}</span></span>}
                   </div>

@@ -280,11 +280,13 @@
 .tn20 .tv-kn-tile.t0 { background: var(--tv-kulta); color: var(--tv-tumma); }
 .tn20 .tv-kn-tile.t1 { background: var(--tv-bg); color: var(--tv-tumma); }
 .tn20 .tv-kn-timg { flex: none; width: 64px; align-self: stretch; object-fit: cover; object-position: 50% 22%; min-height: 0; height: auto; }
-.tn20 .tv-kn-tx { flex: 1; min-width: 0; display: flex; flex-direction: column; align-items: flex-start; gap: 5px; }
+.tn20 .tv-kn-tx { flex: 1; min-width: 0; display: flex; flex-direction: column; align-items: flex-start; gap: 5px; container-type: inline-size; }
 /* KORTTISÄÄNTÖ: laatan otsikko ≤ 28 merkkiä; kapeassa laatassa pisin sana (esim. SENAATINTORI 12) mahtuu 25 px:llä
    wdth 68 (≈ 0,5 em/merkki → 150 px < laatan tekstialue ~ 160 px). Sana ei saa katketa keskeltä. */
-.tn20 .tv-kn-tt { margin: 0; font-family: var(--tv-display); font-weight: 900; font-variation-settings: "wdth" 68; font-stretch: 68%; font-size: 25px; line-height: .98; text-wrap: balance; overflow-wrap: normal; word-break: keep-all; }
-.tn20 .tv-kn-tile.big .tv-kn-tt { font-size: 28px; }
+/* Mitattu 26.11.: SENAATINTORI (12) leikkautui 28 px:llä 170 px:n laatassa → koko myös pisimmästä sanasta (--lw):
+   wdth 68 / 900 isot kirjaimet ≈ 0,56 em/merkki. */
+.tn20 .tv-kn-tt { --tv-tt-max: 25px; margin: 0; font-family: var(--tv-display); font-weight: 900; font-variation-settings: "wdth" 68; font-stretch: 68%; font-size: min(var(--tv-tt-max), calc(100cqi / (var(--lw, 10) * .56))); line-height: .98; text-wrap: balance; overflow-wrap: normal; word-break: keep-all; width: 100%; }
+.tn20 .tv-kn-tile.big .tv-kn-tt { --tv-tt-max: 28px; }
 .tn20 .tv-kn-ts { font-weight: 600; font-size: 14px; line-height: 1.2; }
 .tn20 .tv-kn-hook { margin-top: auto; display: inline-block; background: var(--tv-tumma); color: var(--tv-tumma-ink); font-weight: 700; font-size: 14px; padding: 4px 9px 3px; transform: skewX(-10deg); }
 .tn20 .tv-kn-hook > span { display: inline-block; transform: skewX(10deg); }
@@ -316,7 +318,7 @@
   .tn20 .tv-kn-tiles { grid-template-columns: 1fr; gap: 10px; min-height: 0; flex: 1; }
   .tn20 .tv-kn-tile { padding: 18px; gap: 16px; }
   .tn20 .tv-kn-timg { width: 150px; }
-  .tn20 .tv-kn-tt, .tn20 .tv-kn-tile.big .tv-kn-tt { font-size: clamp(32px, 3.2vw, 46px); }
+  .tn20 .tv-kn-tt, .tn20 .tv-kn-tile.big .tv-kn-tt { --tv-tt-max: clamp(32px, 3.2vw, 46px); }
   .tn20 .tv-kn-ts { font-size: 19px; }
   .tn20 .tv-kn-hook { font-size: 19px; }
   .tn20 .tv-kn-myos { flex: 1; padding: 20px 22px; }

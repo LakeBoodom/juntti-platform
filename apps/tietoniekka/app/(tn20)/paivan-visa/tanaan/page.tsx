@@ -30,7 +30,7 @@ export default async function TanaanSivu({ searchParams }: Props) {
   if (!lehti) {
     return (
       <div className="tv" data-iho="kerma">
-        <Pelipalkki peli="Tänään" iho="kerma" koti={{ href: "/", nimi: "Etusivu" }} />
+        <Pelipalkki peli="Päivän visa" iho="kerma" koti={{ href: "/", nimi: "Etusivu" }} />
         <main id="main" className="tv-tyhja">
           <h1>Päivän lehti ei ole vielä ilmestynyt.</h1>
           <Link className="tv-cta" href="/">Etusivulle</Link>

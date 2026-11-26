@@ -139,7 +139,8 @@ export default function TanaanLehti({ lehti, julkaisija, arkisto, jakoPolku }: {
     return (
       <div className="tv" data-iho="kerma" data-sivu="kansi">
         <h1 className="tv-sr">Päivän visa · Tänään {pv.lyhyt} · päivän lehden kansi</h1>
-        <Pelipalkki peli="Tänään" muunnelma={pv.lyhyt} iho="tumma" pelissa koti={{ href: "/", nimi: "Etusivu" }} />
+        {/* Kannella nimiö ja päiväys ovat jo kannessa: palkissa vain pelin nimi (ei toistoa). */}
+        <Pelipalkki peli="Päivän visa" iho="tumma" pelissa koti={{ href: "/", nimi: "Etusivu" }} />
         <main id="main" className="tv-kn-runko">
           <Kansi
             kansi={lehti.kansi}
@@ -160,7 +161,7 @@ export default function TanaanLehti({ lehti, julkaisija, arkisto, jakoPolku }: {
   return (
     <div className="tv" data-iho="kerma" data-sivu={sivu < n ? "juttu" : sivu === n ? "pahkina" : "tulos"}>
       <h1 className="tv-sr">Päivän visa · Tänään {pv.lyhyt}</h1>
-      <Pelipalkki peli="Tänään" muunnelma={pv.lyhyt} iho="kerma" tila={tila} pelissa={sivu <= n} koti={{ href: "/", nimi: "Etusivu" }} />
+      <Pelipalkki peli="Päivän visa" muunnelma={pv.lyhyt} iho="kerma" tila={tila} pelissa={sivu <= n} koti={{ href: "/", nimi: "Etusivu" }} />
       {sivu <= n && (
         <div className="tv-prog" aria-hidden="true">
           {Array.from({ length: n + 1 }, (_, i) => (
