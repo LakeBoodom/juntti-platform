@@ -233,11 +233,14 @@
 /* ── KANSI (vaihe 2, CD Kansi.dc.html) ───────────────────────────────────────────────────────────
    Tumma arkki, joka täyttää ruudun pelipalkin alla (390 × 844: koko kansi näkyvissä ilman vieritystä).
    Pääjutun laatikko on container (size), joten pääotsikon koko lasketaan sen leveydestä ja korkeudesta (Kansi.tsx). */
-/* Kansi täyttää ruudun: juuri 100dvh, pelipalkki ottaa oman korkeutensa (mobiili 56 px, desktop + paluurivi) ja arkki loput. */
-.tn20 .tv[data-sivu="kansi"] { background: var(--tv-tumma); color: var(--tv-tumma-ink); height: 100dvh; min-height: 600px; }
+/* Kansi täyttää ruudun pelipalkin alla (palkki 57 px; ≥ 900 px pelissäkin paluurivi → 102 px). Arkki on grid, jonka
+   1fr-rivi kasvaa min-heightiin: pääjuttu ottaa jäljelle jäävän tilan, ja pitkä sisältö kasvattaa sivua eikä valu yli. */
+.tn20 .tv[data-sivu="kansi"] { --tv-palkki: 57px; background: var(--tv-tumma); color: var(--tv-tumma-ink); }
+@media (min-width: 900px) { .tn20 .tv[data-sivu="kansi"] { --tv-palkki: 102px; } }
 .tn20 .tv-kn-runko { flex: 1; display: flex; min-height: 0; }
 .tn20 .tv-kn {
-  flex: 1; display: flex; flex-direction: column; gap: 6px; padding: 12px; width: 100%; min-height: 0;
+  flex: 1; display: grid; grid-template-rows: auto minmax(0, 1fr); gap: 6px; padding: 12px; width: 100%;
+  min-height: max(560px, calc(100dvh - var(--tv-palkki)));
 }
 .tn20 .tv-kn-mast { flex: none; display: flex; align-items: center; gap: 8px; background: var(--tv-kulta); color: var(--tv-tumma); padding: 8px 12px 7px; }
 /* Nimiö pitää leveytensä; päiväys ja juhla (≤ 40 merkkiä) joustavat ja rivittyvät oikeaan reunaan (mitattu 26.11.:
@@ -250,15 +253,16 @@
 .tn20 .tv-kn-dt > span { display: inline-block; transform: skewX(10deg); }
 .tn20 .tv-kn-jh { font-family: var(--tv-cond); font-weight: 700; font-size: 13px; line-height: 1.15; letter-spacing: .1em; text-transform: uppercase; text-align: right; overflow-wrap: normal; word-break: keep-all; }
 
-.tn20 .tv-kn-main { flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 6px; }
-.tn20 .tv-kn-lead { position: relative; flex: 1; min-height: 200px; container-type: size; background: var(--tv-tumma2); overflow: clip; }
+.tn20 .tv-kn-main { min-height: 0; display: grid; grid-template-rows: minmax(220px, 1fr) auto; grid-template-columns: minmax(0, 1fr); gap: 6px; }
+.tn20 .tv-kn-lead { position: relative; min-height: 0; container-type: size; background: var(--tv-tumma2); overflow: clip; }
 .tn20 .tv-kn-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
 .tn20 .tv-kn-in { position: absolute; inset: 0; padding: 12px; display: flex; flex-direction: column; align-items: flex-start; gap: 8px; }
 .tn20 .tv-kn-kick { margin: 0; max-width: 100%; background: var(--tv-kulta); color: var(--tv-tumma); font-weight: 700; font-size: 16px; line-height: 1.2; padding: 5px 9px 4px; }
 /* KORTTISÄÄNTÖ: rivit ≤ 12 merkkiä (kanta), koko pisimmästä rivistä; nowrap on turvallinen, koska koko skaalautuu. */
 .tn20 .tv-kn-hl { margin: 0; font-family: var(--tv-display); font-weight: 900; font-variation-settings: "wdth" 62; font-stretch: 62%; line-height: .92; letter-spacing: -.005em; display: flex; flex-direction: column; align-items: flex-start; gap: 3px; }
 .tn20 .tv-kn-ln { display: block; background: var(--tv-tumma); color: var(--tv-tumma-ink); padding: .04em .12em 0; white-space: nowrap; }
-.tn20 .tv-kn-tarra { position: absolute; right: 12px; bottom: 14px; max-width: 46%; transform: rotate(-6deg); background: var(--tv-bg); color: var(--tv-tumma); font-family: var(--tv-display); font-weight: 900; font-variation-settings: "wdth" 80; font-stretch: 80%; font-size: 19px; line-height: 1.05; text-align: center; padding: 9px 12px 8px; border-radius: 10px; text-wrap: balance; overflow-wrap: normal; word-break: keep-all; }
+/* Tarran koko myös pisimmästä sanasta (--lw), jotta sana ei ylitä tarraa (kanta: pisin sana ≤ 14). */
+.tn20 .tv-kn-tarra { --tv-tarra-max: 19px; position: absolute; right: 12px; bottom: 14px; max-width: 46cqw; transform: rotate(-6deg); background: var(--tv-bg); color: var(--tv-tumma); font-family: var(--tv-display); font-weight: 900; font-variation-settings: "wdth" 80; font-stretch: 80%; font-size: min(var(--tv-tarra-max), calc((46cqw - 24px) / (var(--lw, 10) * .6))); line-height: 1.05; text-align: center; padding: 9px 12px 8px; border-radius: 10px; text-wrap: balance; overflow-wrap: normal; word-break: keep-all; }
 .tn20 .tv-kn-lead.noimg { background: var(--tv-bg); }
 .tn20 .tv-kn-lead.noimg .tv-kn-ln { background: transparent; color: var(--tv-tumma); padding: 0; }
 .tn20 .tv-kn-lead.noimg .tv-kn-kick { background: var(--tv-tumma); color: var(--tv-tumma-ink); }
@@ -278,6 +282,8 @@
 .tn20 .tv-kn-sb { font-weight: 600; font-size: 15px; }
 .tn20 .tv-kn-tiles { flex: none; display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); gap: 6px; min-height: 136px; }
 .tn20 .tv-kn-tiles.one { grid-template-columns: 1fr; }
+/* Alle 360 px: laatat allekkain, muuten kuvallisen laatan otsikko jäisi alle 12 px:n. */
+@media (max-width: 359px) { .tn20 .tv-kn-tiles { grid-template-columns: 1fr; } }
 .tn20 .tv-kn-tile { position: relative; display: flex; gap: 10px; padding: 10px; min-width: 0; overflow: clip; }
 .tn20 .tv-kn-tile.t0 { background: var(--tv-kulta); color: var(--tv-tumma); }
 .tn20 .tv-kn-tile.t1 { background: var(--tv-bg); color: var(--tv-tumma); }
@@ -289,8 +295,8 @@
    wdth 68 / 900 isot kirjaimet ≈ 0,56 em/merkki. */
 .tn20 .tv-kn-tt { --tv-tt-max: 25px; margin: 0; font-family: var(--tv-display); font-weight: 900; font-variation-settings: "wdth" 68; font-stretch: 68%; font-size: min(var(--tv-tt-max), calc(100cqi / (var(--lw, 10) * .56))); line-height: .98; text-wrap: balance; overflow-wrap: normal; word-break: keep-all; width: 100%; }
 .tn20 .tv-kn-tile.big .tv-kn-tt { --tv-tt-max: 28px; }
-.tn20 .tv-kn-ts { font-weight: 600; font-size: 14px; line-height: 1.2; }
-.tn20 .tv-kn-hook { margin-top: auto; display: inline-block; background: var(--tv-tumma); color: var(--tv-tumma-ink); font-weight: 700; font-size: 14px; padding: 4px 9px 3px; transform: skewX(-10deg); }
+.tn20 .tv-kn-ts { font-weight: 600; font-size: 14px; line-height: 1.2; overflow-wrap: break-word; hyphens: auto; max-width: 100%; }
+.tn20 .tv-kn-hook { margin-top: auto; display: inline-block; max-width: 100%; overflow-wrap: break-word; background: var(--tv-tumma); color: var(--tv-tumma-ink); font-weight: 700; font-size: 14px; padding: 4px 9px 3px; transform: skewX(-10deg); }
 .tn20 .tv-kn-hook > span { display: inline-block; transform: skewX(10deg); }
 .tn20 .tv-kn-myos { background: var(--tv-bg); color: var(--tv-tumma); padding: 10px 12px 9px; }
 .tn20 .tv-kn-myos b { display: block; font-family: var(--tv-cond); font-weight: 700; font-size: 14px; letter-spacing: .14em; text-transform: uppercase; color: var(--tv-kick); }
@@ -304,16 +310,14 @@
 .tn20 .tv[data-sivu="kansi"] :is(button, a):focus-visible { outline-color: var(--tv-tumma-ink); }
 
 @media (min-width: 1024px) {
-  .tn20 .tv[data-sivu="kansi"] { min-height: 700px; }
-  .tn20 .tv-kn { gap: 10px; max-width: 1280px; margin: 0 auto; padding: 28px 24px 32px; }
+  .tn20 .tv-kn { gap: 10px; max-width: 1280px; margin: 0 auto; padding: 28px 24px 32px; min-height: max(640px, calc(100dvh - var(--tv-palkki))); }
   .tn20 .tv-kn-mast { padding: 12px 20px 10px; }
   .tn20 .tv-kn-name { font-size: 60px; }
   .tn20 .tv-kn-dt { font-size: 34px; }
-  .tn20 .tv-kn-main { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); gap: 10px; }
-  .tn20 .tv-kn-lead { min-height: 0; }
+  .tn20 .tv-kn-main { grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); grid-template-rows: minmax(380px, 1fr); gap: 10px; }
   .tn20 .tv-kn-side { gap: 10px; min-height: 0; }
   .tn20 .tv-kn-kick { font-size: 24px; }
-  .tn20 .tv-kn-tarra { font-size: 32px; padding: 14px 20px 12px; }
+  .tn20 .tv-kn-tarra { --tv-tarra-max: 32px; padding: 14px 20px 12px; }
   .tn20 .tv-kn-leima { font-size: 40px; padding: 14px 20px 12px; }
   .tn20 .tv-kn-sa { font-size: 34px; }
   .tn20 .tv-kn-sb { font-size: 19px; }

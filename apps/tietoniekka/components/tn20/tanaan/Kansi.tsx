@@ -8,6 +8,8 @@ import type { CSSProperties } from "react";
 import type { Kansi as KansiData } from "@/lib/tanaan/tyypit";
 import { Nuoli } from "./Pahkina";
 
+const pisinSana = (t: string) => Math.max(...t.split(/[\s\-–]+/).map((w) => w.length));
+
 export default function Kansi({ kansi, pvLyhyt, juhla, julkaisija, arkisto, luonnos, leima, onPelaa, onVastaukset }: {
   kansi: KansiData;
   /** "SU 6.12." */
@@ -26,7 +28,9 @@ export default function Kansi({ kansi, pvLyhyt, juhla, julkaisija, arkisto, luon
   const kuva = !!pj.kuva;
   const pisin = Math.max(...pj.rivit.map((r) => r.length));
   const leveys = Math.min(kuva ? 19 : 27, 94 / (pisin * 0.56));
-  const korkeus = (kuva ? 56 : 70) / pj.rivit.length;
+  // Korkeusraja: Spec 56/70 cqh; mitattu 26.11. pisimmillä teksteillä (kaksirivinen kärki) → 48/60, ettei viimeinen rivi
+  // valu laatikon alle 375 × 667 -näkymässä.
+  const korkeus = (kuva ? 48 : 60) / pj.rivit.length;
   const otsikko = { fontSize: `min(${leveys.toFixed(1)}cqw, ${korkeus.toFixed(1)}cqh)` } as CSSProperties;
   const laatat = kansi.malli === "yksi" ? [] : kansi.laatat.slice(0, kansi.malli === "kaksi" ? 1 : 2);
   const nauha = kansi.malli === "taysi" ? kansi.nauha : null;
@@ -57,7 +61,7 @@ export default function Kansi({ kansi, pvLyhyt, juhla, julkaisija, arkisto, luon
               {pj.rivit.map((r, i) => <span key={i} className="tv-kn-ln">{r}</span>)}
             </h2>
           </div>
-          {pj.tarra && !pelattu && <div className="tv-kn-tarra">{pj.tarra}</div>}
+          {pj.tarra && !pelattu && <div className="tv-kn-tarra" style={{ "--lw": pisinSana(pj.tarra) } as CSSProperties}>{pj.tarra}</div>}
           {pelattu && <div className="tv-kn-leima" role="status">{leima}</div>}
         </div>
         <div className="tv-kn-side">
@@ -81,7 +85,7 @@ export default function Kansi({ kansi, pvLyhyt, juhla, julkaisija, arkisto, luon
                     <img className="tv-kn-timg" src={t.kuva} alt={t.kuva_alt ?? ""} decoding="async" />
                   )}
                   <div className="tv-kn-tx">
-                    <h3 className="tv-kn-tt" style={{ "--lw": Math.max(...t.otsikko.split(/[\s\-–]+/).map((w) => w.length)) } as CSSProperties}>{t.otsikko}</h3>
+                    <h3 className="tv-kn-tt" style={{ "--lw": pisinSana(t.otsikko) } as CSSProperties}>{t.otsikko}</h3>
                     <span className="tv-kn-ts">{t.alarivi}</span>
                     {t.koukku && <span className="tv-kn-hook"><span>{t.koukku}</span></span>}
                   </div>
