@@ -52,6 +52,10 @@ export const NAV_COLLECTIONS: NavCollection[] = aakkosin([
   { slug: "lapset", label: "Lasten visat", color: "#F5BC45", href: "/lapset" },
 ]);
 
+/** Euroviisut (28.11.2026): valikkoon vain, kun kokoelmasivu on auki (esikatselu tai ≥ 3 julkaistua visaa,
+ *  lib/kokoelmat/luonnokset.ts euroviisutTila). Layout välittää sen TopBarille ja /kokoelmat lisää sen listaan. */
+export const NAV_EUROVIISUT: NavCollection = { slug: "euroviisut", label: "Euroviisut", color: "#FB7185" };
+
 export type NavMode = {
   href: string;
   label: string;

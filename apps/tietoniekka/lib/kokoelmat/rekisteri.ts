@@ -38,18 +38,21 @@ export const KOKOELMA_KORTIT: KokoelmaKortti[] = [
   { slug: "tiede", nimi: "Tiede ja teknologia", href: "/kokoelma/tiede", img: "/20/etusivu/aihe-tiede.webp", teema: "tieto", suosio: 14, mastery: { name: "Tiedeniekka", icon: "tiede", color: "#4FD1FF" } },
   { slug: "juhlat", nimi: "Juhlat ja pyhät", href: "/kokoelma/juhlat", img: "/20/etusivu/aihe-juhlat.webp", teema: "viihde", suosio: 15, mastery: { name: "Juhlaniekka", icon: "juhla", color: "#E8A320" } },
   { slug: "kuvavisat", nimi: "Kuvavisat", href: "/kokoelma/kuvavisat", img: "/20/kokoelmakortit/kuvavisat.webp", teema: "tieto", suosio: 16, mastery: { name: "Kuvaniekka", icon: "kuva", color: "#4C9AFF" } },
-  /* Euroviisut (runko vaihe 2, 19.10.2026): ensimmäinen pelkästä asetuksesta syntynyt kokoelma. Kortti-
-     kuva puuttuu vielä; avoin: false, kunnes sivulla on ≥ 3 julkaistua visaa (lib/kokoelmat/euroviisut.ts). */
-  { slug: "euroviisut", nimi: "Euroviisut", href: "/kokoelma/euroviisut", img: "/20/kokoelmakortit/musiikki.webp", teema: "viihde", suosio: 17, mastery: { name: "Viisuniekka", icon: "viisut", color: "#FB7185" }, avoin: false },
+  /* Euroviisut (runko vaihe 2, 19.10.2026): ensimmäinen pelkästä asetuksesta syntynyt kokoelma. avoin: false, kunnes
+     sivulla on ≥ 3 julkaistua visaa; esikatselussa näkyy aina (naapurit(…, auki), lib/kokoelmat/luonnokset.ts).
+     Kortin kuva = Euroviisut kautta aikojen -visan lavakuva, kunnes kokoelman oma kuva valmistuu (28.11.2026). */
+  { slug: "euroviisut", nimi: "Euroviisut", href: "/kokoelma/euroviisut", img: "/20/musiikki/euroviisut-kautta-aikojen.webp", teema: "viihde", suosio: 17, mastery: { name: "Viisuniekka", icon: "viisut", color: "#FB7185" }, avoin: false },
 ];
 
 export const kokoelmaKortti = (slug: string) => KOKOELMA_KORTIT.find((k) => k.slug === slug) ?? null;
 
 /** V7: asetuksen naapurit tai automaattinen valinta (S6): sama pääteema ensin, sitten suosituimmat. */
-export function naapurit(slug: string, related?: string[]): KokoelmaKortti[] {
-  if (related?.length) return related.map(kokoelmaKortti).filter((k): k is KokoelmaKortti => Boolean(k) && k!.avoin !== false).slice(0, 3);
+/** auki: kokoelmat, joiden avoin: false ohitetaan nyt (Euroviisut esikatselussa tai kun julkaistuja on ≥ 3). */
+export function naapurit(slug: string, related?: string[], auki: string[] = []): KokoelmaKortti[] {
+  const nakyy = (k: KokoelmaKortti) => k.avoin !== false || auki.includes(k.slug);
+  if (related?.length) return related.map(kokoelmaKortti).filter((k): k is KokoelmaKortti => Boolean(k) && nakyy(k!)).slice(0, 3);
   const oma = kokoelmaKortti(slug);
-  return KOKOELMA_KORTIT.filter((k) => k.slug !== slug && k.avoin !== false)
+  return KOKOELMA_KORTIT.filter((k) => k.slug !== slug && nakyy(k))
     .sort((a, b) => Number(b.teema === oma?.teema) - Number(a.teema === oma?.teema) || a.suosio - b.suosio)
     .slice(0, 3);
 }

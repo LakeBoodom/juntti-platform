@@ -30,7 +30,7 @@
 import "./topbar.css";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
-import { NAV_COLLECTIONS, NAV_MODES, isGameRoute, navHref } from "@/lib/nav";
+import { NAV_COLLECTIONS, NAV_MODES, aakkosin, isGameRoute, navHref, type NavCollection } from "@/lib/nav";
 import { HEADER_PROMOS, SITE_TAGLINE } from "@/lib/etusivu";
 import StreakButton from "./StreakButton";
 import HakuLaatikko, { HakuIkoni, lataaIndeksi } from "./haku/HakuLaatikko";
@@ -49,7 +49,9 @@ function taglineOsat(t: string) {
   );
 }
 
-export default function TopBar({ tagline }: { tagline?: string } = {}) {
+/** lisaKokoelmat: ehdolliset kokoelmat (Euroviisut, kun sivu on auki) — layout päättää palvelimella. */
+export default function TopBar({ tagline, lisaKokoelmat = [] }: { tagline?: string; lisaKokoelmat?: NavCollection[] } = {}) {
+  const kokoelmat = lisaKokoelmat.length ? aakkosin([...NAV_COLLECTIONS, ...lisaKokoelmat]) : NAV_COLLECTIONS;
   const pathname = usePathname() ?? "";
   const [open, setOpen] = useState<MenuId | null>(null);
   const [sheet, setSheet] = useState(false);
@@ -189,7 +191,7 @@ export default function TopBar({ tagline }: { tagline?: string } = {}) {
                     Kaikki kokoelmat <span aria-hidden>→</span>
                   </a>
                   <div className="tn-menu-grid">
-                    {NAV_COLLECTIONS.map((c) => (
+                    {kokoelmat.map((c) => (
                       <a
                         key={c.slug}
                         className="tn-menu-row"
@@ -312,7 +314,7 @@ export default function TopBar({ tagline }: { tagline?: string } = {}) {
               </a>
             ))}
             <p className="tn-sheet-group">Kokoelmat</p>
-            {NAV_COLLECTIONS.map((c) => (
+            {kokoelmat.map((c) => (
               <a
                 key={c.slug}
                 className="tn-sheet-row"

@@ -29,6 +29,8 @@ export type Kokoelma = {
   /** h1; highlight korostetaan teemavärillä h1:n lopussa. */
   title: string;
   highlight?: string;
+  /** Vaihtoehtoinen h1 (title + highlight), näytetään vain esikatselussa parametrilla ?h1=b (Euroviisut 28.11.2026). */
+  h1B?: { title: string; highlight?: string };
   /** ≤ 2 riviä 390 px:ssä. */
   ingress: string;
   /** Teemaväri = mestaruusmerkin väri. */
@@ -63,6 +65,8 @@ export type Kokoelma = {
   /** sectionTags: true = kokoelman visat ovat ne, joilla on jokin tämän kokoelman osiotageista
    *  (uusi kokoelma ilman omaa collection-arvoa, esim. Euroviisut; visa voi kuulua useaan kokoelmaan). */
   haku: { collection?: string; category?: string; sectionTags?: boolean };
+  /** Esikatselussa (VERCEL_ENV ≠ production) myös luonnosvisat näkyvät ja ovat pelattavissa (lib/kokoelmat/luonnokset.ts). */
+  luonnoksetEsikatselussa?: boolean;
   /** Korttikuva visan slugista; oletuksena quizzes.hero_image. */
   korttikuva?: (slug: string) => string | null;
   /** Korttikuvan kevyempi versio (Juhlat: quizzes.hero_image → valmis -800.webp). */

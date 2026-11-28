@@ -19,6 +19,8 @@ import "./mobiilisankari.css";
 import TopBar from "@/components/tn20/TopBar";
 import SiteFooter from "@/components/tn20/SiteFooter";
 import Seuranta from "@/components/tn20/Seuranta";
+import { NAV_EUROVIISUT } from "@/lib/nav";
+import { euroviisutTila } from "@/lib/kokoelmat/luonnokset";
 
 /* QA-006 (29.8.2026): oletusotsikko ja -kuvaus etusivulle; alasivut
    (kokoelmat, pelisivut) antavat omansa. noindex poistettu julkaisussa
@@ -39,14 +41,15 @@ export async function generateMetadata(): Promise<Metadata> {
 /* Heikin katselmus 17.8.: visamäärät poistettiin navigaatiosta kokonaan →
    layoutin ei tarvitse hakea lukuja kannasta (/kokoelmat hakee omansa). */
 export default async function Tn20Layout({ children }: { children: React.ReactNode }) {
-  const tagline = `Suomalainen tietovisasivusto · ${visaMaara(await getSiteStats())}`;
+  const [stats, euroviisut] = await Promise.all([getSiteStats(), euroviisutTila()]);
+  const tagline = `Suomalainen tietovisasivusto · ${visaMaara(stats)}`;
   return (
     <div className="tn20">
       {/* UI-laatu 14.10.2026: skip-linkki ensimmäiseksi; kohde on sisällön alussa (sivujen omat <main>-elementit
           vaihtelevat, joten ankkuri on layoutissa). */}
       <a href="#main" className="skip-link">Siirry sisältöön</a>
       {/* Navigaatiojärjestelmä (lukittu 17.8.2026) — piiloutuu itse pelinäkymässä */}
-      <TopBar tagline={tagline} />
+      <TopBar tagline={tagline} lisaKokoelmat={euroviisut.auki ? [NAV_EUROVIISUT] : []} />
       <Seuranta />
       <span id="main" tabIndex={-1} />
       {children}

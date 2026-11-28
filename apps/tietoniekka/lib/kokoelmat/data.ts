@@ -10,6 +10,7 @@ import { kokoelmanPaketti, type PakettiRivi } from "@/lib/visapaketit";
 import { suosio } from "@/lib/suosio";
 import { helsinginPaiva } from "@/lib/aika";
 import type { Kokoelma, KokoelmaOsio, RunkoVisa } from "./tyypit";
+import { euroviisutTila, luonnosAsiakas } from "./luonnokset";
 
 /** S2: ennen "Näytä kaikki" -nappia näkyy osion ensimmäinen kortti + tämä määrä (21.10.2026: kaikki kortit samaa
     A-kokoa → rivit täysiä: mobiili 2 × 3 = 6, tabletti 3 × 2 = 6, desktop 4 × 2 = 8 korttia). */
@@ -98,15 +99,24 @@ export async function haeRunkoData(k: Kokoelma, ulkoiset?: UlkoinenKohde[]): Pro
     const [maarat, paketti] = await Promise.all([getCounts(), kokoelmanPaketti(k)]);
     return { ...kokoa(k, ulkoiset, maarat), paketti };
   }
-  let q = sb
-    .from("quiz_cards" as never)
-    .select("id, slug, custom_slug, game_mode, title, display_title, genre, subcollection, category, suosio_90pv, question_count, section_tags, hero_image, hero_focal_x, hero_focal_y, target_age, published_at");
+  /* Esikatselussa luonnoskokoelman visat suoraan quizzes-taulusta (quiz_cards näyttää vain julkaistut). */
+  const palvelu = k.luonnoksetEsikatselussa ? luonnosAsiakas() : null;
+  const KENTAT = "id, slug, custom_slug, game_mode, title, display_title, genre, subcollection, category, section_tags, hero_image, hero_focal_x, hero_focal_y, target_age, published_at";
+  let q = palvelu
+    ? palvelu.from("quizzes").select(`${KENTAT}, questions(count)`).in("status", ["published", "draft"])
+    : sb.from("quiz_cards" as never).select(`${KENTAT}, suosio_90pv, question_count`);
   if (k.haku.collection) q = q.eq("collection", k.haku.collection);
   if (k.haku.category) q = q.eq("category", k.haku.category);
   if (k.haku.sectionTags) q = q.overlaps("section_tags", k.sections.map((s) => s.slug));
-  const [{ data }, maarat, paketti] = await Promise.all([q, getCounts(), kokoelmanPaketti(k)]);
+  const [{ data }, maarat, paketti, euro] = await Promise.all([q, getCounts(), kokoelmanPaketti(k), euroviisutTila()]);
   const lapsetMukaan = k.lapset && lapsetNakyvissa();
-  const rivit = ((data ?? []) as unknown as Rivi[]).filter((r) => lapsetMukaan || (r.target_age !== "4-7" && r.target_age !== "8-12"));
+  type Raaka = Rivi & { questions?: Array<{ count: number }> };
+  const rivit = ((data ?? []) as unknown as Raaka[])
+    .map((r) => (palvelu ? { ...r, suosio_90pv: 0, question_count: r.questions?.[0]?.count ?? null } : r))
+    .filter((r) => lapsetMukaan || (r.target_age !== "4-7" && r.target_age !== "8-12"));
+  /* Euroviisut V7-tiilinä (Musiikki) ja määrä vain, kun sivu on auki (esikatselu tai ≥ 3 julkaistua). */
+  maarat.euroviisut = euro.maara;
+  const auki = euro.auki ? ["euroviisut"] : [];
 
   const visa = (r: Rivi): RunkoVisa => {
     const kuva0 = (r.slug && k.korttikuva?.(r.slug)) || r.hero_image || null;
@@ -132,7 +142,7 @@ export async function haeRunkoData(k: Kokoelma, ulkoiset?: UlkoinenKohde[]): Pro
     };
   };
 
-  return { ...kokoa(k, rivit.map((r) => ({ tagit: r.section_tags ?? [], visa: visa(r) })), maarat), paketti };
+  return { ...kokoa(k, rivit.map((r) => ({ tagit: r.section_tags ?? [], visa: visa(r) })), maarat, auki), paketti };
 }
 
 /** Heron Pelaa-napin visa (Heikki 14.11.2026): vaihtuu päivittäin (Suomen aika), sama kaikille saman päivän aikana.
@@ -154,7 +164,7 @@ function paivanNosto<T extends { id: string; kuva?: string | null }>(slug: strin
 }
 
 /** Osiot, korttianatomia (S1), katkaisu (S2) ja hero/V6/V7-data kohteista. */
-function kokoa(k: Kokoelma, kohteet: UlkoinenKohde[], maarat: Record<string, number>): RunkoData {
+function kokoa(k: Kokoelma, kohteet: UlkoinenKohde[], maarat: Record<string, number>, auki: string[] = []): RunkoData {
   const nahty = new Set<string>();
   const osiot: RunkoOsio[] = k.sections
     .map((s) => {
@@ -208,6 +218,6 @@ function kokoa(k: Kokoelma, kohteet: UlkoinenKohde[], maarat: Record<string, num
     suosituin: top ? { id: top.id, nimi: top.nimi, href: top.href } : null,
     jarjestys: uniikit.map((v) => ({ id: v.id, nimi: v.nimi, href: v.href })),
     pelit: kokoelmanPelimuodot(k.slug),
-    lisaa: naapurit(k.slug, k.related).map((n) => ({ ...n, maara: maarat[n.slug] ?? 0 })),
+    lisaa: naapurit(k.slug, k.related, auki).map((n) => ({ ...n, maara: maarat[n.slug] ?? 0 })),
   };
 }

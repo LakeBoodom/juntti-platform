@@ -10,7 +10,8 @@ import HubHero from "@/components/tn20/korttirivi/HubHero";
 import HubRivit, { type RiviKortti } from "@/components/tn20/korttirivi/KorttiRivi";
 import { jakoMeta } from "@/lib/jakoMeta";
 import { getCounts } from "@/lib/kokoelmaMaarat";
-import { NAV_COLLECTIONS, NAV_MODES, navHref } from "@/lib/nav";
+import { NAV_COLLECTIONS, NAV_EUROVIISUT, NAV_MODES, aakkosin, navHref } from "@/lib/nav";
+import { euroviisutTila } from "@/lib/kokoelmat/luonnokset";
 import { ETUSIVUN_PELIMUODOT } from "@/lib/pelimuodot";
 
 export const metadata: Metadata = {
@@ -51,8 +52,11 @@ const etusivunPaikka = (href: string) => {
 };
 
 export default async function KokoelmatPage() {
-  const counts = await getCounts();
-  const aiheet: RiviKortti[] = NAV_COLLECTIONS.map((c) => {
+  const [counts, euroviisut] = await Promise.all([getCounts(), euroviisutTila()]);
+  counts.euroviisut = euroviisut.maara;
+  /* Euroviisut listalle vain, kun sivu on auki (esikatselu tai ≥ 3 julkaistua). */
+  const kokoelmat = euroviisut.auki ? aakkosin([...NAV_COLLECTIONS, NAV_EUROVIISUT]) : NAV_COLLECTIONS;
+  const aiheet: RiviKortti[] = kokoelmat.map((c) => {
     const n = counts[c.slug] ?? 0;
     return { href: navHref(c), kuva: `/20/rivi/kokoelma-${c.slug}.webp`, kuvaton: c.label, nimi: c.label, rivi: n > 0 ? `${n} visaa` : null };
   });

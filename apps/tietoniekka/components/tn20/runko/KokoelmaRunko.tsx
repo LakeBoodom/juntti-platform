@@ -18,6 +18,7 @@ import RunkoMetapeli from "./RunkoMetapeli";
 import { PeliIkoniSvg } from "./PeliIkoni";
 import { runkoCond } from "./runkoFontti";
 import Tunnusosa from "./Tunnusosa";
+import RunkoH1B from "./RunkoH1B";
 
 /** Heron mobiiliversio: jokaisesta runkosivun herokuvasta on 800 px kopio nimellä <nimi>-800.webp. */
 const MOBIILI = "(max-width: 899px)";
@@ -125,6 +126,9 @@ export default function KokoelmaRunko({ d, tunnusosa, v3Lisa, heroLisa, sisalto 
             {katko(k.title, true)}
             {k.highlight && <span>{katko(k.highlight, true)}</span>}
           </h1>
+          {k.h1B && esikatselu() && (
+            <RunkoH1B title={k.h1B.title} highlight={k.h1B.highlight} lw={pisinSana(`${k.h1B.title}${k.h1B.highlight ?? ""}`)} />
+          )}
           <p className="rk-ingress">{k.ingress}</p>
           {heroLisa}
           {d.suosituin && <RunkoHeroCta suosituin={d.suosituin} jarjestys={d.jarjestys} tila={k.cta} selite={k.ctaSelite} />}

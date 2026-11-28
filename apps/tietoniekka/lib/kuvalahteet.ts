@@ -106,6 +106,11 @@ export const KUVALAHTEET: Kuvalahde[] = [
   { slug: "nightwish-visa-sinfoninen-metalli", kokoelma: "musiikki", kuvaus: "Floor Jansen ja Nightwish, Florida 2012", tiedosto: "Floor Jansen - Nightwish.jpg", tekija: "Luis Blanco", lisenssi: "CC BY 2.0", lisenssiUrl: CC("by/2.0"), vuosi: "2012" },
   { slug: "jenni-vartiainen-visa-hittien-takana", kokoelma: "musiikki", kuvaus: "Jenni Vartiainen, Ilosaarirock 2014", tiedosto: "Jenni Vartiainen, 2014 (cropped).jpg", tekija: "Tuomas Vitikainen", lisenssi: "CC BY-SA 4.0", lisenssiUrl: CC("by-sa/4.0"), vuosi: "2014" },
   { slug: "popeda-visa-manserock", kokoelma: "musiikki", kuvaus: "Popeda, Provinssirock 2013", tiedosto: "Provinssirock 20130615 - Popeda - 05.jpg", tekija: "Cecil", lisenssi: "CC BY-SA 3.0", lisenssiUrl: CC("by-sa/3.0"), vuosi: "2013" },
+  /* Euroviisut-kokoelman neljä visaa (Heikki valitsi 28.11.2026, taulun vaihtoehdot A). Kortti + hero public/20/musiikki/. */
+  { slug: "euroviisut-kautta-aikojen", kokoelma: "musiikki", kuvaus: "Euroviisujen lava ja yleisö, Liverpool 2023", tiedosto: "Eurovision 2023 - Stage (01).jpg", tekija: "Michael Doherty", lisenssi: "CC BY-SA 4.0", lisenssiUrl: CC("by-sa/4.0"), vuosi: "2023" },
+  { slug: "suomi-euroviisuissa", kokoelma: "musiikki", kuvaus: "Käärijä Euroviisujen finaalin väliohjelmassa, Malmö 2024", tiedosto: "Käärijä Eurovision Song Contest Final 2024 interval act.jpg", tekija: "Arkland", lisenssi: "CC BY-SA 4.0", lisenssiUrl: CC("by-sa/4.0"), vuosi: "2024" },
+  { slug: "umk-uuden-musiikin-kilpailu", kokoelma: "musiikki", kuvaus: "Windows95man lavalla 2024", tiedosto: "Windows95man.jpg", tekija: "Pedro J Pacheco", lisenssi: "CC BY-SA 4.0", lisenssiUrl: CC("by-sa/4.0"), vuosi: "2024" },
+  { slug: "euroviisut-tosifaneille", kokoelma: "musiikki", kuvaus: "Domenico Modugno Euroviisuissa, Hilversum 1958", tiedosto: "Domenico Modugno (1958), Bestanddeelnr 909-4001.jpg", tekija: "Harry Pot / Anefo (Nationaal Archief)", lisenssi: "CC0", lisenssiUrl: "https://creativecommons.org/publicdomain/zero/1.0/", vuosi: "1958" },
 
   // ─── Kaupungit (12.9.2026) ───
   { slug: "espoo", kokoelma: "kaupungit", kuvaus: "Dipoli, Otaniemi, Espoo", tiedosto: "Dipoli11.jpg", tekija: "Halaszo", lisenssi: "CC BY-SA 4.0", lisenssiUrl: CC("by-sa/4.0"), vuosi: "2017" },

@@ -52,6 +52,11 @@ const IMG_SLUGS = new Set([
   "the-weeknd-visa-tunnetko-rnb-tahden",
   "travis-scott-visa-tunnetko-rap-tahden",
   "ultra-bra-tietovisa",
+  /* Euroviisut-kokoelma (28.11.2026) */
+  "euroviisut-kautta-aikojen",
+  "suomi-euroviisuissa",
+  "umk-uuden-musiikin-kilpailu",
+  "euroviisut-tosifaneille",
 ]);
 
 export function musiikkiImg(slug: string | null | undefined): string | null {

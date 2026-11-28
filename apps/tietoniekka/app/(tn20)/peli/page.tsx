@@ -42,6 +42,7 @@ import { haeSeuraavat } from "@/lib/seuraavaksi/hae";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { visanHakuotsikko } from "@/lib/hakuotsikko";
+import { luonnosAsiakas, luonnosSallittu } from "@/lib/kokoelmat/luonnokset";
 
 export const dynamic = "force-dynamic";
 
@@ -155,9 +156,21 @@ async function pelinMetadata(p: Record<string, string | string[] | undefined>): 
         ...(lasten.julkaistu ? {} : { robots: { index: false, follow: false } }),
       };
     }
-    let q = sb.from("quizzes").select("id, title, display_title, teaser, description, slug, seo_title, seo_description, collection, korttinimi").eq("status", "published");
+    type MetaRivi = { id: string; title: string; display_title: string | null; teaser: string | null; description: string | null; slug: string | null; seo_title: string | null; seo_description: string | null; collection: string | null; korttinimi: string | null; section_tags?: string[] | null };
+    const META_KENTAT = "id, title, display_title, teaser, description, slug, seo_title, seo_description, collection, korttinimi, section_tags";
+    let q = sb.from("quizzes").select(META_KENTAT).eq("status", "published");
     q = quizId ? q.eq("id", quizId) : q.eq("slug", slug!);
-    const { data } = await q.maybeSingle<{ id: string; title: string; display_title: string | null; teaser: string | null; description: string | null; slug: string | null; seo_title: string | null; seo_description: string | null; collection: string | null; korttinimi: string | null }>();
+    const { data } = await q.maybeSingle<MetaRivi>();
+    /* Esikatselun luonnosvisa (lib/kokoelmat/luonnokset.ts): otsikko näkyviin, ei indeksointia. */
+    const luonnos = !data ? luonnosAsiakas() : null;
+    if (luonnos) {
+      let lq = luonnos.from("quizzes").select(META_KENTAT).eq("status", "draft");
+      lq = quizId ? lq.eq("id", quizId) : lq.eq("slug", slug!);
+      const { data: l } = await lq.maybeSingle<MetaRivi>();
+      if (l && luonnosSallittu(l.section_tags)) {
+        return { title: `${l.display_title ?? l.title} (luonnos)${suffix}`, robots: { index: false, follow: false } };
+      }
+    }
     if (!data) return { title: `Visaa ei löytynyt${suffix}` };
     const name = data.display_title ?? data.title;
     /* Kanoninen osoite on /visa/<slug> (julkaisu 31.8.2026) — myös silloin kun
@@ -677,19 +690,34 @@ export default async function Peli20({
     return <LastenPeli visa={lasten} muut={muut} paketti={paketti} takaisin={lapsetNakyvissa() ? LAPSET_SIVU : lasten.kokoelma ? `/kokoelma/${lasten.kokoelma}` : "/"} />;
   }
 
+  const VISAN_KENTAT = "id, slug, title, display_title, teaser, description, category, collection, genre, subcollection, section_tags, learn, hero_image, hero_focal_x, hero_focal_y, hero_side, hero_alt, fanitasot, korttinimi, paikkakunnat, updated_at";
   let q = sb
     .from("quizzes")
-    .select("id, slug, title, display_title, teaser, description, category, collection, genre, subcollection, section_tags, learn, hero_image, hero_focal_x, hero_focal_y, hero_side, hero_alt, fanitasot, korttinimi, paikkakunnat, updated_at")
+    .select(VISAN_KENTAT)
     .eq("status", "published");
   q = quizId ? q.eq("id", quizId) : q.eq("slug", slug!);
-  const { data: quiz } = await q.maybeSingle<QuizRow>();
+  let { data: quiz } = await q.maybeSingle<QuizRow>();
+  /* Esikatselu (Euroviisut-brief 28.11.2026 §4): luonnoskokoelman luonnosvisa pelattavissa, jotta kokoelmasivu toimii
+     täytenä. Vain VERCEL_ENV ≠ production ja vain luonnoskokoelman osiotageilla (lib/kokoelmat/luonnokset.ts). */
+  const luonnos = !quiz ? luonnosAsiakas() : null;
+  let luonnosVisa = false;
+  if (luonnos) {
+    let lq = luonnos.from("quizzes").select(VISAN_KENTAT).eq("status", "draft");
+    lq = quizId ? lq.eq("id", quizId) : lq.eq("slug", slug!);
+    const { data: l } = await lq.maybeSingle<QuizRow>();
+    if (l && luonnosSallittu(l.section_tags)) {
+      quiz = l;
+      luonnosVisa = true;
+    }
+  }
   if (!quiz) notFound();
+  const kysymysAsiakas = (luonnosVisa && luonnos ? luonnos : sb) as typeof sb;
 
   const resolved = resolveCollection(quiz);
   /* Ristiinnostot (SEO-erä A3): portaittainen, satunnaistettu haku — ks. lib/related.ts. */
   const pakettiLinkki = tulosPakettiLinkki(quiz.section_tags);
   const [{ data: qs }, genreRes, relatedRes, celebRes, mukana, paikka] = await Promise.all([
-    sb
+    kysymysAsiakas
       .from("questions")
       .select("id, sort_order, question_text, explanation, answers, audio")
       .eq("quiz_id", quiz.id)

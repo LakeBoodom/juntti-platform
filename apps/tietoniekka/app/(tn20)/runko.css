@@ -386,6 +386,20 @@
 .tn20 .rk-nauha-vuosi { font-size: 12px; font-weight: 600; color: var(--rk-muted); }
 .tn20 .rk-nauha li[data-karki] .rk-nauha-sija { color: var(--rk-acc); }
 .tn20 .rk-nauha li[data-karki] .rk-nauha-palkki { background: var(--rk-acc); opacity: 1; }
+/* Sijoitusnauha kannasta (28.11.2026): voitto kullalla, semifinaali matalana ääriviivana, poissaolo ja peruttu ilman pylvästä. */
+.tn20 .rk-nauha li[data-voitto] .rk-nauha-sija { color: #E8A320; }
+.tn20 .rk-nauha li[data-voitto] .rk-nauha-palkki { background: #E8A320; opacity: 1; }
+.tn20 .rk-nauha li[data-tila="semi"] .rk-nauha-palkki { height: 8px; background: none; border: 1px dashed var(--rk-muted); border-bottom: 0; opacity: .8; box-sizing: border-box; }
+.tn20 .rk-nauha li[data-tila="semi"] .rk-nauha-sija { font-size: 12px; color: var(--rk-muted); }
+.tn20 .rk-nauha li[data-tila="poissa"] .rk-nauha-palkki,
+.tn20 .rk-nauha li[data-tila="peruttu"] .rk-nauha-palkki { height: 2px; border-radius: 0; opacity: .25; }
+.tn20 .rk-nauha li[data-tila="poissa"] .rk-nauha-sija,
+.tn20 .rk-nauha li[data-tila="peruttu"] .rk-nauha-sija { color: var(--rk-muted); font-weight: 700; }
+.tn20 .rk-nauha-selite { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 12px; font-weight: 600; color: var(--rk-muted); }
+.tn20 .rk-nauha-selite li { display: inline-flex; align-items: center; gap: 6px; }
+.tn20 .rk-nauha-selite b { color: var(--rk-soft); font-weight: 800; }
+.tn20 .rk-nauha-selite li[data-merkki]::before { content: ""; width: 10px; height: 10px; border-radius: 2px; background: var(--rk-acc); }
+.tn20 .rk-nauha-selite li[data-merkki="voitto"]::before { background: #E8A320; }
 /* Kuvaton hero (kuva tulossa): raidallinen paikka. */
 .tn20 .rk-hero-kuva[data-tyhja] { background: repeating-linear-gradient(135deg, color-mix(in srgb, var(--rk-acc) 14%, #1a170f) 0 12px, #17140d 12px 24px); }
 
