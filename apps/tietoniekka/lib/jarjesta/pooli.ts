@@ -72,7 +72,7 @@ export async function haePool(p: Pakka): Promise<Ehdokas[]> {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let q = (sb as any)
     .from("fact_attributes")
-    .select("num_value, display_value, source, metric, fact_entities!inner(id, name, role_label, image_url, prominence, celebrity_id, kind, status, group_key)")
+    .select("num_value, display_value, source, metric, fact_entities!inner(id, name, role_label, image_url, prominence, celebrity_id, kind, status, group_key, tags)")
     .eq("attr_key", p.attrKey)
     .eq("scope", p.scope)
     .eq("fact_entities.status", "published")
@@ -81,6 +81,7 @@ export async function haePool(p: Pakka): Promise<Ehdokas[]> {
   // (VAKAA_JARJESTYS_ALKAEN). Sen jälkeen päivän rivi ei riipu järjestyksestä (arvonta.ts järjestää).
   q = kinds.length === 1 ? q.eq("fact_entities.kind", kinds[0]) : q.in("fact_entities.kind", kinds);
   if (p.groupKey) q = q.eq("fact_entities.group_key", p.groupKey);
+  if (p.pool?.tagi) q = q.contains("fact_entities.tags", [p.pool.tagi]);
   const { data, error } = await q;
   if (error || !data) {
     console.error("haePool:", error);
