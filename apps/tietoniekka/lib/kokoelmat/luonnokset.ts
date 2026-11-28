@@ -2,11 +2,12 @@
 // näyttää kokoelmasivulla myös luonnosvisat, ja niitä voi pelata, jotta Heikki näkee sivun täytenä ennen julkaisua.
 // Luonnokset luetaan palvelinpuolella service role -avaimella vain esikatselussa (RLS päästää anonin vain julkaistuihin);
 // tuotannossa tämä tiedosto ei avaa mitään. Rajaus: vain visat, joiden section_tags osuu EUROVIISUT-osioihin.
-// Euroviisut avautuu tuotannossa, kun julkaistuja visoja on ≥ EUROVIISUT_AUKI (sivu, valikkolinkki, Musiikin V7-tiili).
+// Euroviisut avautuu tuotannossa vasta julkaisukytkimellä (EUROVIISUT_JULKAISTU) ja kun julkaistuja visoja on
+// ≥ EUROVIISUT_AUKI (sivu, valikkolinkki, Musiikin V7-tiili).
 import { createClient } from "@supabase/supabase-js";
 import { unstable_cache } from "next/cache";
 import { getSupabase } from "@/lib/supabase";
-import { EUROVIISUT, EUROVIISUT_AUKI } from "./euroviisut";
+import { EUROVIISUT, EUROVIISUT_AUKI, EUROVIISUT_JULKAISTU } from "./euroviisut";
 
 export const esikatselu = () => process.env.VERCEL_ENV !== "production";
 
@@ -45,5 +46,5 @@ export async function euroviisutTila(): Promise<{ maara: number; auki: boolean }
     return { maara: count ?? 0, auki: true };
   }
   const maara = await julkaistujaTuotannossa();
-  return { maara, auki: esikatselu() || maara >= EUROVIISUT_AUKI };
+  return { maara, auki: esikatselu() || (EUROVIISUT_JULKAISTU && maara >= EUROVIISUT_AUKI) };
 }

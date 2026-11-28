@@ -363,6 +363,10 @@
 .tn20 .rk-laskuri-teksti { display: flex; flex-direction: column; gap: 2px; font-size: 15px; font-weight: 700; line-height: 1.2; color: var(--rk-ink); }
 .tn20 .rk-laskuri-pvm { font-size: 13px; font-weight: 600; color: var(--rk-muted); }
 @media (min-width: 900px) { .tn20 .rk-laskuri-luku { font-size: 60px; } }
+/* Euroviisulaskurit (28.11.2026): kaksi laskuria rinnakkain, kapeassa allekkain. */
+.tn20 .rk-laskurit { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 12px 28px; }
+.tn20 .rk-laskurit .rk-laskuri-luku { font-size: 40px; }
+@media (min-width: 900px) { .tn20 .rk-laskurit .rk-laskuri-luku { font-size: 52px; } }
 
 /* Aikajana (V4, Historia; CD 2): vaakarivi, kausi 132 px, yläviiva 3 px. Korvaa V3:n. */
 .tn20 .rk-aika { display: flex; margin: 0; padding: 0 0 6px; list-style: none; overflow-x: auto; scroll-snap-type: x proximity; }

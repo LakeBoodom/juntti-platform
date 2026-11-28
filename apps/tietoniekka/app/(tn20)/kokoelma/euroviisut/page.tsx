@@ -5,6 +5,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { jakoMeta } from "@/lib/jakoMeta";
 import KokoelmaRunko from "@/components/tn20/runko/KokoelmaRunko";
+import Euroviisulaskuri from "@/components/tn20/runko/Euroviisulaskuri";
 import { haeRunkoData } from "@/lib/kokoelmat/data";
 import { EUROVIISUT } from "@/lib/kokoelmat/euroviisut";
 import { euroviisutTila } from "@/lib/kokoelmat/luonnokset";
@@ -31,5 +32,5 @@ export default async function EuroviisutSivu() {
   if (!(await euroviisutTila()).auki) notFound();
   const d = await haeRunkoData(EUROVIISUT);
   if (!d) return <main style={{ padding: 32 }}>Ei tietokantayhteyttä.</main>;
-  return <KokoelmaRunko d={d} />;
+  return <KokoelmaRunko d={d} heroLisa={<Euroviisulaskuri />} />;
 }

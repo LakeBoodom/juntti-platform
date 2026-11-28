@@ -11,6 +11,7 @@ import { suosio } from "@/lib/suosio";
 import { helsinginPaiva } from "@/lib/aika";
 import type { Kokoelma, KokoelmaOsio, RunkoVisa } from "./tyypit";
 import { euroviisutTila, luonnosAsiakas } from "./luonnokset";
+import { henkiloKuva } from "@/lib/henkilokuvat";
 
 /** S2: ennen "Näytä kaikki" -nappia näkyy osion ensimmäinen kortti + tämä määrä (21.10.2026: kaikki kortit samaa
     A-kokoa → rivit täysiä: mobiili 2 × 3 = 6, tabletti 3 × 2 = 6, desktop 4 × 2 = 8 korttia). */
@@ -114,12 +115,24 @@ export async function haeRunkoData(k: Kokoelma, ulkoiset?: UlkoinenKohde[]): Pro
   const rivit = ((data ?? []) as unknown as Raaka[])
     .map((r) => (palvelu ? { ...r, suosio_90pv: 0, question_count: r.questions?.[0]?.count ?? null } : r))
     .filter((r) => lapsetMukaan || (r.target_age !== "4-7" && r.target_age !== "8-12"));
-  /* Euroviisut V7-tiilinä (Musiikki) ja määrä vain, kun sivu on auki (esikatselu tai ≥ 3 julkaistua). */
+  /* Henkilövisan kortti ilman omaa kuvaa → henkilön kuva (Euroviisut: artistiosio, 28.11.2026). */
+  const henkiloKuvat = new Map<string, string>();
+  if (k.henkilokuvaVaraksi) {
+    const ilman = rivit.filter((r) => !(r.slug && k.korttikuva?.(r.slug)) && !r.hero_image).map((r) => r.id);
+    if (ilman.length) {
+      const { data: c } = await sb.from("celebrities").select("trivia_quiz_id, image_url").in("trivia_quiz_id", ilman);
+      for (const x of (c ?? []) as Array<{ trivia_quiz_id: string | null; image_url: string | null }>) {
+        const kuva = henkiloKuva(x.image_url);
+        if (x.trivia_quiz_id && kuva) henkiloKuvat.set(x.trivia_quiz_id, kuva);
+      }
+    }
+  }
+  /* Euroviisut V7-tiilinä (Musiikki) ja määrä vain, kun sivu on auki (esikatselu tai julkaistu). */
   maarat.euroviisut = euro.maara;
   const auki = euro.auki ? ["euroviisut"] : [];
 
   const visa = (r: Rivi): RunkoVisa => {
-    const kuva0 = (r.slug && k.korttikuva?.(r.slug)) || r.hero_image || null;
+    const kuva0 = (r.slug && k.korttikuva?.(r.slug)) || r.hero_image || henkiloKuvat.get(r.id) || null;
     const kuva = kuva0 && k.kuvaKevyt ? k.kuvaKevyt(kuva0) : kuva0;
     const metaOsat = [k.metarivi?.(r) ?? ""];
     /* Heikin päätös 19.10.2026: kysymysmäärä vain, kun se poikkeaa kymmenestä. Vaikeustasoa ei koskaan. */
@@ -131,7 +144,9 @@ export async function haeRunkoData(k: Kokoelma, ulkoiset?: UlkoinenKohde[]): Pro
       nimi: r.display_title ?? r.title,
       href: visaHref(r),
       kuva,
-      kuvaPos: r.slug && k.korttikuva?.(r.slug)
+      kuvaPos: henkiloKuvat.has(r.id) && !r.hero_image
+        ? "50% 22%"
+        : r.slug && k.korttikuva?.(r.slug)
         ? k.korttikuvaPos?.(r.slug)
         : r.hero_image && r.hero_focal_x != null
           ? `${Math.round(Number(r.hero_focal_x) * 100)}% ${Math.round(Number(r.hero_focal_y ?? 0.5) * 100)}%`

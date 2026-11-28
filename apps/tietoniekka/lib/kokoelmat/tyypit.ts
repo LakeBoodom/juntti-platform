@@ -67,6 +67,8 @@ export type Kokoelma = {
   haku: { collection?: string; category?: string; sectionTags?: boolean };
   /** Esikatselussa (VERCEL_ENV ≠ production) myös luonnosvisat näkyvät ja ovat pelattavissa (lib/kokoelmat/luonnokset.ts). */
   luonnoksetEsikatselussa?: boolean;
+  /** Kuvattoman visan kortille henkilön kuva (celebrities.trivia_quiz_id → image_url), jos visa on henkilövisa. */
+  henkilokuvaVaraksi?: boolean;
   /** Korttikuva visan slugista; oletuksena quizzes.hero_image. */
   korttikuva?: (slug: string) => string | null;
   /** Korttikuvan kevyempi versio (Juhlat: quizzes.hero_image → valmis -800.webp). */

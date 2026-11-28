@@ -111,6 +111,7 @@ export const KUVALAHTEET: Kuvalahde[] = [
   { slug: "suomi-euroviisuissa", kokoelma: "musiikki", kuvaus: "Käärijä Euroviisujen finaalin väliohjelmassa, Malmö 2024", tiedosto: "Käärijä Eurovision Song Contest Final 2024 interval act.jpg", tekija: "Arkland", lisenssi: "CC BY-SA 4.0", lisenssiUrl: CC("by-sa/4.0"), vuosi: "2024" },
   { slug: "umk-uuden-musiikin-kilpailu", kokoelma: "musiikki", kuvaus: "Windows95man lavalla 2024", tiedosto: "Windows95man.jpg", tekija: "Pedro J Pacheco", lisenssi: "CC BY-SA 4.0", lisenssiUrl: CC("by-sa/4.0"), vuosi: "2024" },
   { slug: "euroviisut-tosifaneille", kokoelma: "musiikki", kuvaus: "Domenico Modugno Euroviisuissa, Hilversum 1958", tiedosto: "Domenico Modugno (1958), Bestanddeelnr 909-4001.jpg", tekija: "Harry Pot / Anefo (Nationaal Archief)", lisenssi: "CC0", lisenssiUrl: "https://creativecommons.org/publicdomain/zero/1.0/", vuosi: "1958" },
+  { slug: "euroviisut-kokoelma-hero", kokoelma: "musiikki", kuvaus: "Euroviisut-kokoelman yläkuva: Euroviisujen lava, Basel 2025", tiedosto: "Eurovision Song Contest 2025 Stage.jpg", tekija: "MrSilesian", lisenssi: "CC0", lisenssiUrl: "https://creativecommons.org/publicdomain/zero/1.0/", vuosi: "2025" },
 
   // ─── Kaupungit (12.9.2026) ───
   { slug: "espoo", kokoelma: "kaupungit", kuvaus: "Dipoli, Otaniemi, Espoo", tiedosto: "Dipoli11.jpg", tekija: "Halaszo", lisenssi: "CC BY-SA 4.0", lisenssiUrl: CC("by-sa/4.0"), vuosi: "2017" },
